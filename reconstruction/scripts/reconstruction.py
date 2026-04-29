@@ -22,7 +22,6 @@ from pxd import add_pxd_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
-    add_mc_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
     add_postfilter_tracking_reconstruction,
     add_cr_tracking_reconstruction,
@@ -475,44 +474,6 @@ def add_cosmics_reconstruction(
                                             add_muid_hits=add_muid_hits,
                                             cosmics=True,
                                             legacy_ecl_charged_pid=legacy_ecl_charged_pid)
-
-
-def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False):
-    """
-    This function adds the standard reconstruction modules with MC tracking
-    to a path.
-
-    @param components list of geometry components to include reconstruction for, or None for all components.
-    @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
-    """
-
-    # Set the run for beam data
-    basf2.declare_beam()
-
-    # Add modules that have to be run before track reconstruction
-    add_prefilter_pretracking_reconstruction(path,
-                                             components=components)
-
-    # tracking
-    add_mc_tracking_reconstruction(path,
-                                   components=components,
-                                   pruneTracks=False,
-                                   use_second_cdc_hits=use_second_cdc_hits)
-
-    # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_MC_Tracking')
-
-    # add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):

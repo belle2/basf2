@@ -22,9 +22,6 @@ import glob
 # bg = glob.glob('/group/belle2/dataprod/BGOverlay/run2/prerelease-08-00-00a/new_overlay/BGx1/set2/BGforOverlay-6*.root')
 bg = glob.glob('/group/belle2/dataprod/BGOverlay/run2/prerelease-08-00-00a/new_overlay/BGx1/set?/*.root')
 
-b2.conditions.prepend_globaltag('patch_main_release-10')
-b2.conditions.prepend_globaltag('patch_main_release-11')
-
 path = b2.create_path()
 
 path.add_module("EventInfoSetter", evtNumList=1000, expList=1004)
@@ -42,6 +39,7 @@ re.add_reconstruction(path=path, enable_top_cluster_timing=True)
 # Save mdst with timing, no. of fitted photons and chi-2/dof
 path.add_module("RootOutput",
                 outputFileName="output_TOPBackSplashTiming.root",
+                additionalBranchNames=['TOPBackSplashFitResult']
                 )
 
 # run

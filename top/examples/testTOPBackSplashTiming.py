@@ -78,6 +78,7 @@ path.add_module("TOPBackSplashTiming", saveFits=args.saveFits, minClusterE=args.
 # Save mdst with timing, no. of fitted photons and chi-2/dof
 path.add_module("RootOutput",
                 outputFileName=f"output_TOPBackSplashTiming_{args.mom}.root",
+                additionalBranchNames=["TOPBackSplashFitResults"]
                 )
 
 b2.process(path)

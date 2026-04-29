@@ -58,7 +58,7 @@ namespace Belle2 {
     bool hasEventT0() const;
 
     /// Return the final event t0, if one is set. Else, return NAN.
-    double getEventT0() const;
+    double getEventT0(bool fromTrackCreator = false) const;
 
     /// Return the final event t0, if one is set. Else, return an empty optional.
     std::optional<EventT0Component> getEventT0Component() const;

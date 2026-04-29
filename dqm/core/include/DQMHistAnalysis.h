@@ -483,7 +483,7 @@ namespace Belle2 {
      * @param index index of PV
      * @param value string to write
      */
-    void setEpicsStringPV(int index, std::string value);
+    void setEpicsStringPV(int index, const std::string& value);
 
     /**
      * Read value from a EPICS PV

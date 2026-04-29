@@ -11,8 +11,6 @@
 #
 #
 #
-Alias K_L0sig K_L0
-Alias anti_K_L0sig K_L0
 
 
 Decay Upsilon(4S)
@@ -20,7 +18,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0   K+  K-  K_L0sig                                  PHSP; 
+1.0   K+  K-  K_L0                                  PHSP; 
 Enddecay
 CDecay anti-B0sig
 

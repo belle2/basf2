@@ -74,9 +74,8 @@ void PXDRawHitMaskingModule::event()
 
     // We need some protection against bad data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
-      if (PXDPixelMasker::getInstance().pixelOK(sensorID, it.getColumn(), it.getRow())) {
+      if (it.getCharge() > PXDPixelMasker::getInstance().getPixelThreshold(sensorID, it.getColumn(), it.getRow()))
         m_pxdRawHitOut.appendNew(it);
-      }
     }
   }
 }

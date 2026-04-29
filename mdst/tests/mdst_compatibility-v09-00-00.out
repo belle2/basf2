@@ -73,6 +73,9 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setLogEnergy
+Untested method ECLCluster::setLogEnergyHighestCrystal
+Untested method ECLCluster::setLogEnergyRaw
 Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setMinTrkDistanceID
@@ -113,6 +116,7 @@ Untested method KLMCluster::setClusterTrackRotationAngle
 Untested method KLMCluster::setClusterTrackSeparation
 Untested method KLMCluster::setClusterTrackSeparationAngle
 Untested method KLMCluster::setInnermostLayer
+Untested method KLMCluster::setKLMnDigits
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setShapeStdDev1
@@ -6992,6 +6996,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.319981,-0.226482,0.176686,0.65766)
   getMomentumMag(): 0.43
@@ -7026,6 +7031,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.0382045,0.08747,0.192651,0.542072)
   getMomentumMag(): 0.215
@@ -15699,6 +15705,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 4
   getMomentum(): (0.328691,-0.474956,1.15346,1.38265)
   getMomentumMag(): 1.29
@@ -24751,6 +24758,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 3
   getMomentum(): (0.324658,0.552248,0.0751244,0.814642)
   getMomentumMag(): 0.645
@@ -24786,6 +24794,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (-0.202894,-0.0264791,0.0660136,0.542072)
   getMomentumMag(): 0.215
@@ -24820,6 +24829,7 @@ KLMCluster#2:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 3
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (-0.069235,0.202372,-0.0218416,0.542072)
   getMomentumMag(): 0.215
@@ -24854,6 +24864,7 @@ KLMCluster#3:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 2
   getMomentum(): (-0.629498,-0.082154,0.580157,0.993588)
   getMomentumMag(): 0.86
@@ -24889,6 +24900,7 @@ KLMCluster#4:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 5
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (-0.145463,-0.0823896,0.135194,0.542072)
   getMomentumMag(): 0.215

@@ -48,6 +48,7 @@ void SoftwareTriggerResultPrinterModule::terminate()
     B2FATAL("Could not open debug output file. Aborting.");
   }
   auto debugTTree = std::make_unique<TTree>("software_trigger_results", "software_trigger_results");
+  // cppcheck-suppress knownConditionTrueFalse
   if (not debugTTree) {
     B2FATAL("Could not create debug output tree. Aborting.");
   }
@@ -66,38 +67,34 @@ void SoftwareTriggerResultPrinterModule::terminate()
   prescaled = true;
   accepted = true;
   unsigned int counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     std::string cutName = cutResult.first;
     boost::replace_all(cutName, "&", "_");
     debugTTree->Branch(cutName.c_str(), &value.at(counter));
 
-    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_accept]);
+    auto it = cutResult.second.find(SoftwareTriggerCutResult::c_accept);
+    value[counter] = (it != cutResult.second.end()) ? static_cast<double>(it->second) : 0;
     counter++;
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
+    auto itReject = cutResult.second.find(SoftwareTriggerCutResult::c_reject);
     // cppcheck-suppress unreadVariable
-    value[counter] = static_cast<double>(cutResult.second[SoftwareTriggerCutResult::c_reject]);
+    value[counter] = (itReject != cutResult.second.end()) ? static_cast<double>(itReject->second) : 0;
     counter++;
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = true;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
       // cppcheck-suppress unreadVariable
@@ -110,14 +107,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = true;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_passedEventsPerTriggerNonPrescaled.find(cutName) == m_passedEventsPerTriggerNonPrescaled.end()) {
       // cppcheck-suppress unreadVariable
@@ -130,14 +124,11 @@ void SoftwareTriggerResultPrinterModule::terminate()
   }
   debugTTree->Fill();
 
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   cut = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   prescaled = false;
-  // cppcheck-suppress redundantAssignment; the variable is used in the Fill() method below
   accepted = false;
   counter = 0;
-  for (auto& cutResult : m_passedEventsPerTrigger) {
+  for (const auto& cutResult : m_passedEventsPerTrigger) {
     const auto& cutName = cutResult.first;
     if (m_prescales.find(cutName) == m_prescales.end()) {
       // cppcheck-suppress unreadVariable

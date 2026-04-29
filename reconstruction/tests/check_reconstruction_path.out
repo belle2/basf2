@@ -1072,7 +1072,16 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=0
-  74. TrackCreator
+  74. TrackQualityEstimatorMVA
+      CDCRecoTracksStoreArrayName=CDCRecoTracks
+      PXDRecoTracksStoreArrayName=PXDRecoTracks
+      SVDRecoTracksStoreArrayName=SVDRecoTracks
+      TracksStoreArrayName=Tracks
+      VXDEstimationMethod=tripletFit
+      WeightFileIdentifier=trackfitting_MVATrackQualityIndicator
+      collectEventFeatures=True
+      recoTracksStoreArrayName=RecoTracks
+  75. TrackCreator
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
       pdgCodes=[211, 321, 2212]
@@ -1082,9 +1091,9 @@
       useBFieldAtHit=False
       useClosestHitToIP=False
       useSeedForTrackFitMomentumRange=False
-  75. TrackTimeEstimator
-  76. Sum_Prefilter_Tracking
-  77. Ext
+  76. TrackTimeEstimator
+  77. Sum_Prefilter_Tracking
+  78. Ext
       EnableVisualization=False
       MaxStep=25.0
       MinKE=0.002
@@ -1095,27 +1104,28 @@
       magneticCacheDistance=0.0
       magneticFieldStepper=default
       pdgCodes=[]
-  78. EventT0Combiner
-  79. ECLFinalizer
+  79. EventT0Combiner
+  80. ECLFinalizer
       clusterEnergyCutMin=0.02
       clusterLossyFraction=0.0001
       clusterTimeCutMaxEnergy=0.05
-  80. MCMatcherECLClusters
-  81. KLMReconstructor
+      useParametersFromDatabase=True
+  81. MCMatcherECLClusters
+  82. KLMReconstructor
       CheckSegmentIntersection=True
       EventT0Correction=True
       IfAlign=True
       IgnoreHotChannels=True
       IgnoreScintillators=False
       TimeCableDelayCorrection=True
-  82. KLMClustersReconstructor
+  83. KLMClustersReconstructor
       ClusterMode=AnyHit
       ClusteringAngle=0.26
       PositionMode=FirstLayer
-  83. KLMClusterAna
-  84. MCMatcherKLMClusters
+  84. KLMClusterAna
+  85. MCMatcherKLMClusters
       Hit2dRelations=False
-  85. Muid
+  86. Muid
       EnableVisualization=False
       MaxDistSigma=3.5
       MaxDt=10000.0
@@ -1132,7 +1142,7 @@
       magneticCacheDistance=0.0
       magneticFieldStepper=default
       pdgCodes=[]
-  86. ECLTrackClusterMatching
+  87. ECLTrackClusterMatching
       brlEdgeTheta=0.1
       matchingConsistency=1e-06
       matchingPTThreshold=0.3
@@ -1140,25 +1150,25 @@
       skipZeroChargeTracks=False
       useAngularDistanceMatching=True
       useOptimizedMatchingConsistency=True
-  87. ECLClusterProperties
+  88. ECLClusterProperties
       trackClusterRelationName=AngularDistance
-  88. Sum_Prefilter_PostTracking
-  89. SoftwareTrigger
+  89. Sum_Prefilter_PostTracking
+  90. SoftwareTrigger
       baseIdentifier=filter
       debugOutputFileName=software_trigger_debug.root
       preScaleStoreDebugOutputToDataStore=0
       resultStoreArrayName=
       storeDebugOutputToROOTFile=False
       useRandomNumbersForPreScale=True
-  90. Sum_HLT_Filter_Calculation
-  91. FlipQuality_1stMVA
+  91. Sum_HLT_Filter_Calculation
+  92. FlipQuality_1stMVA
       identifier=TRKTrackFlipAndRefit_MVA1_weightfile
       indexOfFlippingMVA=1
       recoTracksStoreArrayName=RecoTracks
-  92. RecoTracksReverter
+  93. RecoTracksReverter
       inputStoreArrayName=RecoTracks
       outputStoreArrayName=RecoTracks_flipped
-  93. Combined_DAFRecoFitter_flipped
+  94. Combined_DAFRecoFitter_flipped
       bklmHitsStoreArrayName=
       cdcHitsStoreArrayName=
       correctSeedCharge=False
@@ -1172,7 +1182,7 @@
       resortHits=False
       svdHitsStoreArrayName=
       trackFitType=0
-  94. IPTrackTimeEstimator
+  95. IPTrackTimeEstimator
       pdgCodeToUseForEstimation=211
       readoutPosition=[0.0, 0.0, 0.0]
       readoutPositionPropagationSpeed=29.9792458
@@ -1180,7 +1190,7 @@
       timeOffset=0.0
       useFittedInformation=False
       useReadoutPosition=False
-  95. TrackCreator_flipped
+  96. TrackCreator_flipped
       beamAxis=[0.0, 0.0, 1.0]
       beamSpot=[0.0, 0.0, 0.0]
       pdgCodes=[211, 321, 2212]
@@ -1190,14 +1200,14 @@
       useBFieldAtHit=False
       useClosestHitToIP=False
       useSeedForTrackFitMomentumRange=False
-  96. FlipQuality_2ndMVA
+  97. FlipQuality_2ndMVA
       identifier=TRKTrackFlipAndRefit_MVA2_weightfile
       indexOfFlippingMVA=2
       recoTracksStoreArrayName=RecoTracks
-  97. FlippedRecoTracksMerger
+  98. FlippedRecoTracksMerger
       inputStoreArrayName=RecoTracks
       inputStoreArrayNameFlipped=RecoTracks_flipped
-  98. V0Finder
+  99. V0Finder
       CopiedRecoTracks=CopiedRecoTracks
       RecoTracks=RecoTracks
       TrackFitResults=
@@ -1216,13 +1226,13 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
-  99. KinkFinder
+  100. KinkFinder
       CopiedRecoTracks=RecoTracksKinkTmp
       Kinks=
       RecoTracks=RecoTracks
       TrackFitResults=
       Tracks=
-  100. TrackFinderMCTruthRecoTracks
+  101. TrackFinderMCTruthRecoTracks
       AllowFirstCDCSuperLayerOnly=False
       EnergyCut=0.0
       MergeDecayInFlight=False
@@ -1252,7 +1262,7 @@
       onlyCheckDirectParentPdgCode=False
       useCDCLayers=[]
       useCDCSuperLayers=[]
-  101. MCRecoTracksMatcher
+  102. MCRecoTracksMatcher
       MinimalEfficiency=0.05
       MinimalPurity=0.6666666666666666
       TracksStoreArrayName=
@@ -1263,36 +1273,36 @@
       mcRecoTracksStoreArrayName=MCRecoTracks
       prRecoTracksStoreArrayName=RecoTracks
       useFittedTracks=True
-  102. TrackToMCParticleRelator
+  103. TrackToMCParticleRelator
       MCParticlesName=
       RecoTracksName=
       TracksName=
-  103. PruneRecoHits
-  104. PruneRecoTracks RecoTracks_flipped
+  104. PruneRecoHits
+  105. PruneRecoTracks RecoTracks_flipped
       removeHits=False
       storeArrayName=RecoTracks_flipped
-  105. PruneRecoTracks CopiedRecoTracks
+  106. PruneRecoTracks CopiedRecoTracks
       removeHits=False
       storeArrayName=CopiedRecoTracks
-  106. PruneRecoTracks RecoTracksKinkTmp
+  107. PruneRecoTracks RecoTracksKinkTmp
       removeHits=False
       storeArrayName=RecoTracksKinkTmp
-  107. Sum_Postfilter_Tracking
-  108. CDCDedxHitSaver
-  109. CDCDedxPIDCreator
+  108. Sum_Postfilter_Tracking
+  109. CDCDedxHitSaver
+  110. CDCDedxPIDCreator
       removeHighest=0.25
       removeLowest=0.05
       trackLevel=True
       useBackHalfCurlers=False
-  110. VXDDedxPID
+  111. VXDDedxPID
       onlyPrimaryParticles=False
       useIndividualHits=False
       usePXD=False
       useSVD=True
-  111. TOPChannelMasker
+  112. TOPChannelMasker
       maskUncalibratedChannelT0=True
       maskUncalibratedTimebase=True
-  112. TOPBunchFinder
+  113. TOPBunchFinder
       autoRange=False
       bunchesPerSSTclk=24
       correctDigits=True
@@ -1317,7 +1327,7 @@
       useMCTruth=False
       usePIDLikelihoods=False
       useTimeSeed=True
-  113. TOPReconstructor
+  114. TOPReconstructor
       PDGCode=-1
       TOPDigitCollectionName=
       TOPLikelihoodCollectionName=
@@ -1326,29 +1336,27 @@
       maxTime=0.0
       minTime=0.0
       pTCut=0.27
-  114. ARICHFillHits
+  115. ARICHFillHits
       MagFieldCorrection=0
       bitMask=255
       fillAll=0
       maxApdHits=18
       maxHapdHits=100
-  115. ARICHReconstructor
+  116. ARICHReconstructor
       inputTrackType=0
       storePhotons=1
       trackAngleResolution=0.002
       trackPositionResolution=0.1
       useAlignment=True
       useMirrorAlignment=True
-  116. OnlineEventT0Creator
+  117. OnlineEventT0Creator
       executeThisModule=False
-  117. ECLFillCellIdMapping
-  118. ECLChargedPIDMVA
+  118. ECLFillCellIdMapping
+  119. ECLChargedPIDMVA
       payloadName=ECLChargedPidMVAWeights
-  119. MdstPID
+  120. MdstPID
       subtractMaximum=False
-  120. KLMMuonIDDNNExpert
-  121. KLMExpert
-      classifierPath=KLM_fBDT_10xbkg100k
+  121. KLMMuonIDDNNExpert
   122. ClusterMatcher
       coneInRad=0.25999999046325684
   123. ECLTrackBremFinder

@@ -161,7 +161,7 @@ namespace Belle2 {
       }
 
       /// Setter for the value with the given name.
-      void set(const char* name, Float_t value)
+      void set(const char* name, Float_t value) override
       {
         set(named(name), value);
       }
@@ -185,7 +185,7 @@ namespace Belle2 {
       }
 
       /// Getter for the value with the given name.
-      Float_t get(const char* name) const
+      Float_t get(const char* name) const override
       {
         return get(named(name));
       }
@@ -200,6 +200,15 @@ namespace Belle2 {
         return m_values[I];
       }
 
+      /// Reference getter for the ith value. This is needed since the template version does
+      // not work for the [] operator, once made the base [] virtual
+      Float_t& var(int i)
+      {
+        assert(i < (int)nVars);
+        assert(i >= 0);
+        return m_values[i];
+      }
+
       /// Reference getter for the ith value.
       Float_t& operator[](int iValue) final
       {
@@ -209,7 +218,7 @@ namespace Belle2 {
       }
 
       /// Reference getter for the value with the given name.
-      Float_t& operator[](const char* name)
+      Float_t& operator[](const char* const name) override
       {
         return this->var(named(name));
       }

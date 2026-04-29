@@ -1,9 +1,17 @@
-Changes in the analysis package in light-2603-i
+Changes in the analysis package in light-2604-jellyfish
+
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* It is no longer possible to use ``tree`` as the name for a ``TTree`` saved with the `VariablesToNtuple` and `VariablesToEventBasedTree` modules. In particular, this affects the argument ``treeName`` of the function `modularAnalysis.variablesToNtuple`: ``variablesToNtuple(treeName='tree')`` will now result in a ``FATAL`` message from basf2.
+
+Changes in the analysis package in light-2603-ina
 ------------------------------------------------------
 
 Variables
 +++++++++
 * As a substitute for `klmClusterTrackDistance` which is only available for release-10 mDSTs, a new variable `klmClusterTrackDistance_helix_extrapolation` is provided for analysts to be used with release-09 or ealier mDSTs.
+* Added FEI-related variable :b2:var:`sigProbRank(bp_list, b0_list) <sigProbRank>` to rank candidates across both B+ and B0 lists by descending ``extraInfo(SignalProbability)``.
+* Added FEI-related variables `mostcommonBTagDeltaP` and `mostcommonBTagPDG` for accessing the generated B meson momentum difference and PDG code identified by `mostcommonBTagIndex`.
 
 Changes in the analysis package in light-2601-hyperion
 ------------------------------------------------------

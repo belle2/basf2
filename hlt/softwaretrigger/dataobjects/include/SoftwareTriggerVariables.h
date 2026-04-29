@@ -36,13 +36,13 @@ namespace Belle2 {
       }
 
       /// Get just one value from the map.
-      double getVariable(std::string identifier) const
+      double getVariable(const std::string& identifier) const
       {
         return m_results.at(identifier);
       }
 
       /// Returns true if identifier is in the map of trigger variables
-      bool has(std::string identifier) const
+      bool has(const std::string& identifier) const
       {
         return m_results.count(identifier) > 0;
       }

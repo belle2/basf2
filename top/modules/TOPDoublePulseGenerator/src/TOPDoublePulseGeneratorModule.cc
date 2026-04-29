@@ -78,11 +78,6 @@ namespace Belle2 {
 
   }
 
-  TOPDoublePulseGeneratorModule::~TOPDoublePulseGeneratorModule()
-  {
-    if (m_timebase) delete m_timebase;
-  }
-
   void TOPDoublePulseGeneratorModule::initialize()
   {
     // Output
@@ -121,7 +116,7 @@ namespace Belle2 {
     m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
 
     if (m_useDatabase) {
-      m_timebase = new DBObjPtr<TOPCalTimebase>;
+      B2INFO("TOPDoublePulseGenerator: using sample times from database");
     } else if (m_sampleTimeIntervals.empty()) {
       B2INFO("TOPDoublePulseGenerator: using equidistant sample times");
     } else if (m_sampleTimeIntervals.size() == 256) {
@@ -145,7 +140,7 @@ namespace Belle2 {
   {
     StoreObjPtr<EventMetaData> evtMetaData;
     if (m_useDatabase) {
-      if (!(*m_timebase).isValid()) {
+      if (!m_timebase.isValid()) {
         B2FATAL("Sample time calibration requested but not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
@@ -178,7 +173,7 @@ namespace Belle2 {
             int bs = asic / 16;
             const auto* feMap = feMapper.getMap(moduleID, bs);
             if (feMap) scrodID = feMap->getScrodID();
-            sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel % 128);
+            sampleTimes = m_timebase->getSampleTimes(scrodID, channel % 128);
             if (!sampleTimes->isCalibrated()) {
               B2WARNING("No sample time calibration available for SCROD " << scrodID
                         << " channel " << channel % 128 << " - equidistant will be used");
@@ -212,16 +207,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDoublePulseGeneratorModule::endRun()
-  {
-  }
-
-  void TOPDoublePulseGeneratorModule::terminate()
-  {
-  }
-
-
-  void TOPDoublePulseGeneratorModule::storeSampleTimes(std::string fileName)
+  void TOPDoublePulseGeneratorModule::storeSampleTimes(const std::string& fileName)
   {
     if (fileName.empty()) return;
 
@@ -266,7 +252,7 @@ namespace Belle2 {
           unsigned channel = (asic * 8 + asicChannel) % 128;
           const TOPSampleTimes* sampleTimes = &m_sampleTimes;
           if (m_useDatabase) {
-            sampleTimes = (*m_timebase)->getSampleTimes(scrodID, channel);
+            sampleTimes = m_timebase->getSampleTimes(scrodID, channel);
           }
           string forWhat = "scrod " + to_string(scrodID) +
                            " channel " + to_string(channel) +
@@ -296,7 +282,7 @@ namespace Belle2 {
                                                       const std::string& name,
                                                       const std::string& title,
                                                       const std::string& xTitle,
-                                                      const std::string& yTitle) const
+                                                      const std::string& yTitle)
   {
     if (vec.empty()) return;
 

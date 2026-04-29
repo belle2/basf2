@@ -76,7 +76,7 @@ def add_variable_collection():
 
 def V0Selector_Training(
         train_data,
-        tree_name="tree",
+        tree_name="ntuple",
         mva_identifier="MVA_LightGBM_V0Selector.root",
         target_variable="isSignal",
         parameters={},
@@ -154,7 +154,7 @@ def V0Selector_Training(
 
 def KsVeto_Training(
     train_data,
-    tree_name="tree",
+    tree_name="ntuple",
     mva_identifier="MVA_LightGBM_KsVeto.root",
     target_variable="isSignal",
     parameters={},

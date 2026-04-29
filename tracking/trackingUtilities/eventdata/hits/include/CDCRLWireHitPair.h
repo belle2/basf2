@@ -38,7 +38,7 @@ namespace Belle2 {
       CDCRLWireHitPair reversed() const;
 
       /// Reverses the oriented wire hit pair inplace.
-      void reverse();
+      virtual void reverse();
 
       /// Returns the aliased version of this oriented wire hit pair
       CDCRLWireHitPair getAlias() const;

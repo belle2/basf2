@@ -321,6 +321,8 @@ def stdLambdas(
     suffix = ""
     if addSuffix:
         suffix = f"_{fitter}"
+    if f"PListMerger_Lambda0:merged{suffix}" in [m.name() for m in path.modules()]:
+        return
     # Fill one list from V0
     ma.fillParticleList(
         f"Lambda0:V0_ToFit{suffix} -> p+ pi-", "", writeOut=writeOut, path=path

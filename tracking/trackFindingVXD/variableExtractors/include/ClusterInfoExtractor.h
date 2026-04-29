@@ -21,17 +21,19 @@ namespace Belle2 {
     /** Constructor fills variableSet with variables to be extracted
      * @param variableSet set of variable to be filled
      * @param useTimingInfo whether to use the timing info in clusters
+     * @param prefix prefix that will be added before the variable names
      */
-    ClusterInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, bool useTimingInfo) :
-      VariableExtractor(), m_UseTimingInfo(useTimingInfo)
+    ClusterInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet, bool useTimingInfo,
+                         const std::string& prefix = "") :
+      VariableExtractor(), m_UseTimingInfo(useTimingInfo), m_prefix(prefix)
     {
-      initializeStats("charge", variableSet);
-      initializeStats("seedCharge", variableSet);
-      initializeStats("size", variableSet);
-      initializeStats("energyLoss", variableSet);
+      initializeStats(m_prefix + "charge", variableSet);
+      initializeStats(m_prefix + "seedCharge", variableSet);
+      initializeStats(m_prefix + "size", variableSet);
+      initializeStats(m_prefix + "energyLoss", variableSet);
       if (m_UseTimingInfo) {
-        initializeStats("time", variableSet);
-        initializeStats("timeSigma", variableSet);
+        initializeStats(m_prefix + "time", variableSet);
+        initializeStats(m_prefix + "timeSigma", variableSet);
       }
 
     }
@@ -55,35 +57,35 @@ namespace Belle2 {
       for (unsigned int i = 0; i < clusters.size(); ++i) {
         values[i] = clusters[i]->getCharge();
       }
-      setStats("charge", values);
+      setStats(m_prefix + "charge", values);
 
       for (unsigned int i = 0; i < clusters.size(); ++i) {
         values[i] = clusters[i]->getSeedCharge();
       }
-      setStats("seedCharge", values);
+      setStats(m_prefix + "seedCharge", values);
 
 
       for (unsigned int i = 0; i < clusters.size(); ++i) {
         values[i] = clusters[i]->getSize();
       }
-      setStats("size", values);
+      setStats(m_prefix + "size", values);
 
 
       for (unsigned int i = 0; i < clusters.size(); ++i) {
         values[i] = clusters[i]->getCharge() / clusters[i]->getSize();
       }
-      setStats("energyLoss", values);
+      setStats(m_prefix + "energyLoss", values);
 
       if (m_UseTimingInfo) {
         for (unsigned int i = 0; i < clusters.size(); ++i) {
           values[i] = clusters[i]->getClsTime();
         }
-        setStats("time", values);
+        setStats(m_prefix + "time", values);
 
         for (unsigned int i = 0; i < clusters.size(); ++i) {
           values[i] = clusters[i]->getClsTimeSigma();
         }
-        setStats("timeSigma", values);
+        setStats(m_prefix + "timeSigma", values);
       }
 
     }
@@ -91,6 +93,8 @@ namespace Belle2 {
   protected:
     /// whether to use timing info from cluster
     bool m_UseTimingInfo;
+    /// prefix that will be added before the variable names
+    std::string m_prefix;
 
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
     void initializeStats(const std::string& identifier, std::vector<TrackingUtilities::Named<float*>>& variables)
@@ -112,11 +116,17 @@ namespace Belle2 {
         m_variables.at(identifier + "_mean") = NAN;
         m_variables.at(identifier + "_std") = NAN;
         m_variables.at(identifier + "_sum") = NAN;
+        if (identifier.compare(0, 7, "before_") == 0) {
+          B2INFO("Before is NAN");
+        }
         return;
       }
       // mean
       float sum = std::accumulate(values.begin(), values.end(), 0.0);
       m_variables.at(identifier + "_sum") = sum;
+      if (identifier.compare(0, 7, "before_") == 0) {
+        B2INFO("Before sum = " << sum);
+      }
       float mean = sum / size;
       m_variables.at(identifier + "_mean") = mean;
       // variance and standard deviation

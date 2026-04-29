@@ -218,3 +218,10 @@ std::string RootIOUtilities::getCommitID()
 {
   return GIT_COMMITID;
 }
+
+bool RootIOUtilities::isReservedTreeName(const std::string& name)
+{
+  return std::any_of(std::begin(RootIOUtilities::c_treeNames),
+                     std::end(RootIOUtilities::c_treeNames),
+  [&name](const std::string & s) { return s == name; });
+}

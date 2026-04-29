@@ -62,7 +62,7 @@ namespace Belle2 {
     if (m_modules.empty()) return 0;
 
     double R = m_modules[0].getRadius();
-    for (auto& module : m_modules) {
+    for (const auto& module : m_modules) {
       double tmp = module.getRadius() + module.getBarThickness() / 2
                    - module.getPrism().getExitThickness();
       if (tmp < R) R = tmp;
@@ -75,7 +75,7 @@ namespace Belle2 {
     if (m_modules.empty()) return 0;
 
     double R = m_modules[0].getRadius();
-    for (auto& module : m_modules) {
+    for (const auto& module : m_modules) {
       double x = module.getBarWidth() / 2;
       double y = module.getRadius() + module.getBarThickness() / 2;
       double tmp = sqrt(x * x + y * y);
@@ -89,7 +89,7 @@ namespace Belle2 {
     if (m_modules.empty()) return 0;
 
     double R = 0;
-    for (auto& module : m_modules) {
+    for (const auto& module : m_modules) {
       R += module.getRadius();
     }
     return R / m_modules.size();
@@ -100,7 +100,7 @@ namespace Belle2 {
     if (m_modules.empty()) return 0;
 
     double z = m_modules[0].getBackwardZ();
-    for (auto& module : m_modules) {
+    for (const auto& module : m_modules) {
       double tmp = module.getBackwardZ() - module.getPrism().getFullLength();
       if (tmp < z) z = tmp;
     }
@@ -112,7 +112,7 @@ namespace Belle2 {
     if (m_modules.empty()) return 0;
 
     double z = m_modules[0].getForwardZ();
-    for (auto& module : m_modules) {
+    for (const auto& module : m_modules) {
       double tmp = module.getForwardZ();
       if (tmp > z) z = tmp;
     }

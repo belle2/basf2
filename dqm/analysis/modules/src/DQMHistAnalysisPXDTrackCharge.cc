@@ -20,7 +20,7 @@
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
 #include <RooFitResult.h>
-#include "RooMsgService.h"
+#include <RooMsgService.h>
 
 using namespace std;
 using namespace Belle2;
@@ -71,7 +71,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better

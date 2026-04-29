@@ -49,8 +49,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": [],
-                                    # "rawTimeCalibration", "timeShiftCalibration", "AbsoluteTimeShiftCalibration", "timeValidation"
+                                   "listOfMutedCalibrations": ["rawTimeCalibration", "timeShiftCalibration",],
+                                    # "AbsoluteTimeShiftCalibration", "timeValidation"
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -613,7 +613,7 @@ def get_calibrations(input_data, **kwargs):
                                              input_files=good_input_files,
                                              pre_collector_path=absolute_shift_pre_collector_path)
 
-    absolute_shift_calibration.strategies = strategies.SequentialBoundaries
+    absolute_shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in absolute_shift_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}

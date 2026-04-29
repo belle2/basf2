@@ -149,7 +149,6 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
         onePad.Clear();
         onePad.cd();
         hist->Draw();
-
         if (hist->GetMaximum() < 200.) {
           int rebinValue = 200. / hist->GetMaximum() + 1.;
           while ((hist->GetNbinsX()) % rebinValue != 0) rebinValue++;
@@ -192,7 +191,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
           hist->Rebin(rebinValue);
         }
 
-        auto ptstats = std::make_unique<TPaveStats>(0.55, 0.73, 0.85, 0.88, "brNDC");
+        TPaveStats* ptstats = new TPaveStats(0.55, 0.73, 0.85, 0.88, "brNDC");
         ptstats->SetName("stats1");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);
@@ -208,7 +207,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
                                            fn_singleGaus->GetParName(npar),
                                            fn_singleGaus->GetParameter(npar),
                                            fn_singleGaus->GetParError(npar)));
-        ptstats = std::make_unique<TPaveStats>(0.55, 0.49, 0.85, 0.73, "brNDC");
+        ptstats = new TPaveStats(0.55, 0.49, 0.85, 0.73, "brNDC");
         ptstats->SetName("stats2");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);
@@ -224,7 +223,7 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
                                            fn_doubleGaus->GetParName(npar),
                                            fn_doubleGaus->GetParameter(npar),
                                            fn_doubleGaus->GetParError(npar)));
-        ptstats = std::make_unique<TPaveStats>(0.55, 0.43, 0.85, 0.49, "brNDC");
+        ptstats = new TPaveStats(0.55, 0.43, 0.85, 0.49, "brNDC");
         ptstats->SetName("stats3");
         ptstats->SetBorderSize(1);
         ptstats->SetFillColor(0);

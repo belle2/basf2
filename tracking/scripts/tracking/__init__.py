@@ -41,7 +41,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=True,
                                 pxd_filtering_offline=False,
                                 create_intercepts_for_pxd_ckf=False,
                                 append_full_grid_cdc_eventt0=True,
@@ -114,7 +114,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         -> setting this option to 'True' will have some influence on the final track collection)
     :param add_recoTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
-        (Both other QIs needed as input.)
+        (CDC QI is needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -181,7 +181,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
-                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=True,
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
@@ -223,7 +223,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         -> setting this option to 'True' will have some influence on the final track collection)
     :param add_recoTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
-        (Both other QIs needed as input.)
+        (CDC QI is needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -254,10 +254,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
-    if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
-        b2.B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+    if add_recoTrack_QI and not add_cdcTrack_QI:
+        b2.B2ERROR("RecoTrack qualiy indicator requires CDC QI as input. Turning it all of.")
         add_cdcTrack_QI = False
-        add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
     if not skipGeometryAdding:

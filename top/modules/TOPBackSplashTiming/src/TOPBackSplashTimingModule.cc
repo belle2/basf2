@@ -13,6 +13,8 @@
 #include <math.h>
 #include <string>
 #include <top/modules/TOPBackSplashTiming/TOPBackSplashTimingModule.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <RooAddPdf.h>
 #include <RooArgList.h>
@@ -38,6 +40,7 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
   : Module(),
     m_eclClusters("ECLClusters"),   // DataStore name
     m_digits("TOPDigits"),
+    m_tracks("Tracks"),
     m_fitparams{{{  -0.6,   4,  52,  -0.145075,  0.885072,  0.386489,  -1.361947,   0.662144,   7.134312,  0.449013,  27.397423},
     {  -0.5,   4,  51,  -0.082732,  0.795969,  0.674888,  -1.281492,   0.232786,   6.784821,  0.452656,  26.333126},
     {  -0.4,   5,  50,  -0.071727,  0.828312,  0.657696,  -1.228757,   0.297860,   7.371104,  0.514466,  24.651866},
@@ -59,7 +62,7 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
   setDescription(R"DOC(A module to save timing of neutral cluster events derived from nearby TOP interactions)DOC");
 
   addParam("saveFits", m_saveFits,
-           "Set to true to save RooPlot of fit to TOP signal, from which the timing is extracted, as well as print truth anti-neutron information.",
+           "Set to true to save RooPlot of fit to TOP signal from which the timing is extracted, for debug.",
            false);
   addParam("minClusterE", m_minClusterE,
            "Minimum (incl.) cluster energy to be considered in adding relation to TOP time extraction [GeV]",
@@ -70,6 +73,12 @@ TOPBackSplashTimingModule::TOPBackSplashTimingModule()
   addParam("minClusterNHits", m_minClusterNHits,
            "Minimum (incl.) no. of crystals in cluster required for adding relation to TOP time extraction",
            10.0);
+  addParam("includeSlotsWithTracks", m_includeSlotsWithTracks,
+           "Flag to allow fitting of neutral cluster TOP signal even if there are charged tracks matched to the same slot",
+           false);
+  addParam("saveMoreFitParams", m_saveMoreFitParams,
+           "Flag to save additonal parameters from TOP timing fit (e.g. RooFit errors) to output, for debug.",
+           false);
 }
 
 void TOPBackSplashTimingModule::prepareFitModels()
@@ -143,11 +152,13 @@ int TOPBackSplashTimingModule::getModuleFromPhi(double phi)
   return int(phi / (M_PI / 8) + 1);
 }
 
-void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double clusterE, int moduleIDindex, RooAbsPdf* model,
-                                         RooRealVar* x, RooDataSet data, RooFitResult* res)
+void TOPBackSplashTimingModule::makePlot(double cosTheta, double clusterE, int moduleID, RooAbsPdf* model,
+                                         RooRealVar* x, RooDataSet data, RooFitResult* res, int nTracksPerSlot)
 {
   // For debugging
-  int cosThetaClusterIndex = convertCosThetaToIndex(nearestClusterCosTheta);
+  int cosThetaClusterIndex = int(std::round(cosTheta * 10));  // integer bin in [-6, 8]
+  double nearestClusterCosTheta = cosThetaClusterIndex / 10.0;
+  cosThetaClusterIndex += 6;  // shift to [0, 14]
   int binning = (m_fitparams[cosThetaClusterIndex][2] - m_fitparams[cosThetaClusterIndex][1]);
 
   // Create RooPlot
@@ -155,7 +166,8 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
   StoreObjPtr<EventMetaData> eventMetaData;
   std::string rooPlotTitle = "evtNo: " + std::to_string(eventMetaData->getEvent()) + " runNo.: " + std::to_string(
                                eventMetaData->getRun()) + " clusterE: " + std::to_string(
-                               clusterE) + " slot: " + std::to_string(moduleIDindex + 1) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta);
+                               clusterE) + " slot: " + std::to_string(moduleID) + " fitted cosTheta: " + std::to_string(nearestClusterCosTheta) +
+                             " no. of tracks in slot: " + std::to_string(nTracksPerSlot);
 
   RooPlot* frame = x->frame(RooFit::Title(rooPlotTitle.c_str()));
   data.plotOn(frame, RooFit::Binning(binning));
@@ -216,31 +228,20 @@ void TOPBackSplashTimingModule::makePlot(double nearestClusterCosTheta, double c
   // Save canvas
   std::string roofitname = "TOPBackSplashFit_evtNo_" + std::to_string(eventMetaData->getEvent()) + "_runNo_" + std::to_string(
                              eventMetaData->getRun()) + "_clusterE_" + std::to_string(
-                             clusterE) + "_slot_" + std::to_string(moduleIDindex + 1) + "_cosTheta_" + std::to_string(
+                             clusterE) + "_slot_" + std::to_string(moduleID) + "_cosTheta_" + std::to_string(
                              nearestClusterCosTheta) + ".png";
   c->SaveAs(roofitname.c_str());
 }
 
-int TOPBackSplashTimingModule::convertCosThetaToIndex(double nearestClusterCosTheta)
+TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleID,
+    std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta, int nTracksPerSlot)
 {
-  // Index needs to match m_wss
-  int cosThetaIndex = int(std::round(nearestClusterCosTheta * 10)) + 6;
-  return cosThetaIndex;
-}
-
-
-TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDindex,
-    std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta)
-{
-  // Derive cosTheta bin nearest to cluster cosTheta
-  double nearestClusterCosTheta = (double)std::round(clusterCosTheta * 10) / 10;
-  if (nearestClusterCosTheta == 0.9) {
-    // Treat rare edge case of nearestClusterCosTheta = 0.9
-    // (TOP acceptance is 31 < theta < 128, -0.616 < cosTheta < 0.857)
-    nearestClusterCosTheta = 0.8;
-  }
   // Get pdf according to cosTheta
-  int cosThetaIndex = convertCosThetaToIndex(nearestClusterCosTheta);
+  int cosThetaIndex = int(std::round(clusterCosTheta * 10));  // integer bin in [-6, 8]
+  cosThetaIndex += 6;  // shift to [0, 14]
+
+  // Note edge case: 0.85 < cosTheta < 0.8572 (TOP acceptance) rounds to 0.9
+  // covers ~31 to 31.79 degrees, omit these cases
   if (cosThetaIndex >= int(m_wss.size())) {
     return nullptr;
   }
@@ -286,10 +287,21 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
 
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
   RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::Strategy(0), RooFit::Extended());
-  //TODO add check to model failing and break statement
 
-  // First peak
-  double xpeak1 = m_wss[cosThetaIndex].var("mu")->getValV();
+  if (res->status() > 0) {
+    return nullptr;
+  }
+
+  double res_time = m_wss[cosThetaIndex].var("mu")->getValV();
+  double res_timeErr = m_wss[cosThetaIndex].var("mu")->getError();
+  double res_deltaT = m_wss[cosThetaIndex].var("shift_minus_mu")->getValV();
+  double res_deltaTErr = m_wss[cosThetaIndex].var("shift_minus_mu")->getError();
+  double res_frac = m_wss[cosThetaIndex].var("frac")->getValV();
+  double res_fracErr = m_wss[cosThetaIndex].var("frac")->getError();
+  double res_signalPhotons = m_wss[cosThetaIndex].var("sigPhotons")->getValV();
+  double res_signalPhotonsErr = m_wss[cosThetaIndex].var("sigPhotons")->getError();
+
+
   // Deriving chi2/dof: Need to bin but not Draw
   int binning = (m_fitparams[cosThetaIndex][2] - m_fitparams[cosThetaIndex][1]);
   RooPlot* frame = x->frame();
@@ -298,13 +310,20 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleIDi
   int nfloatParsFinal = res->floatParsFinal().getSize();
   double redchisq = frame->chiSquare(nfloatParsFinal);
 
-  // Saving results & plotting (time, chi2/dof, no. photons)
-  TOPBackSplashFitResult* fitresult = m_fitresult.appendNew(xpeak1, redchisq, data.sumEntries());
-
   if (m_saveFits == true) {
-    makePlot(nearestClusterCosTheta, clusterE, moduleIDindex,  model, x, data, res);
+    makePlot(clusterCosTheta, clusterE, moduleID,  model, x, data, res, nTracksPerSlot);
   }
-  return fitresult;
+
+  // Saving results & plotting (time, chi2/dof, no. photons)
+  if (m_saveMoreFitParams) {
+    TOPBackSplashFitResult* fitresult = m_fitresult.appendNew(res_time, res_timeErr, res_deltaT, res_deltaTErr, res_frac, res_fracErr,
+                                                              res_signalPhotons, res_signalPhotonsErr, redchisq, data.sumEntries(), nTracksPerSlot);
+    return fitresult;
+  } else {
+    TOPBackSplashFitResult* fitresult = m_fitresult.appendNew(res_time, redchisq, data.sumEntries(), nTracksPerSlot);
+    return fitresult;
+  }
+
 }
 
 
@@ -313,6 +332,7 @@ void TOPBackSplashTimingModule::initialize()
   B2INFO("TOPBackSplashTimingModule initialized");
   m_eclClusters.isRequired();
   m_digits.isRequired();
+  m_tracks.isRequired();
   m_fitresult.registerInDataStore();
   m_fitresult.registerRelationTo(m_eclClusters);
   prepareFitModels();
@@ -320,17 +340,22 @@ void TOPBackSplashTimingModule::initialize()
 
 void TOPBackSplashTimingModule::event()
 {
-  // Step 1: Sort digit indicies into slots with cleaning
-  //std::array<std::vector<int>, 16> digitIndiciesPerSlots;
-  //for (int i = 0; i < m_digits.getEntries(); i++) {
-  //  const TOPDigit* digi = m_digits[i];
-  //  if (digi->getHitQuality() != TOPDigit::c_Good) {
-  //    continue;
-  //  }
-  //  if (digi->getTime() > 0 && digi->getTime() < 80) {
-  //    digitIndiciesPerSlots[ int(digi->getModuleID()) - 1].push_back(i);
-  //  }
-  //}
+  // Step 1: See which tracks can be matched to slots, ignore these slots
+  // Even if only neutral clusters are being considered, the same slot
+  // might be adjacent to an additional charged cluster, which will make be bkg
+  // to anti-neutron TOP signal
+  int nTracksPerSlots[16] = {0};
+  for (const auto& track : m_tracks) {
+    const auto* tl = track.getRelated<TOPLikelihood>();
+    if (not tl) continue;
+    const auto* te = tl->getRelated<ExtHit>();
+    if (not te) continue;
+    int slotID = te->getCopyID();
+    // i.e. count how many charged track in slot
+    nTracksPerSlots[slotID - 1]++;
+  }
+
+  // Step 2: Clean digitis, assign to slot
   std::array<std::vector<const TOPDigit*>, 16> digitsPerSlots;
   for (const auto& digi : m_digits) {
     if (digi.getHitQuality() != TOPDigit::c_Good) {
@@ -340,7 +365,7 @@ void TOPBackSplashTimingModule::event()
       digitsPerSlots[ int(digi.getModuleID()) - 1].push_back(&digi);
     }
   }
-  // Step 2: Iterate over clusters with cleaning
+  // Step 3: Iterate over clusters with cleaning
   for (const auto& cluster : m_eclClusters) {
 
     // Clusters in barrel and within TOP acceptance,
@@ -357,9 +382,10 @@ void TOPBackSplashTimingModule::event()
       // Derive module in front of cluster
       double phi = cluster.getPhi();
       int moduleID = TOPBackSplashTimingModule::getModuleFromPhi(phi);
-
-      // First check minNphotons check: are there enough photons to fit?
-      // Second check is in fit func (enough digits in fit boundaries
+      if (m_includeSlotsWithTracks == false && nTracksPerSlots[moduleID - 1] > 0) {
+        continue;
+      }
+      // minNphotons check: are there enough photons to fit?
       if (int(digitsPerSlots[moduleID - 1].size()) < m_minNphotons) {
         continue;
       }
@@ -367,10 +393,10 @@ void TOPBackSplashTimingModule::event()
       // For labelling plot file
       double clusterE = cluster.getEnergy(ECLCluster::EHypothesisBit::c_neutralHadron);
 
-      // Step 3: Perform fit on digits nearest to cluster
-      auto* fitresult = fitTimingDigits(moduleID - 1, digitsPerSlots[moduleID - 1],
-                                        clusterE, std::cos(cluster.getTheta()));
-      // Step 4: Setting up ECL relation to fit
+      // Step 4: Perform fit on digits nearest to cluster
+      auto* fitresult = fitTimingDigits(moduleID, digitsPerSlots[moduleID - 1],
+                                        clusterE, std::cos(cluster.getTheta()), nTracksPerSlots[moduleID - 1]);
+      // Step 5: Setting up ECL relation to fit
       if (fitresult) {
         fitresult->addRelationTo(&cluster);
       }

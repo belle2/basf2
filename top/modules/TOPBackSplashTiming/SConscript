@@ -4,6 +4,7 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'framework',
     'top_dataobjects',
+    'tracking_dataobjects',
     'libRooFit',
     'libRooFitCore',
 ]

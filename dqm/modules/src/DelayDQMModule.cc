@@ -34,7 +34,7 @@ DelayDQMModule::DelayDQMModule() : HistoModule()
   addParam("useMeta", m_useMeta, "Use time from EvtMetadata or FTSW", false);
 }
 
-void DelayDQMModule::BinLogX(TH1* h)
+static void DelayDQMModule::BinLogX(TH1* h)
 {
 // function copied from root-talk
 

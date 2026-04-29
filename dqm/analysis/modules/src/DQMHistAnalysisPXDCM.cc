@@ -60,7 +60,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -125,7 +125,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
   registerEpicsPV("PXD:CommonMode:CM63", "CM63");
   //registerEpicsPV("PXD:CommonMode:CM62", "CM62");
 
-  for (VxdID& aPXDModule : m_PXDModules) {
+  for (auto& aPXDModule : m_PXDModules) {
     auto buff = (std::string)aPXDModule;
     replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:CommonMode:Mean:" + buff, (std::string)aPXDModule);

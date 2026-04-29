@@ -13,6 +13,7 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPTimeZero.h>
 #include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPUnpackerErrors.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 
 // Basf2 headers.
@@ -131,6 +132,8 @@ namespace Belle2 {
     TH1F* m_injVetoFlagDiff = 0; /**< check if injection veto flags differ in the event */
     TH2F* m_PSBypassMode = 0; /**< PS-bypass mode vs. boardstack */
 
+    TProfile* m_unpackErr = 0; /**< fraction of events with boardstack unpacker errors */
+
     // other
     int m_numModules = 0; /**< number of TOP modules */
     double m_bunchTimeSep = 0; /**< bunch separation time */
@@ -142,6 +145,7 @@ namespace Belle2 {
     StoreArray<TOPTimeZero> m_timeZeros; /**< reconstructed event T0 in case of cosmics */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
+    StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
 
     // dbobjects
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */

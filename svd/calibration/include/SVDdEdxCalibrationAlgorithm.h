@@ -66,11 +66,6 @@ namespace Belle2 {
     void setMinEvtsPerTree(const double& value) { m_MinEvtsPerTree = value; }
 
     /**
-     * set the number of events to generate, per momentum bin, for the payloads
-     */
-    void setNEventsToGenerate(const int& value) { m_NToGenerate = value; }
-
-    /**
      * reimplement the profile histogram calculation
      */
     void setCustomProfile(bool value = true) { m_CustomProfile = value; }
@@ -114,7 +109,7 @@ namespace Belle2 {
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
     int m_NToGenerate =
-      500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
+      5e6;                                                     /**< the number of events to be generated in each momentum bin in the new payloads. Please do not change this number unless it's really needed. It is crucial that this is consistent between data and MC payloads, as it affects the minimal possible PID probability value after normalisation. */
     bool m_CustomProfile = 1; /**< reimplement profile histogram calculation instead of the ROOT implementation? */
     bool m_UsePionBGFunctionForEverything =
       0; /**< Assume that the dEdx:betagamma trend is the same for all hadrons; use the pion trend as representative */
@@ -205,6 +200,14 @@ namespace Belle2 {
         // this is needed for the correct normalisation
         for (int iEvent = 0; iEvent < m_NToGenerate; iEvent++) {
           MomentumSlice->Fill(ResolutionFunction->GetRandom());
+        }
+
+        // get rid of the empty bins: set their bin content to 0.5 (i.e. smaller than 1 event)
+        // this is to allow for a well-defined log-likelihood calculation
+        for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
+          if (MomentumSlice->GetBinContent(dedxbin) < 1) {
+            MomentumSlice->SetBinContent(dedxbin, 0.5);
+          };
         }
 
         // normalise each momentum slice to unity, but ignore the cases with empty histograms

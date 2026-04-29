@@ -81,16 +81,9 @@ void DQMHistAutoCanvasModule::event()
     auto split_result = StringSplit(histoname.Data(), '/');
     if (split_result.size() <= 1) continue;
     auto dirname = split_result.at(0); // extract dirname, get hist name is in histogram itself
-    std::string cname;
-    std::string hname;
-    if (split_result.size() > 1) { // checked above already
-      hname = split_result.at(1);
-      if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
-      cname = dirname + "/c_" + hname;
-    } else {
-      hname = histoname.Data();
-      cname = "c_" + hname;
-    }
+    std::string hname = split_result.at(1);
+    if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
+    std::string cname = dirname + "/c_" + hname;
     std::replace(cname.begin(), cname.end(), '.', '_');
 
     // Now find out if we want to have a canvas at all
@@ -108,7 +101,7 @@ void DQMHistAutoCanvasModule::event()
         if (m_exclfolders.size() == 1 && m_exclfolders[0] == "all") {
           in_excl_folder = true;
         } else {
-          for (auto& excl_folder : m_exclfolders) {
+          for (const auto& excl_folder : m_exclfolders) {
             if (excl_folder == dirname) {
               in_excl_folder = true;
               break;
@@ -117,7 +110,7 @@ void DQMHistAutoCanvasModule::event()
         }
 
         if (in_excl_folder) {
-          for (auto& wanted_folder : m_inclfolders) {
+          for (const auto& wanted_folder : m_inclfolders) {
             B2DEBUG(1, "==" << wanted_folder << "==" << dirname << "==");
             if (wanted_folder == std::string(histoname)) {
               give_canvas = true;

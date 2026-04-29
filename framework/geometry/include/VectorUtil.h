@@ -142,22 +142,23 @@ namespace Belle2 {
     /**
      * Calculates the part of vector v1 that is orthogonal to the vector v2
      * @param[in] v1  Vector v1
-     * @param[in] v2  Vector v2
-     * \return    Part of v1 that is orthogonal to v2
+     * @param[in] relativeTo Vector to calculate the orthognal component relative to
+     * \return    Part of v1 that is orthogonal to relativeTo
      * Adapted from tracking/trackingUtilities/geometry/Vector2D:
      * https://gitlab.desy.de/belle2/software/basf2/-/blob/main/tracking/trackingUtilities/geometry/include/Vector2D.h?ref_type=heads#L445
      *
-     * Vector2D orthogonalVector(const Vector2D& relativTo) const
+     * Vector2D orthogonalVector(const Vector2D& relativeTo) const
      * {
-     *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
+     *   return relativeTo.scaled(relativeTo.cross(*this) / relativeTo.normSquared()).orthogonal();
      * }
-     * with v2 = relativTo and v1 = *this.
+     * with v1 = *this.
      */
-    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
+    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativeTo)
     {
-      const double cross = v1.X() * v2.Y() - v1.Y() - v2.X();     // = relativTo.cross(*this)
-      const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
-      return ROOT::Math::XYVector(-tmp.Y(), tmp.X());             // = .orthogonal()
+      const double cross = relativeTo.X() * v1.Y() - relativeTo.Y() * v1.X();       // = relativeTo.cross(*this)
+      const ROOT::Math::XYVector tmp = relativeTo * (cross /
+                                                     relativeTo.Mag2());    // = relativeTo.scaled(cross / relativeTo.normSquared())
+      return ROOT::Math::XYVector(-tmp.Y(), tmp.X());                               // = .orthogonal()
     }
 
     /**

@@ -38,16 +38,19 @@ void RecoTrackStoreArrayCombinerModule::initialize()
 {
   m_temp1RecoTracks.isRequired(m_temp1RecoTracksStoreArrayName);
   m_temp2RecoTracks.isRequired(m_temp2RecoTracksStoreArrayName);
-  m_temp1SPTrackCands.isRequired(m_temp1SPTrackCandsStoreArrayName);
-  m_temp2SPTrackCands.isRequired(m_temp2SPTrackCandsStoreArrayName);
 
   m_recoTracks.registerInDataStore(m_recoTracksStoreArrayName);
   RecoTrack::registerRequiredRelations(m_recoTracks);
 
   m_recoTracks.registerRelationTo(m_temp1RecoTracks);
   m_recoTracks.registerRelationTo(m_temp2RecoTracks);
-  m_recoTracks.registerRelationTo(m_temp1SPTrackCands);
-  m_recoTracks.registerRelationTo(m_temp2SPTrackCands);
+
+  if (m_temp1SPTrackCandsStoreArrayName != "" && m_temp2SPTrackCandsStoreArrayName != "") {
+    m_temp1SPTrackCands.isRequired(m_temp1SPTrackCandsStoreArrayName);
+    m_temp2SPTrackCands.isRequired(m_temp2SPTrackCandsStoreArrayName);
+    m_recoTracks.registerRelationTo(m_temp1SPTrackCands);
+    m_recoTracks.registerRelationTo(m_temp2SPTrackCands);
+  }
 
 }
 
@@ -59,8 +62,10 @@ void RecoTrackStoreArrayCombinerModule::event()
     RecoTrack* newTrack = temp1RecoTrack.copyToStoreArray(m_recoTracks);
     newTrack->addHitsFromRecoTrack(&temp1RecoTrack, newTrack->getNumberOfTotalHits());
     newTrack->addRelationTo(&temp1RecoTrack);
-    const SpacePointTrackCand* newSPTrackCands1 = temp1RecoTrack.getRelated<SpacePointTrackCand>(m_temp1SPTrackCandsStoreArrayName);
-    newTrack->addRelationTo(newSPTrackCands1);
+    if (m_temp1SPTrackCandsStoreArrayName != "") {
+      const SpacePointTrackCand* newSPTrackCands1 = temp1RecoTrack.getRelated<SpacePointTrackCand>(m_temp1SPTrackCandsStoreArrayName);
+      newTrack->addRelationTo(newSPTrackCands1);
+    }
 
   }
 
@@ -68,8 +73,10 @@ void RecoTrackStoreArrayCombinerModule::event()
     RecoTrack* newTrack = temp2RecoTrack.copyToStoreArray(m_recoTracks);
     newTrack->addHitsFromRecoTrack(&temp2RecoTrack, newTrack->getNumberOfTotalHits());
     newTrack->addRelationTo(&temp2RecoTrack);
-    const SpacePointTrackCand* newSPTrackCands2 = temp2RecoTrack.getRelated<SpacePointTrackCand>(m_temp2SPTrackCandsStoreArrayName);
-    newTrack->addRelationTo(newSPTrackCands2);
+    if (m_temp2SPTrackCandsStoreArrayName != "") {
+      const SpacePointTrackCand* newSPTrackCands2 = temp2RecoTrack.getRelated<SpacePointTrackCand>(m_temp2SPTrackCandsStoreArrayName);
+      newTrack->addRelationTo(newSPTrackCands2);
+    }
   }
 }
 

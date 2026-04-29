@@ -249,9 +249,7 @@ GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
 
-  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP
-          << " nHidden.size=" << p.nHidden.size()
-          << " outputScale.size=" << p.outputScale.size());
+  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP);
 
   // ------------------------------------------------------------------
   // Basic parameter validation (fatal in initialize)
@@ -259,21 +257,6 @@ GRLNeuro::initialize(const Parameters& p)
 
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
-  }
-
-  if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
-    B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
-  }
-
-  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
-  if (nTarget < 1) {
-    B2FATAL("No outputs! Turn on targetresult.");
-  }
-
-  for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
-    if (p.outputScale[iScale].size() != 2 * nTarget) {
-      B2FATAL("outputScale should be exactly " << 2 * nTarget << " values");
-    }
   }
 
   // ------------------------------------------------------------------
@@ -292,7 +275,7 @@ GRLNeuro::initialize(const Parameters& p)
   check_size(p.i_cdc_sector, "i_cdc_sector");
   check_size(p.i_ecl_sector, "i_ecl_sector");
   check_size(p.nHidden, "nHidden");
-  check_size(p.outputScale, "outputScale");
+  check_size(p.nn_thres, "nn_thres");
 
   // bias
   check_size(p.total_bit_bias, "total_bit_bias");
@@ -362,13 +345,9 @@ GRLNeuro::initialize(const Parameters& p)
         nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
       }
     }
+    nNodes.push_back(static_cast<float>(pick(p.nOutput)));
 
-    nNodes.push_back(nTarget);
-    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
-
-    const vector<float>& outputScale = pick(p.outputScale);
-
-    GRLMLP grlmlp_temp(nNodes, targetVars, outputScale);
+    GRLMLP grlmlp_temp(nNodes);
 
     // bias
     grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
@@ -409,6 +388,9 @@ GRLNeuro::initialize(const Parameters& p)
     grlmlp_temp.set_W_input(pick(p.W_input));
     grlmlp_temp.set_I_input(pick(p.I_input));
 
+    //threshold
+    grlmlp_temp.set_nn_thres(pick(p.nn_thres));
+
     m_MLPs.push_back(std::move(grlmlp_temp));
   }
 
@@ -418,7 +400,7 @@ GRLNeuro::initialize(const Parameters& p)
 
 
 
-float
+std::vector<float>
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
   const GRLMLP& expert = m_MLPs[isector];
@@ -471,6 +453,9 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   //hidden layer and output layer
   vector<float> layeroutput = {};
   unsigned num_layers = expert.get_number_of_layers();
+
+  //output layer
+  vector<float> final_fixed = {};
 
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
@@ -545,14 +530,15 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
     } else {
 
-
       // ===  HLS result_t: ap_fixed<19,5,AP_RND,AP_SAT_SYM,0> ===
-      float final_fixed = sim_result_t(layeroutput[0]);
+      unsigned num_final_fixed = layeroutput.size();
+      for (unsigned io = 0; io < num_final_fixed; ++io) {
+        final_fixed.push_back(sim_result_t(layeroutput[io]));
+      }
 
-      return final_fixed;
     }
   }
-  return 0;
+  return final_fixed;
 }
 
 

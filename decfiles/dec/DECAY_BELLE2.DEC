@@ -13245,7 +13245,7 @@ Decay B'_c1-
   0.5000     B*-       anti-D0    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
 Enddecay
 
-
+# Doubly charmed baryons
 Decay Xi_cc*++
   1.00  Xi_cc++ gamma   PHSP ;
 Enddecay

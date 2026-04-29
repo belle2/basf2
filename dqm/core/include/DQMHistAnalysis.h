@@ -652,7 +652,7 @@ namespace Belle2 {
      * @param message message to print out
      * @param name the (key)name of the affected PV
      */
-    static void CheckEpicsError(int state, const std::string& message, const std::string& name);
+    void CheckEpicsError(int state, const std::string& message, const std::string& name);
 
     /**
      * check the return status and check PV in case of error

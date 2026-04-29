@@ -574,7 +574,7 @@ namespace Belle2 {
      * Setter for EPICS usage
      * @param flag set in use
      */
-    void setUseEpics(bool flag) {m_useEpics = flag;};
+    static void setUseEpics(bool flag) {m_useEpics = flag;};
 
     /**
      * Setter EPICS flag in read only mode

@@ -1,6 +1,6 @@
 // Model: EvtDsToKKpi
 // This file is an amplitude model for Ds+ -> K- K+ pi+.
-// The model is from PRD 104, 012016 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012016
+// The model is from the BESIII Collaboration in PRD 104, 012016 (2021). DOI: https://doi.org/10.1103/PhysRevD.104.012016
 //
 // Permission to use these files in basf2 was generously granted by the BESIII Collaboration.
 //

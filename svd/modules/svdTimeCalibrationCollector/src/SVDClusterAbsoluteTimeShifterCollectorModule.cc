@@ -77,12 +77,7 @@ void SVDClusterAbsoluteTimeShifterCollectorModule::startRun()
   for (auto alg : m_timeAlgorithms) {
     getObjectPtr<TH2F>(("hClsTimeOnTracks_" + alg).data())->Reset();
   }
-  //temp
   getObjectPtr<TH1F>("hCDCEventT0_")->Reset();
-
-  // Open the calibration output file to read the shift and the resolution value from the fits
-  //
-
 }
 
 void SVDClusterAbsoluteTimeShifterCollectorModule::collect()

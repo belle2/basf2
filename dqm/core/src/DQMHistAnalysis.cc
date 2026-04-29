@@ -47,7 +47,7 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
   setDescription("Histogram Analysis module base class");
 }
 
-static void DQMHistAnalysisModule::clearlist()
+void DQMHistAnalysisModule::clearlist()
 {
   s_histList.clear();
   s_refList.clear();
@@ -770,7 +770,7 @@ void DQMHistAnalysisModule::checkPVStatus(void)
   B2INFO("Check PVs done");
 }
 
-static void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
+void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
 {
   if (pv == nullptr) {
     B2WARNING("PV chid was nullptr");
@@ -804,7 +804,7 @@ void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& messag
   }
 }
 
-static void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, chid id = nullptr)
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, chid id = nullptr)
 {
   if (state != ECA_NORMAL) {
     std::string name;

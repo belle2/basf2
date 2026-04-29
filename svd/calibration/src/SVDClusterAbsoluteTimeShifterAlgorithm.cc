@@ -150,20 +150,6 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
         onePad.cd();
         hist->Draw();
 
-        // // Overlay CDCEventT0 histogram
-        // if (__CDCEventT0__) {
-        //   TH1F* cdcOverlay = (TH1F*)__CDCEventT0__->Clone(Form("cdc_%s", binLabel.Data()));
-        //   cdcOverlay->SetLineColor(kMagenta);
-        //   cdcOverlay->SetLineWidth(2);
-        //   cdcOverlay->SetLineStyle(2);
-        //   cdcOverlay->SetDirectory(0);
-
-        //   // Scale to match histogram height
-        //   double scale = hist->GetMaximum() / cdcOverlay->GetMaximum() * 0.8;
-        //   // cdcOverlay->Scale(scale);
-        //   // cdcOverlay->Draw("SAME");
-        // }
-
         if (hist->GetMaximum() < 200.) {
           int rebinValue = 200. / hist->GetMaximum() + 1.;
           while ((hist->GetNbinsX()) % rebinValue != 0) rebinValue++;

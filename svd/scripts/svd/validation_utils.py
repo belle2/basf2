@@ -208,7 +208,6 @@ def make_combined_plot(pattern, histos, title=None):
 
     # normalise h_eventT0 to have same number of entries as h_onTracks
     h_eventT0 = (h_eventT0[0]*sum(h_onTracks[0])/sum(h_eventT0[0]), h_eventT0[1])
-
     plt.figure()
     plt.hist(h_onTracks[1][0][:-1], h_onTracks[1][0], weights=h_onTracks[0], histtype='step', label='on tracks')
     plt.hist(h_offTracks[1][0][:-1], h_offTracks[1][0], weights=h_offTracks[0], histtype='step', label='off tracks')
@@ -248,7 +247,7 @@ def get_histos(CollectorHistograms):
 
     for det in ['CDC', 'SVD']:
         try:
-            histos[f'{det}eventT0'] = CollectorHistograms[f'hEventT0From{det}'][0]
+            histos[f'{det}eventT0'] = CollectorHistograms[f'hEventT0From{det}']
         except KeyError:
             print(f'No eventT0 histogram for {det}, creating empty histogram')
             #  empty histos
@@ -266,7 +265,7 @@ def get_histos(CollectorHistograms):
     __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks']
     __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual']
     __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap']
-    __hAbsoluteShiftValues__ = CollectorHistograms['hAbsoluteShiftValues'][0]
+    __hAbsoluteShiftValues__ = CollectorHistograms['hAbsoluteShiftValues']
 
     for name_side in names_sides:
         sensorBin = __hBinToSensorMap__.GetXaxis().FindBin(name_side)

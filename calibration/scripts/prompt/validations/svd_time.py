@@ -54,10 +54,9 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     shift_agreements = {algo: {} for algo in vu.time_algorithms}
     entries_onTracks = {algo: {} for algo in vu.time_algorithms}
     entries_eventT0 = {algo: {} for algo in vu.time_algorithms}
-
-    #  agreements between cdc and svd t0
     t0_agreements = {algo: {} for algo in vu.time_algorithms}
     t0_differences = {algo: {} for algo in vu.time_algorithms}
+    absolute_shifts_values = {algo: {} for algo in vu.time_algorithms}
 
     roc_U = {algo: {} for algo in vu.time_algorithms}
     roc_V = {algo: {} for algo in vu.time_algorithms}
@@ -80,12 +79,10 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     shift_histos = {}
     shift_histos_merged_over_ladder = {}
-    absolute_shifts_values = {}
 
     for algo in CollectorHistograms:
         shift_histos[algo] = {}
         shift_histos_merged_over_ladder[algo] = {}
-        absolute_shifts_values[algo] = {}
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")
@@ -114,9 +111,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                                        for key, hShift in histos['timeShifter'].items()}
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
-                        # {key: val.GetEntries() for key, val in histos['absoluteShift'].items()}
                         absolute_shifts_values[algo][run] = histos["absoluteShift"]
-                        # histos.pop('absoluteShift') # causing issues with a plotting function below
 
                         if shift_detailed:
                             for key, hShift in histos['timeShifter'].items():
@@ -132,17 +127,14 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                 else:
                                     shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
                                     shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
-
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')
                         plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
                         plt.close()
-
                         vu.make_combined_plot('*V', histos,
                                               title=f'exp {exp} run {run} V {algo}')
                         plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
                         plt.close()
-
                         roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
                                                        vu.get_combined(histos['offTracks'], '*U'))
                         roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
@@ -150,19 +142,26 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 except AttributeError:
                     print(f'Skipping file algo {algo} exp {exp} run {run}')
                     continue
-
                 # Free-up memory manually as I used `SetDirectory(0)`
-                histos['eventT0'].Delete()
-                del histos['eventT0']
+                for t0 in ['eventT0', 'CDCeventT0', 'SVDeventT0']:
+                    # histos[t0].Delete()
+                    # del histos[t0]
+                    h = histos.pop(t0)
+                    h.__python_owns__ = False
+                    h.Delete()
+
+                # absoluteShift is not a histogram, so just remove it from the dict without trying to delete
+                histos.pop("absoluteShift", None)
+
                 for histo_dict in histos.values():
                     for hh in histo_dict.values():
+                        hh.__python_owns__ = False
                         hh.Delete()
                 del histos
-
                 for key, hh in CollectorHistograms[algo][exp][run].items():
-                    if key != 'hEventT0':
+                    if key not in ['hEventT0', 'hEventT0FromCDC', 'hEventT0FromSVD', 'hAbsoluteShiftValues']:
+                        hh.__python_owns__ = False
                         hh.Delete()
-
                 vu.progress(count + 1, total_item)
                 count += 1
 
@@ -216,8 +215,6 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     dd['name'] = vu.names_sides*len(runs)
     dd['side'] = [i[-1] for i in dd['name']]
 
-    print(f'dd: {dd}')
-
     for algo in vu.time_algorithms:
         dd[f'agreement_{algo}'] = [agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'precision_{algo}'] = [precisions[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
@@ -258,6 +255,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         absolute_shifts_dict[f'absolute_shift_values_{algo}'] = [
             absolute_shifts_values[algo][run][layer_side] for run, layer_side in zip(
                 absolute_shifts_dict['run'], absolute_shifts_dict['name'])]
+
     absolute_shifts_df = pd.DataFrame(absolute_shifts_dict)
 
     print('Making combined plots')

@@ -49,8 +49,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
-                                   "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration",
-                                    # "AbsoluteTimeShiftCalibration", "timeValidation"
+                                   "listOfMutedCalibrations": [],
+                                    # "rawTimeCalibration", "timeShiftCalibration", "AbsoluteTimeShiftCalibration", "timeValidation"
                                    "max_events_per_run":  10000,
                                    "max_events_per_file": 5000,
                                    "isMC": False,
@@ -365,15 +365,15 @@ def get_calibrations(input_data, **kwargs):
     if isMC:
         calType = "MC"
     unique_id_cog6 = f"SVDCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG6:\n{unique_id_cog6}")
 
     unique_id_cog3 = f"SVD3SampleCoGTimeCalibrations_{calType}_{now.isoformat()}_INFO:_3rdOrderPol_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_CoG3:\n{unique_id_cog3}")
 
     unique_id_els3 = f"SVD3SampleELSTimeCalibrations_{calType}_{now.isoformat()}_INFO:_TBindep_" \
-                     f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+        f"Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID_ELS3:\n{unique_id_els3}")
 
     requested_iov = kwargs.get("requested_iov", None)

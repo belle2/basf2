@@ -74,7 +74,7 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   // SVD and CDC temporary entries are set before any TrackCreator runs and remain stable across
   // multiple fitting passes, unlike getEventT0() which can change when EventT0Combiner runs between
   // passes. The fallback to getEventT0() is there in case neither SVD nor CDC proved event T0.
-  if (m_eventTimeStoreObject.isValid()) {
+  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
     driftTime -= m_eventTimeStoreObject->getEventT0(m_fromTrackCreator);
   }
 

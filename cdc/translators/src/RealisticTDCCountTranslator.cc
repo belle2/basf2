@@ -14,8 +14,9 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()),
+RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay, bool fromTrackCreator) :
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_fromTrackCreator(fromTrackCreator),
+  m_gcp(CDCGeoControlPar::getInstance()),
   m_scp(CDCSimControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
@@ -73,18 +74,8 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   // SVD and CDC temporary entries are set before any TrackCreator runs and remain stable across
   // multiple fitting passes, unlike getEventT0() which can change when EventT0Combiner runs between
   // passes. The fallback to getEventT0() is there in case neither SVD nor CDC proved event T0.
-  if (m_eventTimeStoreObject.isValid()) {
-    const auto svdT0 = m_eventTimeStoreObject->getBestSVDTemporaryEventT0();
-    if (svdT0) {
-      driftTime -= svdT0->eventT0;
-    } else {
-      const auto cdcT0 = m_eventTimeStoreObject->getBestCDCTemporaryEventT0();
-      if (cdcT0) {
-        driftTime -= cdcT0->eventT0;
-      } else if (m_eventTimeStoreObject->hasEventT0()) {
-        driftTime -= m_eventTimeStoreObject->getEventT0();
-      }
-    }
+  if (m_eventTimeStoreObject.isValid() && m_eventTimeStoreObject->hasEventT0()) {
+    driftTime -= m_eventTimeStoreObject->getEventT0(m_fromTrackCreator);
   }
 
   //Third: If time of flight was simulated, this has to be undone, too. If it wasn't timeOfFlightEstimator should be taken as 0.

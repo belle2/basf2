@@ -26,8 +26,8 @@ double EventT0::getEventT0(bool fromTrackCreator) const
 {
   B2ASSERT("Not EventT0 available, but someone tried to access it. Check with hasEventT0() method before!", hasEventT0());
 
-  //if EventT0 needed by Track Creator, first check SVD and CDC
-  // used the combined eventT0 only as last resort
+  //if EventT0 is needed by Track Creator, first check SVD and CDC
+  //use the combined eventT0 only as last resort
   if (fromTrackCreator) {
     const auto svdT0 = this->getBestSVDTemporaryEventT0();
     if (svdT0) return svdT0->eventT0;

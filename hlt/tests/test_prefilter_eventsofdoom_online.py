@@ -9,7 +9,6 @@
 # \cond suppress doxygen warning
 
 import basf2 as b2
-import reconstruction as re
 import softwaretrigger.path_utils as hlt_path
 import softwaretrigger.test_support as hlt_test
 
@@ -38,7 +37,7 @@ main.add_module('EventInfoSetter', evtNumList=_calls)
 
 main.add_module(hlt_test.InflateCDCHits())
 
-hlt_path.add_prefilter_module(main, event_abort=re.default_event_abort)
+hlt_path.add_prefilter_module(main)
 
 check = main.add_module(CheckCDCHits())
 

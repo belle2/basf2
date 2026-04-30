@@ -44,6 +44,36 @@ namespace Belle2 {
 
   public:
 
+    /** Set maximal layer jump for state creation
+     *
+     *  @param maximalLayerJump Maximum number of layers to jump
+     */
+    void setMaximalLayerJump(int maximalLayerJump) { m_maximalLayerJump = maximalLayerJump; }
+
+    /** Set maximal layer jump for backward seed tracks
+     *
+     *  @param maximalLayerJumpBackwardSeed Maximum number of layers to jump for backward seeds
+     */
+    void setMaximalLayerJumpBackwardSeed(int maximalLayerJumpBackwardSeed)
+    {
+      m_maximalLayerJump_backwardSeed = maximalLayerJumpBackwardSeed;
+    }
+
+    /** Set maximal delta phi for state creation
+     *
+     *  @param maximalDeltaPhi Maximum distance in phi between wires for Z=0 plane
+     */
+    void setMaximalDeltaPhi(double maximalDeltaPhi) { m_maximalDeltaPhi = maximalDeltaPhi; }
+
+    /** Set hit finding direction
+     *
+     *  @param hitFindingDirection Start from innermost/outermost CDC layers
+     */
+    void setHitFindingDirection(const std::string& hitFindingDirection)
+    {
+      m_param_writeOutDirectionAsString = hitFindingDirection;
+    }
+
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {

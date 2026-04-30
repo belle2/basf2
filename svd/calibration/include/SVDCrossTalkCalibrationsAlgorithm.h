@@ -21,7 +21,7 @@ namespace Belle2 {
     explicit SVDCrossTalkCalibrationsAlgorithm(const std::string& str);
 
     /** Destructor */
-    virtual ~SVDCrossTalkCalibrationsAlgorithm() {}
+    virtual ~SVDCrossTalkCalibrationsAlgorithm() override {}
 
     /** Set the minimum number of entries required in hist from collector for L4.2.1 u-side */
     void setMinEntries(int minEntries) {m_minEntries = minEntries;}

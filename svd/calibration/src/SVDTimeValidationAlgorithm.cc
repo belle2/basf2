@@ -12,9 +12,9 @@
 
 #include <TF1.h>
 #include <TProfile.h>
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TH3F.h"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TH3F.h>
 #include <framework/logging/Logger.h>
 #include <iostream>
 #include <TString.h>
@@ -63,7 +63,7 @@ CalibrationAlgorithm::EResult SVDTimeValidationAlgorithm::calibrate()
 
           B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
-          auto hClsTimeOnTracks = (TH1D*)__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1);
+          auto hClsTimeOnTracks = static_cast<TH1D*>(__hClsTimeOnTracks__->ProjectionX("hClsTimeOnTracks_tmp", ij + 1, ij + 1));
           if (!hClsTimeOnTracks)
             B2ERROR("Histogram " << Form("clsTimeOnTracks__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side) << " not found");
 

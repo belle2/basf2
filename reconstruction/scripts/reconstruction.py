@@ -77,7 +77,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        with_cdc_cellular_automaton=False,
                        use_second_cdc_hits=False, svd_standalone_mode="VXDTF2",
                        add_muid_hits=False, reconstruct_cdst=None,
-                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
+                       use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
                        create_intercepts_for_pxd_ckf=False,
                        append_full_grid_cdc_eventt0=True,
@@ -165,6 +165,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         append_full_grid_cdc_eventt0 = False
         legacy_ecl_charged_pid = True
 
+    # HLT pre-filter
+    add_prefilter_module(path, event_abort=default_event_abort)
+
     # pre-filter reconstruction
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -176,7 +179,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  svd_standalone_mode=svd_standalone_mode,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
-                                 event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
@@ -213,7 +215,6 @@ def add_prefilter_reconstruction(path,
                                  svd_standalone_mode="VXDTF2",
                                  add_muid_hits=False,
                                  reconstruct_cdst=None,
-                                 event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
@@ -244,9 +245,6 @@ def add_prefilter_reconstruction(path,
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
-        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
-        but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -274,9 +272,6 @@ def add_prefilter_reconstruction(path,
 
     # Check components.
     check_components(components)
-
-    # Add HLTPrefilter module to the path.
-    add_prefilter_module(path)
 
     # Add modules that have to be run BEFORE track reconstruction
     add_prefilter_pretracking_reconstruction(path, components=components)

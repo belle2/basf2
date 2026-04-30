@@ -196,7 +196,6 @@ def add_pre_filter_reconstruction(path, run_type, components, switch_off_slow_mo
             path,
             skipGeometryAdding=True,
             components=components,
-            event_abort=hlt_event_abort,
             switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
             **kwargs)
 
@@ -261,7 +260,7 @@ def hlt_event_abort(module, condition, error_flag):
         p.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter_Discard')
 
 
-def add_prefilter_module(path):
+def add_prefilter_module(path, event_abort=hlt_event_abort):
     """
     Add the SoftwareTrigger for the HLT prefilter cuts to the given path.
     Only the calculation of the cuts is implemented here - the cut logic has to be done
@@ -279,7 +278,4 @@ def add_prefilter_module(path):
     hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
 
     # Filter events rejected by prefilter, only save event metadata
-    hlt_event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
-
-    # Save module statistics
-    path.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter')
+    event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)

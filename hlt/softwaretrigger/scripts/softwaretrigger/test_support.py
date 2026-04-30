@@ -39,6 +39,29 @@ class CheckForCorrectHLTResults(basf2.Module):
             basf2.B2FATAL("ROIs are not present")
 
 
+class InflateCDCHits(basf2.Module):
+    """Artificially inflate the number of CDC hits."""
+
+    def initialize(self):
+        """Initialize."""
+        self.cdc_hits = Belle2.PyStoreArray("CDCHits")
+        present = self.cdc_hits.isOptional()
+        if present:
+            self.cdc_hits.isRequired()
+        else:
+            self.cdc_hits.registerInDataStore()
+        eodb_parameters = Belle2.PyDBObj("EventsOfDoomParameters")
+        if not eodb_parameters.isValid():
+            basf2.B2FATAL("EventsOfDoomParameters is not valid")
+        self.cdc_hits_threshold = eodb_parameters.getNCDCHitsMax() + 1
+
+    def event(self):
+        """Event"""
+        # Let's simply append a (default) CDC hit multiple times
+        for i in range(self.cdc_hits_threshold):
+            self.cdc_hits.appendNew()
+
+
 def get_file_name(base_path, run_type, location, passthrough, simulate_events_of_doom_buster):
     mode = ""
     if passthrough:
@@ -84,25 +107,6 @@ def generate_input_file(run_type, location, output_file_name, exp_number, passth
     # inflate the number of CDC hits in order to later simulate the effect of the
     # EventsOfDoomBuster module
     if simulate_events_of_doom_buster:
-
-        class InflateCDCHits(basf2.Module):
-            """Artificially inflate the number of CDC hits."""
-
-            def initialize(self):
-                """Initialize."""
-                self.cdc_hits = Belle2.PyStoreArray("CDCHits")
-                self.cdc_hits.isRequired()
-                eodb_parameters = Belle2.PyDBObj("EventsOfDoomParameters")
-                if not eodb_parameters.isValid():
-                    basf2.B2FATAL("EventsOfDoomParameters is not valid")
-                self.cdc_hits_threshold = eodb_parameters.getNCDCHitsMax() + 1
-
-            def event(self):
-                """Event"""
-                if self.cdc_hits.isValid():
-                    # Let's simply append a (default) CDC hit multiple times
-                    for i in range(self.cdc_hits_threshold):
-                        self.cdc_hits.appendNew()
 
         path.add_module(InflateCDCHits())
 

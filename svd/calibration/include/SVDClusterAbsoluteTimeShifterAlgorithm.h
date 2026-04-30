@@ -25,7 +25,7 @@ namespace Belle2 {
     explicit SVDClusterAbsoluteTimeShifterAlgorithm(const std::string& str);
 
     /** Destructor*/
-    virtual ~SVDClusterAbsoluteTimeShifterAlgorithm() {}
+    virtual ~SVDClusterAbsoluteTimeShifterAlgorithm() override {}
 
     /** Setter for m_allowedTimeShift */
     void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}

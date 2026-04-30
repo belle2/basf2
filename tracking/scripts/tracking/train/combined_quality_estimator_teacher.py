@@ -906,6 +906,7 @@ class CDCQEDataCollectionTask(Basf2PathTask):
             filterParameters={
                 "rootFileName": self.get_output_file_name(self.get_records_file_name())
             },
+            deactivateIfDeadBoard=False  # original behavior before deactivateIfDeadBoard was introduced
         )
         return path
 
@@ -1145,7 +1146,8 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
                 name="TFCDC_TrackQualityEstimator",
                 filterParameters=cdc_qe_mva_filter_parameters,
                 deleteTracks=True,
-                resetTakenFlag=True
+                resetTakenFlag=True,
+                deactivateIfDeadBoard=False,  # original behavior before deactivateIfDeadBoard was introduced
                 )
         if replace_vxd_qi:
             basf2.set_module_parameters(
@@ -1695,6 +1697,7 @@ class CDCQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="TFCDC_TrackQualityEstimator",
             filterParameters=cdc_qe_mva_filter_parameters,
+            deactivateIfDeadBoard=False,  # original behavior before deactivateIfDeadBoard was introduced
         )
         tracking.add_track_fit_and_track_creator(path, components=["CDC"])
         tracking.add_mc_matcher(path, components=["CDC"])
@@ -1797,6 +1800,7 @@ class RecoTrackQEHarvestingValidationTask(HarvestingValidationBaseTask):
             path,
             name="TFCDC_TrackQualityEstimator",
             filterParameters=cdc_qe_mva_filter_parameters,
+            deactivateIfDeadBoard=False,  # original behavior before deactivateIfDeadBoard was introduced
         )
         vxd_identifier = self.get_input_file_names(
                 VXDQETeacherTask.get_weightfile_xml_identifier(VXDQETeacherTask, fast_bdt_option=self.fast_bdt_option)

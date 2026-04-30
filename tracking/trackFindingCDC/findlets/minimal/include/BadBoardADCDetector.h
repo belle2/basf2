@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <cdc/dbobjects/CDCBadBoards.h>
+#include <framework/database/DBObjPtr.h>
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <vector>
@@ -35,16 +37,29 @@ namespace Belle2 {
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
+      /// Initialization
+      void initialize() final;
+
+      /// begin run
+      void beginRun() final;
+
       /// Main algorithm marking hit as background
       void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
+
 
     private:
 
       /// Min ADC value for the average
       int m_badADCaverageMin = 1000;
 
+      /// Max ADC value for the average
+      int m_badADCaverageMax = 0;
+
       /// Min TOT value for the average
       int m_badTOTaverageMin = 15;
+
+      /// Pointer to the CDCBadBoards payload
+      DBObjPtr<CDCBadBoards> m_badBoardsFromDB;
     };
   }
 }

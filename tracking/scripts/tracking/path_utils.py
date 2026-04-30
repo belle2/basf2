@@ -742,7 +742,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
                 filter='mva',
                 filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
                 deleteTracks=True,
-                resetTakenFlag=True
+                resetTakenFlag=True,
+                deactivateIfDeadBoard=False,
+                minLayerJumpsForDeadBoards=4
             )
 
         # Export CDCTracks to RecoTracks representation

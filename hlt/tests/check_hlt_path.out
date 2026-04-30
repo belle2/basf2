@@ -361,6 +361,7 @@
       whichGeometry=Geant4
   53. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMax=0
       badADCaverageMin=1000
       badTOTaverageMin=15
       blockNegativeDriftLength=False
@@ -465,10 +466,12 @@
       inputTracks=CDCTrackVector
       onlyNotFittedTracks=False
   61. TFCDC_TrackQualityEstimator
+      deactivateIfDeadBoard=False
       deleteTracks=True
       filter=mva
       filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}
       inputTracks=CDCTrackVector
+      minLayerJumpsForDeadBoards=4
       resetTakenFlag=True
   62. TFCDC_TrackExporter
       RecoTracksStoreArrayName=CDCRecoTracks
@@ -3288,6 +3291,7 @@
       whichGeometry=Geant4
   53. TFCDC_WireHitPreparer
       UseNLoops=inf
+      badADCaverageMax=0
       badADCaverageMin=1000
       badTOTaverageMin=15
       blockNegativeDriftLength=False
@@ -3392,10 +3396,12 @@
       inputTracks=CDCTrackVector
       onlyNotFittedTracks=False
   61. TFCDC_TrackQualityEstimator
+      deactivateIfDeadBoard=False
       deleteTracks=True
       filter=mva
       filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}
       inputTracks=CDCTrackVector
+      minLayerJumpsForDeadBoards=4
       resetTakenFlag=True
   62. TFCDC_TrackExporter
       RecoTracksStoreArrayName=CDCRecoTracks

@@ -51,6 +51,38 @@ _RegisteredSkims = [
     ("79000200", "flagged", "f_tau_p2"),
     ("79000300", "flagged", "f_tau_p3"),
     ("79000400", "flagged", "f_tau_p4"),
+    ("71000101", "flagged", "f_SLME_p1_v2"),  # v2 - roll off campaign skims into flagged for rel9
+    ("71000201", "flagged", "f_SLME_p2_v2"),
+    ("71000301", "flagged", "f_SLME_p3_v2"),
+    ("71000401", "flagged", "f_SLME_p4_v2"),
+    ("72000101", "flagged", "f_EWP_p1_v2"),
+    ("72000201", "flagged", "f_EWP_p2_v2"),
+    ("72000301", "flagged", "f_EWP_p3_v2"),
+    ("72000401", "flagged", "f_EWP_p4_v2"),
+    ("73000101", "flagged", "f_TDCPV_p1_v2"),
+    ("73000201", "flagged", "f_TDCPV_p2_v2"),
+    ("73000301", "flagged", "f_TDCPV_p3_v2"),
+    ("73000401", "flagged", "f_TDCPV_p4_v2"),
+    ("74000101", "flagged", "f_bhadronic_p1_v2"),  # btocharmless is included here
+    ("74000201", "flagged", "f_bhadronic_p2_v2"),  # btocharmless is included here
+    ("74000301", "flagged", "f_bhadronic_p3_v2"),  # btocharmless is included here
+    ("74000401", "flagged", "f_bhadronic_p4_v2"),  # btocharmless is included here
+    ("75000101", "flagged", "f_quarkonium_p1_v2"),
+    ("75000201", "flagged", "f_quarkonium_p2_v2"),
+    ("75000301", "flagged", "f_quarkonium_p3_v2"),
+    ("75000401", "flagged", "f_quarkonium_p4_v2"),
+    ("77000101", "flagged", "f_charm_p1_v2"),
+    ("77000201", "flagged", "f_charm_p2_v2"),
+    ("77000301", "flagged", "f_charm_p3_v2"),
+    ("77000401", "flagged", "f_charm_p4_v2"),
+    ("78000101", "flagged", "f_dark_p1_v2"),
+    ("78000201", "flagged", "f_dark_p2_v2"),
+    ("78000301", "flagged", "f_dark_p3_v2"),
+    ("78000401", "flagged", "f_dark_p4_v2"),
+    ("79000101", "flagged", "f_tau_p1_v2"),
+    ("79000201", "flagged", "f_tau_p2_v2"),
+    ("79000301", "flagged", "f_tau_p3_v2"),
+    ("79000401", "flagged", "f_tau_p4_v2"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),

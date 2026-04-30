@@ -57,7 +57,9 @@ namespace Belle2 {
     /// Check if a final event t0 is set
     bool hasEventT0() const;
 
-    /// Return the final event t0, if one is set. Else, return NAN.
+    /** Return the final event t0, if one is set. Else, return NAN.
+     * @param fromTrackCreator If true, return the event t0 for track creator with different preferences
+     */
     double getEventT0(bool fromTrackCreator = false) const;
 
     /// Return the final event t0, if one is set. Else, return an empty optional.

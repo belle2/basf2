@@ -276,6 +276,7 @@
       SVDTrueHits=
       SeedSN=5.0
       ShaperDigits=
+      absoluteShiftSVDClusterTime=True
       chargeAlgorithm3Samples=not set
       chargeAlgorithm6Samples=not set
       positionAlgorithm3Samples=not set
@@ -3202,6 +3203,7 @@
       SVDTrueHits=
       SeedSN=5.0
       ShaperDigits=
+      absoluteShiftSVDClusterTime=True
       chargeAlgorithm3Samples=not set
       chargeAlgorithm6Samples=not set
       positionAlgorithm3Samples=not set

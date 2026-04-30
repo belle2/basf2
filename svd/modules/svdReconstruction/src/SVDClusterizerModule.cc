@@ -69,6 +69,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            m_returnRawClusterTime);
   addParam("shiftSVDClusterTime", m_shiftSVDClusterTime,
            "if True, applies SVDCluster time shift based on cluster-size.", m_shiftSVDClusterTime);
+  addParam("absoluteShiftSVDClusterTime", m_absoluteShiftSVDClusterTime,
+           "if True, applies an absolute SVDCluster time shift, based on the layer/side", m_absoluteShiftSVDClusterTime);
   addParam("SeedSN", m_cutSeed,
            "minimum SNR for strips to be considered as cluster seed. Overwritten by the dbobject, unless you set useDB = False.", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
@@ -575,9 +577,10 @@ void SVDClusterizerModule::shiftSVDClusterTime()
                                                           m_storeClusters[clsIndex]->isUCluster(),
                                                           m_storeClusters[clsIndex]->getSize());
   //absolute shift
-  clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
-                                                m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
-                                                m_storeClusters[clsIndex]->isUCluster());
+  if (m_absoluteShiftSVDClusterTime)
+    clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
+                                                  m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                  m_storeClusters[clsIndex]->isUCluster());
 
   m_storeClusters[clsIndex]->setClsTime(clsTime);
 

@@ -31,6 +31,7 @@ SVDTimeValidationCollectorModule::SVDTimeValidationCollectorModule() : Calibrati
   addParam("EventT0Name", m_eventTime, "Name of the EventT0 list", m_eventTime);
   addParam("RecoTracksName", m_recotrack, "Name of the RecoTracks list", m_recotrack);
   addParam("TracksName", m_track, "Name of the Tracks list", m_track);
+  addParam("TimeAlgorithm", m_timeAlgo, "Time algorithm being validated (CoG6, CoG3, ELS3)", m_timeAlgo);
 }
 
 void SVDTimeValidationCollectorModule::prepare()
@@ -38,6 +39,14 @@ void SVDTimeValidationCollectorModule::prepare()
 
   auto hEventT0 = new TH1F("hEventT0", "EventT0", 300, -150, 150);
   registerObject<TH1F>("hEventT0", hEventT0);
+
+  auto hEventT0FromCDC = new TH1F("hEventT0FromCDC", "EventT0FromCDC", 300, -150, 150);
+  registerObject<TH1F>("hEventT0FromCDC", hEventT0FromCDC);
+  auto hEventT0FromSVD = new TH1F("hEventT0FromSVD", "EventT0FromSVD", 300, -150, 150);
+  registerObject<TH1F>("hEventT0FromSVD", hEventT0FromSVD);
+
+  auto hAbsoluteShiftValues = new TH1D("hAbsoluteShiftValues", "Fitted shift values ;Bin;Mean (ns)", 8, 0.5, 8.5);
+  registerObject<TH1D>("hAbsoluteShiftValues", hAbsoluteShiftValues);
 
   m_svdCls.isRequired(m_svdClusters);
   m_svdClsOnTrk.isRequired(m_svdClustersOnTracks);
@@ -102,11 +111,29 @@ void SVDTimeValidationCollectorModule::prepare()
 void SVDTimeValidationCollectorModule::startRun()
 {
   getObjectPtr<TH1F>("hEventT0")->Reset();
+  getObjectPtr<TH1F>("hEventT0FromCDC")->Reset();
+  getObjectPtr<TH1F>("hEventT0FromSVD")->Reset();
   getObjectPtr<TH2F>("__hClsTimeOnTracks__")->Reset();
   getObjectPtr<TH2F>("__hClsTimeAll__")->Reset();
   getObjectPtr<TH2F>("__hClsDiffTimeOnTracks__")->Reset();
   getObjectPtr<TH3F>("__hClusterSizeVsTimeResidual__")->Reset();
   getObjectPtr<TH1F>("__hBinToSensorMap__")->Reset();
+  getObjectPtr<TH1D>("hAbsoluteShiftValues")->Reset();
+
+  // Load absolute time shifts from payload
+  if (m_svdAbsTimeShift.isValid()) {
+    const TString alg = TString(m_timeAlgo.c_str());
+    for (int layer : {3, 4, 5, 6})
+      for (bool side : {true, false}) {
+        const int binIdx = 2 * (layer - 3) + side + 1;
+        const TString binLabel = TString::Format("L%dS%c", layer, side ? 'U' : 'V');
+        getObjectPtr<TH1D>("hAbsoluteShiftValues")->GetXaxis()->SetBinLabel(binIdx, binLabel);
+        getObjectPtr<TH1D>("hAbsoluteShiftValues")->SetBinContent(binIdx, m_svdAbsTimeShift->getAbsTimeShift(alg, layer, side));
+      }
+
+  } else {
+    B2WARNING("SVD Absolute Cluster Time Shift object not found in database");
+  }
 }
 
 void SVDTimeValidationCollectorModule::collect()
@@ -116,6 +143,18 @@ void SVDTimeValidationCollectorModule::collect()
     auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
     float eventT0 = evtT0CDC->eventT0;
     getObjectPtr<TH1F>("hEventT0")->Fill(eventT0);
+
+    // also get CDC and SVD T0
+    if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
+      auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
+      getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(evtT0CDC->eventT0);
+    } else {B2WARNING("Found no CDC event T0");}
+    if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
+      auto evtT0SVD = m_eventT0->getBestSVDTemporaryEventT0();
+      getObjectPtr<TH1F>("hEventT0FromSVD")->Fill(evtT0SVD->eventT0);
+    } else {B2WARNING("Found no SVD event T0");}
+
+
 
     // Fill histograms clusters on tracks
     for (const auto& svdCluster : m_svdClsOnTrk) {

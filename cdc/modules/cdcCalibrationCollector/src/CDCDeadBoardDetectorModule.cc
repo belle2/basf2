@@ -30,7 +30,7 @@ CDCDeadBoardDetectorModule::~CDCDeadBoardDetectorModule()
 void CDCDeadBoardDetectorModule::prepare()
 {
   m_rawCDCs.isRequired();
-  auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 300, -0.5, 299.5);
+  auto m_BoardIDs = new TH1F("CDCboardIDs", "CDC board IDs", 299,  0.5, 299.5);
   registerObject<TH1F>("CDCboardIDs", m_BoardIDs);
 }
 

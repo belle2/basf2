@@ -465,7 +465,7 @@
       inputTracks=CDCTrackVector
       onlyNotFittedTracks=False
   61. TFCDC_TrackQualityEstimator
-      deactivateIfDeadBoard=True
+      deactivateIfDeadBoard=False
       deleteTracks=True
       filter=mva
       filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}
@@ -3385,7 +3385,7 @@
       inputTracks=CDCTrackVector
       onlyNotFittedTracks=False
   61. TFCDC_TrackQualityEstimator
-      deactivateIfDeadBoard=True
+      deactivateIfDeadBoard=False
       deleteTracks=True
       filter=mva
       filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'}

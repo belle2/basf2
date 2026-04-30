@@ -9,7 +9,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------
-# Example steering script that generates anti-neutron events with fixed momentum
+# Example steering script that generates B0B0bar events with BGx1 overlay
 # and applies the TOPBackSplashTiming module
 # ---------------------------------------------------------------------------------
 
@@ -18,6 +18,18 @@ import simulation as si
 import reconstruction as re
 from generators import add_evtgen_generator
 import glob
+import argparse
+
+parser = argparse.ArgumentParser(description="Generates BB events and save TOP timing fits to neutral clusters")
+parser.add_argument('--saveFits', action='store_true', default=False, help='Flag to save plots of RooFits')
+parser.add_argument('--minClusterE', type=float, default=0.5, help='Minimum (incl.) clusterE to be considered for timing')
+parser.add_argument('--minNphotons', type=int, default=2, help='Minimum (incl.) no. of Cherenkov photons for fit')
+parser.add_argument('--minClusterNHits', type=float, default=1, help='Minimum (incl.) no. of crystals in cluster required')
+parser.add_argument('--includeSlotsWithTracks', action='store_true', default=False, help='Flag to save plots of RooFits')
+parser.add_argument('--saveMoreFitParams', action='store_true', default=False,
+                    help='Development flag to save more RooFit params (e.g. RooFit errors, fit params)')
+
+args = parser.parse_args()
 
 # bg = glob.glob('/group/belle2/dataprod/BGOverlay/run2/prerelease-08-00-00a/new_overlay/BGx1/set2/BGforOverlay-6*.root')
 bg = glob.glob('/group/belle2/dataprod/BGOverlay/run2/prerelease-08-00-00a/new_overlay/BGx1/set?/*.root')
@@ -30,11 +42,19 @@ path.add_module("EventInfoPrinter")
 # EvtGen
 add_evtgen_generator(path=path, finalstate='mixed')
 
-
 # detector and L1 trigger simulation and reco
 si.add_simulation(path=path,  bkgfiles=bg)
-re.add_reconstruction(path=path, enable_top_cluster_timing=True)
+re.add_reconstruction(path=path)
 
+# call module and plot timing fits
+path.add_module("TOPBackSplashTiming",
+                saveFits=args.saveFits,
+                minClusterE=args.minClusterE,
+                minNphotons=args.minNphotons,
+                minClusterNHits=args.minClusterNHits,
+                includeSlotsWithTracks=args.includeSlotsWithTracks,
+                saveMoreFitParams=args.saveMoreFitParams,
+                )
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof
 path.add_module("RootOutput",

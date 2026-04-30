@@ -18,12 +18,16 @@ import simulation as si
 import reconstruction as re
 import argparse
 
-parser = argparse.ArgumentParser(description="Choose anti-neutron momentum")
+parser = argparse.ArgumentParser(description="Generates nbar events and save TOP timing fits to neutral clusters")
 parser.add_argument('--mom', default=1, help='Momentum of nbars to generate [GeV/c]')
 parser.add_argument('--saveFits', action='store_true', default=False, help='Flag to save plots of RooFits')
 parser.add_argument('--minClusterE', type=float, default=0.5, help='Minimum (incl.) clusterE to be considered for timing')
 parser.add_argument('--minNphotons', type=int, default=2, help='Minimum (incl.) no. of Cherenkov photons for fit')
 parser.add_argument('--minClusterNHits', type=float, default=1, help='Minimum (incl.) no. of crystals in cluster required')
+parser.add_argument('--includeSlotsWithTracks', action='store_true', default=False, help='Flag to save plots of RooFits')
+parser.add_argument('--saveMoreFitParams', action='store_true', default=False,
+                    help='Development flag to save more RooFit params (e.g. RooFit errors, fit params)')
+
 args = parser.parse_args()
 
 path = b2.create_path()
@@ -41,7 +45,7 @@ path.add_module(
     thetaGeneration="fixed",
     thetaParams=[92],
     phiGeneration="fixed",
-    phiParams=[11.25],
+    phiParams=[11.25],  # initial momentum towards slot1
     vertexGeneration="fixed",
     xVertexParams=[0],
     yVertexParams=[0],
@@ -72,8 +76,14 @@ si.add_simulation(path=path)
 re.add_reconstruction(path=path)
 
 # call module and plot timing fits
-path.add_module("TOPBackSplashTiming", saveFits=args.saveFits, minClusterE=args.minClusterE,
-                minNphotons=args.minNphotons, minClusterNHits=args.minClusterNHits)
+path.add_module("TOPBackSplashTiming",
+                saveFits=args.saveFits,
+                minClusterE=args.minClusterE,
+                minNphotons=args.minNphotons,
+                minClusterNHits=args.minClusterNHits,
+                includeSlotsWithTracks=args.includeSlotsWithTracks,
+                saveMoreFitParams=args.saveMoreFitParams,
+                )
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof
 path.add_module("RootOutput",

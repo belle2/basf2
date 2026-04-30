@@ -10,6 +10,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/IOIntercept.h>
 #include <math.h>
 #include <string>
 #include <top/modules/TOPBackSplashTiming/TOPBackSplashTimingModule.h>
@@ -236,6 +237,12 @@ void TOPBackSplashTimingModule::makePlot(double cosTheta, double clusterE, int m
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleID,
     std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta, int nTracksPerSlot)
 {
+
+  // Intercept RooFit messages
+  IOIntercept::OutputToLogMessages initLogCapture("RooFit", LogConfig::c_Info, LogConfig::c_Info);
+  initLogCapture.setIndent("  ");
+  initLogCapture.start();
+
   // Get pdf according to cosTheta
   int cosThetaIndex = int(std::round(clusterCosTheta * 10));  // integer bin in [-6, 8]
   cosThetaIndex += 6;  // shift to [0, 14]
@@ -286,6 +293,7 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleID,
   m_wss[cosThetaIndex].var("mu")->setMax(maxTime);
 
   RooAbsPdf* model =  m_wss[cosThetaIndex].pdf("model");
+
   RooFitResult* res = model->fitTo(data, RooFit::Save(), RooFit::PrintLevel(-1), RooFit::Strategy(0), RooFit::Extended());
 
   if (res->status() > 0) {
@@ -313,6 +321,8 @@ TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleID,
   if (m_saveFits == true) {
     makePlot(clusterCosTheta, clusterE, moduleID,  model, x, data, res, nTracksPerSlot);
   }
+
+  initLogCapture.finish();
 
   // Saving results & plotting (time, chi2/dof, no. photons)
   if (m_saveMoreFitParams) {

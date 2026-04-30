@@ -213,7 +213,7 @@ void TrackQualityEstimatorMVAModule::event()
     }
 
     m_clusterInfoExtractorBefore->extractVariables(sortedHitsBefore);
-    m_nSpacePointsBefore = sortedHits.size();
+    m_nSpacePointsBefore = sortedHitsBefore.size();
     m_qeResultsExtractorBefore->extractVariables(m_estimator->estimateQualityAndProperties(sortedHitsBefore));
 
     if (m_collectEventFeatures) {

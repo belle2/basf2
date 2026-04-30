@@ -137,6 +137,12 @@ C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned
       DATA    LAMDEC /0/
       COMMON /LAMDEC/ LAMDEC
 C
+      COMMON /PHOINI_PAR/ ISINGLE,IEXPONENTIAL
+      INTEGER             ISINGLE,IEXPONENTIAL
+C
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+C
       SAVE
 C-------------------------------------------------------------------------------
       idff    = xpar(ITAUXPAR+3) ! Lund identifier for first tau (15 for  tau-)
@@ -209,6 +215,19 @@ C     Print optional flags
       ENDIF
       WRITE(iout,*) 'AMDARK, GMDARK, EPDARK = ',AMDARK,GMDARK,EPDARK
       
+      ISINGLE = INT(XPAR(ITAUXPAR+951))
+      IEXPONENTIAL = INT(XPAR(ITAUXPAR+952))
+
+      CV_LL = XPAR(ITAUXPAR+961)
+      CV_LR = XPAR(ITAUXPAR+962)
+      CS_RL = XPAR(ITAUXPAR+963)
+      CS_RR = XPAR(ITAUXPAR+964)
+      CV_RL = XPAR(ITAUXPAR+965)
+      CV_RR = XPAR(ITAUXPAR+966)
+      CS_LL = XPAR(ITAUXPAR+967)
+      CS_LR = XPAR(ITAUXPAR+968)
+      MNURD = XPAR(ITAUXPAR+969)
+
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)
       endif

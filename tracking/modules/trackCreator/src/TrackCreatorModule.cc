@@ -97,7 +97,9 @@ void TrackCreatorModule::event()
     B2DEBUG(20, "RecoTrack StoreArray does not contain any RecoTracks.");
   }
 
-  TrackFitter trackFitter(DAFConfiguration::c_Default, "", "", "", "", "", true, true);
+  // Here, the last parameter is fromTrackCreator, necessary to set the priority of eventT0
+  const bool fromTrackCreator = !m_trackFitResultColName.ends_with("_flipped");
+  TrackFitter trackFitter(DAFConfiguration::c_Default, "", "", "", "", "", true, fromTrackCreator);
   TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_beamSpotAsTVector, m_beamAxisAsTVector);
   for (auto& recoTrack : m_RecoTracks) {
     for (const auto& pdg : m_pdgCodes) {

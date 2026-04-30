@@ -1986,7 +1986,7 @@ C cleo knew nothing about channels recently introduced
         IF (JNPI.LE.2) THEN
 C         11.Oct.11: fix for BINP and KARLSRUHE currents added
           WTMAX(JNPI) = PKORB(3,37+JNPI)
-          NTRIALS = 20000
+          NTRIALS = 50000
         END IF
         IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
           NTRIALS = 50000
@@ -3495,6 +3495,7 @@ C
       DATA NPRIN/0/
       INTEGER LAMDEC
       COMMON /LAMDEC/ LAMDEC
+      LOGICAL PHFLAG
 C
       REAL    AMALFA            ! mass
       INTEGER ISALFA            ! spin
@@ -3538,7 +3539,9 @@ c sigle scalar has no W
 C
 C W boson (W+ is 24)
         CALL TRALO4(KTO,PWB,PWB,AM)
-        CALL FILHEP(0,1,-24*ISGN,NPS,NPS,0,0,PWB,AM,.TRUE.)
+        PHFLAG=.TRUE.
+        IF (MODE.EQ.261) PHFLAG=.FALSE.
+        CALL FILHEP(0,1,-24*ISGN,NPS,NPS,0,0,PWB,AM,PHFLAG)
       ENDIF
 C
 C multi pi mode JNPI
@@ -3549,6 +3552,8 @@ C get multiplicity of mode JNPI
       DO I=1,ND
         KFPI=LUNPIK(IDFFIN(I,JNPI),-ISGN)
 C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
+        PHFLAG=.TRUE.
+        IF (MODE.EQ.261) PHFLAG=.FALSE.
         IDECAY=0
         IF ((KFPI.EQ.221).AND.  !eta
      c       (MODE.EQ.37.OR.MODE.EQ.38.OR.MODE.EQ.39.OR.MODE.EQ.40.OR.
@@ -3599,10 +3604,10 @@ C        IF(KFPI.NE.111)KFPI=KFPI*ISGN
         CALL TRALO4(KTO,PPI,PPI,AM)
         IF(IS.EQ.0) NPS = -I
         IF (IDECAY.EQ.1) THEN
-           CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,.TRUE.)
+           CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,PHFLAG)
            CALL TDECAY(KFPI,MODE,PPI,NDAU)
         ELSE
-           CALL FILHEP(0,1,KFPI,NPS-NDAU,NPS-NDAU,0,0,PPI,AM,.TRUE.)
+           CALL FILHEP(0,1,KFPI,NPS-NDAU,NPS-NDAU,0,0,PPI,AM,PHFLAG)
         ENDIF
       END DO
       IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1) THEN
@@ -4339,7 +4344,52 @@ C
       END
 
       SUBROUTINE DAM2PI_wrap(MNUM,PT,PN,PIM1,PIM2,AMPLIT,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4)
+      IMPLICIT NONE
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),AMPLIT,HV(4),FPI,FPIc,VUD,CE
+      REAL*8 PTD(4),PND(4),PIM1D(4),PIM2D(4)
+      REAL*8 AMPLITD1,HVD1(4),AMPLITD2,HVD2(4),AMPLITD,HVD(4)
+      INTEGER MNUM, I
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+      REAL*8            AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      EXTERNAL pigamma_left, pigamma_right
+      DATA  FPIc /93.3E-3/
+C     omega is amplit; h_i is HV(i)
+C      write(*,*) 'USING DAM2PI_wrap'
+      DO  I=1,3
+         HV(I)=0.0
+      ENDDO
+      HV(4)=1.0
+      DO I = 1,4
+         PTD(I) = PT(I)
+         PND(I) = PN(I)
+         PIM1D(I)=PIM1(I)
+         PIM2D(I)=PIM2(I)
+      ENDDO
+      CALL pigamma_left(AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+     C                  CV_LL,CV_LR,CS_RL,CS_RR,
+     C                  PTD,PND,PIM1D,PIM2D,AMPLITD1,HVD1)
+      CALL pigamma_right(AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+     C                  CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     C                  PTD,PND,PIM1D,PIM2D,AMPLITD2,HVD2)
+      AMPLITD = AMPLITD1 + AMPLITD2
+      DO I = 1,3
+         HVD(I) = (AMPLITD1*HVD1(I) + AMPLITD2*HVD2(I))/(AMPLITD)
+      ENDDO
+      FPI = FPIc
+      VUD = CCABIB
+      CE = 16.*GFERMI * GFERMI * AMTAUD * AMTAUD * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
+      AMPLIT = AMPLITD * CE
+      DO I = 1,3
+         HV(I) = HVD(I)
+      ENDDO
       RETURN
       END
 

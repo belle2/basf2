@@ -40,6 +40,8 @@
       PARAMETER ( ITAUXPAR=2000)
       INTEGER TAUOLA_BBB
       COMMON /TAUOLA_BBB/ TAUOLA_BBB
+      COMMON /PHOINI_PAR/ ISINGLE,IEXPONENTIAL
+      INTEGER             ISINGLE,IEXPONENTIAL
 *=====================================================================================
 
       m_out   = xpar(4)
@@ -85,7 +87,7 @@ C switches of tau+ tau- decay modes !!
         ENDIF
 
 * Initialization of PHOTOS
-        IF(m_IFPHOT .EQ. 1)   CALL PHOINI
+        IF(m_IFPHOT .EQ. 1)   CALL PHOINI(ISINGLE,IEXPONENTIAL)
 
 * control weight
         CALL GLK_Mbook(m_idyfs+30,'Tau Pair: wt1, Spin Imprint weight $', 40, 4d0)

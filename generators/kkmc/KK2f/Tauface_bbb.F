@@ -70,6 +70,9 @@ C initialization for 2 scalars
         ELSEIF(INUM.EQ.4.OR.INUM.EQ.66.OR.INUM.EQ.67) THEN
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0
+        ELSEIF(INUM.EQ.99) THEN
+          PROB1(INUM)=0.4
+          PROB2(INUM)=0.1
         ELSE
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0
@@ -479,7 +482,7 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 1, 2, 2,   2, 2, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
-     a                1, 1, 1, 1, 1,   1, 1, 1, 0, 0,
+     a                1, 1, 1, 1, 1,   1, 1, 1, 5, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
@@ -642,7 +645,7 @@ C AJWMOD fix sign bug, 2/22/99
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 94
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 96
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 98
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 100
+     8             -1,    8,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 100
      8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 102
      8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 104
      8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 106
@@ -1086,7 +1089,7 @@ C=================================================
         IF(II.EQ.96) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:3P0)  ' ! TauDecayModeBBB = 258 
         IF(II.EQ.97) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPP)  ' ! TauDecayModeBBB = 259 
         IF(II.EQ.98) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPG)  ' ! TauDecayModeBBB = 260 
-        IF(II.EQ.99) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 261
+        IF(II.EQ.99) NAMES(I-NLT)='  TAU-  --> pi- gamma          ' ! TauDecayModeBBB = 261
         IF(II.EQ.100)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 262
         IF(II.EQ.101)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 263
         IF(II.EQ.102)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 264

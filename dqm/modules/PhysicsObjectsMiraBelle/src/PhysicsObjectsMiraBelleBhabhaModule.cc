@@ -38,7 +38,8 @@ PhysicsObjectsMiraBelleBhabhaModule::PhysicsObjectsMiraBelleBhabhaModule() : His
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_bhabha_all"));
+           "Trigger identifier string used to select events for the histograms",
+           std::string("software_trigger_cut&skim&accept_bhabha_trk_ecl"));
   addParam("ePListName", m_ePListName, "Name of the electron particle list", std::string("e+:physMiraBelle"));
   addParam("bhabhaPListName", m_bhabhaPListName, "Name of the bhabha events particle list", std::string("Upsilon:ephysMiraBelle"));
 

@@ -120,7 +120,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
       B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
       __hClusterSizeVsTimeResidual__->GetZaxis()->SetRange(ij + 1, ij + 1);
-      TH2D* hClusterSizeVsTimeResidual = (TH2D*)__hClusterSizeVsTimeResidual__->Project3D("yxe");
+      TH2D* hClusterSizeVsTimeResidual = static_cast<TH2D*>(__hClusterSizeVsTimeResidual__->Project3D("yxe"));
       hClusterSizeVsTimeResidual->SetName(Form("clusterSizeVsTimeResidual__L%dS%dS%c", layer_num, sensor_num, side));
       char sidePN = (side == 'U' ? 'P' : 'N');
       hClusterSizeVsTimeResidual->SetTitle(Form("ClusterSize vs Time Residual in L%d.S%d %c/%c", layer_num, sensor_num, side, sidePN));
@@ -128,7 +128,7 @@ CalibrationAlgorithm::EResult SVDClusterTimeShifterAlgorithm::calibrate()
 
       for (int clSize = 1; clSize <= maxClsSize; clSize++) {
 
-        TH1D* hist = (TH1D*)hClusterSizeVsTimeResidual->ProjectionX("tmp", clSize, clSize, "");
+        TH1D* hist = static_cast<TH1D*>(hClusterSizeVsTimeResidual->ProjectionX("tmp", clSize, clSize, ""));
         hist->SetName(Form("clusterTimeResidual__L%dS%dS%c_Sz%d", layer_num, sensor_num, side, clSize));
         hist->SetTitle(Form("Cluster Time Residual for Size %d in L%d.S%d %c/%c", clSize, layer_num, sensor_num, side, sidePN));
         hist->SetDirectory(0);

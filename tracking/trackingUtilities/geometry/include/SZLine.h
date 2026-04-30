@@ -201,7 +201,7 @@ namespace Belle2 {
       }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      SZJacobian passiveMoveByJacobian(const Vector2D& bySZ) const
+      static SZJacobian passiveMoveByJacobian(const Vector2D& bySZ)
       {
         using namespace NSZParameterIndices;
         SZJacobian result = SZUtil::identity();

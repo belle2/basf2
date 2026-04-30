@@ -2208,3 +2208,51 @@ class LambdacToGeneric(BaseSkim):
         DList = [f"Z0:inc1{suffix}",]
 
         return DList
+
+
+@fancy_skim_header
+class DstToD0Pi_D0ToEtaEta(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\eta \\eta` (and CC)
+
+    **Selection Criteria**:
+        * Track cuts are `charm_skim_std_charged` pion
+        * Use photons from `stdPhotons.loadStdSkimPhoton`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * :math:`0.4 < M(\\eta_{\\gamma\\gamma}) < 0.6`
+        * :math:`0.4 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}}) < 0.6`
+        * :math:`1.6 < M(D^0) < 2.1`
+        * :math:`p^{*}(D^{*+})>2.0` and :math:`M(D^{*+})-M(D^{0})<0.160`
+    """
+
+    __authors__ = ["Jaeyoung Kim"]
+    __description__ = "Skim list for D*+ to pi+ D0, D0 to eta eta."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        loadStdSkimPhoton(path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+        ma.reconstructDecay('eta:D0ToEtaEta_2Gam -> gamma:skim gamma:skim', '[0.4 < M < 0.6]', path=path)
+        ma.reconstructDecay('eta:D0ToEtaEta_3Pi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.4 < M < 0.6]', path=path)
+
+        D0cuts = "1.6 < M < 2.1"
+        ma.reconstructDecay('D0:D0ToEtaEta_2Gam_2Gam -> eta:D0ToEtaEta_2Gam eta:D0ToEtaEta_2Gam', D0cuts, path=path)
+        ma.reconstructDecay('D0:D0ToEtaEta_2Gam_3Pi -> eta:D0ToEtaEta_2Gam eta:D0ToEtaEta_3Pi', D0cuts, path=path)
+
+        Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p)>2.0"
+        ma.reconstructDecay('D*+:D0ToEtaEta_2Gam_2Gam -> D0:D0ToEtaEta_2Gam_2Gam pi+:charmSkim', Dstcuts, path=path)
+        ma.reconstructDecay('D*+:D0ToEtaEta_2Gam_3Pi -> D0:D0ToEtaEta_2Gam_3Pi pi+:charmSkim', Dstcuts, path=path)
+
+        DstList = []
+        DstList.append("D*+:D0ToEtaEta_2Gam_2Gam")
+        DstList.append("D*+:D0ToEtaEta_2Gam_3Pi")
+
+        return DstList

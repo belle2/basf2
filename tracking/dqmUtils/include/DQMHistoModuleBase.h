@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~DQMHistoModuleBase();
+    ~DQMHistoModuleBase() override;
 
     /**
      * Initializer.
@@ -307,7 +307,7 @@ namespace Belle2 {
 
   private:
     /** Check a variable for whether or not it is NAN or INF */
-    inline bool checkVariableForNANOrINF(const double var)
+    static inline bool checkVariableForNANOrINF(const double var)
     {
       return std::isnan(var) or std::isinf(var);
     }

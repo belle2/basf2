@@ -56,6 +56,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             # path.add_module('PXDDQMEfficiency', histogramDirectoryName='PXDEFF')
             path.add_module('PXDTrackClusterDQM', histogramDirectoryName='PXDER')
             path.add_module('PXDInjectionDQM', histogramDirectoryName='PXDINJ', eachModule=True)
+            path.add_module("PXDDQMBowing")
+
         # SVD
         if is_detector_present("SVD", components):
             # reconstruct SVDRecoDigits first of all
@@ -212,7 +214,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             },
             cutResultIdentifiersIgnored={
                 "skim": [
-                    "accept_bhabha_all",
+                    "accept_bhabha_trk_ecl",
                 ]
             },
             createTotalResultHistograms=False,

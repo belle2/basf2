@@ -163,7 +163,7 @@ namespace Belle2 {
     {
       if (outOfBounds(parameterIndex))
         return 0.;
-      parameterData& element = data[parameterIndex];
+      const parameterData& element = data[parameterIndex];
       if (eigenPairIndex >= element.eigenweights.size())
         return 0.;
 
@@ -171,12 +171,11 @@ namespace Belle2 {
     }
     void PedeResult::dump()
     {
-      for (auto pdata : data) {
+      for (const auto& pdata : data) {
         std::cout << pdata.index << " : " << pdata.label << " corr: " << pdata.correction << " err: " << pdata.error << " presigma: " <<
                   pdata.presigma << endl;
       }
     }
   }
 }
-
 

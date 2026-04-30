@@ -96,7 +96,7 @@ namespace Belle2 {
       double m_tcrate_min_cut = -150;           /**< Minimum value cut for the crate time calibration constant for plotting */
       double m_tcrate_max_cut = 150;            /**< Maximum value cut for the crate time calibration constant for plotting  */
       double m_tcrate_unc_min_cut = 0.0001 ;    /**< Minimum value cut for the crate time calibration constant uncertainty for plotting */
-      double m_tcrate_unc_max_cut = 0.4 ;       /**< Maximum value cut for the crate time calibration constant uncertainty for plotting */
+      double m_tcrate_unc_max_cut = 999.; /**< Maximum value cut for the crate time calibration constant uncertainty for plotting */
 
 
     };

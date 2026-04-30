@@ -33,11 +33,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      Vector2D()
-        : m_x(0.0)
-        , m_y(0.0)
-      {
-      }
+      Vector2D() = default;
 
       // /// Constructor translating from a ROOT::Math::XYVector instance
       // TODO / FIXME:
@@ -698,10 +694,10 @@ namespace Belle2 {
 
     private:
       /// Memory for the first coordinate
-      double m_x;
+      double m_x = 0.0;
 
       /// Memory for the second coordinate
-      double m_y;
+      double m_y = 0.0;
     };
 
     /// non-memberfunction for subtracting a Vector2D from any generic Vector that implements .X() and .Y()

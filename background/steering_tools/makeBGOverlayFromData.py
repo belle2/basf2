@@ -11,6 +11,7 @@ import sys
 import basf2
 from background import get_trigger_types_for_bgo, SelectTRGTypes
 from rawdata import add_unpackers
+from gdltrigger import filter_trigger_abort_gaps
 
 # --------------------------------------------------------------------------------------
 # Make data sample for BG overlay from experimental raw data
@@ -55,6 +56,9 @@ selector = main.add_module(
     SelectTRGTypes(trg_types=trg_types)
 )
 selector.if_false(emptypath)
+
+# Filter away the events falling in the trigger abort gaps
+filter_trigger_abort_gaps(main)
 
 # Unpack detector data
 add_unpackers(

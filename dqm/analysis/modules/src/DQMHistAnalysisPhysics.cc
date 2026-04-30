@@ -85,9 +85,9 @@ void DQMHistAnalysisPhysicsModule::initialize()
   registerEpicsPV(m_pvPrefix + "mUPSmumu_width", "mUPSmumu_width");
   m_cmUPSmumu = new TCanvas("PhysicsObjects/fit_mUPSmumu");
 
-  //new ratio hadronb2_tight/bhabha_all
+  //new ratio hadronb2_tight/bhabha_trk_ecl
   addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 3000000, 1); // update each 10000 events
-  registerEpicsPV(m_pvPrefix + "hadronb2_tight_over_bhabha_all", "hadronb2_tight_over_bhabha_all");
+  registerEpicsPV(m_pvPrefix + "hadronb2_tight_over_bhabha_trk_ecl", "hadronb2_tight_over_bhabha_trk_ecl");
 
   B2DEBUG(20, "DQMHistAnalysisPhysics: initialized.");
 }
@@ -129,9 +129,9 @@ void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* te
   model.fitTo(data, RooFit::Extended(kTRUE));
 
   RooPlot* frame = m.frame();
-  data.plotOn(frame, RooFit::DrawOption("B"), RooFit::FillColor(kGray), RooFit::LineWidth(2), RooFit::MarkerSize(0),
+  data.plotOn(frame, RooFit::DrawOption("B"), RooFit::FillColor(kGray), RooFit::LineWidth(1), RooFit::MarkerSize(0),
               RooFit::XErrorSize(0), RooFit::DataError(RooAbsData::None), RooFit::LineStyle(kSolid), RooFit::LineColor(kBlack));
-  model.plotOn(frame, RooFit::LineColor(kBlue));
+  model.plotOn(frame, RooFit::LineColor(kBlue), RooFit::LineWidth(1));
   frame->SetTitle("Upsilon(4S) Mass Fit");
   frame->GetXaxis()->SetTitle((parts).c_str());
   frame->Draw();
@@ -167,7 +167,7 @@ void DQMHistAnalysisPhysicsModule::event()
       double hadb2_ntot = m_hphysicsresults->GetBinContent(3);
       double hadb2_tight_ntot = m_hphysicsresults->GetBinContent(4);
       double mumu_tight_ntot = m_hphysicsresults->GetBinContent(5);
-      double bhabha_all_ntot = m_hphysicsresults->GetBinContent(6);
+      double bhabha_trk_ecl_ntot = m_hphysicsresults->GetBinContent(6);
 
       double ratio_hadron_bhabha = 0.;
       double ratio_hadronb2_bhabha = 0.;
@@ -179,15 +179,15 @@ void DQMHistAnalysisPhysicsModule::event()
       double error_mumu_tight_bhabha = -10.;
 
 
-      if (bhabha_all_ntot != 0) {
-        ratio_hadron_bhabha = had_ntot / bhabha_all_ntot;
-        error_hadron_bhabha = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bhabha_all_ntot));
-        ratio_hadronb2_bhabha = hadb2_ntot / bhabha_all_ntot;
-        error_hadronb2_bhabha = ratio_hadronb2_bhabha * sqrt((1 / hadb2_ntot) + (1 / bhabha_all_ntot));
-        ratio_hadronb2_tight_bhabha = hadb2_tight_ntot / bhabha_all_ntot;
-        error_hadronb2_tight_bhabha = ratio_hadronb2_tight_bhabha * sqrt((1 / hadb2_tight_ntot) + (1 / bhabha_all_ntot));
-        ratio_mumu_tight_bhabha = mumu_tight_ntot / bhabha_all_ntot;
-        error_mumu_tight_bhabha = ratio_mumu_tight_bhabha * sqrt((1 / mumu_tight_ntot) + (1 / bhabha_all_ntot));
+      if (bhabha_trk_ecl_ntot != 0) {
+        ratio_hadron_bhabha = had_ntot / bhabha_trk_ecl_ntot;
+        error_hadron_bhabha = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bhabha_trk_ecl_ntot));
+        ratio_hadronb2_bhabha = hadb2_ntot / bhabha_trk_ecl_ntot;
+        error_hadronb2_bhabha = ratio_hadronb2_bhabha * sqrt((1 / hadb2_ntot) + (1 / bhabha_trk_ecl_ntot));
+        ratio_hadronb2_tight_bhabha = hadb2_tight_ntot / bhabha_trk_ecl_ntot;
+        error_hadronb2_tight_bhabha = ratio_hadronb2_tight_bhabha * sqrt((1 / hadb2_tight_ntot) + (1 / bhabha_trk_ecl_ntot));
+        ratio_mumu_tight_bhabha = mumu_tight_ntot / bhabha_trk_ecl_ntot;
+        error_mumu_tight_bhabha = ratio_mumu_tight_bhabha * sqrt((1 / mumu_tight_ntot) + (1 / bhabha_trk_ecl_ntot));
       }
       m_ratio_text->AddText(Form("hadronb2_tight/bhabha: %.4f +/- %.4f", float(ratio_hadronb2_tight_bhabha),
                                  float(error_hadronb2_tight_bhabha)));
@@ -197,32 +197,52 @@ void DQMHistAnalysisPhysicsModule::event()
 
     }
 
-    // for pv #new hadronb2_tight/#bhabha_all
-    auto hist_hadronb2_tight_over_bhabha_all =  getDelta("PhysicsObjects", "physicsresults", 0, true);// only if updated
-    if (hist_hadronb2_tight_over_bhabha_all) {
-      if (hist_hadronb2_tight_over_bhabha_all->GetBinContent(6) != 0) {
-        double hadronb2_tight_over_bhabha_all = hist_hadronb2_tight_over_bhabha_all->GetBinContent(4) /
-                                                hist_hadronb2_tight_over_bhabha_all->GetBinContent(6);
-        B2DEBUG(1, "hadronb2_tight_over_bhabha_all:" << hadronb2_tight_over_bhabha_all);
-        setEpicsPV("hadronb2_tight_over_bhabha_all", hadronb2_tight_over_bhabha_all);
+    // for pv #new hadronb2_tight/#bhabha_trk_ecl
+    auto hist_hadronb2_tight_over_bhabha_trk_ecl =  getDelta("PhysicsObjects", "physicsresults", 0, true);// only if updated
+    if (hist_hadronb2_tight_over_bhabha_trk_ecl) {
+      if (hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(6) != 0) {
+        double hadronb2_tight_over_bhabha_trk_ecl = hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(4) /
+                                                    hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(6);
+        B2DEBUG(1, "hadronb2_tight_over_bhabha_trk_ecl:" << hadronb2_tight_over_bhabha_trk_ecl);
+        setEpicsPV("hadronb2_tight_over_bhabha_trk_ecl", hadronb2_tight_over_bhabha_trk_ecl);
       }
     }
 
-    auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");
-    if (m_cmUPSmumu and hmUPSmumu) {
-      m_cmUPSmumu->cd();
-      fitUpsilonFromHisto(hmUPSmumu, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
-      m_cmUPSmumu->Modified();
-      m_cmUPSmumu->Update();
-      UpdateCanvas(m_cmUPSmumu);
+    if (m_cmUPSmumu) {
+      auto hmUPSmumu = getDelta("PhysicsObjects/mUPS");// check if updated
+      if (hmUPSmumu) {
+        m_cmUPSmumu->cd();
+        fitUpsilonFromHisto(hmUPSmumu, m_cmUPSmumu_text, "M(#mu#mu) [GeV/c^2]", "UPSmumu", m_pvPrefix + "mUPSmumu");
+        m_cmUPSmumu->Modified();
+        m_cmUPSmumu->Update();
+        UpdateCanvas(m_cmUPSmumu);
+      } else {
+        hmUPSmumu = findHist("PhysicsObjects/mUPS", true);// only if updated
+        if (hmUPSmumu and hmUPSmumu->GetEntries() < m_minEntriesUPSmumu) {
+          // only if integral plot is below delta entries
+          m_cmUPSmumu->cd();
+          m_cmUPSmumu->Clear();
+          hmUPSmumu->Draw("hist");
+        }
+      }
     }
-    auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
-    if (m_cmUPSee and hmUPSee) {
-      m_cmUPSee->cd();
-      fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
-      m_cmUPSee->Modified();
-      m_cmUPSee->Update();
-      UpdateCanvas(m_cmUPSee);
+    if (m_cmUPSee) {
+      auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
+      if (hmUPSee) {
+        m_cmUPSee->cd();
+        fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
+        m_cmUPSee->Modified();
+        m_cmUPSee->Update();
+        UpdateCanvas(m_cmUPSee);
+      } else {
+        hmUPSee = findHist("PhysicsObjects/mUPSe", true);// only if updated
+        if (hmUPSee and hmUPSee->GetEntries() < m_minEntriesUPSee) {
+          // only if integral plot is below delta entries
+          m_cmUPSee->cd();
+          m_cmUPSee->Clear();
+          hmUPSee->Draw("hist");
+        }
+      }
     }
     auto* m_cphysicsresults = findCanvas("PhysicsObjects/c_physicsresults");
     if (m_cphysicsresults) {
@@ -241,24 +261,24 @@ void DQMHistAnalysisPhysicsModule::endRun()
     double hadb2_ntot = m_hphysicsresults->GetBinContent(3);
     double hadb2_tight_ntot = m_hphysicsresults->GetBinContent(4);
     double mumu_tight_ntot = m_hphysicsresults->GetBinContent(5);
-    double bhabha_all_ntot = m_hphysicsresults->GetBinContent(6);
+    double bhabha_trk_ecl_ntot = m_hphysicsresults->GetBinContent(6);
     double ratio_hadron_bhabha_final = 0.;
     double ratio_hadronb2_bhabha_final = 0.;
     double ratio_hadronb2_tight_bhabha_final = 0.;
     double ratio_mumu_tight_bhabha_final = 0.;
 
-    if (bhabha_all_ntot != 0) {
-      ratio_hadron_bhabha_final = had_ntot / bhabha_all_ntot;
-      ratio_hadronb2_bhabha_final = hadb2_ntot / bhabha_all_ntot;
-      ratio_hadronb2_tight_bhabha_final = hadb2_tight_ntot / bhabha_all_ntot;
-      ratio_mumu_tight_bhabha_final = mumu_tight_ntot / bhabha_all_ntot;
+    if (bhabha_trk_ecl_ntot != 0) {
+      ratio_hadron_bhabha_final = had_ntot / bhabha_trk_ecl_ntot;
+      ratio_hadronb2_bhabha_final = hadb2_ntot / bhabha_trk_ecl_ntot;
+      ratio_hadronb2_tight_bhabha_final = hadb2_tight_ntot / bhabha_trk_ecl_ntot;
+      ratio_mumu_tight_bhabha_final = mumu_tight_ntot / bhabha_trk_ecl_ntot;
     }
     m_monObj->setVariable("ratio_hadron_bhabha_hlt", ratio_hadron_bhabha_final);
     m_monObj->setVariable("ratio_hadronb2_bhabha_hlt", ratio_hadronb2_bhabha_final);
     m_monObj->setVariable("ratio_hadronb2_tight_bhabha_hlt", ratio_hadronb2_tight_bhabha_final);
     m_monObj->setVariable("ratio_mumu_tight_bhabha_hlt", ratio_mumu_tight_bhabha_final);
     m_monObj->setVariable("hadronb2_tight_hlt", hadb2_tight_ntot);
-    m_monObj->setVariable("bhabha_all_hlt", bhabha_all_ntot);
+    m_monObj->setVariable("bhabha_trk_ecl_hlt", bhabha_trk_ecl_ntot);
 
   }
 }

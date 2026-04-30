@@ -496,16 +496,16 @@ namespace Belle2 {
 
     private:
       /// Memory for the signed curvature
-      double m_curvature;
+      double m_curvature = 0.0;
 
       /// Memory for the azimuth angle of the direction of flight at the perigee
-      double m_phi0;
+      double m_phi0 = NAN;
 
       /// Cached unit direction of flight at the perigee
-      Vector2D m_phi0Vec;
+      Vector2D m_phi0Vec{0.0, 0.0};
 
       /// Memory for the signed impact parameter
-      double m_impact;
+      double m_impact = 0.0;
 
     };
 

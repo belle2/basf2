@@ -143,6 +143,13 @@ namespace Belle2 {
     double klmClusterTrackDistance(const Particle* particle);
 
     /**
+     * This also returns the distance between KLM cluster and its closes track, but calculated using helix extrapolation.
+     * This variable returns NaN if there is no Track-to-KLMCluster relationship.
+     * @param[in] particle Input particle.
+     */
+    double klmClusterTrackDistance_helix_extrapolation(const Particle* particle);
+
+    /**
      * Returns the angle between momenta of the track initially at IP and then at POCA to the KLMCluster
      * associated to this Particle for the closest Track.
      * This variable returns NaN if there is no Track-to-KLMCluster relationship.

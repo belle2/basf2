@@ -25,7 +25,7 @@ namespace Belle2 {
     /** Constructor */
     AlignDQMModule();
     /* Destructor */
-    ~AlignDQMModule() { }
+    ~AlignDQMModule() override { }
 
     /** Module function event */
     virtual void event() override;

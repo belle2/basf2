@@ -192,7 +192,7 @@ def get_metadata(*, TestingCombined=False):
     except FileNotFoundError as e:
         raise SkimNotRunException(
             f"    Failed to open {LogDirectory} / metadata.json.\n"
-            +"    Perhaps you forgot to run ``b2skim-stats-submit`` first to create it?"
+            + "    Perhaps you forgot to run ``b2skim-stats-submit`` first to create it?"
         ) from e
     return metadata
 
@@ -223,7 +223,7 @@ def getLogFile(skim, sample, TestingCombined):
         raise SkimNotRunException(
             f"    Failed to open output log file for {skim} skim on {sample} sample.\n"
             "    Perhaps you forgot to run the skim with ``b2skim-stats-submit``?"
-        ) 
+        )
 
     if not testLogFile(logFileContents):
         raise SkimNotRunException(
@@ -1178,6 +1178,13 @@ def printToScreen(allSkimStats, samples):
 
         df.rename(index=renamingPairs, inplace=True)
 
+        # HOTFIX datacleaning
+        # tabulate prefers `str` instead of `numpy.ndarray` when printing combined skim stats
+        # Problematic for `RetentionRate`, `FileSizeRetentionRate` and `udstSizePerSkimmedEvent`
+        for selectedStat in selectedStats:
+            if isinstance(df[selectedStat].iloc[0], np.ndarray):
+                df[selectedStat] = df[selectedStat].astype(str)
+
         table = tabulate(
             df[selectedStats],
             headers=headers,
@@ -1245,6 +1252,13 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
         df.rename(index=renamingPairs, inplace=True)
 
+        # HOTFIX datacleaning
+        # tabulate prefers `str` instead of `numpy.ndarray` when printing combined skim stats
+        # Problematic for `RetentionRate`, `FileSizeRetentionRate` and `udstSizePerSkimmedEvent`
+        for selectedStat in selectedStats:
+            if isinstance(df[selectedStat].iloc[0], np.ndarray):
+                df[selectedStat] = df[selectedStat].astype(str)
+
         table = tabulate(df, headers=headers, tablefmt="jira", floatfmt=floatFormat)
 
         # Make the first column (the sample label) bold on Confluence
@@ -1294,6 +1308,13 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
         df.rename(index=renamingPairs, inplace=True)
         # Make entries in first column bold
         df.rename(index={label: f"**{label}**" for label in df.index}, inplace=True)
+
+        # HOTFIX datacleaning
+        # tabulate prefers `str` instead of `numpy.ndarray` when printing combined skim stats
+        # Problematic for `RetentionRate`, `FileSizeRetentionRate` and `udstSizePerSkimmedEvent`
+        for selectedStat in selectedStats:
+            if isinstance(df[selectedStat].iloc[0], np.ndarray):
+                df[selectedStat] = df[selectedStat].astype(str)
 
         table = tabulate(
             df[selectedStats],

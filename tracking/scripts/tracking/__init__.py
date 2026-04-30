@@ -41,13 +41,14 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                 svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
-                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=True,
                                 pxd_filtering_offline=False,
                                 create_intercepts_for_pxd_ckf=False,
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
                                 skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                inverted_tracking=False):
+                                inverted_tracking=False,
+                                use_cat_finder=False):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -82,8 +83,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     #. If the reconstruction uses PXD, we finally look for tracks with a wrong charge,\
     flip and refit them to fix the charge, see :ref:`Flip&Refit<trk_flipNrefit>`.
 
-
-
     :param path: the path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: if true, delete all hits except the first and the last in the found tracks.
@@ -115,7 +114,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         -> setting this option to 'True' will have some influence on the final track collection)
     :param add_recoTrack_QI: if true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
-        (Both other QIs needed as input.)
+        (CDC QI is needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -135,6 +134,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     add_prefilter_tracking_reconstruction(
@@ -159,7 +160,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-        inverted_tracking=inverted_tracking)
+        inverted_tracking=inverted_tracking,
+        use_cat_finder=use_cat_finder)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -179,12 +181,13 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
                                           svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, svd_ckf_mode="SVD_after", use_ecl_to_cdc_ckf=False,
-                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
+                                          add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=True,
                                           pxd_filtering_offline=False,
                                           create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
                                           skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                          inverted_tracking=False):
+                                          inverted_tracking=False,
+                                          use_cat_finder=False):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -220,7 +223,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         -> setting this option to 'True' will have some influence on the final track collection)
     :param add_recoTrack_QI: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of all found reco tracks
-        (Both other QIs needed as input.)
+        (CDC QI is needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -238,6 +241,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     if not is_any_detector_present(["SVD", "CDC"], components):
@@ -249,10 +254,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
-    if add_recoTrack_QI and (not add_cdcTrack_QI or not add_vxdTrack_QI):
-        b2.B2ERROR("RecoTrack qualiy indicator requires CDC and VXD QI as input. Turning it all of.")
+    if add_recoTrack_QI and not add_cdcTrack_QI:
+        b2.B2ERROR("RecoTrack qualiy indicator requires CDC QI as input. Turning it all of.")
         add_cdcTrack_QI = False
-        add_vxdTrack_QI = False
         add_recoTrack_QI = False
 
     if not skipGeometryAdding:
@@ -285,7 +289,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           add_vxdTrack_QI=add_vxdTrack_QI,
                           pxd_filtering_offline=pxd_filtering_offline,
                           create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
-                          inverted_tracking=inverted_tracking)
+                          inverted_tracking=inverted_tracking,
+                          use_cat_finder=use_cat_finder)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -469,7 +474,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
                       create_intercepts_for_pxd_ckf=False,
-                      inverted_tracking=False):
+                      inverted_tracking=False, use_cat_finder=False):
     """
     Add the track finding chain to the path. Depending on the parameters, different tracking chains can be defined and attached.
     :param path: The path to add the tracking reconstruction modules to
@@ -507,6 +512,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         ATTENTION: The inverted tracking chain is neither optimised nor guaranteed to be bug free.
         One known issue is a reduced hit efficiency when using the full chain.
         Please remove this comment once the inverted tracking has been optimised and is assumed to be bug-free.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
     if not is_any_detector_present(["SVD", "CDC"], components):
         return
@@ -564,7 +571,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                                                use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                                                svd_standalone_mode=svd_standalone_mode,
                                                add_vxdTrack_QI=add_vxdTrack_QI,
-                                               prune_temporary_tracks=prune_temporary_tracks)
+                                               prune_temporary_tracks=prune_temporary_tracks,
+                                               use_cat_finder=use_cat_finder)
 
         temporary_reco_track_list.extend(tmp_reco_track_list)
     else:

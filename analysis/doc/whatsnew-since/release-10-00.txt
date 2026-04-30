@@ -4,6 +4,10 @@ Modules and Modular Analysis
 ++++++++++++++++++++++++++++
 * It is no longer possible to use ``tree`` as the name for a ``TTree`` saved with the `VariablesToNtuple` and `VariablesToEventBasedTree` modules. In particular, this affects the argument ``treeName`` of the function `modularAnalysis.variablesToNtuple`: ``variablesToNtuple(treeName='tree')`` will now result in a ``FATAL`` message from basf2.
 
+Variables
++++++++++
+* Added metavariable `atan2`, which returns the atan2 value (arctangent of y/x). The result is in radians. 
+
 Changes in the analysis package in light-2603-ina
 ------------------------------------------------------
 

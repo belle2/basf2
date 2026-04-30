@@ -156,7 +156,6 @@ void TrackQETrainingDataCollectorModule::event()
     // If no matching SVD tracks are found, then svdRecoTrackPtr will still be nullptr.
     RecoTrack* svdRecoTrackPtr = nullptr;
     RecoTrack* svdRecoTrackBeforePtr = nullptr;
-    RecoTrack* svdRecoTrackAfterPtr = nullptr;
     // First try to match the whole SVD track, which means it only contains one SVD part.
     for (RecoTrack* foundSVDTrack : allSVDTracks) {
       const auto& foundSVDTrackHitList = foundSVDTrack->getSVDHitList();
@@ -171,12 +170,12 @@ void TrackQETrainingDataCollectorModule::event()
       // Next try to match two SVD tracks.
       for (RecoTrack* foundSVDTrackBefore : allSVDTracks) {
         const auto& foundSVDTrackBeforeHitList = foundSVDTrackBefore->getSVDHitList();
-        int sizeBefore = foundSVDTrackBeforeHitList.size();
+        auto sizeBefore = foundSVDTrackBeforeHitList.size();
         if (sizeBefore >= svdHitList.size())
           continue;
         if (not std::equal(foundSVDTrackBeforeHitList.begin(), foundSVDTrackBeforeHitList.end(), svdHitList.begin()))
           continue;
-        int rest = svdHitList.size() - sizeBefore;
+        auto rest = svdHitList.size() - sizeBefore;
         for (RecoTrack* foundSVDTrackAfter : allSVDTracks) {
           const auto& foundSVDTrackAfterHitList = foundSVDTrackAfter->getSVDHitList();
           if (foundSVDTrackBefore == foundSVDTrackAfter)
@@ -186,7 +185,6 @@ void TrackQETrainingDataCollectorModule::event()
           if (std::equal(foundSVDTrackAfterHitList.begin(), foundSVDTrackAfterHitList.end(), svdHitList.begin() + sizeBefore)) {
             svdRecoTrackPtr = foundSVDTrackAfter;
             svdRecoTrackBeforePtr = foundSVDTrackBefore;
-            svdRecoTrackAfterPtr = foundSVDTrackAfter;
             break;
           }
         }

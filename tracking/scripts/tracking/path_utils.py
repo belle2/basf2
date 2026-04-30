@@ -741,7 +741,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_cdc_cellul
                 filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
                 deleteTracks=True,
                 resetTakenFlag=True,
-                deactivateIfDeadBoard=True,
+                deactivateIfDeadBoard=False,
                 minLayerJumpsForDeadBoards=4
             )
 

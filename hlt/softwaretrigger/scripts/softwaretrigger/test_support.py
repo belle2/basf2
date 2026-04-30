@@ -44,6 +44,7 @@ class InflateCDCHits(basf2.Module):
 
     def initialize(self):
         """Initialize."""
+        #: CDC hits
         self.cdc_hits = Belle2.PyStoreArray("CDCHits")
         present = self.cdc_hits.isOptional()
         if present:
@@ -53,6 +54,7 @@ class InflateCDCHits(basf2.Module):
         eodb_parameters = Belle2.PyDBObj("EventsOfDoomParameters")
         if not eodb_parameters.isValid():
             basf2.B2FATAL("EventsOfDoomParameters is not valid")
+        #: CDC hits threshold
         self.cdc_hits_threshold = eodb_parameters.getNCDCHitsMax() + 1
 
     def event(self):

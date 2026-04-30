@@ -1125,7 +1125,9 @@
   83. KLMClustersReconstructor
       ClusterMode=AnyHit
       ClusteringAngle=0.26
-      PositionMode=FirstLayer
+      OutlierTrimAngle=0.18
+      PositionMode=FirstTwoLayers
+      RemoveOutlierHits=False
   84. KLMClusterAna
   85. MCMatcherKLMClusters
       Hit2dRelations=False

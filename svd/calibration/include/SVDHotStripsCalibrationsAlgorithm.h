@@ -21,7 +21,7 @@ namespace Belle2 {
     explicit SVDHotStripsCalibrationsAlgorithm(const std::string& str);
 
     /** Destructor */
-    virtual ~SVDHotStripsCalibrationsAlgorithm() {}
+    virtual ~SVDHotStripsCalibrationsAlgorithm() override {}
 
     /** Setter of m_computeAverageOccupancyPerChip */
     void computeAverageOccupancyPerChip(bool value) {m_computeAverageOccupancyPerChip = value;}

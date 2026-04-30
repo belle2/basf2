@@ -104,6 +104,9 @@ namespace Belle2::HLTPrefilter {
         } catch (const std::exception&) {
         }
 
+        if (inActiveInjectionVeto && (LER_strip || HER_strip))
+          B2WARNING("Skip event if HLTPrefilter On --> Event tagged by HLTPrefilter as injection background");
+
         // Tag events from active veto inside injection strip with a prescale
         return inActiveInjectionVeto && (LER_strip || HER_strip);
       } else
@@ -154,6 +157,9 @@ namespace Belle2::HLTPrefilter {
         } catch (const std::exception&) {
         }
 
+        if (inActiveInjectionVeto && (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax))
+          B2WARNING("Skip event if HLTPrefilter On --> Event tagged by HLTPrefilter as high CDC-ECL occupancy");
+
         // Tag events having a large CDC and ECL occupancy with a prescale
         return inActiveInjectionVeto && (nCDCHits > nCDCHitsMax && nECLDigits > nECLDigitsMax);
       } else
@@ -189,10 +195,25 @@ namespace Belle2::HLTPrefilter {
         /// Get NCDCHits for the event
         const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
         /// Get NSVDShaperDigits for the event
-        const uint32_t nsvdShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+        const uint32_t nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
 
-        // Tag events having a large SVD and CDC occupancy
-        return (nCDCHits > nCDCHitsMax && nsvdShaperDigits > nSVDShaperDigitsMax);
+        const bool doomCDC = nCDCHits > nCDCHitsMax;
+        const bool doomSVD = nSVDShaperDigits > nSVDShaperDigitsMax;
+
+        if (doomCDC) {
+          B2ERROR("Skip event --> Too much occupancy from CDC for reconstruction!" <<
+                  LogVar("nCDCHits", nCDCHits) <<
+                  LogVar("nCDCHitsMax", nCDCHitsMax));
+        }
+
+        if (doomSVD) {
+          B2ERROR("Skip event --> Too much occupancy from SVD for reconstruction!" <<
+                  LogVar("nSVDShaperDigits", nSVDShaperDigits) <<
+                  LogVar("nSVDShaperDigitsMax", nSVDShaperDigitsMax));
+        }
+
+        // Tag events having a large SVD or CDC occupancy
+        return (doomCDC || doomSVD);
       } else
         return false;
     }

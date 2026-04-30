@@ -107,15 +107,6 @@ namespace Belle2 {
     /** Floor (minimum) angular threshold in rad; effective cut is max(floor, k*MAD). */
     double m_OutlierTrimAngle;
 
-    /** Maximum number of iterations for the iterative centroid trim. */
-    int m_OutlierRemovalMaxIterations;
-
-    /** Multiplier k for k*MAD adaptive angular threshold (scale factor). */
-    double m_OutlierMADFactor;
-
-    /** Minimum fraction of original hits that must survive; otherwise cluster is kept untrimmed. */
-    double m_OutlierMinInlierFraction;
-
     /**
      * Optional post-cluster hit filtering. No-op when m_RemoveOutlierHits is false.
      * Outliers are appended to poolHits and poolHits is re-sorted by R.

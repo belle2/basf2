@@ -30,10 +30,7 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   m_PositionMode(c_FirstLayer),
   m_ClusterMode(c_AnyHit),
   m_RemoveOutlierHits(false),
-  m_OutlierTrimAngle(0.12),
-  m_OutlierRemovalMaxIterations(5),
-  m_OutlierMADFactor(3.0),
-  m_OutlierMinInlierFraction(0.5)
+  m_OutlierTrimAngle(0.18)
 {
   setDescription("Unified BKLM/EKLM module for the reconstruction of KLMClusters.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -42,7 +39,7 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
   addParam("PositionMode", m_PositionModeString,
            "Vertex position mode: 'FullAverage', 'FirstLayer', 'FirstTwoLayers', "
            "or 'SuccessiveTwoLayers'.",
-           std::string("FirstLayer"));
+           std::string("FirstTwoLayers"));
   addParam("ClusterMode", m_ClusterModeString,
            "Clusterization mode ('AnyHit' or 'FirstHit').",
            std::string("AnyHit"));
@@ -53,19 +50,8 @@ KLMClustersReconstructorModule::KLMClustersReconstructorModule() : Module(),
            false);
   addParam("OutlierTrimAngle", m_OutlierTrimAngle,
            "Used only if removeOutlierHits: floor (minimum) angular threshold (rad). "
-           "Effective cut is max(OutlierTrimAngle, OutlierMADFactor * MAD(residuals)).",
-           0.12);
-  addParam("OutlierRemovalMaxIterations", m_OutlierRemovalMaxIterations,
-           "Used only if removeOutlierHits: maximum number of iterations for the "
-           "adaptive centroid-based trim (algorithm stops early at a fixed point).",
-           5);
-  addParam("OutlierMADFactor", m_OutlierMADFactor,
-           "Used only if removeOutlierHits: multiplier k for adaptive k*MAD angular cut.",
-           3.0);
-  addParam("OutlierMinInlierFraction", m_OutlierMinInlierFraction,
-           "Used only if removeOutlierHits: minimum fraction of original hits that must "
-           "survive trimming; otherwise the cluster is kept untrimmed.",
-           0.5);
+           "Effective cut is max(OutlierTrimAngle, k * MAD(residuals)) with fixed k=3.",
+           0.18);
 }
 
 KLMClustersReconstructorModule::~KLMClustersReconstructorModule()
@@ -166,19 +152,25 @@ static double adaptiveThreshold(const ROOT::Math::XYZVector& ref,
 void KLMClustersReconstructorModule::applyOutlierRemoval(std::vector<KLMHit2d*>& clusterHits,
                                                          std::vector<KLMHit2d*>& poolHits)
 {
+  /* Fixed tuning: standard k=3 for MAD scale; iteration cap (fixed-point exits early);
+   * min inlier fraction 0.3 avoids over-trimming a cluster to fewer than 30% the hits. */
+  constexpr double kMADFactor = 3.0;
+  constexpr int kMaxOutlierIterations = 5;
+  constexpr double kMinInlierFraction = 0.3;
+
   if (!m_RemoveOutlierHits || clusterHits.size() <= 1)
     return;
 
   const std::vector<KLMHit2d*> before = clusterHits;
   const std::size_t minInliers = std::max<std::size_t>(
-                                   2, static_cast<std::size_t>(std::ceil(m_OutlierMinInlierFraction * before.size())));
+                                   2, static_cast<std::size_t>(std::ceil(kMinInlierFraction * before.size())));
 
   std::vector<KLMHit2d*> inliers = before;
-  for (int iter = 0; iter < m_OutlierRemovalMaxIterations; iter++) {
+  for (int iter = 0; iter < kMaxOutlierIterations; iter++) {
     const ROOT::Math::XYZVector ref =
       referenceDirection(inliers, /*seedByInnermost=*/iter == 0);
     const double threshold =
-      adaptiveThreshold(ref, before, m_OutlierTrimAngle, m_OutlierMADFactor);
+      adaptiveThreshold(ref, before, m_OutlierTrimAngle, kMADFactor);
     std::vector<KLMHit2d*> next;
     next.reserve(before.size());
     for (KLMHit2d* h : before) {

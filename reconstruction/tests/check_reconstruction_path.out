@@ -1122,14 +1122,11 @@
   83. KLMClustersReconstructor
       ClusterMode=AnyHit
       ClusteringAngle=0.26
-      OutlierMADFactor=3.0
-      OutlierMinInlierFraction=0.5
-      OutlierRemovalMaxIterations=5
-      OutlierTrimAngle=0.12
+      OutlierTrimAngle=0.18
       PositionMode=FirstTwoLayers
-      RemoveOutlierHits=True
-  83. KLMClusterAna
-  84. MCMatcherKLMClusters
+      RemoveOutlierHits=False
+  84. KLMClusterAna
+  85. MCMatcherKLMClusters
       Hit2dRelations=False
   86. Muid
       EnableVisualization=False

@@ -32,7 +32,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -42,7 +42,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -62,7 +62,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -72,7 +72,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -82,11 +82,11 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -106,7 +106,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114
@@ -120,7 +120,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114
@@ -160,7 +160,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [INFO] Conditions Database: found working metadata provider
 	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
@@ -176,7 +176,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [INFO] Conditions Database: found working metadata provider
 	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
@@ -208,7 +208,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [INFO] Conditions Database: found working metadata provider
 	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
@@ -227,7 +227,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [INFO] Conditions Database: found working metadata provider
 	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
@@ -246,11 +246,11 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [INFO] Conditions Database: found working metadata provider
 	provider = /cvmfs/belle.cern.ch/conditions/database.sqlite
@@ -288,7 +288,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114
@@ -311,7 +311,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114
@@ -375,7 +375,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -391,7 +391,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -426,7 +426,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -445,7 +445,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -464,11 +464,11 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_3
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] The random number seed is set to "114"
@@ -506,7 +506,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114
@@ -532,7 +532,7 @@
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = user_depietro_cdb_test_2
 	status = OPEN
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions Database: Cannot download information on global tag. Either the database is overloaded or the selected globaltag doesn't exist
 	server url = http://belle2db.sdcc.bnl.gov/b2s/rest/
 	globaltag = 114

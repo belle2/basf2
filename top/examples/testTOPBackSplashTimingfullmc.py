@@ -17,6 +17,7 @@ import basf2 as b2
 import simulation as si
 import reconstruction as re
 from generators import add_evtgen_generator
+import mdst
 import glob
 import argparse
 
@@ -57,10 +58,7 @@ path.add_module("TOPBackSplashTiming",
                 )
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof
-path.add_module("RootOutput",
-                outputFileName="output_TOPBackSplashTiming.root",
-                additionalBranchNames=['TOPBackSplashFitResult']
-                )
+mdst.add_mdst_output(path, mc=True, additionalBranches=['TOPBackSplashFitResults'])
 
 # run
 path.add_module("Progress")

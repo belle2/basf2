@@ -17,6 +17,7 @@ import basf2 as b2
 import simulation as si
 import reconstruction as re
 import argparse
+import mdst
 
 parser = argparse.ArgumentParser(description="Generates nbar events and save TOP timing fits to neutral clusters")
 parser.add_argument('--mom', default=1, help='Momentum of nbars to generate [GeV/c]')
@@ -86,9 +87,11 @@ path.add_module("TOPBackSplashTiming",
                 )
 
 # Save mdst with timing, no. of fitted photons and chi-2/dof
-path.add_module("RootOutput",
-                outputFileName=f"output_TOPBackSplashTiming_{args.mom}.root",
-                additionalBranchNames=["TOPBackSplashFitResults"]
-                )
+mdst.add_mdst_output(path, mc=True, additionalBranches=['TOPBackSplashFitResults'])
 
-b2.process(path)
+path.add_module("Progress")
+
+b2.process(path, calculateStatistics=True)
+
+# show call statistics
+print(b2.statistics)

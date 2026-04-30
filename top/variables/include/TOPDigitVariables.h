@@ -691,8 +691,11 @@ namespace Belle2 {
        */
       double TOPTracksInSlot(const Particle* particle);
 
+      //-------------- TOPBackSplash based -----------------------------------
+
       /**
        * returns the cluster timing measured by the backsplash in the TOP [ns]
+       * requires TOPBackSplash
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @return backsplash time (NaN if N/A)
        */
@@ -700,24 +703,84 @@ namespace Belle2 {
 
       /**
        * returns the error on the cluster timing measured by the backsplash in the TOP [ns]
+       * requires TOPBackSplash
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @return backsplash time error (NaN if N/A)
        */
       double topBackSplashTimeErr(const Particle* particle);
 
       /**
+       * returns time difference between direct and reflected peak of the backsplash fit [ns]
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return time difference between direct and reflected peak in backsplash fit (NaN if N/A)
+       */
+      double topBackSplashDeltaT(const Particle* particle);
+
+      /**
+       * returns error on time difference between direct and reflected peak of the backsplash fit [ns]
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return error on time difference between direct and reflected peak in backsplash fit (NaN if N/A)
+       */
+      double topBackSplashDeltaTErr(const Particle* particle);
+
+      /**
+       * returns fractional yield of the direct light peak in the backsplash pdf
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return fractional yield of the direct light peak in the backsplash pdf
+      (NaN if N/A)
+       */
+      double topBackSplashFrac(const Particle* particle);
+
+      /**
+       * returns error fractional yield of the direct light peak in the backsplash pdf
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return error on fractional yield of the direct light peak in the backsplash pdf
+       */
+      double topBackSplashFracErr(const Particle* particle);
+
+      /**
+       * returns the number of cherenkov photons in signal component of fit
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return number of photons (i.e. normalization) in signal component of fit result (NaN if N/A)
+       */
+      double topBackSplashSignalPhotons(const Particle* particle);
+
+      /**
+       * returns the error on the number of cherenkov photons in signal component of fit
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return fit error on  number of photons (i.e. normalization) in signal component (NaN if N/A)
+       */
+      double topBackSplashSignalPhotonsErr(const Particle* particle);
+
+      /**
        * returns the number of cherenkov photons associated to the backsplash
+       * requires TOPBackSplash
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @return number of photons from teh backsplash fit result (NaN if N/A)
        */
       double topBackSplashNphotons(const Particle* particle);
 
       /**
-       * returns the chi2/nfd of the fit of the backsplash timing distribution in the TOP
+       * returns the chi2/ndof of the fit of the backsplash timing distribution in the TOP
+       * requires TOPBackSplash
        * @param particle pointer to Particle object (nullptr is also accepted)
        * @return chi2 of the backsplash fit result (NaN if N/A)
        */
       double topBackSplashChi2(const Particle* particle);
+
+      /**
+       * returns the no. of tracks in the same used in backsplash fit result
+       * requires TOPBackSplash
+       * @param particle pointer to Particle object (nullptr is also accepted)
+       * @return no. of tracks in the same slot used in backsplash fit result (NaN if N/A)
+       */
+      double topBackSplashNtracksInSlot(const Particle* particle);
 
 
     } // TOPVariable

@@ -706,6 +706,8 @@ namespace Belle2 {
         return nTracks;
       }
 
+      //-------------- TOPBackSplash based -----------------------------------
+
       double topBackSplashTime(const Particle* particle)
       {
         const ECLCluster* cluster = particle->getECLCluster();
@@ -841,6 +843,18 @@ namespace Belle2 {
       }
 
 
+      double topBackSplashNtracksInSlot(const Particle* particle)
+      {
+        const ECLCluster* cluster = particle->getECLCluster();
+        if (!cluster)
+          return Const::doubleNaN;
+
+        const TOPBackSplashFitResult* backsplash = cluster->getRelated<TOPBackSplashFitResult>();
+        if (!backsplash)
+          return Const::doubleNaN;
+
+        return backsplash->getNtracksInSlot();
+      }
 
     } // TOPVariable
 
@@ -973,43 +987,46 @@ namespace Belle2 {
 
 
     REGISTER_VARIABLE("topBackSplashTime", TOPVariable::topBackSplashTime,
-                      R"DOC(Returns the timing of the backsplash signal in the TOP detector. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the timing of the backsplash signal in the TOP detector. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "ns");
     REGISTER_VARIABLE("topBackSplashTimeErr", TOPVariable::topBackSplashTimeErr,
-                      R"DOC(Returns the error on the  timing of the backsplash signal in the TOP detector. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the error on the  timing of the backsplash signal in the TOP detector. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "ns");
     REGISTER_VARIABLE("topBackSplashDeltaT", TOPVariable::topBackSplashDeltaT,
-                      R"DOC(Returns the time difference between direct and reflected peak of the backsplash PDF.Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the time difference between direct and reflected peak of the backsplash PDF.Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "ns");
 
     REGISTER_VARIABLE("topBackSplashDeltaTerr", TOPVariable::topBackSplashDeltaTerr,
-                      R"DOC( Returns the error on the time difference between direct and reflected peak of the backsplash PDF Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC( Returns the error on the time difference between direct and reflected peak of the backsplash PDF Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "ns");
 
     REGISTER_VARIABLE("topBackSplashFrac", TOPVariable::topBackSplashFrac,
-                      R"DOC(Returns the fractional yield of the direct light peak in the backsplash PDF. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the fractional yield of the direct light peak in the backsplash PDF. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless");
 
     REGISTER_VARIABLE("topBackSplashFracErr", TOPVariable::topBackSplashFracErr,
-                      R"DOC(Returns the error on the  fractional yield of the direct light peak in the backsplash PDF.Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the error on the  fractional yield of the direct light peak in the backsplash PDF.Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless");
 
     REGISTER_VARIABLE("topBackSplashSignalPhotons", TOPVariable::topBackSplashSignalPhotons,
-                      R"DOC(Returns the normalization of the backsplash PDF. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the normalization of the backsplash PDF. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless");
 
     REGISTER_VARIABLE("topBackSplashSignalPhotonsErr", TOPVariable::topBackSplashSignalPhotonsErr,
-                      R"DOC( Returns the error on the normalization of the the backsplash PDF. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC( Returns the error on the normalization of the the backsplash PDF. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless");
 
     REGISTER_VARIABLE("topBackSplashNphotons", TOPVariable::topBackSplashNphotons,
-                      R"DOC(Returns the number of photoelectrons in the slot where the backsplash was identified. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the number of photoelectrons in the slot where the backsplash was identified. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless");
 
     REGISTER_VARIABLE("topBackSplashChi2", TOPVariable::topBackSplashChi2,
-                      R"DOC(Returns the reduced chi square of the fit to the backsplash signal in the TOP. Requires the TOPBackSPlashTiming to be added after the TOP reconstruction )DOC",
+                      R"DOC(Returns the reduced chi square of the fit to the backsplash signal in the TOP. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
                       "dimensionless")
 
+    REGISTER_VARIABLE("topBackSplashNtracksInSlot", TOPVariable::topBackSplashNtracksInSlot,
+                      R"DOC(Returns the no. of tracks in the same slot associated with the  backsplash signal in the TOP. Requires the TOPBackSplashTiming to be added after the TOP reconstruction )DOC",
+                      "dimensionless")
 
 
   } // Variable

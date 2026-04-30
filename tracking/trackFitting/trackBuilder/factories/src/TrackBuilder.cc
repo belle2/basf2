@@ -21,6 +21,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TMatrixDSym.h>
+#include <optional>
 
 #include <genfit/FitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -39,13 +40,14 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(27, trackReps.size() << " track representations available.");
+  std::optional<Track> ownedTrack;
   Track* relatedTrack = recoTrack.getRelatedFrom<Track>();
   bool newTrackCreated = false;
   if (!relatedTrack) {
-    relatedTrack = new Track(recoTrack.getQualityIndicator());
+    ownedTrack.emplace(recoTrack.getQualityIndicator());
+    relatedTrack = &*ownedTrack;
     newTrackCreated = true;
   }
-
 
   bool repAlreadySet = false;
   unsigned int repIDPlusOne = 0;

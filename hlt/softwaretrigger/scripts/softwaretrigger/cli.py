@@ -149,6 +149,11 @@ def add_cut_function(args):
                                reject_cut=args.reject_cut.lower() == "true", iov=None)
     trigger_menu = db_access.download_trigger_menu_from_db(args.base_identifier,
                                                            do_set_event_number=False)
+    if trigger_menu is None:
+        print(f"Trigger menu '{args.base_identifier}' not found. Creating a new one.")
+
+        db_access.upload_trigger_menu_to_db(args.base_identifier, [args.cut_identifier], accept_mode=True, iov=None)
+
     cuts = [str(cut) for cut in trigger_menu.getCutIdentifiers()]
 
     if args.cut_identifier not in cuts:
@@ -454,7 +459,7 @@ Please note that the IoV of the created trigger line and menu is set to infinite
     add_cut_parser.add_argument("--database", help="Where to take the trigger menu from. Defaults to 'online,localdb:latest'.",
                                 type=DownloadableDatabase, default=DownloadableDatabase("online,localdb:latest"))
     add_cut_parser.add_argument("base_identifier",
-                                help="base_identifier of the cut to add", choices=["filter", "skim"])
+                                help="base_identifier of the cut to add", choices=["prefilter", "filter", "skim"])
     add_cut_parser.add_argument("cut_identifier",
                                 help="cut_identifier of the cut to add")
     add_cut_parser.add_argument("cut_string",
@@ -483,7 +488,7 @@ The old cut payload will not be deleted from the database. This is not
 needed as only cuts specified in a trigger menu are used.
                                               """)
     remove_cut_parser.add_argument("base_identifier",
-                                   help="base_identifier of the cut to delete", choices=["filter", "skim"])
+                                   help="base_identifier of the cut to delete", choices=["prefilter", "filter", "skim"])
     remove_cut_parser.add_argument("cut_identifier",
                                    help="cut_identifier of the cut to delete")
     remove_cut_parser.add_argument("--database",

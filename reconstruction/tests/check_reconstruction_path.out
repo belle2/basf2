@@ -1,9 +1,21 @@
 [INFO] Steering file: reconstruction/tests/check_reconstruction_path.py
 [INFO] Modules and parameter settings in the path:
-  1. EventsOfDoomBuster
+  1. SoftwareTrigger
+      baseIdentifier=prefilter
+      debugOutputFileName=software_trigger_debug.root
+      preScaleStoreDebugOutputToDataStore=0
+      resultStoreArrayName=
+      storeDebugOutputToROOTFile=False
+      useRandomNumbersForPreScale=True
+  2. TriggerSkim
+      expectedResult=1
+      logicMode=or
+      resultOnMissing=None
+      skipFirstEvent=False
+      triggerLines=['software_trigger_cut&prefilter&total_result']
+      useRandomNumbersForPreScale=True
 
-      (? >=1[] ):
-  2. Sum_EventsofDoomBuster
+      (? <1[] ):
   3. ECLWaveformFit
       Chi2Threshold25dof=57.1
       Chi2Threshold27dof=60.0

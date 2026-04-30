@@ -8,6 +8,7 @@
 
 #include <hlt/softwaretrigger/modules/basics/SoftwareTriggerModule.h>
 #include <hlt/softwaretrigger/core/utilities.h>
+#include <hlt/softwaretrigger/calculations/PrefilterCalculator.h>
 #include <hlt/softwaretrigger/calculations/FilterCalculator.h>
 #include <hlt/softwaretrigger/calculations/SkimSampleCalculator.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
@@ -125,7 +126,9 @@ void SoftwareTriggerModule::event()
 
 void SoftwareTriggerModule::initializeCalculation()
 {
-  if (m_param_baseIdentifier == "filter") {
+  if (m_param_baseIdentifier == "prefilter") {
+    m_calculation.reset(new PrefilterCalculator());
+  } else if (m_param_baseIdentifier == "filter") {
     m_calculation.reset(new FilterCalculator());
   } else if (m_param_baseIdentifier == "skim") {
     m_calculation.reset(new SkimSampleCalculator());

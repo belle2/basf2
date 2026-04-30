@@ -175,15 +175,28 @@
       unpackTracker2D=True
       useDB=True
   31. Sum_Unpackers
-  32. EventsOfDoomBuster
+  32. SoftwareTrigger
+      baseIdentifier=prefilter
+      debugOutputFileName=software_trigger_debug.root
+      preScaleStoreDebugOutputToDataStore=0
+      resultStoreArrayName=
+      storeDebugOutputToROOTFile=False
+      useRandomNumbersForPreScale=True
+  33. TriggerSkim
+      expectedResult=1
+      logicMode=or
+      resultOnMissing=None
+      skipFirstEvent=False
+      triggerLines=['software_trigger_cut&prefilter&total_result']
+      useRandomNumbersForPreScale=True
 
-      (? >=1[EventErrorFlag -> KeepMetaData] ):
+      (? <1[EventErrorFlag -> KeepMetaData -> Sum_HLTPrefilter_Discard] ):
         1. EventErrorFlag
             errorFlag=8
         2. KeepMetaData
             keepMatchedEntries=True
             matchEntries=['EventMetaData', 'RawFTSWs', 'ROIpayload', 'SoftwareTriggerResult', 'SoftwareTriggerVariables', 'TRGSummary']
-  33. Sum_EventsofDoomBuster
+        3. Sum_HLTPrefilter_Discard
   34. ECLWaveformFit
       Chi2Threshold25dof=57.1
       Chi2Threshold27dof=60.0
@@ -3107,15 +3120,28 @@
       unpackTracker2D=True
       useDB=True
   31. Sum_Unpackers
-  32. EventsOfDoomBuster
+  32. SoftwareTrigger
+      baseIdentifier=prefilter
+      debugOutputFileName=software_trigger_debug.root
+      preScaleStoreDebugOutputToDataStore=0
+      resultStoreArrayName=
+      storeDebugOutputToROOTFile=False
+      useRandomNumbersForPreScale=True
+  33. TriggerSkim
+      expectedResult=1
+      logicMode=or
+      resultOnMissing=None
+      skipFirstEvent=False
+      triggerLines=['software_trigger_cut&prefilter&total_result']
+      useRandomNumbersForPreScale=True
 
-      (? >=1[EventErrorFlag -> KeepMetaData] ):
+      (? <1[EventErrorFlag -> KeepMetaData -> Sum_HLTPrefilter_Discard] ):
         1. EventErrorFlag
             errorFlag=8
         2. KeepMetaData
             keepMatchedEntries=True
             matchEntries=['EventMetaData', 'RawFTSWs', 'ROIpayload', 'SoftwareTriggerResult', 'SoftwareTriggerVariables', 'TRGSummary']
-  33. Sum_EventsofDoomBuster
+        3. Sum_HLTPrefilter_Discard
   34. ECLWaveformFit
       Chi2Threshold25dof=57.1
       Chi2Threshold27dof=60.0

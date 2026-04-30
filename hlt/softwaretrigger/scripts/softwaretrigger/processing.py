@@ -187,7 +187,6 @@ def add_hlt_processing(path,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
                        switch_off_slow_modules_for_online=True,
-                       hlt_prefilter_mode=constants.HLTPrefilterModes.monitor,
                        dqm_run_type=None,
                        **kwargs):
     """
@@ -233,7 +232,7 @@ def add_hlt_processing(path,
     path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # HLT prefilter
-    path_utils.add_prefilter_module(path, mode=hlt_prefilter_mode)
+    path_utils.add_prefilter_module(path)
 
     # Build one path for all accepted events...
     accept_path = basf2.Path()
@@ -258,7 +257,6 @@ def add_hlt_processing(path,
     if softwaretrigger_mode == constants.SoftwareTriggerModes.filter:
         # Now split up the path according to the HLT decision
         hlt_filter_module = path_utils.add_filter_module(path)
-
         # There are two possibilities for the output of this module
         # (1) the event is dismissed -> only store the metadata
         path_utils.hlt_event_abort(hlt_filter_module, "==0", ROOT.Belle2.EventMetaData.c_HLTDiscard)

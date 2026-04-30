@@ -13,11 +13,9 @@
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import events_in_basf2_file, ExpRun
 import basf2
-from ROOT import Belle2
 from random import choice
 from caf.framework import Calibration
 from caf import strategies
-
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
@@ -370,13 +368,12 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
                                    merge_tracks=False,
                                    posttracking=False)
     else:
-        from reconstruction import default_event_abort, add_prefilter_pretracking_reconstruction
+        from reconstruction import add_prefilter_pretracking_reconstruction
         from tracking import add_prefilter_tracking_reconstruction
+        from softwaretrigger.path_utils import add_prefilter_module
 
-        # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-        doom = reco_path.add_module("EventsOfDoomBuster")
-        default_event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-        reco_path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
+        # Add HLTPrefilter module to the path.
+        add_prefilter_module(reco_path)
 
         # Add modules that have to be run BEFORE track reconstruction
         add_prefilter_pretracking_reconstruction(reco_path, components=Components)

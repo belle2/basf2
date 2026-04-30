@@ -53,31 +53,32 @@ namespace Belle2 {
 
     /**
      * Maps azimuthal angle to corresponding TOP slot no.
-     * @param angle [radians]
+     * @param phi angle [radians]
      * @return TOP slot no. (1-16)
      */
     int getModuleFromPhi(double);
 
     /**
      *  Perform fitting of TOP timing in nearby slot
-     *  @param TOP slot no. (1-16) (for labelling)
-     *  @param TOP digits in slot
-     *  @param cluster energy (for labelling)
-     *  @param no. of tracks in same slot as neutral clusters (for labelling)
-     *  @param cosTheta of cluster
+     *  @param moduleID TOP slot no. (1-16) (for labelling)
+     *  @param digitsPerSlot TOP digits in slot
+     *  @param clusterE ECL cluster nergy (for labelling)
+     *  @param clusterCosTheta cosTheta of the ECL cluster
+     *  @param nTracksPerSlot no. of tracks in same slot as neutral clusters (for labelling)
      *  @return pointer to object containing fit parameters of fit to timing of TOP digits
      */
     TOPBackSplashFitResult* fitTimingDigits(int, std::vector<const TOPDigit*>&, double, double, int);
 
     /**
      * Creates RooPlots of fitted TOPtiming and save as png
-     * @param cluster cosTheta (for labelling)
-     * @param cluster energy (for labelling)
-     * @param TOP slot no (for labelling)
-     * @param RooFit model used to perform fit
-     * @param RooRealVar used in fit
-     * @param RooFitResult object containing fit parameters
-     * @param no. of tracks in same slot as neutral clusters (for labelling)
+     * @param cosTheta cluster cosTheta (for labelling)
+     * @param clusterE cluster energy (for labelling)
+     * @param moduleID TOP slot no (for labelling)
+     * @param model RooFit model used to perform fit
+     * @param x RooRealVar used in fit
+     * @param data RooDataSet with the data to be fitted
+     * @param res RooFitResult object containing fit parameters
+     * @param nTracksPerSlot no. of tracks in same slot as neutral clusters (for labelling)
      */
     void makePlot(double, double, int, RooAbsPdf*, RooRealVar*, RooDataSet, RooFitResult*, int);
 

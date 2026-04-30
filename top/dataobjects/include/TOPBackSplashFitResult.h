@@ -43,14 +43,17 @@ namespace Belle2 {
 
     /**
      * Full constructor for development studies
-     * @param  time fitted timing from TOP
-     * @param  timeErr error fitted timing from TOP
-     * @param  deltaT time difference between direct and reflected peaks
-     * @param  deltaTerr error on the time difference between direct and reflected peaks
-     * @param  frac fractional yield of the first peak
-     * @param  fracErr error on the fractional yield of the first peak
-     * @param  signalPhotons fitted number of photons
-     * @param  signalPhotonsErr error on  the fitted number of photons
+     * @param time fitted timing from TOP
+     * @param timeErr error fitted timing from TOP
+     * @param deltaT time difference between direct and reflected peaks
+     * @param deltaTerr error on the time difference between direct and reflected peaks
+     * @param frac fractional yield of the first peak
+     * @param fracErr error on the fractional yield of the first peak
+     * @param signalPhotons fitted number of photons
+     * @param signalPhotonsErr error on  the fitted number of photons
+     * @param chisqdof chi2 per degrees of freedom associated with fit
+     * @param nPhotons no. of Cherenkov photons recorded by TOP and used in fit
+     * @param nTracksInSlot no. of tracks in the same slot as neutral cluster
      */
     TOPBackSplashFitResult(double time,
                            double timeErr,

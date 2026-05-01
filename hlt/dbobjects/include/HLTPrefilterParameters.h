@@ -71,7 +71,6 @@ namespace Belle2 {
      * Constructor
      * @param[in] cdcHitsMax                     Maximum threshold of CDCHits
      * @param[in] eclDigitsMax                   Maximum threshold of ECLDigits
-     * @param[in] State                          State of HLTprefilter
      */
     HLTPrefilterParameters(uint32_t cdcHitsMax, uint32_t eclDigitsMax)
     {

@@ -195,6 +195,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_postfilter_reconstruction(path,
                                   components=components,
                                   pruneTracks=pruneTracks,
+                                  trackFitHypotheses=trackFitHypotheses,
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
                                   legacy_ecl_charged_pid=legacy_ecl_charged_pid,
@@ -313,6 +314,7 @@ def add_prefilter_reconstruction(path,
 def add_postfilter_reconstruction(path,
                                   components=None,
                                   pruneTracks=False,
+                                  trackFitHypotheses=None,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
                                   legacy_ecl_charged_pid=False,
@@ -323,6 +325,8 @@ def add_postfilter_reconstruction(path,
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
         reduce execution time.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -350,6 +354,7 @@ def add_postfilter_reconstruction(path,
         path,
         components=components,
         pruneTracks=False,
+        trackFitHypotheses=trackFitHypotheses,
         flip_recoTrack=flip_recoTrack,
         kink_finding=kink_finding
     )

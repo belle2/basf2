@@ -215,7 +215,8 @@ def add_filter_module(path):
     return path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
 
 
-def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online):
+def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online,
+                                   **kwargs):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
@@ -231,7 +232,8 @@ def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_m
             path,
             components=components,
             pruneTracks=False,
-            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+            **kwargs
         )
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)

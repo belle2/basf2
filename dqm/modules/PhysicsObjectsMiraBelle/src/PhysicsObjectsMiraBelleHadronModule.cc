@@ -28,6 +28,9 @@ PhysicsObjectsMiraBelleHadronModule::PhysicsObjectsMiraBelleHadronModule() : His
   setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
+  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
+           "Trigger identifier string used to select events for the HLTprefilter histograms",
+           std::string("software_trigger_cut&filter&total_result"));
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadronb2"));
   addParam("hadronb2piPListName", m_hadpiPListName, "Name of the pi+ particle list", std::string("pi+:hadb2physMiraBelle"));
@@ -93,7 +96,13 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   // apply software trigger
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
   if (accepted == false) return;
-  m_h_physicsresultsH->Fill(1);
+
+  // Check HLT decision
+  m_HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+  //Fill entries only when HLT accepted the event
+  if (m_HLTAccepted)
+    m_h_physicsresultsH->Fill(1);
+
   // get pi list
   StoreObjPtr<ParticleList> hadpiParticles(m_hadpiPListName);
   std::vector<ROOT::Math::PxPyPzEVector> m_pionHad;
@@ -145,7 +154,8 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   m_h_EsumCMSnorm->Fill(EsumCMSnorm);
   m_h_R2->Fill(R2);
   bool hadronb_tag = visibleEnergyCMSnorm > 0.4 && EsumCMSnorm > 0.2 && R2 < 0.2;
-  if (hadronb_tag) {
+  //Fill entries only when HLT accepted the event
+  if (hadronb_tag && m_HLTAccepted) {
     m_h_physicsresultsH->Fill(2);
   }
 

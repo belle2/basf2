@@ -67,11 +67,17 @@ namespace Belle2 {
     TH1F* m_h_R2 = nullptr; /**< histogram for R2 of hadron events after the hadronb2 selection*/
     TH1F* m_h_physicsresultsH = nullptr; /**< histogram for event results for hadronb2 and hadronb2 tight*/
 
+    /** Trigger identifier string for HLT decision */
+    std::string m_triggerIdentifierHLT = "";
+
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 
     /** Name of the pi+ particle list */
     std::string m_hadpiPListName = "";
+
+    /** Flag to check if event was accepted by HLT */
+    bool m_HLTAccepted = false;
 
   };
 }

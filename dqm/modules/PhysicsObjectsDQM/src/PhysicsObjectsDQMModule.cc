@@ -156,8 +156,8 @@ void PhysicsObjectsDQMModule::event()
     //Cannot find the m_triggerIdentifierHLT
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
   } else {
-    const bool HLT_accept = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
-    if (HLT_accept != false) {
+    m_HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+    if (m_HLTAccepted != false) {
 
       //find out if events are in the passive veto (false) or in the active veto window (true)
       bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
@@ -203,7 +203,9 @@ void PhysicsObjectsDQMModule::event()
     const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
     if (accepted != false) {
 
-      m_h_physicsresults->Fill(1); //hadron events
+      //Fill entries only when HLT accepted the event
+      if (m_HLTAccepted != false)
+        m_h_physicsresults->Fill(1); //hadron events
 
       StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
       StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
@@ -250,7 +252,11 @@ void PhysicsObjectsDQMModule::event()
   } else {
     const bool accepted = (result->getResult(m_triggerIdentifierBhabha) == SoftwareTriggerCutResult::c_accept);
     if (accepted != false) {
-      m_h_physicsresults->Fill(5); //bhabha events
+
+      //Fill entries only when HLT accepted the event
+      if (m_HLTAccepted != false)
+        m_h_physicsresults->Fill(5); //bhabha events
+
       StoreObjPtr<ParticleList> UpsbhabhaParticles(m_upsBhabhaPListName);
       if (UpsbhabhaParticles.isValid()) {
         for (unsigned int i = 0; i < UpsbhabhaParticles->getListSize(); i++) {
@@ -267,7 +273,8 @@ void PhysicsObjectsDQMModule::event()
     return;
   } else {
     const bool accepted = (result->getResult(m_triggerIdentifierHadronb2) == SoftwareTriggerCutResult::c_accept);
-    if (accepted != false) {
+    //Fill entries only when HLT accepted the event
+    if (accepted != false && m_HLTAccepted != false) {
 
       m_h_physicsresults->Fill(2); //hadronb2 events
 

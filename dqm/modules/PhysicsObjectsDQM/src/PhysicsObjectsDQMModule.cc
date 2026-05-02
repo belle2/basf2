@@ -152,7 +152,7 @@ void PhysicsObjectsDQMModule::event()
 
   //--- HLTPrefilter monitoring ---//
   // Check if events pass HLT cut //
-  bool HLTAccepted;
+  bool HLTAccepted = false;
   if (results.find(m_triggerIdentifierHLT) == results.end()) {
     //Cannot find the m_triggerIdentifierHLT
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
@@ -275,7 +275,7 @@ void PhysicsObjectsDQMModule::event()
   } else {
     const bool accepted = (result->getResult(m_triggerIdentifierHadronb2) == SoftwareTriggerCutResult::c_accept);
     //Fill entries only when HLT accepted the event
-    if (accepted != false && m_HLTAccepted != false) {
+    if (accepted != false && HLTAccepted != false) {
 
       m_h_physicsresults->Fill(2); //hadronb2 events
 

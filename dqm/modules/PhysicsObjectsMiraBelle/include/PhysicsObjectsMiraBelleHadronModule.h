@@ -76,8 +76,5 @@ namespace Belle2 {
     /** Name of the pi+ particle list */
     std::string m_hadpiPListName = "";
 
-    /** Flag to check if event was accepted by HLT */
-    bool m_HLTAccepted = false;
-
   };
 }

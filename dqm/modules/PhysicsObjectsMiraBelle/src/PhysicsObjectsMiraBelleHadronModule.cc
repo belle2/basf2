@@ -98,9 +98,9 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   if (accepted == false) return;
 
   // Check HLT decision
-  m_HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+  bool HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
   //Fill entries only when HLT accepted the event
-  if (m_HLTAccepted)
+  if (HLTAccepted)
     m_h_physicsresultsH->Fill(1);
 
   // get pi list
@@ -155,7 +155,7 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   m_h_R2->Fill(R2);
   bool hadronb_tag = visibleEnergyCMSnorm > 0.4 && EsumCMSnorm > 0.2 && R2 < 0.2;
   //Fill entries only when HLT accepted the event
-  if (hadronb_tag && m_HLTAccepted) {
+  if (hadronb_tag && HLTAccepted) {
     m_h_physicsresultsH->Fill(2);
   }
 

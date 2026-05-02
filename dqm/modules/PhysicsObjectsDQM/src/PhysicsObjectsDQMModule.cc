@@ -152,12 +152,13 @@ void PhysicsObjectsDQMModule::event()
 
   //--- HLTPrefilter monitoring ---//
   // Check if events pass HLT cut //
+  bool HLTAccepted;
   if (results.find(m_triggerIdentifierHLT) == results.end()) {
     //Cannot find the m_triggerIdentifierHLT
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
   } else {
-    m_HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
-    if (m_HLTAccepted != false) {
+    HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+    if (HLTAccepted != false) {
 
       //find out if events are in the passive veto (false) or in the active veto window (true)
       bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
@@ -204,7 +205,7 @@ void PhysicsObjectsDQMModule::event()
     if (accepted != false) {
 
       //Fill entries only when HLT accepted the event
-      if (m_HLTAccepted != false)
+      if (HLTAccepted)
         m_h_physicsresults->Fill(1); //hadron events
 
       StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
@@ -254,7 +255,7 @@ void PhysicsObjectsDQMModule::event()
     if (accepted != false) {
 
       //Fill entries only when HLT accepted the event
-      if (m_HLTAccepted != false)
+      if (HLTAccepted)
         m_h_physicsresults->Fill(5); //bhabha events
 
       StoreObjPtr<ParticleList> UpsbhabhaParticles(m_upsBhabhaPListName);

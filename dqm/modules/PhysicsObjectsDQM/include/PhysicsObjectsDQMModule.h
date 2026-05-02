@@ -122,9 +122,6 @@ namespace Belle2 {
     /** Trigger identifier string used to select events for HLTprefilter histograms */
     std::string m_triggerIdentifierHLT = "";
 
-    /** Flag to check if event was accepted by HLT */
-    bool m_HLTAccepted = false;
-
     /** Histograms for Ks */
     TH1F* m_h_nKshortAllH = nullptr; /** Histogram for Ks events */
     TH1F* m_h_nKshortActiveH = nullptr; /** Histogram for Ks events : active veto */

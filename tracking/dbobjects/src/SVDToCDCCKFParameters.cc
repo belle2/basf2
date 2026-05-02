@@ -10,8 +10,6 @@
 
 using namespace Belle2;
 
-ClassImp(SVDToCDCCKFParameters);
-
 /** FLOAT PARAMETERS */
 
 void SVDToCDCCKFParameters::setMaximalDeltaPhi(float phi) { m_maximalDeltaPhi = phi; }

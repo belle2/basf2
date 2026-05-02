@@ -116,17 +116,11 @@ namespace Belle2 {
         m_variables.at(identifier + "_mean") = NAN;
         m_variables.at(identifier + "_std") = NAN;
         m_variables.at(identifier + "_sum") = NAN;
-        if (identifier.compare(0, 7, "before_") == 0) {
-          B2INFO("Before is NAN");
-        }
         return;
       }
       // mean
       float sum = std::accumulate(values.begin(), values.end(), 0.0);
       m_variables.at(identifier + "_sum") = sum;
-      if (identifier.compare(0, 7, "before_") == 0) {
-        B2INFO("Before sum = " << sum);
-      }
       float mean = sum / size;
       m_variables.at(identifier + "_mean") = mean;
       // variance and standard deviation

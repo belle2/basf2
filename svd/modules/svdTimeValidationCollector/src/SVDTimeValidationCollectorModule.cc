@@ -186,5 +186,5 @@ void SVDTimeValidationCollectorModule::collect()
 
       getObjectPtr<TH2F>("__hClsTimeAll__")->Fill(clusterTime, sensorBinCenter);
     };
-  } else {B2WARNING("Found no CDC event T0");}
+  }
 }

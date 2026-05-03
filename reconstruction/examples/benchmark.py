@@ -91,18 +91,13 @@ if limits_file is not None:
             limits[entries[0]] /= float(entries[2])
 
 # get execution times
-categories = [
-    'Simulation',
-    'TriggerSimulation',
-    'Clustering',
-    'Prefilter_Tracking',
-    'Posttracking_Reconstruction',
-    'Postfilter_Reconstruction']
+categories = []
 times = {}
 for module in b2.statistics.modules:
-    if module.name not in ['Sum_' + category for category in categories]:
+    if "Sum_" not in module.name:
         continue
     category = module.name[4:]
+    categories.append(category)
     if category not in times.keys():
         times[category] = 0
     times[category] += module.time_mean(b2.statistics.EVENT) * 1e-6

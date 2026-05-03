@@ -143,12 +143,8 @@ void SVDTimeValidationCollectorModule::collect()
     auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
     float eventT0 = evtT0CDC->eventT0;
     getObjectPtr<TH1F>("hEventT0")->Fill(eventT0);
-
-    // also get CDC and SVD T0
-    if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-      auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
-      getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(evtT0CDC->eventT0);
-    } else {B2WARNING("Found no CDC event T0");}
+    getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(eventT0);
+    // also get SVD T0
     if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
       auto evtT0SVD = m_eventT0->getBestSVDTemporaryEventT0();
       getObjectPtr<TH1F>("hEventT0FromSVD")->Fill(evtT0SVD->eventT0);

@@ -149,6 +149,12 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
+    /** Charge: BKLM scintillators. */
+    TH1F* m_ChargeScintillatorBKLM;
+
+    /** Charge: EKLM scintillators. */
+    TH1F* m_ChargeScintillatorEKLM;
+
     /** Plane occupancy: BKLM, phi readout. */
     TH1F* m_PlaneBKLMPhi;
 

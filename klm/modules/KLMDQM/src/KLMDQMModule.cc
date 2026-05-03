@@ -26,6 +26,8 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeRPC{nullptr},
   m_TimeScintillatorBKLM{nullptr},
   m_TimeScintillatorEKLM{nullptr},
+  m_ChargeScintillatorBKLM{nullptr},
+  m_ChargeScintillatorEKLM{nullptr},
   m_PlaneBKLMPhi{nullptr},
   m_PlaneBKLMZ{nullptr},
   m_PlaneEKLM{nullptr},
@@ -117,6 +119,16 @@ void KLMDQMModule::defineHisto()
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
              100, m_EKLMScintTimeMin, m_EKLMScintTimeMax);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
+  m_ChargeScintillatorBKLM =
+    new TH1F("charge_scintillator_bklm", "Scintillator charge (BKLM)",
+             256, 0., 1024.);
+  m_ChargeScintillatorBKLM->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM =
+    new TH1F("charge_scintillator_eklm", "Scintillator charge (EKLM)",
+             256, 0., 1024.);
+  m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorBKLM->SetOption("HIST LOGY");
+  m_ChargeScintillatorEKLM->SetOption("HIST LOGY");
   m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",
                                       10000, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
   m_TimeRevo9DCArrivalTime->GetXaxis()->SetTitle("Time, ns");
@@ -318,6 +330,8 @@ void KLMDQMModule::beginRun()
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();
   m_TimeScintillatorEKLM->Reset();
+  m_ChargeScintillatorBKLM->Reset();
+  m_ChargeScintillatorEKLM->Reset();
   m_TimeRevo9DCArrivalTime->Reset();
   m_klmTime->updateConstants(); //to get correct CTime
   /* Plane hits. */
@@ -422,6 +436,7 @@ void KLMDQMModule::event()
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
+      m_ChargeScintillatorEKLM->Fill(digit.getCharge());
       if (digit.isMultiStrip()) {
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
@@ -473,6 +488,7 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
+        m_ChargeScintillatorBKLM->Fill(digit.getCharge());
         if (digitRaw) {
           uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
           if (feStatus != 0) {

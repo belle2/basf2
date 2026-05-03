@@ -25,48 +25,62 @@ import glob
 import sys
 
 # parse command line options
-parser = ArgumentParser(description='Measure the execution time.')
-parser.add_argument('-m', '--multiplicity', default='high', choices=['high', 'low', 'data'], help='Multiplicity or type of events')
-parser.add_argument('-l', '--limits', help='Name of file containing limits')
-parser.add_argument('-f', '--file', help='Name of benchmark output file')
-parser.add_argument('-c', '--csv', help='Name of statistics csv file')
+parser = ArgumentParser(description="Measure the execution time.")
+parser.add_argument(
+    "-m",
+    "--multiplicity",
+    default="high",
+    choices=["high", "low", "data"],
+    help="Multiplicity or type of events",
+)
+parser.add_argument("-l", "--limits", help="Name of file containing limits")
+parser.add_argument("-f", "--file", help="Name of benchmark output file")
+parser.add_argument("-c", "--csv", help="Name of statistics csv file")
 args = parser.parse_args()
 
 # create path and reduce log level
 main = b2.create_path()
 b2.set_log_level(b2.LogLevel.ERROR)
 
-if args.multiplicity == 'data':
+if args.multiplicity == "data":
     # Global Tag needed as these are Raw data
     b2.conditions.override_globaltags(get_validation_globaltags())
 
-    input_files = glob.glob(os.environ.get('BELLE2_VALIDATION_DATA_DIR', '') + '/rawdata/physics.0010.05095*.root')
+    input_files = glob.glob(
+        os.environ.get("BELLE2_VALIDATION_DATA_DIR", "")
+        + "/rawdata/physics.0010.05095*.root"
+    )
     main.add_module("RootInput", inputFileNames=input_files)
 
-    main.add_module('EventInfoPrinter').set_log_level(b2.LogLevel.INFO)
+    main.add_module("EventInfoPrinter").set_log_level(b2.LogLevel.INFO)
 
     # gearbox and geometry
-    main.add_module('Gearbox')
-    main.add_module('Geometry', useDB=True)
+    main.add_module("Gearbox")
+    main.add_module("Geometry", useDB=True)
 
     # unpacking
     add_unpackers(main)
 
 else:
     # specify number of events to be generated
-    main.add_module('EventInfoSetter', evtNumList=[1000])
-    main.add_module('EventInfoPrinter').set_log_level(b2.LogLevel.INFO)
+    main.add_module("EventInfoSetter", evtNumList=[1000])
+    main.add_module("EventInfoPrinter").set_log_level(b2.LogLevel.INFO)
 
-    if args.multiplicity == 'high':
+    if args.multiplicity == "high":
         # generate BBbar events if high multiplicity is selected
-        main.add_module('EvtGenInput')
+        main.add_module("EvtGenInput")
 
-    elif args.multiplicity == 'low':
+    elif args.multiplicity == "low":
         # generate mu pair events if low multiplicity is selected
-        add_kkmc_generator(main, 'mu+mu-')
+        add_kkmc_generator(main, "mu+mu-")
 
     # detector and L1 trigger simulation
-    add_simulation(main, bkgfiles=glob.glob(os.environ.get('BELLE2_BACKGROUND_DIR', '/sw/belle2/bkg') + '/*.root'))
+    add_simulation(
+        main,
+        bkgfiles=glob.glob(
+            os.environ.get("BELLE2_BACKGROUND_DIR", "/sw/belle2/bkg") + "/*.root"
+        ),
+    )
 
 # reconstruction
 add_reconstruction(main)
@@ -80,7 +94,7 @@ if args.csv is not None:
 # read limits
 limits = {}
 limits_file = args.limits
-default_limits_file = args.multiplicity + '.limits'
+default_limits_file = args.multiplicity + ".limits"
 if limits_file is None and os.path.isfile(default_limits_file):
     limits_file = default_limits_file
 if limits_file is not None:
@@ -105,7 +119,7 @@ for module in b2.statistics.modules:
 # open output file
 output = None
 if args.file is not None:
-    output = open(args.file, 'w')
+    output = open(args.file, "w")
 
 # print benchmark results and write them to the output file
 b2.set_log_level(b2.LogLevel.INFO)
@@ -114,13 +128,13 @@ for category in categories:
     if category not in times.keys():
         continue
     time = times[category]
-    message = f'Execution time per event for {category} is {time:.0f} ms'
+    message = f"Execution time per event for {category} is {time:.0f} ms"
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
         if fraction > max_fraction:
             max_fraction = fraction
-        message += f' = {fraction:.0%} of the limit.'
+        message += f" = {fraction:.0%} of the limit."
         if fraction <= 0.9:
             b2.B2INFO(message)
         elif fraction <= 1:
@@ -131,10 +145,10 @@ for category in categories:
         b2.B2INFO(message)
 
     if output is not None:
-        output.write(f'{category} {time:.2f}')
+        output.write(f"{category} {time:.2f}")
         if fraction >= 0:
-            output.write(f' {fraction:.4f}')
-        output.write('\n')
+            output.write(f" {fraction:.4f}")
+        output.write("\n")
 
 if output is not None:
     output.close()

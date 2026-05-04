@@ -295,7 +295,7 @@ std::vector<float> NeuroTrigger3DH::runMLPFixedPrecision(const std::vector<float
   // Transform the input floats (range [-2, 2]) to m_precisionInputs bit integers
   std::vector<int32_t> layerInput(input.size());
   std::transform(input.begin(), input.end(), layerInput.begin(),
-  [fractionalInputBits](float i) { return static_cast<int32_t>(std::round(i * (1 << fractionalInputBits))); });
+  [](float i) { return static_cast<int32_t>(std::round(i * (1 << fractionalInputBits))); });
 
   std::vector<int32_t> layerOutput;
   size_t weightIndex = 0;

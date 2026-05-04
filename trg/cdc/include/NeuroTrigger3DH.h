@@ -140,9 +140,10 @@ namespace Belle2 {
       static constexpr int MAX_FLOAT = 1 << MAX_FLOAT_SHIFT;
       static constexpr int LUT_SATURATION = 1 << (LUT_FRAC_BITS + MAX_FLOAT_SHIFT);
 
-      // Headroom for the DSP cut window (high bit cutoff to ensure full representation)
-      static constexpr float MAX_OBSERVED = 10.439; // In simulation of > 50 mio tracks
-      static constexpr int HEADROOM_BITS = std::ceil(std::log2(MAX_OBSERVED / MAX_FLOAT)) + 1;
+      // Headroom for the DSP cut window (high bit cutoff to ensure full representation):
+      // Using MAX_OBSERVED = 10.439 (in simulation of > 50 mio tracks)
+      // With HEADROOM_BITS = std::ceil(std::log2(MAX_OBSERVED / MAX_FLOAT)) + 1
+      static constexpr int HEADROOM_BITS = 3;
 
       inline static const std::array<int32_t, LUT_SIZE> table = []()
       {

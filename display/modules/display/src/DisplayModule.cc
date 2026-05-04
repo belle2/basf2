@@ -14,6 +14,8 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTrigger3DHTrack.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -235,6 +237,7 @@ void DisplayModule::event()
   }
 
   if (m_showTriggerObjects) {
+    // Add Track Segment hits
     const auto arrayList = StoreArray<CDCTriggerSegmentHit>::getArrayList();
     for (const auto& i : arrayList) {
       StoreArray<CDCTriggerSegmentHit> tshits(i);
@@ -242,12 +245,30 @@ void DisplayModule::event()
         m_visualizer->addCDCTriggerSegmentHit(i, &hit);
     }
 
-    //add all possible track candidate arrays
+    // Add 2DNeuro and 2DHough tracks
     const auto trgTrackArrays = StoreArray<CDCTriggerTrack>::getArrayList();
     for (const std::string& colName : trgTrackArrays) {
       StoreArray<CDCTriggerTrack> trgTracks(colName);
       for (const CDCTriggerTrack& trgTrack : trgTracks) {
-        m_visualizer->addCDCTriggerTrack(colName, trgTrack);
+        // Show all 2DHough tracks (tracks are by construction only in the x-y plane)
+        bool is2DHoughTrack = (trgTrack.getZ0() == 0 && trgTrack.getCotTheta() == 0);
+        // Show only 2DNeuro tracks (Neuro Tracks with 2DHough input) if they are:
+        // valid with regards to the stereo bit, i.e., have at least 3 out of 4 stereo TS hits
+        // not an old track from a previous clock cycle (relevant for raw data readout)
+        std::vector<bool> oldTracks = trgTrack.getFoundOldTrack();
+        bool isValid2DNeuroTrack = (trgTrack.getValidStereoBit() && !oldTracks[0]);
+        if (is2DHoughTrack || isValid2DNeuroTrack) {
+          m_visualizer->addCDCTriggerTrack(colName, trgTrack);
+        }
+      }
+    }
+
+    // Add 3DNeuro and 3DHough tracks
+    const auto trg3DHTrackArrays = StoreArray<CDCTrigger3DHTrack>::getArrayList();
+    for (std::string colName : trg3DHTrackArrays) {
+      StoreArray<CDCTrigger3DHTrack> trg3DHTracks(colName);
+      for (const CDCTrigger3DHTrack& trg3DHTrack : trg3DHTracks) {
+        m_visualizer->addCDCTriggerTrack(colName, trg3DHTrack);
       }
     }
   }

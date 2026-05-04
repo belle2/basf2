@@ -5,9 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "trg/cdc/modules/mcmatcher/CDCTriggerRecoMatcherModule.h"
 
-using namespace Belle2;
+#pragma once
 
-REG_MODULE(CDCTriggerRecoMatcher);
-REG_MODULE(CDCTrigger3DHRecoMatcher);
+#include <vector>
+#include <TObject.h>
+
+namespace Belle2 {
+
+  class CDCTriggerNDFinderLUTs : public TObject {
+  public:
+    std::vector<unsigned short> axial;
+    std::vector<unsigned short> stereo;
+
+    ClassDef(CDCTriggerNDFinderLUTs, 1);
+  };
+
+}

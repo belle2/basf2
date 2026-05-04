@@ -343,12 +343,15 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   addObject(&recoTrack, track);
 }
 
+
+/** Add a CDCTriggerTrack or CDCTrigger3DHTrack. */
+template <typename TriggerTrack>
 void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
-                                          const CDCTriggerTrack& trgTrack)
+                                          const TriggerTrack& trgTrack)
 {
   const TString label = ObjectInfo::getIdentifier(&trgTrack);
 
-  B2Vector3D track_pos = B2Vector3D(0, 0, trgTrack.getZ0());
+  B2Vector3D track_pos(0, 0, trgTrack.getZ0());
   B2Vector3D track_mom = (trgTrack.getChargeSign() == 0) ?
                          trgTrack.getDirection() * 1000 :
                          trgTrack.getMomentum(1.5);
@@ -358,10 +361,11 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   rectrack.fV.Set(track_pos);
 
   TEveTrack* track_lines = new TEveTrack(&rectrack, m_consttrackpropagator);
-  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetName(label); // popup label set at end of function
   track_lines->SetPropagator(m_consttrackpropagator);
   track_lines->SetLineColor(kOrange + 2);
   track_lines->SetLineWidth(1);
+
   track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack) +
                         TString::Format("\ncharge: %d, phi: %.2fdeg, pt: %.2fGeV, theta: %.2fdeg, z: %.2fcm",
                                         trgTrack.getChargeSign(),
@@ -369,7 +373,6 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
                                         trgTrack.getTransverseMomentum(1.5),
                                         trgTrack.getDirection().Theta() * 180 / M_PI,
                                         trgTrack.getZ0()));
-
 
   track_lines->SetCharge(trgTrack.getChargeSign());
 
@@ -380,6 +383,12 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   addToGroup(collectionName, track_lines);
   addObject(&trgTrack, track_lines);
 }
+
+template void EVEVisualization::addCDCTriggerTrack<CDCTriggerTrack>(
+  const std::string&, const CDCTriggerTrack&);
+
+template void EVEVisualization::addCDCTriggerTrack<CDCTrigger3DHTrack>(
+  const std::string&, const CDCTrigger3DHTrack&);
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {

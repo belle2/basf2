@@ -168,7 +168,6 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
           m_legNormal->Draw();
         else if (histoType == kGroupIDs) {
           m_legGroupIDsNormal->Draw();
-          printf("totot\n\n\n\n");
         }
       }
       break;

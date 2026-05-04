@@ -31,14 +31,14 @@ namespace Belle2 {
       double arcLength = globalHelix.arcLength2DToCylindricalR(rLayer);
       if (std::isnan(arcLength)) return;
 
-      TVector3 pos3D = globalHelix.atArcLength2D(arcLength);
+      ROOT::Math::XYZVector pos3D = globalHelix.atArcLength2D(arcLength);
 
       // +/- deltaPhi corresponding to 2cm left and right (on circle)
       double deltaPhi = 2. / rLayer;
 
       for (int i = -1; i <= 1; i++) {
-        TVector3 thisPos = pos3D;
-        thisPos.SetPhi(pos3D.Phi() + i * deltaPhi);
+        ROOT::Math::XYZVector thisPos = pos3D;
+        VectorUtil::setPhi(thisPos, pos3D.Phi() + i * deltaPhi);
         const Belle2::CDC::IWire iWire = geometryPar.cellId(iclayer, thisPos);
         const auto board = geometryPar.getBoardID(WireID(iclayer, iWire));
         boardCands.push_back(board);

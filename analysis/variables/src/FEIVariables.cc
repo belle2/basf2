@@ -193,8 +193,8 @@ namespace Belle2 {
 
         std::vector<RankedCandidate> rankedCandidates;
         rankedCandidates.reserve(bpList->getListSize() + b0List->getListSize());
-        collectCandidates(bpList, "bp_list", rankedCandidates);
-        collectCandidates(b0List, "b0_list", rankedCandidates);
+        collectCandidates(bpList, bpListName, rankedCandidates);
+        collectCandidates(b0List, b0ListName, rankedCandidates);
 
         std::stable_sort(rankedCandidates.begin(), rankedCandidates.end(),
                          [](const RankedCandidate & lhs, const RankedCandidate & rhs)
@@ -202,16 +202,27 @@ namespace Belle2 {
           return lhs.signalProbability > rhs.signalProbability;
         });
 
+        // Check if particle is a copy made by ParticleCopy::copyParticle
+        // (e.g. from setBeamConstrainedMomentum); copies store the original's
+        // array index in extraInfo("original_index")
+        int originalIndex = -1;
+        if (particle->hasExtraInfo("original_index"))
+          originalIndex = static_cast<int>(particle->getExtraInfo("original_index"));
+
         for (unsigned int i = 0; i < rankedCandidates.size(); ++i)
         {
-          if (rankedCandidates[i].particle == particle) {
+          const Particle* cand = rankedCandidates[i].particle;
+          if (cand == particle) {
+            return static_cast<int>(i) + 1;
+          }
+          if (originalIndex >= 0 && cand->getArrayIndex() == originalIndex) {
             return static_cast<int>(i) + 1;
           }
         }
 
-        B2FATAL("sigProbRank: particle not found in either input list: "
+        B2FATAL("sigProbRank: particle not found in the input lists: "
                 "bp_list='" << bpListName << "', b0_list='" << b0ListName << "'");
-        return 0;
+        return -1;
       };
       return func;
     }

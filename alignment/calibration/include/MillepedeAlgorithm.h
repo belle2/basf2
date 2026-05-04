@@ -91,7 +91,7 @@ namespace Belle2 {
     ///
     /// Overrides the event slicing defined by setEvents()
     ///
-    void setTimedepConfig(std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
+    void setTimedepConfig(const std::vector< std::tuple< std::vector<int>, std::vector< std::tuple<int, int, int> > > >& config)
     {
       setEvents(alignment::timeline::setupTimedepGlobalLabels(config));
     }
@@ -126,4 +126,3 @@ namespace Belle2 {
 
   };
 } // namespace Belle2
-

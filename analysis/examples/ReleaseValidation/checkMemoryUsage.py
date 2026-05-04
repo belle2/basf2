@@ -162,7 +162,7 @@ ma.variablesToNtuple(
     decayString="B0:sig",
     variables=bvars,
     filename=output_file,
-    treename="tree",
+    treename="B0",
     path=main,
 )
 

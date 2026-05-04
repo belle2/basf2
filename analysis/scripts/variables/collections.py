@@ -39,7 +39,6 @@ cluster = [
     'clusterTiming',
     'clusterTrackMatch',
     'clusterZernikeMVA',
-    'maxWeightedDistanceFromAverageECLTime',
     'minC2TDist',
     'nECLClusterTrackMatches'
 ]
@@ -69,8 +68,7 @@ event_level_cluster = [
     'nECLTriggerCells',
     'nECLTriggerCellsBWDEndcap',
     'nECLTriggerCellsBarrel',
-    'nECLTriggerCellsFWDEndcap',
-    'weightedAverageECLTime'
+    'nECLTriggerCellsFWDEndcap'
 ]
 
 #: KLM cluster information

@@ -50,7 +50,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      GeneralizedCircle();
+      GeneralizedCircle() = default;
 
       /// Constructor with the four parameters of the generalized circle
       GeneralizedCircle(double n0, double n1, double n2, double n3 = 0);
@@ -681,13 +681,13 @@ namespace Belle2 {
       // Order of this parameters make them easier to initialize
 
       /// Memory for the fourth parameter
-      double m_n3;
+      double m_n3 = 0.0;
 
       /// Memory for the second and third parameter
       ROOT::Math::XYVector m_n12;
 
       /// Memory for the first parameter
-      double m_n0;
+      double m_n0 = 0.0;
     };
 
     /// Debug helper

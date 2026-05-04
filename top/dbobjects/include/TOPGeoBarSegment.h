@@ -180,6 +180,7 @@ namespace Belle2 {
      * Returns geant4 parameter describing surface roughness
      * @return surface roughness
      */
+    // cppcheck-suppress truncLongCastReturn
     double getSigmaAlpha() const {return m_sigmaAlpha * 2;}  // multiply by 2 since half-value stored
 
     /**

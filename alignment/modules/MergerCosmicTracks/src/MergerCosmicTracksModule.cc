@@ -53,7 +53,7 @@ void MergerCosmicTracksModule::initialize()
   Belle2::CDC::CDCGeometryPar::Instance();
 }
 
-void MergerCosmicTracksModule::MergingTracks(RecoTrack* firstRecoTrack, RecoTrack* secondRecoTrack,
+void MergerCosmicTracksModule::MergingTracks(const RecoTrack* firstRecoTrack, const RecoTrack* secondRecoTrack,
                                              StoreArray<RecoTrack>& mergedRecoTracks)
 {
 

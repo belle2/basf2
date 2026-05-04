@@ -22,7 +22,7 @@ namespace Belle2 {
 
     public:
       /** Constructor, with the additional information, if propagation in the wire shall be considered. */
-      explicit RealisticTDCCountTranslator(bool useInWirePropagationDelay = false);
+      explicit RealisticTDCCountTranslator(bool useInWirePropagationDelay = false, bool fromTrackCreator = false);
 
       /** Destructor. */
       ~RealisticTDCCountTranslator() {};
@@ -88,6 +88,12 @@ namespace Belle2 {
        *
        */
       bool m_useInWirePropagationDelay;
+
+      /**
+       * Flag to use EventT0 from SVD and CDC with higher priority.
+       *
+       */
+      bool m_fromTrackCreator;
 
       /**
        * Flag to distinguish betw. data and MC.

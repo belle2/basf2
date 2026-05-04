@@ -25,9 +25,6 @@ namespace Belle2 {
       /** Constructor */
       TOPAlignmentAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPAlignmentAlgorithm() {}
-
       /**
        * Sets required precision of displacements to declare calibration as c_OK
        * @param precision required precision [cm]

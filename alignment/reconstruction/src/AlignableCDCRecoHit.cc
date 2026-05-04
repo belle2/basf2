@@ -14,7 +14,7 @@
 #include <cdc/dbobjects/CDCTimeZeros.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/geometry/CDCGeometryPar.h>
-#include "Math/ChebyshevPol.h"
+#include <Math/ChebyshevPol.h>
 
 using namespace std;
 using namespace Belle2;

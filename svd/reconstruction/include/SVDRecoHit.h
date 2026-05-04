@@ -67,7 +67,7 @@ namespace Belle2 {
     explicit SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit = nullptr);
 
     /** Destructor. */
-    virtual ~SVDRecoHit() {}
+    virtual ~SVDRecoHit() override {}
 
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.

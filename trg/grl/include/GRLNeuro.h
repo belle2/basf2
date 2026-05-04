@@ -45,12 +45,12 @@ namespace Belle2 {
        * The number of layers is derived from the shape.
        */
       std::vector<std::vector<float>> nHidden;
-      /** train result as output */
-      bool targetresult = true;
+      /** Number of output nodes */
+      std::vector<unsigned> nOutput;
+      /** Threshold of output nodes */
+      std::vector<std::vector<float>> nn_thres;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
-      /** Output scale for all networks. */
-      std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
 
 
       /** Number of CDC sectors. */
@@ -126,7 +126,7 @@ namespace Belle2 {
      * @param isector index of the MLP
      * @param input vector of input values
      * @return output values (classifier) */
-    float runMLP(unsigned isector,  const std::vector<float>& input);
+    std::vector<float> runMLP(unsigned isector,  const std::vector<float>& input);
 
   private:
     /** List of networks */

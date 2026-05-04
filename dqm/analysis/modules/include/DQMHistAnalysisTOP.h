@@ -36,11 +36,6 @@ namespace Belle2 {
     DQMHistAnalysisTOPModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisTOPModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;
@@ -114,7 +109,7 @@ namespace Belle2 {
      * @param h2 second histogram
      * @return true if (nbins, xmin, xmax) match
      */
-    bool sameHistDefinition(TH1* h1, TH1* h2);
+    static bool sameHistDefinition(TH1* h1, TH1* h2);
 
     /**
      * Makes a plot of dead and hot channel fractions per slot
@@ -138,7 +133,7 @@ namespace Belle2 {
      * @param name the name of histograms
      * @param scale scale factor for the histogram z-axis range (maximum = average * scale)
      */
-    void setZAxisRange(const std::string& name, double scale);
+    static void setZAxisRange(const std::string& name, double scale);
 
     /**
      * Makes background subtracted time distribution plot
@@ -146,7 +141,7 @@ namespace Belle2 {
      * @param trackHits histogram used to scale background in case it is available
      * @param slot slot number
      */
-    void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
+    static void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
      * Makes plots of the number of PMT hits per event
@@ -164,7 +159,7 @@ namespace Belle2 {
      * @param histogram resulting histogram w/ fractions
      * @param canvas canvas to plot
      */
-    void makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas);
+    static void makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas);
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -212,8 +207,8 @@ namespace Belle2 {
      * @param alarmLines alarm lines [out]
      * @param bigRed on true red color for large values, else red color for small values
      */
-    void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
-                       bool bigRed = true);
+    static void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
+                              bool bigRed = true);
 
     /**
      * Sets all alarm lines.
@@ -225,7 +220,7 @@ namespace Belle2 {
      * @param h pixel or channel distribution of hits (1D or 2D histogram)
      * @return cut levels (first = dead, second = hot)
      */
-    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
+    static std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables

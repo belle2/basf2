@@ -91,6 +91,7 @@ class ArgumentsGenerator():
     optimal for expensive calculations, but it is nice for making large sequences of
     Job input arguments on the fly.
     """
+
     def __init__(self, generator_function, *args, **kwargs):
         """
         Parameters:
@@ -211,6 +212,7 @@ class MaxFilesSplitter(SubjobSplitter):
     """
 
     """
+
     def __init__(self, *, arguments_generator=None, max_files_per_subjob=1):
         """
         Parameters:
@@ -242,6 +244,7 @@ class MaxSubjobsSplitter(SubjobSplitter):
     """
 
     """
+
     def __init__(self, *, arguments_generator=None, max_subjobs=1000):
         """
         Parameters:
@@ -358,31 +361,30 @@ class Job:
         self.name = name
         #: The `SubjobSplitter` used to create subjobs if necessary
         self.splitter = None
+        #: Files to be copied directly into the working directory (`pathlib.Path`).
+        #  Not the input root files, those should be in `Job.input_files`.
+        self.input_sandbox_files = []
+        #: Working directory of the job (`pathlib.Path`). Default is '.', mostly used in Local() backend
+        self.working_dir = Path()
+        #: Output directory (`pathlib.Path`), where we will download our output_files to. Default is '.'
+        self.output_dir = Path()
+        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
+        self.output_patterns = []
+        #: Command and arguments as a list that will be run by the job on the backend
+        self.cmd = []
+        #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
+        self.args = []
+        #: Input files to job (`str`), a list of these is copied to the working directory.
+        self.input_files = []
+        #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
+        self.setup_cmds = []
+        #: Config dictionary for the backend to use when submitting the job.
+        #: Saves us from having multiple attributes that may or may not be used.
+        self.backend_args = {}
+        #: dict of subjobs assigned to this job
+        self.subjobs = {}
 
-        if not job_dict:
-            #: Files to be copied directly into the working directory (`pathlib.Path`).
-            #  Not the input root files, those should be in `Job.input_files`.
-            self.input_sandbox_files = []
-            #: Working directory of the job (`pathlib.Path`). Default is '.', mostly used in Local() backend
-            self.working_dir = Path()
-            #: Output directory (`pathlib.Path`), where we will download our output_files to. Default is '.'
-            self.output_dir = Path()
-            #: Files that we produce during the job and want to be returned. Can use wildcard (*)
-            self.output_patterns = []
-            #: Command and arguments as a list that will be run by the job on the backend
-            self.cmd = []
-            #: The arguments that will be applied to the `cmd` (These are ignored by SubJobs as they have their own arguments)
-            self.args = []
-            #: Input files to job (`str`), a list of these is copied to the working directory.
-            self.input_files = []
-            #: Bash commands to run before the main self.cmd (mainly used for batch system setup)
-            self.setup_cmds = []
-            #: Config dictionary for the backend to use when submitting the job.
-            #: Saves us from having multiple attributes that may or may not be used.
-            self.backend_args = {}
-            #: dict of subjobs assigned to this job
-            self.subjobs = {}
-        elif job_dict:
+        if job_dict:
             self.input_sandbox_files = [Path(p) for p in job_dict["input_sandbox_files"]]
             self.working_dir = Path(job_dict["working_dir"])
             self.output_dir = Path(job_dict["output_dir"])
@@ -392,7 +394,6 @@ class Job:
             self.input_files = job_dict["input_files"]
             self.setup_cmds = job_dict["setup_cmds"]
             self.backend_args = job_dict["backend_args"]
-            self.subjobs = {}
             for subjob_dict in job_dict["subjobs"]:
                 self.create_subjob(subjob_dict["id"], input_files=subjob_dict["input_files"], args=subjob_dict["args"])
 
@@ -1207,6 +1208,9 @@ class Batch(Backend):
         raise NotImplementedError("This is an abstract submit(job) method that shouldn't have been called. "
                                   "Did you submit a (Sub)Job?")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @submit.register(SubJob)
     def _(self, job, check_can_submit=True, jobs_per_check=100):
         """
@@ -1327,6 +1331,7 @@ class Batch(Backend):
                 for job in jobs_to_submit:
                     self.submit(job, check_can_submit, jobs_per_check)
         B2INFO(f"All {len(jobs)} requested jobs submitted")
+    # @endcond  # end hiding of @method_dispatch overloads
 
     def get_batch_submit_script_path(self, job):
         """

@@ -231,9 +231,12 @@ namespace Belle2::Conditions {
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
     /** Get the default server URL for the remote metadata provider */
-    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultRemoteMetadataProviderServer; }
+    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultLegacyRemoteMetadataProviderServer; }
+    /** Get the default server URL for the HSF central metadata provider */
+    std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
     /** Get the default local path for the local metadata provider */
     std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+
     ///@}
 
     /** @name Payload Location Configuration
@@ -333,8 +336,10 @@ namespace Belle2::Conditions {
     CppOrPyList m_metadataProviders;
     /** the list with all the payload locations */
     CppOrPyList m_payloadLocations;
-    /** default server URL for the remote metadata provider */
-    std::string m_defaultRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
+    /** default server URL for the (legacy) remote metadata provider */
+    std::string m_defaultLegacyRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
+    /** default server URL for the HSF remote metadata provider */
+    std::string m_defaultHSFRemoteMetadataProviderServer{"http://blcdb.sdcc.bnl.gov/api/cdb_rest/"};
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** the file to put the newly created payload information */
@@ -343,8 +348,9 @@ namespace Belle2::Conditions {
     std::string m_downloadCacheDirectory{""};
     /** the timeout when trying to lock files in the download directory */
     size_t m_downloadLockTimeout{120};
-    /** the tag states accepted for processing */
-    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
+    /** the tag states accepted for processing, including states from the HSF CDB */
+    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING",
+      "locked", "frozen"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
     /** bool indicating whether the database has been initialized, in which case any changes to the configuration object

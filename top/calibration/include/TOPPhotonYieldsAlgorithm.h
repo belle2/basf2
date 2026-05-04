@@ -23,9 +23,6 @@ namespace Belle2 {
       /** Constructor */
       TOPPhotonYieldsAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPPhotonYieldsAlgorithm() {}
-
       /**
        * Sets maximum RQE required for good calibration
        * @param rqe value to be set
@@ -50,13 +47,13 @@ namespace Belle2 {
        * @param bin histogram bin
        * @return equalizing value
        */
-      double getEqualizingValue(int bin) const;
+      static double getEqualizingValue(int bin);
 
       /**
        * Equalize alpha ratio histogram
        * @param h histogram
        */
-      void equalize(TH1F* h) const;
+      static void equalize(TH1F* h);
 
       /**
        * Returns photon yield of nominal QE for given slot and pixel
@@ -65,7 +62,7 @@ namespace Belle2 {
        * @param col pixel column (0-based)
        * @return number of photons per muon which comes from di-muon events
        */
-      double getNominalYield(int slot, int row, int col) const;
+      static double getNominalYield(int slot, int row, int col);
 
       /**
        * Returns photon yield correction factor according to muon local-z distribution
@@ -73,7 +70,7 @@ namespace Belle2 {
        * @param row pixel row (0-based)
        * @return correction factor
        */
-      double getMuonCorrection(const TH1F* h_mu, int row) const;
+      static double getMuonCorrection(const TH1F* h_mu, int row);
 
       double m_maxRQE = 2.0; /**< maximal RQE required for good calibration */
       double m_maxErrorRQE = 0.1; /**< maximal error on RQE required for good calibration */

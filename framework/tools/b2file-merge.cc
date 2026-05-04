@@ -5,14 +5,16 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/io/RootIOUtilities.h>
+#include <framework/core/FileCatalog.h>
+#include <framework/core/MetadataService.h>
+#include <framework/datastore/DataStore.h>
 #include <framework/io/RootFileInfo.h>
+#include <framework/io/RootIOUtilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
-#include <framework/core/FileCatalog.h>
 #include <framework/utilities/KeyValuePrinter.h>
-#include <framework/core/MetadataService.h>
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
@@ -137,7 +139,8 @@ int main(int argc, char* argv[])
   ("no-catalog", "don't register output file in file catalog, This is now the default")
   ("add-to-catalog", "register the output file in the file catalog")
   ("job-information", po::value<std::string>(&jsonfilename), "create json file with metadata of output file and execution status")
-  ("quiet,q", "if given don't print infos, just warnings and errors");
+  ("quiet,q", "if given don't print infos, just warnings and errors")
+  ("reoptimize,O", "reoptimize basket size when merging TTrees, equivalent to `hadd -O` (much slower!)");
   po::positional_options_description positional;
   positional.add("output", 1);
   positional.add("file", -1);
@@ -185,6 +188,17 @@ The following restrictions apply:
     B2ERROR("Output file exists, use -f to force overwriting it");
     return 1;
   }
+
+  // Set the flags:
+  // Copy all entries without unpacking (fast)
+  // Layout the baskets in an optimal order for sequential reading (SortBasketByEntry)
+  // rebuild the index in case some parts of the index are missing (BuildIndexOnError)
+  const bool reoptimize = variables.count("reoptimize") > 0;
+  const std::string copyOptions = reoptimize
+    ? "SortBasketsByEntry BuildIndexOnError"
+    : "fast SortBasketsByEntry BuildIndexOnError";
+  B2INFO("Will use the merging options: " << std::quoted(copyOptions));
+
   // First we check all input files for consistency ...
 
   // the final metadata we will write out
@@ -264,14 +278,14 @@ The following restrictions apply:
         // Make sure the branch is mergeable
         if(!br) continue;
         if(!br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
-          B2ERROR("Branch " << std::quoted(br->GetName()) << " in persistent tree not inheriting from Mergeable");
+          B2ERROR("Branch " << std::quoted(br->GetName()) << " in " << RootIOUtilities::c_treeNames[DataStore::c_Persistent] << " tree not inheriting from Mergeable");
           continue;
         }
         // Ok, it's an object we now how to handle so get it from the tree
         Mergeable* object{nullptr};
         br->SetAddress(&object);
         if(br->GetEntry(0)<=0) {
-          B2ERROR("Could not read branch " << std::quoted(br->GetName()) << " of entry 0 from persistent tree in "
+          B2ERROR("Could not read branch " << std::quoted(br->GetName()) << " of entry 0 from " << RootIOUtilities::c_treeNames[DataStore::c_Persistent] << " tree in "
               << std::quoted(input));
           continue;
         }
@@ -287,7 +301,7 @@ The following restrictions apply:
           // ok, merged, get rid of it.
           delete object;
         }else{
-          B2INFO("Found mergeable object " << std::quoted(br->GetName()) << " in persistent tree");
+          B2INFO("Found mergeable object " << std::quoted(br->GetName()) << " in " << RootIOUtilities::c_treeNames[DataStore::c_Persistent] << " tree");
         }
       }
 
@@ -437,10 +451,8 @@ The following restrictions apply:
       } else {
         outputEventTree->CopyAddresses(tree);
       }
-      // Now let's copy all entries without unpacking (fast), layout the
-      // baskets in an optimal order for sequential reading (SortBasketByEntry)
-      // and rebuild the index in case some parts of the index are missing
-      outputEventTree->CopyEntries(tree, -1, "fast SortBasketsByEntry BuildIndexOnError");
+      // Now let's copy all entries using the requested flags
+      outputEventTree->CopyEntries(tree, -1, copyOptions.c_str());
       // and reset the branch addresses to not be connected anymore
       outputEventTree->CopyAddresses(tree, true);
       // finally clean up and close file.
@@ -448,10 +460,12 @@ The following restrictions apply:
       tfile->Close();
     }
     assert(outputEventTree);
-    // make sure we have an index ...
-    if(!outputEventTree->GetTreeIndex()) {
-      B2INFO("No Index found: building new index");
-      RootIOUtilities::buildIndex(outputEventTree);
+    // make sure we have an index for the basf2 tree ...
+    if (treeName == RootIOUtilities::c_treeNames[DataStore::c_Event]) {
+      if(!outputEventTree->GetTreeIndex()) {
+	B2INFO("No Index found: building new index");
+	RootIOUtilities::buildIndex(outputEventTree);
+      }
     }
     // and finally write the tree
     output->cd();
@@ -490,7 +504,7 @@ The following restrictions apply:
   B2INFO("Writing FileMetaData");
   // Create persistent tree
   output->cd();
-  TTree outputMetaDataTree("persistent", "persistent");
+  TTree outputMetaDataTree(RootIOUtilities::c_treeNames[DataStore::c_Persistent].c_str(), RootIOUtilities::c_treeNames[DataStore::c_Persistent].c_str());
   outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
   for(auto &it: persistentMergeables){
     outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);

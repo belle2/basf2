@@ -54,6 +54,9 @@ def run_validation(job_path, input_data_path=None, **kwargs):
     shift_agreements = {algo: {} for algo in vu.time_algorithms}
     entries_onTracks = {algo: {} for algo in vu.time_algorithms}
     entries_eventT0 = {algo: {} for algo in vu.time_algorithms}
+    t0_agreements = {algo: {} for algo in vu.time_algorithms}
+    t0_differences = {algo: {} for algo in vu.time_algorithms}
+    absolute_shifts_values = {algo: {} for algo in vu.time_algorithms}
 
     roc_U = {algo: {} for algo in vu.time_algorithms}
     roc_V = {algo: {} for algo in vu.time_algorithms}
@@ -83,7 +86,6 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         for exp in CollectorHistograms[algo]:
             for run in CollectorHistograms[algo][exp]:
                 # print(f"working with : algo {algo} exp {exp} run {run}")
-
                 histos = vu.get_histos(CollectorHistograms[algo][exp][run])
 
                 if histos is None:
@@ -93,9 +95,14 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 # if some histogram is empty (too little stat) do not crash but skip that file for that calibration
                 try:
                     entries_eventT0_ = histos['eventT0'].GetEntries()
+
                     if run not in entries_eventT0[algo] or entries_eventT0_ > entries_eventT0[algo][run]:
                         agreements[algo][run] = {key: vu.get_agreement(histos['eventT0'], h_diff)
                                                  for key, h_diff in histos['diff'].items()}
+
+                        t0_agreements[algo][run] = vu.get_agreement2(histos['CDCeventT0'], histos['SVDeventT0'], min_entries=10)
+                        t0_differences[algo][run] = vu.get_difference(histos['SVDeventT0'], histos['CDCeventT0'], min_entries=10)
+
                         precisions[algo][run] = {key: vu.get_precision(h_diff)
                                                  for key, h_diff in histos['diff'].items()}
                         discriminations[algo][run] = {key: vu.get_roc_auc(histos['onTracks'][key], histos['offTracks'][key])
@@ -104,6 +111,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                                        for key, hShift in histos['timeShifter'].items()}
                         entries_onTracks[algo][run] = {key: val.GetEntries() for key, val in histos['onTracks'].items()}
                         entries_eventT0[algo][run] = entries_eventT0_
+                        absolute_shifts_values[algo][run] = histos["absoluteShift"]
 
                         if shift_detailed:
                             for key, hShift in histos['timeShifter'].items():
@@ -119,17 +127,14 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                                 else:
                                     shift_histos_merged_over_ladder[algo][keyGroup] = hShift.Clone()
                                     shift_histos_merged_over_ladder[algo][keyGroup].SetDirectory(0)
-
                         vu.make_combined_plot('*U', histos,
                                               title=f'exp {exp} run {run} U {algo}')
                         plt.savefig(plots_per_run / f'{exp}_{run}_U_{algo}.pdf')
                         plt.close()
-
                         vu.make_combined_plot('*V', histos,
                                               title=f'exp {exp} run {run} V {algo}')
                         plt.savefig(plots_per_run / f'{exp}_{run}_V_{algo}.pdf')
                         plt.close()
-
                         roc_U[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*U'),
                                                        vu.get_combined(histos['offTracks'], '*U'))
                         roc_V[algo][run] = vu.make_roc(vu.get_combined(histos['onTracks'], '*V'),
@@ -137,19 +142,24 @@ def run_validation(job_path, input_data_path=None, **kwargs):
                 except AttributeError:
                     print(f'Skipping file algo {algo} exp {exp} run {run}')
                     continue
-
                 # Free-up memory manually as I used `SetDirectory(0)`
-                histos['eventT0'].Delete()
-                del histos['eventT0']
+                for t0 in ['eventT0', 'CDCeventT0', 'SVDeventT0']:
+                    h = histos.pop(t0)
+                    h.__python_owns__ = False
+                    h.Delete()
+
+                # absoluteShift is not a histogram, so just remove it from the dict without trying to delete
+                histos.pop("absoluteShift", None)
+
                 for histo_dict in histos.values():
                     for hh in histo_dict.values():
+                        hh.__python_owns__ = False
                         hh.Delete()
                 del histos
-
                 for key, hh in CollectorHistograms[algo][exp][run].items():
-                    if key != 'hEventT0':
+                    if key not in ['hEventT0', 'hEventT0FromCDC', 'hEventT0FromSVD', 'hAbsoluteShiftValues']:
+                        hh.__python_owns__ = False
                         hh.Delete()
-
                 vu.progress(count + 1, total_item)
                 count += 1
 
@@ -210,6 +220,8 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         dd[f'shift_agreement_{algo}'] = [shift_agreements[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_onTracks_{algo}'] = [entries_onTracks[algo][run][side] for run, side in zip(dd['run'], dd['name'])]
         dd[f'entries_eventT0_{algo}'] = [entries_eventT0[algo][run] for run, side in zip(dd['run'], dd['name'])]
+        dd[f'T0_agreement_{algo}'] = [t0_agreements[algo][run] for run, side in zip(dd['run'], dd['name'])]
+        dd[f'T0_difference_{algo}'] = [t0_differences[algo][run] for run, side in zip(dd['run'], dd['name'])]
 
     # Make ROC plots
     for run in runs:
@@ -232,8 +244,17 @@ def run_validation(job_path, input_data_path=None, **kwargs):
 
     df = pd.DataFrame(dd)
     df.to_pickle(output_dir / 'df.pkl')
-
     # df = pd.read_pickle('df.pkl')
+
+    absolute_shifts_dict = {}
+    absolute_shifts_dict['run'] = sum([[i]*len(vu.names_layer_sides) for i in runs], [])  # 4 layers * 2 sides
+    absolute_shifts_dict['name'] = vu.names_layer_sides*len(runs)
+    for algo in vu.time_algorithms:
+        absolute_shifts_dict[f'absolute_shift_values_{algo}'] = [
+            absolute_shifts_values[algo][run][layer_side] for run, layer_side in zip(
+                absolute_shifts_dict['run'], absolute_shifts_dict['name'])]
+
+    absolute_shifts_df = pd.DataFrame(absolute_shifts_dict)
 
     print('Making combined plots')
 
@@ -299,6 +320,40 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.setp(ax.get_xticklabels(), rotation=90)
         plt.tight_layout()
         plt.savefig(output_dir / f'entries_eventT0_{algo}.pdf')
+        plt.close()
+
+        for metric in ['agreement', 'difference']:
+            plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+            ax = sns.violinplot(x='run', y=f'T0_{metric}_{algo}', data=df, split=True)
+            ax.set_ylim([-2, 2])
+            ax.xaxis.set_minor_locator(ticker.NullLocator())
+            plt.axhline(0, color='black', linestyle='--')
+            plt.axhline(0.5, color='black', linestyle=':')
+            plt.axhline(-0.5, color='black', linestyle=':')
+            plt.setp(ax.get_xticklabels(), rotation=90)
+            plt.tight_layout()
+            plt.savefig(output_dir / f'T0_{metric}_{algo}.pdf')
+            plt.close()
+
+        plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+        ax = sns.scatterplot(
+            x='run', y=f'absolute_shift_values_{algo}',
+            hue='name', data=absolute_shifts_df,
+            marker='o', s=40,
+        )
+        ax.set_ylim([-5, 5])
+        run_values = sorted(absolute_shifts_df['run'].unique())
+        ax.set_xticks(run_values)
+        ax.set_xticklabels([str(r) for r in run_values])
+        ax.xaxis.set_minor_locator(ticker.NullLocator())
+        plt.axhline(0, color='black', linestyle='--')
+        plt.axhline(2, color='black', linestyle=':')
+        plt.axhline(-2, color='black', linestyle=':')
+        plt.setp(ax.get_xticklabels(), rotation=90)
+        plt.ylabel(f'absolute shift ({algo}) (ns)')
+        ax.legend(title='layer/side', ncol=2)
+        plt.tight_layout()
+        plt.savefig(output_dir / f'absolute_shift_{algo}.pdf')
         plt.close()
 
 

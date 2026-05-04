@@ -19,8 +19,7 @@ path, reco_path = start_zmq_path(args, location=constants.Location.hlt,
                                  event_distribution_mode=constants.EventDistributionModes.zmq)
 add_hlt_processing(reco_path, run_type=constants.RunTypes.beam,
                    dqm_run_type=constants.RunTypes.cosmic,
-                   softwaretrigger_mode=constants.SoftwareTriggerModes.filter,
-                   hlt_prefilter_mode=constants.HLTPrefilterModes.monitor)
+                   softwaretrigger_mode=constants.SoftwareTriggerModes.filter)
 finalize_zmq_path(path, args, location=constants.Location.hlt)
 
 basf2.print_path(path)

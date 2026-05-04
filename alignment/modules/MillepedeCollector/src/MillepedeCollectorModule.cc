@@ -1578,7 +1578,7 @@ TMatrixD MillepedeCollectorModule::getLocalToGlobalTransform(const genfit::Measu
 
 }
 
-tuple<B2Vector3D, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov() const
+tuple<B2Vector3D, TMatrixDSym> MillepedeCollectorModule::getPrimaryVertexAndCov()
 {
   DBObjPtr<BeamSpot> beam;
   return {beam->getIPPosition(), beam->getSizeCovMatrix()};

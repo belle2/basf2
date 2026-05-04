@@ -85,7 +85,7 @@ namespace Belle2 {
     SVDRecoHit2D(const SVDRecoHit& uRecoHit, const SVDRecoHit& vRecoHit);
 
     /** Destructor. */
-    virtual ~SVDRecoHit2D() {}
+    virtual ~SVDRecoHit2D() override {}
 
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.

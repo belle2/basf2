@@ -23,7 +23,7 @@ namespace Belle2 {
     explicit CDCPathFilterFactory(const std::string& defaultFilterName = "size");
 
     /// Default destructor
-    ~CDCPathFilterFactory();
+    ~CDCPathFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

@@ -1856,6 +1856,22 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr atan2(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* varY = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* varX = Manager::Instance().getVariable(arguments[1]);
+        auto func = [varY, varX](const Particle * particle) -> double {
+          double y = std::get<double>(varY->function(particle));
+          double x = std::get<double>(varX->function(particle));
+          return std::atan2(y, x);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function atan2");
+      }
+    }
+
     Manager::FunctionPtr exp(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -3885,6 +3901,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable. The unit of the acos() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable. The unit of the atan() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("atan2(variableY, variableX)", atan2, "Returns the atan2 value (arctangent of y/x). The result is in ``rad``, and the correct quadrant is determined by the signs of the two arguments. Both arguments must not be zero at the same time.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);

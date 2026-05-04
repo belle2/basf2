@@ -22,9 +22,6 @@ namespace Belle2 {
       /** Constructor */
       TOPFillPatternOffsetAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPFillPatternOffsetAlgorithm() {}
-
       /**
        * Sets minimal number of histogram entries to perform calibration
        * @param minEntries minimal number of histogram entries
@@ -74,7 +71,7 @@ namespace Belle2 {
        * @param offset fill pattern offset
        * return fraction of reconstructed buckets matched with filled buckets
        */
-      double getFraction(TH1F* recBuckets, TH1F* fillPattern, int offset);
+      static double getFraction(TH1F* recBuckets, TH1F* fillPattern, int offset);
 
       int m_minEntries = 100; /**< minimal number of entries to perform calibration */
       double m_p = 0.99;      /**< signal fraction for PDF definition */

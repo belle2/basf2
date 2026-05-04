@@ -29,7 +29,7 @@ namespace Belle2 {
       RelationFilter();
 
       /// Default destructor
-      virtual ~RelationFilter();
+      virtual ~RelationFilter() override;
 
       /// Selects the objects possibly related to the given one from the given pool of objects.
       virtual std::vector<AObject*> getPossibleTos(AObject* from,

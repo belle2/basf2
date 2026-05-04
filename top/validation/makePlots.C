@@ -33,6 +33,7 @@ void makePlots()
   // open the file with input data (flat ntuple)
 
   TFile* input = TFile::Open("../TOPNtuple.root");
+  // cppcheck-suppress cstyleCast
   TTree* top = (TTree*) input->Get("top");
 
   kaonID(top);
@@ -209,7 +210,7 @@ void trackResolutions(TTree* top)
 
   // resolutions below 2 GeV/c
 
-  trackSelect = evt_select && "abs(extHit.y - barHit.y) < 0.01 && p < 2";
+  trackSelect = evt_select && TCut("abs(extHit.y - barHit.y) < 0.01 && p < 2");
 
   h = new TH1F("h301", "extrapolated track resolution in z for p < 2 GeV/c", 
 		      100, -10, 10);
@@ -284,7 +285,7 @@ void trackResolutions(TTree* top)
 
   // resolutions above 2 GeV/c
 
-  trackSelect = evt_select && "abs(extHit.y - barHit.y) < 0.01 && p > 2";
+  trackSelect = evt_select && TCut("abs(extHit.y - barHit.y) < 0.01 && p > 2");
 
   h = new TH1F("h306", "extrapolated track resolution in z for p > 2 GeV/c", 
 		      100, -10, 10);

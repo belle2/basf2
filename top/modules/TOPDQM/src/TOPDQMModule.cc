@@ -12,7 +12,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <boost/format.hpp>
 #include <algorithm>
 #include <cmath>
@@ -47,10 +47,6 @@ namespace Belle2 {
              "momentum cut used to histogram number of photons per track", 0.5);
   }
 
-
-  TOPDQMModule::~TOPDQMModule()
-  {
-  }
 
   void TOPDQMModule::defineHisto()
   {
@@ -303,6 +299,13 @@ namespace Belle2 {
     m_PSBypassMode->GetYaxis()->SetNdivisions(8);
     m_PSBypassMode->SetMinimum(0);
 
+    m_unpackErr = new TProfile("unpackErr", "Unpacker errors (per boardstack); slot number; fraction of events", 64, 0.5, 16.5, 0, 2);
+    m_unpackErr->GetXaxis()->SetNdivisions(16);
+    m_unpackErr->SetMinimum(0);
+    m_unpackErr->SetMarkerStyle(24);
+    m_unpackErr->SetFillColor(2);
+    m_unpackErr->SetDrawOption("hist");
+
     // cd back to root directory
     oldDir->cd();
   }
@@ -317,6 +320,7 @@ namespace Belle2 {
 
     m_rawFTSWs.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
     m_productionEventDebugs.isOptional(); // not in sim
+    m_unpackerErrors.isOptional(); // not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
@@ -370,6 +374,7 @@ namespace Belle2 {
     m_injVetoFlag->Reset();
     m_injVetoFlagDiff->Reset();
     m_PSBypassMode->Reset();
+    m_unpackErr->Reset();
   }
 
   void TOPDQMModule::event()
@@ -546,13 +551,23 @@ namespace Belle2 {
       }
       auto slot = femap->getModuleID();
       auto bs = femap->getBoardstackNumber();
-      double x = slot + bs / 4. - 0.5;
+      double x = slot + bs / 4.0 - 0.5;
       m_skipProcFlag->Fill(x, dbg.getSkipProcessingFlag());
       m_injVetoFlag->Fill(x, dbg.getInjectionVetoFlag());
       m_PSBypassMode->Fill(x, dbg.getPSBypassMode());
       if (dbg.getInjectionVetoFlag() != m_productionEventDebugs[0]->getInjectionVetoFlag()) differ = 1;
     }
     m_injVetoFlagDiff->Fill(differ);
+
+    if (m_unpackerErrors.isValid()) {
+      const auto& flags = m_unpackerErrors->getErrorFlags();
+      for (size_t bit = 0; bit < flags.size(); bit++) {
+        int slot = bit / 4;
+        int bs = bit % 4;
+        double x = slot + bs / 4.0 + 0.5;
+        m_unpackErr->Fill(x, flags[bit]);
+      }
+    }
 
   }
 

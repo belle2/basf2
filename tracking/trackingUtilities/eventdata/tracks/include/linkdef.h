@@ -47,3 +47,4 @@
 
 #pragma link C++ class Belle2::TrackingUtilities::StoreWrapper<std::vector<Belle2::TrackingUtilities::CDCSegmentTriple> >+; // checksum=0x9716f22e, implicit, version=2
 #pragma link C++ class Belle2::TrackingUtilities::StoreWrapper<std::vector<Belle2::TrackingUtilities::WeightedRelation<const Belle2::TrackingUtilities::CDCSegmentTriple> > >+; // checksum=0xee6be85e, implicit, version=2
+#pragma link C++ class Belle2::TrackingUtilities::StoreWrapper<std::vector<unsigned int > >+; // checksum=0x9d8ea682, implicit, version=2

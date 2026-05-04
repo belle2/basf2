@@ -41,12 +41,6 @@ namespace Belle2 {
     TOPReconstructorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPReconstructorModule()
-    {}
-
-    /**
      * Initialize the Module.
      *
      * This method is called at the beginning of data processing.

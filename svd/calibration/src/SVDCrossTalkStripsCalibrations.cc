@@ -18,13 +18,8 @@ bool Belle2::SVDCrossTalkStripsCalibrations::isInCrossTalkRegion(const VxdID& se
   const VXD::SensorInfoBase* currentSensorInfo = dynamic_cast<const VXD::SensorInfoBase*>(&VXD::GeoCache::getInstance().getSensorInfo(
                                                    sensorID)); /** SensorInfo class providing information about the current sensor*/
 
-  float m_uPitch = currentSensorInfo->getUPitch(0); /** getting the pitch dimension for u-side*/
-
-  float m_vPitch = currentSensorInfo->getVPitch(0); /** getting the pitch dimension for v-side*/
-
-  float currentPitch;
-  if (isU) currentPitch = m_uPitch;
-  else currentPitch = m_vPitch;
+  float currentPitch = currentSensorInfo->getVPitch(0); /** getting the pitch dimension for v-side*/
+  if (isU) currentPitch = currentSensorInfo->getUPitch(0); /** getting the pitch dimension for u-side*/
 
   return isCrossTalkStrip(sensorID, isU, (int)(clsPosition / currentPitch + 0.5));
 }

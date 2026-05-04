@@ -1,0 +1,9 @@
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'tracking_gnnFinder',
+    '$ROOT_LIBS'
+]
+
+Return('env')

@@ -1,6 +1,6 @@
-[INFO] Steering file: tutorials_B2A7XX.py
+[INFO] Steering file: analysis/tests/tutorials_B2A7XX.py
 TFile: B2A701-ContinuumSuppression_Input.root
-TTree: tree
+TTree: B0
 No entry found
 TBranch: __experiment__
 TBranch: __run__
@@ -44,7 +44,7 @@ TBranch: CleoConeCS__bo8__bc
 TBranch: CleoConeCS__bo9__bc
 TBranch: isNotContinuumEvent
 TFile: B2A703-ContinuumSuppression_MVAExpert.root
-TTree: tree
+TTree: B0
 TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 19405010

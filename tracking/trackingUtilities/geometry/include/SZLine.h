@@ -203,7 +203,7 @@ namespace Belle2 {
       }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      SZJacobian passiveMoveByJacobian(const ROOT::Math::XYVector& bySZ) const
+      static SZJacobian passiveMoveByJacobian(const ROOT::Math::XYVector& bySZ)
       {
         using namespace NSZParameterIndices;
         SZJacobian result = SZUtil::identity();

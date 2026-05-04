@@ -259,7 +259,7 @@ namespace Belle2 {
        * @param zd detection position in z
        * @return the difference in units of mirror radius.
        */
-      double getDeltaXE(double x, double xe, double ze, double xd, double zd) const;
+      static double getDeltaXE(double x, double xe, double ze, double xd, double zd);
 
       double m_cosTotal = 0; /**< cosine of total reflection angle */
       mutable std::vector<Solution> m_solutions[2]; /**< storage for the two solutions */

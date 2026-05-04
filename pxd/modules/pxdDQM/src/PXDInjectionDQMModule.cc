@@ -11,7 +11,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

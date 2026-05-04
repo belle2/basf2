@@ -18,11 +18,11 @@
 #include <map>
 
 // ROOT
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TProfile.h"
-#include "TMultiGraph.h"
-#include "TDirectory.h"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TProfile.h>
+#include <TMultiGraph.h>
+#include <TDirectory.h>
 
 namespace Belle2 {
   /**

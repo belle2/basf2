@@ -45,11 +45,6 @@ namespace Belle2 {
     OpticalGunModule();
 
     /**
-     * Destructor
-     */
-    virtual ~OpticalGunModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -90,7 +85,7 @@ namespace Belle2 {
     double m_cosMaxAlpha = 0; /**< cos of m_maxAlpha */
     double m_energy = 0;     /**< photon energy (from wavelength) */
     ROOT::Math::Transform3D m_transform; /**< transformation to BelleII frame */
-    TF1* m_customDistribution = 0; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
+    mutable TF1 m_customDistribution; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
 
     // data store objects
     StoreArray<MCParticle> m_MCParticles; /**< MC particles collection */

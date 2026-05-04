@@ -124,9 +124,9 @@ namespace Belle2 {
       int PDG = (int)(particle->GetPDGEncoding());
 
       // write hit to datastore
-      auto* hit = m_barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
-                                      globalTime, tracklength, locPosition,
-                                      theta, phi);
+      const auto* hit = m_barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
+                                            globalTime, tracklength, locPosition,
+                                            theta, phi);
 
       // set the relation
       m_relParticleHit.add(trackID, hit->getArrayIndex());

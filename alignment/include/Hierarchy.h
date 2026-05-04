@@ -124,7 +124,7 @@ namespace Belle2 {
       }
 
       /// Derivatives for Lorentz shift in sensor plane
-      TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, const B2Vector3D& bField);
+      static TMatrixD getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, const B2Vector3D& bField);
 
       /// Template function to insert hierarchy relation between two DB objects and their elements
       template<class ChildDBObjectType, class MotherDBObjectType>
@@ -176,13 +176,13 @@ namespace Belle2 {
       }
 
       /// 2x6 matrix of rigid body derivatives
-      TMatrixD getRigidBodyDerivatives(const genfit::StateOnPlane* sop);
+      static TMatrixD getRigidBodyDerivatives(const genfit::StateOnPlane* sop);
 
       /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
       TMatrixD convertG4ToRigidBodyTransformation(G4Transform3D g4transform);
 
       /// Conversion from G4Transform3D to 6D rigid body transformation parametrization
-      TMatrixD convertTGeoToRigidBodyTransformation(TGeoHMatrix tgeo);
+      static TMatrixD convertTGeoToRigidBodyTransformation(TGeoHMatrix tgeo);
     private:
     };
   }

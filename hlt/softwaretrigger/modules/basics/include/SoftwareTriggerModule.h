@@ -58,7 +58,7 @@ namespace Belle2 {
       SoftwareTriggerModule();
 
       /// default virtaual constructor because this is a derived class using virtual methods
-      virtual ~SoftwareTriggerModule() = default;
+      virtual ~SoftwareTriggerModule() override = default;
 
       /// Initialize/Require the DB object pointers and any needed store arrays.
       void initialize() override;

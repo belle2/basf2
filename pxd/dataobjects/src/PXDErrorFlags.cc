@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/dataobjects/PXDErrorFlags.h"
+#include <pxd/dataobjects/PXDErrorFlags.h>
 
 /// Static function to return PXDError::PXDErrorFlags with no bits set (default)
 const Belle2::PXD::PXDError::PXDErrorFlags Belle2::PXD::PXDError::getVerboseMask(void) { return Belle2::PXD::PXDError::PXDErrorFlags();};

@@ -173,15 +173,15 @@ namespace Belle2 {
         }
         muonZ->Write();
 
-        auto* photonYields = (TH1F*) signalHits->Clone("tmp1");
+        auto* photonYields = static_cast<TH1F*>(signalHits->Clone("tmp1"));
         photonYields->Add(signalHits.get(), bkgHits.get(), 1, -1); // subtract background
         for (int bin = 1; bin <= activePixels->GetNbinsX(); bin++) activePixels->SetBinError(bin, 0);
         photonYields->Divide(activePixels.get()); // normalize
 
-        auto* bkgYields = (TH1F*) bkgHits->Clone("tmp2");
+        auto* bkgYields = static_cast<TH1F*>(bkgHits->Clone("tmp2"));
         bkgYields->Divide(activePixels.get()); // normalize
 
-        auto* alphaRatio = (TH1F*) alphaHigh->Clone("tmp2");
+        auto* alphaRatio = static_cast<TH1F*>(alphaHigh->Clone("tmp2"));
         alphaRatio->Divide(alphaHigh.get(), alphaLow.get());
         equalize(alphaRatio);
 
@@ -236,7 +236,7 @@ namespace Belle2 {
     }
 
 
-    double TOPPhotonYieldsAlgorithm::getEqualizingValue(int bin) const
+    double TOPPhotonYieldsAlgorithm::getEqualizingValue(int bin)
     {
       // these constants are determined from fits to MC
       const double a[] = {1.50301, 1.16907, 1.00912, 0.943571, 0.889658, 0.93418, 1.01846, 0.953715};
@@ -255,7 +255,7 @@ namespace Belle2 {
     }
 
 
-    void TOPPhotonYieldsAlgorithm::equalize(TH1F* h) const
+    void TOPPhotonYieldsAlgorithm::equalize(TH1F* h)
     {
       for (int bin = 1; bin <= h->GetNbinsX(); bin++) {
         double s = getEqualizingValue(bin);
@@ -265,7 +265,7 @@ namespace Belle2 {
     }
 
 
-    double TOPPhotonYieldsAlgorithm::getNominalYield(int slot, int row, int col) const
+    double TOPPhotonYieldsAlgorithm::getNominalYield(int slot, int row, int col)
     {
       // these constants are determined from fits to MC
       const double par[8][4] = {{0.0404913, -2.10514e-07, -1.01752e-08, 1.00656e-11},
@@ -292,7 +292,7 @@ namespace Belle2 {
     }
 
 
-    double TOPPhotonYieldsAlgorithm::getMuonCorrection(const TH1F* h_mu, int row) const
+    double TOPPhotonYieldsAlgorithm::getMuonCorrection(const TH1F* h_mu, int row)
     {
       // these constants are determined from MC
       const double numFot[8][100] = {{
@@ -389,8 +389,6 @@ namespace Belle2 {
 
       return nfot / nfotMC[row];
     }
-
-
 
   } // end namespace TOP
 } // end namespace Belle2

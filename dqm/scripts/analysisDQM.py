@@ -125,7 +125,7 @@ def add_mirabelle_dqm(path):
     # bhabha,hadrons
     trigger_skim_bhabhaall = path.add_module(
         "TriggerSkim",
-        triggerLines=["software_trigger_cut&skim&accept_bhabha_all"],
+        triggerLines=["software_trigger_cut&skim&accept_bhabha_trk_ecl"],
         resultOnMissing=0,
     )
     trigger_skim_bhabhaall.if_value("==1", MiraBelleBhabha_path, b2.AfterConditionPath.CONTINUE)

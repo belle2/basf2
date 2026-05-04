@@ -22,13 +22,6 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-GeneralizedCircle::GeneralizedCircle()
-  : m_n3(0.0)
-  , m_n12(0.0, 0.0)
-  , m_n0(0.0)
-{
-}
-
 GeneralizedCircle::GeneralizedCircle(const double n0,
                                      const double n1,
                                      const double n2,
@@ -106,10 +99,10 @@ void GeneralizedCircle::setPerigeeParameters(const double curvature,
                                              const ROOT::Math::XYVector& tangential,
                                              const double impact)
 {
-  double n0 = impact * (impact * curvature / 2.0 + 1.0);
-  ROOT::Math::XYVector n12 = VectorUtil::Orthogonal(-tangential) * (1 + curvature * impact);
-  double n3 = curvature / 2.0;
-  setN(n0, n12, n3);
+  double loc_n0 = impact * (impact * curvature / 2.0 + 1.0);
+  ROOT::Math::XYVector loc_n12 = VectorUtil::Orthogonal(-tangential) * (1 + curvature * impact);
+  double loc_n3 = curvature / 2.0;
+  setN(loc_n0, loc_n12, loc_n3);
 }
 
 ROOT::Math::XYVector GeneralizedCircle::closest(const ROOT::Math::XYVector& point) const
@@ -324,6 +317,7 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
   const ROOT::Math::XYVector& m12 = generalizedCircle.n12();
   const double m3 = generalizedCircle.n3();
 
+  <<< <<< < HEAD
   const double n0 = this->n0();
   const ROOT::Math::XYVector& n12 = this->n12();
   const double n3 = this->n3();
@@ -333,17 +327,31 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
   if (absC != 0.0) {
     unitC *= (1. / absC);
   }
+  == == == =
+    const double loc_n0 = this->n0();
+  const Vector2D& loc_n12 = this->n12();
+  const double loc_n3 = this->n3();
 
-  double xParallel = (m0 * n3 - m3 * n0) / absC;
+  Vector2D unitC = loc_n12 * m3 - m12 * loc_n3;
+  double absC = unitC.normalize();
+  >>> >>> > main
+
+  double xParallel = (m0 * loc_n3 - m3 * loc_n0) / absC;
 
   // Use symmetric solution and use all input parameters
+  <<< <<< < HEAD
   ROOT::Math::XYVector mn12 = n12 + m12;
   double mn12Parallel = VectorUtil::unnormalizedParallelComp(unitC, mn12);
   double mn12Orthogonal = VectorUtil::unnormalizedOrthogonalComp(unitC, mn12);
+  == == == =
+    Vector2D mn12 = loc_n12 + m12;
+  double mn12Parallel = unitC.unnormalizedParallelComp(mn12);
+  double mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
+  >>> >>> > main
 
-  double a = m3 + n3;
+  double a = m3 + loc_n3;
   double b = mn12Orthogonal;
-  double c = (a * xParallel + mn12Parallel) * xParallel + m0 + n0;
+  double c = (a * xParallel + mn12Parallel) * xParallel + m0 + loc_n0;
 
   std::pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 

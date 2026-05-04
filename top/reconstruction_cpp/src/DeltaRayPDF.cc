@@ -148,7 +148,7 @@ namespace Belle2 {
       return m_dirFrac * dirPeak + (1 - m_dirFrac) * reflPeak;
     }
 
-    double DeltaRayPDF::directFraction(double z) const
+    double DeltaRayPDF::directFraction(double z)
     {
       // coefficients of 5th order polynom (from fit to MC, see B2GM/TOP Software status, June 2020)
       const double par[] = {0.332741, -0.00331502, 2.0801e-05, -3.43689e-09, -6.35849e-10, 3.54556e-12};
@@ -162,7 +162,7 @@ namespace Belle2 {
       return f;
     }
 
-    double DeltaRayPDF::photonYield(double beta, int PDGCode) const
+    double DeltaRayPDF::photonYield(double beta, int PDGCode)
     {
       // for parametrizations see B2GM/TOP Software status, June 2020
       const double averagePDE = 1.06404889; // relative to nominal PDE

@@ -435,7 +435,7 @@ namespace Belle2 {
 
     // digitize in time
 
-    for (auto& pixel : pixels) {
+    for (const auto& pixel : pixels) {
       const auto& digitizer = pixel.second;
       int threshold = m_threshold;
       if (m_useDatabase) { // use channel dependent ones

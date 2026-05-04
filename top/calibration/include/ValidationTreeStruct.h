@@ -67,7 +67,7 @@ namespace Belle2 {
        * @param x1 value to be added
        * @param e1 error to be added
        */
-      void add(float& x, float& e, float x1, float e1);
+      static void add(float& x, float& e, float x1, float e1);
 
     };
 

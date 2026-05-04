@@ -80,7 +80,7 @@ ma.variablesToNtuple(
     decayString="B0",
     variables=simpleCSVariables + ["Mbc", "isContinuumEvent"],
     filename="ContinuumSuppression.root",
-    treename="tree",
+    treename="ntuple",
     path=main,
 )
 

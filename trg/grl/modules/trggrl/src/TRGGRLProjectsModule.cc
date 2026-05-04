@@ -739,7 +739,7 @@ void TRGGRLProjectsModule::event()
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
 
-  bool ecltaunn = trgInfo->getTauNN();
+  bool ecltaunn = trgInfo->getTauNN(0);
 
   //std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
   //std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;

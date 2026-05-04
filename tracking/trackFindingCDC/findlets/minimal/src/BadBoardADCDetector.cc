@@ -7,11 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/BadBoardADCDetector.h>
 
-#include <cdc/dataobjects/CDCHit.h>
-
+#include <tracking/trackingUtilities/rootification/StoreWrappedObjPtr.h>
+#include <tracking/trackingUtilities/rootification/StoreWrapper.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <map>
 
@@ -20,6 +21,18 @@ using namespace TrackFindingCDC;
 
 BadBoardADCDetector::BadBoardADCDetector()
 {
+}
+
+void BadBoardADCDetector::initialize()
+{
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("CDCDeadBoardsVector");
+  storeVector.registerInDataStore();
+}
+
+void BadBoardADCDetector::beginRun()
+{
+  // checking validity once per run should be sufficient
+  if (not m_badBoardsFromDB.isValid()) B2FATAL("CDCBadBoards payload not found!");
 }
 
 std::string BadBoardADCDetector::getDescription()
@@ -34,6 +47,10 @@ void BadBoardADCDetector::exposeParameters(ModuleParamList* moduleParamList,
                                 m_badADCaverageMin,
                                 "Minimal value of average ADC to consider board bad",
                                 m_badADCaverageMin);
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badADCaverageMax"),
+                                m_badADCaverageMax,
+                                "Maximal value of average ADC to consider a board as bad",
+                                m_badADCaverageMax);
   moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "badTOTaverageMin"),
                                 m_badTOTaverageMin,
                                 "Minimal value of average TOT to consider board bad",
@@ -63,9 +80,23 @@ void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wire
   // second loop, set flag if board is problematic:
   for (auto& wireHit : wireHits) {
     auto board = geometryPar.getBoardID(wireHit.getWireID());
-    if (BoardADC[board] > m_badADCaverageMin)
+    if ((BoardADC[board] > m_badADCaverageMin) || (BoardADC[board] <= m_badADCaverageMax))
       wireHit->setBoardWithBadADCFlag();
     if (BoardTOT[board] > m_badTOTaverageMin)
       wireHit->setBoardWithBadTOTFlag();
+  }
+
+  // 3rd loop, over all boards, update list of them. Include boards with no hits at all
+  Belle2::TrackingUtilities::StoreWrappedObjPtr< std::vector<unsigned int> > storeVector("CDCDeadBoardsVector");
+
+  storeVector.create();
+
+  // TODO: decide if need the dead boards from the payload. Should be not possible that this method fails to detect those!?
+  double dummyEff = 0; // needed by isDeadBoard function else unused
+  // Note that board 0 is absent, the loop starts from 1.
+  for (unsigned int iBoard = 1; iBoard < c_nBoards; iBoard += 1) {
+    if (BoardCount.find(iBoard) == BoardCount.end() || m_badBoardsFromDB->isDeadBoard(iBoard, dummyEff)) {
+      storeVector->push_back(iBoard);
+    }
   }
 }

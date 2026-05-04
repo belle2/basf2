@@ -118,10 +118,10 @@ void VariablesToNtupleModule::initialize()
   TDirectory::TContext directoryGuard(m_file.get());
 
   // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str()) || m_treeName == "persistent") {
+  if (m_file->Get(m_treeName.c_str()) || isReservedTreeName(m_treeName)) {
     B2FATAL("Tree with the name \"" << m_treeName
             << "\" already exists in the file \"" << m_fileName << "\"\n"
-            << "or is reserved for FileMetaData.\n"
+            << "or is reserved for basf2 TTrees.\n"
             << "\nYou probably want to either set the output fileName or the treeName to something else:\n\n"
             << "   from modularAnalysis import variablesToNtuple\n"
             << "   variablesToNtuple('pi+:all', ['p'], treename='pions', filename='variablesToNtuple.root')\n"
@@ -451,7 +451,7 @@ void VariablesToNtupleModule::fillFileMetaData()
   TTree* persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
   persistent->Branch("FileMetaData", &outputFileMetaData);
   persistent->Fill();
-  persistent->Write("persistent", TObject::kWriteDelete);
+  persistent->Write(c_treeNames[DataStore::c_Persistent].c_str(), TObject::kWriteDelete);
 }
 
 void VariablesToNtupleModule::terminate()

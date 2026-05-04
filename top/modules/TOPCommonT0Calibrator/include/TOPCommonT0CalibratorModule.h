@@ -44,12 +44,6 @@ namespace Belle2 {
     TOPCommonT0CalibratorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPCommonT0CalibratorModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

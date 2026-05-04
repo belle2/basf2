@@ -27,13 +27,6 @@ using namespace Belle2;
 using namespace CDC;
 using namespace TrackingUtilities;
 
-CDCSegmentTriple::CDCSegmentTriple()
-  : m_startSegment(nullptr)
-  , m_middleSegment(nullptr)
-  , m_endSegment(nullptr)
-{
-}
-
 CDCSegmentTriple::CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
                                    const CDCAxialSegment2D* endSegment)
   : m_startSegment(startSegment)

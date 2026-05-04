@@ -280,14 +280,14 @@ void SoftwareTriggerHLTDQMModule::event()
   // this might be pre-scaled for performance reasons in the final configuration, therefore this structure
   // might not be filled in every event
   if (m_variables.isValid()) {
-    for (auto& variableNameAndTH1F : m_triggerVariablesHistograms) {
+    for (const auto& variableNameAndTH1F : m_triggerVariablesHistograms) {
       const std::string& variable = variableNameAndTH1F.first;
-      TH1F* histogram = variableNameAndTH1F.second;
 
       // try to load this variable from the computed trigger variables
       if (not m_variables->has(variable)) {
         B2ERROR("Variable " << variable << " configured for SoftwareTriggerDQM plotting is not available");
       } else {
+        TH1F* histogram = variableNameAndTH1F.second;
         const double value = m_variables->getVariable(variable);
         histogram->Fill(value);
       }
@@ -462,8 +462,8 @@ void SoftwareTriggerHLTDQMModule::event()
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkEventCRCError));
     m_runInfoHistograms["error_flag"]->Fill("HLTCrash",
                                             (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash));
-    m_runInfoHistograms["error_flag"]->Fill("ReconstructionAbort",
-                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort));
+    m_runInfoHistograms["error_flag"]->Fill("HLTPrefilterAbort",
+                                            (bool)(m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTPrefilterDiscard));
   }
 
   if (m_param_create_hlt_unit_histograms) {
@@ -484,4 +484,5 @@ void SoftwareTriggerHLTDQMModule::beginRun()
   std::for_each(m_runInfoHistograms.begin(), m_runInfoHistograms.end(),
   [](auto & it) { it.second->Reset(); });
 }
+
 

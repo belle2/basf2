@@ -76,7 +76,6 @@ namespace Belle2 {
 
   }
 
-  TOPGainEfficiencyCalculatorModule::~TOPGainEfficiencyCalculatorModule() {}
 
   void TOPGainEfficiencyCalculatorModule::initialize()
   {
@@ -153,19 +152,6 @@ namespace Belle2 {
 
   }
 
-  void TOPGainEfficiencyCalculatorModule::beginRun()
-  {
-  }
-
-  void TOPGainEfficiencyCalculatorModule::event()
-  {
-  }
-
-  void TOPGainEfficiencyCalculatorModule::endRun()
-  {
-  }
-
-
   void TOPGainEfficiencyCalculatorModule::terminate()
   {
     //first, check validity of input parameters
@@ -231,7 +217,7 @@ namespace Belle2 {
       hname << "hTime" << pixelstr.str();
 
       //first get 2D histogram from a given input (=an output file of TOPLaserHitSelector)
-      m_timeChargeHistogram[iHisto] = (TH2F*)f->Get(hname.str().c_str());
+      m_timeChargeHistogram[iHisto] = static_cast<TH2F*>(f->Get(hname.str().c_str()));
       TH2F* h2D = m_timeChargeHistogram[iHisto];
       if (!h2D) continue;
 
@@ -239,7 +225,7 @@ namespace Belle2 {
       std::ostringstream hnameProj[2];
       hnameProj[0] << "hTime_" << pixelstr.str();
       hnameProj[1] << "hCharge_" << pixelstr.str();
-      TH1D* hTime = (TH1D*)h2D->ProjectionX(hnameProj[0].str().c_str());
+      TH1D* hTime = static_cast<TH1D*>(h2D->ProjectionX(hnameProj[0].str().c_str()));
       m_timeHistogram[iHisto] = hTime;
       double peakTime = FindPeakForSmallerXThan(hTime, 0);
       //double peakTime = hTime->GetXaxis()->GetBinCenter(hTime->GetMaximumBin());
@@ -257,12 +243,11 @@ namespace Belle2 {
       m_hitTiming = funcLaser->GetParameter(1);
       int binNumMin = hTime->GetXaxis()->FindBin(m_hitTiming - 2 * m_fitHalfWidth);
       int binNumMax = hTime->GetXaxis()->FindBin(m_hitTiming + 2 * m_fitHalfWidth);
-      TH1D* hCharge = (TH1D*)h2D->ProjectionY(hnameProj[1].str().c_str(),
-                                              binNumMin, binNumMax);
+      TH1D* hCharge = static_cast<TH1D*>(h2D->ProjectionY(hnameProj[1].str().c_str(), binNumMin, binNumMax));
       m_chargeHistogram[iHisto] = hCharge;
     }
 
-    m_nCalPulseHistogram = (TH1F*)f->Get("hNCalPulse");
+    m_nCalPulseHistogram = static_cast<TH1F*>(f->Get("hNCalPulse"));
     if (!m_nCalPulseHistogram)
       B2WARNING("TOPGainEfficiencyCalculator : no histogram for the number of events with calibration pulses identified in the given input file");
     m_thresholdForIntegral = m_threshold * m_p1HeightIntegral + m_p0HeightIntegral;
@@ -597,6 +582,7 @@ namespace Belle2 {
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
         canvas->Print(pdfFilename.str().c_str());
     }
+    /* not clear what is to be done here (loop condition is always false)... commented out
     for (int iHisto = (c_NChannelPerPMT - 1) % c_NChannelPerPage + 1 ; iHisto < c_NChannelPerPage ; iHisto++) {
       for (int iPad = 0 ; iPad < c_NPlotsPerChannel ; iPad++) {
         canvas->cd(c_NPlotsPerChannel * (iHisto % c_NChannelPerPage) + iPad + 1);
@@ -606,7 +592,7 @@ namespace Belle2 {
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
         canvas->Print(pdfFilename.str().c_str());
     }
-
+    */
     canvas->Print((pdfFilename.str() + "]").c_str());
 
     delete latex;
@@ -618,6 +604,7 @@ namespace Belle2 {
     return;
   }
 
+  //cppcheck-suppress constParameterCallback
   double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   {
 

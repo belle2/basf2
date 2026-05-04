@@ -9,7 +9,7 @@
 #include <pxd/modules/pxdDQM/PXDGatedDHCDQMModule.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

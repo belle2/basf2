@@ -43,6 +43,54 @@ namespace Belle2 {
       m_pathSelector.exposeParameters(moduleParamList, TrackingUtilities::prefixed("path", prefix));
     }
 
+    /** Set maximal delta phi for state creation
+     *
+     *  @param maximalDeltaPhi Maximum distance in phi between wires for Z=0 plane
+     */
+    void setMaximalDeltaPhi(double maximalDeltaPhi) { m_stateCreator.setMaximalDeltaPhi(maximalDeltaPhi); }
+
+    /** Set maximal layer jump for state creation
+     *
+     *  @param maximalLayerJump Maximum number of layers to jump
+     */
+    void setMaximalLayerJump(int maximalLayerJump) { m_stateCreator.setMaximalLayerJump(maximalLayerJump); }
+
+    /** Set maximal layer jump for backward seed tracks
+     *
+     *  @param maximalLayerJumpBackwardSeed Maximum number of layers to jump for backward seeds
+     */
+    void setMaximalLayerJumpBackwardSeed(int maximalLayerJumpBackwardSeed)
+    {
+      m_stateCreator.setMaximalLayerJumpBackwardSeed(maximalLayerJumpBackwardSeed);
+    }
+
+    /** Set hit finding direction
+     *
+     *  @param hitFindingDirection Start from innermost/outermost CDC layers
+     */
+    void setHitFindingDirection(const std::string& hitFindingDirection)
+    {
+      m_stateCreator.setHitFindingDirection(hitFindingDirection);
+    }
+
+    /** Set maximal candidates in flight for path selection
+     *
+     *  @param pathMaximalCandidatesInFlight Maximum number of candidates to keep in flight
+     */
+    void setPathMaximalCandidatesInFlight(size_t pathMaximalCandidatesInFlight)
+    {
+      m_pathSelector.setMaximalCandidatesInFlight(pathMaximalCandidatesInFlight);
+    }
+
+    /** Set maximal hit candidates for state filtering
+     *
+     *  @param stateMaximalHitCandidates Maximum number of hit candidates to test
+     */
+    void setStateMaximalHitCandidates(size_t stateMaximalHitCandidates)
+    {
+      m_stateFilter.setMaximalHitCandidates(stateMaximalHitCandidates);
+    }
+
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
                const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits) override

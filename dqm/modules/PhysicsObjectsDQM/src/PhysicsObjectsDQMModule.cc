@@ -52,7 +52,7 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
            std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("TriggerIdentifierBhabha", m_triggerIdentifierBhabha,
            "Trigger identifier string used to select events for the bhabha histograms",
-           std::string("software_trigger_cut&skim&accept_bhabha_all"));
+           std::string("software_trigger_cut&skim&accept_bhabha_trk_ecl"));
   addParam("TriggerIdentifierHadronb2", m_triggerIdentifierHadronb2,
            "Trigger identifier string used to select events for the hadronb2 histograms",
            std::string("software_trigger_cut&skim&accept_hadronb2"));
@@ -94,7 +94,7 @@ void PhysicsObjectsDQMModule::defineHisto()
   m_h_physicsresults->GetXaxis()->SetBinLabel(3, "Hadronb2");
   m_h_physicsresults->GetXaxis()->SetBinLabel(4, "Hadronb2_tight");
   m_h_physicsresults->GetXaxis()->SetBinLabel(5, "mumu_tight");
-  m_h_physicsresults->GetXaxis()->SetBinLabel(6, "bhabha_all");
+  m_h_physicsresults->GetXaxis()->SetBinLabel(6, "bhabha_trk_ecl");
 
 // Monitoring variables for prefilter
   m_h_nKshortAllH = new TH1F("hist_nKshortAllH", "hist_nKshortAllH", 50, 0.45, 0.55);

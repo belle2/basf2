@@ -61,6 +61,7 @@ namespace Belle2 {
         m_pole2 = shape.getPole2();
         if (m_interpolator) delete m_interpolator;
         m_interpolator = 0;
+        m_peakTime = 0;
       }
       return *this;
     }

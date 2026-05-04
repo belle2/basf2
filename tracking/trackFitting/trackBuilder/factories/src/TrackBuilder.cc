@@ -21,6 +21,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TMatrixDSym.h>
+#include <optional>
 
 #include <genfit/FitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -39,7 +40,14 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(27, trackReps.size() << " track representations available.");
-  Track newTrack(recoTrack.getQualityIndicator());
+  std::optional<Track> ownedTrack;
+  Track* relatedTrack = recoTrack.getRelatedFrom<Track>();
+  bool newTrackCreated = false;
+  if (!relatedTrack) {
+    ownedTrack.emplace(recoTrack.getQualityIndicator());
+    relatedTrack = &*ownedTrack;
+    newTrackCreated = true;
+  }
 
   bool repAlreadySet = false;
   unsigned int repIDPlusOne = 0;
@@ -57,6 +65,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     if (not recoTrack.wasFitSuccessful(trackRep)) {
       B2DEBUG(27, "The fit with the given track representation (" << std::abs(trackRep->getPDG()) <<
               ") was not successful. Skipping ...");
+      continue;
+    }
+
+    // Skip hypotheses already stored by a previous TrackBuilder call (e.g. from a prior TrackCreator module).
+    if (not newTrackCreated && relatedTrack->getTrackFitResult(particleType)) {
       continue;
     }
 
@@ -124,13 +137,15 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
                                    );
 
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
-    newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
+    relatedTrack->setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
   }
 
-  B2DEBUG(27, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
-  if (newTrack.getNumberOfFittedHypotheses() > 0) {
-    Track* addedTrack = tracks.appendNew(newTrack);
-    addedTrack->addRelationTo(&recoTrack);
+  B2DEBUG(27, "Number of fitted hypothesis = " << relatedTrack->getNumberOfFittedHypotheses());
+  if (relatedTrack->getNumberOfFittedHypotheses() > 0) {
+    if (newTrackCreated) {
+      Track* addedTrack = tracks.appendNew(*relatedTrack);
+      addedTrack->addRelationTo(&recoTrack);
+    }
     return true;
   } else {
     B2DEBUG(28, "No valid fit for any given hypothesis. No Track is added to the Tracks StoreArray.");

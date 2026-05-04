@@ -31,11 +31,11 @@ namespace Belle2 {
       /// Get global unique id = 0 (empty/none)
       static unsigned short getGlobalUniqueID() {return 0;}
       /// Get global parameter - return zero
-      double getGlobalParam(unsigned short, unsigned short) {return 0.;}
+      static double getGlobalParam(unsigned short, unsigned short) {return 0.;}
       /// Set global parameter - do nothing
-      void setGlobalParam(double, unsigned short, unsigned short) {}
+      static void setGlobalParam(double, unsigned short, unsigned short) {}
       /// list stored global parameters - empty list, no parameters
-      std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
+      static std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams() {return {};}
       // ------------------------------------------------------------------------
     };
 

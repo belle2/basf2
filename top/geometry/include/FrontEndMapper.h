@@ -34,11 +34,6 @@ namespace Belle2 {
       FrontEndMapper();
 
       /**
-       * destructor
-       */
-      ~FrontEndMapper();
-
-      /**
        * Initialize from Gearbox (XML)
        * @param frontEndMapping XML data directory
        */
@@ -109,7 +104,7 @@ namespace Belle2 {
       int getMapSize() const
       {
         if (m_fromDB) {
-          return m_mappingDB->getEntries();
+          return m_mappingDB.getEntries();
         } else {
           return m_mapping.size();
         }
@@ -152,18 +147,6 @@ namespace Belle2 {
       enum {c_numModules = 16, c_numColumns = 4};
 
       /**
-       * copy constructor
-       */
-      FrontEndMapper(const FrontEndMapper&)
-      {}
-
-      /**
-       * assignment operator
-       */
-      FrontEndMapper& operator=(const FrontEndMapper&)
-      {return *this;}
-
-      /**
        * Clear
        */
       void clear();
@@ -174,7 +157,7 @@ namespace Belle2 {
       void update();
 
       std::vector<TOPFrontEndMap> m_mapping;      /**< mappings from gearbox */
-      DBArray<TOPFrontEndMap>* m_mappingDB = 0;   /**< mappings from database */
+      DBArray<TOPFrontEndMap> m_mappingDB;        /**< mappings from database */
       bool m_valid = false;                       /**< true, if mapping available */
       bool m_fromDB = false;                      /**< true, if from database */
 

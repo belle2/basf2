@@ -42,7 +42,7 @@ namespace Belle2 {
   {
     auto contour = getForwardContour();
     cout << "Forward contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -68,7 +68,7 @@ namespace Belle2 {
   {
     auto contour = getInnerPanelContour();
     cout << "Inner panel contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -94,7 +94,7 @@ namespace Belle2 {
   {
     auto contour = getOuterPanelContour();
     cout << "Outer panel contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -127,7 +127,7 @@ namespace Belle2 {
   {
     auto contour = getBackwardContour();
     cout << "Backward contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -162,7 +162,7 @@ namespace Belle2 {
   {
     auto contour = getPrismEnclosureContour();
     cout << "Prism enclosure contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -191,7 +191,7 @@ namespace Belle2 {
   {
     auto contour = getBackPlateContour();
     cout << "Prism enclosure back plate contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 
@@ -218,7 +218,7 @@ namespace Belle2 {
   {
     auto contour = getFrontPlateContour();
     cout << "Prism enclosure front plate contour [" << s_unitName << "]:" << endl;
-    for (auto& xy : contour) cout << xy.first << " " << xy.second << endl;
+    for (const auto& xy : contour) cout << xy.first << " " << xy.second << endl;
     cout << endl;
   }
 

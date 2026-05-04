@@ -82,7 +82,7 @@ namespace Belle2 {
           // Get all matched collection items
           const auto& relatedCollectionItems = m_hitLookup.equal_range(&wireHit);
 
-          for (auto& relatedCollectionItemIterator : asRange(relatedCollectionItems)) {
+          for (const auto& relatedCollectionItemIterator : asRange(relatedCollectionItems)) {
             const ACollectionItem* collectionItem = relatedCollectionItemIterator.second;
             numberOfIntersectionsMap[collectionItem] += 1;
           }

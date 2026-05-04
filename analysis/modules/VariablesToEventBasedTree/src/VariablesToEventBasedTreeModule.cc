@@ -14,12 +14,14 @@
 #include <analysis/VariableManager/Utility.h>
 
 // framework
+#include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
+#include <framework/io/RootIOUtilities.h>
 
 #include <cmath>
 
@@ -51,7 +53,7 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
 
   addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
            string("VariablesToEventBasedTree.root"));
-  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
+  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
@@ -94,9 +96,11 @@ void VariablesToEventBasedTreeModule::initialize()
 
   m_file->cd();
 
-  // check if TTree with that name already exists
-  if (m_file->Get(m_treeName.c_str())) {
-    B2FATAL("Tree with the name " << m_treeName << " already exists in the file " << m_fileName);
+  // check if TTree with that name already exists or if the name is reserved
+  if (m_file->Get(m_treeName.c_str()) || RootIOUtilities::isReservedTreeName(m_treeName)) {
+    B2FATAL("Tree with the name \"" << m_treeName
+            << "\" already exists in the file \"" << m_fileName << "\"\n"
+            << "or is reserved for basf2 TTrees.\n");
     return;
   }
 

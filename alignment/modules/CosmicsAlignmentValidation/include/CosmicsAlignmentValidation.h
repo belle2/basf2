@@ -54,7 +54,7 @@ namespace Belle2 {
     /** Find trackfit results in for the corresponding track
     *
     */
-    const TrackFitResult* findRelatedTrackFitResult(const genfit::Track* gfTrack);
+    static const TrackFitResult* findRelatedTrackFitResult(const genfit::Track* gfTrack);
 
   private:
     std::string m_gfTrackColName; ///< m_gfTrackColName

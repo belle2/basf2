@@ -61,7 +61,7 @@ namespace Belle2 {
      * Input:
      * @param c
      */
-    void set_chebyCoeffs(std::vector<double> c)
+    void set_chebyCoeffs(std::vector<double>& c)
     {
       m_chebyCoeffs = c;
     }
@@ -73,7 +73,7 @@ namespace Belle2 {
      * @param x
      * @param y
      */
-    void set_graphPoints(std::vector<double> x, std::vector<double> y)
+    void set_graphPoints(std::vector<double>& x, std::vector<double>& y)
     {
       m_x = x;
       m_y = y;
@@ -100,7 +100,7 @@ namespace Belle2 {
      */
     double cheby_v0(double trkAngle) const
     {
-      TF1* f = (TF1*) gROOT->GetFunction(TString::Format("chebyshev%lu", m_chebyCoeffs.size() - 1));
+      TF1* f = static_cast<TF1*>(gROOT->GetFunction(TString::Format("chebyshev%lu", m_chebyCoeffs.size() - 1)));
       f->SetParameters(&m_chebyCoeffs[0]);
 
       return f->Eval(trkAngle);

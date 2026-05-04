@@ -11,7 +11,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
-#include "TH1D.h"
+#include <TH1D.h>
 
 namespace Belle2 {
   class PXDDigit;

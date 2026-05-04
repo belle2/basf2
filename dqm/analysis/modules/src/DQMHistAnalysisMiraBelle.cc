@@ -814,7 +814,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
 
   //bhabha,hadrons
-  // ========== bhabha_all
+  // ========== bhabha_trk_ecl
   // get existing histograms produced by DQM modules
   auto* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
   auto* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");

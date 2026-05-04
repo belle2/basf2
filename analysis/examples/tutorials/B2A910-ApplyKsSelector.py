@@ -63,7 +63,7 @@ vars += ['extraInfo(Lam_mva)']
 ma.variablesToNtuple('K_S0:custom',
                      variables=vars,
                      filename=output_file,
-                     treename='tree',
+                     treename='ntuple',
                      path=my_path)
 
 b2.process(my_path)

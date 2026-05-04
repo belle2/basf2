@@ -8,7 +8,7 @@
 
 #include <top/calibration/TOPChannelMaskAlgorithm.h>
 #include <framework/logging/Logger.h>
-#include "TROOT.h"
+#include <TROOT.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <string>

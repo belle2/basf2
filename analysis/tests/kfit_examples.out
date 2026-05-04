@@ -43,7 +43,6 @@ TBranch: gamma_0_clusterTheta, 1.754
 TBranch: gamma_0_clusterTiming, 0
 TBranch: gamma_0_clusterTrackMatch, 0
 TBranch: gamma_0_clusterZernikeMVA, 0.8262
-TBranch: gamma_0_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: gamma_0_minC2TDist, 250
 TBranch: gamma_0_nECLClusterTrackMatches, 0
 TBranch: gamma_0_px, -0.05746
@@ -75,7 +74,6 @@ TBranch: gamma_1_clusterTheta, 1.758
 TBranch: gamma_1_clusterTiming, 0.4883
 TBranch: gamma_1_clusterTrackMatch, 0
 TBranch: gamma_1_clusterZernikeMVA, 0.2803
-TBranch: gamma_1_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: gamma_1_minC2TDist, 250
 TBranch: gamma_1_nECLClusterTrackMatches, 0
 TBranch: gamma_1_px, 0.06564
@@ -137,7 +135,6 @@ TBranch: pi0_gamma_0_clusterTheta, 1.076
 TBranch: pi0_gamma_0_clusterTiming, 11.72
 TBranch: pi0_gamma_0_clusterTrackMatch, 0
 TBranch: pi0_gamma_0_clusterZernikeMVA, 0.2129
-TBranch: pi0_gamma_0_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: pi0_gamma_0_minC2TDist, 85.45
 TBranch: pi0_gamma_0_nECLClusterTrackMatches, 0
 TBranch: pi0_gamma_1_clusterAbsZernikeMoment40, 1.124
@@ -163,7 +160,6 @@ TBranch: pi0_gamma_1_clusterTheta, 0.7249
 TBranch: pi0_gamma_1_clusterTiming, -2.93
 TBranch: pi0_gamma_1_clusterTrackMatch, 0
 TBranch: pi0_gamma_1_clusterZernikeMVA, 0.9492
-TBranch: pi0_gamma_1_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: pi0_gamma_1_minC2TDist, 114.7
 TBranch: pi0_gamma_1_nECLClusterTrackMatches, 0
 TFile: B2A403-KFit-VertexFit.root

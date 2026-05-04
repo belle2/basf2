@@ -131,13 +131,13 @@ class Collection():
         if backend_args:
             self.backend_args = backend_args
 
+        #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
+        #: step! Since the algorithm will merge the collected data into one process it has to use a single DB chain set from
+        #: the overall Calibration.
+        self.database_chain = []
         if database_chain:
-            #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
-            #: step! Since the algorithm will merge the collected data into one process it has to use a single DB chain set from
-            #: the overall Calibration.
             self.database_chain = database_chain
         else:
-            self.database_chain = []
             # This may seem weird but the changes to the DB interface mean that they have effectively swapped from being
             # described well by appending to a list to a deque. So we do bit of reversal to translate it back and make the
             # most important GT the last one encountered.
@@ -423,7 +423,10 @@ class CalibrationBase(ABC, Thread):
         Returns the list of calibrations in our dependency list that have failed.
         """
         failed = []
-        for calibration in self.dependencies:
+        # Use local variable to avoid doxygen "no uniquely matching class member" warning
+        # (multiple classes in this file define self.dependencies with doc comments)
+        dependencies = self.dependencies
+        for calibration in dependencies:
             if calibration.state == self.fail_state:
                 failed.append(calibration)
         return failed
@@ -585,12 +588,12 @@ class Calibration(CalibrationBase):
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
+        #: The database chain that is applied to the algorithms.
+        #: This is often updated at the same time as the database chain for the default `Collection`.
+        self.database_chain = []
         if database_chain:
-            #: The database chain that is applied to the algorithms.
-            #: This is often updated at the same time as the database chain for the default `Collection`.
             self.database_chain = database_chain
         else:
-            self.database_chain = []
             # This database is already applied to the `Collection` automatically, so don't do it again
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag, apply_to_default_collection=False)
@@ -915,6 +918,9 @@ class Calibration(CalibrationBase):
             B2ERROR(f"Something other than CalibrationAlgorithm instance passed in ({type(value)}). "
                     "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @algorithms.fset.register(tuple)
     @algorithms.fset.register(list)
     def _(self, value):
@@ -931,6 +937,7 @@ class Calibration(CalibrationBase):
                 else:
                     B2ERROR(f"Something other than CalibrationAlgorithm instance passed in {type(value)}."
                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
+    # @endcond
 
     @property
     def pre_algorithms(self):
@@ -950,6 +957,7 @@ class Calibration(CalibrationBase):
         else:
             B2ERROR("Something evaluated as False passed in as pre_algorithm function.")
 
+    # @cond
     @pre_algorithms.fset.register(tuple)
     @pre_algorithms.fset.register(list)
     def _(self, values):
@@ -964,6 +972,7 @@ class Calibration(CalibrationBase):
                 B2ERROR("Number of functions and number of algorithms doesn't match.")
         else:
             B2ERROR("Empty container passed in for pre_algorithm functions")
+    # @endcond
 
     @property
     def strategies(self):
@@ -983,6 +992,7 @@ class Calibration(CalibrationBase):
         else:
             B2ERROR("Something evaluated as False passed in as a strategy.")
 
+    # @cond
     @strategies.fset.register(tuple)
     @strategies.fset.register(list)
     def _(self, values):
@@ -997,6 +1007,7 @@ class Calibration(CalibrationBase):
                 B2ERROR("Number of strategies and number of algorithms doesn't match.")
         else:
             B2ERROR("Empty container passed in for strategies list")
+    # @endcond
 
     def __repr__(self):
         """

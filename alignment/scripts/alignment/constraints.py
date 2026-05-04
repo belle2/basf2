@@ -236,7 +236,9 @@ class CDCLayerConstraints(Constraints):
 
         consts = []
 
-        for par in self.parameter:
+        parameters = self.parameter
+
+        for par in parameters:
             nTot = 0
             for sl in self.cdc:
                 nlyr = sl[1]
@@ -473,7 +475,9 @@ class CDCWireConstraints(Constraints):
 
         layers = self.layers
 
-        if self.layer_rigid:
+        layer_rigid = self.layer_rigid
+
+        if layer_rigid:
             for layer in layers:
                 const = Constraint()
                 # sum of wire X (BWD) in layer

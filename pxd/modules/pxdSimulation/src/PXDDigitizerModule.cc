@@ -579,7 +579,7 @@ void PXDDigitizerModule::saveDigits()
 
       // Check if the readout digit is coming from a masked or dead area
       if (PXD::PXDPixelMasker::getInstance().pixelDead(sensorID, d.u(), d.v())
-          || !PXD::PXDPixelMasker::getInstance().pixelOK(sensorID, d.u(), d.v())) {
+          || charge <= PXD::PXDPixelMasker::getInstance().getPixelThreshold(sensorID, d.u(), d.v())) {
         continue;
       }
 

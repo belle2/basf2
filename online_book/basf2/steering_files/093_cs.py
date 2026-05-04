@@ -93,7 +93,7 @@ ma.variablesToNtuple(
     decayString="B0",
     variables=["ContProb", "isContinuumEvent"] + simpleCSVariables,
     filename="ContinuumSuppression_applied.root",
-    treename="tree",
+    treename="ntuple",
     path=main,
 )
 

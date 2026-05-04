@@ -152,7 +152,7 @@ namespace Belle2 {
 
           for (auto& collection : pdfCollections) collection.clearPDFOther(); // reset
           for (auto& collection : pdfCollections) { // append
-            for (auto& other : pdfCollections) {
+            for (const auto& other : pdfCollections) {
               if (&other == &collection) continue;
               collection.appendPDFOther(other.mostProbable);
             }
@@ -162,7 +162,7 @@ namespace Belle2 {
 
       // determine and save log likelihoods
 
-      for (auto& collection : pdfCollections) {
+      for (const auto& collection : pdfCollections) {
         auto* topLL = m_likelihoods.appendNew();
         const auto* trk = collection.topTrack;
         const auto* track = trk->getTrack();
@@ -185,7 +185,7 @@ namespace Belle2 {
 
           if (abs(chargedStable.getPDGCode()) == abs(pdgCode)) {
             for (const auto& p : pdfConstructor->getPulls()) {
-              auto* pull = m_topPulls.appendNew(p.pixelID, p.time, p.peakT0 + p.ttsT0, p.sigma, p.phiCer, p.wt);
+              const auto* pull = m_topPulls.appendNew(p.pixelID, p.time, p.peakT0 + p.ttsT0, p.sigma, p.phiCer, p.wt);
               track->addRelationTo(pull);
             }
           }
@@ -203,7 +203,7 @@ namespace Belle2 {
 
     } // loop: moduleID
 
-    for (auto& x : topTracks) delete x.second;
+    for (const auto& x : topTracks) delete x.second;
 
   }
 

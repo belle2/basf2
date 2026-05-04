@@ -16,6 +16,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <tracking/trackFindingCDC/filters/track/CDCTrackDeadBoardFilter.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -55,6 +57,15 @@ void TrackQualityEstimator::exposeParameters(ModuleParamList* moduleParamList, c
                                 m_param_resetTakenFlag,
                                 "Reset taken flag for deleted tracks so that hits can be used by subsequent TFs.",
                                 m_param_resetTakenFlag);
+
+  moduleParamList->addParameter(prefixed(prefix, "deactivateIfDeadBoard"),
+                                m_param_deactivateIfDeadBoard,
+                                "If true the filter will be deactivated for the track in case a dead CDC board is detected at a position where a hole in the track is found.",
+                                m_param_deactivateIfDeadBoard);
+  moduleParamList->addParameter(prefixed(prefix, "minLayerJumpsForDeadBoards"),
+                                m_param_minLayerJumpsForDeadBoards,
+                                "Minimal number of CDC layers to be jumped by the track to trigger the dead board detection. Not used if deactivateIfDeadBoard is false. Default 4 corresponding to potentially 1 SL jumped (3 wire layers).",
+                                m_param_minLayerJumpsForDeadBoards);
 }
 
 void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
@@ -64,7 +75,15 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
   for (CDCTrack& track : tracks) {
     const double qualityIndicator = m_trackQualityFilter(track);
     track.setQualityIndicator(qualityIndicator);
+
+    // check for dead boards in case of rejected tracks
+    if (m_param_deactivateIfDeadBoard && std::isnan(qualityIndicator)) {
+      // set QI to infinity temporarily to prevent deletion if dead board found, will be set back to NAN later (after deletion step)
+      if (cdcTrackDeadBoardFilter(track, m_param_minLayerJumpsForDeadBoards)) track.setQualityIndicator(
+          std::numeric_limits<float>::infinity());
+    }
   }
+
 
   if (m_param_deleteTracks) { // delete track with QI below cut threshold
     auto reject = [this](const CDCTrack & track) {
@@ -76,4 +95,10 @@ void TrackQualityEstimator::apply(std::vector<CDCTrack>& tracks)
     };
     erase_remove_if(tracks, reject);
   }
+
+  // reset NaN for the tracks where the filter has been deactivated
+  for (auto& track : tracks) {
+    if (std::isinf(track.getQualityIndicator())) track.setQualityIndicator(NAN);
+  }
+
 }

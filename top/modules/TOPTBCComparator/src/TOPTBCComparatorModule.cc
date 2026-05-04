@@ -10,11 +10,11 @@
 #include <top/modules/TOPTBCComparator/TOPTBCComparatorModule.h>
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/geometry/FrontEndMapper.h>
-#include "TDirectory.h"
-#include "TSystemDirectory.h"
-#include "TSystemFile.h"
-#include "TString.h"
-#include "TFile.h"
+#include <TDirectory.h>
+#include <TSystemDirectory.h>
+#include <TSystemFile.h>
+#include <TString.h>
+#include <TFile.h>
 #include <boost/format.hpp>
 #include <fstream>
 
@@ -242,7 +242,7 @@ namespace Belle2 {
       if (!m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str())) {
         B2WARNING("Error opening " << str(format("timeDiffcal_ch%1%") % (iChannel)));
       } else {
-        TH2F* h_timeDiffcal = (TH2F*)m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str());
+        TH2F* h_timeDiffcal = static_cast<TH2F*>(m_calSetFile->Get(str(format("timeDiffcal_ch%1%") % (iChannel)).c_str()));
         TH1D* h_projection = h_timeDiffcal->ProjectionY("h_projection", 1, m_numSamples); // full projection
 
         m_slotAverageDeltaT[m_slotID - 1][m_calSetID]->SetBinContent(hardwareChannel + 1, h_projection->GetMean());
@@ -269,7 +269,7 @@ namespace Belle2 {
       if (!m_calSetFile->Get(str(format("sampleOccup_ch%1%") % (iChannel)).c_str())) {
         B2WARNING("Error opening " << str(format("sampleOccup_ch%1%") % (iChannel)));
       } else {
-        TH1F* h_sampleOccup = (TH1F*)m_calSetFile->Get(str(format("sampleOccup_ch%1%") % (iChannel)).c_str());
+        TH1F* h_sampleOccup = static_cast<TH1F*>(m_calSetFile->Get(str(format("sampleOccup_ch%1%") % (iChannel)).c_str()));
 
         // reads the occupancy histogram bin-by-by to look for (almost) empty samples
         int nEmpty = 0;
@@ -334,19 +334,6 @@ namespace Belle2 {
     REG_HISTOGRAM;
   }
 
-  void TOPTBCComparatorModule::beginRun()
-  {
-    return;
-  }
-
-
-  void TOPTBCComparatorModule::event()
-  {
-    return;
-  }
-
-
-
   // This function takes care of looping over the root files. Unless the directory structure is changed, you should
   // not have to touch this part
   void TOPTBCComparatorModule::endRun()
@@ -375,7 +362,7 @@ namespace Belle2 {
       if (calSetDirContent) {
         TSystemFile* entry;
         TIter next(calSetDirContent);
-        while ((entry = (TSystemFile*)next())) {
+        while ((entry = static_cast<TSystemFile*>(next()))) {
 
           // gets the name of the entry in the list of the content of m_calSetDirectory
           std::string entryName = entry->GetName();
@@ -407,7 +394,7 @@ namespace Belle2 {
             if (calSetSubDirContent) {
               TSystemFile* file;
               TIter nextSub(calSetSubDirContent);
-              while ((file = (TSystemFile*)nextSub())) {
+              while ((file = static_cast<TSystemFile*>(nextSub()))) {
                 // gets the name of the entry in the list of the content of m_calSetDirectory
                 std::string fileName = file->GetName();
 
@@ -502,7 +489,7 @@ namespace Belle2 {
   // UTILITIES
   //
   // -------------------------------
-  int TOPTBCComparatorModule::parseInputDirectoryLine(std::string inputString)
+  int TOPTBCComparatorModule::parseInputDirectoryLine(const std::string& inputString)
   {
     // resets the strings
     m_calSetDirectory.clear();
@@ -540,7 +527,7 @@ namespace Belle2 {
 
 
 
-  int TOPTBCComparatorModule::parseSlotAndScrodIDfromFileName(std::string inputString)
+  int TOPTBCComparatorModule::parseSlotAndScrodIDfromFileName(const std::string& inputString)
   {
     // resets the IDs
     m_slotID = -1;
@@ -594,7 +581,7 @@ namespace Belle2 {
     const char* yAxisTitle = hRatio->GetYaxis()->GetTitle();
 
     // clone the numerator histogram into the output one
-    hRatio = (TH1F*)hNum->Clone();
+    hRatio = static_cast<TH1F*>(hNum->Clone());
 
 
     // makes the ratio
@@ -618,7 +605,7 @@ namespace Belle2 {
     const char* yAxisTitle = hRatio->GetYaxis()->GetTitle();
 
     // clone the numerator histogram into the output one
-    hRatio = (TH2F*)hNum->Clone();
+    hRatio = static_cast<TH2F*>(hNum->Clone());
 
 
     // makes the ratio

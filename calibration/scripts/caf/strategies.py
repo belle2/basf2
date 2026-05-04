@@ -692,7 +692,7 @@ class SequentialBoundaries(AlgorithmStrategy):
         #: :py:class:`caf.state_machines.AlgorithmMachine` used to help set up and execute CalibrationAlgorithm
         #: It gets setup properly in :py:func:`run`
         self.machine = AlgorithmMachine(self.algorithm)
-        #: boolean storing whether this is the first time the algorithm is executed
+        #: boolean storing whether this is the first time we run, so the algo setup is executed
         self.first_execution = True
 
     def run(self, iov, iteration, queue):

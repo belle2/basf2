@@ -323,7 +323,7 @@ namespace Belle2 {
 
       for (auto& result : m_results) result.set();
 
-      for (auto& mask : masks) {
+      for (const auto& mask : masks) {
         if (mask.second) delete mask.second;
       }
 

@@ -48,7 +48,7 @@ namespace Belle2 {
       }
 
       /// Mockup as we do not have any sub-items
-      void receiveMaskedFlag() const {}
+      static void receiveMaskedFlag() {}
 
     private:
       /// Memory for the automaton cell

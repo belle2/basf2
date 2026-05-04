@@ -45,8 +45,8 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
   addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", double(3));
   addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", double(2.5));
   addParam("occGroupIDsLevel_Error", m_groupIDsOccError, "Maximum group IDs Occupancy (%) allowed for safe operations (red)",
-           double(2.5));
-  addParam("occGroupIDsLevel_Warning", m_groupIDsOccWarning, "Group IDs Occupancy (%) at WARNING level (orange)", double(2));
+           double(2));
+  addParam("occGroupIDsLevel_Warning", m_groupIDsOccWarning, "Group IDs Occupancy (%) at WARNING level (orange)", double(1.5));
   addParam("occLevel_Empty", m_occEmpty, "Maximum Occupancy (%) for which the sensor is considered empty", double(0));
   addParam("onlineOccLevel_Error", m_onlineOccError, "Maximum OnlineOccupancy (%) allowed for safe operations (red)", double(10));
   addParam("onlineOccLevel_Warning", m_onlineOccWarning, "OnlineOccupancy (%) at WARNING level (orange)", double(5));

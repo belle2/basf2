@@ -16,6 +16,8 @@
 /* ROOT headers. */
 #include <TDirectory.h>
 
+#include <set>
+
 using namespace Belle2;
 
 REG_MODULE(KLMDQM);
@@ -28,6 +30,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeScintillatorEKLM{nullptr},
   m_ChargeScintillatorBKLM{nullptr},
   m_ChargeScintillatorEKLM{nullptr},
+  m_ChargeClusterBKLM{nullptr},
+  m_ChargeClusterEKLM{nullptr},
+  m_AverageChargeClusterBKLM{nullptr},
+  m_AverageChargeClusterEKLM{nullptr},
   m_PlaneBKLMPhi{nullptr},
   m_PlaneBKLMZ{nullptr},
   m_PlaneEKLM{nullptr},
@@ -121,14 +127,28 @@ void KLMDQMModule::defineHisto()
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   m_ChargeScintillatorBKLM =
     new TH1F("charge_scintillator_bklm", "Scintillator charge (BKLM)",
-             256, 0., 1024.);
+             256, 0., 512.);
   m_ChargeScintillatorBKLM->GetXaxis()->SetTitle("Charge");
   m_ChargeScintillatorEKLM =
     new TH1F("charge_scintillator_eklm", "Scintillator charge (EKLM)",
-             256, 0., 1024.);
+             256, 0., 512.);
   m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
-  m_ChargeScintillatorBKLM->SetOption("HIST LOGY");
-  m_ChargeScintillatorEKLM->SetOption("HIST LOGY");
+  m_ChargeClusterBKLM =
+    new TH1F("charge_cluster_bklm", "BKLM Scintillator Clusters",
+             1000, 0., 10000.);
+  m_ChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge");
+  m_ChargeClusterEKLM =
+    new TH1F("charge_cluster_eklm", "EKLM Clusters",
+             1000, 0., 10000.);
+  m_ChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge");
+  m_AverageChargeClusterBKLM =
+    new TH1F("avg_charge_cluster_bklm", "Mean Cluster Charge",
+             256, 0., 512.);
+  m_AverageChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
+  m_AverageChargeClusterEKLM =
+    new TH1F("avg_charge_cluster_eklm", "Mean Cluster Charge",
+             256, 0., 512.);
+  m_AverageChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
   m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",
                                       10000, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
   m_TimeRevo9DCArrivalTime->GetXaxis()->SetTitle("Time, ns");
@@ -316,6 +336,7 @@ void KLMDQMModule::initialize()
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
   m_Hit2ds.isOptional();
+  m_KLMClusters.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -332,6 +353,10 @@ void KLMDQMModule::beginRun()
   m_TimeScintillatorEKLM->Reset();
   m_ChargeScintillatorBKLM->Reset();
   m_ChargeScintillatorEKLM->Reset();
+  m_ChargeClusterBKLM->Reset();
+  m_ChargeClusterEKLM->Reset();
+  m_AverageChargeClusterBKLM->Reset();
+  m_AverageChargeClusterEKLM->Reset();
   m_TimeRevo9DCArrivalTime->Reset();
   m_klmTime->updateConstants(); //to get correct CTime
   /* Plane hits. */
@@ -561,6 +586,50 @@ void KLMDQMModule::event()
     int section = hit2d.getSection();
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());
+  }
+  /* Cluster charge from related scintillator digits (unique per cluster). */
+  if (m_KLMClusters.isValid()) {
+    for (KLMCluster& cluster : m_KLMClusters) {
+      std::set<const KLMDigit*> digitsSeen;
+      double sumChargeBKLM = 0.;
+      double sumChargeEKLM = 0.;
+      int nDigitsClusterBKLM = 0;
+      int nDigitsClusterEKLM = 0;
+      auto addDigits = [&](const RelationVector<KLMDigit>& digits) {
+        for (unsigned id = 0; id < digits.size(); ++id) {
+          const KLMDigit* digit = digits[id];
+          if (!digit->isGood())
+            continue;
+          if (!digitsSeen.insert(digit).second)
+            continue;
+          if (digit->getSubdetector() == KLMElementNumbers::c_EKLM) {
+            sumChargeEKLM += digit->getCharge();
+            ++nDigitsClusterEKLM;
+          } else if (digit->getSubdetector() == KLMElementNumbers::c_BKLM && !digit->inRPC()) {
+            sumChargeBKLM += digit->getCharge();
+            ++nDigitsClusterBKLM;
+          }
+        }
+      };
+      RelationVector<KLMHit2d> clusterHits = cluster.getRelationsTo<KLMHit2d>();
+      for (unsigned ih = 0; ih < clusterHits.size(); ++ih) {
+        KLMHit2d* hit2d = clusterHits[ih];
+        addDigits(hit2d->getRelationsTo<KLMDigit>());
+        RelationVector<BKLMHit1d> hit1ds = hit2d->getRelationsTo<BKLMHit1d>();
+        for (unsigned i1 = 0; i1 < hit1ds.size(); ++i1)
+          addDigits(hit1ds[i1]->getRelationsTo<KLMDigit>());
+      }
+      if (sumChargeBKLM > 0.) {
+        m_ChargeClusterBKLM->Fill(sumChargeBKLM);
+        m_AverageChargeClusterBKLM->Fill(sumChargeBKLM /
+                                         static_cast<double>(nDigitsClusterBKLM));
+      }
+      if (sumChargeEKLM > 0.) {
+        m_ChargeClusterEKLM->Fill(sumChargeEKLM);
+        m_AverageChargeClusterEKLM->Fill(sumChargeEKLM /
+                                         static_cast<double>(nDigitsClusterEKLM));
+      }
+    }
   }
 }
 

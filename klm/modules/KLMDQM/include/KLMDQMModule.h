@@ -23,6 +23,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -155,6 +156,18 @@ namespace Belle2 {
     /** Charge: EKLM scintillators. */
     TH1F* m_ChargeScintillatorEKLM;
 
+    /** Cluster charge (sum of scintillator digit charges), BKLM part. */
+    TH1F* m_ChargeClusterBKLM;
+
+    /** Cluster charge (sum of scintillator digit charges), EKLM part. */
+    TH1F* m_ChargeClusterEKLM;
+
+    /** Mean scintillator digit charge per cluster (BKLM contributors only). */
+    TH1F* m_AverageChargeClusterBKLM;
+
+    /** Mean scintillator digit charge per cluster (EKLM contributors only). */
+    TH1F* m_AverageChargeClusterEKLM;
+
     /** Plane occupancy: BKLM, phi readout. */
     TH1F* m_PlaneBKLMPhi;
 
@@ -258,6 +271,9 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
 
     /** L1 timing trigger bits of interest for KLM DQM (event-level). */
     static constexpr std::array<TRGSummary::ETimingType, 3> c_KlmL1Triggers = {

@@ -51,7 +51,7 @@ _RegisteredSkims = [
     ("79000200", "flagged", "f_tau_p2"),
     ("79000300", "flagged", "f_tau_p3"),
     ("79000400", "flagged", "f_tau_p4"),
-    ("71000101", "flagged", "f_SLME_p1_v2"),  # v2 - roll off campaign skims into flagged for rel9
+    ("71000101", "flagged", "f_SLME_p1_v2"),  # v2 - fold in off-campaign skims into flagged for rel9
     ("71000201", "flagged", "f_SLME_p2_v2"),
     ("71000301", "flagged", "f_SLME_p3_v2"),
     ("71000401", "flagged", "f_SLME_p4_v2"),

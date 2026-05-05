@@ -142,11 +142,11 @@ void KLMDQMModule::defineHisto()
              500, 0., 10000.);
   m_ChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge");
   m_AverageChargeClusterBKLM =
-    new TH1F("avg_charge_cluster_bklm", "Mean Cluster Charge",
+    new TH1F("avg_charge_cluster_bklm", "Mean Cluster Charge (BKLM)",
              256, 0., 512.);
   m_AverageChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
   m_AverageChargeClusterEKLM =
-    new TH1F("avg_charge_cluster_eklm", "Mean Cluster Charge",
+    new TH1F("avg_charge_cluster_eklm", "Mean Cluster Charge (EKLM)",
              256, 0., 512.);
   m_AverageChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
   m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",

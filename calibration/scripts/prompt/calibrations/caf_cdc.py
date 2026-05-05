@@ -45,7 +45,7 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "max_events_per_file_hadron_for_tz_tw": 5000,
                                    "max_events_per_file_hadron_for_xt_sr": 12000,
                                    "min_events_for_tz_tw_calibration": 500000,
-                                   "max_events_for_tz_tw_calibration": 1000000,
+                                   "max_events_for_tz_tw_calibration": 15000000,
                                    "min_events_for_xt_sr_calibration": 1000000,  # 1M
                                    "max_events_for_xt_sr_calibration": 10000000,  # 10M
                                    "fractions_for_each_type": [0.5, 1, 0.5],  # [mumu, hadron, cosmic]
@@ -53,7 +53,8 @@ settings = CalibrationSettings(name="CDC Tracking",
                                    "calib_mode": "quick",  # manual or predefined: quick, full
                                    "calibration_procedure": {"tz0": 1, "xt0": 0, "sr_tz0": 0, "tz2": 0},
                                    "payload_boundaries": [],
-                                   "backend_args": {"request_memory": "4 GB"}},
+                                   "backend_args": {"request_memory": "4 GB"},
+                                   "physics_mode": "yes"},
                                produced_payloads=["CDCTimeZeros", "CDCTimeWalks", "CDCXtRelations", "CDCSpaceResols"])
 
 
@@ -108,6 +109,7 @@ def get_calibrations(input_data, **kwargs):
     # read expert_config values
     expert_config = kwargs.get("expert_config")
     calib_mode = expert_config["calib_mode"]
+    physics_mode = expert_config["physics_mode"]
     #    max_files_per_run = expert_config["max_files_per_run"]
     min_events_per_file = expert_config["min_events_per_file"]
     max_events_per_file = expert_config["max_events_per_file"]
@@ -147,7 +149,7 @@ def get_calibrations(input_data, **kwargs):
 
         file_to_iov_hadron = input_data["hadron_calib"]
         # select data file for tw, t0
-        basf2.B2INFO("----> For T0 and Time walk correction")
+        basf2.B2INFO("----> Hadron for T0 and Time walk correction")
         chosen_files_hadron_for_tz_tw = select_files(list(file_to_iov_hadron.keys()),
                                                      min_hadron_events_for_tz_tw,
                                                      max_hadron_events_for_tz_tw,
@@ -155,7 +157,7 @@ def get_calibrations(input_data, **kwargs):
                                                      max_jobs[1],
                                                      min_events_per_file)
         # select data file for xt, sigma
-        basf2.B2INFO("----> For XT, space resolution calib")
+        basf2.B2INFO("----> Hadron for XT, space resolution calib")
         chosen_files_hadron_for_xt_sr = select_files(list(file_to_iov_hadron.keys()),
                                                      min_hadron_events_for_xt_sr,
                                                      max_hadron_events_for_xt_sr,
@@ -173,7 +175,7 @@ def get_calibrations(input_data, **kwargs):
         min_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * min_events_for_tz_tw
         max_mumu_events_for_tz_tw = fraction_of_event_for_types[0] * max_events_for_tz_tw
         file_to_iov_mumu = input_data["mumu_tight_or_highm_calib"]
-        basf2.B2INFO("----> For T0 and Time walk correction")
+        basf2.B2INFO("----> Mumu for T0 and Time walk correction")
         chosen_files_mumu_for_tz_tw = select_files(list(file_to_iov_mumu.keys()),
                                                    min_mumu_events_for_tz_tw,
                                                    max_mumu_events_for_tz_tw,
@@ -182,7 +184,7 @@ def get_calibrations(input_data, **kwargs):
                                                    min_events_per_file)
 
         # select data file for xt, sigma calibration
-        basf2.B2INFO("----> For XT, space resolution calib")
+        basf2.B2INFO("----> Mumu for XT, space resolution calib")
 
         chosen_files_mumu_for_xt_sr = select_files(list(file_to_iov_mumu.keys()),  # input_files_mumu[:],
                                                    min_mumu_events_for_xt_sr,
@@ -205,16 +207,21 @@ def get_calibrations(input_data, **kwargs):
         file_to_iov_cosmic = input_data["cosmic_calib"]
 
         # Select cosmic data for tw and t0 calibration
-        basf2.B2INFO("---->For T0 and Time walk correction")
-        chosen_files_cosmic_for_tz_tw = select_files(list(file_to_iov_cosmic.keys()),
-                                                     min_cosmic_events_for_tz_tw,
-                                                     max_cosmic_events_for_tz_tw,
-                                                     max_events_per_file,
-                                                     max_jobs[2],
-                                                     min_events_per_file)
+        basf2.B2INFO("----> Cosmic for T0 and Time walk correction")
+        if physics_mode == "no":
+            basf2.B2INFO("---->In non-physics mode, still use cosmic for t0 calibration")
+            chosen_files_cosmic_for_tz_tw = select_files(list(file_to_iov_cosmic.keys()),
+                                                         min_cosmic_events_for_tz_tw,
+                                                         max_cosmic_events_for_tz_tw,
+                                                         max_events_per_file,
+                                                         max_jobs[2],
+                                                         min_events_per_file)
+        else:
+            basf2.B2INFO("---->In physics mode, do not use cosmic for t0 calibration")
+            chosen_files_cosmic_for_tz_tw = {}
 
         # select cosmics data for xt and sigma calibration
-        basf2.B2INFO("----> For T0 and Time walk correction")
+        basf2.B2INFO("----> Cosmic for XT, space resolution calib")
         chosen_files_cosmic_for_xt_sr = select_files(list(file_to_iov_cosmic.keys()),
                                                      min_cosmic_events_for_xt_sr,
                                                      max_cosmic_events_for_xt_sr,

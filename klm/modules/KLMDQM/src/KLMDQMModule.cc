@@ -135,11 +135,11 @@ void KLMDQMModule::defineHisto()
   m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
   m_ChargeClusterBKLM =
     new TH1F("charge_cluster_bklm", "BKLM Scintillator Clusters",
-             1000, 0., 10000.);
+             500, 0., 10000.);
   m_ChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge");
   m_ChargeClusterEKLM =
     new TH1F("charge_cluster_eklm", "EKLM Clusters",
-             1000, 0., 10000.);
+             500, 0., 10000.);
   m_ChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge");
   m_AverageChargeClusterBKLM =
     new TH1F("avg_charge_cluster_bklm", "Mean Cluster Charge",
@@ -150,7 +150,7 @@ void KLMDQMModule::defineHisto()
              256, 0., 512.);
   m_AverageChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
   m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",
-                                      10000, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
+                                      500, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
   m_TimeRevo9DCArrivalTime->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
@@ -619,12 +619,12 @@ void KLMDQMModule::event()
         for (unsigned i1 = 0; i1 < hit1ds.size(); ++i1)
           addDigits(hit1ds[i1]->getRelationsTo<KLMDigit>());
       }
-      if (sumChargeBKLM > 0.) {
+      if (clusterHits.size() > 1 && sumChargeBKLM > 0.) {
         m_ChargeClusterBKLM->Fill(sumChargeBKLM);
         m_AverageChargeClusterBKLM->Fill(sumChargeBKLM /
                                          static_cast<double>(nDigitsClusterBKLM));
       }
-      if (sumChargeEKLM > 0.) {
+      if (clusterHits.size() > 1 && sumChargeEKLM > 0.) {
         m_ChargeClusterEKLM->Fill(sumChargeEKLM);
         m_AverageChargeClusterEKLM->Fill(sumChargeEKLM /
                                          static_cast<double>(nDigitsClusterEKLM));

@@ -1857,8 +1857,8 @@ def rankByHighest(particleList,
     """
     Ranks particles in the input list by the given variable (highest to lowest), and stores an integer rank for each Particle
     in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
-    The list is also sorted from best to worst candidate
-    (each charge, e.g. B+/B-, separately).
+    The list is also sorted from best to worst candidate.
+    All particles are ranked together regardless of particle type.
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
 
@@ -1906,8 +1906,8 @@ def rankByLowest(particleList,
     """
     Ranks particles in the input list by the given variable (lowest to highest), and stores an integer rank for each Particle
     in an :b2:var:`extraInfo` field ``${variable}_rank`` starting at 1 (best).
-    The list is also sorted from best to worst candidate
-    (each charge, e.g. B+/B-, separately).
+    The list is also sorted from best to worst candidate.
+    All particles are ranked together regardless of particle type.
     This can be used to perform a best candidate selection by cutting on the corresponding rank value, or by specifying
     a non-zero value for 'numBest'.
 

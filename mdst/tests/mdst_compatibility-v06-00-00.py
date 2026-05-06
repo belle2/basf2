@@ -32,6 +32,10 @@ CHANGES since release-06-00-00:
   + remove the const classifier of TrackFitResults and add a function to update the contents
   + updateTrackFitResult
   + mask
+- ECLCluster:
+  + setLogEnergy
+  + setLogEnergyRaw
+  + setLogEnergyHighestCrystal
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

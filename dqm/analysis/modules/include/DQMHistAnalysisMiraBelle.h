@@ -68,6 +68,7 @@ namespace Belle2 {
     double m_reference_mumu; /**< Reference value for mumu inv mass */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
+    Belle2::MonitoringObject* mon_tautau = nullptr; /**< MonitoringObject for tau pair events */
     Belle2::MonitoringObject* mon_bhabha = nullptr; /**< MonitoringObject for bhabha events */
     Belle2::MonitoringObject* mon_hadron = nullptr; /**< MonitoringObject for hadronb2 tight events */
 

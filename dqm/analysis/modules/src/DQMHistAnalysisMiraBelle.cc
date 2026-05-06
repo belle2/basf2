@@ -43,6 +43,7 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
   mon_dst = getMonitoringObject("dst");
+  mon_tautau = getMonitoringObject("tautau");
   //bhabha,hadrons
   mon_bhabha = getMonitoringObject("bhabha");
   mon_hadron = getMonitoringObject("hadronb2");
@@ -812,6 +813,44 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_ARICH_kaon", mean_D0_K_PID_ARICH_kaon);
   mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
+
+  //--- L1 efficiency with taupair
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("ECL_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("ECL_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDC_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDC_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDCKLM_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDCKLM_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
 
   //bhabha,hadrons
   // ========== bhabha_trk_ecl

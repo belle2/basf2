@@ -19,9 +19,12 @@ import math
 import ROOT
 from ROOT import Belle2
 import basf2 as b2
+from vtx import get_upgrade_globaltag
 
 # set some random seed
 b2.set_random_seed(10346)
+
+b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
 
 class VTXPositionEstimation(b2.Module):
@@ -295,6 +298,12 @@ if __name__ == "__main__":
     parser.add_argument('--bkgOverlay', dest='bkgOverlay', action="store_true", help='Perform background overlay')
     parser.add_argument('--dbfile', default="./localdb/database.txt", type=str,
                         help='Path to database.txt file for testing payloads')
+    parser.add_argument(
+        '--vtxGeometry',
+        dest='vtxGeometry',
+        default='VTX-5layer-2025-baseline',
+        type=str,
+        help='VTX geometry to be loaded.')
     args = parser.parse_args()
 
     # for quick testing before upload to condDB
@@ -312,7 +321,7 @@ if __name__ == "__main__":
     main.add_module("Gearbox")
     # We only need the vtx for this
     main.add_module('Geometry', excludedComponents=['PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],
-                    additionalComponents=['VTX-CMOS-5layer'],
+                    additionalComponents=[args.vtxGeometry],
                     useDB=False)
 
     # Generate BBbar events

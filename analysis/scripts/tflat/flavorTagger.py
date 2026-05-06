@@ -16,6 +16,7 @@ import modularAnalysis as ma
 from stdPhotons import stdPhotons
 from vertex import kFit
 import tflat.utils as utils
+import b2bii
 
 
 def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
@@ -27,24 +28,35 @@ def fill_particle_lists(config, maskName='TFLATDefaultMask', path=None):
     trk_cut = config['trk_cut']
     ma.fillParticleList('pi+:tflat', trk_cut, path=path)
 
-    # create particle list with gammas
+    if b2bii.isB2BII():
+        # build a list of K_S0 candidates in the rest of event
+        ma.cutAndCopyList(
+            'K_S0:inRoe',
+            'K_S0:mdst',
+            'daughter(0, isInRestOfEvent) > 0.5 and daughter(1, isInRestOfEvent) > 0.5',
+            path=path)
 
-    # load MVA's for all gamma
-    ma.fillParticleList(
-        "gamma:all",
-        "",
-        path=path,
-    )
-    ma.getBeamBackgroundProbability("gamma:all", config['VersionBeamBackgroundMVA'], path=path)
-    ma.getFakePhotonProbability("gamma:all", config['VersionFakePhotonMVA'], path=path)
+        # load MVA's for gammas
+        ma.getBeamBackgroundProbability(particleList=['gamma:mdst'], weight=config['VersionBeamBackgroundMVA'], path=path)
+        ma.getFakePhotonProbability(particleList=['gamma:mdst'], weight=config['VersionFakePhotonMVA'], path=path)
 
-    stdPhotons(listtype='tight',  path=path)
+        # create particle list with gammas
+        gamma_cut = config['gamma_cut']
+        ma.cutAndCopyList('gamma:tflat', 'gamma:mdst', gamma_cut, path=path)
+    else:
+        # create particle list of K_S0
+        ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)
+        kFit('K_S0:inRoe', 0.01, path=path)
 
-    gamma_cut = config['gamma_cut']
-    ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
+        # load MVA's for gammas
+        ma.fillParticleList("gamma:all", "", path=path)
+        ma.getBeamBackgroundProbability("gamma:all", config['VersionBeamBackgroundMVA'], path=path)
+        ma.getFakePhotonProbability("gamma:all", config['VersionFakePhotonMVA'], path=path)
 
-    ma.reconstructDecay('K_S0:inRoe -> pi+:tflat pi-:tflat', '0.40<=M<=0.60', False, path=path)
-    kFit('K_S0:inRoe', 0.01, path=path)
+        # create particle list with gammas
+        stdPhotons(listtype='tight',  path=path)
+        gamma_cut = config['gamma_cut']
+        ma.cutAndCopyList('gamma:tflat', 'gamma:tight', gamma_cut, path=path)
 
 
 def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier='TFlaT_MC16rd_light_2601_hyperion',
@@ -141,7 +153,8 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
             roe_path,
             dead_end_path)
 
-        path.add_module('FlavorTaggerInfoBuilder')
+        if 'FlavorTaggerInfoBuilder' not in path:
+            path.add_module('FlavorTaggerInfoBuilder')
 
         fill_particle_lists(config, maskName, roe_path)
 

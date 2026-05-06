@@ -105,7 +105,8 @@ if __name__ == "__main__":
             loss=keras.losses.binary_crossentropy,
             metrics=[
                 'accuracy',
-                keras.metrics.AUC()])
+                keras.metrics.AUC(),
+                keras.metrics.MeanSquaredError()])
     else:
         model = keras.models.load_model(checkpoint_filepath)
 

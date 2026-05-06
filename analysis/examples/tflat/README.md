@@ -14,7 +14,7 @@ The Training of TFlaT requires $B^0 \rightarrow \nu \overline{\nu}$ samples to b
 ## Hardware Requirements
 The training process requires a CUDA capable GPU.\
 The time needed to complete a training depends on the specific GPU. For a NVIDIA A100 GPU the expected time to completion with 50M samples is ~4 days.\
-Depending on the hardware used for the training some of the parameters found in the basf2/analysis/scrips/tflat/config.py file might need to be adjusted.\
+Depending on the hardware used for the training some of the parameters found in the basf2/analysis/data/{configurationfile}.yaml file might need to be adjusted.\
 If the VRAM of the used GPU is not sufficient, reduce the value of the 'batch_size' parameter.\
 If the system memory is not sufficient, reduce the value of the 'chunk_size' parameter. Not that for optimal efficiency the 'chunk_size' should be an integer multiple of the 'batch_size'.\
 If the GPU utilization is less than ~70% it might be possible to speed up the training by increasing the 'batch_size' parameter.\
@@ -25,18 +25,26 @@ The parameters set in the yaml config file are optimized for a A100 GPU and 120G
 ## Step-by-Step Training Guide
 
 1. **Configuration**
-   - Create new .yaml config file in analysis/data with parameters for your training (start with the latest version as a baseline).\
+   - Create new .yaml config file in `analysis/data` with parameters for your training (start with the latest version as a baseline).\
       The name of the file will also be the uniqueIdentifier of the final weightfile.\
       The default naming scheme is 'TFlaT_{MC_version}_{light_release}' e.g. 'TFlaT_MC16rd_light_2601_hyperion'
    - Possible update 'VersionBeamBackgroundMVA' and 'VersionFakePhotonMVA' in the config file if newer versions are available.
 
-2. **Sample training data**
+2. **Sample Belle II training data on the grid**
+   - Go to folder `analysis/examples/tflat` in your basf2 installation
    - Run sampler script on grid
     ```bash
     gbasf2 sampler.py -p {name} -i {collection_name} -s {basf2_release} --basf2opt='-- uniqueIdentifier {uniqueIdentifier}' -f {uniqueIdentifier}.yaml -n 3
     ```
    - Note that the yaml config file also needs to be passed to the grid as it contains the input lists
    - Download the resulting ntuples
+
+   **Alternatively, sample Belle/Belle2 training data on KEKCC**
+   - Go to folder `analysis/examples/tflat` in your basf2 installation
+   ```bash
+    python3 submit_sampler_kekcc.py --input_dir /path/to/input_files/ --output_dir /path/to/output_root/ --uniqueIdentifier {uniqueIdentifier} --is_belle {True/False} --channel {nunu/jpsiks}
+    ```
+   - The folder `/path/to/output_root/` will contain all sampled root files needed for the next step.
 
 3. **Prepare training data**
    - The training samples need to be split into a training and validation dataset.

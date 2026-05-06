@@ -298,6 +298,12 @@ if __name__ == "__main__":
     parser.add_argument('--bkgOverlay', dest='bkgOverlay', action="store_true", help='Perform background overlay')
     parser.add_argument('--dbfile', default="./localdb/database.txt", type=str,
                         help='Path to database.txt file for testing payloads')
+    parser.add_argument(
+        '--vtxGeometry',
+        dest='vtxGeometry',
+        default='VTX-5layer-2025-baseline',
+        type=str,
+        help='VTX geometry to be loaded.')
     args = parser.parse_args()
 
     # for quick testing before upload to condDB
@@ -315,7 +321,7 @@ if __name__ == "__main__":
     main.add_module("Gearbox")
     # We only need the vtx for this
     main.add_module('Geometry', excludedComponents=['PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],
-                    additionalComponents=['VTX-5layer-2025-baseline'],
+                    additionalComponents=[args.vtxGeometry],
                     useDB=False)
 
     # Generate BBbar events

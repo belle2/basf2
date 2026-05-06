@@ -34,7 +34,7 @@ REG_MODULE(DQMHistAnalysisSVD);
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
+DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online, bool groupIDs)
   : DQMHistAnalysisModule()
 {
   //Parameter definition
@@ -100,6 +100,20 @@ DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
     m_legOnlineNormal->SetTextColor(kBlack);
   }
 
+  if (groupIDs) {
+    m_legGroupIDsProblem = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legGroupIDsProblem->SetFillColor(c_ColorDefault);
+    m_legGroupIDsProblem->SetTextColor(kBlack);
+
+    m_legGroupIDsWarning = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legGroupIDsWarning->SetFillColor(c_ColorDefault);
+    m_legGroupIDsWarning->SetTextColor(kBlack);
+
+    m_legGroupIDsNormal = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legGroupIDsNormal->SetFillColor(c_ColorDefault);
+    m_legGroupIDsNormal->SetTextColor(kBlack);
+  }
+
   // text module numbers
   pair<vector<TText*>, vector<TText*>> moduleNumbers = textModuleNumbers();
   m_laddersText = moduleNumbers.first;
@@ -136,38 +150,49 @@ DQMHistAnalysisSVDModule::~ DQMHistAnalysisSVDModule()
   if (m_legOnlineProblem) delete m_legOnlineProblem;
   if (m_legOnlineNormal)  delete m_legOnlineNormal;
   if (m_legOnlineWarning) delete m_legOnlineWarning;
+
+  if (m_legGroupIDsProblem) delete m_legGroupIDsProblem;
+  if (m_legGroupIDsNormal)  delete m_legGroupIDsNormal;
+  if (m_legGroupIDsWarning) delete m_legGroupIDsWarning;
 }
 
-void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg, bool online)
+void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg, int histoType)
 {
   switch (status) {
     case good: {
       colorizeCanvas(canvas, c_StatusGood);
       if (plotLeg) {
-        if (online)
+        if (histoType == kOnline)
           m_legOnlineNormal->Draw();
-        else
+        else if (histoType == kOffline)
           m_legNormal->Draw();
+        else if (histoType == kGroupIDs) {
+          m_legGroupIDsNormal->Draw();
+        }
       }
       break;
     }
     case warning: {
       colorizeCanvas(canvas, c_StatusWarning);
       if (plotLeg) {
-        if (online)
+        if (histoType == kOnline)
           m_legOnlineWarning->Draw();
-        else
+        else if (histoType == kOffline)
           m_legWarning->Draw();
+        else if (histoType == kGroupIDs)
+          m_legGroupIDsWarning->Draw();
       }
       break;
     }
     case error: {
       colorizeCanvas(canvas, c_StatusError);
       if (plotLeg) {
-        if (online)
+        if (histoType == kOnline)
           m_legOnlineProblem->Draw();
-        else
+        else if (histoType == kOffline)
           m_legProblem->Draw();
+        else if (histoType == kGroupIDs)
+          m_legGroupIDsProblem->Draw();
       }
       break;
     }
@@ -193,7 +218,7 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
 
 // This function is used both for efficiency and occupancy (flag online used onlhy for occupancy)
 void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status,
-                                              bool isU, bool online)
+                                              bool isU, int histoType)
 {
   canvas->Draw();
   canvas->cd();
@@ -201,7 +226,7 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
     if (!m_setColzRange && m_valueMinimum > 0) histo->getHistogram(isU)->SetMinimum(m_valueMinimum * 99.9);
     histo->getHistogram(isU)->Draw("text colz");
   }
-  setStatusOfCanvas(status, canvas, true, online);
+  setStatusOfCanvas(status, canvas, true, histoType);
 
   canvas->Modified();
   canvas->Update();

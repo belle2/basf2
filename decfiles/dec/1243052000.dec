@@ -1,0 +1,49 @@
+# EventType: 1243052002
+# Descriptor: [B+ -> anti-D0(-> K+ pi- omega)  pi+ ]cc
+# NickName: Bu_Dpi
+# Documentation: B+ -> anti-D0(-> K+ pi- omega) pi+
+# Responsible: Dmitry Matvienko
+# Email: dmitry.matvienko@gmail.com
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 06/05/2026
+
+
+Alias MyK*0 K*0
+Alias Myanti-K*0 anti-K*0
+ChargeConj MyK*0 Myanti-K*0
+
+Alias Myomega omega
+Alias Mypi0 pi0
+
+Decay Upsilon(4S)
+0.500  B+sig B-              VSS;
+0.500  B+ B-sig              VSS;
+Enddecay
+
+Decay B+sig
+1.000 anti-D0sig pi+         PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-D0sig
+0.019 K+ pi- Myomega        PHOTOS PHSP;
+0.011 MyK*0  Myomega        SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay D0sig
+
+Decay MyK*0
+1.000  K+  pi-              PHOTOS VSS;
+Enddecay
+CDecay Myanti-K*0
+
+Decay Myomega 
+1.000 pi- pi+ Mypi0         PHOTOS OMEGA_DALITZ;
+Enddecay
+
+Decay Mypi0
+1.000 gamma gamma           PHSP;
+Enddecay
+
+End

@@ -822,52 +822,43 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   auto* hist_tau_L1CDC1x3 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3");
   auto* hist_tau_L1CDCKLM1x1 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1");
   auto* hist_tau_L1CDCKLM1x3 = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3");
-  if (hist_tau_L1ECL1x1 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x1 histogram!");
-    return;
-  }
-  if (hist_tau_L1ECL1x3 == nullptr) {
-    B2ERROR("Can not find the histtau_L1ECL1x3 histogram!");
-    return;
-  }
-  if (hist_tau_L1CDC1x1 == nullptr) {
-    B2ERROR("Can not find the histtau_L1CDC1x1 histogram!");
-    return;
-  }
-  if (hist_tau_L1CDC1x3 == nullptr) {
-    B2ERROR("Can not find the histtau_L1CDC1x3 histogram!");
-    return;
-  }
-  if (hist_tau_L1CDCKLM1x1 == nullptr) {
-    B2ERROR("Can not find the histtau_L1CDCKLM1x1 histogram!");
-    return;
-  }
-  if (hist_tau_L1CDCKLM1x3 == nullptr) {
-    B2ERROR("Can not find the histtau_L1CDCKLM1x3 histogram!");
-    return;
-  }
 
   // set values
-  for (int bin = 1; bin < 15; bin++) {
-    std::string label = std::string("ECL_1_1_") + hist_tau_L1ECL1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1ECL1x1->GetBinContent(bin));
-
-    label = std::string("ECL_1_3_") + hist_tau_L1ECL1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1ECL1x3->GetBinContent(bin));
+  if (hist_tau_L1ECL1x1 != nullptr) {
+    for (int bin = 1; bin < 15; bin++) {
+      std::string label = std::string("ECL_1_1_") + hist_tau_L1ECL1x1->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1ECL1x1->GetBinContent(bin));
+    }
   }
-  for (int bin = 1; bin < 18; bin++) {
-    std::string label = std::string("CDC_1_1_") + hist_tau_L1CDC1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1CDC1x1->GetBinContent(bin));
-
-    label = std::string("CDC_1_3_") + hist_tau_L1CDC1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1CDC1x3->GetBinContent(bin));
+  if (hist_tau_L1ECL1x3 != nullptr) {
+    for (int bin = 1; bin < 15; bin++) {
+      std::string label = std::string("ECL_1_3_") + hist_tau_L1ECL1x3->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1ECL1x3->GetBinContent(bin));
+    }
   }
-  for (int bin = 1; bin < 7; bin++) {
-    std::string label = std::string("CDCKLM_1_1_") + hist_tau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x1->GetBinContent(bin));
-
-    label = std::string("CDCKLM_1_3_") + hist_tau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin);
-    mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x3->GetBinContent(bin));
+  if (hist_tau_L1CDC1x1 != nullptr) {
+    for (int bin = 1; bin < 18; bin++) {
+      std::string label = std::string("CDC_1_1_") + hist_tau_L1CDC1x1->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1CDC1x1->GetBinContent(bin));
+    }
+  }
+  if (hist_tau_L1CDC1x3 != nullptr) {
+    for (int bin = 1; bin < 18; bin++) {
+      std::string label = std::string("CDC_1_3_") + hist_tau_L1CDC1x3->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1CDC1x3->GetBinContent(bin));
+    }
+  }
+  if (hist_tau_L1CDCKLM1x1 != nullptr) {
+    for (int bin = 1; bin < 7; bin++) {
+      std::string label = std::string("CDCKLM_1_1_") + hist_tau_L1CDCKLM1x1->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x1->GetBinContent(bin));
+    }
+  }
+  if (hist_tau_L1CDCKLM1x3 != nullptr) {
+    for (int bin = 1; bin < 7; bin++) {
+      std::string label = std::string("CDCKLM_1_3_") + hist_tau_L1CDCKLM1x3->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, hist_tau_L1CDCKLM1x3->GetBinContent(bin));
+    }
   }
 
   //bhabha,hadrons

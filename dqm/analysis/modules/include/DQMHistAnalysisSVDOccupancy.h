@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisSVDOccupancyModule();
+    ~DQMHistAnalysisSVDOccupancyModule() override;
 
     /**
      * Initializer.
@@ -74,6 +74,10 @@ namespace Belle2 {
     double m_occError; /**<error level of the occupancy */
     double m_occWarning; /**< warning level of the occupancy */
     double m_occEmpty; /**<empty level of the occupancy */
+
+    double m_groupIDsOccError; /**<error level of the group IDs occupancy */
+    double m_groupIDsOccWarning; /**< warning level of the group IDs occupancy */
+    double m_groupIDsOccEmpty; /**<empty level of the IDs occupancy */
 
     double m_onlineOccError; /**<error level of the onlineOccupancy */
     double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
@@ -137,28 +141,28 @@ namespace Belle2 {
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
-    Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
-    void setOccStatus(float occ, svdStatus& occupancyStatus, bool online = false); /**< set occupancy status */
+    static Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
+    void setOccStatus(float occ, svdStatus& occupancyStatus, int histoType = kOffline); /**< set occupancy status */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
 
-    svdStatus m_occUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
-    svdStatus m_occVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_occUstatus = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_occVstatus = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error*/
 
-    svdStatus m_occU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
-    svdStatus m_occV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+    svdStatus m_occU3Samples = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    svdStatus m_occV3Samples = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
 
-    svdStatus m_occUGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
-    svdStatus m_occVGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+    svdStatus m_occUGroupId0 = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    svdStatus m_occVGroupId0 = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
 
-    svdStatus m_onlineOccUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
-    svdStatus m_onlineOccVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_onlineOccUstatus = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error*/
+    svdStatus m_onlineOccVstatus = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error*/
 
-    svdStatus m_onlineOccU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sample*/
-    svdStatus m_onlineOccV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampes*/
+    svdStatus m_onlineOccU3Samples = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 sample*/
+    svdStatus m_onlineOccV3Samples = good; /**< 0 = good, 4 = empty, 1 = warning, 2 = error for 3 sampes*/
 
   };
 } // end namespace Belle2

@@ -28,9 +28,6 @@ PhysicsObjectsMiraBelleHadronModule::PhysicsObjectsMiraBelleHadronModule() : His
   setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
-           "Trigger identifier string used to select events for the HLTprefilter histograms",
-           std::string("software_trigger_cut&filter&total_result"));
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadronb2"));
   addParam("hadronb2piPListName", m_hadpiPListName, "Name of the pi+ particle list", std::string("pi+:hadb2physMiraBelle"));
@@ -98,7 +95,8 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   if (accepted == false) return;
 
   // Check HLT decision
-  bool HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+  bool HLTAccepted = (result->getResult(std::string("software_trigger_cut&filter&total_result")) ==
+                      SoftwareTriggerCutResult::c_accept);
   //Fill entries only when HLT accepted the event
   if (HLTAccepted)
     m_h_physicsresultsH->Fill(1);

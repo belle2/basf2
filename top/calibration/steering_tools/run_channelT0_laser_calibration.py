@@ -167,25 +167,25 @@ def make_calibration(args, input_files, pulser_deltaT, use_seq_input):
     if args.fit_mode != 'mc':
         main.add_module('TOPGeometryParInitializer')
 
-    # TOPUnpacker
-    main.add_module('TOPUnpacker')
+        # TOPUnpacker
+        main.add_module('TOPUnpacker')
 
-    # TOPRawDigitConverter
-    main.add_module(
-        'TOPRawDigitConverter',
-        useChannelT0Calibration=False,
-        useSampleTimeCalibration=args.use_tbc,
-        useAsicShiftCalibration=True,
-        useModuleT0Calibration=False,
-        useCommonT0Calibration=False,
-        calpulseHeightMin=200,
-        calpulseHeightMax=700,
-        calpulseWidthMin=0.5,
-        calpulseWidthMax=3.0,
-        minPulseWidth=0.5,
-        calibrationChannel=0,
-        lookBackWindows=int(args.lookback)
-    )
+        # TOPRawDigitConverter
+        main.add_module(
+            'TOPRawDigitConverter',
+            useChannelT0Calibration=False,
+            useSampleTimeCalibration=args.use_tbc,
+            useAsicShiftCalibration=True,
+            useModuleT0Calibration=False,
+            useCommonT0Calibration=False,
+            calpulseHeightMin=200,
+            calpulseHeightMax=700,
+            calpulseWidthMin=0.5,
+            calpulseWidthMax=3.0,
+            minPulseWidth=0.5,
+            calibrationChannel=0,
+            lookBackWindows=int(args.lookback)
+        )
 
     # Collector
     collector = basf2.register_module('TOPLaserCalibratorCollector')

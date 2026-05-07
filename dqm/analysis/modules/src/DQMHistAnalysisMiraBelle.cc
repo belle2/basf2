@@ -1096,6 +1096,7 @@ void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
   auto* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm");
   auto* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2");
   auto* histhad_physicsresultsH = findHist("PhysicsObjectsMiraBelleHadron/hist_physicsresultsH");
+  auto* histbh_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
 
   if (histhad_nECLClusters == nullptr) {
     B2ERROR("Can not find the histhad_nECLClusters histogram!");
@@ -1117,7 +1118,10 @@ void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
     B2ERROR("Can not find the histhad_physicsresultsH histogram!");
     return;
   }
-
+  if (histbh_nECLClusters == nullptr) {
+    B2ERROR("Can not find the PhysicsObjectsMiraBelleBhabha/hist_nECLClusters histogram!");
+    return;
+  }
   // Make TCanvases
   // --- hadron_Main
   hadron_main->Divide(2, 2);
@@ -1126,6 +1130,7 @@ void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
   hadron_main->cd(3);  histhad_EsumCMSnorm->Draw();
   hadron_main->cd(4);  histhad_R2->Draw();
   // calculate the values of monitoring variables
+  double bh_neve_bhabha = histbh_nECLClusters->GetEntries(); // copy from bhabha
   double had_ntot = histhad_physicsresultsH->GetBinContent(3);
   double ratio_hadron_bhabha = 0.;
   //pull

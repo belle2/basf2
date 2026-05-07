@@ -1152,7 +1152,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   ExtractD0Star();
   ExtractTaupair();
   ExtractBhabha();
-  EtractHadron();
+  ExtractHadron();
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");
 }

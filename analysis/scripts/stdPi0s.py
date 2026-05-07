@@ -25,7 +25,11 @@ def stdPi0s(
     """
     Function to prepare one of several standardized types of pi0 lists:
 
-    - 'all' using gamma:all
+    - 'all' using gamma:all, no cuts
+    - 'base' using gamma:base (CDC acceptance + timing cut), no additional cuts
+
+    The following lists are **deprecated** and will be removed at the end of 2026:
+
     - 'eff10_May2020' gamma:pi0eff10_May2020, mass range selection, 10% pi0 efficiency list, optimized in May 2020
     - 'eff20_May2020' gamma:pi0eff20_May2020, mass range selection, 20% pi0 efficiency list, optimized in May 2020
     - 'eff30_May2020' gamma:pi0eff30_May2020, mass range selection, 30% pi0 efficiency list, optimized in May 2020
@@ -33,9 +37,9 @@ def stdPi0s(
     - 'eff50_May2020' gamma:pi0eff50_May2020, mass range selection, 50% pi0 efficiency list, optimized in May 2020
     - 'eff60_May2020' gamma:pi0eff60_May2020, mass range selection, 60% pi0 efficiency list, optimized in May 2020
 
-    You can also append "Fit" to the listtype which will run a mass fit and
+    You can also append "Fit" to the effXX listtype which will run a mass fit and
     require that the fit did not fail. For example: "pi0:eff50_May2020Fit" is the 50%
-    efficiency list plus a not-failing mass fit.
+    efficiency list plus a not-failing mass fit. These Fit variants are also deprecated.
 
     Parameters:
         listtype (str): name of standard list
@@ -65,14 +69,29 @@ def stdPi0s(
 
     """
 
-    if listtype != 'all':
-        B2WARNING("stdPi0s is loading \"May2020\" pi0 recommendations. Please check Neutrals Performance XWiki"
-                  " page for most up-to-date pi0 recommendations.")
+    _deprecated_pi0_lists = {
+        'eff10_May2020', 'eff20_May2020', 'eff30_May2020',
+        'eff40_May2020', 'eff50_May2020', 'eff60_May2020',
+        'eff50_May2020_nomcmatch', 'eff60_May2020_nomcmatch',
+        'eff10_May2020Fit', 'eff20_May2020Fit', 'eff30_May2020Fit',
+        'eff40_May2020Fit', 'eff50_May2020Fit', 'eff60_May2020Fit',
+    }
+    if listtype in _deprecated_pi0_lists:
+        B2WARNING(
+            f"The standard pi0 list 'pi0:{listtype}' is deprecated "
+            "and will be removed at the end of 2026. "
+            "Only the 'all' and 'base' lists will be kept. "
+            "Please update your analysis accordingly."
+        )
 
     if listtype == 'all':
         stdPhotons('all', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
         ma.reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, writeOut=writeOut, path=path)
         ma.matchMCTruth('pi0:all', path)
+    elif listtype == 'base':
+        stdPhotons('base', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
+        ma.reconstructDecay('pi0:base -> gamma:base gamma:base', '', 1, writeOut=writeOut, path=path)
+        ma.matchMCTruth('pi0:base', path)
     elif 'eff10_May2020' == listtype:
         stdPhotons('pi0eff10_May2020', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff10_May2020 -> gamma:pi0eff10_May2020 gamma:pi0eff10_May2020',

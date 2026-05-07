@@ -83,6 +83,13 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     if particletype not in _chargednames:
         b2.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
+    if listtype != 'all':
+        b2.B2WARNING(
+            f"The standard charged particle list '{particletype}+:{listtype}' is deprecated "
+            "and will be removed at the end of 2026. "
+            "Only the 'all' list will be kept. Please update your analysis accordingly."
+        )
+
     if listtype == 'all':
         ma.fillParticleList(particletype + '+:all', '', writeOut=writeOut, path=path)
     elif listtype == 'good':

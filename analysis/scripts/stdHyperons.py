@@ -133,6 +133,11 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
+    B2WARNING(
+        "stdXi0 is deprecated and will be removed at the end of 2026. "
+        "Please update your analysis accordingly."
+    )
+
     if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)

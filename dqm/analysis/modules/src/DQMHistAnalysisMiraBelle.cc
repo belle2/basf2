@@ -1019,10 +1019,8 @@ void DQMHistAnalysisMiraBelleModule::ExtractBhabha(void)
   double bh_sigma68_dd0 = getSigma68(histbh_dD0);
   double bh_sigma68_dz0 = getSigma68(histbh_dZ0);
   double bh_sigma68_dpt = getSigma68(histbh_dPtcms);
-  int bh_ntot = histbh_nECLClusters->GetEntries();
-  double bh_neve_bhabha = bh_ntot;
-  int bh_ntot_sign = histbh_nsvd->GetEntries();
-  double bh_neve_bhabha_sign = bh_ntot_sign;
+  double bh_neve_bhabha = histbh_nECLClusters->GetEntries();
+  double bh_neve_bhabha_sign = histbh_nsvd->GetEntries();
   double bh_goode_frac = -1.;
   double bh_pval_frac_0 = -1.;
   double bh_pval_frac_1 = -1.;

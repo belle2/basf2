@@ -1009,7 +1009,7 @@ void DQMHistAnalysisMiraBelleModule::ExtractBhabha(void)
   double bh_mean_z0 = histbh_Z0->GetMean();
   double bh_mean_pval = histbh_Pval->GetMean();
   double bh_mean_ndf = histbh_ndf->GetMean();
-  double bh_dif_ndf_ncdc = mean_ndf - mean_ncdc;
+  double bh_dif_ndf_ncdc = bh_mean_ndf - bh_mean_ncdc;
   double bh_mean_dd0 = histbh_dD0->GetMean();
   double bh_mean_dz0 = histbh_dZ0->GetMean();
   double bh_mean_dpt = histbh_dPtcms->GetMean();

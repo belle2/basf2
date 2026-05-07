@@ -281,3 +281,6 @@ def add_prefilter_module(path, event_abort=hlt_event_abort):
 
     # Filter events rejected by prefilter, only save event metadata
     event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
+
+    # Statistics Summary
+    path.add_module("StatisticsSummary").set_name("Sum_HLT_Prefilter_Calculation")

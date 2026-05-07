@@ -1133,7 +1133,7 @@ void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
   //pull
   double ratio_pull_hadBhabha = -10.;
   double error_ratio = -10.;
-  if (bh_ntot != 0) {
+  if (had_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
     //pull
     error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));

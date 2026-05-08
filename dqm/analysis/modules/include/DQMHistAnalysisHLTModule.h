@@ -53,6 +53,8 @@ namespace Belle2 {
   private:
     /// prefix for EPICS PVs
     std::string m_pvPrefix = "B2_nsm:get:ECL_LUM_MON:lum_det_run";
+    /// prefix for EPICS PV of L1 rate
+    std::string m_pvL1Rate = "B2_nsm:get:TTDS_COM:trigoutrate";
     /// name of the bhabha trigger
     std::string m_bhabhaName = "accept_bhabha";
     /// Which columns to use
@@ -87,8 +89,9 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
 
 #ifdef _BELLE2_EPICS
-    //! one EPICS PV
+    //! two EPICS PVs
     chid  m_epicschid;
+    chid  m_epicschid_L1Rate;
 #endif
   };
 }

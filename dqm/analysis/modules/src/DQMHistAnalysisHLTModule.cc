@@ -40,6 +40,7 @@ DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {
   setDescription("Modify and analyze the data quality histograms of HLT");
   addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
+  addParam("pvL1Rate", m_pvL1Rate, "EPICS PV Name for L1 rate", m_pvL1Rate);
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
   addParam("l1Histograms", m_l1Histograms, "Which l1 histograms to show", m_l1Histograms);
@@ -144,10 +145,22 @@ void DQMHistAnalysisHLTModule::initialize()
     new TH1F("MeanMemoryChange", "Mean memory change [MB]", 1, 0, 0)
   };
 
+  //EPICS PVs for HLT
+  addDeltaPar("timing_statistics", "processingTimeHistogram", HistDelta::c_Events, 10000, 1);
+  addDeltaPar("timing_statistics", "processesPerUnitHistogram", HistDelta::c_Events, 10000, 1);
+  registerEpicsPV("HLT:ProcessingTime", "ProcessingTime");
+  registerEpicsPV("HLT:BudgetTime", "BudgetTime");
+  registerEpicsPV("HLT:CPUUsage", "CPUUsage");
+
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+  if (not m_pvL1Rate.empty()) {
+    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
+    SEVCHK(ca_create_channel(m_pvL1Rate.data(), NULL, NULL, 10, &m_epicschid_L1Rate), "ca_create_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif
@@ -175,6 +188,13 @@ void DQMHistAnalysisHLTModule::beginRun()
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
+
+  // Set alarm limits for HLT:CPUUsage epicsPV
+  double unused = NAN;
+  double m_meanUpperWarn = 0.9;
+  double m_meanUpperAlarm = 1.0;
+  requestLimitsFromEpicsPVs("CPUUsage", unused, unused, m_meanUpperWarn, m_meanUpperAlarm);
+
 }
 
 void DQMHistAnalysisHLTModule::event()
@@ -235,6 +255,38 @@ void DQMHistAnalysisHLTModule::event()
     B2ERROR("Can not find the mean memory change histogram!");
     return;
   }
+
+  // Set the epicsPVs for HLT
+  auto hist_ProcessingTime = getDelta("timing_statistics", "processingTimeHistogram", 0, true);
+  double HLTProcessingTime = 0;
+
+  if (hist_ProcessingTime) {
+    HLTProcessingTime = hist_ProcessingTime->GetMean(); // unit = ms
+    setEpicsPV("HLT:ProcessingTime", HLTProcessingTime);
+  }
+
+  auto hist_Procs = getDelta("timing_statistics", "processesPerUnitHistogram", 0, true);
+  double HLTBudgetTime = 0; // Number of HLT threads / L1 rate [kHz]
+  double L1Rate = 0;
+
+#ifdef _BELLE2_EPICS
+  if (not m_pvL1Rate.empty()) {
+    SEVCHK(ca_get(DBR_DOUBLE, m_epicschid_L1Rate, (void*)&L1Rate), "ca_get failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  } else {
+    L1Rate = 0;
+  }
+#endif
+
+  if (hist_Procs && L1Rate != 0) {
+    double nProcs = hist_Procs->GetMean() * 0.5; // Number of HLT threads
+    HLTBudgetTime = nProcs * 1e03 / L1Rate; // unit = ms
+    setEpicsPV("HLT:BudgetTime", HLTBudgetTime);
+  }
+
+  if (HLTBudgetTime != 0)
+    setEpicsPV("HLT:CPUUsage", HLTProcessingTime / HLTBudgetTime);
+
 
   m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();

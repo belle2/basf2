@@ -1519,18 +1519,23 @@ class Importance(Plotter):
         @param columns which are used to calculate the correlations
         """
 
-        def norm(x):
-            width = (numpy.max(x) - numpy.min(x))
-            if width <= 0:
-                return numpy.zeros(x.shape)
-            return (x - numpy.min(x)) / width * 100
+        # normalise each column to sum to 1 so that values represent the fraction of total importance
+        raw = numpy.vstack([numpy.array(data[column]) for column in columns]).T
+        col_sums = raw.sum(axis=0, keepdims=True)
+        col_sums[col_sums == 0] = 1  # avoid division by zero for all-zero columns
+        importance_matrix = raw / col_sums
 
-        importance_matrix = numpy.vstack([norm(data[column]) for column in columns]).T
+        vmin = numpy.min(importance_matrix) if importance_matrix.size > 0 else 0.0
+        vmax = numpy.max(importance_matrix) if importance_matrix.size > 0 else 1.0
+
+        # 2 significant figures
+        n_sig = 2
+
         im = self.axis.imshow(
             importance_matrix[::-1],  # <- reverse rows
             cmap=plt.cm.RdBu,
-            vmin=0.0,
-            vmax=100.0,
+            vmin=vmin,
+            vmax=vmax,
             aspect='equal',
             interpolation='nearest',
             origin='upper'
@@ -1538,9 +1543,13 @@ class Importance(Plotter):
 
         num_y, num_x = importance_matrix.shape
 
-        # Adjust font size based on matrix size
-        base_font_size = 14
-        font_size = max(6, base_font_size * min(1.0, 25 / max(num_x, num_y)))
+        # Dynamic figure sizing and font
+        n_chars = 5
+        cell_pt = max(36, min(108, 576 / max(num_x, num_y)))
+        fig_w_pt = max(864, num_x * cell_pt + 252)
+        fig_h_pt = max(576, num_y * cell_pt + 144)
+        self.figure.set_size_inches(fig_w_pt / 72, fig_h_pt / 72)
+        font_size = max(6, int(min(14, 0.8 * cell_pt / (n_chars * 0.6))))
 
         # Tick positions and labels
         self.axis.set_xticks(numpy.arange(num_x))
@@ -1556,7 +1565,7 @@ class Importance(Plotter):
             for x in range(num_x):
                 value = importance_matrix[-1-y, x]  # Reverse y-axis for correct annotation
                 txt = self.axis.text(
-                    x, y, f'{value:.0f}',
+                    x, y, f'{value:.{n_sig}g}',
                     ha='center', va='center',
                     fontsize=font_size,
                     color='white'
@@ -1564,8 +1573,7 @@ class Importance(Plotter):
                 txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
 
         # Colorbar
-        cb = self.figure.colorbar(im, ax=self.axis, ticks=[0.0, 100.0], orientation='vertical')
-        cb.ax.set_yticklabels(['low', 'high'])
+        cb = self.figure.colorbar(im, ax=self.axis, orientation='vertical')
         cb.solids.set_rasterized(True)
 
         # Layout tightening

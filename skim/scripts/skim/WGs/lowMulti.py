@@ -347,12 +347,13 @@ class PNbarHad(BaseSkim):
     **Physics channel**: :math:`e^{+}e^{-} \\to p^{+}(\\bar{n})X_{had}`
 
     **Decay Modes**:
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}`
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}(\\pi^{+}\\pi^{-})`
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}(\\pi^{+}\\pi^{-})(K^{+}K^{-})`
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`
-        * :math: `e^{+}e^{-} \\to p^{+}(\\bar{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(K^{+}K^{-})`
+
+    1. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}`,
+    2. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})`,
+    3. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`,
+    4. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(K^{+}K^{-})`,
+    5. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`,
+    6. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(K^{+}K^{-})`,
 
     **Selection Criteria**
         * Tracks with ``dr < 1 and abs(dz) < 3``

@@ -34,6 +34,7 @@ EventKinematicsModule::EventKinematicsModule() : Module()
 {
   // Set module properties
   setDescription("Module to compute global event kinematic attributes like missing momentum and energy.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("particleLists", m_particleLists, "List of the ParticleLists", vector<string>());

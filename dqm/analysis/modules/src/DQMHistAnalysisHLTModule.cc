@@ -262,7 +262,7 @@ void DQMHistAnalysisHLTModule::event()
 
   if (hist_ProcessingTime) {
     HLTProcessingTime = hist_ProcessingTime->GetMean(); // unit = ms
-    setEpicsPV("HLT:ProcessingTime", HLTProcessingTime);
+    setEpicsPV("ProcessingTime", HLTProcessingTime);
   }
 
   auto hist_Procs = getDelta("timing_statistics", "processesPerUnitHistogram", 0, true);
@@ -281,11 +281,11 @@ void DQMHistAnalysisHLTModule::event()
   if (hist_Procs && L1Rate != 0) {
     double nProcs = hist_Procs->GetMean() * 0.5; // Number of HLT threads
     HLTBudgetTime = nProcs * 1e03 / L1Rate; // unit = ms
-    setEpicsPV("HLT:BudgetTime", HLTBudgetTime);
+    setEpicsPV("BudgetTime", HLTBudgetTime);
   }
 
   if (HLTBudgetTime != 0)
-    setEpicsPV("HLT:CPUUsage", HLTProcessingTime / HLTBudgetTime);
+    setEpicsPV("CPUUsage", HLTProcessingTime / HLTBudgetTime);
 
 
   m_hEfficiencyTotal.second->Reset();
@@ -486,6 +486,10 @@ void DQMHistAnalysisHLTModule::terminate()
 #ifdef _BELLE2_EPICS
   if (not m_pvPrefix.empty()) {
     SEVCHK(ca_clear_channel(m_epicschid), "ca_clear_channel failure");
+    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  }
+  if (not m_pvL1Rate.empty()) {
+    SEVCHK(ca_clear_channel(m_epicschid_L1Rate), "ca_clear_channel failure");
     SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
   }
 #endif

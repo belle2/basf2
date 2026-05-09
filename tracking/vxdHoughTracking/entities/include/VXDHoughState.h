@@ -37,7 +37,6 @@ namespace Belle2 {
         m_dataCache.sensorID = hit->getVxdID();
         m_dataCache.layer = hit->getVxdID().getLayerNumber();
         m_dataCache.ladder = hit->getVxdID().getLadderNumber();
-        const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(hit->getVxdID());
         m_dataCache.x = hit->X();
         m_dataCache.y = hit->Y();
         m_dataCache.z = hit->Z();
@@ -46,9 +45,6 @@ namespace Belle2 {
         m_dataCache.xConformal = hit->X() * conformalTransform;
         m_dataCache.yConformal = hit->Y() * conformalTransform;
         m_dataCache.localNormalizedu = hit->getNormalizedLocalU();
-        m_dataCache.localNormalizedv = hit->getNormalizedLocalV();
-        m_dataCache.sensorCenterPhi = sensorInfo.pointToGlobal(ROOT::Math::XYZVector(0., 0., 0.), true).Phi();
-        m_dataCache.phi = hit->getPosition().Phi();
         m_dataCache.theta = hit->getPosition().Theta();
         m_dataCache.uTime = hit->TimeU();
         m_dataCache.vTime = hit->TimeV();
@@ -59,7 +55,6 @@ namespace Belle2 {
 
       /// Getter for the automaton cell.
       TrackingUtilities::AutomatonCell& getAutomatonCell() { return m_automatonCell; }
-
 
       /// Cache containing the most important information of this state which will often be needed
       struct DataCache {
@@ -75,12 +70,6 @@ namespace Belle2 {
         float yConformal = std::numeric_limits<float>::quiet_NaN();
         /// Local normalized uCoordinate of this state, only set if based on SpacePoint
         float localNormalizedu = std::numeric_limits<float>::quiet_NaN();
-        /// Local normalized vCoordinate of this state, only set if based on SpacePoint
-        float localNormalizedv = std::numeric_limits<float>::quiet_NaN();
-        /// Phi value of SpacePoint
-        float sensorCenterPhi = std::numeric_limits<float>::quiet_NaN();
-        /// Phi value of SpacePoint
-        float phi = std::numeric_limits<float>::quiet_NaN();
         /// Theta value of SpacePoint
         float theta = std::numeric_limits<float>::quiet_NaN();
         /// Time of the u-side cluster

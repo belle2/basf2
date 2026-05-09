@@ -166,7 +166,7 @@ void ARICHMergerHist::fillFromTH1(TH1* hist)
 // --------------------------------------------------
 // Using MergerID numbering
 // --------------------------------------------------
-void ARICHMergerHist::setBinContent(unsigned mergerID, double value)
+void ARICHMergerHist::SetBinContentFromSN(unsigned mergerID, double value)
 {
   if (mergerID < 1 || mergerID > 100) return;
 

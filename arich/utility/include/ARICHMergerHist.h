@@ -25,7 +25,7 @@ namespace Belle2 {
    *    - Bins correspond to 1_1, 2_1, 12_1,...,6_12 merger positions
    *
    * 2) Real ARICH hardware MergerID
-   *    - Used by setBinContent(mergerID, value).
+   *    - Used by SetBinContentFromSN(mergerID, value).
    */
   class ARICHMergerHist : public TH2Poly {
 
@@ -48,7 +48,7 @@ namespace Belle2 {
     void fillFromTH1(TH1* hist);
 
     /// Set content using the real ARICH hardware MergerID
-    void setBinContent(unsigned mergerID, double value);
+    void SetBinContentFromSN(unsigned mergerID, double value);
 
     /// Draw with sector lines and labels.
     /// @param option ROOT draw option string

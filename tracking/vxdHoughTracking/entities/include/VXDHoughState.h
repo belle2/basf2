@@ -36,7 +36,6 @@ namespace Belle2 {
       {
         m_dataCache.sensorID = hit->getVxdID();
         m_dataCache.layer = hit->getVxdID().getLayerNumber();
-        m_dataCache.ladder = hit->getVxdID().getLadderNumber();
         m_dataCache.x = hit->X();
         m_dataCache.y = hit->Y();
         m_dataCache.z = hit->Z();
@@ -78,8 +77,6 @@ namespace Belle2 {
         float vTime = std::numeric_limits<float>::quiet_NaN();
         /// Geometrical Layer this state is based on
         unsigned short layer = std::numeric_limits<unsigned short>::quiet_NaN();
-        /// Ladder this state is based on (only use for SpacePoint based states)
-        unsigned short ladder = std::numeric_limits<unsigned short>::quiet_NaN();
         /// SensorID of this hit
         VxdID sensorID = 0;
       };

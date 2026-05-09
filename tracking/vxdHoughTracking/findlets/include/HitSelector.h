@@ -37,7 +37,7 @@ namespace Belle2 {
             continue;
           }
 
-          const double hitZPosition = hitData.z;
+          const double hitZPosition = hit.getHit()->Z();
 
           if (sensorInLayerSixLadder == 1 and hitZPosition >= -1.0) {
             selectedHits.emplace_back(&hit);

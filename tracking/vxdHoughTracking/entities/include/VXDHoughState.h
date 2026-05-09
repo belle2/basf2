@@ -38,7 +38,6 @@ namespace Belle2 {
         m_dataCache.layer = hit->getVxdID().getLayerNumber();
         m_dataCache.x = hit->X();
         m_dataCache.y = hit->Y();
-        m_dataCache.z = hit->Z();
         const double conformalTransform = 2. / ((hit->X() - BeamSpotPosition.X()) * (hit->X() - BeamSpotPosition.X()) +
                                                 (hit->Y() - BeamSpotPosition.Y()) * (hit->Y() - BeamSpotPosition.Y()));
         m_dataCache.xConformal = hit->X() * conformalTransform;
@@ -61,8 +60,6 @@ namespace Belle2 {
         float x = std::numeric_limits<float>::quiet_NaN();
         /// y coordinate of this hit
         float y = std::numeric_limits<float>::quiet_NaN();
-        /// z coordinate of this hit
-        float z = std::numeric_limits<float>::quiet_NaN();
         /// conformal transformed x coordinate of this hit
         float xConformal = std::numeric_limits<float>::quiet_NaN();
         /// conformal transformed y coordinate of this hit

@@ -91,6 +91,8 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
 
   gROOT->cd();
+  std::string c_masked_channels_name = m_histogramDirectoryName + "/c_masked_channels";
+  new TCanvas((c_masked_channels_name).c_str());
   std::string c_fe_bklm_ratio_name = m_histogramDirectoryName + "/c_fe_bklm_ratio";
   m_c_fe_bklm_ratio = new TCanvas((c_fe_bklm_ratio_name).c_str());
   std::string c_fe_eklm_ratio_name = m_histogramDirectoryName + "/c_fe_eklm_ratio";
@@ -629,7 +631,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   processPlaneHistogram(histName, &latex, nullptr);
 }
 
-void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
+void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string& histName, TCanvas* canvas)
 {
   if (!feHist) {
     B2WARNING("processFEHistogram: feHist is null, exiting function.");
@@ -637,6 +639,15 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, TH1* denominator,
   }
   if (!canvas) {
     B2WARNING("processFEHistogram: canvas is null, cannot draw histograms.");
+    return;
+  }
+
+  /* Obtain plots necessary for FE Ratio plots */
+  TH1F* numerator = (TH1F*)findHist(m_histogramDirectoryName + "/" + histName + "_0");
+  TH1F* denominator = (TH1F*)findHist(m_histogramDirectoryName + "/" + histName + "_1");
+  /* Check if fe histograms exist*/
+  if (numerator == nullptr || denominator == nullptr) {
+    B2INFO("processFEHistogram: Histograms needed for FE Ratio computation are not found");
     return;
   }
 
@@ -671,8 +682,9 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, TH1* denominator,
     B2INFO("processFEHistogram: Updated canvas after first draw.");
 
     /* Delta component */
-    auto deltaDenom = getDelta("", denominator->GetName());
-    auto deltaNumer = getDelta("", numerator->GetName());
+    // Use the latest available deltas, not only "updated in the same event".
+    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", 0, false);
+    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", 0, false);
 
     UpdateCanvas(canvas->GetName(), (feHist != nullptr));
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
@@ -786,20 +798,7 @@ void DQMHistAnalysisKLMModule::event()
       }
     }
   }
-  /* Obtain plots necessary for FE Ratio plots */
-  TH1F* feStatus_bklm_scintillator_0 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_bklm_scintillator_layers_0");
-  TH1F* feStatus_bklm_scintillator_1 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_bklm_scintillator_layers_1");
 
-  TH1F* feStatus_eklm_plane_0 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_0");
-  TH1F* feStatus_eklm_plane_1 = (TH1F*)findHist(m_histogramDirectoryName + "/feStatus_eklm_plane_1");
-  /* Check if fe histograms exist*/
-  if ((feStatus_bklm_scintillator_0 == nullptr || feStatus_bklm_scintillator_1 == nullptr)) {
-    B2INFO("Histograms needed for BKLM feature extraction computation are not found");
-  }
-
-  if ((feStatus_eklm_plane_0 == nullptr || feStatus_eklm_plane_1 == nullptr)) {
-    B2INFO("Histograms needed for EKLM feature extraction computation are not found");
-  }
   /* Reset the color palette to the default one. */
   gStyle->SetPalette(kBird);
   fillMaskedChannelsHistogram("masked_channels");
@@ -808,8 +807,8 @@ void DQMHistAnalysisKLMModule::event()
   processPlaneHistogram("plane_bklm_z", latex);
   processPlaneHistogram("plane_eklm", latex);
 
-  processFEHistogram(m_fe_bklm_ratio, feStatus_bklm_scintillator_1, feStatus_bklm_scintillator_0, m_c_fe_bklm_ratio);
-  processFEHistogram(m_fe_eklm_ratio, feStatus_eklm_plane_1, feStatus_eklm_plane_0, m_c_fe_eklm_ratio);
+  processFEHistogram(m_fe_bklm_ratio, "feStatus_bklm_scintillator_layers", m_c_fe_bklm_ratio);
+  processFEHistogram(m_fe_eklm_ratio, "feStatus_eklm_plane", m_c_fe_eklm_ratio);
   processPlaneHistogram("fe_bklm_ratio", nullptr, m_fe_bklm_ratio);
   processPlaneHistogram("fe_eklm_ratio", nullptr, m_fe_eklm_ratio);
 

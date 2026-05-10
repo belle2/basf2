@@ -141,11 +141,10 @@ namespace Belle2 {
     /**
      * Process histogram containing the efficiencies.
      * @param[in]  feHist  Histogram itself.
-     * @param[in]  denominator Denominator for efficiency hist.
-     * @param[in]  numerator Numerator for efficiency hist.
+     * @param[in]  histName Name of the histogram.
      * @param[in]  canvas Canvas of interest.
      */
-    void processFEHistogram(TH1* feHist,  TH1* denominator, TH1* numerator, TCanvas* canvas);
+    void processFEHistogram(TH1* feHist, const std::string& histName, TCanvas* canvas);
 
     /**
      * Fill histogram containing masked channels per sector.

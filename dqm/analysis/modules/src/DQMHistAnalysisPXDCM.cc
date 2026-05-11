@@ -60,7 +60,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (auto& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -79,7 +79,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
   }
   m_cCommonModeDelta = new TCanvas((m_histogramDirectoryName + "/c_CommonModeDelta").data());
 
@@ -104,7 +104,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
     return;
   }
   for (size_t i = 0; i < m_parModuleList.size(); i++) {
-    for (auto n : m_parGateList[i]) {
+    for (const auto n : m_parGateList[i]) {
       m_maskedGates[VxdID(m_parModuleList[i])].push_back(n);
     }
   }
@@ -125,7 +125,7 @@ void DQMHistAnalysisPXDCMModule::initialize()
   registerEpicsPV("PXD:CommonMode:CM63", "CM63");
   //registerEpicsPV("PXD:CommonMode:CM62", "CM62");
 
-  for (auto& aPXDModule : m_PXDModules) {
+  for (const auto& aPXDModule : m_PXDModules) {
     auto buff = (std::string)aPXDModule;
     replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:CommonMode:Mean:" + buff, (std::string)aPXDModule);
@@ -275,7 +275,7 @@ void DQMHistAnalysisPXDCMModule::event()
     leg->Draw();
     m_line10->Draw();
     m_lineOutside->Draw();
-    for (auto& it : m_excluded) {
+    for (const auto& it : m_excluded) {
       static std::map <int, TLatex*> ltmap;
       auto tt = ltmap[it];
       if (!tt) {

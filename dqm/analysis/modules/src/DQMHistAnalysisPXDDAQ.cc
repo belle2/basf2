@@ -120,7 +120,7 @@ void DQMHistAnalysisPXDDAQModule::event()
       m_cDAQError->Clear();
       m_cDAQError->cd();
       if (m_hDAQError) delete m_hDAQError;
-      m_hDAQError = (TH1D*)hh1->DrawClone("text");// or just Clone here and Draw below?
+      m_hDAQError = static_cast<TH1D*>(hh1->DrawClone("text"));// or just Clone here and Draw below?
       m_hDAQError->SetName("hPXDDAQError");
       m_hDAQError->SetTitle("PXD Fraction of DAQ Errors");
       if (m_hDAQError->GetBinContent(0)) {
@@ -179,7 +179,7 @@ void DQMHistAnalysisPXDDAQModule::event()
       m_cMissingDHP->Clear();
       m_cMissingDHP->cd();
       if (m_hMissingDHP) delete m_hMissingDHP;
-      m_hMissingDHP = (TH1F*)hh1->DrawClone("text");
+      m_hMissingDHP = static_cast<TH1F*>(hh1->DrawClone("text"));
       if (m_hMissingDHP->GetBinContent(0)) {
         m_hMissingDHP->Scale(1.0 / m_hMissingDHP->GetBinContent(0));
         m_hMissingDHP->Draw("text");
@@ -202,7 +202,7 @@ void DQMHistAnalysisPXDDAQModule::event()
     m_cStatistic->Clear();
     m_cStatistic->cd();
     if (m_hStatistic) delete m_hStatistic;
-    m_hStatistic = (TH1D*)statsum->DrawClone("text");
+    m_hStatistic = static_cast<TH1D*>(statsum->DrawClone("text"));
     if (m_hStatistic->GetBinContent(0)) {
       m_hStatistic->Scale(1.0 / m_hStatistic->GetBinContent(0));
       m_hStatistic->Draw("text");

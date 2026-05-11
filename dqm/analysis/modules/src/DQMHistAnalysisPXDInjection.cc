@@ -49,13 +49,13 @@ void DQMHistAnalysisPXDInjectionModule::initialize()
   m_hInjectionHERPXD = new TH1F("HitInjectionHERPXD", "PXD Hits after HER Injection;Time in #mus;Mean Hits/event", 4000, 0, 20000);
   const VXD::GeoCache& vxdGeometry = VXD::GeoCache::getInstance();
   std::vector<VxdID> vxdsensors = vxdGeometry.getListOfSensors();
-  for (auto& avxdid : vxdsensors) {
+  for (const auto& avxdid : vxdsensors) {
     VXD::SensorInfoBase info = vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_sensors.push_back(avxdid);
   }
 
-  for (auto& avxdid : m_sensors) {
+  for (const auto& avxdid : m_sensors) {
     TString buff = (std::string)avxdid;
     TString bufful = buff;
     bufful.ReplaceAll(".", "_");
@@ -126,7 +126,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
     RefMod_bw = findHist(locationHits.Data());
 
     // assume trigger is the same for all modules (makes sense :-)
-    for (auto& avxdid : m_sensors) {
+    for (const auto& avxdid : m_sensors) {
       TString buff = (std::string)avxdid;
       TString bufful = buff;
       bufful.ReplaceAll(".", "_");
@@ -178,7 +178,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
     }
     RefMod_bw = findHist(locationHits.Data());
     // assume trigger is the same for all modules (makes sense :-)
-    for (auto& avxdid : m_sensors) {
+    for (const auto& avxdid : m_sensors) {
       TString buff = (std::string)avxdid;
       TString bufful = buff;
       bufful.ReplaceAll(".", "_");
@@ -210,7 +210,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
   m_cInjectionHERPXD->Pad()->SetLogy();
   m_hInjectionHERPXD->Draw("hist");
 
-  for (auto& avxdid : m_sensors) {
+  for (const auto& avxdid : m_sensors) {
     m_cInjectionHERPXDMod[avxdid]->Clear();
     m_cInjectionHERPXDMod[avxdid]->cd(0);
     m_cInjectionHERPXDMod[avxdid]->Pad()->SetLogy();
@@ -236,7 +236,7 @@ void DQMHistAnalysisPXDInjectionModule::terminate()
   if (m_hInjectionLERPXD) delete m_hInjectionLERPXD;
   if (m_hInjectionHERPXD) delete m_hInjectionHERPXD;
 
-  for (auto& avxdid : m_sensors) {
+  for (const auto& avxdid : m_sensors) {
     if (m_cInjectionLERPXDMod[avxdid]) delete m_cInjectionLERPXDMod[avxdid];
     if (m_cInjectionHERPXDMod[avxdid]) delete m_cInjectionHERPXDMod[avxdid];
     if (m_hInjectionLERPXDMod[avxdid]) delete m_hInjectionLERPXDMod[avxdid];

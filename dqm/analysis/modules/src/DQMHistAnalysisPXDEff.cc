@@ -249,7 +249,7 @@ bool DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, i
   return false;
 }
 
-bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
+bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, const std::string& name)
 {
   bool warn_flag = (m_eEffAll->GetEfficiency(bin) + m_eEffAll->GetEfficiencyErrorUp(bin) <
                     m_warnlevelmod[name]); // (and not only the actual eff value)
@@ -260,7 +260,7 @@ bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
   return warn_flag;
 }
 
-bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, std::string name)
+bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, const std::string& name)
 {
   bool error_flag = (m_eEffAll->GetEfficiency(bin) + m_eEffAll->GetEfficiencyErrorUp(bin) <
                      m_errorlevelmod[name]); // error if upper error value is below limit

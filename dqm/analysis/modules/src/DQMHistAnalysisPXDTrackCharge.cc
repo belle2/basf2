@@ -324,7 +324,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   // now loop per module over asics pairs (1.5.1)
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
 //     TCanvas* canvas = m_cChargeMod[m_PXDModules[i]];
-    VxdID& aVxdID = m_PXDModules[i];
+    const VxdID& aVxdID = m_PXDModules[i];
 
     if (m_hChargeModASIC2d[aVxdID]) m_hChargeModASIC2d[aVxdID]->Reset();
     if (m_cChargeModASIC2d[aVxdID]) m_cChargeModASIC2d[aVxdID]->Clear();

@@ -52,6 +52,11 @@ def get_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument('-a', '--abbreviation_length', dest='abbreviation_length',
                         action='store', type=int, default=10,
                         help='Number of characters to which variable names are abbreviated.')
+    parser.add_argument('-s', '--importance-scale', dest='importance_scale',
+                        choices=['normalized', 'hundredzero'], default='normalized',
+                        help='Scaling applied to importance values before plotting. '
+                             '"normalized" (default): each column is divided by its sum and multiplied by 100; '
+                             '"hundredzero": each column is rescaled so the minimum is 0 and the maximum is 100.')
     return parser
 
 
@@ -256,14 +261,19 @@ if __name__ == '__main__':
             o += b2latex.Listing(language='XML').add(method.description).finish()
 
         o += b2latex.Section("Variables")
-        o += b2latex.String("""
+        importance_scale_description = {
+            'normalized': 'Each variable\'s importance is shown as a percentage of the total importance '
+                          'for that method (column sums to 100), preserving relative magnitudes between variables.',
+            'hundredzero': 'Each column is rescaled so that the least important variable is 0 and the most '
+                           'important is 100. Relative magnitudes between variables are not preserved.',
+        }
+        o += b2latex.String(f"""
             This section contains an overview of the importance and correlation of the variables used by the classifiers.
             And distribution plots of the variables on the independent dataset. The distributions are normed for signal and
             background separately, and only the region +- 3 sigma around the mean is shown.
 
-            The importance scores shown are the fraction of total importance assigned to each variable by each MVA method
-            (each column sums to 1). This normalisation makes columns comparable even when different methods report
-            importance on different absolute scales. If the method does not provide a ranking, all importances will be 0.
+            {importance_scale_description[args.importance_scale]}
+            If the method does not provide a ranking, all importances will be 0.
         """)
 
         table = b2latex.LongTable(r"ll", "Abbreviations of variables", "{name} & {abbr}", r"Variable & Abbreviation")
@@ -275,7 +285,8 @@ if __name__ == '__main__':
         graphics = b2latex.Graphics()
         p = plotting.Importance()
         p.add({identifier_abbreviations[i.identifier]: np.array([i.importances.get(v, 0.0) for v in variables]) for i in methods},
-              identifier_abbreviations.values(), variable_abbreviations.values())
+              identifier_abbreviations.values(), variable_abbreviations.values(),
+              importance_scale=args.importance_scale)
         p.finish()
         p.save('importance.pdf')
         graphics.add('importance.pdf', width=1.0)

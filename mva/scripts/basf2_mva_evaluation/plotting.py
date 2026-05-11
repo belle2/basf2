@@ -1512,24 +1512,34 @@ class Importance(Plotter):
     Plots importance matrix
     """
 
-    def add(self, data, columns, variables):
+    def add(self, data, columns, variables, importance_scale='normalized'):
         """
         Add a new correlation plot.
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
+        @param variables variable names (y-axis labels)
+        @param importance_scale 'normalized' (default, columns sum to 100) or 'hundredzero' (per-column min=0/max=100)
         """
 
-        # normalise each column to sum to 1 so that values represent the fraction of total importance
         raw = numpy.vstack([numpy.array(data[column]) for column in columns]).T
-        col_sums = raw.sum(axis=0, keepdims=True)
-        col_sums[col_sums == 0] = 1  # avoid division by zero for all-zero columns
-        importance_matrix = raw / col_sums
 
-        vmin = numpy.min(importance_matrix) if importance_matrix.size > 0 else 0.0
-        vmax = numpy.max(importance_matrix) if importance_matrix.size > 0 else 1.0
-
-        # 2 significant figures
-        n_sig = 2
+        if importance_scale == 'hundredzero':
+            def norm(x):
+                width = numpy.max(x) - numpy.min(x)
+                if width <= 0:
+                    return numpy.zeros(x.shape)
+                return (x - numpy.min(x)) / width * 100
+            importance_matrix = numpy.vstack([norm(raw[:, i]) for i in range(raw.shape[1])]).T
+            vmin, vmax = 0.0, 100.0
+            fmt = '.0f'
+        else:
+            # normalized: each column sums to 100
+            col_sums = raw.sum(axis=0, keepdims=True)
+            col_sums[col_sums == 0] = 1  # avoid division by zero for all-zero columns
+            importance_matrix = raw / col_sums * 100
+            vmin = numpy.min(importance_matrix) if importance_matrix.size > 0 else 0.0
+            vmax = numpy.max(importance_matrix) if importance_matrix.size > 0 else 100.0
+            fmt = '.2g'
 
         im = self.axis.imshow(
             importance_matrix[::-1],  # <- reverse rows
@@ -1565,7 +1575,7 @@ class Importance(Plotter):
             for x in range(num_x):
                 value = importance_matrix[-1-y, x]  # Reverse y-axis for correct annotation
                 txt = self.axis.text(
-                    x, y, f'{value:.{n_sig}g}',
+                    x, y, f'{value:{fmt}}',
                     ha='center', va='center',
                     fontsize=font_size,
                     color='white'
@@ -1573,7 +1583,11 @@ class Importance(Plotter):
                 txt.set_path_effects([PathEffects.withStroke(linewidth=3, foreground='black')])
 
         # Colorbar
-        cb = self.figure.colorbar(im, ax=self.axis, orientation='vertical')
+        if importance_scale == 'hundredzero':
+            cb = self.figure.colorbar(im, ax=self.axis, ticks=[0.0, 100.0], orientation='vertical')
+            cb.ax.set_yticklabels(['low', 'high'])
+        else:
+            cb = self.figure.colorbar(im, ax=self.axis, orientation='vertical')
         cb.solids.set_rasterized(True)
 
         # Layout tightening

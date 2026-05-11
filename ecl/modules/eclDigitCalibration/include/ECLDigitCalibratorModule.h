@@ -160,7 +160,7 @@ namespace Belle2 {
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =
       std::make_unique<Belle2::ECL::ECLTimingUtilities>(); /**< ECL timing tools */
 
-    bool m_isMC = false; /** Flag to keep track if we run on MC or not. */
+    bool m_isMC = false; /**< Flag to keep track if we run on MC or not */
 
   };
 

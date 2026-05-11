@@ -73,7 +73,7 @@ namespace Belle2 {
           if (currentLayer == nextLayer) {
             // next layer is an overlap one, so lets return all hits from the same layer, that are on a
             // ladder which is below the last added hit.
-            const unsigned int fromLadderNumber = currentStateCache.sensorID.getLadderNumber();
+            const unsigned int fromLadderNumber = currentHit->getHit()->getVxdID().getLadderNumber();
             const unsigned int maximumLadderNumber = m_maximalLadderCache.at(currentLayer);
 
             // the reason for this strange formula is the numbering scheme in the VXD.
@@ -85,7 +85,7 @@ namespace Belle2 {
             const unsigned int overlappingLadder =
               ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
-            if (nextStateCache.sensorID.getLadderNumber() != overlappingLadder) {
+            if (nextHit->getHit()->getVxdID().getLadderNumber() != overlappingLadder) {
               continue;
             }
 

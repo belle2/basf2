@@ -34,10 +34,7 @@ namespace Belle2 {
       /// Initialize the state as non-root with a related hit (and with a seed)
       explicit VXDHoughState(const SpacePoint* hit, const B2Vector3D& BeamSpotPosition) : m_hit(hit)
       {
-        m_dataCache.sensorID = hit->getVxdID();
         m_dataCache.layer = hit->getVxdID().getLayerNumber();
-        m_dataCache.x = hit->X();
-        m_dataCache.y = hit->Y();
         const double conformalTransform = 2. / ((hit->X() - BeamSpotPosition.X()) * (hit->X() - BeamSpotPosition.X()) +
                                                 (hit->Y() - BeamSpotPosition.Y()) * (hit->Y() - BeamSpotPosition.Y()));
         m_dataCache.xConformal = hit->X() * conformalTransform;
@@ -56,10 +53,6 @@ namespace Belle2 {
 
       /// Cache containing the most important information of this state which will often be needed
       struct DataCache {
-        /// x coordinate of this hit
-        float x = std::numeric_limits<float>::quiet_NaN();
-        /// y coordinate of this hit
-        float y = std::numeric_limits<float>::quiet_NaN();
         /// conformal transformed x coordinate of this hit
         float xConformal = std::numeric_limits<float>::quiet_NaN();
         /// conformal transformed y coordinate of this hit
@@ -74,8 +67,6 @@ namespace Belle2 {
         float vTime = std::numeric_limits<float>::quiet_NaN();
         /// Geometrical Layer this state is based on
         unsigned short layer = std::numeric_limits<unsigned short>::quiet_NaN();
-        /// SensorID of this hit
-        VxdID sensorID = 0;
       };
       /// Get the cached data of this state
       const DataCache getDataCache() const { return m_dataCache; }

@@ -81,7 +81,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
     // Have been promised that all modules have the same number of pixels, so just take from the first one
@@ -491,7 +491,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
         gr->Draw("AP");
 
-        for (auto& it : m_excluded) {
+        for (const auto& it : m_excluded) {
           static std::map <int, TLatex*> ltmap;
           auto tt = ltmap[it];
           if (!tt) {
@@ -573,7 +573,7 @@ void DQMHistAnalysisPXDEffModule::event()
       } else scale_min = 0.0;
       if (gr3) gr3->Draw("P"); // both in one plot
 
-      for (auto& it : m_excluded) {
+      for (const auto& it : m_excluded) {
         static std::map <int, TLatex*> ltmap;
         auto tt = ltmap[it];
         if (!tt) {

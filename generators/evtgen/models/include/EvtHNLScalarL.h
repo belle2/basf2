@@ -39,6 +39,11 @@ public:
   /** Initializes module */
   void init();
 
+private:
+
+  /** Maximum probability used for accept-reject generation */
+  static constexpr double m_ProbMax = 10000.0;
+
 };
 
 

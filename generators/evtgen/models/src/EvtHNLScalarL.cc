@@ -50,7 +50,7 @@ void EvtHNLScalarL::init()
 
 void EvtHNLScalarL::initProbMax()
 {
-  setProbMax(10000.0);
+  setProbMax(m_ProbMax);
 }
 
 

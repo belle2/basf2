@@ -8,6 +8,7 @@
 
 #include <generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h>
 
+#include <framework/logging/Logger.h>
 #include <EvtGenBase/EvtAmp.hh>
 #include <EvtGenBase/EvtDiracSpinor.hh>
 #include <EvtGenBase/EvtId.hh>
@@ -66,8 +67,7 @@ void EvtHNLSemiLeptonicScalarAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
         amp.vertex(i, j, current * tds);
 
       } else {
-        EvtGenReport(EVTGEN_ERROR, "EvtGen")
-            << "Wrong lepton number\n";
+        B2ERROR("HNLSemileptonicScalarAmp: Wrong lepton number");
       }
     }
   }

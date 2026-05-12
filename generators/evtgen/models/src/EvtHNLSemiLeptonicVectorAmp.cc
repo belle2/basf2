@@ -8,6 +8,7 @@
 
 #include <generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h>
 
+#include <framework/logging/Logger.h>
 #include <EvtGenBase/EvtAmp.hh>
 #include <EvtGenBase/EvtDiracSpinor.hh>
 #include <EvtGenBase/EvtId.hh>
@@ -79,8 +80,7 @@ void EvtHNLSemiLeptonicVectorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
            dual(EvtGenFunctions::directProd(p4meson + p4b,
                                             p4b - p4meson));
   } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen")
-        << "Wrong lepton number\n";
+    B2ERROR("HNLSemileptonicVectorAmp: Wrong lepton number");
   }
 
   tds.addDirProd((a0f - a3f) * 2.0 * (m_meson / q2) * p4b,
@@ -89,6 +89,7 @@ void EvtHNLSemiLeptonicVectorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
   EvtVector4C et0 = tds.cont1(parent->getDaug(0)->epsParent(0).conj());
   EvtVector4C et1 = tds.cont1(parent->getDaug(0)->epsParent(1).conj());
   EvtVector4C et2 = tds.cont1(parent->getDaug(0)->epsParent(2).conj());
+  const std::array<const EvtVector4C*, 3> etaList{{&et0, &et1, &et2}};
 
   for (int i{0}; i < 2; ++i) {
     for (int j{0}; j < 2; ++j) {
@@ -96,18 +97,17 @@ void EvtHNLSemiLeptonicVectorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
         EvtLeptonVACurrent(parent->getDaug(2)->spParent(j),
                            parent->getDaug(1)->spParent(i))};
 
-      if (l_num == EM || l_num == MUM || l_num == TAUM) {
+      for (int k{0}; k < static_cast<int>(etaList.size()); ++k) {
 
-        amp.vertex(0, i, j, current.conj().cont(et0));
-        amp.vertex(1, i, j, current.conj().cont(et1));
-        amp.vertex(2, i, j, current.conj().cont(et2));
+        if (l_num == EM || l_num == MUM || l_num == TAUM) {
 
-      } else {
+          amp.vertex(k, i, j, current.conj().cont(*etaList[k]));
 
-        amp.vertex(0, i, j, current.cont(et0));
-        amp.vertex(1, i, j, current.cont(et1));
-        amp.vertex(2, i, j, current.cont(et2));
+        } else {
 
+          amp.vertex(k, i, j, current.cont(*etaList[k]));
+
+        }
       }
     }
   }

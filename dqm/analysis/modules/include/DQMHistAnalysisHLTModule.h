@@ -14,7 +14,7 @@
 #include <map>
 #include <string>
 
-#ifdef _BELLE2_EPICS
+
 #include "cadef.h"
 #endif
 
@@ -87,11 +87,5 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1F*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
     /// Histogram with mean memory change per process
     std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
-
-#ifdef _BELLE2_EPICS
-    //! two EPICS PVs
-    chid  m_epicschid;
-    chid  m_epicschid_L1Rate;
-#endif
   };
-}
+} // end namespace Belle2

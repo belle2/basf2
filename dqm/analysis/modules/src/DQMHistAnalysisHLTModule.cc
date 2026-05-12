@@ -39,8 +39,6 @@ REG_MODULE(DQMHistAnalysisHLT);
 DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {
   setDescription("Modify and analyze the data quality histograms of HLT");
-  addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
-  addParam("pvL1Rate", m_pvL1Rate, "EPICS PV Name for L1 rate", m_pvL1Rate);
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
   addParam("l1Histograms", m_l1Histograms, "Which l1 histograms to show", m_l1Histograms);
@@ -148,6 +146,8 @@ void DQMHistAnalysisHLTModule::initialize()
   //EPICS PVs for HLT
   addDeltaPar("timing_statistics", "processingTimeHistogram", HistDelta::c_Events, 10000, 1);
   addDeltaPar("timing_statistics", "processesPerUnitHistogram", HistDelta::c_Events, 10000, 1);
+  registerEpicsPV("B2_nsm:get:ECL_LUM_MON:lum_det_run", "instLuminosity");
+  registerEpicsPV("B2_nsm:get:TTDS_COM:trigoutrate", "l1Rate");
   registerEpicsPV("HLT:ProcessingTime", "ProcessingTime");
   registerEpicsPV("HLT:BudgetTime", "BudgetTime");
   registerEpicsPV("HLT:CPUUsage", "CPUUsage");

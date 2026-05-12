@@ -51,10 +51,6 @@ namespace Belle2 {
     void terminate() override final;
 
   private:
-    /// prefix for EPICS PVs
-    std::string m_pvPrefix = "B2_nsm:get:ECL_LUM_MON:lum_det_run";
-    /// prefix for EPICS PV of L1 rate
-    std::string m_pvL1Rate = "B2_nsm:get:TTDS_COM:trigoutrate";
     /// name of the bhabha trigger
     std::string m_bhabhaName = "accept_bhabha";
     /// Which columns to use

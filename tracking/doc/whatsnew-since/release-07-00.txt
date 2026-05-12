@@ -1,4 +1,4 @@
-Changes in the tracking package since release-07-00
+Changes in the tracking package since release-07-00 (new features of release-08)
 ----------------------------------------------------
 
 * Addition of the track flip and refit algortihm. This algorithm identifies tracks which have been falsely fitted in the wrong direction, by employing a BDT. 

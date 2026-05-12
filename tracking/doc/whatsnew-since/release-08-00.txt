@@ -1,4 +1,4 @@
-Changes in the tracking package since release-08-00
+Changes in the tracking package since release-08-00 (new features of release-09)
 ----------------------------------------------------
 
 * The Kink finding was added to the tracking algorithms, which runs in the default chain. 

@@ -1,3 +1,0 @@
-Changes in the tracking package since release-11-00
-----------------------------------------------------
-

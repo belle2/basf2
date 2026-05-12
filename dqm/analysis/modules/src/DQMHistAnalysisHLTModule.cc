@@ -146,8 +146,8 @@ void DQMHistAnalysisHLTModule::initialize()
   //EPICS PVs for HLT
   addDeltaPar("timing_statistics", "processingTimeHistogram", HistDelta::c_Events, 10000, 1);
   addDeltaPar("timing_statistics", "processesPerUnitHistogram", HistDelta::c_Events, 10000, 1);
-  registerEpicsPV("B2_nsm:get:ECL_LUM_MON:lum_det_run", "instLuminosity");
-  registerEpicsPV("B2_nsm:get:TTDS_COM:trigoutrate", "L1Rate");
+  registerExternalEpicsPV("B2_nsm:get:ECL_LUM_MON:lum_det_run", "instLuminosity");
+  registerExternalEpicsPV("B2_nsm:get:TTDS_COM:trigoutrate", "L1Rate");
   registerEpicsPV("HLT:ProcessingTime", "ProcessingTime");
   registerEpicsPV("HLT:BudgetTime", "BudgetTime");
   registerEpicsPV("HLT:CPUUsage", "CPUUsage");

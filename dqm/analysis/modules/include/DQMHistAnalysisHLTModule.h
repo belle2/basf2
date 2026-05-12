@@ -14,10 +14,6 @@
 #include <map>
 #include <string>
 
-
-#include "cadef.h"
-#endif
-
 namespace Belle2 {
   /**
    * Class for HLT-related histogram analysis.
@@ -84,4 +80,4 @@ namespace Belle2 {
     /// Histogram with mean memory change per process
     std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
   };
-} // end namespace Belle2
+}

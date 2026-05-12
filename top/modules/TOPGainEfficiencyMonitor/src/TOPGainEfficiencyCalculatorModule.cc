@@ -57,26 +57,25 @@ namespace Belle2 {
     addParam("threshold", m_threshold,
              "pulse height (or integrated charge) threshold in fitting its distribution and calculating efficiency", (float)100.);
     addParam("p0HeightIntegral", m_p0HeightIntegral,
-             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float) - 50.0);
+             "Parameter from p0 + x*p1 function fitting height-integral distribution.", (float) - 50.0);
     addParam("p1HeightIntegral", m_p1HeightIntegral,
-             "Parameter from p0 + x*p1 function fitting height-integral distribtion.", (float)6.0);
+             "Parameter from p0 + x*p1 function fitting height-integral distribution.", (float)6.0);
     addParam("fracFit", m_fracFit, "fraction of events to be used in fitting. "
              "An upper limit of a fit range is given to cover this fraction of events. "
              "Set negative value to calculate the fraction to exclude only 10 events in tail.", (float)(-1)); //,(float)0.99);
     addParam("initialP0", m_initialP0, "initial value of the fit parameter p0 divided by histogram entries."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(0.0001)); //,(float)1e-6);
+             "Set negative value to calculate from histogram information automatically.", (float)(0.0001)); //,(float)1e-6);
     addParam("initialP1", m_initialP1, "initial value of the fit parameter p1."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+             "Set negative value to calculate from histogram information automatically.", (float)(1.0)); //,(float)1.0);
     addParam("initialP2", m_initialP2, "initial value of the fit parameter p2."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(1.0)); //,(float)1.0);
+             "Set negative value to calculate from histogram information automatically.", (float)(1.0)); //,(float)1.0);
     addParam("initialX0", m_initialX0, "initial value of the fit parameter x0 divided by histogram bin width."
-             "Set negative value to calculate from histogram inforamtion automatically.", (float)(100)); //, (float)100.);
+             "Set negative value to calculate from histogram information automatically.", (float)(100)); //, (float)100.);
     addParam("pedestalSigma", m_pedestalSigma, "sigma of pedestal width", (float)10.);
     addParam("fitoption", m_fitoption, "fit option likelihood: default chisquare: R", std::string("L"));
 
   }
 
-  TOPGainEfficiencyCalculatorModule::~TOPGainEfficiencyCalculatorModule() {}
 
   void TOPGainEfficiencyCalculatorModule::initialize()
   {
@@ -153,19 +152,6 @@ namespace Belle2 {
 
   }
 
-  void TOPGainEfficiencyCalculatorModule::beginRun()
-  {
-  }
-
-  void TOPGainEfficiencyCalculatorModule::event()
-  {
-  }
-
-  void TOPGainEfficiencyCalculatorModule::endRun()
-  {
-  }
-
-
   void TOPGainEfficiencyCalculatorModule::terminate()
   {
     //first, check validity of input parameters
@@ -231,7 +217,7 @@ namespace Belle2 {
       hname << "hTime" << pixelstr.str();
 
       //first get 2D histogram from a given input (=an output file of TOPLaserHitSelector)
-      m_timeChargeHistogram[iHisto] = (TH2F*)f->Get(hname.str().c_str());
+      m_timeChargeHistogram[iHisto] = static_cast<TH2F*>(f->Get(hname.str().c_str()));
       TH2F* h2D = m_timeChargeHistogram[iHisto];
       if (!h2D) continue;
 
@@ -239,7 +225,7 @@ namespace Belle2 {
       std::ostringstream hnameProj[2];
       hnameProj[0] << "hTime_" << pixelstr.str();
       hnameProj[1] << "hCharge_" << pixelstr.str();
-      TH1D* hTime = (TH1D*)h2D->ProjectionX(hnameProj[0].str().c_str());
+      TH1D* hTime = static_cast<TH1D*>(h2D->ProjectionX(hnameProj[0].str().c_str()));
       m_timeHistogram[iHisto] = hTime;
       double peakTime = FindPeakForSmallerXThan(hTime, 0);
       //double peakTime = hTime->GetXaxis()->GetBinCenter(hTime->GetMaximumBin());
@@ -257,12 +243,11 @@ namespace Belle2 {
       m_hitTiming = funcLaser->GetParameter(1);
       int binNumMin = hTime->GetXaxis()->FindBin(m_hitTiming - 2 * m_fitHalfWidth);
       int binNumMax = hTime->GetXaxis()->FindBin(m_hitTiming + 2 * m_fitHalfWidth);
-      TH1D* hCharge = (TH1D*)h2D->ProjectionY(hnameProj[1].str().c_str(),
-                                              binNumMin, binNumMax);
+      TH1D* hCharge = static_cast<TH1D*>(h2D->ProjectionY(hnameProj[1].str().c_str(), binNumMin, binNumMax));
       m_chargeHistogram[iHisto] = hCharge;
     }
 
-    m_nCalPulseHistogram = (TH1F*)f->Get("hNCalPulse");
+    m_nCalPulseHistogram = static_cast<TH1F*>(f->Get("hNCalPulse"));
     if (!m_nCalPulseHistogram)
       B2WARNING("TOPGainEfficiencyCalculator : no histogram for the number of events with calibration pulses identified in the given input file");
     m_thresholdForIntegral = m_threshold * m_p1HeightIntegral + m_p0HeightIntegral;
@@ -588,7 +573,7 @@ namespace Belle2 {
           }
 
           if (nEntries > 1) {
-            B2WARNING("TOPGainEfficiencyCalculator : mutliple entries with the same channel ID ("
+            B2WARNING("TOPGainEfficiencyCalculator : multiple entries with the same channel ID ("
                       << m_pmtChId << ") in the output TTree");
           }
         }
@@ -597,6 +582,7 @@ namespace Belle2 {
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
         canvas->Print(pdfFilename.str().c_str());
     }
+    /* not clear what is to be done here (loop condition is always false)... commented out
     for (int iHisto = (c_NChannelPerPMT - 1) % c_NChannelPerPage + 1 ; iHisto < c_NChannelPerPage ; iHisto++) {
       for (int iPad = 0 ; iPad < c_NPlotsPerChannel ; iPad++) {
         canvas->cd(c_NPlotsPerChannel * (iHisto % c_NChannelPerPage) + iPad + 1);
@@ -606,7 +592,7 @@ namespace Belle2 {
       if (((iHisto + 1) % c_NChannelPerPage) == 0)
         canvas->Print(pdfFilename.str().c_str());
     }
-
+    */
     canvas->Print((pdfFilename.str() + "]").c_str());
 
     delete latex;
@@ -618,6 +604,7 @@ namespace Belle2 {
     return;
   }
 
+  //cppcheck-suppress constParameterCallback
   double TOPGainEfficiencyCalculatorModule::TOPGainFunc(double* var, double* par)
   {
 

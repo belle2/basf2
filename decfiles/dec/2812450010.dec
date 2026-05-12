@@ -1,0 +1,47 @@
+# EventType: 2812450010
+# Descriptor: [e+ e- -> J/psi [-> mu+ mu-] X->[D*+ D*-]->[D0 pi+]->[D0->K- K+]]
+# NickName: ee_Jpsi_DstDstmumu_D02KK
+# Documentation: Double charmonium production.
+# Tested:Yes 
+# PhysicsWG: Quarkonium
+# Responsible: Jiyuan Zhang
+# Email: jiyuanzhang24@m.fudan.edu.cn
+# Cuts: None
+# Date: 20260128
+
+Alias Myjpsi J/psi
+Alias myD*+ D*+
+Alias myD*- D*-
+
+Alias myD0  D0
+Alias myantiD0  anti-D0
+
+ChargeConj myD*+ myD*-
+ChargeConj myD0 myantiD0
+
+
+Decay vpho
+1.00  Myjpsi  X4160    PHSP;
+Enddecay
+
+Decay X4160
+0.5 myD*+ D*-    PHSP;
+0.5 D*+ myD*-    PHSP;
+Enddecay
+
+Decay Myjpsi
+1.00   mu+ mu-            PHOTOS VLL;
+Enddecay
+
+Decay myD*+
+1.00  myD0  pi+          PHOTOS PHSP;
+Enddecay
+CDecay myD*-
+
+Decay myD0
+1.00    K-  K+            PHSP;
+Enddecay
+CDecay myantiD0
+
+End
+

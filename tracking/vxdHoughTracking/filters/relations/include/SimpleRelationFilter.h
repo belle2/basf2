@@ -8,16 +8,16 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/relations/BaseRelationFilter.h>
-#include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
+    class VXDHoughState;
 
     /// Filter for relations based on the polar angle difference.
     class SimpleRelationFilter : public BaseRelationFilter {
     public:
       /// Return the weight based on azimuthal-angle separation
-      TrackFindingCDC::Weight operator()(const std::pair<const VXDHoughState*, const VXDHoughState*>& relation) override;
+      TrackingUtilities::Weight operator()(const std::pair<const VXDHoughState*, const VXDHoughState*>& relation) override;
       /// Expose the parameters.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

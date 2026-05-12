@@ -34,11 +34,11 @@ namespace Belle2::Conditions {
       if (m_globaltagStatus.execute(globaltag).step()) {
         return m_globaltagStatus.getRow();
       }
-      B2ERROR("Local Database: Global tag does not exist"
-              << LogVar("database", m_filename) << LogVar("globaltag", globaltag));
+      B2WARNING("Local Database: Global tag does not exist"
+                << LogVar("database", m_filename) << LogVar("globaltag", globaltag));
     } catch (std::exception& e) {
-      B2ERROR("Local Database: Error checking globaltag"
-              << LogVar("database", m_filename) << LogVar("globaltag", globaltag) << LogVar("error", e.what()));
+      B2WARNING("Local Database: Error checking globaltag"
+                << LogVar("database", m_filename) << LogVar("globaltag", globaltag) << LogVar("error", e.what()));
     }
     return "";
   }
@@ -50,8 +50,9 @@ namespace Belle2::Conditions {
         addPayload(std::move(row), "Local Database");
       }
     } catch (std::exception& e) {
-      B2ERROR("Local Database: Error obtaining payloads"
-              << LogVar("database", m_filename) << LogVar("globaltag", globaltag) << LogVar("error", e.what()));
+      B2WARNING("Local Database: Problem while fetching the list of payloads."
+                << LogVar("database", m_filename) << LogVar("globaltag", globaltag) << LogVar("experiment", exp) << LogVar("run",
+                    run) << LogVar("error", e.what()));
       return false;
     }
     return true;

@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF SVD states
   template <class AFilter, class APrefilter = AFilter>
-  class LayerSVDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToSVDState> {
+  class LayerSVDRelationFilter : public TrackingUtilities::RelationFilter<CKFToSVDState> {
     /// The parent class
-    using Super = TrackFindingCDC::RelationFilter<CKFToSVDState>;
+    using Super = TrackingUtilities::RelationFilter<CKFToSVDState>;
 
   public:
     using Super::operator();
@@ -35,7 +35,7 @@ namespace Belle2 {
 
 
     /// Give a final weight to the possibilities by asking the filter.
-    TrackFindingCDC::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) final;
+    TrackingUtilities::Weight operator()(const CKFToSVDState& from, const CKFToSVDState& to) final;
 
     /// Initialize the maximal ladder cache
     void beginRun() final;

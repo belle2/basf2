@@ -8,7 +8,6 @@
 
 #pragma once
 #include <framework/datastore/RelationsObject.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
 
@@ -23,7 +22,6 @@
 namespace Belle2 {
 
   // forward declarations
-  class Particle;
   class ECLCluster;
   class KLMCluster;
   class Track;

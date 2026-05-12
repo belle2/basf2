@@ -7,11 +7,11 @@
  **************************************************************************/
 #include <tracking/modules/cosmicsTrackMerger/CosmicsTrackMergerFindlet.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CosmicsTrackMergerFindlet::CosmicsTrackMergerFindlet()
 {

@@ -996,27 +996,21 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2INFO("Number entries = " << numEntries);
     double database_mean_crate = 0;
     double database_mean_crate_unc = 0;
+    tcrate_new_was_set[crate_id - 1] = false;
+    tcrate_new_goodQuality[crate_id - 1] = false;
     if ((numEntries >= minNumEntries)  &&  good_fit) {
       database_mean_crate = fit_mean_crate;
       database_mean_crate_unc = fit_mean_crate_unc;
+      tcrate_new_was_set[crate_id - 1] = true;
 
       if ((numEntries >= minNumEntriesCrateConvergence)  && (fit_mean_crate_unc < 0.1)) {
         tcrate_new_goodQuality[crate_id - 1] = true;
       }
-    } else {
-      database_mean_crate = default_mean_crate;
-      database_mean_crate_unc = default_mean_crate_unc;
-    }
-    if (numEntries == 0) {
-      database_mean_crate = 0;
-      database_mean_crate_unc = 0;
     }
 
     tcrate_mean_new[crate_id - 1] = database_mean_crate;
     tcrate_mean_unc_new[crate_id - 1] = database_mean_crate_unc;
     tcrate_sigma_new[crate_id - 1] = fit_sigma_crate;
-    tcrate_new_was_set[crate_id - 1] = true;
-
 
     histfile->WriteTObject(h_time_crate, (string("h_time_psi_crate") + to_string(crate_id)).c_str());
     histfile->WriteTObject(h_time_crate_masked, (string("h_time_psi_crate_masked") + to_string(crate_id)).c_str());

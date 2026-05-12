@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/Particle.h>
 
 using namespace std;
 using namespace Belle2;

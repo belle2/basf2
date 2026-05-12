@@ -64,6 +64,10 @@ namespace Belle2 {
      * in an attempt to provide more robust estimate.
      */
     double m_pedwidth_max[4] = {};
+    /** Average pedestal width array
+     * See m_pedwidth_max for the details.
+     */
+    double m_pedwidth_avg[4] = {};
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
     TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */

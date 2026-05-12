@@ -19,6 +19,7 @@
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMEventT0HitResolution.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -81,7 +82,7 @@ void KLMCalibrationChecker::resetDatabase()
 {
   /* Reset both DataStore and Database. */
   DataStore::Instance().reset();
-  Database::Instance().reset(false);
+  Database::Instance().reset(true); // keep the configuration
   DBStore::Instance().reset(false);
 }
 
@@ -566,6 +567,48 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Write();
   delete constantsTree;
   delete timeConstantsResults;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
+}
+
+void KLMCalibrationChecker::checkEventT0HitResolution()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<KLMEventT0HitResolution> eventT0HitResolution;
+  if (!eventT0HitResolution.isValid())
+    B2FATAL("EventT0 Hit Resolution data are not valid.");
+  if (m_GlobalTagName != "")
+    printPayloadInformation(eventT0HitResolution);
+  /* Create tree with EventT0 hit resolution (one row per detector category). */
+  int category;
+  float sigma, sigmaErr;
+  TFile* eventT0HitResolutionResults =
+    new TFile(m_EventT0HitResolutionResultsFile.c_str(), "recreate");
+  TTree* resolutionTree = new TTree("eventT0HitResolution", "KLM EventT0 hit resolution data");
+  resolutionTree->Branch("experiment", &m_experiment, "experiment/I");
+  resolutionTree->Branch("run", &m_run, "run/I");
+  resolutionTree->Branch("category", &category, "category/I");
+  resolutionTree->Branch("sigma", &sigma, "sigma/F");
+  resolutionTree->Branch("sigmaErr", &sigmaErr, "sigmaErr/F");
+  /* Category order must match KLMEventT0HitResolution::Category enum. */
+  const int categories[5] = {
+    KLMEventT0HitResolution::c_EKLMScint,
+    KLMEventT0HitResolution::c_BKLMScint,
+    KLMEventT0HitResolution::c_RPC,
+    KLMEventT0HitResolution::c_RPCPhi,
+    KLMEventT0HitResolution::c_RPCZ,
+  };
+  for (int cat : categories) {
+    category = cat;
+    sigma = eventT0HitResolution->getSigma(cat);
+    sigmaErr = eventT0HitResolution->getSigmaErr(cat);
+    resolutionTree->Fill();
+  }
+  resolutionTree->Write();
+  delete resolutionTree;
+  delete eventT0HitResolutionResults;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
   resetDatabase();
 }

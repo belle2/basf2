@@ -17,7 +17,6 @@
 #include <TMath.h>
 #include <TStyle.h>
 
-#include <algorithm>
 #include <fstream>
 
 using namespace Belle2;

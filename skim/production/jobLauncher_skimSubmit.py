@@ -62,7 +62,7 @@ parser.add_argument('-samples',
                     '--samples',
                     type=str,
                     default='',
-                    help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+                    help="The yaml file (with full path) to be used in ``b2skim-stats-submit``.\
                     If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
                     i.e. ``/group/belle2/dataprod/MC/SkimTraining/SampleLists/TestFiles.yaml`` on KEKCC.")
 
@@ -222,7 +222,7 @@ if args.json:  # step5 - basf2, loop on skim, one command for data and one for M
         HLTstring = info_dict[skim]['HLT']
         MCTypeString = info_dict[skim]['MCType']
 
-        command = f'python3 skimSubmit.py --json --skims {skim} {flaggedString}  ' \
+        command = f'python3 skimSubmit.py --json --skims {skim} {flaggedString} ' \
             f'--infoYaml {args.info} --base_dir {args.base_dir} --release {args.release}'
 
         if args.data:

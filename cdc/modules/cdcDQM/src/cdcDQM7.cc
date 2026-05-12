@@ -11,8 +11,6 @@
 #include <framework/core/HistoModule.h>
 
 // framework aux
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <TDirectory.h>

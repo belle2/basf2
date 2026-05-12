@@ -7,12 +7,15 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdReconstruction/PXDClusterizerModule.h>
+#include <pxd/dbobjects/PXDClusterPositionErrorPar.h>
+#include <pxd/reconstruction/ClusterCache.h>
+#include <pxd/reconstruction/ClusterProjection.h>
 
-#include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 
+#include <vxd/dataobjects/VxdID.h>
 #include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>

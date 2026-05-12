@@ -7,13 +7,13 @@
  **************************************************************************/
 #include <tracking/datcon/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/entities/DATCONSVDDigit.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SVDShaperDigitConverter::SVDShaperDigitConverter() : Super()
 {
@@ -23,7 +23,7 @@ void SVDShaperDigitConverter::exposeParameters(ModuleParamList* moduleParamList,
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storeSVDShaperDigitsName"), m_param_storeSVDShaperDigitsName,
+  moduleParamList->addParameter(prefixed(prefix, "storeSVDShaperDigitsName"), m_param_storeSVDShaperDigitsName,
                                 "StoreArray name of the SVDShaperDigits StoreArray.", m_param_storeSVDShaperDigitsName);
 }
 

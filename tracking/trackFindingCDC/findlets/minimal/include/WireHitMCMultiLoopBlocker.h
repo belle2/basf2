@@ -7,16 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 #include <cmath>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCWireHit;
+  }
 
   namespace TrackFindingCDC {
-    class CDCWireHit;
 
     /**
      *  Marks all hits that are not on the first loop of the track as background.
@@ -27,11 +29,11 @@ namespace Belle2 {
      *  It is however useful to validated fitting procedures and to bias multivariate to
      *  favor the first loops and do not apply a penalty for uncovered higher order loops
      */
-    class WireHitMCMultiLoopBlocker : public Findlet<CDCWireHit&> {
+    class WireHitMCMultiLoopBlocker : public TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCWireHit&>;
 
     public:
       /// Short description of the findlet
@@ -47,7 +49,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Main algorithm marking the hit of higher loops as background.
-      void apply(std::vector<CDCWireHit>& wireHits) final;
+      void apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
 
     private:
       /// Parameter : Maximal fraction of loops of the mc particles trajectory needs to the hit to unblock it.

@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/svd/entities/CKFToSVDState.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,12 +25,12 @@ namespace Belle2 {
    *
    * So if one travels the path of the relations, one would perfectly travel the path of one SVD track.
    */
-  class RelationFromSVDTracksCreator : public TrackFindingCDC::Findlet<CKFToSVDState, CKFToSVDState,
-    TrackFindingCDC::WeightedRelation<CKFToSVDState>> {
+  class RelationFromSVDTracksCreator : public TrackingUtilities::Findlet<CKFToSVDState, CKFToSVDState,
+    TrackingUtilities::WeightedRelation<CKFToSVDState>> {
   public:
     /// The parent findlet
-    using Super = TrackFindingCDC::Findlet<CKFToSVDState, CKFToSVDState,
-          TrackFindingCDC::WeightedRelation<CKFToSVDState>>;
+    using Super = TrackingUtilities::Findlet<CKFToSVDState, CKFToSVDState,
+          TrackingUtilities::WeightedRelation<CKFToSVDState>>;
 
     /// Construct this findlet and add the subfindlet as listener
     RelationFromSVDTracksCreator();
@@ -46,7 +46,7 @@ namespace Belle2 {
 
     /// Create relations between seeds and hits or hits and hits
     void apply(std::vector<CKFToSVDState>& seedStates, std::vector<CKFToSVDState>& states,
-               std::vector<TrackFindingCDC::WeightedRelation<CKFToSVDState>>& relations) final;
+               std::vector<TrackingUtilities::WeightedRelation<CKFToSVDState>>& relations) final;
 
   private:
     // Parameters

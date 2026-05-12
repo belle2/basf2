@@ -81,6 +81,3 @@ ma.variablesToNtuple('B0:scaled', B0_vars,
 
 # process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

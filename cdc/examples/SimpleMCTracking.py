@@ -142,5 +142,5 @@ main.add_module(buildtrack)
 main.add_module(output)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

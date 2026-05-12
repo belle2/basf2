@@ -10,11 +10,9 @@
 #include <analysis/VariableManager/Manager.h>
 
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
 
 #include "utilities/TestParticleFactory.h"
 using namespace std;
@@ -26,27 +24,19 @@ namespace {
 
   class InclusiveVariablesTest : public ::testing::Test {
   protected:
-    /** register Particle array + ParticleExtraInfoMap object. */
+    /** register Particle array. */
     void SetUp() override
     {
 
       DataStore::Instance().setInitializeActive(true);
       StoreArray<ECLCluster> myECLClusters;
-      StoreArray<KLMCluster> myKLMClusters;
       StoreArray<TrackFitResult> myTFRs;
       StoreArray<Track> myTracks;
       StoreArray<Particle> myParticles;
-      StoreArray<RestOfEvent> myROEs;
-      StoreArray<PIDLikelihood> myPIDLikelihoods;
       myECLClusters.registerInDataStore();
-      myKLMClusters.registerInDataStore();
       myTFRs.registerInDataStore();
       myTracks.registerInDataStore();
       myParticles.registerInDataStore();
-      myROEs.registerInDataStore();
-      myPIDLikelihoods.registerInDataStore();
-      myParticles.registerRelationTo(myROEs);
-      myTracks.registerRelationTo(myPIDLikelihoods);
       DataStore::Instance().setInitializeActive(false);
 
       TestUtilities::TestParticleFactory factory;

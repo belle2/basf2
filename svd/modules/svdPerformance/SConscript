@@ -5,6 +5,8 @@ env['LIBS'] = [
     'framework',
     'tracking_dataobjects',
     'mdst_dataobjects',
+    'analysis',
+    'analysis_dataobjects',
     'vxd',	
     'svd',	
     'svd_dataobjects',
@@ -15,5 +17,6 @@ env['LIBS'] = [
     'hlt',
     'hlt_dataobjects',
     'trg_ecl_dataobjects',
+    'reconstruction_persistenceManager'
     ]
 Return('env')

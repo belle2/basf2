@@ -41,7 +41,7 @@ main.add_module('SmearPrimaryVertex')
 main.add_module('Progress')
 main.add_module('PrintMCParticles', showStatus=True, showMomenta=True)
 main.add_module('RootOutput')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)
 
 # remove the files produced by WHIZARD (if necessary)

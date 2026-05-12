@@ -56,7 +56,7 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   protected:
-    //number of skims
+    //! number of skims
     static const int nskim_gdldqm = 11;
     int start_skim_gdldqm = 0;
     int end_skim_gdldqm = 0;
@@ -119,9 +119,9 @@ namespace Belle2 {
     std::vector<int> h_0_vec;
     ////! event by event psnm timing distribution
     std::vector<int> h_p_vec;
-    ////! event by event ftdl timing distribution
+    /// event by event ftdl timing distribution
     std::vector<int> h_f_vec;
-    ////! event by event input timing distribution
+    /// event by event input timing distribution
     std::vector<int> h_i_vec;
 
     TDirectory* oldDir = nullptr;
@@ -158,10 +158,10 @@ namespace Belle2 {
     static const char* output_overlap[n_output_overlap];
     static const int n_output_pure_extra = 13;
     static const char* output_pure_extra[n_output_pure_extra];
-    static const int nsample_fast = 500; //number of sample for fast efficiency monitor
-    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //array to store past nsample events
+    static const int nsample_fast = 500; //!< number of sample for fast efficiency monitor
+    int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //!< array to store past nsample events
 
-    //condition database for unpacker
+    //! condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;
     int LeafBitMap[320] = {0};
     char LeafNames[320][100] = {{0}};
@@ -183,18 +183,18 @@ namespace Belle2 {
     int nword_input  = 0;
     int nword_output = 0;
 
-    //condition database for input bits
+    //! condition database for input bits
     DBObjPtr<TRGGDLDBInputBits>m_dbinput;
     unsigned  n_inbit = 0;
     char inbitname[320][100] = {""};
 
-    //condition database for output bits
+    //! condition database for output bits
     DBObjPtr<TRGGDLDBFTDLBits> m_dbftdl;
     unsigned  n_outbit = 0;
     char outbitname[320][100]  = {""};
 
 
-    //name of skim from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
+    //! name of skim from hlt/softwaretrigger/scripts/softwaretrigger/db_access.py
     std::string skim_menu[nskim_gdldqm] = {
       "all",
       "software_trigger_cut&skim&accept_hadron",
@@ -209,7 +209,7 @@ namespace Belle2 {
       "software_trigger_cut&skim&accept_mumutight"
     };
 
-    //name of histograms
+    //! name of histograms
     std::string skim_smap[nskim_gdldqm] = {
       "all",
       "hadron",
@@ -226,19 +226,19 @@ namespace Belle2 {
 
   private:
 
-    //ecltrg<->ecl mappint
+    //! ecltrg<->ecl mappint
     TrgEclMapping* trgeclmap = nullptr;
 
-    //Input store array of GDL data
+    //! Input store array of GDL data
     StoreArray<TRGGDLUnpackerStore> entAry;
 
-    //Input store array of metadata
+    //! Input store array of metadata
     StoreObjPtr<EventMetaData> bevt;
 
-    //Input store array of HLT
+    //! Input store array of HLT
     StoreObjPtr<SoftwareTriggerResult> result_soft;
 
-    //Input store array of track
+    //! Input store array of track
     StoreArray<Track> Tracks;
 
     //Input store array of ECL

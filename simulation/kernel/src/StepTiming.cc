@@ -9,6 +9,8 @@
 #include <simulation/kernel/StepTiming.h>
 #include <framework/utilities/Utils.h>
 #include <G4SteppingManager.hh>
+#include <G4LogicalVolume.hh>
+#include <G4Track.hh>
 
 namespace Belle2 {
   namespace Simulation {

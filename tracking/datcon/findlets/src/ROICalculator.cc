@@ -8,7 +8,7 @@
 #include <tracking/datcon/findlets/ROICalculator.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -16,7 +16,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 ROICalculator::ROICalculator() : Super()
 {
@@ -26,19 +26,19 @@ void ROICalculator::exposeParameters(ModuleParamList* moduleParamList, const std
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ROIsStoreArrayName"), m_param_ROIsStoreArrayName,
+  moduleParamList->addParameter(prefixed(prefix, "ROIsStoreArrayName"), m_param_ROIsStoreArrayName,
                                 "Name of the ROIs StoreArray?", m_param_ROIsStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL1"), m_param_uROIsizeL1,
+  moduleParamList->addParameter(prefixed(prefix, "uROIsizeL1"), m_param_uROIsizeL1,
                                 "u direction ROI size on L1. Data type: short", m_param_uROIsizeL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "uROIsizeL2"), m_param_uROIsizeL2,
+  moduleParamList->addParameter(prefixed(prefix, "uROIsizeL2"), m_param_uROIsizeL2,
                                 "u direction ROI size on L2. Data type: short", m_param_uROIsizeL2);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL1"), m_param_vROIsizeL1,
+  moduleParamList->addParameter(prefixed(prefix, "vROIsizeL1"), m_param_vROIsizeL1,
                                 "v direction ROI size on L1. Data type: short", m_param_vROIsizeL1);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vROIsizeL2"), m_param_vROIsizeL2,
+  moduleParamList->addParameter(prefixed(prefix, "vROIsizeL2"), m_param_vROIsizeL2,
                                 "v direction ROI size on L2. Data type: short", m_param_vROIsizeL2);
 
 }

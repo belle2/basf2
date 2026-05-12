@@ -11,12 +11,12 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <TH2F.h>
 #include <string>
 
 namespace Belle2 {
+  class EventLevelTriggerTimeInfo;
+  class PXDDAQStatus;
 
   namespace PXD {
     /** The PXD Gatint after Injection DQM module.

@@ -83,22 +83,23 @@ ma.buildRestOfEvent(target_list_name='B0',
 #        Each payload is optimized for different soft-photon selection criteria.
 #        If one wants to use one's own payload and soft-photon criteria, please use arguments,
 #        pi0PayloadNameOverride, pi0SoftPhotonCutOverride, etaPayloadNameOverride, etaSoftPhotonCutOverride,
-mode = 'standard'
-threshold = 0.30
-suffix = '30'
+modePi0EtaVeto = 'standardMC16rd'
 ma.writePi0EtaVeto(particleList='B0',
                    decayString='B0 -> rho0 ^gamma',
-                   mode=mode,
+                   mode=modePi0EtaVeto,
                    path=my_path)
 
 # Perform addPi0VetoEfficiencySystematics
 # Data/MC ratio will be provided as extraInfo related with particleList for a given threshold.
+mode = 'standard'
 tableName = 'Pi0VetoEfficiencySystematics_Mar2022'
+threshold = 0.30
+suffix = '30'
 ma.addPi0VetoEfficiencySystematics(particleList='B0',
                                    decayString='B0 -> rho0 ^gamma',
                                    tableName=tableName,
                                    threshold=threshold,
-                                   mode=mode,
+                                   mode='standard',
                                    suffix=suffix,
                                    path=my_path)
 
@@ -235,7 +236,7 @@ b_vars = vc.kinematics + \
                                    decay_string='B0 -> ^rho0 gamma') + \
     vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
-    ['pi0Prob(standard)', 'etaProb(standard)', 'extraInfo(pi0veto)'] + \
+    [f'pi0Prob({modePi0EtaVeto})', f'etaProb({modePi0EtaVeto})', 'extraInfo(pi0veto)'] + \
     [f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio)',
      f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat)',
      f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys)',
@@ -252,7 +253,4 @@ ma.variablesToNtuple(decayString='B0',
                      path=my_path)
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

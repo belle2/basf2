@@ -436,7 +436,7 @@ main.add_module(CosmicAnalysis)
 progress = b2.register_module('ProgressBar')
 main.add_module(progress)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

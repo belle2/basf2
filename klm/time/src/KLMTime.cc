@@ -59,8 +59,20 @@ std::pair<int, double> KLMTime::getRPCTimes(int ctime, int tdc, int triggerTime)
     relativeTime -= trigger;
   else
     relativeTime -= trigger + 0x800;
-  return std::pair<int, double>(ctime - triggerTime,
-                                relativeTime * m_TDCPeriod);
+
+  /* DC Arrival Time calculation  for RPC hits*/
+  const int halfFRAME = FRAME9_MAX / 2;  /* Threshold for overflow detection */
+
+  int relativeDCTime = ctime - triggerTime;
+
+  /* Apply overflow correction */
+  int revo9DCArrivalTime;
+  if (relativeDCTime > 0 && relativeDCTime > halfFRAME) {
+    revo9DCArrivalTime = relativeDCTime - FRAME9_MAX;
+  } else {
+    revo9DCArrivalTime = relativeDCTime;
+  }
+  return std::pair<int, double>(revo9DCArrivalTime, relativeTime * m_TDCPeriod);
 }
 
 double KLMTime::getTimeSimulation(int tdc, bool scintillator) const

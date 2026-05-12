@@ -29,6 +29,7 @@ namespace Belle2 {
     void FastRaytracer::propagate(const PhotonState& photon, bool averaging) const
     {
       clear();
+      m_photonStates.reserve(m_bars.size() * 2 + 2);
       m_photonStates.push_back(photon);
 
       int nbars = m_bars.size();

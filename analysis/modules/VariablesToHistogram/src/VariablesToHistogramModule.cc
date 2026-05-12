@@ -10,9 +10,9 @@
 
 // analysis
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Manager.h>
 
 // framework
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/ModuleParam.templateDetails.h>

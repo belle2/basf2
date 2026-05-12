@@ -264,12 +264,9 @@ if __name__ == "__main__":
         "Upsilon(4S):graFEI",
         sorted(graFEI_vars),
         filename="graFEI_BReco_example.root",
-        treename="tree",
+        treename="U4S",
         path=path,
     )
 
     # Process
-    b2.process(path)
-
-    # print out the summary
-    print(b2.statistics)
+    b2.process(path, calculateStatistics=True)

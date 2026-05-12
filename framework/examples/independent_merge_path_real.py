@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond
-
 import basf2
 
 main = basf2.Path()
@@ -51,8 +49,6 @@ main.add_module(output)
 main.add_module('Progress')
 
 basf2.print_path(main)
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 print(basf2.statistics)
-
-# @endcond

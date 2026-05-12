@@ -44,7 +44,7 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
   addParam("timeCut", m_timeCut,
            "cut range of hittiming for chargeshare flag [ns]", (float) 1);
   addParam("preValleyDepthLoose", m_preValleyDepthLoose,
-           "loose threshold for depth of pre valley [ADC counts], for corss talk identification", 20);
+           "loose threshold for depth of pre valley [ADC counts], for cross talk identification", 20);
   addParam("preValleyDepthTight", m_preValleyDepthTight,
            "tight threshold for depth of pre valley [ADC counts], identified as cross talk with loose threshold for the second peak amplitude",
            50);
@@ -62,7 +62,6 @@ TOPXTalkChargeShareSetterModule::TOPXTalkChargeShareSetterModule() : Module()
 
 }
 
-TOPXTalkChargeShareSetterModule::~TOPXTalkChargeShareSetterModule() {}
 
 void TOPXTalkChargeShareSetterModule::initialize()
 {
@@ -73,9 +72,6 @@ void TOPXTalkChargeShareSetterModule::initialize()
   if (m_2ndPeakAmplitudeLoose < 0 || m_2ndPeakAmplitudeRatioTight < 0 || m_nSampleAfter < 0) m_checkPostValleyForXTalkId = false;
 }
 
-void TOPXTalkChargeShareSetterModule::beginRun()
-{
-}
 
 void TOPXTalkChargeShareSetterModule::event()
 {
@@ -95,7 +91,7 @@ void TOPXTalkChargeShareSetterModule::event()
     if (waveform and isCrossTalk(waveform->getWaveform(), TMath::FloorNint(digit.getRawTime()), digit.getPulseHeight()))
       digit.setHitQuality(TOPDigit::c_CrossTalk);
     else {
-      //identify a ringing which follows a cross talk hit in the same channle as cross talk
+      //identify a ringing which follows a cross talk hit in the same channel as cross talk
       int slotId = digit.getModuleID();
       unsigned int channelId = digit.getChannel();
       double rawTime = digit.getRawTime();
@@ -114,9 +110,6 @@ void TOPXTalkChargeShareSetterModule::event()
     hitInfoMap[globalPixelId] = &digit;
   }//for(digit)
 
-
-
-
   for (auto& digit : digits) {
 
     if (digit.getHitQuality() == TOPDigit::c_Junk
@@ -130,9 +123,9 @@ void TOPXTalkChargeShareSetterModule::event()
     bool isPrimaryChargeShare = true;
     std::vector<TOPDigit*> vSecondaryCandidates;
 
-    int adjacentPixelIds[] = { pixelId - 1 - c_NPixelsPerRow, pixelId - c_NPixelsPerRow, pixelId + 1 - c_NPixelsPerRow, pixelId + 1,
-                               pixelId + 1 + c_NPixelsPerRow, pixelId + c_NPixelsPerRow, pixelId - 1 + c_NPixelsPerRow, pixelId - 1
-                             };
+    const int adjacentPixelIds[] = { pixelId - 1 - c_NPixelsPerRow, pixelId - c_NPixelsPerRow, pixelId + 1 - c_NPixelsPerRow, pixelId + 1,
+                                     pixelId + 1 + c_NPixelsPerRow, pixelId + c_NPixelsPerRow, pixelId - 1 + c_NPixelsPerRow, pixelId - 1
+                                   };
 
     for (const auto& adjacentPixelId : adjacentPixelIds) {
       if (adjacentPixelId > 0 && adjacentPixelId <= 512) {
@@ -176,16 +169,8 @@ void TOPXTalkChargeShareSetterModule::event()
   }//for(digits)
 }//event()
 
-void TOPXTalkChargeShareSetterModule::endRun()
-{
-}
 
-void TOPXTalkChargeShareSetterModule::terminate()
-{
-}
-
-
-bool TOPXTalkChargeShareSetterModule::isCrossTalk(std::vector<short> wfm, int iRawTime, short height)
+bool TOPXTalkChargeShareSetterModule::isCrossTalk(const std::vector<short>& wfm, int iRawTime, short height)
 {
 
   int nWfmSampling = wfm.size();

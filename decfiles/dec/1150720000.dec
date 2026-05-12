@@ -17,8 +17,8 @@ Enddecay
 #
 
 Decay B0sig
-0.5 pi-     e+      nu_e            PHOTOS  BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
-0.5 pi-     mu+     nu_mu           PHOTOS  BCL 0.419 -0.495 -0.43 0.22 0.510 -1.700 1.53 4.52; #[FF values from HFLAV 2016]
+0.5 pi-     e+      nu_e            PHOTOS  BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[FF values from HFLAV 2023]
+0.5 pi-     mu+     nu_mu           PHOTOS  BCL 0.424 -0.484 -0.658 0 0.561 -1.393 0.763 0; #[FF values from HFLAV 2023]
 Enddecay
 
 CDecay anti-B0sig

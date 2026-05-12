@@ -22,8 +22,8 @@ settings = ValidationSettings(name='CDC Tracking',
                               expert_config={'file_extension': 'png',
                                              'algo_tz': 'tz2',
                                              'algo_tw': 'tw0',
-                                             'algo_sr': 'sr0',
-                                             'algo_xt': 'xt0'})
+                                             'algo_sr': 'sr_tz1',
+                                             'algo_xt': 'xt1'})
 
 
 def findLastIteration(job_path, algorithm):

@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 <header>
     <input>PhokharaEvtgenAnalysis.root</input>
@@ -10,8 +18,6 @@
 
 import ROOT
 import math
-
-#: \cond Doxygen_suppress
 
 nbins_ratio = 91
 emin_ratio = 6.05
@@ -250,8 +256,6 @@ functions.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
 functions.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
 functions.Add(ROOT.TNamed('Contact', contact))
 functions.Add(ROOT.TNamed('MetaOptions', 'shifter'))
-
-#: \endcond
 
 output_file.cd()
 h_ratio.Write()

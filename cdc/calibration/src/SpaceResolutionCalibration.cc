@@ -8,8 +8,8 @@
 #include <iostream>
 #include <iomanip>
 #include <cdc/calibration/SpaceResolutionCalibration.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/calibration/CDCDatabaseImporter.h>
+#include <cdc/geometry/CDCGeometryParConstants.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>

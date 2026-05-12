@@ -9,8 +9,6 @@
 #include <variant>
 #include <boost/python.hpp>
 
-#include <analysis/VariableManager/Manager.h>
-#include <analysis/VariableManager/Utility.h>
 #include <framework/utilities/CutNodes.h>
 #include <framework/utilities/TestHelpers.h>
 
@@ -20,9 +18,9 @@
 using namespace Belle2;
 namespace {
   namespace py = boost::python;
-  using VarVariant = Variable::Manager::VarVariant;
-  using VariableManager = Variable::Manager;
-  /// Class to mock objects for out variable manager.
+  /** Typedef for variable return type, can either be double, int or bool in std::variant */
+  typedef std::variant<double, int, bool> VarVariant;
+  /// Class to mock objects for our variable manager.
   struct MockObjectType {
     /// Stupid singlevalued object.
     explicit MockObjectType(const double& d) : m_value{d} {}
@@ -32,7 +30,7 @@ namespace {
   };
 
   /**
-   *  Class to mock variables for out variable manager.
+   *  Class to mock variables for our variable manager.
    *  This is also the minimal interface a variable must have,
    *  to be used in the GeneralCut.
    */
@@ -74,10 +72,8 @@ namespace {
     using Object = MockObjectType;
     /// Use MockvariableType as Variables.
     using Var = MockVariableType;
-
     /** Typedef for variable return type, can either be double, int or bool in std::variant */
     typedef std::variant<double, int, bool> VarVariant;
-
 
     /// Singleton.
     static MockVariableManager& Instance()

@@ -8,17 +8,17 @@
 #pragma once
 
 #include <tracking/vxdHoughTracking/filters/trackletFilters/BaseTrackletFilter.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
 
     /// Factory that can create filters for tracklets = SpacePointTrackCands from associated names.
-    class TrackletFilterFactory : public TrackFindingCDC::FilterFactory<BaseTrackletFilter> {
+    class TrackletFilterFactory : public TrackingUtilities::FilterFactory<BaseTrackletFilter> {
 
     private:
       /// Type of the base class
-      using Super = TrackFindingCDC::FilterFactory<BaseTrackletFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseTrackletFilter>;
 
     public:
       /// Constructor forwarding the default filter name

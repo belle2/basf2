@@ -69,4 +69,3 @@ mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 
 # process the data
 basf2.process(mypath)
-print(basf2.statistics)

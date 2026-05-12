@@ -52,7 +52,7 @@ main.add_module("Progress")
 main.add_module('RootOutput', outputFileName=fileOUT)
 
 # generate events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # show call statistics
 print(b2.statistics)

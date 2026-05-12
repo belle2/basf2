@@ -33,11 +33,6 @@ namespace Belle2 {
     TOPDoublePulseGeneratorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPDoublePulseGeneratorModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -54,25 +49,13 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
   private:
 
     /**
      * Optionally store sample times used by the generator as root histograms
      * fileName root output file name
      */
-    void storeSampleTimes(std::string fileName);
+    void storeSampleTimes(const std::string& fileName);
 
     /**
      * Save vector to histogram and write it out
@@ -82,11 +65,11 @@ namespace Belle2 {
      * @param xTitle x-axis title
      * @param yTitle y-axis title
      */
-    void saveAsHistogram(const std::vector<double>& vec,
-                         const std::string& name,
-                         const std::string& title,
-                         const std::string& xTitle = "",
-                         const std::string& yTitle = "") const;
+    static void saveAsHistogram(const std::vector<double>& vec,
+                                const std::string& name,
+                                const std::string& title,
+                                const std::string& xTitle = "",
+                                const std::string& yTitle = "");
 
     // module steering parameters
 
@@ -102,7 +85,7 @@ namespace Belle2 {
     // other
 
     TOPSampleTimes m_sampleTimes; /**< sample times from steering input */
-    DBObjPtr<TOPCalTimebase>* m_timebase = 0; /**< sample times from database */
+    DBObjPtr<TOPCalTimebase> m_timebase; /**< sample times from database */
     int m_sampleDivisions = 0; /**< number of sample divisions (from NominalTDC) */
 
   };

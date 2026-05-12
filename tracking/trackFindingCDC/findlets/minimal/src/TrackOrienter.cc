@@ -7,16 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string TrackOrienter::getDescription()
 {

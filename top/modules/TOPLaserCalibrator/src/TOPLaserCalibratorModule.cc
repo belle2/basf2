@@ -64,18 +64,10 @@ namespace Belle2 {
     }
   }
 
-  TOPLaserCalibratorModule::~TOPLaserCalibratorModule()
-  {
-  }
-
   void TOPLaserCalibratorModule::initialize()
   {
     B2WARNING("You are using an old version of the laser fitter, now deprecated. This module has been superseded by the CAF collector TOPLaserCalibratorCollector and the CAF fitter TOPLocalCalFitter.");
     m_digits.isRequired();
-  }
-
-  void TOPLaserCalibratorModule::beginRun()
-  {
   }
 
   void TOPLaserCalibratorModule::event()
@@ -100,10 +92,6 @@ namespace Belle2 {
         histo->Fill(digit.getTime()); //get Time from TOPDigit
       }
     }
-  }
-
-  void TOPLaserCalibratorModule::endRun()
-  {
   }
 
   void TOPLaserCalibratorModule::terminate()

@@ -13,13 +13,10 @@
 #include <calibration/CalibrationCollectorModule.h>
 
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <cdc/dataobjects/CDCDedxTrack.h>
 #include <cdc/dbobjects/CDCDedxWireGain.h>
@@ -83,6 +80,7 @@ namespace Belle2 {
     int m_charge{0}; /**< track momentum */
     int m_run{ -1}; /**<run number */
     int m_nhits{ -1}; /**< number of dE/dx hits on the track */
+    int m_nlhits{ -1}; /**< number of layer dE/dx hits on the track */
 
     /// hit level information
     std::vector<int> m_wire;       /**< wire number for the hit */
@@ -93,6 +91,8 @@ namespace Belle2 {
     std::vector<double> m_entaRS;    /**< rescaled entrance angle for the hit */
     std::vector<double> m_dedxhit; /**< dE/dx for the hit */
     std::vector<double> m_adccorr; /**< adc corrected for the hit */
+    std::vector<int> m_lLayer;      /**< continuous layer number for the layerdE/dx */
+    std::vector<double> m_ldedx; /**< dE/dx for the layer */
 
     bool m_isCosth;         /**< flag to write costh in tree  */
     bool m_isMom;           /**< flag to write momentum in treet */
@@ -111,5 +111,7 @@ namespace Belle2 {
     bool m_isRadee;  /**< flag to select radee event */
     bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off default) */
     bool m_isInjTime; /**< flag to enable trigger skim (off default) */
+    bool m_islLayer;         /**< flag to write layer number for layer dedx in tree */
+    bool m_islDedx;       /**< flag to write layer dedx in tree */
   };
 }

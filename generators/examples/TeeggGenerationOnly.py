@@ -70,7 +70,7 @@ main.add_module(output)
 main.add_module("PrintMCParticles", logLevel=LogLevel.DEBUG, onlyPrimaries=False)
 
 # generate events
-process(main)
+process(main, calculateStatistics=True)
 
 # show call statistics
 print(statistics)

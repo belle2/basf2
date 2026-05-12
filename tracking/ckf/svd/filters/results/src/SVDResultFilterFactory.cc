@@ -7,14 +7,14 @@
  **************************************************************************/
 #include <tracking/ckf/svd/filters/results/SVDResultFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/svd/filters/results/SVDResultVarSet.h>
 #include <tracking/ckf/svd/filters/results/RelationSVDResultVarSet.h>
@@ -23,7 +23,7 @@
 #include <tracking/ckf/svd/filters/results/WeightSVDResultFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter using the truth/teacher information
@@ -82,10 +82,10 @@ std::unique_ptr<BaseSVDResultFilter>
 SVDResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseSVDResultFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseSVDResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseSVDResultFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseSVDResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingSVDResultFilter>();

@@ -9,8 +9,6 @@
 #pragma once
 
 #include <analysis/VertexFitting/TreeFitter/EigenStackConfig.h>
-
-#include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/ErrCode.h>
 
 // inverse() needs this, in the other classes we get away with just Eigen/Core
@@ -18,6 +16,7 @@
 
 
 namespace TreeFitter {
+  class FitParams;
 
   /** does the calculation of the gain matrix, updates the cov and fitpars */
   class KalmanCalculator {

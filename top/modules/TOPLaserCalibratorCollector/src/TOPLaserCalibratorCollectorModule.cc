@@ -138,7 +138,7 @@ void TOPLaserCalibratorCollectorModule::collect()
     m_window = -1;
     const auto* rawDigit = digit.getRelated<TOPRawDigit>();
     if (rawDigit) m_window = rawDigit->getASICWindow(); // window from which the feature is extracted
-    m_sample = digit.getModulo256Sample(); // sample number refered in TBC
+    m_sample = digit.getModulo256Sample(); // sample number referred in TBC
     hitTree->Fill();
   }
   m_event++;

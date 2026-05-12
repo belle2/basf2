@@ -82,7 +82,7 @@ def main():
     main_path.add_module(NoKickCuts)
     main_path.add_module(progressbar)
 
-    b2.process(main_path)
+    b2.process(main_path, calculateStatistics=True)
     print(b2.statistics)
 
 

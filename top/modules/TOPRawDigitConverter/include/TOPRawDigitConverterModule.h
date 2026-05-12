@@ -27,6 +27,7 @@
 #include <top/dbobjects/TOPCalChannelNoise.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 #include <top/dbobjects/TOPCalTimeWalk.h>
+#include <top/dbobjects/TOPCalPrecision.h>
 
 namespace Belle2 {
 
@@ -41,11 +42,6 @@ namespace Belle2 {
      * Constructor
      */
     TOPRawDigitConverterModule();
-
-    /**
-     * Destructor
-     */
-    virtual ~TOPRawDigitConverterModule();
 
     /**
      * Initialize the Module.
@@ -63,18 +59,6 @@ namespace Belle2 {
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   private:
 
@@ -109,12 +93,13 @@ namespace Belle2 {
     DBObjPtr<TOPFrontEndSetting> m_feSetting;   /**< front-end settings */
 
     // time calibration
-    DBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */
-    DBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
-    DBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
-    DBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
-    DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
+    OptionalDBObjPtr<TOPCalTimebase> m_timebase;   /**< sample time calibration constants */
+    OptionalDBObjPtr<TOPCalChannelT0> m_channelT0; /**< channel T0 calibration constants */
+    OptionalDBObjPtr<TOPCalAsicShift> m_asicShift; /**< ASIC shifts calibration constants */
+    OptionalDBObjPtr<TOPCalModuleT0> m_moduleT0;   /**< module T0 calibration constants */
+    OptionalDBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */
     OptionalDBObjPtr<TOPCalTimeWalk> m_timeWalk;   /**< time-walk calibration constants */
+    OptionalDBObjPtr<TOPCalPrecision> m_calPrecision;   /**< calibration precision constants (systematics of channel T0) */
     TOPSampleTimes m_sampleTimes; /**< equidistant in case no calibration required */
 
     // r.m.s of pedestals (noise) of individual channels

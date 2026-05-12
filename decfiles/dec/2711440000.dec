@@ -1,0 +1,29 @@
+##############################################################
+# EventType: 2711440000
+# Descriptor: [e+ e- -> psi(2S) [ ->  mu+ mu- ] pi+ pi-] are generated via ISR
+# NickName: ISR_pi+pi-psi2s_2s2mumu
+# Test : Yes
+# Documentation: MC16rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Shiqing Xie
+# Email: sqxie22@m.fudan.edu.cn
+# Cuts: None
+# Date: 2025/6/12
+#
+# Decay table to generate
+# vpho ->   psi(2S) pi+ pi- 
+#           J/psi pi+ pi- 
+#           |
+#           -> e+ e-
+#           -> mu+ mu- 
+#                     
+###############################################################
+
+Decay vpho
+1.0   psi(2S)sig pi+ pi-  PHSP;
+Enddecay
+
+Decay psi(2S)sig
+1.0   mu+ mu-      VLL;
+Enddecay
+End

@@ -8,11 +8,8 @@
 
 #include <alignment/dataobjects/MilleData.h>
 
-#include <framework/utilities/FileSystem.h>
+#include <filesystem>
 
-#include <cstdlib>
-
-char* full_path = realpath("foo.dat", NULL);
 using namespace std;
 using namespace Belle2;
 
@@ -21,9 +18,9 @@ void MilleData::merge(const MergeableNamed* other)
   auto* data = dynamic_cast<const MilleData*>(other);
   const vector<string>& files = data->getFiles();
   m_numRecords += data->m_numRecords;
-  for (auto& file : files) {
+  for (const auto& file : files) {
     bool exists = false;
-    for (auto& myfile : m_files) {
+    for (const auto& myfile : m_files) {
       if (myfile == file) {
         exists = true;
         break;
@@ -76,7 +73,7 @@ void MilleData::open(string filename)
   }
   m_binary = new gbl::MilleBinary(filename, m_doublePrecision);
   if (m_absFilePaths)
-    m_files.push_back(FileSystem::findFile(string(realpath(filename.c_str(), NULL))));
+    m_files.push_back(string(std::filesystem::canonical(filename)));
   else
     m_files.push_back(filename);
 

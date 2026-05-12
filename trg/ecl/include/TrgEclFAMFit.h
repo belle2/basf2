@@ -36,66 +36,65 @@ namespace Belle2 {
     void FAMFit02(std::vector<std::vector<double>>, std::vector<std::vector<double>>);
     /** function for backup2 */
     void FAMFit03(std::vector<std::vector<double>>, std::vector<std::vector<double>>);
-    /** Set Beam Background Tag flag */
-    void SetBeamBkgTagFlag(int beambkgtagflag) {_BeamBkgTag = beambkgtagflag;}
-    /** Set flag for saving analysis table*/
-    void SetAnaTagFlag(int anatagflag) {_AnaTag = anatagflag;}
-    /** Set Threshold */
-    void SetThreshold(const std::vector<int>& threshold)
+    /** set Beam Background Tag flag */
+    void setBeamBkgTagFlag(int beambkgtagflag) { m_BeamBkgTag = beambkgtagflag; }
+    /** set flag for saving analysis table*/
+    void setAnaTagFlag(int anatagflag) { m_AnaTag = anatagflag; }
+    /** set Threshold */
+    void setThreshold(const std::vector<int>& tcethreshold)
     {
-      Threshold = threshold;
+      m_TCEThreshold = tcethreshold;
     };
-    /** Set Beam Background Tag */
-    void SetBeamBkgTag();
+    /** set Beam Background Tag */
+    void setBeamBkgTag();
 
     //! Get TC Energy
-    std::vector<std::vector<double>>  GetFitEnergy() {return TCFitEnergy;}
+    std::vector<std::vector<double>>  getFitEnergy() {return m_TCFitEnergy;}
     //! Get TC Timing
-    std::vector<std::vector<double>>  GetFitTiming() {return TCFitTiming;}
+    std::vector<std::vector<double>>  getFitTiming() {return m_TCFitTiming;}
     //! Get Background Tag of TC Hit
-    std::vector<std::vector<int>>  GetBeamBkgTag() {return BeamBkgTag;}
-
-
+    std::vector<std::vector<int>>     getBeamBkgTag() {return m_BeamBkgInfo;}
 
   private:
+
     /** fit energy */
-    std::vector<std::vector<double>>  TCFitEnergy;
+    std::vector<std::vector<double>>  m_TCFitEnergy;
     /** fit timing */
-    std::vector<std::vector<double>>  TCFitTiming;
+    std::vector<std::vector<double>>  m_TCFitTiming;
     /** fit timing */
-    std::vector<std::vector<int>>  BeamBkgTag;
+    std::vector<std::vector<int>>     m_BeamBkgInfo;
     /** Raw energy */
-    std::vector<std::vector<double>>  TCRawEnergy;
+    std::vector<std::vector<double>>  m_TCRawEnergy;
     /** Raw timing */
-    std::vector<std::vector<double>>  TCRawTiming;
+    std::vector<std::vector<double>>  m_TCRawTiming;
 
 
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* m_TCMap;
     /** Object of DataBase */
-    TrgEclDataBase* _DataBase;
+    TrgEclDataBase* m_DataBase;
 
     /** Coeffisients of signal PDF0  */
-    std::vector<std::vector<double>> CoeffSigPDF0;
+    std::vector<std::vector<double>> m_CoeffSigPDF0;
     /** Coeffisients of signal PDF1 */
-    std::vector<std::vector<double>> CoeffSigPDF1;
+    std::vector<std::vector<double>> m_CoeffSigPDF1;
     /** Coeffisients of noise 1 */
-    std::vector<std::vector<double>> CoeffNoise31;
+    std::vector<std::vector<double>> m_CoeffNoise31;
     /** Coeffisient of noise 2 */
-    std::vector<std::vector<double>> CoeffNoise32;
+    std::vector<std::vector<double>> m_CoeffNoise32;
     /** Coeffisient of noise 3   */
-    std::vector<std::vector<double>> CoeffNoise33;
+    std::vector<std::vector<double>> m_CoeffNoise33;
     /** TC Latency */
-    std::vector<double>  TCLatency;
+    std::vector<double>  m_TCLatency;
 
     /** Add beambkg */
-    int _BeamBkgTag;
+    int m_BeamBkgTag;
     /** Fill Analysis table */
-    int _AnaTag;
+    int m_AnaTag;
     /** Threshold (MeV) */
-    std::vector<int> Threshold;
+    std::vector<int> m_TCEThreshold;
     /** Fill Analysis table */
-    int EventId;
+    int m_EventId;
 
   };
 } // end namespace Belle2

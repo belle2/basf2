@@ -40,21 +40,21 @@ To be specific, the interface implements the following parameter function
 
 Below are the steps to use ``mc_gen_topo(n)`` to get the input data to ``TopoAna``.
 
-  1. Append the following statement at the beginning part of your python steering
-     script
+1. Append the following statement at the beginning part of your python steering
+   script
 
-     .. code-block:: python
+   .. code-block:: python
 
-        from variables.MCGenTopo import mc_gen_topo
+     from variables.MCGenTopo import mc_gen_topo
 
-  2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
-     steering function ``variablesToNtuple`` as follow
+2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
+   steering function ``variablesToNtuple`` as follow
 
-     .. code-block:: python
+   .. code-block:: python
 
-        variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
+     variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
 
-  3. Run your python steering script with ``basf2``
+3. Run your python steering script with ``basf2``
 
 ~~~~~~~~~~~~
 Repositories
@@ -84,34 +84,34 @@ Documents
 
 The following three documents of ``TopoAna`` are provided in its package.
 
-  * A **brief** description of the tool is in the document: ``share/quick-start_
-    tutorial_v*_Belle_II.pdf``
+* A **brief** description of the tool is in the document: ``share/quick-start_
+  tutorial_v*_Belle_II.pdf``
 
-    * All the examples in the quick-start tutorial can be found in the
-      sub-directory ``examples/in_the_quick-start_tutorial``
+  * All the examples in the quick-start tutorial can be found in the
+    sub-directory ``examples/in_the_quick-start_tutorial``
 
-  * A **detailed** description of the tool is in the document: ``share/user_guide
-    _v*.pdf``
+* A **detailed** description of the tool is in the document: ``share/user_guide
+  _v*.pdf``
 
-    * All the examples in the user guide can be found in the sub-directory
-      ``examples/in_the_user_guide``
+  * All the examples in the user guide can be found in the sub-directory
+    ``examples/in_the_user_guide``
 
-  * An **essential** description of the tool is in the document:
-    ``share/paper_draft_v*.pdf``
+* An **essential** description of the tool is in the document:
+  ``share/paper_draft_v*.pdf``
 
-    * All the examples in the paper draft can be found in the sub-directory
-      ``examples/in_the_paper``
+  * All the examples in the paper draft can be found in the sub-directory
+    ``examples/in_the_paper``
 
-   .. note::
+  .. note::
 
-      The paper on the tool has been published by ``Computer Physics
-      Communications``.
-      You can find this paper and the preprint corresponding to it in the links
-      `Comput. Phys. Commun. 258 (2021) 107540 <https://doi.org/10.1016/j.cpc.
-      2020.107540>`_ and `arXiv:2001.04016 <https://arxiv.org/abs/2001.04016>`_,
-      respectively.
-      **If the tool really helps your researches, we would appreciate it very
-      much if you could cite the paper in your publications.**
+   The paper on the tool has been published by ``Computer Physics
+   Communications``.
+   You can find this paper and the preprint corresponding to it in the links
+   `Comput. Phys. Commun. 258 (2021) 107540 <https://doi.org/10.1016/j.cpc.
+   2020.107540>`_ and `arXiv:2001.04016 <https://arxiv.org/abs/2001.04016>`_,
+   respectively.
+   **If the tool really helps your researches, we would appreciate it very
+   much if you could cite the paper in your publications.**
 
 As for the three documents, the quick-start tutorial is the briefest, the user
 guide is the most detailed, and the paper draft is composed of the essential

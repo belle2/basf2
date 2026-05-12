@@ -15,8 +15,6 @@ import datetime
 
 from hep_ipython_tools.information import EnvironmentInformation
 
-# @cond internal_test
-
 
 class TestEnvironmentInformation(TestCase):
 
@@ -77,4 +75,3 @@ class TestEnvironmentInformation(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

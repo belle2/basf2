@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -28,8 +28,8 @@ namespace Belle2 {
        *  in the box, it returns the number of items as a weight, otherwise it returns NAN;
        */
       template<class ARangeObject>
-      Weight operator()(const ARangeObject& rangeObject,
-                        const HoughBox* box)
+      TrackingUtilities::Weight operator()(const ARangeObject& rangeObject,
+                                           const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         double sumOfWeights = 0;

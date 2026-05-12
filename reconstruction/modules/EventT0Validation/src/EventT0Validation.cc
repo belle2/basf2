@@ -8,6 +8,8 @@
 
 #include <reconstruction/modules/EventT0Validation/EventT0Validation.h>
 
+#include <framework/dataobjects/EventT0.h>
+
 #include <TEfficiency.h>
 
 using namespace Belle2;

@@ -16,14 +16,14 @@
 #include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/geometry/UncertainSZLine.h>
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
+#include <tracking/trackingUtilities/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <framework/logging/Logger.h>
 
@@ -31,6 +31,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   const Vector2D generalCenter(6.0, 0);

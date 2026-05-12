@@ -8,6 +8,10 @@
 
 #include <pxd/modules/pxdMetadata/PXDTrackingEventLevelMdstInfoFillerModule.h>
 
+#include <pxd/dataobjects/PXDCluster.h>
+
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+
 #include <vxd/dataobjects/VxdID.h>
 
 using namespace Belle2;

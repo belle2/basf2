@@ -91,7 +91,7 @@ namespace Belle2 {
     /**
     * function to fit the histograms
     */
-    void fit(TH1F*& hist, const std::string& pdg);
+    void fit(TH1F*& hist, const std::string& pdg, gstatus& status);
 
     /**
     * function to draw the dedx vs costh histograms

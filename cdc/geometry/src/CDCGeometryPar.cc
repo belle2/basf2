@@ -6,7 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
@@ -52,6 +51,11 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     if ((*m_badWireFromDB).isValid()) {
       (*m_badWireFromDB).addCallback(this, &CDCGeometryPar::setBadWire);
     }
+  }
+  // Bad boards are on DB only:
+  m_badBoardsFromDB = new DBObjPtr<CDCBadBoards>;
+  if ((*m_badBoardsFromDB).isValid()) {
+    (*m_badBoardsFromDB).addCallback(this, &CDCGeometryPar::setBadBoard);
   }
 
   if (gcp.getPropSpeedInputType()) {
@@ -1430,6 +1434,11 @@ void CDCGeometryPar::setBadWire()
   calcMeanT0();
 }
 
+// Set bad-boards
+void CDCGeometryPar::setBadBoard()
+{
+  calcMeanT0();
+}
 
 // Set prop.-speed (from DB)
 void CDCGeometryPar::setPropSpeed()

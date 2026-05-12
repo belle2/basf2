@@ -1,0 +1,30 @@
+# EventType: 1220310000
+# Descriptor: [Bp -> tau+ nu_tau]cc
+# NickName: Bu_taununubar
+# Documentation: Rare b->tau nu processes in B+ decays
+# Tested: Yes 
+# PhysicsWG: EWP 
+# Responsible: Corentin Santos
+# Email: corentin.santos@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260121
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.000 tau+sig  nu_tau  PHOTOS  SLN;
+Enddecay
+CDecay B-sig
+
+Decay tau+sig
+0.25 pi+  anti-nu_tau  TAUSCALARNU;
+0.25 K+  anti-nu_tau  TAUSCALARNU;
+0.25 rho+  anti-nu_tau  TAUVECTORNU;
+0.25 K*+  anti-nu_tau  TAUVECTORNU;
+Enddecay
+CDecay tau-sig
+
+End

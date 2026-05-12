@@ -75,6 +75,7 @@ namespace Belle2 {
      * which stores and allows fast access to the parameter value. In addition the type
      * of the parameter is saved and a description is given.
      *
+     * @tparam T Type of the parameter being added.
      * @param name The unique name of the parameter.
      * @param paramVariable Reference to the variable which stores the parameter value.
      * @param description An description of the parameter.
@@ -211,10 +212,15 @@ namespace Belle2 {
   };
 
   // These frequent template instantiations are provided by the library and do not require including the details header
+  /// Specification for bool arguments
   extern template void ModuleParamList::addParameter(const std::string&, bool&, const std::string&, const bool&);
+  /// Specification for double arguments
   extern template void ModuleParamList::addParameter(const std::string&, double&, const std::string&, const double&);
+  /// Specification for float arguments
   extern template void ModuleParamList::addParameter(const std::string&, float&, const std::string&, const float&);
+  /// Specification for int arguments
   extern template void ModuleParamList::addParameter(const std::string&, int&, const std::string&, const int&);
+  /// Specification for string arguments
   extern template void ModuleParamList::addParameter(const std::string&, std::string&, const std::string&, const std::string&);
 
 } //end of Belle2 namespace

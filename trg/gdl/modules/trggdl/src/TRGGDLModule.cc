@@ -18,7 +18,7 @@
 using namespace std;
 
 namespace Belle2 {
-
+  /// Register the module
   REG_MODULE(TRGGDL);
 
   TRGGDL*

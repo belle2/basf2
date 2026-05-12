@@ -8,10 +8,53 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import create_path, B2ERROR, B2INFO
-from basf2.utils import pretty_print_table
-import os
 import glob
+import os
+
+from basf2 import Module, Path, B2ERROR, B2INFO
+from basf2.utils import pretty_print_table
+
+
+class SelectTRGTypes(Module):
+    '''Select events according to given trigger types.'''
+
+    def __init__(self, trg_types=None):
+        '''Constructor.'''
+        from ROOT import Belle2
+        super().__init__()
+        #: The trigger summary object
+        self.trg_summary = Belle2.PyStoreObj('TRGSummary')
+        #: The trigger types
+        self.trg_types = trg_types
+
+    def initialize(self, trg_types=None):
+        '''Initialize the module.'''
+        self.trg_summary.isRequired()
+
+    def event(self):
+        '''Event processing.'''
+        self.return_value(0)
+
+        if not self.trg_summary.isValid():
+            # This should never happen: let's report without crashing the processing
+            B2ERROR('TRGSummary is not available: the event is discarded.')
+            return
+
+        for trg_type in self.trg_types:
+            if self.trg_summary.getTimType() == trg_type:
+                self.return_value(1)
+                return
+
+
+def get_trigger_types_for_bgo():
+    '''Get the default trigger types to be used for the Beam Background Overlay (BGO) production.'''
+    from ROOT import Belle2
+
+    trg_types = [
+        Belle2.TRGSummary.TTYP_DPHY,  # 5 -> delayed physics for background
+        Belle2.TRGSummary.TTYP_RAND,  # 7 -> random trigger events
+    ]
+    return trg_types
 
 
 def get_background_files(folder=None, output_file_info=True):
@@ -137,7 +180,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
 
     # Write out only non-empty events when producing samples for BG mixer
     if sampleType != 'study':
-        emptyPath = create_path()
+        emptyPath = Path()
         tagSetter.if_false(emptyPath)
 
     # Output to file. We don't need a TTreeIndex for background files and memory

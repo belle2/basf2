@@ -59,7 +59,7 @@ namespace Belle2 {
       std::vector<double> deltaT0;
       std::vector<double> sigma;
       std::vector<std::vector<double> > A;
-      auto* chi2Fits = new TH2F("chi2_of_fits", "normalized chi2 of succesfull fits",
+      auto* chi2Fits = new TH2F("chi2_of_fits", "normalized chi2 of successful fits",
                                 16, 0.5, 16.5, 16, 0.5, 16.5);
       chi2Fits->SetXTitle("first slot number");
       chi2Fits->SetYTitle("second slot number");

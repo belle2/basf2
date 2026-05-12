@@ -85,6 +85,3 @@ variablesToNtuple('', ['var_evt', 'mc_gen_topo_120'], 'evt_120_2', 'MCGenTopoVar
 
 # Process the events
 basf2.process(my_path)
-
-# print out the summary
-print(basf2.statistics)

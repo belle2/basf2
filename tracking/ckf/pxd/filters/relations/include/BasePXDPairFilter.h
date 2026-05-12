@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  using BasePXDPairFilter = TrackFindingCDC::Filter<std::pair<const CKFToPXDState*, const CKFToPXDState*>>;
+  using BasePXDPairFilter = TrackingUtilities::Filter<std::pair<const CKFToPXDState*, const CKFToPXDState*>>;
 }

@@ -13,6 +13,7 @@
 #include <genfit/FieldManager.h>
 
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
+#include <tracking/dbobjects/DAFConfiguration.h>
 
 #include <simulation/monopoles/MonopoleConstants.h>
 
@@ -76,8 +77,8 @@ void BaseRecoFitterModule::initialize()
 void BaseRecoFitterModule::event()
 {
   // The used fitting algorithm class.
-  TrackFitter fitter(m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_cdcHitsStoreArrayName,
-                     m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
+  TrackFitter fitter(DAFConfiguration::c_Default, m_param_pxdHitsStoreArrayName, m_param_svdHitsStoreArrayName,
+                     m_param_cdcHitsStoreArrayName, m_param_bklmHitsStoreArrayName, m_param_eklmHitsStoreArrayName);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
   if (genfitFitter) {

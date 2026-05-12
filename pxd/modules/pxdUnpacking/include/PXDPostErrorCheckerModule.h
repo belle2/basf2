@@ -11,12 +11,13 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawROIs.h>
+#include <pxd/dataobjects/PXDErrorFlags.h>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+  class PXDRawHit;
+  class PXDRawROIs;
+  class PXDRawAdc;
 
   namespace PXD {
     /** The PXD DAQ Post Unpacking Error Check.

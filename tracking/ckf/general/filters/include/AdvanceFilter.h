@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/Exception.h>
@@ -38,9 +38,9 @@ namespace Belle2 {
    */
   template <class AState, class AnAdvancer>
   class AdvanceFilter : public
-    TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>> {
+    TrackingUtilities::Filter<std::pair<const std::vector<TrackingUtilities::WithWeight<const AState*>>, AState*>> {
     /// Type of the base class
-    using Super = TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>>;
+    using Super = TrackingUtilities::Filter<std::pair<const std::vector<TrackingUtilities::WithWeight<const AState*>>, AState*>>;
 
   public:
     AdvanceFilter() : Super()
@@ -55,12 +55,13 @@ namespace Belle2 {
     }
 
     /// Extrapolate and return the result. Update the mSoP of the new state.
-    TrackFindingCDC::Weight operator()(const std::pair<const std::vector<TrackFindingCDC::WithWeight<const AState*>>, AState*>& pair)
+    TrackingUtilities::Weight operator()(const std::pair<const std::vector<TrackingUtilities::WithWeight<const AState*>>, AState*>&
+                                         pair)
     override
     {
       m_advancer.setMaterialEffectsToParameterValue();
 
-      const std::vector<TrackFindingCDC::WithWeight<const AState*>>& previousStates = pair.first;
+      const std::vector<TrackingUtilities::WithWeight<const AState*>>& previousStates = pair.first;
       B2ASSERT("Can not extrapolate with nothing", not previousStates.empty());
 
       const AState* lastState = previousStates.back();

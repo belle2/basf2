@@ -19,7 +19,7 @@ from torch.utils.data import Dataset
 from torch.utils.data import random_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import PolynomialFeatures
-import uproot3 as ur
+import uproot as ur
 import numpy as np
 
 
@@ -44,9 +44,12 @@ class PriorDataLoader(Dataset):
             labels (str): Labels of pandas columns containing cos(theta), momentum and PDG values (in this order).
 
         """
-        data = ur.open(path)
-        data = data[key].pandas.df(labels)
-        df = data.dropna().reset_index(drop=True)
+        df = (
+            ur.open(path)[key]
+            .arrays(labels, library="pd")
+            .dropna()
+            .reset_index(drop=True)
+        )
         df.loc[:, labels[2]] = df.loc[:, labels[2]].abs()
         droplist = np.setdiff1d(np.unique(df[labels[2]].values), particlelist)
         for i in droplist:

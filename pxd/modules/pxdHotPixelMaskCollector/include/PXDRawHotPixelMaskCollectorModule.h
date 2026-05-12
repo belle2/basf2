@@ -10,11 +10,12 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <calibration/CalibrationCollectorModule.h>
 #include <string>
 
 namespace Belle2 {
+  class PXDDAQStatus;
+
   /**
    * Calibration Collector Module for PXD hot pixel masking from PXDRawHits
    *

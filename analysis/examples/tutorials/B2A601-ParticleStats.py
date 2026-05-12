@@ -99,6 +99,3 @@ ma.summaryOfLists(particleLists=['D0:all', 'D+:kpipi', 'D_s+:kkpi'], path=my_pat
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

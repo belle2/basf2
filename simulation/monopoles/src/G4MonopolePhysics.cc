@@ -86,7 +86,7 @@ void G4MonopolePhysics::ConstructProcess()
     pmanager[1]->AddProcess(new G4MonopoleTransportation(fApl), -1, 0, 0);
 //
 //  commented out the following 3 lines,
-//  to supress a cppcheck [duplicateCondition] warning for the if condition
+//  to suppress a cppcheck [duplicateCondition] warning for the if condition
 //  }
 //
 //  if (magn != 0.0) {

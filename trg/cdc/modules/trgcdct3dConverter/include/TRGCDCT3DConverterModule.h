@@ -67,9 +67,6 @@ namespace Belle2 {
       /** Called when run ended*/
       virtual void endRun() override;
 
-      /** returns version of TRGCDCT3DConverterModule.*/
-      std::string version() const;
-
       /** converts firmwareResults of TS to a vector*/
       void storeTSFirmwareData(boost::multi_array<double, 4>& tsfInfo);
 

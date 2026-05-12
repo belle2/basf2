@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <simulation/modules/dbtools/ROIfindingConditionFromDBModule.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 using namespace Belle2;

@@ -58,6 +58,6 @@ main.add_module(histo)   # Should be placed right after input module
 main.add_module(ex1)
 
 # Process all events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

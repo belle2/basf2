@@ -80,7 +80,8 @@ namespace Belle2 {
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfBKLMHits,
                      const std::string& storeArrayNameOfEKLMHits,
-                     const bool initializeCDCTranslators = true);
+                     const bool initializeCDCTranslators = true,
+                     bool fromTrackCreator = false);
 
     /**
      * Reset the internal measurement creator storage to the default settings.

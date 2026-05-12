@@ -83,6 +83,12 @@ namespace Belle2 {
      */
     std::string getCommitID();
 
+    /**
+     * Check whether a tree name is a reserved basf2 tree name as defined
+     * in RootIOUtilities::c_treeNames.
+     */
+    bool isReservedTreeName(const std::string& name);
+
     /** Names of trees. */
     extern const std::string c_treeNames[];
 

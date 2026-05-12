@@ -28,7 +28,7 @@ class TestSkimRules(unittest.TestCase):
         SkimsWithApplyEventCuts = set()
 
         for skim in Registry.names:
-            if skim[:2] == "f_":
+            if (skim[:2] == "f_") or ("invalid" in skim):
                 continue  # these are the flagged skims, they are not actual skims
 
             classdef = Registry.get_skim_function(skim)

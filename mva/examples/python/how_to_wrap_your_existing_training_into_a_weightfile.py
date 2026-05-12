@@ -43,7 +43,7 @@ def feature_importance(state):
 
 def end_fit(state):
     """
-    In end_fit you want to load your training and pass it as a picklable object to basf.
+    In end_fit you want to load your training and pass it as a picklable object to basf2.
     You do not perform a real training, so your training data can be empty (or a small file).
     Since you do not fit anything here the training data is just ignored.
     However, you want to ensure that the features you are using (and which you will need later)

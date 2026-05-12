@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 #include <framework/database/DBObjPtr.h>
 #include <tracking/dbobjects/CKFParameters.h>
@@ -15,9 +15,9 @@
 namespace Belle2 {
   /// Base filter for CKF PXD states
   template <class AFilter, class APrefilter = AFilter>
-  class LayerPXDRelationFilter : public TrackFindingCDC::RelationFilter<CKFToPXDState> {
+  class LayerPXDRelationFilter : public TrackingUtilities::RelationFilter<CKFToPXDState> {
     /// The parent class
-    using Super = TrackFindingCDC::RelationFilter<CKFToPXDState>;
+    using Super = TrackingUtilities::RelationFilter<CKFToPXDState>;
 
   public:
     using Super::operator();
@@ -36,7 +36,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Give a final weight to the possibilities by asking the filter.
-    TrackFindingCDC::Weight operator()(const CKFToPXDState& from, const CKFToPXDState& to) override;
+    TrackingUtilities::Weight operator()(const CKFToPXDState& from, const CKFToPXDState& to) override;
 
     void initialize() override;
 

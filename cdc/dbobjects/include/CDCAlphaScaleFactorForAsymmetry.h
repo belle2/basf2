@@ -81,7 +81,7 @@ namespace Belle2 {
     {
       if (alpha > (M_PI / 2)) alpha = alpha - M_PI;
       if (alpha < -(M_PI / 2)) alpha = alpha + M_PI;
-      int alpha_bin = trunc(abs(alpha) / c_AlphaBinWidth);
+      int alpha_bin = std::trunc(std::abs(alpha) / c_AlphaBinWidth);
       if (alpha_bin > c_nAlphaBins) alpha_bin = c_nAlphaBins - 1 ;
       return m_Scales[iCLayer][alpha_bin];
     }

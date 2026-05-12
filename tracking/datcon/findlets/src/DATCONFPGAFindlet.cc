@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/datcon/findlets/DATCONFPGAFindlet.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/logging/Logger.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 DATCONFPGAFindlet::~DATCONFPGAFindlet() = default;
 
@@ -32,13 +32,13 @@ void DATCONFPGAFindlet::exposeParameters(ModuleParamList* moduleParamList, const
   Super::exposeParameters(moduleParamList, prefix);
 
   m_digitConverter.exposeParameters(moduleParamList, prefix);
-  m_uClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
-  m_vClusterizer.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
+  m_uClusterizer.exposeParameters(moduleParamList, prefixed(prefix, "uSide"));
+  m_vClusterizer.exposeParameters(moduleParamList, prefixed(prefix, "vSide"));
 
   m_clusterLoaderAndPreparer.exposeParameters(moduleParamList, prefix);
 
-  m_uInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "uSide"));
-  m_vInterceptFinder.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "vSide"));
+  m_uInterceptFinder.exposeParameters(moduleParamList, prefixed(prefix, "uSide"));
+  m_vInterceptFinder.exposeParameters(moduleParamList, prefixed(prefix, "vSide"));
 
   m_toPXDExtrapolator.exposeParameters(moduleParamList, prefix);
   m_ROICalculator.exposeParameters(moduleParamList, prefix);

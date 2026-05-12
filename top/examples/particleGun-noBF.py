@@ -38,7 +38,7 @@ main = b2.remove_module(main, 'TOPBunchFinder')  # remove bunch finder from the 
 add_mdst_output(main)
 
 main.add_module('Progress')
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

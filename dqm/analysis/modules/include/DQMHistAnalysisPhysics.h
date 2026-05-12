@@ -60,15 +60,26 @@ namespace Belle2 {
 
   private:
 
+    //! fit histogram with UPS mass
+    void fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix, std::string pvname);
+
+    //! min entries for Ups(mumu)
+    int m_minEntriesUPSmumu;
+    //! min entries for Ups(ee)
+    int m_minEntriesUPSee;
+
+    //! Tcanvas for mUPSee
+    TCanvas* m_cmUPSee{};
+    //! Tcanvas for mUPSmumu
+    TCanvas* m_cmUPSmumu{};
 
     //! TPaveText, Ups Invariant Mass (mumu)
-    TPaveText* m_cmUPS_text = nullptr;
-
+    TPaveText* m_cmUPSmumu_text{};
     //! TPaveText, Ups ee Invariant Mass
-    TPaveText* m_cmUPSe_text = nullptr;
+    TPaveText* m_cmUPSee_text{};
 
     //! TPaveText, ratios physics results
-    TPaveText* m_ratio_text = nullptr;
+    TPaveText* m_ratio_text{};
 
     //! prefix for EPICS PVs
     std::string m_pvPrefix;

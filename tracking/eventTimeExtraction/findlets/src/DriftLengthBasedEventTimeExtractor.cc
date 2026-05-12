@@ -7,7 +7,7 @@
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/DriftLengthBasedEventTimeExtractor.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/DriftTimeUtil.h>
+#include <tracking/trackingUtilities/eventdata/utils/DriftTimeUtil.h>
 
 #include <genfit/KalmanFitterInfo.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
@@ -17,7 +17,7 @@
 #include <Math/VectorUtil.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   void addEventT0AndWeight(const genfit::MeasuredStateOnPlane& mSoP,

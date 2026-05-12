@@ -54,5 +54,3 @@ main.add_module(output)
 main.add_module(b2.register_module('ProgressBar'))
 
 b2.process(main)
-
-print(b2.statistics)

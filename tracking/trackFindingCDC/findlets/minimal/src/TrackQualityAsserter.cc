@@ -8,16 +8,17 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackQualityAsserter.h>
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TrackQualityAsserter::TrackQualityAsserter()
   : m_param_corrections({"LayerBreak", "LargeAngle", "OneSuperlayer", "Small"})

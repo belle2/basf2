@@ -9,7 +9,9 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+#include <hlt/utilities/HLTPrefilter.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
@@ -76,5 +78,12 @@ namespace Belle2::SoftwareTrigger {
     double m_goodMagneticRegionZ0 = 57.;
     /// minimum d0 for well understood magnetic field, if z0 is large (cm)
     double m_goodMagneticRegionD0 = 26.5;
+
+    /// Objects relevant to HLTPrefilter monitoring
+    /// Helper instance for timing based prefilter
+    HLTPrefilter::TimingCutState m_timingPrefilter;
+    /// Helper instance for CDC-ECL occupancy based prefilter
+    HLTPrefilter::CDCECLCutState m_cdceclPrefilter;
+
   };
 }

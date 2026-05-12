@@ -116,7 +116,7 @@ namespace Belle2 {
      * Appends curved surface to contour
      * @param contour 2D contour
      * @param y0 offset in y0
-     * @param fromLeftToRight if true, going from left to right otherwise oposite
+     * @param fromLeftToRight if true, going from left to right otherwise opposite
      */
     void appendContour(std::vector<std::pair<double, double> >& contour,
                        double y0,

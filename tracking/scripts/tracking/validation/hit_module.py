@@ -59,7 +59,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             trackCandidatesColumnName='RecoTracks',
             mcTrackCandidatesColumnName='MCRecoTracks',
             cdcHitsColumnName='CDCHits',
-            write_tables=False):
+            write_tables=False,
+            plotTrackQualityIndicator=True):
         """Constructor"""
 
         TrackingValidationModule.__init__(
@@ -83,6 +84,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.cdcHitsColumnname = cdcHitsColumnName
         #: cached value of the flag to write the validation figures of merit
         self.write_tables = write_tables
+        #: draw validation plots of track quality indicator
+        self.plotTrackQualityIndicator = plotTrackQualityIndicator
 
     def initialize(self):
         """Receive signal at the start of event processing"""
@@ -132,6 +135,8 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         self.pr_number_of_hits = collections.deque()
         #: list of the number of pattern-reconstructed hits matched to MC track
         self.pr_number_of_matched_hits = collections.deque()
+        #: list of the quality indicator of tracks
+        self.pr_track_QI = collections.deque()
 
     def event(self):
         """Event method"""
@@ -265,6 +270,9 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             self.pr_number_of_hits.append(len(trackCandHits))
 
+            if self.plotTrackQualityIndicator:
+                self.pr_track_QI.append(trackCand.getQualityIndicator())
+
         for mcTrackCand in mcTrackCands:
             is_missing = \
                 self.trackMatchLookUp.isMissingMCRecoTrack(mcTrackCand)
@@ -333,6 +341,18 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             unit=None)
 
         validation_plots.extend(missing_tracks_plot)
+
+        # Quality Indicator #
+        if self.plotTrackQualityIndicator:
+            track_QI_plot = self.profiles_by_parameters_base(
+                xs=self.pr_track_QI,
+                quantity_name="track quality indicator",
+                make_hist=True,
+                parameter_names=[],
+                profile_parameters={},
+                unit=None)
+
+            validation_plots.extend(track_QI_plot)
 
         for validation_plot in validation_plots:
             validation_plot.write()

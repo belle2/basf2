@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/general/findlets/TrackFitterAndDeleter.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -29,9 +29,9 @@ namespace Belle2 {
    * If there is a relation with the weight equal to the given direction (meaning there is already a
    * partner for this direction), the track is not passed on.
    */
-  class TrackLoader : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class TrackLoader : public TrackingUtilities::Findlet<RecoTrack*> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
+    using Super = TrackingUtilities::Findlet<RecoTrack*>;
 
   public:
     /// Add the subfindlets
@@ -45,6 +45,18 @@ namespace Belle2 {
 
     /// Load in the reco tracks and the hits
     void apply(std::vector<RecoTrack*>& seeds) override;
+
+    /** Set minimal pT requirement for tracks
+     *
+     *  @param minimalPtRequirement Minimal pT in GeV/c
+     */
+    void setMinimalPtRequirement(double minimalPtRequirement) { m_param_minimalPtRequirement = minimalPtRequirement; }
+
+    /** Set whether to ignore tracks with CDC hits
+     *
+     *  @param ignoreTracksWithCDChits True to ignore tracks with CDC hits
+     */
+    void setIgnoreTracksWithCDChits(bool ignoreTracksWithCDChits) { m_noCDChits = ignoreTracksWithCDChits; }
 
   private:
     // Findlets
@@ -61,7 +73,7 @@ namespace Belle2 {
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_relationCheckForDirectionAsString = "invalid";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_relationCheckForDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_relationCheckForDirection = TrackingUtilities::EForwardBackward::c_Unknown;
 
 
     // Store Arrays

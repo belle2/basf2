@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <pxd/reconstruction/PXDClusterShape.h>
+#include <pxd/reconstruction/ClusterCandidate.h>
 
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/ClusterProjection.h>

@@ -41,7 +41,15 @@ path.add_module('MCMatcherParticles', listName='B+:semileptonic', looseMCMatchin
 path.add_module('MCMatcherParticles', listName='B0:generic', looseMCMatching=True)
 path.add_module('MCMatcherParticles', listName='B0:semileptonic', looseMCMatching=True)
 
-commonVariables = ['mcErrors', 'extraInfo(decayModeID)', 'extraInfo(uniqueSignal)', 'extraInfo(SignalProbability)']
+commonVariables = [
+             'mcErrors',
+             'extraInfo(decayModeID)',
+             'extraInfo(uniqueSignal)',
+             'extraInfo(SignalProbability)',
+             'mostcommonBTagDeltaP',
+             'mostcommonBTagPDG',
+             'genParticle(mostcommonBTagIndex, E)'
+             ]
 genericVariables = ['Mbc', 'deltaE', 'isSignal'] + commonVariables
 semiLeptonicVariables = ['cosThetaBetweenParticleAndNominalB', 'isSignalAcceptMissingNeutrino'] + commonVariables
 
@@ -69,5 +77,4 @@ ma.variablesToNtuple('B0:semileptonic',
                      path=path)
 
 # Process 100 events
-b2.process(path, max_event=100)
-print(b2.statistics)
+b2.process(path, max_event=100, calculateStatistics=True)

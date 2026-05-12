@@ -1,6 +1,3 @@
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -42,6 +39,7 @@ class TestCalibrationClass_Configure(TestCase):
         self.col1 = b2.register_module('CaTest')
         #: Path to an example file
         self.example_file1 = Path("example1.root")
+        #: Path to a second example file
         self.example_file2 = Path("example2.root")
         self.example_file1.touch()
         self.example_file2.touch()
@@ -99,6 +97,9 @@ class TestCalibrationClass_Configure(TestCase):
         self.assertTrue(cal.is_valid())
 
     def tearDown(self):
+        """
+        Unlink example files
+        """
         self.example_file1.unlink()
         self.example_file2.unlink()
 
@@ -125,6 +126,7 @@ class TestCalibrationClass_Args(TestCase):
         self.name = 'TestCalibration'
         #: Path to an example file
         self.example_file1 = Path("example1.root")
+        #: Path to a second example file
         self.example_file2 = Path("example2.root")
         self.example_file1.touch()
         self.example_file2.touch()
@@ -160,6 +162,9 @@ class TestCalibrationClass_Args(TestCase):
         self.assertTrue(cal1.max_iterations == 4 and not cal2.max_iterations)
 
     def tearDown(self):
+        """
+        Unlink example files
+        """
         self.example_file1.unlink()
         self.example_file2.unlink()
 
@@ -242,5 +247,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-# @endcond

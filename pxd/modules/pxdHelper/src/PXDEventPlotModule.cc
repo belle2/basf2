@@ -7,6 +7,11 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdHelper/PXDEventPlotModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+#include <pxd/dataobjects/PXDDAQStatus.h>
+#include <rawdata/dataobjects/RawFTSW.h>
+
 #include <TBox.h>
 #include <TCanvas.h>
 #include <TStyle.h>

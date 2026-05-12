@@ -64,7 +64,7 @@ bvars = vc.reco_stats + \
     vc.deltae_mbc + \
     vc.mc_truth + \
     vc.roe_multiplicities + \
-    ft.flavor_tagging + \
+    ['flavor_tagging'] + \
     vc.tag_vertex + \
     vc.mc_tag_vertex + \
     vertex_vars + \
@@ -87,6 +87,3 @@ ma.summaryOfLists(particleLists=['B0:jpsiks'], path=cp_val_path)
 cp_val_path.add_module('Progress')
 # Process the events
 b2.process(cp_val_path)
-
-# print out the summary
-print(b2.statistics)

@@ -149,6 +149,12 @@ namespace Belle2 {
       void getPlaneTransform(HepGeom::Transform3D* t, int n) const;
 
       /**
+       * Get EKLM layer area (same for all layers).
+       * @return Area in cm^2
+       */
+      double getEKLMLayerArea() const;
+
+      /**
        * Get strip transformation.
        * @param[out] t Transformation.
        * @param[in]  n Number of strip.

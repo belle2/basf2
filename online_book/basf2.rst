@@ -18,6 +18,7 @@ Belle II software to perform analysis tasks.
    basf2/generating_mc
    basf2/fei
    basf2/cs
+   basf2/cs_onnx
    basf2/b2bii
    basf2/skim
    basf2/python_module

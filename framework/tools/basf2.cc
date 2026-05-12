@@ -30,7 +30,6 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
-#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -62,13 +61,6 @@ namespace {
 
 int main(int argc, char* argv[])
 {
-  //remove SIGPIPE handler set by ROOT which sometimes caused infinite loops
-  //See https://savannah.cern.ch/bugs/?97991
-  //default action is to abort
-  if (signal(SIGPIPE, SIG_DFL) == SIG_ERR) {
-    B2FATAL("Cannot remove SIGPIPE signal handler");
-  }
-
   //Initialize metadata service
   MetadataService::Instance();
 
@@ -136,8 +128,8 @@ int main(int argc, char* argv[])
     ("module-io", prog::value<string>(),
      "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
-    ("no-stats",
-     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print(statistics)'.")
+    ("stats",
+     "Enable collection of statistics during event processing (fills table called via 'print(statistics)). Useful for debugging, but adds extra processing time.")
     ("dry-run",
      "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),
@@ -444,8 +436,8 @@ int main(int argc, char* argv[])
       }
     }
 
-    if (varMap.count("no-stats")) {
-      Environment::Instance().setNoStats(true);
+    if (varMap.count("stats")) {
+      Environment::Instance().setStats(true);
     }
 
     if (varMap.count("dry-run")) {

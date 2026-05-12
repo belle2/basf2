@@ -26,18 +26,17 @@ EvtGenDatabasePDG* EvtGenDatabasePDG::Instance()
 {
   static bool instanceCreated = false;
   if (!instanceCreated) {
-    // problem with 6.14: ROOT cannot find includes this early. Fix promised for 6.16.
-    // (https://root-forum.cern.ch/t/problem-with-loadclassinfo-for-class-instantiated-very-early/30831)
+    // Necessary to avoid "Error in <TClass::LoadClassInfo>: no interpreter information for class..."
     gInterpreter->Declare("#include <framework/particledb/EvtGenParticlePDG.h>");
-    //hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
+    // hope we are the first to create a TDatabasePDG instance (setting the instance pointer in the process)
     auto instance = new EvtGenDatabasePDG();
-    //ok, now load the data
+    // ok, now load the data
     instance->ReadEvtGenTable();
     instanceCreated = true;
     if (instance != TDatabasePDG::Instance())
       B2FATAL("EvtGenDatabasePDG created too late!");
   }
-  //this cast should be safe as we stop execution above if we couldn't create the first instance ourselves
+  // this cast should be safe as we stop execution above if we couldn't create the first instance ourselves
   return static_cast<EvtGenDatabasePDG*>(TDatabasePDG::Instance());
 }
 
@@ -182,10 +181,12 @@ void EvtGenDatabasePDG::WriteEvtGenTable(std::ostream& out)
 {
   const double c_mm_per_s = Const::speedOfLight / (Unit::mm / Unit::s);
   if (fParticleList) {
-    for (TObject* obj : *fParticleList) {
-      auto* part = dynamic_cast<EvtGenParticlePDG*>(obj);
+    for (TObject* object : *fParticleList) {
+      auto* part = dynamic_cast<EvtGenParticlePDG*>(object);
       if (!part) {
-        B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle does not inherit from EventGenParticlePDG");
+        B2FATAL("EvtGenDatabasePDG::WriteEvtgenTable: Particle "
+                << object->GetName() <<
+                " does not inherit from EventGenParticlePDG");
       }
       out << "add p Particle " << part->GetName() << " " << part->PdgCode()
           << " " << std::scientific << std::setprecision(7) << part->Mass()
@@ -208,4 +209,35 @@ void EvtGenDatabasePDG::WriteEvtGenTable(const char* filename)
     B2FATAL("Cannot write evtgen pdl to '" << filename << "'");
   }
   WriteEvtGenTable(out);
+}
+
+bool EvtGenDatabasePDG::testParticleData()
+{
+  if (!fParticleList)
+    return true;
+  bool testPassed = true;
+  for (TObject* object : *fParticleList) {
+    EvtGenParticlePDG* particle = dynamic_cast<EvtGenParticlePDG*>(object);
+    if (!particle) {
+      B2FATAL("EvtGenDatabasePDG::testParticleData: Particle"
+              << object->GetName() <<
+              " does not inherit from EventGenParticlePDG.");
+    }
+    /*
+     * Check width and mass range. The mass range in EvtGen is
+     * [M - max_Dm, M + 15 * Gamma]. Thus, max_Dm values are required to
+     * be less than or equal to 15 * Gamma, except for zero width. Zero width
+     * and non-zero max_Dm is a valid case for some special particles like
+     * quark pairs.
+     */
+    if ((particle->MaxWidth() > 15.000000000001 * particle->Width()) &&
+        (particle->Width() != 0)) {
+      B2ERROR("Maximum Delta_M is greater than 15 widths for "
+              << particle->GetName()
+              << LogVar("Width", particle->Width())
+              << LogVar("max_Dm", particle->MaxWidth()));
+      testPassed = false;
+    }
+  }
+  return testPassed;
 }

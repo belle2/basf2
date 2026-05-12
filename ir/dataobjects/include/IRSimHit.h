@@ -64,7 +64,7 @@ namespace Belle2 {
     ROOT::Math::XYZVector getmomOut(); /** return momentum at end point*/
     int getPDGcode();     /** return PDG code */
     float getdepEnergy(); /** return deposited energy */
-    std::string getVolname(); /** return volume name */
+    const std::string& getVolname(); /** return volume name */
 
   protected:
 

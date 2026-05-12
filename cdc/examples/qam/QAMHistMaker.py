@@ -53,7 +53,7 @@ def ana(exp=1, run=3118, magneticField=True, prefix='', dest='.'):
 
     main.add_module('Progress')
     # process events and print call statistics
-    b2.process(main)
+    b2.process(main, calculateStatistics=True)
     print(b2.statistics)
 
 

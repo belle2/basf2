@@ -27,12 +27,6 @@ namespace Belle2 {
     }
 
 
-    FrontEndMapper::~FrontEndMapper()
-    {
-      if (m_mappingDB) delete m_mappingDB;
-    }
-
-
     void FrontEndMapper::initialize(const GearDir& frontEndMapping)
     {
 
@@ -143,17 +137,13 @@ namespace Belle2 {
 
     void FrontEndMapper::initialize()
     {
-
-      if (m_mappingDB) delete m_mappingDB;
-      m_mappingDB = new DBArray<TOPFrontEndMap>();
-
-      if (!m_mappingDB->isValid()) {
+      if (!m_mappingDB.isValid()) {
         clear();
         return;
       }
       update();
 
-      m_mappingDB->addCallback(this, &FrontEndMapper::update);
+      m_mappingDB.addCallback(this, &FrontEndMapper::update);
 
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
@@ -192,9 +182,9 @@ namespace Belle2 {
     void FrontEndMapper::update()
     {
       clear();
-      if (!m_mappingDB->isValid()) return;
+      if (!m_mappingDB.isValid()) return;
 
-      for (const auto& feemap : *m_mappingDB) {
+      for (const auto& feemap : m_mappingDB) {
         m_copperIDs.insert(feemap.getCopperID());
         m_fromModule[feemap.getModuleID() - 1][feemap.getBoardstackNumber()] = &feemap;
         m_fromScrod[feemap.getScrodID()] = &feemap;

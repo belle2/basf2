@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma link C++ class Belle2::TRGTOPUnpackerStore+; // , checksum=0x8f274a5f, version=2
+#pragma link C++ class Belle2::TRGTOPUnpackerStore+; // , checksum=0x8f274a5f, version=3
 
 #pragma link C++ class Belle2::TRGTOPCombinedT0Decision+; // , checksum=0x719da54b, version=1
 #pragma link C++ class std::vector<Belle2::TRGTOPCombinedT0Decision>+; // , checksum=0x1d0d8fa8, version=6

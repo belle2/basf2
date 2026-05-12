@@ -8,18 +8,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
-#include <tracking/trackFindingCDC/numerics/ERightLeft.h>
-#include <tracking/trackFindingCDC/numerics/Index.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 
 namespace Belle2 {
   class MCParticle;
   class CDCSimHit;
   class CDCHit;
 
-  namespace TrackFindingCDC {
-
+  namespace TrackingUtilities {
     class Vector3D;
     class Vector2D;
+  }
+  namespace TrackFindingCDC {
 
     /// Interface class to the Monte Carlo information for individual hits
     /** This class provides a stable interface for the underlying implementation for look ups
@@ -51,16 +52,16 @@ namespace Belle2 {
 
 
       /// Getter for the two dimensional reference position of the wire the given hit is located on - mainly for the python event display
-      const Vector2D getRefPos2D(const CDCHit* ptrHit) const;
+      const TrackingUtilities::Vector2D getRefPos2D(const CDCHit* ptrHit) const;
 
       /// Getter for the reference drift length in the two dimensional projection
       float getRefDriftLength(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the primary ionisation for the hit.
-      const Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
+      const TrackingUtilities::Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Getter for the three dimensional position of the ionisation of the primary simulated hit for the hit.
-      const Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+      const TrackingUtilities::Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
@@ -76,19 +77,19 @@ namespace Belle2 {
       bool isBackground(const CDCHit* ptrHit) const;
 
       /// Returns the position of the wire hit in the track along the travel direction
-      Index getInTrackId(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Returns the id of the segment in the track.
-      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Returns the number of superlayers the track traversed until this hit.
-      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
       /// Returns the number of loops the track traversed until this hit.
-      Index getNLoops(const CDCHit* ptrHit) const;
+      TrackingUtilities::Index getNLoops(const CDCHit* ptrHit) const;
 
       /// Returns the true right left passage information
-      ERightLeft getRLInfo(const CDCHit* ptrHit) const;
+      TrackingUtilities::ERightLeft getRLInfo(const CDCHit* ptrHit) const;
     };
   }
 }

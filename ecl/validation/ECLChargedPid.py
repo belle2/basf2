@@ -39,6 +39,8 @@ mergeChargeOfPdgIds = [
     Belle2.Const.proton.getPDGCode()
 ]
 
+basf2.set_random_seed(1337)
+
 # Create path.
 main = basf2.create_path()
 
@@ -68,4 +70,3 @@ basf2.print_path(main)
 
 main.add_module('Progress')
 basf2.process(main)
-print(basf2.statistics)

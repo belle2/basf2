@@ -8,7 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import process, set_random_seed, create_path, statistics, print_path, B2FATAL
+from basf2 import process, set_random_seed, create_path, print_path, B2FATAL
 
 from basf2 import conditions as b2c
 from simulation import add_simulation
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     #####################################################
     # Step 2: run the tracking reconstruction
 
-    add_prefilter_tracking_reconstruction(main)
+    add_prefilter_tracking_reconstruction(main, stopOnSuccessfulTrackFit=False)
 
     main.add_module('TrackTimeEstimator')
     add_mc_matcher(main, reco_tracks="RecoTracks")
@@ -150,6 +150,3 @@ if __name__ == "__main__":
 
     main.add_module("Progress")
     process(main)
-
-    # Print call statistics
-    print(statistics)

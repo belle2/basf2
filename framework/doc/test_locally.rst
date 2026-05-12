@@ -1,8 +1,11 @@
 How to test locally
 -------------------
 
-You can test locally your changes in the Sphinx documentation by compiling your
-code with the following command:
+In order to locally test your code, you must first fully build basf2. This will
+also ensure that nothing in basf2 breaks due to changes in the documentation. 
+
+To both compile basf2 and specify where the documentation output will be saved, you
+can use the following command:
 
 .. code:: bash
 
@@ -12,19 +15,24 @@ The output will be produced in ``$BELLE2_LOCAL_DIR/build/html`` and you can
 navigate it with your favorite browser to check if the output is what you
 expect.
 
-Alternatively you can also build the sphinx documentation without building any
-code with
+If you only made changes to the ``analysis``, ``framework`` or ``online_book`` packages, you can also
+add the ``--light`` option to your command to greatly speed up the compilation time. 
+
+Once basf2 has been compiled, you can build the documentation any time using
 
 .. code:: bash
 
     b2code-sphinx-build
 
-which will be slightly faster. If you're only interested in sphinx warnings,
-use
+If you're only interested in sphinx warnings, use
 
 .. code:: bash
 
     b2code-sphinx-warnings
+
+.. tip:: 
+    It is recommended to re-compile basf2 every time changes are made to the documentation
+    to ensure that nothing in basf2 has been broken. 
 
 If you are working on a remote server with port ``8XXX`` forwarded to your local
 machine (as when running a Jupyter notebook), you can also start a tiny web server on

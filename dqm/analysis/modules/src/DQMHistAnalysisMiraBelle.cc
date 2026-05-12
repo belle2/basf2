@@ -43,6 +43,7 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
   mon_dst = getMonitoringObject("dst");
+  mon_tautau = getMonitoringObject("tautau");
   //bhabha,hadrons
   mon_bhabha = getMonitoringObject("bhabha");
   mon_hadron = getMonitoringObject("hadronb2");
@@ -114,6 +115,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   auto* hist_klmTotalBarrelHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalBarrelHits");
   auto* hist_klmTotalEndcapHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalEndcapHits");
   auto* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
+  auto* hist_hltEff = findHist("PhysicsObjectsMiraBelle/hist_hltEff");
 
   if (hist_npxd == nullptr) {
     B2ERROR("Can not find the hist_npxd histogram!");
@@ -215,6 +217,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
     B2ERROR("Can not find the hist_dPhicms histogram!");
     return;
   }
+  if (hist_hltEff == nullptr) {
+    B2ERROR("Can not find the hist_hltEff histogram!");
+    return;
+  }
+
 
   // Make TCanvases
   // --- Mumu_Main
@@ -323,6 +330,10 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double pull_mumumass = (fit_mumumass - m_reference_mumu) / fit_mumumass_error;
   double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
+  // Variables needed for selectmumu efficiency in HLT
+  double Nmumu_ECLMuonPair = hist_hltEff->GetBinContent(2);
+  double Nmumu_ECLMuonPairSelectmumu = hist_hltEff->GetBinContent(3);
+
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
   mon_mumu->setVariable("mean_nsvd", mean_nsvd);
@@ -362,6 +373,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
   mon_mumu->setVariable("pull_mumumass", pull_mumumass);
   mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
+  mon_mumu->setVariable("Nmumu_ECLMuonPair", Nmumu_ECLMuonPair);
+  mon_mumu->setVariable("Nmumu_ECLMuonPairSelectmumu", Nmumu_ECLMuonPairSelectmumu);
 
   // ========== D*
   // get existing histograms produced by DQM modules
@@ -801,8 +814,46 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
 
+  //--- L1 efficiency with taupair
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("ECL_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("ECL_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDC_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDC_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDCKLM_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      std::string label = std::string("CDCKLM_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+    }
+  }
+
   //bhabha,hadrons
-  // ========== bhabha_all
+  // ========== bhabha_trk_ecl
   // get existing histograms produced by DQM modules
   auto* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
   auto* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");

@@ -5,6 +5,8 @@ env['LIBS'] = [
     '$ROOT_LIBS',
     'calibration',
     'analysis_dataobjects',
-    'reconstruction_dataobjects'
+    'analysis',
+    'reconstruction_dataobjects',
+    'mdst_dataobjects'
     ]
 Return('env')

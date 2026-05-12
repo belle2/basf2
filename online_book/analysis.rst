@@ -8,8 +8,9 @@ Besides, a generic tool for the event type analysis of inclusive MC samples is i
 
 .. toctree::
 
+   analysis/plotting
    analysis/root
    analysis/pandas
-   analysis/fitting
+   analysis/fitting_resources
    analysis/reproducibility
    analysis/topoana

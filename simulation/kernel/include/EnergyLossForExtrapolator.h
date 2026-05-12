@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ENERGYLOSSFOREXTRAPOLATOR_H_
-#define ENERGYLOSSFOREXTRAPOLATOR_H_
+#pragma once
 
 #include <CLHEP/Units/SystemOfUnits.h>
 
@@ -434,5 +433,3 @@ namespace Belle2 {
   } //end namespace Simulation
 
 } //end Belle2 namespace
-
-#endif /* ENERGYLOSSFOREXTRAPOLATOR_H_ */

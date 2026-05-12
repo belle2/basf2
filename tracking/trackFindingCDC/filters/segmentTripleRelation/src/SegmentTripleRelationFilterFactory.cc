@@ -12,15 +12,16 @@
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/MCSegmentTripleRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/SimpleSegmentTripleRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::FilterFactory<BaseSegmentTripleRelationFilter>;
+template class TrackingUtilities::FilterFactory<BaseSegmentTripleRelationFilter>;
 
 SegmentTripleRelationFilterFactory::SegmentTripleRelationFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

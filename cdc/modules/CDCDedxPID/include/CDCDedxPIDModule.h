@@ -16,7 +16,6 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -51,7 +50,7 @@ namespace Belle2 {
    * based on individual hits in the CDC and determines the mean and
    * truncated mean dE/dx value for each track.
    *
-   * The 'EnableDebugOutput' option adds CDCDedxTrack objects (one for each genfit::Track),
+   * The module creates CDCDedxTrack objects (one for each genfit::Track),
    * which includes individual dE/dx data points and their corresponding layer,
    * and hit information like reconstructed position, charge, etc.
    *
@@ -158,7 +157,6 @@ namespace Belle2 {
     double m_removeLowest; /**< Portion of lowest dE/dx values that should be discarded for truncated mean */
     double m_removeHighest; /**< Portion of highest dE/dx values that should be discarded for truncated mean */
     bool m_backHalfCurlers; /**< Whether to use the back half of curlers */
-    bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in DedxTrack objects */
 
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */
 

@@ -11,6 +11,7 @@
 import basf2 as b2
 from ROOT import Belle2
 from alignment import MillepedeCalibration
+from geometry import is_detector_present
 
 # Default configurations
 components = []
@@ -71,9 +72,9 @@ def get_path(
         import pxd
         import svd
 
-        if not geometryComponents or 'PXD' in geometryComponents:
+        if is_detector_present("PXD", geometryComponents):
             pxd.add_pxd_reconstruction(path)
-        if not geometryComponents or 'SVD' in geometryComponents:
+        if is_detector_present("SVD", geometryComponents):
             svd.add_svd_reconstruction(path)
 
         if geometryComponents:

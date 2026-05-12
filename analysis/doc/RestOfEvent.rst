@@ -18,17 +18,17 @@ a collection of all other particles in the event.
 The ROE can be used in multiple cases. For example, two of the most common ones
 are in **tagged** and **untagged** analyses of :math:`Y(4S)` decays:
 
-  - In tagged analyses, where one reconstructs both *B* mesons, the ROE object
-    should be empty in a perfect situation. However, it often contains particles
-    from either the collision event or the background. Cleaning up
-    the ROE in this case can help improve variables such as :math:`E_{extra}`, which
-    should be close to 0.
-  - In untagged analyses one reconstruct only the signal *B* meson, everything
-    else in the event is considered to come from the companion *B* meson. In
-    addition to tracks and clusters from the companion *B* meson, the ROE contains
-    also the extra tracks and clusters, as in the case of the tagged analysis.
-    Cleaning up the ROE in this case can help improve variables such as :math:`M_{bc}` or
-    :math:`\Delta E`.
+- In tagged analyses, where one reconstructs both *B* mesons, the ROE object
+  should be empty in a perfect situation. However, it often contains particles
+  from either the collision event or the background. Cleaning up
+  the ROE in this case can help improve variables such as :math:`E_{extra}`, which
+  should be close to 0.
+- In untagged analyses one reconstruct only the signal *B* meson, everything
+  else in the event is considered to come from the companion *B* meson. In
+  addition to tracks and clusters from the companion *B* meson, the ROE contains
+  also the extra tracks and clusters, as in the case of the tagged analysis.
+  Cleaning up the ROE in this case can help improve variables such as :math:`M_{bc}` or
+  :math:`\Delta E`.
 
 It is therefore a generally bad idea to take everything into account when dealing with the ROE.
 

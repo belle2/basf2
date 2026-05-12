@@ -82,6 +82,3 @@ main.add_module(analyze)
 
 # generate events
 b2.process(main)
-
-# show call statistics
-print(b2.statistics)

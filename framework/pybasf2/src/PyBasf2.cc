@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <boost/python.hpp>
-#include <framework/utilities/RegisterPythonModule.h>
 
 #include <framework/pybasf2/Framework.h>
 #include <framework/pybasf2/LogPythonInterface.h>
@@ -110,6 +109,3 @@ BOOST_PYTHON_MODULE(pybasf2)
 Return the FileMetaData object for the given output file.
 )DOC");
 }
-
-//register the module during library load
-REGISTER_PYTHON_MODULE(pybasf2)

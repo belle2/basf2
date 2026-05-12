@@ -22,7 +22,7 @@ main = b2.create_path()
 
 # Set number of events to generate
 main.add_module('EventInfoSetter',
-                expList=[1003],  # 0 for nominal phase 3, 1002 for phase II, 1003 for early phase III
+                expList=[1003],  # 0 for nominal phase 3, 1002 for Run 0 (phase 2), 1003 for Run 1 (early phase 3)
                 evtNumList=[10])
 
 # Gearbox
@@ -39,7 +39,7 @@ main.add_module('OpticalGun',
                 pulseWidth=10.0e-3,  # laser time Jitter, in ns
                 numPhotons=10,
                 diameter=10.0e-3,  # source diameter in cm
-                slotID=5,  # if nonzero, local (slot) referenc frame is used, otherwise Belle II
+                slotID=5,  # if nonzero, local (slot) reference frame is used, otherwise Belle II
                 x=-22.6,
                 y=0.0,
                 z=-129.9,
@@ -77,7 +77,7 @@ main.add_module('RootOutput',
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(b2.statistics)

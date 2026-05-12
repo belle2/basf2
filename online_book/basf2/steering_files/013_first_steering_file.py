@@ -42,12 +42,9 @@ ma.variablesToNtuple(
     "B0",
     variables=['Mbc'],
     filename="Bd2JpsiKS.root",
-    treename="tree",
+    treename="ntuple",
     path=main,
 )
 
 # start the event loop (actually start processing things)
 b2.process(main)
-
-# print out the summary
-print(b2.statistics)

@@ -7,11 +7,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <analysis/VertexFitting/TreeFitter/InternalParticle.h>
+
+#include <analysis/VertexFitting/TreeFitter/ConstraintConfiguration.h>
 #include <analysis/VertexFitting/TreeFitter/FitParams.h>
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
+#include <analysis/VertexFitting/TreeFitter/Projection.h>
+#include <analysis/VertexFitting/TreeFitter/RecoTrack.h>
+
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/V0.h>
 
@@ -57,23 +60,23 @@ namespace TreeFitter {
       B2ERROR("Trying to create an InternalParticle from NULL. This should never happen.");
     }
 
-    m_massconstraint = std::find(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
-                                 std::abs(m_particle->getPDGCode())) != config.m_massConstraintListPDG.end()
-                       or m_particle->hasExtraInfo("treeFitterMassConstraint");
+    m_massconstraint = std::find_if(config.m_massConstraintListPDG.begin(), config.m_massConstraintListPDG.end(),
+    [pdg = std::abs(m_particle->getPDGCode())](int val) { return std::abs(val) == pdg; }) != config.m_massConstraintListPDG.end()
+    or m_particle->hasExtraInfo("treeFitterMassConstraint");
 
-    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == config.m_beamConstraintPDG);
+    m_beamconstraint = (std::abs(m_particle->getPDGCode()) == std::abs(config.m_beamConstraintPDG));
 
     if (!m_automatic_vertex_constraining) {
       // if this is a hadronically decaying resonance it is useful to constrain the decay vertex to its mother's decay vertex.
       //
-      m_shares_vertex_with_mother  = std::find(config.m_fixedToMotherVertexListPDG.begin(),
-                                               config.m_fixedToMotherVertexListPDG.end(),
-                                               std::abs(m_particle->getPDGCode())) != config.m_fixedToMotherVertexListPDG.end() && this->mother();
+      m_shares_vertex_with_mother  = std::find_if(config.m_fixedToMotherVertexListPDG.begin(), config.m_fixedToMotherVertexListPDG.end(),
+      [pdg = std::abs(m_particle->getPDGCode())](int val) { return std::abs(val) == pdg; }) != config.m_fixedToMotherVertexListPDG.end()
+      and this->mother();
 
       // use geo constraint if this particle is in the list to constrain
-      m_geo_constraint = std::find(config.m_geoConstraintListPDG.begin(),
-                                   config.m_geoConstraintListPDG.end(),
-                                   std::abs(m_particle->getPDGCode())) != config.m_geoConstraintListPDG.end()  && this->mother() && !m_shares_vertex_with_mother;
+      m_geo_constraint = std::find_if(config.m_geoConstraintListPDG.begin(), config.m_geoConstraintListPDG.end(),
+      [pdg = std::abs(m_particle->getPDGCode())](int val) { return std::abs(val) == pdg; }) != config.m_geoConstraintListPDG.end()
+      and this->mother() and !m_shares_vertex_with_mother;
     } else {
       m_shares_vertex_with_mother = this->mother() && m_isStronglyDecayingResonance;
       m_geo_constraint = this->mother() && !m_shares_vertex_with_mother;
@@ -157,12 +160,10 @@ namespace TreeFitter {
           Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
 
           double flt1(0), flt2(0);
-          ROOT::Math::XYZVector v;
+          Eigen::Vector3d v;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
 
-          fitparams.getStateVector()(posindex)     = v.X();
-          fitparams.getStateVector()(posindex + 1) = v.Y();
-          fitparams.getStateVector()(posindex + 2) = v.Z();
+          fitparams.getStateVector().segment<3>(posindex) = v;
 
           dau1->setFlightLength(flt1);
           dau2->setFlightLength(flt2);
@@ -193,9 +194,7 @@ namespace TreeFitter {
     int posindex = posIndex();
     if (hasPosition() &&
         mother() &&
-        fitparams.getStateVector()(posindex) == 0 &&
-        fitparams.getStateVector()(posindex + 1) == 0 && \
-        fitparams.getStateVector()(posindex + 2) == 0) {
+        fitparams.getStateVector().segment<3>(posindex).isZero()) {
       const int posindexmom = mother()->posIndex();
       const int dim = m_config->m_originDimension; //TODO access mother?
       fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);

@@ -22,6 +22,7 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 #include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
+#include <trg/cdc/dbobjects/CDCTrigger2DConfig.h>
 
 #include <TMatrix.h>
 #include <Math/Vector2D.h>
@@ -84,6 +85,8 @@ namespace Belle2 {
 
     /** Initialize the module and check module parameters */
     virtual void initialize() override;
+    /** Register run-dependent DataStore arrays. */
+    virtual void beginRun() override;
     /** Run tracking */
     virtual void event() override;
     /** Clean up */
@@ -231,6 +234,9 @@ namespace Belle2 {
     /** switch to use hit pattern inside TSF with ADC cut*/
     bool m_useadc;
 
+    /** switch to use database to load run dependent parameter*/
+    bool m_useDB;
+
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;
@@ -275,6 +281,10 @@ namespace Belle2 {
     StoreArray<CDCTriggerHoughCluster> m_clusters;
     /** matrix containing the Hough plane */
     StoreObjPtr<TMatrix> m_houghPlane;
+
+    /** run dependent parameter database of 2D */
+    DBObjPtr<CDCTrigger2DConfig> m_cdctrg2d_DB;
+
   };//end class declaration
 } // end namespace Belle2
 

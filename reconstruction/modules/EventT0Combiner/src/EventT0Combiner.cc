@@ -8,6 +8,8 @@
 
 #include <reconstruction/modules/EventT0Combiner/EventT0Combiner.h>
 
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+
 #include <cmath>
 
 using namespace Belle2;

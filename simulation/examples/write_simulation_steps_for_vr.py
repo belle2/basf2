@@ -33,5 +33,5 @@ si.add_simulation(main, simulateT0jitter=False)
 
 main.add_module('Progress')
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

@@ -341,3 +341,13 @@ double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIde
 }
 
 
+
+void PIDLikelihood::setCDCnLayerHitsUsed(int nLayerHitsUsed)
+{
+  m_CDCnLayerHitsUsed = nLayerHitsUsed;
+}
+
+int PIDLikelihood::getCDCnLayerHitsUsed() const
+{
+  return m_CDCnLayerHitsUsed;
+}

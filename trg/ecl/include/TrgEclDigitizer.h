@@ -39,9 +39,9 @@ namespace Belle2 {
     /** save fitting result into tables */
     void save(int);
     /** Set flag of waveform table*/
-    void setWaveform(int wave) {_waveform = wave;}
+    void setWaveform(int wave) { m_SaveTCWaveForm = wave;}
     /** Set flag of waveform table*/
-    void setFADC(int fadc) {_FADC = fadc;}
+    void setFADC(int fadc) { m_FADC = fadc;}
 
 
 
@@ -59,16 +59,17 @@ namespace Belle2 {
     double u_max(double, double);
 
   private:
+
     /** time range(default : -4000 ~ 4000 ns ) */
-    double TimeRange;
+    double m_TimeRange;
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double TCEnergy[576][80];
+    double m_TCEnergy[576][80];
     /** TC Timing converted from Xtarl Timing [GeV] */
-    double TCTiming[576][80];
+    double m_TCTiming[576][80];
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double TCEnergy_tot[576];
+    double m_TCEnergy_tot[576];
     /** TC Timing converted from Xtarl Timing [GeV] */
-    double TCTiming_tot[576];
+    double m_TCTiming_tot[576];
 
     // background TC Energy [GeV]
     // double TCBGEnergy[576][80];
@@ -76,35 +77,35 @@ namespace Belle2 {
     // double TCBGTiming[576][80];
 
     /** Input  TC energy[GeV] */
-    double TCRawEnergy[576][60];
+    double m_TCRawEnergy[576][60];
     /**Input  TC timing[ns]  */
-    double TCRawTiming[576][60];
+    double m_TCRawTiming[576][60];
     /**Input  Beambackground tag  */
-    double TCRawBkgTag[576][60];
+    double m_TCRawBkgTag[576][60];
 
     /** Object of TC Mapping */
-    TrgEclMapping* _TCMap;
+    TrgEclMapping* m_TCMap;
     /** Object of DataBase */
-    TrgEclDataBase* _DataBase;
+    TrgEclDataBase* m_DataBase;
 
     /** Noise Matrix of Parallel and Serial Noise */
     /** Noise Low triangle Matrix of Parallel noise  */
-    std::vector<std::vector<double>> MatrixParallel;
+    std::vector<std::vector<double>> m_MatrixParallel;
     /** Noise Low triangle Matrix of Serial noise  */
-    std::vector<std::vector<double>> MatrixSerial;
+    std::vector<std::vector<double>> m_MatrixSerial;
     /** Beambackground contribution */
-    double TCBkgContribution[576][80];
+    double m_TCBkgContribution[576][80];
     /**  Signal contribution */
-    double TCSigContribution[576][80];
+    double m_TCSigContribution[576][80];
     /** Beambackground tag */
-    int TCBeambkgTag[576][80];
+    int m_TCBeambkgTag[576][80];
     /** Flag of waveform table */
-    int _waveform;
+    int m_SaveTCWaveForm;
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double WaveForm[576][64];
+    double m_WaveForm[576][64];
     /** Flag of choosing the method of waveform generation function 0: use simplifiedFADC, 1: use interFADC(interpolation) */
-    int _FADC;
+    int m_FADC;
     /** Flag of saving beam background tag  or not*/
-    int _BeambkgTag;
+    int m_BeambkgTag;
   };
 } // end namespace Belle2

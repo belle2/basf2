@@ -21,7 +21,7 @@ namespace Belle2 {
     explicit SVDOccupancyCalibrationsAlgorithm(const std::string& str);
 
     /// Destructor
-    virtual ~SVDOccupancyCalibrationsAlgorithm() {}
+    virtual ~SVDOccupancyCalibrationsAlgorithm() override {}
 
   protected:
 

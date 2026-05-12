@@ -327,13 +327,13 @@ bool DecayDescriptor::isSelfConjugated() const
     const DecayDescriptorParticle* daughter = getDaughter(i)->getMother();
     int pdg = daughter->getPDGCode();
     decay.push_back(pdg);
-    decaybar.push_back(Belle2::EvtPDLUtil::hasAntiParticle(pdg) ? -pdg : pdg);
+    decaybar.push_back(EvtPDLUtil::hasAntiParticle(pdg) ? -pdg : pdg);
   }
 
   std::sort(decay.begin(), decay.end());
   std::sort(decaybar.begin(), decaybar.end());
 
-  return (not Belle2::EvtPDLUtil::hasAntiParticle(getMother()->getPDGCode())) || (decay == decaybar);
+  return (not EvtPDLUtil::hasAntiParticle(getMother()->getPDGCode())) || (decay == decaybar);
 
 }
 

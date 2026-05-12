@@ -44,7 +44,7 @@ main.add_module('BKLMDigitAnalyzer',
                 outputRootName='bklmHitmap')  # Note that .root is not needed!
 
 # Process the main path
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)
 
 # Produce a .pdf file with the hitmap

@@ -20,7 +20,7 @@
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
 #include <RooFitResult.h>
-
+#include <RooMsgService.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,7 +46,7 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
@@ -71,7 +71,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -167,6 +167,10 @@ void DQMHistAnalysisPXDTrackChargeModule::beginRun()
 
 void DQMHistAnalysisPXDTrackChargeModule::event()
 {
+  // need to be done every event in case someone else modifies it.
+  RooMsgService::instance().setSilentMode(true);
+  RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
+
   gStyle->SetOptStat(0);
   gStyle->SetStatStyle(1);
   gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work

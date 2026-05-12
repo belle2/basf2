@@ -534,7 +534,7 @@ class SystematicsPhiGamma(BaseSkim):
 
     * :math:`E_{\\gamma}> 3\\,\\text{GeV}` AND
     * :math:`E_{\\gamma}< 8\\,\\text{GeV}`
-    * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 4`
+    * :math:`n_{\\text{tracks}} \\geq 2` AND :math:`n_{\\text{tracks}} \\leq 6`
     * at least 1 candidate in the K_S0:merged or in the phi->K+:all K-:all lists
     """
     __authors__ = ["Giuseppe Finocchiaro", "Benjamin Oberhof"]

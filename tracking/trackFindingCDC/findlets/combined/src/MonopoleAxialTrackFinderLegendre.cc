@@ -7,11 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/MonopoleAxialTrackFinderLegendre.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 MonopoleAxialTrackFinderLegendre::MonopoleAxialTrackFinderLegendre()
 {
@@ -29,15 +30,15 @@ void MonopoleAxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleP
   m_straightMonopoleAxialTrackCreatorHitLegendre.exposeParameters(moduleParamList, prefix);
 }
 
-void MonopoleAxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
+void MonopoleAxialTrackFinderLegendre::apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits,
                                              std::vector<CDCTrack>& tracks)
 {
   B2DEBUG(25, "**********   CDCTrackingModule  ************");
 
   // Acquire the axial hits
-  std::vector<const CDCWireHit*> axialWireHits;
+  std::vector<const TrackingUtilities::CDCWireHit*> axialWireHits;
   axialWireHits.reserve(wireHits.size());
-  for (const CDCWireHit& wireHit : wireHits) {
+  for (const TrackingUtilities::CDCWireHit& wireHit : wireHits) {
     wireHit->unsetTemporaryFlags();
     wireHit->unsetMaskedFlag();
     if (not wireHit.isAxial()) continue;

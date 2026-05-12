@@ -8,19 +8,18 @@
 
 #pragma once
 
-#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
-
-#include <framework/dataobjects/EventT0.h>
 
 #include <TH1F.h>
 #include <TH1D.h>
 #include <TDirectory.h>
 
 namespace Belle2 {
+  class TRGSummary;
+  class SoftwareTriggerResult;
+  class EventT0;
 
   /**
    * This module to design collect the event t0 values base on different detectors and physics processes.

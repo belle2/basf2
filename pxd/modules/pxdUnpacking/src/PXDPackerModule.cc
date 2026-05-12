@@ -8,10 +8,13 @@
 
 #include <pxd/unpacking/PXDRawDataDefinitions.h>
 #include <pxd/modules/pxdUnpacking/PXDPackerModule.h>
-#include <framework/datastore/DataStore.h>
+#include <rawdata/dataobjects/RawPXD.h>
+#include <pxd/dataobjects/PXDDigit.h>
+#include <pxd/dataobjects/PXDInjectionBGTiming.h>
+#include <pxd/dbobjects/PXDDHHFirmwareVersionPar.h>
+
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
 #include <boost/crc.hpp>

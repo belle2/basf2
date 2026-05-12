@@ -48,8 +48,6 @@ partial_select_mod.if_true(success_path)
 
 basf2.process(main)
 
-print(basf2.statistics)
-
 assert success_count.num_events == expected_success_events
 assert success_count.events[0] == expected_event_start
 assert success_count.events[-1] == expected_event_stop

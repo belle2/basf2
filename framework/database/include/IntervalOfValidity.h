@@ -38,6 +38,14 @@ namespace Belle2 {
     ~IntervalOfValidity() = default;
 
     /**
+     * Function that checks whether the (experiment, run) is inside the validity interval.
+     * @param experiment   experiment number to be checked
+     * @param run          run number to be checked; if the run number 0 it's checked whether the whole experiment is inside the validity interval
+     * @return             true if the given (experiment, run) is inside the validity interval.
+     */
+    bool contains(const int experiment, const int run) const;
+
+    /**
      * Function that checks whether the event is inside the validity interval.
      * @param event   event meta data to be checked, if the run number 0 it's checked whether the whole experiment is inside the validity interval
      * @return             true if the given event is inside the validity interval.

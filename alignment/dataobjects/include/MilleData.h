@@ -20,10 +20,11 @@ namespace Belle2 {
   class MilleData : public MergeableNamed {
   public:
     /// Constructor. Set doublePrecision to true to write binary files with doubles instead of floats
-    MilleData(bool doublePrecision = false, bool absFilePaths = false) : MergeableNamed(), m_doublePrecision(doublePrecision),
+    explicit MilleData(bool doublePrecision = false, bool absFilePaths = false) : MergeableNamed(),
+      m_doublePrecision(doublePrecision),
       m_absFilePaths(absFilePaths) {};
     /// Destructor
-    virtual ~MilleData() { close(); }
+    ~MilleData() override { close(); }
 
     /// Implementation of merging
     virtual void merge(const MergeableNamed* other) override;

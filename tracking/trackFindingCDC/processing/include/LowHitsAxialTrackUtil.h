@@ -10,9 +10,11 @@
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /**
      * Utility structure gathering heuristic functions used during the search for non-helix or low hit count tracks
@@ -23,15 +25,16 @@ namespace Belle2 {
        * Create CDCTrack using CDCWireHit hits and store it in the list. Then call the postprocessing on it if need be.
        * Uses extra assumptions like track coming from origin
        */
-      static void addCandidateFromHits(const std::vector<const CDCWireHit*>& foundAxialWireHits,
-                                       const std::vector<const CDCWireHit*>& allAxialWireHits,
-                                       std::vector<CDCTrack>& axialTracks,
+      static void addCandidateFromHits(const std::vector<const TrackingUtilities::CDCWireHit*>& foundAxialWireHits,
+                                       const std::vector<const TrackingUtilities::CDCWireHit*>& allAxialWireHits,
+                                       std::vector<TrackingUtilities::CDCTrack>& axialTracks,
                                        bool fromOrigin = true,
                                        bool straight = true,
                                        bool withPostprocessing = true);
 
       /// Perform all track postprocessing - return whether the track is considered good after the postprocessing
-      static bool postprocessTrack(CDCTrack& track, const std::vector<const CDCWireHit*>& allAxialWireHits);
+      static bool postprocessTrack(TrackingUtilities::CDCTrack& track,
+                                   const std::vector<const TrackingUtilities::CDCWireHit*>& allAxialWireHits);
     };
   }
 }

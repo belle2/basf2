@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -24,11 +24,11 @@ void SpacePointLoader::exposeParameters(ModuleParamList* moduleParamList, const 
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useAssignedHits"), m_param_useAssignedHits,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useAssignedHits"), m_param_useAssignedHits,
                                 "Use only already assigned hits",
                                 m_param_useAssignedHits);
 
-  m_storeArrayLoader.exposeParameters(moduleParamList, TrackFindingCDC::prefixed(prefix, "hits"));
+  m_storeArrayLoader.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "hits"));
 }
 
 void SpacePointLoader::apply(std::vector<const SpacePoint*>& spacePoints)
@@ -39,12 +39,12 @@ void SpacePointLoader::apply(std::vector<const SpacePoint*>& spacePoints)
     const auto hitIsNotAlreadyUsed = [](const auto & hit) {
       return not hit->getAssignmentState();
     };
-    TrackFindingCDC::erase_remove_if(spacePoints, hitIsNotAlreadyUsed);
+    TrackingUtilities::erase_remove_if(spacePoints, hitIsNotAlreadyUsed);
   } else {
     const auto hitIsAlreadyUsed = [](const auto & hit) {
       return hit->getAssignmentState();
     };
-    TrackFindingCDC::erase_remove_if(spacePoints, hitIsAlreadyUsed);
+    TrackingUtilities::erase_remove_if(spacePoints, hitIsAlreadyUsed);
   }
 
   B2DEBUG(29, "Starting with " << spacePoints.size() << " hits.");

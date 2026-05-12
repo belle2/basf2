@@ -169,6 +169,3 @@ if __name__ == "__main__":
     main_path.add_module("Progress")
     
     b2.process(main_path, args.nEvents)
-    print(b2.statistics)
-    
-    

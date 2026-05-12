@@ -56,7 +56,7 @@ namespace Belle2 {
        * @param pixelID pixel ID
        * @param timeOffset time offset [ns]
        * @param calErrorsSq calibration uncertainies squared
-       * @param shift shift of waveform window due to asic mis-alignment [num of windows]
+       * @param shift shift of waveform window due to asic misalignment [num of windows]
        * @param rmsNoise r.m.s of noise [ADC counts]
        * @param sampleTimes sample times
        */
@@ -149,7 +149,7 @@ namespace Belle2 {
        * Returns ASIC storage window number
        * @return window number
        */
-      unsigned getASICWindow() const {return s_window;}
+      static unsigned getASICWindow() {return s_window;}
 
       /**
        * Returns hardware channel number
@@ -234,7 +234,7 @@ namespace Belle2 {
        * @param sigma sigma
        * @return value
        */
-      double gauss(double x, double mean, double sigma) const
+      static double gauss(double x, double mean, double sigma)
       {
         double xx = (x - mean) / sigma;
         return exp(-0.5 * xx * xx);
@@ -278,7 +278,7 @@ namespace Belle2 {
       double m_calErrorsSq = 0; /**< calibration uncertainties squared */
       double m_rmsNoise = 0;  /**< r.m.s of noise [ADC counts] */
       const TOPSampleTimes* m_sampleTimes = 0; /**< sample times */
-      int m_windowShift = 0; /**< additional wf window shift due to asic mis-alignment */
+      int m_windowShift = 0; /**< additional wf window shift due to asic misalignment */
 
       unsigned m_channel = 0; /**< hardware channel number (0-based) */
       unsigned m_scrodID = 0; /**< SCROD ID */

@@ -27,9 +27,6 @@ namespace Belle2 {
       /** Constructor */
       TOPPulseHeightAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPPulseHeightAlgorithm() {}
-
       /**
        * Sets minimal number of histogram entries to perform a fit
        */

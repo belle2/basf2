@@ -16,8 +16,6 @@ import unittest
 
 import fei.config
 
-# @cond
-
 
 class TestFeiConfiguration(unittest.TestCase):
 
@@ -250,5 +248,3 @@ if __name__ == '__main__':
     # main() never returns, so install exit handler to do our cleanup
     atexit.register(shutil.rmtree, tempdir)
     unittest.main()
-
-# @endcond

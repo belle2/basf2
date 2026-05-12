@@ -54,7 +54,7 @@ namespace Belle2 {
     /** Index of the generated negative tau */
     int idOfTauMinus;
     /** PDG codes accepted as charged final state particles in generation: {e, mu, pi, K, p} */
-    const int finalStatePDGs[5] = { 11, 13, 211, 321, 2212 };
+    static constexpr std::array<int, 5> finalStatePDGs = { 11, 13, 211, 321, 2212 };
     /** ID of the decay channel of positive tau */
     Int_t m_pmode;
     /** ID of the decay channel of negative tau*/

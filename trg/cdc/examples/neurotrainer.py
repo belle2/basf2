@@ -167,7 +167,7 @@ basf2.logging.set_info(basf2.LogLevel.DEBUG, basf2.LogInfo.LEVEL | basf2.LogInfo
 
 
 # Process events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 
 # Print call statistics
 print(basf2.statistics)

@@ -248,7 +248,7 @@ namespace Belle2 {
 
       /**
        * Performs the PDF expansion in y for a given pixel column using scan or merge methods.
-       * Results accessable with getResults() method.
+       * Results accessible with getResults() method.
        * @param col pixel column number (0-based)
        * @param yB unfolded coordinate y of photon at prism entrance (= Bar exit) plane
        * @param dydz photon slope in y-z projection at prism entrance (dy/dz)
@@ -301,8 +301,8 @@ namespace Belle2 {
       double getBeta() const {return m_beta;}
 
       /**
-       * Returns particle trajectory lenght inside quartz
-       * @return particle trajectory lenght inside quartz
+       * Returns particle trajectory length inside quartz
+       * @return particle trajectory length inside quartz
        */
       double getTrackLengthInQuartz() const {return m_length;}
 
@@ -365,7 +365,7 @@ namespace Belle2 {
        * Map entries correspond to different Gaussian widths due to different number of reflections.
        * @return photon energy distributions convoluted with multiple scattering and surface roughness
        */
-      const std::map<int, Table> getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
+      const std::map<int, Table>& getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
 
       /**
        * Returns the results of PDF expansion in y

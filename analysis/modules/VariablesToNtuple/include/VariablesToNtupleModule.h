@@ -24,7 +24,7 @@
 #include <string>
 
 namespace Belle2 {
-
+  class Particle;
   class StringWrapper;
 
   /** Module to calculate variables specified by the user for a given ParticleList

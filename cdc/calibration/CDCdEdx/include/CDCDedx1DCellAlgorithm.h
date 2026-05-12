@@ -8,19 +8,8 @@
 
 #pragma once
 
-#include <algorithm>
-#include <iostream>
-#include <fstream>
-
-#include <TMath.h>
 #include <TH1D.h>
-#include <TCanvas.h>
 #include <TH2D.h>
-#include <TTree.h>
-#include <TStyle.h>
-#include <TLegend.h>
-#include <TRandom.h>
-
 
 #include <cdc/dbobjects/CDCDedx1DCell.h>
 #include <calibration/CalibrationAlgorithm.h>
@@ -36,20 +25,75 @@ namespace Belle2 {
 
   public:
 
+    static constexpr int m_kNGroups = 3; /**< SL grouping: inner (SL0), middle (SL1), outer (SL2–8) */
+
     /**
-     * Constructor: Sets the description, the properties and the parameters of the algorithm.
-     */
+    * Constructor: Sets the description, the properties and the parameters of the algorithm.
+    */
     CDCDedx1DCellAlgorithm();
 
     /**
-     * Destructor
-     */
+    * Destructor
+    */
     virtual ~CDCDedx1DCellAlgorithm() {}
 
     /**
-    * adding suffix to control plots
+    * function to set min/max range of entrance angle for calibration
     */
-    void setSuffix(const std::string& value) {m_suffix = value;}
+    void setEntaRange(double min = -1.0, double max = 1.0) {m_eaMin = min; m_eaMax = max;}
+
+    /**
+    * function to set number of entrance angle bins for calibration
+    */
+    void setEntaBins(unsigned int value = 316) {m_eaB = value;}
+
+    /**
+    * function to set nbins of dedx dist for calibration
+    */
+    void setHistBins(int value = 250) {m_dedxBin = value;}
+
+    /**
+    * function to set min/max range of dedx dist for calibration
+    */
+    void setHistRange(double min = 0.0, double max = 5.0) {m_dedxMin = min; m_dedxMax = max;}
+
+    /**
+    * function to set pt limit
+    */
+    void setPtLimit(double value) {m_ptMax = value;}
+
+    /**
+    * function to set costheta limit
+    */
+    void setCosLimit(double value) {m_cosMax = value;}
+
+    /**
+    * function to set bins of truncation from histogram
+    */
+    void setTrucationBins(double lowedge, double upedge)
+    {
+      m_truncMin = lowedge; m_truncMax = upedge ;
+    }
+
+    /**
+    * set bin split factor for all range
+    */
+    void setSplitFactor(int value) {m_binSplit = value;}
+
+    /**
+    * set charge type
+    */
+    void setChargeType(int value) {m_chargeType = value;}
+
+    /**
+    * set adjustment factor
+    */
+    void setAdjustmentFactor(int value) {m_adjustFac = value;}
+
+    /**
+    * function to set truncation method (local vs global)
+    */
+    void setLayerTrunc(bool value = false) {isFixTrunc = value;}
 
     /**
     * Set Var bins flag to on or off
@@ -57,9 +101,19 @@ namespace Belle2 {
     void setVariableBins(bool value) {isVarBins = value;}
 
     /**
-    * function to set truncation method (local vs global)
+    * set rotation sys to copy constants from one region to other
     */
-    void setLayerTrunc(bool value = false) {isFixTrunc = value;}
+    void setRotSymmetry(bool value) {isRotSymm = value;}
+
+    /**
+    * funtion to set flag active for plotting
+    */
+    void enableExtraPlots(bool value = false) {isMakePlots = value;}
+
+    /**
+    * funtion to set flag to print log
+    */
+    void setPrintLog(bool value = false) {isPrintLog = value;}
 
     /**
     * set false if generating absolute (not relative)
@@ -68,37 +122,19 @@ namespace Belle2 {
     void setMergePayload(bool value) { isMerge = value;}
 
     /**
-    * set bin split factor for all range
+    * adding suffix to control plots
     */
-    void setSplitFactor(int value) {m_binSplit = value;}
+    void setSuffix(const std::string& value) {m_suffix = value;}
 
     /**
-    * set rotation sys to copy constants from one region to other
+    * Representative CDC layer for each SL group (used to access group-wise constants):
+    * SL0 => 1, SL1 => 9, SL2-8 => 17
     */
-    void setRotSymmetry(bool value) {isRotSymm = value;}
-
-    /**
-     * function to set bins of truncation from histogram
-    */
-    void setTrucationBins(double lowedge, double upedge)
+    unsigned int getRepresentativeLayer(unsigned int il) const
     {
-      m_truncMin = lowedge; m_truncMax = upedge ;
+      static const std::array<unsigned int, m_kNGroups> repLayer = {1, 9, 17};
+      return repLayer.at(il);
     }
-
-    /**
-    * function to set flag active for plotting
-    */
-    void enableExtraPlots(bool value = false) {isMakePlots = value;}
-
-    /**
-    * function to set pt limit
-    */
-    void setPtLimit(double value) {m_ptMax = value;}
-
-    /**
-    * function to set cos \f$\theta\f$ limit
-    */
-    void setCosLimit(double value) {m_cosMax = value;}
 
     /**
     * adjust baseline based on charge or global overall
@@ -128,7 +164,7 @@ namespace Belle2 {
     }
 
     /**
-    * function to get extract calibration run/exp
+    * function to extract calibration run/exp
     */
     void getExpRunInfo();
 
@@ -140,7 +176,7 @@ namespace Belle2 {
     /**
     * function to define histograms
     */
-    void defineHisto(std::vector<TH1D*>  hdedxhit[2],  TH1D* hdedxlay[2], TH1D* hentalay[2]);
+    void defineHisto(std::array<std::vector<TH1D*>, 3>& hdedxhit, std::array<TH1D*, 3>& hdedxlay, std::array<TH1D*, 3>& hentalay);
 
     /**
     * function to get bins of truncation from histogram
@@ -153,30 +189,30 @@ namespace Belle2 {
     double getTruncationMean(TH1D* hist, int binlow, int binhigh);
 
     /**
-     * function to generate final constants
-     */
+    * function to generate final constants
+    */
     void createPayload();
 
     /**
-     * function to plot merging factor
-     */
+    * function to plot merging factor
+    */
     void plotMergeFactor(std::map<int, std::vector<double>> bounds, const std::array<int, 2> nDev,
                          std::map<int, std::vector<int>> steps);
 
     /**
     * function to draw the dE/dx histogram in enta bins
     */
-    void plotdedxHist(std::vector<TH1D*> hdedxhit[2]);
+    void plotdedxHist(std::array<std::vector<TH1D*>, m_kNGroups>& hdedxhit);
 
     /**
     * function to draw dedx dist. for Inner/outer layer
     */
-    void plotLayerDist(TH1D* hdedxL[2]);
+    void plotLayerDist(std::array<TH1D*, m_kNGroups>& hdedxlay);
 
     /**
     * function to draw pt vs costh and entrance angle distribution for Inner/Outer layer
     */
-    void plotQaPars(TH1D* hentalay[2], TH2D* hptcosth);
+    void plotQaPars(std::array<TH1D*, m_kNGroups>& hentalay, TH2D* hptcosth);
 
     /**
     * function to draw symm/Var layer constant
@@ -189,14 +225,15 @@ namespace Belle2 {
     void plotConstants();
 
     /**
-     * function to draw the stats plots
-     */
+    * function to draw the stats plots
+    */
     void plotEventStats();
 
   protected:
+
     /**
-     * 1D cell algorithm
-     */
+    * 1D cell algorithm
+    */
     virtual EResult calibrate() override;
 
 
@@ -231,17 +268,16 @@ namespace Belle2 {
     bool isMerge; /**< print more debug information */
 
     std::string m_suffix; /**< add suffix to all plot name  */
-    std::string m_runExp; /**< add suffix to all plot name  */
-    std::string m_label[2] = {"IL", "OL"}; /**< add inner/outer layer label */
+    std::string m_runExp; /**< add run and exp to title of plot  */
+    std::string m_label[m_kNGroups] = {"SL0", "SL1", "SL2-8"}; /**< add inner/outer superlayer label */
 
     std::vector<int> m_eaBinLocal; /**< # of var bins for enta angle */
-    std::array<std::vector<int>, 2> m_binIndex; /**< symm/Var bin numbers */
-    std::array<std::vector<double>, 2>m_binValue; /**< enta Var bin values */
+    std::array<std::vector<int>, m_kNGroups> m_binIndex; /**< symm/Var bin numbers */
+    std::array<std::vector<double>, m_kNGroups>m_binValue; /**< enta Var bin values */
 
     std::vector<std::vector<double>> m_onedcors; /**< final vectors of calibration  */
 
     DBObjPtr<CDCDedx1DCell> m_DBOneDCell; /**< One cell correction DB object */
-
 
   };
 } // namespace Belle2

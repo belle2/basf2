@@ -45,6 +45,3 @@ ma.printVariableValues(list_name='pi-:gen', var_names=['charge', 'px', 'py', 'pz
 
 # Process the events
 b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)

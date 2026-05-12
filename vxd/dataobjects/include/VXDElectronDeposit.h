@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_SIMULATION_ELECTRONDEPOSIT_H
-#define VXD_SIMULATION_ELECTRONDEPOSIT_H
 
 #include <algorithm>
 #include <cmath>
@@ -77,4 +75,3 @@ namespace Belle2 {
   };
 
 } //Belle2 namespace
-#endif // VXD_SIMULATION_ELECTRONDEPOSIT_H

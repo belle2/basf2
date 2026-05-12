@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::MVAFilter<BasicClusterVarSet>;
+template class TrackingUtilities::MVAFilter<BasicClusterVarSet>;
 
 MVABackgroundClusterFilter::MVABackgroundClusterFilter()
   : Super("trackfindingcdc_BackgroundClusterFilter", 0.2, "trackfindingcdc_ClusterFilterParameters")

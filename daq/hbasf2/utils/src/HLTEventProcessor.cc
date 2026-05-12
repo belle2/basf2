@@ -8,7 +8,6 @@
 #include <daq/hbasf2/utils/HLTEventProcessor.h>
 
 #include <boost/python.hpp>
-#include <framework/utilities/RegisterPythonModule.h>
 #include <framework/core/InputController.h>
 #include <framework/pcore/ProcHandler.h>
 
@@ -521,5 +520,3 @@ BOOST_PYTHON_MODULE(hbasf2)
   def("processNumbered", &processNumbered);
   def("process", &process);
 }
-
-REGISTER_PYTHON_MODULE(hbasf2)

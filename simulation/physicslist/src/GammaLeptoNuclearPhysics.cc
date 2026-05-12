@@ -31,6 +31,8 @@
 #include "G4CrossSectionDataSetRegistry.hh"
 
 #include "G4SystemOfUnits.hh"
+#include "G4GammaParticipants.hh"
+#include "G4QGSModel.hh"
 
 using namespace Belle2;
 using namespace Simulation;

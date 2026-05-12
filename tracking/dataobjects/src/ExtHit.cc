@@ -9,7 +9,6 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <TMatrixD.h>
-#include <TMatrixDSym.h>
 
 #include <cmath>
 

@@ -88,8 +88,8 @@ namespace Belle2 {
       const IntervalOfValidity& getRequestedIov() const {return m_iov;}
       /// Get constants (in TObjects) for database update from last calibration
       std::list<Database::DBImportQuery>& getPayloads() {return m_payloads;}
-      /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
-      std::list<Database::DBImportQuery> getPayloadValues() {return m_payloads;}
+      /// Get constants (in TObjects) for database update from last calibration
+      const std::list<Database::DBImportQuery>& getPayloadValues() const {return m_payloads;}
       /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
       std::shared_ptr<TNamed> getCalibObj(const std::string& name, const RunRange& runRange) const
       {
@@ -139,13 +139,13 @@ namespace Belle2 {
     virtual ~CalibrationAlgorithm() {}
 
     /// Get the prefix used for getting calibration data
-    std::string getPrefix() const {return m_prefix;}
+    const std::string& getPrefix() const {return m_prefix;}
 
     /// Checks that a PyObject can be successfully converted to an ExpRun type
-    bool checkPyExpRun(PyObject* pyObj);
+    static bool checkPyExpRun(PyObject* pyObj);
 
     /// Performs the conversion of PyObject to ExpRun
-    Calibration::ExpRun convertPyExpRun(PyObject* pyObj);
+    static Calibration::ExpRun convertPyExpRun(PyObject* pyObj);
 
     /**
      * Alias for prefix. For convenience and less writing, we say developers to
@@ -157,7 +157,7 @@ namespace Belle2 {
      * box for default cases -> return the name of module you have to add to your
      * path to collect data for this algorithm.
      */
-    std::string getCollectorName() const {return getPrefix();}
+    const std::string& getCollectorName() const {return getPrefix();}
 
     /// Set the prefix used to identify datastore objects
     void setPrefix(const std::string& prefix) {m_prefix = prefix;}
@@ -181,7 +181,7 @@ namespace Belle2 {
     void fillRunToInputFilesMap();
 
     /// Get the granularity of collected data
-    std::string getGranularity() const {return m_granularityOfData;};
+    const std::string& getGranularity() const {return m_granularityOfData;};
 
     /**
      * Runs calibration over vector of runs for a given iteration. You can also specify the IoV to
@@ -199,8 +199,8 @@ namespace Belle2 {
     /// Get constants (in TObjects) for database update from last execution
     std::list<Database::DBImportQuery>& getPayloads() {return m_data.getPayloads();}
 
-    /// Get constants (in TObjects) for database update from last execution but passed by VALUE
-    std::list<Database::DBImportQuery> getPayloadValues() {return m_data.getPayloadValues();}
+    /// Get constants (in TObjects) for database update from last execution
+    const std::list<Database::DBImportQuery>& getPayloadValues() const {return m_data.getPayloadValues();}
 
     /// Submit constants from last calibration into database
     bool commit();
@@ -265,10 +265,10 @@ namespace Belle2 {
     int getIteration() const { return m_data.getIteration(); }
 
     /// Set the input file names used for this algorithm
-    void setInputFileNames(std::vector<std::string> inputFileNames);
+    void setInputFileNames(const std::vector<std::string>& inputFileNames);
 
     /// Get the input file names used for this algorithm as a STL vector
-    std::vector<std::string> getVecInputFileNames() const {return m_inputFileNames;}
+    const std::vector<std::string>& getVecInputFileNames() const {return m_inputFileNames;}
 
     /// Get calibration data object by name and list of runs, the Merge function will be called to generate the overall object
     template<class T>
@@ -309,7 +309,7 @@ namespace Belle2 {
     void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
     /// Updates any DBObjPtrs by calling update(event) for DBStore
-    void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
+    static void updateDBObjPtrs(const unsigned int event, const int run, const int experiment);
 
     // -----------------------------------------------
 
@@ -320,7 +320,7 @@ namespace Belle2 {
     void clearCalibrationData() {m_data.clearCalibrationData();}
 
     /// Returns the Exp,Run pair that means 'Everything'. Currently unused.
-    Calibration::ExpRun getAllGranularityExpRun() const {return m_allExpRun;}
+    static Calibration::ExpRun getAllGranularityExpRun() {return m_allExpRun;}
 
     /// Clears the m_inputJson member variable.
     void resetInputJson() {m_jsonExecutionInput.clear();}
@@ -440,7 +440,7 @@ namespace Belle2 {
           continue;
         } else {
           auto files = searchFiles->second;
-          for (auto fileName : files) {
+          for (const auto& fileName : files) {
             RunRange* runRangeData;
             //Open TFile to get the objects
             std::unique_ptr<TFile> f;
@@ -463,7 +463,7 @@ namespace Belle2 {
             for (auto key : * (objDir->GetListOfKeys())) {
               std::string keyName = key->GetName();
               B2DEBUG(100, "Adding found object " << keyName << " in the directory " << objDir->GetPath());
-              T* objOther = (T*)objDir->Get(keyName.c_str());
+              T* objOther = dynamic_cast<T*>(objDir->Get(keyName.c_str()));
               if (objOther) {
                 if (mergedEmpty) {
                   mergedObjPtr = std::shared_ptr<T>(dynamic_cast<T*>(objOther->Clone(name.c_str())));
@@ -481,14 +481,14 @@ namespace Belle2 {
         }
       }
     } else {
-      for (auto fileName : m_inputFileNames) {
+      for (const auto& fileName : m_inputFileNames) {
         //Open TFile to get the objects
         std::unique_ptr<TFile> f;
         f.reset(TFile::Open(fileName.c_str(), "READ"));
         Calibration::ExpRun allGranExpRun = getAllGranularityExpRun();
         std::string objDirName = getFullObjectPath(name, allGranExpRun);
         std::string objPath = objDirName + "/" + name + "_1";
-        T* objOther = (T*)f->Get(objPath.c_str()); // Only one index for granularity == all
+        T* objOther = dynamic_cast<T*>(f->Get(objPath.c_str())); // Only one index for granularity == all
         B2DEBUG(100, "Adding " << objPath);
         if (objOther) {
           if (mergedEmpty) {

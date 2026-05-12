@@ -36,21 +36,21 @@ Rave is a Kalman-based vertex fitter implemented as an external library (CMS ver
 
 * **Issues**
 
- * Very slow: external libraries (Root) and shell
- * no developers
+  * Very slow: external libraries (Root) and shell
+  * no developers
 
-**RAVE: global**
+* **RAVE: global**
 
   * RAVE algorithm to be tested
   * RAVE API to be developed and tested
   * RAVE API kinematic constraints to be tested and/or debugged
 
-**RAVE: progressive**
+* **RAVE: progressive**
 
   * Algorithm should be developed inside RAVE
   * Progressive: References are missing
 
-**General RAVE development**
+* **General RAVE development**
 
   * memory consumption
   * documentation

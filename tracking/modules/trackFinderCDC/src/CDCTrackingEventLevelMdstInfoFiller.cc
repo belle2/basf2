@@ -10,6 +10,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 // Register the modules to the framework

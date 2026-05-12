@@ -12,7 +12,7 @@
 <header>
   <output>BabayagaNLOBhabhaSimRec.root</output>
   <cacheable/>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <description>
     This steering file produces 1000 radiative Bhabha events with
     Babayaga.NLO, runs the detector simulation with mixed in background, and
@@ -21,7 +21,7 @@
 </header>
 """
 
-from basf2 import set_random_seed, create_path, process, statistics
+from basf2 import set_random_seed, create_path, process
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from validation import statistics_plots, event_timing_plot
@@ -68,14 +68,11 @@ main.add_module("Profile")
 main.add_module("RootOutput", outputFileName="../BabayagaNLOBhabhaSimRec.root")
 
 main.add_module('Progress')
-process(main)
-
-# Print call statistics
-print(statistics)
+process(main, calculateStatistics=True)
 
 statistics_plots(
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",
@@ -83,7 +80,7 @@ statistics_plots(
 event_timing_plot(
     "../BabayagaNLOBhabhaSimRec.root",
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",

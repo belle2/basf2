@@ -52,5 +52,5 @@ ROOT::Math::XYZVector IRSimHit::getposOut() { return m_posOut; }
 ROOT::Math::XYZVector IRSimHit::getmomOut() { return m_momOut; }
 int IRSimHit::getPDGcode() { return m_PDGcode; }
 float IRSimHit::getdepEnergy() { return m_depEnergy; }
-std::string IRSimHit::getVolname() { return m_Volname; }
+const std::string& IRSimHit::getVolname() { return m_Volname; }
 

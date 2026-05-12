@@ -187,9 +187,6 @@ if __name__ == "__main__":
     basf2.process(path=main,
                   max_event=max_events)
 
-    # Print the statistics
-    print(basf2.statistics)
-
     #####################################################
     # Part 2: run the masking of (very) hot channels if required
 

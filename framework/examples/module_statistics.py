@@ -26,8 +26,8 @@ eventinfosetter = main.add_module('EventInfoSetter',
 # eventinfo - show event meta info
 eventinfo = main.add_module('EventInfoPrinter')
 
-# Process all events
-process(main)
+# Process all events and turn on calculation of statistics
+process(main, calculateStatistics=True)
 
 # Print basic event statistics to stdout
 print('Event Statistics:')

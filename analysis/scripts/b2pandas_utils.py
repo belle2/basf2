@@ -38,6 +38,22 @@ numpy_to_pyarrow_type_map = {
 class VariablesToTable(basf2.Module):
     """
     Base class to dump ntuples into a non root format of your choosing
+
+    Arguments:
+        listname(str): name of the particle list
+        variables(list[str]): list of variables to save for each particle
+        filename(str): name of the output file to be created.
+            Needs to end with ``.csv`` for csv output, ``.parquet`` or ``.pq`` for parquet output,
+            ``.h5``, ``.hdf`` or ``.hdf5`` for hdf5 output and ``.feather`` or ``.arrow`` for feather output
+        hdf_table_name(str): name of the table in the hdf5 file.
+            If not provided, it will be the same as the listname. Defaults to None.
+        event_buffer_size(int): number of events to buffer before writing to disk,
+            higher values will use more memory but result in smaller files.
+            For some formats, like parquet, this also sets the row group size. Defaults to 100.
+        **writer_kwargs: additional keyword arguments to pass to the writer.
+            For details, see the documentation of the respective writer in the apache arrow documentation.
+            For HDF5, these are passed to ``tables.File.create_table``.
+            Only use, if you know what you are doing!
     """
 
     def __init__(
@@ -49,22 +65,7 @@ class VariablesToTable(basf2.Module):
         event_buffer_size: int = 100,
         **writer_kwargs,
     ):
-        """Constructor to initialize the internal state
-
-        Arguments:
-            listname(str): name of the particle list
-            variables(list(str)): list of variables to save for each particle
-            filename(str): name of the output file to be created.
-                Needs to end with `.csv` for csv output, `.parquet` or `.pq` for parquet output,
-                `.h5`, `.hdf` or `.hdf5` for hdf5 output and `.feather` or `.arrow` for feather output
-            hdf_table_name(str): name of the table in the hdf5 file.
-                If not provided, it will be the same as the listname
-            event_buffer_size(int): number of events to buffer before writing to disk,
-                higher values will use more memory but write faster and result in smaller files
-            **writer_kwargs: additional keyword arguments to pass to the writer.
-                For details, see the documentation of the writer in the apache arrow documentation.
-                Only use, if you know what you are doing!
-        """
+        """Constructor to initialize the internal state"""
         super().__init__()
         #: Output filename
         self._filename = filename
@@ -285,7 +286,9 @@ class VariablesToTable(basf2.Module):
         """
         if self._format == "hdf5":
             """Create a new row in the hdf5 file with for each particle in the list"""
+            # \cond false positive doxygen warning
             self._table.append(self.buffer)
+            # \endcond
         else:
             table = {name: self.buffer[name] for name, _ in self._dtypes}
             pa_table = pa.table(table, schema=pa.schema(self._schema))
@@ -305,15 +308,19 @@ class VariablesToTable(basf2.Module):
         """
         self.append_buffer()
         self.fill_event_buffer()
+        # \cond false positive doxygen warning
         if self.buffer_full:
             self.write_buffer()
             self.clear_buffer()
+        # \endcond
 
     def terminate(self):
         """save and close the output"""
         import ROOT  # noqa
+        # \cond false positive doxygen warning
         if len(self.buffer) > 0:
             self.write_buffer()
+        # \endcond
 
         if self._format == "hdf5":
             self._table.flush()
@@ -329,10 +336,25 @@ class VariablesToTable(basf2.Module):
 
 class VariablesToHDF5(VariablesToTable):
     """
-    Legacy class to not break existing code
+    Legacy class to not break existing code.
+
+    This class is a wrapper around `VariablesToTable` that enforces HDF5 output
+    and uses default settings for buffer size and writer arguments.
+    It mostly exists for legacy reasons and new code should use `VariablesToTable` directly.
+
+    Arguments:
+        listname(str): name of the particle list
+        variables(list[str]): list of variables to save for each particle
+        filename(str): name of the output file to be created.
+            Must end with ``.h5``, ``.hdf`` or ``.hdf5``.
+        hdf_table_name(str): name of the table in the hdf5 file.
+            If not provided, it will be the same as the listname. Defaults to None.
     """
 
-    def __init__(self, listname, variables, filename, hdf_table_name: Optional[str] = None,):
+    def __init__(self, listname, variables, filename, hdf_table_name: Optional[str] = None):
+        """
+        Constructor for the legacy HDF5 writer.
+        """
         super().__init__(listname, variables, filename, hdf_table_name)
         assert self._filename.split(".")[-1] in ["h5", "hdf", "hdf5"], (
             "Filename must end with .h5, .hdf or .hdf5 for HDF5 output. "

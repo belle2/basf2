@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <vector>
 
 namespace Belle2 {
   /// Create new states and add them to a vector from a given object vector.
   template <class AnObject, class AState>
-  class StateCreator : public TrackFindingCDC::Findlet<AnObject* const, AState> {
+  class StateCreator : public TrackingUtilities::Findlet<AnObject* const, AState> {
   public:
     /// Add new states to the list of states using all given objects.
     void apply(const std::vector<AnObject*>& objects,

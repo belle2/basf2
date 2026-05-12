@@ -13,6 +13,7 @@
 #include <dqm/modules/PhysicsObjectsDQM/PhysicsObjectsDQMModule.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/variables/EventShapeVariables.h>
+#include <analysis/variables/BelleVariables.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <mdst/dataobjects/Track.h>
@@ -21,6 +22,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <hlt/softwaretrigger/calculations/utilities.h>
 #include <TDirectory.h>
 #include <map>
@@ -50,10 +52,13 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
            std::string("software_trigger_cut&skim&accept_mumutight"));
   addParam("TriggerIdentifierBhabha", m_triggerIdentifierBhabha,
            "Trigger identifier string used to select events for the bhabha histograms",
-           std::string("software_trigger_cut&skim&accept_bhabha_all"));
+           std::string("software_trigger_cut&skim&accept_bhabha_trk_ecl"));
   addParam("TriggerIdentifierHadronb2", m_triggerIdentifierHadronb2,
            "Trigger identifier string used to select events for the hadronb2 histograms",
            std::string("software_trigger_cut&skim&accept_hadronb2"));
+  addParam("TriggerIdentifierHLT", m_triggerIdentifierHLT,
+           "Trigger identifier string used to select events for the HLTprefilter histograms",
+           std::string("software_trigger_cut&filter&total_result"));
   addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:physDQM"));
   addParam("KS0PListName", m_ks0PListName, "Name of the KS0 particle list", std::string("K_S0:physDQM"));
   addParam("UpsPListName", m_upsPListName, "Name of the Ups particle list", std::string("Upsilon:physDQM"));
@@ -89,7 +94,14 @@ void PhysicsObjectsDQMModule::defineHisto()
   m_h_physicsresults->GetXaxis()->SetBinLabel(3, "Hadronb2");
   m_h_physicsresults->GetXaxis()->SetBinLabel(4, "Hadronb2_tight");
   m_h_physicsresults->GetXaxis()->SetBinLabel(5, "mumu_tight");
-  m_h_physicsresults->GetXaxis()->SetBinLabel(6, "bhabha_all");
+  m_h_physicsresults->GetXaxis()->SetBinLabel(6, "bhabha_trk_ecl");
+
+// Monitoring variables for prefilter
+  m_h_nKshortAllH = new TH1F("hist_nKshortAllH", "hist_nKshortAllH", 50, 0.45, 0.55);
+  m_h_nKshortActiveH = new TH1F("hist_nKshortActiveH", "hist_nKshortActiveH", 50, 0.45, 0.55);
+  m_h_nKshortActiveNotTimeH = new TH1F("hist_nKshortActiveNotTimeH", "hist_nKshortActiveNotTimeH", 50, 0.45, 0.55);
+  m_h_nKshortActiveNotCDCECLH = new TH1F("hist_nKshortActiveNotCDCECLH", "hist_nKshortActiveNotCDCECLH", 50, 0.45, 0.55);
+
   oldDir->cd();
 }
 
@@ -100,6 +112,7 @@ void PhysicsObjectsDQMModule::initialize()
 
   StoreObjPtr<SoftwareTriggerResult> result;
   result.isOptional();
+  m_l1Trigger.isOptional();
 }
 
 
@@ -110,6 +123,10 @@ void PhysicsObjectsDQMModule::beginRun()
   m_h_mUPS->Reset();
   m_h_R2->Reset();
   m_h_physicsresults->Reset();
+  m_h_nKshortAllH->Reset();
+  m_h_nKshortActiveH->Reset();
+  m_h_nKshortActiveNotTimeH->Reset();
+  m_h_nKshortActiveNotCDCECLH->Reset();
 }
 
 
@@ -133,6 +150,53 @@ void PhysicsObjectsDQMModule::event()
 
   const std::map<std::string, int>& results = result->getResults();
 
+  //--- HLTPrefilter monitoring ---//
+  // Check if events pass HLT cut //
+  bool HLTAccepted = false;
+  if (results.find(m_triggerIdentifierHLT) == results.end()) {
+    //Cannot find the m_triggerIdentifierHLT
+    B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifierHLT);
+  } else {
+    HLTAccepted = (result->getResult(m_triggerIdentifierHLT) == SoftwareTriggerCutResult::c_accept);
+    if (HLTAccepted != false) {
+
+      //find out if events are in the passive veto (false) or in the active veto window (true)
+      bool inActiveInjectionVeto = false; //events accepted in the passive veto window but not in the active
+      try {
+        if (m_l1Trigger->testInput("passive_veto") == 1 &&  m_l1Trigger->testInput("cdcecl_veto") == 0)
+          inActiveInjectionVeto = true; //events in active veto
+      } catch (const std::exception&) {}
+
+      if (results.find(m_prefilter_Injection_Strip) != results.end()) {
+        m_TimingCut = (result->getNonPrescaledResult(m_prefilter_Injection_Strip) == SoftwareTriggerCutResult::c_accept);
+      }
+      if (results.find(m_prefilter_CDCECL_Cut) != results.end()) {
+        m_CDCECLCut = (result->getNonPrescaledResult(m_prefilter_CDCECL_Cut) == SoftwareTriggerCutResult::c_accept);
+      }
+
+      // Iterate over Ks particle list //
+      StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
+
+      if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
+        for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
+          Particle* mergeKsCand = ks0Particles->getParticle(i);
+          const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+
+          if (isKsCandGood) {
+            m_h_nKshortAllH->Fill(mergeKsCand->getMass());                   // Fill all Ks events
+            if (inActiveInjectionVeto) {
+              m_h_nKshortActiveH->Fill(mergeKsCand->getMass());              // Fill Ks events from active veto
+              if (!m_TimingCut)
+                m_h_nKshortActiveNotTimeH->Fill(mergeKsCand->getMass());     // Fill Ks events retained after timing cut of HLTprefilter
+              if (!m_CDCECLCut)
+                m_h_nKshortActiveNotCDCECLH->Fill(mergeKsCand->getMass());   // Fill Ks events retained after CDC-ECL cut of HLTprefilter
+            }
+          }
+        }
+      }
+    }
+  }
+
   if (results.find(m_triggerIdentifier) == results.end()) {
     //Cannot find the m_triggerIdentifier, move on to mumu
     B2WARNING("PhysicsObjectsDQM: Can't find trigger identifier: " << m_triggerIdentifier);
@@ -140,7 +204,9 @@ void PhysicsObjectsDQMModule::event()
     const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
     if (accepted != false) {
 
-      m_h_physicsresults->Fill(1); //hadron events
+      //Fill entries only when HLT accepted the event
+      if (HLTAccepted)
+        m_h_physicsresults->Fill(1); //hadron events
 
       StoreObjPtr<ParticleList> pi0Particles(m_pi0PListName);
       StoreObjPtr<ParticleList> ks0Particles(m_ks0PListName);
@@ -187,7 +253,11 @@ void PhysicsObjectsDQMModule::event()
   } else {
     const bool accepted = (result->getResult(m_triggerIdentifierBhabha) == SoftwareTriggerCutResult::c_accept);
     if (accepted != false) {
-      m_h_physicsresults->Fill(5); //bhabha events
+
+      //Fill entries only when HLT accepted the event
+      if (HLTAccepted)
+        m_h_physicsresults->Fill(5); //bhabha events
+
       StoreObjPtr<ParticleList> UpsbhabhaParticles(m_upsBhabhaPListName);
       if (UpsbhabhaParticles.isValid()) {
         for (unsigned int i = 0; i < UpsbhabhaParticles->getListSize(); i++) {
@@ -204,7 +274,8 @@ void PhysicsObjectsDQMModule::event()
     return;
   } else {
     const bool accepted = (result->getResult(m_triggerIdentifierHadronb2) == SoftwareTriggerCutResult::c_accept);
-    if (accepted != false) {
+    //Fill entries only when HLT accepted the event
+    if (accepted != false && HLTAccepted != false) {
 
       m_h_physicsresults->Fill(2); //hadronb2 events
 

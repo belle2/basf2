@@ -110,6 +110,3 @@ ma.variablesToNtuple('D*+', varlist, 'dstar', args.out, path=main)
 
 # Process events
 basf2.process(main)
-
-# Print statistics
-print(basf2.statistics)

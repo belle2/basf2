@@ -9,14 +9,14 @@
 
 #include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   /// For the two paths with the same number of hits prefers one with shortest arcLength ("densest path")
   class ArcLengthBasedCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if pair.first to be selected, 0 otherwise.
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    TrackingUtilities::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
     {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;

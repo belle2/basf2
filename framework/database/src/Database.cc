@@ -27,6 +27,7 @@
 #include <framework/database/MetadataProvider.h>
 #include <framework/database/LocalMetadataProvider.h>
 #include <framework/database/CentralMetadataProvider.h>
+#include <framework/database/HSFCentralMetadataProvider.h>
 #include <framework/database/Configuration.h>
 
 #include <algorithm>
@@ -174,7 +175,12 @@ namespace Belle2 {
     }
     try {
       if (remote) {
-        m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);
+        // Check if this is the HSF central server by looking for its URL pattern
+        if (m_currentProvider.find("blcdb.sdcc.bnl.gov") != std::string::npos) {
+          m_metadataProvider = std::make_unique<Conditions::HSFCentralMetadataProvider>(m_currentProvider, m_usableTagStates);
+        } else {
+          m_metadataProvider = std::make_unique<Conditions::CentralMetadataProvider>(m_currentProvider, m_usableTagStates);
+        }
       } else {
         m_metadataProvider = std::make_unique<Conditions::LocalMetadataProvider>(m_currentProvider, m_usableTagStates);
       }
@@ -183,9 +189,10 @@ namespace Belle2 {
                 << LogVar("provider", m_currentProvider) << LogVar("error", e.what()));
       return nextMetadataProvider();
     }
-    // and check the tags are usable
+    // and check the tags are usable: if not, fallback to the next metadata provider
     if (!m_metadataProvider->setTags(m_globalTags)) {
-      B2FATAL("Conditions data: Problems with globaltag configuration, cannot continue");
+      B2WARNING("Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...");
+      return nextMetadataProvider();
     }
   }
 

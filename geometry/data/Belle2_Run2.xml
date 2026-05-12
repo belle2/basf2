@@ -71,7 +71,7 @@
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
 
-  <!-- early phase 3 and phase3 Beast system -->
+  <!-- Run 1 and Run 2 Beast system -->
   <DetectorComponent name="MICROTPC" isDefault="false">
     <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>

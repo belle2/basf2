@@ -13,16 +13,9 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 
 // OrcaKinFit
-#include <analysis/OrcaKinFit/BaseFitter.h>
-#include <analysis/OrcaKinFit/TextTracer.h>
-
-// Constraints
 #include <analysis/OrcaKinFit/MomentumConstraint.h>
 #include <analysis/OrcaKinFit/RecoilMassConstraint.h>
 #include <analysis/OrcaKinFit/MassConstraint.h>
-
-// Fitobjects
-#include <analysis/OrcaKinFit/ParticleFitObject.h>
 
 // analysis dataobjects
 #include <framework/dataobjects/EventExtraInfo.h>
@@ -42,6 +35,9 @@
 namespace Belle2 {
   class Particle;
   namespace OrcaKinFit {
+    class BaseFitter;
+    class ParticleFitObject;
+    class TextTracer;
 
     /**
      * Kinematic fitter module

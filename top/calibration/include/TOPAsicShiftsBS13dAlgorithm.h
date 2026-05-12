@@ -25,9 +25,6 @@ namespace Belle2 {
       /** Constructor */
       TOPAsicShiftsBS13dAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPAsicShiftsBS13dAlgorithm() {}
-
       /**
        * Sets minimal function value
        * @param minVal minimal value

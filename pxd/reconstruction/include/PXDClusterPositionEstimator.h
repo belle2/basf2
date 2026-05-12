@@ -10,17 +10,18 @@
 
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-#include <pxd/dataobjects/PXDCluster.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <framework/database/DBObjPtr.h>
 #include <set>
 #include <vector>
-#include <pxd/reconstruction/Pixel.h>
 #include <memory>
 
 namespace Belle2 {
+  class PXDCluster;
+  class VxdID;
 
   namespace PXD {
+    class Pixel;
+
     /**
     * Singleton class that estimates cluster positions taking into account the estimated track
     * incidence angles into the sensor. The class also provides an interface to get the likelihood

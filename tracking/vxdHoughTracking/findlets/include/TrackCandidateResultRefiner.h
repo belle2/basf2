@@ -7,24 +7,23 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingVXD/trackQualityEstimators/QualityEstimatorBase.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-
-#include <string>
-#include <vector>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   class SpacePointTrackCand;
   class ModuleParamList;
+  class QualityEstimatorBase;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
     /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-    class TrackCandidateResultRefiner : public TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand> {
+    class TrackCandidateResultRefiner : public TrackingUtilities::Findlet<SpacePointTrackCand, SpacePointTrackCand> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, SpacePointTrackCand>;
+      using Super = TrackingUtilities::Findlet<SpacePointTrackCand, SpacePointTrackCand>;
 
     public:
       /// Find intercepts in the 2D Hough space
@@ -39,7 +38,7 @@ namespace Belle2 {
       /// Create the store arrays
       void initialize() override;
 
-      /// End run and write Root file
+      /// Check dbobject validity
       void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining
@@ -68,6 +67,9 @@ namespace Belle2 {
 
       /// Accept nHits for each size at maximum
       uint m_maxNumberOfEachPathLength = 15;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
     };
 
   }

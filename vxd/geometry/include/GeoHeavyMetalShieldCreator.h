@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef GEOHEAVYMETALSHIELDCREATOR_H
-#define GEOHEAVYMETALSHIELDCREATOR_H
+#pragma once
 
 #include <geometry/CreatorBase.h>
 
@@ -63,5 +62,3 @@ namespace Belle2 {
     };
   }
 }
-
-#endif /* GEOHEAVYMETALSHIELDCREATOR_H */

@@ -77,7 +77,6 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
   const Int_t kline  = 1024;
   Int_t cdate = 0;
   Int_t ctime = 0;
-  UInt_t* cdatime;
   char line[kline];
 
   TDataType* membertype;
@@ -108,7 +107,7 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
     if (pos != kNPOS) {
       elname.Remove(pos);
     }
-    TStreamerElement* element = (TStreamerElement*)info->GetElements()->FindObject(elname.Data());
+    TStreamerElement* element = dynamic_cast<TStreamerElement*>(info->GetElements()->FindObject(elname.Data()));
     if (!element) return;
     memberFullTypeName = element->GetTypeName();
 
@@ -135,7 +134,7 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
   if (strcmp(memberName, "fBits") == 0 && strcmp(memberTypeName, "UInt_t") == 0) {
     isbits = kTRUE;
   }
-  TClass* dataClass = TClass::GetClass(memberFullTypeName);
+  const TClass* dataClass = TClass::GetClass(memberFullTypeName);
   Bool_t isTString = (dataClass == TString::Class());
   static TClassRef stdClass("std::string");
   Bool_t isStdString = (dataClass == stdClass);
@@ -143,12 +142,10 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
   Int_t i;
   for (i = 0; i < kline; i++) line[i] = ' ';
   line[kline - 1] = 0;
-  //snprintf(line,kline,"%s%s ",pname,mname);
-  //i = strlen(line); line[i] = ' ';
 
   // Encode data value or pointer value
-  char* pointer = (char*)add;
-  char** ppointer = (char**)(pointer);
+  char* pointer = static_cast<char*>(const_cast<void*>(add));
+  char** ppointer = reinterpret_cast<char**>(pointer);
 
   if (isapointer) {
     char** p3pointer = (char**)(*ppointer);
@@ -204,20 +201,20 @@ void HtmlClassInspector::Inspect(TClass* cl, const char* pname, const char* mnam
     }
   } else if (membertype) {
     if (isdate) {
-      cdatime = (UInt_t*)pointer;
+      UInt_t* cdatime = reinterpret_cast<UInt_t*>(pointer);
       TDatime::GetDateTime(cdatime[0], cdate, ctime);
       snprintf(&line[kvalue], kline - kvalue, "%d/%d", cdate, ctime);
     } else if (isbits) {
-      snprintf(&line[kvalue], kline - kvalue, "0x%08x", *(UInt_t*)pointer);
+      snprintf(&line[kvalue], kline - kvalue, "0x%08x", *reinterpret_cast<UInt_t*>(pointer));
     } else {
       strncpy(&line[kvalue], membertype->AsString(pointer), TMath::Min(kline - 1 - kvalue, (int)strlen(membertype->AsString(pointer))));
     }
   } else {
     if (isStdString) {
-      std::string* str = (std::string*)pointer;
+      const std::string* str = reinterpret_cast<const std::string*>(pointer);
       snprintf(&line[kvalue], kline - kvalue, "%s", str->c_str());
     } else if (isTString) {
-      TString* str = (TString*)pointer;
+      TString* str = reinterpret_cast<TString*>(pointer);
       snprintf(&line[kvalue], kline - kvalue, "%s", str->Data());
     } else {
       snprintf(&line[kvalue], kline - kvalue, "->%lx ", (Long_t)pointer);

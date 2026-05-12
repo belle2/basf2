@@ -292,7 +292,7 @@ namespace Belle2 {
       while (m_rayTracers.size() < 3) m_rayTracers.push_back(*m_fastRaytracer); // push back a copy of the object
 
       bool ok = true;
-      auto& rayTracer_dL = m_rayTracers[0];
+      const auto& rayTracer_dL = m_rayTracers[0];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_dL, dL);
         if (ok) break;
@@ -300,7 +300,7 @@ namespace Belle2 {
       }
       if (not ok) return false;
 
-      auto& rayTracer_de = m_rayTracers[1];
+      const auto& rayTracer_de = m_rayTracers[1];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_de, 0, de);
         if (ok) break;
@@ -308,7 +308,7 @@ namespace Belle2 {
       }
       if (not ok) return false;
 
-      auto& rayTracer_dFic = m_rayTracers[2];
+      const auto& rayTracer_dFic = m_rayTracers[2];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_dFic, 0, 0, dFic);
         if (ok) break;
@@ -391,7 +391,7 @@ namespace Belle2 {
       double Len = m_fastRaytracer->getPropagationLen();
       double speedOfLightQuartz = Const::speedOfLight / m_groupIndex; // average speed of light in quartz
 
-      // difference of propagation times of true and fliped prism
+      // difference of propagation times of true and flipped prism
       double dTime = m_fastRaytracer->getPropagationLenDelta() / speedOfLightQuartz;
 
       // derivatives: dt/de, dt/dx, dt/dL
@@ -497,12 +497,12 @@ namespace Belle2 {
       const auto& trk = emission.trackAngles;
       const auto& cer = cerenkovAngle();
 
-      // range in x from propagation lenght limit
+      // range in x from propagation length limit
 
       double dz = z - emission.position.Z();
       double cosFicLimit = (trk.cosTh * cer.cosThc - dz / maxLen) / (trk.sinTh * cer.sinThc); // at maxLen
       double cosLimit = (dz > 0) ? cosFicLimit : -cosFicLimit;
-      if (cosLimit < -1) return false; // photons cannot reach the plane at z within propagation lenght limit
+      if (cosLimit < -1) return false; // photons cannot reach the plane at z within propagation length limit
 
       std::vector<double> xmima;
       double x0 = emission.position.X();
@@ -569,7 +569,7 @@ namespace Belle2 {
     }
 
 
-    double PDFConstructor::derivativeOfReflectedX(double x, double xe, double ze, double zd) const
+    double PDFConstructor::derivativeOfReflectedX(double x, double xe, double ze, double zd)
     {
       double z = sqrt(1 - x * x);
       double kx = (x - xe);
@@ -588,7 +588,7 @@ namespace Belle2 {
 
 
     double PDFConstructor::findReflectionExtreme(double xE, double zE, double zD, int Nxm, double A,
-                                                 const RaytracerBase::Mirror& mirror) const
+                                                 const RaytracerBase::Mirror& mirror)
     {
 
       if (Nxm % 2 == 0) {

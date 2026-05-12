@@ -36,7 +36,7 @@ gROOT.SetBatch()
 def wf_display(waveform, run, event, suffix=""):
 
     # Some of the following code was taken from top/tools/showFEWaveforms.py
-    # TODO: Think about re-using this code in the two scripts
+    # TODO: Think about reusing this code in the two scripts
     '''
     Simple event display of waveforms with feature extraction points
     '''
@@ -201,7 +201,7 @@ class WaveformAnalyzer(b2.Module):
                     wf_display(waveform, run, event, "calPuls_firstWin")
                     self.plotCounter += 1
 
-            # there are strange bumps in the ADC distribtion of the cal channels
+            # there are strange bumps in the ADC distribution of the cal channels
             if (140 < fePeakHt < 220) and chan % 8 == 0:
                 if False and args.plotWaveforms:
                     wf_display(waveform, run, event, "strangeADCBump_1")

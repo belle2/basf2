@@ -45,7 +45,17 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      virtual ~GeoTOPCreator();
+      virtual ~GeoTOPCreator() override;
+
+      /**
+       * Copy constructor (disabled)
+       */
+      GeoTOPCreator(const GeoTOPCreator&) = delete;
+
+      /**
+       * Assignment operator (disabled)
+       */
+      GeoTOPCreator& operator=(const GeoTOPCreator&) = delete;
 
       /**
        * Creation of the detector geometry from Gearbox (XML).
@@ -114,7 +124,7 @@ namespace Belle2 {
        * @param geo geometry description
        * @return assembly volume
        */
-      G4AssemblyVolume* assembleQBB(const TOPGeoQBB& geo);
+      static G4AssemblyVolume* assembleQBB(const TOPGeoQBB& geo);
 
       /**
        * Creates honeycomb panel
@@ -122,7 +132,7 @@ namespace Belle2 {
        * @param type panel type
        * @return logical volume
        */
-      G4LogicalVolume* createHoneycombPanel(const TOPGeoQBB& geo, EPanelType type);
+      static G4LogicalVolume* createHoneycombPanel(const TOPGeoQBB& geo, EPanelType type);
 
       /**
        * Creates side rail
@@ -130,7 +140,7 @@ namespace Belle2 {
        * @param type side rail type
        * @return logical volume
        */
-      G4LogicalVolume* createSideRail(const TOPGeoQBB& geo, ESideRailType type);
+      static G4LogicalVolume* createSideRail(const TOPGeoQBB& geo, ESideRailType type);
 
       /**
        * Assembles front-end electronics
@@ -146,7 +156,7 @@ namespace Belle2 {
        * @param N number of board stacks per module
        * @return logical volume
        */
-      G4LogicalVolume* createBoardStack(const TOPGeoFrontEnd& geo, int N);
+      static G4LogicalVolume* createBoardStack(const TOPGeoFrontEnd& geo, int N);
 
       /**
        * Assembles optical components (PMT array, prism and bar segments) along z
@@ -203,9 +213,9 @@ namespace Belle2 {
        * @param materialName material name
        * @return logical volume
        */
-      G4LogicalVolume* createBox(const std::string& name,
-                                 double A, double B, double C,
-                                 const std::string& materialName);
+      static G4LogicalVolume* createBox(const std::string& name,
+                                        double A, double B, double C,
+                                        const std::string& materialName);
 
       /**
        * Creates material volume that is intersection of box and half-sphere shell (z > 0)
@@ -219,11 +229,11 @@ namespace Belle2 {
        * @param materialName material name
        * @return logical volume
        */
-      G4LogicalVolume* createBoxSphereIntersection(const std::string& name,
-                                                   G4Box* box,
-                                                   double Rmin, double Rmax,
-                                                   double xc, double yc, double zc,
-                                                   const std::string& materialName);
+      static G4LogicalVolume* createBoxSphereIntersection(const std::string& name,
+                                                          G4Box* box,
+                                                          double Rmin, double Rmax,
+                                                          double xc, double yc, double zc,
+                                                          const std::string& materialName);
 
       /**
        * Creates material extruded solid
@@ -233,10 +243,10 @@ namespace Belle2 {
        * @param materialName material name
        * @return logical volume
        */
-      G4LogicalVolume* createExtrudedSolid(const std::string& name,
-                                           const Polygon& shape,
-                                           double length,
-                                           const std::string& materialName);
+      static G4LogicalVolume* createExtrudedSolid(const std::string& name,
+                                                  const Polygon& shape,
+                                                  double length,
+                                                  const std::string& materialName);
 
       /**
        * Adds number to string
@@ -244,7 +254,7 @@ namespace Belle2 {
        * @param number number to be added
        * @return string with a number
        */
-      std::string addNumber(const std::string& str, unsigned number);
+      static std::string addNumber(const std::string& str, unsigned number);
 
 
       SensitivePMT* m_sensitivePMT = 0;  /**< Sensitive vol. to register PMT hits */
@@ -252,7 +262,7 @@ namespace Belle2 {
       BkgSensitiveDetector* m_sensitivePCB1 = 0;  /**< PCB sensitive for BG studies */
       BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< singleton class */
-      int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
+      int m_isBeamBkgStudy = 0; /**< flag for beam background simulation */
 
       G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
       G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */

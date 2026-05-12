@@ -7,11 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -22,6 +22,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string TrackExporter::getDescription()
 {

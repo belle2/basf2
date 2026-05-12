@@ -31,7 +31,7 @@ namespace Belle2 {
     /// Constructor. Sets the default prefix for calibration dataobjects
     CalibrationCollectorModule();
     /// Virtual destructor (base class)
-    virtual ~CalibrationCollectorModule() {}
+    ~CalibrationCollectorModule() override {}
 
     /// Set up a default RunRange object in datastore and call prepare()
     void initialize() final;
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     /// Register object with a name, takes ownership, do not access the pointer beyond prepare()
     template <class T>
-    void registerObject(std::string name, T* obj)
+    void registerObject(const std::string& name, T* obj)
     {
       std::shared_ptr<T> calObj(obj);
       calObj->SetName(name.c_str());
@@ -57,7 +57,7 @@ namespace Belle2 {
 
     /// Calls the CalibObjManager to get the requested stored collector data
     template<class T>
-    T* getObjectPtr(std::string name)
+    T* getObjectPtr(const std::string& name)
     {
       return m_manager.getObject<T>(name, m_expRun);
     }

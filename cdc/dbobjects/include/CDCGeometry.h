@@ -779,9 +779,9 @@ namespace Belle2 {
        */
       NeutronShield(int id, double rmin1, double rmin2,
                     double rmax1, double rmax2,
-                    double thick, double z):
+                    double thick, double z, int ena):
         m_id(id), m_rmin1(rmin1), m_rmin2(rmin2), m_rmax1(rmax1),
-        m_rmax2(rmax2), m_thick(thick), m_z(z)
+        m_rmax2(rmax2), m_thick(thick), m_z(z), m_ena(ena)
       {}
 
 
@@ -824,6 +824,10 @@ namespace Belle2 {
        */
       double getZ() const { return m_z;}
 
+      /**
+       * Get the enable status of the shield.
+       */
+      int getEna() const { return m_ena;}
 
 
     private:
@@ -834,6 +838,7 @@ namespace Belle2 {
       double m_rmax2; /**< the maximum radius 2 of the shield. */
       double m_thick;/**< the z-position of the shield. */
       double m_z;/**< the thickness of the shield. */
+      int m_ena;/**< the enable status of the shield. */
 
 
       /** Makes objects storable. */

@@ -5,23 +5,22 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#ifndef TRGTOPUNPACKERWAVEFORM_H
-#define TRGTOPUNPACKERWAVEFORM_H
 
-#include <string>
-
-//#pragma once
-
-#include "rawdata/dataobjects/RawTRG.h"
-#include "trg/top/dataobjects/TRGTOPWaveFormTimeStampsSlot.h"
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
+
+#include <string>
 
 
 #define NUMBER_OF_TOP_SLOTS 16
 
 namespace Belle2 {
+  class TRGTOPWaveFormTimeStampsSlot;
+  class TRGTOPWaveFormTimeStamp;
+  class RawTRG;
+
   /**
   * TRG TOP Unpacker for Timestamps
   *
@@ -68,11 +67,11 @@ namespace Belle2 {
 
   protected:
 
-    int m_eventNumber;    /**Event number (according to L1/global) */
-    int m_trigType;       /**Trigger type */
-    int m_nodeId;         /**Our read-out ID */
-    int m_nWords;         /**N words in raw data */
-    bool m_pciedata;         /**PCIe40 data or copper data */
+    int m_eventNumber;    /**< Event number (according to L1/global) */
+    int m_trigType;       /**< Trigger type */
+    int m_nodeId;         /**< Our read-out ID */
+    int m_nWords;         /**< N words in raw data */
+    bool m_pciedata;      /**< PCIe40 data or copper data */
 
     bool m_reportedAlreadyRun_1;
     bool m_reportedAlreadyRun_2;
@@ -89,5 +88,3 @@ namespace Belle2 {
 
   };
 }
-
-#endif

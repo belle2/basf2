@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 #include <vector>
 
 namespace Belle2 {
@@ -22,7 +22,7 @@ namespace Belle2 {
     unsigned int getNumberOfCorrectHits(const RecoTrack* mcRecoTrack, const std::vector<const SpacePoint*>& hits) const;
 
     /// Are all hits related to the same MC track the seed is related to?
-    bool allStatesCorrect(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states) const;
+    bool allStatesCorrect(const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& states) const;
 
     /// Returns true, of the space point is related to the mc track and if it is on the first half.
     bool hitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spacePoint) const;

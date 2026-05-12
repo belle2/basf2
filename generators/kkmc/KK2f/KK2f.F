@@ -189,6 +189,8 @@
       INTEGER DPARITY
       DATA    DPARITY /0/
       COMMON /DPARITY/ DPARITY
+      INTEGER ILEPTOGAM
+      COMMON /ILEPTOGAM/ ILEPTOGAM
 *--------------------------------------------------------------------------
 *     Initialization of the internal histogramming package
       CALL GLK_Initialize
@@ -370,6 +372,7 @@
       CALL MBrA_SetXSList(Xborn)
 *----------------------------------------------------------------------
       IPAIRPHOTOS = INT(XPAR(ITAUXPAR+915))
+      ILEPTOGAM   = INT(XPAR(ITAUXPAR+923)) ! Replace pair of leptons with a pair of photons
       if (IPAIRPHOTOS.EQ.0)  THEN ! Do Nothing
          ifpair=0               ! general switch for pair emission
          ifspecial=0            ! to switch resonance decaying to lepton pair
@@ -1121,6 +1124,8 @@ C     WRITE (*,*) ISWHO, IDDARKMOTHER, IZPOS, INDECAY
       INCLUDE 'HepEvt.fi'
       INTEGER          NHP, IDSPECIAL, I, IDAU1, IDAU2
       DOUBLE PRECISION MPAIR,PX,PY,PZ,EN
+      INTEGER ILEPTOGAM
+      COMMON /ILEPTOGAM/ ILEPTOGAM
       NHP=NHEP
       PX = 0
       PY = 0
@@ -1131,6 +1136,20 @@ C     WRITE (*,*) ISWHO, IDDARKMOTHER, IZPOS, INDECAY
          IF (IDHEP(I).EQ.IDSPECIAL.AND.ISTHEP(I).GT.1) THEN
             IDAU1 = JDAHEP(1,I)
             IDAU2 = JDAHEP(2,I)
+            IF (ILEPTOGAM.EQ.1) THEN
+               IDHEP(IDAU1) = 22
+               PX = PHEP(1,IDAU1)
+               PY = PHEP(2,IDAU1)
+               PZ = PHEP(3,IDAU1)
+               PHEP(4,IDAU1)= SQRT(MAX(PX*PX+PY*PY+PZ*PZ,0.0D0))
+               PHEP(5,IDAU1)= 0.0D0
+               IDHEP(IDAU2) = 22
+               PX = PHEP(1,IDAU2)
+               PY = PHEP(2,IDAU2)
+               PZ = PHEP(3,IDAU2)
+               PHEP(4,IDAU2)= SQRT(MAX(PX*PX+PY*PY+PZ*PZ,0.0D0))
+               PHEP(5,IDAU2)= 0.0D0
+            ENDIF
             PX = PHEP(1,IDAU1) + PHEP(1,IDAU2)
             PY = PHEP(2,IDAU1) + PHEP(2,IDAU2)
             PZ = PHEP(3,IDAU1) + PHEP(3,IDAU2)

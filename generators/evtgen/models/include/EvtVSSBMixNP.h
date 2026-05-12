@@ -15,7 +15,7 @@
  * Routine to decay vector-> scalar scalar with BB-like mixing and
  * decoherence parameter lambda.  Based on
  * https://doi.org/10.1103/PhysRevD.64.056004 aka the Lindblad
- * model. It has a single dissipative parameter $\lambda$. The model
+ * model. It has a single dissipative parameter \f$\lambda\f$. The model
  * name is VSSBMixNP.
  */
 class EvtVSSBMixNP : public EvtDecayAmp {

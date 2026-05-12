@@ -15,24 +15,12 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-// Rave
-#include <analysis/VertexFitting/RaveInterface/RaveSetup.h>
-#include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
-#include <analysis/VertexFitting/RaveInterface/RaveKinematicVertexFitter.h>
-
 // kFit
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
-// KFit
-#include <CLHEP/Geometry/Point3D.h>
-#include <CLHEP/Matrix/SymMatrix.h>
-#include <CLHEP/Vector/LorentzVector.h>
-
 // DataObjects
-#include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/TagVertex.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/MCParticle.h>

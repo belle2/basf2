@@ -15,9 +15,9 @@
 namespace Belle2 {
 
 
-  //! Class BeamBackHit - Stores hits from beam backgound simulation
+  //! Class BeamBackHit - Stores hits from beam background simulation
   /*!
-   This is a class to store beam backgound hits hits in datastore.
+   This is a class to store beam background hits hits in datastore.
    It is a general class for all subdetectors
    */
 
@@ -38,7 +38,7 @@ namespace Belle2 {
      * @param trackID the trackID of the track
      * @param position the position of the hit
      * @param momentum the momentum of particle at the time of the hit
-     * @param t time at which the hit occured
+     * @param t time at which the hit occurred
      * @param E_start the energy of the particle at the entrance to the volume
      * @param E_end the energy of the particle at the exit of the volume
      * @param eDep the energy deposited in the volume
@@ -58,7 +58,7 @@ namespace Belle2 {
       setMomentum(momentum);
     }
 
-    //! Get the subdetector name in which the hit occured
+    //! Get the subdetector name in which the hit occurred
     TString getSubDetName() const
     {
       switch (m_subDet) {
@@ -75,10 +75,10 @@ namespace Belle2 {
       return "";
     }
 
-    //! Get the identifier of subdetector component in which hit occured
+    //! Get the identifier of subdetector component in which hit occurred
     int getIdentifier() const { return m_identifier;    }
 
-    //! Det the index of subdetector in which hit occured
+    //! Det the index of subdetector in which hit occurred
     int getSubDet() const {return m_subDet; }
 
     //! Get the lund code of the particle that hit the sensitive area
@@ -99,7 +99,7 @@ namespace Belle2 {
       return ROOT::Math::XYZVector(m_momentumX, m_momentumY, m_momentumZ);
     }
 
-    //! Get the time at which the hit occured
+    //! Get the time at which the hit occurred
     double getTime() const { return m_t; }
 
     //! Get energy of the particle
@@ -114,10 +114,10 @@ namespace Belle2 {
     //! the length of the track in the volume
     double getTrackLength() const { return m_trackLength; }
 
-    //! get the effective neutron weigth
+    //! get the effective neutron weight
     double getNeutronWeight() const {return m_neutronWeight;}
 
-    //! Set the subdetector group in which the hit occured
+    //! Set the subdetector group in which the hit occurred
     void setSubDet(int subDet) { m_subDet = subDet; }
 
     //! Set the subdetector component identifier
@@ -145,7 +145,7 @@ namespace Belle2 {
       m_momentumZ = momentum.Z();
     }
 
-    //! Set the time at which the hit occured
+    //! Set the time at which the hit occurred
     void setTime(double t)  {  m_t = t; }
 
     //! Set energy of the particle
@@ -198,7 +198,7 @@ namespace Belle2 {
     /** Momentum of the hit (Z coordinate). */
     float m_momentumZ;
 
-    /** Time at which the hit occured. */
+    /** Time at which the hit occurred. */
     float m_t;
 
     /** Energy of particle at entrance into the volume. */

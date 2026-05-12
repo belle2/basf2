@@ -28,7 +28,7 @@ namespace Belle2 {
      * Destructor
      */
 
-    virtual ~SVDdEdxValidationAlgorithm() {}
+    virtual ~SVDdEdxValidationAlgorithm() override {}
 
     /**
      * decide between full or basic validation mode. full validation also produces global PID performance plots.
@@ -77,14 +77,12 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    bool m_fullValidation;   /**< decide between full or basic validation mode. full validation also produces global PID performance plots.  */
-    bool m_isMakePlots;                                                           /**< produce plots for monitoring of the fit quality */
     /**
      * a generic function to produce efficiency plots
      */
-    void PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
-                             TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
-                             TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh);
+    static void PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
+                                    TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
+                                    TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh);
 
     /**
      * a generic function to produce ROC curves
@@ -101,6 +99,7 @@ namespace Belle2 {
     double m_MomHighROC = 7.;    /**< upper edge of the momentum interval considered for the ROC curve */
     unsigned int m_NumEffBins = 30;    /**< number of bins for the efficiency/fake rate plot */
     double m_MomHighEff = 2.5;    /**< upper edge of the momentum interval for the efficiency/fake rate plot */
-
+    bool m_fullValidation;   /**< decide between full or basic validation mode. full validation also produces global PID performance plots.  */
+    bool m_isMakePlots;      /**< produce plots for monitoring of the fit quality */
   };
 } // namespace Belle2

@@ -320,7 +320,8 @@ def verify_stats_dict(args, sampleRegistry, skimStatsDict):
             sys.exit(1)
 
         try:
-            # since we have stats for MC15ri_b and MC15rd_a, if we run over MC15ri_a, or MC15rd_b, we need to adjust what stats to check:
+            # since we have stats for MC15ri_b and MC15rd_a, if we run over MC15ri_a,
+            # or MC15rd_b, we need to adjust what stats to check:
             if "ri_a" in sampleLabel:
                 sampleLabel = re.sub(r"ri_a", "ri_b", sampleLabel)
             elif "rd_b" in sampleLabel:
@@ -671,8 +672,9 @@ def make_data_description_block(skims, sampleInfo, skimName, flagged=False):
                 "": skimName,
                 "SkimDecayMode": Registry.encode_skim_name(skimName),
                 "DataLevel": 'mdst',
-                "GeneralSkimName": GeneralSkim
             }
+        if GeneralSkim is not None:
+            DescriptionDict["GeneralSkimName"] = GeneralSkim
         DataDescription.append(DescriptionDict)
     else:
         for skim in skims:
@@ -827,7 +829,9 @@ def make_request_dict(
 
     skimRequestDict = {
         "FabricationType": fabricationType,
-        "ProductionName": f"{skimName}_skim_on_{key}",  # no whitespace allowed in ProductionName #add here _v1, _v2 if the production must be resubmitted (since the name is unique)
+        # no whitespace allowed in ProductionName #add here _v1, _v2 if the
+        # production must be resubmitted (since the name is unique)
+        "ProductionName": f"{skimName}_skim_on_{key}",
         "ProductionGroup": "skim",
         "Description": f"{skimName} skim on {key}",
         "Release": args.release,
@@ -850,7 +854,7 @@ def make_request_dict(
         "DataStructureByRun": "False",
         "VolumeDependentMerge": "True",
         "DataDescription": make_data_description_block(individualSkims, sampleInfo, skimName, args.flagged),
-        "ResourceTag": "EL9", # needed from light-2503-ceres onwards, may not be needed if made default on the grid in the future
+        "ResourceTag": "EL9",  # needed from light-2503-ceres onwards, may not be needed if made default on the grid in the future
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
@@ -924,15 +928,21 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                         get_individual_skims(skimName, CombinedSkimDefinitions)
                     )
             ):
+                print(
+                    f"Warning!: taupair production will not proceed for {get_individual_skims(skimName,CombinedSkimDefinitions)} as `produce_on_tau_samples=False`")
                 continue
 
             if args.mcrd:
                 pattern = r'r\d+$'
                 key = re.sub(pattern, '', sampleLabel)
-                print(key)  # MC15rd_b_4S_offres_exp18_ssbar_29600
+                print(key)  # Ex: MC15rd_b_4S_offres_exp18_ssbar_29600
             else:
                 if '5S_scan' in sampleLabel:
-                    match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)
+                    # HOTFIX: 5S_scan samples in sample registry
+                    # is no longer separated by energy, may need to be restored
+                    # if further 5S_scan runs take place
+                    # match = re.match(r"(\w+\d+)_5S_scan_(\d+)_exp(\d+)", sampleLabel)
+                    match = re.match(r"(\w+\d+)_5S_scan_exp(\d+)", sampleLabel)
                 elif '4S_offres' in sampleLabel:
                     match = re.match(r"(\w+\d+)_4S_offres_exp(\d+)", sampleLabel)
                 else:
@@ -940,8 +950,11 @@ def write_json_files(sampleRegistry, args, outputDirectory):
                 if match:
                     # Create a unique key for each campaign and experiment number combination
                     if '5S_scan' in sampleLabel:
-                        campaign, scan_energy, exp_number = match.groups()
-                        key = f"{campaign}_5S_scan_{scan_energy}_exp{exp_number}"
+                        # HOTFIX: See HOTFIX above
+                        # campaign, scan_energy, exp_number = match.groups()
+                        # key = f"{campaign}_5S_scan_{scan_energy}_exp{exp_number}"
+                        campaign, exp_number = match.groups()
+                        key = f"{campaign}_5S_scan_exp{exp_number}"
                     elif '4S_offres' in sampleLabel:
                         campaign, exp_number = match.groups()
                         key = f"{campaign}_4S_offres_exp{exp_number}"

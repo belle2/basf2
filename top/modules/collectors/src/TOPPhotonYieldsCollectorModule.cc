@@ -9,6 +9,7 @@
 #include <top/modules/collectors/TOPPhotonYieldsCollectorModule.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <top/dataobjects/TOPTimeZero.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
@@ -65,7 +66,7 @@ namespace Belle2 {
       m_selector = TrackSelector(m_sample);
       m_selector.setDeltaEcms(m_deltaEcms);
       m_selector.setCutOnPOCA(m_dr, m_dz);
-      m_selector.setCutOnLocalZ(m_minZ, m_maxZ);
+      m_selector.setCutOnLocalZ(m_minZprism, m_maxZ);
     } else {
       B2ERROR("Invalid sample type '" << m_sample << "'");
     }
@@ -74,6 +75,10 @@ namespace Belle2 {
 
     const int numModules = 16;
     const int numPixels = 512;
+
+    // TOF corrections
+    auto* tofCorrections = new TProfile("tofCorrections", "TOF corrections; local z [cm]; t0 [ns]", 1000, m_minZprism, m_maxZ, -1, 1);
+    registerObject<TProfile>("tofCorrections", tofCorrections);
 
     // time stamp (average unix time and its standard deviation)
     auto* timeStamp = new TProfile("timeStamp", "Time stamp; ; unix time", 1, 0, 1, 0, 1.0e10, "S");
@@ -188,7 +193,16 @@ namespace Belle2 {
       if (not trk.isValid()) continue;
       if (not m_selector.isSelected(trk)) continue;
 
-      // fill histograms
+      // fill TOF corrections
+      double localZ = m_selector.getLocalPosition().Z();
+      const auto* timeZero = trk.getExtHit()->getRelated<TOPTimeZero>();
+      if (timeZero and timeZero->isValid()) {
+        auto tofCorrections = getObjectPtr<TProfile>("tofCorrections");
+        tofCorrections->Fill(localZ, timeZero->getTime());
+      }
+      if (localZ < m_minZ) continue;
+
+      // fill all the other histograms
       auto timeStamp = getObjectPtr<TProfile>("timeStamp");
       timeStamp->Fill(0.5, m_eventMetaData->getTime() / 1000000000);
 

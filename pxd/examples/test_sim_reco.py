@@ -42,6 +42,6 @@ add_reconstruction(main, components=['MagneticField', 'PXD'])
 main.add_module('RootOutput')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

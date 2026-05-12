@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -22,10 +22,10 @@ namespace Belle2 {
   /**
    * Findlet to extrapolate found tracks to the PXD sensors and calculate intercepts.
    */
-  class ToPXDExtrapolator : public TrackFindingCDC::Findlet<const std::pair<double, double>, const std::pair<double, double>,
+  class ToPXDExtrapolator : public TrackingUtilities::Findlet<const std::pair<double, double>, const std::pair<double, double>,
     std::pair<VxdID, long>, std::pair<VxdID, long>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const std::pair<double, double>, const std::pair<double, double>,
+    using Super = TrackingUtilities::Findlet<const std::pair<double, double>, const std::pair<double, double>,
           std::pair<VxdID, long>, std::pair<VxdID, long>>;
 
   public:

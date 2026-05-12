@@ -71,8 +71,9 @@ namespace Belle2 {
     {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
-    /** set and get total relevant ID range */
+    /** set total relevant ID range */
     void setRelID(std::vector<float> relid) {relevantID = relid;}
+    /** get total relevant ID range */
     std::vector<float> getRelID() const {return relevantID;}
     /** Returns way of obtaining the event time */
     std::string get_et_option() const { return et_option; }

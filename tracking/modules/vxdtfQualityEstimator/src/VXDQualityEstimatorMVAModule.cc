@@ -13,6 +13,7 @@
 #include <framework/geometry/BFieldManager.h>
 
 using namespace Belle2;
+using namespace TrackingUtilities;
 
 
 REG_MODULE(VXDQualityEstimatorMVA);

@@ -23,7 +23,7 @@ namespace Belle2 {
     explicit SVDTimeValidationAlgorithm();
 
     /** Destructor*/
-    virtual ~SVDTimeValidationAlgorithm() {}
+    virtual ~SVDTimeValidationAlgorithm() override {}
 
     /** Setter for m_allowedT0Shift*/
     void setAllowedTimeShift(float value) {m_allowedDeviationMean = value;}

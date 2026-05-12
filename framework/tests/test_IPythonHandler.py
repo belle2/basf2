@@ -15,8 +15,6 @@ from hep_ipython_tools.information import EnvironmentInformation
 from hep_ipython_tools.ipython_handler import IPythonHandler
 from hep_ipython_tools.tests.fixtures import MockQueue
 
-# @cond internal_test
-
 
 class DeriviedCalculationProcess(CalculationProcess):
 
@@ -197,4 +195,3 @@ class TestIPythonHandler(TestCase):
 
 if __name__ == "__main__":
     main()
-# @endcond

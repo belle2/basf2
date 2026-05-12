@@ -14,10 +14,6 @@
 #include <map>
 #include <string>
 
-#ifdef _BELLE2_EPICS
-#include "cadef.h"
-#endif
-
 namespace Belle2 {
   /**
    * Class for HLT-related histogram analysis.
@@ -51,8 +47,6 @@ namespace Belle2 {
     void terminate() override final;
 
   private:
-    /// prefix for EPICS PVs
-    std::string m_pvPrefix = "B2_nsm:get:ECL_LUM_MON:lum_det_run";
     /// name of the bhabha trigger
     std::string m_bhabhaName = "accept_bhabha";
     /// Which columns to use
@@ -85,10 +79,5 @@ namespace Belle2 {
     std::pair<TCanvas*, TH1F*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
     /// Histogram with mean memory change per process
     std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
-
-#ifdef _BELLE2_EPICS
-    //! one EPICS PV
-    chid  m_epicschid;
-#endif
   };
 }

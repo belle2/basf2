@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <analysis/dataobjects/FlavorTaggerInfoMap.h>
 
 namespace Belle2 {
 

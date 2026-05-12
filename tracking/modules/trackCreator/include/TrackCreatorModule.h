@@ -70,6 +70,12 @@ namespace Belle2 {
       */
     bool m_useBFieldAtHit = false;
 
+    /// Flag to use the momentum seed of the RecoTrack for the TrackFitMomentumRange selection (instead of the fitted value)
+    bool m_useSeedForTrackFitMomentumRange = false;
+
+    /// Flag to stop the module when a particle hypothesis leads to a successiful track fit (used in prefilter for optimization)
+    bool m_stopOnSuccessfulTrackFit = false;
+
     /// TrackFitMomentumRange Database OjbPtr
     DBObjPtr<TrackFitMomentumRange> m_trackFitMomentumRange;
 

@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_DATAOBJECTS_VXDTRUEHIT_H
-#define VXD_DATAOBJECTS_VXDTRUEHIT_H
 
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/datastore/RelationsObject.h>
@@ -124,5 +122,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif

@@ -30,7 +30,7 @@ def add_event_generation(path, randomSeed, eventType, expNumber):
       @param eventType: the allowed event types are
           "BBbar" which will generate BBbar events plus extra ParticleGun tracks.
           "BhaBha" which will generate radiative BhaBha events
-      @param expNumber: the experiment number 0 or 1004 for full geometry, 1003 for partial PXD geometry (early phase 3).
+      @param expNumber: the experiment number 0 or 1004 for full geometry, 1003 for partial PXD geometry (Run 1, early phase 3).
           For training SVD only SectorMaps this setting does not matter, as SVD does not change between exp 0, 1004 and 1003.
     '''
     if (expNumber not in (0, 1003, 1004)):
@@ -438,4 +438,3 @@ def remove_timing_cuts_from_SectorMap(sectorMapFile, setupToRead="SVDOnlyDefault
     b2.print_path(main)
     # run path
     b2.process(main)
-    print(b2.statistics)

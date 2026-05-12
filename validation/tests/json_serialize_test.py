@@ -17,9 +17,6 @@ import json
 import json_objects
 
 
-# @cond internal_test
-
-
 class TestJsonSerialize(unittest.TestCase):
     """
     Test serialization of JSON objects.
@@ -88,5 +85,3 @@ class TestJsonSerialize(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# @endcond

@@ -74,7 +74,7 @@ namespace Belle2 {
       }
 
       StoreArray<IRSimHit> irSimHits;
-      IRSimHit* simHit = irSimHits.appendNew(posInVec, momInVec, posOutVec, momOutVec, partPDGCode, depEnergy, Volname);
+      const IRSimHit* simHit = irSimHits.appendNew(posInVec, momInVec, posOutVec, momOutVec, partPDGCode, depEnergy, Volname);
 
       // add relation to MCParticles
       StoreArray<MCParticle> mcParticles;

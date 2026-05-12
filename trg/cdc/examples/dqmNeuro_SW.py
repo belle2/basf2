@@ -102,5 +102,5 @@ main.add_module('CDCTriggerNeuroDQM',
 main.add_module('RootOutput', outputFileName=dstputfile)
 
 # run basf2: ###
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)
 print(basf2.statistics)

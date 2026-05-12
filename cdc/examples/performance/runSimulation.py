@@ -93,7 +93,7 @@ def sim(exp, run, evt, st, topInCounter=False, magneticField=True, fieldMapper=F
                                 outputFileName=f'gcr.cdc.{int(exp):04d}.{int(run):06d}.{int(st):04d}.root')
     main_path.add_module(output)
     b2.print_path(main_path)
-    b2.process(main_path)
+    b2.process(main_path, calculateStatistics=True)
     print(b2.statistics)
 
 

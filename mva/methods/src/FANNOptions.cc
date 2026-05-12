@@ -71,9 +71,9 @@ namespace Belle2 {
       ("hidden_layers_architecture", po::value<std::string>(&m_hidden_layers_architecture),
        "Architecture with number of neurons in each hidden layer")
       ("hidden_activiation_function", po::value<std::string>(&m_hidden_activiation_function),
-       "Name of acitvation function used for hidden layers")
+       "Name of activation function used for hidden layers")
       ("output_activiation_function", po::value<std::string>(&m_output_activiation_function),
-       "Name of acitvation function used for output layer")
+       "Name of activation function used for output layer")
       ("error_function", po::value<std::string>(&m_error_function), "Name of error function")
       ("training_method", po::value<std::string>(&m_training_method), "Method used for backpropagation")
       ("validation_fraction", po::value<double>(&m_validation_fraction), "Fraction of training sample used for validation.")

@@ -135,7 +135,7 @@ main.add_module(simulation)
 main.add_module(output)
 
 # Process events
-process(main)
+process(main, calculateStatistics=True)
 
 # Print call statistics
 print(statistics)

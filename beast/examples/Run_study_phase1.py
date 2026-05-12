@@ -68,7 +68,7 @@ main.add_module(detector)
 main.add_module(histo)
 main.add_module(progress)
 
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print('Event Statistics:')
 print(b2.statistics)

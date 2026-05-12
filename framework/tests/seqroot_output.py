@@ -47,7 +47,7 @@ conditions.disable_globaltag_replay()
 readpath = create_path()
 readpath.add_module('SeqRootInput', inputFileName='seqout_test.sroot')
 readpath.add_module('Progress')
-process(readpath)
+process(readpath, calculateStatistics=True)
 
 # remove input file
 os.remove('seqout_test.sroot')

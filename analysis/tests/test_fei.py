@@ -25,8 +25,6 @@ import numpy as np
 
 import pdg
 
-# @cond
-
 # Define equality operators for a bunch of pybasf2 classes
 import pybasf2
 pybasf2.Module.__eq__ = lambda a, b: a.type() == b.type() and\
@@ -1303,5 +1301,3 @@ if __name__ == '__main__':
     with b2test_utils.clean_working_directory():
         basf2.conditions.testing_payloads = ['localdb/database.txt']
         unittest.main()
-
-# @endcond

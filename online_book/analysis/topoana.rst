@@ -11,18 +11,17 @@ Topology analysis
 
     **Prerequisites**:
 
-        * Command Line Tutorial (Bash)
+    * Command Line Tutorial (Bash)
 
     **Questions**:
 
-        * What's inside my MC?
-        * How frequently do I have certain different decay modes in my MC?
+    * What's inside my MC?
+    * How frequently do I have certain different decay modes in my MC?
 
     **Objectives**:
 
-        * Install ``TopoAna``.
-
-	* Generate a PDF report with a lot of information about your MC.
+    * Install ``TopoAna``.
+    * Generate a PDF report with a lot of information about your MC.
 
 
 .. tip::
@@ -195,7 +194,7 @@ Please follow the steps below to install the software.
 
 1. Set up ``basf2`` (see :numref:`cvmfs_setup`) if you have not
 
- .. note::
+   .. note::
 
     This guarantees you have ``ROOT`` installed in your environment.
     It does not mean ``TopoAna`` is a software based on ``basf2``.
@@ -210,28 +209,28 @@ Please follow the steps below to install the software.
 
 5. Switch to the latest release with ``git checkout vxx-yy-zz``
 
-  .. note::
+   .. note::
 
     Please replace it with the concrete version number, which you can find
     with ``git tag | tail -1``.
 
 6. Configure the package path with ``./Configure``
 
- .. note::
+   .. note::
 
     You need to manually set up the environment variable ``PATH`` according
     to the guidelines printed out by the command.
 
 7. Compile and link the program with ``make``
 
- .. tip::
+   .. tip::
 
     The installation succeeds if you see the following line: ``"topoana.exe"
     installed successfully!``
 
 8. Set up the experiment name with ``./Setup Belle_II``
 
- .. note::
+   .. note::
 
     If you want to try the program with examples under the directory
     ``examples``, please execute ``./Setup Example``.
@@ -247,19 +246,19 @@ with the interface.
 1. Append the following statement at the beginning part of your python
    steering script
 
- .. code-block:: python
+   .. code-block:: python
 
     from variables.MCGenTopo import mc_gen_topo
 
 2. Use the parameter function ``mc_gen_topo(n)`` as a list of variables in the
    steering function ``variablesToNtuple`` as follow
 
- .. code-block:: python
+   .. code-block:: python
 
     variablesToNtuple(particleList, yourOwnVariableList + mc_gen_topo(n), treeName, fieName, path)
 
- Here, ``n`` is the number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables,
- and its default value is 200.
+   Here, ``n`` is the number of ``MCGenPDG_i``/``MCGenMothIndex_i`` variables,
+   and its default value is 200.
 
 3. Run your python steering script with ``basf2``
 
@@ -391,7 +390,7 @@ Below are some detailed explanations on these setting items.
 
 * The first item sets the names of the input root files.
 
-.. tip::
+  .. tip::
 
    1. The names ought to be input one per line without tailing characters,
       such as comma, semicolon, and period.
@@ -402,7 +401,7 @@ Below are some detailed explanations on these setting items.
 
 * The second item specifies the ``TTree`` name.
 
-.. note::
+  .. note::
 
    Here, the ``TTree`` object should contain the following variables:
    ``nMCGen``, ``MCGenPDG_i``, and ``MCGenMothIndex_i`` (``i = 0, 1, 2 ...``).
@@ -412,7 +411,7 @@ Below are some detailed explanations on these setting items.
   With the second parameter ``100`` in the item, the maximum number of output
   components is set to 100.
 
-.. note::
+  .. note::
 
    1. The item can be replaced or co-exist with other functionality items.
 
@@ -425,7 +424,7 @@ Below are some detailed explanations on these setting items.
   Though in different formats, they are denominated with the same name for the
   sake of uniformity.
 
-.. tip::
+  .. tip::
 
    * This item is optional, with the name of the card file as its default
      input value.
@@ -451,7 +450,7 @@ After the following steps:
 
 2. ``topoana.exe topoana.card``
 
- .. tip::
+   .. tip::
 
     * Since the name of the card file is the default one, you can just execute
       ``topoana.exe``.
@@ -585,14 +584,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    lines in one step. Could you figure out a way to do this?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Use the ``system`` function of the ``os`` module in your python steering script.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
-   Reivse your python steering script by adding ``import os`` to the end of its
+   Revise your python steering script by adding ``import os`` to the end of its
    preamble and appending ``os.system('topoana.exe topoana.card')`` at its end,
    and then run the script with ``basf2``.
 
@@ -602,7 +601,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       :language: python
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    Could you think of another way to do this? For example, with a shell script?
 
@@ -613,14 +612,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    branches of :math:`D^{*+}` in the input sample.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 3 in the quick-start tutorial for the introduction of the
      setting item.
    * See Section 3.3 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and
    check the changes of the output files.
@@ -634,7 +633,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 3 in the user guide for the description of other similar
      setting items.
@@ -647,14 +646,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    sample.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 4 in the quick-start tutorial for the introduction of the setting
      item.
    * See Section 4.4 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -668,7 +667,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 4 in the user guide for the description of other similar setting
      items.
@@ -682,14 +681,14 @@ setting items in the quick-start tutorial or the user guide we introduce in
    and decay trees together.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5 in the quick-start tutorial for the introduction of the setting
      item.
    * See Section 5.2.2 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -702,7 +701,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.2 in the user guide for the description of other similar
      setting items.
@@ -714,13 +713,13 @@ setting items in the quick-start tutorial or the user guide we introduce in
    to select only the events with ``nMCGen>=20 && nMCGen<=40``.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5.1.1 in the user guide for the description of the setting
      item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and
    check the changes of the output files.
@@ -733,7 +732,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.1 in the user guide for the description of other similar
      setting items.
@@ -746,12 +745,12 @@ setting items in the quick-start tutorial or the user guide we introduce in
    the program terminates.
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    * See Section 5.3.2 in the user guide for the description of the setting item.
 
 .. admonition:: Solution
-   :class: toggle solution stacked
+   :class: dropdown solution
 
    Add the following setting item to the card file, re-run the program, and check
    the changes of the output files.
@@ -764,7 +763,7 @@ setting items in the quick-start tutorial or the user guide we introduce in
       }
 
 .. admonition:: Extension
-   :class: toggle xhint
+   :class: dropdown xhint
 
    * See Section 5.3 in the user guide for the description of other similar
      setting items.

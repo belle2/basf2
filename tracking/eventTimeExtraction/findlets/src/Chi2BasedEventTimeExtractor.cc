@@ -8,13 +8,13 @@
 #include <tracking/eventTimeExtraction/findlets/Chi2BasedEventTimeExtractor.h>
 
 #include <tracking/eventTimeExtraction/utilities/TimeExtractionUtils.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 void Chi2BasedEventTimeExtractor::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {

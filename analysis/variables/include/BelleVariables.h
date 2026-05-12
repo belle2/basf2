@@ -8,6 +8,11 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
+
+#include <vector>
+#include <string>
+
 namespace Belle2 {
   class Particle;
 
@@ -68,6 +73,12 @@ namespace Belle2 {
 
     /** Returns significance of invariant mass using daughters' covariance matrices */
     double BellePi0InvariantMassSignificance(const Particle* particle);
+
+    /** Returns pi0 veto developed by Belle */
+    Manager::FunctionPtr BellePi0Veto(const std::vector<std::string>& arguments);
+    /** Returns eta veto developed by Belle */
+    Manager::FunctionPtr BelleEtaVeto(const std::vector<std::string>& arguments);
+
   }
 }
 

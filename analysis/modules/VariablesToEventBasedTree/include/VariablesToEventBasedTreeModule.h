@@ -17,6 +17,7 @@
 #include <framework/pcore/RootMergeable.h>
 
 #include <TFile.h>
+#include <TTree.h>
 
 #include <string>
 

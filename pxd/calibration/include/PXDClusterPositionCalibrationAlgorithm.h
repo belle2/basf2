@@ -8,13 +8,14 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
-#include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
+#include <pxd/dbobjects/PXDClusterShapeClassifierPar.h>
 
 #include <vector>
 #include <set>
 
 namespace Belle2 {
+  class PXDClusterShapeIndexPar;
+
   /**
    * Class implementing the PXD cluster position calibration algorithm
    */

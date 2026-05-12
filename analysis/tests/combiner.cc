@@ -247,7 +247,7 @@ namespace {
       pdgCode = mother->getPDGCode();
       listName = mother->getFullName();
 
-      isSelfConjugatedParticle = !(Belle2::EvtPDLUtil::hasAntiParticle(pdgCode));
+      isSelfConjugatedParticle = !(EvtPDLUtil::hasAntiParticle(pdgCode));
 
       StoreObjPtr<ParticleList> list(listName);
       DataStore::Instance().setInitializeActive(true);
@@ -259,7 +259,7 @@ namespace {
       list->initialize(pdgCode, listName);
 
       if (not isSelfConjugatedParticle) {
-        antiListName = Belle2::EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
+        antiListName = EvtPDLUtil::antiParticleListName(pdgCode, mother->getLabel());
         StoreObjPtr<ParticleList> antiList(antiListName);
         DataStore::Instance().setInitializeActive(true);
         antiList.registerInDataStore();

@@ -15,6 +15,7 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dbobjects/SVDSpacePointSNRFractionSelector.h>
+#include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -95,16 +96,24 @@ namespace Belle2 {
     float noise = 0;
     for (auto iSD : shaperDigits) {
       auto samples = iSD.getSamples();
+      std::vector<float> selectedSamples;
+      if (samples.size() == 6) {
+        Belle2::SVD::SVDMaxSumAlgorithm maxSum(samples);
+        auto maxSamples = maxSum.getSelectedSamples();
+        selectedSamples.assign(maxSamples.begin(), maxSamples.end());
+      } else {
+        selectedSamples.assign(samples.begin(), samples.end());
+      }
+      if (selectedSamples.size() < 3) continue;
 
-      inputVector[0] += samples[0];
-      inputVector[1] += samples[1];
-      inputVector[2] += samples[2];
+      inputVector[0] += selectedSamples[0];
+      inputVector[1] += selectedSamples[1];
+      inputVector[2] += selectedSamples[2];
 
       VxdID thisSensorID = iSD.getSensorID();
       bool thisSide = iSD.isUStrip();
       int thisCellID = iSD.getCellID();
       float thisNoise = noiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-
       noise += thisNoise * thisNoise;
     }
     noise = sqrt(noise);

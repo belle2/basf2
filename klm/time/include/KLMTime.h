@@ -61,6 +61,7 @@ namespace Belle2 {
 
     /**
      * Get coarse and fine times for RPC.
+     * Returns DC arrival time (clocks, first) and TDC-based time (nanoseconds, second).
      * @param[in] ctime        REVO9 time.
      * @param[in] tdc          TDC.
      * @param[in] triggerTime  REVO9 Trigger time.
@@ -109,6 +110,9 @@ namespace Belle2 {
 
     /** CTIME period. */
     double m_CTimePeriod = 0.;
+
+    /** RPC Frame9 Clock Counter from 0 to 11519, then resets */
+    static const int FRAME9_MAX = 11520;
 
   };
 

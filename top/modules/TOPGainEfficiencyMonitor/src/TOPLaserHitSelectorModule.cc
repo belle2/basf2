@@ -78,14 +78,13 @@ namespace Belle2 {
              "select window number (All=0, Odd=2, Even=1)",
              0);
     addParam("includePrimaryChargeShare", m_includePrimaryChargeShare,
-             "set ture when you require without primary chargeshare cut for making 2D histogram",
+             "set true when you require without primary chargeshare cut for making 2D histogram",
              (bool)false);
     addParam("includeAllChargeShare", m_includeAllChargeShare,
-             "set ture when you require without all chargeshare cut for making 2D histogram",
+             "set true when you require without all chargeshare cut for making 2D histogram",
              (bool)false);
   }
 
-  TOPLaserHitSelectorModule::~TOPLaserHitSelectorModule() {}
 
   void TOPLaserHitSelectorModule::initialize()
   {
@@ -141,10 +140,6 @@ namespace Belle2 {
     const short nAsic = c_NPixelPerModule / c_NChannelPerAsic * c_NChannelPerPMT;
     m_nCalPulseHistogram = new TH1F("hNCalPulse", "number of calibration pulses identificed for each asic",
                                     nAsic, -0.5, nAsic - 0.5);
-  }
-
-  void TOPLaserHitSelectorModule::beginRun()
-  {
   }
 
   void TOPLaserHitSelectorModule::event()
@@ -247,14 +242,6 @@ namespace Belle2 {
       m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
     }
 
-  }
-
-  void TOPLaserHitSelectorModule::endRun()
-  {
-  }
-
-  void TOPLaserHitSelectorModule::terminate()
-  {
   }
 
 } // end Belle2 namespace

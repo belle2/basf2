@@ -12,17 +12,20 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 const CDCMCTrackStore& CDCMCTrackStore::getInstance()
 {

@@ -9,6 +9,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool SkimmedHitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {

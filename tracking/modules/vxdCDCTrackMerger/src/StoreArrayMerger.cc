@@ -7,8 +7,8 @@
  **************************************************************************/
 #include <tracking/modules/vxdCDCTrackMerger/StoreArrayMerger.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -19,10 +19,10 @@ void StoreArrayMerger::exposeParameters(ModuleParamList* moduleParamList, const 
   Super::exposeParameters(moduleParamList, prefix);
 
   // CDC input tracks
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "CDCRecoTrackStoreArrayName"), m_param_cdcRecoTrackStoreArrayName,
                                 "StoreArray name of the CDC Track Store Array", m_param_cdcRecoTrackStoreArrayName);
   // VXD input tracks
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "VXDRecoTrackStoreArrayName"), m_param_vxdRecoTrackStoreArrayName,
                                 "StoreArray name of the VXD Track Store Array", m_param_vxdRecoTrackStoreArrayName);
 }
 
@@ -67,5 +67,5 @@ void StoreArrayMerger::removeRecoTracksWithPartner(std::vector<RecoTrack*>& trac
     return recoTrack->getRelated<RecoTrack>(partnerStoreArrayName) != nullptr;
   };
 
-  TrackFindingCDC::erase_remove_if(tracks, trackHasAlreadyRelations);
+  TrackingUtilities::erase_remove_if(tracks, trackHasAlreadyRelations);
 }

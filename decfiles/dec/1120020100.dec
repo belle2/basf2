@@ -1,0 +1,21 @@
+# EventType: 1120020100
+# Descriptor: [B0 -> K0 Xinv]cc
+# NickName: Bd_K0Xinv
+# Documentation: Rare b->s nu anti-nu process
+# Tested: Yes 
+# PhysicsWG: DSLM 
+# Responsible:  Roberta Volpe
+# Email: roberta.volpe@cern.ch
+# Cuts: None
+# Date: 20260224
+
+Decay Upsilon(4S)
+1.00 B0sig anti-B0sig B0 anti-B0         VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K_S0 Xinv PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+End

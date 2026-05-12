@@ -5,12 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <boost/python.hpp>
 
 #include <framework/modules/core/InteractiveModule.h>
-
 #include <framework/logging/Logger.h>
 
+#include <Python.h>
 
 using namespace Belle2;
 

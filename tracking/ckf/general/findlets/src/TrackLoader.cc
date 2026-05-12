@@ -8,7 +8,7 @@
 #include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -25,26 +25,26 @@ void TrackLoader::exposeParameters(ModuleParamList* moduleParamList, const std::
 {
   m_trackFitter.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "inputRecoTrackStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "inputRecoTrackStoreArrayName"),
                                 m_param_inputRecoTrackStoreArrayName,
                                 "StoreArray name of the input Track Store Array.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "relatedRecoTrackStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "relatedRecoTrackStoreArrayName"),
                                 m_param_relationRecoTrackStoreArrayName,
                                 "Check for relations to this store array name and only use the unrelated ones or "
                                 "relations with different direction",
                                 m_param_relationRecoTrackStoreArrayName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalPtRequirement"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimalPtRequirement"),
                                 m_param_minimalPtRequirement,
                                 "Minimal Pt requirement for the input tracks",
                                 m_param_minimalPtRequirement);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "relationCheckForDirection"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "relationCheckForDirection"),
                                 m_param_relationCheckForDirectionAsString,
                                 "Check for this direction when checking for related tracks.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ignoreTracksWithCDChits"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ignoreTracksWithCDChits"),
                                 m_noCDChits, "Do not consider tracks containing CDC hits.", false);
 
 }
@@ -57,10 +57,10 @@ void TrackLoader::initialize()
 
   m_param_relationCheckForDirection = fromString(m_param_relationCheckForDirectionAsString);
 
-  if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
+  if (m_param_relationCheckForDirection != TrackingUtilities::EForwardBackward::c_Invalid) {
     StoreArray<RecoTrack> relatedRecoTracks;
     if (not relatedRecoTracks.isOptional(m_param_relationRecoTrackStoreArrayName)) {
-      m_param_relationCheckForDirection = TrackFindingCDC::EForwardBackward::c_Invalid;
+      m_param_relationCheckForDirection = TrackingUtilities::EForwardBackward::c_Invalid;
     }
   }
 }
@@ -75,7 +75,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
       if (item.hasCDCHits()) continue;
     }
 
-    if (m_param_relationCheckForDirection != TrackFindingCDC::EForwardBackward::c_Invalid) {
+    if (m_param_relationCheckForDirection != TrackingUtilities::EForwardBackward::c_Invalid) {
       const auto& relatedTracksWithWeight = item.template getRelationsWith<RecoTrack>(m_param_relationRecoTrackStoreArrayName);
       bool hasAlreadyRelation = false;
       for (unsigned int index = 0; index < relatedTracksWithWeight.size(); ++index) {
@@ -100,7 +100,7 @@ void TrackLoader::apply(std::vector<RecoTrack*>& seeds)
   const auto hasLowPt = [this](const auto & track) {
     return track->getMomentumSeed().Rho() < m_param_minimalPtRequirement;
   };
-  TrackFindingCDC::erase_remove_if(seeds, hasLowPt);
+  TrackingUtilities::erase_remove_if(seeds, hasLowPt);
 
   m_trackFitter.apply(seeds);
 }

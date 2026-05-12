@@ -109,4 +109,3 @@ progress = basf2.register_module('Progress')
 main.add_module(progress)
 
 basf2.process(main)
-print(basf2.statistics)

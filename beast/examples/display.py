@@ -108,4 +108,3 @@ display.param('hideObjects', [])
 main.add_module(display)
 
 b2.process(main)
-# print(statistics(statistics.INIT))

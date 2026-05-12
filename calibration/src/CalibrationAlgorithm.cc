@@ -191,7 +191,7 @@ void CalibrationAlgorithm::setInputFileNames(PyObject* inputFileNames)
 }
 
 /// Set the input file names used for this algorithm and resolve the wildcards
-void CalibrationAlgorithm::setInputFileNames(vector<string> inputFileNames)
+void CalibrationAlgorithm::setInputFileNames(const vector<string>& inputFileNames)
 {
   // A lot of code below is tweaked from RootInputModule::initialize,
   // since we're basically copying the functionality anyway.
@@ -308,6 +308,7 @@ bool CalibrationAlgorithm::commit()
   return Database::Instance().storeData(payloads);
 }
 
+// cppcheck-suppress functionStatic
 bool CalibrationAlgorithm::commit(list<Database::DBImportQuery> payloads)
 {
   if (payloads.empty())
@@ -369,7 +370,7 @@ RunRange CalibrationAlgorithm::getRunRangeFromAllData() const
     //Open TFile to get the objects
     unique_ptr<TFile> f;
     f.reset(TFile::Open(fileName.c_str(), "READ"));
-    RunRange* runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
+    const RunRange* runRangeOther = dynamic_cast<RunRange*>(f->Get(runRangeObjName.c_str()));
     if (runRangeOther) {
       runRange.merge(runRangeOther);
     } else {
@@ -384,7 +385,7 @@ string CalibrationAlgorithm::getGranularityFromData() const
 {
   // Save TDirectory to change back at the end
   TDirectory* dir = gDirectory;
-  RunRange* runRange;
+  const RunRange* runRange;
   string runRangeObjName(getPrefix() + "/" + RUN_RANGE_OBJ_NAME);
   // We only check the first file
   string fileName = m_inputFileNames[0];
@@ -401,7 +402,7 @@ string CalibrationAlgorithm::getGranularityFromData() const
   return granularity;
 }
 
-void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event = 1, const int run = 0, const int experiment = 0)
+void CalibrationAlgorithm::updateDBObjPtrs(const unsigned int event, const int run, const int experiment)
 {
   // Construct an EventMetaData object but NOT in the Datastore
   EventMetaData emd(event, run, experiment);

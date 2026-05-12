@@ -444,5 +444,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr photonHasOverlap(const std::vector<std::string>& arguments);
 
+    /**
+     * return ECL cluster's normalized time (dimensionless)
+     */
+    double eclClusterTimeNorm90(const Particle* particle);
+
   }
 } // Belle2 namespace

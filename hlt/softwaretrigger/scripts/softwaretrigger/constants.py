@@ -45,6 +45,16 @@ class DQMModes(Enum):
     dont_care = "dont_care"
 
 
+class EventDistributionModes(Enum):
+    """Enum of event distribution modes inside the HLT farm"""
+    #: ringbuffer, also known as rfarm
+    ringbuffer = "ringbuffer"
+    #: zmq, also known as hbasf2
+    zmq = "zmq"
+    #: zmqbasf2
+    zmqbasf2 = "zmqbasf2"
+
+
 #: Always store those objects
 ALWAYS_SAVE_OBJECTS = ["EventMetaData", "RawFTSWs", "ROIpayload", "SoftwareTriggerResult", "SoftwareTriggerVariables",
                        "TRGSummary"]

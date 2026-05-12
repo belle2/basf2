@@ -7,18 +7,18 @@
  **************************************************************************/
 
 #include <tracking/ckf/svd/filters/states/SVDStateVarSet.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Helper function to calculate the mean of a given function over all states in the list
   template<class APredicate>
-  double meanOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
+  double meanOver(const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double sum = 0;
     unsigned int numberOfHits = 0;
@@ -39,7 +39,7 @@ namespace {
 
   /// Helper function to calculate the min of a given function over all states in the list
   template<class APredicate>
-  double minOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
+  double minOver(const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double minimalValue = NAN;
 
@@ -63,7 +63,7 @@ namespace {
 
   /// Helper function to calculate the standard deviation of a given function over all states in the list
   template<class APredicate>
-  double stdOver(const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
+  double stdOver(const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& states, const APredicate& t)
   {
     double sum = 0;
     double sumSquared = 0;
@@ -88,7 +88,7 @@ namespace {
 
 bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& previousStates = pair->first;
   CKFToSVDState* state = pair->second;
 
   const RecoTrack* cdcTrack = previousStates.front()->getSeed();
@@ -97,7 +97,7 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
   const SpacePoint* spacePoint = state->getHit();
   B2ASSERT("Path without hit?", spacePoint);
 
-  std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>> allStates = previousStates;
+  std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>> allStates = previousStates;
   allStates.emplace_back(state, 0);
 
   const std::vector<CDCHit*>& cdcHits = cdcTrack->getSortedCDCHitList();

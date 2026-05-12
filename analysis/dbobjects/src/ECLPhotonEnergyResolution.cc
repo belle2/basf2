@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <analysis/dbobjects/ECLPhotonEnergyResolution.h>
+#include <analysis/dbobjects/ParticleWeightingBinLimits.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

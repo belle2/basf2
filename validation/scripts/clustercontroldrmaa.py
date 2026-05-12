@@ -64,7 +64,7 @@ class Cluster(ClusterBase):
         The default constructor.
         - Holds the current working directory, which is also the location of
           the shellscripts that are being sent to the cluster.
-        - Initializes a logger which writes to validate_basf2.py's log.
+        - Initializes a logger which writes to b2validation's log.
         - Finds the revision of basf2 that will be set up on the cluster.
         """
 

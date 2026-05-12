@@ -65,6 +65,9 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
       - input_data_path will be replaced with path/to/data_path used for calibration, e.g. /group/belle2/dataprod/Data/PromptSkim/
     '''
 
+    # Avoid looking for the release globaltag
+    basf2.conditions.override_globaltags()
+
     # Grab the expert configurations.
     expert_config = json.loads(expert_config)
     chunk_size = expert_config['chunk_size']

@@ -140,8 +140,8 @@ def add_skim_software_trigger(path, store_array_debug_prescale=0):
     modularAnalysis.fillParticleList("pi+:hadb", 'p>0.1 and abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:tau", 'abs(d0) < 2 and abs(z0) < 8', path=path)
     modularAnalysis.fillParticleList("gamma:skim", 'E>0.1', path=path)
-    stdV0s.stdKshorts(path=path, fitter='KFit')
-    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged', 'goodBelleKshort == 1', path=path)
+    stdV0s.stdKshorts(path=path, fitter='KFit', addSuffix=True)
+    modularAnalysis.cutAndCopyList('K_S0:dstSkim', 'K_S0:merged_KFit', 'goodBelleKshort == 1', path=path)
     stdV0s.stdLambdas(path=path)
     modularAnalysis.fillParticleList("K+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
     modularAnalysis.fillParticleList("pi+:dstSkim", 'abs(d0) < 2 and abs(z0) < 4', path=path)
@@ -196,7 +196,6 @@ def add_pre_filter_reconstruction(path, run_type, components, switch_off_slow_mo
             path,
             skipGeometryAdding=True,
             components=components,
-            event_abort=hlt_event_abort,
             switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
             **kwargs)
 
@@ -216,7 +215,8 @@ def add_filter_module(path):
     return path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&all&total_result"])
 
 
-def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online):
+def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_modules_for_online,
+                                   **kwargs):
     """
     Add all modules which should run after the HLT decision is taken
     and only on the accepted events.
@@ -232,7 +232,8 @@ def add_post_filter_reconstruction(path, run_type, components, switch_off_slow_m
             path,
             components=components,
             pruneTracks=False,
-            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online
+            switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+            **kwargs
         )
 
         add_skim_software_trigger(path, store_array_debug_prescale=1)
@@ -257,3 +258,29 @@ def hlt_event_abort(module, condition, error_flag):
     module.if_value(condition, p, basf2.AfterConditionPath.CONTINUE)
     if error_flag == ROOT.Belle2.EventMetaData.c_HLTDiscard:
         p.add_module('StatisticsSummary').set_name('Sum_HLT_Discard')
+    elif error_flag == ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard:
+        p.add_module('StatisticsSummary').set_name('Sum_HLTPrefilter_Discard')
+
+
+def add_prefilter_module(path, event_abort=hlt_event_abort):
+    """
+    Add the SoftwareTrigger for the HLT prefilter cuts to the given path.
+    Only the calculation of the cuts is implemented here - the cut logic has to be done
+    using the module return value.
+    Discard events tagged by HLTPrefilter as injection background or high occupancy.
+    """
+
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
+
+    # Execute SoftwareTrigger module for prefilter
+    path.add_module("SoftwareTrigger", baseIdentifier="prefilter")
+
+    # Get total_result for prefilter
+    hlt_prefilter_module = path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&prefilter&total_result"])
+
+    # Filter events rejected by prefilter, only save event metadata
+    event_abort(hlt_prefilter_module, "<1", ROOT.Belle2.EventMetaData.c_HLTPrefilterDiscard)
+
+    # Statistics Summary
+    path.add_module("StatisticsSummary").set_name("Sum_HLT_Prefilter_Calculation")

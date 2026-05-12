@@ -15,14 +15,15 @@
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MVAFeasibleAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/MVARealisticAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
+#include <tracking/trackingUtilities/varsets/BaseVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
+template class TrackingUtilities::UnionRecordingFilter<AxialSegmentPairFilterFactory>;
 
 std::vector<std::string>
 UnionRecordingAxialSegmentPairFilter::getValidVarSetNames() const

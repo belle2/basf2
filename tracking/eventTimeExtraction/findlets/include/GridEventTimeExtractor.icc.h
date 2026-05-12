@@ -10,7 +10,7 @@
 #include <tracking/eventTimeExtraction/findlets/GridEventTimeExtractor.dcl.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 #include <tracking/eventTimeExtraction/utilities/TimeExtractionUtils.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
 
@@ -70,27 +70,27 @@ namespace Belle2 {
   {
     Super::exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "iterations"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "iterations"),
                                   m_param_iterations,
                                   "How many iterations should be done?",
                                   m_param_iterations);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "abortOnUnsuccessfulStep"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "abortOnUnsuccessfulStep"),
                                   m_param_abortOnUnsuccessfulStep,
                                   "Abort on a single unsuccessful step. Otherwise, the success is defined by the last step",
                                   m_param_abortOnUnsuccessfulStep);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalT0Value"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalT0Value"),
                                   m_param_maximalT0Value,
                                   "Maximal Grid Value of the T0 extraction",
                                   m_param_maximalT0Value);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimalT0Value"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minimalT0Value"),
                                   m_param_minimalT0Value,
                                   "Maximal Grid Value of the T0 extraction",
                                   m_param_minimalT0Value);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gridSteps"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "gridSteps"),
                                   m_param_gridSteps,
                                   "Number of steps in the grid",
                                   m_param_gridSteps);
 
-    m_findlet.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("sub", prefix));
+    m_findlet.exposeParameters(moduleParamList, TrackingUtilities::prefixed("sub", prefix));
   }
 }

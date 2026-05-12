@@ -19,7 +19,7 @@
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <rawdata/dataobjects/RawCDC.h>
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+
 namespace Belle2 {
 
   namespace CDC {

@@ -84,13 +84,13 @@ namespace Belle2 {
     int getModuleID() const {return m_moduleID;}
 
     /**
-     * Return assumed emision position within the quartz
+     * Return assumed emission position within the quartz
      * @return x coordinate in local (module) frame
      */
     double getX() const {return m_x;}
 
     /**
-     * Return assumed emision position within the quartz
+     * Return assumed emission position within the quartz
      * @return z coordinate in local (module) frame
      */
     double getZ() const {return m_z;}

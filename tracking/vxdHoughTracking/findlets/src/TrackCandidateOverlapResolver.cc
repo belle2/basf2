@@ -7,17 +7,18 @@
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateOverlapResolver.h>
 #include <framework/core/ModuleParamList.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapMatrixCreator.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/Scrooge.h>
 #include <tracking/trackFindingVXD/trackSetEvaluator/OverlapResolverNodeInfo.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/dbobjects/SVDHoughParameters.h>
+#include <svd/dataobjects/SVDCluster.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 TrackCandidateOverlapResolver::~TrackCandidateOverlapResolver() = default;
@@ -31,15 +32,18 @@ void TrackCandidateOverlapResolver::exposeParameters(ModuleParamList* modulePara
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ResolveMethod"), m_resolveMethod,
+  m_prefix = prefix;
+
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "ResolveMethod"), m_resolveMethod,
                                 "Strategy used to resolve overlaps. Currently implemented are \"greedy\" and \"hopfield\".",
                                 m_resolveMethod);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "NameSVDClusters"), m_nameSVDClusters,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "NameSVDClusters"), m_nameSVDClusters,
                                 "Name of expected SVDClusters StoreArray.", m_nameSVDClusters);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minActivityState"), m_minActivityState,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minActivityState"), m_minActivityState,
                                 "Sets the minimal value of activity for acceptance. [0,1]", m_minActivityState);
 }
+
 
 void TrackCandidateOverlapResolver::initialize()
 {
@@ -50,6 +54,19 @@ void TrackCandidateOverlapResolver::initialize()
   B2ASSERT("ResolveMethod has to be either 'greedy' or 'hopfield'. Selected ResolveMethod: " << m_resolveMethod,
            m_resolveMethod == "greedy" || m_resolveMethod == "hopfield");
 
+}
+
+void TrackCandidateOverlapResolver::beginRun()
+{
+  if (!m_SVDHoughParameters.isValid()) {
+    B2FATAL("SVDHough - TrackCandidateOverlapResolver: SVDHoughParameter dbobject not found, using default parameters.");
+  } else {
+    if (m_prefix == "finalOverlapResolver") {
+      m_minActivityState = m_SVDHoughParameters->getFinalOverlapResolverMinActivityState();
+    } else if (m_prefix == "refinerOverlapResolver") {
+      m_minActivityState = m_SVDHoughParameters->getRefinerOverlapResolverMinActivityState();
+    }
+  }
 }
 
 void TrackCandidateOverlapResolver::apply(std::vector<SpacePointTrackCand>& spacePointTrackCandsToResolve)

@@ -48,7 +48,7 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 # Print statistics
 print(b2.statistics)

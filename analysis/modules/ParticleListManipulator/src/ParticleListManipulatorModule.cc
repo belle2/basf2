@@ -19,6 +19,7 @@
 // utilities
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ValueIndexPairSorting.h>
+#include <analysis/VariableManager/Utility.h>
 
 using namespace std;
 using namespace Belle2;

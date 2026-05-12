@@ -583,6 +583,35 @@ int GeometryPar::getNPhiScints(int layer) const
   return m_NPhiScints[layer - 1];
 }
 
+double GeometryPar::getBKLMLayerArea(int section, int sector, int layer) const
+{
+  // Validate inputs
+  if (section < 0 || section > 1 || sector < 1 || sector > m_NSector || layer <= 0 || layer > m_NLayer) {
+    B2ERROR("GeometryPar::getBKLMLayerArea(): invalid section, sector, or layer"
+            << LogVar("section", section)
+            << LogVar("sector", sector)
+            << LogVar("layer", layer));
+    return 0.0;
+  }
+  double area = 0.0;
+  bool hasChimney = (section == 0 && sector == 3); // Backward chimney sector(BB2)
+
+  if (!hasRPCs(layer)) {
+    // Scintillator layers (1-2)
+    int nPhiScints = getNPhiScints(layer);
+    int nZScints = getNZScints(hasChimney);
+    area = nPhiScints * m_ScintWidth * nZScints * m_ScintWidth;
+  } else {
+    // RPC layers (3-15)
+    int nPhiStrips = m_NPhiStrips[layer - 1];
+    double phiStripWidth = m_PhiStripWidth[layer - 1];
+    double zStripWidth = m_ZStripWidth[layer - 1];
+    int nZStrips = getNZStrips(hasChimney);
+    area = nPhiStrips * phiStripWidth * nZStrips * zStripWidth;
+  }
+  return area;
+}
+
 double GeometryPar::getPolystyreneOffsetX(void) const
 {
   return 0.5 * (m_ModulePolystyreneInnerHeight - m_ModulePolystyreneOuterHeight);

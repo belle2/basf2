@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
@@ -23,7 +23,7 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Findlet to finalize CKF Paths in terms of final result.
-  class CDCCKFResultFinalizer : public TrackFindingCDC::Findlet<const CDCCKFPath, CDCCKFResult> {
+  class CDCCKFResultFinalizer : public TrackingUtilities::Findlet<const CDCCKFPath, CDCCKFResult> {
   public:
     CDCCKFResultFinalizer()
     {
@@ -44,10 +44,10 @@ namespace Belle2 {
       }
 
       const CDCCKFPath* bestElement = nullptr;
-      TrackFindingCDC::Weight bestWeight = -NAN;
+      TrackingUtilities::Weight bestWeight = -NAN;
 
       for (const CDCCKFPath& path : paths) {
-        const TrackFindingCDC::Weight weight = m_filter(path);
+        const TrackingUtilities::Weight weight = m_filter(path);
         if (weight <= bestWeight) {
           continue;
         }
@@ -62,6 +62,6 @@ namespace Belle2 {
 
   private:
     /// Filter to weight the best path
-    TrackFindingCDC::ChooseableFilter<CDCPathFilterFactory> m_filter;
+    TrackingUtilities::ChooseableFilter<CDCPathFilterFactory> m_filter;
   };
 }

@@ -675,7 +675,7 @@ void CDCTriggerUnpackerModule::initialize()
     m_NeuroTracks.registerRelationTo(m_NeuroInputs);
   }
   //make datastore object for neurotrigger config
-  m_cdctriggerneuroconfig = new DBObjPtr<CDCTriggerNeuroConfig>(m_neurotrigger_config_name);
+  m_cdctriggerneuroconfig = std::make_unique<DBObjPtr<CDCTriggerNeuroConfig>>(m_neurotrigger_config_name);
 
   for (int iSL = 0; iSL < 9; iSL += 2) {
     if (m_unpackMerger) {

@@ -6,27 +6,25 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDDQMClustersModule.h"
+#include <pxd/modules/pxdDQM/PXDDQMClustersModule.h>
 
-#include <framework/core/HistoModule.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
+#include <pxd/dataobjects/PXDDAQStatus.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/geometry/SensorInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoTools.h>
 #include <pxd/unpacking/PXDMappingLookup.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;

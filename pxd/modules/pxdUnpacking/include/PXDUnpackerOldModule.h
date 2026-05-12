@@ -9,19 +9,19 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <pxd/dataobjects/PXDRawHit.h>
-#include <pxd/dataobjects/PXDRawAdc.h>
-#include <pxd/dataobjects/PXDRawROIs.h>
-#include <vxd/dataobjects/VxdID.h>
-#include <rawdata/dataobjects/RawPXD.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 
 #include <pxd/dataobjects/PXDErrorFlags.h>
 #include <pxd/dataobjects/PXDDAQStatus.h>
 
 namespace Belle2 {
+  class RawPXD;
+  class EventMetaData;
+  class PXDRawHit;
+  class PXDRawROIs;
+  class PXDRawAdc;
+  class VxdID;
 
   namespace PXD {
 

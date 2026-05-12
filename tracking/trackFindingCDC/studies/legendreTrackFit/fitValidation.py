@@ -64,7 +64,7 @@ class FitValidationModule(HarvestingModule):
 
             # We will only use the axial hits here as the FastFit can only process axial hits too
             if cdc_hit.getISuperLayer() % 2 == 0:
-                cdc_wire_hit = Belle2.TrackFindingCDC.CDCWireHit(cdc_hit)
+                cdc_wire_hit = Belle2.TrackingUtilities.CDCWireHit(cdc_hit)
 
                 wireRefPos2D = cdc_wire_hit.getRefPos2D()
                 drift_length = cdc_wire_hit.getRefDriftLength()
@@ -78,7 +78,7 @@ class FitValidationModule(HarvestingModule):
         viktor_chi2 = self.fast_fitter.fitTrackCandidateFast(hits, track_par, ref_point, False) * (hits.size() - 4)
 
         # Riemann without drift variances
-        trajectory2D = Belle2.TrackFindingCDC.CDCTrajectory2D()
+        trajectory2D = Belle2.TrackingUtilities.CDCTrajectory2D()
         self.circle_fitter.update(trajectory2D, observations)
         riemann_chi2 = trajectory2D.getChi2()
 

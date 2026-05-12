@@ -45,8 +45,11 @@ settings_local_calibrations = {
     "klm": {"local_staging_klm": []},
     "trigger": {
         "local_staging_trigger": [
-            "TRGGDLDBPrescales",
             "CDCTriggerDeadch",
+            "TRGGDLDBAlgs",
+            "TRGGDLDBFTDLBits",
+            "TRGGDLDBInputBits",
+            "TRGGDLDBPrescales",
         ]
     },
     "tracking": {"local_staging_tracking": []},

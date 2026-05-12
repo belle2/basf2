@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 
 #include <string>
 #include <map>
@@ -17,8 +17,10 @@
 namespace Belle2 {
   class ModuleParamList;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /**
      *  Wire hit relation filter that is compensating for hit inefficiencies.
@@ -33,11 +35,11 @@ namespace Belle2 {
      *  The criterion can be lowered such that fewer missing hits trigger the inclusion of the
      *  secondary neighbors.
      */
-    class BridgingWireHitRelationFilter : public RelationFilter<CDCWireHit> {
+    class BridgingWireHitRelationFilter : public TrackingUtilities::RelationFilter<TrackingUtilities::CDCWireHit> {
 
     private:
       /// Type of the base class
-      using Super = RelationFilter<CDCWireHit>;
+      using Super = TrackingUtilities::RelationFilter<TrackingUtilities::CDCWireHit>;
 
     public:
       /// Default constructor
@@ -56,8 +58,8 @@ namespace Belle2 {
        *  Returns a vector containing the neighboring wire hits of the given wire hit out of the
        *  sorted range given by the two iterator other arguments.
        */
-      std::vector<CDCWireHit*> getPossibleTos(CDCWireHit* from,
-                                              const std::vector<CDCWireHit*>& wireHits) const final;
+      std::vector<TrackingUtilities::CDCWireHit*> getPossibleTos(TrackingUtilities::CDCWireHit* from,
+                                                                 const std::vector<TrackingUtilities::CDCWireHit*>& wireHits) const final;
 
     private:
       /// Parameter: A map from o'clock direction to the number of missing primary drift cells

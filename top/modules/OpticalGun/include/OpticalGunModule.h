@@ -29,7 +29,7 @@ namespace Belle2 {
    * - 'Lambertian'  (between minAlpha and maxAlpha),
    * - 'Gaussian'  (uses numerical aperture instead of minAlpha and maxAlpha),
    * or passed as a string (TFormula-compliat) function of the polar direction theta.
-   * When using the latter option, be careful about normalizing over the spherical unit area proprely
+   * When using the latter option, be careful about normalizing over the spherical unit area properly
    * (i.e. multiply by sin(theta)).
    * In all cases we assume the emission is symmetric around the axis of the source.
    *
@@ -43,11 +43,6 @@ namespace Belle2 {
      * Constructor
      */
     OpticalGunModule();
-
-    /**
-     * Destructor
-     */
-    virtual ~OpticalGunModule();
 
     /**
      * Initialize the Module.
@@ -70,7 +65,7 @@ namespace Belle2 {
     double m_maxAlpha = 0;   /**< maximum emission angle */
     double m_minAlpha = 0;   /**< minimum emission angle */
     double m_na = 0;         /**< source numerical aperture. Used only by the Gaussian emission model. */
-    double m_wavelength = 0; /**< source wavelenght [nm] */
+    double m_wavelength = 0; /**< source wavelength [nm] */
     double m_phi = 0;        /**< first rotation angle (around z) [deg] */
     double m_theta = 0;      /**< second rotation angle (around x) [deg] */
     double m_psi = 0;        /**< third rotation angle (around z) [deg] */
@@ -90,7 +85,7 @@ namespace Belle2 {
     double m_cosMaxAlpha = 0; /**< cos of m_maxAlpha */
     double m_energy = 0;     /**< photon energy (from wavelength) */
     ROOT::Math::Transform3D m_transform; /**< transformation to BelleII frame */
-    TF1* m_customDistribution = 0; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
+    mutable TF1 m_customDistribution; /**< Custom angular distribution, that uses m_angularDistribution as formula. */
 
     // data store objects
     StoreArray<MCParticle> m_MCParticles; /**< MC particles collection */

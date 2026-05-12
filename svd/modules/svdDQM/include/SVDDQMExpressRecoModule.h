@@ -10,12 +10,15 @@
 
 #include <framework/core/HistoModule.h>
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
+#include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
+#include <framework/database/DBObjPtr.h>
 #include <vector>
 #include "TList.h"
 #include "TH1F.h"
@@ -56,6 +59,8 @@ namespace Belle2 {
 
     /** Trigger Summary data object */
     StoreObjPtr<TRGSummary> m_objTrgSummary;
+    /** SVD DQM plots configuration */
+    DBObjPtr<SVDDQMPlotsConfiguration> m_svdPlotsConfig;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/
@@ -63,14 +68,18 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-    /** if true skip events rejected by HLT (default)*/
-    bool m_skipRejectedEvents = true;
+
+    /** if true skip events rejected by HLT */
+    bool m_skipRejectedEvents = false;
 
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
     /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
+
+    /** if true read back from DB configuration parameters */
+    bool m_useParamFromDB = true;
 
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
@@ -184,10 +193,10 @@ namespace Belle2 {
     TH1F** m_onlineZSstripCountV = nullptr;
 
     /** U strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0U = nullptr;
+    TH1F** m_stripCountSignalGroupIDsU = nullptr;
 
     /** V strip count for cluster time group Id = 0 */
-    TH1F** m_stripCountGroupId0V = nullptr;
+    TH1F** m_stripCountSignalGroupIDsV = nullptr;
 
     /** u strip count for 3 samples */
     TH1F** m_strip3SampleCountU = nullptr;
@@ -218,7 +227,6 @@ namespace Belle2 {
     /** time group id for  V side**/
     TH2F* m_clusterTimeGroupIdV = nullptr;
 
-
     /** time group id for  U side for fine trigger**/
     TH2F* m_clusterTimeFineGroupIdU = nullptr;
     /** time group id for  V side for fine trigger**/
@@ -228,6 +236,33 @@ namespace Belle2 {
     TH2F* m_clusterTimeCoarseGroupIdU = nullptr;
     /** time group id for  V side for coarse trigger**/
     TH2F* m_clusterTimeCoarseGroupIdV = nullptr;
+
+    /** u charge group id  of clusters for layer 3 sensors */
+    TH1F* m_clusterChargeGroupIDsL3U = nullptr;
+    /** v charge group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterChargeGroupIDsL3V = nullptr;
+    /** u charge group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeGroupIDsL456U = nullptr;
+    /** v charge group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterChargeGroupIDsL456V = nullptr;
+
+    /** u SNR group id  of clusters for layer 3 sensors */
+    TH1F* m_clusterSNRGroupIDsL3U = nullptr;
+    /** v SNR group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterSNRGroupIDsL3V = nullptr;
+    /** u SNR group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRGroupIDsL456U = nullptr;
+    /** v SNR group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterSNRGroupIDsL456V = nullptr;
+
+    /** u Time  group id of clusters for layer 3 sensors */
+    TH1F* m_clusterTimeGroupIDsL3U = nullptr;
+    /** v Time group id  of clusters for layer 3  sensors */
+    TH1F* m_clusterTimeGroupIDsL3V = nullptr;
+    /** u Time group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeGroupIDsL456U = nullptr;
+    /** v Time group id  of clusters for layer 4,5,6 sensors */
+    TH1F* m_clusterTimeGroupIDsL456V = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;

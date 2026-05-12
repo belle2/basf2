@@ -155,12 +155,12 @@ instantly. The computations are only “booked”.
   Create two RDataFrames, one for Signal and one for Background only.
 
 .. admonition:: Hint
-  :class: xhint stacked toggle
+  :class: xhint stacked dropdown
 
   Split between signal and background using the ``B0_isSignal`` column.
 
 .. admonition:: Solution
-  :class: solution toggle
+  :class: solution dropdown
 
   .. code:: ipython3
 

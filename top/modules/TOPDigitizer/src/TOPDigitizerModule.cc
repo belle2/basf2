@@ -198,11 +198,14 @@ namespace Belle2 {
       if (m_timeWalk.isValid()) {
         TimeDigitizer::setTimeWalk(&m_timeWalk);
       } else {
-        TimeDigitizer::setTimeWalk(0);
-        // B2FATAL("Time-walk parameters requested but not available for run "
-        B2WARNING("Time-walk parameters not available for run "
-                  << evtMetaData->getRun()
-                  << " of experiment " << evtMetaData->getExperiment());
+        B2FATAL("Time-walk parameters requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
+      }
+      if (not m_calPrecision.isValid()) {
+        B2FATAL("Calibration precision requested but not available for run "
+                << evtMetaData->getRun()
+                << " of experiment " << evtMetaData->getExperiment());
       }
     } else if (m_useSampleTimeCalibration) {
       if (not m_timebases.isValid()) {
@@ -318,7 +321,7 @@ namespace Belle2 {
       }
 
       // get time offset for a given pixel
-      auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID);
+      auto timeOffset = getTimeOffset(trgTimeOffset, moduleID, pixelID, true);
 
       // time range cut (to speed up digitization)
       if (time + timeOffset.value < timeMin + timeOffset.timeShift) continue;
@@ -432,7 +435,7 @@ namespace Belle2 {
 
     // digitize in time
 
-    for (auto& pixel : pixels) {
+    for (const auto& pixel : pixels) {
       const auto& digitizer = pixel.second;
       int threshold = m_threshold;
       if (m_useDatabase) { // use channel dependent ones
@@ -489,9 +492,7 @@ namespace Belle2 {
   }
 
 
-  TOPDigitizerModule::TimeOffset TOPDigitizerModule::getTimeOffset(double trgOffset,
-      int moduleID,
-      int pixelID)
+  TOPDigitizerModule::TimeOffset TOPDigitizerModule::getTimeOffset(double trgOffset, int moduleID, int pixelID, bool generate)
   {
     double timeOffset = trgOffset;
     double calErrorSq = 0;
@@ -502,8 +503,10 @@ namespace Belle2 {
       auto channel = channelMapper.getChannel(pixelID);
       if (m_channelT0->isCalibrated(moduleID, channel)) {
         timeOffset += m_channelT0->getT0(moduleID, channel);
-        double err = m_channelT0->getT0Error(moduleID, channel);
-        calErrorSq += err * err;
+        double err = m_channelT0->getT0Error(moduleID, channel); // statistics from laser data fit
+        double sys = m_calPrecision->get(moduleID); // systematics from di-muon events (this is dominant)
+        if (generate and sys > 0) timeOffset += gRandom->Gaus(0, sys);
+        calErrorSq += err * err + sys * sys;
       }
       auto asic = channel / 8;
       if (m_asicShift->isCalibrated(moduleID, asic)) {

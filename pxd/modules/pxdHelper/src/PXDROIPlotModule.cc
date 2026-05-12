@@ -7,6 +7,10 @@
  **************************************************************************/
 
 #include <pxd/modules/pxdHelper/PXDROIPlotModule.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
+#include <pxd/dataobjects/PXDRawHit.h>
+
 #include <TBox.h>
 #include <TCanvas.h>
 #include <TStyle.h>

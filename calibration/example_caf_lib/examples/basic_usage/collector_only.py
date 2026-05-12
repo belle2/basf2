@@ -31,7 +31,7 @@ main.add_module('HistoManager', histoFileName="CollectorOutput.root", workDirNam
 # main.add_module("CaTest", granularity="all")
 main.add_module("CaTest", granularity="run")
 # Notice that there is NO RootOutput module required anymore, although you could include it if you wanted
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 # The Collector Module memory can look weirdly high with default statistics printing. If you want to view the memory
 # statistics of a collector use this command, Otherwise just do the normal print(statistics)
 print(b2.statistics(b2.statistics.TOTAL))

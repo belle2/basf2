@@ -8,6 +8,9 @@
 
 #include <analysis/modules/DistanceCalculator/DistanceCalculatorModule.h>
 
+#include <analysis/dataobjects/Btube.h>
+#include <analysis/dataobjects/Particle.h>
+
 #include <Eigen/Dense>
 
 using namespace std;

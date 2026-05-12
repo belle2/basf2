@@ -9,6 +9,12 @@
 #include <reconstruction/modules/VXDDedxPID/VXDDedxPIDRemakerModule.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 
+#include <mdst/dataobjects/Track.h>
+#include <reconstruction/dataobjects/VXDDedxTrack.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
+#include <svd/dbobjects/SVDdEdxPDFs.h>
+#include <pxd/dbobjects/PXDdEdxPDFs.h>
+
 namespace Belle2 {
 
   using namespace Dedx;

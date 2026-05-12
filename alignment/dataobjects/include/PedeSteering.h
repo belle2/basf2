@@ -30,7 +30,7 @@ namespace Belle2 {
     void import(std::string filename);
     //! Add command to the steering
     //! @param line Line with command to be added
-    void command(std::string line);
+    void command(const std::string& line);
     //! Compose and write out steering file
     //! @param filename Output steering file name
     std::string make(std::string filename = "");
@@ -38,7 +38,9 @@ namespace Belle2 {
     //! @param labels Vector of Pede labels (see GlobalLabel.h)
     //! @param values Vector (of size labels) with values to be set to parameters in labels
     //! @param presigmas Vector (of size labels) with presigmas for parameters (<0 means fixed parameter)
-    void fixParameters(std::vector<int> labels, std::vector<double> values = {}, std::vector<double> presigmas = {});
+    void fixParameters(const std::vector<int>& labels,
+                       const std::vector<double>& values = {},
+                       const std::vector<double>& presigmas = {});
 
     //void addConstraint(double constraint, vector<int> labels, vector<double> coefficients);
 

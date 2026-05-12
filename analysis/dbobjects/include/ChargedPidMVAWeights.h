@@ -22,10 +22,6 @@
 #include <TParameter.h>
 #include <TFile.h>
 
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
-
-
 namespace Belle2 {
 
   /**
@@ -158,20 +154,20 @@ namespace Belle2 {
                   ")\nPlease check how the input xml file list is being filled.");
         }
 
-        Belle2::MVA::Weightfile weightfile;
-        if (boost::ends_with(path, ".root")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromROOTFile(path);
-        } else  if (boost::ends_with(path, ".xml")) {
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
+        MVA::Weightfile weightfile;
+        if (path.ends_with(".root")) {
+          weightfile = MVA::Weightfile::loadFromROOTFile(path);
+        } else  if (path.ends_with(".xml")) {
+          weightfile = MVA::Weightfile::loadFromXMLFile(path);
         } else {
           B2WARNING("Unknown file extension for file: " << path << ", fallback to xml...");
-          weightfile = Belle2::MVA::Weightfile::loadFromXMLFile(path);
+          weightfile = MVA::Weightfile::loadFromXMLFile(path);
         }
 
         // Serialize the MVA::Weightfile object into a string for storage in the database,
         // otherwise there are issues w/ dictionary generation for the payload class...
         std::stringstream ss;
-        Belle2::MVA::Weightfile::saveToStream(weightfile, ss);
+        MVA::Weightfile::saveToStream(weightfile, ss);
         m_weightfiles[pdg].push_back(ss.str());
 
         ++idx;

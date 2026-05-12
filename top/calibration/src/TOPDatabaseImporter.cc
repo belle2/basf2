@@ -53,8 +53,8 @@
 #include <set>
 #include <map>
 
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 
@@ -62,7 +62,7 @@ namespace Belle2 {
 
   using namespace TOP;
 
-  void TOPDatabaseImporter::importSampleTimeCalibration(string fNames,
+  void TOPDatabaseImporter::importSampleTimeCalibration(const string& fNames,
                                                         int firstExp, int firstRun,
                                                         int lastExp, int lastRun)
   {
@@ -96,7 +96,7 @@ namespace Belle2 {
       }
       B2INFO(fileName << ": open for reading");
 
-      TH1F* hsuccess = (TH1F*) file->Get("success");
+      TH1F* hsuccess = static_cast<TH1F*>(file->Get("success"));
       if (!hsuccess) {
         B2ERROR("Fit status histogram '" << hsuccess << "' not found");
         file->Close();
@@ -110,7 +110,7 @@ namespace Belle2 {
 
         string hname = "sampleTimes_ch" +  to_string(channel);
 
-        TH1F* hsampleTimes = (TH1F*) file->Get(hname.c_str());
+        TH1F* hsampleTimes = static_cast<TH1F*>(file->Get(hname.c_str()));
         if (!hsampleTimes) {
           B2ERROR("Histogram '" << hname << "' with calibration constants not found");
           continue;
@@ -188,7 +188,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importLocalT0Calibration(string fNames,
+  void TOPDatabaseImporter::importLocalT0Calibration(const string& fNames,
                                                      int firstExp, int firstRun,
                                                      int lastExp, int lastRun)
   {
@@ -216,7 +216,7 @@ namespace Belle2 {
       }
       B2INFO("--> " << fileName << ": open for reading");
 
-      TTree* treeCal = (TTree*)file->Get("chT0");
+      TTree* treeCal = static_cast<TTree*>(file->Get("chT0"));
 
       if (!treeCal) {
         B2ERROR("openFile: no tree named chT0 found in " << fileName);
@@ -283,7 +283,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importChannelT0(std::string fileName,
+  void TOPDatabaseImporter::importChannelT0(const std::string& fileName,
                                             int expNo, int firstRun, int lastRun)
   {
     // declare db object to be imported -- and construct it
@@ -305,7 +305,7 @@ namespace Belle2 {
       std::string name = "channelT0_slot";
       if (moduleID < 10) name += "0";
       name += std::to_string(moduleID);
-      auto* h = (TH1F*) file->Get(name.c_str());
+      auto* h = static_cast<TH1F*>(file->Get(name.c_str()));
       if (!h) {
         B2ERROR("Histogram with name '" + name + "' not found");
         continue;
@@ -365,7 +365,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importOfflineCommonT0Calibration(string fileName,
+  void TOPDatabaseImporter::importOfflineCommonT0Calibration(const string& fileName,
                                                              int firstExp, int firstRun,
                                                              int lastExp, int lastRun)
   {
@@ -378,7 +378,7 @@ namespace Belle2 {
     }
     B2INFO("--> " << fileName << ": open for reading");
 
-    TTree* treeCal = (TTree*)file->Get("tree");
+    TTree* treeCal = static_cast<TTree*>(file->Get("tree"));
 
     if (!treeCal) {
       B2ERROR("openFile: no tree named tree found in " << fileName);
@@ -454,7 +454,7 @@ namespace Belle2 {
            << " run = " << firstRun << " to " << lastRun << " imported");
   }
 
-  void TOPDatabaseImporter::importModuleT0Calibration(string fileName,
+  void TOPDatabaseImporter::importModuleT0Calibration(const string& fileName,
                                                       int firstExp, int firstRun,
                                                       int lastExp, int lastRun)
   {
@@ -507,7 +507,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importModuleT0(std::string fileName,
+  void TOPDatabaseImporter::importModuleT0(const std::string& fileName,
                                            int expNo, int firstRun, int lastRun)
   {
 
@@ -524,7 +524,7 @@ namespace Belle2 {
     B2INFO(fileName << ": open for reading");
 
     // get histogram and set the DB import object
-    auto* h = (TH1F*) file->Get("moduleT0");
+    auto* h = static_cast<TH1F*>(file->Get("moduleT0"));
     if (not h) {
       B2ERROR("no histogram 'moduleT0' found in the file, nothing imported");
       return;
@@ -614,7 +614,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importChannelMask(std::string fileName,
+  void TOPDatabaseImporter::importChannelMask(const std::string& fileName,
                                               int expNo, int firstRun, int lastRun)
   {
     // declare db object to be imported -- and construct it
@@ -634,7 +634,7 @@ namespace Belle2 {
     int active = 0, dead = 0, noisy = 0;
     for (int moduleID = 1; moduleID <= nModules; moduleID++) {
       std::string name = "slot_" + std::to_string(moduleID);
-      auto* h = (TH1F*) file->Get(name.c_str());
+      auto* h = static_cast<TH1F*>(file->Get(name.c_str()));
       if (!h) {
         B2ERROR("Histogram with name '" + name + "' not found");
         continue;
@@ -716,7 +716,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtQEData(string fileName, string treeName,
+  void TOPDatabaseImporter::importPmtQEData(const string& fileName, const string& treeName,
                                             int firstExp, int firstRun,
                                             int lastExp, int lastRun)
   {
@@ -737,7 +737,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tQeData = (TTree*)file->Get(treeName.c_str());
+    TTree* tQeData = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tQeData) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -789,7 +789,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtGainData(string fileName, string treeName,
+  void TOPDatabaseImporter::importPmtGainData(const string& fileName, const string& treeName,
                                               int firstExp, int firstRun,
                                               int lastExp, int lastRun)
   {
@@ -808,7 +808,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tGainData = (TTree*)file->Get(treeName.c_str());
+    TTree* tGainData = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tGainData) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -848,7 +848,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtInstallationData(string fileName, string treeName,
+  void TOPDatabaseImporter::importPmtInstallationData(const string& fileName, const string& treeName,
                                                       int firstExp, int firstRun,
                                                       int lastExp, int lastRun)
   {
@@ -866,7 +866,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tInstData = (TTree*)file->Get(treeName.c_str());
+    TTree* tInstData = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tInstData) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -898,7 +898,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtObsoleteData(string fileName, string treeName,
+  void TOPDatabaseImporter::importPmtObsoleteData(const string& fileName, const string& treeName,
                                                   int firstExp, int firstRun,
                                                   int lastExp, int lastRun)
   {
@@ -917,7 +917,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tObsData = (TTree*)file->Get(treeName.c_str());
+    TTree* tObsData = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tObsData) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -958,7 +958,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSPar(string fileName, string treeName,
+  void TOPDatabaseImporter::importPmtTTSPar(const string& fileName, const string& treeName,
                                             int firstExp, int firstRun,
                                             int lastExp, int lastRun)
   {
@@ -983,7 +983,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tTtsPar = (TTree*)file->Get(treeName.c_str());
+    TTree* tTtsPar = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tTtsPar) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -1059,8 +1059,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::importPmtTTSHisto(string fileName,
-                                              string treeName,
+  void TOPDatabaseImporter::importPmtTTSHisto(const string& fileName, const string& treeName,
                                               int firstExp, int firstRun,
                                               int lastExp, int lastRun)
   {
@@ -1079,7 +1078,7 @@ namespace Belle2 {
       B2ERROR("Cannot open the file " << fileName);
       return;
     }
-    TTree* tTtsHisto = (TTree*)file->Get(treeName.c_str());
+    TTree* tTtsHisto = static_cast<TTree*>(file->Get(treeName.c_str()));
     if (!tTtsHisto) {
       B2ERROR("No TTree with name " << treeName << " in file " << fileName);
       file->Close();
@@ -1122,7 +1121,7 @@ namespace Belle2 {
     return;
   }
 
-  void TOPDatabaseImporter::importPmtPulseHeightFitResult(std::string fileName,
+  void TOPDatabaseImporter::importPmtPulseHeightFitResult(const std::string& fileName,
                                                           int firstExp, int firstRun,
                                                           int lastExp, int lastRun)
   {
@@ -1137,7 +1136,7 @@ namespace Belle2 {
       B2ERROR("openFile: " << fileName << " *** failed to open");
       return;
     }
-    TTree* tr = (TTree*)file->Get("tree");   // defined in TOPGainEfficiencyCalculatorModule
+    TTree* tr = static_cast<TTree*>(file->Get("tree"));   // defined in TOPGainEfficiencyCalculatorModule
     if (!tr) {
       B2ERROR("No TTree with name tree found in " << fileName);
       file->Close();
@@ -1212,7 +1211,7 @@ namespace Belle2 {
   }
 
 
-  void TOPDatabaseImporter::exportPmtTTSHisto(string outFileName)
+  void TOPDatabaseImporter::exportPmtTTSHisto(const string& outFileName)
   {
 
     // this is just an example on how to retrieve TTS histograms

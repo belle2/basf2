@@ -91,7 +91,7 @@ void ViewAlignment(const char *fname)
   }
   /* EKLM. */
   TFile *f = new TFile(fname);
-  TTree *tComparisonEKLMModule = (TTree*)f->Get("eklm_module");
+  TTree *tComparisonEKLMModule = static_cast<TTree*>(f->Get("eklm_module"));
   tComparisonEKLMModule->SetBranchAddress("section", &section);
   tComparisonEKLMModule->SetBranchAddress("layer", &layer);
   tComparisonEKLMModule->SetBranchAddress("sector", &sector);
@@ -143,7 +143,7 @@ void ViewAlignment(const char *fname)
     }
   }
   /* BKLM. */
-  TTree *tComparisonBKLMModule = (TTree*)f->Get("bklm_module");
+  TTree *tComparisonBKLMModule = static_cast<TTree*>(f->Get("bklm_module"));
   tComparisonBKLMModule->SetBranchAddress("section", &section);
   tComparisonBKLMModule->SetBranchAddress("layer", &layer);
   tComparisonBKLMModule->SetBranchAddress("sector", &sector);
@@ -195,4 +195,3 @@ void ViewAlignment(const char *fname)
     }
   }
 }
-

@@ -8,10 +8,11 @@
 
 #pragma once
 #include <calibration/CalibrationAlgorithm.h>
-#include <vxd/dataobjects/VxdID.h>
 #include <map>
 
 namespace Belle2 {
+  class VxdID;
+
   /**
    * Class implementing PXD hot pixel masking calibration algorithm
    */

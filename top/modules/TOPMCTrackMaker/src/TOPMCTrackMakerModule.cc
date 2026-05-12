@@ -50,10 +50,6 @@ namespace Belle2 {
 
   }
 
-  TOPMCTrackMakerModule::~TOPMCTrackMakerModule()
-  {
-  }
-
   void TOPMCTrackMakerModule::initialize()
   {
 
@@ -81,10 +77,6 @@ namespace Belle2 {
 
   }
 
-  void TOPMCTrackMakerModule::beginRun()
-  {
-  }
-
   void TOPMCTrackMakerModule::event()
   {
 
@@ -101,7 +93,7 @@ namespace Belle2 {
       const auto* barHit = mcParticle.getRelated<TOPBarHit>();
       if (!barHit) continue;
 
-      TMatrixDSym cov(6); // infinite precission
+      TMatrixDSym cov(6); // infinite precision
       fitResults.appendNew(mcParticle.getVertex(),
                            mcParticle.getMomentum(),
                            cov,
@@ -120,29 +112,19 @@ namespace Belle2 {
       double mass = chargedStable.getMass();
       double beta = pmom / sqrt(pmom * pmom + mass * mass);
       double tof = barHit->getLength() / beta / Const::speedOfLight;
-      auto* extHit = extHits.appendNew(tof,
-                                       chargedStable.getPDGCode(),
-                                       Const::TOP,
-                                       barHit->getModuleID(),
-                                       EXT_ENTER,
-                                       false,
-                                       barHit->getPosition(),
-                                       barHit->getMomentum(),
-                                       cov);
+      const auto* extHit = extHits.appendNew(tof,
+                                             chargedStable.getPDGCode(),
+                                             Const::TOP,
+                                             barHit->getModuleID(),
+                                             EXT_ENTER,
+                                             false,
+                                             barHit->getPosition(),
+                                             barHit->getMomentum(),
+                                             cov);
       track->addRelationTo(extHit);
     }
 
   }
-
-
-  void TOPMCTrackMakerModule::endRun()
-  {
-  }
-
-  void TOPMCTrackMakerModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

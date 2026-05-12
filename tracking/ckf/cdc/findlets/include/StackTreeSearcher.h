@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/ckf/cdc/findlets/CDCCKFStateCreator.h>
 #include <tracking/ckf/cdc/findlets/CDCCKFStateFilter.h>
@@ -17,14 +17,14 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 
 namespace Belle2 {
   /// CKF tree searcher which traces several best paths.
   class StackTreeSearcher : public
-    TrackFindingCDC::Findlet<CDCCKFPath, const TrackFindingCDC::CDCWireHit* const> {
+    TrackingUtilities::Findlet<CDCCKFPath, const TrackingUtilities::CDCWireHit* const> {
   public:
     StackTreeSearcher()
     {
@@ -38,14 +38,62 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
       m_stateCreator.exposeParameters(moduleParamList, prefix);
-      m_stateFilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("state", prefix));
+      m_stateFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("state", prefix));
       m_pathMerger.exposeParameters(moduleParamList, prefix);
-      m_pathSelector.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("path", prefix));
+      m_pathSelector.exposeParameters(moduleParamList, TrackingUtilities::prefixed("path", prefix));
+    }
+
+    /** Set maximal delta phi for state creation
+     *
+     *  @param maximalDeltaPhi Maximum distance in phi between wires for Z=0 plane
+     */
+    void setMaximalDeltaPhi(double maximalDeltaPhi) { m_stateCreator.setMaximalDeltaPhi(maximalDeltaPhi); }
+
+    /** Set maximal layer jump for state creation
+     *
+     *  @param maximalLayerJump Maximum number of layers to jump
+     */
+    void setMaximalLayerJump(int maximalLayerJump) { m_stateCreator.setMaximalLayerJump(maximalLayerJump); }
+
+    /** Set maximal layer jump for backward seed tracks
+     *
+     *  @param maximalLayerJumpBackwardSeed Maximum number of layers to jump for backward seeds
+     */
+    void setMaximalLayerJumpBackwardSeed(int maximalLayerJumpBackwardSeed)
+    {
+      m_stateCreator.setMaximalLayerJumpBackwardSeed(maximalLayerJumpBackwardSeed);
+    }
+
+    /** Set hit finding direction
+     *
+     *  @param hitFindingDirection Start from innermost/outermost CDC layers
+     */
+    void setHitFindingDirection(const std::string& hitFindingDirection)
+    {
+      m_stateCreator.setHitFindingDirection(hitFindingDirection);
+    }
+
+    /** Set maximal candidates in flight for path selection
+     *
+     *  @param pathMaximalCandidatesInFlight Maximum number of candidates to keep in flight
+     */
+    void setPathMaximalCandidatesInFlight(size_t pathMaximalCandidatesInFlight)
+    {
+      m_pathSelector.setMaximalCandidatesInFlight(pathMaximalCandidatesInFlight);
+    }
+
+    /** Set maximal hit candidates for state filtering
+     *
+     *  @param stateMaximalHitCandidates Maximum number of hit candidates to test
+     */
+    void setStateMaximalHitCandidates(size_t stateMaximalHitCandidates)
+    {
+      m_stateFilter.setMaximalHitCandidates(stateMaximalHitCandidates);
     }
 
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,
-               const std::vector<const TrackFindingCDC::CDCWireHit*>& wireHits) override
+               const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits) override
     {
 
       if (paths.empty()) {

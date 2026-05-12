@@ -52,12 +52,12 @@ No hands-on training without some nice exercises:
        What's the object-oriented way to get rich?
 
     .. admonition:: Hint
-       :class: toggle xhint stacked
+       :class: dropdown xhint stacked
 
        Think about relationships between classes!
 
     .. admonition:: Solution
-       :class: toggle solution
+       :class: dropdown solution
 
        Inheritance.
 
@@ -67,12 +67,12 @@ No hands-on training without some nice exercises:
    What's the object-oriented way to get rich?
 
 .. admonition:: Hint
-   :class: toggle xhint stacked
+   :class: dropdown xhint stacked
 
    Think about relationships between classes!
 
 .. admonition:: Solution
-   :class: toggle solution
+   :class: dropdown solution
 
    Inheritance.
 

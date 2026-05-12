@@ -118,5 +118,3 @@ if __name__ == "__main__":
     b2.print_path(main)
 
     b2.process(main)
-
-    print(b2.statistics)

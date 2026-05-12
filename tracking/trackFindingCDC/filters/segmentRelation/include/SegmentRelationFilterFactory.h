@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 #include <map>
 #include <string>
@@ -18,14 +18,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseSegmentRelationFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseSegmentRelationFilter>;
 
     /// Factory that can create appropriate segment relation filters from associated names.
-    class SegmentRelationFilterFactory : public FilterFactory<BaseSegmentRelationFilter> {
+    class SegmentRelationFilterFactory : public TrackingUtilities::FilterFactory<BaseSegmentRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseSegmentRelationFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseSegmentRelationFilter>;
 
     public:
       /// Constructor forwarding the default filter name

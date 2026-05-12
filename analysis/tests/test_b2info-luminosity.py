@@ -21,6 +21,9 @@ lumiDB_path = b2tu.require_file('luminosity/', 'validation')
 
 if __name__ == '__main__':
 
+    if b2tu.is_rundb_down():
+        b2tu.skip_test('Test currently disabled due to RunDB troubles')
+
     rundb_token = os.getenv('BELLE2_RUNDB_TOKEN', '')
     if rundb_token == '':
         b2tu.skip_test('The BELLE2_RUNDB_TOKEN environment variable is not set')

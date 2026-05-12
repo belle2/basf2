@@ -11,18 +11,19 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string AxialTrackMerger::getDescription()
 {

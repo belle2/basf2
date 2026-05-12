@@ -13,10 +13,11 @@ Perform code quality cppchecks for every commit to the trg package.
 """
 
 import re
-from b2test_utils import check_error_free
+from b2test_utils import check_error_free, skip_test
 
 
 if __name__ == "__main__":
+    skip_test("Test skipped due to the update of Cppcheck")
     ignoreme = "nofile:0:0"
     check_error_free("b2code-cppcheck", "cppcheck", "trg",
                      lambda x: re.findall(ignoreme, x) or x == "'")

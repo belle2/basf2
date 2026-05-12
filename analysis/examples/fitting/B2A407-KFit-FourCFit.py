@@ -93,5 +93,3 @@ variablesToNtuple('Upsilon(4S)', u4svars,
 
 # Process the events
 b2.process(my_path)
-# print out the summary
-print(b2.statistics)

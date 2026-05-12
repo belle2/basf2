@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseAxialSegmentPairFilter>;
-template class TrackFindingCDC::ChooseableFilter<AxialSegmentPairFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseAxialSegmentPairFilter>;
+template class TrackingUtilities::ChooseableFilter<AxialSegmentPairFilterFactory>;

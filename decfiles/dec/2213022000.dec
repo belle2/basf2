@@ -1,0 +1,30 @@
+# EventType: 2213022000
+# Descriptor: [ccbar D02PhiPi0 Phi2KpKm Pi02GammaGamma]
+# NickName: D02PhiPi0_Phi2KpKm_Pi02GammaGamma
+# PhysicsWG: Charm
+# Responsible: Young Jun Kim
+# Date: 20260319 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias Myphi phi
+Alias Mypi0 pi0
+
+Decay D0
+1.000 Myphi Mypi0       SVS;
+Enddecay
+
+Decay Myphi
+1.000 K+ K-       VSS;
+Enddecay
+
+Decay Mypi0
+1.000 gamma gamma       PHSP;
+Enddecay
+
+End
+

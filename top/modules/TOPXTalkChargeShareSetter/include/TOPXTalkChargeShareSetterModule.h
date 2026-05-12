@@ -32,33 +32,21 @@ namespace Belle2 {
      */
     TOPXTalkChargeShareSetterModule();
 
-    /** destructor */
-    virtual ~TOPXTalkChargeShareSetterModule() override;
-
     /** initialize */
     virtual void initialize() override;
 
-    /** beginRun */
-    virtual void beginRun() override;
-
     /** event */
     virtual void event() override;
-
-    /** endRun */
-    virtual void endRun() override;
-
-    /** terminate */
-    virtual void terminate() override;
 
     /**
      * Examine whether the give hit is cross talk hits using waveform information
      * Thresholds for such as pre-valley depth and amplitude of oscillation are given as parameters of TOPRawDigitConverModule
      * @param wfm      an array of ADC counts, which indicates waveform
-     * @param iRawTime rawTime of the correcponding hit, rounded into an integer
+     * @param iRawTime rawTime of the corresponding hit, rounded into an integer
      * @param height   pulse height of the corresponding hit in a unit of ADC count
      * @return true if the given hit is identified as cross talk
      */
-    bool isCrossTalk(std::vector<short> wfm, int iRawTime, short height);
+    bool isCrossTalk(const std::vector<short>& wfm, int iRawTime, short height);
 
 
   private:
@@ -67,7 +55,7 @@ namespace Belle2 {
     float m_timeCut = 1;                  /**< cut range of hittiming for chargeshare */
     double m_nCrossTalkRingingSamples =
       0;  /**< the number of samples to identify the hit as a cross talk hit when there is another cross talk hit in this number of samples before */
-    int m_preValleyDepthLoose = 20; /**< loose threshold for depth of pre valley [ADC counts], for corss talk identification */
+    int m_preValleyDepthLoose = 20; /**< loose threshold for depth of pre valley [ADC counts], for cross talk identification */
     int m_preValleyDepthTight =
       50; /**< tight threshold for depth of pre valley [ADC counts], identified as cross talk with loose threshold for the second peak amplitude */
     int m_2ndPeakAmplitudeLoose =

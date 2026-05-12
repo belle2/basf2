@@ -13,13 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
 
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-
-#include <top/dataobjects/TOPLikelihood.h>
-#include <arich/dataobjects/ARICHLikelihood.h>
-#include <cdc/dataobjects/CDCDedxLikelihood.h>
-#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
@@ -28,6 +21,12 @@
 #include <map>
 
 namespace Belle2 {
+  class Track;
+  class TOPLikelihood;
+  class ARICHLikelihood;
+  class CDCDedxLikelihood;
+  class VXDDedxLikelihood;
+  class PIDLikelihood;
 
   /**
    * a module to fill PIDLikelihoods
@@ -170,6 +169,7 @@ namespace Belle2 {
     // other
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
     std::map<Const::ChargedStable, std::string> m_chargedNames; /**< names of charged particles (used in error messages) */
+    int m_CDCnLayerHitsUsed = -1; /**< number of layers with measurements used in the CDC likelihood */
 
   };
 

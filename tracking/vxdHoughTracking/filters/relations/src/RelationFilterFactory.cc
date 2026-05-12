@@ -8,13 +8,13 @@
 #include <tracking/vxdHoughTracking/filters/relations/RelationFilterFactory.h>
 #include <tracking/vxdHoughTracking/filters/relations/AngleAndTimeRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/relations/SimpleRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 using namespace vxdHoughTracking;
 
 RelationFilterFactory::RelationFilterFactory(const std::string& defaultFilterName)
@@ -48,12 +48,12 @@ std::unique_ptr<BaseRelationFilter>
 RelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseRelationFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseRelationFilter>>();
   }
 
   // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseRelationFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseRelationFilter>>();
   }
 
   // cppcheck-suppress knownConditionTrueFalse

@@ -93,7 +93,14 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   // apply software trigger
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
   if (accepted == false) return;
-  m_h_physicsresultsH->Fill(1);
+
+  // Check HLT decision
+  bool HLTAccepted = (result->getResult(std::string("software_trigger_cut&filter&total_result")) ==
+                      SoftwareTriggerCutResult::c_accept);
+  //Fill entries only when HLT accepted the event
+  if (HLTAccepted)
+    m_h_physicsresultsH->Fill(1);
+
   // get pi list
   StoreObjPtr<ParticleList> hadpiParticles(m_hadpiPListName);
   std::vector<ROOT::Math::PxPyPzEVector> m_pionHad;
@@ -145,7 +152,8 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   m_h_EsumCMSnorm->Fill(EsumCMSnorm);
   m_h_R2->Fill(R2);
   bool hadronb_tag = visibleEnergyCMSnorm > 0.4 && EsumCMSnorm > 0.2 && R2 < 0.2;
-  if (hadronb_tag) {
+  //Fill entries only when HLT accepted the event
+  if (hadronb_tag && HLTAccepted) {
     m_h_physicsresultsH->Fill(2);
   }
 

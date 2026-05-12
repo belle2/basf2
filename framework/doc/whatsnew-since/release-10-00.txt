@@ -1,0 +1,9 @@
+Changes in the framework package
+--------------------------------
+
+Command line Tools
+++++++++++++++++++
+
+* :ref:`b2file-merge <b2file-merge>` now lets you: merge output files
+  containing histograms produced by `VariablesToHistogram`; re-optimize
+  the basket size when merging the ``TTree``s using the option ``-O``.

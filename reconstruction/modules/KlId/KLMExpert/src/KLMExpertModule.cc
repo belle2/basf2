@@ -7,14 +7,16 @@
  **************************************************************************/
 #include <reconstruction/modules/KlId/KLMExpert/KLMExpertModule.h>
 #include <mdst/dataobjects/KlId.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
 #include <mva/interface/Interface.h>
-#include <boost/algorithm/string/predicate.hpp>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Expert.h>
 
 // here's where the functions are hidden
 #include "reconstruction/modules/KlId/KLMExpert/KlId.h"
@@ -52,7 +54,7 @@ void KLMExpertModule::initialize()
   m_klmClusters.registerRelationTo(m_klids);
 
 
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+  if (not(m_identifier.ends_with(".root") or m_identifier.ends_with(".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }

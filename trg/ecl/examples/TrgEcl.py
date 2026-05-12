@@ -68,7 +68,7 @@ main.add_module(rootoutput, branchNames=["TRGECLTrgs", "TRGECLHits", "TRGECLClus
 
 
 # main
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 ###
 ###
 ###

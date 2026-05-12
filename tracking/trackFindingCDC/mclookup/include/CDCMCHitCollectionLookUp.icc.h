@@ -9,10 +9,10 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -54,7 +54,8 @@ namespace Belle2 {
 
       size_t nHits = 0;
       std::pair<ITrackType, size_t> highestHitCountMCTrackId(0, 0);
-      static_cast<void>(std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(), LessOf<Second>()));
+      static_cast<void>(std::max_element(hitCountByMCTrackId.begin(), hitCountByMCTrackId.end(),
+                                         TrackingUtilities::LessOf<TrackingUtilities::Second>()));
 
       for (const auto& hitCountForMCTrackId : hitCountByMCTrackId) {
 
@@ -70,8 +71,8 @@ namespace Belle2 {
       int correctRLVote = 0;
       for (const auto& recoHit : hits) {
         const CDCHit* hit = recoHit;
-        ERightLeft mcRLInfo = mcHitLookUp.getRLInfo(hit);
-        ERightLeft rlInfo = recoHit.getRLInfo();
+        TrackingUtilities::ERightLeft mcRLInfo = mcHitLookUp.getRLInfo(hit);
+        TrackingUtilities::ERightLeft rlInfo = recoHit.getRLInfo();
         if (rlInfo == mcRLInfo) {
           ++correctRLVote;
         } else {
@@ -115,12 +116,12 @@ namespace Belle2 {
     double
     CDCMCHitCollectionLookUp<ACDCHitCollection>::getRLPurity(const ACDCHitCollection* ptrHits) const
     {
-      EForwardBackward fbInfo = isForwardOrBackwardToMCTrack(ptrHits);
-      if (fbInfo == EForwardBackward::c_Invalid) return NAN;
+      TrackingUtilities::EForwardBackward fbInfo = isForwardOrBackwardToMCTrack(ptrHits);
+      if (fbInfo == TrackingUtilities::EForwardBackward::c_Invalid) return NAN;
 
       int correctRLVote = getCorrectRLVote(ptrHits);
 
-      if (fbInfo == EForwardBackward::c_Backward) {
+      if (fbInfo == TrackingUtilities::EForwardBackward::c_Backward) {
         correctRLVote = -correctRLVote;
       }
 
@@ -169,79 +170,79 @@ namespace Belle2 {
 
       const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
-      for (const CDCHit* hit : reversedRange(hits)) {
+      for (const CDCHit* hit : TrackingUtilities::reversedRange(hits)) {
         if (mcTrackId == mcHitLookUp.getMCTrackId(hit)) return hit;
       }
       return nullptr;
     }
 
     template <class ACDCHitCollection>
-    EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::isForwardOrBackwardToMCTrack(
+    TrackingUtilities::EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::isForwardOrBackwardToMCTrack(
       const ACDCHitCollection* ptrHits) const
     {
-      Index firstInTrackId = getFirstInTrackId(ptrHits);
-      Index lastInTrackId = getLastInTrackId(ptrHits);
-      if (firstInTrackId == c_InvalidIndex or lastInTrackId == c_InvalidIndex) {
-        return EForwardBackward::c_Invalid;
+      TrackingUtilities::Index firstInTrackId = getFirstInTrackId(ptrHits);
+      TrackingUtilities::Index lastInTrackId = getLastInTrackId(ptrHits);
+      if (firstInTrackId == TrackingUtilities::c_InvalidIndex or lastInTrackId == TrackingUtilities::c_InvalidIndex) {
+        return TrackingUtilities::EForwardBackward::c_Invalid;
       } else if (firstInTrackId < lastInTrackId) {
-        return EForwardBackward::c_Forward;
+        return TrackingUtilities::EForwardBackward::c_Forward;
       } else if (firstInTrackId > lastInTrackId) {
-        return EForwardBackward::c_Backward;
+        return TrackingUtilities::EForwardBackward::c_Backward;
       } else if (firstInTrackId == lastInTrackId) {
-        return EForwardBackward::c_Unknown;
+        return TrackingUtilities::EForwardBackward::c_Unknown;
       }
-      return EForwardBackward::c_Invalid;
+      return TrackingUtilities::EForwardBackward::c_Invalid;
     }
 
     template <class ACDCHitCollection>
-    EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrack(
+    TrackingUtilities::EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrack(
       const ACDCHitCollection* ptrFromHits,
       const ACDCHitCollection* ptrToHits) const
     {
       /// Check if the segments are in the same track
       ITrackType fromMCTrackId = getMCTrackId(ptrFromHits);
-      if (fromMCTrackId == INVALID_ITRACK) return EForwardBackward::c_Invalid;
+      if (fromMCTrackId == INVALID_ITRACK) return TrackingUtilities::EForwardBackward::c_Invalid;
 
       ITrackType toMCTrackId = getMCTrackId(ptrToHits);
-      if (toMCTrackId == INVALID_ITRACK) return EForwardBackward::c_Invalid;
+      if (toMCTrackId == INVALID_ITRACK) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-      if (fromMCTrackId != toMCTrackId) return EForwardBackward::c_Invalid;
+      if (fromMCTrackId != toMCTrackId) return TrackingUtilities::EForwardBackward::c_Invalid;
 
       // Check if the segments are meaningful on their own
-      EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
-      if (fromFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
+      TrackingUtilities::EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
+      if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Invalid) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-      EForwardBackward toFBInfo = isForwardOrBackwardToMCTrack(ptrToHits);
-      if (toFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
+      TrackingUtilities::EForwardBackward toFBInfo = isForwardOrBackwardToMCTrack(ptrToHits);
+      if (toFBInfo == TrackingUtilities::EForwardBackward::c_Invalid) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-      if (fromFBInfo != toFBInfo) return EForwardBackward::c_Invalid;
+      if (fromFBInfo != toFBInfo) return TrackingUtilities::EForwardBackward::c_Invalid;
 
       {
         // Now check if hits are aligned within their common track
         // Index firstNPassedSuperLayersOfFromHits = getFirstNPassedSuperLayers(ptrFromHits);
-        Index lastNPassedSuperLayersOfFromHits = getLastNPassedSuperLayers(ptrFromHits);
+        TrackingUtilities::Index lastNPassedSuperLayersOfFromHits = getLastNPassedSuperLayers(ptrFromHits);
         // if (firstNPassedSuperLayersOfFromHits == c_InvalidIndex) return
         // EForwardBackward::c_Invalid;
-        if (lastNPassedSuperLayersOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (lastNPassedSuperLayersOfFromHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-        Index firstNPassedSuperLayersOfToHits = getFirstNPassedSuperLayers(ptrToHits);
+        TrackingUtilities::Index firstNPassedSuperLayersOfToHits = getFirstNPassedSuperLayers(ptrToHits);
         // Index lastNPassedSuperLayersOfToHits = getLastNPassedSuperLayers(ptrToHits);
-        if (firstNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (firstNPassedSuperLayersOfToHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
         // if (lastNPassedSuperLayersOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
         if (lastNPassedSuperLayersOfFromHits < firstNPassedSuperLayersOfToHits) {
-          if (fromFBInfo == EForwardBackward::c_Forward and
-              toFBInfo == EForwardBackward::c_Forward) {
-            return EForwardBackward::c_Forward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Forward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Forward) {
+            return TrackingUtilities::EForwardBackward::c_Forward;
           } else {
-            return EForwardBackward::c_Invalid;
+            return TrackingUtilities::EForwardBackward::c_Invalid;
           }
         } else if (firstNPassedSuperLayersOfToHits < lastNPassedSuperLayersOfFromHits) {
-          if (fromFBInfo == EForwardBackward::c_Backward and
-              toFBInfo == EForwardBackward::c_Backward) {
-            return EForwardBackward::c_Backward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Backward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Backward) {
+            return TrackingUtilities::EForwardBackward::c_Backward;
           } else {
-            return EForwardBackward::c_Invalid;
+            return TrackingUtilities::EForwardBackward::c_Invalid;
           }
         }
       }
@@ -249,31 +250,31 @@ namespace Belle2 {
       {
         // Now we are in the same true segment with both segments
         // Index firstInTrackSegmentIdOfFromHits = getFirstInTrackSegmentId(ptrFromHits);
-        Index lastInTrackSegmentIdOfFromHits = getLastInTrackSegmentId(ptrFromHits);
+        TrackingUtilities::Index lastInTrackSegmentIdOfFromHits = getLastInTrackSegmentId(ptrFromHits);
         // if (firstInTrackSegmentIdOfFromHits == c_InvalidIndex) return
         // EForwardBackward::c_Invalid;
-        if (lastInTrackSegmentIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (lastInTrackSegmentIdOfFromHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-        Index firstInTrackSegmentIdOfToHits = getFirstInTrackSegmentId(ptrToHits);
+        TrackingUtilities::Index firstInTrackSegmentIdOfToHits = getFirstInTrackSegmentId(ptrToHits);
         // Index lastInTrackSegmentIdOfToHits = getLastInTrackSegmentId(ptrToHits);
-        if (firstInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (firstInTrackSegmentIdOfToHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
         // if (lastInTrackSegmentIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
         if (lastInTrackSegmentIdOfFromHits < firstInTrackSegmentIdOfToHits) {
-          if (fromFBInfo == EForwardBackward::c_Forward and
-              toFBInfo == EForwardBackward::c_Forward) {
-            return EForwardBackward::c_Forward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Forward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Forward) {
+            return TrackingUtilities::EForwardBackward::c_Forward;
           } else {
-            return EForwardBackward::c_Invalid;
+            return TrackingUtilities::EForwardBackward::c_Invalid;
           }
         } else if (firstInTrackSegmentIdOfToHits < lastInTrackSegmentIdOfFromHits) {
           // Test if to segment lies before in the mc track
           // Hence the whole pair of segments is reverse to the track direction of flight
-          if (fromFBInfo == EForwardBackward::c_Backward and
-              toFBInfo == EForwardBackward::c_Backward) {
-            return EForwardBackward::c_Backward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Backward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Backward) {
+            return TrackingUtilities::EForwardBackward::c_Backward;
           } else {
-            return EForwardBackward::c_Invalid;
+            return TrackingUtilities::EForwardBackward::c_Invalid;
           }
         }
       }
@@ -281,47 +282,47 @@ namespace Belle2 {
       {
         // Now we are in the same true segment with both of the hits
         // Index firstInTrackIdOfFromHits = getFirstInTrackId(ptrFromHits);
-        Index lastInTrackIdOfFromHits = getLastInTrackId(ptrFromHits);
+        TrackingUtilities::Index lastInTrackIdOfFromHits = getLastInTrackId(ptrFromHits);
         // if (firstInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
-        if (lastInTrackIdOfFromHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (lastInTrackIdOfFromHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
 
-        Index firstInTrackIdOfToHits = getFirstInTrackId(ptrToHits);
+        TrackingUtilities::Index firstInTrackIdOfToHits = getFirstInTrackId(ptrToHits);
         // Index lastInTrackIdOfToHits = getLastInTrackId(ptrToHits);
-        if (firstInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
+        if (firstInTrackIdOfToHits == TrackingUtilities::c_InvalidIndex) return TrackingUtilities::EForwardBackward::c_Invalid;
         // if (lastInTrackIdOfToHits == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
         // Relax conditions somewhat such that segments may overlap at the borders.
 
         if (lastInTrackIdOfFromHits - 1 < firstInTrackIdOfToHits + 1) {
-          if (fromFBInfo == EForwardBackward::c_Forward and
-              toFBInfo == EForwardBackward::c_Forward) {
-            return EForwardBackward::c_Forward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Forward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Forward) {
+            return TrackingUtilities::EForwardBackward::c_Forward;
           }
         }
 
         if (firstInTrackIdOfToHits - 1 < lastInTrackIdOfFromHits + 1) {
-          if (fromFBInfo == EForwardBackward::c_Backward and
-              toFBInfo == EForwardBackward::c_Backward) {
-            return EForwardBackward::c_Backward;
+          if (fromFBInfo == TrackingUtilities::EForwardBackward::c_Backward and
+              toFBInfo == TrackingUtilities::EForwardBackward::c_Backward) {
+            return TrackingUtilities::EForwardBackward::c_Backward;
           }
         }
       }
       // FIXME: Handle intertwined hits that are not cleanly consecutive along the track?
-      return EForwardBackward::c_Invalid;
+      return TrackingUtilities::EForwardBackward::c_Invalid;
     }
 
     template <class ACDCHitCollection>
-    EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrackWithRLCheck(
+    TrackingUtilities::EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrackWithRLCheck(
       const ACDCHitCollection* ptrFromHits,
       const ACDCHitCollection* ptrToHits) const
     {
-      EForwardBackward result = areAlignedInMCTrack(ptrFromHits, ptrToHits);
-      if (result == EForwardBackward::c_Invalid) return result;
+      TrackingUtilities::EForwardBackward result = areAlignedInMCTrack(ptrFromHits, ptrToHits);
+      if (result == TrackingUtilities::EForwardBackward::c_Invalid) return result;
 
       int fromCorrectRLVote = getCorrectRLVote(ptrFromHits);
       int toCorrectRLVote = getCorrectRLVote(ptrToHits);
 
-      if (result == EForwardBackward::c_Backward) {
+      if (result == TrackingUtilities::EForwardBackward::c_Backward) {
         fromCorrectRLVote = -fromCorrectRLVote;
         toCorrectRLVote = -toCorrectRLVote;
       }
@@ -339,16 +340,16 @@ namespace Belle2 {
         return result;
       }
 
-      return EForwardBackward::c_Invalid;
+      return TrackingUtilities::EForwardBackward::c_Invalid;
     }
 
     template <class ACDCHitCollection>
-    CDCTrajectory3D CDCMCHitCollectionLookUp<ACDCHitCollection>::getTrajectory3D(
+    TrackingUtilities::CDCTrajectory3D CDCMCHitCollectionLookUp<ACDCHitCollection>::getTrajectory3D(
       const ACDCHitCollection* ptrHits) const
     {
       if (not ptrHits) {
         B2WARNING("Segment is nullptr. Could not get fit.");
-        return CDCTrajectory3D();
+        return TrackingUtilities::CDCTrajectory3D();
       }
 
       const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
@@ -360,14 +361,14 @@ namespace Belle2 {
         // If there is no primary SimHit simply use the secondary simhit as reference
         ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
         if (not ptrPrimarySimHit) {
-          return CDCTrajectory3D();
+          return TrackingUtilities::CDCTrajectory3D();
         }
       }
 
       const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
-      Vector3D mom3D{primarySimHit.getMomentum()};
-      Vector3D pos3D{primarySimHit.getPosTrack()};
+      TrackingUtilities::Vector3D mom3D{primarySimHit.getMomentum()};
+      TrackingUtilities::Vector3D pos3D{primarySimHit.getPosTrack()};
       double time{primarySimHit.getFlightTime()};
 
       int pdgCode = primarySimHit.getPDGCode();
@@ -375,18 +376,18 @@ namespace Belle2 {
 
       if (not ptrTPDGParticle) {
         B2WARNING("No particle for PDG code " << pdgCode << ". Could not get fit");
-        return CDCTrajectory3D();
+        return TrackingUtilities::CDCTrajectory3D();
       }
 
       const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
 
       double charge = tPDGParticle.Charge() / 3.0;
 
-      ESign chargeSign = sign(charge);
+      TrackingUtilities::ESign chargeSign = TrackingUtilities::sign(charge);
 
-      CDCTrajectory3D trajectory3D(pos3D, time, mom3D, charge);
+      TrackingUtilities::CDCTrajectory3D trajectory3D(pos3D, time, mom3D, charge);
 
-      ESign settedChargeSign = trajectory3D.getChargeSign();
+      TrackingUtilities::ESign settedChargeSign = trajectory3D.getChargeSign();
 
       if (chargeSign != settedChargeSign) {
         B2WARNING("Charge sign of mc particle is not the same as the one of the fit");

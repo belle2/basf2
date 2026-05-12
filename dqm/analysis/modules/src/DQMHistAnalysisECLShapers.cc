@@ -15,6 +15,9 @@
 //boost
 #include "boost/format.hpp"
 
+//std
+#include <numeric>
+
 using namespace Belle2;
 
 REG_MODULE(DQMHistAnalysisECLShapers);
@@ -43,6 +46,10 @@ void DQMHistAnalysisECLShapersModule::initialize()
     std::string pv_name = "pedwidth:max_";
     pv_name += part_id;
     registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+
+    pv_name = "pedwidth:avg_";
+    pv_name += part_id;
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
 
   m_monObj = getMonitoringObject("ecl");
@@ -64,15 +71,18 @@ void DQMHistAnalysisECLShapersModule::event()
   TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
 
   if (h_pedrms_cellid != NULL) {
+    double pedwidth_sum = 0;
     // Using multiset to automatically sort the added values.
+    // (so we can easily calculate the max value)
     std::multiset<double> barrel_pedwidth;
     std::multiset<double> bwd_pedwidth;
     std::multiset<double> fwd_pedwidth;
 
-    for (int i = 0; i < 8736; i++) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
       const int cellid = i + 1;
       if (h_pedrms_cellid->GetBinEntries(cellid) < 100) continue;
       double pedrms = h_pedrms_cellid->GetBinContent(cellid);
+      pedwidth_sum += pedrms;
       if (cellid < 1153) {
         fwd_pedwidth.insert(pedrms);
       } else if (cellid < 7777) {
@@ -89,10 +99,19 @@ void DQMHistAnalysisECLShapersModule::event()
     m_pedwidth_max[0] = robust_max(fwd_pedwidth)    * adc_to_mev;
     m_pedwidth_max[1] = robust_max(barrel_pedwidth) * adc_to_mev;
     m_pedwidth_max[2] = robust_max(bwd_pedwidth)    * adc_to_mev;
-    m_pedwidth_max[3] = *std::max(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+    m_pedwidth_max[3] = *std::max_element(&m_pedwidth_max[0], &m_pedwidth_max[2]);
+
+    // Sum of a given multiset
+    auto sum = [](std::multiset<double> x) { return std::accumulate(x.begin(), x.end(), 0.0); };
+
+    m_pedwidth_avg[0] = sum(fwd_pedwidth) / fwd_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[1] = sum(barrel_pedwidth) / barrel_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[2] = sum(bwd_pedwidth) / bwd_pedwidth.size() * adc_to_mev;
+    m_pedwidth_avg[3] = pedwidth_sum / ECLElementNumbers::c_NCrystals * adc_to_mev;
   } else {
     for (int i = 0; i < 4; i++) {
       m_pedwidth_max[i] = 0;
+      m_pedwidth_avg[i] = 0;
     }
   }
 
@@ -113,6 +132,12 @@ void DQMHistAnalysisECLShapersModule::event()
       std::string pv_name = "pedwidth:max_";
       pv_name += part_id[i];
       setEpicsPV(pv_name, m_pedwidth_max[i]);
+    }
+    for (int i = 0; i < 4; i++) {
+      if (m_pedwidth_avg[i] <= 0) continue;
+      std::string pv_name = "pedwidth:avg_";
+      pv_name += part_id[i];
+      setEpicsPV(pv_name, m_pedwidth_avg[i]);
     }
   }
 }
@@ -136,10 +161,14 @@ void DQMHistAnalysisECLShapersModule::endRun()
 
   // set values of monitoring variables (if variable already exists this will
   // change its value, otherwise it will insert new variable)
-  m_monObj->setVariable("pedwidthFWD", m_pedwidth_max[0]);
-  m_monObj->setVariable("pedwidthBarrel", m_pedwidth_max[1]);
-  m_monObj->setVariable("pedwidthBWD", m_pedwidth_max[2]);
-  m_monObj->setVariable("pedwidthTotal", m_pedwidth_max[3]);
+  m_monObj->setVariable("pedwidthmaxFWD", m_pedwidth_max[0]);
+  m_monObj->setVariable("pedwidthmaxBarrel", m_pedwidth_max[1]);
+  m_monObj->setVariable("pedwidthmaxBWD", m_pedwidth_max[2]);
+  m_monObj->setVariable("pedwidthmaxTotal", m_pedwidth_max[3]);
+  m_monObj->setVariable("pedwidthavgFWD", m_pedwidth_avg[0]);
+  m_monObj->setVariable("pedwidthavgBarrel", m_pedwidth_avg[1]);
+  m_monObj->setVariable("pedwidthavgBWD", m_pedwidth_avg[2]);
+  m_monObj->setVariable("pedwidthavgTotal", m_pedwidth_avg[3]);
 }
 
 

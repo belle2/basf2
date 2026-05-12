@@ -10,13 +10,13 @@
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHit/WireHitFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Guard to prevent repeated instantiations
-    extern template class Chooseable<BaseWireHitFilter>;
-    extern template class ChooseableFilter<WireHitFilterFactory>;
-    using ChooseableWireHitFilter = ChooseableFilter<WireHitFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseWireHitFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<WireHitFilterFactory>;
+    using ChooseableWireHitFilter = TrackingUtilities::ChooseableFilter<WireHitFilterFactory>;
   }
 }

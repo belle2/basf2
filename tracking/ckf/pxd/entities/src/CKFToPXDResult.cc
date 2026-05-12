@@ -8,7 +8,7 @@
 
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -16,7 +16,7 @@
 
 using namespace Belle2;
 
-CKFToPXDResult::CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToPXDState*>>& path) :
+CKFToPXDResult::CKFToPXDResult(const std::vector<TrackingUtilities::WithWeight<const CKFToPXDState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
   B2ASSERT("Path should not be empty", not path.empty());
@@ -25,7 +25,7 @@ CKFToPXDResult::CKFToPXDResult(const std::vector<TrackFindingCDC::WithWeight<con
 void CKFToPXDResult::addToRecoTrack(RecoTrack& recoTrack) const
 {
   unsigned int sortingParameter = 0;
-  for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
+  for (const SpacePoint* spacePoint : TrackingUtilities::reversedRange(getHits())) {
     RelationVector<PXDCluster> relatedClusters = spacePoint->getRelationsTo<PXDCluster>();
     for (const PXDCluster& cluster : relatedClusters) {
       recoTrack.addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_SVDtoPXDCKF);

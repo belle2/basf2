@@ -9,15 +9,15 @@
 
 #include <tracking/ckf/pxd/filters/results/BasePXDResultFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class PXDResultFilterFactory : public TrackFindingCDC::FilterFactory<BasePXDResultFilter> {
+  class PXDResultFilterFactory : public TrackingUtilities::FilterFactory<BasePXDResultFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BasePXDResultFilter>;
+    using Super = TrackingUtilities::FilterFactory<BasePXDResultFilter>;
 
   public:
     /// Constructor forwarding the default filter name

@@ -9,15 +9,15 @@
 
 #include <tracking/ckf/svd/filters/states/BaseSVDStateFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class SVDStateFilterFactory : public TrackFindingCDC::FilterFactory<BaseSVDStateFilter> {
+  class SVDStateFilterFactory : public TrackingUtilities::FilterFactory<BaseSVDStateFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseSVDStateFilter>;
+    using Super = TrackingUtilities::FilterFactory<BaseSVDStateFilter>;
 
   public:
     /// Constructor forwarding the default filter name

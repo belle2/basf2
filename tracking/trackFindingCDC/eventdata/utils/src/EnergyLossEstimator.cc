@@ -7,9 +7,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/utils/EnergyLossEstimator.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackFindingCDC/numerics/ESign.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <geometry/GeometryManager.h>
 
@@ -24,6 +24,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 EnergyLossEstimator EnergyLossEstimator::forCDC()
 {

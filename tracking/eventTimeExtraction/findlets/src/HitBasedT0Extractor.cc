@@ -8,7 +8,7 @@
 #include <tracking/eventTimeExtraction/findlets/HitBasedT0Extractor.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractor.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -25,7 +25,7 @@
 #include <memory>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string HitBasedT0Extractor::getDescription()
 {

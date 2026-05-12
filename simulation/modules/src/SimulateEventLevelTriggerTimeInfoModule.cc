@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <simulation/modules/SimulateEventLevelTriggerTimeInfoModule.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 using namespace Belle2;
 

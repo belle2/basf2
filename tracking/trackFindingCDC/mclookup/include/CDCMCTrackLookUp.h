@@ -10,13 +10,15 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
 
-    extern template class CDCMCHitCollectionLookUp<CDCTrack>;
+  namespace TrackFindingCDC {
+    extern template class CDCMCHitCollectionLookUp<TrackingUtilities::CDCTrack>;
 
     /// Specialisation of the lookup for the truth values of reconstructed tracks.
-    class CDCMCTrackLookUp  : public CDCMCHitCollectionLookUp<CDCTrack> {
+    class CDCMCTrackLookUp  : public CDCMCHitCollectionLookUp<TrackingUtilities::CDCTrack> {
 
     public:
       /// Getter for the singletone instance

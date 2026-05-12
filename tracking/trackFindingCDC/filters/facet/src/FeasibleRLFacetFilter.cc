@@ -7,17 +7,18 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <tracking/trackFindingCDC/numerics/Modulo.h>
+#include <tracking/trackingUtilities/numerics/Modulo.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 FeasibleRLFacetFilter::FeasibleRLFacetFilter(bool hardRLCut)
   : m_param_hardRLCut(hardRLCut)

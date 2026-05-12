@@ -186,4 +186,3 @@ main.add_module('KLMReconstructor')
 main.add_module(eventInspector)
 
 basf2.process(main, max_event=maxCount)
-print(basf2.statistics)

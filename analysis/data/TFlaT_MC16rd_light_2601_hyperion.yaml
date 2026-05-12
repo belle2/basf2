@@ -1,0 +1,80 @@
+TFLAT_Mask: !!python/tuple # ROE Mask
+- TFLATDefaultMask
+- thetaInCDCAcceptance and p<infinity and p >= 0 and dr<1 and abs(dz)<3
+- thetaInCDCAcceptance and clusterNHits>1.5 and [[E>0.08 and clusterReg==1] or [E>0.06
+  and clusterReg==2] or                     [E>0.06 and clusterReg==3]] and abs(clusterTiming)
+  < 200
+
+trk_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and p >= 0
+gamma_cut: isInRestOfEvent > 0.5 and passesROEMask(TFLATDefaultMask) > 0.5 and beamBackgroundSuppression > 0.4 and fakePhotonSuppression > 0.3
+
+trk_variable_list: # Input lists
+- charge
+- useCMSFrame(p)
+- useCMSFrame(cosTheta)
+- useCMSFrame(phi)
+- electronID
+- muonID
+- kaonID
+- pionID
+- protonID
+- pidPairProbabilityExpert(321, 211, CDC)
+- pidPairProbabilityExpert(321, 211, TOP)
+- pidPairProbabilityExpert(321, 211, ARICH)
+- pidPairProbabilityExpert(11, 211, TOP)
+- pidPairProbabilityExpert(11, 211, ARICH)
+- pidPairProbabilityExpert(11, 211, ECL)
+- pidPairProbabilityExpert(13, 211, TOP)
+- pidPairProbabilityExpert(13, 211, ARICH)
+- pidPairProbabilityExpert(13, 211, KLM)
+- pidPairProbabilityExpert(211, 321, TOP)
+- pidPairProbabilityExpert(211, 321, ARICH)
+- nPXDHits/2
+- nSVDHits/8
+- dxdiff
+- dydiff
+- dzdiff
+- clusterEoP
+- clusterLAT
+ecl_variable_list:
+- useCMSFrame(p)
+- useCMSFrame(cosTheta)
+- useCMSFrame(phi)
+- clusterE1E9
+- clusterE9E21
+- clusterLAT
+roe_variable_list:
+- countInList(gamma:tflat)/8
+- countInList(pi+:tflat)/6
+- NumberOfKShortsInRoe
+- ptTracksRoe(TFLATDefaultMask)
+
+parameters: # Architecture parameters
+  seed: null
+  clip_value: 4
+  mask_value: 0
+  num_trk: 10
+  num_ecl: 20
+  num_roe: 1
+  num_transformer_blocks: 6
+  num_heads: 4
+  embedding_dims: 128
+  mlp_hidden_units_factors:
+  - 2
+  - 1
+  dropout_rate: 0.1
+
+# Training parameters
+weight_decay: 0.0001
+initial_learning_rate: 0.0001
+decay_steps: 2000000
+alpha: 0.1
+patience: 20
+batch_size: 2048
+epochs: 200
+train_valid_fraction: 0.92
+chunk_size: 3072000 # This should be multiple of batch size
+
+# Miscellaneous parameters
+VersionBeamBackgroundMVA: MC15ri
+VersionFakePhotonMVA: MC15ri

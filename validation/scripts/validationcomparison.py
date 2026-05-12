@@ -25,10 +25,6 @@ import ROOT
 # ours
 from metaoptions import MetaOptionParser
 
-# Unfortunately doxygen has some trouble with inheritance of attributes, so
-# we disable it.
-# @cond SUPPRESS_DOXYGEN
-
 
 # ==============================================================================
 # Custom Exceptions
@@ -143,9 +139,9 @@ class ComparisonBase(ABC):
         #: store the second object to compare
         self.object_b = object_b
 
-        #: MetaOptionParser
         if mop is None:
             mop = MetaOptionParser()
+        #: MetaOptionParser
         self.mop = mop
 
         #: enable debug?
@@ -549,15 +545,7 @@ class Chi2Test(PvalueTest):
             print()
 
         if res_ndf < 1:
-            msg = (
-                "Comparison failed, no Chi^2 could be computed. For "
-                "debugging, you can use the CLI of "
-                "'validation/scripts/validationcomparison.py' on your root "
-                "file and the reference. Run 'validationcomparison.py "
-                "--help' for info. If problem persists, please open "
-                "GitLab issue (validation label)."
-            )
-            raise ComparisonFailed(msg)
+            raise TooFewBins("res_ndf (<1) is too few to perform the Chi2 test.")
 
         res_chi2ndf = res_chi2 / res_ndf
 
@@ -756,7 +744,9 @@ class TablePrinter:
 
     def print_divider(self, char="="):
         """ Print a divider made up from repeated chars """
+        # \cond false positive doxygen warning
         print(char * self.tot_width)
+        # \endcond
 
     def print(self, cols):
         """ Print one row """
@@ -896,6 +886,3 @@ def debug_cli():
 if __name__ == "__main__":
     # Run command line interface for testing purposes.
     debug_cli()
-
-# End suppression of doxygen checks
-# @endcond

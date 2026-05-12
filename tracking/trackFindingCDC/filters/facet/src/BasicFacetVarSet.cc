@@ -7,10 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 {

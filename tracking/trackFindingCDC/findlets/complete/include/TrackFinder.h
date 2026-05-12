@@ -28,11 +28,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Complete findlet implementing track finding with the cellular automaton in two stages.
-    class TrackFinder : public Findlet<> {
+    class TrackFinder : public TrackingUtilities::Findlet<> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<>;
+      using Super = TrackingUtilities::Findlet<>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery

@@ -240,6 +240,8 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
   vector<bool> bhabhaCalibGoodQuality(m_numCrystals, false);
   vector<bool> bhabhaGammaCalibGoodQuality(m_numCrystals, false);
+  const int firstHighStatsCrysID = 673 - 1; // cellID 673
+  const int lastHighStatsCrysID = 8160 - 1; // cellID 8160
   for (int ic = 0; ic < m_numCrystals; ic++) {
     /* Define a good bhabha calibration value.  This is the
        uncertainty on the calibration constant (e.g. fit mean),
@@ -249,7 +251,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
        Uncertainty stored as ticks so converted to ns for
        more human readable cut.*/
     if (bhabhaCalibUnc[ic] != 0
-        && fabs(bhabhaCalibUnc[ic])*TICKS_TO_NS < 2) {
+        && fabs(bhabhaCalibUnc[ic])*TICKS_TO_NS < 2 and ic >= firstHighStatsCrysID and ic <= lastHighStatsCrysID) {
       // The limits on the uncertainties are not fully optimized !!!!!!!!!!!!!!!!!!!!!!!!!!
       // Tighten the uncertainty cut after introduction of bhabha gamma calibration.  Perhaps checking if the
       // value is negative as that flags poor fits / the overall hist mean was used.  In these cases,

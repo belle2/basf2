@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef VXD_DATAOBJECTS_VXDSIMHIT_H
-#define VXD_DATAOBJECTS_VXDSIMHIT_H
 
 #include <simulation/dataobjects/SimHitBase.h>
 #include <vxd/dataobjects/VxdID.h>
@@ -133,5 +131,3 @@ namespace Belle2 {
     ClassDefOverride(VXDSimHit, 2)
   };
 } // end namespace Belle2
-
-#endif

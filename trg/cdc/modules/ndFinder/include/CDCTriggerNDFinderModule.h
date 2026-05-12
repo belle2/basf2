@@ -8,25 +8,25 @@
 
 #pragma once
 
+#include <string>
+
 #include "framework/core/Module.h"
 #include "framework/datastore/StoreArray.h"
-#include "trg/cdc/dataobjects/CDCTriggerTrack.h"
-#include "trg/cdc/dataobjects/CDCTrigger3DFinderInfo.h"
+#include "trg/cdc/dataobjects/CDCTrigger3DHTrack.h"
 #include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "trg/cdc/NDFinder.h"
-#include "trg/cdc/Clusterizend.h"
 
 namespace Belle2 {
 
-  /** CDC Trigger NDFinder Module */
+  // CDC Trigger NDFinder Module
   class CDCTriggerNDFinderModule : public Module {
   public:
-    /** Constructor */
+    // Constructor
     CDCTriggerNDFinderModule();
-    /** Destructor */
+    // Destructor
     virtual ~CDCTriggerNDFinderModule();
 
-    /** Module functions */
+    // Module functions
     virtual void initialize() override;
     virtual void beginRun() override;
     virtual void event() override;
@@ -34,66 +34,39 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
+    // Sets the CDC quadrant according to the phi prediction
+    short getNDFinderQuadrant(const CDCTrigger3DHTrack& ndFinderTrack);
+    // Calculates the 3DHough total momentum estimate
+    double getNDFinderTotalMomentum(const CDCTrigger3DHTrack& ndFinderTrack);
+    // Name for TS hits
+    std::string m_trackSegmentHitsName;
+    // Name for NDFinder tracks
+    std::string m_ndFinderTracksName;
+    // Name for NDFinder Track To Hit Array
+    std::string m_ndFinderTrackToHitArrayName;
 
-    /** Name for TS hits */
-    std::string m_TrackSegmentHitsName;
-    /** Name for NDFinder tracks */
-    std::string m_NDFinderTracksName;
-    /** Name for NDFinder Track To Hit Array */
-    std::string m_NDFinderTrackToHitArrayName;
-    /** Name for the NDFinder Cluster Data */
-    std::string m_NDFinderInfosName;
+    // StoreArray for TS hits
+    StoreArray<CDCTriggerSegmentHit> m_trackSegmentHits;
+    // StoreArray for NDFinder tracks
+    StoreArray<CDCTrigger3DHTrack> m_ndFinderTracks;
 
-    /** StoreArray for TS hits */
-    StoreArray<CDCTriggerSegmentHit> m_TrackSegmentHits;
-    /** StoreArray for 2D finder tracks from unpacker */
-    StoreArray<CDCTriggerTrack> m_NDFinderTracks;
-    /** StoreArray for NDFinder Cluster Data */
-    StoreArray<CDCTrigger3DFinderInfo> m_NDFinderInfos;
-
-    /** Instance of the 3D Track Finder */
+    // Instance of the 3DHough Track Finder (NDFinder/3DFinder)
     NDFinder m_NDFinder;
-    /** Cluster pruning: Minimum number of axial super layer hits related to a cluster
-     * for the cluster to be considered as a track */
-    int m_minSuperAxial;
-    /** Cluster pruning: Minimum number of stereo super layer hits related to a cluster
-     * for the cluster to be considered as a track */
-    int m_minSuperStereo;
-    /** Clustering: Minimum weight of a cell in Hough space
-     * for the cell to be considered as a cluster member */
-    int m_minWeight;
-    /** Clustering: Minimum number of neighbor cells with minWeight
-     * for a cell to be considered a core cell */
-    int m_minPts;
-    /** Track estimation: Minimum weight of a cluster member cell
-     * relative to the peak weight of the cluster
-     * for the cell to enter in the weighted mean
-     * track parameter value estimation */
-    double m_thresh;
-    /** Clustering: consider diagonal neighbors */
-    bool m_diagonal;
-    /**Clustering: minimum number of cells for a cluster */
-    int m_minCells;
-    /** Clustering method: When true: dbscan, when false: fixed three
-     * dimensional volume */
-    bool m_dbscanning;
-    /** Clustering with 3d volume: Cut on the total weight in this volume */
-    int m_minTotalWeight;
-    /** Clustering with 3d volume: Cut on the peak cell weight */
-    int m_minPeakWeight;
-    /** Clustering with 3d volume: Number of global maximum searches per Hough space */
-    int m_iterations;
-    /** Clustering with 3d volume: Max deletion in omega (number of cells in each direction from max */
-    int m_omegaTrim;
-    /** Clustering with 3d volume: Max deletion in phi (number of cells in each direction from max */
-    int m_phiTrim;
-    /** Clustering with 3d volume: Max deletion in theta (number of cells in each direction from max */
-    int m_thetaTrim;
-    /** Print Hough planes and verbose output */
-    bool m_verbose;
-    /** File name of the axial hit patterns */
+    // Minimum number of axial super layers for the peak to be considered as a track
+    unsigned short m_minSuperAxial;
+    // Minimum number of stereo super layers for the peak to be considered as a track
+    unsigned short m_minSuperStereo;
+    // Peak finding: Number of global maximum searches per Hough space section
+    unsigned short m_iterations;
+    // Peak finding: Max deletion in omega (number of cells in each direction from max)
+    unsigned short m_omegaTrim;
+    // Peak finding: Max deletion in phi (number of cells in each direction from max)
+    unsigned short m_phiTrim;
+    // Switch for saving the full Hough space
+    bool m_storeHoughSpace;
+    // File name of the axial hit patterns
     std::string m_axialFile;
-    /** File name of the stereo hit patterns */
+    // File name of the stereo hit patterns
     std::string m_stereoFile;
   };
 }

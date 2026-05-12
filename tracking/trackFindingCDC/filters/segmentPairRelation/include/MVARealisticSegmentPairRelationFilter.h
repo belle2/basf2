@@ -12,22 +12,22 @@
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/BasicSegmentPairRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/FitSegmentPairRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Final filter for the construction of segment pairs.
-    class MVARealisticSegmentPairRelationFilter : public MVA<BaseSegmentPairRelationFilter> {
+    class MVARealisticSegmentPairRelationFilter : public TrackingUtilities::MVA<BaseSegmentPairRelationFilter> {
 
     private:
       /// Type of the base class
-      using Super = MVA<BaseSegmentPairRelationFilter>;
+      using Super = TrackingUtilities::MVA<BaseSegmentPairRelationFilter>;
 
       /// Set of variables used in this filter
-      using VarSet = VariadicUnionVarSet <
+      using VarSet = TrackingUtilities::VariadicUnionVarSet <
                      BasicSegmentPairRelationVarSet,
                      FitSegmentPairRelationVarSet >;
 

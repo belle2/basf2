@@ -8,11 +8,9 @@
 
 #include <cdc/modules/cdcDigitizer/EDepInGas.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/logging/Logger.h>
 
 #include <TDatabasePDG.h>
 #include <TRandom.h>
-//#include <iostream>
 
 using namespace std;
 using namespace Belle2;

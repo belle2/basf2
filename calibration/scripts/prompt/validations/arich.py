@@ -20,6 +20,9 @@ import subprocess
 import math
 import json
 
+# Avoid looking for the release globaltag
+basf2.conditions.override_globaltags()
+
 #: Tells the automated system some details of this script
 settings = ValidationSettings(name='ARICH channel masks',
                               description=__doc__,

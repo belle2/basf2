@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>
@@ -18,10 +18,10 @@ namespace Belle2 {
 
   /// Findlet for applying filters for creating hit-hit and hit-seed relations
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter = ASeedRelationFilter>
-  class CKFRelationCreator : public TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>> {
+  class CKFRelationCreator : public TrackingUtilities::Findlet<AState, AState, TrackingUtilities::WeightedRelation<AState>> {
   public:
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<AState, AState, TrackFindingCDC::WeightedRelation<AState>>;
+    using Super = TrackingUtilities::Findlet<AState, AState, TrackingUtilities::WeightedRelation<AState>>;
 
     /// Construct this findlet and add the subfindlet as listener
     CKFRelationCreator();
@@ -34,7 +34,7 @@ namespace Belle2 {
 
     /// Apply both filters for creating state-hit and hit-hit relations
     void apply(std::vector<AState>& seedStates, std::vector<AState>& states,
-               std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations) override;
+               std::vector<TrackingUtilities::WeightedRelation<AState>>& relations) override;
 
   private:
     /// Subfindlet for the relation checking between seed and hits

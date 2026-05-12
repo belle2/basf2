@@ -1,0 +1,75 @@
+# EventType: 1193040000
+# Descriptor: anti-B0 -> D_s+ X inclusive decays
+# NickName: Bd_DspX
+# Documentation: anti-B0 -> D_s+ X inclusive decays
+# Responsible: Varsha Gautam
+# Email: a22ph09007@iitbbs.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 04/03/2026
+#
+
+
+# Define Aliases
+Alias MyK*0 K*0
+Alias Myanti-K*0 anti-K*0
+ChargeConj MyK*0 Myanti-K*0
+Alias MyK_S0   K_S0
+Alias Myphi   phi
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+
+
+
+Decay anti-B0sig
+0.000028410   D_s+  Lambda0  anti-p-                       PHSP;
+0.000027480   D_s+  K-                                     PHSP; 
+0.000021900   D_s*+  K-                                    SVS;
+0.000035000   K*-   D_s+                                   SVS;
+0.000096960   D_s+  pi-  anti-K0                           PHSP;
+0.000032000   D_s*+  K*-                                   SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0; 
+0.000020000   D_s+  D_s-                                   PHSP;
+0.000024000   D_s*+  D_s-                                  SVS;                  
+0.000024000   D_s*-  D_s+                                  SVS;
+0.000030000   D_s*+  D_s*-                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.00095       D_s*+ pi-  anti-K0                           PHSP;
+0.00100       D_s+  pi-  anti-K0  pi0                      PHSP;
+0.00100       D_s*+ pi-  anti-K0  pi0                      PHSP;
+0.00080       D_s+  pi-  K-  pi+                           PHSP;
+0.00080       D_s*+ pi-  K-  pi+                           PHSP;
+0.00016       D_s+  pi-  anti-K0  pi0 pi0                  PHSP;
+0.00016       D_s*+ pi-  anti-K0  pi0 pi0                  PHSP;
+0.00016       D_s+  pi-  anti-K0  pi+ pi-                  PHSP;
+0.00016       D_s*+ pi-  anti-K0  pi+ pi-                  PHSP;
+0.00016       D_s+  pi-  K-  pi+ pi0                       PHSP;
+0.00016       D_s*+ pi-  K-  pi+ pi0                       PHSP;
+Enddecay
+CDecay B0sig
+
+
+Decay D_s-
+0.02250000      Myphi    pi-                               SVS;
+0.02500776      MyK*0    K-                                SVS;
+0.0103698278    MyK_S0   K-                                PHSP;
+Enddecay
+CDecay D_s+
+
+Decay MyK*0
+1.00      K+  pi-                                          VSS;
+Enddecay
+CDecay Myanti-K*0
+
+Decay MyK_S0
+1.00    pi+  pi-                                           PHSP;
+Enddecay
+
+Decay Myphi
+1.00  K+   K-                                              VSS;
+Enddecay
+End
+

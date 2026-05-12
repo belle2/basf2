@@ -673,7 +673,7 @@ class ValidationRoot:
 
         #: Git version
         self.version = validationfunctions.get_compact_git_hash(
-            os.environ["BELLE2_LOCAL_DIR"]
+            os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
         )
 
         #: Gitlab object
@@ -900,7 +900,7 @@ class ValidationRoot:
             + time.tzname[1],
             "version_restart": self.version,
             "version_current": validationfunctions.get_compact_git_hash(
-                os.environ["BELLE2_LOCAL_DIR"]
+                os.environ.get("BELLE2_LOCAL_DIR", os.environ.get("BELLE2_RELEASE_DIR", None))
             ),
         }
 
@@ -1191,7 +1191,7 @@ def run_server(
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
         sys.exit(
-            f"Result folder {results_folder} does not exist, run validate_basf2 first " +
+            f"Result folder {results_folder} does not exist, run b2validation first " +
             "to create validation output"
         )
 
@@ -1204,7 +1204,7 @@ def run_server(
     if results_count == 0:
         sys.exit(
             f"Result folder {results_folder} contains no folders, run "
-            f"validate_basf2 first to create validation output"
+            f"b2validation first to create validation output"
         )
 
     # Go to the html directory

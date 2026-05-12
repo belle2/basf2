@@ -7,23 +7,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
-#include <svd/dataobjects/SVDCluster.h>
-
-#include <string>
-#include <vector>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
+  class SVDCluster;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
     /// Findlet for rejecting wrong SpacePointTrackCands and for removing bad hits.
-    class TrackCandidateOverlapResolver : public TrackFindingCDC::Findlet<SpacePointTrackCand> {
+    class TrackCandidateOverlapResolver : public TrackingUtilities::Findlet<SpacePointTrackCand> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<SpacePointTrackCand>;
+      using Super = TrackingUtilities::Findlet<SpacePointTrackCand>;
 
     public:
       /// Find intercepts in the 2D Hough space
@@ -37,6 +36,9 @@ namespace Belle2 {
 
       /// Create the store arrays
       void initialize() override;
+
+      /// Check dbobject validity
+      void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining
       void apply(std::vector<SpacePointTrackCand>& spacePointTrackCandsToResolve) override;
@@ -52,6 +54,12 @@ namespace Belle2 {
 
       /// Minimum of activityState of candidate required to be accepted by the algorithm.
       double m_minActivityState = 0.7;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
+
+      /// parameters prefix (finalOverlapResolver, refinerOverlapResolver)
+      std::string m_prefix = "";
     };
 
   }

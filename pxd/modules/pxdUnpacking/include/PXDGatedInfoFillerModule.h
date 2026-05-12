@@ -9,12 +9,11 @@
 #pragma once
 
 #include <framework/core/Module.h>
-//#include <pxd/dataobjects/PXDDAQStatus.h>
-#include <pxd/dataobjects/PXDGatedModeInfo.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
+  class PXDGatedModeInfo;
 
   namespace PXD {
     /** PXD Gates Mode information on readout gate basis

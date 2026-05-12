@@ -56,7 +56,5 @@ eventlimiter_mod.if_true(success_path)
 
 basf2.process(main)
 
-print(basf2.statistics)
-
 for passing_events in num_events.values():
     assert passing_events == max_events

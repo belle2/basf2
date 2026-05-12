@@ -61,7 +61,7 @@ namespace Belle2 {
       GeoFarBeamLineCreator();
 
       /** The destructor of the GeoFarBeamLineCreator class. */
-      virtual ~GeoFarBeamLineCreator();
+      virtual ~GeoFarBeamLineCreator() override;
 
       /** Do not want a copy constructor */
       GeoFarBeamLineCreator(const GeoFarBeamLineCreator&) = delete;

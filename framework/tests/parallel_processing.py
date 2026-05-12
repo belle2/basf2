@@ -74,7 +74,7 @@ if not simulation.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFI
 # one of them doesn't get an event
 basf2.set_nprocesses(5)
 with clean_working_directory():
-    basf2.process(main)
+    basf2.process(main, calculateStatistics=True)
 
     print(basf2.statistics)
     print(basf2.statistics(basf2.statistics.TOTAL))

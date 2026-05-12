@@ -11,10 +11,10 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 namespace Belle2 {
+  class RestOfEvent;
 
   /**
    * Extract particles from ROE and fill them in ParticleList

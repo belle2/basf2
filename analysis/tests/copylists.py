@@ -60,7 +60,7 @@ def run_copylists():
 
     # third test: check that two lists with the same daughters in different
     # orders don't double count
-    # (they are different Belle2::Particles but we should match them)
+    # (they are different Particles but we should match them)
     ma.reconstructDecay("vpho:e -> K+ pi-", "", path=pa)
     ma.reconstructDecay("vpho:f -> pi- K+", "", path=pa)
     ma.copyLists("vpho:ef", ["vpho:e", "vpho:f"], path=pa)

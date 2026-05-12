@@ -25,7 +25,7 @@ from variables import variables
 # create path
 main = create_path()
 
-# generate and reconstruct 100 generic BBbar events w/ the beam background overlayed
+# generate and reconstruct 100 generic BBbar events w/ the beam background overlaid
 main.add_module('EventInfoSetter', evtNumList=[100])
 main.add_module('EvtGenInput')
 add_simulation(main, bkgfiles=get_background_files())

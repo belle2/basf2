@@ -13,7 +13,7 @@
   <contact>software-tracking@belle2.org</contact>
   <input>VxdCdcValidationHarvested.root</input>
   <output>VxdCdcMergerValidation.root</output>
-  <description>This module creates efficiency plots for the V0 validation.</description>
+  <description>This script creates the validation plots for the CDC+SVD track merging algorithm.</description>
 </header>
 """
 
@@ -24,7 +24,7 @@ ACTIVE = True
 
 
 class VxdCdcMergerValidationPlots:
-    """Create efficiency plots for the V0 validation"""
+    """Create efficiency plots for the CDC+SVD track merging algorithm validation."""
 
     def __init__(self, input_file='../VxdCdcValidationHarvested.root', output_file='VxdCdcMergerValidation.root'):
         """Constructor"""

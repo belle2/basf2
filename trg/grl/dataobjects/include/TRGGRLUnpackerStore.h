@@ -168,6 +168,20 @@ namespace Belle2 {
     /** \#wire hit in SL8*/
     int get_wirecnt_tsf8() const {return m_wirecnt_tsf8;}
 
+    /** ECLTRG ML tau nn input*/
+    int get_ml_tau_nn_input() const {return m_ml_tau_nn_input;}
+    /** ECLTRG ML tau nn output*/
+    int get_ml_tau_nn_output_0() const {return m_ml_tau_nn_output_0;}
+    int get_ml_tau_nn_output_1() const {return m_ml_tau_nn_output_1;}
+    int get_ml_tau_nn_output_2() const {return m_ml_tau_nn_output_2;}
+    int get_ml_tau_nn_output_3() const {return m_ml_tau_nn_output_3;}
+    int get_ml_tau_nn_output_4() const {return m_ml_tau_nn_output_4;}
+    int get_ml_tau_nn_output_5() const {return m_ml_tau_nn_output_5;}
+    int get_ml_tau_nn_output_6() const {return m_ml_tau_nn_output_6;}
+    int get_ml_tau_nn_output_7() const {return m_ml_tau_nn_output_7;}
+    int get_ml_tau_nn_output_8() const {return m_ml_tau_nn_output_8;}
+    int get_ml_tau_nn_output_9() const {return m_ml_tau_nn_output_9;}
+
     /**m_map_TSF0 integer leaf*/
     int get_map_TSF0_int(int i) const {return m_map_TSF0_int[i];}
     /**m_map_TSF2 integer leaf*/
@@ -431,6 +445,21 @@ namespace Belle2 {
     void set_wirecnt_tsf7(int wirecnt_tsf7) { m_wirecnt_tsf7 = wirecnt_tsf7; }
     /** \#wire hit in SL8*/
     void set_wirecnt_tsf8(int wirecnt_tsf8) { m_wirecnt_tsf8 = wirecnt_tsf8; }
+
+
+    /** ECLTRG ML tau nn input*/
+    void set_ml_tau_nn_input(int ml_tau_nn_input) { m_ml_tau_nn_input = ml_tau_nn_input;}
+    /** ECLTRG ML tau nn output*/
+    void set_ml_tau_nn_output_0(int ml_tau_nn_output_0) { m_ml_tau_nn_output_0 = ml_tau_nn_output_0;}
+    void set_ml_tau_nn_output_1(int ml_tau_nn_output_1) { m_ml_tau_nn_output_1 = ml_tau_nn_output_1;}
+    void set_ml_tau_nn_output_2(int ml_tau_nn_output_2) { m_ml_tau_nn_output_2 = ml_tau_nn_output_2;}
+    void set_ml_tau_nn_output_3(int ml_tau_nn_output_3) { m_ml_tau_nn_output_3 = ml_tau_nn_output_3;}
+    void set_ml_tau_nn_output_4(int ml_tau_nn_output_4) { m_ml_tau_nn_output_4 = ml_tau_nn_output_4;}
+    void set_ml_tau_nn_output_5(int ml_tau_nn_output_5) { m_ml_tau_nn_output_5 = ml_tau_nn_output_5;}
+    void set_ml_tau_nn_output_6(int ml_tau_nn_output_6) { m_ml_tau_nn_output_6 = ml_tau_nn_output_6;}
+    void set_ml_tau_nn_output_7(int ml_tau_nn_output_7) { m_ml_tau_nn_output_7 = ml_tau_nn_output_7;}
+    void set_ml_tau_nn_output_8(int ml_tau_nn_output_8) { m_ml_tau_nn_output_8 = ml_tau_nn_output_8;}
+    void set_ml_tau_nn_output_9(int ml_tau_nn_output_9) { m_ml_tau_nn_output_9 = ml_tau_nn_output_9;}
 
     /**m_map_TSF0 integer leaf*/
     void set_map_TSF0_int(int i, int map_TSF0_int)  { m_map_TSF0_int[i] = map_TSF0_int; }
@@ -700,6 +729,21 @@ namespace Belle2 {
     /** \#wire hit in SL8*/
     int m_wirecnt_tsf8;
 
+
+    /** ECLTRG ML tau nn input*/
+    int m_ml_tau_nn_input;
+    /** ECLTRG ML tau nn output*/
+    int m_ml_tau_nn_output_0;
+    int m_ml_tau_nn_output_1;
+    int m_ml_tau_nn_output_2;
+    int m_ml_tau_nn_output_3;
+    int m_ml_tau_nn_output_4;
+    int m_ml_tau_nn_output_5;
+    int m_ml_tau_nn_output_6;
+    int m_ml_tau_nn_output_7;
+    int m_ml_tau_nn_output_8;
+    int m_ml_tau_nn_output_9;
+
     /**m_map_TSF0 integer leaf*/
     int m_map_TSF0_int[2];
     /**m_map_TSF2 integer leaf*/
@@ -804,7 +848,7 @@ namespace Belle2 {
     /**m_maxrvc leafs*/
     int m_maxrvc;
     /** the class title*/
-    ClassDef(TRGGRLUnpackerStore, 3);
+    ClassDef(TRGGRLUnpackerStore, 4);
 
   };
 

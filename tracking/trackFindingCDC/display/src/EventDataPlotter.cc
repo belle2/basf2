@@ -10,23 +10,23 @@
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCTangent.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit3D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <cdc/topology/CDCWireTopology.h>
 
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackingUtilities/geometry/Circle2D.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCHit.h>
@@ -41,7 +41,9 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 EventDataPlotter::EventDataPlotter(bool animate, bool forwardFade)
   : m_ptrPrimitivePlotter(new SVGPrimitivePlotter(
@@ -438,7 +440,7 @@ void EventDataPlotter::draw(const CDCTangent& tangent, const AttributeMap& attri
   draw(toTouchPoint, attributeMap);
 }
 
-void EventDataPlotter::draw(const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D,
+void EventDataPlotter::draw(const CDCRecoHit3D& recoHit3D,
                             const AttributeMap& attributeMap)
 {
   draw(recoHit3D.getRecoHit2D(), attributeMap);

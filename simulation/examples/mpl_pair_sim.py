@@ -91,7 +91,7 @@ mypath.add_module(output)
 mypath.add_module(progress)
 
 # Process the events
-b2.process(mypath)
+b2.process(mypath, calculateStatistics=True)
 
 # print out the summary
 print(b2.statistics)

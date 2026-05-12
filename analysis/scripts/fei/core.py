@@ -8,8 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# @cond SUPPRESS_DOXYGEN
-
 """
  The Full Event Interpretation Algorithm
 
@@ -340,7 +338,10 @@ class PreReconstruction:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
                 if self.config.monitor:
-                    ma.matchMCTruth(channel.name, path=path)
+                    if "tag" in (channel.name).lower():
+                        ma.matchTagTruth(channel.name, path=path)
+                    else:
+                        ma.matchMCTruth(channel.name, path=path)
                     bc_variable = channel.preCutConfig.bestCandidateVariable
                     if self.config.monitor == 'simple':
                         hist_variables = [channel.mvaConfig.target, 'extraInfo(decayModeID)']
@@ -427,7 +428,10 @@ class PreReconstruction:
                 # If we are not in monitor mode we do the mc matching now,
                 # otherwise we did it above already!
                 elif self.config.training:
-                    ma.matchMCTruth(channel.name, path=path)
+                    if "tag" in (channel.name).lower():
+                        ma.matchTagTruth(channel.name, path=path)
+                    else:
+                        ma.matchMCTruth(channel.name, path=path)
 
                 if b2bii.isB2BII() and particle.name in ['K_S0', 'Lambda0']:
                     pvfit = basf2.register_module('ParticleVertexFitter')
@@ -1157,5 +1161,3 @@ def get_path(particles: typing.Sequence[config.Particle], configuration: config.
 
     # Finally we return the path, the stage and the used lists to the user.
     return FeiState(path, stage+1, plists=used_lists, fsplists=fsps_of_all_stages, excludelists=excludelists)
-
-# @endcond

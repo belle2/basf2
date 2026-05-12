@@ -7,14 +7,15 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::RelationFilter<const CDCTrack>;
+template class TrackingUtilities::RelationFilter<const CDCTrack>;
 
 BaseTrackRelationFilter::BaseTrackRelationFilter() = default;
 

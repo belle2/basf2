@@ -529,10 +529,10 @@ def merge_root_files(args, stage, roundMode=0):
         os.chdir(f'{args.directory}/collection')
         for f in rootfiles:
             inputs = [f'../jobs/{i}/{f}' for i in range(args.nJobs)]
-            cmd = f"analysis-fei-mergefiles -o {f} -i " + " ".join(inputs)
+            cmd = ['analysis-fei-mergefiles', '-o', f, '-i'] + inputs
             if 'training_input' in f:
-                cmd += f" -s {1.0-args.validation}"
-            ret = subprocess.call(cmd, shell=True)
+                cmd += ['-s', str(1.0-args.validation)]
+            ret = subprocess.call(cmd)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
 
@@ -767,7 +767,7 @@ if __name__ == '__main__':
     # 7. We clean the job directories so they can be used during the next stage again.
     if get_training_cache(args)[0] is not None and get_training_cache(args)[0] > args.end:
         raise RuntimeError(
-            f'FEI-distributed: Check args.end this doesnt make sense: {args.end}, training is at {get_training_cache(args)}')
+            f"FEI-distributed: Check args.end this doesn't make sense: {args.end}, training is at {get_training_cache(args)}")
 
     while get_training_cache(args)[1] != 2:
         if get_training_cache(args)[0] is None or get_training_cache(

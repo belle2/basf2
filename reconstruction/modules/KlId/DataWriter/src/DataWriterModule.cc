@@ -17,12 +17,16 @@
 
 #include <analysis/ClusterUtility/ClusterUtils.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
 #include <TTree.h>
 #include <TFile.h>
 #include <utility>
 #include <Math/VectorUtil.h>
 
-#include "reconstruction/modules/KlId/KLMExpert/KlId.h"
+#include <reconstruction/modules/KlId/KLMExpert/KlId.h>
 
 using namespace std;
 using namespace Belle2;

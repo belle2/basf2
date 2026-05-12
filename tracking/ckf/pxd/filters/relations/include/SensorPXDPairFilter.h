@@ -8,14 +8,13 @@
 #pragma once
 
 #include <tracking/ckf/pxd/filters/relations/BasePXDPairFilter.h>
-#include <tracking/ckf/pxd/entities/CKFToPXDState.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
   class SensorPXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on layer
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

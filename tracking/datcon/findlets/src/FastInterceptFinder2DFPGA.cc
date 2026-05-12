@@ -6,13 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/datcon/findlets/FastInterceptFinder2DFPGA.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 FastInterceptFinder2DFPGA::FastInterceptFinder2DFPGA() : Super()
 {
@@ -22,49 +22,49 @@ void FastInterceptFinder2DFPGA::exposeParameters(ModuleParamList* moduleParamLis
 {
   Super::exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "isUFinder"), m_param_isUFinder,
+  moduleParamList->addParameter(prefixed(prefix, "isUFinder"), m_param_isUFinder,
                                 "Intercept finder for u-side or v-side?", m_param_isUFinder);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeGnuplotOutput"), m_param_writeGnuplotOutput,
+  moduleParamList->addParameter(prefixed(prefix, "writeGnuplotOutput"), m_param_writeGnuplotOutput,
                                 "Write gnuplot debugging output to file?", m_param_writeGnuplotOutput);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSOutputFileName"), m_param_gnuplotHSOutputFileName,
+  moduleParamList->addParameter(prefixed(prefix, "gnuplotHSOutputFileName"), m_param_gnuplotHSOutputFileName,
                                 "Name of the gnuplot debug file.", m_param_gnuplotHSOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSRectOutputFileName"), m_param_gnuplotHSRectOutputFileName,
+  moduleParamList->addParameter(prefixed(prefix, "gnuplotHSRectOutputFileName"), m_param_gnuplotHSRectOutputFileName,
                                 "Name of the gnuplot debug HS sectors file.", m_param_gnuplotHSRectOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "gnuplotHSCoGOutputFileName"), m_param_gnuplotHSCoGOutputFileName,
+  moduleParamList->addParameter(prefixed(prefix, "gnuplotHSCoGOutputFileName"), m_param_gnuplotHSCoGOutputFileName,
                                 "Name of the gnuplot debug cluster CoG file.", m_param_gnuplotHSCoGOutputFileName);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumRecursionLevel"), m_param_maxRecursionLevel,
+  moduleParamList->addParameter(prefixed(prefix, "maximumRecursionLevel"), m_param_maxRecursionLevel,
                                 "Maximum recursion level for the fast Hough trafo algorithm.", m_param_maxRecursionLevel);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nAngleSectors"), m_param_nAngleSectors,
+  moduleParamList->addParameter(prefixed(prefix, "nAngleSectors"), m_param_nAngleSectors,
                                 "Number of angle sectors (= x-axis) dividing the Hough space.", m_param_nAngleSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "nVerticalSectors"), m_param_nVerticalSectors,
+  moduleParamList->addParameter(prefixed(prefix, "nVerticalSectors"), m_param_nVerticalSectors,
                                 "Number of vertical sectors (= y-axis) dividing the Hough space.", m_param_nVerticalSectors);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
+  moduleParamList->addParameter(prefixed(prefix, "verticalHoughSpaceSize"), m_param_verticalHoughSpaceSize,
                                 "Vertical size of the Hough space. Data type: long", m_param_verticalHoughSpaceSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumX"), m_param_minimumX,
+  moduleParamList->addParameter(prefixed(prefix, "minimumX"), m_param_minimumX,
                                 "Minimum x value of the Hough space.", m_param_minimumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumX"), m_param_maximumX,
+  moduleParamList->addParameter(prefixed(prefix, "maximumX"), m_param_maximumX,
                                 "Maximum x value of the Hough space.", m_param_maximumX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
+  moduleParamList->addParameter(prefixed(prefix, "minimumHSClusterSize"), m_param_MinimumHSClusterSize,
                                 "Minimum size of the Hough Space clusters.", m_param_MinimumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
+  moduleParamList->addParameter(prefixed(prefix, "maximumHSClusterSize"), m_param_MaximumHSClusterSize,
                                 "Maximum size of the Hough Space clusters.", m_param_MaximumHSClusterSize);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
+  moduleParamList->addParameter(prefixed(prefix, "maximumHSClusterSizeX"), m_param_MaximumHSClusterSizeX,
                                 "Maximum size of the Hough Space clusters in horizontal direction.", m_param_MaximumHSClusterSizeX);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
+  moduleParamList->addParameter(prefixed(prefix, "maximumHSClusterSizeY"), m_param_MaximumHSClusterSizeY,
                                 "Maximum size of the Hough Space clusters in vertical direction.", m_param_MaximumHSClusterSizeY);
 
 }

@@ -182,7 +182,4 @@ ma.variablesToNtuple(decayString='Upsilon(4S)',
                      path=my_path)
 
 # Process the events
-b2.process(my_path)
-
-# print out the summary
-print(b2.statistics)
+b2.process(my_path, calculateStatistics=True)

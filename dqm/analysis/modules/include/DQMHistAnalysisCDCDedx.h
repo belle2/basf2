@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <boost/format.hpp>
 #include <TROOT.h>
 
 #include <TLine.h>

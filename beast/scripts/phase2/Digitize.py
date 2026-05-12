@@ -104,8 +104,5 @@ qcs_study = b2.register_module('QcsmonitorStudy')
 
 b2.process(main)
 
-print('Event Statistics:')
-print(b2.statistics)
-
 d = datetime.datetime.today()
 print(d.strftime('job finish: %Y-%m-%d %H:%M:%S\n'))

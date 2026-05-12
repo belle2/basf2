@@ -23,8 +23,11 @@ settings = ValidationSettings(name='KLM alignment',
                               download_files=['stdout'],
                               expert_config=None)
 
+# Avoid looking for the release globaltag
+basf2.conditions.override_globaltags()
 
-def get_result(job_path, tmp_dir):
+
+def get_result(job_path, tmp_dir, suffix=''):
     from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMCalibrationChecker
 
@@ -44,7 +47,7 @@ def get_result(job_path, tmp_dir):
         checker.setExperimentRun(exp, run)
         checker.setTestingPayload(database_file)
         basf2.B2INFO(f'Creating alignment results tree for experiment {exp}, run {run}.')
-        checker.setAlignmentResultsFile(tmp_dir+f'/alignment_{exp}_{run}.root')
+        checker.setAlignmentResultsFile(tmp_dir+f'/alignment_{exp}_{run}{suffix}.root')
         checker.checkAlignment()
 
     return exp_run_list
@@ -171,7 +174,17 @@ def get_residuals(data_path, data_path_prev):
                         BKLM_chi2[section][sector][param][layer] = (
                             BKLM_res_values[section][sector][param][layer]**2)/(BKLM_res_errors[section][sector][param][layer]**2)
 
-    return [EKLM_res_values, EKLM_res_errors, EKLM_chi2, BKLM_res_values, BKLM_res_errors, BKLM_chi2]
+    return [
+        EKLM_res_values,
+        EKLM_res_errors,
+        EKLM_chi2,
+        BKLM_res_values,
+        BKLM_res_errors,
+        BKLM_chi2,
+        BKLM_values,
+        BKLM_errors,
+        EKLM_values,
+        EKLM_errors]
 
 
 def draw_EKLM_pics(EKLM_values, EKLM_errors, EKLM_chi2, pdfPages):
@@ -307,6 +320,130 @@ def draw_BKLM_pics(BKLM_values, BKLM_errors, BKLM_chi2, pdfPages):
     plt.close('all')
 
 
+def draw_EKLM_corrections_pics(EKLM_values, EKLM_errors, pdfPages):
+    # Draw the EKLM alignment corrections and add them to a .pdf file
+    plt.rcParams.update({
+        'font.size': 20,
+        'figure.figsize': (11, 10),
+        'axes.grid': True,
+        'grid.linestyle': '-',
+        'grid.alpha': 0.2,
+        'lines.markersize': 5.0,
+        'xtick.minor.visible': True,
+        'xtick.direction': 'in',
+        'xtick.major.size': 20.0,
+        'xtick.minor.size': 10.0,
+        'xtick.top': True,
+        'ytick.minor.visible': True,
+        'ytick.direction': 'in',
+        'ytick.major.size': 20.0,
+        'ytick.minor.size': 10.0,
+        'ytick.right': True,
+        'errorbar.capsize': 0.0,
+    })
+    param_meaning = {0: 'x', 1: 'y', 2: r'$\alpha$'}
+    section_meaning = {0: 'b', 1: 'f'}
+    layers = {'EKLM': np.arange(1, 15, 1), 'BKLM': np.arange(1, 16, 1)}
+    layers_err = {'EKLM': np.full(14, 0.5), 'BKLM': np.full(15, 0.5)}
+    for section in [0, 1]:
+        fig, axs = plt.subplots(4, 3, figsize=(20, 20))
+        for i in range(0, 12):
+            sector = i//3
+            param = i % 3
+            plt.sca(axs[sector][param])
+            plt.errorbar(
+                x=layers['EKLM'],
+                xerr=layers_err['EKLM'],
+                y=EKLM_values[1][section][sector][param],
+                yerr=EKLM_errors[1][section][sector][param],
+                ls='',
+                fmt='o',
+                ds='steps-mid',
+                color='black',
+                label='EKLM ' +
+                section_meaning[section] +
+                ' ' +
+                str(sector))
+            plt.hlines(0, 0, 14, color='red')
+            if (param == 2):
+                plt.ylim(-0.02, 0.02)
+                plt.ylabel(param_meaning[param]+' rad')
+            else:
+                plt.ylim(-2, 2)
+                plt.ylabel(param_meaning[param]+' cm')
+            plt.xlabel('Layer')
+            axs[sector][param].yaxis.set_label_coords(-0.1, 0.5)
+            plt.legend()
+        fig.suptitle(f"Calibrated EKLM alignment corrections for section {section_meaning[section]}")
+        fig.tight_layout()
+        plt.savefig(pdfPages, format='pdf')
+    plt.close('all')
+
+
+def draw_BKLM_corrections_pics(BKLM_values, BKLM_errors, pdfPages):
+    # Draw the BKLM alignment corrections and add them to a .pdf file
+    plt.rcParams.update({
+        'font.size': 20,
+        'figure.figsize': (11, 10),
+        'axes.grid': True,
+        'grid.linestyle': '-',
+        'grid.alpha': 0.2,
+        'lines.markersize': 5.0,
+        'xtick.minor.visible': True,
+        'xtick.direction': 'in',
+        'xtick.major.size': 20.0,
+        'xtick.minor.size': 10.0,
+        'xtick.top': True,
+        'ytick.minor.visible': True,
+        'ytick.direction': 'in',
+        'ytick.major.size': 20.0,
+        'ytick.minor.size': 10.0,
+        'ytick.right': True,
+        'errorbar.capsize': 0.0,
+    })
+    param_meaning = {0: 'x', 1: 'y', 2: r'$\alpha$'}
+    section_meaning = {0: 'b', 1: 'f'}
+    layers = {'EKLM': np.arange(1, 15, 1), 'BKLM': np.arange(1, 16, 1)}
+    layers_err = {'EKLM': np.full(14, 0.5), 'BKLM': np.full(15, 0.5)}
+    for section in [0, 1]:
+        for sector_shift in [0, 4]:
+            fig, axs = plt.subplots(4, 3, figsize=(20, 20))
+            for i in range(0, 12):
+                sector = i//3+sector_shift
+                param = i % 3
+                plt.sca(axs[sector-sector_shift][param])
+                plt.errorbar(
+                    x=layers['BKLM'],
+                    xerr=layers_err['BKLM'],
+                    y=BKLM_values[1][section][sector][param],
+                    yerr=BKLM_errors[1][section][sector][param],
+                    ls='',
+                    fmt='o',
+                    ds='steps-mid',
+                    color='black',
+                    label='BKLM ' +
+                    section_meaning[section] +
+                    ' ' +
+                    str(sector))
+                plt.hlines(0, 0, 15, color='red')
+                if (param == 2):
+                    plt.ylim(-0.02, 0.02)
+                    plt.ylabel(param_meaning[param]+' rad')
+                else:
+                    plt.ylim(-2, 2)
+                    plt.ylabel(param_meaning[param]+' cm')
+                plt.xlabel('Layer')
+                axs[sector-sector_shift][param].yaxis.set_label_coords(-0.1, 0.5)
+                plt.legend()
+            fig.suptitle(
+                f"Calibrated BKLM alignment corrections for \
+                    section {section_meaning[section]} \
+                    sectors {sector_shift} to {sector_shift+3}")
+            fig.tight_layout()
+            plt.savefig(pdfPages, format='pdf')
+    plt.close('all')
+
+
 def run_validation(calibration_results_dir, input_data_path=None, **kwargs):
     '''
     Run the validation.
@@ -329,22 +466,25 @@ def run_validation(calibration_results_dir, input_data_path=None, **kwargs):
     job_path_prev = f'{iterations[1]}/algorithm_output'
 
     # Create alignment results tree the recent and previous calibration and get IoVs
-    exp_run_list = get_result(job_path, tmp_work_dir)
-    exp_run_list_prev = get_result(job_path_prev, tmp_work_dir)
+    exp_run_list = get_result(job_path, tmp_work_dir, suffix='_new')
+    exp_run_list_prev = get_result(job_path_prev, tmp_work_dir, suffix='_previous')
     # Sort IoV from earliest to latest
     sorted_exp_run_list = sorted(exp_run_list + exp_run_list_prev)
     # Calculate the residuals for each adjacent pair of IoVs and saves the results of the comparison in a .pdf file
-    for i in range(0, len(sorted_exp_run_list)//2):
-        exp_prev = sorted_exp_run_list[2*i][0]
-        run_prev = sorted_exp_run_list[2*i][1]
-        exp = sorted_exp_run_list[2*i+1][0]
-        run = sorted_exp_run_list[2*i+1][1]
-        data_path = tmp_work_dir+f'/alignment_{exp_prev}_{run_prev}.root'
-        data_path_prev = tmp_work_dir+f'/alignment_{exp}_{run}.root'
-        EKLM_values, EKLM_errors, EKLM_chi2, BKLM_values, BKLM_errors, BKLM_chi2 = get_residuals(data_path, data_path_prev)
+    for i in range(0, len(sorted_exp_run_list)-1):
+        exp_prev = sorted_exp_run_list[i][0]
+        run_prev = sorted_exp_run_list[i][1]
+        exp = sorted_exp_run_list[i+1][0]
+        run = sorted_exp_run_list[i+1][1]
+        data_path = tmp_work_dir+f'/alignment_{exp_prev}_{run_prev}_new.root'
+        data_path_prev = tmp_work_dir+f'/alignment_{exp}_{run}_previous.root'
+        EKLM_values, EKLM_errors, EKLM_chi2, BKLM_values, BKLM_errors, BKLM_chi2, \
+            BKLM_abs_values, BKLM_abs_errors, EKLM_abs_values, EKLM_abs_errors = get_residuals(data_path, data_path_prev)
         pdfPages = PdfPages(tmp_plot_dir+'/e'+str(exp_prev)+'r'+str(run_prev)+'_e'+str(exp)+'r'+str(run)+'.pdf')
         draw_EKLM_pics(EKLM_values, EKLM_errors, EKLM_chi2, pdfPages)
         draw_BKLM_pics(BKLM_values, BKLM_errors, BKLM_chi2, pdfPages)
+        draw_EKLM_corrections_pics(EKLM_abs_values, EKLM_abs_errors, pdfPages)
+        draw_BKLM_corrections_pics(BKLM_abs_values, BKLM_abs_errors, pdfPages)
         pdfPages.close()
 
 

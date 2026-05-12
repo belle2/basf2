@@ -74,5 +74,5 @@ main.add_module(
 b2.print_path(main)
 main.add_module('ProgressBar')
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 print(b2.statistics)

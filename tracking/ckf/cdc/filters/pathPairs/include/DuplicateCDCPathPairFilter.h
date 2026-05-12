@@ -10,7 +10,7 @@
 #include <tracking/ckf/cdc/filters/pathPairs/BaseCDCPathPairFilter.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <utility>
 
@@ -19,7 +19,7 @@ namespace Belle2 {
   class DuplicateCDCPathPairFilter : public BaseCDCPathPairFilter {
   public:
     /// Input: pair of paths, returns 1 if too many duplicate hits found
-    TrackFindingCDC::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
+    TrackingUtilities::Weight operator()(const BaseCDCPathPairFilter::Object& pair) final
     {
       const auto& lhs = *pair.first;
       const auto& rhs = *pair.second;
@@ -48,7 +48,7 @@ namespace Belle2 {
     /// Expose the parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "minFractionSharedHits"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "minFractionSharedHits"),
                                     m_minFractionSharedHits,
                                     "Fraction of shared hits to distinguish photon conversion/Bremsstahlung",
                                     m_minFractionSharedHits);

@@ -9,8 +9,13 @@
 /* Own header. */
 #include <reconstruction/modules/EventsOfDoomBuster/EventsOfDoomBusterModule.h>
 
+
 /* Basf2 headers. */
 #include <framework/logging/Logger.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <cdc/dataobjects/CDCHit.h>
+#include <reconstruction/dbobjects/EventsOfDoomParameters.h>
 
 using namespace Belle2;
 

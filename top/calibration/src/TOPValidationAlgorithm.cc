@@ -8,11 +8,13 @@
 
 #include <top/calibration/TOPValidationAlgorithm.h>
 #include <top/utilities/Chi2MinimumFinder1D.h>
+#include <top/dbobjects/TOPCalPrecision.h>
 
 #include <TFile.h>
 #include <TH1F.h>
 #include <TH1D.h>
 #include <TH2F.h>
+#include <TProfile.h>
 
 #include <string>
 #include <vector>
@@ -67,6 +69,7 @@ namespace Belle2 {
 
       B2INFO("TOPValidationAlgorithm: determine channel T0 residuals");
 
+      auto* h_profile = new TProfile("calPrecision", "calibration precision; slot; residuals [ns]", 16, 0.5, 16.5, -1, 1, "S");
       for (unsigned slot = 0; slot < c_numModules; slot++) {
         string name = "chi2_" + slotNames[slot];
         auto h = getObjectPtr<TH2F>(name);
@@ -83,8 +86,12 @@ namespace Belle2 {
           if (not minimum.valid) continue;
           h0->SetBinContent(ibin, minimum.position);
           h0->SetBinError(ibin, minimum.error);
+          h_profile->Fill(slot + 1, minimum.position);
         }
       }
+      auto* calPrecision = new TOPCalPrecision();
+      calPrecision->set(h_profile);
+      saveCalibration(calPrecision);
 
       // moduleT0, commonT0 and others: get input tree and set branch addresses
 

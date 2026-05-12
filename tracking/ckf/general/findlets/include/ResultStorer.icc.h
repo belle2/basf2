@@ -9,7 +9,7 @@
 
 #include <tracking/ckf/general/findlets/ResultStorer.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -20,18 +20,18 @@ namespace Belle2 {
   template <class AResult>
   void ResultStorer<AResult>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "exportTracks"), m_param_exportTracks,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "exportTracks"), m_param_exportTracks,
                                   "Export the result tracks into a StoreArray.",
                                   m_param_exportTracks);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRecoTrackStoreArrayName"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "outputRecoTrackStoreArrayName"),
                                   m_param_outputRecoTrackStoreArrayName,
                                   "StoreArray name of the output Track Store Array.");
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "outputRelationRecoTrackStoreArrayName"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "outputRelationRecoTrackStoreArrayName"),
                                   m_param_outputRelationRecoTrackStoreArrayName,
                                   "StoreArray name of the tracks, the output reco tracks should be related to.");
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeOutDirection"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "writeOutDirection"),
                                   m_param_writeOutDirectionAsString,
                                   "Write out the relations with the direction of the VXD part as weight");
   }

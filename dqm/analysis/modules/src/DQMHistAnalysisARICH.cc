@@ -242,7 +242,7 @@ void DQMHistAnalysisARICHModule::event()
     if (x < 0.3 || x > 0.35) status = c_StatusError;
     c_theta->Clear();
     c_theta->cd();
-    h_theta->Scale(h_thetaInt->GetEntries() / double(h_theta->GetEntries()));
+    if (h_theta->GetEntries() > 0) h_theta->Scale(h_thetaInt->GetEntries() / double(h_theta->GetEntries()));
     h_thetaInt->Draw();
     h_theta->Draw("same");
     if (m_enableAlert && h_theta->GetEntries() > 10000) colorizeCanvas(c_theta, status);

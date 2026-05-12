@@ -7,75 +7,34 @@
  **************************************************************************/
 
 #include <trg/klm/modules/klmtrigger/KLMTriggerModule.h>
-
-
-#include "trg/klm/modules/klmtrigger/KLMAxis.h"
-
-#include "trg/klm/modules/klmtrigger/klmtrgLayerCounter.h"
+#include <trg/klm/modules/klmtrigger/KLMAxis.h>
+#include <trg/klm/modules/klmtrigger/klmtrgLayerCounter.h>
 #include <trg/klm/modules/klmtrigger/klmtrgLinearFit.h>
-
 #include <trg/klm/modules/klmtrigger/IO_csv.h>
-
-
-#include <klm/bklm/geometry/GeometryPar.h>
-// framework - DataStore
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-
-// event data
-#include <framework/dataobjects/EventMetaData.h>
-
-// digits
-#include <klm/dataobjects/KLMDigit.h>
-
-
 #include <trg/klm/dataobjects/KLMTrgSummary.h>
 #include <trg/klm/dataobjects/KLMTrgFittedTrack.h>
-
-
-
-
-
-
 #include <trg/klm/dbobjects/KLMTriggerParameters.h>
+
+// klm
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/dataobjects/KLMDigit.h>
+
+// framework
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/database/DBObjPtr.h>
 
-
-#include <unordered_map>
-#include <algorithm>
-#include <numeric>
 #include <vector>
-#include <tuple>
-#include <iostream>
-
-//#include <trg/klm/modules/klmtrigger/geometry.h>
-
 
 using namespace std;
 using namespace Belle2;
-
-
-
-
-
-
-
-
-
-using namespace Belle2;
 using namespace Belle2::KLM_TRG_definitions;
 
-
-
 // part of unused old Trigger collection
-const std::string m_klmtrackCollectionName = "TRGKLMTracks";
-const std::string m_klmhitCollectionName = "TRGKLMHits";
+// const std::string m_klmtrackCollectionName = "TRGKLMTracks";
+// const std::string m_klmhitCollectionName = "TRGKLMHits";
 // end
-
-
-
-
-
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -147,18 +106,6 @@ KLMTriggerModule::KLMTriggerModule() : Module()
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void KLMTriggerModule::initialize()
 {
   m_event_nr = 0;
@@ -170,12 +117,8 @@ void KLMTriggerModule::initialize()
   StoreObjPtr<KLMTrgSummary> KLMTrgSummary;
   KLMTrgSummary.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
 
-
-
   StoreArray<KLMTrgFittedTrack> KLMTrgFittedTrack_("KLMTrgFittedTrack");
   KLMTrgFittedTrack_.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-
-
 
   if (!m_dump_Path.empty()) {
     get_IO_csv_handle().dump_path  = m_dump_Path;
@@ -216,9 +159,7 @@ void KLMTriggerModule::beginRun()
       m_klmtrg_layer_counter->add_layersUsed(e);
     }
 
-
     Belle2::KLM_TRG_definitions::KLM_geo_fit_t e{};
-
 
     for (size_t i = 0 ; i < KLMTriggerParameters->getGeometryDataSize() ; ++i) {
       e.subdetector  = KLMTriggerParameters->getSubdetector(i);
@@ -234,8 +175,6 @@ void KLMTriggerModule::beginRun()
 
     }
 
-
-
   } catch (const std::exception& er) {
     B2FATAL(er.what());
   }
@@ -245,17 +184,7 @@ void KLMTriggerModule::beginRun()
 
 void KLMTriggerModule::endRun()
 {
-
-
 }
-
-
-
-
-
-
-
-
 
 template <typename T1, typename T2>
 auto push_linear_fit_to_KLMTrgFittedTrack(T1&& linear_fited,  T2& KLMTrgFittedTrack_)
@@ -277,9 +206,6 @@ auto push_linear_fit_to_KLMTrgFittedTrack(T1&& linear_fited,  T2& KLMTrgFittedTr
   }
 
 }
-
-
-
 
 template <typename T1, typename T2, typename T3>
 auto push_KLMSummary(T1&& m_klmtrg_layer_counter, T2&& m_klm_trig_linear_fit, T3& KLMTrgSummary)
@@ -314,12 +240,6 @@ auto push_KLMSummary(T1&& m_klmtrg_layer_counter, T2&& m_klm_trig_linear_fit, T3
     m_klmtrg_layer_counter->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
   );
 
-
-
-
-
-
-
   KLMTrgSummary->setSector_mask_SLF_Backward_Barrel(
     m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
   );
@@ -334,7 +254,6 @@ auto push_KLMSummary(T1&& m_klmtrg_layer_counter, T2&& m_klm_trig_linear_fit, T3
   KLMTrgSummary->setSector_mask_SLF_Forward_Endcap(
     m_klm_trig_linear_fit->get_triggermask(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
   );
-
 
   KLMTrgSummary->setSector_mask_SLF_OR_Backward_Barrel(
     m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_BKLM, BKLMElementNumbers::c_BackwardSection)
@@ -351,7 +270,6 @@ auto push_KLMSummary(T1&& m_klmtrg_layer_counter, T2&& m_klm_trig_linear_fit, T3
     m_klm_trig_linear_fit->get_triggermask_or(KLMElementNumbers::c_EKLM, EKLMElementNumbers::c_ForwardSection)
   );
 
-
 }
 
 
@@ -365,13 +283,11 @@ void KLMTriggerModule::event()
     StoreObjPtr<KLMTrgSummary> KLMTrgSummary;
     KLMTrgSummary.create();
 
-
     get_IO_csv_handle().event_nr = m_event_nr;
     Belle2::KLM_TRG_definitions::KLM_Digit_compact_t dummy {};
     auto hits = nt::algorithms::fill_vector(klmDigits.getEntries(),
     [&](auto Index) {
       const auto& digit = klmDigits[Index];
-
 
       dummy.event_nr    = m_event_nr;
       dummy.subdetector = digit->getSubdetector();
@@ -386,7 +302,6 @@ void KLMTriggerModule::event()
 
     m_klmtrg_layer_counter->run(hits);
     m_klm_trig_linear_fit->run(hits);
-
 
     push_linear_fit_to_KLMTrgFittedTrack(m_klm_trig_linear_fit->get_result(), KLMTrgFittedTrack_);
 

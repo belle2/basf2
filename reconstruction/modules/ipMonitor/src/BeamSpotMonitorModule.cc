@@ -7,7 +7,6 @@
  **************************************************************************/
 
 #include <reconstruction/modules/ipMonitor/BeamSpotMonitorModule.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <TMatrixDSym.h>

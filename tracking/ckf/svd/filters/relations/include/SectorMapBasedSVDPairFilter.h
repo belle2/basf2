@@ -33,7 +33,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     /// Give a final weight to the possibilities by asking the filter.
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToSVDState*, const CKFToSVDState*>& relation) override;
 
     /// Initialize the sector map
     void beginRun() final;

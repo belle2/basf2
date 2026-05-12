@@ -23,7 +23,7 @@ ProcessStatistics* ProcessStatisticsPython::getWrapped()
   StoreObjPtr<ProcessStatistics> stats("", DataStore::c_Persistent);
   if (!stats) {
     if (!Environment::Instance().getDryRun()) {
-      B2ERROR("ProcessStatistics data object is not available, you either disabled statistics with --no-stats or didn't run process(path) yet.");
+      B2ERROR("ProcessStatistics data object is not available, you either didn't enable statistics with --stats or didn't run process(path) yet.");
     }
     return nullptr;
   }
@@ -34,6 +34,9 @@ string ProcessStatisticsPython::getStatisticsString()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules);
 }
 
@@ -41,6 +44,9 @@ string ProcessStatisticsPython::getStatisticsStringHTML()
 {
   if (!getWrapped())
     return "";
+  if (getWrapped()->getStatisticsPrintStatus(m_type))
+    return "";
+  getWrapped()->setStatisticsPrintStatus(m_type, true);
   return getWrapped()->getStatisticsString(m_type, m_modules.empty() ? nullptr : &m_modules, true);
 }
 

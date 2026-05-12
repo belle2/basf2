@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 TrackLinker::TrackLinker()
 {

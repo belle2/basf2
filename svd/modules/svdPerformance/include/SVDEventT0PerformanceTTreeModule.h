@@ -97,8 +97,8 @@ namespace Belle2 {
     float m_eclEventT0Err       = std::numeric_limits<float>::quiet_NaN(); /**< ECL event T0 Error */
     float m_eclOnlineEventT0    = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 */
     float m_eclOnlineEventT0Err = std::numeric_limits<float>::quiet_NaN(); /**< ECL online event T0 Error */
-    int m_eclTCEmax             = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC Emax  */
-    int m_eclTCid               = std::numeric_limits<int>::quiet_NaN();   /**< ECal TC id  */
+    int m_eclTCEmax             = 0;   /**< ECal TC Emax  */
+    int m_eclTCid               = 0;   /**< ECal TC id  */
     int m_nTracks = 0; /**< number of tracks in the event*/
     int m_svdTB = -1; /**< trigger bin */
     float m_trueEventT0         = std::numeric_limits<float>::quiet_NaN(); /**< true event t0 */

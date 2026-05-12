@@ -35,6 +35,6 @@ main.add_module('PXDdigiFilter', ROIidsName='ROIs', CreateOutside=True, override
 main.add_module('Progress')
 
 # Process events
-b2.process(main)
+b2.process(main, calculateStatistics=True)
 
 print(b2.statistics)

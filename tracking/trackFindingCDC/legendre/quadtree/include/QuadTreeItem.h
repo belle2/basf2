@@ -8,10 +8,11 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-
+  namespace TrackingUtilities {
     class CDCWireHit;
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     /**
      * This class serves as a wrapper around all things that should go into a QuadTree.
@@ -74,24 +75,24 @@ namespace Belle2 {
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    bool QuadTreeItem<const CDCWireHit>::isUsed() const;
+    bool QuadTreeItem<const TrackingUtilities::CDCWireHit>::isUsed() const;
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    void QuadTreeItem<const CDCWireHit>::setUsedFlag(bool usedFlag);
+    void QuadTreeItem<const TrackingUtilities::CDCWireHit>::setUsedFlag(bool usedFlag);
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself
      */
     template<>
-    bool QuadTreeItem<CDCSegment2D>::isUsed() const;
+    bool QuadTreeItem<TrackingUtilities::CDCSegment2D>::isUsed() const;
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself
      */
     template<>
-    void QuadTreeItem<CDCSegment2D>::setUsedFlag(bool usedFlag);
+    void QuadTreeItem<TrackingUtilities::CDCSegment2D>::setUsedFlag(bool usedFlag);
   }
 }

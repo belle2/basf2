@@ -101,7 +101,7 @@ def rec(input, output, topInCounter=False, magneticField=True,
 
     #    main_path.add_module("RootOutput", outputFileName='full.root')
     b2.print_path(main_path)
-    b2.process(main_path)
+    b2.process(main_path, calculateStatistics=True)
     print(b2.statistics)
 
 

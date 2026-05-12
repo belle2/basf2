@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/Product.h>
+#include <tracking/trackingUtilities/utilities/Product.h>
 
 #include <framework/utilities/Utils.h>
 
@@ -43,7 +43,7 @@ namespace Belle2 {
 
     public:
       /// Number of sub boxes produced by this factory facility.
-      static const std::size_t s_nSubBoxes = Product<divisions...>::value;
+      static const std::size_t s_nSubBoxes = TrackingUtilities::Product<divisions...>::value;
 
     private:
       /// Array of the number of divisions for each dimension.

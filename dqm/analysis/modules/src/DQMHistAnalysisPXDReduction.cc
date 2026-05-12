@@ -41,7 +41,7 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   addParam("UpperWarnLimit", m_meanUpperWarn, "Mean Reduction High limit for warning", double(NAN)); // default is NAN =disable
   addParam("UpperErrorLimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms", double(NAN)); // default is NAN =disable
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)", std::vector<int>());
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
@@ -58,7 +58,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better

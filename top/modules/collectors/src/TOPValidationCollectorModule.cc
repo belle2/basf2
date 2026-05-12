@@ -266,7 +266,7 @@ namespace Belle2 {
           h->SetBinContent(channel + 1, ibin + 1, chi);
         }
         double logL = 0;
-        for (auto& LL : pixelLogLs) logL += LL.logL;
+        for (const auto& LL : pixelLogLs) logL += LL.logL;
         finder.add(ibin, -2 * logL);
       }
       m_treeEntry.numTracks++;

@@ -7,11 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentPairCreator.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -21,7 +21,9 @@
 #include <algorithm>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 SegmentPairCreator::SegmentPairCreator()
 {

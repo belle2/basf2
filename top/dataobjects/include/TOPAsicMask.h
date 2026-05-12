@@ -39,7 +39,7 @@ namespace Belle2 {
     const std::vector<unsigned short>& get() const {return m_masks;}
 
     /**
-     * Returns true if channel is not explicitely labeled as masked.
+     * Returns true if channel is not explicitly labeled as masked.
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
      */

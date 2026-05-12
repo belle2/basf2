@@ -97,7 +97,7 @@ namespace Belle2 {
       double timeStep = timeReference->GetBinWidth(1);
       for (unsigned cb = 0; cb < 4; cb++) {
         auto& h_chi = chi2Carriers[cb];
-        auto& h_time = timeCarriers[cb];
+        const auto& h_time = timeCarriers[cb];
         if (not h_time) continue;
         for (int shift = m_shiftBegin; shift < m_shiftEnd; shift++) {
           double chi2 = -2.0 * logL(h_time, shift);
@@ -134,7 +134,7 @@ namespace Belle2 {
         int Ny = time_vs_BS->GetNbinsY();
         int step = Nx / 16;
         if (step * 16 == Nx) {
-          auto* time_vs_BS_corr = (TH2F*) time_vs_BS->Clone("time_vs_BS_corrected");
+          auto* time_vs_BS_corr = static_cast<TH2F*>(time_vs_BS->Clone("time_vs_BS_corrected"));
           int i0 = (Nx / 4) * 3;
           for (int i = i0; i < Nx; i++) {
             int cb = (i - i0) / step;

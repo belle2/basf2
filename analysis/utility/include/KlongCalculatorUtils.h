@@ -51,11 +51,11 @@ namespace Belle2 {
           if (k_check)
             B2FATAL("More than one K_L is detected! This tool accepts only one K_L in the final state.");
 
-          const Belle2::KLMCluster* klm_cluster = daughter->getKLMCluster();
+          const KLMCluster* klm_cluster = daughter->getKLMCluster();
           if (klm_cluster)
             klDaughters = klm_cluster->getMomentum();
           else {
-            const Belle2::ECLCluster* ecl_cluster = daughter->getECLCluster();
+            const ECLCluster* ecl_cluster = daughter->getECLCluster();
             if (ecl_cluster) {
               ClusterUtils clutls;
               klDaughters = clutls.Get4MomentumFromCluster(ecl_cluster, ECLCluster::EHypothesisBit::c_neutralHadron);

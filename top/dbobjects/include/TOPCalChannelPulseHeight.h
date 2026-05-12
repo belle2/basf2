@@ -106,7 +106,7 @@ namespace Belle2 {
      * Returns pulse height parameters for a given slot and channel
      * @param moduleID module ID (1-based)
      * @param channel hardware channel number (0-based)
-     * @return parameters of pulse heigth distribution
+     * @return parameters of pulse height distribution
      */
     const TOPPulseHeightPar& getParameters(int moduleID, unsigned channel) const
     {

@@ -10,9 +10,9 @@
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
@@ -20,7 +20,9 @@
 #include <cmath>
 
 using namespace Belle2;
+using namespace CDC;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Chi2FacetFilter::Chi2FacetFilter()
 // : m_param_chi2CutByISuperLayer{35.0, 130.0, 73.0, 76.0, 76.0, 84.0, 76.0, 100.0, 110.0} // efficiency 0.99 is a bit to loose

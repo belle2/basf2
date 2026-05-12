@@ -19,8 +19,6 @@ import fei.default_channels
 
 import b2bii
 
-# @cond
-
 
 class TestGetDefaultChannels(unittest.TestCase):
     def test_get_default(self):
@@ -208,5 +206,3 @@ if __name__ == '__main__':
     # main() never returns, so install exit handler to do our cleanup
     atexit.register(shutil.rmtree, tempdir)
     unittest.main()
-
-# @endcond

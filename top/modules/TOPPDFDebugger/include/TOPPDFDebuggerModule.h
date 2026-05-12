@@ -34,12 +34,6 @@ namespace Belle2 {
     TOPPDFDebuggerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPPDFDebuggerModule()
-    {}
-
-    /**
      * Initialize the Module.
      *
      * This method is called at the beginning of data processing.

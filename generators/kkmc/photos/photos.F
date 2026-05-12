@@ -89,7 +89,7 @@ C.   PHOPRO   3)               4      var. for photon rep. (in branch)
 C.   PHOCMS   2)               3      parameters of boost to branch CMS
 C.   PHNUM    4)               1      event number from outside         
 C.----------------------------------------------------------------------
-      SUBROUTINE PHOINI
+      SUBROUTINE PHOINI(ISINGLE, IEXPONENTIAL)
 C.----------------------------------------------------------------------
 C.
 C.    PHOTOS:   PHOton radiation in decays INItialisation
@@ -107,6 +107,7 @@ C.                                                Last Update: 12/04/90
 C.
 C.----------------------------------------------------------------------
       IMPLICIT NONE
+      INTEGER ISINGLE,IEXPONENTIAL
       INTEGER INIT,IDUM,IPHQRK,IPHEKL
       SAVE INIT
       DATA INIT/ 0/
@@ -132,7 +133,7 @@ C--   (enables otherwise)
       IDUM= IPHEKL(2)   ! default is 1 
 C--
 C--   Preset parameters in PHOTOS commons
-      CALL PHOCIN
+      CALL PHOCIN(ISINGLE, IEXPONENTIAL)
 C--
 C--   Print info
       CALL PHOINF
@@ -142,7 +143,7 @@ C--   Initialize Marsaglia and Zaman random number generator
       CALL PHORIN
       RETURN
       END
-      SUBROUTINE PHOCIN
+      SUBROUTINE PHOCIN(ISINGLE, IEXPONENTIAL)
 C.----------------------------------------------------------------------
 C.
 C.    PHOTOS:   PHOton Common INitialisation
@@ -182,7 +183,7 @@ C.----------------------------------------------------------------------
       LOGICAL INTERF,ISEC,ITRE,IEXP,IFTOP,IFW
       REAL*8 FINT,FSEC,EXPEPS
       COMMON /PHOKEY/ FSEC,FINT,EXPEPS,INTERF,ISEC,ITRE,IEXP,IFTOP,IFW
-      INTEGER INIT,I
+      INTEGER INIT,I,ISINGLE,IEXPONENTIAL
       SAVE INIT
       DATA INIT/ 0/
 C--
@@ -219,11 +220,16 @@ C--   Interference weight now universal.
 C--   (2)
 C--   Second order - double photon switch
       ISEC=.TRUE.
+      IF (ISINGLE.EQ.1) THEN
+         ISEC=.FALSE.
+         xphcut=10.0/1777.0  *0.5 ! check .5 zbw
+      ENDIF
 C--   Third/fourth order - triple (or quatric) photon switch, 
 C--                        see dipswitch ifour
       ITRE=.FALSE.
 C--   Exponentiation on:
       IEXP=.FALSE. !.TRUE.
+      IF (IEXPONENTIAL==1) IEXP=.TRUE.
       IF (IEXP) THEN
       ISEC=.FALSE.
       ITRE=.FALSE.

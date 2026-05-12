@@ -11,6 +11,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 BaseCandidateReceiver::BaseCandidateReceiver(std::vector<const CDCWireHit*> allAxialWireHits)
   : m_allAxialWireHits(std::move(allAxialWireHits))

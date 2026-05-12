@@ -90,7 +90,7 @@ void CaTestModule::closeRun()
   // convenient than one large binary block.
   auto mille = getObjectPtr<MilleData>("test_mille");
   if (mille->isOpen()) {
-    for (auto& fileName : mille->getFiles()) {
+    for (const auto& fileName : mille->getFiles()) {
       B2DEBUG(100, "Stored Mille binary file: " << fileName);
     }
     mille->close();

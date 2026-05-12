@@ -53,16 +53,16 @@ namespace Belle2 {
 
 
     /** TC Id */
-    int _tcid;       // ID = 1-576
+    int m_tcid;       // ID = 1-576
     /** TC Sub Id*/
-    int _tcsubid;    // ID = 0-1
+    int m_tcsubid;    // ID = 0-1
     /** TC Theta Id*/
-    int _tcthetaid;  // ID = 1-17
+    int m_tcthetaid;  // ID = 1-17
     /** TC Phi Id*/
-    int _tcphiid;    // ID = 1-36(1-32 for both endcap)
+    int m_tcphiid;    // ID = 1-36(1-32 for both endcap)
 
     /** Matrix of the relation of TC and Xtal*/
-    std::vector<std::vector<int>> TC2Xtal;
+    std::vector<std::vector<int>> m_TC2Xtal;
   };
 //
 //

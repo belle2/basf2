@@ -9,20 +9,21 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialStraightTrackCreator.h>
 
 #include <mdst/dataobjects/ECLCluster.h>
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 AxialStraightTrackCreator::AxialStraightTrackCreator() = default;
 

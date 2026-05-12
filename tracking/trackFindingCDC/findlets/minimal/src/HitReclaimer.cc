@@ -7,10 +7,11 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/findlets/minimal/HitReclaimer.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 HitReclaimer::HitReclaimer() = default;
 

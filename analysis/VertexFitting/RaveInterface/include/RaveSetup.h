@@ -8,9 +8,6 @@
 
 #pragma once
 
-//std
-#include <string>
-
 #include <framework/logging/Logger.h>
 
 //root

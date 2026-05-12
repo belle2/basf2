@@ -9,15 +9,16 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string SegmentFitter::getDescription()
 {
@@ -122,7 +123,7 @@ void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
         ERightLeft rlInfo = trajectory2D.isRightOrLeft(recoHit2D.getRefPos2D());
         if (rlInfo != recoHit2D.getRLInfo()) ++nRLChanges;
         recoHit2D.setRLInfo(rlInfo);
-        const CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
+        const TrackingUtilities::CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
         Vector2D recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
         recoHit2D.setRecoPos2D(recoPos2D);
       }

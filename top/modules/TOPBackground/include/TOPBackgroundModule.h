@@ -20,9 +20,9 @@
 
 
 namespace Belle2 {
-  //! TOP backgound module.
+  //! TOP background module.
   /*
-   * This module analyses the data for beam backgound studies
+   * This module analyses the data for beam background studies
    */
   class TOPBackgroundModule : public Module {
 
@@ -31,9 +31,6 @@ namespace Belle2 {
 
     //! Constructor.
     TOPBackgroundModule();
-
-    //! Destructor.
-    virtual ~TOPBackgroundModule();
 
     /**
      * Initialize the Module.
@@ -69,11 +66,6 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     virtual void terminate() override;
-
-    /**
-     *Prints module parameters.
-     */
-    void printModuleParams() const;
 
     /**
      *Print histogram 1D, helper function.

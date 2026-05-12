@@ -17,7 +17,8 @@ from caf import strategies
 # ..Tell the automated script some required details
 settings = CalibrationSettings(
     name="ecl_autocovariance",
-    expert_username="longos",
+    expert_username="savino.longo",
+    subsystem="ecl",
     description=__doc__,
     input_data_formats=["raw"],
     input_data_names=["delayedbhabha_calib"],
@@ -31,7 +32,8 @@ settings = CalibrationSettings(
     expert_config={
         "C1_lowestEnergyFraction": 0.75,
         "C1_TotalCountsThreshold": 10000
-    })
+    },
+    produced_payloads=["ECLAutoCovariance"])
 
 
 # --------------------------------------------------------------

@@ -9,15 +9,16 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/OffOriginExtension.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 using EPass = AxialTrackCreatorHitLegendre::EPass;
 std::unique_ptr<AxialHitQuadTreeProcessor> AxialTrackCreatorHitLegendre::constructQTProcessor(EPass pass)
@@ -96,13 +97,13 @@ void AxialTrackCreatorHitLegendre::initialize()
   Super::initialize();
 }
 
-void AxialTrackCreatorHitLegendre::apply(const std::vector<const CDCWireHit*>& axialWireHits,
-                                         std::vector<CDCTrack>& tracks)
+void AxialTrackCreatorHitLegendre::apply(const std::vector<const TrackingUtilities::CDCWireHit*>& axialWireHits,
+                                         std::vector<TrackingUtilities::CDCTrack>& tracks)
 {
   // Prepare vector of unused hits to provide to the qt processor
   // Also reset the mask flag and select only the untaken hits
-  std::vector<const CDCWireHit*> unusedAxialWireHits;
-  for (const CDCWireHit* wireHit : axialWireHits) {
+  std::vector<const TrackingUtilities::CDCWireHit*> unusedAxialWireHits;
+  for (const TrackingUtilities::CDCWireHit* wireHit : axialWireHits) {
     (*wireHit)->setMaskedFlag(false);
     if ((*wireHit)->hasTakenFlag()) continue;
     unusedAxialWireHits.push_back(wireHit);

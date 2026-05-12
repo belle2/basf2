@@ -9,14 +9,14 @@
 
 #include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   /// Return the size of the path
   class SizeCDCPathFilter : public BaseCDCPathFilter {
   public:
     /// Main function: return the size of the path
-    TrackFindingCDC::Weight operator()(const BaseCDCPathFilter::Object& path) final
+    TrackingUtilities::Weight operator()(const BaseCDCPathFilter::Object& path) final
     {
       return path.size();
     }

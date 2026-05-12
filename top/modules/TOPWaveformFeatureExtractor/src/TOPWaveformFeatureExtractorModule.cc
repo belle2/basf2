@@ -59,20 +59,12 @@ namespace Belle2 {
 
   }
 
-  TOPWaveformFeatureExtractorModule::~TOPWaveformFeatureExtractorModule()
-  {
-  }
-
   void TOPWaveformFeatureExtractorModule::initialize()
   {
 
     StoreArray<TOPRawDigit> rawDigits(m_inputRawDigitsName);
     rawDigits.isRequired();
 
-  }
-
-  void TOPWaveformFeatureExtractorModule::beginRun()
-  {
   }
 
   void TOPWaveformFeatureExtractorModule::event()
@@ -120,27 +112,17 @@ namespace Belle2 {
         newDigit->setValuePeak(feature.vPeak);
         newDigit->setIntegral(feature.integral);
         double rawTime = newDigit->getCFDLeadingTime();
-        unsigned tfine = int(rawTime * sampleDivisions) % sampleDivisions; // TODO: <0 ?
+        int tfine = int(rawTime * sampleDivisions) % sampleDivisions;
+        if (tfine < 0) tfine += sampleDivisions;
         newDigit->setTFine(tfine);
         newDigit->addRelationTo(waveform);
       }
     }
 
-    int finalSize = rawDigits.getEntries();
-    B2DEBUG(20, "TOPWaveformFeatureExtractor: appended " << finalSize - initSize
+    B2DEBUG(20, "TOPWaveformFeatureExtractor: appended " << rawDigits.getEntries() - initSize
             << " raw digits to initial " << initSize);
 
   }
-
-
-  void TOPWaveformFeatureExtractorModule::endRun()
-  {
-  }
-
-  void TOPWaveformFeatureExtractorModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

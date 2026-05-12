@@ -18,8 +18,8 @@ using namespace Belle2;
 
 TrgEclDataBase::TrgEclDataBase()
 {
-  _AmpCoefficient.clear();
-  _TimingCoefficient.clear();
+  m_AmpCoefficient.clear();
+  m_TimingCoefficient.clear();
 
 
 }
@@ -111,8 +111,8 @@ void TrgEclDataBase::MakeFitterCoefficient(const std::vector<int>& SignalPDF, st
   // double dgg1[20] = {0};
   double dgg2[20] = {0};
 
-  _AmpCoefficient.resize(12, std::vector<int>(10, 0));
-  _TimingCoefficient.resize(12, std::vector<int>(10, 0));
+  m_AmpCoefficient.resize(12, std::vector<int>(10, 0));
+  m_TimingCoefficient.resize(12, std::vector<int>(10, 0));
 
   std::vector<std::vector<double>> fg31;
   std::vector<std::vector<double>> fg32;
@@ -208,8 +208,8 @@ void TrgEclDataBase::MakeFitterCoefficient(const std::vector<int>& SignalPDF, st
     for (int iii = 0; iii < NFitBin; iii++) {
       // int_f0[iii][kkk]   = int (f0[iii][kkk]*LutIntOffset);
       // int_f1[iii][kkk]   = int (f1[iii][kkk]*LutIntOffset);
-      _AmpCoefficient[iii][kkk] = int (fg31[iii][kkk] * LutIntOffset);
-      _TimingCoefficient[iii][kkk] = int (fg32[iii][kkk] * LutIntOffset);
+      m_AmpCoefficient[iii][kkk] = int (fg31[iii][kkk] * LutIntOffset);
+      m_TimingCoefficient[iii][kkk] = int (fg32[iii][kkk] * LutIntOffset);
       //      int_fg33[iii][kkk] = int (fg33[iii][kkk]*LutIntOffset);
     }
   }
@@ -221,7 +221,7 @@ void TrgEclDataBase::MakeFitterCoefficient(const std::vector<int>& SignalPDF, st
 
 
 
-double TrgEclDataBase::GetTCFLatency(int TCId)
+double TrgEclDataBase::getTCFLatency(int TCId)
 {
 
   //----------------------------------------------------------
@@ -524,7 +524,7 @@ void TrgEclDataBase:: readNoiseLMatrix(std::vector<std::vector<double>>& MatrixP
 
 
 
-double TrgEclDataBase::GetCMPhi(int tcid)
+double TrgEclDataBase::getCMPhi(int tcid)
 {
 
 
@@ -539,7 +539,7 @@ double TrgEclDataBase::GetCMPhi(int tcid)
 }
 
 
-double TrgEclDataBase::GetCMTheta(int tcid)
+double TrgEclDataBase::getCMTheta(int tcid)
 {
 
   int index = tcid - 1;
@@ -555,7 +555,7 @@ double TrgEclDataBase::GetCMTheta(int tcid)
 //
 //
 //
-double TrgEclDataBase::GetCMEnergy(int tcid)
+double TrgEclDataBase::getCMEnergy(int tcid)
 {
 
   int index = tcid - 1;
@@ -568,7 +568,7 @@ double TrgEclDataBase::GetCMEnergy(int tcid)
 
 }
 
-int TrgEclDataBase::Get3DBhabhaLUT(int tcid)
+int TrgEclDataBase::get3DBhabhaLUT(int tcid)
 {
 
   const std::vector<int> BhabhaLUT  = {0, 147805, 221373, 286893, 287085, 221565, 148205, 221773,

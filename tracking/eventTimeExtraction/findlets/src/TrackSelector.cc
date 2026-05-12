@@ -6,13 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/eventTimeExtraction/findlets/TrackSelector.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;;
 
 void TrackSelector::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
@@ -30,7 +30,7 @@ void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
     return (rt->getNumberOfCDCHits() < m_param_minNumberCDCHits) or
            (rt->getMomentumSeed().Rho() < m_param_minimumTrackPt);
   };
-  TrackFindingCDC::erase_remove_if(tracks, trackHasEnoughPtAndHits);
+  TrackingUtilities::erase_remove_if(tracks, trackHasEnoughPtAndHits);
 
   // this lambda will sort in reverse order, meaning the tracks with the most CDC hits first
   const auto greaterHits = [](RecoTrack * lhs, RecoTrack * rhs) {

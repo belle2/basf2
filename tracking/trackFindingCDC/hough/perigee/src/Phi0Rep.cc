@@ -6,11 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/numerics/LookupTable.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Phi0BinsSpec::Phi0BinsSpec(long nBins, int nOverlap, int nWidth)
   : m_nBins(nBins)

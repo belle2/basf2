@@ -25,33 +25,33 @@ using namespace Belle2;
 //
 //
 //
-TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), EventId(0) //, bin(0)
+TrgEclFAMFit::TrgEclFAMFit(): m_BeamBkgTag(0), m_AnaTag(0), m_EventId(0) //, bin(0)
 {
 
-  CoeffSigPDF0.clear();
-  CoeffSigPDF1.clear();
-  CoeffNoise31.clear();
-  CoeffNoise32.clear();
-  CoeffNoise33.clear();
+  m_CoeffSigPDF0.clear();
+  m_CoeffSigPDF1.clear();
+  m_CoeffNoise31.clear();
+  m_CoeffNoise32.clear();
+  m_CoeffNoise33.clear();
 
-  _TCMap = new TrgEclMapping();
-  _DataBase = new TrgEclDataBase();
+  m_TCMap = new TrgEclMapping();
+  m_DataBase = new TrgEclDataBase();
 
-  Threshold.clear();
+  m_TCEThreshold.clear();
 
-  TCFitEnergy.clear();
-  TCFitTiming.clear();
-  TCRawEnergy.clear();
-  TCRawTiming.clear();
-  BeamBkgTag.clear();
-  TCLatency.clear();
+  m_TCFitEnergy.clear();
+  m_TCFitTiming.clear();
+  m_TCRawEnergy.clear();
+  m_TCRawTiming.clear();
+  m_BeamBkgInfo.clear();
+  m_TCLatency.clear();
 
-  Threshold.resize(576, 100.0);
-  TCFitEnergy.resize(576);
-  TCFitTiming.resize(576);
-  TCRawEnergy.resize(576);
-  TCRawTiming.resize(576);
-  BeamBkgTag.resize(576);
+  m_TCEThreshold.resize(576, 100.0);
+  m_TCFitEnergy.resize(576);
+  m_TCFitTiming.resize(576);
+  m_TCRawEnergy.resize(576);
+  m_TCRawTiming.resize(576);
+  m_BeamBkgInfo.resize(576);
 }
 //
 //
@@ -59,8 +59,8 @@ TrgEclFAMFit::TrgEclFAMFit(): _BeamBkgTag(0), _AnaTag(0), EventId(0) //, bin(0)
 TrgEclFAMFit::~TrgEclFAMFit()
 {
 
-  delete _TCMap;
-  delete _DataBase;
+  delete m_TCMap;
+  delete m_DataBase;
 }
 //
 //
@@ -73,16 +73,17 @@ TrgEclFAMFit::setup(int eventId)
   // prepare coefficient for fitting
   //
 
-  _DataBase -> getCoeffSigPDF(CoeffSigPDF0,  CoeffSigPDF1);
-  _DataBase -> getCoeffNoise(0,  CoeffNoise31, CoeffNoise32, CoeffNoise33);
+  m_DataBase->getCoeffSigPDF(m_CoeffSigPDF0,  m_CoeffSigPDF1);
+  m_DataBase->getCoeffNoise(0,  m_CoeffNoise31, m_CoeffNoise32, m_CoeffNoise33);
 
-  EventId = eventId;
+  m_EventId = eventId;
   //
   return;
 }
 
 void
-TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<std::vector<double>> digiTiming)
+TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
+                       std::vector<std::vector<double>> digiTiming)
 {
   //============================
   // In this function,
@@ -107,9 +108,9 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   int Nsmalldt = 10;
   int SmallOffset = 1;
   double IntervaldT  = 125 * 0.001 / Nsmalldt;
-  //  double EThreshold = _Threshold; //[MeV]
+  //  double EThreshold = m_Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
-  int FitSleepThreshold = 2;   // # of clk to suspend fit
+  int FitSleepThreshold = 12;   // # of clk to suspend fit
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
@@ -139,8 +140,8 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
       CoeffAAA = 0;
       CoeffBBB = 0;
       for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
-        CoeffAAA += CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
-        CoeffBBB += CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
+        CoeffAAA += m_CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
+        CoeffBBB += m_CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       }
       double deltaT = CoeffBBB / CoeffAAA; // deltaT [us]
 
@@ -153,23 +154,29 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
       //-------
       double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > Threshold[iTCIdm]) {
-        double fitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
+      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > m_TCEThreshold[iTCIdm]) {
+        double fitT =
+          condition_t +
+          (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
 
         pedFlag = 1;
-        double rand_sampling_correction = digiTiming[iTCIdm][iShift] + (nbin_pedestal - iShift + 32) * fam_sampling_interval;
+        double rand_sampling_correction =
+          digiTiming[iTCIdm][iShift] +
+          (nbin_pedestal - iShift + 32) * fam_sampling_interval;
 
-        TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
-        TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 + (_DataBase->GetTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
+        m_TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
+        m_TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 +
+                                        (m_DataBase->getTCFLatency(iTCIdm + 1)) +
+                                        rand_sampling_correction);
         FitSleepCounter = 0;
         ShiftdTBin = 0;
 
       }
     }
   }
-  if (_BeamBkgTag == 1 || _AnaTag == 1) {
-    SetBeamBkgTag();
+  if (m_BeamBkgTag == 1 || m_AnaTag == 1) {
+    setBeamBkgTag();
   }
   //
   //
@@ -182,7 +189,8 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
 //
 //
 void
-TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std::vector<double>> TCDigiT)
+TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
+                       std::vector<std::vector<double>> TCDigiT)
 {
 
   int NSampling = 64;
@@ -197,7 +205,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     int noutput = 0;
 
-    //    double threshold = _Threshold * 0.001; //GeV
+    //    double threshold = m_Threshold * 0.001; //GeV
     int maxId[500] = {0};
     for (int iii = 0 ; iii < 500 ; iii++) {
 
@@ -224,7 +232,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
         count_down++;
         if (count_down >= flag_down) {
           if (count_up >= flag_up) {
-            if (Threshold[iTCIdm] * 0.001 < max) {
+            if (m_TCEThreshold[iTCIdm] * 0.001 < max) {
               max = 0;
               count_up = 0;
               count_down = 0;
@@ -240,7 +248,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
               }
               if (NoiseCount != 0) { NoiseLevel /= NoiseCount; }
               //** Peak point is the Energy */
-              TCFitEnergy[iTCIdm].push_back(TCDigiE[iTCIdm][maxId[noutput]] - NoiseLevel);
+              m_TCFitEnergy[iTCIdm].push_back(TCDigiE[iTCIdm][maxId[noutput]] - NoiseLevel);
               if (!(maxId[noutput] - 1)) {
                 for (int jSampling = 1; jSampling < maxId[noutput] + 3; jSampling++) {
                   TCDigiE[iTCIdm][jSampling] -= NoiseLevel;
@@ -253,23 +261,23 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
               //@ Search T_a ID
               for (int iSearch = 0; iSearch < 5; iSearch++) {
 
-                if (TCDigiE[iTCIdm][maxId[noutput] - iSearch]  > 0.6 * TCFitEnergy[iTCIdm][noutput] &&
-                    TCDigiE[iTCIdm][maxId[noutput] - iSearch - 1] < 0.6 * TCFitEnergy[iTCIdm][noutput]) {
+                if (TCDigiE[iTCIdm][maxId[noutput] - iSearch]  > 0.6 * m_TCFitEnergy[iTCIdm][noutput] &&
+                    TCDigiE[iTCIdm][maxId[noutput] - iSearch - 1] < 0.6 * m_TCFitEnergy[iTCIdm][noutput]) {
                   ta_id[noutput] = maxId[noutput] - iSearch - 1;
                 }
               }
 
               //@ Estimate timing of t0
               if (ta_id[noutput] == 1000) {
-                printf("TrgEclFAMFit::digi02> Cannot find TC Timing (TCId=%5i, E=%8.5f)!!!\n", iTCIdm - 1, TCFitEnergy[iTCIdm][0]);
+                printf("TrgEclFAMFit::digi02> Cannot find TC Timing (TCId=%5i, E=%8.5f)!!!\n", iTCIdm - 1, m_TCFitEnergy[iTCIdm][0]);
                 B2ERROR("TrgEclFAMFit::digi02> Cannot find TC Timing");
               } else {
                 ttt_a[noutput] = TCDigiT[iTCIdm][ta_id[noutput]];
                 ttt_b[noutput] = TCDigiT[iTCIdm][ta_id[noutput] + 1];
-                TCFitTiming[iTCIdm].push_back((ttt_a[noutput] +
-                                               (0.6 * TCFitEnergy[iTCIdm][noutput] - TCDigiE[iTCIdm][ta_id[noutput]]) * (ttt_b[noutput] -
-                                                   ttt_a[noutput])
-                                               / (TCDigiE[iTCIdm][ta_id[noutput] + 1] - TCDigiE[iTCIdm][ta_id[noutput]])) - (278.7 + 2) + (_DataBase->GetTCFLatency(iTCIdm + 1)));
+                m_TCFitTiming[iTCIdm].push_back((ttt_a[noutput] +
+                                                 (0.6 * m_TCFitEnergy[iTCIdm][noutput] - TCDigiE[iTCIdm][ta_id[noutput]]) * (ttt_b[noutput] -
+                                                     ttt_a[noutput])
+                                                 / (TCDigiE[iTCIdm][ta_id[noutput] + 1] - TCDigiE[iTCIdm][ta_id[noutput]])) - (278.7 + 2) + (m_DataBase->getTCFLatency(iTCIdm + 1)));
                 //@ time between t0 and 0.6*peak_energy
                 //@ Alex's number = 274.4 (how he got this value ?)
                 //@ by my check = 278.7 [ns]
@@ -282,8 +290,8 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
       }
     }
   }
-  if (_BeamBkgTag == 1 || _AnaTag == 1) {
-    SetBeamBkgTag();
+  if (m_BeamBkgTag == 1 || m_AnaTag == 1) {
+    setBeamBkgTag();
   }
 
   //
@@ -296,7 +304,8 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE, std::vector<std
 //
 //
 void
-TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vector<std::vector<double>> TCDigiTiming)
+TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy,
+                       std::vector<std::vector<double>> TCDigiTiming)
 {
   //===============
   // (03)Signal digitization (w/ 12ns interval for method-0)
@@ -310,7 +319,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
   // (03)Peak search
   //==================
   float max_shape_time = 563.48; // [ns], time between peak of PDF and t0.
-  //  double threshold = _Threshold * 0.001; //GeV
+  //  double threshold = m_Threshold * 0.001; //GeV
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
     int noutput = 0;
     int maxId[500] = {0};
@@ -331,7 +340,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
         count_down++;
         if (count_down >= flag_down) {
           if (count_up >= flag_up) {
-            if (Threshold[iTCIdm] * 0.001 < max) {
+            if (m_TCEThreshold[iTCIdm] * 0.001 < max) {
               max = 0;
               count_up = 0;
               count_down = 0;
@@ -346,8 +355,8 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
                 }
               }
               if (NoiseCount != 0) { NoiseLevel /= NoiseCount; }
-              TCFitEnergy[iTCIdm].push_back(TCDigiEnergy[iTCIdm][maxId[noutput]] - NoiseLevel);
-              TCFitTiming[iTCIdm].push_back(TCDigiTiming[iTCIdm][maxId[noutput]] - max_shape_time + (_DataBase->GetTCFLatency(iTCIdm)));
+              m_TCFitEnergy[iTCIdm].push_back(TCDigiEnergy[iTCIdm][maxId[noutput]] - NoiseLevel);
+              m_TCFitTiming[iTCIdm].push_back(TCDigiTiming[iTCIdm][maxId[noutput]] - max_shape_time + (m_DataBase->getTCFLatency(iTCIdm)));
               noutput++;
             }
           }
@@ -356,8 +365,8 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
     }
   }
 
-  if (_BeamBkgTag == 1 || _AnaTag == 1) {
-    SetBeamBkgTag();
+  if (m_BeamBkgTag == 1 || m_AnaTag == 1) {
+    setBeamBkgTag();
   }
 
 
@@ -367,7 +376,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy, std::vecto
 //
 //
 void
-TrgEclFAMFit::SetBeamBkgTag()
+TrgEclFAMFit::setBeamBkgTag()
 {
   std::vector<int> TCId;
   std::vector<double> RawTCTiming;
@@ -378,17 +387,17 @@ TrgEclFAMFit::SetBeamBkgTag()
   RawTCTiming.clear();
   RawTCEnergy.clear();
   // BeamBkgTag.resize(576  ,std::vector<int> (size,100));
-  // TCRawEnergy.resize(576,std::vector<double>(size,0.));
-  // TCRawTiming.resize(576,std::vector<double>(size,0.));
-  BeamBkgTag.resize(576);
-  TCRawEnergy.resize(576);
-  TCRawTiming.resize(576);
+  // m_TCRawEnergy.resize(576,std::vector<double>(size,0.));
+  // m_TCRawTiming.resize(576,std::vector<double>(size,0.));
+  m_BeamBkgInfo.resize(576);
+  m_TCRawEnergy.resize(576);
+  m_TCRawTiming.resize(576);
 
   StoreArray<TRGECLDigi0> trgeclDigiArray;
   for (int ii = 0; ii < trgeclDigiArray.getEntries(); ii++) {
     TRGECLDigi0* aTRGECLDigi = trgeclDigiArray[ii];
     int eventid = aTRGECLDigi->getEventId();
-    if (EventId != eventid) {continue;}
+    if (m_EventId != eventid) {continue;}
     TCId.push_back(aTRGECLDigi->getTCId());
     RawTCTiming.push_back(aTRGECLDigi -> getRawTiming());
     RawTCEnergy.push_back(aTRGECLDigi -> getRawEnergy());
@@ -396,16 +405,16 @@ TrgEclFAMFit::SetBeamBkgTag()
   }
 
   for (int iTCId = 0; iTCId < 576 ; iTCId ++) {
-    const int hitsize = TCFitEnergy[iTCId].size();
+    const int hitsize = m_TCFitEnergy[iTCId].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       const int rawsize = TCId.size();
       for (int iDigi = 0; iDigi < rawsize; iDigi++) {
         if (TCId[iDigi] != (iTCId + 1)) {continue;}
-        if (abs(TCFitEnergy[iTCId][iHit] - RawTCEnergy[iDigi]) < 12) {
-          if (abs(TCFitTiming[iTCId][iHit] - RawTCTiming[iDigi]) < 30) {
-            BeamBkgTag[iTCId].push_back(RawBeamBkgTag[iDigi]);
-            TCRawEnergy[iTCId].push_back(RawTCEnergy[iDigi]);
-            TCRawTiming[iTCId].push_back(RawTCTiming[iDigi]);
+        if (abs(m_TCFitEnergy[iTCId][iHit] - RawTCEnergy[iDigi]) < 12) {
+          if (abs(m_TCFitTiming[iTCId][iHit] - RawTCTiming[iDigi]) < 30) {
+            m_BeamBkgInfo[iTCId].push_back(RawBeamBkgTag[iDigi]);
+            m_TCRawEnergy[iTCId].push_back(RawTCEnergy[iDigi]);
+            m_TCRawTiming[iTCId].push_back(RawTCTiming[iDigi]);
           }
         }
       }
@@ -417,7 +426,7 @@ TrgEclFAMFit::SetBeamBkgTag()
 //
 //
 void
-TrgEclFAMFit::save(int m_nEvent)
+TrgEclFAMFit::save(int eventid)
 {
   //---------------
   // Root Output
@@ -428,44 +437,44 @@ TrgEclFAMFit::save(int m_nEvent)
   double tc_timing_correction = -15;
 
   for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
-    const int hitsize = TCFitEnergy[iTCIdm].size();
+    const int hitsize = m_TCFitEnergy[iTCIdm].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       StoreArray<TRGECLHit> TrgEclHitArray;
       TrgEclHitArray.appendNew();
       hitNum = TrgEclHitArray.getEntries() - 1;
-      TrgEclHitArray[hitNum]->setEventId(m_nEvent);
+      TrgEclHitArray[hitNum]->setEventId(eventid);
       TrgEclHitArray[hitNum]->setTCId(iTCIdm + 1);
-      TrgEclHitArray[hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][iHit]);
-      TrgEclHitArray[hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
-      if (_BeamBkgTag == 1) {
-        TrgEclHitArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
+      TrgEclHitArray[hitNum]->setEnergyDep(m_TCFitEnergy[iTCIdm][iHit]);
+      TrgEclHitArray[hitNum]->setTimeAve(m_TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
+      if (m_BeamBkgTag == 1) {
+        TrgEclHitArray[hitNum]->setBeamBkgTag(m_BeamBkgInfo[iTCIdm][iHit]);
       }
     }
   }
 
-  if (_AnaTag == 1) {
+  if (m_AnaTag == 1) {
     for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
-      if (TCFitEnergy[iTCIdm].size() != TCRawEnergy[iTCIdm].size()) {continue;}
-      const int hitsize = TCFitEnergy[iTCIdm].size();
+      if (m_TCFitEnergy[iTCIdm].size() != m_TCRawEnergy[iTCIdm].size()) {continue;}
+      const int hitsize = m_TCFitEnergy[iTCIdm].size();
       for (int iHit = 0; iHit < hitsize; iHit++) {
         StoreArray<TRGECLFAMAna> TrgEclAnaArray;
         TrgEclAnaArray.appendNew();
         hitNum = TrgEclAnaArray.getEntries() - 1;
-        TrgEclAnaArray[hitNum]->setEventId(m_nEvent);
+        TrgEclAnaArray[hitNum]->setEventId(eventid);
         TrgEclAnaArray[hitNum]->setTCId(iTCIdm + 1);
-        TrgEclAnaArray[hitNum]->setPhiId(_TCMap->getTCPhiIdFromTCId(iTCIdm + 1));
-        TrgEclAnaArray[hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm + 1));
-        TrgEclAnaArray[hitNum]->setRawEnergy(TCRawEnergy[iTCIdm][iHit]);
-        TrgEclAnaArray[hitNum]->setRawTiming(TCRawTiming[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setPhiId(m_TCMap->getTCPhiIdFromTCId(iTCIdm + 1));
+        TrgEclAnaArray[hitNum]->setThetaId(m_TCMap->getTCThetaIdFromTCId(iTCIdm + 1));
+        TrgEclAnaArray[hitNum]->setRawEnergy(m_TCRawEnergy[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setRawTiming(m_TCRawTiming[iTCIdm][iHit]);
 
-        //        TrgEclAnaArray[hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][iHit]);
+        //        TrgEclAnaArray[hitNum]->setFitEnergy(m_TCFitEnergy[iTCIdm][iHit]);
         int p_ene2adc = 525;
-        int ene_i0 = (int)(TCFitEnergy[iTCIdm][iHit] * 100000.0 / p_ene2adc);
+        int ene_i0 = (int)(m_TCFitEnergy[iTCIdm][iHit] * 100000.0 / p_ene2adc);
         double ene_d = (double) ene_i0 * p_ene2adc /  100000;
         TrgEclAnaArray[hitNum]->setFitEnergy(ene_d);
 
-        TrgEclAnaArray[hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
-        TrgEclAnaArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setFitTiming(m_TCFitTiming[iTCIdm][iHit] + tc_timing_correction);
+        TrgEclAnaArray[hitNum]->setBeamBkgTag(m_BeamBkgInfo[iTCIdm][iHit]);
       }
     }
   }

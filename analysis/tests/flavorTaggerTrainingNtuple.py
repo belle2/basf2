@@ -74,7 +74,7 @@ ntuple.param('fileName', methodPrefixEventLevel + "sampled0.root")
 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
 
 # Call variable aliases from flavor tagger
-ft.set_FlavorTagger_pid_aliases()
+ft.utils.set_FT_pid_aliases()
 
 variablesToBeSaved = ['useCMSFrame(p)',
                       'useCMSFrame(pt)',

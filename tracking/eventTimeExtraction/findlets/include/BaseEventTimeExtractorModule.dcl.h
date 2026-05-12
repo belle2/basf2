@@ -7,22 +7,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/eventTimeExtraction/findlets/TrackSelector.h>
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
-#include <tracking/trackFindingCDC/findlets/wrapper/FindletStoreArrayInput.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/wrapper/FindletStoreArrayInput.h>
 
 namespace Belle2 {
   class RecoTrack;
 
   /// Base class for most of the time extraction modules doing a track selection beforehand.
   template<class AFindlet>
-  class BaseEventTimeExtractorModuleFindlet final : public TrackFindingCDC::Findlet<RecoTrack*> {
+  class BaseEventTimeExtractorModuleFindlet final : public TrackingUtilities::Findlet<RecoTrack*> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::Findlet<RecoTrack*>;
+    using Super = TrackingUtilities::Findlet<RecoTrack*>;
 
   public:
     /// Add the subfindlet as listener
@@ -43,6 +43,6 @@ namespace Belle2 {
 
   /// Alias for the event time extraction module
   template <class AFindlet>
-  using EventTimeExtractorModule = TrackFindingCDC::FindletModule <
-                                   TrackFindingCDC::FindletStoreArrayInput<BaseEventTimeExtractorModuleFindlet<AFindlet> >>;
+  using EventTimeExtractorModule = TrackingUtilities::FindletModule <
+                                   TrackingUtilities::FindletStoreArrayInput<BaseEventTimeExtractorModuleFindlet<AFindlet> >>;
 }

@@ -22,9 +22,6 @@
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/SphericityEigenvalues.h>
 
-#include <Math/Vector4D.h>
-
-
 using namespace std;
 using namespace Belle2;
 
@@ -251,7 +248,7 @@ int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNa
 
       if (m_checkForDuplicates) {
 
-        std::vector<const Belle2::Particle*> finalStateDaughters = part->getFinalStateDaughters();
+        std::vector<const Particle*> finalStateDaughters = part->getFinalStateDaughters();
 
         for (const auto fsp : finalStateDaughters) {
           int mdstSource = fsp->getMdstSource();

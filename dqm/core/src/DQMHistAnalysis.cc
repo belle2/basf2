@@ -290,7 +290,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
   return nullptr;
 }
 
-double DQMHistAnalysisModule::getSigma68(TH1* h) const
+double DQMHistAnalysisModule::getSigma68(TH1* h)
 {
   double probs[2] = {0.16, 1 - 0.16};
   double quant[2] = {0, 0};
@@ -315,7 +315,7 @@ void DQMHistAnalysisModule::clearCanvases(void)
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
       cnv->Clear();
-      colorizeCanvas(cnv, c_StatusDefault);
+      DQMHistAnalysisModule::colorizeCanvas(cnv, c_StatusDefault);
     }
   }
 }
@@ -351,7 +351,7 @@ void DQMHistAnalysisModule::resetDeltaList(void)
   }
 }
 
-void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(const std::string& name, bool updated)
 {
   s_canvasUpdatedList[name] = updated;
 }
@@ -385,17 +385,18 @@ void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerExternalEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(const std::string& prefix, const std::string& pvname,
+                                                     const std::string& keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -422,7 +423,7 @@ int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::st
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, double value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -434,7 +435,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -446,7 +447,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string value)
+void DQMHistAnalysisModule::setEpicsStringPV(const std::string& keyname, const std::string& value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -503,7 +504,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
 #endif
 }
 
-double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
+double DQMHistAnalysisModule::getEpicsPV(const std::string& keyname)
 {
   double value{NAN};
   if (!m_useEpics) return value;
@@ -549,7 +550,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   return NAN;
 }
 
-std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
+std::string DQMHistAnalysisModule::getEpicsStringPV(const std::string& keyname, bool& status)
 {
   status = false;
   char value[40] = "";
@@ -587,7 +588,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
+  auto r = ca_get(DBR_STRING, m_epicsChID[index], value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     status = true;
@@ -599,7 +600,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
   return std::string(value);
 }
 
-chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
+chid DQMHistAnalysisModule::getEpicsPVChID(const std::string& keyname)
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
@@ -654,8 +655,8 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
 #endif
 }
 
-bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn,
-                                                      double& upperAlarm)
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(const std::string& name, double& lowerAlarm, double& lowerWarn,
+                                                      double& upperWarn, double& upperAlarm)
 {
   return requestLimitsFromEpicsPVs(getEpicsPVChID(name), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
 }
@@ -749,7 +750,7 @@ DQMHistAnalysisModule::EStatusColor DQMHistAnalysisModule::getStatusColor(EStatu
 void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 {
   if (!canvas) return;
-  auto color = getStatusColor(stat);
+  auto color = DQMHistAnalysisModule::getStatusColor(stat);
 
   canvas->Pad()->SetFillColor(color);
 
@@ -763,7 +764,7 @@ void DQMHistAnalysisModule::checkPVStatus(void)
 {
   B2INFO("Check PV Connections");
 
-  for (auto& it : m_epicsChID) {
+  for (const auto& it : m_epicsChID) {
     printPVStatus(it);
   }
   B2INFO("Check PVs done");

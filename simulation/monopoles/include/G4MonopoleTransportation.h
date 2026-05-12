@@ -14,16 +14,16 @@
 
 #include <G4VProcess.hh>
 #include <G4FieldManager.hh>
-#include <G4Navigator.hh>
 #include <G4TransportationManager.hh>
-#include <G4PropagatorInField.hh>
-#include <G4Track.hh>
-#include <G4Step.hh>
 #include <G4ParticleChangeForTransport.hh>
 
 #include <simulation/monopoles/G4MonopoleFieldSetup.h>
 
 class G4SafetyHelper;
+class G4Navigator;
+class G4PropagatorInField;
+class G4Track;
+class G4Step;
 
 namespace Belle2 {
 
@@ -196,14 +196,14 @@ namespace Belle2 {
 
       G4ParticleChangeForTransport fParticleChange; /**< New ParticleChange*/
 
-      G4double endpointDistance; /**< Endpint distance */
+      G4double endpointDistance; /**< Endpoint distance */
 
       G4double fThreshold_Trap_Energy; /**< Assume monopoles below this can bound to material*/ //FIXME should be dependent on e.g. density
 
       // Thresholds for looping particles:
       G4double fThreshold_Warning_Energy; /**< Warn above this energy about looping particle*/
       G4double fThreshold_Important_Energy; /**< Hesitate above this about looping particle for a certain no of trials*/
-      G4int    fThresholdTrials; /**< Nubmer of trials for looping particles*/
+      G4int    fThresholdTrials; /**< Number of trials for looping particles*/
       // Above 'important' energy a 'looping' particle in field will
       //   *NOT* be abandoned, except after fThresholdTrials attempts.
       // G4double fUnimportant_Energy;

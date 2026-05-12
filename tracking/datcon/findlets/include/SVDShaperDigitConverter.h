@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -23,9 +23,9 @@ namespace Belle2 {
    * DATCONSVDDigtis are a simplified digit that contains different information of the SVD hits to have information
    * similar as in the real FPGA DATCON.
    */
-  class SVDShaperDigitConverter : public TrackFindingCDC::Findlet<DATCONSVDDigit, DATCONSVDDigit> {
+  class SVDShaperDigitConverter : public TrackingUtilities::Findlet<DATCONSVDDigit, DATCONSVDDigit> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<DATCONSVDDigit, DATCONSVDDigit>;
+    using Super = TrackingUtilities::Findlet<DATCONSVDDigit, DATCONSVDDigit>;
 
   public:
     /// Add the subfindlets

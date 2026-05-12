@@ -20,18 +20,9 @@ namespace Belle2 {
 
     /** Convert given TObject into encoded byte stream (for storing in XML).
      *
-     * Returns base64-encoded TMessage. Please pass it through escapeXML() first.
+     * Returns base64-encoded TMessage.
      */
     std::string serializeAndEncode(const TObject* obj);
-
-
-    /** Escape given XML string as CDATA sequence.
-     *
-     * This format is suitable for storing in an XML file, wrap it in a tag
-     * and use Gearbox::getInstance().getTObject(".../MyTag") to retrieve the
-     * object again.
-     */
-    std::string escapeXML(const std::string& xmlString);
 
     /** Convert given serialized raw data back into TObject.
      *

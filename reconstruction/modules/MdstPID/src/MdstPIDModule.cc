@@ -8,6 +8,13 @@
 
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 #include <klm/muid/MuidElementNumbers.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <top/dataobjects/TOPLikelihood.h>
+#include <arich/dataobjects/ARICHLikelihood.h>
+#include <cdc/dataobjects/CDCDedxLikelihood.h>
+#include <cdc/dataobjects/CDCDedxTrack.h>
+#include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 
 using namespace std;
 using namespace Belle2;
@@ -74,6 +81,9 @@ void MdstPIDModule::event()
     // set CDC dE/dx likelihoods
     const CDCDedxLikelihood* cdcdedx = track->getRelatedTo<CDCDedxLikelihood>();
     if (cdcdedx) setLikelihoods(cdcdedx);
+    // and the number of layers with measurements used in the CDC likelihood
+    const CDCDedxTrack* cdcdedxtrack = track->getRelatedTo<CDCDedxTrack>();
+    if (cdcdedxtrack)   m_CDCnLayerHitsUsed = cdcdedxtrack->getNLayerHitsUsed();
 
     // set VXD dE/dx likelihoods
     const VXDDedxLikelihood* vxddedx = track->getRelatedTo<VXDDedxLikelihood>();
@@ -123,6 +133,7 @@ void MdstPIDModule::setLikelihoods(const CDCDedxLikelihood* logl)
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getLogL(chargedStable));
+    m_pid->setCDCnLayerHitsUsed(m_CDCnLayerHitsUsed);
   }
 
 }

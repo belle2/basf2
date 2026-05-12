@@ -67,7 +67,7 @@ class Histogrammer(b2.Module):
         self.width_vs_sample = TH2F("width_vs_sample", "Pulse width vs. sample; sample number; pulse width [ns]",
                                     256, 0, 256, 100, 0, 10)
         #: histogram of time distribution
-        self.time = TH1F('time', 'Time distibution; time [ns]', 400, -100, 300)
+        self.time = TH1F('time', 'Time distribution; time [ns]', 400, -100, 300)
         #: histogram of asic channel occupancy
         self.asic_channels = TH1F('asic_channels', 'ASIC channel occupancy; ASIC channel number', 8, 0, 8)
 
@@ -119,6 +119,3 @@ main.add_module('Progress')
 
 # Process events
 b2.process(main)
-
-# Print call statistics
-print(b2.statistics)

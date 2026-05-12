@@ -9,23 +9,26 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/database/DBArray.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
-#include <tracking/trackFindingCDC/mva/Recorder.h>
+#include <tracking/trackingUtilities/mva/Recorder.h>
 #include <cdc/dbobjects/CDCCrossTalkClasses.h>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Finds ASICs with single signal hit, records info to the library
-    class AsicBackgroundLibraryCreator : public Findlet<const CDCWireHit, const CDCTrack> {
+    class AsicBackgroundLibraryCreator : public
+      TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, const TrackingUtilities::CDCTrack> {
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, const CDCTrack >;
+      using Super = TrackingUtilities::Findlet<const TrackingUtilities::CDCWireHit, const TrackingUtilities::CDCTrack >;
 
     public:
       /// Default constructor
@@ -44,14 +47,16 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)  final;
 
       /// Main algorithm marking hit as background
-      void apply(const std::vector<CDCWireHit>& wireHits, const std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits,
+                 const std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
       /// write out the library
       void terminate() final;
     private:
 
       /// Algorithm to select suitable ASIC for library creation
-      void selectAsic(const std::vector<const CDCWireHit*>& wireHits, const std::vector<CDCTrack>& tracks);
+      void selectAsic(const std::vector<const TrackingUtilities::CDCWireHit*>& wireHits,
+                      const std::vector<TrackingUtilities::CDCTrack>& tracks);
       /**
        * Channel map retrieved from DB.
        */
@@ -83,7 +88,7 @@ namespace Belle2 {
       size_t m_minimal_hits_on_track{40};
 
       /// Recorder for the root output
-      std::unique_ptr<Recorder> m_recorder;
+      std::unique_ptr<TrackingUtilities::Recorder> m_recorder;
 
       // Variables to be stored:
 

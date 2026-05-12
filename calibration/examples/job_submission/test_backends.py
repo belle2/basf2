@@ -95,7 +95,7 @@ def get_argparser():
 def main():
     parser = get_argparser()
     args = parser.parse_args()
-    basf2.set_log_level(basf2.LogLevel.names[args.log_level])
+    # basf2.set_log_level(basf2.LogLevel.names[args.log_level])
     if args.debug_level:
         basf2.set_log_level(basf2.LogLevel.DEBUG)  # Override
         basf2.set_debug_level(args.debug_level)

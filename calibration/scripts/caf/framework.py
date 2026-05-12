@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-# disable doxygen check for this file
-# @cond
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -84,6 +81,8 @@ class Collection():
                  max_collector_jobs=None,
                  backend_args=None
                  ):
+        """
+        """
         #: Collector module of this collection
         self.collector = collector
         #: Internal input_files stored for this calibration
@@ -117,12 +116,14 @@ class Collection():
         self.splitter = None
         if max_files_per_collector_job and max_collector_jobs:
             B2FATAL("Cannot set both 'max_files_per_collector_job' and 'max_collector_jobs' of a collection!")
+        # \cond false positive doxygen warning
         elif max_files_per_collector_job:
             self.max_files_per_collector_job = max_files_per_collector_job
         elif max_collector_jobs:
             self.max_collector_jobs = max_collector_jobs
         else:
             self.max_collector_jobs = self.default_max_collector_jobs
+        # \endcond
 
         #: Dictionary passed to the collector Job object to configure how the `caf.backends.Backend` instance should treat
         #: the collector job when submitting. The choice of arguments here depends on which backend you plan on using.
@@ -130,19 +131,20 @@ class Collection():
         if backend_args:
             self.backend_args = backend_args
 
+        #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
+        #: step! Since the algorithm will merge the collected data into one process it has to use a single DB chain set from
+        #: the overall Calibration.
+        self.database_chain = []
         if database_chain:
-            #: The database chain used for this Collection. NOT necessarily the same database chain used for the algorithm
-            #: step! Since the algorithm will merge the collected data into one process it has to use a single DB chain set from
-            #: the overall Calibration.
             self.database_chain = database_chain
         else:
-            self.database_chain = []
             # This may seem weird but the changes to the DB interface mean that they have effectively swapped from being
             # described well by appending to a list to a deque. So we do bit of reversal to translate it back and make the
             # most important GT the last one encountered.
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag)
 
+        #: job script
         self.job_script = Path(find_file("calibration/scripts/caf/run_collector_path.py")).absolute()
         """The basf2 steering file that will be used for Collector jobs run by this collection.
 This script will be copied into subjob directories as part of the input sandbox."""
@@ -224,12 +226,17 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def input_files(self):
+        """
+        """
         return self._input_files
 
     @input_files.setter
     def input_files(self, value):
+        """
+        """
         if isinstance(value, str):
             # If it's a string, we convert to a list of URIs
+            #: set input files
             self._input_files = self.uri_list_from_input_file(value)
         elif isinstance(value, list):
             # If it's a list we loop and do the same thing
@@ -263,6 +270,8 @@ This script will be copied into subjob directories as part of the input sandbox.
         self._collector = collector
 
     def is_valid(self):
+        """
+        """
         if (not self.collector or not self.input_files):
             return False
         else:
@@ -270,6 +279,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def max_collector_jobs(self):
+        """
+        """
         if self.splitter:
             return self.splitter.max_subjobs
         else:
@@ -277,6 +288,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @max_collector_jobs.setter
     def max_collector_jobs(self, value):
+        """
+        """
         if value is None:
             self.splitter = None
         else:
@@ -284,6 +297,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @property
     def max_files_per_collector_job(self):
+        """
+        """
         if self.splitter:
             return self.splitter.max_files_per_subjob
         else:
@@ -291,6 +306,8 @@ This script will be copied into subjob directories as part of the input sandbox.
 
     @max_files_per_collector_job.setter
     def max_files_per_collector_job(self, value):
+        """
+        """
         if value is None:
             self.splitter = None
         else:
@@ -406,7 +423,10 @@ class CalibrationBase(ABC, Thread):
         Returns the list of calibrations in our dependency list that have failed.
         """
         failed = []
-        for calibration in self.dependencies:
+        # Use local variable to avoid doxygen "no uniquely matching class member" warning
+        # (multiple classes in this file define self.dependencies with doc comments)
+        dependencies = self.dependencies
+        for calibration in dependencies:
             if calibration.state == self.fail_state:
                 failed.append(calibration)
         return failed
@@ -568,12 +588,12 @@ class Calibration(CalibrationBase):
             #: algorithms, or assign a single strategy to apply it to all algorithms in this `Calibration`. You can see the choices
             #: in :py:mod:`caf.strategies`.
             self.strategies = strategies.SingleIOV
+        #: The database chain that is applied to the algorithms.
+        #: This is often updated at the same time as the database chain for the default `Collection`.
+        self.database_chain = []
         if database_chain:
-            #: The database chain that is applied to the algorithms.
-            #: This is often updated at the same time as the database chain for the default `Collection`.
             self.database_chain = database_chain
         else:
-            self.database_chain = []
             # This database is already applied to the `Collection` automatically, so don't do it again
             for tag in reversed(b2conditions.default_globaltags):
                 self.use_central_database(tag, apply_to_default_collection=False)
@@ -752,6 +772,8 @@ class Calibration(CalibrationBase):
             self.collections[self.default_collection_name].use_local_database(filename, directory)
 
     def _get_default_collection_attribute(self, attr):
+        """
+        """
         if self.default_collection_name in self.collections:
             return getattr(self.collections[self.default_collection_name], attr)
         else:
@@ -762,6 +784,8 @@ class Calibration(CalibrationBase):
             return None
 
     def _set_default_collection_attribute(self, attr, value):
+        """
+        """
         if self.default_collection_name in self.collections:
             setattr(self.collections[self.default_collection_name], attr, value)
         else:
@@ -894,6 +918,9 @@ class Calibration(CalibrationBase):
             B2ERROR(f"Something other than CalibrationAlgorithm instance passed in ({type(value)}). "
                     "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @algorithms.fset.register(tuple)
     @algorithms.fset.register(list)
     def _(self, value):
@@ -910,6 +937,7 @@ class Calibration(CalibrationBase):
                 else:
                     B2ERROR(f"Something other than CalibrationAlgorithm instance passed in {type(value)}."
                             "Algorithm needs to inherit from Belle2::CalibrationAlgorithm")
+    # @endcond
 
     @property
     def pre_algorithms(self):
@@ -929,6 +957,7 @@ class Calibration(CalibrationBase):
         else:
             B2ERROR("Something evaluated as False passed in as pre_algorithm function.")
 
+    # @cond
     @pre_algorithms.fset.register(tuple)
     @pre_algorithms.fset.register(list)
     def _(self, values):
@@ -943,6 +972,7 @@ class Calibration(CalibrationBase):
                 B2ERROR("Number of functions and number of algorithms doesn't match.")
         else:
             B2ERROR("Empty container passed in for pre_algorithm functions")
+    # @endcond
 
     @property
     def strategies(self):
@@ -962,6 +992,7 @@ class Calibration(CalibrationBase):
         else:
             B2ERROR("Something evaluated as False passed in as a strategy.")
 
+    # @cond
     @strategies.fset.register(tuple)
     @strategies.fset.register(list)
     def _(self, values):
@@ -976,6 +1007,7 @@ class Calibration(CalibrationBase):
                 B2ERROR("Number of strategies and number of algorithms doesn't match.")
         else:
             B2ERROR("Empty container passed in for strategies list")
+    # @endcond
 
     def __repr__(self):
         """
@@ -995,6 +1027,7 @@ class Calibration(CalibrationBase):
                                           iov_to_calibrate=self.iov,
                                           initial_state=initial_state,
                                           iteration=initial_iteration)
+        #: state
         self.state = initial_state
         self.machine.root_dir = Path(os.getcwd(), self.name)
         self.machine.collector_backend = self.backend
@@ -1122,6 +1155,7 @@ class Algorithm():
         self.algorithm = algorithm
         #: The name of the algorithm, default is the Algorithm class name
         cppname = type(algorithm).__cpp_name__
+        #: reduced name
         self.name = cppname[cppname.rfind('::') + 2:]
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
         #: The list of files matching the `Calibration.output_patterns` from the collector output
@@ -1473,5 +1507,3 @@ class CAF():
         # Will create a new database + tables, or do nothing but checks we can connect to existing one
         with CAFDB(self._db_path):
             pass
-
-# @endcond

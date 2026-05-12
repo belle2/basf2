@@ -27,6 +27,7 @@ import basf2 as b2
 import basf2_mva
 import subprocess
 
+
 if __name__ == "__main__":
 
     # Note that the target variable 'isNotContinuum' needs to be
@@ -37,7 +38,7 @@ if __name__ == "__main__":
         b2.B2FATAL("You need the example data installed. Run `b2install-data example` in terminal for it.")
 
     # Use this path to run over Bd_KsPi0 reconstructed signal and qqbar skims.
-    path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/'
+    path = os.getenv('BELLE2_EXAMPLES_DATA_DIR')+'/mva/B2A701_output_'
 
     train_data = path + 'train.root'
     test_data = path + 'test.root'
@@ -55,7 +56,7 @@ if __name__ == "__main__":
         'thrustOm',
         'cosTBTO',
         'cosTBz',
-        'KSFWVariables(et)',
+        'KSFWVariables(pt_sum)',
         'KSFWVariables(mm2)',
         'KSFWVariables(hso00)',
         'KSFWVariables(hso01)',

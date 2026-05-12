@@ -563,7 +563,7 @@ namespace {
     particles.registerInDataStore();
     DataStore::Instance().setInitializeActive(false);
 
-    // mock up a composite Belle2::Particle
+    // mock up a composite Particle
     ROOT::Math::PxPyPzEVector zeroes(0, 0, 0, 0);
     Particle* Kp = particles.appendNew(Particle(zeroes, 321));    // 0
     Particle* pim1 = particles.appendNew(Particle(zeroes, -211)); // 1

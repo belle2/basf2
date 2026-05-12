@@ -52,6 +52,7 @@ Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
 Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
+Untested method PIDLikelihood::setCDCnLayerHitsUsed
 Untested method PIDLikelihood::setLogLikelihood
 Untested method PIDLikelihood::subtractMaximum
 Untested method ECLCluster::addHypothesis
@@ -73,6 +74,9 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setLogEnergy
+Untested method ECLCluster::setLogEnergyHighestCrystal
+Untested method ECLCluster::setLogEnergyRaw
 Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setMinTrkDistanceID
@@ -109,9 +113,16 @@ Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
+Untested method KLMCluster::setClusterTrackRotationAngle
+Untested method KLMCluster::setClusterTrackSeparation
+Untested method KLMCluster::setClusterTrackSeparationAngle
 Untested method KLMCluster::setInnermostLayer
+Untested method KLMCluster::setKLMnDigits
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
+Untested method KLMCluster::setShapeStdDev1
+Untested method KLMCluster::setShapeStdDev2
+Untested method KLMCluster::setShapeStdDev3
 Untested method KLMCluster::setTime
 Untested method TRGSummary::getInfoHTML
 Untested method TRGSummary::getInputBitNumber
@@ -1237,6 +1248,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -493.81
   getLogL(<type: mu->): -471.66
   getLogL(<type: pi+>): -465.399
@@ -1271,6 +1283,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -222.279
   getLogL(<type: mu->): -157.809
   getLogL(<type: pi+>): -169.121
@@ -1305,6 +1318,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -219.272
   getLogL(<type: mu->): -568.206
   getLogL(<type: pi+>): -240.307
@@ -1339,6 +1353,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -39.8558
   getLogL(<type: mu->): -27.5763
   getLogL(<type: pi+>): -24.4838
@@ -1373,6 +1388,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -10.2395
   getLogL(<type: mu->): -10.2831
   getLogL(<type: pi+>): -10.2447
@@ -1407,6 +1423,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -208.699
   getLogL(<type: mu->): -201.236
   getLogL(<type: pi+>): -198.315
@@ -3310,6 +3327,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (44.3,-185.5,-189.9)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.973626
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -3325,6 +3345,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 6
   getMomentum(): (0.137747,-0.576796,-0.590478,0.973626)
   getMomentumMag(): 0.836858
@@ -3333,6 +3354,9 @@ KLMCluster#0:
     -> KlIds#0 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#7 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 10.4447
 KlId#0:
   getKlId(): 1
@@ -7213,6 +7237,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -466.037
   getLogL(<type: mu->): -425.313
   getLogL(<type: pi+>): -420.046
@@ -7247,6 +7272,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -422.718
   getLogL(<type: mu->): -417.285
   getLogL(<type: pi+>): -389.371
@@ -7281,6 +7307,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -139.986
   getLogL(<type: mu->): -134.138
   getLogL(<type: pi+>): -131.955
@@ -7315,6 +7342,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -865.052
   getLogL(<type: mu->): -869.958
   getLogL(<type: pi+>): -861.135
@@ -7349,6 +7377,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -291.057
   getLogL(<type: mu->): -279.265
   getLogL(<type: pi+>): -274.019
@@ -7383,6 +7412,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -57.5101
   getLogL(<type: mu->): -65.2698
   getLogL(<type: pi+>): -52.5459
@@ -7417,6 +7447,7 @@ PIDLikelihood#6:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -30.6299
   getLogL(<type: mu->): -23.2437
   getLogL(<type: pi+>): -19.1857
@@ -7451,6 +7482,7 @@ PIDLikelihood#7:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -28.4554
   getLogL(<type: mu->): -25.5145
   getLogL(<type: pi+>): -20.1832
@@ -9480,6 +9512,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (212.836,12.2027,149.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -9495,6 +9530,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.175819,0.0100803,0.123333,0.542072)
   getMomentumMag(): 0.215
@@ -9504,6 +9540,9 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#29 (weight: 0.600051)
     -> MCParticles#54 (weight: 0.39995)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 12.466
 KlId#0:
   getKlId(): 1
@@ -12974,6 +13013,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -380.124
   getLogL(<type: mu->): -803.553
   getLogL(<type: pi+>): -396.261
@@ -13008,6 +13048,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -411.274
   getLogL(<type: mu->): -409.987
   getLogL(<type: pi+>): -365.656
@@ -13042,6 +13083,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -437.655
   getLogL(<type: mu->): -868.92
   getLogL(<type: pi+>): -469.067
@@ -13076,6 +13118,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -213.169
   getLogL(<type: mu->): -293.104
   getLogL(<type: pi+>): -188.963
@@ -13110,6 +13153,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -122.899
   getLogL(<type: mu->): -122.924
   getLogL(<type: pi+>): -122.105
@@ -14333,6 +14377,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-122.412,166.129,-17.9667)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.79054
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14348,6 +14395,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 3
   getMomentum(): (-1.01647,1.37947,-0.149188,1.79054)
   getMomentumMag(): 1.72
@@ -14357,11 +14405,17 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#10 (weight: 0.516221)
     -> MCParticles#23 (weight: 0.483779)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.6572
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-122.412,166.129,-111.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.65766
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14377,6 +14431,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (-0.224505,0.304681,-0.204125,0.65766)
   getMomentumMag(): 0.43
@@ -14386,11 +14441,17 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#10 (weight: 0.702801)
     -> MCParticles#23 (weight: 0.297199)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 13.6572
 KLMCluster#2:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (55.7973,-212.852,-159.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -14406,6 +14467,7 @@ KLMCluster#2:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.0441607,-0.168461,-0.126078,0.542072)
   getMomentumMag(): 0.215
@@ -14414,6 +14476,9 @@ KLMCluster#2:
     -> KlIds#2 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 2.14459
 KlId#0:
   getKlId(): 1
@@ -20169,6 +20234,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -441.393
   getLogL(<type: mu->): -449.203
   getLogL(<type: pi+>): -433.505
@@ -20203,6 +20269,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -431.397
   getLogL(<type: mu->): -381.86
   getLogL(<type: pi+>): -352.415
@@ -20237,6 +20304,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -574.937
   getLogL(<type: mu->): -510.804
   getLogL(<type: pi+>): -510.557
@@ -20271,6 +20339,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -385.231
   getLogL(<type: mu->): -350.65
   getLogL(<type: pi+>): -344.55
@@ -20305,6 +20374,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -387.888
   getLogL(<type: mu->): -355.454
   getLogL(<type: pi+>): -350.279
@@ -20339,6 +20409,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -500.599
   getLogL(<type: mu->): -455.267
   getLogL(<type: pi+>): -451.954
@@ -20373,6 +20444,7 @@ PIDLikelihood#6:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -423.563
   getLogL(<type: mu->): -360.161
   getLogL(<type: pi+>): -370.605
@@ -20407,6 +20479,7 @@ PIDLikelihood#7:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -92.6745
   getLogL(<type: mu->): -91.4771
   getLogL(<type: pi+>): -89.2298
@@ -20441,6 +20514,7 @@ PIDLikelihood#8:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -518.542
   getLogL(<type: mu->): -447.575
   getLogL(<type: pi+>): -456.538
@@ -20475,6 +20549,7 @@ PIDLikelihood#9:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -256.872
   getLogL(<type: mu->): -247.289
   getLogL(<type: pi+>): -222.934
@@ -20509,6 +20584,7 @@ PIDLikelihood#10:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -235.395
   getLogL(<type: mu->): -220.093
   getLogL(<type: pi+>): -218.089
@@ -20543,6 +20619,7 @@ PIDLikelihood#11:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -268.14
   getLogL(<type: mu->): -230.742
   getLogL(<type: pi+>): -231.102
@@ -20577,6 +20654,7 @@ PIDLikelihood#12:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -154.315
   getLogL(<type: mu->): -130.884
   getLogL(<type: pi+>): -122.724
@@ -20611,6 +20689,7 @@ PIDLikelihood#13:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -22.6697
   getLogL(<type: mu->): -23.6527
   getLogL(<type: pi+>): -21.3386
@@ -20645,6 +20724,7 @@ PIDLikelihood#14:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -19.0283
   getLogL(<type: mu->): -15.4072
   getLogL(<type: pi+>): -13.2274
@@ -20679,6 +20759,7 @@ PIDLikelihood#15:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -296.831
   getLogL(<type: mu->): -251.169
   getLogL(<type: pi+>): -259.075
@@ -23006,6 +23087,9 @@ KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (190.069,-98.2696,-27.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 1.18459
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -23021,6 +23105,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 5
   getMomentum(): (0.947241,-0.489743,-0.136054,1.18459)
   getMomentumMag(): 1.075
@@ -23029,11 +23114,17 @@ KLMCluster#0:
     -> KlIds#0 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#42 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#1:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (113.689,-200.31,-55.6)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.542072
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -23049,6 +23140,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 3
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.103162,-0.181762,-0.0504515,0.542072)
   getMomentumMag(): 0.215
@@ -23057,11 +23149,17 @@ KLMCluster#1:
     -> KlIds#1 (weight: 1)
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#19 (weight: 1)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#2:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (59.088,-203.886,121.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.993588
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -23077,6 +23175,7 @@ KLMCluster#2:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 4
   getMomentum(): (0.207845,-0.717179,0.426678,0.993588)
   getMomentumMag(): 0.86
@@ -23086,11 +23185,17 @@ KLMCluster#2:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#25 (weight: 0.999875)
     -> MCParticles#49 (weight: 0.000125138)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KLMCluster#3:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
   getClusterPosition(): (-68.912,204.029,229.3)
+  getClusterTrackRotationAngle(): nan
+  getClusterTrackSeparation(): nan
+  getClusterTrackSeparationAngle(): nan
   getEnergy(): 0.993588
   getError4x4(): 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00 
@@ -23106,6 +23211,7 @@ KLMCluster#3:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 3
   getMomentum(): (-0.188397,0.557791,0.626878,0.993588)
   getMomentumMag(): 0.86
@@ -23116,6 +23222,9 @@ KLMCluster#3:
     -> MCParticles#46 (weight: 0.189487)
     -> MCParticles#65 (weight: 0.0754985)
     -> MCParticles#66 (weight: 0.735014)
+  getShapeStdDev1(): 0
+  getShapeStdDev2(): 0
+  getShapeStdDev3(): 0
   getTime(): 0.502517
 KlId#0:
   getKlId(): 1

@@ -12,8 +12,10 @@
 #include <cdc/dbobjects/CDCWireHitRequirements.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCWireHit;
+  }
+  namespace TrackFindingCDC {
 
     /// Filter rejecting hits according to DB values.
     class CutsFromDBWireHitFilter : public BaseWireHitFilter {
@@ -33,7 +35,7 @@ namespace Belle2 {
       void beginRun() final;
 
       /// Basic filter method to override.
-      Weight operator()(const CDCWireHit& wireHit) final;
+      TrackingUtilities::Weight operator()(const TrackingUtilities::CDCWireHit& wireHit) final;
 
     private:
 

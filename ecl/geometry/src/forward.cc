@@ -27,6 +27,7 @@
 #include <G4ReflectionFactory.hh>
 #include <G4Region.hh>
 #include <G4SubtractionSolid.hh>
+#include <G4IntersectionSolid.hh>
 #include <G4Tubs.hh>
 #include <G4TwoVector.hh>
 #include <G4UnionSolid.hh>
@@ -164,12 +165,17 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 
     H = 40;
     dxymzm = dxymzp + tand(th0) * H, dxypzm = dxypzp + tand(th0) * H;
-    G4VSolid* solid6_p2 = new G4Trap("fwd_solid6_p2", H / 2, theta, 0, W / 2, dxypzm / 2, dxymzm / 2, -alpha, W / 2, dxypzp / 2,
-                                     dxymzp / 2,
-                                     -alpha);
+
+    G4Transform3D tsolid6_p2(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, -W / 2, ZT - H / 2));
+
+    // Added intersection to avoid protrusion from the mother volume
+    G4VSolid* solid6_p2_x = new G4Trap("fwd_solid6_p2_x", H / 2, theta, 0, W / 2, dxypzm / 2, dxymzm / 2, -alpha, W / 2, dxypzp / 2,
+                                       dxymzp / 2,
+                                       -alpha);
+    G4VSolid* solid6_p2 = new G4IntersectionSolid("fwd_solid6_p2", solid6_p2_x, innervolumesector_solid, tsolid6_p2.inverse());
+
     G4LogicalVolume* lsolid6_p2 = new G4LogicalVolume(solid6_p2, Materials::get("SUS304"), "lsolid6", 0, 0, 0);
     lsolid6_p2->SetVisAttributes(att("iron"));
-    G4Transform3D tsolid6_p2(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, -W / 2, ZT - H / 2));
     new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p2, lsolid6_p2, "psolid6_p3", innervolumesector_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid6_p2, lsolid6_p2, "psolid6_p4", innervolumesector_logical, false, 0, overlap);
 

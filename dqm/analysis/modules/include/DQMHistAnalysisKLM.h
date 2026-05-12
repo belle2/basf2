@@ -148,9 +148,10 @@ namespace Belle2 {
 
     /**
      * Fill histogram containing masked channels per sector.
-     * @param[in] histName  Histogram name.
+     * @param[in] histogram  Histogram.
+     * @param[in] canvas  Canvas.
      */
-    void fillMaskedChannelsHistogram(const std::string& histName);
+    void fillMaskedChannelsHistogram(TH1* histogram, TCanvas* canvas);
 
     /**
      * Scales and draws desired delta histogram for current canvas.
@@ -198,6 +199,12 @@ namespace Belle2 {
 
     /** Vector of masked channels. */
     std::vector<uint16_t> m_MaskedChannels;
+
+    /** Histogram for masked channels per sector. */
+    TH1* m_MaskedChannelsHist = nullptr;
+
+    /** Canvas for masked channels per sector summary. */
+    TCanvas* m_c_masked_channels = nullptr;
 
     /** TLine for background region in 2d hits histograms. */
     TLine m_2DHitsLine;

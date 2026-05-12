@@ -47,7 +47,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
-           "Minimal number for delta histogram updates", 50000.);
+           "Minimal number for delta histogram updates", 30000.);
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
@@ -92,7 +92,7 @@ void DQMHistAnalysisKLMModule::initialize()
 
   gROOT->cd();
   std::string c_masked_channels_name = m_histogramDirectoryName + "/c_masked_channels";
-  new TCanvas((c_masked_channels_name).c_str());
+  m_c_masked_channels = new TCanvas((c_masked_channels_name).c_str());
   std::string c_fe_bklm_ratio_name = m_histogramDirectoryName + "/c_fe_bklm_ratio";
   m_c_fe_bklm_ratio = new TCanvas((c_fe_bklm_ratio_name).c_str());
   std::string c_fe_eklm_ratio_name = m_histogramDirectoryName + "/c_fe_eklm_ratio";
@@ -116,10 +116,18 @@ void DQMHistAnalysisKLMModule::initialize()
   m_fe_eklm_ratio->GetXaxis()->SetTitle("Plane number");
   m_fe_eklm_ratio->SetStats(false);
   m_fe_eklm_ratio->SetOption("HIST");
+  /* Masked channels per sector. */
+  KLMSectorNumber totalSectors = m_SectorArrayIndex->getNElements();
+  m_MaskedChannelsHist = new TH1F("masked_channels", "Number of masked channels per sector",
+                                  totalSectors, -0.5, totalSectors - 0.5);
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {
+    std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
+    KLMSectorNumber sector = klmSector.getKLMSectorNumber();
+    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
+    m_MaskedChannelsHist->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -458,19 +466,8 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
 }
 
 void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
-  const std::string& histName)
+  TH1* histogram, TCanvas* canvas)
 {
-  TH1* histogram = findHist(m_histogramDirectoryName + "/" + histName);
-  if (histogram == nullptr) {
-    B2WARNING("KLM DQM histogram " + m_histogramDirectoryName + "/" << histName << " is not found.");
-    return;
-  }
-  TCanvas* canvas = findCanvas(m_histogramDirectoryName + "/c_" + histName);
-  if (canvas == nullptr) {
-    B2WARNING("KLM DQM histogram canvas " + m_histogramDirectoryName + "/c_" << histName << " is not found.");
-    return;
-  }
-
   histogram->Clear();
   canvas->Clear();
   canvas->cd();
@@ -491,6 +488,7 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
     }
   }
   histogram->SetStats(false);
+  histogram->SetTitle("Number of masked channels per sector");
   histogram->Draw();
   canvas->Modified();
   canvas->Update();
@@ -643,8 +641,8 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
   }
 
   /* Obtain plots necessary for FE Ratio plots */
-  TH1F* numerator = (TH1F*)findHist(m_histogramDirectoryName + "/" + histName + "_0");
-  TH1F* denominator = (TH1F*)findHist(m_histogramDirectoryName + "/" + histName + "_1");
+  auto* numerator = findHist(m_histogramDirectoryName + "/" + histName + "_0");
+  auto* denominator = findHist(m_histogramDirectoryName + "/" + histName + "_1");
   /* Check if fe histograms exist*/
   if (numerator == nullptr || denominator == nullptr) {
     B2INFO("processFEHistogram: Histograms needed for FE Ratio computation are not found");
@@ -801,7 +799,7 @@ void DQMHistAnalysisKLMModule::event()
 
   /* Reset the color palette to the default one. */
   gStyle->SetPalette(kBird);
-  fillMaskedChannelsHistogram("masked_channels");
+  fillMaskedChannelsHistogram(m_MaskedChannelsHist, m_c_masked_channels);
   latex.SetTextColor(kBlue);
   processPlaneHistogram("plane_bklm_phi", latex);
   processPlaneHistogram("plane_bklm_z", latex);

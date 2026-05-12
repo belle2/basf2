@@ -7,7 +7,7 @@
 
 #pragma link C++ class Belle2::ARICHChannelHist+; // checksum=0xd05d461d, version=2
 #pragma link C++ class Belle2::ARICHAerogelHist+; // checksum=0x27185530, version=2
-#pragma link C++ class Belle2::ARICHMergerHist+;
+#pragma link C++ class Belle2::ARICHMergerHist+; // checksum=0x650792ad, version=1
 
 #pragma read sourceClass="Belle2::ARICHAerogelHist" version="[-1]"  \
   source="std::map<Int_t, std::vector<TVector2>> m_verticesMap"     \

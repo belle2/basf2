@@ -1620,7 +1620,7 @@ class HarvestingValidationBaseTask(Basf2PathTask):
             "RootInput",
             inputFileNames=inputFileNames,
         )
-        print('\nThe input file for the harvesting validation is:', inputFileNames, '\n')
+        # print('\nThe input file for the harvesting validation is:', inputFileNames, '\n')
         path.add_module("Gearbox")
         tracking.add_geometry_modules(path)
         tracking.add_hit_preparation_modules(path)  # only needed for simulated hits

@@ -30,6 +30,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeScintillatorEKLM{nullptr},
   m_ChargeScintillatorBKLM{nullptr},
   m_ChargeScintillatorEKLM{nullptr},
+  m_ChargeScintillatorBKLM_SingleStrip{nullptr},
+  m_ChargeScintillatorEKLM_SingleStrip{nullptr},
+  m_ChargeScintillatorBKLM_MultiStrip{nullptr},
+  m_ChargeScintillatorEKLM_MultiStrip{nullptr},
   m_ChargeClusterBKLM{nullptr},
   m_ChargeClusterEKLM{nullptr},
   m_AverageChargeClusterBKLM{nullptr},
@@ -37,7 +41,6 @@ KLMDQMModule::KLMDQMModule() :
   m_PlaneBKLMPhi{nullptr},
   m_PlaneBKLMZ{nullptr},
   m_PlaneEKLM{nullptr},
-  m_MaskedChannelsPerSector{nullptr},
   m_DigitsKLM{nullptr},
   m_DigitsRPC{nullptr},
   m_DigitsScintillatorBKLM{nullptr},
@@ -133,6 +136,22 @@ void KLMDQMModule::defineHisto()
     new TH1F("charge_scintillator_eklm", "Scintillator charge (EKLM)",
              256, 0., 512.);
   m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorBKLM_SingleStrip =
+    new TH1F("charge_scintillator_bklm_single _strip", "Scintillator charge (BKLM) single strip",
+             256, 0., 512.);
+  m_ChargeScintillatorBKLM_SingleStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM_SingleStrip =
+    new TH1F("charge_scintillator_eklm_single_strip", "Scintillator charge (EKLM) single strip",
+             256, 0., 512.);
+  m_ChargeScintillatorEKLM_SingleStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorBKLM_MultiStrip =
+    new TH1F("charge_scintillator_bklm_multi_strip", "Scintillator charge (BKLM) multi strip",
+             256, 0., 512.);
+  m_ChargeScintillatorBKLM_MultiStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM_MultiStrip =
+    new TH1F("charge_scintillator_eklm_multi_strip", "Scintillator charge (EKLM) multi strip",
+             256, 0., 512.);
+  m_ChargeScintillatorEKLM_MultiStrip->GetXaxis()->SetTitle("Charge");
   m_ChargeClusterBKLM =
     new TH1F("charge_cluster_bklm", "BKLM Scintillator Clusters",
              500, 0., 10000.);
@@ -224,18 +243,6 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
-  /* Masked channels per sector:
-   * it is defined here, but filled by the analysis module. */
-  KLMSectorNumber totalSectors = m_SectorArrayIndex->getNElements();
-  m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
-                                       totalSectors, -0.5, totalSectors - 0.5);
-  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
-    std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
-    KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
-    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
-  }
   /* Number of digits. */
   m_DigitsKLM = new TH1F("digits_klm", "Number of KLM digits",
                          250.0, 0.0, 250.0);
@@ -353,6 +360,10 @@ void KLMDQMModule::beginRun()
   m_TimeScintillatorEKLM->Reset();
   m_ChargeScintillatorBKLM->Reset();
   m_ChargeScintillatorEKLM->Reset();
+  m_ChargeScintillatorBKLM_SingleStrip->Reset();
+  m_ChargeScintillatorEKLM_SingleStrip->Reset();
+  m_ChargeScintillatorBKLM_MultiStrip->Reset();
+  m_ChargeScintillatorEKLM_MultiStrip->Reset();
   m_ChargeClusterBKLM->Reset();
   m_ChargeClusterEKLM->Reset();
   m_AverageChargeClusterBKLM->Reset();
@@ -461,7 +472,6 @@ void KLMDQMModule::event()
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
-      m_ChargeScintillatorEKLM->Fill(digit.getCharge());
       if (digit.isMultiStrip()) {
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
@@ -480,6 +490,13 @@ void KLMDQMModule::event()
         uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
         if (feStatus != 0) {
           m_FE_EKLM_Plane_1->Fill(planeGlobal);
+          m_ChargeScintillatorEKLM->Fill(digit.getCharge());
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x10) != 0) {
+            m_ChargeScintillatorEKLM_MultiStrip->Fill(digit.getCharge());
+          } else if ((triggerBits & 0x10) == 0) {
+            m_ChargeScintillatorEKLM_SingleStrip->Fill(digit.getCharge());
+          }
         } else {
           m_FE_EKLM_Plane_0->Fill(planeGlobal);
         }
@@ -513,11 +530,17 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
-        m_ChargeScintillatorBKLM->Fill(digit.getCharge());
         if (digitRaw) {
           uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
           if (feStatus != 0) {
             m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
+            m_ChargeScintillatorBKLM->Fill(digit.getCharge());
+            uint16_t triggerBits = digitRaw->getTriggerBits();
+            if ((triggerBits & 0x10) != 0) {
+              m_ChargeScintillatorBKLM_MultiStrip->Fill(digit.getCharge());
+            } else if ((triggerBits & 0x10) == 0) {
+              m_ChargeScintillatorBKLM_SingleStrip->Fill(digit.getCharge());
+            }
           } else {
             m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
           }
@@ -602,10 +625,10 @@ void KLMDQMModule::event()
             continue;
           if (!digitsSeen.insert(digit).second)
             continue;
-          if (digit->getSubdetector() == KLMElementNumbers::c_EKLM) {
+          if (digit->getSubdetector() == KLMElementNumbers::c_EKLM && digit->getCharge() > 35.) {
             sumChargeEKLM += digit->getCharge();
             ++nDigitsClusterEKLM;
-          } else if (digit->getSubdetector() == KLMElementNumbers::c_BKLM && !digit->inRPC()) {
+          } else if (digit->getSubdetector() == KLMElementNumbers::c_BKLM && !digit->inRPC() && digit->getCharge() > 35.) {
             sumChargeBKLM += digit->getCharge();
             ++nDigitsClusterBKLM;
           }

@@ -85,7 +85,7 @@ namespace Belle2 {
 
   private:
 
-    /** Bins for the trigger bits histograms. */
+    /** Bins for the trigger bits historgrams. */
     enum TriggerBitsBin {
 
       /** 0x8. */
@@ -150,11 +150,23 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
-    /** Charge: BKLM scintillators. */
+    /** Charge: BKLM scintillators when FE != 0 */
     TH1F* m_ChargeScintillatorBKLM;
 
-    /** Charge: EKLM scintillators. */
+    /** Charge: EKLM scintillators when FE != 0 */
     TH1F* m_ChargeScintillatorEKLM;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorBKLM_SingleStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorEKLM_SingleStrip;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorBKLM_MultiStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorEKLM_MultiStrip;
 
     /** Cluster charge (sum of scintillator digit charges), BKLM part. */
     TH1F* m_ChargeClusterBKLM;
@@ -181,9 +193,6 @@ namespace Belle2 {
     TH1F** m_ChannelHits[
     EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
     BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-
-    /** Masked channels per sector. */
-    TH1F* m_MaskedChannelsPerSector;
 
     /** Number of digits: whole KLM. */
     TH1F* m_DigitsKLM;

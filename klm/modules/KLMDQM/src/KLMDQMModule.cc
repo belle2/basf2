@@ -137,7 +137,7 @@ void KLMDQMModule::defineHisto()
              256, 0., 512.);
   m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
   m_ChargeScintillatorBKLM_SingleStrip =
-    new TH1F("charge_scintillator_bklm_single _strip", "Scintillator charge (BKLM) single strip",
+    new TH1F("charge_scintillator_bklm_single_strip", "Scintillator charge (BKLM) single strip",
              256, 0., 512.);
   m_ChargeScintillatorBKLM_SingleStrip->GetXaxis()->SetTitle("Charge");
   m_ChargeScintillatorEKLM_SingleStrip =

@@ -89,7 +89,7 @@ void TrackingMomentumScaleFactorsModule::beginRun()
 
 void TrackingMomentumScaleFactorsModule::event()
 {
-  for (auto& iList : m_ParticleLists) {
+  for (const auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
     //check particle List exists and has particles
@@ -162,7 +162,7 @@ void TrackingMomentumScaleFactorsModule::setMomentumScalingFactor(Particle* part
     double py = 0;
     double pz = 0;
     double E = 0;
-    for (auto daughter : particle->getDaughters()) {
+    for (const auto daughter : particle->getDaughters()) {
       px += daughter->getPx();
       py += daughter->getPy();
       pz += daughter->getPz();

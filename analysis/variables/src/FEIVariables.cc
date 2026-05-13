@@ -56,7 +56,7 @@ namespace Belle2 {
     {
       const MCParticle* i_mcpart = mcpart;
       while (i_mcpart) {
-        auto* i_mcpart_mother = i_mcpart->getMother();
+        const auto* i_mcpart_mother = i_mcpart->getMother();
         if (i_mcpart_mother) {
           constexpr std::array<int, 2> B_PDG = {511, 521};
           auto result = std::find(B_PDG.begin(), B_PDG.end(), abs(i_mcpart_mother->getPDG()));

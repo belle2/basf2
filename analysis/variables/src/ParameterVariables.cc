@@ -178,7 +178,7 @@ namespace Belle2 {
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
-      for (auto& double_daughter : daughter_indexes) {
+      for (const auto& double_daughter : daughter_indexes) {
         long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
           return Const::doubleNaN;
@@ -198,7 +198,7 @@ namespace Belle2 {
       const auto& daughters = particle->getDaughters();
       int nDaughters = static_cast<int>(daughters.size());
 
-      for (auto& double_daughter : daughter_indexes) {
+      for (const auto& double_daughter : daughter_indexes) {
         long daughter = std::lround(double_daughter);
         if (daughter >= nDaughters)
           return Const::doubleNaN;

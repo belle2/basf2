@@ -79,7 +79,7 @@ void TauDecayMarkerModule::IdentifyTauPair()
   idOfTauPlus = 0;
   idOfTauMinus = 0;
   for (int i = 0; i < m_MCParticles.getEntries(); i++) {
-    MCParticle& p = *m_MCParticles[i];
+    const MCParticle& p = *m_MCParticles[i];
 
     if (p.getStatus() == 1 && p.getPDG() == 15) {
       numOfTauMinus++;
@@ -105,19 +105,19 @@ int TauDecayMarkerModule::getNumDaughterOfTau(int s, int id, int sign)
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *m_MCParticles[i - 1];
+      const MCParticle& d = *m_MCParticles[i - 1];
       if (abs(d.getPDG()) == 24)
         ret += d.getLastDaughter() - d.getFirstDaughter() + 1;
       else ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *m_MCParticles[i - 1];
+      const MCParticle& d = *m_MCParticles[i - 1];
       int pdg = d.getPDG();
       if (pdg == id || (sign == 0 && abs(pdg) == abs(id))) ret++;
       if (abs(pdg) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *m_MCParticles[j - 1];
+          const MCParticle& e = *m_MCParticles[j - 1];
           int pdg2 = e.getPDG();
           if (pdg2 == id ||
               (sign == 0)) ret++;
@@ -138,21 +138,21 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
 
   if (id == 0) {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *m_MCParticles[i - 1];
+      const MCParticle& d = *m_MCParticles[i - 1];
       if (abs(d.getPDG()) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *m_MCParticles[j - 1];
+          const MCParticle& e = *m_MCParticles[j - 1];
           if (e.getPDG() != Const::photon.getPDGCode()) ret++;
         }
       } else if (d.getPDG() != Const::photon.getPDGCode()) ret++;
     }
   } else {
     for (int i = p.getFirstDaughter(); i <= p.getLastDaughter(); ++i) {
-      MCParticle& d = *m_MCParticles[i - 1];
+      const MCParticle& d = *m_MCParticles[i - 1];
       int pdg = d.getPDG();
       if (abs(pdg) == 24) {
         for (int j = d.getFirstDaughter(); j <= d.getLastDaughter(); ++j) {
-          MCParticle& e = *m_MCParticles[j - 1];
+          const MCParticle& e = *m_MCParticles[j - 1];
           int pdg2 = e.getPDG();
           if (pdg2 == id ||
               (sign == 0 && abs(pdg2) == abs(id))) ret++;
@@ -563,7 +563,7 @@ int TauDecayMarkerModule::getProngOfDecay(const MCParticle& p)
   int ret = 0;
   const vector<MCParticle*> daughters = p.getDaughters();
   if (daughters.empty()) return ret;
-  for (MCParticle* d : daughters) {
+  for (const MCParticle* d : daughters) {
     if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
     // TODO: Improve how to identify a final state particle.
     bool isChargedFinalState = find(finalStatePDGs.begin(),

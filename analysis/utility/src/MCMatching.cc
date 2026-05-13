@@ -311,7 +311,7 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   const Particle::EFlavorType flavorType = particle->getFlavorType();
   if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
       or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG()))) {
-    auto mother = mcParticle->getMother();
+    const MCParticle* mother = mcParticle->getMother();
 
     // Check if mother particle has the correct pdg code, if so we have to take care of the special case
     // tau -> rho nu, where a the matched mother is  the rho, but we have only a missing resonance and not added a wrong particle.

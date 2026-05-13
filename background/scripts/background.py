@@ -20,15 +20,15 @@ class SelectTRGTypes(Module):
 
     def __init__(self, trg_types=None):
         '''Constructor.'''
-        from ROOT import Belle2
         super().__init__()
-        #: The trigger summary object
-        self.trg_summary = Belle2.PyStoreObj('TRGSummary')
         #: The trigger types
         self.trg_types = trg_types
 
     def initialize(self, trg_types=None):
         '''Initialize the module.'''
+        from ROOT import Belle2
+        #: The trigger summary object
+        self.trg_summary = Belle2.PyStoreObj('TRGSummary')
         self.trg_summary.isRequired()
 
     def event(self):

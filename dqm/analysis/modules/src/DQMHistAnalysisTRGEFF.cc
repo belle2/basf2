@@ -17,7 +17,7 @@
 #include <TClass.h>
 #include <TStyle.h>
 #include <TROOT.h>
-#include "TLatex.h"
+#include <TLatex.h>
 
 #include <fstream>
 #include <iostream>

@@ -94,7 +94,7 @@ namespace Belle2 {
     /**
     * Clear all static global lists
     */
-    void clearlist(void);
+    static void clearlist(void);
 
 
   private:
@@ -483,7 +483,7 @@ namespace Belle2 {
      * @param index index of PV
      * @param value string to write
      */
-    void setEpicsStringPV(int index, std::string value);
+    void setEpicsStringPV(int index, const std::string& value);
 
     /**
      * Read value from a EPICS PV
@@ -574,7 +574,7 @@ namespace Belle2 {
      * Setter for EPICS usage
      * @param flag set in use
      */
-    void setUseEpics(bool flag) {m_useEpics = flag;};
+    static void setUseEpics(bool flag) {m_useEpics = flag;};
 
     /**
      * Setter EPICS flag in read only mode
@@ -637,7 +637,7 @@ namespace Belle2 {
     /**
      * Check the status of all PVs and report if disconnected or not found
      */
-    void checkPVStatus(void);
+    static void checkPVStatus(void);
 
     /**
      * check the status of a PVs and report if disconnected or not found
@@ -660,7 +660,7 @@ namespace Belle2 {
      * @param message message to print out
      * @param id the chid of the affected PV
      */
-    void CheckEpicsError(int state, const std::string& message, chid id);
+    static void CheckEpicsError(int state, const std::string& message, chid id);
 
 
     // Public functions

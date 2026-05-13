@@ -1,12 +1,11 @@
 Changes in the tracking package since release-07-00 (new features of release-08)
-----------------------------------------------------
+--------------------------------------------------------------------------------
 
 Track Refining
 ++++++++++++++
 
-* Addition of the track flip and refit algortihm. This algorithm identifies tracks which have been falsely fitted in the wrong direction, by employing a BDT. 
-Once these have been identified the track's direction is inverted and the track refitted. Another BDT decides if the inverted track or the original track is 
-kept.
+* Addition of the track flip and refit algortihm. This algorithm identifies tracks which have been falsely fitted in the wrong direction, by employing a BDT. Once these have been identified the track's direction is inverted and the track refitted. Another BDT decides if the inverted track or the original track is kept.
+
 
 Track Fit
 +++++++++

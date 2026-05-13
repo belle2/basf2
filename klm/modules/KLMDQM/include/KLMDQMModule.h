@@ -23,6 +23,7 @@
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
@@ -149,6 +150,36 @@ namespace Belle2 {
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
 
+    /** Charge: BKLM scintillators when FE != 0 */
+    TH1F* m_ChargeScintillatorBKLM;
+
+    /** Charge: EKLM scintillators when FE != 0 */
+    TH1F* m_ChargeScintillatorEKLM;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorBKLM_SingleStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorEKLM_SingleStrip;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorBKLM_MultiStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorEKLM_MultiStrip;
+
+    /** Cluster charge (sum of scintillator digit charges), BKLM part. */
+    TH1F* m_ChargeClusterBKLM;
+
+    /** Cluster charge (sum of scintillator digit charges), EKLM part. */
+    TH1F* m_ChargeClusterEKLM;
+
+    /** Mean scintillator digit charge per cluster (BKLM contributors only). */
+    TH1F* m_AverageChargeClusterBKLM;
+
+    /** Mean scintillator digit charge per cluster (EKLM contributors only). */
+    TH1F* m_AverageChargeClusterEKLM;
+
     /** Plane occupancy: BKLM, phi readout. */
     TH1F* m_PlaneBKLMPhi;
 
@@ -162,9 +193,6 @@ namespace Belle2 {
     TH1F** m_ChannelHits[
     EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
     BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-
-    /** Masked channels per sector. */
-    TH1F* m_MaskedChannelsPerSector;
 
     /** Number of digits: whole KLM. */
     TH1F* m_DigitsKLM;
@@ -252,6 +280,9 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
 
     /** L1 timing trigger bits of interest for KLM DQM (event-level). */
     static constexpr std::array<TRGSummary::ETimingType, 3> c_KlmL1Triggers = {

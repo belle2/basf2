@@ -55,8 +55,8 @@ namespace Belle2 {
      * Returns four momentum vector
      * @return const four momentum vector
      */
-    const ROOT::Math::PxPyPzEVector Get4MomentumFromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
-                                                            ECLCluster::EHypothesisBit hypo);
+    static const ROOT::Math::PxPyPzEVector Get4MomentumFromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
+        ECLCluster::EHypothesisBit hypo);
     /**
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
      * @return const TMatrixD
@@ -67,8 +67,8 @@ namespace Belle2 {
      * Returns 4x6 Jacobi matrix (px, py, pz, E)
      * @return const TMatrixD
      */
-    const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
-                                                 ECLCluster::EHypothesisBit hypo);
+    static const TMatrixD GetJacobiMatrix4x6FromCluster(const ECLCluster* cluster, const ROOT::Math::XYZVector& vertex,
+                                                        ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns 3x3 covariance matrix (E, theta, phi)

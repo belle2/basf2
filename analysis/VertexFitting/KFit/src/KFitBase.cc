@@ -747,7 +747,7 @@ KFitBase::isTrackIDInRange(const int id) const
 
 
 bool
-KFitBase::isNonZeroEnergy(const HepLorentzVector& p) const
+KFitBase::isNonZeroEnergy(const HepLorentzVector& p)
 {
   if (p.t() != 0) return true;
 

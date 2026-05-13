@@ -344,7 +344,7 @@ namespace TreeFitter {
     return getDecayLength(pb, *m_fitparams);
   }
 
-  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const
+  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams)
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();

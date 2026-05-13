@@ -232,7 +232,7 @@ namespace Belle2 {
        * @param p Lorentz vector
        * @return true for non-zero energy, false for otherwise
        */
-      bool isNonZeroEnergy(const CLHEP::HepLorentzVector& p) const;
+      static bool isNonZeroEnergy(const CLHEP::HepLorentzVector& p);
 
 
       /** Error code. */

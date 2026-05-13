@@ -643,11 +643,6 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
   /* Obtain plots necessary for FE Ratio plots */
   auto* numerator = findHist(m_histogramDirectoryName + "/" + histName + "_0");
   auto* denominator = findHist(m_histogramDirectoryName + "/" + histName + "_1");
-  /* Check if fe histograms exist*/
-  if (numerator == nullptr || denominator == nullptr) {
-    B2INFO("processFEHistogram: Histograms needed for FE Ratio computation are not found");
-    return;
-  }
 
   feHist->Reset();
   std::unique_ptr<TH1> feClone(static_cast<TH1*>(feHist->Clone())); // Clone feHist

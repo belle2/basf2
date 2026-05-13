@@ -269,6 +269,14 @@ namespace Belle2 {
         return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_colOf[slot][ch] : short(-1);
       }
 
+      /**
+       * Set the hardware identifiers corresponding to a TOP channel.
+       *
+       * The identifiers are derived from the channel number and stored in the
+       * member variables used to fill the output tree branches.
+       *
+       * @param channel channel number within the TOP slot
+       */
       void setHardwareIdentifiers(short channel)
       {
         TOPDigit digit;

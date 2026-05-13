@@ -13,6 +13,23 @@ import os
 
 from basf2 import Module, Path, B2ERROR, B2INFO
 from basf2.utils import pretty_print_table
+from rawdata import add_unpackers
+from gdltrigger import filter_trigger_abort_gaps
+
+
+BGO_OBJECTS = (
+    'EventLevelTriggerTimeInfo',
+    'PXDDigits',
+    'SVDShaperDigits',
+    'CDCHits',
+    'TOPDigits',
+    'TOPInjectionVeto'
+    'ARICHDigits',
+    'ECLWaveforms',
+    'KLMDigits',
+    'TRGECLBGTCHits',
+    'TRGSummary'
+)
 
 
 class SelectTRGTypes(Module):
@@ -188,3 +205,57 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     # fewer and or smaller amounts of data have to be read for each GetEntry()
     path.add_module('RootOutput', outputFileName=fileName, branchNames=branches, excludeBranchNames=excludeBranches,
                     buildIndex=False, autoFlushSize=-500000)
+
+
+def add_bgo_modules(path, additionalBranches=None):
+    """
+    This function adds to the path all the necessary modules to produce Beam Background Overlay (BGO) files
+    starting from raw data.
+    This function already adds the ``RootOutput`` module with all the branch names correctly set.
+
+    Arguments:
+        path (Path): Path to add module to
+        additionalBranches (list): Additional objects/arrays of event durability to save
+    """
+
+    empty = Path()
+
+    # Gearbox
+    path.add_module('Gearbox')
+
+    # Geometry
+    path.add_module('Geometry')
+
+    # Unpack TRGSummary
+    path.add_module('TRGGDLUnpacker')
+    path.add_module('TRGGDLSummary')
+
+    # Show progress of processing
+    path.add_module('Progress')
+
+    # Select specific triggered events
+    selector = path.add_module(SelectTRGTypes(trg_types=get_trigger_types_for_bgo()))
+    selector.if_false(empty)
+
+    # Filter away the events falling in the trigger abort gaps
+    filter_trigger_abort_gaps(path)
+
+    # Unpack detector data
+    add_unpackers(path, components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
+
+    # Convert ECLDsps to ECLWaveforms
+    compress = path.add_module('ECLCompressBGOverlay', CompressionAlgorithm=3)
+    compress.if_false(empty)
+
+    # Shift the time of KLMDigits
+    path.add_module('KLMDigitTimeShifter')
+
+    # ECL trigger unpacker and BGOverlay dataobject
+    path.add_module('TRGECLUnpacker')
+    path.add_module('TRGECLBGTCHit')
+
+    # Output
+    branches = list(BGO_OBJECTS)
+    if additionalBranches:
+        branches += additionalBranches
+    path.add_module('RootOutput', branchNames=branches)

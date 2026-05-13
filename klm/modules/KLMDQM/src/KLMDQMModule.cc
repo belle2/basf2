@@ -494,7 +494,7 @@ void KLMDQMModule::event()
           uint16_t triggerBits = digitRaw->getTriggerBits();
           if ((triggerBits & 0x10) != 0) {
             m_ChargeScintillatorEKLM_MultiStrip->Fill(digit.getCharge());
-          } else if ((triggerBits & 0x10) == 0) {
+          } else {
             m_ChargeScintillatorEKLM_SingleStrip->Fill(digit.getCharge());
           }
         } else {
@@ -538,7 +538,7 @@ void KLMDQMModule::event()
             uint16_t triggerBits = digitRaw->getTriggerBits();
             if ((triggerBits & 0x10) != 0) {
               m_ChargeScintillatorBKLM_MultiStrip->Fill(digit.getCharge());
-            } else if ((triggerBits & 0x10) == 0) {
+            } else {
               m_ChargeScintillatorBKLM_SingleStrip->Fill(digit.getCharge());
             }
           } else {

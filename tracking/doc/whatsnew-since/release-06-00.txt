@@ -1,5 +1,6 @@
-Changes in the tracking package since release-06-00 (new features of release-07)
---------------------------------------------------------------------------------
+Changes in the tracking package since release-06-00
+---------------------------------------------------
+... (new features of release-07)
 
 Event Time
 ++++++++++

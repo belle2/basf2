@@ -685,7 +685,7 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
     auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", 0, false);
 
     UpdateCanvas(canvas->GetName(), (feHist != nullptr));
-    if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
+    if (deltaNumer != nullptr && deltaDenom != nullptr) {
       B2INFO("DQMHistAnalysisKLM: FE Ratio Delta Num/Denom Entries is "
              << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
 

@@ -73,16 +73,16 @@ namespace Belle2 {
     TH1F* m_h_L1CDCKLM1x3 = nullptr;/**< histogram for efficiency of CDC-KLM TRG bits using 1x3 prong tau pairs */
 
     /** Array of ECL trigger bits */
-    std::array<std::string, 8> m_ECLTrgBit =
-    {"hie", "c4", "eclmumu", "lml1", "lml2", "lml6", "lml8", "lml12"};
+    std::array<std::string, 13> m_ECLTrgBit =
+    {"hie", "c4", "eclmumu", "ecltaub2b", "lml0", "lml1", "lml2", "lml4", "lml6", "lml8", "lml12", "lml13", "lml16"};
 
     /** Array of CDC trigger bits */
-    std::array<std::string, 7> m_CDCTrgBit =
-    {"ffz", "fz0", "fz30", "fso", "szo", "szoecl", "sttz"};
+    std::array<std::string, 9> m_CDCTrgBit =
+    {"ffz", "fzo", "fz30", "fso", "syo", "sso", "szo", "szoecl", "sttz"};
 
     /** Array of KLM and CDC-KLM bits */
-    std::array<std::string, 9> m_CDCKLMTrgBit =
-    {"klmb2b", "eklmb2b", "beklm", "zcdcklm1", "zcdcklm2", "cdcklm3", "cdcklm4", "seklm1", "seklm2"};
+    std::array<std::string, 17> m_CDCKLMTrgBit =
+    {"klm2", "eklm2", "eklmhit", "fwd_seklm", "bwd_seklm", "ieklm1", "mu_pair", "mu_eb2b", "klmb2b", "eklmb2b", "beklm", "zcdcklm1", "zcdcklm2", "cdcklm3", "cdcklm4", "seklm1", "seklm2"};
 
     /** Name of the tau+tau- (1x1) particle list */
     std::string m_tautau1x1PListName = "";

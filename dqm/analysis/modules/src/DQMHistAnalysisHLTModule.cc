@@ -39,7 +39,6 @@ REG_MODULE(DQMHistAnalysisHLT);
 DQMHistAnalysisHLTModule::DQMHistAnalysisHLTModule()
 {
   setDescription("Modify and analyze the data quality histograms of HLT");
-  addParam("pvPrefix", m_pvPrefix, "EPICS PV Name for the inst. luminosity", m_pvPrefix);
   addParam("bhabhaName", m_bhabhaName, "Name of the bhabha trigger to do a ratio against", m_bhabhaName);
   addParam("columnMapping", m_columnMapping, "Which columns to use for calculating ratios and cross sections", m_columnMapping);
   addParam("l1Histograms", m_l1Histograms, "Which l1 histograms to show", m_l1Histograms);
@@ -144,13 +143,15 @@ void DQMHistAnalysisHLTModule::initialize()
     new TH1F("MeanMemoryChange", "Mean memory change [MB]", 1, 0, 0)
   };
 
-#ifdef _BELLE2_EPICS
-  if (not m_pvPrefix.empty()) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel(m_pvPrefix.data(), NULL, NULL, 10, &m_epicschid), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  //EPICS PVs for HLT
+  addDeltaPar("timing_statistics", "processingTimeHistogram", HistDelta::c_Events, 10000, 1);
+  addDeltaPar("timing_statistics", "processesPerUnitHistogram", HistDelta::c_Events, 10000, 1);
+  registerExternalEpicsPV("B2_nsm:get:ECL_LUM_MON:lum_det_run", "instLuminosity");
+  registerExternalEpicsPV("B2_nsm:get:TTDS_COM:trigoutrate", "L1Rate");
+  registerEpicsPV("HLT:ProcessingTime", "ProcessingTime");
+  registerEpicsPV("HLT:BudgetTime", "BudgetTime");
+  registerEpicsPV("HLT:CPUUsage", "CPUUsage");
+
 }
 
 
@@ -175,6 +176,13 @@ void DQMHistAnalysisHLTModule::beginRun()
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
+
+  // Set alarm limits for HLT:CPUUsage epicsPV
+  double unused = NAN;
+  double m_meanUpperWarn = 0.9;
+  double m_meanUpperAlarm = 1.0;
+  requestLimitsFromEpicsPVs("CPUUsage", unused, unused, m_meanUpperWarn, m_meanUpperAlarm);
+
 }
 
 void DQMHistAnalysisHLTModule::event()
@@ -236,25 +244,39 @@ void DQMHistAnalysisHLTModule::event()
     return;
   }
 
+  // Set the epicsPVs for HLT
+  auto hist_ProcessingTime = getDelta("timing_statistics", "processingTimeHistogram", 0, true);
+  double HLTProcessingTime = 0;
+
+  if (hist_ProcessingTime) {
+    HLTProcessingTime = hist_ProcessingTime->GetMean(); // unit = ms
+    setEpicsPV("ProcessingTime", HLTProcessingTime);
+  }
+
+  auto hist_Procs = getDelta("timing_statistics", "processesPerUnitHistogram", 0, true);
+  double HLTBudgetTime = 0; // Number of HLT threads / L1 rate [kHz]
+  double L1Rate = getEpicsPV("L1Rate");
+
+  if (hist_Procs && L1Rate != 0) {
+    double nProcs = hist_Procs->GetMean() * 0.5; // Number of HLT threads
+    HLTBudgetTime = nProcs * 1e03 / L1Rate; // unit = ms
+    setEpicsPV("BudgetTime", HLTBudgetTime);
+  }
+
+  if (HLTBudgetTime != 0)
+    setEpicsPV("CPUUsage", HLTProcessingTime / HLTBudgetTime);
+
+
   m_hEfficiencyTotal.second->Reset();
   m_hEfficiency.second->Reset();
   m_hCrossSection.second->Reset();
   m_hRatios.second->Reset();
 
-  double instLuminosity = 0;
+  double instLuminosity = getEpicsPV("instLuminosity");
   double numberOfAcceptedHLTEvents = getValue("total_result", totalResultHistogram);
   double numberOfBhabhaEvents = getValue(m_bhabhaName, skimHistogram);
   double numberOfAllEvents = hltUnitNumberHistogram->GetEntries();
   double numberOfProcesses = processesPerUnitHistogram->GetEntries();
-
-#ifdef _BELLE2_EPICS
-  if (not m_pvPrefix.empty()) {
-    SEVCHK(ca_get(DBR_DOUBLE, m_epicschid, (void*)&instLuminosity), "ca_get failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  } else {
-    instLuminosity = 0;
-  }
-#endif
 
   m_hEfficiencyTotal.second->Fill("total_result", numberOfAcceptedHLTEvents / numberOfAllEvents);
   if (instLuminosity != 0) {
@@ -431,10 +453,4 @@ void DQMHistAnalysisHLTModule::event()
 
 void DQMHistAnalysisHLTModule::terminate()
 {
-#ifdef _BELLE2_EPICS
-  if (not m_pvPrefix.empty()) {
-    SEVCHK(ca_clear_channel(m_epicschid), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }

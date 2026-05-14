@@ -70,6 +70,7 @@ class TestValidationMetadataSetter(unittest.TestCase):
         )
 
         modularAnalysis.fillParticleListFromMC("Upsilon(4S)", "", path=path)
+        modularAnalysis.fillParticleListFromMC("B+", "", path=path)
 
         out_file_path = tmp_dir_path / "out.root"
         create_validation_histograms(
@@ -111,6 +112,26 @@ class TestValidationMetadataSetter(unittest.TestCase):
             description="Overall description of plots in this package.",
         )
 
+        # Test the possibility of calling create_validation_histograms twice with the same output file
+        create_validation_histograms(
+            path,
+            out_file_path,
+            "B+",
+            variables_1d=[
+                (
+                    "E",
+                    100,
+                    5,
+                    15,
+                    "energy",
+                    "me <wontreply@dont.try>",
+                    "description of E",
+                    "nothing to check",
+                    "x label",
+                )
+            ]
+        )
+
         basf2.process(path=path)
 
         # Test outcome
@@ -142,6 +163,15 @@ class TestValidationMetadataSetter(unittest.TestCase):
         self.assertEqual(md["description"], "some description nobody reads")
         self.assertEqual(md["check"], "nothing to check")
         self.assertEqual(md["metaoptions"], ["mop1", "mop2"])
+        self.assertEqual(md["contact"], "me <wontreply@dont.try>")
+
+        # 1D Histogram from second call
+        # *****************************
+
+        md = get_metadata(tf.Get("E"))
+        self.assertEqual(md["description"], "description of E")
+        self.assertEqual(md["check"], "nothing to check")
+        self.assertEqual(md["metaoptions"], [])
         self.assertEqual(md["contact"], "me <wontreply@dont.try>")
 
 

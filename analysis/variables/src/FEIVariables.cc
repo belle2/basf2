@@ -43,7 +43,6 @@ namespace Belle2 {
       }
       int tag_index = -1;
       int tag_N = 0;
-      // cppcheck-suppress unassignedVariable
       for (const auto& [key, value] : tag_candidates) {
         if (value > tag_N) {
           tag_index = key;

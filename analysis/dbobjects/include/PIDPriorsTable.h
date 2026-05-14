@@ -195,8 +195,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
-    // cppcheck-suppress unusedPrivateFunction
-    short findBinFast(float val, std::vector<float> array) const;
+    [[maybe_unused]] short findBinFast(float val, std::vector<float> array) const;
 
     /**
      * This function returns the position of a number in a sorted array of bin edges,
@@ -205,9 +204,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
-    // cppcheck-suppress unusedPrivateFunction
-    short findBinWithFixedWidth(float val, std::vector<float> array) const;
-
+    [[maybe_unused]] short findBinWithFixedWidth(float val, std::vector<float> array) const;
 
   };
 } // Belle2 namespace

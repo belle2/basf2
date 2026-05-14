@@ -34,12 +34,10 @@ namespace {
   {
     TreeFitter::FitParams fitParDim3(3);
 
-    // cppcheck-suppress constStatement
     fitParDim3.getStateVector() << 1, 2, 3;
     fitParDim3.resetStateVector();
     EXPECT_FALSE(fitParDim3.getStateVector().array().any()) << "fitParDim3.resetStateVector() didn't work";
 
-    // cppcheck-suppress constStatement
     fitParDim3.getCovariance() << 1, 2, 3, 4, 5, 6, 7, 8, 9;
     fitParDim3.resetCovariance();
     EXPECT_FALSE(fitParDim3.getCovariance().array().any()) << "fitParDim3.resetCovariance() didn't work";

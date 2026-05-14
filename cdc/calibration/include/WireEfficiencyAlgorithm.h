@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Constructor.
       WireEfficiencyAlgorithm();
       /// Destructor.
-      ~WireEfficiencyAlgorithm() { delete m_efficiencyList; }
+      ~WireEfficiencyAlgorithm() { delete m_efficiencyList; delete m_badWireList; }
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_outputFileName = "histWireEff_" + name + ".root";}
       /// Set the average occupancy threshold

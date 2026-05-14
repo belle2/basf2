@@ -31,7 +31,7 @@ namespace Belle2 {
     EventKinematicsModule();
 
     /** free memory */
-    virtual ~EventKinematicsModule();
+    virtual ~EventKinematicsModule() override;
 
     /** Define the physical parameters. look for them in database. */
     virtual void initialize() override;

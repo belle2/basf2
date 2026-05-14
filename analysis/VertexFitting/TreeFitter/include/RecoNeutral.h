@@ -22,7 +22,7 @@ namespace TreeFitter {
     RecoNeutral(Belle2::Particle* bc, const ParticleBase* mother) ;
 
     /** destructor */
-    virtual ~RecoNeutral() {};
+    virtual ~RecoNeutral() override = default;
 
     /** init particle with mother */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;

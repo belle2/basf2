@@ -73,7 +73,7 @@ namespace Belle2 {
       explicit SoftGaussParticleConstraint(double sigma_     ///< The sigma value
                                           );
       /// Virtual destructor
-      virtual ~SoftGaussParticleConstraint() {};
+      virtual ~SoftGaussParticleConstraint() override = default;
 
       /// Adds several ParticleFitObject objects to the list
       virtual void setFOList(std::vector <ParticleFitObject*>* fitobjects_ ///< A list of BaseFitObject objects

@@ -36,7 +36,7 @@ namespace Belle2 {
       /// Constructor
       NewtonFitterGSL();
       /// Virtual destructor
-      virtual ~NewtonFitterGSL();
+      virtual ~NewtonFitterGSL() override;
 
       /// The fit method, returns  the fit probability
       virtual double fit() override;

@@ -23,7 +23,7 @@ namespace TreeFitter {
     /** empty constructor */
     MergedConstraint() : Constraint(Constraint::merged) {}
     /** destructor */
-    virtual ~MergedConstraint() {}
+    virtual ~MergedConstraint() override = default;
     /** constructor with constraint list */
     explicit MergedConstraint(const constraintlist& list) :
       Constraint(Constraint::merged), m_list(list)

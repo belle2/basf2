@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Default destructor
      */
-    virtual ~EventShapeCalculatorModule() {};
+    virtual ~EventShapeCalculatorModule() override = default;
 
     /** Define the physical parameters. look for them in database. */
     virtual void initialize() override;

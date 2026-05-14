@@ -34,7 +34,7 @@ namespace Belle2 {
       SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName);
 
       /** Destructor */
-      ~SelectorMVA();
+      ~SelectorMVA() override;
 
       /** Selector response that this pair of particles come from the same mc/actual particle */
       virtual float getResponse(Particle* iPart, Particle* jPart) override;

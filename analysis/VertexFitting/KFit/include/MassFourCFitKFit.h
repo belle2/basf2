@@ -30,11 +30,9 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       MassFourCFitKFit();
       /** Destruct the object. */
-      ~MassFourCFitKFit(void);
-
+      ~MassFourCFitKFit(void) override;
 
     public:
-
 
       /** Set an invariant mass of daughter particle for the mass-four-momentum-constraint fit.
        * @param m invariant mass

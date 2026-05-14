@@ -28,8 +28,7 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       MassPointingVertexFitKFit(void);
       /** Destruct the object. */
-      ~MassPointingVertexFitKFit(void);
-
+      ~MassPointingVertexFitKFit(void) override;
 
     public:
       /** Set an initial vertex point for the mass-vertex-pointing constraint fit.

@@ -46,7 +46,7 @@ namespace Belle2 {
       explicit MassConstraint(double mass_ = 0.    ///< The mass difference between object sets 1 and 2
                              );
       /// Virtual destructor
-      virtual ~MassConstraint();
+      virtual ~MassConstraint() override;
 
       /// Returns the value of the constraint
       virtual double getValue() const override;

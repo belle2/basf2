@@ -54,7 +54,7 @@ namespace Belle2 {
                                   double value_ = 0  ///< Target value of sum
                                  );
       /// Virtual destructor
-      virtual ~SoftGaussMomentumConstraint();
+      virtual ~SoftGaussMomentumConstraint() override;
 
       /// Returns the value of the constraint function
       virtual double getValue() const override;

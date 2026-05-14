@@ -852,7 +852,6 @@ namespace Belle2 {
       // sort descending by weight
       std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                 ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
-      // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 

@@ -76,12 +76,10 @@ namespace Belle2 {
     */
     void addRemainingParticles(const Particle* particle, RestOfEvent* roe);
 
-    // cppcheck-suppress unusedPrivateFunction
     /** for debugging purposes */
-    void printEvent();
+    [[maybe_unused]] void printEvent();
 
-    // cppcheck-suppress unusedPrivateFunction
     /** for debugging purposes */
-    void printParticle(const Particle* particle);
+    [[maybe_unused]]void printParticle(const Particle* particle);
   };
 }

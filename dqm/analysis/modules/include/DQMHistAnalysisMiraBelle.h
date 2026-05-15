@@ -28,6 +28,8 @@ namespace Belle2 {
      */
     DQMHistAnalysisMiraBelleModule();
 
+  private:
+
     /**
      * Destructor
      */
@@ -61,6 +63,31 @@ namespace Belle2 {
      * Clean-up, close files, summarize statistics, etc.
      */
     void terminate() override final;
+
+    /**
+    * Extract data from histograms related to MuMu
+    */
+    void ExtractMumu(void);
+
+    /**
+    * Extract data from histograms related to Do*
+    */
+    void ExtractD0Star(void);
+
+    /**
+    * Extract data from histograms related to TauPairs
+    */
+    void ExtractTaupair(void);
+
+    /**
+    * Extract data from histograms related to Bhabha
+    */
+    void ExtractBhabha(void);
+
+    /**
+    * Extract data from histograms related to Hadron
+    */
+    void ExtractHadron(void);
 
   protected:
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */

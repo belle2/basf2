@@ -100,7 +100,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[0].histo = Triggers;
@@ -110,7 +110,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
+    Hits = findHist(locationHits.Data());
     if (Hits) {
       m_hInjectionLERPXD->Divide(Hits, Triggers);
     }
@@ -118,12 +118,12 @@ void DQMHistAnalysisPXDInjectionModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    RefMod_fw = (TH1*)findHist(locationHits.Data());
+    RefMod_fw = findHist(locationHits.Data());
     locationHits = "PXDOccInjLER_1_1_2";
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    RefMod_bw = (TH1*)findHist(locationHits.Data());
+    RefMod_bw = findHist(locationHits.Data());
 
     // assume trigger is the same for all modules (makes sense :-)
     for (VxdID& avxdid : m_sensors) {
@@ -135,7 +135,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
       if (m_histogramDirectoryName != "") {
         locationHits = m_histogramDirectoryName + "/" + locationHits;
       }
-      Hits = (TH1*)findHist(locationHits.Data());
+      Hits = findHist(locationHits.Data());
       if (Hits) {
         m_hInjectionLERPXDMod[avxdid]->Divide(Hits, Triggers);
         if (avxdid.getSensorNumber() == 1 && RefMod_fw) {
@@ -153,7 +153,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[3].histo = Triggers;
@@ -163,7 +163,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
+    Hits = findHist(locationHits.Data());
     if (Hits) {
       m_hInjectionHERPXD->Divide(Hits, Triggers);
     }
@@ -171,12 +171,12 @@ void DQMHistAnalysisPXDInjectionModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    RefMod_fw = (TH1*)findHist(locationHits.Data());
+    RefMod_fw = findHist(locationHits.Data());
     locationHits = "PXDOccInjHER_1_1_2";
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    RefMod_bw = (TH1*)findHist(locationHits.Data());
+    RefMod_bw = findHist(locationHits.Data());
     // assume trigger is the same for all modules (makes sense :-)
     for (VxdID& avxdid : m_sensors) {
       TString buff = (std::string)avxdid;
@@ -186,7 +186,7 @@ void DQMHistAnalysisPXDInjectionModule::event()
       if (m_histogramDirectoryName != "") {
         locationHits = m_histogramDirectoryName + "/" + locationHits;
       }
-      Hits = (TH1*)findHist(locationHits.Data());
+      Hits = findHist(locationHits.Data());
       if (Hits) {
         m_hInjectionHERPXDMod[avxdid]->Divide(Hits, Triggers);
         if (avxdid.getSensorNumber() == 1 && RefMod_fw) {

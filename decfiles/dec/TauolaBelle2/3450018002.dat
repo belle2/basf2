@@ -3,6 +3,8 @@
 1                               * switch for KKMC-JETSET (1:on, 0:off)
 ********** Above is for basf *********
 
+* MCEventType: 3450018002 Descriptor: tau+ -> K+ [eta -> gg] nu (TauolaBelle2) 
+
 BeginX
 ********************************************************************************
 *               ACTUAL DATA FOR THIS PARTICULAR RUN

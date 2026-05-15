@@ -37,6 +37,7 @@
 #include <analysis/utility/ROOTToCLHEP.h>
 #include <analysis/utility/CLHEPToROOT.h>
 
+#include <analysis/VertexFitting/KFit/KFitError.h>
 #include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 using namespace Belle2;
@@ -48,36 +49,45 @@ namespace {
     const CLHEP::HepLorentzVector& p4)
   {
     // ordering expected by KFit:
-    // (x,y,z,px,py,pz,E)
+    // (px,py,pz,E,x,y,z)
+    // cov6 from getPosMomCov has ordering:
+    // (x,y,z,px,py,pz)
+    // so we need to reindex: KFit 0,1,2 (px,py,pz) <- cov6 3,4,5
+    //                        KFit 4,5,6 (x,y,z)    <- cov6 0,1,2
+    constexpr int toCov6[7] = {3, 4, 5, -1, 0, 1, 2}; // -1 = E, handled separately
+    constexpr int pIdx[3] = {3, 4, 5}; // momentum indices in cov6
+
     CLHEP::HepSymMatrix cov7(7, 0);
 
-    // copy 6x6 block (lower triangle only)
-    for (int i = 0; i < 6; ++i) {
-      for (int j = 0; j <= i; ++j) {
-        cov7[i][j] = cov6(i, j);
+    // copy 6x6 block (lower triangle only), skipping E (index 3)
+    for (int i = 0; i < 7; ++i) {
+      if (i == 3) continue;
+      for (int j = i; j < 7; ++j) {
+        if (j == 3) continue;
+        cov7[j][i] = cov6(toCov6[j], toCov6[i]);
       }
     }
 
-    // Calculate E and related derivatives
+    // calculate E-related derivatives
     const double E = p4.e();
     const double dEdp[3] = {
       p4.px() / E,
       p4.py() / E,
       p4.pz() / E
     };
-    constexpr int pIdx[3] = {3, 4, 5};
 
-    // cov(E, i) (lower triangle only)
-    for (int i = 0; i < 6; ++i) {
+    // cov(E, i) for all i != E (lower triangle only)
+    for (int i = 0; i < 7; ++i) {
+      if (i == 3) continue;
       double covEi = 0.0;
       for (int k = 0; k < 3; ++k) {
-        covEi += cov6(i, pIdx[k]) * dEdp[k];
+        covEi += cov6(toCov6[i], pIdx[k]) * dEdp[k];
       }
-      // only lower triangle storage
-      if (i < 6) {
-        cov7[6][i] = covEi;
+      // index 3 is E; since i != 3, we always have i < 3 or i > 3
+      if (i < 3) {
+        cov7[3][i] = covEi; // lower triangle: row > col
       } else {
-        cov7[i][6] = covEi;
+        cov7[i][3] = covEi; // lower triangle: row > col
       }
     }
 
@@ -88,7 +98,7 @@ namespace {
         covEE += cov6(pIdx[i], pIdx[j]) * dEdp[i] * dEdp[j];
       }
     }
-    cov7[6][6] = covEE;
+    cov7[3][3] = covEE;
 
     return cov7;
   }
@@ -179,49 +189,36 @@ bool V0Fitter::fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus
   EvtGenDatabasePDG* pdgDB = EvtGenDatabasePDG::Instance();
 
   auto addTrackToFit =
-  [&](genfit::Track & track, int pdg, int id) {
-    const genfit::MeasuredStateOnPlane state = track.getFittedState();
+  [&](const genfit::Track & track, const int pdg) {
     TVector3 pos;
     TVector3 mom;
     // KFit needs the 7x7 cov. matrix, not the 6x6 one:
     // in the 6x6 one, correlations with E are missing.
     TMatrixDSym cov6;
+    const genfit::MeasuredStateOnPlane state = track.getFittedState();
     state.getPosMomCov(pos, mom, cov6);
     const double mass = pdgDB->GetParticle(pdg)->Mass();
-    const CLHEP::HepLorentzVector clhepMom(
-      mom.X(),
-      mom.Y(),
-      mom.Z(),
-      std::sqrt(mom.Mag2() + mass * mass)
-    );
-    const HepGeom::Point3D<double> clhepPos(
-      pos.X(),
-      pos.Y(),
-      pos.Z()
-    );
+    const CLHEP::HepLorentzVector clhepMom(mom.X(), mom.Y(), mom.Z(), std::sqrt(mom.Mag2() + mass * mass));
+    const HepGeom::Point3D<double> clhepPos(pos.X(), pos.Y(), pos.Z());
     // This is now good for KFit
-    const CLHEP::HepSymMatrix clhepCov7 =
-      makeCov7x7(cov6, clhepMom);
+    const CLHEP::HepSymMatrix clhepCov7 = makeCov7x7(cov6, clhepMom);
     const int charge = track.getFitStatus()->getCharge();
-    B2INFO("Before fit, track " << id << ": " << clhepMom.z() << " " << clhepMom.y() << " " << clhepMom.z());
 
     vertexFit.addTrack(clhepMom, clhepPos, clhepCov7, charge);
   };
 
-  addTrackToFit(trackPlus,  pdgTrackPlus, 0);
-  addTrackToFit(trackMinus, pdgTrackMinus, 1);
+  addTrackToFit(trackPlus,  pdgTrackPlus);
+  addTrackToFit(trackMinus, pdgTrackMinus);
 
-  const bool ok = vertexFit.doFit();
-  if (not ok) return ok;
+  const bool ok = (vertexFit.doFit() == analysis::KFitError::kNoError);
+  if (!ok) return false;
 
   const HepGeom::Point3D<double> posVertex = vertexFit.getVertex();
-  B2INFO("Vertex: " << posVertex.z() << " " << posVertex.y() << " " << posVertex.z());
   const CLHEP::HepSymMatrix covVertex = vertexFit.getVertexError();
   std::vector<genfit::GFRaveTrackParameters*> trackParamsVertex;
   trackParamsVertex.reserve(vertexFit.getTrackCount());
   for (int i = 0; i < vertexFit.getTrackCount(); ++i) {
     const CLHEP::HepLorentzVector mom = vertexFit.getTrackMomentum(i);
-    B2INFO("After fit, track " << i << ": " << mom.z() << " " << mom.y() << " " << mom.z());
     const HepPoint3D pos = vertexFit.getTrackPosition(i);
     TVectorD state{6};
     state[0] = pos.x();
@@ -230,7 +227,7 @@ bool V0Fitter::fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus
     state[3] = mom.x();
     state[4] = mom.y();
     state[5] = mom.z();
-    TMatrixDSym cov6 = extractCov6x6(vertexFit.getTrackError(i));
+    const TMatrixDSym cov6 = extractCov6x6(vertexFit.getTrackError(i));
     genfit::GFRaveTrackParameters* trackparams = new genfit::GFRaveTrackParameters(nullptr, nullptr, 1, state, cov6, true);
     trackParamsVertex.push_back(trackparams);
   }
@@ -239,7 +236,7 @@ bool V0Fitter::fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus
 
   vertex = genfit::GFRaveVertex{TVector3{posVertex.x(), posVertex.y(), posVertex.z()}, CLHEPToROOT::getTMatrixDSym(covVertex), trackParamsVertex, ndfVertex, chisqVertex};
 
-  return ok;
+  return true;
 }
 
 // cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers

@@ -496,25 +496,12 @@ int main(int argc, char* argv[])
   config.install_signal_handlers = 0;
   config.safe_path = 0;
 
-  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-
-  std::vector<wstring> pyArgvString(arguments.size() + 2);
-
-
-  pyArgvString[0] = L"python3"; //set the executable
-  pyArgvString[1] = converter.from_bytes(pythonFile);
-  for (size_t i = 0; i < arguments.size(); i++) {
-    pyArgvString[i + 2] = converter.from_bytes(arguments[i]);
-  }
-  std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
-  for (size_t i = 0; i < pyArgvString.size(); ++i) {
-    pyArgvArray[i] = pyArgvString[i].c_str();
-  }
-
-
   //Pass python filename and additional arguments to python
-  status = PyConfig_SetArgv(&config, pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
-  checkPythonStatus(config, status);
+  PyWideStringList_Append(&config.argv, L"python3");
+  PyWideStringList_Append(&config.argv, Py_DecodeLocale(pythonFile.c_str(), nullptr));
+  for (size_t i = 0; i < arguments.size(); i++) {
+    PyWideStringList_Append(&config.argv, Py_DecodeLocale(arguments[i].c_str(), nullptr));
+  }
 
   status = Py_InitializeFromConfig(&config);
   checkPythonStatus(config, status);

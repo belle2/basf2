@@ -211,7 +211,7 @@
        whole thing. The position is given relative to the lower left edge of
        the module (the point with the most negative local coordinates). -->
   <Active>
-    <u unit="mm">3.5</u>
+    <u unit="mm">0.0</u>
     <v unit="mm">0.3</v>
     <w>top</w>
     <width unit="mm">15.312</width>

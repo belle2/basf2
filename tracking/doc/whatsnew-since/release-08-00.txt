@@ -10,6 +10,6 @@ Track Refining
 Background Rejection
 ++++++++++++++++++++
 
-* an MVA-based hit filter for the CDC is used in place of the previous cut-based version. A combined (cut-based for the inner SuperLayers + MVA-based for the outer SuperLayers) versionis also available to deal with lower HV in the innermost SuperLayers. (NOTE: the combined filter is _not_ available in release-10)
+* an MVA-based hit filter for the CDC is used in place of the previous cut-based version. A combined (cut-based for the inner SuperLayers + MVA-based for the outer SuperLayers) version is also available to deal with lower HV in the innermost SuperLayers. (NOTE: the combined filter is _not_ available in release-10)
 
 * the SVD Grouping algorithm is switched on by default, in its so-called "relaxed" configuration (i.e. accpeting the first 4 groups).

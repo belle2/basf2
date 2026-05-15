@@ -86,7 +86,7 @@ namespace Belle2 {
                                  RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
                                  const Const::ParticleType& v0Hypothesis,
                                  unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
-                                 const bool forceStore);
+                                 const bool forceStore, const bool useKFit = true);
 
     /** Create a copy of RecoTrack. Track fit should be executed in removeInnerHits function.
      * @param origRecoTrack original RecoTrack
@@ -130,6 +130,9 @@ namespace Belle2 {
      * @return
      */
     static bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+
+    bool fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, const int pdgTrackPlus, const int pdgTrackMinus,
+                       genfit::GFRaveVertex& vertex);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,

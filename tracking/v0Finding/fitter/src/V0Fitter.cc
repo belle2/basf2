@@ -32,7 +32,12 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 
+#include <framework/particledb/EvtGenDatabasePDG.h>
 #include <framework/utilities/IOIntercept.h>
+#include <analysis/utility/ROOTToCLHEP.h>
+#include <analysis/utility/CLHEPToROOT.h>
+
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
 
 using namespace Belle2;
 
@@ -100,6 +105,72 @@ void V0Fitter::initializeCuts(double beamPipeRadius,
   m_invMassRangePhoton = invMassRangePhoton;
 }
 
+bool V0Fitter::fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, const int pdgTrackPlus, const int pdgTrackMinus,
+                             genfit::GFRaveVertex& vertex)
+{
+  analysis::VertexFitKFit vertexFit;
+
+  EvtGenDatabasePDG* pdgDB = EvtGenDatabasePDG::Instance();
+
+  auto addTrackToFit =
+  [&](genfit::Track & track, int pdg) {
+    const genfit::MeasuredStateOnPlane state = track.getFittedState();
+    TVector3 pos;
+    TVector3 mom;
+    TMatrixDSym cov;
+    state.getPosMomCov(pos, mom, cov);
+    const double mass = pdgDB->GetParticle(pdg)->Mass();
+    const CLHEP::HepLorentzVector clhepMom(
+      mom.X(),
+      mom.Y(),
+      mom.Z(),
+      std::sqrt(mom.Mag2() + mass * mass)
+    );
+    const HepGeom::Point3D<double> clhepPos(
+      pos.X(),
+      pos.Y(),
+      pos.Z()
+    );
+    // This is wrong... KFit needs the 7x7 cov. matrix, not the 6x6 one:
+    // in the 6x6 one, correlations with E are missing.
+    const CLHEP::HepSymMatrix clhepCov =
+      ROOTToCLHEP::getHepSymMatrix(cov);
+    const int charge = track.getFitStatus()->getCharge();
+
+    vertexFit.addTrack(clhepMom, clhepPos, clhepCov, charge);
+  };
+
+  addTrackToFit(trackPlus,  pdgTrackPlus);
+  addTrackToFit(trackMinus, pdgTrackMinus);
+
+  const bool ok = vertexFit.doFit();
+  if (not ok) return ok;
+
+  const HepGeom::Point3D<double> posVertex = vertexFit.getVertex();
+  const CLHEP::HepSymMatrix covVertex = vertexFit.getVertexError();
+  std::vector<genfit::GFRaveTrackParameters*> trackParamsVertex;
+  trackParamsVertex.reserve(vertexFit.getTrackCount());
+  for (int i = 0; i < vertexFit.getTrackCount(); ++i) {
+    const CLHEP::HepLorentzVector mom = vertexFit.getTrackMomentum(i);
+    const HepPoint3D pos = vertexFit.getTrackPosition(i);
+    TVectorD state{6};
+    state[0] = pos.x();
+    state[1] = pos.y();
+    state[2] = pos.z();
+    state[3] = mom.x();
+    state[4] = mom.y();
+    state[5] = mom.z();
+    TMatrixDSym cov = CLHEPToROOT::getTMatrixDSym(vertexFit.getTrackError(i));
+    genfit::GFRaveTrackParameters* trackparams = new genfit::GFRaveTrackParameters(nullptr, nullptr, 1, state, cov, true);
+    trackParamsVertex.push_back(trackparams);
+  }
+  const double ndfVertex = static_cast<double>(vertexFit.getNDF());
+  const double chisqVertex = vertexFit.getCHIsq();
+
+  vertex = genfit::GFRaveVertex{TVector3{posVertex.x(), posVertex.y(), posVertex.z()}, CLHEPToROOT::getTMatrixDSym(covVertex), trackParamsVertex, ndfVertex, chisqVertex};
+
+  return ok;
+}
 
 // cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
 bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
@@ -346,7 +417,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
                                        RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
                                        const Const::ParticleType& v0Hypothesis,
                                        unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
-                                       const bool forceStore)
+                                       const bool forceStore, const bool useKFit)
 {
   const auto& trackHypotheses = getTrackHypotheses(v0Hypothesis);
 
@@ -396,8 +467,14 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
 
   genfit::GFRaveVertex vert;
-  if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {
-    return false;
+  if (useKFit) {
+    if (not fitKFitVertex(gfTrackPlus, gfTrackMinus, pdgTrackPlus, pdgTrackMinus, vert)) {
+      return false;
+    }
+  } else {
+    if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {
+      return false;
+    }
   }
 
   const ROOT::Math::XYZVector& posVert = ROOT::Math::XYZVector(vert.getPos());

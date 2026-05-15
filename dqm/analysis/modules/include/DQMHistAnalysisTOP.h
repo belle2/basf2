@@ -89,6 +89,11 @@ namespace Belle2 {
     void updateEventMonitorCanvas();
 
     /**
+     * Updates canvas of unpacker errors w/ alarming
+     */
+    void updateUnpackerErrCanvas();
+
+    /**
      * Updates canvas of number of good hits per event w/ alarming (injection BG)
      */
     void updateNGoodHitsCanvas();
@@ -244,11 +249,18 @@ namespace Belle2 {
      */
     void setIncludedBoardstacks(const std::vector<std::string>& excludedBoardstacks);
 
+    /**
+     * Sets grid x on the canvas
+     * @param canvasName canvas name
+     */
+    static void setGridX(const std::string& canvasName);
+
     // module parameters
 
     std::vector<int> m_asicWindowsBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
     std::vector<double> m_asicWindowsAlarmLevels = {0.002, 0.02}; /**< alarm levels for fraction of windows outside the band */
     std::vector<double> m_eventMonitorAlarmLevels = {1e-4, 2e-3}; /**< alarm levels for fraction of desynchronized digits */
+    std::vector<double> m_unpackerErrAlarmLevels = {0.01, 0.10}; /**< alarm levels for the fraction of unpacker errors */
     std::vector<double> m_junkHitsAlarmLevels = {0.05, 0.25}; /**< alarm levels for the fraction of junk hits */
     std::vector<double> m_deadChannelsAlarmLevels = {0.1, 0.35}; /**< alarm levels for the fraction of dead + hot channels */
     std::vector<double> m_backgroundAlarmLevels = {5.0, 10.0}; /**< alarm levels for background rates [MHz/PMT] */
@@ -310,7 +322,6 @@ namespace Belle2 {
     // graphic primitives
 
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
-    std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_deadChannelsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_backgroundAlarmLines; /**< lines representing alarm levels */

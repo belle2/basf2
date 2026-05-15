@@ -12,9 +12,9 @@ Tracking
 +++++++++++++
 
 * the GNN-based CDC pattern Recognition algorithm (CAT Finder) is now available for developers (but switched off in the standard tracking chain)
-* add the fix of tracking to preserve the tracks going through CDC dead boards --> off at the moment, need further validation
+* added the fix of tracking to preserve the tracks going through CDC dead boards --> off at the moment, need further validation
 * a combined cdc wire filter is available to perform a cut-based filter for inner layers and MVA-based filter for outer layers, layer number from which to switch to MVA could be changed via payloload
-* a "fit until success" strategy introduced in TrackCreator handles the pre-HLT fit, leaving the remaining hypotheses for offline reconstruction to split the fitting workload and save CPU time  
+* a "fit until success" strategy introduced in TrackCreator handles the pre-HLT fit (prefilter), leaving the remaining hypotheses for offline reconstruction (postfilter) to split the track fitting workload and save CPU time  
 
 
 Convenience Functions

@@ -191,9 +191,14 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   double n_l1 = 0.;
   if (h_l1) n_l1 = h_l1->GetEntries();
   m_monObj->setVariable("n_l1", n_l1);
-  double n_procs = 0.;
-  if (h_procs) n_procs = h_procs->GetEntries();
-  m_monObj->setVariable("n_procs", n_procs);
+
+  if (h_procs) {
+    m_monObj->setVariable("n_procs", h_procs->GetEntries());
+    for (int i = 2; i <= h_procs->GetXaxis()->GetNbins(); i++) {
+      std::string label = "n_procs_HLT" + std::to_string(i - 1);
+      m_monObj->setVariable(label, h_procs->GetBinContent(i));
+    }
+  }
 
   if (h_skim) {
     // loop bins, add variable to monObj named as "effCS_" + bin label w/o "accept"

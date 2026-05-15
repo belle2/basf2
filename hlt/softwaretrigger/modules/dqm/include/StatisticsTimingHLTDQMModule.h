@@ -161,10 +161,10 @@ namespace Belle2 {
       const double m_processingTimeNBins = 375;
 
       /// Maximum for the histograms of fullMemory
-      const double m_fullMemoryMax = 4000;
+      const double m_fullMemoryMax = 10000;
 
       /// Number of bins for the histograms of fullMemory
-      const double m_fullMemoryNBins = 100;
+      const double m_fullMemoryNBins = 250;
 
       /// Maximum for the histograms of nSVDShaperDigits
       const double m_nSVDShaperDigitsMax = 20000;

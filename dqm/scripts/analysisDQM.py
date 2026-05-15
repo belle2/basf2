@@ -19,6 +19,7 @@ import modularAnalysis as ma
 import stdV0s
 import vertex
 from variables import variables as vm
+import math as math
 
 
 def add_analysis_dqm(path):
@@ -187,8 +188,11 @@ def add_mirabelle_dqm(path):
     MiraBelleDst2_path.add_module(MiraBelleDst2)
 
     # MiraBelle tau path
+    # The selections are inspired from TauGeneric skim to retain taupair events
+    # The retention rate for taupair MC is ~ 51%
+    # For other MC samples, the retention rate is < 7%
     ma.fillParticleList('pi+:MiraBelleTau', 'abs(d0)<1 and abs(z0)<3', path=MiraBelleTau_path)
-    ma.fillParticleList('gamma:MiraBelleTau', '0.1<E and 1.5<clusterNHits and thetaInCDCAcceptance', path=MiraBelleTau_path)
+    ma.fillParticleList('gamma:MiraBelleTau', 'E>0.1 and clusterNHits>1.5 and thetaInCDCAcceptance', path=MiraBelleTau_path)
     ParticleListForEvent = ['pi+:MiraBelleTau', 'gamma:MiraBelleTau']
     ma.buildEventShape(ParticleListForEvent,
                        allMoments=False, foxWolfram=False, cleoCones=False,
@@ -205,15 +209,17 @@ def add_mirabelle_dqm(path):
     vm.addAlias('pionInParaThrust', 'countInList(pi+:MiraBelleTau_para)')
     vm.addAlias('pionInAntiThrust', 'countInList(pi+:MiraBelleTau_anti)')
 
+    PmissTheta_Threshold = math.radians(150)
+    maxOp_Threshold = math.radians(178)
     Tau1x1Cuts = '[nGoodTracks == 2] and [3 < visibleEnergyOfEventCMS < 10]'
-    Tau1x1Cuts += 'and [missingMomentumOfEvent_theta < 2.618]'
-    Tau1x1Cuts += 'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < 3.106686]'
+    Tau1x1Cuts += f'and [missingMomentumOfEvent_theta < {PmissTheta_Threshold}]'
+    Tau1x1Cuts += f'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < {maxOp_Threshold}]'
     Tau1x1Cuts += 'and [pionInParaThrust == 1 and pionInAntiThrust == 1]'
     ma.reconstructDecay('Z0:physMiraBelleTau1x1 -> pi+:MiraBelleTau pi-:MiraBelleTau',
                         f'{Tau1x1Cuts}', path=MiraBelleTau_path)
 
     Tau1x3Cuts = '[nGoodTracks == 4] and [3 < visibleEnergyOfEventCMS < 10.5]'
-    Tau1x3Cuts += 'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < 3.106686]'
+    Tau1x3Cuts += f'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < {maxOp_Threshold}]'
     Tau1x3Cuts += 'and [[pionInParaThrust == 1 and pionInAntiThrust == 3] or [pionInParaThrust == 3 and pionInAntiThrust == 1]]'
     ma.reconstructDecay('Z0:physMiraBelleTau1x3 -> pi+:MiraBelleTau pi-:MiraBelleTau pi+:MiraBelleTau pi-:MiraBelleTau',
                         f'{Tau1x3Cuts}', path=MiraBelleTau_path)

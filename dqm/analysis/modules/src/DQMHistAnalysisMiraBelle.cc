@@ -823,38 +823,50 @@ void DQMHistAnalysisMiraBelleModule::ExtractTaupair(void)
   //--- L1 efficiency with taupair
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x1"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("ECL_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("ECL_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x3"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("ECL_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("ECL_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x1"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("CDC_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDC_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("CDC_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDC_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("CDCKLM_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDCKLM_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
   if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3"); ptr != nullptr) {
     for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
-      std::string label = std::string("CDCKLM_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
-      mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDCKLM_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
     }
   }
 }

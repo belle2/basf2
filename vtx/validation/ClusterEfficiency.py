@@ -59,7 +59,7 @@ class ClusterEfficiency(b2.Module):
         def profile(name, title, text, contact):
             """small helper function to create a phi profile and set the names
             and descriptions"""
-            prof = ROOT.TProfile(name, title, 60, -180, 180)
+            prof = ROOT.TProfile(name, title, 360, -180, 180)
             prof.GetListOfFunctions().Add(ROOT.TNamed("Description", text))
             prof.GetListOfFunctions().Add(ROOT.TNamed("Contact", contact))
             prof.GetListOfFunctions().Add(ROOT.TNamed("Check", "Should be close to 1 everywhere"))
@@ -177,9 +177,10 @@ main = b2.create_path()
 
 b2.conditions.disable_globaltag_replay()
 b2.conditions.prepend_globaltag(get_upgrade_globaltag())
+print(b2.conditions.globaltags)
 
 eventinfosetter = main.add_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [1000])
+eventinfosetter.param('evtNumList', [10000])
 eventinfosetter.param('runList', [1])
 eventinfosetter.param('expList', [0])
 
@@ -205,5 +206,5 @@ clusterefficiency = ClusterEfficiency()
 main.add_module(clusterefficiency)
 main.add_module("Progress")
 
-b2.process(main)
-print(b2.statistics)
+b2.print_path(main)
+b2.process(main, calculateStatistics=True)

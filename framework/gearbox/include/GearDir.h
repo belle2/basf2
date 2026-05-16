@@ -33,7 +33,7 @@ namespace Belle2 {
       if (index > 0) m_path = addIndex(m_path, index);
     }
     /** Create a GearDir with an absolute path and optionally appending an index */
-    GearDir(const std::string& path = "", int index = 0)
+    explicit GearDir(const std::string& path = "", int index = 0)
     {
       m_path = path;
       if (index > 0) m_path = addIndex(path, index);

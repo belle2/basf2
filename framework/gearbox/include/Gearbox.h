@@ -57,7 +57,7 @@ namespace Belle2 {
     };
 
     /** Free structures on destruction */
-    ~Gearbox();
+    ~Gearbox() override;
 
     /** Return reference to the Gearbox instance */
     static Gearbox& getInstance();
@@ -170,7 +170,7 @@ namespace Belle2 {
      *
      * @param component Name of the DetectorComponent (e.g. IR, PXD)
      */
-    GearDir getDetectorComponent(const std::string& component);
+    static GearDir getDetectorComponent(const std::string& component);
 
     /**
      * Register a new input handler

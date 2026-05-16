@@ -56,7 +56,7 @@ namespace Belle2::Conditions {
     /** move assignment operator */
     LocalMetadataProvider& operator=(LocalMetadataProvider&&) = delete;
     /** default destructor */
-    virtual ~LocalMetadataProvider() = default;
+    virtual ~LocalMetadataProvider() override = default;
 
     /** Return the status of the given globaltag
      *

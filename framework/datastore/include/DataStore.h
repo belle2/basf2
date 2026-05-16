@@ -276,8 +276,8 @@ namespace Belle2 {
      *  @return           True if the requested object exists.
      *  @sa DependencyMap
      */
-    bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
-                          std::string const& namedRelation);
+    static bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
+                                 std::string const& namedRelation);
 
     /** Check whether an entry with the correct type is registered in the DataStore map and return it.
      *
@@ -476,11 +476,11 @@ namespace Belle2 {
      *
      * (this does NOT include the internal RelationContainer objects.)
      */
-    std::vector<std::string> getListOfObjects(const TClass* objClass, EDurability durability) const;
+    static std::vector<std::string> getListOfObjects(const TClass* objClass, EDurability durability);
 
     /** Returns a list of names of StoreObjPtr-objects whose class is (or inherits from) RelationContainer.
      */
-    std::vector<std::string> getListOfRelations(EDurability durability) const;
+    static std::vector<std::string> getListOfRelations(EDurability durability);
 
     /** Returns a (sorted) list of all the content of the DataStore (Objs-Arrays-Relations).
      */
@@ -553,7 +553,7 @@ namespace Belle2 {
      *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if both types match.
      */
-    bool checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const;
+    static bool checkType(const StoreEntry& entry, const StoreAccessorBase& accessor);
 
     /** Returns a vector with the names of store arrays matching the given name and class. Note that the returned reference is only valid until the next call.
      *

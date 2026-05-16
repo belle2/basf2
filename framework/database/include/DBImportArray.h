@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~DBImportArray()
+    ~DBImportArray() override
     {
       delete m_object;
     }

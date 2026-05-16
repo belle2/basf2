@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * The LogConnectionFilter destructor.
      */
-    virtual ~LogConnectionFilter();
+    virtual ~LogConnectionFilter() override;
 
     /**
      * Sends a log message.

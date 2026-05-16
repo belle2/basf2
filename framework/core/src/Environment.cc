@@ -31,7 +31,7 @@ Environment& Environment::Instance()
   return instance;
 }
 
-const list<string>& Environment::getModuleSearchPaths() const
+const list<string>& Environment::getModuleSearchPaths()
 {
   return ModuleManager::Instance().getModuleSearchPaths();
 }

@@ -60,6 +60,7 @@ namespace {
     unsigned long vmSizePages{0};
     unsigned long rssPages{0};
     rewind(stream);
+    if (!stream) return std::make_pair(-1, -1);
     fscanf(stream, "%lu %lu", &vmSizePages, &rssPages);
     return std::make_pair(vmSizePages * pageSizeKb, rssPages * pageSizeKb);
   }

@@ -27,7 +27,7 @@ namespace Belle2 {
     EventLimiterModule();
 
     /** Destructor of the module */
-    virtual ~EventLimiterModule() {};
+    virtual ~EventLimiterModule() override {};
 
     /** Initialization states required data objects (EventMetaData) */
     virtual void initialize() override;

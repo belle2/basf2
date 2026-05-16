@@ -674,7 +674,7 @@ namespace Belle2 {
           Scalar value = convertPythonObject(pyObject, Scalar());
           variant = value;
           return;
-        } catch (std::runtime_error& e) {
+        } catch (const std::runtime_error& e) {
         }
       }
       // Conversion failed - try next type

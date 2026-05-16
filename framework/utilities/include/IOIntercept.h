@@ -75,9 +75,9 @@ namespace Belle2 {
       /** This class is basically empty so the constructor does nothing */
       KeepStream(std::ostream&, FILE*) {}
       /** doing nothing always succeeds */
-      bool start() const { return true; }
+      static bool start() { return true; }
       /** doing nothing always succeeds */
-      bool finish() const { return true; }
+      static bool finish() { return true; }
     };
 
     /** Simple class to just discard anything written to stream by redirecting it to /dev/null */

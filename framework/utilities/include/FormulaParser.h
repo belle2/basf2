@@ -94,11 +94,11 @@ namespace Belle2 {
     /** Check if the next character is a operator */
     EOperator checkForOperator(char next);
     /** Bool to check whether there were consecutive operators or variables */
-    bool m_lastTokenWasOperator;
+    bool m_lastTokenWasOperator = false;
     /** Buffer for the formula */
     std::istringstream m_buffer;
     /** collect characters into a variable name */
-    std::string m_currentVariableName;
+    std::string m_currentVariableName = "";
     /** State of the current variable name being a valid float literal */
     ENumberStatus m_currentVariableNameNumberStatus;
     /** Stack of operators for the Shunting-yard algorithm */

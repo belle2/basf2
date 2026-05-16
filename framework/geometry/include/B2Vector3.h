@@ -756,11 +756,9 @@ namespace Belle2 {
   {
     switch (i) {
       case 0:
-        return B2Vector3<DataType>::m_coordinates[0];
       case 1:
-        return B2Vector3<DataType>::m_coordinates[1];
       case 2:
-        return B2Vector3<DataType>::m_coordinates[2];
+        return m_coordinates[i];
     }
     B2FATAL(this->name() << "::access operator: given index (i=" << i << ") is out of bounds!");
     return 0.;

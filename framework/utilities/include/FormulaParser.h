@@ -100,7 +100,7 @@ namespace Belle2 {
     /** collect characters into a variable name */
     std::string m_currentVariableName = "";
     /** State of the current variable name being a valid float literal */
-    ENumberStatus m_currentVariableNameNumberStatus;
+    ENumberStatus m_currentVariableNameNumberStatus = ENumberStatus::c_Empty;
     /** Stack of operators for the Shunting-yard algorithm */
     std::stack<EOperator> m_operatorStack;
   };

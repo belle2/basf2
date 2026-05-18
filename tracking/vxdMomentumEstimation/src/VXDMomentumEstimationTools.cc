@@ -16,7 +16,7 @@ using namespace Belle2;
 
 /** We only need a calibration for the PXD Clusters */
 template<>
-double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const
+double VXDMomentumEstimationTools<PXDCluster>::getCalibration()
 {
   return 0.5658682413283911;
 }

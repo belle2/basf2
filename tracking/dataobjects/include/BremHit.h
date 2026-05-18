@@ -84,16 +84,16 @@ namespace Belle2 {
     ROOT::Math::XYZVector m_position;
 
     /** The radiation position radius. */
-    double m_positionRadius;
+    double m_positionRadius = 0;
 
     /** The radiated energy. */
-    double m_bremEnergy;
+    double m_bremEnergy = 0;
 
     /** Angle difference between the extrapolation and the bremCluster position. */
-    double m_clusterDistance;
+    double m_clusterDistance = 0;
 
     /** The acceptance factor which is needed to find the BremHit. */
-    double m_acceptanceFactor;
+    double m_acceptanceFactor = 0;
 
     /** Making this class a ROOT class.*/
     ClassDef(BremHit, 2);

@@ -20,7 +20,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    SVDEventT0Configuration(const TString& uniqueID = "")
+    explicit SVDEventT0Configuration(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
       , m_selectTracksFromIP(true)
       , m_minimumPtSelection(0.25)
@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Get payload name
      */
-    std::string get_name() const {return s_name;}
+    const std::string& get_name() const {return s_name;}
 
     /**
      * Get the unique ID  of the calibration

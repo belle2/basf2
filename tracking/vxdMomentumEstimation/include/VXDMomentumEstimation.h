@@ -94,8 +94,8 @@ namespace Belle2 {
 
     /** After calculating dEdX we need to map this to p using a predefined function and parameters that
      * were extracted with a fit to mc data. */
-    double convertDEDXToMomentum(double dEdX, const FitParameters& fitParameters,
-                                 const CorrectionFitParameters& correctionFitParameters) const
+    static double convertDEDXToMomentum(double dEdX, const FitParameters& fitParameters,
+                                        const CorrectionFitParameters& correctionFitParameters)
     {
       const double firstPart = fitParameters.aE / (dEdX - fitParameters.bE) / (dEdX - fitParameters.bE);
       const double lastPart = fitParameters.cE + fitParameters.dE * dEdX;

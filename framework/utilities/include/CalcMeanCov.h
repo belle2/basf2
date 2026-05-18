@@ -203,7 +203,7 @@ namespace Belle2 {
       addValue < i + 1 > (weight, values...);
     }
     /** Break recursion of addValue when no parameters are left */
-    template<int i> void addValue(value_type) {}
+    template<int i> static void addValue(value_type) {}
 
     /** Update covariance between parameters i and j
      * @see addArrayValues
@@ -225,7 +225,7 @@ namespace Belle2 {
     }
 
     /** Break recursion of updateCov once all parameters are consumed */
-    template<int i, int j> void updateCov(value_type, value_type) {}
+    template<int i, int j> static void updateCov(value_type, value_type) {}
 
     /** Add a new set of values and update mean and covariance.
      * This function does the same as addValue and updateCov but in a
@@ -253,7 +253,7 @@ namespace Belle2 {
      * symmetric matrix including diagonal elements if the elements are
      * stored in a continuous array of size n(n+1)/2
      */
-    constexpr int getIndex(unsigned int i, unsigned int j) const
+    static constexpr int getIndex(unsigned int i, unsigned int j)
     {
       //swap indices if i >= j
       return (i < j) ? ((j + 1) * j / 2 + i) : ((i + 1) * i / 2 + j);

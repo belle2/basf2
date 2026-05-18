@@ -98,6 +98,7 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
       return "";
     }
     while ((i = fread((void*) buf, 1, sizeof(buf), fp)) > 0) {
+      if (!i) break;
       sum = adler32(sum, buf, i);
     }
     fclose(fp);

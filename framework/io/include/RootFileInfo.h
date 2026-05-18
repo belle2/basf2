@@ -43,7 +43,7 @@ namespace Belle2 {
       /** Return a set of branch names for either the event or the persistent tree */
       const std::set<std::string>& getBranchNames(bool persistent = false);
       /** Return a set of branch names residing in the passed tree */
-      const std::set<std::string> getNtupleBranchNames(std::string treeName);
+      const std::set<std::string> getNtupleBranchNames(const std::string& treeName);
       /** Return a set of event tree names in the file */
       const std::set<std::string> getTreeNames();
       /** Check if the event or persistent tree contain at least all the

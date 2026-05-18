@@ -88,7 +88,7 @@ namespace Belle2::Conditions {
     boost::python::list getGlobalTagsPy() { return m_globalTags.ensurePy(); }
 
     /** Get the std::vector of default globaltags */
-    std::vector<std::string> getDefaultGlobalTags() const;
+    static std::vector<std::string> getDefaultGlobalTags();
     /** Get the tuple of default globaltags as python version */
     boost::python::tuple getDefaultGlobalTagsPy() const;
 

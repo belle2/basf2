@@ -120,7 +120,7 @@ namespace Belle2::Conditions {
     *this = Configuration();
   }
 
-  std::vector<std::string> Configuration::getDefaultGlobalTags() const
+  std::vector<std::string> Configuration::getDefaultGlobalTags()
   {
     // currently the default globaltag can be overwritten by environment variable
     // so keep that

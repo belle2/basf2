@@ -210,6 +210,22 @@ void TrackingAbortDQMModule::defineHisto()
     m_nCDCExtraHitsSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
   }
 
+  //CDC extra hits per SL
+  histoName = "fCDCExtraHitsPostCleanSL";
+  histoTitle = "Fraction of CDC Extra Hits Post Cleaning in SL";
+  for (int sl = 0; sl < 9; sl++) {
+    //outside active_veto window:
+    m_fCDCExtraHitsPostCleanSL[0][sl] = new TH1F(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[0].c_str()),
+                                                 TString::Format("%s%d %s", histoTitle.c_str(), sl, title[0].c_str()),
+                                                 100, 0, 1);
+    m_fCDCExtraHitsPostCleanSL[0][sl]->GetXaxis()->SetTitle("nCDCExtraHitsPostClean/nCDCExtraHits");
+    m_fCDCExtraHitsPostCleanSL[0][sl]->GetYaxis()->SetTitle("Number of Events");
+    //inside active_veto window:
+    m_fCDCExtraHitsPostCleanSL[1][sl] = new TH1F(*m_fCDCExtraHitsPostCleanSL[0][sl]);
+    m_fCDCExtraHitsPostCleanSL[1][sl]->SetName(TString::Format("%s%d_%s", histoName.c_str(), sl, tag[1].c_str()));
+    m_fCDCExtraHitsPostCleanSL[1][sl]->SetTitle(TString::Format("%s%d %s", histoTitle.c_str(), sl, title[1].c_str()));
+  }
+
   //CDC signal hits per SL
   histoName = "nCDCHitsSL";
   histoTitle = "Average Number of CDC Hits per Track in SL";
@@ -278,6 +294,8 @@ void TrackingAbortDQMModule::beginRun()
   for (int sl = 0; sl < 9; sl++) {
     if (m_nCDCExtraHitsSL[0][sl] != nullptr) m_nCDCExtraHitsSL[0][sl]->Reset();
     if (m_nCDCExtraHitsSL[1][sl] != nullptr) m_nCDCExtraHitsSL[1][sl]->Reset();
+    if (m_fCDCExtraHitsPostCleanSL[0][sl] != nullptr) m_fCDCExtraHitsPostCleanSL[0][sl]->Reset();
+    if (m_fCDCExtraHitsPostCleanSL[1][sl] != nullptr) m_fCDCExtraHitsPostCleanSL[1][sl]->Reset();
     if (m_nCDCHitsSL[0][sl] != nullptr) m_nCDCHitsSL[0][sl]->Reset();
     if (m_nCDCHitsSL[1][sl] != nullptr) m_nCDCHitsSL[1][sl]->Reset();
   }
@@ -405,11 +423,14 @@ void TrackingAbortDQMModule::event()
 
     float nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
     int nCDCExtraHits = nTotalCDCHits[sl] - nSignalCDCHits;
+    int nCDCExtraHitsPostClean = nCDCExtraHits - nBgCDCHits[sl];
     if (nTracks > 0) nSignalCDCHits = nSignalCDCHits / nTracks;
 
     if (nSignalCDCHits == 0) m_noCDCHitsInSL[index]->Fill(sl);
     else {
       if (m_nCDCExtraHitsSL[index][sl] != nullptr) m_nCDCExtraHitsSL[index][sl]->Fill(std::min(nCDCExtraHits, (int)999));
+      if (m_fCDCExtraHitsPostCleanSL[index][sl] != nullptr) m_fCDCExtraHitsPostCleanSL[index][sl]->Fill((
+              float)nCDCExtraHitsPostClean / nCDCExtraHits);
       if (m_nCDCHitsSL[index][sl] != nullptr) m_nCDCHitsSL[index][sl]->Fill(std::min(nSignalCDCHits, (float)30.5));
     }
   }

@@ -994,66 +994,69 @@ namespace Belle2 {
 
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
-                      "It behaves according to DecayStringGrammar.");
+                      "Returns 1.0 if the particle is correctly reconstructed, 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
-                      "1.0 if Particle is almost correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
-                      "Misidentification of charged FSP is allowed.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (**mis-identified final state particles are allowed**), 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL) and primary, 0.0 if not, and NaN if no related MCParticle could be found");
+                      "Returns 1.0 if the particle is correctly reconstructed and primary, 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
-                      "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found.\n"
-                      "Particles with gamma daughters attached through the bremsstrahlung recovery modules are allowed.");
+                      "Returns 1.0 if the particle is correctly reconstructed, 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.\n"
+                      "Reconstruction involving any recovered Bremsstrahlung photons attached to the particle are still considered correct.");
     REGISTER_VARIABLE("genMotherPDG", genMotherPDG,
-                      "Check the PDG code of a particles MC mother particle");
+                      "Returns the PDG code of generated mother of the particle.");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
-                      "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
-
+                      "Returns the PDG code the :math:`n`-th generated mother of the particle. The argument is the generation: 0 is first mother, 1 is grandmother etc.:noindex:");
     REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
-                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
+                       Returns the generated 4-momentum transfer squared :math:`q^2` calculated as
+                       
+                       .. math::
+                       q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2
 
-                       Here :math:`p_m` is the four momentum of the given (mother) particle,
-                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
-                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
+                       where :math:`p_m` is the 4-momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices :math:`i, j, ...` given as arguments .
+                       The ordering of daughters is as defined in the `DECAY_BELLE2.DEC <https://gitlab.desy.de/belle2/software/basf2/-/blob/main/decfiles/dec/DECAY_BELLE2.DEC?ref_type=heads>`_
+                       file used in the generation, with the numbering starting at :math:`n=0`.
 
-                       Returns NaN if no related MCParticle could be found.
-                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
+                       Returns ``NaN`` if no related `MCParticle` could be found ot if any of the given indices are larger than the number of daughters of
+                       the given particle. 
 
                        )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
-                      "Check the array index of a particles generated mother");
+                      "Returns the generated particle array index of a particle's generated mother");
     REGISTER_VARIABLE("genMotherID(i)", genNthMotherIndex,
-                      "Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc. :noindex:");
+                      "Returns the generated particle array index of the particle's :math:`i`-th generated mother. 0 is first mother, 1 is grandmother etc. :noindex:");
     // genMotherPDG and genMotherID are overloaded (each are two C++ functions
     // sharing one variable name) so one of the two needs to be made the indexed
     // variable in sphinx
-    REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
-                      "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed, R"DOC(
+                      Returns 1 if there is cross-feed between the reconstructed :math:`B` mesons, 0 for no cross-feed and ``NaN`` for
+                      no :math:`B` meson reconstructed or there is a failed truth-matching.
+                      )DOC");
     REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
-                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
+                      "Returns the generated particle array index of the particle's :math:`B` meson ancestor, or -1 if no :math:`B` meson or `MCParticle` is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
-                      "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
+                      "Returns the generated momentum of the particle's MC mother\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
-                      "Check the array index of a particle's related MCParticle");
+                      "Returns the generated particle array index of the particle's matched `MCParticle`.");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
-                      "Same as isSignal, but also accept missing neutrino");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing neutrinos are allowed**), 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
-                      "Same as isSignal, but also accept missing massive particle");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing massive particles are allowed**), 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissingGamma",
                       isSignalAcceptMissingGamma,
-                      "Same as isSignal, but also accept missing gamma, such as B -> K* gamma, pi0 -> gamma gamma");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing photons are allowed**), 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
-                      "Same as isSignal, but also accept missing particle");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing particles are allowed**), 0.0 if not, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
-                      "Return 1 if the particle is misidentified: at least one of the final state particles has the wrong PDG code assignment (including wrong charge), 0 if PDG code is fine, and NaN if no related MCParticle could be found.");
+                      "Return 1 if the particle is mis-identified (the wrong PDG code is assigned), 0 if PDG code is correct, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
-                      "Return 1 if the charge of the particle is wrongly assigned, 0 if it's the correct charge, and NaN if no related MCParticle could be found.");
+                      "Return 1 if the charge of the particle is wrongly assigned, 0 if it's the correct charge, and ``NaN`` if no related `MCParticle` could be found.");
     REGISTER_VARIABLE("isCloneTrack", isCloneTrack,
-                      "Return 1 if the charged final state particle comes from a cloned track, 0 if not a clone. Returns NAN if neutral, composite, or MCParticle not found (like for data or if not MCMatched)");
+                      "Return 1 if the charged final state particle comes from a cloned track, 0 if it does not come from a clone, and ``NaN`` if the particle is neutral, composite, or no `MCParticle` could be found.");
     REGISTER_VARIABLE("isOrHasCloneTrack", isOrHasCloneTrack,
                       "Return 1 if the particle is a clone track or has a clone track as a daughter, 0 otherwise.");
     REGISTER_VARIABLE("mcPDG", particleMCMatchPDGCode,

@@ -34,7 +34,7 @@ namespace Belle2 {
       rawHitCov_.ResizeTo(1, 1);
 
       setHitId(hit->getArrayIndex());
-      setDetId(getVXDMomentumDetId());
+      setDetId(getDetId());
     }
 
     /** Clone the measurement. */
@@ -105,7 +105,7 @@ namespace Belle2 {
     const RecoTrack* m_recoTrack = nullptr;
 
     /// Return the detector ID.
-    int getVXDMomentumDetId() const
+    static int getDetId()
     {
       return -1;
     }
@@ -196,10 +196,10 @@ namespace Belle2 {
 
   /** Specialisation for PXD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<PXDCluster>::getVXDMomentumDetId() const;
+  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId();
 
   /** Specialisation for SVD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<SVDCluster>::getVXDMomentumDetId() const;
+  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId();
 
 }

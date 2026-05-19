@@ -13,6 +13,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <top/dataobjects/TOPBackSplashFitResult.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRecBunch.h>
 
 #include <RooAbsPdf.h>
 #include <RooRealVar.h>
@@ -56,7 +57,7 @@ namespace Belle2 {
      * @param phi angle [radians]
      * @return TOP slot no. (1-16)
      */
-    int getModuleFromPhi(double);
+    static int getModuleFromPhi(double phi);
 
     /**
      *  Perform fitting of TOP timing in nearby slot
@@ -67,7 +68,8 @@ namespace Belle2 {
      *  @param nTracksPerSlot no. of tracks in same slot as neutral clusters (for labelling)
      *  @return pointer to object containing fit parameters of fit to timing of TOP digits
      */
-    TOPBackSplashFitResult* fitTimingDigits(int, std::vector<const TOPDigit*>&, double, double, int);
+    TOPBackSplashFitResult* fitTimingDigits(int moduleID, const std::vector<const TOPDigit*>& digitsPerSlot,
+                                            double clusterE, double clusterCosTheta, int nTracksPerSlot);
 
     /**
      * Creates RooPlots of fitted TOPtiming and save as png
@@ -80,7 +82,8 @@ namespace Belle2 {
      * @param res RooFitResult object containing fit parameters
      * @param nTracksPerSlot no. of tracks in same slot as neutral clusters (for labelling)
      */
-    void makePlot(double, double, int, RooAbsPdf*, RooRealVar*, RooDataSet, RooFitResult*, int);
+    void makePlot(double cosTheta, double clusterE, int moduleID, RooAbsPdf* model,
+                  RooRealVar* x, RooDataSet data, RooFitResult* res, int nTracksPerSlot);
 
 
     /** plot and save fits of TOP timing */
@@ -113,6 +116,8 @@ namespace Belle2 {
 
     /** Store Array of Track */
     StoreArray<Track> m_tracks;
+
+    StoreObjPtr<TOPRecBunch> m_recBunch; /**< reconstructed bunch */
 
     /** container of 11 TOP timing fit params per cosTheta */
     std::array<std::array<double, 11>, 15> m_fitparams;

@@ -21,6 +21,7 @@
 
 #include <TMath.h>
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 using namespace Belle2;
@@ -45,7 +46,8 @@ DQMHistAnalysisSVDClustersOnTrackModule::DQMHistAnalysisSVDClustersOnTrackModule
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("statThreshold", m_statThreshold, "Minimal number of events to compare histograms", double(10000.));
   addParam("timeThreshold", m_timeThreshold, "Acceptable difference between mean of central peak for present and reference run",
-           double(6)); // 6 ns
+           double(8)); // 8 ns
+  addParam("refMode", m_refMode, "Mode reference of the signal time peak", double(0.0));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
@@ -62,6 +64,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::initialize()
     m_cClusterOnTrackTimeL456V3Samples = new TCanvas("SVDAnalysis/c_ClusterOnTrackTime_L456V3Samples");
 
   //register limits for EPICS
+  registerEpicsPV(m_pvPrefix + "clusterTimeOnTrackMode", "clusterTimeOnTrackMode");
   registerEpicsPV(m_pvPrefix + "ratio3_6", "ratio3_6");
   registerEpicsPV(m_pvPrefix + "clusterTimeOnTrackLimits", "clusTimeOnTrkLimits");
 }
@@ -81,13 +84,20 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   double timeErrorLo = 0.;
   double timeWarnLo = 0.;
   requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", timeErrorLo, timeWarnLo, timeWarnUp,  m_timeThreshold);
+
+  //Retrieve mode value for cluster time on track
+  double ref = getEpicsPV("clusterTimeOnTrackMode");
+  if (!std::isnan(ref))
+    m_refMode = ref;
+
   B2DEBUG(10, " SVD cluster time on track threshold taken from EPICS configuration file:");
-  B2DEBUG(10, "  CLUSTER TIME ON TRACK: error > " << m_timeThreshold << " ns with minimum statistics of " << m_statThreshold);
+  B2DEBUG(10, "  CLUSTER TIME ON TRACK: error > " << m_timeThreshold - m_refMode << " ns with minimum statistics of " <<
+          m_statThreshold);
 
   // cluster time on tracks legend
   m_legProblem->Clear();
   m_legProblem->AddText("ERROR!");
-  m_legProblem->AddText(Form("abs(Mode) > %3.1f ns", m_timeThreshold));
+  m_legProblem->AddText(Form("abs(Mode - Ref) > %3.1f ns", m_timeThreshold));
   m_legProblem->AddText("Mode: 0.0 ns");
 
 
@@ -96,7 +106,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
 
   m_legNormal->Clear();
   m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legNormal->AddText(Form("abs(Mode) < %3.1f ns", m_timeThreshold));
+  m_legNormal->AddText(Form("abs(Mode - Ref) < %3.1f ns", m_timeThreshold));
   m_legNormal->AddText("Mode: 0.0 ns");
 
   m_legLowStat->Clear();
@@ -228,14 +238,14 @@ int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(double mode)
 {
   int status = good;
 
-  if (fabs(mode) > m_timeThreshold) {
+  if (fabs(mode - m_refMode) > m_timeThreshold) {
     status = error;
     TText* text = m_legProblem->GetLine(m_legProblem->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mode: %3.1f ns", mode));
+    text->SetText(text->GetX(), text->GetY(), Form("Mode - Ref: %3.1f ns", mode - m_refMode));
   } else {
     status = good;
     TText* text = m_legNormal->GetLine(m_legNormal->GetSize() - 1);
-    text->SetText(text->GetX(), text->GetY(), Form("Mode: %3.1f ns", mode));
+    text->SetText(text->GetX(), text->GetY(), Form("Mode - Ref: %3.1f ns", mode - m_refMode));
   }
 
   return status;

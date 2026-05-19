@@ -279,6 +279,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
       m_monObj->setVariable("fEventsWithCDCExtraHitsAbove2700_outActiveVeto",   integral / hCDCExtraHitsOut->GetEntries());
     }
   }
+
   TH1* hCDCExtraHitsIn_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_IN");
   if (hCDCExtraHitsIn_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_inActiveVeto", hCDCExtraHitsIn_BF->GetMean());
   TH1* hCDCExtraHitsOut_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_OUT");
@@ -308,31 +309,49 @@ void DQMHistAnalysisTrackingAbortModule::event()
   }
   for (int sl = 0; sl < 9; sl++) {
     //before filter IN & OUT
+    // nCDCExtraHits
     TH1* hCDCExtraHitsSLIn_BF = findHist(Form("TrackingAbort_before_filter/nCDCExtraHitsSL%d_IN", sl));
     if (hCDCExtraHitsSLIn_BF != nullptr) m_monObj->setVariable(Form("nCDCExtraHitsSL%dBeforeFilter_inActiveVeto", sl),
                                                                  hCDCExtraHitsSLIn_BF->GetMean());
     TH1* hCDCExtraHitsSLOut_BF = findHist(Form("TrackingAbort_before_filter/nCDCExtraHitsSL%d_OUT", sl));
     if (hCDCExtraHitsSLOut_BF != nullptr) m_monObj->setVariable(Form("nCDCExtraHitsSL%dBeforeFilter_outActiveVeto", sl),
                                                                   hCDCExtraHitsSLOut_BF->GetMean());
+    // signal CDC hits
     TH1* hCDCHitsSLIn_BF = findHist(Form("TrackingAbort_before_filter/nCDCHitsSL%d_IN", sl));
     if (hCDCHitsSLIn_BF != nullptr) m_monObj->setVariable(Form("nCDCHitsSL%dBeforeFilter_inActiveVeto", sl),
                                                             hCDCHitsSLIn_BF->GetMean());
     TH1* hCDCHitsSLOut_BF = findHist(Form("TrackingAbort_before_filter/nCDCHitsSL%d_OUT", sl));
     if (hCDCHitsSLOut_BF != nullptr) m_monObj->setVariable(Form("nCDCHitsSL%dBeforeFilter_outActiveVeto", sl),
                                                              hCDCHitsSLOut_BF->GetMean());
+    // fraction of CDCExtraHits post cleaning
+    TH1* hfCDCExtraHitsPCSLIn_BF = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_IN", sl));
+    if (hCDCExtraHitsSLIn_BF != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_inActiveVeto", sl),
+                                                                 hfCDCExtraHitsPCSLIn_BF->GetMean());
+    TH1* hfCDCExtraHitsPCSLOut_BF = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_OUT", sl));
+    if (hCDCExtraHitsSLIn_BF != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_outActiveVeto", sl),
+                                                                 hfCDCExtraHitsPCSLOut_BF->GetMean());
     //after filter IN & OUT
+    // nCDCExtraHits
     TH1* hCDCExtraHitsSLIn = findHist(Form("TrackingAbort/nCDCExtraHitsSL%d_IN", sl));
     if (hCDCExtraHitsSLIn != nullptr) m_monObj->setVariable(Form("nCDCExtraHitsSL%d_inActiveVeto", sl),
                                                               hCDCExtraHitsSLIn->GetMean());
     TH1* hCDCExtraHitsSLOut = findHist(Form("TrackingAbort/nCDCExtraHitsSL%d_OUT", sl));
     if (hCDCExtraHitsSLOut != nullptr) m_monObj->setVariable(Form("nCDCExtraHitsSL%d_outActiveVeto", sl),
                                                                hCDCExtraHitsSLOut->GetMean());
+    // signal CDC hits
     TH1* hCDCHitsSLIn = findHist(Form("TrackingAbort/nCDCHitsSL%d_IN", sl));
     if (hCDCHitsSLIn != nullptr) m_monObj->setVariable(Form("nCDCHitsSL%d_inActiveVeto", sl),
                                                          hCDCHitsSLIn->GetMean());
     TH1* hCDCHitsSLOut = findHist(Form("TrackingAbort/nCDCHitsSL%d_OUT", sl));
     if (hCDCHitsSLOut != nullptr) m_monObj->setVariable(Form("nCDCHitsSL%d_outActiveVeto", sl),
                                                           hCDCHitsSLOut->GetMean());
+    // fraction of CDCExtraHits post cleaning
+    TH1* hfCDCExtraHitsPCSLIn = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_IN", sl));
+    if (hCDCExtraHitsSLIn != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_inActiveVeto", sl),
+                                                              hfCDCExtraHitsPCSLIn->GetMean());
+    TH1* hfCDCExtraHitsPCSLOut = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_OUT", sl));
+    if (hCDCExtraHitsSLIn != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_outActiveVeto", sl),
+                                                              hfCDCExtraHitsPCSLOut->GetMean());
 
     //events with no signal hits in each SL after filter and outside active veto
     if (noCDCHitsInSLIn_BF != nullptr) m_monObj->setVariable(Form("noCDCHitsSL%dBeforeFilter_inActiveVeto", sl),

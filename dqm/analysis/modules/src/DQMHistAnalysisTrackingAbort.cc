@@ -346,10 +346,10 @@ void DQMHistAnalysisTrackingAbortModule::event()
     if (hCDCHitsSLOut != nullptr) m_monObj->setVariable(Form("nCDCHitsSL%d_outActiveVeto", sl),
                                                           hCDCHitsSLOut->GetMean());
     // fraction of CDCExtraHits post cleaning
-    TH1* hfCDCExtraHitsPCSLIn = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_IN", sl));
+    TH1* hfCDCExtraHitsPCSLIn = findHist(Form("TrackingAbort/fCDCExtraHitsPostCleanSL%d_IN", sl));
     if (hCDCExtraHitsSLIn != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_inActiveVeto", sl),
                                                               hfCDCExtraHitsPCSLIn->GetMean());
-    TH1* hfCDCExtraHitsPCSLOut = findHist(Form("TrackingAbort_before_filter/fCDCExtraHitsPostCleanSL%d_OUT", sl));
+    TH1* hfCDCExtraHitsPCSLOut = findHist(Form("TrackingAbort/fCDCExtraHitsPostCleanSL%d_OUT", sl));
     if (hCDCExtraHitsSLIn != nullptr) m_monObj->setVariable(Form("fCDCExtraHitsPostCleanSL%dBeforeFilter_outActiveVeto", sl),
                                                               hfCDCExtraHitsPCSLOut->GetMean());
 

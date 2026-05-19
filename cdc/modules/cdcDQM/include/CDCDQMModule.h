@@ -104,6 +104,7 @@ namespace Belle2 {
     int m_minHits;                   /**< Minimum hits for processing. */
     int m_minNdf;                   /**< Minimum track NDF for cdc dqm plots. */
     bool m_adjustWireShift = true;   /**< If true, gets the correct phi view of the boards */
+    bool m_isMC = false;             /**< True when running on simulation; skips trigger and raw-data checks. */
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */

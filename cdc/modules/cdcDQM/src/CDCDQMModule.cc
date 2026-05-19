@@ -9,6 +9,8 @@
 // Own include
 #include <cdc/modules/cdcDQM/CDCDQMModule.h>
 
+#include <framework/core/Environment.h>
+
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -81,6 +83,7 @@ void CDCDQMModule::defineHisto()
 void CDCDQMModule::initialize()
 {
   REG_HISTOGRAM
+  m_isMC = Environment::Instance().isMC();
   m_cdcHits.isOptional();
   m_cdcRawHits.isOptional();
   m_trgSummary.isOptional();
@@ -118,30 +121,37 @@ void CDCDQMModule::event()
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   const int nWires = 14336;
   setReturnValue(1);
-  if (!m_trgSummary.isValid() || (m_trgSummary->getTimType() == Belle2::TRGSummary::TTYP_RAND)) {
-    setReturnValue(0);
-    return;
-  }
 
-  if (!m_TrgResult.isValid()) {
-    B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events skim");
-    return;
-  }
+  bool IsBhabha = false;
+  bool IsHadron = false;
+  bool IsMumu   = false;
 
-  const std::map<std::string, int>& fresults = m_TrgResult->getResults();
-  if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())   ||
-      (fresults.find("software_trigger_cut&skim&accept_mumu_tight_or_highm") == fresults.end())   ||
-      (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
-    B2WARNING("CDCDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
-    return;
-  }
+  if (!m_isMC) {
+    if (!m_trgSummary.isValid() || (m_trgSummary->getTimType() == Belle2::TRGSummary::TTYP_RAND)) {
+      setReturnValue(0);
+      return;
+    }
 
-  const bool IsBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
-                         SoftwareTriggerCutResult::c_accept);
-  const bool IsHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
-                         SoftwareTriggerCutResult::c_accept);
-  const bool IsMumu = (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_tight_or_highm") ==
-                       SoftwareTriggerCutResult::c_accept);
+    if (!m_TrgResult.isValid()) {
+      B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events skim");
+      return;
+    }
+
+    const std::map<std::string, int>& fresults = m_TrgResult->getResults();
+    if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())   ||
+        (fresults.find("software_trigger_cut&skim&accept_mumu_tight_or_highm") == fresults.end())   ||
+        (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
+      B2WARNING("CDCDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
+      return;
+    }
+
+    IsBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
+                SoftwareTriggerCutResult::c_accept);
+    IsHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
+                SoftwareTriggerCutResult::c_accept);
+    IsMumu   = (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_tight_or_highm") ==
+                SoftwareTriggerCutResult::c_accept);
+  }
 
   if (m_cdcHits.getEntries() < m_minHits) {
     setReturnValue(0);
@@ -157,20 +167,22 @@ void CDCDQMModule::event()
     m_hHit->Fill(lay, wire);
   }
 
-  // to record removed databits
-  const int nEntries = m_rawCDCs.getEntries();
-  B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
-  for (int i = 0; i < nEntries; ++i) {
-    const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
-    B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
-    for (int j = 0; j < nEntriesRawCDC; ++j) {
-      int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
-      if (MaxNumOfCh != 4 && MaxNumOfCh != 48) {
-        B2ERROR("CDCDQM: Invalid value of GetMaxNumOfCh");
-      } else if (MaxNumOfCh == 48) {
-        for (int k = 0; k < MaxNumOfCh; ++k) {
-          if (m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true)m_hBit->SetBinContent(i + 1, k + 1, -0.5);
-          else m_hBit->SetBinContent(i + 1, k + 1, 0.5);
+  // to record removed databits (raw data not available in simulation)
+  if (!m_isMC) {
+    const int nEntries = m_rawCDCs.getEntries();
+    B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
+    for (int i = 0; i < nEntries; ++i) {
+      const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
+      B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
+      for (int j = 0; j < nEntriesRawCDC; ++j) {
+        int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
+        if (MaxNumOfCh != 4 && MaxNumOfCh != 48) {
+          B2ERROR("CDCDQM: Invalid value of GetMaxNumOfCh");
+        } else if (MaxNumOfCh == 48) {
+          for (int k = 0; k < MaxNumOfCh; ++k) {
+            if (m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true)m_hBit->SetBinContent(i + 1, k + 1, -0.5);
+            else m_hBit->SetBinContent(i + 1, k + 1, 0.5);
+          }
         }
       }
     }

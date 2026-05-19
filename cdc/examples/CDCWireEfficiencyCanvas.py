@@ -96,8 +96,10 @@ def make_poly(name, title, geo):
 
 
 class CDCCanvasModule(b2.Module):
+    """Produce a 4-panel CDC wire-by-wire tracking efficiency canvas from a DQM ROOT file."""
 
     def initialize(self):
+        """Build the TH2Poly geometry, fill efficiency histograms, and save the canvas."""
         import ROOT
         from ROOT import Belle2
 

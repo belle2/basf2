@@ -492,7 +492,7 @@ namespace Belle2 {
       const std::vector<Particle*> daughters = part->getDaughters();
       if (daughters.size() > 0) {
         ROOT::Math::PxPyPzEVector sum;
-        for (auto daughter : daughters)
+        for (const auto* daughter : daughters)
           sum += daughter->get4Vector();
 
         return sum.M();
@@ -512,7 +512,7 @@ namespace Belle2 {
 
       const double bField = BFieldManager::getFieldInTesla(vertex).Z();
       ROOT::Math::PxPyPzMVector sum;
-      for (auto daughter : daughters) {
+      for (const auto* daughter : daughters) {
         const TrackFitResult* tfr = daughter->getTrackFitResult();
         if (!tfr) {
           sum += daughter->get4Vector();
@@ -733,7 +733,7 @@ namespace Belle2 {
       // q = pB - pX
       ROOT::Math::PxPyPzEVector pX;
 
-      for (auto mcTemp : mcDaug) {
+      for (const auto* mcTemp : mcDaug) {
         if (abs(mcTemp->getPDG()) <= 16)
           continue;
 
@@ -891,7 +891,7 @@ namespace Belle2 {
       if (!mcp)
         return Const::doubleNaN;
 
-      MCParticle* mcMother = mcp->getMother();
+      const MCParticle* mcMother = mcp->getMother();
 
       if (!mcMother)
         return Const::doubleNaN;
@@ -919,14 +919,14 @@ namespace Belle2 {
       return decayType;
     }
 
-    void checkMCParticleDecay(MCParticle* mcp, int& decayType, bool recursive)
+    void checkMCParticleDecay(const MCParticle* mcp, int& decayType, bool recursive)
     {
       int nHadronicParticles = 0;
       int nPrimaryParticleDaughters = 0;
       std::vector<MCParticle*> daughters = mcp->getDaughters();
 
       // Are any of the daughters primary particles? How many of them are hadrons?
-      for (auto& daughter : daughters) {
+      for (const auto* daughter : daughters) {
         if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
           continue;
 
@@ -936,7 +936,7 @@ namespace Belle2 {
       }
 
       if (nPrimaryParticleDaughters > 1) {
-        for (auto& daughter : daughters) {
+        for (const auto* daughter : daughters) {
           if (!daughter->hasStatus(MCParticle::c_PrimaryParticle))
             continue;
 

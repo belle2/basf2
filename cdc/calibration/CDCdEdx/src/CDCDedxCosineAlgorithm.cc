@@ -194,6 +194,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   }
 
   m_suffix.clear();
+  m_coscors.clear();
 
   return c_OK;
 }

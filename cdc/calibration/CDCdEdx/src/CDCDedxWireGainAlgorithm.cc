@@ -385,7 +385,7 @@ void CDCDedxWireGainAlgorithm::plotWireGain(const vector<double>& vdedx_means, c
         && i == 0) hconstpw[i]->SetTitle(Form("merged wiregain rel-const  (%s), avg = %0.03f; wire numbers;<dedxhit>", m_suffix.data(),
                                                 layeravg));
 
-    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%s", m_suffix.data()), "", 400, -0.5, 2.5);
+    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%d_%s", i, m_suffix.data()), "", 400, -0.5, 2.5);
     hconstpwvar[i]->SetTitle(Form("wiregain const (%s); wire gains; nentries", m_suffix.data()));
     if (m_isMerge
         && i == 0) hconstpwvar[i]->SetTitle(Form("merged wiregain rel-const (%s), avg = %0.03f; wire gains; nentries", m_suffix.data(),

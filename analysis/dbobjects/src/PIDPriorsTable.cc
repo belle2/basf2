@@ -149,7 +149,7 @@ void  PIDPriorsTable::printError() const
 
 
 
-bool PIDPriorsTable::checkRange(const std::string& text, float val, const std::vector<float>& edges) const
+bool PIDPriorsTable::checkRange(const std::string& text, float val, const std::vector<float>& edges)
 {
   const float& min = edges.front();
   const float& max = edges.back();
@@ -161,14 +161,14 @@ bool PIDPriorsTable::checkRange(const std::string& text, float val, const std::v
 };
 
 
-short PIDPriorsTable::findBin(float val, std::vector<float> array) const
+short PIDPriorsTable::findBin(float val, std::vector<float> array)
 {
   auto it = std::lower_bound(array.cbegin(),  array.cend(), val);
   return std::distance(array.cbegin(), it) - 1;
 };
 
 
-short PIDPriorsTable::findBinFast(float val, std::vector<float> array) const
+short PIDPriorsTable::findBinFast(float val, std::vector<float> array)
 {
   // This function searches for the first bin the axis which is above the
   // value. First it starts assuming the bins are equal, and then moves around
@@ -188,7 +188,7 @@ short PIDPriorsTable::findBinFast(float val, std::vector<float> array) const
 };
 
 
-short PIDPriorsTable::findBinWithFixedWidth(float val, std::vector<float> array) const
+short PIDPriorsTable::findBinWithFixedWidth(float val, std::vector<float> array)
 {
   float binWidth = (array.back() - array.front()) / (array.size() - 1.);
   return (short)((val - array.back()) / binWidth);

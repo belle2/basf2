@@ -269,7 +269,7 @@ namespace Belle2 {
       std::vector<std::string> getAliasNames() const;
 
       /** Abort with B2FATAL if name is not a valid name for a variable. */
-      void assertValidName(const std::string& name);
+      static void assertValidName(const std::string& name);
 
     private:
       Manager() {};

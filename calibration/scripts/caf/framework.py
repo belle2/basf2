@@ -1020,14 +1020,14 @@ class Calibration(CalibrationBase):
         Will be run in a new Thread by calling the start() method.
         """
 
-        def _print_execution_time(start, stop, step, calibration):
+        def _print_execution_time(start, stop, calibration, iteration, step):
             """
             Simple function to calculate the execution time of a step and printing it on stdout.
             """
             elapsed = stop - start
             hours = int(elapsed // 3600)
             minutes = int((elapsed % 3600) // 60)
-            B2INFO(f"Execution time of '{step}' for '{calibration}': {hours}:{minutes} (hours:minutes)")
+            B2INFO(f"Execution time of '{step}' for '{calibration}:{iteration}': {hours}:{minutes} (hours:minutes)")
 
         with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
@@ -1056,14 +1056,14 @@ class Calibration(CalibrationBase):
                     B2INFO(f"Attempting collector submission for calibration {self.name}.")
                     self.machine.submit_collector()
                 except Exception as err:
-                    _print_execution_time(start, time(), "collectors", self.name)
+                    _print_execution_time(start, time(), self.name, self.machine.iteration, "collectors")
                     B2FATAL(str(err))
 
                 self._poll_collector()
 
                 # Print the execution time of the collectors step
                 # This includes also the time needed to submit the collector jobs
-                _print_execution_time(start, time(), "collectors", self.name)
+                _print_execution_time(start, time(), self.name, self.machine.iteration, "collectors")
 
             # If we failed take us to the final fail state
             if self.state == "collector_failed":
@@ -1082,7 +1082,7 @@ class Calibration(CalibrationBase):
                 self.machine.fail()
 
             # Print the execution time of the algorithm step
-            _print_execution_time(start, time(), "algorihtm", self.name)
+            _print_execution_time(start, time(), self.name, self.machine.iteration, "algorihtm")
 
             # If we failed take us to the final fail state
             if self.machine.state == "algorithms_failed":

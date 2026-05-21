@@ -163,7 +163,7 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
-  registerEpicsPV(m_pvPrefix + "occupancyGoupIDsLimits", "occGroupIDsLimits");
+  registerEpicsPV(m_pvPrefix + "occupancyGroupIDsLimits", "occGroupIDsLimits");
 }
 
 void DQMHistAnalysisSVDOccupancyModule::beginRun()

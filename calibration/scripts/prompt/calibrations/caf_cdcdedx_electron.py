@@ -265,7 +265,7 @@ def pre_collector(name='rg'):
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_bhabha"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
-    recon.prepare_cdst_analysis(path=reco_path)
+    recon.prepare_cdst_analysis(path=reco_path, components=['CDC', 'ECL', 'KLM'])
 
     reco_path.add_module(
         'CDCDedxCorrection',

@@ -3,53 +3,39 @@
 Standard Particles
 ==================
 
+.. deprecated:: light-2604-jellyfish
+        `stdCharged.stdE`, `stdCharged.stdMu`, `stdCharged.stdLep`, and most lists in
+        `stdPhotons` and `stdPi0s` are deprecated and will be removed at the end of 2026.
+        Use the following replacements or the 'all' list instead:
+
+        - `stdCharged.stdCharged` with ``listtype='clean'``:
+          ``thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2``
+        - `stdPhotons.stdPhotons` with ``listtype='base'``:
+          ``inCDCAcceptance and abs(clusterTiming) < 200``
+        - `stdPi0s.stdPi0s` with ``listtype='base'``:
+          reconstructed from two ``gamma:base`` photons with no additional cuts
+
+        These lists provide a common baseline; further selections should be optimised
+        based on the requirements of each individual analysis.
+        Please refer to the
+        `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
+        for further guidance. To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
+
 .. warning::
-        Construction site!
-
-        At the moment, we are in a strange situation where some of the standard particle lists are actually
-        **not** recommended for use with recent data processings.
-
-        However, some of these lists *have* been tested and *can* be used.
+        Some standard particle lists are outdated and no longer recommended for use.
+        Please refer to the
+        `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
+        for recommended selections and the latest updates on what to use.
 
 .. tip::
-        The following ``pi0`` and ``V0`` standard lists are **good** (i.e. recommended for use):
+        The following ``V0`` standard lists are **good** (i.e. recommended for use):
 
-        * `stdPi0s.stdPi0s`
         * `stdV0s.stdKshorts`
         * `stdV0s.stdLambdas`
 
-        However, please refer to the
-        `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
-        for the latest updates.
-
-.. tip::
-        The following standard lepton lists are **good** (i.e. recommended for use):
-
-        * `stdCharged.stdE`
-        * `stdCharged.stdMu`
-
-	for a choice of the input ``listtype`` parameter among:
-
-	* 'FixedThresh05'
-	* 'FixedThresh09'
-	* 'FixedThresh095'
-	* 'UniformEff60'
-	* 'UniformEff70'
-	* 'UniformEff80'
-	* 'UniformEff90'
-	* 'UniformEff95'
-
-        However, please check
-        `the Charged PID performance XWiki page <https://xwiki.desy.de/xwiki/rest/p/fab3e>`_
-        for the latest updates.
-
-
-The ultimate goal is that these standard particle lists will provide recommended selection
-criteria for final-state particles, and in some cases, for composite particles.
-The recommended selections will be provided by the performance group(s).
-Furthermore the intention is that systematics will be provided centrally for these recommended lists.
-For information about their status, please see :issue:`4045`.
-
+These standard particle lists provide common selection criteria for final-state particles, 
+and in some cases, for composite particles.
 There are also some skimming, development and legacy lists available.
 These are specifically for use in skims, for study, or for comparison with Belle and old simulations.
 If you don't know that you specifically need these legacy/skim lists, then avoid them.

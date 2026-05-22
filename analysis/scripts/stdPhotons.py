@@ -23,7 +23,8 @@ def stdPhotons(
     Function to prepare one of several standardized types of photon lists:
 
     - 'gamma:all' with no cuts this will be polluted by tracks from outside the acceptance
-    - 'gamma:base' clusters in CDC acceptance with a loose timing cut (replaces all deprecated lists)
+    - 'gamma:base' clusters in CDC acceptance with a loose timing cut
+      (``inCDCAcceptance and abs(clusterTiming) < 200``), replaces all deprecated lists
 
     The following lists are **deprecated** and will be removed at the end of 2026:
 

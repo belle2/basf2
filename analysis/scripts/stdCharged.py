@@ -78,6 +78,13 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     - '85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
       [**deprecated**, will be removed end of 2026]
 
+    .. deprecated:: light-2604-jellyfish
+        The list types ``'good'``, ``'loosepid'``, ``'loose'``, ``'higheff'``, ``'mostlikely'``,
+        ``'99eff'``, ``'95eff'``, ``'90eff'``, and ``'85eff'`` will be removed at the end of 2026.
+        Only ``'all'`` and ``'clean'`` will be kept. Please update your analysis accordingly.
+        To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
+
     @param particletype type of charged particle to make a list of
     @param listtype     name of standard list
     @param path         modules are added to this path
@@ -96,7 +103,9 @@ def stdCharged(particletype, listtype, path, writeOut=True):
         b2.B2WARNING(
             f"The standard charged particle list '{particletype}+:{listtype}' is deprecated "
             "and will be removed at the end of 2026. "
-            "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly."
+            "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly. "
+            "To provide feedback on the removal, see "
+            "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
         )
 
     if listtype == 'all':
@@ -198,10 +207,11 @@ def stdLep(pdgId,
     """
     Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists, with the following working points:
 
-    .. deprecated::
-        This function is deprecated and will be removed at the end of 2026.
+    .. deprecated:: light-2604-jellyfish
         Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
         Efficiency corrections are available via the systematic corrections framework.
+        To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
     * 'FixedThresh05', PID cut of > 0.5 for each particle in the list.
     * 'FixedThresh09', PID cut of > 0.9 for each particle in the list.
@@ -313,7 +323,9 @@ def stdLep(pdgId,
     b2.B2WARNING(
         "stdLep is deprecated and will be removed at the end of 2026. "
         "Please use stdCharged and apply PID cuts manually depending on your analysis. "
-        "Efficiency corrections are available via the systematic corrections framework."
+        "Efficiency corrections are available via the systematic corrections framework. "
+        "To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
     available_methods = ("likelihood", "bdt")
@@ -542,10 +554,11 @@ def stdE(listtype=_defaultlist,
     """ Function to prepare one of several standardized types of electron lists.
     See the documentation of `stdLep` for details.
 
-    .. deprecated::
-        This function is deprecated and will be removed at the end of 2026.
+    .. deprecated:: light-2604-jellyfish
         Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
         Efficiency corrections are available via the systematic corrections framework.
+        To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
     It also accepts any of the legacy definitions
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
@@ -567,7 +580,9 @@ def stdE(listtype=_defaultlist,
     b2.B2WARNING(
         "stdE is deprecated and will be removed at the end of 2026. "
         "Please use stdCharged and apply PID cuts manually depending on your analysis. "
-        "Efficiency corrections are available via the systematic corrections framework."
+        "Efficiency corrections are available via the systematic corrections framework. "
+        "To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
     if listtype in _stdnames + _effnames:
@@ -602,10 +617,11 @@ def stdMu(listtype=_defaultlist,
     """ Function to prepare one of several standardized types of muon lists.
     See the documentation of `stdLep` for details.
 
-    .. deprecated::
-        This function is deprecated and will be removed at the end of 2026.
+    .. deprecated:: light-2604-jellyfish
         Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
         Efficiency corrections are available via the systematic corrections framework.
+        To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
     It also accepts any of the legacy definitions
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
@@ -627,7 +643,9 @@ def stdMu(listtype=_defaultlist,
     b2.B2WARNING(
         "stdMu is deprecated and will be removed at the end of 2026. "
         "Please use stdCharged and apply PID cuts manually depending on your analysis. "
-        "Efficiency corrections are available via the systematic corrections framework."
+        "Efficiency corrections are available via the systematic corrections framework. "
+        "To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
     if listtype in _stdnames + _effnames:
@@ -650,9 +668,10 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
-    .. deprecated::
-        This function is deprecated and will be removed at the end of 2026.
+    .. deprecated:: light-2604-jellyfish
         Please update your analysis to use the ``'all'`` or ``'clean'`` lists instead.
+        To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
     @param pidPriors    list of 6 float numbers used to reweight PID likelihoods, for e, mu, pi, K, p and d
     @param suffix       string added to the end of particle list names
@@ -662,7 +681,9 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     """
     b2.B2WARNING(
         "stdMostLikely is deprecated and will be removed at the end of 2026. "
-        "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly."
+        "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly. "
+        "To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
     # Here we need basic track quality cuts to be applied,
     # otherwise, we get a lot of badly reconstructed particles,

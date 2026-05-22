@@ -26,7 +26,8 @@ def stdPi0s(
     Function to prepare one of several standardized types of pi0 lists:
 
     - 'all' using gamma:all, no cuts
-    - 'base' using gamma:base (CDC acceptance + timing cut), no additional cuts
+    - 'base' reconstructed from two ``gamma:base`` photons
+      (``inCDCAcceptance and abs(clusterTiming) < 200``), no additional cuts
 
     The following lists are **deprecated** and will be removed at the end of 2026:
 

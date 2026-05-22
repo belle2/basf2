@@ -258,7 +258,7 @@ void DQMHistAnalysisHLTModule::event()
   double L1Rate = getEpicsPV("L1Rate");
 
   if (hist_Procs && L1Rate != 0) {
-    double nProcs = hist_Procs->GetMean() * 0.5; // Number of HLT threads
+    double nProcs = hist_Procs->GetEntries() * 0.5; // Number of HLT threads
     HLTBudgetTime = nProcs * 1e03 / L1Rate; // unit = ms
     setEpicsPV("BudgetTime", HLTBudgetTime);
   }

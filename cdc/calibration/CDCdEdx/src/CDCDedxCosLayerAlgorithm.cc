@@ -230,7 +230,7 @@ CalibrationAlgorithm::EResult CDCDedxCosLayerAlgorithm::calibrate()
   }
 
   m_suffix.clear();
-
+  m_coscors.clear();
   return c_OK;
 }
 
@@ -303,7 +303,7 @@ void CDCDedxCosLayerAlgorithm::createPayload()
     if (isMerge) {
       unsigned int nbins = m_DBCosineCor->getSize(getRepresentativeLayer(il));
       if (nbins != m_cosBin)
-        B2ERROR("merging failed because of unmatch bins (old " << m_cosBin << " new " << nbins << ")");
+        B2ERROR("merging failed because of unmatch bins (old " << nbins << " new " << m_cosBin << ")");
 
       for (unsigned int ibin = 0; ibin < nbins; ibin++) {
         double prev = m_DBCosineCor->getMean(getRepresentativeLayer(il), ibin);
@@ -316,7 +316,7 @@ void CDCDedxCosLayerAlgorithm::createPayload()
   }
 
   //Saving constants
-  B2INFO("dE/dx calibration done for CDC dE/dx _eltron saturation");
+  B2INFO("dE/dx calibration done for CDC dE/dx electron saturation");
 
   std::vector<unsigned int> layerToGroup(56);
 

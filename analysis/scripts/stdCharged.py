@@ -23,7 +23,7 @@ _TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
 # define arrays to interpret cut matrix
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
 _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
-_stdnames = ['all', 'loose', 'loosepid', 'good', 'higheff']
+_stdnames = ['all', 'clean', 'loose', 'loosepid', 'good', 'higheff']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
@@ -56,18 +56,27 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     Function to prepare one of several standardized types of charged particle lists:
 
     - 'all' with no cuts on track
-    - 'good' high purity lists for data studies
-    - 'loosepid' loose selections for skimming, PID cut only
-    - 'loose' loose selections for skimming
-    - 'higheff' high efficiency list with loose global ID cut for data studies
-    - 'mostlikely' list with the highest PID likelihood
+    - 'clean' tracks passing trackQuality and IP cuts (``thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2``),
+      no PID requirement
+    - 'good' high purity lists for data studies [**deprecated**, will be removed end of 2026]
+    - 'loosepid' loose selections for skimming, PID cut only [**deprecated**, will be removed end of 2026]
+    - 'loose' loose selections for skimming [**deprecated**, will be removed end of 2026]
+    - 'higheff' high efficiency list with loose global ID cut for data studies [**deprecated**, will be removed end of 2026]
+    - 'mostlikely' list with the highest PID likelihood [**deprecated**, will be removed end of 2026]
+
+    .. note::
+        After end of 2026 only the ``'all'`` and ``'clean'`` lists will be available.
 
     Also the following lists, which may or may not be available depending on the release
 
     - '99eff' with 99% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      [**deprecated**, will be removed end of 2026]
     - '95eff' with 95% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      [**deprecated**, will be removed end of 2026]
     - '90eff' with 90% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      [**deprecated**, will be removed end of 2026]
     - '85eff' with 85% selection efficiency (calculated for 1<p<4 GeV) and good track (MC only)
+      [**deprecated**, will be removed end of 2026]
 
     @param particletype type of charged particle to make a list of
     @param listtype     name of standard list
@@ -83,15 +92,17 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     if particletype not in _chargednames:
         b2.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
-    if listtype != 'all':
+    if listtype not in ('all', 'clean'):
         b2.B2WARNING(
             f"The standard charged particle list '{particletype}+:{listtype}' is deprecated "
             "and will be removed at the end of 2026. "
-            "Only the 'all' list will be kept. Please update your analysis accordingly."
+            "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly."
         )
 
     if listtype == 'all':
         ma.fillParticleList(particletype + '+:all', '', writeOut=writeOut, path=path)
+    elif listtype == 'clean':
+        ma.fillParticleList(particletype + '+:clean', goodTrack, writeOut=writeOut, path=path)
     elif listtype == 'good':
         ma.fillParticleList(
             particletype + '+:good',
@@ -186,6 +197,11 @@ def stdLep(pdgId,
            path=None):
     """
     Function to prepare one of several standardized types of lepton (:math:`e,\\mu`) lists, with the following working points:
+
+    .. deprecated::
+        This function is deprecated and will be removed at the end of 2026.
+        Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
+        Efficiency corrections are available via the systematic corrections framework.
 
     * 'FixedThresh05', PID cut of > 0.5 for each particle in the list.
     * 'FixedThresh09', PID cut of > 0.9 for each particle in the list.
@@ -292,6 +308,12 @@ def stdLep(pdgId,
         "UniformPiFR1EM2",
         "UniformPiFR5EM3",
         "UniformPiFR1EM3",
+    )
+
+    b2.B2WARNING(
+        "stdLep is deprecated and will be removed at the end of 2026. "
+        "Please use stdCharged and apply PID cuts manually depending on your analysis. "
+        "Efficiency corrections are available via the systematic corrections framework."
     )
 
     available_methods = ("likelihood", "bdt")
@@ -520,21 +542,33 @@ def stdE(listtype=_defaultlist,
     """ Function to prepare one of several standardized types of electron lists.
     See the documentation of `stdLep` for details.
 
+    .. deprecated::
+        This function is deprecated and will be removed at the end of 2026.
+        Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
+        Efficiency corrections are available via the systematic corrections framework.
+
     It also accepts any of the legacy definitions
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
-    * 'good'
-    * 'loosepid'
-    * 'loose'
-    * 'higheff'
-    * '95eff'
-    * '90eff'
-    * '85eff'
+    * 'clean'
+    * 'good' (deprecated, will be removed end of 2026)
+    * 'loosepid' (deprecated, will be removed end of 2026)
+    * 'loose' (deprecated, will be removed end of 2026)
+    * 'higheff' (deprecated, will be removed end of 2026)
+    * '95eff' (deprecated, will be removed end of 2026)
+    * '90eff' (deprecated, will be removed end of 2026)
+    * '85eff' (deprecated, will be removed end of 2026)
 
     Returns:
         tuple(str, list(str)): the alias for the electron ID variable, and the list of aliases for the weights.
     """
+
+    b2.B2WARNING(
+        "stdE is deprecated and will be removed at the end of 2026. "
+        "Please use stdCharged and apply PID cuts manually depending on your analysis. "
+        "Efficiency corrections are available via the systematic corrections framework."
+    )
 
     if listtype in _stdnames + _effnames:
         stdCharged("e", listtype, path)
@@ -568,21 +602,33 @@ def stdMu(listtype=_defaultlist,
     """ Function to prepare one of several standardized types of muon lists.
     See the documentation of `stdLep` for details.
 
+    .. deprecated::
+        This function is deprecated and will be removed at the end of 2026.
+        Please use ``stdCharged`` and apply PID cuts manually depending on your analysis.
+        Efficiency corrections are available via the systematic corrections framework.
+
     It also accepts any of the legacy definitions
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
-    * 'good'
-    * 'loosepid'
-    * 'loose'
-    * 'higheff'
-    * '95eff'
-    * '90eff'
-    * '85eff'
+    * 'clean'
+    * 'good' (deprecated, will be removed end of 2026)
+    * 'loosepid' (deprecated, will be removed end of 2026)
+    * 'loose' (deprecated, will be removed end of 2026)
+    * 'higheff' (deprecated, will be removed end of 2026)
+    * '95eff' (deprecated, will be removed end of 2026)
+    * '90eff' (deprecated, will be removed end of 2026)
+    * '85eff' (deprecated, will be removed end of 2026)
 
     Returns:
         tuple(str, list(str)): the alias for the muon ID variable, and the list of aliases for the weights.
     """
+
+    b2.B2WARNING(
+        "stdMu is deprecated and will be removed at the end of 2026. "
+        "Please use stdCharged and apply PID cuts manually depending on your analysis. "
+        "Efficiency corrections are available via the systematic corrections framework."
+    )
 
     if listtype in _stdnames + _effnames:
         stdCharged("mu", listtype, path)
@@ -604,12 +650,20 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     """
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
+    .. deprecated::
+        This function is deprecated and will be removed at the end of 2026.
+        Please update your analysis to use the ``'all'`` or ``'clean'`` lists instead.
+
     @param pidPriors    list of 6 float numbers used to reweight PID likelihoods, for e, mu, pi, K, p and d
     @param suffix       string added to the end of particle list names
     @param custom_cuts  custom selection cut string, if empty, standard track quality cuts will be applied
     @param path         modules are added to this path
     @param writeOut     whether RootOutput module should save the created ParticleList
     """
+    b2.B2WARNING(
+        "stdMostLikely is deprecated and will be removed at the end of 2026. "
+        "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly."
+    )
     # Here we need basic track quality cuts to be applied,
     # otherwise, we get a lot of badly reconstructed particles,
     # which will end up filled as a random type

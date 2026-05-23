@@ -44,7 +44,7 @@ using namespace Calibration;
 //
 //  3. Loop over each energy and group to find the optimal number of crystals
 //    - start by checking the current value of nOptimal, then check smaller and larger
-//      values of number of summed crystals. For value, find:
+//      values of number of summed crystals. For each value, find:
 //      - peak contained energy divided by generated energy by fitting the histogram
 //        range that includes 50% of events;
 //      - corresponding bias = sum of ECLCalDigits minus mc true energy;
@@ -70,32 +70,45 @@ std::vector<int> eclNOptimalFitRange(TH1D* h, const double& fraction)
 {
   const double target = fraction * h->GetEntries();
   const int nBins = h->GetNbinsX();
+  int iLo = 1;
+  int iHi = nBins;
+  double currentSum = h->Integral(iLo, iHi);
 
-  //..Start at the histogram maximum
-  int iLo = h->GetMaximumBin();
-  int iHi = iLo;
-  double sum = h->Integral(iLo, iHi);
+  //..Give up if the histogram integral is less than the target
+  std::vector<int> iBins;
+  if (currentSum < target) {
+    iBins.push_back(iLo);
+    iBins.push_back(iHi);
+  }
 
-  //..Add one bin at a time
-  while (sum < target and (iLo > 1 or iHi < nBins)) {
-    double nextLo = 0.;
-    if (iLo > 1) {nextLo = h->GetBinContent(iLo - 1);}
-    double nextHi = 0.;
-    if (iHi < nBins) {nextHi = h->GetBinContent(iHi + 1);}
-    if (nextLo > nextHi) {
-      sum += nextLo;
-      iLo--;
-    } else {
-      sum += nextHi;
-      iHi++;
+  //..Vector of cumulative contents, i.e. inVector[n] = sum of 0...n
+  std::vector<double> intVector;
+  intVector.push_back(h->GetBinContent(1));
+  for (int iL = 2; iL <= nBins; iL++) {
+    double nextIntegral = intVector[iL - 2] + h->GetBinContent(iL);
+    intVector.push_back(nextIntegral);
+  }
+
+  //..Now search all possible ranges
+  double maxIntegral = currentSum;
+  for (int iL = 2; iL <= nBins; iL++) {
+    for (int iH = iL; iH <= nBins; iH++) {
+
+      // sum[iL, iH] = sum[1, iH] - sum[1,iL-1] = intVector[iH-1] - intVector[iL-2]
+      double integral = intVector[iH - 1] - intVector[iL - 2];
+      if ((integral > target and (iH - iL) < (iHi - iLo)) or
+          (integral > target and (iH - iL) == (iHi - iLo) and integral > maxIntegral)
+         ) {
+        iLo = iL;
+        iHi = iH;
+        maxIntegral = integral;
+      }
     }
   }
 
-  std::vector<int> iBins;
   iBins.push_back(iLo);
   iBins.push_back(iHi);
   return iBins;
-
 }
 
 //-----------------------------------------------------------------------------------
@@ -249,6 +262,12 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   //..Couple of diagnostic histograms
   auto entriesPerThetaIdEnergy = getObjectPtr<TH2F>("entriesPerThetaIdEnergy");
   auto mcEnergyDiff = getObjectPtr<TH2F>("mcEnergyDiff");
+  auto eMCOverEGenerated = getObjectPtr<TH1D>("eMCOverEGenerated");
+  auto clusterTime = getObjectPtr<TH1D>("clusterTime");
+  auto angularDiff = getObjectPtr<TH1D>("angularDiff");
+  auto nOutOfTimeCrystals = getObjectPtr<TH1D>("nOutOfTimeCrystals");
+  auto timeSinceInjection = getObjectPtr<TH1D>("timeSinceInjection");
+
 
   //..Write these to disk.
   TFile* histFile = new TFile("eclNOptimalAlgorithm.root", "recreate");
@@ -256,6 +275,12 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   groupNumberOfEachCellID->Write();
   entriesPerThetaIdEnergy->Write();
   mcEnergyDiff->Write();
+  eMCOverEGenerated->Write();
+  clusterTime->Write();
+  angularDiff->Write();
+  nOutOfTimeCrystals->Write();
+  timeSinceInjection->Write();
+
 
   //-----------------------------------------------------------------------------------
   //..Parameters from the inputParameters histogram

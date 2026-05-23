@@ -1678,7 +1678,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1725,7 +1725,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))

@@ -19,6 +19,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <mdst/dataobjects/ECLCluster.h>
+
 
 /* Root headers. */
 #include <Math/Vector3D.h>
@@ -141,6 +144,9 @@ void eclLeakageCollectorModule::prepare()
   //..Required arrays
   m_eclShowerArray.isRequired(m_showerArrayName);
   m_mcParticleArray.isRequired();
+  m_eventLevelClusteringInfo.isRequired();
+  m_eclClusterArray.isRequired("ECLClusters");
+
 
   //-----------------------------------------------------------------
   //..nOptimal payload. Get optimal number of crystals, and
@@ -381,6 +387,40 @@ void eclLeakageCollectorModule::collect()
     measuredLocation, radius, thetaLocation, phiLocation);
   ROOT::Math::XYZVector measuredDirection = ROOT::Math::XYZVector(measuredLocation) - vertex;
   t_locationError = radius * ROOT::Math::VectorUtil::Angle(measuredDirection, mcp3);
+
+
+  //--------------------------------------------------------
+  //..Clean up the sample
+
+  //..Get the related ECLCluster
+  double timing = -1000.;
+  double eMCTotal = 0.;
+
+  const auto showerClusterRelations = m_eclShowerArray[minShower]->getRelationsWith<ECLCluster>();
+  const unsigned int nRelatedClusters = showerClusterRelations.size();
+  if (nRelatedClusters > 0) {
+    const auto cluster = showerClusterRelations.object(0);
+    timing = cluster->getTime();
+
+    //..Associated MC true energy
+    const auto clusterMCRelations = cluster->getRelationsWith<MCParticle>();
+    for (unsigned int ir = 0; ir < clusterMCRelations.size(); ++ir) {
+      eMCTotal += clusterMCRelations.weight(ir);
+    }
+  }
+
+  //..True energy content of cluster must be >15% of generated
+  const double minTrueFrac = 0.15;
+  if (eMCTotal < minTrueFrac * mcLabE) {return;}
+
+  //..Standard timing cut
+  const double maxClusterTiming = 200.;
+  if (abs(timing) > maxClusterTiming) {return;}
+
+  //..Out of time crystals.
+  double OutOfTime = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
+  const double maxOutOfTime = 900.;
+  if (OutOfTime > maxOutOfTime) {return;}
 
 
   //-----------------------------------------------------------------

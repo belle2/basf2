@@ -179,69 +179,44 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     // --- 6. Final Conversion ---
     return static_cast<float>(fixed_val) * scale;
   }
-  //for sperical case with total_bits < int-bits (only used to this code, need modify for generic using)
+  // for total_bits < int_bits case: matches Xilinx HLS ap_fixed behavior
+  // ap_ufixed<W, I> with W < I means:
+  // 1. First: wrap (mod 2^I) - note: uses 2^I not 2^W
+  // 2. Then: round to representable values (step = 2^(I-W))
+  // 3. Finally: wrap to W bits if result exceeds representable range
   else {
-    // 1. calculate the bits
-    const int zero_bits = std::max(int_bits - total_bits, 0);//So called negative fraction bits
-    const int useful_bits = total_bits - 1;
+    const int shift_bits = int_bits - total_bits;
+    const double step = std::pow(2.0, shift_bits);  // 2^(I-W)
+    const int64_t wrap_range = 1LL << int_bits;  // 2^I
 
-    // 2. value collections
-    std::vector<float> legal_values;
-    for (int64_t i = 0; i < (1LL << useful_bits); ++i) {
-      int64_t value = i << zero_bits;
-      legal_values.push_back(static_cast<float>(value));
-      legal_values.push_back(static_cast<float>(-1 * value)); //need confirm
+    // Step 1: Wrap (mod 2^I)
+    double wrapped = fmod(val, static_cast<double>(wrap_range));
+    if (wrapped < 0) wrapped += wrap_range;
+
+    // Step 2: Round to nearest representable value (step = 2^(I-W))
+    double rounded;
+    if (quant_mode == 1) {  // AP_RND
+      rounded = std::round(wrapped / step) * step;
+    } else {  // AP_TRN
+      rounded = std::floor(wrapped / step) * step;
     }
-    std::sort(legal_values.begin(), legal_values.end());
 
-    // 3. find the closest values in legal_values
-    auto closest = std::min_element(legal_values.begin(), legal_values.end(),
-    [val](float a, float b) {
-      float dist_a = std::abs(a - val);
-      float dist_b = std::abs(b - val);
+    // Step 3: Wrap to W bits if result exceeds representable range
+    // For ap_ufixed<W,I>, max representable value is (2^W - 1) * 2^(I-W)
+    const double max_val = ((1LL << total_bits) - 1) * step;
+    if (rounded > max_val) {
+      // Apply AP_WRAP: take lower W bits of the integer representation
+      int64_t int_repr = static_cast<int64_t>(rounded / step);
+      int_repr &= ((1LL << total_bits) - 1);  // Keep only lower W bits
+      rounded = static_cast<double>(int_repr) * step;
+    }
 
-      if (std::abs(dist_a - dist_b) < 1e-6f) {
-        return a > b;
-      }
-      return dist_a < dist_b;
-    });
-
-    return *closest;
+    return static_cast<float>(rounded);
   }
 
 }
 
-// ---  Wrappers for this code---
 
-//=== for input layer ===//
-inline float sim_input_layer_t(float val)
-{
-  return sim_ap_fixed(val, 13, 12, false, 0, 4, 0); // AP_TRN,AP_SAT
-}
-
-inline float sim_dense_0_iq_t(float val)
-{
-  return sim_ap_fixed(val, 12, 12, false, 1, 2, 0); // AP_RND,AP_WAP
-}
-
-inline float sim_ap_dense_0_iq(float val, int w, int i)
-{
-  return sim_ap_fixed(val, w, i, false, 1, 4, 0);  // AP_RND, AP_SAT_SYM
-}
-
-// === for weights, bias and hiden layers ===
-inline float sim_fixed(float val, int total_bits, int int_bits,  bool is_signed = true,
-                       int rounding = 0,     // 0: trunc, 1: round
-                       int saturation = 2)   // 2: wrap
-{
-  return sim_ap_fixed(val, total_bits, int_bits, is_signed, rounding, saturation, 0);  // AP_TRN, AP_SAT_SYM
-}
-
-// === unsign for result ===
-inline float sim_result_t(float val)
-{
-  return sim_ap_fixed(val, 25, 9, true, 0, 2, 0);  // AP_RND, AP_SAT_SYM
-}
 
 
 void
@@ -453,19 +428,42 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<vector<int>> I_input = expert.get_I_input();
 
 
-  //input layer
-  vector<float> layerinput = input;
 
+  //input layer
+  // vector<float> layerinput = input;
+  // vector<float> layerinput = {
+  //   488.0, 383.0, 31.0, 0.0, 0.0, 0.0,
+  //   31.0, -21.0, -31.0, 0.0, 0.0, 0.0,
+  //   63.0, -44.0, -41.0, 0.0, 0.0, 0.0,
+  //   -7.7276349068, -7.5720639229, 12.3242473602,
+  //   0.0, 0.0, 0.0
+  // };
+  vector<float> layerinput = {
+    12.47, -3.21, 58.90, 0.00, -17.36, 8.15,
+    -42.77, 19.04, 3.33, -0.98, 27.61, -11.25,
+    6.78, -55.02, 14.66, 0.45, -2.17, 39.88,
+    -7.54, 21.09, -13.73, 4.62, 0.00, 18.37
+  };
   // quantizer the inputs
   for (size_t i = 0; i < layerinput.size(); ++i) {
 
-    int W_arr[24] = { 12, 12, 11, 11, 8, 8, 7, 7, 5, 6, 6, 6, 8, 8, 6, 5, 4, 5, 7, 7, 6, 4, 5, 5 };
+    int W_arr[24] = { 12, 12, 11, 10, 9, 7, 7, 7, 5, 5, 7, 4, 8, 8, 6, 6, 5, 6, 8, 8, 7, 6, 5, 5 };
     int I_arr[24] = { 12, 12, 11, 11, 10, 9, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
-    if (i != 23) {
-      layerinput[i] = sim_input_layer_t(layerinput[i]);
-      layerinput[i] = sim_ap_dense_0_iq(layerinput[i], W_arr[i], I_arr[i]);
-
-    } else layerinput[i] = 0;
+    if (i != 24) {
+      std::cout << "[RAW INPUT] i=" << i
+                << " value=" << layerinput[i]
+                << std::endl;
+      if (layerinput[i] < 0) {
+        float wrapped = fmod(layerinput[i], 8192.0f);
+        if (wrapped < 0) wrapped += 8192.0f;
+        layerinput[i] = sim_ap_fixed(wrapped, 13, 12, false, 1, 2, 0);
+      } else {
+        layerinput[i] = sim_ap_fixed(layerinput[i], 13, 12, false, 0, 2, 0);
+      }
+      layerinput[i] = sim_ap_fixed(layerinput[i], W_arr[i], I_arr[i], false, 1, 2, 0);
+    } else {
+      layerinput[i] = 0;
+    }
   }
 
   //hidden layer and output layer
@@ -483,12 +481,11 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
     for (unsigned io = 0; io < num_neurons; ++io) {
       float bias_raw = bias[io + num_total_neurons];
-      float bias_fixed   = sim_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
-                                     rounding_bias[i_layer], saturation_bias[i_layer]);
-      float bias_contrib = sim_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                     rounding_accum[i_layer], saturation_accum[i_layer]);
+      float bias_fixed   = sim_ap_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
+                                        rounding_bias[i_layer], saturation_bias[i_layer], 0);
+      float bias_contrib = sim_ap_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                        rounding_accum[i_layer], saturation_accum[i_layer], 0);
       layeroutput[io] = bias_contrib;
-
     }
     num_total_neurons += num_neurons;
 
@@ -498,11 +495,11 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
       float input_val = layerinput[ii];
       for (unsigned io = 0; io < num_neurons; ++io) {
         float weight_raw = weights[iw];
-        float weight_fixed = sim_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
-                                       rounding_weight[i_layer], saturation_weight[i_layer]);
+        float weight_fixed = sim_ap_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
+                                          rounding_weight[i_layer], saturation_weight[i_layer], 0);
         float product = input_val * weight_fixed;
-        float contrib = sim_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                  rounding_accum[i_layer], saturation_accum[i_layer]);
+        float contrib = sim_ap_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
+                                     rounding_accum[i_layer], saturation_accum[i_layer], 0);
         layeroutput[io] += contrib;
         ++iw;
       }
@@ -511,13 +508,12 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
     if (i_layer < num_layers - 2) {
       //relu
       for (unsigned io = 0; io < num_neurons; ++io) {
-        float fixed_val = sim_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
-                                    saturation[i_layer]);
+        float fixed_val = sim_ap_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
+                                       saturation[i_layer], 0);
         float relu_val = (fixed_val > 0) ? fixed_val : 0;
-        layeroutput[io] = sim_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
-                                    rounding_relu[i_layer], saturation_relu[i_layer]);
+        layeroutput[io] = sim_ap_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
+                                       rounding_relu[i_layer], saturation_relu[i_layer], 0);
       }
-
 
       //input to next layer
       layerinput.clear();
@@ -526,32 +522,18 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
       for (unsigned i = 0; i < num_neurons; ++i) {
 
-        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 4, 0);
+        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 2, 0);
 
       }
-      if (i_layer == 0) {}
-      else if (i_layer == 1) {
-
-        layerinput[1] = 0;
-        layerinput[10] = 0;
-        layerinput[18] = 0;
-
-      } else if (i_layer == 2) {
-        layerinput[2] = 0;
-        layerinput[16] = 0;
-
-      }
-
 
     } else {
 
 
-      // ===  HLS result_t: ap_fixed<19,5,AP_RND,AP_SAT_SYM,0> ===
-      float final_fixed = sim_result_t(layeroutput[0]);
-
+      float final_fixed = sim_ap_fixed(layeroutput[0], 12, 5, true, 1, 4, 0);
       return final_fixed;
     }
   }
+
   return 0;
 }
 

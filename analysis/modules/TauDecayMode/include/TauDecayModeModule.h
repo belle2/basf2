@@ -39,6 +39,9 @@ namespace Belle2 {
   protected:
 
     std::string m_printmode; /**< Parameter passed by the user to indicate the information to be printed */
+    bool m_compute2Body; /**< Flag to enable/disable 2-body invariant mass computation */
+    bool m_compute3Body; /**< Flag to enable/disable 3-body invariant mass computation */
+    bool m_compute4Body; /**< Flag to enable/disable 4-body invariant mass computation */
 
   private:
 
@@ -174,6 +177,9 @@ namespace Belle2 {
     std::vector<int> vec_radgam_taup;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauminus;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauplus;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<double> m_massBuffer2B; /**< Reusable buffer for 2-body invariant masses */
+    std::vector<double> m_massBuffer3B; /**< Reusable buffer for 3-body invariant masses */
+    std::vector<double> m_massBuffer4B; /**< Reusable buffer for 4-body invariant masses */
 
     /** Analyze a generated tau pair event */
     void AnalyzeTauPairEvent();
@@ -187,6 +193,18 @@ namespace Belle2 {
     static int getProngOfDecay(const MCParticle& mc);
     /** Energy of the radiative photon in tau rest frame */
     double getEgstar(const std::vector<int>& vec_radgam, const MCParticle& mc);
+    /** Calculate invariant mass from 4-momentum */
+    static inline double calculateInvariantMass(double E, double px, double py, double pz);
+    /** Compute 2-body invariant masses */
+    void compute2BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses);
+    /** Compute 3-body invariant masses */
+    void compute3BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses);
+    /** Compute 4-body invariant masses */
+    void compute4BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses);
+    /** Compute and store invariant masses for one tau from its final-state daughter list */
+    void computeAndStoreInvariantMasses(const std::vector<int>& tauDaughters, bool forTauMinus);
+    /** Store default zero invariant-mass vectors for both taus */
+    void storeZeroInvariantMasses();
   };
 
 }

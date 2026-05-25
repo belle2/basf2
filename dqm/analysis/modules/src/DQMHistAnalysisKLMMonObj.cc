@@ -64,31 +64,30 @@ void DQMHistAnalysisKLMMonObjModule::event()
   B2DEBUG(20, "DQMHistAnalysisKLMMonObj: event called.");
 }
 
-void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(auto* hist, int layer, Double_t totalEvents,
+void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(auto* hist, int layerGlobalBin, Double_t totalEvents,
                                                          Double_t layerArea, Double_t& hitRate, Double_t& hitRateErr)
 {
-  if (!hist || hist->GetDimension() != 2 || layer <= 0 || layerArea <= 0 || totalEvents <= 0) {
+  if (!hist || hist->GetDimension() != 2 || layerGlobalBin <= 0 || layerArea <= 0 || totalEvents <= 0) {
     B2ERROR("CalculateKLMHitRate: Invalid input parameters.");
     hitRate = 0.0;
     hitRateErr = 0.0;
     return;
   }
 
-  // Sum entries for the specific layer across all time bins (Y-axis)
-  // Layer number is on X-axis, so we sum over all Y bins for a given X bin (layer)
+  // Sum entries for the specific BKLM layer across all time bins (Y-axis).
+  // X-axis is the global layer index (1..240), as filled by DetectorOccupanciesDQM.
   Double_t numDigits = 0.0;
 
   int nBinsX = hist->GetNbinsX();
   int nBinsY = hist->GetNbinsY();
 
-  // Layer corresponds to X-axis bins
-  if (layer > 0 && layer <= nBinsX) {
+  if (layerGlobalBin > 0 && layerGlobalBin <= nBinsX) {
     for (int binY = 1; binY <= nBinsY; binY++) {
-      Double_t binContent = hist->GetBinContent(layer, binY);
+      Double_t binContent = hist->GetBinContent(layerGlobalBin, binY);
       numDigits += binContent;
     }
   } else {
-    B2ERROR("CalculateKLMHitRate: Layer number out of range.");
+    B2ERROR("CalculateKLMHitRate: Global layer bin out of range.");
     hitRate = 0.0;
     hitRateErr = 0.0;
     return;
@@ -145,12 +144,13 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
         layerGlobal, &section, &sector, &layer);
       Double_t layerAreaTrg = m_bklmGeoPar->getBKLMLayerArea(section, sector, layer); // in cm^2
       Double_t hitRate, hitRateErr;
-      CalculateKLMHitRate(bklm_trg[i], layer, totalEventsTrg, layerAreaTrg, hitRate, hitRateErr);
+      CalculateKLMHitRate(bklm_trg[i], layerGlobal + 1, totalEventsTrg, layerAreaTrg, hitRate, hitRateErr);
       // Naming consistent with KLM2: B/F for section, 0-based sector, 1-based layer
       std::string varName = prefix + "B";
       varName += (section == 0) ? "B" : "F";
       varName += std::to_string((sector - 1) % BKLMElementNumbers::getMaximalSectorNumber());
       varName += "_layer" + std::to_string(layer) + "_trg_" + suffix + "_" + m_tag[i];
+      B2DEBUG(20, "Setting variable: " << varName << " = " << hitRate << " +/- " << hitRateErr);
       m_klmMonObj->setVariable(varName, hitRate, hitRateErr);
     }
   }

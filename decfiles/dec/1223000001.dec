@@ -1,0 +1,22 @@
+# EventType: 1223000001 
+# Descriptor: [B+ -> anti-D0* rho+ ]cc
+# NickName: Bu_Dstrho
+# Documentation: B+ -> anti-D0* rho+
+# Responsible: Nihar Pawar
+# Email: ph24resch11018@iith.ac.in
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 2026 May 25
+
+Decay Upsilon(4S)
+0.5 B+ B-sig VSS;
+0.5 B- B+sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D*0  rho+ SVV_HELAMP 0.283 1.13 0.932 0.0 0.228 0.95;
+Enddecay
+CDecay B-sig
+
+End

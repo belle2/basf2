@@ -956,7 +956,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         hashed=True, default=[200, 8, 3, 0.1]
         #: \endcond
     )
-    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
+    #: files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(
         #: \cond
         default="BBBAR"

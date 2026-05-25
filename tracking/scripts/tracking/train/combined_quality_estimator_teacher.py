@@ -1393,6 +1393,9 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     object_name = 'VXDQualityEstimatorMVA'  # "trackfindingvxd_TrackQualityIndicator"
 
     def make_db(self):
+        """
+        Creates the 'VXDQualityEstimatorMVA' payload from the weightfile produced by this task.
+        """
         vxd_identifier = self.get_output_file_name(self.get_weightfile_identifier() + '.xml')  # .root
         with open(vxd_identifier, "r") as f:
             weight_file_content = f.read()
@@ -1430,6 +1433,9 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     object_name = 'TrackingMVAFilterParameters'  # "trackfindingcdc_TrackQualityIndicator"
 
     def make_db(self):
+        """
+        Creates the 'TrackingMVAFilterParameters' payload from the weightfile produced by this task.
+        """
         cut_index = self.recotrack_option.find('deleteCDCQI') + len('deleteCDCQI')
         cut = int(self.recotrack_option[cut_index:cut_index+3])/100.
 
@@ -1495,6 +1501,9 @@ class RecoTrackQETeacherTask(TrackQETeacherBaseTask):
                 )
 
     def make_db(self):
+        """
+        Creates the 'TrackQualityEstimatorMVA' payload from the weightfile produced by this task.
+        """
         recotrack_identifier = self.get_output_file_name(self.get_weightfile_identifier() + '.xml')  # .root
         with open(recotrack_identifier, 'r') as f:
             weight_file_content = f.read()

@@ -65,13 +65,13 @@ namespace Belle2 {
      * Calculate KLM hit rate for a specific layer from 2D histogram.
      * Formula: hitRate = entries / (totalEvents * lookbackWindow * layerArea)
      * @param[in]  hist           TH1* histogram (must be TH2, e.g. occupancy)
-     * @param[in]  layer          Layer number to calculate hit rate for
+     * @param[in]  layerGlobalBin Global BKLM layer bin (1..240) on histogram X-axis
      * @param[in]  totalEvents    Total number of events passed delayed bhabha timing decision (TTYP_DPHY == 1)
      * @param[in]  layerArea      Area of the KLM layer in cm^2
      * @param[out] hitRate        Calculated KLM hit rate for the specific layer (Hz/cm^2)
      * @param[out] hitRateErr     Error on KLM hit rate for the specific layer (Hz/cm^2)
      */
-    void CalculateKLMHitRate(TH2* hist, int layer, Double_t totalEvents, Double_t layerArea,
+    void CalculateKLMHitRate(TH2* hist, int layerGlobalBin, Double_t totalEvents, Double_t layerArea,
                              Double_t& hitRate, Double_t& hitRateErr);
 
 

@@ -421,7 +421,7 @@ void CDCDedxInjectTimeAlgorithm::defineTimeHisto(std::array<std::array<TH1D*, 3>
 void CDCDedxInjectTimeAlgorithm::checkStatistics(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar)
 {
   for (unsigned int ir = 0; ir < c_rings; ir++) {
-    for (unsigned int it = 3; it < m_tbins; it++) {
+    for (unsigned int it = 5; it < m_tbins; it++) {
       //check statiscs from 1-40ms
       if (m_tedges[it] < 4e4 && hvar[ir][it]->Integral() < m_thersE) {
         m_isminStat = true;

@@ -19,7 +19,7 @@ from caf import strategies
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="guanyu",
+                               expert_username="farhoumh",
                                subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],

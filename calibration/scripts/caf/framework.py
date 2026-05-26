@@ -18,7 +18,7 @@ __all__ = ["CalibrationBase", "Calibration", "Algorithm", "CAF"]
 
 import os
 from threading import Thread
-from time import sleep
+from time import sleep, time
 from pathlib import Path
 import shutil
 from glob import glob
@@ -1019,6 +1019,16 @@ class Calibration(CalibrationBase):
         Main logic of the Calibration object.
         Will be run in a new Thread by calling the start() method.
         """
+
+        def _print_execution_time(start, stop, calibration, iteration, step):
+            """
+            Simple function to calculate the execution time of a step and printing it on stdout.
+            """
+            elapsed = stop - start
+            hours = int(elapsed // 3600)
+            minutes = int((elapsed % 3600) // 60)
+            B2INFO(f"Execution time of '{step}' for '{calibration}:{iteration}': {hours}:{minutes} (hours:minutes)")
+
         with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
             initial_iteration = db.get_calibration_value(self.name, "iteration")
@@ -1041,13 +1051,19 @@ class Calibration(CalibrationBase):
 
         while self.state != self.end_state and self.state != self.fail_state:
             if self.state == "init":
+                start = time()
                 try:
                     B2INFO(f"Attempting collector submission for calibration {self.name}.")
                     self.machine.submit_collector()
                 except Exception as err:
+                    _print_execution_time(start, time(), self.name, self.machine.iteration, "collectors")
                     B2FATAL(str(err))
 
                 self._poll_collector()
+
+                # Print the execution time of the collectors step
+                # This includes also the time needed to submit the collector jobs
+                _print_execution_time(start, time(), self.name, self.machine.iteration, "collectors")
 
             # If we failed take us to the final fail state
             if self.state == "collector_failed":
@@ -1057,12 +1073,16 @@ class Calibration(CalibrationBase):
             # It's possible that we might raise an error while attempting to run due
             # to some problems e.g. Missing collector output files
             # We catch the error and exit with failed state so the CAF will stop
+            start = time()
             try:
                 B2INFO(f"Attempting to run algorithms for calibration {self.name}.")
                 self.machine.run_algorithms()
             except MachineError as err:
                 B2ERROR(str(err))
                 self.machine.fail()
+
+            # Print the execution time of the algorithm step
+            _print_execution_time(start, time(), self.name, self.machine.iteration, "algorihtm")
 
             # If we failed take us to the final fail state
             if self.machine.state == "algorithms_failed":

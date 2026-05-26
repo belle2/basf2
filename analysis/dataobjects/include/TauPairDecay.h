@@ -27,9 +27,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    TauPairDecay() : m_pmode(0.0), m_mmode(0.0), m_pprong(0.0), m_mprong(0.0), m_megstar(0), m_pegstar(0),
-      m_masses2BMinus(21, 0.0), m_masses3BMinus(35, 0.0), m_masses4BMinus(35, 0.0),
-      m_masses2BPlus(21, 0.0), m_masses3BPlus(35, 0.0), m_masses4BPlus(35, 0.0) {};
+    TauPairDecay() : m_pmode(0.0), m_mmode(0.0), m_pprong(0.0), m_mprong(0.0), m_megstar(0), m_pegstar(0) {};
 
     // setters
     /**
@@ -134,58 +132,38 @@ namespace Belle2 {
       return m_pegstar;
     }
 
-    /** Add 2-body invariant masses for tau- decay */
-    void addTauMinusMasses2Body(const std::vector<double>& masses);
+    /**
+     * Add list of daughter particle indices from negative tau decay
+     *
+     * @param dau_tauminus vector of daughter particle indices from tau-.
+     */
+    void addTauMinusDaughters(const std::vector<int>& dau_tauminus);
 
-    /** Add 3-body invariant masses for tau- decay */
-    void addTauMinusMasses3Body(const std::vector<double>& masses);
+    /**
+     * Add list of daughter particle indices from positive tau decay
+     *
+     * @param dau_tauplus vector of daughter particle indices from tau+.
+     */
+    void addTauPlusDaughters(const std::vector<int>& dau_tauplus);
 
-    /** Add 4-body invariant masses for tau- decay */
-    void addTauMinusMasses4Body(const std::vector<double>& masses);
-
-    /** Add 2-body invariant masses for tau+ decay */
-    void addTauPlusMasses2Body(const std::vector<double>& masses);
-
-    /** Add 3-body invariant masses for tau+ decay */
-    void addTauPlusMasses3Body(const std::vector<double>& masses);
-
-    /** Add 4-body invariant masses for tau+ decay */
-    void addTauPlusMasses4Body(const std::vector<double>& masses);
-
-    /** Get 2-body invariant masses for tau- decay */
-    const std::vector<double>& getTauMinusMasses2Body(void) const
+    /**
+     * Get list of daughter particle indices from negative tau decay
+     *
+     * @return Vector of indices of daughter particles from tau-.
+     */
+    std::vector<int> getTauMinusDaughters(void) const
     {
-      return m_masses2BMinus;
+      return m_vec_dau_tauminus;
     }
 
-    /** Get 3-body invariant masses for tau- decay */
-    const std::vector<double>& getTauMinusMasses3Body(void) const
+    /**
+     * Get list of daughter particle indices from positive tau decay
+     *
+     * @return Vector of indices of daughter particles from tau+.
+     */
+    std::vector<int> getTauPlusDaughters(void) const
     {
-      return m_masses3BMinus;
-    }
-
-    /** Get 4-body invariant masses for tau- decay */
-    const std::vector<double>& getTauMinusMasses4Body(void) const
-    {
-      return m_masses4BMinus;
-    }
-
-    /** Get 2-body invariant masses for tau+ decay */
-    const std::vector<double>& getTauPlusMasses2Body(void) const
-    {
-      return m_masses2BPlus;
-    }
-
-    /** Get 3-body invariant masses for tau+ decay */
-    const std::vector<double>& getTauPlusMasses3Body(void) const
-    {
-      return m_masses3BPlus;
-    }
-
-    /** Get 4-body invariant masses for tau+ decay */
-    const std::vector<double>& getTauPlusMasses4Body(void) const
-    {
-      return m_masses4BPlus;
+      return m_vec_dau_tauplus;
     }
 
   private:
@@ -197,12 +175,8 @@ namespace Belle2 {
     int m_mprong; /**< Prong of negative tau lepton decay */
     double m_megstar; /**< Energy of photon from negative tau decay*/
     double m_pegstar; /**< Energy of photon from positive tau decay*/
-    std::vector<double> m_masses2BMinus; /**< tau- 2-body invariant masses (10 fixed slots) */
-    std::vector<double> m_masses3BMinus; /**< tau- 3-body invariant masses (10 fixed slots) */
-    std::vector<double> m_masses4BMinus; /**< tau- 4-body invariant masses (5 fixed slots) */
-    std::vector<double> m_masses2BPlus; /**< tau+ 2-body invariant masses (10 fixed slots) */
-    std::vector<double> m_masses3BPlus; /**< tau+ 3-body invariant masses (10 fixed slots) */
-    std::vector<double> m_masses4BPlus; /**< tau+ 4-body invariant masses (5 fixed slots) */
+    std::vector<int> m_vec_dau_tauminus; /**< Indices of daughter particles from tau- decay */
+    std::vector<int> m_vec_dau_tauplus; /**< Indices of daughter particles from tau+ decay */
 
     ClassDef(TauPairDecay, 3) /**< class definition */
 

@@ -8,68 +8,16 @@
 
 #include <analysis/modules/TauDecayMode/TauDecayModeModule.h>
 #include <framework/logging/Logger.h>
-#include <array>
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <vector>
 #include <algorithm>
 #include <TParticlePDG.h>
 #include <map>
 #include <fstream>
-#include <sstream>
 #include <Math/LorentzRotation.h>
 #include <Math/Boost.h>
 using namespace std;
 using namespace Belle2;
-
-namespace {
-
-  // 2-Body: 21 combinations
-  constexpr std::array<std::array<int, 2>, 21> kPairs2Body = {{
-      {0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}, {0, 6},
-      {1, 2}, {1, 3}, {1, 4}, {1, 5}, {1, 6},
-      {2, 3}, {2, 4}, {2, 5}, {2, 6},
-      {3, 4}, {3, 5}, {3, 6},
-      {4, 5}, {4, 6},
-      {5, 6}
-    }
-  };
-
-  // 3-Body: 35 combinations
-  constexpr std::array<std::array<int, 3>, 35> kTriplets3Body = {{
-      {0, 1, 2}, {0, 1, 3}, {0, 1, 4}, {0, 1, 5}, {0, 1, 6},
-      {0, 2, 3}, {0, 2, 4}, {0, 2, 5}, {0, 2, 6},
-      {0, 3, 4}, {0, 3, 5}, {0, 3, 6},
-      {0, 4, 5}, {0, 4, 6}, {0, 5, 6},
-      {1, 2, 3}, {1, 2, 4}, {1, 2, 5}, {1, 2, 6},
-      {1, 3, 4}, {1, 3, 5}, {1, 3, 6},
-      {1, 4, 5}, {1, 4, 6}, {1, 5, 6},
-      {2, 3, 4}, {2, 3, 5}, {2, 3, 6},
-      {2, 4, 5}, {2, 4, 6}, {2, 5, 6},
-      {3, 4, 5}, {3, 4, 6}, {3, 5, 6},
-      {4, 5, 6}
-    }
-  };
-
-  // 4-Body: 35 combinations
-  constexpr std::array<std::array<int, 4>, 35> kQuads4Body = {{
-      {0, 1, 2, 3}, {0, 1, 2, 4}, {0, 1, 2, 5}, {0, 1, 2, 6},
-      {0, 1, 3, 4}, {0, 1, 3, 5}, {0, 1, 3, 6},
-      {0, 1, 4, 5}, {0, 1, 4, 6}, {0, 1, 5, 6},
-      {0, 2, 3, 4}, {0, 2, 3, 5}, {0, 2, 3, 6},
-      {0, 2, 4, 5}, {0, 2, 4, 6}, {0, 2, 5, 6},
-      {0, 3, 4, 5}, {0, 3, 4, 6}, {0, 3, 5, 6},
-      {0, 4, 5, 6},
-      {1, 2, 3, 4}, {1, 2, 3, 5}, {1, 2, 3, 6},
-      {1, 2, 4, 5}, {1, 2, 4, 6}, {1, 2, 5, 6},
-      {1, 3, 4, 5}, {1, 3, 4, 6}, {1, 3, 5, 6},
-      {1, 4, 5, 6},
-      {2, 3, 4, 5}, {2, 3, 4, 6}, {2, 3, 5, 6},
-      {2, 4, 5, 6},
-      {3, 4, 5, 6}
-    }
-  };
-
-}
 
 std::map<std::string, int> make_map(const std::string& file, int chg)
 {
@@ -109,7 +57,6 @@ REG_MODULE(TauDecayMode);
 //-----------------------------------------------------------------
 
 TauDecayModeModule::TauDecayModeModule() : Module(), m_printmode(),
-  m_compute2Body(false), m_compute3Body(false), m_compute4Body(false),
   m_tauDecay(), m_event_metadata(), m_taum_no(0), m_taup_no(0), m_mmode(-2),
   m_pmode(-2), m_mprong(0), m_pprong(0), m_megstar(0), m_pegstar(0), tauPair(false),
   numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1),
@@ -124,9 +71,6 @@ TauDecayModeModule::TauDecayModeModule() : Module(), m_printmode(),
   addParam("printmode",  m_printmode, "Printout more information from each event", std::string("default"));
   addParam("file_minus", m_file_minus, "Path for an alternative mapping for tau- decays", std::string(""));
   addParam("file_plus",  m_file_plus, "Path for an alternative mapping for tau+ decays", std::string(""));
-  addParam("compute2Body", m_compute2Body, "Compute 2-body invariant mass combinations", false);
-  addParam("compute3Body", m_compute3Body, "Compute 3-body invariant mass combinations", false);
-  addParam("compute4Body", m_compute4Body, "Compute 4-body invariant mass combinations", false);
 }
 
 //
@@ -200,14 +144,9 @@ void TauDecayModeModule::event()
   m_tauDecay->addTauMinusEgstar(m_megstar);
   m_tauDecay->addTauPlusEgstar(m_pegstar);
 
-  if (m_compute2Body || m_compute3Body || m_compute4Body) {
-    if (tauPair) {
-      computeAndStoreInvariantMasses(vec_dau_tauminus, true);
-      computeAndStoreInvariantMasses(vec_dau_tauplus, false);
-    } else {
-      storeZeroInvariantMasses();
-    }
-  }
+  m_tauDecay->addTauMinusDaughters(vec_dau_tauminus);
+  m_tauDecay->addTauPlusDaughters(vec_dau_tauplus);
+
 }
 
 void TauDecayModeModule::AnalyzeTauPairEvent()
@@ -957,175 +896,4 @@ double TauDecayModeModule::getEgstar(const std::vector<int>& vec_radgam, const M
   }
   B2DEBUG(19, "egstar: " << egstar);
   return egstar;
-}
-
-void TauDecayModeModule::storeZeroInvariantMasses()
-{
-  m_massBuffer2B.assign(21, 0.0);
-  m_massBuffer3B.assign(35, 0.0);
-  m_massBuffer4B.assign(35, 0.0);
-
-  if (m_compute2Body) {
-    m_tauDecay->addTauMinusMasses2Body(m_massBuffer2B);
-    m_tauDecay->addTauPlusMasses2Body(m_massBuffer2B);
-  }
-  if (m_compute3Body) {
-    m_tauDecay->addTauMinusMasses3Body(m_massBuffer3B);
-    m_tauDecay->addTauPlusMasses3Body(m_massBuffer3B);
-  }
-  if (m_compute4Body) {
-    m_tauDecay->addTauMinusMasses4Body(m_massBuffer4B);
-    m_tauDecay->addTauPlusMasses4Body(m_massBuffer4B);
-  }
-}
-
-void TauDecayModeModule::computeAndStoreInvariantMasses(const std::vector<int>& tauDaughters, bool forTauMinus)
-{
-  std::vector<int> visibleForMasses; /**< Reusable buffer of non-neutrino final-state indices for mass computation */
-  visibleForMasses.clear();
-  visibleForMasses.reserve(tauDaughters.size());
-  for (int idx : tauDaughters) {
-    int pdgid = abs(MCParticles[idx]->getPDG());
-    if (pdgid == 12 || pdgid == 14 || pdgid == 16) continue;
-    visibleForMasses.push_back(idx);
-  }
-
-  const char* tauLabel = forTauMinus ? "tau-" : "tau+";
-  const size_t n = visibleForMasses.size();
-  B2INFO("TauDecayMode:: EventNumber = " << m_event_metadata->getEvent()
-         << " " << tauLabel << " invariant masses: "
-         << n << " visible final-state particles (indices 0.." << (n > 0 ? n - 1 : 0) << ")");
-
-  {
-    std::stringstream pdg_ss;
-    pdg_ss << "particle PDG: ";
-    if (n == 0) {
-      pdg_ss << "(none)";
-    } else {
-      for (size_t i = 0; i < n; ++i) {
-        if (i > 0) pdg_ss << ", ";
-        pdg_ss << "[" << i << "]=" << MCParticles[visibleForMasses[i]]->getPDG();
-      }
-    }
-    B2INFO("TauDecayMode::   " << pdg_ss.str());
-  }
-
-
-  if (visibleForMasses.size() < 2) {
-    if (m_compute2Body) {
-      m_massBuffer2B.assign(21, 0.0);
-      if (forTauMinus) m_tauDecay->addTauMinusMasses2Body(m_massBuffer2B);
-      else m_tauDecay->addTauPlusMasses2Body(m_massBuffer2B);
-    }
-    if (m_compute3Body) {
-      m_massBuffer3B.assign(35, 0.0);
-      if (forTauMinus) m_tauDecay->addTauMinusMasses3Body(m_massBuffer3B);
-      else m_tauDecay->addTauPlusMasses3Body(m_massBuffer3B);
-    }
-    if (m_compute4Body) {
-      m_massBuffer4B.assign(35, 0.0);
-      if (forTauMinus) m_tauDecay->addTauMinusMasses4Body(m_massBuffer4B);
-      else m_tauDecay->addTauPlusMasses4Body(m_massBuffer4B);
-    }
-    return;
-  }
-
-  if (m_compute2Body) {
-    compute2BodyMasses(visibleForMasses, m_massBuffer2B);
-    if (forTauMinus) m_tauDecay->addTauMinusMasses2Body(m_massBuffer2B);
-    else m_tauDecay->addTauPlusMasses2Body(m_massBuffer2B);
-  }
-  if (m_compute3Body) {
-    compute3BodyMasses(visibleForMasses, m_massBuffer3B);
-    if (forTauMinus) m_tauDecay->addTauMinusMasses3Body(m_massBuffer3B);
-    else m_tauDecay->addTauPlusMasses3Body(m_massBuffer3B);
-  }
-  if (m_compute4Body) {
-    compute4BodyMasses(visibleForMasses, m_massBuffer4B);
-    if (forTauMinus) m_tauDecay->addTauMinusMasses4Body(m_massBuffer4B);
-    else m_tauDecay->addTauPlusMasses4Body(m_massBuffer4B);
-  }
-}
-
-
-// Calculate invariant mass from 4-momentum
-inline double TauDecayModeModule::calculateInvariantMass(double E, double px, double py, double pz)
-{
-  double m2 = (E * E) - (px * px) - (py * py) - (pz * pz);
-  return (m2 > 0.0) ? std::sqrt(m2) : 0.0;
-}
-
-// Compute 2-body invariant masses (10 fixed slots from 5 particles)
-void TauDecayModeModule::compute2BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses)
-{
-  masses.assign(21, 0.0);
-
-  if (visibleParticles.size() < 2) return;
-
-  const int n = visibleParticles.size();
-  for (size_t slot = 0; slot < kPairs2Body.size(); ++slot) {
-    const auto& pair = kPairs2Body[slot];
-    if (pair[0] >= n || pair[1] >= n) continue;
-
-    const MCParticle* p1 = MCParticles[visibleParticles[pair[0]]];
-    const MCParticle* p2 = MCParticles[visibleParticles[pair[1]]];
-
-    double E = p1->getEnergy() + p2->getEnergy();
-    double px = p1->getMomentum().X() + p2->getMomentum().X();
-    double py = p1->getMomentum().Y() + p2->getMomentum().Y();
-    double pz = p1->getMomentum().Z() + p2->getMomentum().Z();
-
-    masses[slot] = calculateInvariantMass(E, px, py, pz);
-  }
-}
-
-// Compute 3-body invariant masses (10 fixed slots from 5 particles)
-void TauDecayModeModule::compute3BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses)
-{
-  masses.assign(35, 0.0);
-
-  if (visibleParticles.size() < 3) return;
-
-  const int n = visibleParticles.size();
-  for (size_t slot = 0; slot < kTriplets3Body.size(); ++slot) {
-    const auto& triplet = kTriplets3Body[slot];
-    if (triplet[0] >= n || triplet[1] >= n || triplet[2] >= n) continue;
-
-    const MCParticle* p1 = MCParticles[visibleParticles[triplet[0]]];
-    const MCParticle* p2 = MCParticles[visibleParticles[triplet[1]]];
-    const MCParticle* p3 = MCParticles[visibleParticles[triplet[2]]];
-
-    double E = p1->getEnergy() + p2->getEnergy() + p3->getEnergy();
-    double px = p1->getMomentum().X() + p2->getMomentum().X() + p3->getMomentum().X();
-    double py = p1->getMomentum().Y() + p2->getMomentum().Y() + p3->getMomentum().Y();
-    double pz = p1->getMomentum().Z() + p2->getMomentum().Z() + p3->getMomentum().Z();
-
-    masses[slot] = calculateInvariantMass(E, px, py, pz);
-  }
-}
-
-// Compute 4-body invariant masses (5 fixed slots from 5 particles)
-void TauDecayModeModule::compute4BodyMasses(const std::vector<int>& visibleParticles, std::vector<double>& masses)
-{
-  masses.assign(35, 0.0);
-
-  if (visibleParticles.size() < 4) return;
-
-  const int n = visibleParticles.size();
-  for (size_t slot = 0; slot < kQuads4Body.size(); ++slot) {
-    const auto& quad = kQuads4Body[slot];
-    if (quad[0] >= n || quad[1] >= n || quad[2] >= n || quad[3] >= n) continue;
-
-    const MCParticle* p1 = MCParticles[visibleParticles[quad[0]]];
-    const MCParticle* p2 = MCParticles[visibleParticles[quad[1]]];
-    const MCParticle* p3 = MCParticles[visibleParticles[quad[2]]];
-    const MCParticle* p4 = MCParticles[visibleParticles[quad[3]]];
-
-    double E = p1->getEnergy() + p2->getEnergy() + p3->getEnergy() + p4->getEnergy();
-    double px = p1->getMomentum().X() + p2->getMomentum().X() + p3->getMomentum().X() + p4->getMomentum().X();
-    double py = p1->getMomentum().Y() + p2->getMomentum().Y() + p3->getMomentum().Y() + p4->getMomentum().Y();
-    double pz = p1->getMomentum().Z() + p2->getMomentum().Z() + p3->getMomentum().Z() + p4->getMomentum().Z();
-
-    masses[slot] = calculateInvariantMass(E, px, py, pz);
-  }
 }

@@ -40,32 +40,12 @@ void TauPairDecay::addTauPlusEgstar(double pegstar)
   m_pegstar = pegstar;
 }
 
-void TauPairDecay::addTauMinusMasses2Body(const std::vector<double>& masses)
+void TauPairDecay::addTauMinusDaughters(const std::vector<int>& dau_tauminus)
 {
-  m_masses2BMinus = masses;
+  m_vec_dau_tauminus = dau_tauminus;
 }
 
-void TauPairDecay::addTauMinusMasses3Body(const std::vector<double>& masses)
+void TauPairDecay::addTauPlusDaughters(const std::vector<int>& dau_tauplus)
 {
-  m_masses3BMinus = masses;
-}
-
-void TauPairDecay::addTauMinusMasses4Body(const std::vector<double>& masses)
-{
-  m_masses4BMinus = masses;
-}
-
-void TauPairDecay::addTauPlusMasses2Body(const std::vector<double>& masses)
-{
-  m_masses2BPlus = masses;
-}
-
-void TauPairDecay::addTauPlusMasses3Body(const std::vector<double>& masses)
-{
-  m_masses3BPlus = masses;
-}
-
-void TauPairDecay::addTauPlusMasses4Body(const std::vector<double>& masses)
-{
-  m_masses4BPlus = masses;
+  m_vec_dau_tauplus = dau_tauplus;
 }

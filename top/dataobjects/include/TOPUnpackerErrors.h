@@ -28,7 +28,7 @@ namespace Belle2 {
 
     /**
      * Sets unpacker error flag
-     * @parameter BS boardstack number within the TOP detector (0-based)
+     * @param BS boardstack number within the TOP detector (0-based)
      */
     void setErrorFlag(unsigned BS)
     {

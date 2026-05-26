@@ -76,7 +76,7 @@
 #   Added decay table for sigma_0 particle (f_0(500) in the PDG)
 #
 # Sept.-Dec. 2020, P. Goldenzweig (pablo.goldenzweig@kit.edu)
-#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://gitlab.desy.de/belle2/software/basf2/-/issues/7124.
+#   Updated hundreds of B0 and B+ BFs and some FFs as described in https://gitlab.desy.de/belle2/software/basf2/-/work_items/7124.
 #   Further updates and corrections applied in https://gitlab.desy.de/belle2/software/software/-/merge_requests/7501.
 #   Added the remaining rare decays from the Belle mixedrare.dec and chargedrare.dec files.
 #   Pythia hadron contributions rescaled by S. Duell (https://gitlab.desy.de/belle2/software/software/-/merge_requests/6690)

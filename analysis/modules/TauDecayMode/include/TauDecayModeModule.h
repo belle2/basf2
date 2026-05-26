@@ -174,9 +174,6 @@ namespace Belle2 {
     std::vector<int> vec_radgam_taup;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauminus;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauplus;/**< Variable name of the vector where particles identified in the event are stored */
-    std::vector<double> m_massBuffer2B; /**< Reusable buffer for 2-body invariant masses */
-    std::vector<double> m_massBuffer3B; /**< Reusable buffer for 3-body invariant masses */
-    std::vector<double> m_massBuffer4B; /**< Reusable buffer for 4-body invariant masses */
 
     /** Analyze a generated tau pair event */
     void AnalyzeTauPairEvent();

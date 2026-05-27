@@ -392,7 +392,7 @@ void DQMHistAnalysisTrackingAbortModule::terminate()
 
 }
 
-void DQMHistAnalysisTrackingAbortModule::scaleAndSendToMirabelle(TH1F* hAverage, const int nEvents, const TString& tag)
+void DQMHistAnalysisTrackingAbortModule::scaleAndSendToMirabelle(TH1* hAverage, const int nEvents, const TString& tag)
 {
 
   //scale the histogram to the number of events

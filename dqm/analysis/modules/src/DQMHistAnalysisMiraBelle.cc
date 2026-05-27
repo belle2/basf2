@@ -1146,23 +1146,18 @@ void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
 
 
   // calculate the values of monitoring variables
-  double bh_neve_bhabha = histbh_nECLClusters->GetEntries(); // copy from bhabha
   double had_ntot = histhad_physicsresultsH->GetBinContent(3);
-  double ratio_hadron_bhabha = 0.;
-  //pull
-  double ratio_pull_hadBhabha = -10.;
-  double error_ratio = -10.;
-  if (had_ntot != 0 and bh_neve_bhabha != 0) {
-    ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
-    //pull
-    error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
-    ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
-  }
-  // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);
-  mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
-  mon_hadron->setVariable("error_ratio", error_ratio);
-  mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
+  double bh_neve_bhabha = histbh_nECLClusters->GetEntries(); // copy from bhabha
+  if (had_ntot != 0 and bh_neve_bhabha != 0) {
+    double ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
+    //pull
+    double error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
+    double ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
+    mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
+    mon_hadron->setVariable("error_ratio", error_ratio);
+    mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
+  }
 }
 
 void DQMHistAnalysisMiraBelleModule::endRun()

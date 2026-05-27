@@ -65,15 +65,14 @@ void ElectronValCollectorModule::prepare()
   hestats->GetXaxis()->SetBinLabel(7, "unclean");
   hestats->GetXaxis()->SetBinLabel(8, "selected");
 
-  auto htstats = new TH1I("htstats", "track Stats", 7, -0.5, 6.5);
+  auto htstats = new TH1I("htstats", "track Stats", 6, -0.5, 5.5);
   htstats->SetFillColor(kYellow);
   htstats->GetXaxis()->SetBinLabel(1, "alltrk");
   htstats->GetXaxis()->SetBinLabel(2, "vtx");
   htstats->GetXaxis()->SetBinLabel(3, "inCDC");
   htstats->GetXaxis()->SetBinLabel(4, "whits");
   htstats->GetXaxis()->SetBinLabel(5, "weop");
-  htstats->GetXaxis()->SetBinLabel(6, "radee");
-  htstats->GetXaxis()->SetBinLabel(7, "selected");
+  htstats->GetXaxis()->SetBinLabel(6, "selected");
 
   tRadee->Branch<double>("injtime", &m_injTime);
   tRadee->Branch<double>("injring", &m_injRing);
@@ -132,8 +131,7 @@ void ElectronValCollectorModule::collect()
 
   // Check for the required trigger identifiers
   if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() &&
-      (fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()
-       || fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end())) {
+      fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end()) {
     B2WARNING("Can't find required bhabha/radee trigger identifiers");
     hestats->Fill(2); // Fill bin 3 to indicate missing trigger identifiers
     return;
@@ -247,23 +245,6 @@ void ElectronValCollectorModule::collect()
       htstats->Fill(4);
     }
 
-    //if dealing with radee here (do a safe side cleanup)
-    if (eRadBhabha) {
-      if (nTracks != 2)continue; //exactly 2 tracks
-      bool goodradee = false;
-      //checking if dedx of other track is restricted
-      //will not do too much as radee is clean enough
-      for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[std::abs(jdedx - 1)];
-        if (!dedxOtherTrack)continue;
-        if (std::abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
-        goodradee = true;
-        break;
-      }
-      if (!goodradee)continue;
-      htstats->Fill(5);
-    }
-
     // Make sure to remove all the data in vectors from the previous track
     m_wire.clear();
     m_layer.clear();
@@ -280,7 +261,7 @@ void ElectronValCollectorModule::collect()
     }
 
     // Track and/or hit information filled as per config
-    htstats->Fill(6);
+    htstats->Fill(5);
     hmeans->Fill(m_dedx);
     if (eBhabha) tBhabha->Fill();
     if (eRadBhabha) tRadee->Fill();

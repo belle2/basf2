@@ -396,7 +396,7 @@ void DQMHistAnalysisTrackingAbortModule::scaleAndSendToMirabelle(TH1* hAverage, 
 {
 
   //scale the histogram to the number of events
-  hAverage->Scale(1. / nEvents);
+  if (nEvents != 0) hAverage->Scale(1. / nEvents);
 
   const int nBins = hAverage->GetNbinsX();
   for (int bin = 1; bin < nBins + 1; bin++) {

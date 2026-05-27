@@ -23,6 +23,7 @@ import process_wiregain as pw
 import process_cosgain as pc
 import process_onedcell as oned
 import process_rungain as rg
+import re
 
 from prompt import ValidationSettings
 
@@ -32,6 +33,32 @@ settings = ValidationSettings(name="CDC dedx",
                               expert_config={
                                 "GT": "data_prompt_rel09",
                                   })
+
+
+def get_latest_calibration_dir(base_dir, cal_name):
+
+    latest_idx = -1
+    latest_dir = None
+
+    for idir in os.listdir(base_dir):
+
+        match = re.fullmatch(rf"{re.escape(cal_name)}(\d+)", idir)
+
+        if not match:
+            continue
+
+        idx = int(match.group(1))
+
+        if idx > latest_idx:
+            latest_idx = idx
+            latest_dir = idir
+
+    if latest_dir is None:
+        basf2.B2FATAL(f"No calibration directory found for {cal_name}")
+
+    basf2.B2INFO(f"Using latest calibration directory: {latest_dir}")
+
+    return os.path.join(base_dir, latest_dir)
 
 
 def save_to_pdf(pdf, fig):
@@ -428,21 +455,27 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
 
     basf2.B2INFO("Starting validation...")
 
-    basf2.B2INFO("Processing run gain payloads...")
-    gtpath = os.path.join(job_path, 'rungain2', 'outputdb')
-    rg.getRunGain(gtpath, GT)
+    payloads = [
+        ("rungain",  "run gain",  rg.getRunGain),
+        ("coscorr",  "coscorr",   pc.process_cosgain),
+        ("wiregain", "wire gain", pw.process_wiregain),
+        ("onedcell", "1D gain",   oned.process_onedgain),
+    ]
 
-    basf2.B2INFO("Processing coscorr payloads...")
-    ccpath = os.path.join(job_path, 'coscorr1', 'outputdb')
-    pc.process_cosgain(ccpath, GT)
+    exp_run_dict = None
 
-    basf2.B2INFO("Processing wire gain payloads...")
-    wgpath = os.path.join(job_path, 'wiregain0', 'outputdb')
-    exp_run_dict = pw.process_wiregain(wgpath, GT)
+    for dirname, label, function in payloads:
 
-    basf2.B2INFO("Processing 1D gain payloads...")
-    onedpath = os.path.join(job_path, 'onedcell0', 'outputdb')
-    oned.process_onedgain(onedpath, GT)
+        basf2.B2INFO(f"Processing {label} payloads...")
+
+        caldir = get_latest_calibration_dir(job_path, dirname)
+
+        dbpath = os.path.join(caldir, "outputdb")
+
+        result = function(dbpath, GT)
+
+        if dirname == "wiregain":
+            exp_run_dict = result
 
     basf2.B2INFO("Generating validation plots...")
     val_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output')

@@ -67,7 +67,7 @@ namespace Belle2 {
     {
       std::vector<double> weightVector = getWeights(pdg);
 
-      Const::EDetector det;
+      Const::EDetector det = Const::invalidDetector; // default value, will be overwritten
       boost::to_lower(detector);
       if (detector == "svd") det = Const::SVD;
       else if (detector == "cdc") det = Const::CDC;

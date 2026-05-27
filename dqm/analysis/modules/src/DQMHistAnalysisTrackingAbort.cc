@@ -230,25 +230,25 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
   //scale tracking abort reason histograms
 
-  if (auto* hAbortReason_in = (auto*)findHist("TrackingAbort/TrkAbortReason_IN");
+  if (auto* hAbortReason_in = findHist("TrackingAbort/TrkAbortReason_IN");
       hAbortReason_in != nullptr) scaleAndSendToMirabelle(hAbortReason_in, nEventsIN, "_inActiveVeto");
-  if (auto* hAbortReason_out = (auto*)findHist("TrackingAbort/TrkAbortReason_OUT");
+  if (auto* hAbortReason_out = findHist("TrackingAbort/TrkAbortReason_OUT");
       hAbortReason_out != nullptr) scaleAndSendToMirabelle(hAbortReason_out, nEventsOUT, "_outActiveVeto");
-  if (auto* hAbortReason_in_BF = (auto*)findHist("TrackingAbort_before_filter/TrkAbortReason_IN");
+  if (auto* hAbortReason_in_BF = findHist("TrackingAbort_before_filter/TrkAbortReason_IN");
       hAbortReason_in_BF != nullptr) scaleAndSendToMirabelle(hAbortReason_in_BF, nEventsIN, "BeforeFilter_inActiveVeto");
-  if (auto* hAbortReason_out_BF = (auto*)findHist("TrackingAbort_before_filter/TrkAbortReason_OUT");
+  if (auto* hAbortReason_out_BF = findHist("TrackingAbort_before_filter/TrkAbortReason_OUT");
       hAbortReason_out_BF != nullptr) scaleAndSendToMirabelle(hAbortReason_out_BF, nEventsOUT, "BeforeFilter_outActiveVeto");
 
 
   //scale average histograms
 
-  if (auto* hAverage_in = (auto*)findHist("TrackingAbort/averages_IN");
+  if (auto* hAverage_in = findHist("TrackingAbort/averages_IN");
       hAverage_in != nullptr) scaleAndSendToMirabelle(hAverage_in, nEventsIN, "_inActiveVeto");
-  if (auto* hAverage_out = (auto*)findHist("TrackingAbort/averages_OUT");
+  if (auto* hAverage_out = findHist("TrackingAbort/averages_OUT");
       hAverage_out != nullptr) scaleAndSendToMirabelle(hAverage_out, nEventsOUT, "_outActiveVeto");
-  if (auto* hAverage_in_BF = (auto*)findHist("TrackingAbort_before_filter/averages_IN");
+  if (auto* hAverage_in_BF = findHist("TrackingAbort_before_filter/averages_IN");
       hAverage_in_BF != nullptr) scaleAndSendToMirabelle(hAverage_in_BF, nEventsINbf, "BeforeFilter_inActiveVeto");
-  if (auto* hAverage_out_BF = (auto*)findHist("TrackingAbort_before_filter/averages_OUT");
+  if (auto* hAverage_out_BF = findHist("TrackingAbort_before_filter/averages_OUT");
       hAverage_out_BF != nullptr) scaleAndSendToMirabelle(hAverage_out_BF, nEventsOUTbf, "BeforeFilter_outActiveVeto");
 
   // average SVD L3U Occupancy to Mirabelle

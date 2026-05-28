@@ -4,6 +4,12 @@
 B2BII
 =====
 
+.. important::
+
+    Analysts should be aware of the policies concerning analyses and publications
+    involving Belle data and are expected to consult the corresponding physics
+    working group conveners prior to initiating any such analysis.
+
 The b2bii package in ``basf2`` converts Belle MDST files (basf data format) to
 Belle II MDST (``basf2`` data format). This enables performing physics analysis
 using data collected with Belle detector with the analysis software and algorithms

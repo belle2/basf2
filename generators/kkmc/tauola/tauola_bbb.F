@@ -1979,21 +1979,8 @@ C       PRINT 7003
         SSWT(JNPI)=0
         WTMAX(JNPI)=-1.
 
-C for 4pi phase space, need lots more trials at initialization,
-C or use the WTMAX determined with many trials for default model:
-        NTRIALS = 5000
-C cleo knew nothing about channels recently introduced
-        IF (JNPI.LE.2) THEN
-C         11.Oct.11: fix for BINP and KARLSRUHE currents added
-          WTMAX(JNPI) = PKORB(3,37+JNPI)
-          NTRIALS = 50000
-        END IF
-        IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
-          NTRIALS = 50000
-        ENDIF
-        IF (JNPI.GE.NM4+NM5+NM6+47.AND.JNPI.LE.NM4+NM5+NM6+48) THEN
-           NTRIALS = 50000
-        ENDIF          
+C Universal solution is to use brute force, which is safe at this stage [SwB 2026]
+        NTRIALS = 50000
 !       write(*,*) 'jnpi=',jnpi, ntrials, a
         DO  I=1,NTRIALS
 

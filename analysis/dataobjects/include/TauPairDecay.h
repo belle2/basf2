@@ -9,7 +9,6 @@
 #pragma once
 
 #include <framework/datastore/RelationsObject.h>
-#include <vector>
 
 namespace Belle2 {
 
@@ -132,40 +131,6 @@ namespace Belle2 {
       return m_pegstar;
     }
 
-    /**
-     * Add list of daughter particle indices from negative tau decay
-     *
-     * @param dau_tauminus vector of daughter particle indices from tau-.
-     */
-    void addTauMinusDaughters(const std::vector<int>& dau_tauminus);
-
-    /**
-     * Add list of daughter particle indices from positive tau decay
-     *
-     * @param dau_tauplus vector of daughter particle indices from tau+.
-     */
-    void addTauPlusDaughters(const std::vector<int>& dau_tauplus);
-
-    /**
-     * Get list of daughter particle indices from negative tau decay
-     *
-     * @return Vector of indices of daughter particles from tau-.
-     */
-    std::vector<int> getTauMinusDaughters(void) const
-    {
-      return m_vec_dau_tauminus;
-    }
-
-    /**
-     * Get list of daughter particle indices from positive tau decay
-     *
-     * @return Vector of indices of daughter particles from tau+.
-     */
-    std::vector<int> getTauPlusDaughters(void) const
-    {
-      return m_vec_dau_tauplus;
-    }
-
   private:
 
     // persistent data members
@@ -175,10 +140,8 @@ namespace Belle2 {
     int m_mprong; /**< Prong of negative tau lepton decay */
     double m_megstar; /**< Energy of photon from negative tau decay*/
     double m_pegstar; /**< Energy of photon from positive tau decay*/
-    std::vector<int> m_vec_dau_tauminus; /**< Indices of daughter particles from tau- decay */
-    std::vector<int> m_vec_dau_tauplus; /**< Indices of daughter particles from tau+ decay */
 
-    ClassDef(TauPairDecay, 3) /**< class definition */
+    ClassDef(TauPairDecay, 2) /**< class definition */
 
   };
 

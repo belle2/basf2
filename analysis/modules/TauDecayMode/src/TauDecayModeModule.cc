@@ -143,10 +143,6 @@ void TauDecayModeModule::event()
 
   m_tauDecay->addTauMinusEgstar(m_megstar);
   m_tauDecay->addTauPlusEgstar(m_pegstar);
-
-  m_tauDecay->addTauMinusDaughters(vec_dau_tauminus);
-  m_tauDecay->addTauPlusDaughters(vec_dau_tauplus);
-
 }
 
 void TauDecayModeModule::AnalyzeTauPairEvent()

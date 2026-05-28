@@ -39,13 +39,3 @@ void TauPairDecay::addTauPlusEgstar(double pegstar)
 {
   m_pegstar = pegstar;
 }
-
-void TauPairDecay::addTauMinusDaughters(const std::vector<int>& dau_tauminus)
-{
-  m_vec_dau_tauminus = dau_tauminus;
-}
-
-void TauPairDecay::addTauPlusDaughters(const std::vector<int>& dau_tauplus)
-{
-  m_vec_dau_tauplus = dau_tauplus;
-}

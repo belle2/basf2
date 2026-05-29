@@ -16,6 +16,7 @@
 #include <boost/format.hpp>
 #include <algorithm>
 #include <cmath>
+#include <map>
 
 using namespace std;
 using boost::format;
@@ -63,20 +64,25 @@ namespace Belle2 {
 
     // Histograms
 
-    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event synchronization", 2, -0.5, 1.5);
-    m_BoolEvtMonitor->GetYaxis()->SetTitle("number of digits");
-    m_BoolEvtMonitor->GetXaxis()->SetBinLabel(1, "synchronized");
-    m_BoolEvtMonitor->GetXaxis()->SetBinLabel(2, "de-synchronized");
-    m_BoolEvtMonitor->GetXaxis()->SetLabelSize(0.05);
-    m_BoolEvtMonitor->GetXaxis()->SetAlphanumeric();
+    m_BoolEvtMonitor = new TH2D("BoolEvtMonitor", "Event synchronization", 64, 1, 17, 2, 0, 2);
+    m_BoolEvtMonitor->SetXTitle("slot number");
+    m_BoolEvtMonitor->SetYTitle("     synchonized hits | de-synchronized hits");
+    m_BoolEvtMonitor->GetXaxis()->SetNdivisions(16);
+    m_BoolEvtMonitor->GetXaxis()->CenterLabels();
+    m_BoolEvtMonitor->GetYaxis()->SetNdivisions(2);
+    m_BoolEvtMonitor->GetYaxis()->SetBinLabel(1, "0");
+    m_BoolEvtMonitor->GetYaxis()->SetBinLabel(2, "1");
+    m_BoolEvtMonitor->GetYaxis()->SetLabelSize(0.05);
+    m_BoolEvtMonitor->GetYaxis()->SetAlphanumeric();
+    m_BoolEvtMonitor->GetYaxis()->CenterTitle();
     m_BoolEvtMonitor->SetMinimum(0);
 
-    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 16, 0.5, 16.5, 512, 0, 512);
+    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 64, 1, 17, 512, 0, 512);
     m_window_vs_slot->SetXTitle("slot number");
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
-    m_window_vs_slot->SetStats(kFALSE);
-    m_window_vs_slot->SetMinimum(0);
     m_window_vs_slot->GetXaxis()->SetNdivisions(16);
+    m_window_vs_slot->GetXaxis()->CenterLabels();
+    m_window_vs_slot->SetMinimum(0);
 
     int nbinsT0 = 75;
     double rangeT0 = nbinsT0 * m_bunchTimeSep;
@@ -417,9 +423,24 @@ namespace Belle2 {
     // fill event desynchronization
 
     if (m_digits.getEntries() > 0) {
+
+      // determine most common window number
+      std::map<unsigned, unsigned> firstWindows;
       for (const auto& digit : m_digits) {
-        int x = digit.getFirstWindow() != m_digits[0]->getFirstWindow() ? 1 : 0 ;
-        m_BoolEvtMonitor->Fill(x);
+        firstWindows[digit.getFirstWindow()] += 1;
+      }
+      auto it0 = firstWindows.begin();
+      for (auto it = firstWindows.begin(); it != firstWindows.end(); ++it) {
+        if (it->second > it0->second) it0 = it;
+      }
+
+      // fill histogram
+      for (const auto& digit : m_digits) {
+        int slot = digit.getModuleID();
+        int bs = digit.getBoardstackNumber();
+        double x = slot + bs / 4.0;
+        double y = digit.getFirstWindow() != it0->first ? 1 : 0 ;
+        m_BoolEvtMonitor->Fill(x, y);
       }
     }
 
@@ -470,8 +491,10 @@ namespace Belle2 {
       int asic_no = digit.getChannel() / 8;
       int asic_ch = digit.getChannel() % 8;
 
-      m_window_vs_slot->Fill(digit.getModuleID(), digit.getRawTime() / 64 + 220);
-      m_window_vs_asic[slot - 1]->Fill(asic_no, digit.getRawTime() / 64 + 220);
+      double window = digit.getRawTime() / 64 + 220;
+      if (window < 0) window += 512;
+      m_window_vs_slot->Fill(digit.getModuleID() + digit.getBoardstackNumber() / 4.0, window);
+      m_window_vs_asic[slot - 1]->Fill(asic_no, window);
 
       if (digit.getHitQuality() != TOPDigit::c_Junk) { // good hits
         m_goodHitsXY[slot - 1]->Fill(digit.getPixelCol(), digit.getPixelRow());

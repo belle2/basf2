@@ -16,6 +16,7 @@
 #include <TProfile.h>
 #include <TProfile2D.h>
 #include <TString.h>
+#include <TMath.h>
 #include <map>
 
 using namespace std;
@@ -41,6 +42,8 @@ DQMHistAnalysisTOPModule::DQMHistAnalysisTOPModule(): DQMHistAnalysisModule()
            "lower and upper bin of a band denoting good windows", m_asicWindowsBand);
   addParam("asicWindowsAlarmLevels", m_asicWindowsAlarmLevels,
            "alarm levels for the fraction of windows outside the band (yellow, red)", m_asicWindowsAlarmLevels);
+  addParam("windowMedianAlarmLevels", m_windowMedianAlarmLevels,
+           "alarm levels for the window_vs_slot medians (yellow, red)", m_windowMedianAlarmLevels);
   addParam("eventMonitorAlarmLevels", m_eventMonitorAlarmLevels,
            "alarm levels for the fraction of desynchronized digits (yellow, red)", m_eventMonitorAlarmLevels);
   addParam("unpackerErrAlarmLevels", m_unpackerErrAlarmLevels,
@@ -83,6 +86,7 @@ void DQMHistAnalysisTOPModule::initialize()
 
   if (m_asicWindowsBand.size() != 2) B2ERROR("Parameter list 'asicWindowsBand' must contain two numbers");
   if (m_asicWindowsAlarmLevels.size() != 2) B2ERROR("Parameter list 'asicWindowsAlarmLevels' must contain two numbers");
+  if (m_windowMedianAlarmLevels.size() != 2) B2ERROR("Parameter list 'windowMedianAlarmLevels' must contain two numbers");
   if (m_eventMonitorAlarmLevels.size() != 2) B2ERROR("Parameter list 'eventMonitorAlarmLevels' must contain two numbers");
   if (m_unpackerErrAlarmLevels.size() != 2) B2ERROR("Parameter list 'unpackerErrAlarmLevels' must contain two numbers");
   if (m_junkHitsAlarmLevels.size() != 2) B2ERROR("Parameter list 'junkHitsAlarmLevels' must contain two numbers");
@@ -128,6 +132,7 @@ void DQMHistAnalysisTOPModule::initialize()
 
   registerEpicsPV(m_pvPrefix + "asicWindowsBand", "asicWindowsBand");
   registerEpicsPV(m_pvPrefix + "asicWindowsAlarmLevels", "asicWindowsAlarmLevels");
+  registerEpicsPV(m_pvPrefix + "windowMedianAlarmLevels", "windowMedianAlarmLevels"); // also output
   registerEpicsPV(m_pvPrefix + "eventMonitorAlarmLevels", "eventMonitorAlarmLevels");
   registerEpicsPV(m_pvPrefix + "unpackerErrAlarmLevels", "unpackerErrAlarmLevels");
   registerEpicsPV(m_pvPrefix + "junkHitsAlarmLevels", "junkHitsAlarmLevels");
@@ -147,6 +152,8 @@ void DQMHistAnalysisTOPModule::initialize()
 
   gROOT->cd();
 
+  m_c_evtMonitorFract = new TCanvas("TOP/c_evtMonitorFract", "c_evtMonitorFract");
+  m_c_windowMedian =  new TCanvas("TOP/c_windowMedian", "c_windowMedian");
   m_c_photonYields = new TCanvas("TOP/c_photonYields", "c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates", "c_backgroundRates");
 
@@ -252,6 +259,9 @@ void DQMHistAnalysisTOPModule::event()
   // Update window_vs_slot canvas w/ alarming
   updateWindowVsSlotCanvas();
 
+  // Update window_vs_slot median canvas w/ alarming
+  updateWindowMedianCanvas();
+
   // Update event desynchronization monitor w/ alarming
   updateEventMonitorCanvas();
 
@@ -348,7 +358,11 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
   auto* hraw = (TH2F*) findHist("TOP/window_vs_slot");
   if (hraw) {
     auto* px = hraw->ProjectionX("tmp_px");
-    auto* band = hraw->ProjectionX("TOP/windowFractions", m_asicWindowsBand[0], m_asicWindowsBand[1]);
+    auto* band = hraw->ProjectionX("tmp_band", m_asicWindowsBand[0], m_asicWindowsBand[1]);
+    if (px->GetNbinsX() == 64) {
+      band->Rebin(4); // binned in slots for MiraBelle
+      px->Rebin(4); // binned in slots for MiraBelle
+    }
     band->Add(px, band, 1, -1);
     double total = px->Integral();
     double totalWindowFraction = (total != 0) ? band->Integral() / total : 0;
@@ -374,20 +388,74 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
     for (auto* line : m_asicWindowsBandLines) line->Draw();
     canvas->Pad()->SetFrameFillColor(10);
     canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+    canvas->SetGridx();
     canvas->Modified();
   }
+
 }
 
+void DQMHistAnalysisTOPModule::updateWindowMedianCanvas()
+{
+  int alarmState = c_Gray;
+  if (m_windowMedian) delete m_windowMedian;
+  double hmax = 0;
+
+  auto* hraw = static_cast<TH2F*>(findHist("TOP/window_vs_slot"));
+  if (hraw) {
+    m_windowMedian = hraw->ProjectionX("TOP/windowMedian");
+    m_windowMedian->Reset();
+    m_windowMedian->SetTitle("Asic windows (medians)");
+    m_windowMedian->SetYTitle("median");
+    m_windowMedian->SetFillColor(9);
+    for (int i = 1; i <= hraw->GetNbinsX(); i++) {
+      auto* py = hraw->ProjectionY("tmp", i, i);
+      auto median = TMath::Median(py->GetNbinsX(), py->GetArray(), 0, 0);
+      m_windowMedian->SetBinContent(i, median);
+      delete py;
+    }
+    hmax = m_windowMedian->GetMaximum();
+    alarmState = getAlarmState(hmax, m_windowMedianAlarmLevels);
+  }
+
+  setEpicsPV("windowMedianAlarmLevels", hmax);
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
+
+  auto* canvas = m_c_windowMedian;
+  canvas->Clear();
+  canvas->cd();
+  if (m_windowMedian) m_windowMedian->Draw("hist");
+  canvas->Pad()->SetFrameFillColor(10);
+  canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+  canvas->SetGridx();
+  canvas->Modified();
+
+}
 
 void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
 {
   int alarmState = c_Gray;
   m_text2->Clear();
+  if (m_evtMonitorFract) delete m_evtMonitorFract;
 
-  auto* evtMonitor = (TH1F*) findHist("TOP/BoolEvtMonitor");
-  if (evtMonitor) {
-    double totalEvts = evtMonitor->Integral();
-    double badEvts = evtMonitor->GetBinContent(2);
+  auto* h = findHist("TOP/BoolEvtMonitor");
+  if (h) {
+    double badEvts = 0;
+    double totalEvts = 0;
+    if (std::string(h->IsA()->GetName()) == "TH2D") { // new 2D histogram
+      auto* evtMonitor = static_cast<TH2D*>(h);
+      m_evtMonitorFract = evtMonitor->ProjectionX("TOP/evtMonitorFract", 2, 2);
+      auto* tmp = evtMonitor->ProjectionX("tmp");
+      badEvts = m_evtMonitorFract->Integral();
+      totalEvts = tmp->Integral();
+      m_evtMonitorFract->Divide(m_evtMonitorFract, tmp, 1, 1, "B");
+      delete tmp;
+      m_evtMonitorFract->SetTitle("EventSynchonization (fractions)");
+      m_evtMonitorFract->SetYTitle("fraction of de-synchronized hits");
+      m_evtMonitorFract->SetFillColor(9);
+    } else { // old 1D histogram
+      badEvts = h->GetBinContent(2);
+      totalEvts = h->Integral();
+    }
     if (totalEvts > 0) {
       double badRatio = badEvts / totalEvts;
       alarmState = getAlarmState(badRatio, m_eventMonitorAlarmLevels);
@@ -403,8 +471,21 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
     m_text2->Draw();
     canvas->Pad()->SetFrameFillColor(10);
     canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+    canvas->SetGridx();
     canvas->Modified();
   }
+
+  canvas = m_c_evtMonitorFract;
+  canvas->Clear();
+  canvas->cd();
+  if (m_evtMonitorFract) {
+    m_evtMonitorFract->Draw("hist");
+    canvas->Pad()->SetFrameFillColor(10);
+    canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+    canvas->SetGridx();
+  }
+  canvas->Modified();
+
 }
 
 
@@ -443,11 +524,11 @@ void DQMHistAnalysisTOPModule::updateNGoodHitsCanvas()
   double ymax = 0;
   auto* h = (TH1F*) findHist("TOP/goodHitsPerEventAll");
   if (h) {
+    xcut = h->GetBinCenter(h->GetMaximumBin()) + 900;
+    ymax = h->GetMaximum() / 2;
     double totalEvts = h->GetEntries();
     if (totalEvts > 1000) {
       // fraction of events with more than xcut hits - these are mostly containing injection BG
-      xcut = h->GetBinCenter(h->GetMaximumBin()) + 900;
-      ymax = h->GetMaximum() / 2;
       fract = h->Integral(h->FindBin(xcut), h->GetNbinsX() + 1) / totalEvts * 100; // in %
       alarmState = getAlarmState(fract, m_injectionBGAlarmLevels);
       m_text4->AddText(Form("Events w/ Injection BG: %.2f %%", fract));
@@ -1030,7 +1111,7 @@ void DQMHistAnalysisTOPModule::setAlarmLines()
       line->SetY1(y);
       line->SetY2(y);
     } else {
-      auto* line = new TLine(0.5, y, 16.5, y);
+      auto* line = new TLine(1, y, 17, y);
       line->SetLineWidth(2);
       line->SetLineColor(kRed);
       m_asicWindowsBandLines.push_back(line);
@@ -1160,6 +1241,7 @@ void DQMHistAnalysisTOPModule::updateLimits()
   m_asicWindowsBand[1] = yHi;
 
   requestLimitsFromEpicsPVs("asicWindowsAlarmLevels", unused, unused, m_asicWindowsAlarmLevels[0], m_asicWindowsAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("windowMedianAlarmLevels", unused, unused, m_windowMedianAlarmLevels[0], m_windowMedianAlarmLevels[1]);
   requestLimitsFromEpicsPVs("eventMonitorAlarmLevels", unused, unused, m_eventMonitorAlarmLevels[0], m_eventMonitorAlarmLevels[1]);
   requestLimitsFromEpicsPVs("unpackerErrAlarmLevels", unused, unused, m_unpackerErrAlarmLevels[0], m_unpackerErrAlarmLevels[1]);
   requestLimitsFromEpicsPVs("junkHitsAlarmLevels", unused, unused, m_junkHitsAlarmLevels[0], m_junkHitsAlarmLevels[1]);
@@ -1199,6 +1281,7 @@ void DQMHistAnalysisTOPModule::updateLimits()
 
   B2DEBUG(20, "asicWindowsBand:         [" << m_asicWindowsBand[0] << ", " << m_asicWindowsBand[1] << "]");
   B2DEBUG(20, "asicWindowsAlarmLevels:  [" << m_asicWindowsAlarmLevels[0] << ", " << m_asicWindowsAlarmLevels[1] << "]");
+  B2DEBUG(20, "windowMedianAlarmLevels: [" << m_windowMedianAlarmLevels[0] << ", " << m_windowMedianAlarmLevels[1] << "]");
   B2DEBUG(20, "eventMonitorAlarmLevels: [" << m_eventMonitorAlarmLevels[0] << ", " << m_eventMonitorAlarmLevels[1] << "]");
   B2DEBUG(20, "unpackerErrAlarmLevels: [" << m_unpackerErrAlarmLevels[0] << ", " << m_unpackerErrAlarmLevels[1] << "]");
   B2DEBUG(20, "junkHitsAlarmLevels:     [" << m_junkHitsAlarmLevels[0] << ", " << m_junkHitsAlarmLevels[1] << "]");

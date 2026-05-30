@@ -55,7 +55,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
 {
 
   gROOT->cd();
-  m_canvmd_ladc = new TCanvas("CDC/c_histmd_ladc", "c_histmd_ladc", 500, 400);
+  m_canv_md_ladc = new TCanvas("CDC/c_histmd_ladc", "c_histmd_ladc", 500, 400);
   m_histmd_ladc = new TH1F("CDC/histmd_ladc", "m_histmd_ladc", 56, 0, 56);
   m_histmd_ladc->SetTitle("ADC Medians vs Layers (SL-lines); CDC Layer index; ADC medians");
 
@@ -265,8 +265,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
       m_histmd_ladc->SetBinContent(il + 1, md_ladc);
     }
     // Draw canvas
-    m_canvmd_ladc->Clear();
-    m_canvmd_ladc->cd();
+    m_canv_md_ladc->Clear();
+    m_canv_md_ladc->cd();
     double y_max = m_histmd_ladc->GetMaximum();
     if (!std::isfinite(y_max) || y_max <= 0 || y_max > 1e3)y_max = 1;
     m_histmd_ladc->SetFillColor(kYellow);
@@ -277,8 +277,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
       line->SetY2(y_max * 1.20);
       line->Draw("same");
     }
-    m_canvmd_ladc->Update();
-    UpdateCanvas(m_canvmd_ladc);
+    m_canv_md_ladc->Update();
+    UpdateCanvas(m_canv_md_ladc);
   }
 
   //2. get adc medians vs board ID

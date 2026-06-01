@@ -441,8 +441,8 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
   if (h) {
     double badEvts = 0;
     double totalEvts = 0;
-    if (std::string(h->IsA()->GetName()) == "TH2D") { // new 2D histogram
-      auto* evtMonitor = static_cast<TH2D*>(h);
+    auto* evtMonitor = dynamic_cast<TH2D*>(h);
+    if (evtMonitor) { // new 2D histogram
       m_evtMonitorFract = evtMonitor->ProjectionX("TOP/evtMonitorFract", 2, 2);
       auto* tmp = evtMonitor->ProjectionX("tmp");
       badEvts = m_evtMonitorFract->Integral();

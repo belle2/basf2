@@ -564,7 +564,6 @@ def stdE(listtype=_defaultlist,
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
-    * 'clean'
     * 'good' (deprecated, will be removed end of 2026)
     * 'loosepid' (deprecated, will be removed end of 2026)
     * 'loose' (deprecated, will be removed end of 2026)
@@ -627,7 +626,6 @@ def stdMu(listtype=_defaultlist,
     for the ``listtype`` parameter (aka ``working_point`` in `stdLep`) to fall back to the `stdCharged` behaviour:
 
     * 'all'
-    * 'clean'
     * 'good' (deprecated, will be removed end of 2026)
     * 'loosepid' (deprecated, will be removed end of 2026)
     * 'loose' (deprecated, will be removed end of 2026)
@@ -669,7 +667,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
     .. deprecated:: light-2604-jellyfish
-        Please update your analysis to use the ``'all'`` or ``'clean'`` lists instead.
+        Please update your analysis to use the ``stdCharged`` ``'all'`` or ``'clean'`` lists instead.
         To provide feedback on the removal, see
         `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
@@ -681,7 +679,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     """
     b2.B2WARNING(
         "stdMostLikely is deprecated and will be removed at the end of 2026. "
-        "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly. "
+        "Please use stdCharged and apply PID cuts manually depending on your analysis. "
         "To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )

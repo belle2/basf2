@@ -1,6 +1,6 @@
 [INFO] Steering file: analysis/tests/tdcpv_variables.py
 [INFO] The random number seed is set to "1337"
-[WARNING] stdMostLikely is deprecated and will be removed at the end of 2026. Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly. To provide feedback on the removal, see https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641
+[WARNING] stdMostLikely is deprecated and will be removed at the end of 2026. Please use stdCharged and apply PID cuts manually depending on your analysis. To provide feedback on the removal, see https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641
 [INFO] Starting event processing, random seed is set to '1337'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/tdcpv-mdst.root
 [INFO] Conditions Database: found working metadata provider

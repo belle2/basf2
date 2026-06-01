@@ -40,7 +40,8 @@ def stdPi0s(
 
     You can also append "Fit" to the effXX listtype which will run a mass fit and
     require that the fit did not fail. For example: "pi0:eff50_May2020Fit" is the 50%
-    efficiency list plus a not-failing mass fit. These Fit variants are also deprecated.
+    efficiency list plus a not-failing mass fit.
+    These Fit variants are also deprecated, fits with mass constraint can be performed manually when necessary.
 
     Parameters:
         listtype (str): name of standard list

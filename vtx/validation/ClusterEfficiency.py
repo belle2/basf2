@@ -199,7 +199,7 @@ particlegun.param({
 add_simulation(main, useVTX=True)
 
 # Add mc reconstruction
-rec.add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
+rec.add_reconstruction(main, pruneTracks=False, useVTX=True)
 
 
 clusterefficiency = ClusterEfficiency()

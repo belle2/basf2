@@ -24,25 +24,25 @@ namespace Belle2 {
      */
     GenBsTag();
 
-    int Mode_Bs0(std::vector<int> genDAU); /**< returns Bs0 mode identifier */
-    int Mode_anti_Bs0(std::vector<int> genDAU); /**< returns Bs0bar mode identifier */
+    int Mode_Bs0(const std::vector<int>& genDAU); /**< returns Bs0 mode identifier */
+    int Mode_anti_Bs0(const std::vector<int>& genDAU); /**< returns Bs0bar mode identifier */
 
   private:
     int m_nPhotos; /**< number of photons */
     /** check decay with two daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2);
     /** check decay with three daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3);
     /** check decay with four daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4);
     /** check decay with five daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5);
     /** check decay with six daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6);
     /** check decay with seven daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7);
     /** check decay with eight daughters */
-    bool PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8);
+    bool PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8);
   };
 
 } //End of Belle2 namespace

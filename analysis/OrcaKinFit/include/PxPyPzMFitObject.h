@@ -31,7 +31,7 @@ namespace Belle2 {
       PxPyPzMFitObject& operator= (const PxPyPzMFitObject& rhs   ///< right hand side
                                   );
 
-      virtual ~PxPyPzMFitObject();
+      virtual ~PxPyPzMFitObject() override;
 
       // Return a new copy of itself
       virtual PxPyPzMFitObject* copy() const override;

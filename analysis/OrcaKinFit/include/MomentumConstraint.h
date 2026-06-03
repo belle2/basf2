@@ -42,7 +42,7 @@ namespace Belle2 {
                          double pzfact_ = 0,   ///< Factor for pz sum
                          double value_ = 0     ///< Target value of sum
                         );
-      virtual ~MomentumConstraint();
+      virtual ~MomentumConstraint() override;
       virtual double getValue() const override;
       /// Get first order derivatives.
       /// Call this with a predefined array "der" with the necessary number of entries!

@@ -49,7 +49,7 @@ namespace Belle2 {
       /// Constructor
       NewFitterGSL();
       /// Virtual destructor
-      virtual ~NewFitterGSL();
+      virtual ~NewFitterGSL() override;
 
       /// The fit method, returns  the fit probability
       virtual double fit() override;

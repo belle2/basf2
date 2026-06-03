@@ -558,7 +558,7 @@ namespace Belle2 {
       }
 
       /** Returns an invalid particle to check if iteration should be stopped. */
-      ParticleType end() const
+      static ParticleType end()
       {
         return invalidParticle;
       }
@@ -566,7 +566,7 @@ namespace Belle2 {
       /** Returns particle in set with given PDG code, or invalidParticle if not found. */
       const ParticleType& find(int pdg) const
       {
-        for (ParticleType pdgIter : *this) {
+        for (const ParticleType& pdgIter : *this) {
           if (pdgIter.getPDGCode() == pdg)
             return m_particles[pdgIter.getIndex()];
         }

@@ -49,13 +49,14 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
       B2WARNING(c_SteerExcludeBranchNames[durability] << " has duplicate entry " << b);
   }
 
-  std::set<std::string> out, relations, excluderelations;
+  std::set<std::string> out;
   for (const std::string& branch : branchesToFilter) {
     if (excludeBranchSet.count(branch))
       continue;
     if (branchSet.empty() or branchSet.count(branch))
       out.insert(branch);
   }
+  std::set<std::string> excluderelations;
   if (!excludeBranchSet.empty()) {
     //remove relations for excluded things
     for (const std::string& from : branchesToFilter) {
@@ -75,6 +76,7 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
     }
   }
   //add relations between accepted branches
+  std::set<std::string> relations;
   for (const std::string& from : out) {
     for (const std::string& to : out) {
       std::string branch = DataStore::relationName(from, to);
@@ -152,7 +154,7 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
 void RootIOUtilities::buildIndex(TTree* tree)
 {
   std::string treeName = tree->GetName();
-  TBranch* EventMetaDataBranch = tree->GetBranch("EventMetaData");
+  TBranch* const EventMetaDataBranch = tree->GetBranch("EventMetaData");
   if ((strcmp(treeName.c_str(), "tree") == 0) && EventMetaDataBranch) {
     tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
   }

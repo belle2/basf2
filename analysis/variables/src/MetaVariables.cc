@@ -617,7 +617,7 @@ namespace Belle2 {
         // the list individually
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
-          Particle* iparticle = list->getParticle(i);
+          const Particle* iparticle = list->getParticle(i);
           if (particle->getMdstSource() == iparticle->getMdstSource())
             return 1;
         }
@@ -684,14 +684,14 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
               convertString<int>(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
 
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
@@ -747,19 +747,19 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
           {
             return false;
           }
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
               std::stod(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
               bool result = false;
@@ -1167,7 +1167,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1214,7 +1214,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1244,7 +1244,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1312,7 +1312,7 @@ namespace Belle2 {
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
           if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const MCParticle* mcPart = particle->getMCParticle();
               if (mcPart == nullptr)
                 return Const::doubleNaN;
@@ -1324,7 +1324,7 @@ namespace Belle2 {
             }
           } else
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
               if (dauPart == nullptr)
                 return Const::doubleNaN;
@@ -1405,7 +1405,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
           ROOT::Math::PxPyPzEVector pSum;
 
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1587,7 +1587,7 @@ namespace Belle2 {
     {
       if (arguments.size() > 0) {
         std::vector<const Variable::Manager::Var*> variables;
-        for (auto& argument : arguments)
+        for (const auto& argument : arguments)
           variables.push_back(Manager::Instance().getVariable(argument));
 
         auto func = [variables, arguments](const Particle * particle) -> double {
@@ -1678,7 +1678,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1725,7 +1725,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -2141,7 +2141,7 @@ namespace Belle2 {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcParticle = mcParticles[particleNumber];
+          const MCParticle* mcParticle = mcParticles[particleNumber];
           Particle part = Particle(mcParticle);
           auto var_result = var->function(&part);
           if (std::holds_alternative<double>(var_result))
@@ -2173,7 +2173,7 @@ namespace Belle2 {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcUpsilon4S = mcParticles[0];
+          const MCParticle* mcUpsilon4S = mcParticles[0];
           if (mcUpsilon4S->isInitial()) mcUpsilon4S = mcParticles[2];
           if (mcUpsilon4S->getPDG() != 300553)
           {
@@ -2488,7 +2488,6 @@ namespace Belle2 {
           std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                     ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
-          // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
           StoreArray<Particle> tempParticles("tempParticles");
@@ -2705,7 +2704,7 @@ namespace Belle2 {
             for (int i = 0; i < nParticles; i++) {
               bool overlaps = false;
               Particle* part = listOfParticles->getParticle(i);
-              for (auto poolPart : particlePool) {
+              for (const auto* poolPart : particlePool) {
                 if (part->overlapsWith(poolPart)) {
                   overlaps = true;
                   break;
@@ -3427,7 +3426,7 @@ namespace Belle2 {
         } else {
           try {
             pdg_code = convertString<int>(arg);
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
         }
 
         if (pdg_code == -1) {

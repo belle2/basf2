@@ -32,7 +32,7 @@ namespace TreeFitter {
     explicit Origin(Belle2::Particle* daughter);
 
     /** destructor */
-    virtual ~Origin() {};
+    virtual ~Origin() override = default;
 
     /** init particle, used if it has a mother */
     virtual  ErrCode initParticleWithMother(FitParams& fitparams) override;

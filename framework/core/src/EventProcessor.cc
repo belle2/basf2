@@ -110,7 +110,7 @@ namespace {
   };
 }
 
-long EventProcessor::getMaximumEventNumber(long maxEvent) const
+long EventProcessor::getMaximumEventNumber(long maxEvent)
 {
   //Check whether the number of events was set via command line argument
   unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();

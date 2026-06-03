@@ -24,7 +24,7 @@ namespace TreeFitter {
               bool forceFitAll);
 
     /** destructor  */
-    virtual ~Resonance() ;
+    virtual ~Resonance() override;
 
     /** initialise a motherless particle */
     ErrCode initMotherlessParticle(FitParams& fitparams) override;

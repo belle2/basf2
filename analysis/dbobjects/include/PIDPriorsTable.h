@@ -175,7 +175,7 @@ namespace Belle2 {
      * @param edges the vector of bin edge values the val has to be found in
      * @returns the position of the last edge below the input value
      */
-    bool checkRange(const std::string& text, float val, const std::vector<float>& edges) const;
+    static bool checkRange(const std::string& text, float val, const std::vector<float>& edges);
 
     /**
      * This function returns the position of a number in a sorted array of bin edges
@@ -183,7 +183,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
-    short findBin(float val, std::vector<float> array) const;
+    static short findBin(float val, std::vector<float> array);
 
     /**
      * This function returns the position of a number in a sorted array of bin edges
@@ -195,8 +195,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
-    // cppcheck-suppress unusedPrivateFunction
-    short findBinFast(float val, std::vector<float> array) const;
+    [[maybe_unused]] static short findBinFast(float val, std::vector<float> array);
 
     /**
      * This function returns the position of a number in a sorted array of bin edges,
@@ -205,9 +204,7 @@ namespace Belle2 {
      * @param array the std::vector the val has to be found
      * @returns the position of the last edge below the input value
      */
-    // cppcheck-suppress unusedPrivateFunction
-    short findBinWithFixedWidth(float val, std::vector<float> array) const;
-
+    [[maybe_unused]] static short findBinWithFixedWidth(float val, std::vector<float> array);
 
   };
 } // Belle2 namespace

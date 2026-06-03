@@ -361,7 +361,7 @@ namespace Belle2 {
       return result;
     }
 
-    int SoftGaussParticleConstraint::getVarBasis() const
+    int SoftGaussParticleConstraint::getVarBasis()
     {
       return VAR_BASIS;
     }

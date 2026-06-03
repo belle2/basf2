@@ -71,7 +71,7 @@ namespace Belle2 {
       /// Creates an empty ParticleConstraint object
       inline ParticleConstraint();
       /// Virtual destructor
-      virtual ~ParticleConstraint() {};
+      virtual ~ParticleConstraint() override = default;
 
       /// Adds several ParticleFitObject objects to the list
       virtual void setFOList(std::vector <ParticleFitObject*>* fitobjects_ ///< A list of BaseFitObject objects

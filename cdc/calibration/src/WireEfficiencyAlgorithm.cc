@@ -197,9 +197,13 @@ void WireEfficiencyAlgorithm::detectBadWires()
         if (wireID < 0 || wireID >= maxWires) {
           B2ERROR("Invalid wireID: " << wireID << " for LayerID: " << layerNo
                   << ". Max wires: " << maxWires);
-          continue; // remove invalid wireID
+          delete singleWirePassed;
+          delete singleWireTotal;
+          continue;
         }
         m_badWireList->setWire(layerNo, round(wireID), 0);
+        delete singleWirePassed;
+        delete singleWireTotal;
         continue;
       }
       // constructs efficiency of one wire
@@ -221,7 +225,21 @@ void WireEfficiencyAlgorithm::detectBadWires()
         double wireID = passed->GetYaxis()->GetBinCenter(i);
         m_badWireList->setWire(layerNo, round(wireID), singleWireEfficiencyFromFit);
       }
+
+      delete singleWireEfficiency;
+      delete graphSingleWireEfficiency;
+      delete singleWirePassed;
+      delete singleWireTotal;
     }
+
+    delete constantFunction;
+    delete passedProjectedX;
+    delete totalProjectedX;
+    delete efficiencyProjectedX;
+    delete passedProjectedY;
+    delete totalProjectedY;
+    delete efficiencyProjectedY;
+    delete graphEfficiencyProjected;
   }
 }
 

@@ -23,7 +23,7 @@ namespace Belle2 {
       RecoilMassConstraint(double recoilmass = 0., double beampx = 0., double beampy = 0., double beampz = 0, double beampe = 0.);
 
       /// Virtual destructor
-      virtual ~RecoilMassConstraint();
+      virtual ~RecoilMassConstraint() override;
 
       /// Returns the value of the constraint
       virtual double getValue() const override;

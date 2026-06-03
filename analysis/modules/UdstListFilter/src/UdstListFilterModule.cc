@@ -95,7 +95,7 @@ void UdstListFilterModule::event()
 {
   std::map < Particle::EParticleSourceObject, std::unordered_set<unsigned  int>> mdstIndices;
   // Select objects to keep/remove:
-  for (auto& p : *m_plist) {
+  for (const auto& p : *m_plist) {
     keepObject(&p, mdstIndices);
   }
 
@@ -148,7 +148,7 @@ void UdstListFilterModule::swapV0s()
     }
   }
 
-  StoreEntry* fromEntry = DataStore::Instance().getEntry(*m_selectedV0s);
+  const StoreEntry* fromEntry = DataStore::Instance().getEntry(*m_selectedV0s);
   StoreEntry* toEntry = DataStore::Instance().getEntry(m_v0s);
   if (!fromEntry->ptr) {
     if (toEntry->isArray)

@@ -38,7 +38,7 @@ namespace Belle2 {
       /// Assignment
       ISRPhotonFitObject& operator= (const ISRPhotonFitObject& rhs); ///< right hand side
 
-      virtual ~ISRPhotonFitObject();
+      virtual ~ISRPhotonFitObject() override;
 
       /// Return a new copy of itself
       virtual ISRPhotonFitObject* copy() const override;

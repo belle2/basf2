@@ -21,7 +21,7 @@ namespace TreeFitter {
     RecoParticle(Belle2::Particle* bc, const ParticleBase* mother);
 
     /** destructor */
-    virtual ~RecoParticle() {};
+    virtual ~RecoParticle() override = default;
 
     /** init particle without mother */
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;

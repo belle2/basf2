@@ -1,0 +1,4 @@
+Changes in the mva package since release-11-00
+----------------------------------------------
+
+* The importance plot produced by ``basf2_mva_evaluate.py`` now preserves the relative magnitudes between variables, by normalising each method's importances so that the column sums to 100. The previous 0 to 100 rescaling discarded this information by mapping the least and most important variables to fixed endpoints. The old behaviour is still available via ``--importance-scale hundredzero``.

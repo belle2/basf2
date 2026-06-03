@@ -19,7 +19,7 @@ std::string MCInitialParticles::getGenerationFlagString(const std::string& separ
     {c_smearBeamDirection, "smearBeamDirection"},
     {c_smearVertex, "smearVertex"}
   };
-  for (auto& i : flagvalues) {
+  for (const auto& i : flagvalues) {
     if (hasGenerationFlags(i.first)) {
       if (flags.size() > 0) flags += separator;
       flags += i.second;

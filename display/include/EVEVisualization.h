@@ -15,6 +15,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTrigger3DHTrack.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -123,9 +124,10 @@ namespace Belle2 {
     void addTrackCandidateImproved(const std::string& collectionName,
                                    const RecoTrack& recoTrack);
 
-    /** Add a CDCTriggerTrack. */
+    /** Add a CDCTriggerTrack or CDCTrigger3DHTrack. */
+    template <typename TriggerTrack>
     void addCDCTriggerTrack(const std::string& collectionName,
-                            const CDCTriggerTrack& track);
+                            const TriggerTrack& trgTrack);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits)

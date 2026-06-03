@@ -229,7 +229,6 @@ def add_hlt_processing(path,
 
     # Unpack the event content
     add_unpackers(path, components=unpacker_components, writeKLMDigitRaws=True)
-    path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
 
     # HLT prefilter
     path_utils.add_prefilter_module(path)

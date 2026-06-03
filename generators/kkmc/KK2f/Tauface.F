@@ -83,7 +83,7 @@ C IRCLH3PI=1  TAUOLA RChL COEF(I,J) =  COEFr(I,J) [suggested default]
       
 ! switch on initialization of FF mixing in tau- -> K-  PI- PI+ nu, PI- K0B PI0 nu 
 C IFKPIPI = 0 CLEO initialization (suggested default)
-C IFKPIPI = 1 BaBar initialization 
+C IFKPIPI = 1 BaBar initialization (new default)
 C-- Improve Form Factors for tau->K-pi-pi+nu 
 C   New modelling using parameters from CLEO, PRD62, 072006 (2000):
 C   M(1270) = 1.254 GeV, M(1400) = 1.463 GeV
@@ -93,7 +93,7 @@ C   F2 = (eta BW[K1(1270)]+BW[K1(1400)]) X BW[K*],
 C   eta=0.33 (M. Finkemeier, E. Mirkes, ZPC69, 243 (1996))
 C Similar tuning also applied to tau- -> PI- K0B PI0 nu 
       INTEGER IFKPIPI
-      DATA    IFKPIPI /0/
+      DATA    IFKPIPI /1/
       COMMON /IFKPIPI/ IFKPIPI
 
 C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:

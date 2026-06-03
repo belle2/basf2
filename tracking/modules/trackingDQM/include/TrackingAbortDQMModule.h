@@ -81,6 +81,7 @@ namespace Belle2 {
     TH1F* m_svdTime[2]; /**< L3 V-side time for all clusters*/
     TH1D* m_integratedAverages[2]; /**< integrated averages of additional SVD, CDC variables */
     TH1F* m_nCDCExtraHitsSL[2][9]; /**< distribution of the number of extra CDC hits divided by SL */
+    TH1F* m_fCDCExtraHitsPostCleanSL[2][9]; /**< distribution of the fraction of extra CDC hits post cleaning divided by SL */
     TH1F* m_nCDCHitsSL[2][9]; /**< distribution of the number of signal CDC hits divided by SL */
     TH1F* m_noCDCHitsInSL[2]; /**< number of tracks without CDC hits in each SL */
     /** function to update the bin content */

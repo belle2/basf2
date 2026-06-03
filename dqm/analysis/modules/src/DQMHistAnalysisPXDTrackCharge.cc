@@ -71,7 +71,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (auto& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -101,7 +101,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -218,7 +218,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      for (auto& it : m_excluded) {
+      for (const auto& it : m_excluded) {
         static std::map <int, TLatex*> ltmap;
         auto tt = ltmap[it];
         if (!tt) {
@@ -324,7 +324,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   // now loop per module over asics pairs (1.5.1)
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
 //     TCanvas* canvas = m_cChargeMod[m_PXDModules[i]];
-    VxdID& aVxdID = m_PXDModules[i];
+    const VxdID& aVxdID = m_PXDModules[i];
 
     if (m_hChargeModASIC2d[aVxdID]) m_hChargeModASIC2d[aVxdID]->Reset();
     if (m_cChargeModASIC2d[aVxdID]) m_cChargeModASIC2d[aVxdID]->Clear();
@@ -390,7 +390,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
 
-  for (auto& it : m_excluded) {
+  for (const auto& it : m_excluded) {
     static std::map <int, TLatex*> ltmap;
     auto tt = ltmap[it];
     if (!tt) {

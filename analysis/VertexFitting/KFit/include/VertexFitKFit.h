@@ -32,8 +32,7 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       VertexFitKFit(void);
       /** Destruct the object. */
-      ~VertexFitKFit(void);
-
+      ~VertexFitKFit(void) override;
 
     public:
       /** Set an initial vertex point for the vertex-vertex constraint fit.

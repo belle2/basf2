@@ -180,11 +180,11 @@ namespace Belle2 {
     /** Classifies the decays of the event and assigns a decay mode */
     int TauolaBelle2DecayMode(const std::string& s, int chg);
     /** Identifies particles coming from tau decays */
-    int getRecursiveMotherCharge(const MCParticle* mc);
+    static int getRecursiveMotherCharge(const MCParticle* mc);
     /** Identifies if the event is a generated tau pair */
     void IdentifyTauPair();
     /** Identifies the number of charged final state particles in the decay*/
-    int getProngOfDecay(const MCParticle& mc);
+    static int getProngOfDecay(const MCParticle& mc);
     /** Energy of the radiative photon in tau rest frame */
     double getEgstar(const std::vector<int>& vec_radgam, const MCParticle& mc);
   };

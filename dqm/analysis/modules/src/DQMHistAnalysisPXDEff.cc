@@ -60,7 +60,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -81,7 +81,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
     // Have been promised that all modules have the same number of pixels, so just take from the first one
@@ -90,7 +90,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
     nv = cellGetInfo.getVCells();
   }
 
-  for (VxdID& aPXDModule : m_PXDModules) {
+  for (const auto& aPXDModule : m_PXDModules) {
     auto buff = (std::string)aPXDModule;
     replace(buff.begin(), buff.end(), '.', '_');
     registerEpicsPV("PXD:Eff:" + buff, (std::string)aPXDModule);
@@ -249,7 +249,7 @@ bool DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, i
   return false;
 }
 
-bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
+bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, const std::string& name)
 {
   bool warn_flag = (m_eEffAll->GetEfficiency(bin) + m_eEffAll->GetEfficiencyErrorUp(bin) <
                     m_warnlevelmod[name]); // (and not only the actual eff value)
@@ -260,7 +260,7 @@ bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
   return warn_flag;
 }
 
-bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, std::string name)
+bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, const std::string& name)
 {
   bool error_flag = (m_eEffAll->GetEfficiency(bin) + m_eEffAll->GetEfficiencyErrorUp(bin) <
                      m_errorlevelmod[name]); // error if upper error value is below limit
@@ -296,7 +296,7 @@ void DQMHistAnalysisPXDEffModule::event()
     // there may be update glitches dues to separate histograms
     // The histograms
     bool updateinner = false, updateouter = false;
-    for (auto aPXDModule : m_PXDModules) {
+    for (const auto& aPXDModule : m_PXDModules) {
       auto buff = (std::string)aPXDModule;
       replace(buff.begin(), buff.end(), '.', '_');
 
@@ -402,7 +402,7 @@ void DQMHistAnalysisPXDEffModule::event()
       // excluded modules are not counted at all!
       int bin = i + 1; // bin nr is index +1
 
-      VxdID& aModule = m_PXDModules[i];
+      const VxdID& aModule = m_PXDModules[i];
       double nmatch = Combined->GetBinContent(i * 2 + 2);
       double nhit = Combined->GetBinContent(i * 2 + 1);
 
@@ -491,7 +491,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
         gr->Draw("AP");
 
-        for (auto& it : m_excluded) {
+        for (const auto& it : m_excluded) {
           static std::map <int, TLatex*> ltmap;
           auto tt = ltmap[it];
           if (!tt) {
@@ -573,7 +573,7 @@ void DQMHistAnalysisPXDEffModule::event()
       } else scale_min = 0.0;
       if (gr3) gr3->Draw("P"); // both in one plot
 
-      for (auto& it : m_excluded) {
+      for (const auto& it : m_excluded) {
         static std::map <int, TLatex*> ltmap;
         auto tt = ltmap[it];
         if (!tt) {
@@ -621,7 +621,7 @@ void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
 
-  for (VxdID& aPXDModule : m_PXDModules) {
+  for (const auto& aPXDModule : m_PXDModules) {
     if (m_cEffModules[aPXDModule]) delete m_cEffModules[aPXDModule];
     if (m_eEffModules[aPXDModule]) delete m_eEffModules[aPXDModule];
   }

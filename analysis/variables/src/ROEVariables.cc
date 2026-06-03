@@ -90,7 +90,7 @@ namespace Belle2 {
       }
       auto* signalReco = roe->getRelatedFrom<Particle>();
       auto* signalMC = signalReco->getMCParticle();
-      MCParticle* ancestorMC = particleMC->getMother();
+      const MCParticle* ancestorMC = particleMC->getMother();
       while (ancestorMC) {
         if (ancestorMC == signalMC) {
           return 1;
@@ -412,7 +412,7 @@ namespace Belle2 {
           return Const::doubleNaN;
 
         // Get the companion B meson
-        MCParticle* mcROE = nullptr;
+        const MCParticle* mcROE = nullptr;
         if (mcDaughters[0]->getArrayIndex() == mcParticle->getArrayIndex())
           mcROE = mcDaughters[1];
         else
@@ -424,9 +424,9 @@ namespace Belle2 {
         std::set<const MCParticle*> mcROEObjects;
 
         auto roeParticles = roe->getParticles(maskName);
-        for (auto* roeParticle : roeParticles)
+        for (const auto* roeParticle : roeParticles)
         {
-          auto* mcroeParticle = roeParticle->getMCParticle();
+          const auto* mcroeParticle = roeParticle->getMCParticle();
           if (mcroeParticle != nullptr) {
             mcROEObjects.insert(mcroeParticle);
           }

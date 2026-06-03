@@ -3439,6 +3439,8 @@ def writePi0EtaVeto(
                    path=roe_path)
     variableToSignalSideExtraInfo('pi0:Pi0VetoFirst' + ListName + suffix,
                                   {'extraInfo(' + Pi0ExtraInfoName + ')': Pi0ExtraInfoName + suffix}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:Pi0VetoFirst' + ListName + suffix,
+                                  {'daughter(1,E)': 'SoftGammaEinPi0' + suffix}, path=roe_path)
     # Pick up the pi0/eta candidate with the second highest pi0/eta probability.
     cutAndCopyList(outputListName='pi0:Pi0VetoSecond' + ListName + suffix,
                    inputListName='pi0:Pi0Veto' + ListName + suffix,
@@ -3446,6 +3448,8 @@ def writePi0EtaVeto(
                    path=roe_path)
     variableToSignalSideExtraInfo('pi0:Pi0VetoSecond' + ListName + suffix,
                                   {'extraInfo(' + Pi0ExtraInfoName + ')': 'second' + Pi0ExtraInfoName + suffix}, path=roe_path)
+    variableToSignalSideExtraInfo('pi0:Pi0VetoSecond' + ListName + suffix,
+                                  {'daughter(1,E)': 'secondSoftGammaEinPi0' + suffix}, path=roe_path)
 
     # eta veto
     if etaPayloadNameOverride is not None:
@@ -3482,12 +3486,16 @@ def writePi0EtaVeto(
                    path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVetoFirst' + ListName + suffix,
                                   {'extraInfo(' + EtaExtraInfoName + ')': EtaExtraInfoName + suffix}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:EtaVetoFirst' + ListName + suffix,
+                                  {'daughter(1,E)': 'SoftGammaEinEta' + suffix}, path=roe_path)
     cutAndCopyList(outputListName='eta:EtaVetoSecond' + ListName + suffix,
                    inputListName='eta:EtaVeto' + ListName + suffix,
                    cut='extraInfo(EtaVetoRank)==2',
                    path=roe_path)
     variableToSignalSideExtraInfo('eta:EtaVetoSecond' + ListName + suffix,
                                   {'extraInfo(' + EtaExtraInfoName + ')': 'second' + EtaExtraInfoName + suffix}, path=roe_path)
+    variableToSignalSideExtraInfo('eta:EtaVetoSecond' + ListName + suffix,
+                                  {'daughter(1,E)': 'secondSoftGammaEinEta' + suffix}, path=roe_path)
 
     path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

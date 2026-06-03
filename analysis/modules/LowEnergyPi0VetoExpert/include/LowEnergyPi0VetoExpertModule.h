@@ -43,7 +43,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~LowEnergyPi0VetoExpertModule();
+    ~LowEnergyPi0VetoExpertModule() override;
 
     /**
      * Initializer.

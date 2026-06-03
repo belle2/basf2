@@ -156,7 +156,7 @@ namespace Belle2 {
      * called by parent constructor */
     void SetSeed(UInt_t) {}
     /** argument type was changed in root 6.08. */
-    void SetSeed(ULong_t) {}
+    void SetSeed(ULong_t) override {}
 
     /** Set the state of the random number generator.
      * To achieve maximum reproducibility the generator is reset at the begin

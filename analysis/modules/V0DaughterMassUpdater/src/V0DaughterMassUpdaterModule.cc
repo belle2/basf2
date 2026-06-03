@@ -35,7 +35,7 @@ void V0DaughterMassUpdaterModule::event()
 {
 
 
-  for (auto& iList : m_strParticleLists) {
+  for (const auto& iList : m_strParticleLists) {
 
     StoreObjPtr<ParticleList> particlelist(iList);
     if (!particlelist) {
@@ -44,7 +44,7 @@ void V0DaughterMassUpdaterModule::event()
     } else {
       if (particlelist->getListSize() == 0) continue;
       for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
-        Particle* iParticle = particlelist->getParticle(i);
+        const Particle* iParticle = particlelist->getParticle(i);
         if (iParticle->getParticleSource() != Particle::EParticleSourceObject::c_Composite)
           B2FATAL("This V0 particle is not a composite particle!");
         else {

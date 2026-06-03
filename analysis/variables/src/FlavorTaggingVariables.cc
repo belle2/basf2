@@ -388,7 +388,7 @@ namespace Belle2 {
       if (MuonList.isValid()) {
         double maximumProbMuon = 0;
         for (unsigned int i = 0; i < MuonList->getListSize(); ++i) {
-          Particle* pMuon = MuonList->getParticle(i);
+          const Particle* pMuon = MuonList->getParticle(i);
           double probMuon = pMuon->getExtraInfo("isRightTrack(Muon)");
           if (probMuon > maximumProbMuon) {
             maximumProbMuon = probMuon;
@@ -406,7 +406,7 @@ namespace Belle2 {
       if (ElectronList.isValid()) {
         double maximumProbElectron = 0;
         for (unsigned int i = 0; i < ElectronList->getListSize(); ++i) {
-          Particle* pElectron = ElectronList->getParticle(i);
+          const Particle* pElectron = ElectronList->getParticle(i);
           double probElectron = pElectron->getExtraInfo("isRightTrack(Electron)");
           if (probElectron > maximumProbElectron) {
             maximumProbElectron = probElectron;
@@ -921,7 +921,7 @@ namespace Belle2 {
         {
           double maximumProbSlowPion = 0;
           for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-            Particle* pSlowPion = SlowPionList->getParticle(i);
+            const Particle* pSlowPion = SlowPionList->getParticle(i);
             if (!pSlowPion) continue;
             if (!pSlowPion->hasExtraInfo("isRightCategory(SlowPion)")) continue;
 
@@ -973,7 +973,7 @@ namespace Belle2 {
 
         double maximumProbFastest = 0;
         ROOT::Math::PxPyPzEVector momFastParticle;  //Momentum of Fast Pion in CMS-System
-        Particle* TargetFastParticle = nullptr;
+        const Particle* TargetFastParticle = nullptr;
         for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
         {
           Particle* particlei = FastParticleList->getParticle(i);
@@ -1311,7 +1311,7 @@ namespace Belle2 {
 
       auto func = [index](const Particle * particle) -> int {
 
-        Particle* nullParticle = nullptr;
+        const Particle* nullParticle = nullptr;
         double qTarget = particle->getCharge();
         double qMC = Variable::isRestOfEventB0Flavor(nullParticle);
 
@@ -1401,7 +1401,7 @@ namespace Belle2 {
         {
           const MCParticle* mcSlowPionMother = nullptr;
           StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
-          Particle* targetSlowPion = nullptr;
+          const Particle* targetSlowPion = nullptr;
           if (SlowPionList.isValid()) {
             double mcProbSlowPion = 0;
             for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
@@ -1436,7 +1436,7 @@ namespace Belle2 {
         if (index == 11)   // FSC
         {
           StoreObjPtr<ParticleList> FastParticleList("pi+:inRoe");
-          Particle* targetFastParticle = nullptr;
+          const Particle* targetFastParticle = nullptr;
           if (FastParticleList.isValid()) {
             double mcProbFastest = 0;
             for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
@@ -1743,11 +1743,11 @@ namespace Belle2 {
         StoreObjPtr<ParticleList> ListOfParticles(particleListName);
         if (!ListOfParticles.isValid()) return 0;
 
-        Particle* target = nullptr; //Particle selected as target
+        const Particle* target = nullptr; //Particle selected as target
         double maximumTargetProb = 0; //Probability of being the target track from the track level
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
         {
-          Particle* particlei = ListOfParticles->getParticle(i);
+          const Particle* particlei = ListOfParticles->getParticle(i);
           if (!particlei) continue;
 
           double target_prob = 0;
@@ -1933,10 +1933,10 @@ namespace Belle2 {
 
         const auto mdstSource = particle->getMdstSource();
 
-        Particle* target = nullptr; //Particle selected as target
+        const Particle* target = nullptr; //Particle selected as target
         for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i)
         {
-          Particle* particlei = ListOfParticles->getParticle(i);
+          const Particle* particlei = ListOfParticles->getParticle(i);
           if (!particlei)
             continue;
 

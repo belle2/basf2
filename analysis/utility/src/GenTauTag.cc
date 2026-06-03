@@ -13,7 +13,7 @@ using namespace Belle2;
 
 GenTauTag::GenTauTag() = default;
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2)
 {
   int ndau = gp.size();
   if (ndau == 2) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2);}
@@ -24,7 +24,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2)
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3)
 {
   int ndau = gp.size();
   if (ndau == 3) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3);}
@@ -35,7 +35,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4)
 {
   int ndau = gp.size();
   if (ndau == 4) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4);}
@@ -46,7 +46,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int 
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5)
 {
   int ndau = gp.size();
   if (ndau == 5) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5);}
@@ -57,7 +57,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int 
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6)
 {
   int ndau = gp.size();
   if (ndau == 6) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6);}
@@ -68,7 +68,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int 
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
 {
   int ndau = gp.size();
   if (ndau == 7) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7);}
@@ -79,7 +79,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int 
   else return false;
 }
 
-bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
+bool GenTauTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
 {
   int ndau = gp.size();
   if (ndau == 8) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7, da8);}
@@ -92,7 +92,7 @@ bool GenTauTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int 
 
 //All the tag number for various decay mode is defined here
 
-int GenTauTag::Mode_tau_plus(std::vector<int> genpart)
+int GenTauTag::Mode_tau_plus(const std::vector<int>& genpart)
 {
   if (GenTauTag::PcheckDecay(genpart, -11, 12, -16)) {
     return 1000 * m_nPhotos + 1;
@@ -407,7 +407,7 @@ int GenTauTag::Mode_tau_plus(std::vector<int> genpart)
 }// not yet defined tau+ decay
 
 
-int GenTauTag::Mode_tau_minus(std::vector<int> genpart)
+int GenTauTag::Mode_tau_minus(const std::vector<int>& genpart)
 {
   if (GenTauTag::PcheckDecay(genpart, 11, -12, 16)) {
     return 1000 * m_nPhotos + 1;

@@ -19,7 +19,7 @@ from caf import strategies
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="CDC Tracking",
-                               expert_username="guanyu",
+                               expert_username="farhoumh",
                                subsystem="cdc",
                                description=__doc__,
                                input_data_formats=["raw"],
@@ -311,7 +311,8 @@ def get_calibrations(input_data, **kwargs):
                                  )
     if payload_boundaries:
         basf2.B2INFO("Found payload_boundaries: calibration strategies set to SequentialBoundaries.")
-        cals[0].strategies = strategies.SequentialBoundaries
+        for i in range(len(cals)):
+            cals[i].strategies = strategies.SequentialBoundaries
         for alg in cals:
             for algorithm in alg.algorithms:
                 algorithm.params = {"iov_coverage": output_iov, "payload_boundaries": payload_boundaries}

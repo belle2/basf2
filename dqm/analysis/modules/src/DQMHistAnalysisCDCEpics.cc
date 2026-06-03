@@ -101,7 +101,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   }
 
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
-  m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
+  m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 180, -180.0, 180.0);
 
   c_hist_attach_eff[0] = new TCanvas("CDC/c_hist_attached_wires", "c_hist_attached_wires", 403, 400);
   c_hist_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
@@ -192,8 +192,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   registerEpicsPV(m_name_pvpfx + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_name_pvpfx + "cdcboards_wtdc", "tdcboards");
 
-  registerEpicsPV(m_name_pvpfx + "adc_median_window_sl10", "adcmedianwindow_sl01");
-  registerEpicsPV(m_name_pvpfx + "tdc_median_window_sl10", "tdcmedianwindow_sl01");
+  registerEpicsPV(m_name_pvpfx + "adc_median_window_sl01", "adcmedianwindow_sl01");
+  registerEpicsPV(m_name_pvpfx + "tdc_median_window_sl01", "tdcmedianwindow_sl01");
   registerEpicsPV(m_name_pvpfx + "adc_median_window_sl28", "adcmedianwindow_sl28");
   registerEpicsPV(m_name_pvpfx + "tdc_median_window_sl28", "tdcmedianwindow_sl28");
 

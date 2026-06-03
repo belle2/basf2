@@ -190,7 +190,7 @@ namespace {
         ROEChargedECL.setTheta(roeChargedECLClusterProperties[chargedECLCLusterCounter][1]);
         ROEChargedECL.setPhi(roeChargedECLClusterProperties[chargedECLCLusterCounter][2]);
         ROEChargedECL.setR(roeChargedECLClusterProperties[chargedECLCLusterCounter][3]);
-        ECLCluster* savedROEChargedECL = testsECLClusters.appendNew(ROEChargedECL);
+        const ECLCluster* savedROEChargedECL = testsECLClusters.appendNew(ROEChargedECL);
         savedROEChargedECL->addRelationTo(savedROETrack);
         chargedECLCLusterCounter++;
 
@@ -205,7 +205,7 @@ namespace {
           ROEChargedECL2.setTheta(roeChargedECLClusterProperties[chargedECLCLusterCounter][1]);
           ROEChargedECL2.setPhi(roeChargedECLClusterProperties[chargedECLCLusterCounter][2]);
           ROEChargedECL2.setR(roeChargedECLClusterProperties[chargedECLCLusterCounter][3]);
-          ECLCluster* savedROEChargedECL2 = testsECLClusters.appendNew(ROEChargedECL2);
+          const ECLCluster* savedROEChargedECL2 = testsECLClusters.appendNew(ROEChargedECL2);
           savedROETrack->addRelationTo(savedROEChargedECL2);
           chargedECLCLusterCounter++;
 
@@ -341,7 +341,7 @@ namespace {
     MCB0.setPDG(511);
     MCB0.setMassFromPDG();
     MCB0.setMomentum(-0.12593, -0.143672, 2.09072);
-    MCParticle* savedMCB0 = testsMCParticles.appendNew(MCB0);
+    const MCParticle* savedMCB0 = testsMCParticles.appendNew(MCB0);
 
     /** Here we create a B0 particle and set its relation to the mc B0 particle.*/
     Particle B0({ -0.129174, -0.148899, 2.09292, 5.67644}, 511);

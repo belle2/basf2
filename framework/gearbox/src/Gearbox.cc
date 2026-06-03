@@ -169,7 +169,7 @@ namespace Belle2 {
     m_xpathContext = nullptr;
     m_xmlDocument = nullptr;
 
-    for (auto& entry : m_ownedObjects) {
+    for (auto const& entry : m_ownedObjects) {
       delete entry.second;
     }
     m_ownedObjects.clear();

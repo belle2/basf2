@@ -64,7 +64,7 @@ void VariablesToEventExtraInfoModule::event()
 
   const unsigned int numParticles = m_inputList->getListSize();
   for (unsigned int i = 0; i < numParticles; i++) {
-    Particle* p = m_inputList->getParticle(i);
+    const Particle* p = m_inputList->getParticle(i);
     addEventExtraInfo(p);
   }
 

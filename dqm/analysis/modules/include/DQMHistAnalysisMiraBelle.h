@@ -28,6 +28,8 @@ namespace Belle2 {
      */
     DQMHistAnalysisMiraBelleModule();
 
+  private:
+
     /**
      * Destructor
      */
@@ -62,12 +64,38 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+    * Extract data from histograms related to MuMu
+    */
+    void ExtractMumu(void);
+
+    /**
+    * Extract data from histograms related to Do*
+    */
+    void ExtractD0Star(void);
+
+    /**
+    * Extract data from histograms related to TauPairs
+    */
+    void ExtractTaupair(void);
+
+    /**
+    * Extract data from histograms related to Bhabha
+    */
+    void ExtractBhabha(void);
+
+    /**
+    * Extract data from histograms related to Hadron
+    */
+    void ExtractHadron(void);
+
   protected:
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
     double m_reference_hadb; /**< Reference value for hadronb2_tight bhabha ratio */
     double m_reference_mumu; /**< Reference value for mumu inv mass */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
+    Belle2::MonitoringObject* mon_tautau = nullptr; /**< MonitoringObject for tau pair events */
     Belle2::MonitoringObject* mon_bhabha = nullptr; /**< MonitoringObject for bhabha events */
     Belle2::MonitoringObject* mon_hadron = nullptr; /**< MonitoringObject for hadronb2 tight events */
 

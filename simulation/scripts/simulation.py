@@ -124,8 +124,7 @@ def add_simulation(
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
         ignoreRunNumberForBG=False,
-        save_slow_pions_in_mc=False,
-        save_all_charged_particles_in_mc=False):
+        save_slow_pions_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'

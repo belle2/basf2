@@ -129,7 +129,7 @@ void DQMHistAnalysisTOPModule::initialize()
 
   registerEpicsPV(m_pvPrefix + "asicWindowsBand", "asicWindowsBand");
   registerEpicsPV(m_pvPrefix + "asicWindowsAlarmLevels", "asicWindowsAlarmLevels");
-  registerEpicsPV(m_pvPrefix + "windowMedianAlarmLevels", "windowMedianAlarmLevels"); // also output
+  registerEpicsPV(m_pvPrefix + "windowMedian", "windowMedian"); // also output
   registerEpicsPV(m_pvPrefix + "eventMonitorAlarmLevels", "eventMonitorAlarmLevels");
   registerEpicsPV(m_pvPrefix + "unpackerErrAlarmLevels", "unpackerErrAlarmLevels");
   registerEpicsPV(m_pvPrefix + "junkHitsAlarmLevels", "junkHitsAlarmLevels");
@@ -150,6 +150,11 @@ void DQMHistAnalysisTOPModule::initialize()
   gROOT->cd();
 
   m_c_evtMonitorFract = new TCanvas("TOP/c_evtMonitorFract", "c_evtMonitorFract");
+  m_windowMedian = new TH1F("TOP/windowMedian", "Asic windows (medians); slot number; median", 64, 1, 17);
+  m_windowMedian->SetFillColor(9);
+  m_windowMedian->GetXaxis()->SetNdivisions(16);
+  m_windowMedian->GetXaxis()->CenterLabels();
+  m_windowMedian->SetMinimum(0);
   m_c_windowMedian =  new TCanvas("TOP/c_windowMedian", "c_windowMedian");
   m_c_photonYields = new TCanvas("TOP/c_photonYields", "c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates", "c_backgroundRates");
@@ -394,33 +399,35 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
 void DQMHistAnalysisTOPModule::updateWindowMedianCanvas()
 {
   int alarmState = c_Gray;
-  if (m_windowMedian) delete m_windowMedian;
-  double hmax = 0;
+  m_windowMedian->Reset();
 
-  auto* hraw = static_cast<TH2F*>(findHist("TOP/window_vs_slot"));
-  if (hraw) {
-    m_windowMedian = hraw->ProjectionX("TOP/windowMedian");
-    m_windowMedian->Reset();
-    m_windowMedian->SetTitle("Asic windows (medians)");
-    m_windowMedian->SetYTitle("median");
-    m_windowMedian->SetFillColor(9);
-    for (int i = 1; i <= hraw->GetNbinsX(); i++) {
-      auto* py = hraw->ProjectionY("tmp", i, i);
-      auto median = TMath::Median(py->GetNbinsX(), py->GetArray(), 0, 0);
-      m_windowMedian->SetBinContent(i, median);
-      delete py;
+  for (int slot = 1; slot <= 16; slot++) {
+    std::string name = "TOP/window_vs_asic_" + std::to_string(slot);
+    auto* h = static_cast<TH2F*>(findHist(name));
+    if (not h) continue;
+    for (int bs = 1; bs <= 4; bs++) {
+      std::vector<double> longArray;
+      longArray.reserve(16 * h->GetNbinsY());
+      for (int asic = 1; asic <= 16; asic++) {
+        int binX = (bs - 1) * 16 + asic;
+        for (int binY = 1; binY <= h->GetNbinsY(); binY++) longArray.push_back(h->GetBinContent(binX, binY));
+      }
+      auto median = TMath::Median(longArray.size(), longArray.data(), 0, 0);
+      int bin = (slot - 1) * 4 + bs;
+      m_windowMedian->SetBinContent(bin, median);
     }
-    hmax = m_windowMedian->GetMaximum();
-    alarmState = getAlarmState(hmax, m_windowMedianAlarmLevels);
   }
 
-  setEpicsPV("windowMedianAlarmLevels", hmax);
+  double hmax = m_windowMedian->GetMaximum();
+  alarmState = getAlarmState(hmax, m_windowMedianAlarmLevels);
+
+  setEpicsPV("windowMedian", hmax);
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   auto* canvas = m_c_windowMedian;
   canvas->Clear();
   canvas->cd();
-  if (m_windowMedian) m_windowMedian->Draw("hist");
+  m_windowMedian->Draw("hist");
   canvas->Pad()->SetFrameFillColor(10);
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
   canvas->SetGridx();
@@ -1240,7 +1247,7 @@ void DQMHistAnalysisTOPModule::updateLimits()
   m_asicWindowsBand[1] = yHi;
 
   requestLimitsFromEpicsPVs("asicWindowsAlarmLevels", unused, unused, m_asicWindowsAlarmLevels[0], m_asicWindowsAlarmLevels[1]);
-  requestLimitsFromEpicsPVs("windowMedianAlarmLevels", unused, unused, m_windowMedianAlarmLevels[0], m_windowMedianAlarmLevels[1]);
+  requestLimitsFromEpicsPVs("windowMedian", unused, unused, m_windowMedianAlarmLevels[0], m_windowMedianAlarmLevels[1]);
   requestLimitsFromEpicsPVs("eventMonitorAlarmLevels", unused, unused, m_eventMonitorAlarmLevels[0], m_eventMonitorAlarmLevels[1]);
   requestLimitsFromEpicsPVs("unpackerErrAlarmLevels", unused, unused, m_unpackerErrAlarmLevels[0], m_unpackerErrAlarmLevels[1]);
   requestLimitsFromEpicsPVs("junkHitsAlarmLevels", unused, unused, m_junkHitsAlarmLevels[0], m_junkHitsAlarmLevels[1]);

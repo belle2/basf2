@@ -257,7 +257,7 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
       const ROOT::Math::XYVector& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
       const double driftLength(wireHit.getRefDriftLength());
       ROOT::Math::XYVector disp2D(recoPosOnTrajectory - wirePos2DAtZ);
-      if (disp2D.R() != 0.0) {
+      if (disp2D.R() > 0.0) {
         disp2D *= (driftLength / disp2D.R());
       }
       recoPos2D = wirePos2DAtZ + disp2D;

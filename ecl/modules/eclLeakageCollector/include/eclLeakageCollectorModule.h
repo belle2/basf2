@@ -20,6 +20,8 @@ namespace Belle2 {
   class ECLShower;
   class MCParticle;
   class EventMetaData;
+  class EventLevelClusteringInfo;
+  class ECLCluster;
 
   namespace ECL {
     class ECLLeakagePosition;
@@ -55,6 +57,9 @@ namespace Belle2 {
     StoreArray<ECLShower> m_eclShowerArray; /**< Required input array of ECLShowers */
     StoreArray<MCParticle> m_mcParticleArray; /**< Required input array of MCParticles */
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
+    StoreArray<ECLCluster> m_eclClusterArray; /**< Array of ECLClusters */
+
 
     /** Some other useful quantities */
     const int nLeakReg = 3; /**< 3 ECL regions: 0 = forward, 1 = barrel, 2 = backward */

@@ -264,7 +264,7 @@ namespace Belle2 {
 
     std::vector<int> m_asicWindowsBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
     std::vector<double> m_asicWindowsAlarmLevels = {0.002, 0.02}; /**< alarm levels for fraction of windows outside the band */
-    std::vector<double> m_windowMedianAlarmLevels = {5, 10}; /**< alarm levels for window_vs_slot medians */
+    std::vector<double> m_windowMedianAlarmLevels = {50, 100}; /**< alarm levels for window_vs_slot medians */
     std::vector<double> m_eventMonitorAlarmLevels = {1e-4, 2e-3}; /**< alarm levels for fraction of desynchronized digits */
     std::vector<double> m_unpackerErrAlarmLevels = {0.01, 0.10}; /**< alarm levels for the fraction of unpacker errors */
     std::vector<double> m_junkHitsAlarmLevels = {0.05, 0.25}; /**< alarm levels for the fraction of junk hits */
@@ -299,7 +299,7 @@ namespace Belle2 {
     TH1D* m_evtMonitorFract = nullptr; /**< fractions of de-synchronized hits */
     TCanvas* m_c_evtMonitorFract = nullptr; /**< Canvas: fractions of de-synchronized hits */
 
-    TH1D* m_windowMedian = nullptr; /**< window_vs_slot medians */
+    TH1F* m_windowMedian = nullptr; /**< window_vs_slot medians */
     TCanvas* m_c_windowMedian = nullptr; /**< Canvas: window_vs_slot medians */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */

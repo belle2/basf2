@@ -253,7 +253,7 @@ void DQMHistAnalysisHLTModule::event()
     setEpicsPV("ProcessingTime", HLTProcessingTime);
   }
 
-  auto hist_Procs = findHist("timing_statistics", "processesPerUnitHistogram");
+  auto hist_Procs = findHist("timing_statistics/processesPerUnitHistogram");
   double HLTBudgetTime = 0; // Number of HLT threads / L1 rate [kHz]
   double L1Rate = getEpicsPV("L1Rate");
 

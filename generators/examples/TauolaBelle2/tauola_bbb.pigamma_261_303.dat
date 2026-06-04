@@ -11,7 +11,7 @@ BeginX
 *     Center-of-mass energy [GeV]
     1        10.58D0      CMSene =xpar( 1) Average Center of mass energy [GeV]
     2        0.007e0      DelEne =xpar( 2)  Beam energy spread [GeV]
-    5             -1
+    5              0
 ********************************************************************************
 *   61       0.7071d0      spin1x  polarization vector beam 1
 *   62            0d0      spin1y  polarization vector beam 1
@@ -25,8 +25,8 @@ BeginX
 ********************************************************************************
   901              4      Ihvp  ! =1,2,3,4
 ********************************************************************************
- 2001          112e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
- 2002          261e0      Jak2   =xpar(72)  Second Tau decay mask (tau+)
+ 2001          261e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
+ 2002          303e0      Jak2   =xpar(72)  Second Tau decay mask (tau+)
 ********************************************************************************
  2900            1e0      BBB    0: ORIG  1: BBB
  2901            0e0      EQUALBR
@@ -37,14 +37,23 @@ BeginX
  2909            0e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
  2910            0e0      TauToElOrMu = 1: swap e/mu decay for alternate events
 ********************************************************************************
- 2961            1e0      CV_LL
- 2962            1e0      CV_LR
+ 2951            0e0      ISINGLE
+ 2952            0e0      IEXPONENTIAL
+ 2961            0e0      CV_LL
+ 2962            0e0      CV_LR
  2963            0e0      CS_RL
  2964            0e0      CS_RR
  2965            0e0      CV_RL
  2966            0e0      CV_RR
  2967            0e0      CS_LL
  2968            0e0      CS_LR
- 2969            1e0      MNUR
+ 2969            0e0      MNUR
+ 2970            1e0      ONOF_L_IB
+ 2971            0e0      ONOF_L_V
+ 2972            0e0      ONOF_L_A
+ 2973            0e0      ONOF_R_IB
+ 2974            0e0      ONOF_R_V
+ 2975            0e0      ONOF_R_A
+ 2976            0e0      OFF_PHOT
 ********************************************************************************
 EndX

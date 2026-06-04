@@ -222,7 +222,7 @@ C--   Second order - double photon switch
       ISEC=.TRUE.
       IF (ISINGLE.EQ.1) THEN
          ISEC=.FALSE.
-         xphcut=10.0/1777.0  *0.5 ! check .5 zbw
+         xphcut=0.01 D0 ! 10 MeV in tau rest frame
       ENDIF
 C--   Third/fourth order - triple (or quatric) photon switch, 
 C--                        see dipswitch ifour

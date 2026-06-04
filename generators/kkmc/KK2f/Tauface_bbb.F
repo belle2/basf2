@@ -71,8 +71,12 @@ C initialization for 2 scalars
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0
         ELSEIF(INUM.EQ.99) THEN
-          PROB1(INUM)=0.4
-          PROB2(INUM)=0.1
+          PROB1(INUM)=0.3
+          PROB2(INUM)=0.3
+          AM2(INUM) =0.02
+          GAM2(INUM)=0.02
+          AM3(INUM) =0.01
+          GAM3(INUM)=0.01
         ELSE
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0

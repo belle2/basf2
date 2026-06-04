@@ -8,12 +8,12 @@
 
 extern "C" void pigamma_right_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho, const double& m_a1, const double& Gamma_a1,
 			       const double& CV_RL, const double& CV_RR, const double& CS_LL, const double& CS_LR, const double& MnuR,
-			       const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
+			       const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
 			       const double *ptau, const double *pnu, const double *ppi, const double *k, double &omega, double *hj);
 
 void pigamma_right_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho, const double& m_a1, const double& Gamma_a1,
 		    const double& CV_RL, const double& CV_RR, const double& CS_LL, const double& CS_LR, const double& MnuR,
-		    const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
+		    const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
 		    const double* ptau, const double* pnu, const double* ppi, const double* k, double& omega, double* hj)
 {
   // Physical constants

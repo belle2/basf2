@@ -37,7 +37,8 @@ BeginX
  2909            0e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
  2910            0e0      TauToElOrMu = 1: swap e/mu decay for alternate events
 ********************************************************************************
- 2951            1e0      ISINGLE
+ 2951            0e0      ISINGLE
+ 2952            0e0      IEXPONENTIAL
  2961            0e0      CV_LL
  2962            0e0      CV_LR
  2963            0e0      CS_RL
@@ -53,5 +54,6 @@ BeginX
  2973            0e0      ONOF_R_IB
  2974            0e0      ONOF_R_V
  2975            0e0      ONOF_R_A
+ 2976            0e0      OFF_PHOT
 ********************************************************************************
 EndX

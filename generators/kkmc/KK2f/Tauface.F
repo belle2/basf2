@@ -141,10 +141,9 @@ C
       INTEGER             ISINGLE,IEXPONENTIAL
 C
       COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
-     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_R_IB,ONOF_R_V,ONOF_R_A
-      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
-     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_R_IB,ONOF_R_V,ONOF_R_A
-
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_R_IB,ONOF_R_V,ONOF_R_A,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_R_IB,ONOF_R_V,ONOF_R_A,OFF_PHOT
 C
       SAVE
 C-------------------------------------------------------------------------------
@@ -231,12 +230,13 @@ C     Print optional flags
       CS_LR = XPAR(ITAUXPAR+968)
       MNURD = XPAR(ITAUXPAR+969)
 
-      ONOF_L_IB = XPAR(ITAUXPAR+970)
-      ONOF_L_V  = XPAR(ITAUXPAR+971)
-      ONOF_L_A  = XPAR(ITAUXPAR+972)
-      ONOF_R_IB = XPAR(ITAUXPAR+973)
-      ONOF_R_V  = XPAR(ITAUXPAR+974)
-      ONOF_R_A  = XPAR(ITAUXPAR+975)
+      ONOF_L_IB = INT(XPAR(ITAUXPAR+970))
+      ONOF_L_V  = INT(XPAR(ITAUXPAR+971))
+      ONOF_L_A  = INT(XPAR(ITAUXPAR+972))
+      ONOF_R_IB = INT(XPAR(ITAUXPAR+973))
+      ONOF_R_V  = INT(XPAR(ITAUXPAR+974))
+      ONOF_R_A  = INT(XPAR(ITAUXPAR+975))
+      OFF_PHOT  = INT(XPAR(ITAUXPAR+976))
 
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)

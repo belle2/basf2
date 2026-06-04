@@ -8,13 +8,13 @@
 
 extern "C" void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 			      const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
-			      const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
+			      const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
 			      const double *ptau, const double *pnu, const double *ppi, const double *k, double &omega, double *hj);
 
 
 void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 		   const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
-		   const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
+		   const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
 		   const double* ptau, const double* pnu, const double* ppi, const double* k, double& omega, double* hj)
 {
 

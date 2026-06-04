@@ -123,6 +123,7 @@ def add_simulation(
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
+        ignoreRunNumberForBG=False,
         save_slow_pions_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
@@ -134,6 +135,8 @@ def add_simulation(
     @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
         Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
+      process and the beam background files. Note that this check should be skipped only by experts.
+    @param ignoreRunNumberForBG: If True, skip the check on the run number consistency between the basf2
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
@@ -150,6 +153,7 @@ def add_simulation(
             bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             bkginput.param('skipExperimentCheck', skipExperimentCheckForBG)
+            bkginput.param('ignoreRunNumbers', ignoreRunNumberForBG)
             path.add_module(bkginput)
         else:
             bkgmixer = b2.register_module('BeamBkgMixer')

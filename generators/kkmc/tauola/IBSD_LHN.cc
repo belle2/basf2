@@ -5,23 +5,25 @@
 #include <cmath>
 #include <complex>
 
-extern "C" void pigamma_left_(const double& Mtau, const double& Mpi,const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
+extern "C" void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 			      const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
+			      const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
 			      const double *ptau, const double *pnu, const double *ppi, const double *k, double &omega, double *hj);
 
 
-void pigamma_left_(const double& Mtau, const double& Mpi,const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
+void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 		   const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
+		   const double& ONOF_IB, const double& ONOF_V, const double& ONOF_A,
 		   const double* ptau, const double* pnu, const double* ppi, const double* k, double& omega, double* hj)
 {
 
   // Physical constants
-  // const double Mtau  = 1.777;
-  // const double Mpi   = 0.139568;
-  // const double m_rho = 0.7749; // PRD 78, 2008, 072006
-  // const double Gamma_rho = 0.1486;
-  // const double m_a1 = 1.251;
-  // const double Gamma_a1 = 0.599;
+  const double Mtau  = 1.77693; // PDG
+  const double Mpi   = 0.139568; // PDG
+  const double m_rho = 0.7749; // Belle, PRD 78, 2008, 072006
+  const double Gamma_rho = 0.1486;
+  const double m_a1 = 1.23;  // COMPASS Phys.Rev.D 98 (2018) 9, 092003
+  const double Gamma_a1 = 0.38;
   const double M_Borel = 3.35; // arXiv:2010.00549 [hep-ph]
   const double M_u = 2.16e-3;    // Mass of up quark in GeV
   const double M_d = 4.67e-3;    // Mass of down quark in GeV
@@ -208,6 +210,14 @@ void pigamma_left_(const double& Mtau, const double& Mpi,const double& m_rho, co
     
     h6[j] = ((-2.0 * f_pi * re_ia * Mtau) / (PkPpi * PkPtau * omega_6)) * (p1[j] + p2[j] + p3[j]);
   }
+
+  // Turn on or off
+  omega_1*=ONOF_IB;
+  omega_2*=ONOF_V;
+  omega_3*=ONOF_A;
+  omega_4*=ONOF_V*ONOF_A;
+  omega_5*=ONOF_IB*ONOF_V;
+  omega_6*=ONOF_IB*ONOF_A;
   
   // Sum total amplitude
   omega = omega_1 + omega_2 + omega_3 + omega_4 + omega_5 + omega_6;
@@ -216,6 +226,8 @@ void pigamma_left_(const double& Mtau, const double& Mpi,const double& m_rho, co
     hj[j] = (omega_1*h1[j] + omega_2*h2[j] + omega_3*h3[j] + omega_4*h4[j] + omega_5*h5[j] + omega_6*h6[j] ) / omega;
   }
 
-  
+  const double E_cut=0.01;// 10 MeV in tau rest frame
+  if(k[3]<E_cut) omega=0.0;
+
   return;
 }

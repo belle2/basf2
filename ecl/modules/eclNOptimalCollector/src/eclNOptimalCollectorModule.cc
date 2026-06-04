@@ -17,9 +17,13 @@
 /* Basf2 headers. */
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 /* ROOT headers. */
 #include <TH2F.h>
+#include <Math/Vector3D.h>
+#include <Math/VectorUtil.h>
 
 /* C++ headers. */
 #include <iostream>
@@ -82,6 +86,8 @@ void eclNOptimalCollectorModule::prepare()
   m_eclClusterArray.isRequired("ECLClusters");
   m_eclCalDigitArray.isRequired(m_digitArrayName);
   m_mcParticleArray.isRequired();
+  m_eventLevelClusteringInfo.isRequired();
+  m_eventLevelTriggerTimeInfo.isRequired();
 
   //--------------------------------------------------------
   //..Sort the crystals into groups of similar performance
@@ -160,6 +166,7 @@ void eclNOptimalCollectorModule::prepare()
                                           ECLElementNumbers::c_NCrystals, 1, 8737);
   registerObject<TH1F>("groupNumberOfEachCellID", groupNumberOfEachCellID);
 
+
   //-----------------------------------------------------------------
   //..Histograms to check MC sample properties
   auto entriesPerThetaIdEnergy = new TH2F("entriesPerThetaIdEnergy", "Entries per thetaID/energy point;thetaID;energy point", 69, 0,
@@ -170,6 +177,25 @@ void eclNOptimalCollectorModule::prepare()
                                m_numberEnergies, 0, m_numberEnergies);
   mcEnergyDiff->Sumw2();
   registerObject<TH2F>("mcEnergyDiff", mcEnergyDiff);
+
+  //..Criteria to clean the sample
+  auto eMCOverEGenerated = new TH1D("eMCOverEGenerated", "MC energy of cluster divided by generated;ratio", 101, 0, 1.01);
+  registerObject<TH1D>("eMCOverEGenerated", eMCOverEGenerated);
+
+  auto clusterTime = new TH1D("clusterTime", "clusterTiming of matched clusters;clusterTiming (ns)", 2048, -1000, 1000);
+  registerObject<TH1D>("clusterTime", clusterTime);
+
+  auto angularDiff = new TH1D("angularDiff",
+                              "angular difference between generated photon and cluster;angular difference (rad);photons per 0.01", 300, 0, 0.3);
+  registerObject<TH1D>("angularDiff", angularDiff);
+
+  auto nOutOfTimeCrystals = new TH1D("nOutOfTimeCrystals", "Out-of-time crystals in single particle MC;Out of time crystals", 2000, 0,
+                                     2000);
+  registerObject<TH1D>("nOutOfTimeCrystals", nOutOfTimeCrystals);
+
+  auto timeSinceInjection = new TH1D("timeSinceInjection",
+                                     "Time since injection in single particle MC;time (micro seconds);events per 10 us", 8000, 0, 80000);
+  registerObject<TH1D>("timeSinceInjection", timeSinceInjection);
 
 
   //-----------------------------------------------------------------
@@ -197,6 +223,9 @@ void eclNOptimalCollectorModule::prepare()
       registerObject<TH2F>(name, biasSum[iHist]);
     }
   }
+
+  B2INFO("Finished setup for eclNOptimalCollectorModule");
+
 }
 
 /**----------------------------------------------------------------------------------------*/
@@ -264,13 +293,22 @@ void eclNOptimalCollectorModule::collect()
   if (iMax == -1) {return;}
 
   //--------------------------------------------------------
-  //..Get cellID from related cluster
+  //..Get cellID from related cluster. Also store clusterTiming and angles,
+  //  used later to clean the sample.
   int iCellId = -1;
+  double timing = -1000.;
+  double thetaLab = 0.;
+  double phiLab = 0.;
+  double rLab = 999.;
   const auto showerClusterRelations = m_eclShowerArray[iMax]->getRelationsWith<ECLCluster>();
   const unsigned int nRelatedClusters = showerClusterRelations.size();
   if (nRelatedClusters > 0) {
     const auto cluster = showerClusterRelations.object(0);
     iCellId = cluster->getMaxECellId();
+    timing = cluster->getTime();
+    thetaLab = cluster->getTheta();
+    phiLab = cluster->getPhi();
+    rLab = cluster->getR();
   }
 
   //..Quit if cellID is not in the range being calibrated
@@ -318,6 +356,7 @@ void eclNOptimalCollectorModule::collect()
   getObjectPtr<TH2F>("entriesPerThetaIdEnergy")->Fill(thetaIDofCrysID[iCellId - 1] + 0.001, iEnergy + 0.001);
   getObjectPtr<TH2F>("mcEnergyDiff")->Fill(thetaIDofCrysID[iCellId - 1] + 0.001, iEnergy + 0.001, minDiff);
 
+
   //--------------------------------------------------------
   //..Get the ECLCalDigits and weights associated with the cluster,
   //  plus MC true energy
@@ -326,6 +365,7 @@ void eclNOptimalCollectorModule::collect()
 
   const auto showerDigitRelations = m_eclShowerArray[iMax]->getRelationsWith<ECLCalDigit>(m_digitArrayName);
   unsigned int nRelatedDigits = showerDigitRelations.size();
+  double eMCTotal = 0.;
   for (unsigned int ir = 0; ir < nRelatedDigits; ir++) {
     const auto calDigit = showerDigitRelations.object(ir);
     const auto weight = showerDigitRelations.weight(ir);
@@ -340,10 +380,49 @@ void eclNOptimalCollectorModule::collect()
     }
     std::pair<double, double> pTemp = std::make_pair(eCalDigit, eMC);
     energies.push_back(pTemp);
+    eMCTotal += eMC;
   }
 
   //..Sort digit and mc energies from lowest to highest
   std::sort(energies.begin(), energies.end());
+
+
+  //--------------------------------------------------------
+  //..Clean up the sample
+
+  //..True energy content of cluster must be >15% of generated
+  getObjectPtr<TH1D>("eMCOverEGenerated")->Fill(eMCTotal / eTrue);
+  const double minTrueFrac = 0.15;
+  if (eMCTotal < minTrueFrac * eTrue) {return;}
+
+  //..Standard timing cut
+  getObjectPtr<TH1D>("clusterTime")->Fill(timing);
+  const double maxClusterTiming = 200.;
+  if (abs(timing) > maxClusterTiming) {return;}
+
+  //..Direction (3 momentum) of the generated photon
+  ROOT::Math::XYZVector momentumGen = m_mcParticleArray[0]->getMomentum();
+
+  //..Make the cluster vector from the vertex and the postition in the ECL
+  ROOT::Math::XYZVector vertex = m_mcParticleArray[0]->getProductionVertex();
+  ROOT::Math::Polar3DVector position(rLab, thetaLab, phiLab);
+  ROOT::Math::XYZVector direction = ROOT::Math::XYZVector(position) - vertex;
+
+  double angle = ROOT::Math::VectorUtil::Angle(direction, momentumGen);
+  getObjectPtr<TH1D>("angularDiff")->Fill(angle);
+  const double maxAngularDiff = 0.09;
+  if (angle > maxAngularDiff) {return;}
+
+  //..Out of time crystals.
+  double OutOfTime = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
+  getObjectPtr<TH1D>("nOutOfTimeCrystals")->Fill(OutOfTime);
+  const double maxOutOfTime = 900.;
+  if (OutOfTime > maxOutOfTime) {return;}
+
+  //..Time since injection to monitor background reuse
+  double timeSinceInjectionMicroS = m_eventLevelTriggerTimeInfo->getTimeSinceLastInjectionInMicroSeconds();
+  getObjectPtr<TH1D>("timeSinceInjection")->Fill(timeSinceInjectionMicroS);
+
 
   //--------------------------------------------------------
   //..Store the energy sum of 1, 2, ..., n crystals (max 21), and corresponding bias

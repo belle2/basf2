@@ -1,3 +1,4 @@
+#include <TDatabasePDG.h>
 #include <math.h>
 #include <cstdlib>
 #include <cstdio>
@@ -16,15 +17,23 @@ void pigamma_right_(//const double& Mtau, const double& Mpi, const double& m_rho
 		    const double* ptau, const double* pnu, const double* ppi, const double* k, double& omega, double* hj)
 {
   // Physical constants
-  const double Mtau  = 1.77693; // PDG
-  const double Mpi   = 0.139568; // PDG
-  const double m_rho = 0.7749; // Belle, PRD 78, 2008, 072006
-  const double Gamma_rho = 0.1486;
-  const double m_a1 = 1.23;  // COMPASS Phys.Rev.D 98 (2018) 9, 092003
-  const double Gamma_a1 = 0.38;
+  //const double Mtau  = 1.77693; // PDG
+  const double Mtau = TDatabasePDG::Instance()->GetParticle("tau+")->Mass();
+  //const double Mpi   = 0.139568; // PDG
+  const double Mpi = TDatabasePDG::Instance()->GetParticle("pi+")->Mass();
+  //const double m_rho = 0.7749; // Belle, PRD 78, 2008, 072006
+  const double m_rho = TDatabasePDG::Instance()->GetParticle("rho+")->Mass();
+  //const double Gamma_rho = 0.1486;
+  const double Gamma_rho = TDatabasePDG::Instance()->GetParticle("rho+")->Width();
+  //const double m_a1 = 1.23;  // COMPASS Phys.Rev.D 98 (2018) 9, 092003
+  const double m_a1 = TDatabasePDG::Instance()->GetParticle("a_1+")->Mass();
+  //const double Gamma_a1 = 0.38;
+  const double Gamma_a1 = TDatabasePDG::Instance()->GetParticle("a_1+")->Width();
+  //const double M_u = 2.16e-3;    // Mass of up quark in GeV
+  const double M_u = TDatabasePDG::Instance()->GetParticle("u")->Mass();
+  //const double M_d = 4.67e-3;    // Mass of down quark in GeV
+  const double M_d = TDatabasePDG::Instance()->GetParticle("d")->Mass();
   const double M_Borel = 3.35; // arXiv:2010.00549 [hep-ph]
-  const double M_u = 2.16e-3;    // Mass of up quark in GeV
-  const double M_d = 4.67e-3;    // Mass of down quark in GeV
   const double f_pi  = 0.092;
 
   // Wilson coefficients (real as requested)

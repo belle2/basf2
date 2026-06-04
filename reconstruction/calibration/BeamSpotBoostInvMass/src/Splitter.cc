@@ -261,8 +261,11 @@ namespace Belle2 {
     int nFound = 0;
     for (auto r : runs) { //Linear search over runs
       if (r.second.first <= t && t < r.second.second) {
-        rFound = r.first;
         ++nFound;
+        if (nFound == 2
+            && rFound.run == r.first.run - 1) // to fix corner case when a time is seen in two consecutive runs due to float rounding errors
+          --nFound;
+        rFound = r.first;
       }
     }
 

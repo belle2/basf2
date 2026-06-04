@@ -16,7 +16,7 @@ b2.set_random_seed(12345)
 b2.set_log_level(b2.LogLevel.INFO)
 
 # identifier for this run
-tag = "112_261"
+tag = "261_303"
 
 # main path
 main = b2.create_path()

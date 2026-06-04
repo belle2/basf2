@@ -1984,7 +1984,7 @@ C cleo knew nothing about channels recently introduced
         IF (JNPI.LE.2) THEN
 C         11.Oct.11: fix for BINP and KARLSRUHE currents added
           WTMAX(JNPI) = PKORB(3,37+JNPI)
-          NTRIALS = 50000
+          NTRIALS = 20000
         END IF
         IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
           NTRIALS = 50000

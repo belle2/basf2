@@ -2123,7 +2123,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
 
         auto func = [var, indexString](const Particle * particle) -> double {
-          // First get the partcile index. If not int, evaluate the variable
+          // First get the particle index. If not int, evaluate the variable
           int particleNumber = 0;
           try
           {
@@ -2136,7 +2136,7 @@ namespace Belle2 {
           }
 
           StoreArray<MCParticle> mcParticles("MCParticles");
-          if (particleNumber >= mcParticles.getEntries())
+          if (particleNumber < 0 or particleNumber >= mcParticles.getEntries())
           {
             return Const::doubleNaN;
           }

@@ -172,7 +172,7 @@ TEST(TrackingUtilitiesTest, geometry_GeneralizedCircle_intersections)
 {
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(ROOT::Math::XYVector(1.0, 1.0), 1);
-  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), VectorUtil::unit(-ROOT::Math::XYVector(1.0, 1.0)));
+  GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), -VectorUtil::unit(ROOT::Math::XYVector(1.0, 1.0)));
 
   std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> intersections = circle.intersections(line);
 

@@ -100,7 +100,7 @@ void GeneralizedCircle::setPerigeeParameters(const double curvature,
                                              const double impact)
 {
   double loc_n0 = impact * (impact * curvature / 2.0 + 1.0);
-  ROOT::Math::XYVector loc_n12 = VectorUtil::Orthogonal(-tangential) * (1 + curvature * impact);
+  ROOT::Math::XYVector loc_n12 = -VectorUtil::Orthogonal(tangential) * (1 + curvature * impact);
   double loc_n3 = curvature / 2.0;
   setN(loc_n0, loc_n12, loc_n3);
 }
@@ -351,7 +351,7 @@ ROOT::Math::XYVector GeneralizedCircle::atArcLength(const double arcLength) cons
 
   double atX = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   double atY = -arcLength * sinc(chi);
-  return VectorUtil::compose(VectorUtil::unit(-n12()), atX, atY);
+  return VectorUtil::compose(-VectorUtil::unit(n12()), atX, atY);
 }
 
 std::ostream& TrackingUtilities::operator<<(std::ostream& output, const GeneralizedCircle& circle)

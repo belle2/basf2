@@ -40,8 +40,8 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  const ROOT::Math::XYZVector& position = ROOT::Math::XYZVector(firstMeasurement.getPos());
-  const ROOT::Math::XYZVector& momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
+  const ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 

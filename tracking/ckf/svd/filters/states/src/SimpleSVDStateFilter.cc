@@ -59,8 +59,8 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  const ROOT::Math::XYZVector& position = ROOT::Math::XYZVector(firstMeasurement.getPos());
-  const ROOT::Math::XYZVector& momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
+  const ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
 
   const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
 

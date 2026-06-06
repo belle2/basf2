@@ -241,6 +241,29 @@ void DQMHistAnalysisTRGModule::initialize()
   //mumu2trk_over_bhabha_trk_ecl
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_trk_ecl", "mumu2trk_over_bhabha_trk_ecl");
 
+  //mumu_tight_over_bhabha_all
+  registerEpicsPV(m_pvPrefix + "mumu_tight_over_bhabha_all", "mumu_tight_over_bhabha_all");
+
+  //gammagamma_over_bhabha_all
+  registerEpicsPV(m_pvPrefix + "gammagamma_over_bhabha_all", "gammagamma_over_bhabha_all");
+
+  //tautau2trk_over_bhabha_all
+  registerEpicsPV(m_pvPrefix + "tautau2trk_over_bhabha_all", "tautau2trk_over_bhabha_all");
+
+  //hadron_over_bhabha_all
+  registerEpicsPV(m_pvPrefix + "hadron_over_bhabha_all", "hadron_over_bhabha_all");
+
+  //mumu_tight_over_bhabha_trk_ecl
+  registerEpicsPV(m_pvPrefix + "mumu_tight_over_bhabha_trk_ecl", "mumu_tight_over_bhabha_trk_ecl");
+
+  //gammagamma_over_bhabha_trk_ecl
+  registerEpicsPV(m_pvPrefix + "gammagamma_over_bhabha_trk_ecl", "gammagamma_over_bhabha_trk_ecl");
+
+  //tautau2trk_over_bhabha_trk_ecl
+  registerEpicsPV(m_pvPrefix + "tautau2trk_over_bhabha_trk_ecl", "tautau2trk_over_bhabha_trk_ecl");
+
+  //hadron_over_bhabha_trk_ecl
+  registerEpicsPV(m_pvPrefix + "hadron_over_bhabha_trk_ecl", "hadron_over_bhabha_trk_ecl");
 }
 
 void DQMHistAnalysisTRGModule::beginRun()

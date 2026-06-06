@@ -35,8 +35,8 @@ def stdXi(fitter="TreeFit", addSuffix=False, path=None):
 
     B2WARNING(
         "stdXi is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
@@ -142,8 +142,8 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
 
     B2WARNING(
         "stdXi0 is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
@@ -232,8 +232,8 @@ def stdOmega(fitter="TreeFit", addSuffix=False, path=None):
 
     B2WARNING(
         "stdOmega is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
@@ -328,8 +328,8 @@ def goodXi(xitype='loose', path=None):
 
     B2WARNING(
         "goodXi is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
@@ -386,8 +386,8 @@ def goodXi0(xitype='loose', path=None):
 
     B2WARNING(
         "goodXi0 is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 
@@ -448,8 +448,8 @@ def goodOmega(omegatype='loose', path=None):
 
     B2WARNING(
         "goodOmega is deprecated and will be removed at the end of 2026. "
-        "Please update your analysis accordingly. "
-        "To provide feedback on the removal, see "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
         "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
     )
 

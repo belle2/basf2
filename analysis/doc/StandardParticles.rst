@@ -93,6 +93,13 @@ Other functions available
    :members:
    :undoc-members:
 
+.. deprecated:: light-2604-jellyfish
+        All functions in ``stdHyperons`` (`stdXi`, `stdXi0`, `stdOmega`, `goodXi`, `goodXi0`,
+        `goodOmega`) are deprecated and will be removed at the end of 2026.
+        Please replace them with a custom hyperon reconstruction and selection optimised for
+        your specific analysis. To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
+
 .. automodule:: stdHyperons
    :members:
    :undoc-members:

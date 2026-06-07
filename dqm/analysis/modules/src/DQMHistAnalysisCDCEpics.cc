@@ -80,7 +80,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
     m_fileRefPhi = TFile::Open(m_fname_refphi.data(), "READ");
     if (m_fileRefPhi && m_fileRefPhi->IsOpen()) {
       B2INFO("DQMHistAnalysisCDCEpics: reference (" << m_fname_refphi << ") found OK");
-      m_histref_phiindex = (TH2F*)m_fileRefPhi->Get((m_name_refdir + "/hPhiIndex").data());
+      m_histref_phiindex = static_cast<TH2F*>(m_fileRefPhi->Get((m_name_refdir + "/hPhiIndex").data()));
       if (!m_histref_phiindex)B2INFO("\t .. but (histogram) not found");
       else B2INFO("\t ..and (cdcdqm_phiref) also exist");
     }
@@ -112,10 +112,10 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
                                                   "hist_attachedWires (backplate view);X [cm];Y [cm]; Track / bin");
     m_hist_attach_eff_Poly[0]->GetYaxis()->SetTitleOffset(1.4);
     m_hist_attach_eff_Poly[0]->SetDirectory(gDirectory);
-    m_hist_attach_eff_Poly[1] = (TH2Poly*)m_hist_attach_eff_Poly[0]->Clone();
+    m_hist_attach_eff_Poly[1] = static_cast<TH2Poly*>(m_hist_attach_eff_Poly[0]->Clone());
     m_hist_attach_eff_Poly[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires (backplate view);X [cm];Y [cm]; Track / bin");
     m_hist_attach_eff_Poly[1]->SetDirectory(gDirectory);
-    m_hist_attach_eff_Poly[2] = (TH2Poly*)m_hist_attach_eff_Poly[0]->Clone();
+    m_hist_attach_eff_Poly[2] = static_cast<TH2Poly*>(m_hist_attach_eff_Poly[0]->Clone());
     m_hist_attach_eff_Poly[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff (backplate view);X [cm];Y [cm]; Efficiency");
     m_hist_attach_eff_Poly[2]->SetDirectory(gDirectory);
   } else {
@@ -126,9 +126,9 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
                                     nSLayers * 6, -maxLayerR * 1.02, maxLayerR * 1.02,
                                     nSLayers * 6, -maxLayerR * 1.02, maxLayerR * 1.02);
     m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
-    m_hist_attach_eff[1] = (TH2F*)m_hist_attach_eff[0]->Clone();
+    m_hist_attach_eff[1] = static_cast<TH2F*>(m_hist_attach_eff[0]->Clone());
     m_hist_attach_eff[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires (backplate view);X [cm];Y [cm]; Track / bin");
-    m_hist_attach_eff[2] = (TH2F*)m_hist_attach_eff[0]->Clone();
+    m_hist_attach_eff[2] = static_cast<TH2F*>(m_hist_attach_eff[0]->Clone());
     m_hist_attach_eff[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff (backplate view);X [cm];Y [cm]; Efficiency");
   }
   m_hist_wire_attach_eff_1d = new TH1F("CDC/hist_wire_attach_eff_1d", "hist_wire_attach_eff_1d;Wire Efficiency;Wire / bin",
@@ -253,7 +253,7 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
 void DQMHistAnalysisCDCEpicsModule::event()
 {
   //1. get adc median vs layer numbers
-  auto m_delta_ladc = (TH2F*)getDelta(m_name_dir, m_hname_ladc, 0, true);
+  auto m_delta_ladc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_ladc, 0, true));
   if (m_delta_ladc) {
     m_histmd_ladc->Reset();
     for (unsigned il = 0; il < kNumLayers; ++il) {
@@ -267,14 +267,19 @@ void DQMHistAnalysisCDCEpicsModule::event()
     // Draw canvas
     m_canv_md_ladc->Clear();
     m_canv_md_ladc->cd();
-    double y_max = m_histmd_ladc->GetMaximum();
-    if (!std::isfinite(y_max) || y_max <= 0 || y_max > 1e3)y_max = 1;
+    double y_max = 0;
+    for (int ib = 1; ib <= m_histmd_ladc->GetNbinsX(); ib++) {
+      double val = m_histmd_ladc->GetBinContent(ib);
+      if (std::isfinite(val) && val > y_max) y_max = val;
+    }
+    if (y_max <= 0) y_max = 1;
+    m_histmd_ladc->SetMaximum(y_max * 1.20);
     m_histmd_ladc->SetFillColor(kYellow);
     m_histmd_ladc->SetMinimum(0);
-    m_histmd_ladc->SetMaximum(y_max * 1.20);
     m_histmd_ladc->Draw("hist");
     for (auto* line : m_lines) {
-      line->SetY2(y_max * 1.20);
+      line->SetY1(0);
+      line->SetY2(y_max);
       line->Draw("same");
     }
     m_canv_md_ladc->Update();
@@ -282,7 +287,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //2. get adc medians vs board ID
-  auto m_delta_adc = (TH2F*)getDelta(m_name_dir, m_hname_badc, 0, true); //true=only if updated
+  auto m_delta_adc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_badc, 0, true)); //true=only if updated
   if (m_delta_adc) {
     m_hist_adc->Reset();
     int cadcgood = 0;
@@ -320,7 +325,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //3. get tdc medians vs board ID
-  auto m_delta_tdc = (TH2F*)getDelta(m_name_dir, m_hname_btdc, 0, true);
+  auto m_delta_tdc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_btdc, 0, true));
   if (m_delta_tdc) {
     m_hist_tdc->Reset();
     int ctdcgood = 0;
@@ -357,7 +362,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get phi plots for various options
-  auto m_delta_skimphi = (TH2F*)getDelta(m_name_dir, m_hname_idxphi, 0, true); //true=only if updated
+  auto m_delta_skimphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_idxphi, 0, true)); //true=only if updated
   if (m_delta_skimphi) {
     TString sip[2] = {"OffIP", "IP"};
     TString sname[4] = {"all", "bhabha", "hadron", "mumutrk"};
@@ -383,8 +388,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_canv_crphi->Clear();
     bool isFew = false, isAlarm = false, isWarn = false;
     m_hist_crphi = m_delta_skimphi->ProjectionX("histphi_ip_hadrons", 7, 7, "");
-    m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
     if (m_hist_crphi) {
+      m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
       double maxnow = m_hist_crphi->Integral();
       if (maxnow > 0)m_hist_crphi->Scale(1.0 / maxnow);
       if (maxnow < 10000) {
@@ -440,7 +445,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get tracking efficiency
-  auto m_delta_effphi = (TH2F*)getDelta(m_name_dir, m_hname_effphi, 0, true); //true=only if updated
+  auto m_delta_effphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_effphi, 0, true)); //true=only if updated
   if (m_delta_effphi) {
     m_canv_effphi->Clear();
     double eff = -1;
@@ -448,7 +453,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     const int all_hitbins = m_delta_effphi->GetNbinsY();
     const int thr_hitbin = m_delta_effphi->GetYaxis()->FindBin(20);//min hits bin
     for (int iphi = 0; iphi < all_phibins; iphi++) {
-      TH1D* temp = (TH1D*)m_delta_effphi->ProjectionY(Form("hhits_bin_%d", iphi + 1), iphi + 1, iphi + 1, "");
+      TH1D* temp = static_cast<TH1D*>(m_delta_effphi->ProjectionY(Form("hhits_bin_%d", iphi + 1), iphi + 1, iphi + 1, ""));
       Double_t num = temp->Integral(thr_hitbin, all_hitbins);
       Double_t den = temp->Integral();
       if (den > 0)eff = num * 100.0 / den;
@@ -468,7 +473,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get cdc hits vs phi
-  auto m_delta_hitphi = (TH2F*)getDelta(m_name_dir, m_hname_hitsphi, 0, true); //true=only if updated
+  auto m_delta_hitphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_hitsphi, 0, true)); //true=only if updated
   if (m_delta_hitphi) {
     m_canv_hitsphi->Clear();
     m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
@@ -484,7 +489,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   double fracWiresWithLowAttachProb = 0;
   double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
-  auto m_delta_efflay = (TH2F*)getDelta(m_name_dir, m_histoTrackingWireEff, 0, true); //true=only if updated
+  auto m_delta_efflay = static_cast<TH2F*>(getDelta(m_name_dir, m_histoTrackingWireEff, 0, true)); //true=only if updated
   if (m_delta_efflay) {
     for (int ij = 0; ij < 4; ij++) m_canv_attach_eff[ij]->Clear();
     m_hist_wire_attach_eff_1d->Reset();
@@ -580,11 +585,11 @@ void DQMHistAnalysisCDCEpicsModule::terminate()
 
 
 //------------------------------------
-float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
+float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h)
 {
 
   if (!h) return 0.0;
-  TH1D* hist = (TH1D*)h->Clone();
+  TH1D* hist = static_cast<TH1D*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float median = 0.0;
   if (hist->Integral(1, hist->GetNbinsX()) > 0) {

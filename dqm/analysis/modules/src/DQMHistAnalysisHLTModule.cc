@@ -245,7 +245,7 @@ void DQMHistAnalysisHLTModule::event()
   }
 
   // Set the epicsPVs for HLT
-  auto hist_ProcessingTime = getDelta("timing_statistics", "processingTimeHistogram", 0, true);
+  auto hist_ProcessingTime = getDelta("timing_statistics", "processingTimeHistogram");
   double HLTProcessingTime = 0;
 
   if (hist_ProcessingTime) {
@@ -253,7 +253,7 @@ void DQMHistAnalysisHLTModule::event()
     setEpicsPV("ProcessingTime", HLTProcessingTime);
   }
 
-  auto hist_Procs = getDelta("timing_statistics", "processesPerUnitHistogram", 0, true);
+  auto hist_Procs = findHist("timing_statistics/processesPerUnitHistogram");
   double HLTBudgetTime = 0; // Number of HLT threads / L1 rate [kHz]
   double L1Rate = getEpicsPV("L1Rate");
 
@@ -263,7 +263,7 @@ void DQMHistAnalysisHLTModule::event()
     setEpicsPV("BudgetTime", HLTBudgetTime);
   }
 
-  if (HLTBudgetTime != 0)
+  if (HLTBudgetTime != 0 and hist_ProcessingTime)
     setEpicsPV("CPUUsage", HLTProcessingTime / HLTBudgetTime);
 
 

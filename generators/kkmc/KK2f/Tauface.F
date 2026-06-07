@@ -740,7 +740,7 @@ C
      *                 ,AMPIZ,AMPI,AMRO,GAMRO,AMA1,GAMA1
      *                 ,AMK,AMKZ,AMKST,GAMKST
       INTEGER           IRANGE
-      REAL              XRANGE,XRANGE1,XRANGE15,XRANGE2,XRANGE25,XRANGE3
+      REAL              XRANGE,XRANGE1,XRANGE15,XRANGE2,XRANGE25,XRANGE3,XRANGE4,XRANGE5
       REAL              QQBRWG
       EXTERNAL          QQBRWG
       REAL              AMALFA            ! mass
@@ -761,6 +761,10 @@ C
       IF (XRANGE25.GT.2.5) XRANGE25=2.5
       XRANGE3=XRANGE
       IF (XRANGE3.GT.3.0)  XRANGE3=3.0
+      XRANGE4=XRANGE
+      IF (XRANGE4.GT.4.0)  XRANGE4=4.0
+      XRANGE5=XRANGE
+      IF (XRANGE5.GT.5.0)  XRANGE5=5.0
 C
       IF      (IDENT.EQ. 1) THEN
         APKMAS=AMPI
@@ -823,7 +827,7 @@ C
       ELSEIF  (ABS(IDENT).EQ. 130) THEN
          APKMAS=AMKZ                      ! K0L
       ELSEIF  (ABS(IDENT).EQ. 313) THEN
-         APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*0(892)
+         APKMAS=QQBRWG(AMKST,GAMKST,XRANGE5)! K*0(892)
       ELSEIF  (ABS(IDENT).EQ. 3122) THEN
          APKMAS=1.115683                   ! Lambda
       ELSEIF  (ABS(IDENT).EQ.10211) THEN

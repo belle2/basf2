@@ -50,10 +50,10 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
 
   ROOT::Math::XYVector tangential = VectorUtil::average(fromTangential, toTangential);
 
-  double fromMiddleCos = VectorUtil::CosTheta(fromFacet->getStartToMiddleLine().tangential(), toTangential);
-  double toMiddleCos = VectorUtil::CosTheta(fromTangential, toFacet->getMiddleToEndLine().tangential());
+  double fromMiddleCos = VectorUtil::CosPhi(fromFacet->getStartToMiddleLine().tangential(), toTangential);
+  double toMiddleCos = VectorUtil::CosPhi(fromTangential, toFacet->getMiddleToEndLine().tangential());
 
-  var<named("cos_delta")>() = VectorUtil::CosTheta(fromTangential, toTangential);
+  var<named("cos_delta")>() = VectorUtil::CosPhi(fromTangential, toTangential);
 
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
@@ -70,7 +70,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);
     var<named("fit_0_phi0")>() = fitLine->tangential().Phi();
-    var<named("fit_0_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
+    var<named("fit_0_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   {
@@ -80,7 +80,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2_1")>() = fitLine.chi2();
     var<named("chi2_1_per_s")>() = fitLine.chi2() / s;
     var<named("fit_1_phi0")>() = fitLine->tangential().Phi();
-    var<named("fit_1_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
+    var<named("fit_1_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   {
@@ -89,7 +89,7 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     var<named("chi2")>() = fitLine.chi2();
     var<named("chi2_per_s")>() = fitLine.chi2() / s;
     var<named("fit_phi0")>() = fitLine->tangential().Phi();
-    var<named("fit_cos_delta")>() = VectorUtil::CosTheta(fitLine->tangential(), tangential);
+    var<named("fit_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   // Combination fit

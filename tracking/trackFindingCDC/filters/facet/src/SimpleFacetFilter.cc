@@ -49,9 +49,9 @@ Weight SimpleFacetFilter::operator()(const CDCFacet& facet)
   const ParameterLine2D& startToEnd = facet.getStartToEndLine();
   const ParameterLine2D& middleToEnd = facet.getMiddleToEndLine();
 
-  const double startCos  = VectorUtil::CosTheta(startToMiddle.tangential(), startToEnd.tangential());
-  // const double middleCos = VectorUtil::CosTheta(startToMiddle.tangential(), middleToEnd.tangential());
-  const double endCos = VectorUtil::CosTheta(startToEnd.tangential(), middleToEnd.tangential());
+  const double startCos  = VectorUtil::CosPhi(startToMiddle.tangential(), startToEnd.tangential());
+  // const double middleCos = VectorUtil::CosPhi(startToMiddle.tangential(), middleToEnd.tangential());
+  const double endCos = VectorUtil::CosPhi(startToEnd.tangential(), middleToEnd.tangential());
 
   // cut on the angle of
   if (startCos > m_param_deviationCosCut and endCos > m_param_deviationCosCut) {

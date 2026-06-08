@@ -73,9 +73,9 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const double startToEndLength = startToEndTangentialVector.R();
   const double middleToEndLength = middleToEndTangentialVector.R();
 
-  const double startCos = VectorUtil::CosTheta(startToMiddleTangentialVector, startToEndTangentialVector);
-  const double middleCos = VectorUtil::CosTheta(startToMiddleTangentialVector, middleToEndTangentialVector);
-  const double endCos = VectorUtil::CosTheta(startToEndTangentialVector, middleToEndTangentialVector);
+  const double startCos = VectorUtil::CosPhi(startToMiddleTangentialVector, startToEndTangentialVector);
+  const double middleCos = VectorUtil::CosPhi(startToMiddleTangentialVector, middleToEndTangentialVector);
+  const double endCos = VectorUtil::CosPhi(startToEndTangentialVector, middleToEndTangentialVector);
 
   const double startPhi = acos(startCos);
   const double middlePhi = acos(middleCos);

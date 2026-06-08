@@ -31,8 +31,8 @@ bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetR
   const ParameterLine2D& toStartToEnd   = toFacet.getStartToEndLine();
   const ParameterLine2D& toMiddleToEnd  = toFacet.getMiddleToEndLine();
 
-  const double fromMiddleCos = VectorUtil::CosTheta(fromStartToMiddle.tangential(), toStartToEnd.tangential());
-  const double toMiddleCos = VectorUtil::CosTheta(fromStartToEnd.tangential(), toMiddleToEnd.tangential());
+  const double fromMiddleCos = VectorUtil::CosPhi(fromStartToMiddle.tangential(), toStartToEnd.tangential());
+  const double toMiddleCos = VectorUtil::CosPhi(fromStartToEnd.tangential(), toMiddleToEnd.tangential());
 
   const double fromMiddlePhi = acos(fromMiddleCos);
   const double toMiddlePhi = acos(toMiddleCos);

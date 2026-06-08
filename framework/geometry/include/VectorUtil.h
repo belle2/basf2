@@ -104,8 +104,7 @@ namespace Belle2 {
      * (like v1 being cartesian and v2 being polar) and would only work for 3-vectors.
      * However, we also need a 2D version, thus, this custom implementation.
      */
-    template <class Vector>
-    double CosTheta(const Vector&  v1, const Vector& v2)
+    inline double CosPhi(const ROOT::Math::XYVector&  v1, const ROOT::Math::XYVector& v2)
     {
       const double v1_r2 = v1.Mag2();
       const double v2_r2 = v2.Mag2();

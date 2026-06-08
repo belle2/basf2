@@ -77,7 +77,7 @@ namespace Belle2 {
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
       double getCosFlightDifference(const CDCTangent& tangent) const
-      { return VectorUtil::CosTheta(getFlightVec2D(), tangent.getFlightVec2D()); }
+      { return VectorUtil::CosPhi(getFlightVec2D(), tangent.getFlightVec2D()); }
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position.
       CDCRecoHit2D getFromRecoHit2D() const;

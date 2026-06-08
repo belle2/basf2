@@ -24,9 +24,9 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
-#include <framework/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -108,7 +108,7 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
     for (CDCRecoHit2D& recoHit2D : segment) {
       ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
       ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
-      double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
+      double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit2D.getWire();
       const CDCHit* hit = recoHit2D.getWireHit().getHit();

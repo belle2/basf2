@@ -14,8 +14,7 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <framework/geometry/VectorUtil.h>
-
+#include <Math/VectorUtil.h>
 #include <Math/Vector2D.h>
 
 using namespace Belle2;
@@ -73,8 +72,8 @@ Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   ROOT::Math::XYVector fromMom2DAtToFront = fromFit.getFlightDirection2D(toFrontRecoPos2D);
   ROOT::Math::XYVector toMom2DAtFromBack = toFit.getFlightDirection2D(fromBackRecoPos2D);
 
-  double momAngleAtFromBack = VectorUtil::Angle(fromMom2DAtFromBack, toMom2DAtFromBack);
-  double momAngleAtToFront = VectorUtil::Angle(toMom2DAtToFront, fromMom2DAtToFront);
+  double momAngleAtFromBack = ROOT::Math::VectorUtil::DeltaPhi(fromMom2DAtFromBack, toMom2DAtFromBack);
+  double momAngleAtToFront = ROOT::Math::VectorUtil::DeltaPhi(toMom2DAtToFront, fromMom2DAtToFront);
 
   if (fabs(momAngleAtToFront) > 1.0 or fabs(momAngleAtFromBack) > 1.0) {
     return NAN;

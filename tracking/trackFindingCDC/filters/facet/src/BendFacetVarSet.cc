@@ -9,9 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <framework/geometry/VectorUtil.h>
-
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -66,9 +65,9 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double startToEndLength = startToEndTangentialVector.R();
   const double middleToEndLength = middleToEndTangentialVector.R();
 
-  const double startPhi = VectorUtil::Angle(startToMiddleTangentialVector, startToEndTangentialVector);
-  const double middlePhi = VectorUtil::Angle(startToMiddleTangentialVector, middleToEndTangentialVector);
-  const double endPhi = VectorUtil::Angle(startToEndTangentialVector, middleToEndTangentialVector);
+  const double startPhi = ROOT::Math::VectorUtil::DeltaPhi(startToMiddleTangentialVector, startToEndTangentialVector);
+  const double middlePhi = ROOT::Math::VectorUtil::DeltaPhi(startToMiddleTangentialVector, middleToEndTangentialVector);
+  const double endPhi = ROOT::Math::VectorUtil::DeltaPhi(startToEndTangentialVector, middleToEndTangentialVector);
 
   const double startToMiddleSigmaPhi = startDriftLengthSigma / startToMiddleLength;
   const double startToEndSigmaPhi = startDriftLengthSigma / startToEndLength;

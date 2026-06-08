@@ -34,6 +34,7 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -141,7 +142,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
     for (CDCRecoHit3D& recoHit3D : track) {
       ROOT::Math::XYVector recoPos2D = recoHit3D.getRecoPos2D();
       ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
-      double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
+      double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit3D.getWire();
       const bool rl = recoHit3D.getRLInfo() == ERightLeft::c_Right;

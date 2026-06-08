@@ -20,6 +20,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -322,7 +323,7 @@ namespace Belle2 {
       /// Getter for the direction of flight relative to the position
       double getAlpha() const
       {
-        return VectorUtil::Angle(getRecoPos2D(), getFlightDirection2D());
+        return ROOT::Math::VectorUtil::DeltaPhi(getRecoPos2D(), getFlightDirection2D());
       }
 
       /**

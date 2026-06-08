@@ -16,6 +16,7 @@
 #include <framework/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 #include <cmath>
 
@@ -189,7 +190,7 @@ namespace Belle2 {
       /// Calculates the angle between two points as seen from the center of the circle
       double openingAngle(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
-        return VectorUtil::Angle(gradient(from), gradient(to));
+        return ROOT::Math::VectorUtil::DeltaPhi(gradient(from), gradient(to));
       } // can be optimized in the number of computations
 
       /// Calculates the arc length between two points of closest approach on the circle.

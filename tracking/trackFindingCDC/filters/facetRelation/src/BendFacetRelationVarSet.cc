@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <framework/geometry/VectorUtil.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -66,9 +66,9 @@ bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRe
   // const double sBD = sBC + sCD;
 
   const double fromDeltaPhi =
-    VectorUtil::Angle(fromStartToMiddle.tangential(), fromStartToEnd.tangential());
+    ROOT::Math::VectorUtil::DeltaPhi(fromStartToMiddle.tangential(), fromStartToEnd.tangential());
   const double toDeltaPhi =
-    VectorUtil::Angle(toStartToMiddle.tangential(), toStartToEnd.tangential());
+    ROOT::Math::VectorUtil::DeltaPhi(toStartToMiddle.tangential(), toStartToEnd.tangential());
 
   const double deltaPhi = fromDeltaPhi - toDeltaPhi;
 

@@ -10,9 +10,8 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
-#include <framework/geometry/VectorUtil.h>
-
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -78,15 +77,15 @@ bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* p
   const ROOT::Math::XYVector fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
   const ROOT::Math::XYVector toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
 
-  const double deltaPosPhi = VectorUtil::Angle(fromFitPos, toFitPos);
-  const double deltaMomPhi = VectorUtil::Angle(fromFitMom, toFitMom);
+  const double deltaPosPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitPos, toFitPos);
+  const double deltaMomPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, toFitMom);
   const double deltaAlpha = AngleUtil::normalised(deltaMomPhi - deltaPosPhi);
 
   finitevar<named("delta_pos_phi")>() = deltaPosPhi;
   finitevar<named("delta_mom_phi")>() = deltaMomPhi;
 
-  finitevar<named("from_delta_mom_phi")>() = VectorUtil::Angle(fromFitMom, fromOtherFitMom);
-  finitevar<named("to_delta_mom_phi")>() = VectorUtil::Angle(toFitMom, toOtherFitMom);
+  finitevar<named("from_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, fromOtherFitMom);
+  finitevar<named("to_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(toFitMom, toOtherFitMom);
   finitevar<named("delta_alpha")>() = deltaAlpha;
 
   finitevar<named("arc_length_front_offset")>() =

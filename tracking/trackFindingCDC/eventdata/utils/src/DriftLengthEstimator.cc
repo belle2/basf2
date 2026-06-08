@@ -38,6 +38,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -64,7 +65,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 
   ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
   ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
-  double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
@@ -96,7 +97,7 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   const UncertainParameterLine2D& line = facet.getFitLine();
   ROOT::Math::XYVector flightDirection = line->tangential();
   ROOT::Math::XYVector centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
-  double alpha = VectorUtil::Angle(centralPos2D, flightDirection);
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(centralPos2D, flightDirection);
   if (not m_param_useAlphaInDriftLength) {
     alpha = 0;
   }
@@ -146,7 +147,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
   ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
   const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
   const ROOT::Math::XYVector& recoPos2D = VectorUtil::get2DVector(recoPos3D);
-  double alpha = VectorUtil::Angle(recoPos2D, flightDirection);
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 

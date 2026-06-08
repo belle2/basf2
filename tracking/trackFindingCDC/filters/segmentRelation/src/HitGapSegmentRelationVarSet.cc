@@ -52,8 +52,8 @@ bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* pt
   const ROOT::Math::XYVector fromLastHitMom = fromLastHit.getFlightDirection2D();
   const ROOT::Math::XYVector toFirstHitMom = toFirstHit.getFlightDirection2D();
 
-  finitevar<named("delta_hit_pos_phi")>() = VectorUtil::Angle(fromLastHitPos, toFirstHitPos);
-  finitevar<named("delta_hit_mom_phi")>() = VectorUtil::Angle(fromLastHitMom, toFirstHitMom);
+  finitevar<named("delta_hit_pos_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitPos, toFirstHitPos);
+  finitevar<named("delta_hit_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitMom, toFirstHitMom);
 
   double fromLastHitAlpha = fromLastHit.getAlpha();
   double toFirstHitAlpha = toFirstHit.getAlpha();

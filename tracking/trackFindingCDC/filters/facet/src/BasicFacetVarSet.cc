@@ -9,7 +9,7 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
-#include <framework/geometry/VectorUtil.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -69,7 +69,7 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   facet.adjustFitLine();
   UncertainParameterLine2D fitLine = facet.getFitLine();
-  double alpha = VectorUtil::Angle(fitLine->at(0.5), fitLine->tangential());
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(fitLine->at(0.5), fitLine->tangential());
   var<named("alpha")>() = alpha;
   return true;
 }

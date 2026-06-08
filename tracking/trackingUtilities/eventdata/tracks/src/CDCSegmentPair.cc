@@ -22,9 +22,9 @@
 #include  <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 #include <memory>
 #include <cmath>
@@ -146,7 +146,7 @@ double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
   const ROOT::Math::XYVector lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
   const ROOT::Math::XYVector firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
 
-  return VectorUtil::Angle(lastPos2D_fromSegment, firstPos2D_toSegment);
+  return ROOT::Math::VectorUtil::DeltaPhi(lastPos2D_fromSegment, firstPos2D_toSegment);
 }
 
 double CDCSegmentPair::computeFromIsBeforeToFitless() const
@@ -181,7 +181,7 @@ double CDCSegmentPair::computeFromIsBeforeToFitless() const
   ROOT::Math::XYVector firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
   ROOT::Math::XYVector firstToFirst = firstPos2D_toSegment - firstPos2D_fromSegment;
 
-  return VectorUtil::Angle(firstToLast_fromSegment, firstToFirst);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_fromSegment, firstToFirst);
 }
 
 double CDCSegmentPair::computeToIsAfterFromFitless() const
@@ -216,7 +216,7 @@ double CDCSegmentPair::computeToIsAfterFromFitless() const
   ROOT::Math::XYVector firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
   ROOT::Math::XYVector lastToLast = lastPos2D_toSegment - lastPos2D_fromSegment;
 
-  return VectorUtil::Angle(firstToLast_toSegment, lastToLast);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_toSegment, lastToLast);
 }
 
 double CDCSegmentPair::computeIsCoalignedFitless() const
@@ -254,7 +254,7 @@ double CDCSegmentPair::computeIsCoalignedFitless() const
   ROOT::Math::XYVector firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
   ROOT::Math::XYVector firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
 
-  return VectorUtil::Angle(firstToLast_fromSegment, firstToLast_toSegment);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_fromSegment, firstToLast_toSegment);
 }
 
 EForwardBackward CDCSegmentPair::isCoaligned(const CDCTrajectory2D& trajectory2D) const

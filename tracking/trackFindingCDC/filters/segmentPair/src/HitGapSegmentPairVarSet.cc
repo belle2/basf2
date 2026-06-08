@@ -17,6 +17,7 @@
 #include <framework/geometry/VectorUtil.h>
 
 #include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -56,8 +57,8 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const ROOT::Math::XYVector fromLastHitMom = fromLastHit.getFlightDirection2D();
   const ROOT::Math::XYVector toFirstHitMom = toFirstHit.getFlightDirection2D();
 
-  finitevar<named("delta_hit_pos_phi")>() = VectorUtil::Angle(fromLastHitPos, toFirstHitPos);
-  finitevar<named("delta_hit_mom_phi")>() = VectorUtil::Angle(fromLastHitMom, toFirstHitMom);
+  finitevar<named("delta_hit_pos_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitPos, toFirstHitPos);
+  finitevar<named("delta_hit_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitMom, toFirstHitMom);
 
   double fromLastHitAlpha = fromLastHit.getAlpha();
   double toFirstHitAlpha = toFirstHit.getAlpha();

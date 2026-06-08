@@ -1,9 +1,9 @@
 {
     "result_path": "output/",
     "process_type": "BBBAR",
-    "n_events_training": 100,
-    "n_events_testing": 100,
-    "n_events_per_task": 25,
+    "n_events_training": 5000,
+    "n_events_testing": 2500,
+    "n_events_per_task": 500,
     "n_events_test_on_data": -1,
     "workers": 400,
     "basf2_processes_per_worker": 0,

@@ -175,7 +175,7 @@ import tracking.root_utils as root_utils
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_mva_weightfile_content_to_db
 from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
-from basf2 import conditions
+# from basf2 import conditions
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -238,8 +238,7 @@ def my_basf2_mva_teacher(
     fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
 ):
 
-    conditions.testing_payloads = ['localdb/database.txt']  # this line of code is probably redundant
-
+    # conditions.testing_payloads = ['localdb/database.txt']  # this line of code is probably redundant
     """
     My custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
 

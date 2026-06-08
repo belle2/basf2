@@ -357,10 +357,10 @@ void ECLDigitizerModuleUp::makeElectronicNoiseAndPedestal(int J, int* FitA)
     for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 3000;
     return;
   }
-  float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
+  std::vector<float> z(ec.m_nsmp), AdcNoise(ec.m_nsmp); // buffers with electronic noise
   // Noise generation
   for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
-  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z, AdcNoise);
+  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z.data(), AdcNoise.data());
   for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = AdcNoise[i] + 3000;
 }
 

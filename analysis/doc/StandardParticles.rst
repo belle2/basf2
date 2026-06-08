@@ -17,17 +17,17 @@ Standard Particles
 
         These lists provide a common baseline; further selections should be optimised
         based on the requirements of each individual analysis.
-        Please refer to the
-        :ref:`b2help-recommendation` tool
-        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_)
+        Please refer to 
+        :ref:`b2help-recommendation` 
+        (`web version <https://belle2.pages.desy.de/performance/recommendations/>`_)
         for further guidance. To provide feedback on the removal, see
         `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
 .. warning::
         Some standard particle lists are outdated and no longer recommended for use.
-        Please refer to the
-        :ref:`b2help-recommendation` tool
-        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_)
+        Please refer to 
+        :ref:`b2help-recommendation` 
+        (`web version <https://belle2.pages.desy.de/performance/recommendations/>`_)
         for recommended selections and the latest updates on what to use.
 
 .. tip::

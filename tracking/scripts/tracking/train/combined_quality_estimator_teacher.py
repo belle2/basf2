@@ -638,7 +638,7 @@ class SplitNMergeSimTask(Basf2Task):
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
         print(f"args for merging: {args}")
         subprocess.check_call(args)
-        print("Finished merging. Now remove the input files to save space.")
+        print("Finished merging. Removing the input files to save space.")
         cmd2 = ["rm", "-f"]
         args = cmd2 + file_list
         print(f"args for deleting: {args}")
@@ -953,7 +953,7 @@ class RecoTrackQEDataCollectionTask(Basf2PathTask):
         hashed=True, default=[200, 8, 3, 0.1]
         #: \endcond
     )
-    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
+    #: files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
     process_type = b2luigi.Parameter(
         #: \cond
         default="BBBAR"
@@ -1390,6 +1390,9 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     object_name = 'VXDQualityEstimatorMVA'
 
     def make_db(self):
+        """
+        Creates the local VXD payload from weightfiles.
+        """
         vxd_identifier = self.get_output_file_name(self.get_weightfile_identifier() + '.xml')
         with open(vxd_identifier, "r") as f:
             weight_file_content = f.read()
@@ -1427,6 +1430,9 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     object_name = 'TrackingMVAFilterParameters'  # "trackfindingcdc_TrackQualityIndicator"
 
     def make_db(self):
+        """
+        Creates the local CDC payload from weightfiles.
+        """
         cut_index = self.recotrack_option.find('deleteCDCQI') + len('deleteCDCQI')
         cut = int(self.recotrack_option[cut_index:cut_index+3])/100.
 
@@ -1492,6 +1498,9 @@ class RecoTrackQETeacherTask(TrackQETeacherBaseTask):
                 )
 
     def make_db(self):
+        """
+        Creates the local Reco payload from weightfiles.
+        """
         recotrack_identifier = self.get_output_file_name(self.get_weightfile_identifier() + '.xml')
         with open(recotrack_identifier, 'r') as f:
             weight_file_content = f.read()

@@ -23,7 +23,7 @@ _TrainingMode = Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode
 # define arrays to interpret cut matrix
 _chargednames = ['pi', 'K', 'p', 'e', 'mu']
 _pidnames = ['pionID', 'kaonID', 'protonID', 'electronID', 'muonID']
-_stdnames = ['all', 'clean', 'loose', 'loosepid', 'good', 'higheff']
+_stdnames = ['all', 'base', 'loose', 'loosepid', 'good', 'higheff']
 _effnames = ['95eff', '90eff', '85eff']
 # default particle list for stdPi() and similar functions
 _defaultlist = 'good'
@@ -56,7 +56,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     Function to prepare one of several standardized types of charged particle lists:
 
     - 'all' with no cuts on track
-    - 'clean' tracks passing trackQuality and IP cuts (``thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2``),
+    - 'base' tracks passing trackQuality and IP cuts (``thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2``),
       no PID requirement
     - 'good' high purity lists for data studies [**deprecated**, will be removed end of 2026]
     - 'loosepid' loose selections for skimming, PID cut only [**deprecated**, will be removed end of 2026]
@@ -65,7 +65,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     - 'mostlikely' list with the highest PID likelihood [**deprecated**, will be removed end of 2026]
 
     .. note::
-        After end of 2026 only the ``'all'`` and ``'clean'`` lists will be available.
+        After end of 2026 only the ``'all'`` and ``'base'`` lists will be available.
 
     Also the following lists, which may or may not be available depending on the release
 
@@ -81,7 +81,7 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     .. deprecated:: light-2604-jellyfish
         The list types ``'good'``, ``'loosepid'``, ``'loose'``, ``'higheff'``, ``'mostlikely'``,
         ``'99eff'``, ``'95eff'``, ``'90eff'``, and ``'85eff'`` will be removed at the end of 2026.
-        Only ``'all'`` and ``'clean'`` will be kept. Please update your analysis accordingly.
+        Only ``'all'`` and ``'base'`` will be kept. Please update your analysis accordingly.
         To provide feedback on the removal, see
         `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
@@ -99,19 +99,19 @@ def stdCharged(particletype, listtype, path, writeOut=True):
     if particletype not in _chargednames:
         b2.B2ERROR("The requested list is not a standard charged particle. Use one of pi, K, e, mu, p.")
 
-    if listtype not in ('all', 'clean'):
+    if listtype not in ('all', 'base'):
         b2.B2WARNING(
             f"The standard charged particle list '{particletype}+:{listtype}' is deprecated "
             "and will be removed at the end of 2026. "
-            "Only the 'all' and 'clean' lists will be kept. Please update your analysis accordingly. "
+            "Only the 'all' and 'base' lists will be kept. Please update your analysis accordingly. "
             "To provide feedback on the removal, see "
             "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
         )
 
     if listtype == 'all':
         ma.fillParticleList(particletype + '+:all', '', writeOut=writeOut, path=path)
-    elif listtype == 'clean':
-        ma.fillParticleList(particletype + '+:clean', goodTrack, writeOut=writeOut, path=path)
+    elif listtype == 'base':
+        ma.fillParticleList(particletype + '+:base', goodTrack, writeOut=writeOut, path=path)
     elif listtype == 'good':
         ma.fillParticleList(
             particletype + '+:good',
@@ -667,7 +667,7 @@ def stdMostLikely(pidPriors=None, suffix='', custom_cuts='', path=None, writeOut
     Function to prepare most likely particle lists according to PID likelihood, refer to stdCharged for details
 
     .. deprecated:: light-2604-jellyfish
-        Please update your analysis to use the ``stdCharged`` ``'all'`` or ``'clean'`` lists instead.
+        Please update your analysis to use the ``stdCharged`` ``'all'`` or ``'base'`` lists instead.
         To provide feedback on the removal, see
         `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 

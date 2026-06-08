@@ -66,6 +66,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                produced_payloads=["SVD3SampleCoGTimeCalibrations",
                                                   "SVD3SampleELSTimeCalibrations",
                                                   "SVDCoGTimeCalibrations",
+                                                  "SVDAbsoluteClusterTimeShift",
                                                   "SVDClusterTimeShifter"])
 
 ##################################################################

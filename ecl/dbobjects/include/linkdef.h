@@ -34,8 +34,11 @@
 #pragma link C++ class Belle2::ECLCrystalLocalRunCalib; // checksum=0xf7c81e44, version=1
 #pragma link C++ class Belle2::ECLLocalRunCalibRef; // checksum=0x37dc8c50, version=1
 #pragma link C++ class Belle2::ECLWaveformData+; // checksum=0x82c9e7d2, version=1
+#pragma link C++ class Belle2::ECLWaveformDataUp+; // 
 #pragma link C++ class Belle2::ECLWFAlgoParams+; // checksum=0x731094cf, implicit, version=1
+#pragma link C++ class Belle2::ECLWFAlgoParamsUp+; // implicit
 #pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
+#pragma link C++ class Belle2::ECLNoiseDataUp+; // implicit
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
 #pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
 #pragma link C++ class Belle2::ECLnOptimal+; // checksum=0xe49fab6f, version=1

@@ -62,6 +62,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module(), m_waveformParametersMC("ECL
            false);
   addParam("DiodeDeposition", m_inter,
            "Flag to take into account energy deposition in photodiodes; Default diode is sensitive detector (default: true)", true);
+  addParam("NoElectronicNoise", m_noElectronicNoise,
+           "Flag to disable electronic noise when generating waveforms (default: false)", false);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: false)", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 0u)", 0u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
@@ -350,6 +352,10 @@ void ECLDigitizerModule::shapeSignals()
 void ECLDigitizerModule::makeElectronicNoiseAndPedestal(int J, int* FitA)
 {
   const EclConfiguration& ec = EclConfiguration::get();
+  if (m_noElectronicNoise) {
+    for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 3000;
+    return;
+  }
   std::vector<float> z(ec.m_nsmp), AdcNoise(ec.m_nsmp); // buffers with electronic noise
   float z[ec.m_nsmp], AdcNoise[ec.m_nsmp]; // buffers with electronic noise
   // Noise generation

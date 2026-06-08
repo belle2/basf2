@@ -240,6 +240,7 @@ namespace Belle2 {
     bool m_background;  /**< background flag */
     bool m_calibration;  /**< calibration flag */
     bool m_inter; /**< internuclear counter effect */
+    bool m_noElectronicNoise; /**< flag to disable electronic noise when generating waveforms */
     bool m_waveformMaker; /**< produce only waveform digits */
     bool m_storeDspWithExtraMCInfo;  /**< DSP with extra info flag */
     unsigned int m_compAlgo; /**< compression algorithm for background waveforms */

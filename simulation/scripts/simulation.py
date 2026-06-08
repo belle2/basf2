@@ -138,7 +138,9 @@ def add_simulation(
         ignoreRunNumberForBG=False,
         save_slow_pions_in_mc=False,
         useVTX=False,
-        save_all_charged_particles_in_mc=False):
+        save_all_charged_particles_in_mc=False,
+        simulateECLUpgrade=False,
+        ECLElectronicNoise=True):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
@@ -157,11 +159,17 @@ def add_simulation(
     @param useVTX: use the VTX instead of the VXD
     @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of all charged primary MCParticles that traverse PXD
+    @param simulateECLUpgrade: if True, simulate the upgrade electronics for the ECL by using the
+        ECLDigitizerModuleUp in the simulation and activating the corresponding calibration and analysis options in reconstruction.
+        This includes a waveform threshold override of 40 MeV in the digitizer, which is motivated by the expected noise
+        performance of the upgraded ECL electronics. The default value is False, which means that no changes are applied to
+        the ECL simulation compared to the pre-upgrade version.
+    @param ECLElectronicNoise: if False, disable electronic noise in the ECL digitizer when simulating the waveform digitization.
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
-    # Check components.
+    # Check compoments.
     check_components(components)
 
     # background mixing or overlay input before process forking
@@ -238,9 +246,24 @@ def add_simulation(
 
     # ECL digitization
     if is_detector_present("ECL", components):
-        ecl_digitizer = b2.register_module('ECLDigitizer')
-        if bkgfiles is not None:
-            ecl_digitizer.param('Background', 1)
+        if simulateECLUpgrade:
+            ecl_digitizer = b2.register_module(
+                'ECLDigitizerModuleUp',
+                useWaveformParameters=False,
+                WaveformThresholdOverride=-1,
+                DiodeDeposition=True,
+                StoreDspWithExtraMCInfo=True,
+                HadronPulseShapes=False,
+                NoElectronicNoise=not ECLElectronicNoise,
+            )
+        else:
+            ecl_digitizer = b2.register_module(
+                'ECLDigitizer',
+                StoreDspWithExtraMCInfo=True,
+                NoElectronicNoise=not ECLElectronicNoise,
+            )
+            if bkgfiles is not None:
+                ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization

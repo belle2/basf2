@@ -31,6 +31,7 @@ namespace Belle2 {
   class ECLCrystalCalib;
   class ECLDigit;
   class ECLDsp;
+  class ECLDspUp;
   class ECLCalDigit;
   class ECLPureCsIInfo;
 
@@ -70,6 +71,10 @@ namespace Belle2 {
     /** Name of the ECLDsp.*/
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
+
+    /** Name of the ECLDspUp.*/
+    virtual const char* eclDspUpArrayName() const
+    { return "ECLDspUps" ; }
 
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
@@ -123,9 +128,11 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits; /**< storearray ECLDigit */
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< storearray ECLCalDigit */
     StoreArray<ECLDsp> m_eclDsps; /**< storearray ECLDsp */
+    StoreArray<ECLDspUp> m_eclDspUps; /**< storearray ECLDspUp */
     StoreArray<ECLPureCsIInfo> m_eclPureCsIInfo; /**< storearray ECLPureCsIInfo - Special information for pure CsI simulation */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
+    double m_timeInverseSlopeUp; /**< Time calibration inverse slope "a" for upgrade. */
 
     double m_pureCsIEnergyCalib = 0.00005; /**< conversion factor from ADC counts to GeV. */
     double m_pureCsITimeCalib = 10.; /**< conversion factor from eclPureCsIDigitizer to ns. */
@@ -155,6 +162,7 @@ namespace Belle2 {
     const double c_minT99 = 3.5; /**< The minimum t99 */
 
     bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
+    bool m_simulateUpgrade = 0; /**< Flag to set upgrade electronics simulation option */
 
 
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =

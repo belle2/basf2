@@ -13,9 +13,11 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLDspUp.h>
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/digitization/EclConfigurationUp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/utility/utilityFunctions.h>
 
@@ -65,6 +67,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
   addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
+  addParam("simulateUpgrade", m_simulateUpgrade, "Flag to simulate upgrade electronics option", false);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -84,7 +87,9 @@ void ECLDigitCalibratorModule::initializeCalibration()
 {
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
-  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
+  m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3; // convert to ns
+  m_timeInverseSlopeUp = EclConfigurationUp::s_clock / (EclConfigurationUp::m_ndt * 32 * EclConfigurationUp::getRF()) *
+                         1e3; // convert to ns
   m_pureCsIEnergyCalib = 0.00005; // conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1;       // conversion factor from eclPureCsIDigitizer to ns
   m_pureCsITimeOffset = 0.31;     // ad-hoc offset correction for pureCsI timing
@@ -243,6 +248,10 @@ void ECLDigitCalibratorModule::event()
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                                     v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
                          + m_pureCsITimeOffset;
+      } if (m_simulateUpgrade) {
+        calibratedTime = (time * m_timeInverseSlopeUp) + m_timeInverseSlope * (- v_calibrationCrystalElectronicsTime[cellid - 1] -
+                         v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) -
+                         v_calibrationCrystalFlightTime[cellid - 1];
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                v_calibrationCrystalTimeOffset[cellid - 1] -
@@ -268,51 +277,53 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
-    // Calibrating offline fit results
-    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
-    aECLCalDigit->setTwoComponentChi2(-1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
-    aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
-    aECLCalDigit->setTwoComponentTotalEnergy(-1);
-    aECLCalDigit->setTwoComponentHadronEnergy(-1);
-    aECLCalDigit->setTwoComponentDiodeEnergy(-1);
-    // copy online fit quality from ECLDigit
-    const int online_quality = aECLDigit.getQuality();
-    if (online_quality == 1) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality1);
-    } else if (online_quality == 2) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality2);
-    } else if (online_quality == 3) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality3);
-    } else if (online_quality == 0) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality0);
-    }
+    if (!m_simulateUpgrade) {
+      // Calibrating offline fit results
+      ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
+      aECLCalDigit->setTwoComponentChi2(-1);
+      aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
+      aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
+      aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, -1);
+      aECLCalDigit->setTwoComponentTotalEnergy(-1);
+      aECLCalDigit->setTwoComponentHadronEnergy(-1);
+      aECLCalDigit->setTwoComponentDiodeEnergy(-1);
+      // copy online fit quality from ECLDigit
+      const int online_quality = aECLDigit.getQuality();
+      if (online_quality == 1) {
+        aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality1);
+      } else if (online_quality == 2) {
+        aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality2);
+      } else if (online_quality == 3) {
+        aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality3);
+      } else if (online_quality == 0) {
+        aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality0);
+      }
 
-    if (aECLDsp) {
-      // require ECLDigit to have offline waveform
-      if (aECLDsp->getTwoComponentChi2() > 0) {
-        // require offline waveform to have offline fit result
+      if (aECLDsp) {
+        // require ECLDigit to have offline waveform
+        if (aECLDsp->getTwoComponentChi2() > 0) {
+          // require offline waveform to have offline fit result
 
-        const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                                         v_calibrationCrystalEnergy[cellid - 1];
-        const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
-                                                                 1] *
-                                                          v_calibrationCrystalEnergy[cellid - 1];
-        const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
-                                                         v_calibrationCrystalEnergy[cellid - 1];
-        const double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
-        const ECLDsp::TwoComponentFitType twoComponentFitType = aECLDsp->getTwoComponentFitType();
+          const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                           v_calibrationCrystalEnergy[cellid - 1];
+          const double calibratedTwoComponentHadronEnergy = aECLDsp->getTwoComponentHadronAmp() * v_calibrationCrystalElectronics[cellid -
+                                                                   1] *
+                                                            v_calibrationCrystalEnergy[cellid - 1];
+          const double calibratedTwoComponentDiodeEnergy = aECLDsp->getTwoComponentDiodeAmp() * v_calibrationCrystalElectronics[cellid - 1] *
+                                                           v_calibrationCrystalEnergy[cellid - 1];
+          const double twoComponentChi2 = aECLDsp->getTwoComponentChi2();
+          const ECLDsp::TwoComponentFitType twoComponentFitType = aECLDsp->getTwoComponentFitType();
 
-        aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
-        aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
-        aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
-        aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadron));
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
-                                               aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
-        aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
-        aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
+          aECLCalDigit->setTwoComponentTotalEnergy(calibratedTwoComponentTotalEnergy);
+          aECLCalDigit->setTwoComponentHadronEnergy(calibratedTwoComponentHadronEnergy);
+          aECLCalDigit->setTwoComponentDiodeEnergy(calibratedTwoComponentDiodeEnergy);
+          aECLCalDigit->setTwoComponentChi2(twoComponentChi2);
+          aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadron));
+          aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton,
+                                                 aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
+          aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
+          aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
+        }
       }
     }
 

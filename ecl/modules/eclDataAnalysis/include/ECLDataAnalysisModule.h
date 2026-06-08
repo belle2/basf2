@@ -33,6 +33,10 @@ namespace Belle2 {
   class ECLPidLikelihood;
   class ECLLocalMaximum;
   class ECLConnectedRegion;
+  class ECLDsp;
+  class ECLDspUp;
+  class ECLDspWithExtraMCInfo;
+  class ECLDspWithExtraMCInfoUp;
   class ECLCalDigit;
   class ECLDigit;
   class ECLHit;
@@ -83,6 +87,10 @@ namespace Belle2 {
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at python level */
     bool m_doPureCsI; /**< if true, info on pureCsI upgrade is stored*/
     bool m_doHits; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doDsps; /**< if true, info on DSPs is stored*/
+    bool m_doDspUps; /**< if true, info on DSPUps is stored*/
+    bool m_doDspWithExtraMCInfos; /**< if true, info on ECLDspWithExtraMCInfos is stored*/
+    bool m_doDspWithExtraMCInfoUps; /**< if true, info on ECLDspWithExtraMCInfoUps is stored*/
     bool m_doDigits; /**< if true, info on Digits and CalDigits is stored*/
 
     //dataStore objects
@@ -91,6 +99,10 @@ namespace Belle2 {
     StoreArray<ECLPidLikelihood> m_eclPidLikelihoods; /**< ECLPidLikelihood storeArray */
     StoreArray<ECLSimHit> m_eclSimHits; /**< Store array: ECLSimHit. */
     StoreArray<ECLHit> m_eclHits; /**< Store array: ECLHit. */
+    StoreArray<ECLDsp> m_eclDsps; /**< Store array: ECLDsp. */
+    StoreArray<ECLDspUp> m_eclDspUps; /**< Store array: ECLDspUp. */
+    StoreArray<ECLDspWithExtraMCInfo> m_eclDspWithExtraMCInfos; /**< Store array: ECLDspWithExtraMCInfo. */
+    StoreArray<ECLDspWithExtraMCInfoUp> m_eclDspWithExtraMCInfoUps; /**< Store array: ECLDspWithExtraMCInfoUp. */
     StoreArray<ECLDigit> m_eclDigits; /**< Store array: ECLDigit. */
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< Store array: ECLCalDigit. */
     StoreArray<ECLConnectedRegion> m_eclConnectedRegions; /**< Store array: ECLConnectedRegion. */
@@ -106,6 +118,18 @@ namespace Belle2 {
     /** Default name ECLCalDigits array*/
     virtual const char* eclHitArrayName() const
     { return "ECLHits" ; }
+    /** Default name ECLDsps array*/
+    virtual const char* eclDspArrayName() const
+    { return "ECLDsps" ; }
+    /** Default name ECLDspUps array*/
+    virtual const char* eclDspUpArrayName() const
+    { return "ECLDspUps" ; }
+    /** Default name ECLDspWithExtraMCInfos array*/
+    virtual const char* eclDspWithExtraMCInfoArrayName() const
+    { return "ECLDspWithExtraMCInfos" ; }
+    /** Default name ECLDspWithExtraMCInfoUps array*/
+    virtual const char* eclDspWithExtraMCInfoUpArrayName() const
+    { return "ECLDspWithExtraMCInfoUps" ; }
     /** Default name ECLDigits array*/
     virtual const char* eclDigitArrayName() const
     { return "ECLDigits" ; }
@@ -180,6 +204,36 @@ namespace Belle2 {
     uint8_t m_nECLShowersRejectedBarrel {0};
     /** Number of photon showers that are rejected before storing to mdst (max. 255), BWD. */
     uint8_t m_nECLShowersRejectedBWD {0};
+
+    int m_eclDspMultip; /**< Number of ECLDsps per event */
+    std::vector<int>* m_eclDspIdx; /**< ECLDsp index */
+    std::vector<int>* m_eclDspCellId; /**< Number of ECLDsp CellId */
+    std::vector<std::vector<int>>* m_eclDspAVector; /**< AVector for ECLDsp */
+
+    int m_eclDspUpMultip; /**< Number of ECLDspUps per event */
+    std::vector<int>* m_eclDspUpIdx; /**< ECLDspUp index */
+    std::vector<int>* m_eclDspUpCellId; /**< Number of ECLDspUp CellId */
+    std::vector<std::vector<int>>* m_eclDspUpAVector; /**< AVector for ECLDspUp */
+
+    int m_eclDspWithExtraMCInfoMultip; /**< Number of ECLDspWithExtraMCInfos per event */
+    std::vector<int>* m_eclDspWithExtraMCInfoIdx; /**< ECLDspWithExtraMCInfo index */
+    std::vector<int>* m_eclDspWithExtraMCInfoCellId; /**< Number of ECLDspWithExtraMCInfo CellId */
+    std::vector<std::vector<int>>* m_eclDspWithExtraMCInfoAVector; /**< AVector for ECLDspWithExtraMCInfo */
+    std::vector<double>* m_eclDspWithExtraMCInfoEnergyDep; /**< Energy deposition for ECLDspWithExtraMCInfo */
+    std::vector<double>* m_eclDspWithExtraMCInfoFlightTime; /**< Flight time for ECLDspWithExtraMCInfo */
+    std::vector<double>* m_eclDspWithExtraMCInfoTimeShift; /**< Time shift for ECLDspWithExtraMCInfo */
+    std::vector<double>* m_eclDspWithExtraMCInfoTimeToSensor; /**< Time to sensor for ECLDspWithExtraMCInfo */
+    std::vector<double>* m_eclDspWithExtraMCInfoEnergyConversion; /**< Energy conversion for ECLDspWithExtraMCInfo */
+
+    int m_eclDspWithExtraMCInfoUpMultip; /**< Number of ECLDspWithExtraMCInfoUps per event */
+    std::vector<int>* m_eclDspWithExtraMCInfoUpIdx; /**< ECLDspWithExtraMCInfoUp index */
+    std::vector<int>* m_eclDspWithExtraMCInfoUpCellId; /**< Number of ECLDspWithExtraMCInfoUp CellId */
+    std::vector<std::vector<int>>* m_eclDspWithExtraMCInfoUpAVector; /**< AVector for ECLDspWithExtraMCInfoUp */
+    std::vector<double>* m_eclDspWithExtraMCInfoUpEnergyDep; /**< Energy deposition for ECLDspWithExtraMCInfoUp */
+    std::vector<double>* m_eclDspWithExtraMCInfoUpFlightTime; /**< Flight time for ECLDspWithExtraMCInfoUp */
+    std::vector<double>* m_eclDspWithExtraMCInfoUpTimeShift; /**< Time shift for ECLDspWithExtraMCInfoUp */
+    std::vector<double>* m_eclDspWithExtraMCInfoUpTimeToSensor; /**< Time to sensor for ECLDspWithExtraMCInfoUp */
+    std::vector<double>* m_eclDspWithExtraMCInfoUpEnergyConversion; /**< Energy conversion for ECLDspWithExtraMCInfoUp */
 
     int m_eclDigitMultip; /**< Number of ECLDigits per event */
     std::vector<int>* m_eclDigitIdx; /**< ECLDigit index */

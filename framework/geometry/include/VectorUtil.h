@@ -122,23 +122,6 @@ namespace Belle2 {
       return arg;
     }
 
-
-    /**
-     * Calculate the angle (theta in the formula below) between two vectors
-     * @param[in] v1  Vector v1
-     * @param[in] v2  Vector v2
-     * \return    Angle between the two vectors
-     * \f[ \theta = \cos ^{-1} \frac { \vec{v1} \cdot \vec{v2} }{ | \vec{v1} | | \vec{v2} | } \f]
-     *
-     * There is a function with the same name in ROOT::Math::VectorUtil. However, that function only works for 3-vectors as it calls the
-     * ROOT version of CosTheta (see above). Thus, we need a custom version to be able to use it for 2D vectors, too.
-     */
-    template <class Vector>
-    double Angle(const Vector&  v1, const Vector& v2)
-    {
-      return std::acos(CosTheta(v1, v2));
-    }
-
     /// Calculated the two dimensional cross product.
     inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
     {

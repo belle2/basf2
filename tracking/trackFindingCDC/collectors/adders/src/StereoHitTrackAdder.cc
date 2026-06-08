@@ -26,7 +26,7 @@ void StereoHitTrackAdder::add(CDCTrack& track, const CDCRLWireHit& hit, Weight w
   const bool isCurler = trajectory2D.isCurler();
 
   ROOT::Math::XYZVector recoPos3D = hit.reconstruct3D(trajectory2D);
-  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
+  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
   if (isCurler and arcLength2D < 0) {
     arcLength2D += 2 * TMath::Pi() * radius;
   }

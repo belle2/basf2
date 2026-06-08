@@ -118,14 +118,14 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   int fbVote21 = 0;
 
   for (const CDCRecoHit3D& recoHit3D : track1) {
-    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::get2DVector(trajectory3D2.getFlightDirection3DAtSupport()),
+    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::getXYVector(trajectory3D2.getFlightDirection3DAtSupport()),
                                                                 recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote12 += fbInfo;
   }
 
   for (const CDCRecoHit3D& recoHit3D : track2) {
-    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::get2DVector(trajectory3D1.getFlightDirection3DAtSupport()),
+    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::getXYVector(trajectory3D1.getFlightDirection3DAtSupport()),
                                                                 recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote21 += fbInfo;

@@ -117,7 +117,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
 
       // If the track is a curler, shift all perpS values to positive ones.
       // Else do not use this hit if m_param_checkForB2BTracks is enabled.
-      double perpS = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(recoPos3D));
+      double perpS = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
       if (perpS < 0) {
         if (isCurler) {
           perpS += trajectory2D.getArcLength2DPeriod();

@@ -139,7 +139,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegme
     const CDCTrajectory3D& preliminaryTrajectory3D)
 {
   ROOT::Math::XYZVector localOrigin3D = preliminaryTrajectory3D.getLocalOrigin();
-  ROOT::Math::XYVector localOrigin2D = VectorUtil::get2DVector(localOrigin3D);
+  ROOT::Math::XYVector localOrigin2D = VectorUtil::getXYVector(localOrigin3D);
 
   CDCRiemannFitter riemannFitter;
   //riemannFitter.useOnlyOrientation();

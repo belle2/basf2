@@ -35,10 +35,10 @@ Weight PhiRecoTrackRelationFilter::operator()(const CellularRecoTrack& fromTrack
     return NAN;
   }
 
-  const CDCTrajectory2D fromTrajectory(VectorUtil::get2DVector(fromTrack->getPositionSeed()), 0,
-                                       VectorUtil::get2DVector(fromTrack->getMomentumSeed()), fromTrack->getChargeSeed());
-  const CDCTrajectory2D toTrajectory(VectorUtil::get2DVector(toTrack->getPositionSeed()), 0,
-                                     VectorUtil::get2DVector(toTrack->getMomentumSeed()), toTrack->getChargeSeed());
+  const CDCTrajectory2D fromTrajectory(VectorUtil::getXYVector(fromTrack->getPositionSeed()), 0,
+                                       VectorUtil::getXYVector(fromTrack->getMomentumSeed()), fromTrack->getChargeSeed());
+  const CDCTrajectory2D toTrajectory(VectorUtil::getXYVector(toTrack->getPositionSeed()), 0,
+                                     VectorUtil::getXYVector(toTrack->getMomentumSeed()), toTrack->getChargeSeed());
 
   const ROOT::Math::XYVector origin;
 

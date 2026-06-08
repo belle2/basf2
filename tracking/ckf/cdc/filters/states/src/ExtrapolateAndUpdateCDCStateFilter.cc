@@ -32,8 +32,8 @@ namespace {
     const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
 
     ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
-    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire),
-                                           VectorUtil::get2DVector(mom));
+    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire),
+                                           VectorUtil::getXYVector(mom));
 
     state.setRLinfo(rlInfo);
     return rlInfo;

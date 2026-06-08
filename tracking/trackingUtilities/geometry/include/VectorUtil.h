@@ -283,7 +283,7 @@ namespace Belle2 {
     }
 
     /// Get 2D Vector from 3D Vector
-    inline ROOT::Math::XYVector get2DVector(const ROOT::Math::XYZVector& a)
+    inline ROOT::Math::XYVector getXYVector(const ROOT::Math::XYZVector& a)
     {
       return ROOT::Math::XYVector(a.X(), a.Y());
     }

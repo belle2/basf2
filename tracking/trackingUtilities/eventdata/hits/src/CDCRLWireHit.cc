@@ -107,8 +107,8 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
   ROOT::Math::XYZVector trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
   ROOT::Math::XYZVector directionOfFlight{simhit.getMomentum()};
 
-  ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire),
-                                                  VectorUtil::get2DVector(directionOfFlight));
+  ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire),
+                                                  VectorUtil::getXYVector(directionOfFlight));
 
   CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength(), CDCWireHit::c_simpleDriftLengthVariance);
 

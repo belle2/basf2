@@ -271,7 +271,7 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
     const ROOT::Math::XYZVector hitPosition(wireHit.getWire().getWirePos3DAtZ(trackPosition.z()));
 
     ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
-    results.rlInfo =  VectorUtil::isRightOrLeftOf(VectorUtil::get2DVector(trackPosToWire), VectorUtil::get2DVector(trackMomentum));
+    results.rlInfo =  VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire), VectorUtil::getXYVector(trackMomentum));
 
     results.isValid = true;
 

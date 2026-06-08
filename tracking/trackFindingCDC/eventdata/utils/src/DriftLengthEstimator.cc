@@ -146,7 +146,7 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
 
   ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
   const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
-  const ROOT::Math::XYVector& recoPos2D = VectorUtil::get2DVector(recoPos3D);
+  const ROOT::Math::XYVector& recoPos2D = VectorUtil::getXYVector(recoPos3D);
   double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);

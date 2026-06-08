@@ -154,8 +154,8 @@ std::array<ROOT::Math::XYZVector, 2> CDCTrajectory2D::reconstructBoth3D(const Wi
 
   const ROOT::Math::XYZVector firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
   const ROOT::Math::XYZVector secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
-  const auto& tmp1 = getClosest(VectorUtil::get2DVector(firstRecoWirePos3D));
-  const auto& tmp2 = getClosest(VectorUtil::get2DVector(secondRecoWirePos3D));
+  const auto& tmp1 = getClosest(VectorUtil::getXYVector(firstRecoWirePos3D));
+  const auto& tmp2 = getClosest(VectorUtil::getXYVector(secondRecoWirePos3D));
   return {{{tmp1.X(), tmp1.Y(), firstRecoWirePos3D.z()},
       {tmp2.X(), tmp2.Y(), secondRecoWirePos3D.z()}
     }};
@@ -167,7 +167,7 @@ ROOT::Math::XYZVector CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
 {
   const double recoZ = reconstructZ(wireLine, distance, z);
   const ROOT::Math::XYZVector recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
-  const auto& tmp = getClosest(VectorUtil::get2DVector(recoWirePos2D));
+  const auto& tmp = getClosest(VectorUtil::getXYVector(recoWirePos2D));
   return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), recoZ);
 }
 

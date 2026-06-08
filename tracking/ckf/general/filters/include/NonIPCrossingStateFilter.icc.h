@@ -50,14 +50,14 @@ namespace Belle2 {
     const ROOT::Math::XYZVector& position = static_cast<ROOT::Math::XYZVector>(firstMeasurement.getPos());
     const ROOT::Math::XYZVector& momentum = static_cast<ROOT::Math::XYZVector>(firstMeasurement.getMom());
 
-    const TrackingUtilities::CDCTrajectory2D trajectory2D(VectorUtil::get2DVector(position), 0, VectorUtil::get2DVector(momentum),
+    const TrackingUtilities::CDCTrajectory2D trajectory2D(VectorUtil::getXYVector(position), 0, VectorUtil::getXYVector(momentum),
                                                           cdcTrack->getChargeSeed());
 
     const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
     const ROOT::Math::XYVector origin(0, 0);
 
-    const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(VectorUtil::get2DVector(hitPosition), origin);
-    const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(VectorUtil::get2DVector(hitPosition));
+    const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(VectorUtil::getXYVector(hitPosition), origin);
+    const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(hitPosition));
 
     if (not arcLengthInRightDirection(deltaArcLengthTrackHit, m_param_direction) or
         not arcLengthInRightDirection(deltaArcLengthHitOrigin, m_param_direction)) {

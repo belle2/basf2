@@ -301,7 +301,7 @@ namespace Belle2 {
       /// after moving to ROOT::Math::Vector(2/3)D
       const ROOT::Math::XYVector getRecoPos2D() const
       {
-        return VectorUtil::get2DVector(getRecoPos3D());
+        return VectorUtil::getXYVector(getRecoPos3D());
       }
 
       /// Getter for the z coordinate of the reconstructed position.

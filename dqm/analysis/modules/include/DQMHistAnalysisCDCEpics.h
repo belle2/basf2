@@ -93,7 +93,7 @@ namespace Belle2 {
     /**
      * Get median of given histogram
      */
-    static float getHistMedian(TH1D* h);
+    static float getHistMedian(TH1* h);
 
     /**
      * Convenient function to create a TH2Poly based on CDC geometry

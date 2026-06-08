@@ -585,11 +585,11 @@ void DQMHistAnalysisCDCEpicsModule::terminate()
 
 
 //------------------------------------
-float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h)
+float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1* h)
 {
 
   if (!h) return 0.0;
-  TH1D* hist = static_cast<TH1D*>(h->Clone());
+  TH1* hist = static_cast<TH1*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float median = 0.0;
   if (hist->Integral(1, hist->GetNbinsX()) > 0) {

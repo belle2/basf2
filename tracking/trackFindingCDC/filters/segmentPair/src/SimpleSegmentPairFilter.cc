@@ -14,7 +14,8 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <Math/VectorUtil.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -61,18 +62,18 @@ Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
     return NAN;
   }
 
-  Vector2D fromBackRecoPos2D = fromSegment.back().getRecoPos2D();
-  Vector2D toFrontRecoPos2D = toSegment.front().getRecoPos2D();
+  ROOT::Math::XYVector fromBackRecoPos2D = fromSegment.back().getRecoPos2D();
+  ROOT::Math::XYVector toFrontRecoPos2D = toSegment.front().getRecoPos2D();
 
   // Momentum agreement cut
-  Vector2D fromMom2DAtFromBack = fromFit.getFlightDirection2D(fromBackRecoPos2D);
-  Vector2D toMom2DAtToFront = toFit.getFlightDirection2D(toFrontRecoPos2D);
+  ROOT::Math::XYVector fromMom2DAtFromBack = fromFit.getFlightDirection2D(fromBackRecoPos2D);
+  ROOT::Math::XYVector toMom2DAtToFront = toFit.getFlightDirection2D(toFrontRecoPos2D);
 
-  Vector2D fromMom2DAtToFront = fromFit.getFlightDirection2D(toFrontRecoPos2D);
-  Vector2D toMom2DAtFromBack = toFit.getFlightDirection2D(fromBackRecoPos2D);
+  ROOT::Math::XYVector fromMom2DAtToFront = fromFit.getFlightDirection2D(toFrontRecoPos2D);
+  ROOT::Math::XYVector toMom2DAtFromBack = toFit.getFlightDirection2D(fromBackRecoPos2D);
 
-  double momAngleAtFromBack = fromMom2DAtFromBack.angleWith(toMom2DAtFromBack);
-  double momAngleAtToFront = toMom2DAtToFront.angleWith(fromMom2DAtToFront);
+  double momAngleAtFromBack = ROOT::Math::VectorUtil::DeltaPhi(fromMom2DAtFromBack, toMom2DAtFromBack);
+  double momAngleAtToFront = ROOT::Math::VectorUtil::DeltaPhi(toMom2DAtToFront, fromMom2DAtToFront);
 
   if (fabs(momAngleAtToFront) > 1.0 or fabs(momAngleAtFromBack) > 1.0) {
     return NAN;

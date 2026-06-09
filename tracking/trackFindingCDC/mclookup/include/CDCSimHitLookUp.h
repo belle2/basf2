@@ -11,6 +11,8 @@
 
 #include <tracking/trackingUtilities/utilities/MayBePtr.h>
 
+#include <Math/Vector3D.h>
+
 #include <map>
 #include <vector>
 
@@ -21,7 +23,6 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCWireHit;
-    class Vector3D;
     class CDCRecoHit3D;
     class CDCRecoHit2D;
     class CDCRLWireHit;
@@ -69,7 +70,7 @@ namespace Belle2 {
       const CDCSimHit* getClosestPrimarySimHit(const CDCHit* ptrHit) const;
 
       /// Calculate the local direction of flight. If the hit is secondary take the direction of flight from a close by primary - null vector if it cannot be assumed this way
-      TrackingUtilities::Vector3D getDirectionOfFlight(const CDCHit* ptrHit);
+      ROOT::Math::XYZVector getDirectionOfFlight(const CDCHit* ptrHit);
 
     private:
       /// Construct the look up relation for the right left passage information as used in track finding
@@ -80,14 +81,14 @@ namespace Belle2 {
       TrackingUtilities::ERightLeft getRLInfo(const CDCHit* ptrHit) const;
 
       /// Look up the position of the primary ionisation from related simulated hit.
-      TrackingUtilities::Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
+      ROOT::Math::XYZVector getRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Look up the drift length from the primary ionisation to the wire from related simulated hit.
       double getDriftLength(const CDCHit* ptrHit) const;
 
       /// Look up the position of the primary ionisation from the closest primary simulated hit.
       /// If no primary sim hit is available use the information from the secondary hit
-      TrackingUtilities::Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+      ROOT::Math::XYZVector getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
 
       /// Look up the drift length from the primary ionisation to the wire from related simulated hit.
       /// If no primary sim hit is available use the information from the secondary hit

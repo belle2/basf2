@@ -13,12 +13,13 @@
 #include <cdc/topology/ISuperLayer.h>
 #include <cdc/topology/EWirePosition.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <cdc/geometry/CDCGeometryParConstants.h>
 
 #include <framework/database/DBObjPtr.h>
 #include <cdc/dbobjects/CDClayerTimeCut.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 #include <vector>
 #include <tuple>
@@ -116,7 +117,7 @@ namespace Belle2 {
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
 
       /// Central location of the flight time zero position. Usually the location of the trigger.
-      TrackingUtilities::Vector3D m_triggerPoint = TrackingUtilities::Vector3D(0.0, 0.0, 0.0);
+      ROOT::Math::XYZVector m_triggerPoint = ROOT::Math::XYZVector(0.0, 0.0, 0.0);
 
       /// Bits for the used super layers
       std::array<bool, CDC::ISuperLayerUtil::c_N> m_useSuperLayers{};
@@ -125,7 +126,7 @@ namespace Belle2 {
       std::array<bool, c_maxNSenseLayers> m_useLayers{};
 
       /// Unit vectors denoting the sector for which hits should be created
-      std::array<TrackingUtilities::Vector2D, 2> m_useSector{};
+      std::array<ROOT::Math::XYVector, 2> m_useSector{};
 
     private: // Translators
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes

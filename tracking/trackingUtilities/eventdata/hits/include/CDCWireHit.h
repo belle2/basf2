@@ -38,8 +38,6 @@ namespace Belle2 {
   namespace TrackingUtilities {
     class CDCTrajectory2D;
     class Circle2D;
-    class Vector3D;
-    class Vector2D;
 
     /**
      *  Class representing a hit wire in the central drift chamber.
@@ -252,7 +250,7 @@ namespace Belle2 {
        *  Also the right left passage hypotheses does not play a role in
        *  the reconstruction in any way.
        */
-      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
+      ROOT::Math::XYVector reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Attempts to reconstruct a three dimensional position (especially of stereo hits).
@@ -267,7 +265,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
+      ROOT::Math::XYZVector reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo, double z = 0) const;
 
       /**
        *  Applies the conformal transformation to the drift circle this hit represents.
@@ -279,7 +277,7 @@ namespace Belle2 {
        *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
        *  - \f$R = r / (x^2 + y^2 - r^2)\f$
        */
-      Circle2D conformalTransformed(const Vector2D& relativeTo) const;
+      Circle2D conformalTransformed(const ROOT::Math::XYVector& relativeTo) const;
 
       /// Mutable getter for the automaton cell.
       AutomatonCell& getAutomatonCell() const

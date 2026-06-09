@@ -7,9 +7,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 #include <memory>
 #include <cmath>
@@ -28,7 +30,7 @@ namespace Belle2 {
 
       /// Default estimator for the flight time
       virtual double
-      getFlightTime2D(const TrackingUtilities::Vector2D& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
+      getFlightTime2D(const ROOT::Math::XYVector& /*pos2D*/, double /*alpha*/, double /*beta */ = 1) const
       {
         return 0;
       }
@@ -47,10 +49,10 @@ namespace Belle2 {
       BeamEventFlightTimeEstimator();
 
       /// Flight time estimator for regular beam events
-      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const ROOT::Math::XYVector& pos2D, double alpha, double beta = 1) const override
       {
         double absAlpha = std::fabs(alpha);
-        double directDist2D = pos2D.cylindricalR();
+        double directDist2D = pos2D.R();
         return directDist2D * m_firstPeriodAlphaFlightTimeFactor(absAlpha) / beta;
       }
 
@@ -64,16 +66,16 @@ namespace Belle2 {
 
     public:
       /// Constructor also setting up the flight time lookup table
-      explicit CosmicRayFlightTimeEstimator(TrackingUtilities::Vector3D triggerPoint = TrackingUtilities::Vector3D(0, 0, 0));
+      explicit CosmicRayFlightTimeEstimator(ROOT::Math::XYZVector triggerPoint = ROOT::Math::XYZVector(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
-      double getFlightTime2D(const TrackingUtilities::Vector2D& pos2D, double alpha, double beta = 1) const override
+      double getFlightTime2D(const ROOT::Math::XYVector& pos2D, double alpha, double beta = 1) const override
       {
-        TrackingUtilities::Vector2D relPos2D = pos2D - m_triggerPoint.xy();
-        double deltaAlpha = pos2D.angleWith(relPos2D);
+        ROOT::Math::XYVector relPos2D = pos2D - VectorUtil::getXYVector(m_triggerPoint);
+        double deltaAlpha = ROOT::Math::VectorUtil::DeltaPhi(pos2D, relPos2D);
         alpha += deltaAlpha;
         double absAlpha = std::fabs(alpha);
-        double directDist2D = relPos2D.cylindricalR();
+        double directDist2D = relPos2D.R();
         return directDist2D * m_halfPeriodAlphaFlightTimeFactor(absAlpha) / beta;
       }
 
@@ -82,7 +84,7 @@ namespace Belle2 {
       TrackingUtilities::LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
 
       /// Trigger point of the cosmic ray setup
-      TrackingUtilities::Vector3D m_triggerPoint;
+      ROOT::Math::XYZVector m_triggerPoint;
     };
 
   }

@@ -11,8 +11,8 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-Vector2D SZLine::intersection(const SZLine& szLine) const
+ROOT::Math::XYVector SZLine::intersection(const SZLine& szLine) const
 {
   const double s = -(z0() - szLine.z0()) / (tanLambda() - szLine.tanLambda());
-  return Vector2D(s, map(s));
+  return ROOT::Math::XYVector(s, map(s));
 }

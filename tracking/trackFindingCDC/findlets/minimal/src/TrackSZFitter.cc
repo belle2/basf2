@@ -21,7 +21,8 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 
 #include <tracking/trackingUtilities/geometry/UncertainHelix.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <vector>
 
@@ -44,7 +45,7 @@ void TrackSZFitter::apply(std::vector<CDCTrack>& tracks)
     track.sortByArcLength2D();
 
     CDCTrajectory2D originalTrajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-    Vector2D localOrigin = originalTrajectory2D.getLocalOrigin();
+    ROOT::Math::XYVector localOrigin = originalTrajectory2D.getLocalOrigin();
 
     const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(track);
     CDCTrajectory3D preliminaryTrajectory3D{originalTrajectory2D, szTrajectory};
@@ -67,7 +68,7 @@ void TrackSZFitter::apply(std::vector<CDCTrack>& tracks)
 
     CDCTrajectory3D trajectory3D =
       axialStereoFusionFitter.reconstructFuseTrajectories(axialSegment2D, stereoSegment2D, preliminaryTrajectory3D);
-    trajectory3D.setLocalOrigin({localOrigin, 0});
+    trajectory3D.setLocalOrigin({localOrigin.X(), localOrigin.Y(), 0});
 
     // Copy only the covariance matrix, chi2 and ndf over for a conservative introduction for the moment.
     UncertainHelix preliminaryUncertainHelix = preliminaryTrajectory3D.getLocalHelix();

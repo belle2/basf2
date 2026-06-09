@@ -10,6 +10,8 @@
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
+#include <Math/Vector2D.h>
+
 #include <cstddef>
 #include <iosfwd>
 
@@ -17,7 +19,6 @@ namespace Belle2 {
 
   namespace TrackingUtilities {
     class GeneralizedCircle;
-    class Vector2D;
 
     /**
      *  Adds an uncertainty matrix to the circle in perigee parameterisation.
@@ -54,7 +55,7 @@ namespace Belle2 {
        *  Covariance matrix defaults to a zero matrix
        */
       UncertainPerigeeCircle(const double curvature,
-                             const Vector2D& phi0,
+                             const ROOT::Math::XYVector& phi0,
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
@@ -221,7 +222,7 @@ namespace Belle2 {
        *  calculates the new perigee and its covariance matrix.
        *  Change is inplace.
        */
-      void passiveMoveBy(const Vector2D& by)
+      void passiveMoveBy(const ROOT::Math::XYVector& by)
       {
         // Move the covariance matrix first to have access to the original parameters
         PerigeeJacobian jacobian = m_perigeeCircle.passiveMoveByJacobian(by);
@@ -234,7 +235,7 @@ namespace Belle2 {
        * covariance
        *  for a passive move of the coordinate system.
        */
-      PerigeeCovariance passiveMovedCovarianceBy(const Vector2D& by) const
+      PerigeeCovariance passiveMovedCovarianceBy(const ROOT::Math::XYVector& by) const
       {
         PerigeeJacobian jacobian = m_perigeeCircle.passiveMoveByJacobian(by);
         return PerigeeUtil::transported(jacobian, perigeeCovariance());

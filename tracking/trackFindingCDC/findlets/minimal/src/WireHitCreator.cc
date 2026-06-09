@@ -8,6 +8,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
@@ -26,6 +27,9 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -146,9 +150,9 @@ void WireHitCreator::initialize()
     }
   }
 
-  m_triggerPoint = Vector3D(std::get<0>(m_param_triggerPoint),
-                            std::get<1>(m_param_triggerPoint),
-                            std::get<2>(m_param_triggerPoint));
+  m_triggerPoint = ROOT::Math::XYZVector(std::get<0>(m_param_triggerPoint),
+                                         std::get<1>(m_param_triggerPoint),
+                                         std::get<2>(m_param_triggerPoint));
 
   if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
     B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
@@ -197,8 +201,8 @@ void WireHitCreator::initialize()
   }
 
   if (std::isfinite(std::get<0>(m_param_useDegreeSector))) {
-    m_useSector[0] = Vector2D::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
-    m_useSector[1] = Vector2D::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[0] = VectorUtil::Phi(std::get<0>(m_param_useDegreeSector) * Unit::deg);
+    m_useSector[1] = VectorUtil::Phi(std::get<1>(m_param_useDegreeSector) * Unit::deg);
   }
 
   Super::initialize();
@@ -292,10 +296,10 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
 
     const CDCWire& wire = wireTopology.getWire(wireID);
 
-    const Vector2D& pos2D = wire.getRefPos2D();
+    const ROOT::Math::XYVector& pos2D = wire.getRefPos2D();
 
     // Check whether the position is outside the selected sector
-    if (pos2D.isBetween(m_useSector[1], m_useSector[0])) continue;
+    if (VectorUtil::isBetween(pos2D, m_useSector[1], m_useSector[0])) continue;
 
     // Only use some MCParticles if request - mostly for debug
     if (not m_param_useMCParticleIds.empty()) {

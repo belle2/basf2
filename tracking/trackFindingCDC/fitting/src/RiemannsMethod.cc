@@ -14,6 +14,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector2D.h>
+
 #include <Eigen/Eigen>
 #include <Eigen/Core>
 
@@ -126,7 +128,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
   }
 
   //check if the orientation is alright
-  Vector2D directionAtCenter = trajectory2D.getFlightDirection2D(Vector2D(0.0, 0.0));
+  const ROOT::Math::XYVector& directionAtCenter = trajectory2D.getFlightDirection2D(ROOT::Math::XYVector(0.0, 0.0));
 
 
   size_t voteForChangeSign = 0;

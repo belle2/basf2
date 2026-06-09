@@ -10,7 +10,9 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitPair.h>
 
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <iosfwd>
 
@@ -56,26 +58,26 @@ namespace Belle2 {
                  const ParameterLine2D& line);
 
       /// Getter for the touching point of the tangent to the first drift circle.
-      const Vector2D& getFromRecoPos2D() const
+      const ROOT::Math::XYVector& getFromRecoPos2D() const
       { return getLine().support(); }
 
       /// Getter for displacement of the touching point from the first wire in the reference plane.
-      Vector2D getFromRecoDisp2D() const;
+      ROOT::Math::XYVector getFromRecoDisp2D() const;
 
       /// Getter for the touching point of the tangent to the second drift circle.
-      Vector2D getToRecoPos2D() const
+      ROOT::Math::XYVector getToRecoPos2D() const
       { return getLine().at(1); }
 
       /// Getter for displacement of the touching point from the second wire in the reference plane.
-      Vector2D getToRecoDisp2D() const;
+      ROOT::Math::XYVector getToRecoDisp2D() const;
 
       /// Getter for the vector from the first to the second touch point.*/
-      const Vector2D& getFlightVec2D() const
+      const ROOT::Math::XYVector& getFlightVec2D() const
       { return getLine().tangential(); }
 
       /// Returns the cosine of the angle between the two flight directions of the tangents.
       double getCosFlightDifference(const CDCTangent& tangent) const
-      { return getFlightVec2D().cosWith(tangent.getFlightVec2D()); }
+      { return VectorUtil::CosPhi(getFlightVec2D(), tangent.getFlightVec2D()); }
 
       /// Getter for the reconstructed hit on the first oriented wire hit using reconstructed touch point as position.
       CDCRecoHit2D getFromRecoHit2D() const;

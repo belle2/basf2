@@ -21,6 +21,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -116,13 +118,15 @@ double AxialTrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
   int fbVote21 = 0;
 
   for (const CDCRecoHit3D& recoHit3D : track1) {
-    EForwardBackward fbInfo = trajectory3D2.getFlightDirection3DAtSupport().xy().isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::getXYVector(trajectory3D2.getFlightDirection3DAtSupport()),
+                                                                recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote12 += fbInfo;
   }
 
   for (const CDCRecoHit3D& recoHit3D : track2) {
-    EForwardBackward fbInfo = trajectory3D1.getFlightDirection3DAtSupport().xy().isForwardOrBackwardOf(recoHit3D.getRecoPos2D());
+    EForwardBackward fbInfo = VectorUtil::isForwardOrBackwardOf(VectorUtil::getXYVector(trajectory3D1.getFlightDirection3DAtSupport()),
+                                                                recoHit3D.getRecoPos2D());
     if (not isValid(fbInfo)) continue;
     fbVote21 += fbInfo;
   }
@@ -179,7 +183,7 @@ void AxialTrackMerger::removeStrangeHits(double factor,
                                          CDCTrajectory2D& trajectory2D)
 {
   auto farFromTrajectory = [&trajectory2D, &factor](const CDCWireHit * wireHit) {
-    Vector2D pos2D = wireHit->getRefPos2D();
+    ROOT::Math::XYVector pos2D = wireHit->getRefPos2D();
     double driftLength = wireHit->getRefDriftLength();
     double dist = std::fabs(trajectory2D.getDist2D(pos2D)) - driftLength;
     return std::fabs(dist) > driftLength * factor;
@@ -207,7 +211,8 @@ void AxialTrackMerger::mergeTracks(CDCTrack& track1,
   AxialTrackUtil::normalizeTrack(track1);
 
   for (CDCRecoHit3D& recoHit3D : track2) {
-    recoHit3D.setRecoPos3D({recoHit3D.getRefPos2D(), 0});
+    const auto& tmp = recoHit3D.getRefPos2D();
+    recoHit3D.setRecoPos3D({tmp.X(), tmp.Y(), 0});
     recoHit3D.setRLInfo(ERightLeft::c_Unknown);
   }
 

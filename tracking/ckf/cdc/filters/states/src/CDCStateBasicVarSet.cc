@@ -11,6 +11,8 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
@@ -35,8 +37,8 @@ bool CDCStateBasicVarSet::extract(const BaseCDCStateFilter::Object* pair)
   var<named("arcLength")>() = state->getArcLength() - lastState.getArcLength();
   var<named("hitDistance")>() = state->getHitDistance();
 
-  TrackingUtilities::Vector3D wirePos = state->getWireHit()->getRefPos3D();
-  var<named("wire_r")>() = wirePos.cylindricalR();
+  ROOT::Math::XYZVector wirePos = state->getWireHit()->getRefPos3D();
+  var<named("wire_r")>() = wirePos.Rho();
   var<named("wire_z")>() = wirePos.z();
   var<named("wire_x")>() = wirePos.x();
   var<named("wire_y")>() = wirePos.y();

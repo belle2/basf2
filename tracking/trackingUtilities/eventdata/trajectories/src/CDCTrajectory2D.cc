@@ -16,8 +16,7 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
@@ -47,7 +46,7 @@ CDCTrajectory2D::CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle)
 {
 }
 
-CDCTrajectory2D::CDCTrajectory2D(const Vector2D& localOrigin,
+CDCTrajectory2D::CDCTrajectory2D(const ROOT::Math::XYVector& localOrigin,
                                  const UncertainPerigeeCircle& localPerigeeCircle,
                                  double flightTime)
   : m_localOrigin(localOrigin)
@@ -56,26 +55,26 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& localOrigin,
 {
 }
 
-CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+CDCTrajectory2D::CDCTrajectory2D(const ROOT::Math::XYVector& pos2D,
                                  const double time,
-                                 const Vector2D& mom2D,
+                                 const ROOT::Math::XYVector& mom2D,
                                  const double charge,
                                  const double bZ)
   : m_localOrigin(pos2D)
-  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
-                         mom2D.unit(),
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, bZ),
+                         VectorUtil::unit(mom2D),
                          0.0)
   , m_flightTime(time)
 {
 }
 
-CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+CDCTrajectory2D::CDCTrajectory2D(const ROOT::Math::XYVector& pos2D,
                                  const double time,
-                                 const Vector2D& mom2D,
+                                 const ROOT::Math::XYVector& mom2D,
                                  const double charge)
   : m_localOrigin(pos2D)
-  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
-                         mom2D.unit(),
+  , m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D),
+                         VectorUtil::unit(mom2D),
                          0.0)
   , m_flightTime(time)
 {
@@ -88,7 +87,7 @@ bool CDCTrajectory2D::isFitted() const
 
 void CDCTrajectory2D::clear()
 {
-  m_localOrigin.set(0.0, 0.0);
+  m_localOrigin.SetXY(0.0, 0.0);
   m_localPerigeeCircle.invalidate();
   m_flightTime = NAN;
 }
@@ -111,17 +110,17 @@ std::array<double, 2> CDCTrajectory2D::reconstructBothZ(const WireLine& wireLine
                                                         const double distance,
                                                         const double z) const
 {
-  Vector2D globalPos2D = wireLine.sagPos2DAtZ(z);
-  Vector2D movePerZ = wireLine.sagMovePerZ(z);
+  ROOT::Math::XYVector globalPos2D = wireLine.sagPos2DAtZ(z);
+  ROOT::Math::XYVector movePerZ = wireLine.sagMovePerZ(z);
 
-  Vector2D localPos2D = globalPos2D - getLocalOrigin();
+  ROOT::Math::XYVector localPos2D = globalPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
 
   double fastDistance = distance != 0.0 ? localCircle.fastDistance(distance) : 0.0;
 
   double c = localCircle.fastDistance(localPos2D) - fastDistance;
-  double b = localCircle.gradient(localPos2D).dot(movePerZ);
-  double a = localCircle.n3() * movePerZ.normSquared();
+  double b = localCircle.gradient(localPos2D).Dot(movePerZ);
+  double a = localCircle.n3() * movePerZ.Mag2();
 
   const std::pair<double, double> solutionsDeltaZ = solveQuadraticABC(a, b, c);
 
@@ -147,29 +146,32 @@ double CDCTrajectory2D::reconstructZ(const WireLine& wireLine,
   return recoZ;
 }
 
-std::array<Vector3D, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireLine,
-                                                           const double distance,
-                                                           const double z) const
+std::array<ROOT::Math::XYZVector, 2> CDCTrajectory2D::reconstructBoth3D(const WireLine& wireLine,
+    const double distance,
+    const double z) const
 {
   const std::array<double, 2> solutionsZ = reconstructBothZ(wireLine, distance, z);
 
-  const Vector3D firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
-  const Vector3D secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
-  return {{{getClosest(firstRecoWirePos3D.xy()), firstRecoWirePos3D.z()},
-      {getClosest(secondRecoWirePos3D.xy()), secondRecoWirePos3D.z()}
+  const ROOT::Math::XYZVector firstRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[0]);
+  const ROOT::Math::XYZVector secondRecoWirePos3D = wireLine.sagPos3DAtZ(solutionsZ[1]);
+  const auto& tmp1 = getClosest(VectorUtil::getXYVector(firstRecoWirePos3D));
+  const auto& tmp2 = getClosest(VectorUtil::getXYVector(secondRecoWirePos3D));
+  return {{{tmp1.X(), tmp1.Y(), firstRecoWirePos3D.z()},
+      {tmp2.X(), tmp2.Y(), secondRecoWirePos3D.z()}
     }};
 }
 
-Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
-                                        const double distance,
-                                        const double z) const
+ROOT::Math::XYZVector CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
+                                                     const double distance,
+                                                     const double z) const
 {
   const double recoZ = reconstructZ(wireLine, distance, z);
-  const Vector3D recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
-  return Vector3D(getClosest(recoWirePos2D.xy()), recoZ);
+  const ROOT::Math::XYZVector recoWirePos2D = wireLine.sagPos3DAtZ(recoZ);
+  const auto& tmp = getClosest(VectorUtil::getXYVector(recoWirePos2D));
+  return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), recoZ);
 }
 
-Vector2D CDCTrajectory2D::getClosest(const Vector2D& point) const
+ROOT::Math::XYVector CDCTrajectory2D::getClosest(const ROOT::Math::XYVector& point) const
 {
   return getLocalCircle()->closest(point - getLocalOrigin()) + getLocalOrigin();
 }
@@ -253,7 +255,7 @@ ISuperLayer CDCTrajectory2D::getMaximalISuperLayer() const
 
 ISuperLayer CDCTrajectory2D::getStartISuperLayer() const
 {
-  double startCylindricalR = getLocalOrigin().cylindricalR();
+  double startCylindricalR = getLocalOrigin().R();
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
@@ -288,23 +290,23 @@ double CDCTrajectory2D::getAbsMom2D(const double bZ) const
 
 double CDCTrajectory2D::getAbsMom2D() const
 {
-  Vector2D position = getSupport();
+  ROOT::Math::XYVector position = getSupport();
   return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle()->curvature(), position);
 }
 
-Vector2D CDCTrajectory2D::getInnerExit() const
+ROOT::Math::XYVector CDCTrajectory2D::getInnerExit() const
 {
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
   double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
 
-  const Vector2D support = getSupport();
+  const ROOT::Math::XYVector support = getSupport();
   const PerigeeCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() < innerCylindricalR) {
+  if (support.Mag2() < innerCylindricalR * innerCylindricalR) {
     // If we start within the inner volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
-    const Vector2D apogee = globalCircle.apogee();
+    const ROOT::Math::XYVector apogee = globalCircle.apogee();
     return globalCircle.atCylindricalRForwardOf(apogee, innerCylindricalR);
 
   } else {
@@ -312,19 +314,19 @@ Vector2D CDCTrajectory2D::getInnerExit() const
   }
 }
 
-Vector2D CDCTrajectory2D::getOuterExit(double factor) const
+ROOT::Math::XYVector CDCTrajectory2D::getOuterExit(double factor) const
 {
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
   double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
 
-  const Vector2D support = getSupport();
+  const ROOT::Math::XYVector support = getSupport();
   const PerigeeCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() > outerCylindricalR) {
+  if (support.Mag2() > outerCylindricalR * outerCylindricalR) {
     // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the outer wall.
     // Therefore we take the outer exit that comes after the perigee.
-    const Vector2D perigee = globalCircle.perigee();
+    const ROOT::Math::XYVector perigee = globalCircle.perigee();
     return globalCircle.atCylindricalRForwardOf(perigee, outerCylindricalR);
 
   } else {
@@ -332,28 +334,28 @@ Vector2D CDCTrajectory2D::getOuterExit(double factor) const
   }
 }
 
-Vector2D CDCTrajectory2D::getExit() const
+ROOT::Math::XYVector CDCTrajectory2D::getExit() const
 {
-  const Vector2D outerExit = getOuterExit();
-  const Vector2D innerExit = getInnerExit();
-  const Vector2D localExit =  getLocalCircle()->chooseNextForwardOf(Vector2D(0, 0),
-                              outerExit - getLocalOrigin(),
-                              innerExit - getLocalOrigin());
+  const ROOT::Math::XYVector outerExit = getOuterExit();
+  const ROOT::Math::XYVector innerExit = getInnerExit();
+  const ROOT::Math::XYVector localExit =  getLocalCircle()->chooseNextForwardOf(ROOT::Math::XYVector(0, 0),
+                                          outerExit - getLocalOrigin(),
+                                          innerExit - getLocalOrigin());
   return localExit + getLocalOrigin();
 }
 
-void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
-                                  const Vector2D& mom2D,
+void CDCTrajectory2D::setPosMom2D(const ROOT::Math::XYVector& pos2D,
+                                  const ROOT::Math::XYVector& mom2D,
                                   const double charge)
 {
   m_localOrigin = pos2D;
-  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D);
-  Vector2D phiVec = mom2D.unit();
+  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.R(), charge, pos2D);
+  ROOT::Math::XYVector phiVec = VectorUtil::unit(mom2D);
   double impact = 0.0;
   m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
 }
 
-double CDCTrajectory2D::setLocalOrigin(const Vector2D& localOrigin)
+double CDCTrajectory2D::setLocalOrigin(const ROOT::Math::XYVector& localOrigin)
 {
   double arcLength2D = calcArcLength2D(localOrigin);
   m_flightTime += arcLength2D / Const::speedOfLight;

@@ -11,13 +11,14 @@
 
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
 
+#include <Math/Vector2D.h>
+
 #include <cstddef>
 #include <iosfwd>
 
 namespace Belle2 {
 
   namespace TrackingUtilities {
-    class Vector2D;
 
     /// A line in sz where s is the transverse travel distance as seen in the xy projection with
     /// uncertainties in the slope and intercept of the line.
@@ -176,7 +177,7 @@ namespace Belle2 {
     public:
       /// Moves the coordinate system by the vector by and calculates the new sz line and its
       /// covariance matrix. Change is inplace.
-      void passiveMoveBy(const Vector2D& bySZ)
+      void passiveMoveBy(const ROOT::Math::XYVector& bySZ)
       {
         // Move the covariance matrix first to have access to the original parameters
         SZJacobian jacobian = m_szLine.passiveMoveByJacobian(bySZ);
@@ -189,7 +190,7 @@ namespace Belle2 {
        * covariance
        *  for a passive move of the coordinate system.
        */
-      SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
+      SZCovariance passiveMovedCovarianceBy(const ROOT::Math::XYVector& bySZ) const
       {
         SZJacobian jacobian = m_szLine.passiveMoveByJacobian(bySZ);
         return SZUtil::transported(jacobian, szCovariance());

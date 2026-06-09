@@ -11,6 +11,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
+
 #include <vector>
 #include <string>
 
@@ -27,9 +32,9 @@ void TrackFlightTimeAdjuster::apply(std::vector<CDCTrack>& tracks)
 {
   for (CDCTrack& track : tracks) {
     CDCTrajectory3D startTrajectory3D = track.getStartTrajectory3D();
-    const Vector2D pos2D = startTrajectory3D.getSupport().xy();
-    const Vector2D dir2D = startTrajectory3D.getFlightDirection3DAtSupport().xy();
-    const double alpha = pos2D.angleWith(dir2D);
+    const ROOT::Math::XYVector pos2D = VectorUtil::getXYVector(startTrajectory3D.getSupport());
+    const ROOT::Math::XYVector dir2D = VectorUtil::getXYVector(startTrajectory3D.getFlightDirection3DAtSupport());
+    const double alpha = ROOT::Math::VectorUtil::DeltaPhi(pos2D, dir2D);
     const double beta = 1;
     const double flightTime2D =
       FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);

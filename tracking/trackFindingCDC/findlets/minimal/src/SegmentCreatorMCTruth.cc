@@ -20,11 +20,13 @@
 #include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
-#include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -104,9 +106,9 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
   for (CDCSegment2D& segment : outputSegments) {
     for (CDCRecoHit2D& recoHit2D : segment) {
-      Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-      Vector2D recoPos2D = recoHit2D.getRecoPos2D();
-      double alpha = recoPos2D.angleWith(flightDirection);
+      ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
+      ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
+      double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit2D.getWire();
       const CDCHit* hit = recoHit2D.getWireHit().getHit();

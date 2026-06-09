@@ -18,6 +18,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+
 #include <utility>
 
 using namespace Belle2;
@@ -162,10 +164,10 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
       CDCSegment2D aliasSegment = segment;
       CDCRecoHit2D& aliasHit = aliasSegment.back();
       aliasHit.reverse();
-      aliasHit.setRecoPos2D(Vector2D(NAN, NAN));
+      aliasHit.setRecoPos2D(ROOT::Math::XYVector(NAN, NAN));
       if (aliasHit.getRefDriftLength() < 0.2) {
         refit(aliasSegment, false);
-        Vector2D recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
+        ROOT::Math::XYVector recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
         ERightLeft rlInfo = aliasSegment.getTrajectory2D().isRightOrLeft(aliasHit.getRefPos2D());
         aliasHit.setRecoPos2D(recoPos2D);
         aliasHit.setRLInfo(rlInfo);
@@ -178,10 +180,10 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
       CDCSegment2D aliasSegment = segment;
       CDCRecoHit2D& aliasHit = aliasSegment.front();
       aliasHit.reverse();
-      aliasHit.setRecoPos2D(Vector2D(NAN, NAN));
+      aliasHit.setRecoPos2D(ROOT::Math::XYVector(NAN, NAN));
       if (aliasHit.getRefDriftLength() < 0.2) {
         refit(aliasSegment, false);
-        Vector2D recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
+        ROOT::Math::XYVector recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
         ERightLeft rlInfo = aliasSegment.getTrajectory2D().isRightOrLeft(aliasHit.getRefPos2D());
         aliasHit.setRecoPos2D(recoPos2D);
         aliasHit.setRLInfo(rlInfo);
@@ -207,9 +209,9 @@ void SegmentAliasResolver::apply(std::vector<CDCSegment2D>& outputSegments)
       if (minimalHit) {
         CDCRecoHit2D& aliasHit = *minimalHit;
         aliasHit.reverse();
-        aliasHit.setRecoPos2D(Vector2D(NAN, NAN));
+        aliasHit.setRecoPos2D(ROOT::Math::XYVector(NAN, NAN));
         refit(aliasSegment, false);
-        Vector2D recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
+        ROOT::Math::XYVector recoPos2D = aliasSegment.getTrajectory2D().getClosest(aliasHit.getRefPos2D());
         ERightLeft rlInfo = aliasSegment.getTrajectory2D().isRightOrLeft(aliasHit.getRefPos2D());
         aliasHit.setRecoPos2D(recoPos2D);
         aliasHit.setRLInfo(rlInfo);

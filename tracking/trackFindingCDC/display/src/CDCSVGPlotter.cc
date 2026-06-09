@@ -24,9 +24,6 @@
 #include <tracking/trackingUtilities/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
 #include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
@@ -37,6 +34,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <Math/Vector3D.h>
 
 #include <cmath>
 
@@ -363,11 +362,11 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       CDCRLWireHit fromRLWireHit(&fromWireHit);
       CDCRLWireHit toRLWireHit(&toWireHit);
 
-      Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
-      Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
+      ROOT::Math::XYZVector fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
+      ROOT::Math::XYZVector toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
 
-      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, fromDisplacement.xy());
-      CDCRecoHit2D toRecoHit2D(toRLWireHit, toDisplacement.xy());
+      CDCRecoHit2D fromRecoHit2D(fromRLWireHit, VectorUtil::getXYVector(fromDisplacement));
+      CDCRecoHit2D toRecoHit2D(toRLWireHit, VectorUtil::getXYVector(toDisplacement));
 
       bool falseOrder = false;
       if (fromSimHit->getArrayIndex() > toSimHit->getArrayIndex()) {
@@ -386,11 +385,11 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       draw(fromRecoHit2D, attributeMap);
       draw(toRecoHit2D, attributeMap);
 
-      const Vector2D fromPos = fromRecoHit2D.getRecoPos2D();
+      const ROOT::Math::XYVector fromPos = fromRecoHit2D.getRecoPos2D();
       const float fromX = fromPos.x();
       const float fromY = fromPos.y();
 
-      const Vector2D toPos = toRecoHit2D.getRecoPos2D();
+      const ROOT::Math::XYVector toPos = toRecoHit2D.getRecoPos2D();
       const float toX = toPos.x();
       const float toY = toPos.y();
 

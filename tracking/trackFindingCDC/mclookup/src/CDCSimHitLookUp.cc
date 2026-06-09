@@ -16,7 +16,7 @@
 
 #include <cdc/topology/CDCWireTopology.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/utilities/VectorRange.h>
 
@@ -137,10 +137,10 @@ MayBePtr<const CDCSimHit> CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimH
     auto compareDistanceBetweenSimHits =
       [&simHit](const CDCSimHit * primarySimHit,
     const CDCSimHit * otherPrimarySimHit) -> bool {
-      Vector3D primaryHitPos(primarySimHit->getPosTrack());
-      Vector3D otherPrimaryHitPos(otherPrimarySimHit->getPosTrack());
-      Vector3D secondaryHitPos(simHit.getPosTrack());
-      return primaryHitPos.distance(secondaryHitPos) < otherPrimaryHitPos.distance(secondaryHitPos);
+      ROOT::Math::XYZVector primaryHitPos(primarySimHit->getPosTrack());
+      ROOT::Math::XYZVector otherPrimaryHitPos(otherPrimarySimHit->getPosTrack());
+      ROOT::Math::XYZVector secondaryHitPos(simHit.getPosTrack());
+      return VectorUtil::Distance(primaryHitPos, secondaryHitPos) < VectorUtil::Distance(otherPrimaryHitPos, secondaryHitPos);
     };
 
     auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
@@ -175,20 +175,20 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) 
   return mcMap.getSimHit(ptrHit);
 }
 
-Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
+ROOT::Math::XYZVector CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
 {
-  if (not ptrHit) return Vector3D();
+  if (not ptrHit) return ROOT::Math::XYZVector();
 
   if (not m_ptrMCMap) {
     B2WARNING("CDCMCMap not set. Cannot find direction of flight");
-    return Vector3D();
+    return ROOT::Math::XYZVector();
   }
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
   const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
 
-  if (not ptrSimHit) return Vector3D();
+  if (not ptrSimHit) return ROOT::Math::XYZVector();
 
   const CDCSimHit* ptrPrimarySimHit =
     mcMap.isReassignedSecondary(ptrHit) ? getClosestPrimarySimHit(ptrHit) : ptrSimHit;
@@ -203,7 +203,7 @@ Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)
   const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
   // Take the momentum of the primary hit
-  Vector3D directionOfFlight{primarySimHit.getMomentum()};
+  ROOT::Math::XYZVector directionOfFlight{primarySimHit.getMomentum()};
   return directionOfFlight;
 }
 
@@ -224,12 +224,13 @@ void CDCSimHitLookUp::fillRLInfo()
     if (not ptrSimHit) continue;
     const CDCSimHit& simHit = *ptrSimHit;
 
-    Vector3D directionOfFlight = getDirectionOfFlight(ptrHit);
-    if (directionOfFlight.isNull()) continue;
+    ROOT::Math::XYZVector directionOfFlight = getDirectionOfFlight(ptrHit);
+    if (VectorUtil::isNull(directionOfFlight)) continue;
 
     // find out if the wire is right or left of the track ( view in flight direction )
-    Vector3D trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
-    ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+    ROOT::Math::XYZVector trackPosToWire{simHit.getPosWire() - simHit.getPosTrack()};
+    ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire),
+                                                    VectorUtil::getXYVector(directionOfFlight));
     m_rightLeftInfos[ptrHit] = rlInfo;
   }
 }
@@ -240,11 +241,11 @@ ERightLeft CDCSimHitLookUp::getRLInfo(const CDCHit* ptrHit) const
   return itFoundHit == m_rightLeftInfos.end() ? ERightLeft::c_Invalid : itFoundHit->second;
 }
 
-Vector3D CDCSimHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+ROOT::Math::XYZVector CDCSimHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
 {
   if (not m_ptrMCMap) {
     B2WARNING("CDCMCMap not set. Cannot find reconstructed position");
-    return Vector3D();
+    return ROOT::Math::XYZVector();
   }
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
@@ -252,11 +253,11 @@ Vector3D CDCSimHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
 
   if (not ptrSimHit) {
     B2WARNING("No CDCSimHit related to CDCHit");
-    return Vector3D();
+    return ROOT::Math::XYZVector();
   }
 
   const CDCSimHit& simHit = *ptrSimHit;
-  return Vector3D{simHit.getPosTrack()};
+  return ROOT::Math::XYZVector{simHit.getPosTrack()};
 }
 
 double CDCSimHitLookUp::getDriftLength(const CDCHit* ptrHit) const
@@ -278,12 +279,12 @@ double CDCSimHitLookUp::getDriftLength(const CDCHit* ptrHit) const
   return simHit.getDriftLength();
 }
 
-Vector3D CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
+ROOT::Math::XYZVector CDCSimHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
 {
   const CDCSimHit* ptrPrimarySimHit = getClosestPrimarySimHit(ptrHit);
   if (ptrPrimarySimHit) {
     const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
-    return Vector3D{primarySimHit.getPosTrack()};
+    return ROOT::Math::XYZVector{primarySimHit.getPosTrack()};
   } else {
     return getRecoPos3D(ptrHit);
   }
@@ -328,7 +329,7 @@ CDCRecoHit3D CDCSimHitLookUp::getRecoHit3D(const CDCHit* ptrHit,
   CDCRLWireHit rlWireHit = getRLWireHit(ptrHit, wireHits);
   double driftLength = getDriftLength(ptrHit);
   rlWireHit.setRefDriftLength(driftLength);
-  Vector3D recoPos3D = getRecoPos3D(ptrHit);
+  ROOT::Math::XYZVector recoPos3D = getRecoPos3D(ptrHit);
   return CDCRecoHit3D(rlWireHit, recoPos3D);
 }
 
@@ -339,7 +340,7 @@ CDCSimHitLookUp::getClosestPrimaryRecoHit3D(const CDCHit* ptrHit,
   CDCRLWireHit rlWireHit = getRLWireHit(ptrHit, wireHits);
   double driftLength = getClosestPrimaryDriftLength(ptrHit);
   rlWireHit.setRefDriftLength(driftLength);
-  Vector3D recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
+  ROOT::Math::XYZVector recoPos3D = getClosestPrimaryRecoPos3D(ptrHit);
   return CDCRecoHit3D(rlWireHit, recoPos3D);
 }
 

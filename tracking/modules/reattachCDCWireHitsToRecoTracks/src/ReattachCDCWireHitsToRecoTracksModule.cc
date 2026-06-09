@@ -8,14 +8,15 @@
 #include <tracking/modules/reattachCDCWireHitsToRecoTracks/ReattachCDCWireHitsToRecoTracksModule.h>
 
 #include <cdc/topology/CDCWire.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dbobjects/DAFConfiguration.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -79,12 +80,12 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
 
   for (RecoTrack& recoTrack : m_inputRecoTracks) {
     // only fit tracks coming from the IP (d0 and z0 from Helix)
-    const Vector3D trackPosition(recoTrack.getPositionSeed());
-    const Vector3D trackMomentum(recoTrack.getMomentumSeed());
+    const ROOT::Math::XYZVector trackPosition(recoTrack.getPositionSeed());
+    const ROOT::Math::XYZVector trackMomentum(recoTrack.getMomentumSeed());
     const CDCTrajectory3D trajectory(trackPosition, recoTrack.getTimeSeed(), trackMomentum, recoTrack.getChargeSeed());
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
-    const double d0Estimate((trajectory2D.getClosest(Vector2D(0, 0))).norm());
+    const double d0Estimate(trajectory2D.getClosest(ROOT::Math::XYVector(0, 0)).R());
     const double z0Estimate(trajectorySZ.getZ0());
     if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {
@@ -234,29 +235,31 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
   try {
 
     const genfit::MeasuredStateOnPlane& mSoP(recoTrack.getMeasuredStateOnPlaneFromRecoHit(recoHitInformation));
-    const Vector3D trackPosition(mSoP.getPos());
-    const Vector3D trackMomentum(mSoP.getMom());
+    const ROOT::Math::XYZVector trackPosition(mSoP.getPos());
+    const ROOT::Math::XYZVector trackMomentum(mSoP.getMom());
     const CDCTrajectory3D trajectory(trackPosition, mSoP.getTime(), trackMomentum, mSoP.getCharge());
 
     const CDCTrajectory2D& trajectory2D(trajectory.getTrajectory2D());
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
 
-    Vector2D recoPos2D;
+    ROOT::Math::XYVector recoPos2D;
     if (wireHit.isAxial()) {
       recoPos2D = wireHit.reconstruct2D(trajectory2D);
     } else {
       const CDCWire& wire(wireHit.getWire());
-      const Vector2D& posOnXYPlane(wireHit.reconstruct2D(trajectory2D));
+      const ROOT::Math::XYVector& posOnXYPlane(wireHit.reconstruct2D(trajectory2D));
 
       const double arcLength(trajectory2D.calcArcLength2D(posOnXYPlane));
       const double z(trajectorySZ.mapSToZ(arcLength));
 
-      const Vector2D& wirePos2DAtZ(wire.getWirePos2DAtZ(z));
+      const ROOT::Math::XYVector& wirePos2DAtZ(wire.getWirePos2DAtZ(z));
 
-      const Vector2D& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
+      const ROOT::Math::XYVector& recoPosOnTrajectory(trajectory2D.getClosest(wirePos2DAtZ));
       const double driftLength(wireHit.getRefDriftLength());
-      Vector2D disp2D(recoPosOnTrajectory - wirePos2DAtZ);
-      disp2D.normalizeTo(driftLength);
+      ROOT::Math::XYVector disp2D(recoPosOnTrajectory - wirePos2DAtZ);
+      if (disp2D.R() > 0.0) {
+        disp2D *= (driftLength / disp2D.R());
+      }
       recoPos2D = wirePos2DAtZ + disp2D;
     }
 
@@ -265,10 +268,10 @@ ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHits
     results.z =  trajectorySZ.mapSToZ(results.arcLength);
     results.distanceToTrack = trajectory2D.getDist2D(recoPos2D);
 
-    const Vector3D hitPosition(wireHit.getWire().getWirePos3DAtZ(trackPosition.z()));
+    const ROOT::Math::XYZVector hitPosition(wireHit.getWire().getWirePos3DAtZ(trackPosition.z()));
 
-    Vector3D trackPosToWire{hitPosition - trackPosition};
-    results.rlInfo =  trackPosToWire.xy().isRightOrLeftOf(trackMomentum.xy());
+    ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
+    results.rlInfo =  VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire), VectorUtil::getXYVector(trackMomentum));
 
     results.isValid = true;
 

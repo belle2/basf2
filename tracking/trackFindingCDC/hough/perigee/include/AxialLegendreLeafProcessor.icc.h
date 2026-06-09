@@ -19,12 +19,15 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -62,7 +65,7 @@ namespace Belle2 {
           trajectory2D.reverse();
         }
       }
-      trajectory2D.setLocalOrigin(TrackingUtilities::Vector2D(0, 0));
+      trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0, 0));
 
       // Look for more hits near the found trajectory
       /////////////////////////////////////////////////////////////////////////
@@ -91,7 +94,7 @@ namespace Belle2 {
           observations2D.clear();
           observations2D.appendRange(hits);
           trajectory2D = fitter.fit(observations2D);
-          trajectory2D.setLocalOrigin(TrackingUtilities::Vector2D(0.0, 0.0));
+          trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
         }
       }
 
@@ -119,8 +122,8 @@ namespace Belle2 {
     std::vector<WithSharedMark<TrackingUtilities::CDCRLWireHit> >
     AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const TrackingUtilities::CDCTrajectory2D& trajectory2D)
     {
-      TrackingUtilities::PerigeeCircle circle = trajectory2D.getGlobalCircle();
-      TrackingUtilities::Vector2D support = trajectory2D.getGlobalPerigee();
+      const TrackingUtilities::PerigeeCircle& circle = trajectory2D.getGlobalCircle();
+      const ROOT::Math::XYVector& support = trajectory2D.getGlobalPerigee();
       const float curv = circle.curvature();
       const float phi0 = circle.phi0();
 
@@ -140,7 +143,7 @@ namespace Belle2 {
 
       DiscreteCurv::Array curvBounds{{curv - curvPrecision, curv + curvPrecision}};
       ContinuousImpact::Array impactBounds{{ -impactPrecision, impactPrecision}};
-      DiscretePhi0::Array phi0Bounds{{TrackingUtilities::Vector2D::Phi(phi0 - phi0Precision), TrackingUtilities::Vector2D::Phi(phi0 + phi0Precision)}};
+      DiscretePhi0::Array phi0Bounds{{VectorUtil::Phi(phi0 - phi0Precision), VectorUtil::Phi(phi0 + phi0Precision)}};
       RoadHoughBox precisionPhi0CurvBox(DiscretePhi0::getRange(phi0Bounds),
                                         ContinuousImpact::getRange(impactBounds),
                                         DiscreteCurv::getRange(curvBounds));

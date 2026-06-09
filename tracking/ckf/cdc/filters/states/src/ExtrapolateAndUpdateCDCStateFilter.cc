@@ -8,6 +8,7 @@
 #include <tracking/ckf/cdc/filters/states/ExtrapolateAndUpdateCDCStateFilter.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
@@ -17,19 +18,22 @@
 
 #include <framework/core/ModuleParamList.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 
 namespace {
   TrackingUtilities::ERightLeft setRLInfo(const genfit::MeasuredStateOnPlane& mSoP, CDCCKFState& state)
   {
-    const auto& mom = TrackingUtilities::Vector3D(mSoP.getMom());
+    const auto& mom = ROOT::Math::XYZVector(mSoP.getMom());
     const auto& wire = state.getWireHit()->getWire();
 
-    const auto& trackPosition = TrackingUtilities::Vector3D(mSoP.getPos());
+    const auto& trackPosition = ROOT::Math::XYZVector(mSoP.getPos());
     const auto& hitPosition = wire.getWirePos3DAtZ(trackPosition.z());
 
-    TrackingUtilities::Vector3D trackPosToWire{hitPosition - trackPosition};
-    TrackingUtilities::ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(mom.xy());
+    ROOT::Math::XYZVector trackPosToWire{hitPosition - trackPosition};
+    TrackingUtilities::ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire),
+                                           VectorUtil::getXYVector(mom));
 
     state.setRLinfo(rlInfo);
     return rlInfo;

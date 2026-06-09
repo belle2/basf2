@@ -14,8 +14,6 @@
 #include <cdc/topology/EStereoKind.h>
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Index.h>
@@ -163,24 +161,26 @@ const CDCWire& CDCWireHit::attachWire() const
   return *m_wire;
 }
 
-Vector2D CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
+ROOT::Math::XYVector CDCWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 {
-  const Vector2D& refPos2D = getRefPos2D();
-  Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
+  const ROOT::Math::XYVector& refPos2D = getRefPos2D();
+  ROOT::Math::XYVector recoPos2D = trajectory2D.getClosest(refPos2D);
 
-  const Vector2D& wirePos2D = getWire().getRefPos2D();
+  const ROOT::Math::XYVector& wirePos2D = getWire().getRefPos2D();
   const double driftLength = getRefDriftLength();
 
-  Vector2D disp2D = recoPos2D - wirePos2D;
+  ROOT::Math::XYVector disp2D = recoPos2D - wirePos2D;
 
   // Fix the displacement to lie on the drift circle.
-  disp2D.normalizeTo(driftLength);
+  if (disp2D.R() != 0.0) {
+    disp2D *= (driftLength / disp2D.R());
+  }
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
-                                   const ERightLeft rlInfo,
-                                   const double z) const
+ROOT::Math::XYZVector CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
+                                                const ERightLeft rlInfo,
+                                                const double z) const
 {
   const EStereoKind stereoType = getStereoKind();
 
@@ -190,14 +190,14 @@ Vector3D CDCWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D,
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength, z);
 
   } else { /*if (stereoType == EStereoKind::c_Axial)*/
-    const Vector2D recoPos2D = reconstruct2D(trajectory2D);
+    const ROOT::Math::XYVector recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    return Vector3D(recoPos2D, z);
+    return ROOT::Math::XYZVector(recoPos2D.X(), recoPos2D.Y(), z);
   }
 }
 
-Circle2D CDCWireHit::conformalTransformed(const Vector2D& relativeTo) const
+Circle2D CDCWireHit::conformalTransformed(const ROOT::Math::XYVector& relativeTo) const
 {
   Circle2D driftCircle(getRefPos2D() - relativeTo, getRefDriftLength());
   driftCircle.conformalTransform();

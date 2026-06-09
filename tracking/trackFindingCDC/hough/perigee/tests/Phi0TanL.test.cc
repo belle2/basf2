@@ -143,8 +143,8 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
-      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
+      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Lower TanL " << houghBox.getLowerBound<ContinuousTanL>());
       B2DEBUG(100, "Upper TanL " << houghBox.getUpperBound<ContinuousTanL>());
 
@@ -238,8 +238,8 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
-      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
+      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Lower TanL " << houghBox.getLowerBound<ContinuousTanL>());
       B2DEBUG(100, "Upper TanL " << houghBox.getUpperBound<ContinuousTanL>());
 

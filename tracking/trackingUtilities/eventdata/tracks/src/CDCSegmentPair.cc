@@ -16,13 +16,15 @@
 #include  <cdc/topology/EStereoKind.h>
 #include  <cdc/topology/ISuperLayer.h>
 
-#include  <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include  <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include  <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 #include <framework/logging/Logger.h>
+
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 #include <memory>
 #include <cmath>
@@ -141,10 +143,10 @@ double CDCSegmentPair::computeDeltaPhiAtSuperLayerBound() const
   const CDCRecoHit2D& lastRecoHit_fromSegment = fromSegment.back();
   const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
 
-  const Vector2D lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
-  const Vector2D firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
 
-  return lastPos2D_fromSegment.angleWith(firstPos2D_toSegment);
+  return ROOT::Math::VectorUtil::DeltaPhi(lastPos2D_fromSegment, firstPos2D_toSegment);
 }
 
 double CDCSegmentPair::computeFromIsBeforeToFitless() const
@@ -172,14 +174,14 @@ double CDCSegmentPair::computeFromIsBeforeToFitless() const
 
   const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
 
-  const Vector2D firstPos2D_fromSegment = firstRecoHit_fromSegment.getRecoPos2D();
-  const Vector2D lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
-  const Vector2D firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_fromSegment = firstRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
 
-  Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
-  Vector2D firstToFirst = firstPos2D_toSegment - firstPos2D_fromSegment;
+  ROOT::Math::XYVector firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
+  ROOT::Math::XYVector firstToFirst = firstPos2D_toSegment - firstPos2D_fromSegment;
 
-  return firstToLast_fromSegment.angleWith(firstToFirst);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_fromSegment, firstToFirst);
 }
 
 double CDCSegmentPair::computeToIsAfterFromFitless() const
@@ -207,14 +209,14 @@ double CDCSegmentPair::computeToIsAfterFromFitless() const
   const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
   const CDCRecoHit2D& lastRecoHit_toSegment = toSegment.back();
 
-  const Vector2D lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
-  const Vector2D firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
-  const Vector2D lastPos2D_toSegment = lastRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_toSegment = lastRecoHit_toSegment.getRecoPos2D();
 
-  Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
-  Vector2D lastToLast = lastPos2D_toSegment - lastPos2D_fromSegment;
+  ROOT::Math::XYVector firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
+  ROOT::Math::XYVector lastToLast = lastPos2D_toSegment - lastPos2D_fromSegment;
 
-  return firstToLast_toSegment.angleWith(lastToLast);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_toSegment, lastToLast);
 }
 
 double CDCSegmentPair::computeIsCoalignedFitless() const
@@ -243,16 +245,16 @@ double CDCSegmentPair::computeIsCoalignedFitless() const
   const CDCRecoHit2D& firstRecoHit_toSegment = toSegment.front();
   const CDCRecoHit2D& lastRecoHit_toSegment = toSegment.back();
 
-  const Vector2D firstPos2D_fromSegment = firstRecoHit_fromSegment.getRecoPos2D();
-  const Vector2D lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_fromSegment = firstRecoHit_fromSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_fromSegment = lastRecoHit_fromSegment.getRecoPos2D();
 
-  const Vector2D firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
-  const Vector2D lastPos2D_toSegment = lastRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector firstPos2D_toSegment = firstRecoHit_toSegment.getRecoPos2D();
+  const ROOT::Math::XYVector lastPos2D_toSegment = lastRecoHit_toSegment.getRecoPos2D();
 
-  Vector2D firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
-  Vector2D firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
+  ROOT::Math::XYVector firstToLast_fromSegment = lastPos2D_fromSegment - firstPos2D_fromSegment;
+  ROOT::Math::XYVector firstToLast_toSegment = lastPos2D_toSegment - firstPos2D_toSegment;
 
-  return firstToLast_fromSegment.angleWith(firstToLast_toSegment);
+  return ROOT::Math::VectorUtil::DeltaPhi(firstToLast_fromSegment, firstToLast_toSegment);
 }
 
 EForwardBackward CDCSegmentPair::isCoaligned(const CDCTrajectory2D& trajectory2D) const

@@ -16,12 +16,13 @@
 
 #include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -53,20 +54,20 @@ const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit) co
 }
 
 
-const Vector2D CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit) const
+const ROOT::Math::XYVector CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit) const
 {
-  if (not ptrHit) return Vector2D();
+  if (not ptrHit) return ROOT::Math::XYVector();
   const CDCHit& hit = *ptrHit;
 
   const CDCWire* ptrWire = CDCWire::getInstance(hit);
 
   if (not ptrWire) {
     B2WARNING("Encountered CDCHit with wire ids that do not correspond to a valid wire in the CDC)");
-    return Vector2D();
+    return ROOT::Math::XYVector();
   }
 
   const CDCWire& wire = *ptrWire;
-  Vector2D refPos2D =  wire.getRefPos2D();
+  ROOT::Math::XYVector refPos2D =  wire.getRefPos2D();
   return refPos2D;
 }
 
@@ -81,13 +82,13 @@ float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
 }
 
 
-const Vector3D CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+const ROOT::Math::XYZVector CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getSimHitLookUp().getRecoPos3D(ptrHit);
 }
 
 
-const Vector3D CDCMCHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
+const ROOT::Math::XYZVector CDCMCHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
 {
   return CDCMCManager::getSimHitLookUp().getClosestPrimaryRecoPos3D(ptrHit);
 }

@@ -14,9 +14,6 @@
 #include <generators/evtgen/EvtGenModelRegister.h>
 #include <generators/evtgen/models/EvtHNLGoityRoberts.h>
 #include "EvtGenBase/EvtDiracSpinor.hh"
-// #include "EvtGenBase/EvtGenKine.hh"
-// #include "EvtGenBase/EvtPatches.hh"
-// #include "EvtGenBase/EvtReport.hh"
 #include "EvtGenBase/EvtTensor4C.hh"
 #include "EvtGenBase/EvtVector4C.hh"
 
@@ -315,7 +312,7 @@ void EvtHNLGoityRoberts::DecayBDstarpilnuGR(EvtParticle* pb, EvtId ndstar,
   et1 = omega.cont2(dstar->epsParent(1).conj());
   et2 = omega.cont2(dstar->epsParent(2).conj());
 
-  EvtVector4C et[3] = {et0, et1, et2};
+  const EvtVector4C et[3] = {et0, et1, et2};
 
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 2; ++j) {
@@ -323,11 +320,11 @@ void EvtHNLGoityRoberts::DecayBDstarpilnuGR(EvtParticle* pb, EvtId ndstar,
         EvtLeptonVACurrent(hnl->spParent(j), lepton->spParent(i))
       };
 
-      for (int k = 0; k < 3; ++k) {
+      for (int pol = 0; pol < 3; ++pol) {
         if (isNegativeLepton) {
-          vertex(k, i, j, current.conj() * et[k]);
+          vertex(pol, i, j, current.conj() * et[pol]);
         } else if (isPositiveLepton) {
-          vertex(k, i, j, current * et[k]);
+          vertex(pol, i, j, current * et[pol]);
         }
       }
     }

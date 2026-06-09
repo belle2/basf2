@@ -296,7 +296,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         canvas->cd();
 
         // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        auto h = static_cast<TH1*>(hist2->Clone()); // Annoying ... Maybe an memory leak? TODO
         // would it work to scale it each time again?
         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
@@ -339,7 +339,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         if (hh1) {
           double mpv = 0.0;
           if (hh1->GetEntries() > 50) {
-            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, static_cast<const TH1*> hh1);
             auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
             /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 

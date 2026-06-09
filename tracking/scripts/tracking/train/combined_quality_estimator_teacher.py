@@ -636,7 +636,7 @@ class SplitNMergeSimTask(Basf2Task):
         print(file_list)
         cmd = ["b2file-merge", "-f"]
         args = cmd + [self.get_output_file_name(self.output_file_name())] + file_list
-        print(f"args for merging: {args}")
+        print(f"args to merge: {args}")
         subprocess.check_call(args)
         print("Finished merging. Removing the input files to save space.")
         cmd2 = ["rm", "-f"]

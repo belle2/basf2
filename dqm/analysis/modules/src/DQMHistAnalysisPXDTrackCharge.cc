@@ -50,10 +50,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
-DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
-{
-}
-
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");

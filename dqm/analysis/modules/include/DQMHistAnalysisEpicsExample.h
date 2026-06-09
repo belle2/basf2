@@ -31,11 +31,6 @@ namespace Belle2 {
     DQMHistAnalysisEpicsExampleModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisEpicsExampleModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

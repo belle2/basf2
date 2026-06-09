@@ -41,11 +41,6 @@ DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
 }
 
-
-DQMHistAnalysisPXDERModule::~DQMHistAnalysisPXDERModule()
-{
-}
-
 void DQMHistAnalysisPXDERModule::initialize()
 {
   m_refFile = NULL;

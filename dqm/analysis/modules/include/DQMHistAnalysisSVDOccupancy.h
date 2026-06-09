@@ -37,11 +37,6 @@ namespace Belle2 {
     DQMHistAnalysisSVDOccupancyModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisSVDOccupancyModule() override;
-
-    /**
      * Initializer.
      */
     void initialize() override final;

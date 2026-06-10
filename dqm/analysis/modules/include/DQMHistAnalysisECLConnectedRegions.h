@@ -30,9 +30,6 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLConnectedRegionsModule();
 
-    /** Destructor. */
-    ~DQMHistAnalysisECLConnectedRegionsModule() {};
-
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */

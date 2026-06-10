@@ -30,9 +30,6 @@ DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
   B2DEBUG(1, "DQMHistReference: Constructor done.");
 }
 
-
-DQMHistReferenceModule::~DQMHistReferenceModule() { }
-
 void DQMHistReferenceModule::initialize()
 {
   B2DEBUG(1, "DQMHistReference: initialized.");

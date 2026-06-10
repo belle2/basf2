@@ -28,9 +28,6 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLOutOfTimeDigitsModule();
 
-    /** Destructor. */
-    ~DQMHistAnalysisECLOutOfTimeDigitsModule() {}
-
     /** Initialize the module. */
     void initialize() override final;
     /** Event processor. */

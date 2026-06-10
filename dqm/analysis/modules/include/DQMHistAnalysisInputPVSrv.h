@@ -55,11 +55,6 @@ namespace Belle2 {
     DQMHistAnalysisInputPVSrvModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisInputPVSrvModule();
-
-    /**
      * Definition of the histograms.
      */
     void initialize() override final;

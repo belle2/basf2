@@ -43,11 +43,6 @@ DQMHistAnalysisECLSummaryModule::DQMHistAnalysisECLSummaryModule()
            true);
 }
 
-
-DQMHistAnalysisECLSummaryModule::~DQMHistAnalysisECLSummaryModule()
-{
-}
-
 void DQMHistAnalysisECLSummaryModule::initialize()
 {
   m_mapper.initFromFile();

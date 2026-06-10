@@ -39,9 +39,6 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLSummaryModule();
 
-    /** Destructor. */
-    ~DQMHistAnalysisECLSummaryModule();
-
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */

@@ -34,11 +34,6 @@ namespace Belle2 {
     DQMHistAnalysisSVDUnpackerModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisSVDUnpackerModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

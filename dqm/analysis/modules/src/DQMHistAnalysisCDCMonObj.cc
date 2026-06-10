@@ -46,10 +46,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   for (int i = 0; i < 56; i++) m_hHits[i] = nullptr;
 }
 
-DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
-{
-}
-
 void DQMHistAnalysisCDCMonObjModule::initialize()
 {
 

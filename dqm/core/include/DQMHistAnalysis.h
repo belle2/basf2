@@ -668,7 +668,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisModule();
-    virtual ~DQMHistAnalysisModule() {};
+    virtual ~DQMHistAnalysisModule() override = default;
 
     /**
      * Helper function for string token split

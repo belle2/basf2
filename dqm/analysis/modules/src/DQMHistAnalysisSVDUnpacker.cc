@@ -48,8 +48,6 @@ DQMHistAnalysisSVDUnpackerModule::DQMHistAnalysisSVDUnpackerModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
-DQMHistAnalysisSVDUnpackerModule::~DQMHistAnalysisSVDUnpackerModule() { }
-
 void DQMHistAnalysisSVDUnpackerModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDUnpacker: initialized.");

@@ -30,9 +30,6 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLShapersModule();
 
-    /** Destructor. */
-    ~DQMHistAnalysisECLShapersModule();
-
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */

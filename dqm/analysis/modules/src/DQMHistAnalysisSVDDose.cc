@@ -33,10 +33,6 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
            std::string("Occ:Pois:State"));
 }
 
-DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
-{
-}
-
 void DQMHistAnalysisSVDDoseModule::initialize()
 {
   B2DEBUG(18, "DQMHistAnalysisSVDDose: initialize");

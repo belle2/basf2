@@ -44,10 +44,6 @@ DQMHistAnalysisHLTMonObjModule::DQMHistAnalysisHLTMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-DQMHistAnalysisHLTMonObjModule::~DQMHistAnalysisHLTMonObjModule()
-{
-}
-
 void DQMHistAnalysisHLTMonObjModule::initialize()
 {
   // make monitoring object related to this module

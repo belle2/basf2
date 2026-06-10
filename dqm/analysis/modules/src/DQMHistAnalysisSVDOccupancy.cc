@@ -60,8 +60,6 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
-DQMHistAnalysisSVDOccupancyModule::~DQMHistAnalysisSVDOccupancyModule() { }
-
 void DQMHistAnalysisSVDOccupancyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: initialized.");

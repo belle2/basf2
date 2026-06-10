@@ -31,7 +31,7 @@ namespace Belle2 {
         ECLElementNumbers::c_NCrystals;  /**< total number of electronic channels (crystals) in calorimeter */
       static constexpr double    m_step = 1. / 9.; /**< time between points in internal units t_{asrto}*m_rf/2./64. */
       static constexpr double    s_clock = 64.; /**< digitization clock in RF units */
-      static constexpr int       m_ntrg = 144; /**< number of trigger counts per ADC clock tick */
+      static constexpr int       m_ntrg = 256; /**< number of trigger counts per ADC clock tick */
 
       static constexpr int       m_nsmp = 64; /**< number of ADC measurements for signal fitting */
       static constexpr double    m_tmin = -32; /**< lower range of the signal fitting region in ADC clocks */
@@ -40,6 +40,7 @@ namespace Belle2 {
       static constexpr int       m_ns = 32; /**< number of samples per ADC clock */
       static constexpr int       m_ndt = 128; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
       static constexpr int       m_ntf = 4; /**< number of time shifts for signal fit procedure parameters */
+      static constexpr int       m_nta = 32; /**< number of time shifts for signal fit procedure parameters in low amplitude case */
 
     private:
       static double m_rf; /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
@@ -98,7 +99,7 @@ namespace Belle2 {
       /** a struct for the fit parameters */
       struct fitparams_t {
         typedef int int_array_gridxadc_t[m_ntf * m_ndt][m_npre]; /**< Array for DSP coefs in normal fit */
-        typedef int int_array_subxadc_t[m_ntf * m_ndt / 8][m_npre]; /**< Array for DSP coefs in fast fit */
+        typedef int int_array_subxadc_t[m_nta][m_npre]; /**< Array for DSP coefs in fast fit */
         int_array_gridxadc_t f; /**< Array with tabulated signal waveform */
         int_array_gridxadc_t f1; /**< Array with tabulated derivative of signal waveform */
         int_array_gridxadc_t fg31; /**< Array to estimate signal amplitude */

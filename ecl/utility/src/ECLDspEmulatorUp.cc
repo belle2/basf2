@@ -84,17 +84,24 @@ namespace Belle2 {
       constexpr int SIG_OFFSET = 0;      // signal starts at y[SIG_OFFSET]
       constexpr int N_DT = 128;    // number of time divisions in 1 step
       constexpr int N_TF = 4;    // number of time divisions in 1 step
-      constexpr int N_TRG = 144; // number of trigger divisions in 1 step
+      constexpr int N_TRG = 256; // number of trigger divisions in 1 step
+      constexpr int N_TA = 32;   // number of time divisions in 1 step for low amplitude case
+      constexpr int N_SUB = 32;   // number of sub-divisions for time correction
+      constexpr int MAX_ITER = 20; // max number of iterations for time correction
 
-      // Trigger time 0-23
-      const int ttrig = ttrig2 > 0 ? ttrig2 / 6 : 0;
+      // Trigger time [0, N_TA-1]
+      const int ttrig = setInRange((ttrig2 * N_TA) / N_TRG, 0, N_TA - 1);
 
       // Initial time index
       int it0;
       if (!adjusted_timing) {
-        it0 = (N_TF * N_DT / 4) + (((N_TF * N_DT / 8 - 1) - ttrig) << 2);
+        it0 = lround(
+                ((N_TF - 1) * N_DT / 2) - 1 + ((N_TA - 1 - ttrig) * N_DT) / N_TA
+              );
       } else {
-        it0 = (N_TF * N_DT / 4) + ((N_TRG - 1 - ttrig2) << 2) / 6;
+        it0 = lround(
+                ((N_TF - 1) * N_DT / 2) - 1 + ((N_TRG - 1 - ttrig2) * N_DT) / N_TRG
+              );
       }
       // Min time index, max time index
       int it_l = 0, it_h = (N_TF * N_DT) - 1;
@@ -160,7 +167,7 @@ namespace Belle2 {
       int T = 0;
       int converge_flag = 0;
 
-      const int iterations = 20; // number of iterations for time correction, can be tuned for better performance
+      const int iterations = MAX_ITER; // number of iterations for time correction, can be tuned for better performance
       if (!skip_fit && !low_ampl) {
         for (int iter = 1; iter <= iterations; iter++) {
 
@@ -226,43 +233,50 @@ namespace Belle2 {
 
           //== Estimate t_new as t_0 - B/A
 
-          if (k_b >= 13) {
-            B2 = B1 >> (k_b - 13);
+          if (k_b >= 15) {
+            B2 = B1 >> (k_b - 15);
           } else {
-            B2 = B1 << (13 - k_b);
+            B2 = B1 << (15 - k_b);
           }
-          B2 += (A1 << 13);
+          B2 += (A1 << 15);
           B3 = (B2 / A1);
 
-          int it_uncut = (B3 + 16) >> 5;
-          int delta_it = it_uncut - 256;
+          int it_uncut = (B3 + 64) >> 7;
+          int delta_it = it_uncut - (N_TF * N_DT / 2);
           delta_it = setInRange(delta_it, -(N_TF * N_DT - 1), N_TF * N_DT - 1);
 
           int it_current = it;
 
           it += delta_it;
-          int r = B3 - 8192;
-          if ((delta_it == 0) && (converge_flag == 0)) {
-            if (r > 0) it += 1;
-            else if (r < 0) it -= 1;
-            converge_flag = 1;
-          }
           it = setInRange(it, it_l, it_h);
 
+          int r = static_cast<int>(B3 - (1 << 15));
+          const int half_bin = (1 << 15) / (2 * N_TF * N_DT);
+
+          if ((delta_it == 0) && (converge_flag == 0)) {
+            if (r > half_bin) it += 1;
+            else if (r < -half_bin) it -= 1;
+            it = setInRange(it, it_l, it_h);
+            converge_flag = 1;
+          }
+
           if ((iter == iterations) || ((it == it_current) && (converge_flag == 1))) {
+
+            int residual = B3 - (1 << 15);
             int delta_T;
-
-            if (B3 >= 0x37FE)
-              delta_T = 2047;
-            else if ((B3 >> 1) <= 0x400)
-              delta_T = -2047;
+            if (residual >= 0)
+              delta_T = (residual + 2) >> 2;
             else
-              delta_T = B3 - 8192;
+              delta_T = -(((-residual) + 2) >> 2);
+            delta_T = setInRange(delta_T, -8192, 8191);
 
-            int t_uncut = it_current * 32 + delta_T;
-            t_uncut = setInRange(t_uncut, -N_TF * N_DT * 32, N_TF * N_DT * 32 - 1);
+            int t_uncut = (it_current - (N_TF * N_DT / 2)) * N_SUB + delta_T;
+            t_uncut = setInRange(t_uncut, -16384, 16383);
 
-            T = -t_uncut + (N_TF * N_DT * 16); // time in ADC ticks, with reference to trigger time, in range [-2048, 2047]
+            int trig_offset = static_cast<int>(std::lround(
+                                                 double(ttrig2 - N_TRG / 2) * double(N_DT * N_SUB) / double(N_TRG)
+                                               ));
+            T = -t_uncut - trig_offset;
             /*
             if (!adjusted_timing) {
               T += (((210) - ttrig2) << 3);
@@ -271,7 +285,7 @@ namespace Belle2 {
             }
             */
 
-            T = setInRange(T, -N_TF * N_DT * 32, N_TF * N_DT * 32 - 1);
+            T = setInRange(T, -16384, 16383);
 
             //== Estimate pedestal
 

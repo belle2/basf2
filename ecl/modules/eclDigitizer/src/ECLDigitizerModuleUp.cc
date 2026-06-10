@@ -428,8 +428,8 @@ void ECLDigitizerModuleUp::event()
   }
 
   if (!m_trigTime || !isTrigTime) { // reproduce previous logic -- one trigger time for all crates
-    int DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..72)
-    for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = 0;//DeltaT;
+    int DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..n_trg/2)
+    for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
   }
 
   int triggerTag0 = m_EventMetaData->getEvent();
@@ -757,6 +757,7 @@ void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   constexpr int nADC_signal = ECLWaveformDataUp::c_nADCsignal;
   constexpr int m_ndt = ec.m_ndt;
   constexpr int m_ntf = ec.m_ntf;
+  constexpr int m_nta = ec.m_nta;
 
   double ssd[nADC_signal][nADC_signal];
   eclWFData.getMatrix(ssd);
@@ -775,8 +776,8 @@ void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   double dbl_fg31[m_ntf * m_ndt][nADC_signal];
   double dbl_fg32[m_ntf * m_ndt][nADC_signal];
   double dbl_fg33[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg41[m_ntf * m_ndt / 8][nADC_signal];
-  double dbl_fg43[m_ntf * m_ndt / 8][nADC_signal];
+  double dbl_fg41[m_nta][nADC_signal];
+  double dbl_fg43[m_nta][nADC_signal];
 
   int_array_gridxadc_t& ref_f    = p.f;
   int_array_gridxadc_t& ref_f1   = p.f1;
@@ -847,17 +848,24 @@ void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, cons
     }
 
     //first approximation without time correction
-    int jk = (m_ntf * m_ndt / 8) - 1 + (((m_ntf * m_ndt / 4) - k) >> 2);
-    if (jk >= 0 && jk < (m_ntf * m_ndt / 8) && ((m_ntf * m_ndt / 4) - k) % 4 == 0) {
+    int center = m_ndt * (m_ntf - 1) / 2;
+    int step   = m_ndt / m_nta;   // 4
 
-      double igg1 = 1 / a11;
-      // to fixed point
-      for (int i = 0; i < nADC_signal; i++) {
+    int rel = center - k;
 
-        double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
-        double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-        dbl_fg41[jk][i] = (fg41 * ia);
-        dbl_fg43[jk][i] = (fg43 * ic);
+    if (rel % step == 0) {
+      int jk = (m_nta - 1) + rel / step;
+      if (jk >= 0 && jk < m_nta) {
+
+        double igg1 = 1 / a11;
+        // to fixed point
+        for (int i = 0; i < nADC_signal; i++) {
+
+          double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
+          double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
+          dbl_fg41[jk][i] = (fg41 * ia);
+          dbl_fg43[jk][i] = (fg43 * ic);
+        }
       }
     }
   }
@@ -871,7 +879,7 @@ void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, cons
       ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
       ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
       ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
-      if (k >= (m_ntf * m_ndt / 8)) continue;
+      if (k >= m_nta) continue;
       ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
       ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
     }

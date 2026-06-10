@@ -12,8 +12,8 @@
 # create 5 layers staggered with last obelix design
 # using super modules 1x4, 1x2 sensors
 
-fileName = "VTX-5layer-2025-baseline.xml"
-fileNameC = "VTX-Components-5layer-2025-baseline.xml"
+fileName = "VTX-5layer-2026-July-baseline.xml"
+fileNameC = "VTX-Components-5layer-2026-July-baseline.xml"
 
 f = open('../data/' + fileNameC, 'w')
 
@@ -103,7 +103,7 @@ for layer in range(1, nlayer+1):
 
     if layer == 3:
         type = 'layer1o'
-        nsensor = 16
+        nsensor = 15
         start = -157.144  # + sensorL/2.
         gap = 0.1
         shiftL = 0
@@ -111,7 +111,7 @@ for layer in range(1, nlayer+1):
 
     if layer == 4:
         type = 'layer1o'
-        nsensor = 20
+        nsensor = 19
         start = -207.546  # + sensorL/2.
         gap = 0.1
         shiftL = 0
@@ -119,7 +119,7 @@ for layer in range(1, nlayer+1):
 
     if layer == 5:
         type = 'layer1o'
-        nsensor = 24
+        nsensor = 23
         start = -249.082  # + sensorL/2.
         gap = 0.1
         shiftL = 0

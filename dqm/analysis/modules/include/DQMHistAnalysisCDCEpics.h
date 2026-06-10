@@ -50,11 +50,6 @@ namespace Belle2 {
     DQMHistAnalysisCDCEpicsModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisCDCEpicsModule();
-
-    /**
      * Initialize the Module.
      */
     void initialize() override final;

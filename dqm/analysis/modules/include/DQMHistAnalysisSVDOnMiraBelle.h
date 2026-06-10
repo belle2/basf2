@@ -30,8 +30,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
-    /** Destructor */
-    ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
     void initialize() override final;
     /** Module function beginRun */

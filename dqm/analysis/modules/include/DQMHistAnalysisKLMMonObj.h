@@ -35,13 +35,15 @@ namespace Belle2 {
      */
     DQMHistAnalysisKLMMonObjModule();
 
-    /** Destructor. */
-    ~DQMHistAnalysisKLMMonObjModule();
-
     /**
      * Initializer.
      */
     void initialize() override final;
+
+    /**
+     * Terminate
+     */
+    void terminate() override final;
 
     /**
      * Called when entering a new run.

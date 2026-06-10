@@ -35,10 +35,6 @@ DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   B2DEBUG(1, "DQMHistAnalysisRooFitExample: Constructor done.");
 }
 
-DQMHistAnalysisRooFitExampleModule::~DQMHistAnalysisRooFitExampleModule()
-{
-}
-
 void DQMHistAnalysisRooFitExampleModule::initialize()
 {
   B2INFO("DQMHistAnalysisRooFitExample: initialized.");

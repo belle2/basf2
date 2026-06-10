@@ -47,10 +47,6 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: Constructor done.");
 }
 
-DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
-{
-}
-
 void DQMHistAnalysisCDCEpicsModule::initialize()
 {
 

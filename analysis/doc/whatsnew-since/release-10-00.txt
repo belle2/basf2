@@ -1,5 +1,9 @@
 Changes in the analysis package in light-2604-jellyfish
 
+Standard Particle Lists
++++++++++++++++++++++++
+* Deprecated most standard particle lists in `stdCharged`, `stdPhotons`, `stdPi0s`, and `stdHyperons`, with removal planned at the end of 2026. 
+
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++
 * It is no longer possible to use ``tree`` as the name for a ``TTree`` saved with the `VariablesToNtuple` and `VariablesToEventBasedTree` modules. In particular, this affects the argument ``treeName`` of the function `modularAnalysis.variablesToNtuple`: ``variablesToNtuple(treeName='tree')`` will now result in a ``FATAL`` message from basf2.

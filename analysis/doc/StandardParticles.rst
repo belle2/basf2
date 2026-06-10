@@ -12,8 +12,8 @@ Standard Particles
           ``thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2``
         - `stdPhotons.stdPhotons` with ``listtype='base'``:
           ``inCDCAcceptance and abs(clusterTiming) < 200``
-        - `stdPi0s.stdPi0s` with ``listtype='base'``:
-          reconstructed from two ``gamma:base`` photons with no additional cuts
+        - For pi0s, use ``reconstructDecay`` directly with a suitable photon selection,
+          mass window, and any other variables recommended by the performance group.
 
         These lists provide a common baseline; further selections should be optimised
         based on the requirements of each individual analysis.

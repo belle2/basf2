@@ -23,14 +23,11 @@ def stdPi0s(
             writeOut=True
         ):
     """
-    Function to prepare one of several standardized types of pi0 lists:
-
-    - 'all' using gamma:all, no cuts
-    - 'base' reconstructed from two ``gamma:base`` photons
-      (``inCDCAcceptance and abs(clusterTiming) < 200``), no additional cuts
+    Function to prepare one of several standardized types of pi0 lists.
 
     The following lists are **deprecated** and will be removed at the end of 2026:
 
+    - 'all' using gamma:all, no cuts
     - 'eff10_May2020' gamma:pi0eff10_May2020, mass range selection, 10% pi0 efficiency list, optimized in May 2020
     - 'eff20_May2020' gamma:pi0eff20_May2020, mass range selection, 20% pi0 efficiency list, optimized in May 2020
     - 'eff30_May2020' gamma:pi0eff30_May2020, mass range selection, 30% pi0 efficiency list, optimized in May 2020
@@ -42,6 +39,14 @@ def stdPi0s(
     require that the fit did not fail. For example: "pi0:eff50_May2020Fit" is the 50%
     efficiency list plus a not-failing mass fit.
     These Fit variants are also deprecated, fits with mass constraint can be performed manually when necessary.
+
+    .. deprecated:: light-2604-jellyfish
+        All list types in this function are deprecated and will be removed at the end of 2026.
+        Please use ``reconstructDecay`` directly with an appropriate selection optimised for your analysis.
+        Refer to the :ref:`b2help-recommendation` tool
+        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_)
+        for guidance. To provide feedback on the removal, see
+        `work item #11641 <https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641>`_.
 
     Parameters:
         listtype (str): name of standard list
@@ -72,6 +77,7 @@ def stdPi0s(
     """
 
     _deprecated_pi0_lists = {
+        'all', 'allFit',
         'eff10_May2020', 'eff20_May2020', 'eff30_May2020',
         'eff40_May2020', 'eff50_May2020', 'eff60_May2020',
         'eff50_May2020_nomcmatch', 'eff60_May2020_nomcmatch',
@@ -82,18 +88,15 @@ def stdPi0s(
         B2WARNING(
             f"The standard pi0 list 'pi0:{listtype}' is deprecated "
             "and will be removed at the end of 2026. "
-            "Only the 'all' and 'base' lists will be kept. "
-            "Please update your analysis accordingly."
+            "Please use reconstructDecay directly with an appropriate selection optimised for your analysis. "
+            "To provide feedback on the removal, see "
+            "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
         )
 
     if listtype == 'all':
         stdPhotons('all', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
         ma.reconstructDecay('pi0:all -> gamma:all gamma:all', '', 1, writeOut=writeOut, path=path)
         ma.matchMCTruth('pi0:all', path)
-    elif listtype == 'base':
-        stdPhotons('base', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
-        ma.reconstructDecay('pi0:base -> gamma:base gamma:base', '', 1, writeOut=writeOut, path=path)
-        ma.matchMCTruth('pi0:base', path)
     elif 'eff10_May2020' == listtype:
         stdPhotons('pi0eff10_May2020', path, beamBackgroundMVAWeight, fakePhotonMVAWeight, biasCorrectionTable)
         ma.reconstructDecay('pi0:eff10_May2020 -> gamma:pi0eff10_May2020 gamma:pi0eff10_May2020',

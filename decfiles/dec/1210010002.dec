@@ -1,0 +1,33 @@
+# EventType: 1210010002
+# Descriptor: [B+ -> K*+ n anti-n]
+# NickName: Bu_Kstpnn
+# Tested: No
+# PhysicsWG: EWP
+# Responsible: Merna Abumusabh
+# Email: merna.abumusabh@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260610
+
+Alias MyK*+ K*+
+Alias MyK*- K*-
+ChargeConj MyK*+ MyK*-
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0  MyK*+ n0 anti-n0    PHSP;
+Enddecay
+
+CDecay B-sig
+
+Decay MyK*+
+0.5      K+  pi0                        VSS;
+0.5      K_S0  pi+                        VSS;
+Enddecay
+
+CDecay  MyK*-
+
+End

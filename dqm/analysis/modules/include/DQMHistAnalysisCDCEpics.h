@@ -82,7 +82,7 @@ namespace Belle2 {
     /**
      * get histogram styles
      */
-    void getHistStyle(TH1F*& htemp, std::string label, double max) const
+    static void getHistStyle(TH1F*& htemp, const std::string& label, double max)
     {
       gStyle->SetOptStat("ne");
       if (strcmp(label.data(), "adc") == 0)htemp->GetYaxis()->SetRangeUser(max * 0.25, max * 2.25);
@@ -93,17 +93,17 @@ namespace Belle2 {
     /**
      * Get median of given histogram
      */
-    float getHistMedian(TH1D* h) const;
+    static float getHistMedian(TH1* h);
 
     /**
      * Convenient function to create a TH2Poly based on CDC geometry
      */
-    TH2Poly* createEffiTH2Poly(const TString& name, const TString& title) ;
+    static TH2Poly* createEffiTH2Poly(const TString& name, const TString& title) ;
 
     /**
      * Populate the efficiency histograms
      */
-    void fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency) ;
+    static void fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency) ;
 
     /**
      * Populate the efficiency histograms
@@ -183,7 +183,6 @@ namespace Belle2 {
     double m_mintdc_sl28 = 4600.0;/**< min tdc median threshold accepted for SL2-8 */
     double m_maxtdc_sl28 = 5000.0;/**< max tdc median threshold accepted for SL2-8 */
 
-    double m_phistop;/**< stop thershold for phi differences */
     double m_phiwarn = 0.05;/**< 5% warn thershold for phi differences */
     double m_phialarm = 0.15;/**< 15% alarm thershold for phi differences */
     std::vector<TLine*> m_lines;/**< number of CDC layer lines */

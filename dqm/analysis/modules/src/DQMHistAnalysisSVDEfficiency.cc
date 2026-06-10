@@ -50,11 +50,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
-DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule()
-{
-
-}
-
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialize");

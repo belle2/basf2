@@ -20,8 +20,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisTrackingERModule();
-    /**Destructor */
-    ~DQMHistAnalysisTrackingERModule() {};
 
     /** Module function initialize */
     void initialize() override final;

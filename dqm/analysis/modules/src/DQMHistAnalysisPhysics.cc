@@ -47,10 +47,6 @@ DQMHistAnalysisPhysicsModule::DQMHistAnalysisPhysicsModule() : DQMHistAnalysisMo
   B2DEBUG(20, "DQMHistAnalysisPhysics: Constructor done.");
 }
 
-DQMHistAnalysisPhysicsModule::~DQMHistAnalysisPhysicsModule()
-{
-}
-
 void DQMHistAnalysisPhysicsModule::initialize()
 {
   gROOT->cd();

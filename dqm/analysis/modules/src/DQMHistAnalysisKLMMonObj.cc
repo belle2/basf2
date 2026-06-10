@@ -36,9 +36,9 @@ DQMHistAnalysisKLMMonObjModule::DQMHistAnalysisKLMMonObjModule()
            10.4e-6);
 }
 
-DQMHistAnalysisKLMMonObjModule::~DQMHistAnalysisKLMMonObjModule()
+void DQMHistAnalysisKLMMonObjModule::terminate()
 {
-  delete m_BklmElementNumbers;
+  if (m_BklmElementNumbers) delete m_BklmElementNumbers;
 }
 
 void DQMHistAnalysisKLMMonObjModule::initialize()

@@ -39,8 +39,6 @@ DQMHistAnalysisSVDOnMiraBelleModule::DQMHistAnalysisSVDOnMiraBelleModule()
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: Constructor done.");
 }
 
-DQMHistAnalysisSVDOnMiraBelleModule::~DQMHistAnalysisSVDOnMiraBelleModule() { }
-
 void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
 {
   gROOT->cd();

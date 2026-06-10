@@ -35,11 +35,6 @@ namespace Belle2 {
     DQMHistAnalysisEcmsMonObjModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisEcmsMonObjModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

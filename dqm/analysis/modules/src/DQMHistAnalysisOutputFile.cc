@@ -46,9 +46,6 @@ DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   B2DEBUG(20, "DQMHistAnalysisOutputFile: Constructor done.");
 }
 
-
-DQMHistAnalysisOutputFileModule::~DQMHistAnalysisOutputFileModule() { }
-
 void DQMHistAnalysisOutputFileModule::initialize()
 {
   m_eventMetaDataPtr.isOptional();

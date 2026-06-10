@@ -32,10 +32,6 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   addParam("m_reference_mumu", m_reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
-DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
-{
-}
-
 void DQMHistAnalysisMiraBelleModule::initialize()
 {
   gROOT->cd();

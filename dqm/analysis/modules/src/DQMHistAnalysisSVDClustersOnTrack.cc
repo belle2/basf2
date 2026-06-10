@@ -52,8 +52,6 @@ DQMHistAnalysisSVDClustersOnTrackModule::DQMHistAnalysisSVDClustersOnTrackModule
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
-DQMHistAnalysisSVDClustersOnTrackModule::~DQMHistAnalysisSVDClustersOnTrackModule() { }
-
 void DQMHistAnalysisSVDClustersOnTrackModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDClustersOnTrack: initialized.");

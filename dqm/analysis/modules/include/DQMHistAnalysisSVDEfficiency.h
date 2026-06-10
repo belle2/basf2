@@ -36,11 +36,6 @@ namespace Belle2 {
     DQMHistAnalysisSVDEfficiencyModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisSVDEfficiencyModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

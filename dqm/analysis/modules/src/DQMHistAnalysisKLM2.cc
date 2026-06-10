@@ -53,8 +53,6 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   m_PlaneText.SetTextSize(0.02); // 2% of TPad's full height
 }
 
-
-
 void DQMHistAnalysisKLM2Module::initialize()
 {
   m_monObj = getMonitoringObject("klm");
@@ -193,7 +191,6 @@ void DQMHistAnalysisKLM2Module::initialize()
     std::string E_lay = std::to_string(lay_id);
     m_eff2d_eklm->GetYaxis()->SetBinLabel(lay_id + 1, E_lay.c_str());
   }
-
 
 }
 

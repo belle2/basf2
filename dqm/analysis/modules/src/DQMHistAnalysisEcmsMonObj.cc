@@ -50,10 +50,6 @@ DQMHistAnalysisEcmsMonObjModule::DQMHistAnalysisEcmsMonObjModule()
   B2DEBUG(20, "DQMHistAnalysisEcmsMonObj: Constructor done.");
 }
 
-DQMHistAnalysisEcmsMonObjModule::~DQMHistAnalysisEcmsMonObjModule()
-{
-}
-
 void DQMHistAnalysisEcmsMonObjModule::initialize()
 {
   m_monObj = getMonitoringObject("ecms");

@@ -40,8 +40,6 @@ DQMHistAnalysisEventT0EfficiencyModule::DQMHistAnalysisEventT0EfficiencyModule()
 }
 
 
-DQMHistAnalysisEventT0EfficiencyModule::~DQMHistAnalysisEventT0EfficiencyModule() { }
-
 void DQMHistAnalysisEventT0EfficiencyModule::initialize()
 {
   gROOT->cd();

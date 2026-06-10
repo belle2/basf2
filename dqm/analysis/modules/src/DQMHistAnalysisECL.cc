@@ -45,8 +45,6 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
 }
 
 
-DQMHistAnalysisECLModule::~DQMHistAnalysisECLModule() { }
-
 void DQMHistAnalysisECLModule::initialize()
 {
   gROOT->cd();

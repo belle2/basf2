@@ -14,7 +14,10 @@ import os
 
 """
 Example script showing how to train neural networks
-to be used with the CDCTriggerNeuroModule.
+to be used with the GRLNeuroModule.
+
+Architecture: 24 inputs -> QDense(64,relu) -> QDense(64,relu) -> QDense(64,relu) -> QDense(10,linear)
+This matches the reference firmware architecture from neuralGRL-multi.
 
 This script uses realistic values for the amount of training data
 and the number of runs, so it will run a long time.
@@ -58,15 +61,15 @@ main.add_module('GRLNeuroTrainer',
                 filename=os.path.join(mlpdir, mlpname),
                 trainFilename=os.path.join(traindir, trainname),
 
-                # network structure
+                # network structure (matching neuralGRL-multi reference: 24->64->64->64->10)
                 # nMLP=20,  # total number of sectors
                 # multiplyHidden=False,  # set the number of hidden nodes directly
-                # nHidden=[[10]],  # 1 hidden layer with 81 nodes for all sectors
+                # nHidden=[[10]],  # 1 hidden layer with 10 nodes for all sectors
                 # i_cdc_sector=[0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,3],
                 # i_ecl_sector=[0,1,2,3,4,0,1,2,3,4,0,1,2,3,4,0,1,2,3,4],
                 nMLP=8,  # total number of sectors
                 multiplyHidden=False,  # set the number of hidden nodes directly
-                nHidden=[[100]],  # 1 hidden layer with 81 nodes for all sectors
+                nHidden=[[64, 64, 64]],  # 3 hidden layers with 64 nodes each, matching reference architecture
                 n_cdc_sector=1,
                 n_ecl_sector=8,
                 i_cdc_sector=[0*2+36*3, 0*2+36*3, 0*2+36*3, 0*2+36*3, 0*2+36*3, 0*2+36*3, 0*2+36*3, 0*2+36*3],

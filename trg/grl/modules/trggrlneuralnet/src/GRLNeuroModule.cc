@@ -93,8 +93,8 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "Name of the StoreArray holding the information of trigger ecl clusters ",
            string("TRGECLClusters"));
   addParam("MVACut", m_nn_thres,
-           "Cut value applied to the MLP output",
-  {0});
+           "Cut values applied to the MLP outputs (10 thresholds for 10 outputs)",
+  {0., 0., 0., 0., 0., 0., 0., 0., 0., 0.});
   addParam("useDB", m_useDB,
            "Flag to use database to set config", true);
 
@@ -187,7 +187,9 @@ GRLNeuroModule::beginRun()
       m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
       m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
-      m_nn_thres[0]               = m_db_trggrlconfig->get_ecltaunn_threshold();
+      // Use single DB threshold for all 10 outputs
+      float db_threshold = m_db_trggrlconfig->get_ecltaunn_threshold();
+      m_nn_thres.assign(10, db_threshold);
       m_parameters.total_bit_bias  = m_db_trggrlconfig->get_ecltaunn_total_bit_bias();
       m_parameters.int_bit_bias    = m_db_trggrlconfig->get_ecltaunn_int_bit_bias();
       m_parameters.is_signed_bias  = m_db_trggrlconfig->get_ecltaunn_is_signed_bias();
@@ -216,6 +218,12 @@ GRLNeuroModule::beginRun()
       m_parameters.W_input = m_db_trggrlconfig->get_ecltaunn_W_input();
       m_parameters.I_input = m_db_trggrlconfig->get_ecltaunn_I_input();
 
+      // Set outputScale for 10 outputs (matching firmware architecture)
+      m_parameters.outputScale = {{0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1.}};
+
+      // Set nHidden to 64 neurons per layer (matching firmware architecture)
+      m_parameters.nHidden = {{64, 64, 64}};
+
       B2INFO("DB GRLConfig: nMLP=" << m_db_trggrlconfig->get_ecltaunn_nMLP()
              << " weight=" << m_db_trggrlconfig->get_ecltaunn_weight().size()
              << " bias=" << m_db_trggrlconfig->get_ecltaunn_bias().size()
@@ -234,8 +242,10 @@ GRLNeuroModule::beginRun()
 
   if (m_saveHist) {
     for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-      h_target.push_back(new TH1D(("h_target_" + to_string(isector)).c_str(),
-                                  ("h_target_" + to_string(isector)).c_str(),  100, -40.0, 40.0));
+      for (unsigned int io = 0; io < 10; ++io) {
+        h_target.push_back(new TH1D(("h_target_" + to_string(isector) + "_out" + to_string(io)).c_str(),
+                                    ("h_target_" + to_string(isector) + "_out" + to_string(io)).c_str(),  100, -40.0, 40.0));
+      }
     }
   }
 }
@@ -303,16 +313,22 @@ void GRLNeuroModule::event()
 
   }
 
-  // Run MLP
-  float target = m_GRLNeuro.runMLP(0, MLPinput);
+  // Run MLP (10 outputs for multi-label classification)
+  std::vector<float> targets = m_GRLNeuro.runMLP(0, MLPinput);
   if (m_saveHist) {
-    h_target[0]->Fill(target);
+    for (size_t io = 0; io < targets.size() && io < h_target.size(); ++io) {
+      h_target[io]->Fill(targets[io]);
+    }
   }
-  if (target > m_nn_thres[0]) {
-    trgInfo->setTauNN(true);
-  } else {
-    trgInfo->setTauNN(false);
+  // Decision: trigger if ANY output exceeds its threshold
+  bool triggered = false;
+  for (size_t io = 0; io < targets.size() && io < m_nn_thres.size(); ++io) {
+    if (targets[io] > m_nn_thres[io]) {
+      triggered = true;
+      break;
+    }
   }
+  trgInfo->setTauNN(triggered);
 }
 
 

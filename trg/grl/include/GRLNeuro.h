@@ -49,8 +49,8 @@ namespace Belle2 {
       bool targetresult = true;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
-      /** Output scale for all networks. */
-      std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
+      /** Output scale for all networks (10 outputs × 2 values each). */
+      std::vector<std::vector<float>> outputScale = {{0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1.}};
 
 
       /** Number of CDC sectors. */
@@ -125,8 +125,8 @@ namespace Belle2 {
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
-     * @return output values (classifier) */
-    float runMLP(unsigned isector,  const std::vector<float>& input);
+     * @return output values (10 classifiers for multi-label classification) */
+    std::vector<float> runMLP(unsigned isector,  const std::vector<float>& input);
 
   private:
     /** List of networks */

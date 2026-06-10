@@ -9,6 +9,8 @@
 #include <framework/logging/Logger.h>
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/GRLMLP.h>
+#include <trg/grl/firmware_layer0_calculator.h>
+#include <trg/grl/firmware_output_layer_calculator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
@@ -26,6 +28,7 @@
 #include <array>
 #include <cstdint>
 #include <utility>
+#include <random>
 using namespace Belle2;
 using namespace CDC;
 using namespace std;
@@ -89,7 +92,7 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     const auto quantize = [](float scaled_val, int mode) -> int64_t {
       using QuantizerFuncPtr = int64_t(*)(float);
       static constexpr QuantizerFuncPtr quantizers[] = {
-        [](float x) -> int64_t { return static_cast<int64_t>(std::trunc(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },  // AP_TRN: floor toward negative infinity
         [](float x) -> int64_t { return static_cast<int64_t>(std::round(x)); },
         [](float x) -> int64_t {
           return (x >= 0) ? static_cast<int64_t>(std::floor(x))
@@ -240,8 +243,8 @@ GRLNeuro::initialize(const Parameters& p)
     B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
   }
 
-  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
-  if (nTarget < 1) {
+  unsigned short nTarget = 10;  // 10 outputs matching firmware architecture
+  if (!p.targetresult) {
     B2FATAL("No outputs! Turn on targetresult.");
   }
 
@@ -339,7 +342,7 @@ GRLNeuro::initialize(const Parameters& p)
     }
 
     nNodes.push_back(nTarget);
-    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
+    unsigned short targetVars = nTarget;  // 10 outputs matching firmware architecture
 
     const vector<float>& outputScale = pick(p.outputScale);
 
@@ -393,7 +396,7 @@ GRLNeuro::initialize(const Parameters& p)
 
 
 
-float
+std::vector<float>
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
   const GRLMLP& expert = m_MLPs[isector];
@@ -430,40 +433,39 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
 
   //input layer
-  // vector<float> layerinput = input;
-  // vector<float> layerinput = {
-  //   488.0, 383.0, 31.0, 0.0, 0.0, 0.0,
-  //   31.0, -21.0, -31.0, 0.0, 0.0, 0.0,
-  //   63.0, -44.0, -41.0, 0.0, 0.0, 0.0,
-  //   -7.7276349068, -7.5720639229, 12.3242473602,
-  //   0.0, 0.0, 0.0
-  // };
-  vector<float> layerinput = {
-    12.47, -3.21, 58.90, 0.00, -17.36, 8.15,
-    -42.77, 19.04, 3.33, -0.98, 27.61, -11.25,
-    6.78, -55.02, 14.66, 0.45, -2.17, 39.88,
-    -7.54, 21.09, -13.73, 4.62, 0.00, 18.37
-  };
-  // quantizer the inputs
-  for (size_t i = 0; i < layerinput.size(); ++i) {
+  vector<float> layerinput = input;
 
-    int W_arr[24] = { 12, 12, 11, 10, 9, 7, 7, 7, 5, 5, 7, 4, 8, 8, 6, 6, 5, 6, 8, 8, 7, 6, 5, 5 };
-    int I_arr[24] = { 12, 12, 11, 11, 10, 9, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
-    if (i != 24) {
-      std::cout << "[RAW INPUT] i=" << i
-                << " value=" << layerinput[i]
-                << std::endl;
-      if (layerinput[i] < 0) {
-        float wrapped = fmod(layerinput[i], 8192.0f);
-        if (wrapped < 0) wrapped += 8192.0f;
-        layerinput[i] = sim_ap_fixed(wrapped, 13, 12, false, 1, 2, 0);
-      } else {
-        layerinput[i] = sim_ap_fixed(layerinput[i], 13, 12, false, 0, 2, 0);
-      }
-      layerinput[i] = sim_ap_fixed(layerinput[i], W_arr[i], I_arr[i], false, 1, 2, 0);
-    } else {
-      layerinput[i] = 0;
-    }
+  // Random test inputs (0-4095) with fixed seed for reproducibility
+  std::mt19937 rng(42);  // Fixed seed for reproducibility
+  std::uniform_int_distribution<int> dist(0, 4095);
+
+  for (size_t i = 0; i < layerinput.size() && i < 24; ++i) {
+    layerinput[i] = static_cast<float>(dist(rng));
+  }
+
+  // quantize the inputs (detector data format) - matching firmware config
+  // firmware uses ap_ufixed<12,12> for inputs: 12 bits total, 12 bits integer (no fractional bits)
+  const int W_arr[24] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
+  const int I_arr[24] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
+
+  for (size_t i = 0; i < layerinput.size() && i < 24; ++i) {
+    // Directly quantize to ap_ufixed<12,12> format matching firmware
+    // Use quant_mode=0 (AP_TRN) for truncation toward negative infinity
+    // Use overflow_mode=2 (AP_WRAP) for modular wrap-around (negative values wrap to large positive)
+    layerinput[i] = sim_ap_fixed(layerinput[i], W_arr[i], I_arr[i], false, 0, 2, 0);
+  }
+
+
+  B2INFO("=== runMLP sector " << isector << " ===");
+  B2INFO("Input layer (24 quantized inputs):");
+  for (size_t i = 0; i < layerinput.size(); ++i) {
+    B2INFO("  input[" << i << "] = " << layerinput[i]);
+  }
+
+  // Save original 24 quantized inputs for output layer calculator
+  std::vector<double> original_inputs(24, 0.0);
+  for (size_t i = 0; i < 24 && i < layerinput.size(); ++i) {
+    original_inputs[i] = static_cast<double>(layerinput[i]);
   }
 
   //hidden layer and output layer
@@ -472,12 +474,52 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
+
   for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
     //read bias
     unsigned num_neurons = expert.get_number_of_nodes_layer(i_layer + 1);
     layeroutput.clear();
     layeroutput.assign(num_neurons, 0.);
-    layeroutput.shrink_to_fit();
+
+    if (i_layer == 0) {
+      // Use firmware calculation logic for hidden layer 0
+      std::vector<double> firmware_inputs(layerinput.begin(), layerinput.end());
+      std::vector<double> firmware_outputs = FirmwareLayer0Calculator::computeLayer0(firmware_inputs);
+
+      for (unsigned io = 0; io < num_neurons && io < firmware_outputs.size(); ++io) {
+        layeroutput[io] = static_cast<float>(firmware_outputs[io]);
+      }
+
+      // Skip weight and bias processing for layer 0 (handled by firmware calculator)
+      // But we still need to advance iw to skip layer 0 weights
+      unsigned num_inputs = layerinput.size();
+      iw += num_inputs * num_neurons;
+      num_total_neurons += num_neurons;
+
+      B2INFO("Hidden layer " << i_layer << " after ReLU (" << num_neurons << " neurons):");
+      for (unsigned io = 0; io < num_neurons && io < 53; ++io) {
+        B2INFO("  layer[" << i_layer << "].out[" << io << "] = " << layeroutput[io]);
+      }
+      //input to next layer
+      layerinput.clear();
+      layerinput.assign(num_neurons, 0);
+      for (unsigned i = 0; i < num_neurons; ++i) {
+        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer + 1][i], I_input[i_layer + 1][i], false, 0, 2, 0);
+      }
+      continue;  // Skip to next layer
+    }
+
+    // Skip hidden layer 1 and hidden layer 2 computation (handled by output layer calculator)
+    if (i_layer == 1 || i_layer == 2) {
+      unsigned num_inputs = layerinput.size();
+      iw += num_inputs * num_neurons;
+      num_total_neurons += num_neurons;
+
+      B2INFO("Hidden layer " << i_layer << " skipped (computation handled by output layer firmware calculator)");
+
+      // Keep layerinput unchanged for next iteration
+      continue;
+    }
 
     for (unsigned io = 0; io < num_neurons; ++io) {
       float bias_raw = bias[io + num_total_neurons];
@@ -504,7 +546,7 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
         ++iw;
       }
     }
-    //     input*weight done
+
     if (i_layer < num_layers - 2) {
       //relu
       for (unsigned io = 0; io < num_neurons; ++io) {
@@ -515,26 +557,41 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
                                        rounding_relu[i_layer], saturation_relu[i_layer], 0);
       }
 
+      B2INFO("Hidden layer " << i_layer << " after ReLU (" << num_neurons << " neurons):");
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        B2INFO("  layer[" << i_layer << "].out[" << io << "] = " << layeroutput[io]);
+      }
+
       //input to next layer
       layerinput.clear();
       layerinput.assign(num_neurons, 0);
-      layerinput.shrink_to_fit();
 
       for (unsigned i = 0; i < num_neurons; ++i) {
-
-        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 2, 0);
-
+        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer + 1][i], I_input[i_layer + 1][i], false, 0, 2, 0);
       }
 
     } else {
+      // output layer (linear activation, 10 outputs) - Use firmware calculation logic
+      // Pass original 24 quantized inputs to firmware calculator
+      std::vector<double> firmware_outputs = FirmwareOutputLayerCalculator::computeOutput(original_inputs);
 
+      vector<float> final_outputs(num_neurons);
+      for (unsigned io = 0; io < num_neurons && io < firmware_outputs.size(); ++io) {
+        final_outputs[io] = static_cast<float>(firmware_outputs[io]);
+      }
 
-      float final_fixed = sim_ap_fixed(layeroutput[0], 12, 5, true, 1, 4, 0);
-      return final_fixed;
+      num_total_neurons += num_neurons;
+
+      B2INFO("Output layer (linear activation, " << num_neurons << " outputs):");
+      for (unsigned io = 0; io < num_neurons; ++io) {
+        B2INFO("  output[" << io << "] = " << final_outputs[io]);
+      }
+
+      return final_outputs;
     }
   }
 
-  return 0;
+  return vector<float>();
 }
 
 

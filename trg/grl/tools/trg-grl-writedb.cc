@@ -34,7 +34,7 @@ void setgrlconfig()
     false
   };
   std::vector<std::vector<float>> ecltaunn_nHidden[N_config];
-  std::vector<float> eclaunn_nHidden_0 = {24, 24, 24};
+  std::vector<float> eclaunn_nHidden_0 = {64, 64, 64};  // hidden layer 0: 64 neurons, hidden layer 1: 64 neurons, hidden layer 2: 64 neurons, matching firmware 24x64x64x64x10 structure
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
@@ -49,7 +49,7 @@ void setgrlconfig()
   ecltaunn_i_ecl_sector[0].push_back(1 * 6 * 4);
 
   char wfilename[N_config][10][1000] = {{{
-        "/group/belle/users/zhaoxy/hls1112/neuralGRL/hls4ml_Latency/firmware/weights/all_weights.txt"
+        "/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/data/all_weights.txt"
       }
     }
   };
@@ -71,7 +71,7 @@ void setgrlconfig()
   }
 
   char bfilename[N_config][10][1000] = {{{
-        "/group/belle/users/zhaoxy/hls1112/neuralGRL/hls4ml_Latency/firmware/weights/all_bias.txt"
+        "/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/data/all_bias.txt"
       }
     }
   };
@@ -93,118 +93,138 @@ void setgrlconfig()
   }
 
   std::vector<std::vector<int>> total_bit_bias[N_config] = {
-    {{ 5, 7, 6, 2 }}   // total bits
+    {{ 12, 12, 12, 12 }}   // total bits: all layers use b0=12 from firmware (kbi quantization)
   };
   std::vector<std::vector<int>> int_bit_bias[N_config] {
-    {{ 5, 5, 3, 32 }}   // integer bits
+    {{ 6, 6, 6, 6 }}   // integer bits: all layers use i0=6 from firmware (kbi quantization)
   };
   std::vector<std::vector<bool>> is_signed_bias[N_config] {
-    {{ true, true, true, false }}
+    {{ true, true, true, true }}  // all biases are signed
   };
   std::vector<std::vector<int>> rounding_bias[N_config] {
-    {{ 0, 0, 0, 0 }}   // 0 = truncate
+    {{ 1, 1, 1, 1 }}   // 1 = RND (round to nearest), matching firmware
   };
   std::vector<std::vector<int>> saturation_bias[N_config] {
-    {{ 2, 2, 2, 2 }}   // 2 = saturate
+    {{ 2, 2, 2, 2 }}   // 2 = SAT_SYM (symmetric saturation), matching firmware
   };
 
 ////////////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit_accum[N_config] {
-    {{29, 29, 24, 25 }}
+    {{ 18, 18, 18, 18 }}   // total bits for accumulator: input_bits(16) + weight_bits(12) - 10 = 18
   };
   std::vector<std::vector<int>> int_bit_accum[N_config] {
-    {{15, 14, 12, 9 }}
+    {{ 12, 12, 12, 12 }}   // integer bits for accumulator: input_int(6) + weight_int(6) = 12
   };
   std::vector<std::vector<bool>> is_signed_accum[N_config] {
     {{ true, true, true, true }}
   };
   std::vector<std::vector<int>> rounding_accum[N_config] {
-    {{ 0, 0, 0, 0 }}
+    {{ 1, 1, 1, 1 }}   // 1 = RND, matching firmware
   };
   std::vector<std::vector<int>> saturation_accum[N_config] {
-    {{ 2, 2, 2, 2 }}
+    {{ 2, 2, 2, 2 }}   // 2 = SAT_SYM, matching firmware
   };
 ////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit_weight[N_config] = {
-    {{ 17, 17, 13, 12 }}
+    {{ 12, 12, 12, 12 }}   // total bits: all layers use b0=12 from firmware (kbi quantization)
   };
 
   std::vector<std::vector<int>> int_bit_weight[N_config] = {
-    {{ 3, 5, 3, 1 }}
+    {{ 6, 6, 6, 6 }}   // integer bits: all layers use i0=6 from firmware (kbi quantization)
   };
 
   std::vector<std::vector<bool>> is_signed_weight[N_config] = {
-    {{ true, true, true, true }}  //
+    {{ true, true, true, true }}  // all weights are signed
   };
 
   std::vector<std::vector<int>> rounding_weight[N_config] = {
-    {{ 0, 0, 0, 0 }}      // 0 = truncate
+    {{ 1, 1, 1, 1 }}      // 1 = RND (round to nearest), matching firmware
   };
 
   std::vector<std::vector<int>> saturation_weight[N_config] = {
-    {{ 2, 2, 2, 2 }}      // 2 = saturate
+    {{ 2, 2, 2, 2 }}      // 2 = SAT_SYM (symmetric saturation), matching firmware
   };
 
 ///////////////////////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit_relu[N_config] = {
-    {{ 15, 15, 15 }}  //
+    {{ 16, 16, 16 }}   // total bits: i0(6) + f0(10) = 16 from firmware (kif quantization)
   };
 
   std::vector<std::vector<int>> int_bit_relu[N_config] = {
-    {{ 10, 9, 8 }}  //
+    {{ 6, 6, 6 }}   // integer bits: i0=6 from firmware (kif quantization)
   };
 
   std::vector<std::vector<bool>> is_signed_relu[N_config] = {
-    {{ false, false, false }}  //
+    {{ false, false, false }}  // ReLU outputs are unsigned (always positive)
   };
 
   std::vector<std::vector<int>> rounding_relu[N_config] = {
-    {{ 0, 0, 0 }}       // 0 = truncate
+    {{ 1, 1, 1 }}       // 1 = RND (round to nearest), matching firmware
   };
 
   std::vector<std::vector<int>> saturation_relu[N_config] = {
-    {{ 2, 2, 2 }}       // 2 = saturate
+    {{ 0, 0, 0 }}       // 0 = WRAP (no saturation for ReLU), matching firmware
   };
 
 //////////////////////////////////////////////////////////////////////////////////////
   std::vector<std::vector<int>> total_bit[N_config] {
-    {{20, 20, 19}}
+    {{ 16, 16, 16, 16 }}   // total bits: i0(6) + f0(10) = 16 from firmware (kif quantization)
   };
   std::vector<std::vector<int>> int_bit[N_config] {
-    {{15, 14, 12}}
+    {{ 6, 6, 6, 6 }}   // integer bits: i0=6 from firmware (kif quantization)
   };
   std::vector<std::vector<bool>> is_signed[N_config] {
-    {{true, true, true}}
+    {{true, true, true, true}}  // layer outputs are signed
   };
   std::vector<std::vector<int>> rounding[N_config] {
-    {{0, 0, 0}}
+    {{1, 1, 1, 1}}   // 1 = RND, matching firmware
   };
   std::vector<std::vector<int>> saturation[N_config] {
-    {{2, 2, 2}}
+    {{0, 0, 0, 0}}   // 0 = WRAP, matching firmware for datalane
   };
 
 
   std::vector<std::vector<std::vector<int>>> W_input[N_config] {
     {
       {
-        { 9, 10, 9, 8, 12, 11, 9, 7, 8, 9, 9, 9, 11, 9, 11, 13, 11, 12, 11, 12, 12, 11, 13, 10 }
-        ,
-        { 6, 0, 9, 10, 9, 7, 9, 10, 9, 9, 0, 9, 7, 12, 8, 9, 9, 8, 0, 10, 7, 8, 8, 11 }
-        ,
-        { 11, 8, 0, 8, 11, 12, 11, 11, 12, 9, 12, 11, 10, 10, 12, 12, 0, 12, 12, 9, 12, 10, 8, 11 }
-
+        { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 },  // layer 0 (input): 24 inputs, ap_ufixed<12,12> matching firmware
+        {
+          13, 10, 16, 13, 13, 13, 13, 13, 13, 13, 15, 14, 14, 15, 12, 16, 16, 15, 14, 16, 14, 13, 14, 14,
+          15, 13, 11, 13, 12, 13, 15, 14, 15, 14, 14, 14, 10, 15, 15, 15, 14, 12, 14, 15, 11, 12, 15, 13,
+          15, 14, 15, 13, 11, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+        },  // layer 1 (hidden 0): 64 neurons, unique W per neuron from firmware
+        {
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+        },  // layer 2 (hidden 1): 64 neurons, matching firmware
+        {
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+        }   // layer 3 (hidden 2): 64 neurons, matching firmware
       }
     }
   };
   std::vector<std::vector<std::vector<int>>> I_input[N_config] {
     {
       {
-        { 7, 9, 7, 7, 8, 8, 7, 6, 6, 7, 8, 8, 9, 7, 8, 9, 10, 10, 9, 9, 9, 9, 10, 8 }
-        ,
-        { 5, 0, 7, 7, 6, 6, 7, 8, 7, 6, 0, 6, 6, 9, 6, 6, 6, 6, 0, 7, 6, 6, 5, 6 }
-        ,
-        { 6, 7, 0, 5, 7, 7, 7, 6, 7, 6, 7, 6, 6, 4, 7, 7, 0, 7, 8, 6, 8, 6, 6, 6 }
-
+        { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 },  // layer 0 (input): 24 inputs, ap_ufixed<12,12> matching firmware
+        {
+          12, 9, 14, 11, 12, 13, 13, 13, 10, 11, 13, 13, 14, 12, 12, 13, 15, 12, 12, 15, 12, 11, 12, 11,
+          13, 13, 11, 11, 12, 13, 12, 14, 11, 13, 13, 13, 10, 14, 14, 14, 12, 12, 13, 14, 9, 11, 12, 10,
+          14, 12, 14, 13, 10, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
+        },  // layer 1 (hidden 0): 64 neurons, unique I per neuron from firmware
+        {
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
+        },  // layer 2 (hidden 1): 64 neurons, matching firmware
+        {
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
+        }   // layer 3 (hidden 2): 64 neurons, matching firmware
       }
     }
   };

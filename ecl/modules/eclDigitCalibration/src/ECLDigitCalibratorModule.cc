@@ -88,7 +88,8 @@ void ECLDigitCalibratorModule::initializeCalibration()
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
   m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3; // convert to ns
-  m_timeInverseSlopeUp = EclConfigurationUp::s_clock / (EclConfigurationUp::m_ndt * 32 * EclConfigurationUp::getRF()) *
+  m_timeInverseSlopeUp = EclConfigurationUp::s_clock / (EclConfigurationUp::m_ndt * EclConfigurationUp::m_nta *
+                                                        EclConfigurationUp::getRF()) *
                          1e3; // convert to ns
   m_pureCsIEnergyCalib = 0.00005; // conversion factor from ADC counts to GeV
   m_pureCsITimeCalib = 0.1;       // conversion factor from eclPureCsIDigitizer to ns
@@ -248,7 +249,7 @@ void ECLDigitCalibratorModule::event()
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                                     v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
                          + m_pureCsITimeOffset;
-      } if (m_simulateUpgrade) {
+      } else if (m_simulateUpgrade) {
         calibratedTime = (time * m_timeInverseSlopeUp) + m_timeInverseSlope * (- v_calibrationCrystalElectronicsTime[cellid - 1] -
                          v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) -
                          v_calibrationCrystalFlightTime[cellid - 1];

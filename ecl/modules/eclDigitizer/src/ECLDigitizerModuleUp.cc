@@ -266,7 +266,7 @@ void ECLDigitizerModuleUp::shapeSignals()
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
   const double trgtick = ec.s_clock / ec.getRF() / ec.m_ntrg;   // trigger tick
-  const double tscale = 2 * trgtick, toff = 0;//ec.s_clock / (2 * ec.getRF());
+  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));

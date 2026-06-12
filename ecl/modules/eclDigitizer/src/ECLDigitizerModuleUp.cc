@@ -281,7 +281,8 @@ void ECLDigitizerModuleUp::shapeSignals()
     int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
     double timeOffset = tscale * m_ttime[id] - toff;
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
-    double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
+    //double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
+    double hitTimeAve = (hit.getFlightTime() + eclp->time2sensor(j, hit.getPosition())) * T2us;
 
     m_adc[j].energyConversion = m_calib[j].ascale * E2GeV * 20000;
     m_adc[j].flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy

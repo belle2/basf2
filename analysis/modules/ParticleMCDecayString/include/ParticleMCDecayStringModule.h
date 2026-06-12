@@ -63,19 +63,19 @@ namespace Belle2 {
     std::string getDecayString(const Particle& p);
 
     /** get decay string of particle */
-    std::string getDecayStringFromParticle(const Particle* p);
+    static std::string getDecayStringFromParticle(const Particle* p);
 
     /** get mc decay string from particle */
     std::string getMCDecayStringFromParticle(const Particle* p);
 
     /** get mc decay string from mc particle */
-    std::string getMCDecayStringFromMCParticle(const MCParticle* mcPMatched);
+    static std::string getMCDecayStringFromMCParticle(const MCParticle* mcPMatched);
 
     /** search from mcP upwards for a particle that matches specified mother PDG codes. */
-    const MCParticle* getInitialParticle(const MCParticle* mcP);
+    static const MCParticle* getInitialParticle(const MCParticle* mcP);
 
     /** return decay string for mcPMother, highlight mcPMatched. */
-    std::string buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched);
+    static std::string buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched);
 
     /** Convert the extended string to a more concise format. */
     void convertToConciseString(std::string& string);

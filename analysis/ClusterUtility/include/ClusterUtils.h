@@ -43,7 +43,7 @@ namespace Belle2 {
      * Returns cluster four momentum vector
      * @return const cluster four momentum vector
      */
-    const ROOT::Math::PxPyPzEVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
+    static ROOT::Math::PxPyPzEVector GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo);
 
     /**
      * Returns four momentum vector

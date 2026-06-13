@@ -80,6 +80,6 @@ namespace Belle2 {
     [[maybe_unused]] void printEvent();
 
     /** for debugging purposes */
-    [[maybe_unused]]void printParticle(const Particle* particle);
+    [[maybe_unused]] static void printParticle(const Particle* particle);
   };
 }

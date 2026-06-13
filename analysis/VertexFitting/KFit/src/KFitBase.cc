@@ -217,8 +217,8 @@ KFitBase::getCorrelation(const int id1, const int id2, const int flag) const
 }
 
 
-const HepSymMatrix
-KFitBase::makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const
+HepSymMatrix
+KFitBase::makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e)
 {
   // self track
   // Error(6x6,e) ==> Error(7x7,output(hsm)) using Momentum(p).
@@ -251,8 +251,8 @@ KFitBase::makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e
 }
 
 
-const HepMatrix
-KFitBase::makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e) const
+HepMatrix
+KFitBase::makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e)
 {
   // track and track
   // Error(6x6,e) ==> Error(7x7,output(hm)) using Momentum(p1&p2).
@@ -292,8 +292,8 @@ KFitBase::makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzV
 }
 
 
-const HepMatrix
-KFitBase::makeError2(const HepLorentzVector& p, const HepMatrix& e) const
+HepMatrix
+KFitBase::makeError2(const HepLorentzVector& p, const HepMatrix& e)
 {
   // vertex and track
   // Error(3x6,e) ==> Error(3x7,output(hm)) using Momentum(p).
@@ -316,8 +316,8 @@ KFitBase::makeError2(const HepLorentzVector& p, const HepMatrix& e) const
 }
 
 
-const HepSymMatrix
-KFitBase::makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass) const
+HepSymMatrix
+KFitBase::makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass)
 {
   // self track
   // Error(7x7,e) ==> Error(7x7,output(hsm)) using Momentum(p).
@@ -357,10 +357,10 @@ KFitBase::makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e
 }
 
 
-const HepMatrix
+HepMatrix
 KFitBase::makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2, const CLHEP::HepMatrix& e,
                      const bool is_fix_mass1,
-                     const bool is_fix_mass2) const
+                     const bool is_fix_mass2)
 {
   // track and track
   // Error(7x7,e) ==> Error(7x7,output(hm)) using Momentum(p1&p2).
@@ -435,8 +435,8 @@ KFitBase::makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzV
 }
 
 
-const HepMatrix
-KFitBase::makeError4(const HepLorentzVector& p, const HepMatrix& e) const
+HepMatrix
+KFitBase::makeError4(const HepLorentzVector& p, const HepMatrix& e)
 {
   // vertex and track
   // Error(3x7,e) ==> Error(3x7,output(hm)) using Momentum(p).

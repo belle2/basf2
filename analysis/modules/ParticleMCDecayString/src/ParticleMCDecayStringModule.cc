@@ -164,7 +164,7 @@ const MCParticle* ParticleMCDecayStringModule::getInitialParticle(const MCPartic
   if (mcPMother == nullptr) {
     return mcP;
   } else {
-    return getInitialParticle(mcPMother);
+    return ParticleMCDecayStringModule::getInitialParticle(mcPMother);
   }
 }
 

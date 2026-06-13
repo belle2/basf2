@@ -145,28 +145,28 @@ namespace Belle2 {
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const CLHEP::HepSymMatrix makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
+      static CLHEP::HepSymMatrix makeError1(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e);
       /** Rebuild an error matrix from a pair of Lorentz vectors and an error matrix.
        * @param p1 first Lorentz vector
        * @param p2 second Lorentz vector
        * @param e (6x6) error matrix
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
-                                           const CLHEP::HepMatrix& e) const;
+      static CLHEP::HepMatrix    makeError1(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                            const CLHEP::HepMatrix& e);
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x6) error matrix
        * @return (3x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError2(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
+      static CLHEP::HepMatrix    makeError2(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e);
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (7x7) error matrix
        * @param is_fix_mass true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const CLHEP::HepSymMatrix makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass) const;
+      static CLHEP::HepSymMatrix makeError3(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e, const bool is_fix_mass);
       /** Rebuild an error matrix from a pair of Lorentz vectors and an error matrix.
        * @param p1 first Lorentz vector
        * @param p2 second Lorentz vector
@@ -175,14 +175,14 @@ namespace Belle2 {
        * @param is_fix_mass2 true to recalculate energy term from other parameters, false to do nothing
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
-                                           const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2) const;
+      static CLHEP::HepMatrix    makeError3(const CLHEP::HepLorentzVector& p1, const CLHEP::HepLorentzVector& p2,
+                                            const CLHEP::HepMatrix& e, const bool is_fix_mass1, const bool is_fix_mass2);
       /** Rebuild an error matrix from a Lorentz vector and an error matrix.
        * @param p Lorentz vector
        * @param e (3x7) error matrix
        * @return (7x7) error matrix
        */
-      const CLHEP::HepMatrix    makeError4(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e) const;
+      static CLHEP::HepMatrix    makeError4(const CLHEP::HepLorentzVector& p, const CLHEP::HepMatrix& e);
 
 
       /** Build grand matrices for minimum search from input-track properties.

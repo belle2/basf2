@@ -89,7 +89,7 @@ C.   PHOPRO   3)               4      var. for photon rep. (in branch)
 C.   PHOCMS   2)               3      parameters of boost to branch CMS
 C.   PHNUM    4)               1      event number from outside         
 C.----------------------------------------------------------------------
-      SUBROUTINE PHOINI(ISINGLE, IEXPONENTIAL)
+      SUBROUTINE PHOINI
 C.----------------------------------------------------------------------
 C.
 C.    PHOTOS:   PHOton radiation in decays INItialisation
@@ -107,7 +107,8 @@ C.                                                Last Update: 12/04/90
 C.
 C.----------------------------------------------------------------------
       IMPLICIT NONE
-      INTEGER ISINGLE,IEXPONENTIAL
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
       INTEGER INIT,IDUM,IPHQRK,IPHEKL
       SAVE INIT
       DATA INIT/ 0/
@@ -222,7 +223,7 @@ C--   Second order - double photon switch
       ISEC=.TRUE.
       IF (ISINGLE.EQ.1) THEN
          ISEC=.FALSE.
-         xphcut=0.01 D0 ! 10 MeV in tau rest frame
+         xphcut=2 * 0.01 / 1.777 ! 10 MeV in tau rest frame
       ENDIF
 C--   Third/fourth order - triple (or quatric) photon switch, 
 C--                        see dipswitch ifour
@@ -1972,6 +1973,7 @@ C.
 C.----------------------------------------------------------------------
       IMPLICIT NONE
       DOUBLE PRECISION MPASQR,MCHREN,BETA,XX,YY,DATA
+      DOUBLE PRECISION R2,YB,S1,BETA0,BETA1,PHOTRI
       INTEGER ME
       REAL*8 PHOCOR,PHOFAC,WT1,WT2,WT3
       DOUBLE PRECISION MCHSQR,MNESQR
@@ -1983,13 +1985,27 @@ C.----------------------------------------------------------------------
       INTEGER IREP
       REAL*8 PROBH,CORWT,XF
       COMMON/PHOPRO/PROBH,CORWT,XF,IREP
-C--
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
 C--   Shaping (modified by ZW)...
       XX=4.D0*MCHSQR/MPASQR*(1.D0-XPHOTO)/(1.D0-XPHOTO+(MCHSQR-MNESQR)/
      &MPASQR)**2
       IF (ME.EQ.1) THEN
         YY=1.D0
         WT3=(1.D0-XPHOTO/XPHMAX)/((1.D0+(1.D0-XPHOTO/XPHMAX)**2)/2.D0)
+        IF (IB_ME_FD.EQ.1) THEN
+C -- IB matrix element squared, Decker & Finkemeier, hep-ph/9302286 Eq.(29)
+           R2=MCHSQR/MPASQR
+           YB=((2.D0-XPHOTO)*(1.D0-XPHOTO+R2)
+     $          -XPHOTO*(1.D0-XPHOTO-R2)*COSTHG)/(2.D0*(1.D0-XPHOTO))
+           WT3= (R2**2*(XPHOTO+2.D0)-2.D0*R2*(XPHOTO+YB) !matrix element.
+     $          +(XPHOTO+YB-1.D0)
+     $          *(2.D0-3.D0*XPHOTO+XPHOTO**2+XPHOTO*YB))
+     $          *(R2-YB+1.D0)
+     $          /((R2-XPHOTO-YB+1.D0)**2*XPHOTO**2)
+     $          /(4.D0*(1.D0-R2))
+           WT3=MAX(WT3,0.D0)    ! round-off at y=ymax
+        ENDIF
       ELSEIF (ME.EQ.2) THEN
         YY=0.5D0*(1.D0-XPHOTO/XPHMAX+1.D0/(1.D0-XPHOTO/XPHMAX))
         WT3=1.D0
@@ -2003,10 +2019,21 @@ C--   Shaping (modified by ZW)...
         YY=1.D0
         WT3=1.D0
       ENDIF
-      BETA=SQRT(1.D0-XX)
-      WT1=(1.D0-COSTHG*SQRT(1.D0-MCHREN))/(1.D0-COSTHG*BETA)
-      WT2=(1.D0-XX/YY/(1.D0-BETA**2*COSTHG**2))*(1.D0+COSTHG*BETA)/2.D0
-      WT2=WT2*PHOFAC(1)
+      IF (ME.EQ.1.AND.IB_ME_FD.EQ.1) THEN
+C --  IB matrix element squared, Decker & Finkemeier, hep-ph/9302286 Eq.(29)
+         S1=MPASQR  * (1.D0-XPHOTO)
+         BETA0=2*PHOTRI(1D0,dsqrt(MCHSQR/MPASQR),dsqrt(MNESQR/MPASQR))
+         BETA1=2*PHOTRI(1D0,dsqrt(MCHSQR/S1),dsqrt(MNESQR/S1))
+         WT1= (1.D0-COSTHG*SQRT(1.D0-MCHREN))
+     $        /((1D0+(1D0-XPHOTO/XPHMAX)**2)/2.D0)*XPHOTO ! de-presampler
+     $
+         WT2= beta1/beta0*XPHOTO !phase space jacobians
+      ELSE
+        BETA=SQRT(1.D0-XX)
+        WT1=(1.D0-COSTHG*SQRT(1.D0-MCHREN))/(1.D0-COSTHG*BETA)
+        WT2=(1.D0-XX/YY/(1.D0-BETA**2*COSTHG**2))*(1.D0+COSTHG*BETA)/2.D0
+        WT2=WT2*PHOFAC(1)
+      ENDIF
       PHOCOR=WT1*WT2*WT3
       CORWT=PHOCOR
       IF (PHOCOR.GT.1.D0) THEN
@@ -2324,7 +2351,10 @@ C--   All 'neutrals' treated, fill /PHOEVT/ for charged particle...
       DO 90 J=1,3
    90 PPHO(J,NCHARB)=-(PPHO(J,NPHO)+PNEUTR(J))
       PPHO(4,NCHARB)=PPHO(5,IP)-(PPHO(4,NPHO)+PNEUTR(4))
-C--
+C--   Verify the map from xphoto and costheta give the same y as used in PHOCOR calculations
+C     PRINT *, 'Y = ', 2*PPHO(4,NCHARB)/PPHO(5,IP) ! y = 2Epi/Mtau
+C     PRINT *, 'YB =', ((2.D0-XPHOTO)*(1.D0-XPHOTO+(MCHSQR/PPHO(5,IP)**2)) ! y=y(x,c)=((2-x)(1-x+r^2)-x(1-x-r^2)c)/2(1-x) where r=m_pi^2/m_tau^2
+C    $          -XPHOTO*(1.D0-XPHOTO-(MCHSQR/PPHO(5,IP)**2))*COSTHG)/(2.D0*(1.D0-XPHOTO))
       END
       FUNCTION PHOTRI(A,B,C)
 C.----------------------------------------------------------------------

@@ -52,9 +52,10 @@ namespace Belle2 {
     /**
      * Get the WeightMatrix.
      */
-    WeightMatrix getWeightMatrix() const
+    const WeightMatrix& getWeightMatrix() const
     {
       return m_weightMatrix;
+https: //gitlab.desy.de/belle2/software/basf2/tree/9d21d39308e8a9646976010659cc21177d10020d/analysis/modules/ParticleMCDecayString/src/ParticleMCDecayStringModule.cc#L212
     };
 
     /**

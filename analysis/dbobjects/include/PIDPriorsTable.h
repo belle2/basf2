@@ -132,7 +132,7 @@ namespace Belle2 {
      * Returns the X axis label
      * @return the X axis label
      */
-    std::string getXAxisLabel() const
+    const std::string& getXAxisLabel() const
     {
       return m_xAxisLabel;
     };
@@ -141,7 +141,7 @@ namespace Belle2 {
      * Returns the Y axis label
      * @return the Y axis label
      */
-    std::string getYAxisLabel() const
+    const std::string& getYAxisLabel() const
     {
       return m_yAxisLabel;
     };

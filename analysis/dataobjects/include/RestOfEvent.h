@@ -76,7 +76,7 @@ namespace Belle2 {
       /**
        * Get mask name
        */
-      std::string getName() const
+      const std::string& getName() const
       {
         return m_name;
       }
@@ -105,14 +105,14 @@ namespace Belle2 {
       /**
        *  Get selected particles associated to the mask
        */
-      std::set<int> getParticles() const
+      const std::set<int>& getParticles() const
       {
         return m_maskedParticleIndices;
       }
       /**
        *  Get selected particles associated to the V0 of mask
        */
-      std::set<int> getV0s() const
+      const std::set<int>& getV0s() const
       {
         return m_maskedV0Indices;
       }

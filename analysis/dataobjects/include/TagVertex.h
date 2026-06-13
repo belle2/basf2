@@ -125,8 +125,7 @@ namespace Belle2 {
     /**
      * get the constraint type used in the tag fit
      */
-
-    std::string getConstraintType() const;
+    const std::string& getConstraintType() const;
 
     /**
      * Returns number of tracks used in the fit

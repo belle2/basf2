@@ -137,8 +137,8 @@ C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned
       DATA    LAMDEC /0/
       COMMON /LAMDEC/ LAMDEC
 C
-      COMMON /PHOINI_PAR/ ISINGLE,IEXPONENTIAL
-      INTEGER             ISINGLE,IEXPONENTIAL
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
 C
       COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
      *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_R_IB,ONOF_R_V,ONOF_R_A,OFF_PHOT
@@ -219,6 +219,7 @@ C     Print optional flags
       
       ISINGLE = INT(XPAR(ITAUXPAR+951))
       IEXPONENTIAL = INT(XPAR(ITAUXPAR+952))
+      IB_ME_FD = INT(XPAR(ITAUXPAR+953))
 
       CV_LL = XPAR(ITAUXPAR+961)
       CV_LR = XPAR(ITAUXPAR+962)

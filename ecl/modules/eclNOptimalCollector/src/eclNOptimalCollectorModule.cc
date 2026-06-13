@@ -87,7 +87,7 @@ void eclNOptimalCollectorModule::prepare()
   m_eclCalDigitArray.isRequired(m_digitArrayName);
   m_mcParticleArray.isRequired();
   m_eventLevelClusteringInfo.isRequired();
-  m_eventLevelTriggerTimeInfo.isRequired();
+  m_eventLevelTriggerTimeInfo.isOptional();
 
   //--------------------------------------------------------
   //..Sort the crystals into groups of similar performance
@@ -420,7 +420,10 @@ void eclNOptimalCollectorModule::collect()
   if (OutOfTime > maxOutOfTime) {return;}
 
   //..Time since injection to monitor background reuse
-  double timeSinceInjectionMicroS = m_eventLevelTriggerTimeInfo->getTimeSinceLastInjectionInMicroSeconds();
+  double timeSinceInjectionMicroS = -1.;
+  if (m_eventLevelTriggerTimeInfo.isValid()) {
+    timeSinceInjectionMicroS = m_eventLevelTriggerTimeInfo->getTimeSinceLastInjectionInMicroSeconds();
+  }
   getObjectPtr<TH1D>("timeSinceInjection")->Fill(timeSinceInjectionMicroS);
 
 

@@ -661,10 +661,7 @@ void ECLBhabhaTCollectorModule::collect()
 
     /* Test if the loose track is also a tight track */
 
-    // Number of hits in the CDC
-    if (nCDChits < 1) {
-      continue;
-    }
+    // Number of hits in the CDC --> removed
 
 
     // d0 and z0 cuts

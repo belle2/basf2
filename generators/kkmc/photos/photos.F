@@ -2351,7 +2351,10 @@ C--   All 'neutrals' treated, fill /PHOEVT/ for charged particle...
       DO 90 J=1,3
    90 PPHO(J,NCHARB)=-(PPHO(J,NPHO)+PNEUTR(J))
       PPHO(4,NCHARB)=PPHO(5,IP)-(PPHO(4,NPHO)+PNEUTR(4))
-C--
+C--   Verify the map from xphoto and costheta give the same y as used in PHOCOR calculations
+C     PRINT *, 'Y = ', 2*PPHO(4,NCHARB)/PPHO(5,IP) ! y = 2Epi/Mtau
+C     PRINT *, 'YB =', ((2.D0-XPHOTO)*(1.D0-XPHOTO+(MCHSQR/PPHO(5,IP)**2)) ! y=y(x,c)=((2-x)(1-x+r^2)-x(1-x-r^2)c)/2(1-x) where r=m_pi^2/m_tau^2
+C    $          -XPHOTO*(1.D0-XPHOTO-(MCHSQR/PPHO(5,IP)**2))*COSTHG)/(2.D0*(1.D0-XPHOTO))
       END
       FUNCTION PHOTRI(A,B,C)
 C.----------------------------------------------------------------------

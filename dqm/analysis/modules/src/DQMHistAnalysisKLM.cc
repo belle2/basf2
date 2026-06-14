@@ -47,7 +47,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
-           "Minimal number for delta histogram updates", 30000.);
+           "Minimal number of entries for delta histogram updates", 30000.);
+  addParam("MinEvents", m_minEvents,
+           "Minimal number of processed events for delta histogram updates", 30000.);
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
@@ -80,10 +82,12 @@ void DQMHistAnalysisKLMModule::initialize()
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
 
-  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_0", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_1", HistDelta::c_Entries, m_minEntries, 1);
+  // The FE ratio formed though a pair: in c_Entries one fills far more slowly than other,
+  // leaving the pair out of sync and now use c_Events to update over the same event window.
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_0", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_1", HistDelta::c_Events, m_minEvents, 1);
 
   //register EPICS PVs
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");

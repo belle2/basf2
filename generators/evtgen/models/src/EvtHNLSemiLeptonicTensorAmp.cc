@@ -8,6 +8,7 @@
 
 #include <generators/evtgen/models/EvtHNLSemiLeptonicTensorAmp.h>
 
+#include <framework/logging/Logger.h>
 #include <EvtGenBase/EvtAmp.hh>
 #include <EvtGenBase/EvtDiracSpinor.hh>
 #include <EvtGenBase/EvtId.hh>
@@ -61,8 +62,6 @@ void EvtHNLSemiLeptonicTensorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
 
   EvtVector4R p4meson = parent->getDaug(0)->getP4();
 
-  EvtVector4C l11, l12, l21, l22;
-
   EvtId l_num = parent->getDaug(1)->getId();
 
   EvtVector4C ep_meson_b[5];
@@ -96,102 +95,47 @@ void EvtHNLSemiLeptonicTensorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
   ep_meson_bb[3] = ep_meson_b[3] * (p4b);
   ep_meson_bb[4] = ep_meson_b[4] * (p4b);
 
-  EvtVector4C tds0, tds1, tds2, tds3, tds4;
+  EvtTensor4C tdual;
 
-  EvtTensor4C tds;
   if (l_num == EM || l_num == MUM || l_num == TAUM) {
-    EvtTensor4C tdual = EvtComplex(0.0, hf) *
-                        dual(EvtGenFunctions::directProd(pp, pm));
-    tds0 = tdual.cont2(ep_meson_b[0]) - kf * ep_meson_b[0] -
-           bpf * ep_meson_bb[0] * pp - bmf * ep_meson_bb[0] * pm;
-    tds0 *= q2maxin;
-
-    tds1 = tdual.cont2(ep_meson_b[1]) - kf * ep_meson_b[1] -
-           bpf * ep_meson_bb[1] * pp - bmf * ep_meson_bb[1] * pm;
-    tds1 *= q2maxin;
-
-    tds2 = tdual.cont2(ep_meson_b[2]) - kf * ep_meson_b[2] -
-           bpf * ep_meson_bb[2] * pp - bmf * ep_meson_bb[2] * pm;
-    tds2 *= q2maxin;
-
-    tds3 = tdual.cont2(ep_meson_b[3]) - kf * ep_meson_b[3] -
-           bpf * ep_meson_bb[3] * pp - bmf * ep_meson_bb[3] * pm;
-    tds3 *= q2maxin;
-
-    tds4 = tdual.cont2(ep_meson_b[4]) - kf * ep_meson_b[4] -
-           bpf * ep_meson_bb[4] * pp - bmf * ep_meson_bb[4] * pm;
-    tds4 *= q2maxin;
-
-    l11 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(0));
-    l12 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(1));
-    l21 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(0));
-    l22 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(1));
+    tdual = EvtComplex(0.0, hf) *
+            dual(EvtGenFunctions::directProd(pp, pm));
+  } else if (l_num == EP || l_num == MUP || l_num == TAUP) {
+    tdual = EvtComplex(0.0, -hf) *
+            dual(EvtGenFunctions::directProd(pp, pm));
   } else {
-    if (l_num == EP || l_num == MUP || l_num == TAUP) {
-      EvtTensor4C tdual = EvtComplex(0.0, -hf) *
-                          dual(EvtGenFunctions::directProd(pp, pm));
-      tds0 = tdual.cont2(ep_meson_b[0]) - kf * ep_meson_b[0] -
-             bpf * ep_meson_bb[0] * pp - bmf * ep_meson_bb[0] * pm;
-      tds0 *= q2maxin;
-
-      tds1 = tdual.cont2(ep_meson_b[1]) - kf * ep_meson_b[1] -
-             bpf * ep_meson_bb[1] * pp - bmf * ep_meson_bb[1] * pm;
-      tds1 *= q2maxin;
-
-      tds2 = tdual.cont2(ep_meson_b[2]) - kf * ep_meson_b[2] -
-             bpf * ep_meson_bb[2] * pp - bmf * ep_meson_bb[2] * pm;
-      tds2 *= q2maxin;
-
-      tds3 = tdual.cont2(ep_meson_b[3]) - kf * ep_meson_b[3] -
-             bpf * ep_meson_bb[3] * pp - bmf * ep_meson_bb[3] * pm;
-      tds3 *= q2maxin;
-
-      tds4 = tdual.cont2(ep_meson_b[4]) - kf * ep_meson_b[4] -
-             bpf * ep_meson_bb[4] * pp - bmf * ep_meson_bb[4] * pm;
-      tds4 *= q2maxin;
-
-      l11 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(0));
-      l12 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(1));
-      l21 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(0));
-      l22 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(1));
-    } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen")
-          << "Wrong lepton number\n";
-    }
+    B2ERROR("HNLSemileptonicTensorAmp: Wrong lepton number");
   }
 
-  amp.vertex(0, 0, 0, l11 * tds0);
-  amp.vertex(0, 0, 1, l12 * tds0);
-  amp.vertex(0, 1, 0, l21 * tds0);
-  amp.vertex(0, 1, 1, l22 * tds0);
+  std::array<EvtVector4C, 5> tdsList;
 
-  amp.vertex(1, 0, 0, l11 * tds1);
-  amp.vertex(1, 0, 1, l12 * tds1);
-  amp.vertex(1, 1, 0, l21 * tds1);
-  amp.vertex(1, 1, 1, l22 * tds1);
+  for (std::size_t k{0}; k < tdsList.size(); ++k) {
+    tdsList[k] = tdual.cont2(ep_meson_b[k]) - kf * ep_meson_b[k] -
+                 bpf * ep_meson_bb[k] * pp - bmf * ep_meson_bb[k] * pm;
+    tdsList[k] *= q2maxin;
+  }
 
-  amp.vertex(2, 0, 0, l11 * tds2);
-  amp.vertex(2, 0, 1, l12 * tds2);
-  amp.vertex(2, 1, 0, l21 * tds2);
-  amp.vertex(2, 1, 1, l22 * tds2);
+  for (int i{0}; i < 2; ++i) {
+    for (int j{0}; j < 2; ++j) {
+      const EvtVector4C current{
+        EvtLeptonVACurrent(parent->getDaug(2)->spParent(j),
+                           parent->getDaug(1)->spParent(i))};
 
-  amp.vertex(3, 0, 0, l11 * tds3);
-  amp.vertex(3, 0, 1, l12 * tds3);
-  amp.vertex(3, 1, 0, l21 * tds3);
-  amp.vertex(3, 1, 1, l22 * tds3);
+      for (int k{0}; k < static_cast<int>(tdsList.size()); ++k) {
 
-  amp.vertex(4, 0, 0, l11 * tds4);
-  amp.vertex(4, 0, 1, l12 * tds4);
-  amp.vertex(4, 1, 0, l21 * tds4);
-  amp.vertex(4, 1, 1, l22 * tds4);
+        if (l_num == EM || l_num == MUM || l_num == TAUM) {
+
+          amp.vertex(k, i, j, current.conj() * tdsList[k]);
+
+        } else if (l_num == EP || l_num == MUP || l_num == TAUP) {
+
+          amp.vertex(k, i, j, current * tdsList[k]);
+
+        }
+
+      }
+    }
+  }
 
   return;
 }

@@ -82,7 +82,7 @@ void DQMHistAnalysisKLMModule::initialize()
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
 
-  // The FE ratio formed though a pair: in c_Entries one fills far more slowly than other,
+  // The FE ratio via pair: in c_Entries one fills far more slowly than other,
   // leaving the pair out of sync and now use c_Events to update over the same event window.
   addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Events, m_minEvents, 1);
   addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Events, m_minEvents, 1);

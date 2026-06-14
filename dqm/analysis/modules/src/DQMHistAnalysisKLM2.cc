@@ -65,7 +65,7 @@ void DQMHistAnalysisKLM2Module::initialize()
   registerEpicsPV("KLM:Eff:uncertaintyThreshold", "uncertaintyThreshold");
   registerEpicsPV("KLM:Eff:minEntriesThreshold", "minEntriesThreshold");
   registerEpicsPV("KLM:Eff:deltaEffThreshold", "deltaEffThreshold");
-  registerEpicsPV("KLM:EFF:deltaEffStopThreshold", "deltaEffStopThreshold");
+  registerEpicsPV("KLM:Eff:deltaEffStopThreshold", "deltaEffStopThreshold");
 
   gROOT->cd();
   m_c_eff_bklm = new TCanvas((m_histogramDirectoryName + "/c_eff_bklm_plane").data());

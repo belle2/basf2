@@ -702,9 +702,10 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
 
       canvas->Modified();
       canvas->Update();
-    } else {
-      B2WARNING("processFEHistogram: Delta numerator or denominator not found.");
     }
+    // If the deltas are not available yet (e.g. before the first MinEvents window
+    // has closed), silently skip drawing the delta overlay, consistent with the
+    // other histogram handlers (e.g. processTimeHistogram).
   } else {
     B2WARNING("processFEHistogram: Skipped histogram processing due to missing numerator/denominator.");
   }

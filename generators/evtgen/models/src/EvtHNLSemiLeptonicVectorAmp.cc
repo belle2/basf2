@@ -8,6 +8,7 @@
 
 #include <generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h>
 
+#include <framework/logging/Logger.h>
 #include <EvtGenBase/EvtAmp.hh>
 #include <EvtGenBase/EvtDiracSpinor.hh>
 #include <EvtGenBase/EvtId.hh>
@@ -61,8 +62,6 @@ void EvtHNLSemiLeptonicVectorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
 
   EvtVector4R p4meson = parent->getDaug(0)->getP4();
 
-  EvtVector4C l11, l12, l21, l22;
-
   EvtId l_num = parent->getDaug(1)->getId();
   double m_b = parent->mass();
 
@@ -70,64 +69,48 @@ void EvtHNLSemiLeptonicVectorAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
         ((m_b - m_meson) / (2.0 * m_meson)) * a2f;
 
   EvtTensor4C tds;
+  tds = a1f * (m_b + m_meson) * EvtTensor4C::g();
+  tds.addDirProd((-a2f / (m_b + m_meson)) * p4b, p4b + p4meson);
+
   if (l_num == EM || l_num == MUM || l_num == TAUM) {
-    tds = a1f * (m_b + m_meson) * EvtTensor4C::g();
-    tds.addDirProd((-a2f / (m_b + m_meson)) * p4b, p4b + p4meson);
     tds += EvtComplex(0.0, vf / (m_b + m_meson)) *
            dual(EvtGenFunctions::directProd(p4meson + p4b, p4b - p4meson));
-    tds.addDirProd((a0f - a3f) * 2.0 * (m_meson / q2) * p4b,
-                   p4b - p4meson);
-
-    l11 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(0));
-    l12 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(1));
-    l21 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(0));
-    l22 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(1));
+  } else if (l_num == EP || l_num == MUP || l_num == TAUP) {
+    tds -= EvtComplex(0.0, vf / (m_b + m_meson)) *
+           dual(EvtGenFunctions::directProd(p4meson + p4b,
+                                            p4b - p4meson));
   } else {
-    if (l_num == EP || l_num == MUP || l_num == TAUP) {
-      tds = a1f * (m_b + m_meson) * EvtTensor4C::g();
-      tds.addDirProd((-a2f / (m_b + m_meson)) * p4b, p4b + p4meson);
-      tds -= EvtComplex(0.0, vf / (m_b + m_meson)) *
-             dual(EvtGenFunctions::directProd(p4meson + p4b,
-                                              p4b - p4meson));
-      tds.addDirProd((a0f - a3f) * 2.0 * (m_meson / q2) * p4b,
-                     p4b - p4meson);
-
-      l11 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(0));
-      l12 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(1));
-      l21 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(0));
-      l22 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(1));
-    } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen")
-          << "Wrong lepton number\n";
-    }
+    B2ERROR("HNLSemileptonicVectorAmp: Wrong lepton number");
   }
+
+  tds.addDirProd((a0f - a3f) * 2.0 * (m_meson / q2) * p4b,
+                 p4b - p4meson);
 
   EvtVector4C et0 = tds.cont1(parent->getDaug(0)->epsParent(0).conj());
   EvtVector4C et1 = tds.cont1(parent->getDaug(0)->epsParent(1).conj());
   EvtVector4C et2 = tds.cont1(parent->getDaug(0)->epsParent(2).conj());
+  const std::array<const EvtVector4C*, 3> etaList{{&et0, &et1, &et2}};
 
-  amp.vertex(0, 0, 0, l11.cont(et0));
-  amp.vertex(0, 0, 1, l12.cont(et0));
-  amp.vertex(0, 1, 0, l21.cont(et0));
-  amp.vertex(0, 1, 1, l22.cont(et0));
+  for (int i{0}; i < 2; ++i) {
+    for (int j{0}; j < 2; ++j) {
+      const EvtVector4C current{
+        EvtLeptonVACurrent(parent->getDaug(2)->spParent(j),
+                           parent->getDaug(1)->spParent(i))};
 
-  amp.vertex(1, 0, 0, l11.cont(et1));
-  amp.vertex(1, 0, 1, l12.cont(et1));
-  amp.vertex(1, 1, 0, l21.cont(et1));
-  amp.vertex(1, 1, 1, l22.cont(et1));
+      for (int k{0}; k < static_cast<int>(etaList.size()); ++k) {
 
-  amp.vertex(2, 0, 0, l11.cont(et2));
-  amp.vertex(2, 0, 1, l12.cont(et2));
-  amp.vertex(2, 1, 0, l21.cont(et2));
-  amp.vertex(2, 1, 1, l22.cont(et2));
+        if (l_num == EM || l_num == MUM || l_num == TAUM) {
+
+          amp.vertex(k, i, j, current.conj().cont(*etaList[k]));
+
+        } else {
+
+          amp.vertex(k, i, j, current.cont(*etaList[k]));
+
+        }
+      }
+    }
+  }
 
   return;
 }

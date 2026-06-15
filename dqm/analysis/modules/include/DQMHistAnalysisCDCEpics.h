@@ -108,27 +108,27 @@ namespace Belle2 {
   protected:
 
     //Canvas for DQM analysis IR plots
-    TCanvas* c_histmd_ladc = nullptr; /**< canvas for adc layer median */
+    TCanvas* m_canv_md_ladc = nullptr; /**< canvas for adc layer median */
     TH1F* m_histmd_ladc = nullptr; /**< for above*/
 
-    TCanvas* c_hist_adc = nullptr; /**< canvas for adc board median */
+    TCanvas* m_canv_adc = nullptr; /**< canvas for adc board median */
     TH1F* m_hist_adc = nullptr; /**< for above*/
 
-    TCanvas* c_hist_tdc = nullptr; /**< canvas for tdc board median */
+    TCanvas* m_canv_tdc = nullptr; /**< canvas for tdc board median */
     TH1F* m_hist_tdc = nullptr; /**< for above */
 
-    TCanvas* c_hist_crphi = nullptr; /**< canvas for control shifter phi */
+    TCanvas* m_canv_crphi = nullptr; /**< canvas for control shifter phi */
     TH1D* m_hist_crphi = nullptr; /**< for above*/
 
-    TCanvas* c_hist_hitsphi = nullptr; /**< expert canvas for hits vs phi */
+    TCanvas* m_canv_hitsphi = nullptr; /**< expert canvas for hits vs phi */
 
-    TCanvas* c_hist_effphi = nullptr; /**< canvas for tracking efficiency */
+    TCanvas* m_canv_effphi = nullptr; /**< canvas for tracking efficiency */
     TH1D* m_hist_effphi = nullptr; /**< for above*/
 
-    TCanvas* c_hist_skimphi[8] = {nullptr}; /**< canvas for various phi distribution */
+    TCanvas* m_canv_skimphi[8] = {nullptr}; /**< canvas for various phi distribution */
     TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
-    TCanvas* c_hist_attach_eff[4] = {nullptr}; /**< canvas for layer efficiency */
+    TCanvas* m_canv_attach_eff[4] = {nullptr}; /**< canvas for layer efficiency */
     TH2F* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
     TH2Poly* m_hist_attach_eff_Poly[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/

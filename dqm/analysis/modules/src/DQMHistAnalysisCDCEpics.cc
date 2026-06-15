@@ -51,25 +51,25 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
 {
 
   gROOT->cd();
-  c_histmd_ladc = new TCanvas("CDC/c_histmd_ladc", "c_histmd_ladc", 500, 400);
+  m_canv_md_ladc = new TCanvas("CDC/c_histmd_ladc", "c_histmd_ladc", 500, 400);
   m_histmd_ladc = new TH1F("CDC/histmd_ladc", "m_histmd_ladc", 56, 0, 56);
   m_histmd_ladc->SetTitle("ADC Medians vs Layers (SL-lines); CDC Layer index; ADC medians");
 
-  c_hist_adc = new TCanvas("CDC/c_hist_adc", "c_hist_adc", 500, 400);
+  m_canv_adc = new TCanvas("CDC/c_hist_adc", "c_hist_adc", 500, 400);
   m_hist_adc = new TH1F("CDC/hist_adc", "m_hist_adc", 300, 0, 300);
   m_hist_adc->SetTitle("ADC Medians; CDC board index; ADC medians");
 
-  c_hist_tdc = new TCanvas("CDC/c_hist_tdc", "c_hist_tdc", 500, 400);
+  m_canv_tdc = new TCanvas("CDC/c_hist_tdc", "c_hist_tdc", 500, 400);
   m_hist_tdc = new TH1F("CDC/hist_tdc", "m_hist_tdc", 300, 0, 300);
   m_hist_tdc->SetTitle("TDC Medians; CDC board index; TDC medians");
 
   //array of various phi histograms
   for (int ic = 0; ic < 8; ic++) {
-    c_hist_skimphi[ic] = new TCanvas(Form("CDC/c_hist_skimphi_c%d", ic), Form("hist_skimphi_c%d", ic), 500, 400);
+    m_canv_skimphi[ic] = new TCanvas(Form("CDC/c_hist_skimphi_c%d", ic), Form("hist_skimphi_c%d", ic), 500, 400);
   }
 
-  c_hist_crphi = new TCanvas("CDC/c_hist_crphi", "c_hist_crphi", 500, 400);
-  c_hist_hitsphi = new TCanvas("CDC/c_hist_hitsphi", "c_hist_hitsphi", 500, 400);
+  m_canv_crphi = new TCanvas("CDC/c_hist_crphi", "c_hist_crphi", 500, 400);
+  m_canv_hitsphi = new TCanvas("CDC/c_hist_hitsphi", "c_hist_hitsphi", 500, 400);
 
   //CR alarm reference
   if (m_fname_refphi != "") {
@@ -96,13 +96,13 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
     m_lines.push_back(line);
   }
 
-  c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
+  m_canv_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 180, -180.0, 180.0);
 
-  c_hist_attach_eff[0] = new TCanvas("CDC/c_hist_attached_wires", "c_hist_attached_wires", 403, 400);
-  c_hist_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
-  c_hist_attach_eff[2] = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 403, 400);
-  c_hist_attach_eff[3] = new TCanvas("CDC/c_hist_attach_eff_1d", "c_hist_attach_eff_1d", 403, 400);
+  m_canv_attach_eff[0] = new TCanvas("CDC/c_hist_attached_wires", "c_hist_attached_wires", 403, 400);
+  m_canv_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
+  m_canv_attach_eff[2] = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 403, 400);
+  m_canv_attach_eff[3] = new TCanvas("CDC/c_hist_attach_eff_1d", "c_hist_attach_eff_1d", 403, 400);
   if (m_doTH2PolyTrackingWireEff) {
     m_hist_attach_eff_Poly[0] = createEffiTH2Poly("CDC/hist_attachedWires",
                                                   "hist_attachedWires (backplate view);X [cm];Y [cm]; Track / bin");
@@ -261,8 +261,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
       m_histmd_ladc->SetBinContent(il + 1, md_ladc);
     }
     // Draw canvas
-    c_histmd_ladc->Clear();
-    c_histmd_ladc->cd();
+    m_canv_md_ladc->Clear();
+    m_canv_md_ladc->cd();
     double y_max = m_histmd_ladc->GetMaximum();
     if (!std::isfinite(y_max) || y_max <= 0 || y_max > 1e3)y_max = 1;
     m_histmd_ladc->SetFillColor(kYellow);
@@ -273,8 +273,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
       line->SetY2(y_max * 1.20);
       line->Draw("same");
     }
-    c_histmd_ladc->Update();
-    UpdateCanvas(c_histmd_ladc);
+    m_canv_md_ladc->Update();
+    UpdateCanvas(m_canv_md_ladc);
   }
 
   //2. get adc medians vs board ID
@@ -301,8 +301,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     double adcfrac = cadcgood / 2.99; // (100.0/299) in %
     setEpicsPV("adcboards", adcfrac);
     // Draw canvas
-    c_hist_adc->Clear();
-    c_hist_adc->cd();
+    m_canv_adc->Clear();
+    m_canv_adc->cd();
     if (cadcgood > 0)sumadcgood = sumadcgood * 1.0 / cadcgood;
     getHistStyle(m_hist_adc, "adc", sumadcgood);
     m_hist_adc->SetTitle(Form("ADC Medians: Bad board count = %d (%0.01f%%)", cadcbad - 1, 100.0 - adcfrac));
@@ -311,8 +311,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_line_hadc_sl01->Draw("same");
     m_line_ladc_sl28->Draw("same");
     m_line_hadc_sl28->Draw("same");
-    c_hist_adc->Update();
-    UpdateCanvas(c_hist_adc);
+    m_canv_adc->Update();
+    UpdateCanvas(m_canv_adc);
   }
 
   //3. get tdc medians vs board ID
@@ -338,8 +338,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     }
     double tdcfrac = ctdcgood / 2.99;
     setEpicsPV("tdcboards", tdcfrac);
-    c_hist_tdc->Clear();
-    c_hist_tdc->cd();
+    m_canv_tdc->Clear();
+    m_canv_tdc->cd();
     if (ctdcgood > 0)sumtdcgood = sumtdcgood * 1.0 / ctdcgood;
     getHistStyle(m_hist_tdc, "tdc", sumtdcgood);
     m_hist_tdc->SetTitle(Form("TDC Medians: Bad board count = %d (%0.01f%%)", ctdcbad - 1, 100.0 - tdcfrac));
@@ -348,8 +348,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_line_htdc_sl01->Draw("same");
     m_line_ltdc_sl28->Draw("same");
     m_line_htdc_sl28->Draw("same");
-    c_hist_tdc->Update();
-    UpdateCanvas(c_hist_tdc);
+    m_canv_tdc->Update();
+    UpdateCanvas(m_canv_tdc);
   }
 
   //get phi plots for various options
@@ -365,8 +365,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
         m_hist_skimphi[k]->SetTitle(TString::Format("cdc-track #phi (%s, %s-events);#phi;entries", sip[j].Data(), sname[i].Data()));
         if (k < 4)m_hist_skimphi[k]->SetFillColor(kGray);
         else m_hist_skimphi[k]->SetFillColor(kCyan);
-        c_hist_skimphi[k]->Clear();
-        c_hist_skimphi[k]->cd();
+        m_canv_skimphi[k]->Clear();
+        m_canv_skimphi[k]->cd();
         gPad->SetGridx(1);
         gPad->SetGridy(1);
         m_hist_skimphi[k]->Draw("hist");
@@ -376,7 +376,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   //for CR shifter IP + all hadrons including alarm system
   if (m_delta_skimphi) {
-    c_hist_crphi->Clear();
+    m_canv_crphi->Clear();
     bool isFew = false, isAlarm = false, isWarn = false;
     m_hist_crphi = m_delta_skimphi->ProjectionX("histphi_ip_hadrons", 7, 7, "");
     m_hist_crphi->SetTitle("cdc-track #phi (IP + hadrons);cdc-track #phi;norm entries");
@@ -422,23 +422,23 @@ void DQMHistAnalysisCDCEpicsModule::event()
         }
       }
     }
-    c_hist_crphi->cd();
+    m_canv_crphi->cd();
     gPad->SetGridx(1);
     gPad->SetGridy(1);
     if (!m_histref_phiindex)m_hist_crphi->SetTitle(Form("%s (no ref file)", m_hist_crphi->GetTitle()));
     m_hist_crphi->Draw("hist");
-    if (isFew) colorizeCanvas(c_hist_crphi, c_StatusTooFew);
-    else if (isAlarm)colorizeCanvas(c_hist_crphi, c_StatusError);
-    else if (isWarn)colorizeCanvas(c_hist_crphi, c_StatusWarning);
-    else colorizeCanvas(c_hist_crphi, c_StatusGood);
-    c_hist_crphi->Update();
-    UpdateCanvas(c_hist_crphi);
+    if (isFew) colorizeCanvas(m_canv_crphi, c_StatusTooFew);
+    else if (isAlarm)colorizeCanvas(m_canv_crphi, c_StatusError);
+    else if (isWarn)colorizeCanvas(m_canv_crphi, c_StatusWarning);
+    else colorizeCanvas(m_canv_crphi, c_StatusGood);
+    m_canv_crphi->Update();
+    UpdateCanvas(m_canv_crphi);
   }
 
   //get tracking efficiency
   auto m_delta_effphi = (TH2F*)getDelta(m_name_dir, m_hname_effphi, 0, true); //true=only if updated
   if (m_delta_effphi) {
-    c_hist_effphi->Clear();
+    m_canv_effphi->Clear();
     double eff = -1;
     const int all_phibins = m_delta_effphi->GetNbinsX();
     const int all_hitbins = m_delta_effphi->GetNbinsY();
@@ -454,25 +454,25 @@ void DQMHistAnalysisCDCEpicsModule::event()
     }
     m_hist_effphi->GetYaxis()->SetRangeUser(80.0, 110.0); //per efficiency
     m_hist_effphi->SetTitle("CDC track efficiency(cdchits>20/all); cdc-track #phi; tracking efficiency");
-    c_hist_effphi->cd();
+    m_canv_effphi->cd();
     gPad->SetGridx();
     gPad->SetGridy();
     m_hist_effphi->SetFillColor(kCyan);
     m_hist_effphi->Draw("hist");
-    c_hist_effphi->Update();
-    UpdateCanvas(c_hist_effphi);
+    m_canv_effphi->Update();
+    UpdateCanvas(m_canv_effphi);
   }
 
   //get cdc hits vs phi
   auto m_delta_hitphi = (TH2F*)getDelta(m_name_dir, m_hname_hitsphi, 0, true); //true=only if updated
   if (m_delta_hitphi) {
-    c_hist_hitsphi->Clear();
+    m_canv_hitsphi->Clear();
     m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
-    c_hist_hitsphi->cd();
+    m_canv_hitsphi->cd();
     gPad->SetLogz();
     m_delta_hitphi->Draw("COLZ");
-    c_hist_hitsphi->Update();
-    UpdateCanvas(c_hist_hitsphi);
+    m_canv_hitsphi->Update();
+    UpdateCanvas(m_canv_hitsphi);
   }
 
   // get wire efficiency
@@ -482,7 +482,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   gStyle->SetNumberContours(100);
   auto m_delta_efflay = (TH2F*)getDelta(m_name_dir, m_histoTrackingWireEff, 0, true); //true=only if updated
   if (m_delta_efflay) {
-    for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
+    for (int ij = 0; ij < 4; ij++) m_canv_attach_eff[ij]->Clear();
     m_hist_wire_attach_eff_1d->Reset();
     int nEffiValues = 0;
     for (int ij = 1; ij <= m_delta_efflay->GetNbinsX(); ij++) {
@@ -503,7 +503,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     TLatex latex;
     latex.SetTextSize(0.025);
     for (int ij = 0; ij < 3; ij++) {
-      c_hist_attach_eff[ij]->cd();
+      m_canv_attach_eff[ij]->cd();
       if (m_doTH2PolyTrackingWireEff) {
         m_hist_attach_eff_Poly[ij]->SetStats(0);
         m_hist_attach_eff_Poly[ij]->Draw("COLZ");
@@ -527,7 +527,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
       if (ij == 2)
         latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanWireAttachProb * 100.0));
     }
-    c_hist_attach_eff[3]->cd();
+    m_canv_attach_eff[3]->cd();
     if (nEffiValues) {
       int firstBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
       fracWiresWithLowAttachProb = m_hist_wire_attach_eff_1d->Integral(1, firstBoundaryBin) / nEffiValues;
@@ -547,8 +547,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
                                                      m_secondEffBoundary));
     }
     for (int ij = 0; ij < 4; ij++) {
-      c_hist_attach_eff[ij]->Update();
-      UpdateCanvas(c_hist_attach_eff[ij]);
+      m_canv_attach_eff[ij]->Update();
+      UpdateCanvas(m_canv_attach_eff[ij]);
     }
   }
 

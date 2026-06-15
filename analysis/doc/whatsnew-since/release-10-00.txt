@@ -1,4 +1,5 @@
 Changes in the analysis package in light-2604-jellyfish
+-------------------------------------------------------
 
 Standard Particle Lists
 +++++++++++++++++++++++
@@ -11,6 +12,11 @@ Modules and Modular Analysis
 Variables
 +++++++++
 * Added metavariable `atan2`, which returns the atan2 value (arctangent of y/x). The result is in radians. 
+* Added variables `nCDCDedxLayers`, which returns number of CDC layers with dE/dx measurements used in PID likelihood and `trackQualityIndicator`, which returns fake/real track classification (0 = likely fake).
+
+FlavorTagger
+++++++++++++
+* Updated TFlaT and added config for Belle.
 
 Changes in the analysis package in light-2603-ina
 ------------------------------------------------------

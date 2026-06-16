@@ -30,6 +30,7 @@ skim = feiSLB0_RDstar(
     udstOutput=False,
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
+skim.FEIPrefix = "FEIv1_2025_MC16ri_aldebaran_200"
 
 ma.inputMdstList(
     b2.find_file(skim.validation_sample, data_type="validation"),

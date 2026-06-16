@@ -38,7 +38,8 @@ gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 fei_skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
     udstOutput=False,
-    roundToMdstPrecision=True
+    roundToMdstPrecision=True,
+    feiPrefix="FEIv1_2025_MC16ri_aldebaran_200",
 )
 
 # Add SmartBkg filtering by providing the skim

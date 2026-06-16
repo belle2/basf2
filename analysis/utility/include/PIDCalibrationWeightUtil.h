@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Constructor with the name of the calibration weight matrix
      */
-    PIDCalibrationWeightUtil(std::string matrixName)
+    PIDCalibrationWeightUtil(const std::string& matrixName)
     {
       m_matrixName = matrixName;
 

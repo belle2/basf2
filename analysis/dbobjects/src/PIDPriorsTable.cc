@@ -168,7 +168,7 @@ short PIDPriorsTable::findBin(float val, std::vector<float> array)
 };
 
 
-short PIDPriorsTable::findBinFast(float val, std::vector<float> array)
+short PIDPriorsTable::findBinFast(float val, const std::vector<float>& array)
 {
   // This function searches for the first bin the axis which is above the
   // value. First it starts assuming the bins are equal, and then moves around
@@ -188,7 +188,7 @@ short PIDPriorsTable::findBinFast(float val, std::vector<float> array)
 };
 
 
-short PIDPriorsTable::findBinWithFixedWidth(float val, std::vector<float> array)
+short PIDPriorsTable::findBinWithFixedWidth(float val, const std::vector<float>& array)
 {
   float binWidth = (array.back() - array.front()) / (array.size() - 1.);
   return (short)((val - array.back()) / binWidth);

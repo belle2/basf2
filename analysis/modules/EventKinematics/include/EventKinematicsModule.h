@@ -58,7 +58,7 @@ namespace Belle2 {
     /** A vector of the photons' 4-momenta in the lab */
     std::vector<ROOT::Math::PxPyPzEVector> m_photonsMomentumList;
     /** Fill the lists of particles' momenta */
-    void getParticleMomentumLists(std::vector<std::string> particleLists);
+    void getParticleMomentumLists(const std::vector<std::string>& particleLists);
 
     /** Calculate the missing momentum in the lab system for this event */
     ROOT::Math::XYZVector getMissingMomentum();

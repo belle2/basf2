@@ -19,7 +19,7 @@
 using namespace Belle2;
 using namespace CurlTagger;
 
-SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName)
+SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag, const std::string& tFileName)
 {
   m_TrainFlag = trainFlag;
   m_TFileName = tFileName;

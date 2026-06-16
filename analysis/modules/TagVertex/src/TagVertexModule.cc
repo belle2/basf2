@@ -936,7 +936,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_truthTagVol = m_mcTagV.Dot(oboost);
 }
 
-Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
+Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, const std::string& fitType) const
 {
   //make a copy of motherIn to not modify the original object
   Particle* mother = ParticleCopy::copyParticle(motherIn);

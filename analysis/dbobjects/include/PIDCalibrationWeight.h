@@ -35,7 +35,7 @@ namespace Belle2 {
     PIDCalibrationWeight() {};
 
     /// Constructor with the initial WeightMatrix
-    PIDCalibrationWeight(WeightMatrix weightMatrix)
+    PIDCalibrationWeight(const WeightMatrix& weightMatrix)
     {
       m_weightMatrix = weightMatrix;
     };
@@ -44,7 +44,7 @@ namespace Belle2 {
      * Set the WeightMatrix.
      * @param weightMatrix is the weight matrix to be set.
      */
-    void setWeightMatrix(WeightMatrix weightMatrix)
+    void setWeightMatrix(const WeightMatrix& weightMatrix)
     {
       m_weightMatrix = weightMatrix;
     };

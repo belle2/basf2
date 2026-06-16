@@ -37,7 +37,7 @@ namespace Belle2 {
      */
     static bool calculateBtoKlongX(ROOT::Math::PxPyPzEVector& BMomentum,
                                    ROOT::Math::PxPyPzEVector& KMomentum,
-                                   const std::vector<Particle*> daughters,
+                                   const std::vector<Particle*>& daughters,
                                    const double m_b,
                                    int& idx)
     {

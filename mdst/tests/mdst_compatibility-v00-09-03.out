@@ -73,6 +73,9 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setLogEnergy
+Untested method ECLCluster::setLogEnergyHighestCrystal
+Untested method ECLCluster::setLogEnergyRaw
 Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setMinTrkDistanceID

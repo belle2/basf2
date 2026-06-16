@@ -86,6 +86,8 @@ ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC(
            "Normalization coefficient for ECL signal shape. "
            "If positive, use same static value for all ECL channels. "
            "If negative, calculate dynamically at beginRun().", 1.0);
+  addParam("TimeCalibration", m_timeCalib,
+           "Flag to disable electronic calibration for time (default: true)", true);
 
 }
 
@@ -130,7 +132,9 @@ void ECLDigitizerModuleUp::initialize()
 void ECLDigitizerModuleUp::beginRun()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  double ns_per_tick = 1.0 / (4.0 * ec.getRF()) * 1e3;// ~0.49126819903043308239 ns/tick
+  double ns_per_tick = EclConfigurationUp::s_clock / (EclConfigurationUp::m_ndt * EclConfigurationUp::m_nta *
+                                                      EclConfigurationUp::getRF()) *
+                       1e3; // convert to ns
 
   if (m_useWaveformParameters || m_loadOnce) {
     readDSPDB();
@@ -164,725 +168,717 @@ void ECLDigitizerModuleUp::beginRun()
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
       m_calib[i].tshift += m_MCTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
-  m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
-  if (m_WaveformThresholdOverride < 0) {
-    if (m_FPGAWaveform.isValid()) {
+  if (m_timeCalib) {
+    // Set to zero all time calibrations for Upgrade electronics
+    m_calib[i].tshift = 0;
+
+    m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
+    if (m_WaveformThresholdOverride < 0) {
+      if (m_FPGAWaveform.isValid()) {
+        for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+          m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
+      }
+    } else {
+      //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
       for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-        m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
+        m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
     }
-  } else {
-    //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
-    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
-  }
 
-  if (m_HadronPulseShape)
-    callbackHadronSignalShapes();
+    if (m_HadronPulseShape)
+      callbackHadronSignalShapes();
 
-  // Initialize channel mapper at run start to account for possible
-  // changes in ECL mapping between runs.
-  if (!m_eclMapper.initFromDB()) {
-    B2FATAL("ECLDigitizer: Can't initialize eclChannelMapper!");
+    // Initialize channel mapper at run start to account for possible
+    // changes in ECL mapping between runs.
+    if (!m_eclMapper.initFromDB()) {
+      B2FATAL("ECLDigitizer: Can't initialize eclChannelMapper!");
+    }
   }
-}
 
 // interface to C shape fitting function function
-void ECLDigitizerModuleUp::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
-                                              int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
-{
-  const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
-  const fitparams_t& r = m_fitparams[t.ifunc];
+  void ECLDigitizerModuleUp::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
+                                                int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const {
+    const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
+    const fitparams_t& r = m_fitparams[t.ifunc];
 
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-  constexpr int m_nsmp = ec.m_nsmp;
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+    constexpr int m_nsmp = ec.m_nsmp;
 
-  ECLShapeFitUp result;
+    ECLShapeFitUp result;
 
-  if (!m_dspDataTest) {
-    short int* id = (short int*)m_idn[t.idn].id;
+    if (!m_dspDataTest) {
+      short int* id = (short int*)m_idn[t.idn].id;
 
-    int A0  = (int) * (id + 0) - 128;
-    int Askip  = (int) * (id + 1) - 128;
+      int A0  = (int) * (id + 0) - 128;
+      int Askip  = (int) * (id + 1) - 128;
 
-    int Ahard  = (int) * (id + 2);
-    int k_a = (int) * ((unsigned char*)id + 26);
-    int k_b = (int) * ((unsigned char*)id + 27);
-    int k_c = (int) * ((unsigned char*)id + 28);
-    int k1_chi = (int) * ((unsigned char*)id + 24);
-    int k2_chi = (int) * ((unsigned char*)id + 25);
+      int Ahard  = (int) * (id + 2);
+      int k_a = (int) * ((unsigned char*)id + 26);
+      int k_b = (int) * ((unsigned char*)id + 27);
+      int k_c = (int) * ((unsigned char*)id + 28);
+      int k1_chi = (int) * ((unsigned char*)id + 24);
+      int k2_chi = (int) * ((unsigned char*)id + 25);
 
-    int chi_thres = (int) * (id + 15);
+      int chi_thres = (int) * (id + 15);
 
-    int trg_time = ttrig;
+      int trg_time = ttrig;
 
-    result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-                    (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
-                    trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k1_chi,
-                    k2_chi, chi_thres);
-  } else {
-    std::vector<int> adc(m_nsmp);
-    for (int i = 0; i < m_nsmp; i++) adc[i] = FitA[i];
-    // NOTE: ttrig_packed is any even number in set {8*Z, 8*Z + 2, 8*Z + 4}
-    //       where Z is an integer number in 0..23 range
-    // ttrig = ttrig_packed - 2 * (ttrig_packed / 8);
-    // ttrig = 6*Z + q
-    int ttrig_packed = ttrig / 6 * 8 + ttrig % 6;
-    result = ECLDspUtilitiesUp::shapeFitter(j + 1, adc, ttrig_packed);
-  }
-
-  m_lar = result.amp;
-  m_ltr = result.time;
-  m_lq  = result.quality;
-  m_chi = result.chi2;
-
-  //== Set precision of chi^2 to be the same as in the raw data.
-  int discarded_bits = 0;
-  if ((m_chi & 0x7800000) != 0) {
-    m_chi = 0x7800000;
-  } else if ((m_chi & 0x0600000) != 0) {
-    discarded_bits = 14;
-  } else if ((m_chi & 0x0180000) != 0) {
-    discarded_bits = 12;
-  } else if ((m_chi & 0x0060000) != 0) {
-    discarded_bits = 10;
-  } else if ((m_chi & 0x0018000) != 0) {
-    discarded_bits = 8;
-  } else if ((m_chi & 0x0006000) != 0) {
-    discarded_bits = 6;
-  } else if ((m_chi & 0x0001800) != 0) {
-    discarded_bits = 4;
-  } else if ((m_chi & 0x0000600) != 0) {
-    discarded_bits = 2;
-  }
-  if (discarded_bits > 0) {
-    m_chi >>= discarded_bits;
-    m_chi <<= discarded_bits;
-  }
-}
-
-void ECLDigitizerModuleUp::shapeSignals()
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-
-  const double trgtick = ec.s_clock / ec.getRF() / ec.m_ntrg;   // trigger tick
-  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
-
-  // clear the storage for the event
-  memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
-
-  const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
-  const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
-
-  // emulate response for ECL hits after ADC measurements
-  for (const auto& hit : m_eclSimHits) {
-    int cellId = hit.getCellId(); // 1 .. 8736
-    int j = cellId - 1; // 0 .. 8735
-    int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
-    double timeOffset = tscale * m_ttime[id] - toff;
-    double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
-    //double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
-    double hitTimeAve = (hit.getFlightTime() + eclp->time2sensor(j, hit.getPosition())) * T2us;
-
-    m_adc[j].energyConversion = m_calib[j].ascale * E2GeV * 20000;
-    m_adc[j].flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
-    m_adc[j].timeshift += m_calib[j].tshift * hit.getEnergyDep();
-    m_adc[j].timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
-    m_adc[j].totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
-    m_adc[j].totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
-
-    if (m_HadronPulseShape == true) {
-      double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
-      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
-      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
+      result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
+                      (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
+                      trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k1_chi,
+                      k2_chi, chi_thres);
     } else {
-      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+      std::vector<int> adc(m_nsmp);
+      for (int i = 0; i < m_nsmp; i++) adc[i] = FitA[i];
+      // NOTE: ttrig_packed is any even number in set {8*Z, 8*Z + 2, 8*Z + 4}
+      //       where Z is an integer number in 0..23 range
+      // ttrig = ttrig_packed - 2 * (ttrig_packed / 8);
+      // ttrig = 6*Z + q
+      int ttrig_packed = ttrig / 6 * 8 + ttrig % 6;
+      result = ECLDspUtilitiesUp::shapeFitter(j + 1, adc, ttrig_packed);
+    }
+
+    m_lar = result.amp;
+    m_ltr = result.time;
+    m_lq  = result.quality;
+    m_chi = result.chi2;
+
+    //== Set precision of chi^2 to be the same as in the raw data.
+    int discarded_bits = 0;
+    if ((m_chi & 0x7800000) != 0) {
+      m_chi = 0x7800000;
+    } else if ((m_chi & 0x0600000) != 0) {
+      discarded_bits = 14;
+    } else if ((m_chi & 0x0180000) != 0) {
+      discarded_bits = 12;
+    } else if ((m_chi & 0x0060000) != 0) {
+      discarded_bits = 10;
+    } else if ((m_chi & 0x0018000) != 0) {
+      discarded_bits = 8;
+    } else if ((m_chi & 0x0006000) != 0) {
+      discarded_bits = 6;
+    } else if ((m_chi & 0x0001800) != 0) {
+      discarded_bits = 4;
+    } else if ((m_chi & 0x0000600) != 0) {
+      discarded_bits = 2;
+    }
+    if (discarded_bits > 0) {
+      m_chi >>= discarded_bits;
+      m_chi <<= discarded_bits;
     }
   }
 
-  // add only background hits
-  for (const auto& hit : m_eclHits) {
-    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) continue;
-    int cellId = hit.getCellId(); // 1 .. 8736
-    int j = cellId - 1; // 0 .. 8735
-    int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
-    double timeOffset = tscale * m_ttime[id] - toff;
-    double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
-    double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
-  }
+  void ECLDigitizerModuleUp::shapeSignals() {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+    ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
-  // internuclear counter effect -- charged particle crosses diode and produces signal
-  if (m_inter) {
-    // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
-    // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
-    // conversion factor to get equivalent energy deposition in the crystal to sum up it with deposition in crystal
-    const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
-    for (const auto& hit : m_eclDiodeHits) {
+    const double trgtick = ec.s_clock / ec.getRF() / ec.m_ntrg;   // trigger tick
+    const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
+
+    // clear the storage for the event
+    memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
+
+    const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
+    const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
+
+    // emulate response for ECL hits after ADC measurements
+    for (const auto& hit : m_eclSimHits) {
       int cellId = hit.getCellId(); // 1 .. 8736
       int j = cellId - 1; // 0 .. 8735
       int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
       double timeOffset = tscale * m_ttime[id] - toff;
-      double hitE       = hit.getEnergyDep() * m_calib[j].ascale * diodeEdep2crystalEdep;
-      double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
+      double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
+      double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * T2us;
 
-      adccounts_t& a = m_adc[j];
-      // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
-      // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-      if (m_HadronPulseShape) {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[2]); // diode component
+      m_adc[j].energyConversion = m_calib[j].ascale * E2GeV * 20000;
+      m_adc[j].flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
+      m_adc[j].timeshift += m_calib[j].tshift * hit.getEnergyDep();
+      m_adc[j].timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
+      m_adc[j].totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
+      m_adc[j].totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
+
+      if (m_HadronPulseShape == true) {
+        double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
+        m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
+        m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
       } else {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+        m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
       }
-      //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
     }
-  }
 
-  if (m_calibration) {
-    // This has been added by Alex Bobrov for calibration
-    // of covariance matrix artificially generate 100 MeV in time for each crystal
-    double hitE = 0.1, hitTimeAve = 0.0;
-    for (int j = 0; j < ec.m_nch; j++) {
-      int cellId = j + 1; // 1 .. 8736
+    // add only background hits
+    for (const auto& hit : m_eclHits) {
+      if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) continue;
+      int cellId = hit.getCellId(); // 1 .. 8736
+      int j = cellId - 1; // 0 .. 8735
       int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
       double timeOffset = tscale * m_ttime[id] - toff;
+      double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
+      double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
       m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
     }
-  }
-}
 
-void ECLDigitizerModuleUp::makeElectronicNoiseAndPedestal(int J, int* FitA)
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-  if (m_noElectronicNoise) {
-    for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 3000;
-    return;
-  }
-  std::vector<float> z(ec.m_nsmp), AdcNoise(ec.m_nsmp); // buffers with electronic noise
-  // Noise generation
-  for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
-  m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z.data(), AdcNoise.data());
-  for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = AdcNoise[i] + 3000;
-}
+    // internuclear counter effect -- charged particle crosses diode and produces signal
+    if (m_inter) {
+      // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
+      // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
+      // conversion factor to get equivalent energy deposition in the crystal to sum up it with deposition in crystal
+      const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
+      for (const auto& hit : m_eclDiodeHits) {
+        int cellId = hit.getCellId(); // 1 .. 8736
+        int j = cellId - 1; // 0 .. 8735
+        int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+        double timeOffset = tscale * m_ttime[id] - toff;
+        double hitE       = hit.getEnergyDep() * m_calib[j].ascale * diodeEdep2crystalEdep;
+        double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
 
-void ECLDigitizerModuleUp::makeWaveforms()
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-  BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
-  out.putNBits(m_compAlgo & 0xff, 8);
-  ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
-  if (comp == nullptr)
-    B2FATAL("Unknown compression algorithm: " << m_compAlgo);
-
-  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
-  // loop over entire calorimeter
-  for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
-    makeElectronicNoiseAndPedestal(j, FitA);
-    for (int  i = 0; i < ec.m_nsmp; i++) {
-      int A = 20000 * a.c[i] + FitA[i];
-      FitA[i] = max(0, min(A, (1 << 18) - 1));
+        adccounts_t& a = m_adc[j];
+        // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
+        // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+        if (m_HadronPulseShape) {
+          a.AddHit(hitE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[2]); // diode component
+        } else {
+          a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+        }
+        //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+      }
     }
-    comp->compress(out, FitA);
-  }
-  out.resize();
 
-  ECLWaveforms* wf = new ECLWaveforms;
-  m_eclWaveforms.assign(wf);
-
-  std::swap(out.getStore(), wf->getStore());
-  if (comp) delete comp;
-}
-
-void ECLDigitizerModuleUp::event()
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-
-  // make relation between cellid and eclhits
-  struct ch_t {int cell, id;};
-  vector<ch_t> hitmap;
-  for (const auto& hit : m_eclHits) {
-    int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
-    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
+    if (m_calibration) {
+      // This has been added by Alex Bobrov for calibration
+      // of covariance matrix artificially generate 100 MeV in time for each crystal
+      double hitE = 0.1, hitTimeAve = 0.0;
+      for (int j = 0; j < ec.m_nch; j++) {
+        int cellId = j + 1; // 1 .. 8736
+        int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
+        double timeOffset = tscale * m_ttime[id] - toff;
+        m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+      }
+    }
   }
 
-  bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
-  BitStream out;
-  ECLCompress* comp = nullptr;
+  void ECLDigitizerModuleUp::makeElectronicNoiseAndPedestal(int J, int* FitA) {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+    if (m_noElectronicNoise) {
+      for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = 3000;
+      return;
+    }
+    std::vector<float> z(ec.m_nsmp), AdcNoise(ec.m_nsmp); // buffers with electronic noise
+    // Noise generation
+    for (int i = 0; i < ec.m_nsmp; i++) z[i] = gRandom->Gaus(0, 1);
+    m_noise[m_tbl[J].inoise].generateCorrelatedNoise(z.data(), AdcNoise.data());
+    for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = AdcNoise[i] + 3000;
+  }
 
-  // check background overlay
-  if (isBGOverlay) {
-    std::swap(out.getStore(), m_eclWaveforms->getStore());
-    out.setPos(0);
-    unsigned int compAlgo = out.getNBits(8);
-    comp = selectAlgo(compAlgo & 0x7f);
+  void ECLDigitizerModuleUp::makeWaveforms() {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+    BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
+    out.putNBits(m_compAlgo & 0xff, 8);
+    ECLCompress* comp = selectAlgo(m_compAlgo & 0xff);
     if (comp == nullptr)
-      B2FATAL("Unknown compression algorithm: " << compAlgo);
-    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrieved
-    if (isTrigTime) {
-      for (int i = 0; i < ECL::ECL_CRATES; i++) {
-        unsigned char t = out.getNBits(7); // [0..72)
-        m_ttime[i] = t;
-      }
-    }
-  }
+      B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 
-  if (!m_trigTime || !isTrigTime) { // reproduce previous logic -- one trigger time for all crates
-    int DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..n_trg/2)
-    for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
-  }
-
-  int triggerTag0 = m_EventMetaData->getEvent();
-  for (int id = 0; id < ECL::ECL_CRATES; id++) {
-    auto eclTrig = m_eclTrigs.appendNew();
-    int triggerPhase0 = 2 * (m_ttime[id] + m_ttime[id] / 3);
-    eclTrig->setTrigId(id);
-    eclTrig->setTimeTrig(triggerPhase0);
-    eclTrig->setTrigTag(triggerTag0);
-  }
-
-  shapeSignals();
-
-  // We want to produce background waveforms in simulation first than
-  // dump to a disk, read from the disk to test before real data
-  if (m_waveformMaker) { makeWaveforms(); return; }
-
-  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
-
-  // loop over entire calorimeter
-  for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
-
-    //normalize the MC true arrival times
-    if (m_adc[j].totalDep > 0) {
-      m_adc[j].flighttime /= m_adc[j].totalDep;
-      m_adc[j].timeshift /= m_adc[j].totalDep;
-      m_adc[j].timetosensor /= m_adc[j].totalDep;
-    }
-
-    // if background waveform is here there is no need to generate
-    // electronic noise since it is already in the waveform
-    if (isBGOverlay) {
-      comp->uncompress(out, FitA);
-    } else {
-      // Signal amplitude should be above 100 keV
-      if (a.total < 0.0001) continue;
+    int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+    // loop over entire calorimeter
+    for (int j = 0; j < ec.m_nch; j++) {
+      adccounts_t& a = m_adc[j];
       makeElectronicNoiseAndPedestal(j, FitA);
-    }
-
-    for (int i = 0; i < ec.m_nsmp; i++) {
-      int A = 20000 * a.c[i] + FitA[i];
-      FitA[i] = max(0, min(A, (1 << 18) - 1));
-    }
-
-    int  energyFit = 0; // fit output : Amplitude 18 bits
-    int       tFit = 0; // fit output : T_ave     12 bits
-    int qualityFit = 0; // fit output : quality    2 bits
-    int        chi = 0; // fit output : chi square   it is not available in the experiment
-
-    int id = m_eclMapper.getCrateID(j + 1) - 1; // 0 .. 51
-    int ttrig = 2 * m_ttime[id];
-
-    shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
-
-    if (energyFit > m_ADCThreshold) {
-      int CellId = j + 1;
-
-      //note energyFit and m_Awave is in ADC units
-      if (energyFit > m_Awave[CellId - 1]) {
-        //only save waveforms above ADC threshold
-        const auto eclDsp = m_eclDsps.appendNew();
-        eclDsp->setCellId(CellId);
-        eclDsp->setDspA(FitA);
+      for (int  i = 0; i < ec.m_nsmp; i++) {
+        int A = 20000 * a.c[i] + FitA[i];
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
       }
-
-      // only store extra MC info if requested and above threshold
-      if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
-        const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew();
-        eclDspWithExtraMCInfo->setCellId(CellId);
-        eclDspWithExtraMCInfo->setDspA(FitA);
-        eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
-        eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
-        eclDspWithExtraMCInfo->setFlightTime(a.flighttime);
-        eclDspWithExtraMCInfo->setTimeShift(a.timeshift);
-        eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor);
-        eclDspWithExtraMCInfo->setEnergyConversion(a.energyConversion * 20000);
-      }
-
-      const auto eclDigit = m_eclDigits.appendNew();
-      eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
-      eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
-      eclDigit->setTimeFit(tFit);  // t0 (us)= (64 / 508.876) / (m_ndt*32)
-      eclDigit->setQuality(qualityFit);
-      if (qualityFit == 2)
-        eclDigit->setChi(chi);
-      else eclDigit->setChi(0);
-      for (const auto& hit : hitmap)
-        if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
-
-      // set relation to DspWithExtraInfo
-      for (auto& DspWithExtraMCInfo : m_eclDspsWithExtraMCInfo) {
-        if (eclDigit->getCellId() == DspWithExtraMCInfo.getCellId()) DspWithExtraMCInfo.addRelationTo(eclDigit);
-      }
+      comp->compress(out, FitA);
     }
-  } //store each crystal hit
-  if (comp) delete comp;
-}
+    out.resize();
 
-void ECLDigitizerModuleUp::endRun()
-{
-}
+    ECLWaveforms* wf = new ECLWaveforms;
+    m_eclWaveforms.assign(wf);
 
-void ECLDigitizerModuleUp::terminate()
-{
-}
-
-void ECLDigitizerModuleUp::callbackHadronSignalShapes()
-{
-
-  if (m_waveformParametersMC.hasChanged()) {
-
-    m_ss_HadronShapeSimulations.resize(3);
-
-    //read MC templates from database
-    float photonParsPSD[14];
-    float hadronParsPSD[14];
-    float diodeParsPSD[14];
-    for (int i = 0; i < 14; i++) {
-      photonParsPSD[i] = m_waveformParametersMC->getPhotonParameters()[i + 1];
-      hadronParsPSD[i] = m_waveformParametersMC->getHadronParameters()[i + 1];
-      diodeParsPSD[i] = m_waveformParametersMC->getDiodeParameters()[i + 1];
-    }
-
-    //Initialize templates for hadron shape simulations
-    m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
-    m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
-    m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
-
+    std::swap(out.getStore(), wf->getStore());
+    if (comp) delete comp;
   }
 
-}
+  void ECLDigitizerModuleUp::event() {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
 
-void ECLDigitizerModuleUp::readDSPDB()
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-
-  TFile* rootfile = nullptr;
-  TTree* tree  = nullptr;
-  TTree* tree2 = nullptr;
-  TTree* tree3 = nullptr;
-
-  if (m_useWaveformParameters) {
-    bool hasChanged = false;
-    hasChanged |= m_waveformParameters.hasChanged();
-    hasChanged |= m_algoParameters.hasChanged();
-    hasChanged |= m_noiseParameters.hasChanged();
-
-    if (!hasChanged) return;
-
-    tree  = const_cast<TTree*>(&*m_waveformParameters);
-    tree2 = const_cast<TTree*>(&*m_algoParameters);
-    tree3 = const_cast<TTree*>(&*m_noiseParameters);
-  } else {
-    string dataFileName;
-    if (m_background) {
-      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG-Up.root");
-      B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
-    } else {
-      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Up.root");
-      B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
-    }
-    assert(! dataFileName.empty());
-
-    rootfile = new TFile(dataFileName.c_str(), "read");
-    tree  = (TTree*) rootfile->Get("EclWF");
-    tree2 = (TTree*) rootfile->Get("EclAlgo");
-    tree3 = (TTree*) rootfile->Get("EclNoise");
-  }
-
-  if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
-
-  m_tbl.resize(ec.m_nch);
-
-  const int maxncellid = 512;
-  int ncellId;
-  vector<int> cellId(maxncellid);//[ncellId] buffer for crystal identification number
-
-  tree->SetBranchAddress("ncellId", &ncellId);
-  tree->SetBranchAddress("cellId", cellId.data());
-
-  vector<int> eclWaveformDataTable(ec.m_nch);
-  for (Long64_t j = 0, jmax = tree->GetEntries(); j < jmax; j++) {
-    tree->GetEntry(j);
-    assert(ncellId <= maxncellid);
-    for (int i = 0; i < ncellId; ++i)
-      eclWaveformDataTable[cellId[i] - 1] = j;
-  }
-  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matrices will be used.");
-
-  ECLWFAlgoParamsUp* algo = new ECLWFAlgoParamsUp;
-  tree2->SetBranchAddress("Algopars", &algo);
-  tree2->SetBranchAddress("ncellId", &ncellId);
-  tree2->SetBranchAddress("cellId", cellId.data());
-  Long64_t jmax2 = tree2->GetEntries();
-  vector<ECLWFAlgoParamsUp> eclWFAlgoParams;
-  eclWFAlgoParams.reserve(jmax2);
-  for (Long64_t j = 0; j < jmax2; j++) {
-    tree2->GetEntry(j);
-    assert(ncellId <= maxncellid);
-    eclWFAlgoParams.push_back(*algo);
-    for (int i = 0; i < ncellId; ++i)
-      m_tbl[cellId[i] - 1].idn = j;
-  }
-  if (algo) delete algo;
-  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
-
-  ECLNoiseDataUp* noise = new ECLNoiseDataUp;
-  tree3->SetBranchAddress("NoiseM", &noise);
-  tree3->SetBranchAddress("ncellId", &ncellId);
-  tree3->SetBranchAddress("cellId", cellId.data());
-
-  Long64_t jmax3 = tree3->GetEntries();
-  m_noise.reserve(jmax3);
-  for (Long64_t j = 0; j < jmax3; j++) {
-    tree3->GetEntry(j);
-    assert(ncellId <= maxncellid);
-    m_noise.push_back(*noise);
-    if (ncellId == 0) {
-      for (int i = 0; i < ec.m_nch; i++)
-        m_tbl[i].inoise = 0;
-      break;
-    } else {
-      for (int i = 0; i < ncellId; ++i)
-        m_tbl[cellId[i] - 1].inoise = j;
-    }
-  }
-  if (noise) delete noise;
-  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matrices were loaded.");
-
-  // repack fitting algorithm parameters
-  m_idn.resize(eclWFAlgoParams.size());
-  for (int i = 0, imax = eclWFAlgoParams.size(); i < imax; i++)
-    repack(eclWFAlgoParams[i], m_idn[i]);
-
-  vector<uint_pair_t> pairIdx;
-  for (int i = 0; i < ec.m_nch; i++) {
-    unsigned int   wfIdx = eclWaveformDataTable[i];
-    unsigned int algoIdx = m_tbl[i].idn;
-    uint_pair_t p(wfIdx, algoIdx);
-    vector<uint_pair_t>::iterator ip = find(pairIdx.begin(), pairIdx.end(), p);
-    if (ip != pairIdx.end()) { // crystal i already have the same parameters as before
-      m_tbl[i].ifunc = ip - pairIdx.begin();
-    } else {                  // new combination of parameters
-      m_tbl[i].ifunc = pairIdx.size();
-      pairIdx.push_back(p);
-    }
-  }
-
-  // now we know how many distinct elements of the (Waveform x AlgoParams) matrix should be
-  m_fitparams.resize(pairIdx.size());
-
-  ECLWaveformDataUp* eclWFData = new ECLWaveformDataUp;
-  tree->SetBranchAddress("CovarianceM", &eclWFData);
-  tree->SetBranchStatus("ncellId", 0); // do not read it at the moment
-  tree->SetBranchStatus("cellId", 0); // do not read it at the moment
-
-  // fill parameters for each (Waveform x AlgoParams) parameter set
-  for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
-    const uint_pair_t& p = pairIdx[ip];
-    tree->GetEntry(p.first); // retrieve data to eclWFData pointer
-    getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
-  }
-  B2DEBUG(150, "ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
-
-  // at the moment there is only one sampled signal shape in the pool
-  // since all shaper parameters are the same for all crystals
-  m_ss.resize(2);
-  float MP[14]; eclWFData->getWaveformParArray(MP);
-  m_ss[0].InitSample(MP, 1.0);
-  // parameters vector from ps.dat file, time offset 0.5 usec added to
-  // have peak position with parameters from ps.dat roughly in the
-  // same place as in current MC
-  // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
-  // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
-  for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
-  // one sampled diode response in the pool, parameters vector from
-  // pg.dat file, time offset 0.5 usec added to have peak position with
-  // parameters from ps.dat roughly in the same place as in current MC
-  const double t_adc_up = ec.s_clock / ec.getRF(); // ADC clock period in us
-  const double time_to_units_up = ec.m_step / t_adc_up; // Convert time to units of ADC clock
-  double diode_params[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.010 * time_to_units_up, 6.975 * time_to_units_up, 0., 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters
-
-  m_ss[1].InitSample(diode_params, 1.0);
-
-  B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
-
-  if (eclWFData) delete eclWFData;
-
-  if (!m_useWaveformParameters) rootfile->Close();
-}
-
-void ECLDigitizerModuleUp::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams_t& t)
-{
-  // filling short int array
-  t.id[ 0] = eclWFAlgo.getlAT() + 128;
-  t.id[ 1] = eclWFAlgo.getsT()  + 128;
-  t.id[ 2] = eclWFAlgo.gethT();
-  t.id[ 3] = 17952;
-  t.id[ 4] = 19529;
-  t.id[ 5] = 69;
-  t.id[ 6] = 0;
-  t.id[ 7] = 0;
-  t.id[ 8] = 257;
-  t.id[ 9] = -1;
-  t.id[10] = 0;
-  t.id[11] = 0;
-
-  // filling unsigned char array
-  t.ic[12 * 2 + 0] = eclWFAlgo.getk1();
-  t.ic[12 * 2 + 1] = eclWFAlgo.getk2();
-  t.ic[13 * 2 + 0] = eclWFAlgo.getka();
-  t.ic[13 * 2 + 1] = eclWFAlgo.getkb();
-  t.ic[14 * 2 + 0] = eclWFAlgo.getkc();
-  t.ic[14 * 2 + 1] = eclWFAlgo.gety0s() - 16;
-
-  // again, filling short int array
-  t.id[15] = eclWFAlgo.getcT();
-}
-
-void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, fitparams_t& p)
-{
-  const EclConfigurationUp& ec = EclConfigurationUp::get();
-
-  constexpr int nADC_signal = ECLWaveformDataUp::c_nADCsignal;
-  constexpr int m_ndt = ec.m_ndt;
-  constexpr int m_ntf = ec.m_ntf;
-  constexpr int m_nta = ec.m_nta;
-
-  double ssd[nADC_signal][nADC_signal];
-  eclWFData.getMatrix(ssd);
-  vector<double> MP(14);
-  eclWFData.getWaveformParArray(MP.data());
-
-  // shape function parameters
-  int iff = 1 << 14;   //Alex Bobrov for correct chi square
-
-  int ia = 1 << eclWFAlgo.getka();
-  int ib = 1 << eclWFAlgo.getkb();
-  int ic = 1 << eclWFAlgo.getkc();
-
-  double dbl_f   [m_ntf * m_ndt][nADC_signal];
-  double dbl_f1  [m_ntf * m_ndt][nADC_signal];
-  double dbl_fg31[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg32[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg33[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg41[m_nta][nADC_signal];
-  double dbl_fg43[m_nta][nADC_signal];
-
-  int_array_gridxadc_t& ref_f    = p.f;
-  int_array_gridxadc_t& ref_f1   = p.f1;
-  int_array_gridxadc_t& ref_fg31 = p.fg31;
-  int_array_gridxadc_t& ref_fg32 = p.fg32;
-  int_array_gridxadc_t& ref_fg33 = p.fg33;
-  int_array_subxadc_t&  ref_fg41 = p.fg41;
-  int_array_subxadc_t&  ref_fg43 = p.fg43;
-
-  // Dynamic normalization coefficient for shape function
-  double fm = 0;
-
-  double unitscale = 1.0;
-  if (m_unitscale > 0) unitscale = m_unitscale;
-
-  ShaperDSPUp_t dsp(MP, unitscale);
-  dsp.settimestride(ec.m_step);
-  dsp.setseedoffset(ec.m_step / ec.m_ndt);
-  dsp.settimeseed((ec.m_step * ec.m_tmin) + (ec.m_step / ec.m_ndt));
-  dsp.settimeseed(ec.m_step * (ec.m_tmin - (m_ntf / 2)));
-  vector<dd_t> f(nADC_signal);
-  for (int k = 0; k < m_ntf * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- m_ntf/2 ADC tick
-    dsp.fillvector(f);
-
-    double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
-    double sg0[nADC_signal], sg1[nADC_signal], sg2[nADC_signal];
-    for (int j = 0; j < nADC_signal; j++) {
-      double g0 = 0, g1 = 0, g2 = 0;
-      for (int i = 0; i < nADC_signal; i++) {
-        if (fm < f[i].first) fm = f[i].first;
-        g0 += ssd[j][i] * f[i].first;
-        g1 += ssd[j][i] * f[i].second;
-        g2 += ssd[j][i];
-      }
-      g0g0 += g0 * f[j].first;
-      g0g1 += g1 * f[j].first;
-      g1g1 += g1 * f[j].second;
-      g0g2 += g0;
-      g1g2 += g1;
-      g2g2 += g2;
-      sg0[j] = g0;
-      sg1[j] = g1;
-      sg2[j] = g2;
+    // make relation between cellid and eclhits
+    struct ch_t {int cell, id;};
+    vector<ch_t> hitmap;
+    for (const auto& hit : m_eclHits) {
+      int j = hit.getCellId() - 1; //0~8735
+      if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+      //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
     }
 
-    double a00 = g1g1 * g2g2 - g1g2 * g1g2;
-    double a11 = g0g0 * g2g2 - g0g2 * g0g2;
-    double a22 = g0g0 * g1g1 - g0g1 * g0g1;
-    double a01 = g1g2 * g0g2 - g0g1 * g2g2;
-    double a02 = g0g1 * g1g2 - g1g1 * g0g2;
-    double a12 = g0g1 * g0g2 - g0g0 * g1g2;
+    bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
+    BitStream out;
+    ECLCompress* comp = nullptr;
 
-    double igg2 = 1 / (a11 * g1g1 + g0g1 * a01 + g1g2 * a12);
-
-    // to fixed point representation
-    for (int i = 0; i < nADC_signal; i++) {
-
-      dbl_f   [k][i] = (f[i].first  * iff);
-      dbl_f1  [k][i] = (f[i].second * iff);
-
-      double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
-      double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
-      double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
-
-      dbl_fg31[k][i] = (fg31 * ia);
-      dbl_fg32[k][i] = (fg32 * ib);
-      dbl_fg33[k][i] = (fg33 * ic);
-    }
-
-    //first approximation without time correction
-    int center = m_ndt * (m_ntf - 1) / 2;
-    int step   = m_ndt / m_nta;   // 4
-
-    int rel = center - k;
-
-    if (rel % step == 0) {
-      int jk = (m_nta - 1) + rel / step;
-      if (jk >= 0 && jk < m_nta) {
-
-        double igg1 = 1 / a11;
-        // to fixed point
-        for (int i = 0; i < nADC_signal; i++) {
-
-          double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
-          double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-          dbl_fg41[jk][i] = (fg41 * ia);
-          dbl_fg43[jk][i] = (fg43 * ic);
+    // check background overlay
+    if (isBGOverlay) {
+      std::swap(out.getStore(), m_eclWaveforms->getStore());
+      out.setPos(0);
+      unsigned int compAlgo = out.getNBits(8);
+      comp = selectAlgo(compAlgo & 0x7f);
+      if (comp == nullptr)
+        B2FATAL("Unknown compression algorithm: " << compAlgo);
+      isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrieved
+      if (isTrigTime) {
+        for (int i = 0; i < ECL::ECL_CRATES; i++) {
+          unsigned char t = out.getNBits(7); // [0..72)
+          m_ttime[i] = t;
         }
       }
     }
+
+    if (!m_trigTime || !isTrigTime) { // reproduce previous logic -- one trigger time for all crates
+      int DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..n_trg/2)
+      for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
+    }
+
+    int triggerTag0 = m_EventMetaData->getEvent();
+    for (int id = 0; id < ECL::ECL_CRATES; id++) {
+      auto eclTrig = m_eclTrigs.appendNew();
+      int triggerPhase0 = 2 * (m_ttime[id] + m_ttime[id] / 3);
+      eclTrig->setTrigId(id);
+      eclTrig->setTimeTrig(triggerPhase0);
+      eclTrig->setTrigTag(triggerTag0);
+    }
+
+    shapeSignals();
+
+    // We want to produce background waveforms in simulation first than
+    // dump to a disk, read from the disk to test before real data
+    if (m_waveformMaker) { makeWaveforms(); return; }
+
+    int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+
+    // loop over entire calorimeter
+    for (int j = 0; j < ec.m_nch; j++) {
+      adccounts_t& a = m_adc[j];
+
+      //normalize the MC true arrival times
+      if (m_adc[j].totalDep > 0) {
+        m_adc[j].flighttime /= m_adc[j].totalDep;
+        m_adc[j].timeshift /= m_adc[j].totalDep;
+        m_adc[j].timetosensor /= m_adc[j].totalDep;
+      }
+
+      // if background waveform is here there is no need to generate
+      // electronic noise since it is already in the waveform
+      if (isBGOverlay) {
+        comp->uncompress(out, FitA);
+      } else {
+        // Signal amplitude should be above 100 keV
+        if (a.total < 0.0001) continue;
+        makeElectronicNoiseAndPedestal(j, FitA);
+      }
+
+      for (int i = 0; i < ec.m_nsmp; i++) {
+        int A = 20000 * a.c[i] + FitA[i];
+        FitA[i] = max(0, min(A, (1 << 18) - 1));
+      }
+
+      int  energyFit = 0; // fit output : Amplitude 18 bits
+      int       tFit = 0; // fit output : T_ave     12 bits
+      int qualityFit = 0; // fit output : quality    2 bits
+      int        chi = 0; // fit output : chi square   it is not available in the experiment
+
+      int id = m_eclMapper.getCrateID(j + 1) - 1; // 0 .. 51
+      int ttrig = 2 * m_ttime[id];
+
+      shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
+
+      if (energyFit > m_ADCThreshold) {
+        int CellId = j + 1;
+
+        //note energyFit and m_Awave is in ADC units
+        if (energyFit > m_Awave[CellId - 1]) {
+          //only save waveforms above ADC threshold
+          const auto eclDsp = m_eclDsps.appendNew();
+          eclDsp->setCellId(CellId);
+          eclDsp->setDspA(FitA);
+        }
+
+        // only store extra MC info if requested and above threshold
+        if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
+          const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew();
+          eclDspWithExtraMCInfo->setCellId(CellId);
+          eclDspWithExtraMCInfo->setDspA(FitA);
+          eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
+          eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
+          eclDspWithExtraMCInfo->setFlightTime(a.flighttime);
+          eclDspWithExtraMCInfo->setTimeShift(a.timeshift);
+          eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor);
+          eclDspWithExtraMCInfo->setEnergyConversion(a.energyConversion * 20000);
+        }
+
+        const auto eclDigit = m_eclDigits.appendNew();
+        eclDigit->setCellId(CellId); // cellId in range from 1 to 8736
+        eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
+        eclDigit->setTimeFit(tFit);  // t0 (us)= (64 / 508.876) / (m_ndt*32)
+        eclDigit->setQuality(qualityFit);
+        if (qualityFit == 2)
+          eclDigit->setChi(chi);
+        else eclDigit->setChi(0);
+        for (const auto& hit : hitmap)
+          if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
+
+        // set relation to DspWithExtraInfo
+        for (auto& DspWithExtraMCInfo : m_eclDspsWithExtraMCInfo) {
+          if (eclDigit->getCellId() == DspWithExtraMCInfo.getCellId()) DspWithExtraMCInfo.addRelationTo(eclDigit);
+        }
+      }
+    } //store each crystal hit
+    if (comp) delete comp;
   }
-  // Ignore dynamically calculated normalization coefficient if
-  // unitscale is set to a static positive value.
-  if (m_unitscale > 0) fm = 1.0;
-  for (int k = 0; k < m_ntf * m_ndt; k++) {
-    for (int j = 0; j < nADC_signal; j++) {
-      ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
-      ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
-      ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
-      ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
-      ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
-      if (k >= m_nta) continue;
-      ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
-      ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
+
+  void ECLDigitizerModuleUp::endRun() {
+  }
+
+  void ECLDigitizerModuleUp::terminate() {
+  }
+
+  void ECLDigitizerModuleUp::callbackHadronSignalShapes() {
+
+    if (m_waveformParametersMC.hasChanged()) {
+
+      m_ss_HadronShapeSimulations.resize(3);
+
+      //read MC templates from database
+      float photonParsPSD[14];
+      float hadronParsPSD[14];
+      float diodeParsPSD[14];
+      for (int i = 0; i < 14; i++) {
+        photonParsPSD[i] = m_waveformParametersMC->getPhotonParameters()[i + 1];
+        hadronParsPSD[i] = m_waveformParametersMC->getHadronParameters()[i + 1];
+        diodeParsPSD[i] = m_waveformParametersMC->getDiodeParameters()[i + 1];
+      }
+
+      //Initialize templates for hadron shape simulations
+      m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
+      m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
+      m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
+
+    }
+
+  }
+
+  void ECLDigitizerModuleUp::readDSPDB() {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+
+    TFile* rootfile = nullptr;
+    TTree* tree  = nullptr;
+    TTree* tree2 = nullptr;
+    TTree* tree3 = nullptr;
+
+    if (m_useWaveformParameters) {
+      bool hasChanged = false;
+      hasChanged |= m_waveformParameters.hasChanged();
+      hasChanged |= m_algoParameters.hasChanged();
+      hasChanged |= m_noiseParameters.hasChanged();
+
+      if (!hasChanged) return;
+
+      tree  = const_cast<TTree*>(&*m_waveformParameters);
+      tree2 = const_cast<TTree*>(&*m_algoParameters);
+      tree3 = const_cast<TTree*>(&*m_noiseParameters);
+    } else {
+      string dataFileName;
+      if (m_background) {
+        dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG-Up.root");
+        B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
+      } else {
+        dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Up.root");
+        B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
+      }
+      assert(! dataFileName.empty());
+
+      rootfile = new TFile(dataFileName.c_str(), "read");
+      tree  = (TTree*) rootfile->Get("EclWF");
+      tree2 = (TTree*) rootfile->Get("EclAlgo");
+      tree3 = (TTree*) rootfile->Get("EclNoise");
+    }
+
+    if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
+
+    m_tbl.resize(ec.m_nch);
+
+    const int maxncellid = 512;
+    int ncellId;
+    vector<int> cellId(maxncellid);//[ncellId] buffer for crystal identification number
+
+    tree->SetBranchAddress("ncellId", &ncellId);
+    tree->SetBranchAddress("cellId", cellId.data());
+
+    vector<int> eclWaveformDataTable(ec.m_nch);
+    for (Long64_t j = 0, jmax = tree->GetEntries(); j < jmax; j++) {
+      tree->GetEntry(j);
+      assert(ncellId <= maxncellid);
+      for (int i = 0; i < ncellId; ++i)
+        eclWaveformDataTable[cellId[i] - 1] = j;
+    }
+    B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matrices will be used.");
+
+    ECLWFAlgoParamsUp* algo = new ECLWFAlgoParamsUp;
+    tree2->SetBranchAddress("Algopars", &algo);
+    tree2->SetBranchAddress("ncellId", &ncellId);
+    tree2->SetBranchAddress("cellId", cellId.data());
+    Long64_t jmax2 = tree2->GetEntries();
+    vector<ECLWFAlgoParamsUp> eclWFAlgoParams;
+    eclWFAlgoParams.reserve(jmax2);
+    for (Long64_t j = 0; j < jmax2; j++) {
+      tree2->GetEntry(j);
+      assert(ncellId <= maxncellid);
+      eclWFAlgoParams.push_back(*algo);
+      for (int i = 0; i < ncellId; ++i)
+        m_tbl[cellId[i] - 1].idn = j;
+    }
+    if (algo) delete algo;
+    B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
+
+    ECLNoiseDataUp* noise = new ECLNoiseDataUp;
+    tree3->SetBranchAddress("NoiseM", &noise);
+    tree3->SetBranchAddress("ncellId", &ncellId);
+    tree3->SetBranchAddress("cellId", cellId.data());
+
+    Long64_t jmax3 = tree3->GetEntries();
+    m_noise.reserve(jmax3);
+    for (Long64_t j = 0; j < jmax3; j++) {
+      tree3->GetEntry(j);
+      assert(ncellId <= maxncellid);
+      m_noise.push_back(*noise);
+      if (ncellId == 0) {
+        for (int i = 0; i < ec.m_nch; i++)
+          m_tbl[i].inoise = 0;
+        break;
+      } else {
+        for (int i = 0; i < ncellId; ++i)
+          m_tbl[cellId[i] - 1].inoise = j;
+      }
+    }
+    if (noise) delete noise;
+    B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matrices were loaded.");
+
+    // repack fitting algorithm parameters
+    m_idn.resize(eclWFAlgoParams.size());
+    for (int i = 0, imax = eclWFAlgoParams.size(); i < imax; i++)
+      repack(eclWFAlgoParams[i], m_idn[i]);
+
+    vector<uint_pair_t> pairIdx;
+    for (int i = 0; i < ec.m_nch; i++) {
+      unsigned int   wfIdx = eclWaveformDataTable[i];
+      unsigned int algoIdx = m_tbl[i].idn;
+      uint_pair_t p(wfIdx, algoIdx);
+      vector<uint_pair_t>::iterator ip = find(pairIdx.begin(), pairIdx.end(), p);
+      if (ip != pairIdx.end()) { // crystal i already have the same parameters as before
+        m_tbl[i].ifunc = ip - pairIdx.begin();
+      } else {                  // new combination of parameters
+        m_tbl[i].ifunc = pairIdx.size();
+        pairIdx.push_back(p);
+      }
+    }
+
+    // now we know how many distinct elements of the (Waveform x AlgoParams) matrix should be
+    m_fitparams.resize(pairIdx.size());
+
+    ECLWaveformDataUp* eclWFData = new ECLWaveformDataUp;
+    tree->SetBranchAddress("CovarianceM", &eclWFData);
+    tree->SetBranchStatus("ncellId", 0); // do not read it at the moment
+    tree->SetBranchStatus("cellId", 0); // do not read it at the moment
+
+    // fill parameters for each (Waveform x AlgoParams) parameter set
+    for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
+      const uint_pair_t& p = pairIdx[ip];
+      tree->GetEntry(p.first); // retrieve data to eclWFData pointer
+      getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
+    }
+    B2DEBUG(150, "ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
+
+    // at the moment there is only one sampled signal shape in the pool
+    // since all shaper parameters are the same for all crystals
+    m_ss.resize(2);
+    float MP[14]; eclWFData->getWaveformParArray(MP);
+    m_ss[0].InitSample(MP, 1.0);
+    // parameters vector from ps.dat file, time offset 0.5 usec added to
+    // have peak position with parameters from ps.dat roughly in the
+    // same place as in current MC
+    // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
+    // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
+    for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
+    // one sampled diode response in the pool, parameters vector from
+    // pg.dat file, time offset 0.5 usec added to have peak position with
+    // parameters from ps.dat roughly in the same place as in current MC
+    const double t_adc_up = ec.s_clock / ec.getRF(); // ADC clock period in us
+    const double time_to_units_up = ec.m_step / t_adc_up; // Convert time to units of ADC clock
+    double diode_params[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.010 * time_to_units_up, 6.975 * time_to_units_up, 0., 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters
+
+    m_ss[1].InitSample(diode_params, 1.0);
+
+    B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
+
+    if (eclWFData) delete eclWFData;
+
+    if (!m_useWaveformParameters) rootfile->Close();
+  }
+
+  void ECLDigitizerModuleUp::repack(const ECLWFAlgoParamsUp & eclWFAlgo, algoparams_t& t) {
+    // filling short int array
+    t.id[ 0] = eclWFAlgo.getlAT() + 128;
+    t.id[ 1] = eclWFAlgo.getsT()  + 128;
+    t.id[ 2] = eclWFAlgo.gethT();
+    t.id[ 3] = 17952;
+    t.id[ 4] = 19529;
+    t.id[ 5] = 69;
+    t.id[ 6] = 0;
+    t.id[ 7] = 0;
+    t.id[ 8] = 257;
+    t.id[ 9] = -1;
+    t.id[10] = 0;
+    t.id[11] = 0;
+
+    // filling unsigned char array
+    t.ic[12 * 2 + 0] = eclWFAlgo.getk1();
+    t.ic[12 * 2 + 1] = eclWFAlgo.getk2();
+    t.ic[13 * 2 + 0] = eclWFAlgo.getka();
+    t.ic[13 * 2 + 1] = eclWFAlgo.getkb();
+    t.ic[14 * 2 + 0] = eclWFAlgo.getkc();
+    t.ic[14 * 2 + 1] = eclWFAlgo.gety0s() - 16;
+
+    // again, filling short int array
+    t.id[15] = eclWFAlgo.getcT();
+  }
+
+  void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp & eclWFData, const ECLWFAlgoParamsUp & eclWFAlgo, fitparams_t& p) {
+    const EclConfigurationUp& ec = EclConfigurationUp::get();
+
+    constexpr int nADC_signal = ECLWaveformDataUp::c_nADCsignal;
+    constexpr int m_ndt = ec.m_ndt;
+    constexpr int m_ntf = ec.m_ntf;
+    constexpr int m_nta = ec.m_nta;
+
+    double ssd[nADC_signal][nADC_signal];
+    eclWFData.getMatrix(ssd);
+    vector<double> MP(14);
+    eclWFData.getWaveformParArray(MP.data());
+
+    // shape function parameters
+    int iff = 1 << 14;   //Alex Bobrov for correct chi square
+
+    int ia = 1 << eclWFAlgo.getka();
+    int ib = 1 << eclWFAlgo.getkb();
+    int ic = 1 << eclWFAlgo.getkc();
+
+    double dbl_f   [m_ntf * m_ndt][nADC_signal];
+    double dbl_f1  [m_ntf * m_ndt][nADC_signal];
+    double dbl_fg31[m_ntf * m_ndt][nADC_signal];
+    double dbl_fg32[m_ntf * m_ndt][nADC_signal];
+    double dbl_fg33[m_ntf * m_ndt][nADC_signal];
+    double dbl_fg41[m_nta][nADC_signal];
+    double dbl_fg43[m_nta][nADC_signal];
+
+    int_array_gridxadc_t& ref_f    = p.f;
+    int_array_gridxadc_t& ref_f1   = p.f1;
+    int_array_gridxadc_t& ref_fg31 = p.fg31;
+    int_array_gridxadc_t& ref_fg32 = p.fg32;
+    int_array_gridxadc_t& ref_fg33 = p.fg33;
+    int_array_subxadc_t&  ref_fg41 = p.fg41;
+    int_array_subxadc_t&  ref_fg43 = p.fg43;
+
+    // Dynamic normalization coefficient for shape function
+    double fm = 0;
+
+    double unitscale = 1.0;
+    if (m_unitscale > 0) unitscale = m_unitscale;
+
+    ShaperDSPUp_t dsp(MP, unitscale);
+    dsp.settimestride(ec.m_step);
+    dsp.setseedoffset(ec.m_step / ec.m_ndt);
+    dsp.settimeseed((ec.m_step * ec.m_tmin) + (ec.m_step / ec.m_ndt));
+    dsp.settimeseed(ec.m_step * (ec.m_tmin - (m_ntf / 2)));
+    vector<dd_t> f(nADC_signal);
+    for (int k = 0; k < m_ntf * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- m_ntf/2 ADC tick
+      dsp.fillvector(f);
+
+      double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
+      double sg0[nADC_signal], sg1[nADC_signal], sg2[nADC_signal];
+      for (int j = 0; j < nADC_signal; j++) {
+        double g0 = 0, g1 = 0, g2 = 0;
+        for (int i = 0; i < nADC_signal; i++) {
+          if (fm < f[i].first) fm = f[i].first;
+          g0 += ssd[j][i] * f[i].first;
+          g1 += ssd[j][i] * f[i].second;
+          g2 += ssd[j][i];
+        }
+        g0g0 += g0 * f[j].first;
+        g0g1 += g1 * f[j].first;
+        g1g1 += g1 * f[j].second;
+        g0g2 += g0;
+        g1g2 += g1;
+        g2g2 += g2;
+        sg0[j] = g0;
+        sg1[j] = g1;
+        sg2[j] = g2;
+      }
+
+      double a00 = g1g1 * g2g2 - g1g2 * g1g2;
+      double a11 = g0g0 * g2g2 - g0g2 * g0g2;
+      double a22 = g0g0 * g1g1 - g0g1 * g0g1;
+      double a01 = g1g2 * g0g2 - g0g1 * g2g2;
+      double a02 = g0g1 * g1g2 - g1g1 * g0g2;
+      double a12 = g0g1 * g0g2 - g0g0 * g1g2;
+
+      double igg2 = 1 / (a11 * g1g1 + g0g1 * a01 + g1g2 * a12);
+
+      // to fixed point representation
+      for (int i = 0; i < nADC_signal; i++) {
+
+        dbl_f   [k][i] = (f[i].first  * iff);
+        dbl_f1  [k][i] = (f[i].second * iff);
+
+        double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
+        double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
+        double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
+
+        dbl_fg31[k][i] = (fg31 * ia);
+        dbl_fg32[k][i] = (fg32 * ib);
+        dbl_fg33[k][i] = (fg33 * ic);
+      }
+
+      //first approximation without time correction
+      int center = m_ndt * (m_ntf - 1) / 2;
+      int step   = m_ndt / m_nta;   // 4
+
+      int rel = center - k;
+
+      if (rel % step == 0) {
+        int jk = (m_nta - 1) + rel / step;
+        if (jk >= 0 && jk < m_nta) {
+
+          double igg1 = 1 / a11;
+          // to fixed point
+          for (int i = 0; i < nADC_signal; i++) {
+
+            double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
+            double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
+            dbl_fg41[jk][i] = (fg41 * ia);
+            dbl_fg43[jk][i] = (fg43 * ic);
+          }
+        }
+      }
+    }
+    // Ignore dynamically calculated normalization coefficient if
+    // unitscale is set to a static positive value.
+    if (m_unitscale > 0) fm = 1.0;
+    for (int k = 0; k < m_ntf * m_ndt; k++) {
+      for (int j = 0; j < nADC_signal; j++) {
+        ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
+        ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
+        ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
+        ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
+        ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
+        if (k >= m_nta) continue;
+        ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
+        ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
+      }
     }
   }
-}

@@ -250,10 +250,7 @@ void ECLDigitCalibratorModule::event()
                                                                     v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
                          + m_pureCsITimeOffset;
       } else if (m_simulateUpgrade) {
-        //calibratedTime = (time * m_timeInverseSlopeUp) + m_timeInverseSlope * (- v_calibrationCrystalElectronicsTime[cellid - 1] -
-        //                 v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) -
-        //                 v_calibrationCrystalFlightTime[cellid - 1];
-        calibratedTime = (time * m_timeInverseSlopeUp) - v_calibrationCrystalFlightTime[cellid - 1];
+        calibratedTime = (time * m_timeInverseSlopeUp);
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                v_calibrationCrystalTimeOffset[cellid - 1] -

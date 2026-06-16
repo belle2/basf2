@@ -262,6 +262,8 @@ namespace Belle2 {
      *  (for default shape parameters, the static value is 1.0)
      */
     double m_unitscale;
+    /** Flag to disable electronic calibration for time (default: true) */
+    bool m_timeCalib;
   };
   // Compatibility wrapper: REG_MODULE expects to instantiate a class named
   // <name>Module (it concatenates 'Module' to the token you pass). The

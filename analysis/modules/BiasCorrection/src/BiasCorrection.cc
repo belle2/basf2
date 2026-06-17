@@ -115,7 +115,7 @@ void EnergyBiasCorrectionModule::setEnergyScalingFactor(Particle* particle)
     double py = 0;
     double pz = 0;
     double E = 0;
-    for (auto daughter : particle->getDaughters()) {
+    for (const auto* daughter : particle->getDaughters()) {
       px += daughter->getPx();
       py += daughter->getPy();
       pz += daughter->getPz();

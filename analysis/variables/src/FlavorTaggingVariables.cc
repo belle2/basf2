@@ -976,7 +976,7 @@ namespace Belle2 {
         const Particle* TargetFastParticle = nullptr;
         for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i)
         {
-          Particle* particlei = FastParticleList->getParticle(i);
+          const Particle* particlei = FastParticleList->getParticle(i);
           if (!particlei) continue;
 
           ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());
@@ -1405,7 +1405,7 @@ namespace Belle2 {
           if (SlowPionList.isValid()) {
             double mcProbSlowPion = 0;
             for (unsigned int i = 0; i < SlowPionList->getListSize(); ++i) {
-              Particle* pSlowPion = SlowPionList->getParticle(i);
+              const Particle* pSlowPion = SlowPionList->getParticle(i);
               if (!pSlowPion) continue;
               if (pSlowPion->hasExtraInfo("isRightCategory(SlowPion)")) {
                 double probSlowPion = pSlowPion->getExtraInfo("isRightCategory(SlowPion)");
@@ -1440,7 +1440,7 @@ namespace Belle2 {
           if (FastParticleList.isValid()) {
             double mcProbFastest = 0;
             for (unsigned int i = 0; i < FastParticleList->getListSize(); ++i) {
-              Particle* particlei = FastParticleList->getParticle(i);
+              const Particle* particlei = FastParticleList->getParticle(i);
               if (!particlei) continue;
 
               ROOT::Math::PxPyPzEVector momParticlei = PCmsLabTransform::labToCms(particlei->get4Vector());

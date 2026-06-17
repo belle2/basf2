@@ -96,7 +96,7 @@ namespace Belle2 {
     void TextTracer::printFitObjects(BaseFitter& fitter)
     {
       chi2fo = 0;
-      FitObjectContainer* fitobjects = fitter.getFitObjects();
+      const FitObjectContainer* fitobjects = fitter.getFitObjects();
       if (!fitobjects) return;
       os << "Fit objects:\n";
       for (auto fo : *fitobjects) {

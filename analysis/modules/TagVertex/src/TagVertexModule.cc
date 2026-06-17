@@ -172,7 +172,7 @@ void TagVertexModule::event()
   for (unsigned i = 0; i < m_plist->getListSize(); ++i) {
     resetReturnParams();
 
-    Particle* particle =  m_plist->getParticle(i);
+    const Particle* particle =  m_plist->getParticle(i);
     if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
     bool ok = doVertexFit(particle);
     if (ok) deltaT(particle);

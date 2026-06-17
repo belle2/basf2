@@ -166,7 +166,7 @@ void CurlTaggerModule::event()
         if (m_McStatsFlag) {
           bool addedParticleToTruthBundle = false;
           for (auto& truthBundle : truthBundles) {
-            Particle* bPart = truthBundle.getParticle(0);
+            const Particle* bPart = truthBundle.getParticle(0);
             if (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(bPart)) {
               truthBundle.addParticle(iPart);
               addedParticleToTruthBundle = true;

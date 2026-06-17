@@ -170,7 +170,7 @@ int RaveKinematicVertexFitter::fit()
 
       try {
 
-        Particle* aParticlePtr = m_motherParticlePtr;
+        const Particle* aParticlePtr = m_motherParticlePtr;
 
         rave::Vector7D raveState(aParticlePtr->getX(), aParticlePtr->getY(), aParticlePtr->getZ(), aParticlePtr->getPx(),
                                  aParticlePtr->getPy(), aParticlePtr->getPz(), aParticlePtr->getMass());

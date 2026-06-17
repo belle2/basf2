@@ -46,7 +46,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector klDaughters; // 4-vector of K_L
       ROOT::Math::PxPyPzEVector pDaughters; // 4-vector of other daughters
       double m_j = 0;
-      for (auto daughter : daughters) {
+      for (const auto* daughter : daughters) {
         if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
           if (k_check)
             B2FATAL("More than one K_L is detected! This tool accepts only one K_L in the final state.");

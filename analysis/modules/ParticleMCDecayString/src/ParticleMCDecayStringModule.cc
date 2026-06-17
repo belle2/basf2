@@ -209,7 +209,7 @@ std::string ParticleMCDecayStringModule::getDecayStringFromParticle(const Partic
 
   if (not isFSP(p->getPDGCode())) {
     output += " (-->";
-    for (auto daughter : p->getDaughters()) {
+    for (const auto* daughter : p->getDaughters()) {
       output += getDecayStringFromParticle(daughter);
     }
     output += ")";
@@ -266,7 +266,7 @@ std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mc
 
   if (not isFSP(mcPMother->getPDG())) {
     ss << " (-->";
-    for (auto daughter : mcPMother->getDaughters()) {
+    for (const auto* daughter : mcPMother->getDaughters()) {
       ss << buildMCDecayString(daughter, mcPMatched);
     }
     ss << ")";

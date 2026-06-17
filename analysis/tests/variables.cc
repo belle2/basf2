@@ -2049,7 +2049,7 @@ namespace {
     daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
     Particle dau1_noclst(dau1_4vec_Lab, 22);
     momentum += dau1_noclst.get4Vector();
-    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    const Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
     daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
     const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
 

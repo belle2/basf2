@@ -901,7 +901,7 @@ namespace Belle2 {
       if (daughters.size() != 2)
         return Const::doubleNaN;
 
-      MCParticle* recoilMC = nullptr;
+      const MCParticle* recoilMC = nullptr;
       if (daughters[0]->getArrayIndex() == mcp->getArrayIndex())
         recoilMC = daughters[1];
       else

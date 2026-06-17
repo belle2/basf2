@@ -266,7 +266,7 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
     B2FATAL("ROE Mask name '" << RestOfEvent::c_defaultMaskName << "' is reserved for no mask case! " <<
             "Please check your inputs.");
   }
-  Mask* mask = findMask(name);
+  const Mask* mask = findMask(name);
   if (!mask) {
     B2FATAL("ROE Mask '" << name << "' does not exist!");
   }

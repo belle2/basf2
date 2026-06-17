@@ -108,7 +108,7 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
   float maxVeto = 0;
   int n = m_ListGamma->getListSize();
   for (int i = 0; i < n; ++i) {
-    Particle* gamma2 = m_ListGamma->getParticle(i);
+    const Particle* gamma2 = m_ListGamma->getParticle(i);
     if (gamma1 == gamma2)
       continue;
     if (pi0Gamma != nullptr) {

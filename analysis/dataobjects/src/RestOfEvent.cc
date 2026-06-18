@@ -23,7 +23,7 @@ void RestOfEvent::addParticles(const std::vector<const Particle*>& particlesToAd
     std::vector<const Particle*> daughters = particleToAdd->getFinalStateDaughters();
     for (auto* daughter : daughters) {
       bool toAdd = true;
-      for (auto& myIndex : m_particleIndices) {
+      for (const auto& myIndex : m_particleIndices) {
         if (allParticles[myIndex]->isCopyOf(daughter, true)) {
           toAdd = false;
           break;
@@ -51,7 +51,7 @@ std::vector<const Particle*> RestOfEvent::getParticles(const std::string& maskNa
     source = m_particleIndices;
   } else {
     bool maskFound = false;
-    for (auto& mask : m_masks) {
+    for (const auto& mask : m_masks) {
       if (mask.getName() == maskName) {
         maskFound = true;
         source = mask.getParticles();
@@ -252,7 +252,7 @@ void RestOfEvent::updateMaskWithV0(const std::string& name, const Particle* part
     return;
   }
   std::string toprint = "We will erase next indices from " + name + " mask: ";
-  for (auto& i : indicesToErase) {
+  for (const auto& i : indicesToErase) {
     toprint += std::to_string(i) + " ";
   }
   B2DEBUG(10, toprint);
@@ -291,7 +291,7 @@ bool RestOfEvent::checkCompatibilityOfMaskAndV0(const std::string& name, const P
 
 bool RestOfEvent::hasMask(const std::string& name) const
 {
-  for (auto& mask : m_masks) {
+  for (const auto& mask : m_masks) {
     if (mask.getName() == name) {
       return true;
     }
@@ -376,7 +376,7 @@ std::vector<std::string> RestOfEvent::getMaskNames() const
 {
   std::vector<std::string> maskNames;
 
-  for (auto& mask : m_masks) {
+  for (const auto& mask : m_masks) {
     maskNames.push_back(mask.getName());
   }
 
@@ -444,7 +444,7 @@ Particle* RestOfEvent::convertToParticle(const std::string& maskName, int pdgCod
     source = m_particleIndices;
   } else {
     bool maskFound = false;
-    for (auto& mask : m_masks) {
+    for (const auto& mask : m_masks) {
       if (mask.getName() == maskName) {
         maskFound = true;
         source = mask.getParticles();

@@ -227,7 +227,7 @@ std::string ParticleMCDecayStringModule::getMCDecayStringFromParticle(const Part
   output = getMCDecayStringFromMCParticle(p->getRelatedTo<MCParticle>());
   // Some FSPs can have daughters, e.g. converted Photons and K-Shorts
   if (not isFSP(p->getPDGCode())) {
-    for (auto& daughter : p->getDaughters()) {
+    for (const auto& daughter : p->getDaughters()) {
       output += " | " + getMCDecayStringFromParticle(daughter);
     }
   }

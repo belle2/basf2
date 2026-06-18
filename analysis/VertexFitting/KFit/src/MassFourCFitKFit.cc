@@ -334,7 +334,7 @@ MassFourCFitKFit::prepareInputMatrix() {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-    for (auto& track : m_Tracks) {
+    for (const auto& track : m_Tracks) {
       // momentum x,y,z and position x,y,z
       m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
       m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
@@ -379,7 +379,7 @@ MassFourCFitKFit::prepareInputMatrix() {
     m_property = HepMatrix(m_TrackCount, 3, 0);
     m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount + 3, 0);
 
-    for (auto& track : m_Tracks) {
+    for (const auto& track : m_Tracks) {
       // momentum x,y,z and position x,y,z
       m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
       m_al_0[index * KFitConst::kNumber7 + 1][0] = track.getMomentum(KFitConst::kBeforeFit).y();
@@ -447,7 +447,7 @@ MassFourCFitKFit::prepareCorrelation() {
 
   int row = 0, col = 0;
 
-  for (auto& hm : m_BeforeCorrelation)
+  for (const auto& hm : m_BeforeCorrelation)
   {
     // counter
     row++;
@@ -484,7 +484,7 @@ MassFourCFitKFit::prepareCorrelation() {
       }
 
       int i = 0;
-      for (auto& hm : m_BeforeTrackVertexError) {
+      for (const auto& hm : m_BeforeTrackVertexError) {
         for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber7; k++) {
             m_V_al_0[j + KFitConst::kNumber7 * m_TrackCount][k + i * KFitConst::kNumber7] = hm[j][k];
           }

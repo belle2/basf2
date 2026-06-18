@@ -84,7 +84,7 @@ namespace {
       if (m_pdg == pdg and m_particle)
         return m_particle;
 
-      for (auto& d : m_daughterDecays) {
+      for (const auto& d : m_daughterDecays) {
         Particle* res = d.getParticle(pdg);
         if (res)
           return res;
@@ -97,7 +97,7 @@ namespace {
       if (m_pdg == pdg and m_mcparticle)
         return m_mcparticle;
 
-      for (auto& d : m_daughterDecays) {
+      for (const auto& d : m_daughterDecays) {
         MCParticle* res = d.getMCParticle(pdg);
         if (res)
           return res;

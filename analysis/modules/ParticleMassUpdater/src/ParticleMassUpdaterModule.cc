@@ -36,7 +36,7 @@ void ParticleMassUpdaterModule::event()
 {
 
 
-  for (auto& iList : m_strParticleLists) {
+  for (const auto& iList : m_strParticleLists) {
 
     StoreObjPtr<ParticleList> particlelist(iList);
     if (!particlelist) {

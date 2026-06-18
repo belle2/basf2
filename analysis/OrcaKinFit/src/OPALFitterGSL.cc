@@ -304,7 +304,7 @@ namespace Belle2 {
         // Get covariance matrix
         gsl_matrix_set_zero(V);
 
-        for (auto& fitobject : fitobjects) {
+        for (const auto& fitobject : fitobjects) {
           fitobject->addToGlobCov(V->block->data, V->tda);
         }
         if (debug > 1)  debug_print(V, "V");

@@ -72,7 +72,7 @@ void PhotonEfficiencySystematicsModule::beginRun()
 
 void PhotonEfficiencySystematicsModule::event()
 {
-  for (auto& iList : m_ParticleLists) {
+  for (const auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
     //check particle List exists and has particles

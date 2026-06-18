@@ -236,14 +236,6 @@ namespace Belle2 {
     static TCanvas* findCanvas(TString cname);
 
     /**
-     * Get histogram from list (no other search).
-     * @param histname The name of the histogram (incl dir).
-     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
-     * @return The found histogram, or nullptr if not found.
-     */
-    static TH1* findHist(const std::string& histname, bool onlyIfUpdated = false);
-
-    /**
      * Find histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
@@ -252,15 +244,6 @@ namespace Belle2 {
      */
     static TH1* findHist(const std::string& dirname,
                          const std::string& histname, bool onlyIfUpdated = false);
-
-    /**
-     * Get referencehistogram from list (no other search).
-     * @param histname The name of the histogram (incl dir).
-     * @param scaling enum what scaling to use
-     * @param hist histogram to scale to
-     * @return The found histogram, or nullptr if not found.
-     */
-    static TH1* findRefHist(const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /**
      * Find reference histogram.
@@ -362,15 +345,6 @@ namespace Belle2 {
      * Reset Delta
      */
     static void resetDeltaList(void);
-
-    /**
-     * Get Delta histogram.
-     * @param fullname directory+name of histogram
-     * @param n index of delta histogram, 0 is most recent one
-     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
-     * @return delta histogram or nullptr
-     */
-    TH1* getDelta(const std::string& fullname, int n = 0, bool onlyIfUpdated = true);
 
     /**
      * Get Delta histogram.

@@ -64,15 +64,6 @@ namespace TreeFitter {
     /** vertex position index in the statevector */
     virtual int posIndex() const override { return index(); }
 
-    /**  momentum index in the statevector. no value for beamspot as a particle */
-    virtual int momIndex() const override { return -1; }
-
-    /**  the lifetime index. the origin does not have a lifetime */
-    virtual int tauIndex() const override { return -1; }
-
-    /** has energy  */
-    virtual bool hasEnergy() const override { return false; }
-
     /** get name  */
     virtual std::string name() const { return "Origin"; }
 

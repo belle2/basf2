@@ -79,10 +79,6 @@ void LowEnergyPi0VetoExpertModule::beginRun()
   }
 }
 
-void LowEnergyPi0VetoExpertModule::endRun()
-{
-}
-
 void LowEnergyPi0VetoExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();

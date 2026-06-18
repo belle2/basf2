@@ -209,10 +209,6 @@ void CurlTaggerModule::event()
   } // particle Lists
 }
 
-void CurlTaggerModule::endRun()
-{
-}
-
 void CurlTaggerModule::terminate()
 {
   m_Selector->finalize();

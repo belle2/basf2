@@ -39,10 +39,6 @@ namespace Belle2 {
     /** Define event parameters */
     virtual void event() override;
 
-    /** finish the execution  */
-    virtual void terminate() override;
-
-
   private:
 
     StoreObjPtr<EventKinematics> m_eventKinematics; /**< event kinematics object pointer */

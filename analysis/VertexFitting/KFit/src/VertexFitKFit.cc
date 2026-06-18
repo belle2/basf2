@@ -136,14 +136,6 @@ VertexFitKFit::getVertexError() const
   return m_AfterVertexError;
 }
 
-
-double
-VertexFitKFit::getCHIsq() const
-{
-  return KFitBase::getCHIsq();
-}
-
-
 double
 VertexFitKFit::getCHIsqVertex() const
 {

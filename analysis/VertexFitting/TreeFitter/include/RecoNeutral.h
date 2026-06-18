@@ -42,9 +42,6 @@ namespace TreeFitter {
     /** sets the size of the corresponding residual projection */
     virtual int dimM() const override { return dim(); }
 
-    /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const override { return false; }
-
     /**set the size of the particle in the statevector */
     virtual int dim() const override { return m_dim; }
 

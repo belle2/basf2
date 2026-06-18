@@ -28,10 +28,6 @@ ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
   addParam("pdgCode", m_pdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
 }
 
-void ParticleMassUpdaterModule::initialize()
-{
-}
-
 void ParticleMassUpdaterModule::event()
 {
 
@@ -50,9 +46,5 @@ void ParticleMassUpdaterModule::event()
       }
     }
   }
-}
-
-void ParticleMassUpdaterModule::terminate()
-{
 }
 

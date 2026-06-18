@@ -130,18 +130,6 @@ RecoilMassKFit::setTrackZeroVertexError() {
 }
 
 
-enum KFitError::ECode
-RecoilMassKFit::setCorrelation(const HepMatrix& m) {
-  return KFitBase::setCorrelation(m);
-}
-
-
-enum KFitError::ECode
-RecoilMassKFit::setZeroCorrelation() {
-  return KFitBase::setZeroCorrelation();
-}
-
-
 const HepPoint3D
 RecoilMassKFit::getVertex(const int flag) const
 {

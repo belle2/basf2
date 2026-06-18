@@ -75,19 +75,6 @@ MassVertexFitKFit::unfixMass() {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-
-enum KFitError::ECode
-MassVertexFitKFit::setCorrelation(const HepMatrix& m) {
-  return KFitBase::setCorrelation(m);
-}
-
-
-enum KFitError::ECode
-MassVertexFitKFit::setZeroCorrelation() {
-  return KFitBase::setZeroCorrelation();
-}
-
-
 const HepPoint3D
 MassVertexFitKFit::getVertex(const int flag) const
 {

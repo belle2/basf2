@@ -151,12 +151,6 @@ void TagVertexModule::initialize()
     B2FATAL("TagVertexModule : the singleTrack option is temporarily broken.");
 }
 
-void TagVertexModule::beginRun()
-{
-  //TODO: set magnetic field for each run
-  //m_Bfield = BFieldMap::Instance().getBField(m_BeamSpotCenter).Z();
-}
-
 void TagVertexModule::event()
 {
   if (!m_plist) {

@@ -56,8 +56,6 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       unfixMass(void);
-      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m) override;
-      enum KFitError::ECode       setZeroCorrelation(void) override;
 
       /** Get a vertex position.
        * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit

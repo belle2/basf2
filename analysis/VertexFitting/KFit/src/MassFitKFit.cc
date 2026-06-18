@@ -122,18 +122,6 @@ MassFitKFit::setTrackZeroVertexError() {
 }
 
 
-enum KFitError::ECode
-MassFitKFit::setCorrelation(const HepMatrix& m) {
-  return KFitBase::setCorrelation(m);
-}
-
-
-enum KFitError::ECode
-MassFitKFit::setZeroCorrelation() {
-  return KFitBase::setZeroCorrelation();
-}
-
-
 const HepPoint3D
 MassFitKFit::getVertex(const int flag) const
 {

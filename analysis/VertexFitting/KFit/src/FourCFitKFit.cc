@@ -131,18 +131,6 @@ FourCFitKFit::setTrackZeroVertexError() {
 }
 
 
-enum KFitError::ECode
-FourCFitKFit::setCorrelation(const HepMatrix& m) {
-  return KFitBase::setCorrelation(m);
-}
-
-
-enum KFitError::ECode
-FourCFitKFit::setZeroCorrelation() {
-  return KFitBase::setZeroCorrelation();
-}
-
-
 const HepPoint3D
 FourCFitKFit::getVertex(const int flag) const
 {

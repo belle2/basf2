@@ -31,8 +31,8 @@ namespace Belle2 {
       * All private members are set to 0 (all vectors are empty).
       */
     TagVertex()
+      : m_tagVertex(ROOT::Math::XYZVector(0, 0, 0))
     {
-      m_tagVertex = ROOT::Math::XYZVector(0, 0, 0);
       m_tagVertexPval = 0;
       m_deltaT = 0;
       m_deltaTErr = 0;

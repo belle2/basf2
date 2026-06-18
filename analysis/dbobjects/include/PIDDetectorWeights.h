@@ -80,8 +80,8 @@ namespace Belle2 {
      * in bins of p and theta.
     */
     PIDDetectorWeights(const std::string& weightsCSVFileName)
+      : m_weightsRDataFrame(ROOT::RDF::FromCSV(weightsCSVFileName))
     {
-      m_weightsRDataFrame = ROOT::RDF::FromCSV(weightsCSVFileName);
       fillWeightsTablePerHypoFromRDF();
     };
 

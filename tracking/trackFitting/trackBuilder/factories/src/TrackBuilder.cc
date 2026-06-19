@@ -25,6 +25,7 @@
 
 #include <genfit/FitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
+#include <genfit/GblFitterInfo2.h>
 #include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/MeasuredStateOnPlane.h>
@@ -163,11 +164,24 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) {  // Loop on TrackPoint
 
-    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
-
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {  //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+      genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
+
+      if (kalmanInfo) {
+        const double weight = kalmanInfo->getWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else if (gblInfo) {
+        const double weight = gblInfo->getDownWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else {
+        ++nNotFittedVXDhits;
+        continue;
+      }
 
       PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
       SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
@@ -234,11 +248,12 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) { // Loop on TrackPoint
 
-    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
-
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) { //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
+      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+      genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
+
       CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
 
       if (!cdcHit)
@@ -262,11 +277,12 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
           hitPatternCDC.setLayer(wire.getICLayer());
           nCDChits++;             // counts CDC hits where there is KalmanFitterInfo and not negligible weight
         }
-
-      }   // end of if kalmanInfo
-      else {
-        // i.e. if !kalmanInfo)
-        ++nNotFittedCDChits;    // counts TrackPoints with CDC hits without KalmanFitterInfo
+      } else if (gblInfo) {
+        const double weight = gblInfo->getDownWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else {
+        ++nNotFittedCDChits;
         continue;
       }
 

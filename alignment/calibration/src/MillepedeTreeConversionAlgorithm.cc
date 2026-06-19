@@ -48,10 +48,11 @@ CalibrationAlgorithm::EResult MillepedeTreeConversionAlgorithm::calibrate()
   t_out->Branch("label", label, "label[nlab]/I");
   t_out->Branch("der", der, "der[nlab]/F");
   n = gblData->GetEntries();
+  B2ERROR("Broken with GBL V02");
   for (i = 0; i < n; i++) {
     gblData->GetEntry(i);
     for (it = dat->begin(); it != dat->end(); ++it) {
-      it->getAllData(aValue, aErr, indLocal, derLocal, labGlobal, derGlobal);
+      // it->getAllData(aValue, aErr, indLocal, derLocal, labGlobal, derGlobal);
       if (labGlobal->size() == 0)
         continue;
       value = aValue;

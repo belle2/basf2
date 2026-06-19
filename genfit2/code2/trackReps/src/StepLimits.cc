@@ -31,10 +31,7 @@ const double StepLimits::maxLimit_ = 99.E99;
 
 
 StepLimits& StepLimits::operator=(const StepLimits& other) {
-  for (unsigned int i=1; i<static_cast<unsigned int>(EStepLimitType::ENUM_NR_ITEMS); ++i) {
-    limits_[i] = other.limits_[i];
-  }
-
+  limits_ = other.limits_;
   stepSign_ = other.stepSign_;
 
   return *this;
@@ -46,7 +43,7 @@ std::pair<EStepLimitType, double> StepLimits::getLowestLimit(double margin) cons
   double lowest(maxLimit_);
   unsigned int iLowest(0);
 
-  for (unsigned int i=1; i<static_cast<unsigned int>(EStepLimitType::ENUM_NR_ITEMS); ++i) {
+  for (size_t i = 1; i < c_nStepLimitTypes; ++i) {
 
     // lowest hard limit may exceed lowest soft limit by up to #margin
     if (i == int(EStepLimitType::stp_sMaxArg))
@@ -66,7 +63,7 @@ double StepLimits::getLowestLimitVal(double margin) const {
 
   double lowest(maxLimit_);
 
-  for (unsigned int i=1; i<static_cast<unsigned int>(EStepLimitType::ENUM_NR_ITEMS); ++i) {
+  for (size_t i = 1; i < c_nStepLimitTypes; ++i) {
 
     // lowest hard limit may exceed lowest soft limit by up to #margin
     if (i == int(EStepLimitType::stp_sMaxArg))
@@ -106,15 +103,13 @@ void StepLimits::setStepSign(double signedVal) {
 
 
 void StepLimits::reset() {
-  for (unsigned int i=1; i<static_cast<unsigned int>(EStepLimitType::ENUM_NR_ITEMS); ++i) {
-    limits_[i] = maxLimit_;
-  }
+  limits_.fill(maxLimit_);
   stepSign_ = 1;
 }
 
 
 void StepLimits::Print() {
-  for (unsigned int i=0; i<static_cast<unsigned int>(EStepLimitType::ENUM_NR_ITEMS); ++i) {
+  for (size_t i = 0; i < c_nStepLimitTypes; ++i) {
     if (limits_[i] >= maxLimit_)
       continue;
 
@@ -139,8 +134,6 @@ void StepLimits::Print() {
       break;
     case EStepLimitType::stp_plane:
       printOut << "stp_plane (hard limit):  stepsize limited because destination plane is reached";
-      break;
-    case EStepLimitType::ENUM_NR_ITEMS:
       break;
     }
     printOut << "\n";

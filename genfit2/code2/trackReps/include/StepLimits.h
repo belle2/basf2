@@ -24,8 +24,8 @@
 #ifndef genfit_StepLimits_h
 #define genfit_StepLimits_h
 
-#include <vector>
-#include <math.h>
+#include <array>
+#include <cmath>
 
 
 namespace genfit {
@@ -44,7 +44,6 @@ enum class EStepLimitType {
   stp_boundary,   // stepsize limited by stepper because material boundary is encountered
   stp_plane,      // stepsize limited because destination plane is reached
 
-  ENUM_NR_ITEMS   // only for internal use
 };
 
 
@@ -54,8 +53,13 @@ enum class EStepLimitType {
 class StepLimits {
 
  public:
-  StepLimits()
-  : limits_(static_cast<double>(EStepLimitType::ENUM_NR_ITEMS), maxLimit_), stepSign_(1) {;}
+
+  //! Number of step-limit types.
+  static constexpr size_t c_nStepLimitTypes = 7;
+
+  StepLimits() {
+    limits_.fill(maxLimit_);
+  }
 
   StepLimits(const StepLimits&) = default;
 
@@ -100,8 +104,11 @@ class StepLimits {
   void Print();
 
  private:
-  std::vector<double> limits_; // limits are unsigned (i.e. non-negative)
-  signed char stepSign_;
+
+  // limits are unsigned (i.e. non-negative)
+  std::array<double, c_nStepLimitTypes> limits_;
+
+  signed char stepSign_ = 1;
   static const double maxLimit_;
 
 };

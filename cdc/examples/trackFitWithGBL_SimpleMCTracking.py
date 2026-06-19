@@ -41,8 +41,6 @@ import reconstruction
 import modularAnalysis as ana
 
 b2.set_log_level(b2.LogLevel.INFO)
-# set_log_level(LogLevel.DEBUG)
-# b2.set_random_seed(1028307)
 
 # register necessary modules
 eventinfosetter = b2.register_module('EventInfoSetter')
@@ -68,7 +66,6 @@ param_pGun = {
     'momentumGeneration': 'uniform',
     'momentumParams': [5.0, 5.01],
     'thetaGeneration': 'uniform',
-    #    'thetaGeneration': 'uniformCos',
     'thetaParams': [90., 90.],
     'phiGeneration': 'uniform',
     'phiParams': [0., 360.],
@@ -81,18 +78,11 @@ pGun.param(param_pGun)
 # simulation
 g4sim = b2.register_module('FullSim')
 # this is needed for the MCTrackFinder to work correctly <- obsolete ?
-# g4sim.param('StoreAllSecondaries', True)
-# g4sim.param('SecondariesEnergyCut', 0.0)
-# g4sim.param('UICommandsAtIdle', ['/control/execute interactions.mac'])
-# suppress delta-rays
-# g4sim.param('ProductionCut', 1000000.)
 
 # digitizer
 cdcDigitizer = b2.register_module('CDCDigitizer')
 
 # find MCTracks
-# mctrackfinder = register_module('MCTrackFinder')
-# mctrackfinder = register_module('TrackFinderMCTruth')
 mctrackfinder = b2.register_module('TrackFinderMCTruthRecoTracks')
 
 # select which detectors you would like to use
@@ -100,21 +90,15 @@ param_mctrackfinder = {  # select which particles to use: primary particles
     'UseCDCHits': 1,
     'UseSVDHits': 1,
     'UsePXDHits': 1,
-    #    'UseClusters': False,
     'WhichParticles': ['primary'],
-    #    'WhichParticles': ['CDC'],
 }
 mctrackfinder.param(param_mctrackfinder)
 
 # setupgf
 setupgf = b2.register_module('SetupGenfitExtrapolation')
-# param_setupgf = {}
-# setupgf.param(param_setupgf)
 
 # fitting
 cdcfitting = b2.register_module('GBLRecoFitter2', resolveAmbiguities=1, externalIterations=1)
-# param_cdcfitting = {}
-# cdcfitting.param(param_cdcfitting)
 
 # build track
 buildtrack = b2.register_module("TrackCreator")
@@ -134,18 +118,11 @@ main.add_module(gearbox)
 main.add_module(geometry)
 
 main.add_module(pGun)
-# main.add_module(g4sim)
-# main.add_module(cdcDigitizer)
-
-# main.add_module(mctrackfinder)
-# main.add_module(setupgf)
-
 
 simulation.add_simulation(main)
 reconstruction.add_reconstruction(main, pruneTracks=False, add_muid_hits=False, components=["PXD", "SVD", "CDC"])
 
 main.add_module(cdcfitting)
-# main.add_module(buildtrack)
 main.add_module('AlignDQM')
 main.add_module('TrackDQM')
 

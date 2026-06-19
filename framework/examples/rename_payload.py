@@ -1,3 +1,11 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import argparse
 
 import basf2
@@ -6,7 +14,7 @@ from ROOT import Belle2 as B2  # noqa: N811
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description='Copy a payload from a global tag into a local database.',
+        description='Copy a payload from a global tag into a local database and rename it.',
     )
     parser.add_argument(
         '--gt', required=True,

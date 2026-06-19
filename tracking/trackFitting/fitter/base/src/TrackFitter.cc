@@ -14,6 +14,13 @@
 #include <genfit/AbsFitter.h>
 #include <genfit/DAF.h>
 #include <genfit/KalmanFitterInfo.h>
+#include <genfit/GblFitterInfo2.h>
+#include <genfit/Track.h>
+
+#include <genfit/GblFitter2.h>
+#include <svd/reconstruction/SVDRecoHit.h>
+#include <svd/reconstruction/SVDRecoHit2D.h>
+
 
 using namespace Belle2;
 
@@ -75,7 +82,100 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
     // Delete the old information to start from scratch
     recoTrack.deleteFittedInformationForRepresentation(&trackRepresentation);
     B2DEBUG(28, "resortHits is set to " << resortHits << " when fitting the tracks");
-    m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation, resortHits);
+    if (dynamic_cast<genfit::GblFitter2*>(m_fitter.get())) {
+      try {
+        auto& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(recoTrack);
+        //TODO: check also in cosmics if sorted / unsorted even makes really sense -> critical
+        std::vector<RecoHitInformation*> recoInfos = recoTrack.getRecoHitInformations(true);
+
+        /*
+        B2ERROR("len recoInfos = " << recoInfos.size() << " num track points = " << RecoTrackGenfitAccess::getGenfitTrack(
+                  recoTrack).getNumPoints() << " before");
+        double ctr = 0;
+        for (auto ri : recoInfos) {
+          if (not recoTrack.getCreatedTrackPoint(ri))
+            continue;
+
+          if (not dynamic_cast<genfit::PlanarMeasurement*>(recoTrack.getCreatedTrackPoint(ri)->getRawMeasurement(0)))
+            continue;
+
+          B2ERROR(ctr << "  tp ID: " << ri->getCreatedTrackPointID() << " det " << ri->getTrackingDetector() << " detID= " <<
+                  dynamic_cast<genfit::PlanarMeasurement*>(recoTrack.getCreatedTrackPoint(ri)->getRawMeasurement(0))->getPlaneId());
+          ++ctr;
+        }
+        */
+
+        if (true) {
+          int recoInfoCounter = 0;
+          for (unsigned int i = 0; i < gfTrack.getNumPoints() - 1; ++i) {
+            while (recoInfos[recoInfoCounter]->getCreatedTrackPointID() == -1) {
+              ++recoInfoCounter;
+            }
+            //if (gfTrack.getPointWithMeasurement(i)->getNumRawMeasurements() != 1)
+            //  continue;
+            genfit::PlanarMeasurement* planarMeas1 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                       i)->getRawMeasurement(0));
+            genfit::PlanarMeasurement* planarMeas2 = dynamic_cast<genfit::PlanarMeasurement*>(gfTrack.getPointWithMeasurement(
+                                                       i + 1)->getRawMeasurement(0));
+
+            if (planarMeas1 != NULL && planarMeas2 != NULL &&
+                planarMeas1->getDetId() == planarMeas2->getDetId() &&
+                planarMeas1->getPlaneId() != -1 &&   // -1 is default plane id
+                planarMeas1->getPlaneId() == planarMeas2->getPlaneId()) {
+              Belle2::SVDRecoHit* hit1 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas1);
+              Belle2::SVDRecoHit* hit2 = dynamic_cast<Belle2::SVDRecoHit*>(planarMeas2);
+
+              //TODO check planeID and VxdID in recoInfo and trackPoint
+
+              if (hit1 && hit2) {
+                Belle2::SVDRecoHit* hitU(NULL);
+                Belle2::SVDRecoHit* hitV(NULL);
+                // We have to decide U/V now (else SVDRecoHit2D could throw FATAL)
+                if (hit1->isU() && !hit2->isU()) {
+                  hitU = hit1;
+                  hitV = hit2;
+                } else if (!hit1->isU() && hit2->isU()) {
+                  hitU = hit2;
+                  hitV = hit1;
+                } else {
+                  //TODO remove the fatal? issue warning and try to continue
+                  B2FATAL("Something is wrong with u/v");
+                  continue;
+                }
+                Belle2::SVDRecoHit2D* hit = new Belle2::SVDRecoHit2D(*hitU, *hitV);
+                // insert measurement before point i (increases number of currect point to i+1)
+                gfTrack.insertMeasurement(hit, i);
+
+                recoInfos[recoInfoCounter]->setCreatedTrackPointID(i);
+                ++recoInfoCounter;
+                recoInfos[recoInfoCounter]->setCreatedTrackPointID(i);
+                ++recoInfoCounter;
+
+                // now delete current point (at its original place, we have the new 2D recohit)
+                gfTrack.deletePoint(i + 1);
+                gfTrack.deletePoint(i + 1);
+
+              }
+            } else {
+              recoInfos[recoInfoCounter]->setCreatedTrackPointID(i);
+              ++recoInfoCounter;
+            }
+
+            // The last point is not in the loop above. If the loop ends with 1Dx1D SVD hits combined together,
+            // this is just redundant (the correct track point ID is already set from above).
+            recoInfos[recoInfos.size() - 1]->setCreatedTrackPointID(gfTrack.getNumPoints() - 1);
+
+          }
+
+        }
+      } catch (std::exception& e) {
+        B2ERROR(e.what());
+        B2ERROR("SVD Cluster combination failed. This is symptomatic of pruned tracks. MillepedeCollector cannot process pruned tracks.");
+        return false;
+      }
+    }
+    m_fitter->processTrackWithRep(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), &trackRepresentation);
+
   } catch (genfit::Exception& e) {
     B2WARNING(e.getExcString());
   }
@@ -88,11 +188,18 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
   for (RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
     const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
+      std::vector<double> weights;
       genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
-      if (not kalmanFitterInfo) {
+      genfit::GblFitterInfo2* gblFitterInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(&trackRepresentation));
+
+      if (not(kalmanFitterInfo or gblFitterInfo)) {
         recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
       } else {
-        std::vector<double> weights = kalmanFitterInfo->getWeights();
+        if (kalmanFitterInfo) {
+          weights = kalmanFitterInfo->getWeights();
+        } else if (gblFitterInfo) {
+          weights = gblFitterInfo->getDownWeights();
+        }
         for (const double weight : weights) {
           if (weight < 1.e-9) {
             recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);

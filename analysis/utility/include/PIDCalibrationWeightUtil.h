@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Constructor with the name of the calibration weight matrix
      */
-    PIDCalibrationWeightUtil(const std::string& matrixName)
+    explicit PIDCalibrationWeightUtil(const std::string& matrixName)
       : m_matrixName(matrixName)
     {
       if (m_matrixName.find("PIDDetectorWeights") != std::string::npos) {

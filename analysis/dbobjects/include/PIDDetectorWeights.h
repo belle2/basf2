@@ -79,7 +79,7 @@ namespace Belle2 {
      * @param  weightsCSVFileName the path to the CSV file containing the detector weights per std charged particle hypothesis,
      * in bins of p and theta.
     */
-    PIDDetectorWeights(const std::string& weightsCSVFileName)
+    explicit PIDDetectorWeights(const std::string& weightsCSVFileName)
       : m_weightsRDataFrame(ROOT::RDF::FromCSV(weightsCSVFileName))
     {
       fillWeightsTablePerHypoFromRDF();

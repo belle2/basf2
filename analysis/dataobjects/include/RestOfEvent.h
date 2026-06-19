@@ -67,7 +67,7 @@ namespace Belle2 {
        * @param name name of mask
        * @param origin origin of mask, for debug
        */
-      Mask(const std::string& name = c_defaultMaskName, const std::string& origin = "unknown"): m_name(name),
+      explicit Mask(const std::string& name = c_defaultMaskName, const std::string& origin = "unknown"): m_name(name),
         m_origin(origin)
       {
         B2DEBUG(10, "Mask " << name << " is being initialized by " << origin);

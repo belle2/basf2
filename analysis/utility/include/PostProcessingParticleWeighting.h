@@ -35,7 +35,7 @@ namespace Belle2 {
      * Constructor.
      * @param[in] lookupTableName Lookup-table name.
      */
-    PostProcessingParticleWeighting(const char* lookupTableName);
+    explicit PostProcessingParticleWeighting(const char* lookupTableName);
 
     /**
      * Destructor.

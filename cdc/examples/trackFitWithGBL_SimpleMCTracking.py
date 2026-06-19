@@ -112,7 +112,7 @@ setupgf = b2.register_module('SetupGenfitExtrapolation')
 # setupgf.param(param_setupgf)
 
 # fitting
-cdcfitting = b2.register_module('GBLRecoFitter4', resolveAmbiguities=1, externalIterations=1)
+cdcfitting = b2.register_module('GBLRecoFitter2', resolveAmbiguities=1, externalIterations=1)
 # param_cdcfitting = {}
 # cdcfitting.param(param_cdcfitting)
 

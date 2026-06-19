@@ -54,11 +54,11 @@ new_main = b2.create_path()
 
 for mod in main.modules():
     if mod.type() == "DAFRecoFitter":
-        gbl_mod = b2.register_module("GBLRecoFitter4")
+        gbl_mod = b2.register_module("GBLRecoFitter2")
         gbl_mod.param("resolveAmbiguities", 1)
         gbl_mod.param("externalIterations", 2)
         gbl_mod.param("gblInternalIterations", "hh")
-        gbl_mod.set_name(str(mod.name()).replace("DAFRecoFitter", "GBLRecoFitter4"))
+        gbl_mod.set_name(str(mod.name()).replace("DAFRecoFitter", "GBLRecoFitter2"))
         for par in mod.available_params():
             if par.setInSteering:
                 gbl_mod.param(par.name, par.values)
@@ -75,14 +75,14 @@ new_main = b2.create_path()
 for mod in main.modules():
 
     if mod.name() == "Combined_DAFRecoFitter":
-        new_main.add_module("GBLRecoFitter4", resolveAmbiguities=1, externalIterations=2, gblInternalIterations="hh,hh")
+        new_main.add_module("GBLRecoFitter2", resolveAmbiguities=1, externalIterations=2, gblInternalIterations="hh,hh")
     else:
         new_main.add_module(mod)
 
 main = new_main
 
 
-# main.add_module('GBLRecoFitter4')
+# main.add_module('GBLRecoFitter2')
 """
 main.add_module(
     'MillepedeCollector',

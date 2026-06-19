@@ -825,6 +825,9 @@ C
          APKMAS=AMKZ                      ! K0L
       ELSEIF  (ABS(IDENT).EQ. 313) THEN
          APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*0(892)
+      ELSEIF  (ABS(IDENT).EQ. 323) THEN
+         XRANGE=5.0
+         APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*+-(892)
       ELSEIF  (ABS(IDENT).EQ. 3122) THEN
          APKMAS=1.115683                   ! Lambda
       ELSEIF  (ABS(IDENT).EQ.10211) THEN
@@ -937,6 +940,8 @@ C
          IPKDEF=ABS(IDENT)! K0L
       ELSEIF  (ABS(IDENT).EQ.313) THEN
          IPKDEF=IDENT     ! K*0(892)
+      ELSEIF  (ABS(IDENT).EQ.323) THEN
+         IPKDEF=IDENT     ! K*+-(892)
       ELSEIF  (ABS(IDENT).EQ.3122) THEN
          IPKDEF=IDENT     ! Lambda
       ELSEIF  (ABS(IDENT).EQ.10211) THEN

@@ -60,7 +60,7 @@ for mod in main.modules():
         gbl_mod.param("gblInternalIterations", "hh")
         gbl_mod.set_name(str(mod.name()).replace("DAFRecoFitter", "GBLRecoFitter2"))
         for par in mod.available_params():
-            if par.setInSteering:
+            if par.setInSteering and par.name not in ["trackFitType"]:
                 gbl_mod.param(par.name, par.values)
         print("Replacing DAFRecoFitter with name:", mod.name(), "with GBLRecoFitter using name:", gbl_mod.name())
         new_main.add_module(gbl_mod)

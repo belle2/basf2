@@ -150,7 +150,11 @@ void PrintMCParticlesModule::event()
     first_gen.emplace_back(&mc);
   }
   filterPrimaryOnly(first_gen);
-  printTree(first_gen);
+
+  // Build the full tree if needed for log output or default (non-compact) storage
+  if (not m_suppressPrint or not m_storeCompact) {
+    printTree(first_gen);
+  }
 
   if (!m_suppressPrint)
     B2INFO(m_output.str());

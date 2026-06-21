@@ -57,7 +57,7 @@ namespace Belle2 {
     std::stringstream m_output; /**< Buffer to keep all the output while building the tree */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     bool m_onlyPrimaries;       /**< Print only primary particles. */
-    int m_maxLevel;             /**< Show only up to specified depth level. */
+    int m_maxLevel;             /**< Show only up to specified depth level; <= 0 means no limit. */
     bool m_showVertices;        /**< Show particle production vertices */
     bool m_showMomenta;         /**< Show particle momenta */
     bool m_showProperties;      /**< Show remaining properties */

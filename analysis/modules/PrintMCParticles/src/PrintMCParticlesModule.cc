@@ -116,7 +116,7 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
   //Parameter definition
   addParam("storeName", m_particleList, "Name of the StoreArray to print", m_particleList);
   addParam("onlyPrimaries", m_onlyPrimaries, "Show only primary particles", true);
-  addParam("maxLevel", m_maxLevel, "Show only up to specified depth level, -1 means no limit", -1);
+  addParam("maxLevel", m_maxLevel, "Show only up to specified depth level; any value <= 0 means no limit (default: -1)", -1);
   addParam("showVertices", m_showVertices, "Show also the particle production vertices and times", false);
   addParam("showMomenta", m_showMomenta, "Show also the particle momenta", false);
   addParam("showProperties", m_showProperties, "Show the basic particle properties", false);

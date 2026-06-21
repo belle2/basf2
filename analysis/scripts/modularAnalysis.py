@@ -381,15 +381,15 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
 
     The same information will be stored in the branch ``__MCDecayString__`` of
     TTree created by `VariablesToNtuple` or `VariablesToEventBasedTree` module.
-    This branch is automatically created when `PrintMCParticles` modules is called.
+    This branch is automatically created when `PrintMCParticles` module is called.
     Printing the information on the log message can be suppressed if ``suppressPrint``
-    is True, while the branch ``__MCDecayString__``. This option helps to reduce the
+    is True, while the branch ``__MCDecayString__`` is still created. This option helps to reduce the
     size of the log message.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
             the generator and not created by the simulation.
-        maxLevel (int): If 0 or less print the whole tree, otherwise stop after n generations
+        maxLevel (int): If 0 or less print the whole tree (the default -1 means unlimited), otherwise stop after n generations
         showProperties (bool): If True show mass, energy and charge of the particles
         showMomenta (bool): if True show the momenta of the particles
         showVertices (bool): if True show production vertex and production time of all particles

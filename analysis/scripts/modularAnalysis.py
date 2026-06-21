@@ -277,7 +277,8 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False,
+                     storeCompact=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -386,6 +387,18 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     is True, while the branch ``__MCDecayString__`` is still created. This option helps to reduce the
     size of the log message.
 
+    By default the stored string is the full indented tree shown above. If
+    ``storeCompact`` is True, a compact single-line representation is stored
+    instead::
+
+        Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> pi- [D0 -> pi- pi+]]
+
+    Here ``->`` separates a particle from its daughters, ``[...]`` groups a
+    composite daughter with its descendants, and ``~`` prefixes secondary
+    particles. The compact string uses less storage space and is easier to
+    parse. Note that this only affects the ``__MCDecayString__`` branch in the
+    ROOT file; the log output always shows the full indented tree.
+
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
             the generator and not created by the simulation.
@@ -397,6 +410,10 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
             For secondary particles this includes creation process.
         suppressPrint (bool): if True printing the information on the log message is suppressed.
             Even if True, the branch ``__MCDecayString__`` is created.
+        storeCompact (bool): if True, store a compact single-line string in the
+            ``__MCDecayString__`` branch (e.g. ``Upsilon(4S) -> [B+ -> mu+ ...]``)
+            instead of the full indented tree. Only affects the ROOT branch, not the
+            log output. Default False.
     """
 
     return path.add_module(
@@ -408,6 +425,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showVertices=showVertices,
         showStatus=showStatus,
         suppressPrint=suppressPrint,
+        storeCompact=storeCompact,
     )
 
 

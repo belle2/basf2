@@ -122,6 +122,8 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
   addParam("showProperties", m_showProperties, "Show the basic particle properties", false);
   addParam("showStatus", m_showStatus, "Show extendend status information of the particle", false);
   addParam("suppressPrint", m_suppressPrint, "Suppress print the information", false);
+  addParam("storeCompact", m_storeCompact, "Store a compact single-line string in the ROOT branch instead of the full indented tree",
+           false);
 }
 
 void PrintMCParticlesModule::initialize()
@@ -156,7 +158,16 @@ void PrintMCParticlesModule::event()
   if (not m_stringWrapper.isValid())
     m_stringWrapper.create();
 
-  m_stringWrapper->setString(std::string(m_output.str()));
+  if (m_storeCompact) {
+    std::stringstream compact;
+    for (size_t i = 0; i < first_gen.size(); ++i) {
+      if (i > 0) compact << " ";
+      compact << formatParticleCompact(first_gen[i]);
+    }
+    m_stringWrapper->setString(compact.str());
+  } else {
+    m_stringWrapper->setString(std::string(m_output.str()));
+  }
 }
 
 void PrintMCParticlesModule::filterPrimaryOnly(std::vector<MCParticle*>& particles) const
@@ -247,4 +258,44 @@ void PrintMCParticlesModule::printTree(const std::vector<MCParticle*>& particles
     // and if we show any extra info also leave blank line to sibling
     if (anyExtraInfo and not last) m_output << newIndent << std::endl;
   }
+}
+
+std::string PrintMCParticlesModule::formatParticleCompact(const MCParticle* mc, int level) const
+{
+  TDatabasePDG* pdb = TDatabasePDG::Instance();
+  TParticlePDG* pdef = pdb->GetParticle(mc->getPDG());
+  std::string name = pdef ? pdef->GetTitle() : "[UNKNOWN]";
+
+  if (not mc->hasStatus(MCParticle::c_PrimaryParticle)) {
+    name = "~" + name;
+  }
+
+  auto daughters = mc->getDaughters();
+  filterPrimaryOnly(daughters);
+
+  const bool showDaughters = (not daughters.empty()) and (m_maxLevel <= 0 or level < m_maxLevel);
+
+  if (not showDaughters) {
+    if (not daughters.empty()) {
+      name += " ...";
+    }
+    return name;
+  }
+
+  std::string result = name + " -> ";
+  for (size_t i = 0; i < daughters.size(); ++i) {
+    if (i > 0) result += " ";
+    auto* daughter = daughters[i];
+    std::string dstr = formatParticleCompact(daughter, level + 1);
+
+    auto granddaughters = daughter->getDaughters();
+    filterPrimaryOnly(granddaughters);
+    if ((not granddaughters.empty()) and (m_maxLevel <= 0 or level + 1 < m_maxLevel)) {
+      result += "[" + dstr + "]";
+    } else {
+      result += dstr;
+    }
+  }
+
+  return result;
 }

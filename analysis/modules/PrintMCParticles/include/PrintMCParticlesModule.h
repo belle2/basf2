@@ -54,6 +54,9 @@ namespace Belle2 {
     /** if m_onlyPrimary is set remove all non primary particles from the given vector inplace */
     void filterPrimaryOnly(std::vector<MCParticle*>& particles) const;
 
+    /** Return a compact single-line representation of an MCParticle and its descendants */
+    std::string formatParticleCompact(const MCParticle* mc, int level = 1) const;
+
     std::stringstream m_output; /**< Buffer to keep all the output while building the tree */
     std::string m_particleList; /**< The name of the MCParticle collection. */
     bool m_onlyPrimaries;       /**< Print only primary particles. */
@@ -63,6 +66,7 @@ namespace Belle2 {
     bool m_showProperties;      /**< Show remaining properties */
     bool m_showStatus;          /**< Show extended status information */
     bool m_suppressPrint;       /**< Suppress print the information */
+    bool m_storeCompact;        /**< Store a compact single-line string in the ROOT branch instead of the full tree */
     StoreArray<MCParticle> m_mcparticles; /**< store array for the MCParticles */
     StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper to store the MCDecayString */
   };

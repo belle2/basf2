@@ -691,7 +691,8 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     Parameters:
         inputListNames (list(str)): input particle list names
         scale (float): scaling factor (1.0 -- no scaling)
-        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        payloadName (str): base name of the payload which contains the phase-space dependent scaling factors.
+            The suffix ``_data`` or ``_MC`` is appended automatically depending on whether the module runs on data or MC.
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
@@ -720,7 +721,8 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", 
     Parameters:
         inputListNames (list(str)): input particle list names
         correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction)
-        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        payloadName (str): base name of the payload which contains the phase-space dependent corrections.
+            The suffix ``_data`` or ``_MC`` is appended automatically depending on whether the module runs on data or MC.
         correctionName (str): name of correction variable in the payload.
         path (basf2.Path): module is added to this path
     """

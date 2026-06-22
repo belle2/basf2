@@ -707,6 +707,9 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="tracking_
     import math
     # A valid constant scale takes precedence over the default payload (the two options are mutually exclusive).
     if not math.isnan(scale) and payloadName == "tracking_MomentumScaling":
+        B2WARNING(f"A constant scale value ({scale}) was provided to scaleTrackMomenta: the default "
+                  "'tracking_MomentumScaling' payload from the global tag will NOT be used. "
+                  "The constant scale is applied instead.")
         payloadName = ""
 
     TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
@@ -745,6 +748,9 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="tra
     import math
     # A valid constant correction takes precedence over the default payload (the two options are mutually exclusive).
     if not math.isnan(correction) and payloadName == "tracking_EnergyLoss":
+        B2WARNING(f"A constant correction value ({correction}) was provided to correctTrackEnergy: the default "
+                  "'tracking_EnergyLoss' payload from the global tag will NOT be used. "
+                  "The constant correction is applied instead.")
         payloadName = ""
 
     TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')

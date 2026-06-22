@@ -467,7 +467,7 @@ KFitBase::prepareCorrelation() {
   HepMatrix tmp_hm(KFitConst::kNumber6, KFitConst::kNumber6, 0);
   int row = 0, col = 0;
 
-  for (auto& hm : m_BeforeCorrelation)
+  for (const auto& hm : m_BeforeCorrelation)
   {
     row++;
     if (row == m_TrackCount) {

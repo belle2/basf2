@@ -40,9 +40,6 @@ namespace Belle2 {
     /** event code - all curl track selection done here */
     virtual void event() override;
 
-    /** end run - unused */
-    virtual void endRun() override;
-
     /** termination */
     virtual void terminate() override;
 

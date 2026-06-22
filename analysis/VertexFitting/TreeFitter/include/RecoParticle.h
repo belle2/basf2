@@ -41,9 +41,6 @@ namespace TreeFitter {
     /** get momentum index */
     virtual int momIndex() const override { return index(); }
 
-    /** has an energy in the statevector? */
-    virtual bool hasEnergy() const override { return false; }
-
     /** abstract projection */
     virtual ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const = 0;
 

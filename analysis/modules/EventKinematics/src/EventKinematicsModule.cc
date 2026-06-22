@@ -73,11 +73,7 @@ void EventKinematicsModule::event()
   m_eventKinematics->addTotalPhotonsEnergy(totalPhotonsEnergy);
 }
 
-void EventKinematicsModule::terminate()
-{
-}
-
-void EventKinematicsModule::getParticleMomentumLists(vector<string> particleLists)
+void EventKinematicsModule::getParticleMomentumLists(const std::vector<std::string>& particleLists)
 {
   PCmsLabTransform T;
 

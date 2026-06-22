@@ -44,7 +44,7 @@ namespace Belle2 {
      *
      * @return the string.
      */
-    std::string getString() const
+    const std::string& getString() const
     {
       return m_string;
     }

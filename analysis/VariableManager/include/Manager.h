@@ -223,7 +223,7 @@ namespace Belle2 {
       std::vector<std::string> resolveCollections(const std::vector<std::string>& variables);
 
       /** Return list of all variables (in order registered). */
-      std::vector<const Variable::Manager::VarBase*> getVariables() const { return m_variablesInRegistrationOrder; }
+      const std::vector<const Variable::Manager::VarBase*>& getVariables() const { return m_variablesInRegistrationOrder; }
 
 
       /** All variables registered after VARIABLE_GROUP(groupName) will be added to this group. */

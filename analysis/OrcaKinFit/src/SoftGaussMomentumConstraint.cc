@@ -46,7 +46,7 @@ namespace Belle2 {
       double totpy = 0;
       double totpz = 0;
       double totE = 0;
-      for (auto fitobject : fitobjects) {
+      for (const auto* fitobject : fitobjects) {
         if (pxfact != 0) totpx += fitobject->getPx();
         if (pyfact != 0) totpy += fitobject->getPy();
         if (pzfact != 0) totpz += fitobject->getPz();
@@ -62,7 +62,7 @@ namespace Belle2 {
 //          =  +-1/M * p(i) * d p(i) /d par(j)
     void SoftGaussMomentumConstraint::getDerivatives(int idim, double der[]) const
     {
-      for (auto fitobject : fitobjects) {
+      for (const auto* fitobject : fitobjects) {
         for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
           if (!fitobject->isParamFixed(ilocal)) {
             int iglobal = fitobject->getGlobalParNum(ilocal);

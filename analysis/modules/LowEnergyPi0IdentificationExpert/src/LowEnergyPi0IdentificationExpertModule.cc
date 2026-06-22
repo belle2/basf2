@@ -66,9 +66,6 @@ void LowEnergyPi0IdentificationExpertModule::beginRun()
   }
 }
 
-void LowEnergyPi0IdentificationExpertModule::endRun()
-{
-}
 
 void LowEnergyPi0IdentificationExpertModule::init_mva(MVA::Weightfile& weightfile)
 {

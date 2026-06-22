@@ -127,14 +127,14 @@ def plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf):
 
     fig, ax = plt.subplots(2, 2, figsize=(20, 12))
 
-    # # 2. Ratio (top-right)
+    # 2. Ratio (top-right)
     il_r = (il_new["wiregain"] / il_prev["wiregain"]).dropna()
     ol_r = (ol_new["wiregain"] / ol_prev["wiregain"]).dropna()
 
     ratio_panels = [
         (ax[0, 0], il_r, "Inner Wiregain Ratio",        0.0, 1.5, 100,  "Inner Layer"),
         (ax[0, 1], ol_r, "Outer Wiregain Ratio",        0.5, 2.0, 1000, "Outer Layer"),
-        (ax[1, 0], il_r, "Inner Wiregain Ratio (zoom)", 0.3, 0.7, 100,  "Inner Layer"),
+        (ax[1, 0], il_r, "Inner Wiregain Ratio (zoom)", 0.9, 1.2, 100,  "Inner Layer"),
         (ax[1, 1], ol_r, "Outer Wiregain Ratio (zoom)", 0.92, 1.2, 1000, "Outer Layer"),
     ]
 
@@ -150,18 +150,25 @@ def plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf):
 
     fig, ax = plt.subplots(1, 2, figsize=(20, 6))
 
-    # 5. Ratio Histogram  (bottom -left)
-    # 5. Ratio Histogram (filled)
+    # 3. Ratio Histogram  (bottom -left)
     ax[0].set_title("Wiregain Ratio histo")
-    cg.hist(x_min=0.0, x_max=2.0, xlabel=r"$\Delta$ wiregains", ylabel="Normalized count", fs1=10, fs2=6, ax=ax[0])
+    cg.hist(x_min=0.0, x_max=2.0, xlabel=r"wiregain ratio", ylabel="Normalized count", fs1=10, fs2=6, ax=ax[0])
 
-    scale1 = 1 / il_r.shape[0] if il_r.shape[0] > 0 else 1
-    scale2 = 1 / ol_r.shape[0] if ol_r.shape[0] > 0 else 1
+    bins = np.linspace(0.0, 2.0, 201)
+    all_ratio = pd.concat([il_r, ol_r])
+    all_counts, _ = np.histogram(all_ratio, bins=bins)
+    norm = all_counts.max()
 
-    ax[0].hist(il_r, bins=200, weights=np.ones_like(il_r) * scale1, histtype='stepfilled', alpha=0.5, label='Inner layer')
+    il_counts, _ = np.histogram(il_r, bins=bins)
+    il_counts = il_counts / norm
 
-    ax[0].hist(ol_r, bins=200, weights=np.ones_like(ol_r) * scale2, histtype='stepfilled', alpha=0.5, label='Outer Layer')
+    ax[0].hist(bins[:-1], bins=bins, weights=il_counts, histtype='stepfilled', alpha=0.5, label='Inner layer')
 
+    ol_counts, _ = np.histogram(ol_r, bins=bins)
+    ol_counts = ol_counts / norm
+    ax[0].hist(bins[:-1], bins=bins, weights=ol_counts, histtype='stepfilled', alpha=0.5, label='Outer Layer')
+
+    ax[0].axvline(1.0, linestyle="--", linewidth=1)
     ax[0].legend(fontsize=12)
 
     plt.tight_layout()

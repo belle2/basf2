@@ -51,9 +51,11 @@ BeginX
  2970            1e0      ONOF_L_IB
  2971            0e0      ONOF_L_V
  2972            0e0      ONOF_L_A
- 2973            0e0      ONOF_R_IB
- 2974            0e0      ONOF_R_V
- 2975            0e0      ONOF_R_A
- 2976            0e0      OFF_PHOT
+ 2973            0e0      ONOF_L_VAINT
+ 2974            0e0      ONOF_R_IB
+ 2975            0e0      ONOF_R_V
+ 2976            0e0      ONOF_R_A
+ 2977            0e0      ONOF_R_VAINT
+ 2978            0e0      OFF_PHOT
 ********************************************************************************
 EndX

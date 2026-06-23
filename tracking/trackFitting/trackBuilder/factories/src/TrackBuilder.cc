@@ -171,19 +171,6 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
 
-      if (kalmanInfo) {
-        const double weight = kalmanInfo->getWeights().at(measurementId);
-        if (weight == 0)
-          continue;
-      } else if (gblInfo) {
-        const double weight = gblInfo->getDownWeights().at(measurementId);
-        if (weight == 0)
-          continue;
-      } else {
-        ++nNotFittedVXDhits;
-        continue;
-      }
-
       PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
       SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
       SVDRecoHit2D* svdHit2D = dynamic_cast<SVDRecoHit2D*>(absMeas);
@@ -221,7 +208,11 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
         }
 
       }   // end of if kalmanInfo
-      else {
+      else if (gblInfo) {
+        const double weight = gblInfo->getDownWeights().at(measurementId);
+        if (weight == 0)
+          continue;
+      } else {
         // i.e. if !kalmanInfo)
         ++nNotFittedVXDhits;    // counts TrackPoints with VXD hits without KalmanFitterInfo
         continue;

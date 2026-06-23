@@ -44,7 +44,9 @@ def create_dictionaries(dirs):
                 header_files = [
                     os.path.join(src_dir, dir, 'include', 'GFGbl.h'),
                     os.path.join(src_dir, dir, 'include', 'GblFitter.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitter2.h'),
                     os.path.join(src_dir, dir, 'include', 'GblFitterInfo.h'),
+                    os.path.join(src_dir, dir, 'include', 'GblFitterInfo2.h'),
                     os.path.join(src_dir, dir, 'include', 'GblFitStatus.h'),
                     os.path.join(src_dir, dir, 'include', 'ICalibrationParametersDerivatives.h')
                 ]

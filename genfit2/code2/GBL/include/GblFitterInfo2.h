@@ -20,8 +20,8 @@
  * @{
  */
 
-#ifndef genfit_GblFitterInfo_h
-#define genfit_GblFitterInfo_h
+#ifndef genfit_GblFitterInfo2_h
+#define genfit_GblFitterInfo2_h
 
 #include "AbsFitterInfo.h"
 #include "MeasuredStateOnPlane.h"
@@ -34,7 +34,7 @@
 #include "ICalibrationParametersDerivatives.h"
 #include "GblPoint.h"
 #include "GblTrajectory.h"
-#include "GblFitter.h"
+#include "GblFitter2.h"
 #include "TMatrixD.h"
 #include "TMatrixDSym.h"
 #include "AbsHMatrix.h"
@@ -49,21 +49,21 @@ namespace genfit {
   /**
    *  @brief Collects information needed and produced by a GblFitter/GBL and is specific to one AbsTrackRep of the Track.
    */
-  class GblFitterInfo : public AbsFitterInfo {
+  class GblFitterInfo2 : public AbsFitterInfo {
     
   public:
     
     /**
      * @brief Constructor for ROOT I/O 
      */
-    GblFitterInfo();
+    GblFitterInfo2();
     
     /**
      * @brief Default (inherited) constructor
      * Should not be used or the reference should set immediately upon
      * construction (to set the plane).
      */
-    GblFitterInfo(const TrackPoint* trackPoint, const AbsTrackRep* rep);
+    GblFitterInfo2(const TrackPoint* trackPoint, const AbsTrackRep* rep);
     
     /**
      * @brief Default user constructor
@@ -72,7 +72,7 @@ namespace genfit {
      * @param rep The representation this fitter info belongs to
      * @param referenceState State from extrapolation to init predictions and plane
      */
-    GblFitterInfo(const TrackPoint* trackPoint, const AbsTrackRep* rep, StateOnPlane& referenceState);
+    GblFitterInfo2(const TrackPoint* trackPoint, const AbsTrackRep* rep, StateOnPlane& referenceState);
     
     /**
      * @brief (Initial) reset of fitter info
@@ -81,7 +81,7 @@ namespace genfit {
      * @param repDim Representation dimension (5)
      * @return void
      */
-    void reset(unsigned int measurementDim = 2, unsigned int repDim = 5);
+    void reset(unsigned int repDim = 5);
         
     /**
      * @brief Set the prediction and plane (from measurement if any)
@@ -96,25 +96,8 @@ namespace genfit {
      * @param referenceState StateOnPlane from extrapolation to this point
      * @return void
      */
+     
     void setReferenceState(StateOnPlane& referenceState);
-    /**
-     * @brief Set the Jacobian for further GblPoint construction
-     * 
-     * @param jacobian 5x5 TMatrixD with Jacobian for propagation of the state from previous point
-     *                 to this point.
-     * @return void
-     */
-    void setJacobian(TMatrixD jacobian);
-    
-    /**
-     * @brief Get scattering covariance projected into (measurement) plane
-     * 
-     * @param variance Variance of slopes in track frame
-     * @param trackDirection Direction of the track at the plane
-     * @param measurementPlane The plane with measurement to which MS shall be projected
-     * @return TMatrixDSym
-     */
-    TMatrixDSym getCovariance(double variance, TVector3 trackDirection, SharedPlanePtr measurementPlane) const;
     
     /**
      * @brief Collect all data and create a GblPoint
@@ -124,10 +107,31 @@ namespace genfit {
      * - Global and local derivatives are added for RawMesurement implementing
      *   ICalibrationParametersDerivatives interface. Using most up to date prediction.
      * 
+     * @param index  measurement index
+     * @param allowAmbiguities Allow ambiguities (to be resolved by GBL)
      * @return gbl::GblPoint
      */
-    gbl::GblPoint constructGblPoint();
+    gbl::GblPoint constructGblPoint(unsigned int index, bool allowAmbiguities);
   
+    /**
+     * @brief Resolve ambuguities from GBL fit
+     * 
+     * @param traj Fitted GblTrajectory 
+     * @param point GblPoint, optionally with ambiguties to be resolved
+     * @param nResolved  number of resolved ambiguities
+     * @param nSwapped   number of swaps
+     * @return void
+     */
+    void resolveAmbiguities(gbl::GblTrajectory& traj, gbl::GblPoint& point, unsigned int &nResolved, unsigned int &nSwapped);
+
+    /**
+     * @brief Update down weights from GBL fit
+     * 
+     * @param traj Fitted GblTrajectory 
+     * @return void
+     */
+    void updateDownweights(gbl::GblTrajectory& traj);
+
     /**
      * @brief Update fitter info from GBL fit results
      * 
@@ -137,6 +141,7 @@ namespace genfit {
      * @param traj Fitted GblTrajectory constructed with this point
      * @return void
      */
+     
     void updateFitResults(gbl::GblTrajectory& traj);
     
     /**
@@ -169,31 +174,25 @@ namespace genfit {
      *                              If false, diagonalized residual error incl. correlation from track fit is returned.
      * @return genfit::MeasurementOnPlane
      */
-    MeasurementOnPlane getResidual(unsigned int = 0, bool = false, bool onlyMeasurementErrors = true) const override;
+    MeasurementOnPlane getResidual(unsigned int = 0, bool = false, bool = false) const override;
     
     /**
-     * @brief Get kink (residual) with diagonalized covariance (2D)
-     * Covariance may be zero if not yet fitted or no scatterer!
-     * 
-     * @return genfit::MeasurementOnPlane
-     */
-    MeasurementOnPlane getKink() const;
-    
-    /**
-     * @brief Get kink (residual) (2D)
+     * @brief Get kinks and steps (residual) (4D)
      * = 0 - ( (+)pred - (-)pred )
      * 
      * @return TVectorD
      */
-    TVectorD getKinks() const;
+    TVectorD getKinksAndSteps() const;
     
     /**
      * @brief Get the measurement on plane from stored
      * measurement data (from last construction/update)
-     * 
+     *
+     * @param Measurement (ambiguity)
+     *
      * @return genfit::MeasuredStateOnPlane
      */
-    MeasurementOnPlane getMeasurement() const;
+    MeasurementOnPlane getMeasurement(unsigned int = 0) const;
     
     /**
      * @brief SHOULD BE USED ONLY INTERNALLY!
@@ -220,10 +219,57 @@ namespace genfit {
      * @param prevFitterInfo Pointer to GblFitterInfo of previous point
      * @return void
      */
-    void recalculateJacobian(GblFitterInfo* prevFitterInfo);
+    void recalculateJacobian(GblFitterInfo2* prevFitterInfo);
     
-    virtual ~GblFitterInfo() {;}
-    virtual GblFitterInfo* clone() const override;
+    /**
+     * @brief Set GBL label
+     * 
+     * @param unsigned int  label (>0)
+     * @return void
+     */
+    void setLabel(unsigned int aLabel) {label_ = aLabel;}
+    
+    /**
+     * @brief Get GBL label
+     * 
+     * @return unsigned int
+     */    
+    unsigned int getLabel() const {return label_;}
+
+    /**
+     * @brief Set GBL downweight
+     * 
+     * @param unsigned int  measurement index
+     * @param double  downweight
+     * @return void
+     */
+    void setDownWeight(unsigned int iMeas, double downWeight) {measDownWeight_.at(iMeas) = downWeight;}
+    
+    /**
+     * @brief Get GBL downWeight
+     * 
+     * @param unsigned int  measurement index
+     * @return double
+     */    
+    double getDownWeight(unsigned int iMeas) const {return measDownWeight_.at(iMeas);}
+
+    /**
+     * @brief Get GBL downWeight
+     * 
+     * @param unsigned int  measurement index
+     * @return double
+     */    
+    const std::vector<double>& getDownWeights() const {return measDownWeight_;}
+    
+    /**
+     * @brief Get most probable measurement (index)
+     * 
+     * @return unsigned int
+     */    
+    unsigned int getMopMeas() const {return measUsed_.at(0);}
+    
+    virtual ~GblFitterInfo2() {;}
+    virtual GblFitterInfo2* clone() const override;
     bool hasMeasurements() const override {return trackPoint_->hasRawMeasurements();}
     bool hasReferenceState() const override {return (refPrediction_(0) != 0.);}
     bool hasForwardPrediction() const override {return hasReferenceState();}
@@ -245,35 +291,37 @@ namespace genfit {
     virtual bool checkConsistency(const genfit::PruneFlags* = nullptr) const override;
        
   private:
+    enum class EMeasurementType{uMeas, vMeas, uvMeas, noMeas};
+    EMeasurementType measType_;
+    unsigned int label_;
     TMatrixD jacobian_;
-    TVectorD measResiduals_;
-    TVectorD measResidualErrors_;
-    TVectorD kinkResiduals_;
-    TVectorD kinkResidualErrors_;
-    TVectorD measDownWeights_;
-    TVectorD kinkDownWeights_;
+    TMatrixDSym noise_;
     TVectorD bwdStateCorrection_;
     TVectorD fwdStateCorrection_;
     TMatrixDSym bwdCov_;
     TMatrixDSym fwdCov_;
+    TVectorD diffFwdBwdPrediction_;
     TVectorD fwdPrediction_;
     TVectorD bwdPrediction_;
     TVectorD refPrediction_;
-    
-    TVectorD measurement_;
-    TMatrixDSym measCov_;
     TMatrixD hMatrix_;
+
+    // allow for left/right ambiguity in CDC
+    std::vector<unsigned int> measUsed_; // list of used measurements (indices, sorted by previous weights)
+    std::vector<double> measDownWeight_; // downweights from GBL (not normalized)
+    std::vector<TVectorD> measurement_;
+    std::vector<TMatrixDSym> measCov_;
 
     mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateBwd_; //!  cache
     mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateFwd_; //!  cache
     
   public:
     
-    ClassDefOverride(GblFitterInfo, 1)
+    ClassDefOverride(GblFitterInfo2, 1)
     
   };
   
 } /* End of namespace genfit */
 /** @} */
 
-#endif // genfit_GblFitterInfo_h
+#endif // genfit_GblFitterInfo2_h

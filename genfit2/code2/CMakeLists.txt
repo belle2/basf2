@@ -1,15 +1,11 @@
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
-if(POLICY CMP0042)
-   # policies not known to CMake 2.8 ...
-   cmake_policy(SET CMP0042 NEW) # Mac OS -rpath behavior
-endif(POLICY CMP0042)
+CMAKE_MINIMUM_REQUIRED( VERSION 3.10 )
 
 # declare the project name
-PROJECT(genfit2)
+PROJECT(genfit2 LANGUAGES CXX)
 
 # set project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 2 )
-SET( ${PROJECT_NAME}_VERSION_MINOR 2 )
+SET( ${PROJECT_NAME}_VERSION_MINOR 3 )
 SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
 include(GNUInstallDirs)
@@ -33,6 +29,13 @@ IF(ROOT_VERSION VERSION_LESS 6.20.0)
 	MESSAGE(FATAL_ERROR "GenFit requires a ROOT version > 6.20.00")
 ENDIF()
 set(CMAKE_CC_FLAGS "${CMAKE_CC_FLAGS} ${ROOT_CC_FLAGS}")
+
+OPTION( SUPPORT_ROOT "Support ROOT for user I/O" True )
+IF( SUPPORT_ROOT )
+  FIND_PACKAGE(ROOT REQUIRED)
+  ADD_DEFINITIONS(-DGBL_EIGEN_SUPPORT_ROOT)
+ENDIF()
+FIND_PACKAGE(Eigen3 REQUIRED)
 
 
 # either, the environment variable RAVEPATH has to be specified, and RAVE's RaveConfig.cmake will be used to determine everything we need
@@ -88,7 +91,7 @@ SET(GF_INC_DIRS
 
 INSTALL(DIRECTORY ${GF_INC_DIRS}
         DESTINATION ${INCLUDE_OUTPUT_DIRECTORY}
-        PATTERN ".svn" EXCLUDE)
+        PATTERN ".git" EXCLUDE)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING
@@ -134,6 +137,11 @@ AUX_SOURCE_DIRECTORY( ./measurements/src  library_sources )
 AUX_SOURCE_DIRECTORY( ./trackReps/src     library_sources )
 AUX_SOURCE_DIRECTORY( ./utilities/src     library_sources )
 
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/core/include/Version.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/core/include/Version.h"
+)
+
 # Dictionary generation.  For the time being, we list classes one-by-one.
 SET(CORE_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/core/include/AbsFinitePlane.h
@@ -155,6 +163,7 @@ SET(CORE_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackCand.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackCandHit.h
 		${CMAKE_CURRENT_SOURCE_DIR}/core/include/TrackPoint.h
+		${CMAKE_CURRENT_BINARY_DIR}/core/include/Version.h
 		${CMAKE_CURRENT_SOURCE_DIR}/finitePlanes/include/RectangularFinitePlane.h
 )
 ROOT_GENERATE_DICTIONARY(
@@ -194,10 +203,14 @@ SET(library_sources "${CMAKE_CURRENT_BINARY_DIR}/fittersRootDict.cxx" "${library
 SET(GBL_DICTIONARY_SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GFGbl.h
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitter.h
+		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitter2.h
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/ICalibrationParametersDerivatives.h
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitterInfo.h
+		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitterInfo2.h
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblFitStatus.h
 		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblData.h
+		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblMeasurement.h
+		${CMAKE_CURRENT_SOURCE_DIR}/GBL/include/GblUtilities.h
 )
 ROOT_GENERATE_DICTIONARY(
 	    GBLRootDict

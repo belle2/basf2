@@ -680,7 +680,7 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="tracking_MomentumScaling", scalingFactorName="SF",
+def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="tracking_MomentumScaling", scalingFactorName="central",
                       path=None):
     """
     Scale momenta of the particles according to a scaling factor scale.
@@ -721,7 +721,7 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="tracking_
     path.add_module(TrackingMomentumScaleFactors)
 
 
-def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="tracking_EnergyLoss", correctionName="SF",
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="tracking_EnergyLoss", correctionName="central",
                        path=None):
     """
     Correct the energy loss of tracks according to a 'correction' value.

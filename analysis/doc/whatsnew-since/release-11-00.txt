@@ -1,0 +1,6 @@
+Changes in the analysis package in light-2607-k
+-----------------------------------------------
+
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* `modularAnalysis.scaleTrackMomenta` and `modularAnalysis.correctTrackEnergy` now let basf2 automatically choose the data or MC version of the correction payload: the suffix ``_data`` or ``_MC`` is appended to the given ``payloadName`` depending on whether the module runs on data or MC.

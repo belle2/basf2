@@ -11,30 +11,35 @@ using namespace Belle2;
 
 REG_MODULE(GBLRecoFitter)
 
-/** Module for the Kalman Fitter */
+/** Module for the GBL Fitter */
 GBLRecoFitterModule::GBLRecoFitterModule() : BaseRecoFitterModule()
 {
-  setDescription("GBL Fitter using Genfit. If you have TrackCands, you have to convert them to RecoTracks"
-                 "using the RecoTrackCreatorModule first. After that, you probably want to add the measurements from the"
-                 "hits using the MeasurementCreatorModule.");
+  setDescription("GBL Fitter using Genfit.");
 
-  addParam("minimumIterations", m_param_minimumIterations,
-           "Minimum number of iterations for the Kalman filter", static_cast<unsigned int>(3));
-  addParam("maximumIterations", m_param_maximumIterations,
-           "Maximum number of iterations for the Kalman filter", static_cast<unsigned int>(10));
-
-  addParam("numberOfFailedHits", m_param_maxNumberOfFailedHits,
-           "Maximum number of failed hits before aborting the fit.", static_cast<unsigned int>(5));
+  addParam("gblInternalIterations", m_param_gblInternalIterations, "M estimator iterations (c:Chaucy, h:Huber, t:Tukey)",
+           m_param_gblInternalIterations);
+  addParam("externalIterations", m_param_externalIterations,
+           "Number of external iterations (with updated seed trajectory)", m_param_externalIterations);
+  addParam("resolveAmbiguities", m_param_resolveAmbiguities,
+           "Number of iteration up to which Ambiguities should be resolved", m_param_resolveAmbiguities);
+  addParam("recalcJacobians", m_param_recalcJacobians,
+           "Number of iteration up to which Jacobians should be recalculated / planes/meas updated after the fit. " \
+           "0 = do not recalculate Jacobians. 1 = recalculate after first GBL fit. 2 = after 1st and 2nd GBL fit etc.",
+           m_param_recalcJacobians);
+  addParam("enableScatterers", m_param_enableScatterers,
+           "If false, no scatterers will be added to GBL trajectory", m_param_enableScatterers);
+  addParam("enableIntermediateScatterer", m_param_enableIntermediateScatterer,
+           "True to simulate thick sctatterers by two thin scatterers 1st at detector plane and intermediate between each two planes",
+           m_param_enableIntermediateScatterer);
 }
 
 
-/** Create a Kalman fitter */
+/** Create a GBL fitter */
 std::shared_ptr<genfit::AbsFitter> GBLRecoFitterModule::createFitter() const
 {
   std::shared_ptr<genfit::GblFitter> fitter = std::make_shared<genfit::GblFitter>();
-  //fitter->setMinIterations(m_param_minimumIterations);
-  //fitter->setMaxIterations(m_param_maximumIterations);
-  //fitter->setMaxFailedHits(m_param_maxNumberOfFailedHits);
+  fitter->setOptions(m_param_gblInternalIterations, m_param_enableScatterers, m_param_enableIntermediateScatterer,
+                     m_param_externalIterations, m_param_recalcJacobians);
 
   return fitter;
 }

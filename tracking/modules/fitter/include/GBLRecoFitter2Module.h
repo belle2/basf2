@@ -12,14 +12,14 @@
 
 namespace Belle2 {
 
-  /** Kalman fitter. */
+  /** General Broken Lines (GBL) 2 fitter. */
   class GBLRecoFitter2Module : public BaseRecoFitterModule {
   public:
-    /** Module for the GBL(2) Fitter. */
+    /** Module for the General Broken Lines (GBL) 2 Fitter. */
     GBLRecoFitter2Module();
 
   protected:
-    /** Create a GBL(2) fitter. */
+    /** Create a General Broken Lines (GBL) 2 fitter. */
     std::shared_ptr<genfit::AbsFitter> createFitter() const override;
 
   private:

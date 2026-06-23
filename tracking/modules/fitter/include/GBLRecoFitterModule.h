@@ -12,20 +12,22 @@
 
 namespace Belle2 {
 
-  /** Kalman fitter. */
+  /** General Broken Lines (GBL) fitter. */
   class GBLRecoFitterModule : public BaseRecoFitterModule {
   public:
-    /** Module for the Kalman Fitter. */
+    /** Module for the General Broken Lines (GBL) Fitter. */
     GBLRecoFitterModule();
 
   protected:
-    /** Create a Kalman fitter. */
+    /** Create a General Broken Lines (GBL) fitter. */
     std::shared_ptr<genfit::AbsFitter> createFitter() const override;
 
   private:
-    unsigned int m_param_minimumIterations; /**< Minimum number of iterations for the Kalman filter. */
-    unsigned int m_param_maximumIterations; /**< Maximum number of iterations for the Kalman filter. */
-    /** Maximum number of failed hits before aborting the fit. */
-    unsigned int m_param_maxNumberOfFailedHits = 5;
+    std::string m_param_gblInternalIterations = ""; /**< M estimator iterations*/
+    unsigned int m_param_externalIterations = 1; /**< Number of external iterations */
+    unsigned int m_param_resolveAmbiguities = 0 ; /**< Number of iteration up to which ambiguities should be resolved */
+    unsigned int m_param_recalcJacobians = 1; /**< Number of iteration up to which Jacobians should be recalculated. */
+    bool m_param_enableScatterers = true; /**< If false, no scatterers will be added to GBL trajectory */
+    bool m_param_enableIntermediateScatterer = true; /**< True to simulate thick sctatterers by two thin scatterers */
   };
 }

@@ -12,8 +12,6 @@
 #include <genfit/AbsTrackRep.h>
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitStatus.h>
-#include <genfit/GblFitterInfo2.h>
-#include <genfit/GblFitStatus.h>
 #include <genfit/WireTrackCandHit.h>
 #include <genfit/RKTrackRep.h>
 #include <genfit/MplTrackRep.h>
@@ -272,16 +270,11 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
     double minimalWeight = *optionalMinimalWeight;
     const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
-      std::vector<double> weights;
-
-      if (auto kalmanFitterInfo = dynamic_cast<genfit::KalmanFitterInfo*>(trackPoint->getFitterInfo())) {
-        weights = kalmanFitterInfo->getWeights();
-      } else if (auto gblFitterInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo())) {
-        weights = gblFitterInfo->getDownWeights();
-      } else {
+      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
+      if (not kalmanFitterInfo) {
         return false;
       }
-
+      const std::vector<double>& weights = kalmanFitterInfo->getWeights();
       const auto checkWeight = [minimalWeight](const double weight) {
         return weight >= minimalWeight;
       };
@@ -360,8 +353,8 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
     return false;
   }
 
-  // make sure we only consider fitted if the Kalman or GBL method was used
-  if (not(dynamic_cast<const genfit::KalmanFitStatus*>(fs) or dynamic_cast<const genfit::GblFitStatus*>(fs))) {
+  // make sure we only consider fitted if the Kalman method was used
+  if (not dynamic_cast<const genfit::KalmanFitStatus*>(fs)) {
     return false;
   }
 

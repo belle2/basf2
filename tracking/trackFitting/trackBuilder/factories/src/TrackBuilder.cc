@@ -239,7 +239,6 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) { //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-
       CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
 
       if (!cdcHit)
@@ -263,7 +262,8 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
           hitPatternCDC.setLayer(wire.getICLayer());
           nCDChits++;             // counts CDC hits where there is KalmanFitterInfo and not negligible weight
         }
-      }    // end of if kalmanInfo
+
+      }   // end of if kalmanInfo
       else {
         // i.e. if !kalmanInfo)
         ++nNotFittedCDChits;    // counts TrackPoints with CDC hits without KalmanFitterInfo

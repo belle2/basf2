@@ -164,11 +164,12 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) {  // Loop on TrackPoint
 
+    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+    genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
+
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {  //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
-      genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
 
       if (kalmanInfo) {
         const double weight = kalmanInfo->getWeights().at(measurementId);
@@ -248,11 +249,12 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) { // Loop on TrackPoint
 
+    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+    genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
+
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) { //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
-      genfit::GblFitterInfo2* gblInfo = dynamic_cast<genfit::GblFitterInfo2*>(trackPoint->getFitterInfo(representation));
 
       CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
 

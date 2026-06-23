@@ -8,13 +8,13 @@
 
 extern "C" void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 			      const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
-			      const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
+			      const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A, const int& ONOF_VAINT,
 			      const double *ptau, const double *pnu, const double *ppi, const double *k, double &omega, double *hj);
 
 
 void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho, const double& Gamma_rho,const double& m_a1,const double& Gamma_a1,
 		   const double& CV_LL, const double& CV_LR, const double& CS_RL, const double& CS_RR,
-		   const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A,
+		   const int& ONOF_IB, const int& ONOF_V, const int& ONOF_A, const int& ONOF_VAINT,
 		   const double* ptau, const double* pnu, const double* ppi, const double* k, double& omega, double* hj)
 {
 
@@ -224,7 +224,7 @@ void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho,
   omega_1*=ONOF_IB;
   omega_2*=ONOF_V;
   omega_3*=ONOF_A;
-  omega_4*=ONOF_V*ONOF_A;
+  omega_4*=ONOF_V*ONOF_A*ONOF_VAINT;
   omega_5*=ONOF_IB*ONOF_V;
   omega_6*=ONOF_IB*ONOF_A;
   

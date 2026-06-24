@@ -680,7 +680,8 @@ def removeTracksForTrackingEfficiencyCalculation(inputListNames, fraction, path=
     path.add_module(trackingefficiency)
 
 
-def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalingFactorName="SF", path=None):
+def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="tracking_MomentumScaling", scalingFactorName="central",
+                      path=None):
     """
     Scale momenta of the particles according to a scaling factor scale.
     This scaling factor can either be given as constant number or as the name of the payload which contains
@@ -690,8 +691,11 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        scale (float): scaling factor (1.0 -- no scaling)
-        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        scale (float): scaling factor (1.0 -- no scaling). If a valid value is given, it takes precedence over
+            ``payloadName`` and the latter is ignored.
+        payloadName (str): base name of the payload which contains the phase-space dependent scaling factors.
+            The suffix ``_data`` or ``_MC`` is appended automatically depending on whether the module runs on data or MC.
+            Defaults to the standard ``tracking_MomentumScaling`` payload.
         scalingFactorName (str): name of scaling factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
@@ -699,6 +703,14 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     import b2bii
     if b2bii.isB2BII():
         B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
+
+    import math
+    # A valid constant scale takes precedence over the default payload (the two options are mutually exclusive).
+    if not math.isnan(scale) and payloadName == "tracking_MomentumScaling":
+        B2WARNING(f"A constant scale value ({scale}) was provided to scaleTrackMomenta: the default "
+                  "'tracking_MomentumScaling' payload from the global tag will NOT be used. "
+                  "The constant scale is applied instead.")
+        payloadName = ""
 
     TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
     TrackingMomentumScaleFactors.param('particleLists', inputListNames)
@@ -709,7 +721,8 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     path.add_module(TrackingMomentumScaleFactors)
 
 
-def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", correctionName="SF", path=None):
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="tracking_EnergyLoss", correctionName="central",
+                       path=None):
     """
     Correct the energy loss of tracks according to a 'correction' value.
     This correction can either be given as constant number or as the name of the payload which contains
@@ -719,8 +732,11 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", 
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction)
-        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction).
+            If a valid value is given, it takes precedence over ``payloadName`` and the latter is ignored.
+        payloadName (str): base name of the payload which contains the phase-space dependent corrections.
+            The suffix ``_data`` or ``_MC`` is appended automatically depending on whether the module runs on data or MC.
+            Defaults to the standard ``tracking_EnergyLoss`` payload.
         correctionName (str): name of correction variable in the payload.
         path (basf2.Path): module is added to this path
     """
@@ -728,6 +744,14 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", 
     import b2bii
     if b2bii.isB2BII():
         B2ERROR("The tracking energy correction can only be run over Belle II data.")
+
+    import math
+    # A valid constant correction takes precedence over the default payload (the two options are mutually exclusive).
+    if not math.isnan(correction) and payloadName == "tracking_EnergyLoss":
+        B2WARNING(f"A constant correction value ({correction}) was provided to correctTrackEnergy: the default "
+                  "'tracking_EnergyLoss' payload from the global tag will NOT be used. "
+                  "The constant correction is applied instead.")
+        payloadName = ""
 
     TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
     TrackingEnergyLossCorrection.param('particleLists', inputListNames)

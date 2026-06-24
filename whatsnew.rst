@@ -18,6 +18,8 @@ be adapted when changing to the new release.
 Changes since release-11
 ========================
 
+.. include:: analysis/doc/whatsnew-since/release-11-00.txt
+
 .. include:: mva/doc/whatsnew-since/release-11-00.txt
 
 

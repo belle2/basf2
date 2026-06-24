@@ -1979,21 +1979,8 @@ C       PRINT 7003
         SSWT(JNPI)=0
         WTMAX(JNPI)=-1.
 
-C for 4pi phase space, need lots more trials at initialization,
-C or use the WTMAX determined with many trials for default model:
-        NTRIALS = 5000
-C cleo knew nothing about channels recently introduced
-        IF (JNPI.LE.2) THEN
-C         11.Oct.11: fix for BINP and KARLSRUHE currents added
-          WTMAX(JNPI) = PKORB(3,37+JNPI)
-          NTRIALS = 50000
-        END IF
-        IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
-          NTRIALS = 50000
-        ENDIF
-        IF (JNPI.GE.NM4+NM5+NM6+47.AND.JNPI.LE.NM4+NM5+NM6+48) THEN
-           NTRIALS = 50000
-        ENDIF          
+C Universal solution is to use brute force, which is safe at this stage [SwB 2026]
+        NTRIALS = 50000
 !       write(*,*) 'jnpi=',jnpi, ntrials, a
         DO  I=1,NTRIALS
 
@@ -3504,6 +3491,10 @@ C
       REAL    GMALFA            ! width
       COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
 C     
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOFF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
       JNPI=MODE-NLT
 C position of decaying particle
       IF(KTO.EQ. 1) THEN
@@ -3540,7 +3531,7 @@ C
 C W boson (W+ is 24)
         CALL TRALO4(KTO,PWB,PWB,AM)
         PHFLAG=.TRUE.
-        IF (MODE.EQ.261) PHFLAG=.FALSE.
+        IF (MODE.EQ.261.AND.OFF_PHOT.EQ.1) PHFLAG=.FALSE.
         CALL FILHEP(0,1,-24*ISGN,NPS,NPS,0,0,PWB,AM,PHFLAG)
       ENDIF
 C
@@ -3553,7 +3544,7 @@ C get multiplicity of mode JNPI
         KFPI=LUNPIK(IDFFIN(I,JNPI),-ISGN)
 C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
         PHFLAG=.TRUE.
-        IF (MODE.EQ.261) PHFLAG=.FALSE.
+        IF (MODE.EQ.261.AND.OFF_PHOT.EQ.1) PHFLAG=.FALSE.
         IDECAY=0
         IF ((KFPI.EQ.221).AND.  !eta
      c       (MODE.EQ.37.OR.MODE.EQ.38.OR.MODE.EQ.39.OR.MODE.EQ.40.OR.
@@ -4349,8 +4340,10 @@ C
       REAL*8 PTD(4),PND(4),PIM1D(4),PIM2D(4)
       REAL*8 AMPLITD1,HVD1(4),AMPLITD2,HVD2(4),AMPLITD,HVD(4)
       INTEGER MNUM, I
-      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
       REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
       COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
      *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
      *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
@@ -4373,15 +4366,21 @@ C      write(*,*) 'USING DAM2PI_wrap'
          PIM1D(I)=PIM1(I)
          PIM2D(I)=PIM2(I)
       ENDDO
-      CALL pigamma_left(AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+      CALL pigamma_left(!AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
      C                  CV_LL,CV_LR,CS_RL,CS_RR,
+     C                  ONOF_L_IB, ONOF_L_V, ONOF_L_A, ONOF_L_VAINT,
      C                  PTD,PND,PIM1D,PIM2D,AMPLITD1,HVD1)
-      CALL pigamma_right(AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+      CALL pigamma_right(!AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
      C                  CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     C                  ONOF_R_IB, ONOF_R_V, ONOF_R_A, ONOF_R_VAINT,
      C                  PTD,PND,PIM1D,PIM2D,AMPLITD2,HVD2)
       AMPLITD = AMPLITD1 + AMPLITD2
       DO I = 1,3
-         HVD(I) = (AMPLITD1*HVD1(I) + AMPLITD2*HVD2(I))/(AMPLITD)
+C        HVD(I) = (AMPLITD1*HVD1(I) + AMPLITD2*HVD2(I))/(AMPLITD)
+         HVD(I) = 0.0D0
+         IF (AMPLITD1.GT.0.0D0) HVD(I) = HVD(I) + AMPLITD1*HVD1(I)
+         IF (AMPLITD2.GT.0.0D0) HVD(I) = HVD(I) + AMPLITD2*HVD2(I)
+         IF (AMPLITD.GT.0.0D0)  HVD(I) = HVD(I) / AMPLITD
       ENDDO
       FPI = FPIc
       VUD = CCABIB

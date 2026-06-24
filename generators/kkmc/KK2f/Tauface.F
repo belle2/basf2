@@ -83,7 +83,7 @@ C IRCLH3PI=1  TAUOLA RChL COEF(I,J) =  COEFr(I,J) [suggested default]
       
 ! switch on initialization of FF mixing in tau- -> K-  PI- PI+ nu, PI- K0B PI0 nu 
 C IFKPIPI = 0 CLEO initialization (suggested default)
-C IFKPIPI = 1 BaBar initialization 
+C IFKPIPI = 1 BaBar initialization (new default)
 C-- Improve Form Factors for tau->K-pi-pi+nu 
 C   New modelling using parameters from CLEO, PRD62, 072006 (2000):
 C   M(1270) = 1.254 GeV, M(1400) = 1.463 GeV
@@ -93,7 +93,7 @@ C   F2 = (eta BW[K1(1270)]+BW[K1(1400)]) X BW[K*],
 C   eta=0.33 (M. Finkemeier, E. Mirkes, ZPC69, 243 (1996))
 C Similar tuning also applied to tau- -> PI- K0B PI0 nu 
       INTEGER IFKPIPI
-      DATA    IFKPIPI /0/
+      DATA    IFKPIPI /1/
       COMMON /IFKPIPI/ IFKPIPI
 
 C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:
@@ -137,11 +137,13 @@ C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned
       DATA    LAMDEC /0/
       COMMON /LAMDEC/ LAMDEC
 C
-      COMMON /PHOINI_PAR/ ISINGLE,IEXPONENTIAL
-      INTEGER             ISINGLE,IEXPONENTIAL
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
 C
-      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
       REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
 C
       SAVE
 C-------------------------------------------------------------------------------
@@ -217,6 +219,7 @@ C     Print optional flags
       
       ISINGLE = INT(XPAR(ITAUXPAR+951))
       IEXPONENTIAL = INT(XPAR(ITAUXPAR+952))
+      IB_ME_FD = INT(XPAR(ITAUXPAR+953))
 
       CV_LL = XPAR(ITAUXPAR+961)
       CV_LR = XPAR(ITAUXPAR+962)
@@ -227,6 +230,16 @@ C     Print optional flags
       CS_LL = XPAR(ITAUXPAR+967)
       CS_LR = XPAR(ITAUXPAR+968)
       MNURD = XPAR(ITAUXPAR+969)
+
+      ONOF_L_IB    = INT(XPAR(ITAUXPAR+970))
+      ONOF_L_V     = INT(XPAR(ITAUXPAR+971))
+      ONOF_L_A     = INT(XPAR(ITAUXPAR+972))
+      ONOF_L_VAINT = INT(XPAR(ITAUXPAR+973))
+      ONOF_R_IB    = INT(XPAR(ITAUXPAR+974))
+      ONOF_R_V     = INT(XPAR(ITAUXPAR+975))
+      ONOF_R_A     = INT(XPAR(ITAUXPAR+976))
+      ONOF_R_VAINT = INT(XPAR(ITAUXPAR+977))
+      OFF_PHOT     = INT(XPAR(ITAUXPAR+978))
 
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)

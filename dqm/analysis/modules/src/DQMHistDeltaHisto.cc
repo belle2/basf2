@@ -36,9 +36,6 @@ DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
 }
 
-
-DQMHistDeltaHistoModule::~DQMHistDeltaHistoModule() { }
-
 void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();

@@ -44,7 +44,6 @@ DQMHistAnalysisTrackingAbortModule::DQMHistAnalysisTrackingAbortModule()
 }
 
 
-
 void DQMHistAnalysisTrackingAbortModule::beginRun()
 {
   // get the abort rate and statThreshold from epics

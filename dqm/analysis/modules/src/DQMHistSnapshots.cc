@@ -37,9 +37,6 @@ DQMHistSnapshotsModule::DQMHistSnapshotsModule()
   B2DEBUG(1, "DQMHistSnapshots: Constructor done.");
 }
 
-
-DQMHistSnapshotsModule::~DQMHistSnapshotsModule() { }
-
 void DQMHistSnapshotsModule::initialize()
 {
   gROOT->cd();

@@ -26,11 +26,6 @@ namespace Belle2 {
     DQMHistAnalysisDAQMonObjModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisDAQMonObjModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

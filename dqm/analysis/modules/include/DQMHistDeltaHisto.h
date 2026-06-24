@@ -48,11 +48,6 @@ namespace Belle2 {
     DQMHistDeltaHistoModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistDeltaHistoModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

@@ -47,11 +47,6 @@ namespace Belle2 {
     DQMHistSnapshotsModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistSnapshotsModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

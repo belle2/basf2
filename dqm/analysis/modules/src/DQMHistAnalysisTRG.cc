@@ -38,12 +38,6 @@ DQMHistAnalysisTRGModule::DQMHistAnalysisTRGModule()
 
 }
 
-DQMHistAnalysisTRGModule::~DQMHistAnalysisTRGModule()
-{
-  // destructor not needed
-  // EPICS singleton deletion not urgent -> can be done by framework
-}
-
 void DQMHistAnalysisTRGModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisTRGModule: initialized.");

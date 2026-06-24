@@ -36,10 +36,6 @@ DQMHistComparitorModule::DQMHistComparitorModule()
   B2DEBUG(1, "DQMHistComparitor: Constructor done.");
 }
 
-DQMHistComparitorModule::~DQMHistComparitorModule()
-{
-}
-
 void DQMHistComparitorModule::initialize()
 {
   gStyle->SetOptStat(0);

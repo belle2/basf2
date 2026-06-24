@@ -137,6 +137,14 @@ C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned
       DATA    LAMDEC /0/
       COMMON /LAMDEC/ LAMDEC
 C
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
+C
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+C
       SAVE
 C-------------------------------------------------------------------------------
       idff    = xpar(ITAUXPAR+3) ! Lund identifier for first tau (15 for  tau-)
@@ -209,6 +217,30 @@ C     Print optional flags
       ENDIF
       WRITE(iout,*) 'AMDARK, GMDARK, EPDARK = ',AMDARK,GMDARK,EPDARK
       
+      ISINGLE = INT(XPAR(ITAUXPAR+951))
+      IEXPONENTIAL = INT(XPAR(ITAUXPAR+952))
+      IB_ME_FD = INT(XPAR(ITAUXPAR+953))
+
+      CV_LL = XPAR(ITAUXPAR+961)
+      CV_LR = XPAR(ITAUXPAR+962)
+      CS_RL = XPAR(ITAUXPAR+963)
+      CS_RR = XPAR(ITAUXPAR+964)
+      CV_RL = XPAR(ITAUXPAR+965)
+      CV_RR = XPAR(ITAUXPAR+966)
+      CS_LL = XPAR(ITAUXPAR+967)
+      CS_LR = XPAR(ITAUXPAR+968)
+      MNURD = XPAR(ITAUXPAR+969)
+
+      ONOF_L_IB    = INT(XPAR(ITAUXPAR+970))
+      ONOF_L_V     = INT(XPAR(ITAUXPAR+971))
+      ONOF_L_A     = INT(XPAR(ITAUXPAR+972))
+      ONOF_L_VAINT = INT(XPAR(ITAUXPAR+973))
+      ONOF_R_IB    = INT(XPAR(ITAUXPAR+974))
+      ONOF_R_V     = INT(XPAR(ITAUXPAR+975))
+      ONOF_R_A     = INT(XPAR(ITAUXPAR+976))
+      ONOF_R_VAINT = INT(XPAR(ITAUXPAR+977))
+      OFF_PHOT     = INT(XPAR(ITAUXPAR+978))
+
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)
       endif

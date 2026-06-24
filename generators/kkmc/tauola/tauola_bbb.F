@@ -3349,7 +3349,7 @@ C
       INUM=JNPI-NM3-NM4- NM5- NM6
 
       AMF1 = DCDMAS(IDFFIN(1,JNPI),0)
-      AMF2 = DCDMAS(IDFFIN(2,JNPI),4)  
+      AMF2 = DCDMAS(IDFFIN(2,JNPI),4)
       AMF0 = AMNUTAD
 !      IF(INUM.GT.4) THEN
 !       write(*,*) inum,':',IDFFIN(1,IADDR),IDFFIN(2,IADDR),IDFFIN(3,IADDR),DCDMAS(IDFFIN(3,IADDR))
@@ -3555,6 +3555,10 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c        MODE.EQ.145.OR.MODE.EQ.146.OR.MODE.EQ.147.OR.MODE.EQ.148.OR.
      c        MODE.EQ.242.OR.MODE.EQ.243.OR.MODE.EQ.244.OR.MODE.EQ.245.OR.
      c        MODE.EQ.246.OR.MODE.EQ.247.OR.MODE.EQ.248.OR.MODE.EQ.249.OR.
+     c        MODE.EQ.262.OR.MODE.EQ.263.OR.MODE.EQ.264.OR.MODE.EQ.265.OR.
+     c        MODE.EQ.266.OR.MODE.EQ.267.OR.MODE.EQ.268.OR.MODE.EQ.269.OR.
+     c        MODE.EQ.270.OR.MODE.EQ.271.OR.MODE.EQ.272.OR.MODE.EQ.273.OR.
+     c        MODE.EQ.274.OR.MODE.EQ.275.OR.MODE.EQ.276.OR.MODE.EQ.277.OR.
      c        MODE.EQ.350.OR.MODE.EQ.351.OR.MODE.EQ.352.OR.MODE.EQ.353.OR.
      c        MODE.EQ.354.OR.MODE.EQ.355.OR.MODE.EQ.356.OR.MODE.EQ.357))
      c        IDECAY=1    
@@ -3578,10 +3582,11 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c        MODE.EQ.253.OR.MODE.EQ.254.OR.MODE.EQ.255.OR.MODE.EQ.256.OR.
      c        MODE.EQ.257.OR.MODE.EQ.258.OR.MODE.EQ.259.OR.MODE.EQ.260))
      c       IDECAY=1
-        IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) IDECAY=1 ! a1+
-        IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+
-        IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+
-        IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+
+        IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) IDECAY=1 ! a1+-
+        IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+-
+        IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.266.AND.MODE.LE.277)) IDECAY=2 ! K*+- [calling TDECAY twice]
+        IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+-
+        IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+-
         IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332).AND.(LAMDEC.EQ.1)) IDECAY=1 ! Lambda(bar)
         IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) IDECAY=1 ! f0
         IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) IDECAY=1 ! a0
@@ -3594,7 +3599,10 @@ C        IF(KFPI.NE.111)KFPI=KFPI*ISGN
         END DO
         CALL TRALO4(KTO,PPI,PPI,AM)
         IF(IS.EQ.0) NPS = -I
-        IF (IDECAY.EQ.1) THEN
+        IF (IDECAY.EQ.2) THEN
+           CALL FILHEP(0,2,KFPI,NPS-2,NPS-2,0,0,PPI,AM,PHFLAG)
+           CALL TDECAY(KFPI,MODE,PPI,NDAU)
+        ELSE IF (IDECAY.EQ.1) THEN
            CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,PHFLAG)
            CALL TDECAY(KFPI,MODE,PPI,NDAU)
         ELSE
@@ -3638,7 +3646,8 @@ C
 C
       IS=0
       ISIGN = KFPI/ABS(KFPI)
-      IF (MODE.EQ.37.OR.
+      IF ((KFPI.EQ.221).AND.
+     c    (MODE.EQ.37.OR.
      c     MODE.EQ.41.OR.
      c     MODE.EQ.133.OR.
      c     MODE.EQ.137.OR.
@@ -3646,12 +3655,17 @@ C
      c     MODE.EQ.145.OR.
      c     MODE.EQ.242.OR.
      c     MODE.EQ.246.OR.
+     c     MODE.EQ.262.OR.
+     c     MODE.EQ.266.OR.
+     c     MODE.EQ.270.OR.
+     c     MODE.EQ.274.OR.
      c     MODE.EQ.350.OR.
-     c     MODE.EQ.354) THEN                    ! eta->gammagamma
+     c     MODE.EQ.354)) THEN                    ! eta->gammagamma
          ID1=22
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.38.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.38.OR.
      c        MODE.EQ.42.OR.
      c        MODE.EQ.134.OR.
      c        MODE.EQ.138.OR.
@@ -3659,12 +3673,17 @@ C
      c        MODE.EQ.146.OR.
      c        MODE.EQ.243.OR.
      c        MODE.EQ.247.OR.
+     c        MODE.EQ.263.OR.
+     c        MODE.EQ.267.OR.
+     c        MODE.EQ.271.OR.
+     c        MODE.EQ.275.OR.
      c        MODE.EQ.351.OR.
-     c        MODE.EQ.355) THEN                 ! eta->pi0pi0pi0
+     c        MODE.EQ.355)) THEN                 ! eta->pi0pi0pi0
          ID1= 111
          ID2= 111
          ID3= 111
-      ELSE IF (MODE.EQ.39.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.39.OR.
      c        MODE.EQ.43.OR.
      c        MODE.EQ.135.OR.
      c        MODE.EQ.139.OR.
@@ -3672,12 +3691,17 @@ C
      c        MODE.EQ.147.OR.
      c        MODE.EQ.244.OR.
      c        MODE.EQ.248.OR.
+     c        MODE.EQ.264.OR.
+     c        MODE.EQ.268.OR.
+     c        MODE.EQ.272.OR.
+     c        MODE.EQ.276.OR.
      c        MODE.EQ.352.OR.
-     c        MODE.EQ.356) THEN                 ! eta->pi+pi-pi0
+     c        MODE.EQ.356)) THEN                 ! eta->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.40.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.40.OR.
      c        MODE.EQ.44.OR.
      c        MODE.EQ.136.OR.
      c        MODE.EQ.140.OR.
@@ -3685,12 +3709,17 @@ C
      c        MODE.EQ.148.OR.
      c        MODE.EQ.245.OR.
      c        MODE.EQ.249.OR.
+     c        MODE.EQ.265.OR.
+     c        MODE.EQ.269.OR.
+     c        MODE.EQ.273.OR.
+     c        MODE.EQ.277.OR.
      c        MODE.EQ.353.OR.
-     c        MODE.EQ.357) THEN                 ! eta->pi+pi-gamma
+     c        MODE.EQ.357)) THEN                 ! eta->pi+pi-gamma
          ID1= 211
          ID2=-211
          ID3= 22
-      ELSE IF (MODE.EQ.45.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c       (MODE.EQ.45.OR.
      c        MODE.EQ.48.OR.
      c        MODE.EQ.130.OR.
      c        MODE.EQ.151.OR.
@@ -3700,11 +3729,12 @@ C
      c        MODE.EQ.239.OR.
      c        MODE.EQ.250.OR.
      c        MODE.EQ.358.OR.
-     c        MODE.EQ.361) THEN                 ! omega->pi+pi-pi0
+     c        MODE.EQ.361)) THEN                 ! omega->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.46.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c        (MODE.EQ.46.OR.
      c         MODE.EQ.49.OR.
      c         MODE.EQ.131.OR.
      c         MODE.EQ.152.OR.
@@ -3714,11 +3744,12 @@ C
      c         MODE.EQ.240.OR.
      c         MODE.EQ.251.OR.
      c         MODE.EQ.359.OR.
-     c         MODE.EQ.362) THEN                 ! omega->pi+pi-
+     c         MODE.EQ.362)) THEN                 ! omega->pi+pi-
          ID1= 211
          ID2=-211
          ID3=0
-      ELSE IF (MODE.EQ.47.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c        (MODE.EQ.47.OR.
      c         MODE.EQ.50.OR.
      c         MODE.EQ.132.OR.
      c         MODE.EQ.153.OR.
@@ -3728,63 +3759,75 @@ C
      c         MODE.EQ.241.OR.
      c         MODE.EQ.252.OR.
      c         MODE.EQ.360.OR.
-     c         MODE.EQ.363) THEN                 ! omega->pi0gamma
+     c         MODE.EQ.363)) THEN                 ! omega->pi0gamma
          ID1=111
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.230) THEN     ! phi->K+K-
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.230) THEN     ! phi->K+K-
          ID1= 321
          ID2=-321
          ID3=0
-      ELSE IF (MODE.EQ.231) THEN     ! phi->K0SK0L
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.231) THEN     ! phi->K0SK0L
          ID1= 310
          ID2= 130
          ID3=0
-      ELSE IF (MODE.EQ.232) THEN     ! phi->pi+pi-pi0
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.232) THEN     ! phi->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.233) THEN     ! f1->pi+pi-rho0(->pi+pi-)
+      ELSE IF (KFPI.EQ.20223.AND.MODE.EQ.233) THEN     ! f1->pi+pi-rho0(->pi+pi-)
          ID1= 211
          ID2=-211
          ID3= 113
-      ELSE IF (MODE.EQ.234.OR.(MODE.GE.253.AND.MODE.LE.256)) THEN ! f1->pi+a0-(->pi-eta)
+      ELSE IF ((KFPI.EQ.20223).AND.(MODE.EQ.234.OR.(MODE.GE.253.AND.MODE.LE.256))) THEN ! f1->pi+a0-(->pi-eta)
          ID1= 211
          ID2=-9000211
          ID3=0
-      ELSE IF (MODE.EQ.235.OR.(MODE.EQ.257.AND.MODE.LE.260)) THEN ! f1->pi0a00(->pi0eta)
+      ELSE IF ((KFPI.EQ.20223).AND.(MODE.EQ.235.OR.(MODE.EQ.257.AND.MODE.LE.260))) THEN ! f1->pi0a00(->pi0eta)
          ID1= 111
          ID2= 9000111
          ID3=0
-      ELSE IF (MODE.EQ.341) THEN !   a1- -> pi-gamma
+      ELSE IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) THEN !   a1- -> pi-gamma
          ID1=211*ISIGN
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.342) THEN ! rho- -> pi-gamma
+      ELSE IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) THEN ! rho- -> pi-gamma
          ID1=211*ISIGN
          ID2=22
          ID3=0
-      ELSE IF (MODE.GE.343.AND.MODE.LE.346) THEN ! a0- -> pi-eta
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.266.AND.MODE.LE.269)) THEN ! K*- -> K- pi0
+         ID1=321*ISIGN
+         ID2=111
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.270.AND.MODE.LE.273)) THEN ! K*- -> pi- K0S
+         ID1=211*ISIGN
+         ID2=310
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.274.AND.MODE.LE.277)) THEN ! K*- -> pi- K0L
+         ID1=211*ISIGN
+         ID2=130
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) THEN ! a0- -> pi-eta
          ID1=211*ISIGN
          ID2=221
          ID3=0
-      ELSE IF (MODE.GE.347.AND.MODE.LE.349) THEN ! b1- -> pi-omega
+      ELSE IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) THEN ! b1- -> pi-omega
          ID1=211*ISIGN
          ID2=223
          ID3=0
-      ELSE IF (MODE.GE.329.AND.MODE.LE.332) THEN ! Lambda -> p pi- OR Lambdabar -> pbar pi+
+      ELSE IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332)) THEN ! Lambda -> p pi- OR Lambdabar -> pbar pi+
          ID1=2212*ISIGN
          ID2=-211*ISIGN
          ID3=0
-      ELSE IF (MODE.GE.339.AND.MODE.LE.340) THEN ! f0(980)->pi+pi-
+      ELSE IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) THEN ! f0(980)->pi+pi-
          ID1= 211
          ID2=-211
          ID3=0
-      ELSE IF (MODE.GE.364.AND.MODE.LE.371) THEN ! a00(->pi0eta)
+      ELSE IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) THEN ! a00(->pi0eta)
          ID1=111
          ID2=221
          ID3=0
-      ELSE IF (MODE.EQ.372.OR.MODE.EQ.373) THEN ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      ELSE IF ((ABS(KFPI).EQ.94144).AND.(DMALFA.GT.0).AND.(MODE.EQ.372.OR.MODE.EQ.373)) THEN ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
          IF (DMALFA.EQ.1) THEN
             ID1=22
             ID2=22

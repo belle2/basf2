@@ -27,18 +27,22 @@ namespace Belle2 {
     return x * x * x;
   }
   /**
-   * Calculate the quadruple of the input
-   * Ideally, this would be
-   * ```
-   * const T a = x * x;
-   * return a * a;
-   * ```
-   * But with inlining this will likely result in x * x * x * x
+   * Calculate the fourth power of the input
    */
   template<typename T>
-  inline constexpr T quadruple(const T& x)
+  inline constexpr T pow4(const T& x)
   {
-    return square(x) * square(x);
+    const T x2 = square(x);
+    return x2 * x2;
+  }
+  /**
+   * Calculate the fifth power of the input
+   */
+  template<typename T>
+  inline constexpr T pow5(const T& x)
+  {
+    const T x4 = pow4(x);
+    return x4 * x;
   }
 
 }

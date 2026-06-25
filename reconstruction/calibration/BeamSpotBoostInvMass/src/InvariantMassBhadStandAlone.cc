@@ -394,8 +394,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
     double s = 0, sw = 0;
     for (auto p : mumuVals) {
-      const double invSquared = 1. / (p.second * p.second)
-                                s  += p.first * invSquared;
+      const double invSquared = 1. / (p.second * p.second);
+      s  += p.first * invSquared;
       sw += invSquared;
     }
     const double mumuMean = s / sw;

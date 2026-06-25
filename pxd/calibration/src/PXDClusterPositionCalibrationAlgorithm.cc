@@ -9,6 +9,7 @@
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <string>
 #include <tuple>
@@ -439,8 +440,8 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
       double offsetU = histo.GetMean(1);
       double offsetV = histo.GetMean(2);
       double covUV = histo.GetCovariance();
-      double covU = pow(histo.GetRMS(1), 2);
-      double covV = pow(histo.GetRMS(2), 2);
+      double covU = square(histo.GetRMS(1));
+      double covV = square(histo.GetRMS(2));
 
       B2INFO("Name " << name  << ", posU=" << offsetU << ", posV=" << offsetV << ", covU=" << covU << ", covV=" << covV << ", covUV=" <<
              covUV);

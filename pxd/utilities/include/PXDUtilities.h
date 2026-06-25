@@ -10,6 +10,7 @@
 
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/MathHelpers.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasuredStateOnPlane.h>
 //#include <limits>
@@ -38,7 +39,7 @@ namespace Belle2 {
                             const double rho = rho_Si,
                             const int z = 1)
     {
-      const double K = 0.307075 * Unit::MeV * pow(Unit::cm, 2);
+      const double K = 0.307075 * Unit::MeV * square(Unit::cm);
       return K / 2 * Z / A * z * z * rho;
     }
 
@@ -67,7 +68,7 @@ namespace Belle2 {
       if (betaGamma <= 100) return 0.0; // requirement of the formula.
       double beta2 = 1. / (1. + 1. / betaGamma / betaGamma);
       double xi = xiBeta2_L() * length / beta2;
-      return xi * log(2 * mass * xi / pow(hbarWp(), 2) + 0.2);
+      return xi * log(2 * mass * xi / square(hbarWp()) + 0.2);
     }
 
     /** Helper function to get DHE id like module id from VxdID */

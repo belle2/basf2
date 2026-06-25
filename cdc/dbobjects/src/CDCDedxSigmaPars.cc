@@ -26,7 +26,7 @@ namespace Belle2 {
         f = par[1] * x * x * x * x + par[2] * x * x * x + par[3] * x * x + par[4] * x + par[5];
       } else if (par[0] == 3) { // return cos(theta) parameterization
         f = par[1] * std::exp(-0.5 * square(((x - par[2]) / par[3]), 2)) +
-            par[4] * (pow5(x, 6) * x) + par[5] * pow5(x) + par[6] * pow4(x) +
+            par[4] * (pow5(x) * x) + par[5] * pow5(x) + par[6] * pow4(x) +
             par[7] * x * x * x + par[8] * x * x + par[9] * x + par[10];
       }
     }

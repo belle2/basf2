@@ -839,8 +839,8 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
           par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
     } else if (par[0] == 3) { // return cos(theta) parameterization
       f = par[1] * exp(-0.5 * square((x[0] - par[2]) / par[3])) +
-          par[4] * (pow5(x[0]) * x[0]) + par[5] * pow5(x[0], 5) + par[6] * pow4(x[0], 4) +
-          par[7] * cube(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
+          par[4] * (pow5(x[0]) * x[0]) + par[5] * pow5(x[0]) + par[6] * pow4(x[0]) +
+          par[7] * cube(x[0]) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
     }
   }
 

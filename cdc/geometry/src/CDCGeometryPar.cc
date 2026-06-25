@@ -9,6 +9,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/CDCGeoControlPar.h>
@@ -2548,7 +2549,7 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     }
     if (nointersection) {
       cout <<"final minTime= " << minTime << endl;
-      cout <<"final minx   = " << a[0] + a[1] * minTime + a[2] *pow(minTime,2) + a[3] *pow(minTime,3) + a[4] *pow(minTime,4) + a[5] *pow(minTime,5) << endl;
+      cout <<"final minx   = " << a[0] + a[1] * minTime + a[2] *square(minTime) + a[3] *cube(minTime) + a[4] *pow4(minTime) + a[5] *pow5(minTime) << endl;
     }
     */
     /*

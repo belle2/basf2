@@ -19,6 +19,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/MathHelpers.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
@@ -785,7 +786,7 @@ double CDCDedxPIDModule::meanCurve(double* x, double* par, int version) const
       f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
           (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
     else if (par[0] == 2)
-      f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+      f = par[1] * cube(x[0]) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
     else if (par[0] == 3)
       f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
   }
@@ -834,12 +835,12 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
     if (par[0] == 1) { // return dedx parameterization
       f = par[1] + par[2] * x[0];
     } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
-      f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
+      f = par[1] * pow4(x[0]) + par[2] * cube(x[0]) +
           par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
     } else if (par[0] == 3) { // return cos(theta) parameterization
-      f = par[1] * exp(-0.5 * pow(((x[0] - par[2]) / par[3]), 2)) +
-          par[4] * pow(x[0], 6) + par[5] * pow(x[0], 5) + par[6] * pow(x[0], 4) +
-          par[7] * pow(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
+      f = par[1] * exp(-0.5 * square((x[0] - par[2]) / par[3])) +
+          par[4] * (pow5(x[0]) * x[0]) + par[5] * pow5(x[0], 5) + par[6] * pow4(x[0], 4) +
+          par[7] * cube(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
     }
   }
 

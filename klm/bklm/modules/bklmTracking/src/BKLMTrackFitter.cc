@@ -15,6 +15,7 @@
 
 /* Basf2 headers. */
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/DiagMatrix.h>
@@ -217,8 +218,8 @@ double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
 
   error = sqrt(errors[ MY ][ MY ] +
                errors[ MZ ][ MZ ] +
-               pow(hit_localPhiErr, 2) +
-               pow(hit_localZErr, 2));
+               square(hit_localPhiErr) +
+               square(hit_localZErr));
 
   if (error != 0.0) {
     sigma = distance / error;
@@ -291,13 +292,13 @@ double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   double cosphi = globalOrigin[0] / globalOrigin.mag();
 
   HepMatrix globalHitErr(3, 3, 0);
-  globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
+  globalHitErr[0][0] = square(hit_localPhiErr * sinphi); //x
   globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
   globalHitErr[0][2] = 0;
-  globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
+  globalHitErr[1][1] = square(hit_localPhiErr * cosphi);;
   globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
   globalHitErr[1][2] = 0;
-  globalHitErr[2][2] = pow(hit_localZErr, 2);
+  globalHitErr[2][2] = square(hit_localZErr);
   globalHitErr[2][0] = 0;
   globalHitErr[2][1] = 0;
 
@@ -542,13 +543,13 @@ double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
     double sinphi = globalOrigin[1] / globalOrigin.mag();
     double cosphi = globalOrigin[0] / globalOrigin.mag();
 
-    globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
+    globalHitErr[0][0] = square(hit_localPhiErr * sinphi); //x
     globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
     globalHitErr[0][2] = 0;
-    globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
+    globalHitErr[1][1] = square(hit_localPhiErr * cosphi);;
     globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
     globalHitErr[1][2] = 0;
-    globalHitErr[2][2] = pow(hit_localZErr, 2);;
+    globalHitErr[2][2] = square(hit_localZErr);;
     globalHitErr[2][0] = 0;
     globalHitErr[2][1] = 0;
 

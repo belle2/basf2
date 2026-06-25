@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 /* C++ standard libraries*/
@@ -709,8 +710,7 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
     //error from tracking is ignored here
-    error = sqrt(pow(hit_localPhiErr, 2) +
-                 pow(hit_localZErr, 2));
+    error = sqrt(square(hit_localPhiErr) + square(hit_localZErr));
     B2DEBUG(11, "Dist = " << distance << ", error = " << error);
     B2DEBUG(11, "Dist2 = " << dist2 << ", error = " << error);
   } //end of BKLM section
@@ -741,8 +741,7 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
 
 
     //error from tracking is ignored here
-    error = sqrt(pow(hit_xErr, 2) +
-                 pow(hit_yErr, 2));
+    error = sqrt(square(hit_xErr) + square(hit_yErr));
   } //end of EKLM section
   else {
     B2WARNING("KLMTracking::distanceToHit Received KLMHit2d that's not from E/B-KLM. Setting distance to -1");

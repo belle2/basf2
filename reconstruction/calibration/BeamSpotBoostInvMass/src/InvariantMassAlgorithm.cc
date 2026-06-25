@@ -12,6 +12,7 @@
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassBhadStandAlone.h>
 #include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
+#include <framework/utilities/MathHelpers.h>
 #include <TFile.h>
 
 #include <Eigen/Dense>
@@ -339,8 +340,8 @@ std::vector<std::vector<CalibrationData>> InvariantMassAlgorithm::adjustOffReson
       spread = weightAvg(spreads[0], spreadsUnc[0], spreads[1], spreadsUnc[1]);
       shift  = weightAvg(shifts[0], shiftsUnc[0], shifts[1], shiftsUnc[1]);
 
-      spreadUnc = sqrt(pow(spreads[0] - spreads[1], 2) + (pow(spreadsUnc[0], 2)  + pow(spreadsUnc[1], 2)) / 2);
-      shiftUnc  = sqrt((pow(shift - shifts[0], 2) + pow(shift - shifts[1], 2)) / 2 + (pow(shiftsUnc[0], 2)  + pow(shiftsUnc[1], 2)) / 2);
+      spreadUnc = sqrt(square(spreads[0] - spreads[1]) + (square(spreadsUnc[0])  + square(spreadsUnc[1])) / 2);
+      shiftUnc  = sqrt((square(shift - shifts[0]) + square(shift - shifts[1])) / 2 + (square(shiftsUnc[0])  + square(shiftsUnc[1])) / 2);
     }
 
     CalResultsBlocks[b] = addSpreadAndOffset(CalResultsBlocks[b], spread, spreadUnc, shift, shiftUnc);

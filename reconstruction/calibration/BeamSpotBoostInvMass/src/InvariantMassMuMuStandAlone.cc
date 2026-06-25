@@ -33,6 +33,7 @@
 #include <Eigen/Dense>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/utilities/MathHelpers.h>
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
@@ -92,7 +93,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       evt.mu0.p = *p0;
       evt.mu1.p = *p1;
 
-      evt.m = sqrt(pow(hypot(evt.mu0.p.Mag(), mMu) + hypot(evt.mu1.p.Mag(), mMu), 2)   - (evt.mu0.p + evt.mu1.p).Mag2());
+      evt.m = sqrt(square(hypot(evt.mu0.p.Mag(), mMu) + hypot(evt.mu1.p.Mag(), mMu))   - (evt.mu0.p + evt.mu1.p).Mag2());
 
       evt.nBootStrap = 1;
       evt.isSig = true;
@@ -203,10 +204,10 @@ namespace Belle2::InvariantMassMuMuCalib {
     x -= a;
 
     double A = 1. / sqrt(2) * (-x / sK + sK / tau);
-    double B = -x / tau + 1. / 2 * pow(sK / tau, 2);
+    double B = -x / tau + 1. / 2 * square(sK / tau);
     double res = 0;
     if (B > 700 || A > 20) { // safety term to deal with 0 * inf limit
-      res = 1. / (2 * tau) * 1. / sqrt(M_PI) * exp(-A * A + B) * (1 / A - 1 / 2. / pow(A, 3) + 3. / 4 / pow(A, 5));
+      res = 1. / (2 * tau) * 1. / sqrt(M_PI) * exp(-A * A + B) * (1 / A - 1 / 2. / cube(A) + 3. / 4 / pow5(A));
     } else {
       res = 1. / (2 * tau) * TMath::Erfc(A) * exp(B);
     }
@@ -225,8 +226,8 @@ namespace Belle2::InvariantMassMuMuCalib {
     double xR = bR * sigma + mean;
 
     double iGaus  = sqrt(2 * M_PI) * sigma * convGausGaus(sigmaK, sigma, xL, xR, mean, x);
-    double iRight = exp(-1. / 2 * pow(bR, 2)) * tauR * convExpGaus(sigmaK, tauR, xR, x);
-    double iLeft  = exp(-1. / 2 * pow(bL, 2)) * tauL * convExpGaus(sigmaK, tauL, -xL, -x);
+    double iRight = exp(-1. / 2 * (bR * bR)) * tauR * convExpGaus(sigmaK, tauR, xR, x);
+    double iLeft  = exp(-1. / 2 * (bL * bL)) * tauL * convExpGaus(sigmaK, tauL, -xL, -x);
 
     return (iGaus + iLeft + iRight);
   }
@@ -246,7 +247,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     double fA     = par[9]; // fraction of the added Gaussian
 
     //added Gaussian
-    double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * pow((x - mean) / sigmaA, 2));
+    double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * square((x - mean) / sigmaA));
     return (1 - fA) * gausExpConv(mean, sigma, bMean, bDelta, tauL, tauR, sigmaK, x) + fA * G;
   }
 
@@ -283,7 +284,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       double t = eCMS - i * step;
 
       double y = x - t;
-      double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * pow((y - mean) / sigmaA, 2));
+      double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * square((y - mean) / sigmaA));
       double Core = (1 - fA) * gausExpConv(mean, sigma, bMean, bDelta, tauL, tauR, sigmaK, y) + fA * G;
 
       double C = (i == 0 || i == N - 1) ? 0.5 : 1;
@@ -347,13 +348,13 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double r = (x - mean) / sigma;
     if (bL <= r && r <= bR) {
-      return exp(-1. / 2 * pow(r, 2));
+      return exp(-1. / 2 * (r * r));
     } else if (r < bL) {
-      double bp = exp(-1. / 2 * pow(bL, 2));
+      double bp = exp(-1. / 2 * (bL * bL));
       double xb = mean + bL * sigma;
       return exp((x - xb) / tauL) * bp;
     } else {
-      double bp = exp(-1. / 2 * pow(bR, 2));
+      double bp = exp(-1. / 2 * (bR * bR));
       double xb = mean + bR * sigma;
       return exp(-(x - xb) / tauR) * bp;
     }
@@ -559,7 +560,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double chi2 = 0;
     for (int j = 1; j <= hPull->GetNbinsX(); ++j)
-      chi2 += pow(hPull->GetBinContent(j), 2);
+      chi2 += square(hPull->GetBinContent(j));
     int ndf = hPull->GetNbinsX() - nPars - 1;
 
 
@@ -899,7 +900,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       double sum2 = 0;
       for (auto v : vals)
-        sum2 += pow(v - meanMass, 2);
+        sum2 += square(v - meanMass);
       double errBootStrap = vals.size() > 1 ? sqrt(sum2 / (vals.size() - 1)) : 0;
 
       mumuTextOut << n << " " << iDiv << " " << std::setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " " <<

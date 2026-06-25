@@ -34,13 +34,23 @@ namespace {
     EXPECT_NEAR(cube(r),  std::pow(r, 3),  1e-10);
   }
 
-  TEST(MathHelpers, quadruple)
+  TEST(MathHelpers, pow4)
   {
     const double pi = 3.14159265358979323846;
     const double e  = 2.71828182845904523536;
     const double r  = (1 + std::sqrt(5)) / 2.0;
-    EXPECT_NEAR(quadruple(pi), std::pow(pi, 4), 1e-10);
-    EXPECT_NEAR(quadruple(e),  std::pow(e, 4),  1e-10);
-    EXPECT_NEAR(quadruple(r),  std::pow(r, 4),  1e-10);
+    EXPECT_NEAR(pow4(pi), std::pow(pi, 4), 1e-10);
+    EXPECT_NEAR(pow4(e),  std::pow(e, 4),  1e-10);
+    EXPECT_NEAR(pow4(r),  std::pow(r, 4),  1e-10);
+  }
+
+  TEST(MathHelpers, pow5)
+  {
+    const double pi = 3.14159265358979323846;
+    const double e  = 2.71828182845904523536;
+    const double r  = (1 + std::sqrt(5)) / 2.0;
+    EXPECT_NEAR(pow5(pi), std::pow(pi, 5), 1e-10);
+    EXPECT_NEAR(pow5(e),  std::pow(e, 5),  1e-10);
+    EXPECT_NEAR(pow5(r),  std::pow(r, 5),  1e-10);
   }
 }

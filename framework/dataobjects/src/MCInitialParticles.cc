@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/dataobjects/MCInitialParticles.h>
+#include <framework/utilities/MathHelpers.h>
 
 using namespace Belle2;
 
@@ -39,7 +40,7 @@ ROOT::Math::LorentzRotation MCInitialParticles::cmsToLab(double bX, double bY, d
 
   double tanAngleXZ = tan(angleXZ);
   double tanAngleYZ = tan(angleYZ);
-  double Norm   = 1 / sqrt(1 + pow(tanAngleXZ, 2) + pow(tanAngleYZ, 2));
+  double Norm   = 1 / sqrt(1 + square(tanAngleXZ) + square(tanAngleYZ));
   ROOT::Math::XYZVector electronCMS(Norm * tanAngleXZ, Norm * tanAngleYZ, Norm); //current collision axis
 
   ROOT::Math::XYZVector rotAxis = zaxis.Cross(electronCMS);

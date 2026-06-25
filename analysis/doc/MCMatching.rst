@@ -7,9 +7,10 @@ Truth-matching
 MC matching
 -----------
 
-A general overview of the main MC matching algorithm and its user interface can be found in the
-proceeding `Monte Carlo matching in the Belle II software <https://doi.org/10.1051/epjconf/202125103021>`_
-for the CHEP 2021 conference.
+.. important::
+        If you use MC matching for your analysis, please cite the following proceeding
+        `Monte Carlo matching in the Belle II software <https://doi.org/10.1051/epjconf/202125103021>`_ which describes
+        the Belle II MC matching algorithm.
 
 ~~~~~~~~~~~~~~~~~~~~~~
 First, you must run it
@@ -437,11 +438,11 @@ tracking-level     analysis-level
  ghost             fake
 =================  ===============
 
+.. _ecl-mcmatching:
+
 --------------------------
 MCMatching of ECL clusters
 --------------------------
-
-.. _ecl-mcmatching:
 
 To understand the method of ECL cluster matching, a basic introduction to the ECL objects used during the reconstruction of simulated data is required.
 

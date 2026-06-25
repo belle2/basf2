@@ -1332,23 +1332,48 @@ Returns 1.0 if the particle was seen in the KLM, 0.0 if not, or ``NaN`` for comp
 )DOC");                
     REGISTER_VARIABLE("clusterMCMatchWeight", particleClusterMatchWeight, R"DOC(
 Returns the weight of the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation for the matched MC particle. It returns ``NaN``
-if no ECL cluster is related to the particle or if there are no MC matches for the cluster or particle. If the cluster was matched to
-particles other than the one for which this variable is calculated, -1 will be returned.  
+if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster. 
 
 .. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
 
 )DOC"); 
-    REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight,
-                      "Returns the weight of the ECLCluster -> MCParticle relation for the relation with the largest weight.");
-    REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode,
-                      "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
-    REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
-                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
-    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
-                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
-    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
-                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+    REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight, R"DOC(
+Returns the weight of the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation for the relation with the largest weight. It returns ``NaN``
+if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster.
 
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
 
+)DOC"); 
+    REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode, R"DOC(
+Returns the PDG code of the MC particle for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation with the largest weight. It returns ``NaN``
+if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster.
+
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+
+)DOC"); 
+    REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight, R"DOC(
+Returns the sum of all weights for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation. It returns ``NaN``
+if no ECL cluster is related to the particle.
+
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+
+)DOC"); 
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong, R"DOC(
+Returns the sum of all weights for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation when the MC particle is either a :math:`K_L^0` or
+a daughter of a :math:`K_L^0`. It returns ``NaN`` if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster, and
+it returns 0 if there are no weights between the ECL cluster and :math:`K_L^0` particles. 
+
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+
+)DOC"); 
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong, R"DOC(
+Returns the sum of all weights for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation when the MC particle is either a :math:`K_L^0` or
+a daughter of a :math:`K_L^0`. If multiple :math:`K_L^0` are related to the ECL cluster, the sum of weights for the best-matched (highest weighted) :math:`K_L^0` are returned.
+It returns ``NaN`` if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster, and it returns 0 if there are
+no weights between the ECL cluster and :math:`K_L^0` particles. 
+
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+
+)DOC"); 
   }
 }

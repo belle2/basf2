@@ -16,8 +16,8 @@
 #include <ecl/dataobjects/ECLPureCsIInfo.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/utility/utilityFunctions.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
 #include <framework/core/Environment.h>
@@ -26,6 +26,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <framework/datastore/RelationArray.h>
 
 /* ROOT headers. */
 #include <TFile.h>
@@ -56,7 +57,8 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   m_calibrationCrateTimeOffset("ECLCrateTimeOffset"),
   m_calibrationCrystalFlightTime("ECLCrystalFlightTime"),
   m_eclDigits(eclDigitArrayName()),
-  m_eclCalDigits(eclCalDigitArrayName())
+  m_eclCalDigits(eclCalDigitArrayName()),
+  m_eclDsps(eclDspArrayName())
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -120,6 +122,7 @@ void ECLDigitCalibratorModule::initialize()
   m_eclDigits.isRequired(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclCalDigits.registerRelationTo(m_eclDigits);
+  m_eclDsps.isRequired(eclDspArrayName());
 
   // initialize calibration
   initializeCalibration();
@@ -197,14 +200,29 @@ void ECLDigitCalibratorModule::beginRun()
 // event
 void ECLDigitCalibratorModule::event()
 {
+  // In this module, we set a relation between each ECLCalDigit and the corresponidng ECLDigit
+  // addRelationTo is, unfortunately, pretty expensive: instead of calling the function
+  // we add the relations using directly the RelationArray object
+  RelationArray calDigitsToDigits(m_eclCalDigits, m_eclDigits);
+
+  // Look-up table to get a ECLDsp from the corresponding cellID
+  std::array < const ECLDsp*, ECLElementNumbers::c_NCrystals + 1 > dspFromCellId{};
+  for (const auto& eclDsp : m_eclDsps) {
+    int cellId = eclDsp.getCellId();
+    dspFromCellId[cellId] = &eclDsp;
+  }
 
   // Loop over the input array
-  for (auto& aECLDigit : m_eclDigits) {
+  for (int index = 0; index < m_eclDigits.getEntries(); ++index) {
+    const ECLDigit& aECLDigit = *m_eclDigits[index];
 
     bool is_pure_csi = 0;
 
     // append an ECLCalDigit to the storearray
     const auto aECLCalDigit = m_eclCalDigits.appendNew();
+
+    // set a relation to the ECLDigit
+    calDigitsToDigits.add(index, index);
 
     // get the cell id from the ECLDigit as identifier
     const int cellid = aECLDigit.getCellId();
@@ -270,7 +288,7 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
     // Calibrating offline fit results
-    ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
+    const ECLDsp* aECLDsp = dspFromCellId[cellid];
     aECLCalDigit->setTwoComponentChi2(-1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton, -1);
@@ -325,9 +343,6 @@ void ECLDigitCalibratorModule::event()
 
     aECLCalDigit->setTime(calibratedTime);
     aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
-
-    // set a relation to the ECLDigit
-    aECLCalDigit->addRelationTo(&aECLDigit);
   }
 
   // determine background level
@@ -405,22 +420,20 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
     {ECL::DetectorRegion::BRL, 0},
     {ECL::DetectorRegion::BWD, 0}};
 
-  ECLGeometryPar* geom = ECLGeometryPar::Instance();
-
   // Loop over the input array
   for (auto& aECLCalDigit : m_eclCalDigits) {
-    if (abs(aECLCalDigit.getTime()) >= m_backgroundTimingCut) {
-      if (aECLCalDigit.getEnergy() >= m_backgroundEnergyCut) {
-        // Get digit theta
-        const B2Vector3D position = geom->GetCrystalPos(aECLCalDigit.getCellId() - 1);
-        const double theta = position.Theta();
+    if ((abs(aECLCalDigit.getTime()) >= m_backgroundTimingCut) and (aECLCalDigit.getEnergy() >= m_backgroundEnergyCut)) {
+      // Get detector region
+      // Do not rely on the geometry here, since it's pretty expensive: let's rely on the dedicated convenient function
+      // from the ECLElementNumbers class
+      const int cellId = aECLCalDigit.getCellId();
+      const ECL::DetectorRegion detectorRegion =
+        ECLElementNumbers::isBarrel(cellId) ? ECL::DetectorRegion::BRL :
+        (ECLElementNumbers::isBackward(cellId) ? ECL::DetectorRegion::BWD :
+         ECL::DetectorRegion::FWD);
 
-        // Get detector region
-        const auto detectorRegion = ECL::getDetectorRegion(theta);
-
-        // Count out of time digits per region
-        ++outOfTimeCount.at(detectorRegion);
-      }
+      // Count out of time digits per region
+      ++outOfTimeCount.at(detectorRegion);
     }
   }
 

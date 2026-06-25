@@ -79,6 +79,8 @@ class addECLCalDigitsModule(b2.Module):
         # Necessary for ECLDigitCalibrator
         eclDigits = Belle2.PyStoreArray(Belle2.ECLDigit.Class())
         eclDigits.registerInDataStore()
+        eclDsps = Belle2.PyStoreArray(Belle2.ECLDsp.Class())
+        eclDsps.registerInDataStore()
 
     def event(self):
         """

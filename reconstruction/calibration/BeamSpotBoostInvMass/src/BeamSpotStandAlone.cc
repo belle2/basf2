@@ -286,7 +286,7 @@ namespace Belle2::BeamSpotCalib {
    */
   std::pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
   {
-    double A = SizeX * SizeX + (SizeY * SizeY);
+    double A = (SizeX * SizeX) + (SizeY * SizeY);
     double B = (SizeX * SizeX) * (SizeY * SizeY) - (SizeXY * SizeXY * SizeXY * SizeXY);
     double D = A * A - 4 * B;
 
@@ -860,12 +860,12 @@ namespace Belle2::BeamSpotCalib {
     double eigHigh, phi;
     fEig.GetMinimumXY(eigHigh, phi);
 
-    const double cphi = cos(phi);
+    const double cPhi = cos(phi);
     const double sPhi = sin(phi);
 
-    pars[0] = eigHigh * (cphi * cphi) + s2MinLimit * (sphi * sphi);
-    pars[1] = eigHigh * (sphi * sphi) + s2MinLimit * (cphi * cphi);
-    pars[2] = sphi * cphi * (eigHigh - s2MinLimit);
+    pars[0] = eigHigh * (cPhi * cPhi) + s2MinLimit * (sPhi * sPhi);
+    pars[1] = eigHigh * (sPhi * sPhi) + s2MinLimit * (cPhi * cPhi);
+    pars[2] = sPhi * cPhi * (eigHigh - s2MinLimit);
 
 
     return pars;

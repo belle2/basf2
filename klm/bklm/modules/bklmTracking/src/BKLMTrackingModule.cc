@@ -17,6 +17,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -604,8 +605,7 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, KLMHit2d* hit,
   double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
   //error from tracking is ignored here
-  error = sqrt(pow(hit_localPhiErr, 2) +
-               pow(hit_localZErr, 2));
+  error = sqrt(square(hit_localPhiErr) + square(hit_localZErr));
 
   if (error != 0.0) {
     sigma = distance / error;

@@ -17,6 +17,7 @@
 
 /* Basf2 headers. */
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/DiagMatrix.h>
@@ -179,13 +180,13 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
     hit_zErr = hit_localZErr;
 
 
-    globalHitErr[0][0] = pow(hit_xErr, 2); //x
+    globalHitErr[0][0] = square(hit_xErr); //x
     globalHitErr[0][1] = (hit_xErr) * (hit_yErr);
     globalHitErr[0][2] = 0;
-    globalHitErr[1][1] = pow(hit_yErr, 2);;
+    globalHitErr[1][1] = square(hit_yErr);;
     globalHitErr[1][0] = (hit_xErr) * (hit_yErr);
     globalHitErr[1][2] = 0;
-    globalHitErr[2][2] = pow(hit_zErr, 2);
+    globalHitErr[2][2] = square(hit_zErr);
     globalHitErr[2][0] = 0;
     globalHitErr[2][1] = 0;
 
@@ -209,13 +210,13 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
                (hit->getYStripMax() - hit->getYStripMin() + 1) / sqrt(12);
     hit_zErr = 0.; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
 
-    globalHitErr[0][0] = pow(hit_xErr, 2); //x
+    globalHitErr[0][0] = square(hit_xErr); //x
     globalHitErr[0][1] = 0.;
     globalHitErr[0][2] = 0.;
-    globalHitErr[1][1] = pow(hit_yErr, 2); //y
+    globalHitErr[1][1] = square(hit_yErr); //y
     globalHitErr[1][0] = 0.;
     globalHitErr[1][2] = 0.;
-    globalHitErr[2][2] = pow(hit_zErr, 2);; //z
+    globalHitErr[2][2] = square(hit_zErr);; //z
     globalHitErr[2][0] = 0.;
     globalHitErr[2][1] = 0.;
 
@@ -312,13 +313,13 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
       double sinphi = globalOrigin[1] / globalOrigin.mag();
       double cosphi = globalOrigin[0] / globalOrigin.mag();
 
-      globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); // x
+      globalHitErr[0][0] = square(hit_localPhiErr * sinphi); // x
       globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
       globalHitErr[0][2] = 0.;
-      globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2); // y
+      globalHitErr[1][1] = square(hit_localPhiErr * cosphi); // y
       globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
       globalHitErr[1][2] = 0.;
-      globalHitErr[2][2] = pow(hit_localZErr, 2); // z
+      globalHitErr[2][2] = square(hit_localZErr); // z
       globalHitErr[2][0] = 0.;
       globalHitErr[2][1] = 0.;
 
@@ -374,13 +375,13 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
       B2DEBUG(28, "KLMTrackFitter" << " Width: " << eklmGeo->getStripGeometry()->getWidth() << " Vec_x: " << hit_xErr * sqrt(
                 12) << " Vec_y: " << hit_yErr * sqrt(12));
 
-      globalHitErr[0][0] = pow(hit_xErr, 2); //x
+      globalHitErr[0][0] = square(hit_xErr); //x
       globalHitErr[0][1] = 0.;
       globalHitErr[0][2] = 0.;
-      globalHitErr[1][1] = pow(hit_yErr, 2); //y
+      globalHitErr[1][1] = square(hit_yErr); //y
       globalHitErr[1][0] = 0.;
       globalHitErr[1][2] = 0.;
-      globalHitErr[2][2] = pow(hit_zErr, 2); //z
+      globalHitErr[2][2] = square(hit_zErr); //z
       globalHitErr[2][0] = 0.;
       globalHitErr[2][1] = 0.;
 

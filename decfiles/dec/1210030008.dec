@@ -1,12 +1,12 @@
-# EventType:
+# EventType: 1210030008.dec
 # Descriptor: [B+ -> K+ pi- pi+ gamma]
 # NickName: Bp_to_Kp_pip_pim_gamma
 # Documentation: Amplitude Analysis Study; Rare b-›s gamma process
-# Tested:
+# Tested: Yes
 # PhysicsWG: TDCPV
 # Responsible: Mattéo MAUSHART
 # Email: matteo.m.belle2@gmail.com
-# Cuts: None # Possibly a cut on m_kpipi < 3.5
+# Cuts: None 
 # Date: 25062026
 
 Decay Upsilon(4S)

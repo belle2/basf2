@@ -336,14 +336,18 @@ def run_validation(job_path, input_data_path=None, **kwargs):
             plt.close()
 
         plt.figure(figsize=(6.4*max(2, total_length/30), 4.8*2))
+        run_values = sorted(absolute_shifts_df['run'].unique())
+        run_to_idx = {r: i for i, r in enumerate(run_values)}
+        abs_shifts_plot_df = absolute_shifts_df.copy()
+        abs_shifts_plot_df['run_idx'] = abs_shifts_plot_df['run'].map(run_to_idx)
         ax = sns.scatterplot(
-            x='run', y=f'absolute_shift_values_{algo}',
-            hue='name', data=absolute_shifts_df,
+            x='run_idx', y=f'absolute_shift_values_{algo}',
+            hue='name', data=abs_shifts_plot_df,
             marker='o', s=40,
         )
         ax.set_ylim([-5, 5])
-        run_values = sorted(absolute_shifts_df['run'].unique())
-        ax.set_xticks(run_values)
+        ax.set_xlim([-0.5, len(run_values) - 0.5])
+        ax.set_xticks(range(len(run_values)))
         ax.set_xticklabels([str(r) for r in run_values])
         ax.xaxis.set_minor_locator(ticker.NullLocator())
         plt.axhline(0, color='black', linestyle='--')

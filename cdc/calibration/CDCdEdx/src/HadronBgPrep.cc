@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/HadronBgPrep.h>
+#include <framework/utilities/MathHelpers.h>
 using namespace Belle2;
 
 HadronBgPrep::HadronBgPrep()
@@ -179,7 +180,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     m_sumcos[bgBin] += costh;
     m_sumbg[bgBin] += bg;
-    m_sumres_square[bgBin] += pow(dedx_res, 2);
+    m_sumres_square[bgBin] += square(dedx_res);
     m_sumsize[bgBin] += 1;
 
     // make histograms of dE/dx vs. cos(theta) for validation

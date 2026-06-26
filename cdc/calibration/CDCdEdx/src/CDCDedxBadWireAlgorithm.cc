@@ -9,6 +9,7 @@
 #include <cdc/calibration/CDCdEdx/CDCDedxBadWireAlgorithm.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <TCanvas.h>
 #include <TLegend.h>
@@ -137,7 +138,7 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
       double nrms = 0.;
       for (unsigned int kh = 0; kh < vhitvar[jw].size(); ++kh) {
         double kvalue = vhitvar[jw][kh];
-        if (kvalue < m_varMax)  nrms += pow(kvalue - nmean, 2);
+        if (kvalue < m_varMax)  nrms += square(kvalue - nmean);
       }
 
       nrms = sqrt(nrms / ncount);

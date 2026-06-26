@@ -1009,8 +1009,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
 Returns the generated 4-momentum transfer squared :math:`q^2` calculated as
 
-.. math::
-q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2
+.. math:: q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2
 
 where :math:`p_m` is the 4-momentum of the given (mother) particle,
 and :math:`p_{d_{i,j,...}}` are the daughter particles with indices :math:`i, j, ...` given as arguments .
@@ -1148,7 +1147,7 @@ Returns the weight of the first (and largest) ``Particle -> MCParticle`` relatio
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
-)DOC")    
+)DOC");    
     REGISTER_VARIABLE("mcRecoilMass", particleMCRecoilMass,
                       "Returns the mass recoiling against the given particle's daughters, calculated using MC truth values.",
                       "GeV/:math:`\\text{c}^2`");
@@ -1217,21 +1216,21 @@ The process flags are:
                       "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("mcVirtual", particleMCVirtualParticle,
                       "Returns 1 if the particle is matched to a virtual MC particle, 0 if the particle is matched to a non-virtual MC particle, "
-                      "or ``NaN`` if no MC particle is found.")
+                      "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("mcInitial", particleMCInitialParticle,
                       "Returns 1 if the particle is matched to an initial MC particle, 0 if the particle is matched to a non-initial MC particle, "
-                      "or ``NaN`` if no MC particle is found.")
+                      "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("mcISR", particleMCISRParticle,
                       "Returns 1 if the particle is related to an ISR MC particle, 0 if it is related to a non-ISR MC particle, or "
-                      "or ``NaN`` if no MC particle is found.")
+                      "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("mcFSR", particleMCFSRParticle,
                       "Returns 1 if the particle is related to an FSR MC particle, 0 if it is related to a non-FSR MC particle, or "
-                      "or ``NaN`` if no MC particle is found.")
+                      "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("mcPhotos", particleMCPhotosParticle,
                       "Returns 1 if the particle is related to Photos particle, 0 if it is related to a non-Photos MC particle, or "
-                      "or ``NaN`` if no MC particle is found.")
+                      "or ``NaN`` if no MC particle is found.");
     REGISTER_VARIABLE("generatorEventWeight", generatorEventWeight,
-                      "**[Eventbased]** Returns the event weight produced by the event generator.")
+                      "**[Eventbased]** Returns the event weight produced by the event generator.");
     REGISTER_VARIABLE("genNStepsToDaughter(i)", genNStepsToDaughter,
                       "Returns the number of steps to :math:`i`-th daughter of the particle at generator level, or "
                       "``NaN`` if no MC particle is associated to the particle or :math:`i`-th daughter, or if the "

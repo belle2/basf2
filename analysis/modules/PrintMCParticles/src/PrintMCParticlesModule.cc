@@ -270,6 +270,10 @@ std::string PrintMCParticlesModule::formatParticleCompact(const MCParticle* mc, 
   TParticlePDG* pdef = pdb->GetParticle(mc->getPDG());
   std::string name = pdef ? pdef->GetTitle() : "[UNKNOWN]";
 
+  if (name == "gamma" and (mc->hasStatus(MCParticle::c_IsFSRPhoton) or mc->hasStatus(MCParticle::c_IsPHOTOSPhoton))) {
+    name = "gammaF";
+  }
+
   if (not mc->hasStatus(MCParticle::c_PrimaryParticle)) {
     name = "~" + name;
   }

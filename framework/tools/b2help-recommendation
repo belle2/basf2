@@ -383,11 +383,12 @@ def convert_json_to_payload(localfile: str, payload: str):
     db = Belle2.Database.Instance()
     db.addPayload(payload, localfile, iov)
 
-def print_tags(tools: list, release: int|str, n_tag_columns: int = 2):
+   
+def print_tags(tools: list, release_name: str, n_tag_columns: int = 2):
     """
     Print all available tags.
     """
-    print(f"Available tags for release-{release}:")
+    print(f"Available tags for {release_name}:")
     available_tags = get_available_tags(tools)
     if n_tag_columns < 2 or n_tag_columns >= len(available_tags):
         for tag in available_tags:
@@ -527,22 +528,23 @@ def main():
     else:
         tools = load_data(args.localfile, formatter)
 
+    release_name = f"release-{args.release}" if args.release else "local"
     if args.tags is None:
-        print_tags(tools, args.release if not None else "local", n_tag_columns=args.n_tag_columns)
+        print_tags(tools, release_name, n_tag_columns=args.n_tag_columns)
         display_summary(tools, 'all')
         sys.exit(0)
 
     tags_line = '[' + ', '.join(args.tags) + ']'
     if args.summary:
-        print(f'Showing tools for release-{args.release} and {tags_line} tags:')
+        print(f'Showing tools for {release_name} and {tags_line} tags:')
         display_summary(tools, args.tags)
         sys.exit(0)
 
-    print(f'Recommendations for release-{args.release} and {tags_line} tags:')
+    print(f'Recommendations for {release_name} and {tags_line} tags:')
     if args.no_pager:
         display_tags(tools, args.tags)
     else:
-        with terminal_utils.Pager(f'Recommendations for release-{args.release} and {tags_line} tags', True):
+        with terminal_utils.Pager(f'Recommendations for {release_name} and {tags_line} tags', True):
             display_tags(tools, args.tags)
 
 if __name__ == "__main__":

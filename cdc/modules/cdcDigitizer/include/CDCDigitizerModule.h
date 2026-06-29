@@ -195,7 +195,6 @@ namespace Belle2 {
     double m_tMin;              /**< Lower edge of time window in ns */
     double m_tMaxOuter;         /**< Upper edge of time window in ns for the outer layers*/
     double m_tMaxInner;         /**< Upper edge of time window in ns for the inner layers */
-    //    unsigned short m_tdcOffset; /**< Offset of TDC count (in ns)*/
     double m_trigTimeJitter;   /**< Magnitude of trigger timing jitter (ns). */
 
     CDC::CDCGeometryPar* m_cdcgp;  /**< Cached Pointer to CDCGeometryPar */
@@ -230,7 +229,6 @@ namespace Belle2 {
     double m_effWForGasGainSmearing = 0.0266;  /**< Effective energy (keV) for one electron prod. for gas gain smearing */
     double m_thetaOfPolya = 0.5;     /**< theta of Polya function for gas gain smearing */
     bool m_extraADCSmearing = false; /**< Switch for extra ADC smearing */
-    //    double m_sigmaForExtraADCSmearing = 0.3;  /**< Gaussian sigma for extra ADC smearing */
     double m_runGain = 1.;  /**< run gain. */
     float m_semiTotalGain[c_maxNSenseLayers][c_maxNDriftCells] = {{}}; /**< total gain per wire */
     double m_overallGainFactor = 1.;  /**< Overall gain factor. */
@@ -253,7 +251,6 @@ namespace Belle2 {
     bool m_treatNegT0WiresAsGood;    /**< A switch for negative-t0 wires */
     bool m_matchFirstMCParticles;    /**< A switch to match first three MCParticles, not just the one with smallest drift time */
     bool m_matchAllMCParticles;    /**< A switch to match all particles to a hit, regardless whether they produced a hit or not */
-//    float m_eventTime;         /**< It is a timing of event, which includes a time jitter due to the trigger system */
 
     bool m_useDB4FEE;             /**< Fetch FEE params from DB */
     DBArray<CDCFEElectronics>* m_fEElectronicsFromDB = nullptr; /*!< Pointer to FE electronics params. from DB. */
@@ -270,8 +267,6 @@ namespace Belle2 {
     DBObjPtr<CDCDedxRunGain>* m_runGainFromDB = nullptr; /*!< Pointer to run gain from DB. */
     DBObjPtr<CDCDedxScaleFactor>* m_gain0FromDB = nullptr; /*!< Pointer to overall gain factor from DB. */
     DBObjPtr<CDCDedxWireGain>* m_wireGainFromDB = nullptr; /*!< Pointer to wire gain from DB. */
-    //    DBObjPtr<CDCEDepToADCConversions>* m_eDepToADCConversionsFromDB = nullptr; /*!< Pointer to edep-to-ADC conv. params. from DB. */
-    //    float m_eDepToADCParams[c_maxNSenseLayers][4]; /*!< edep-to-ADC conv. params. */
 
     bool m_addXTalk;           /**< Flag to switch on/off crosstalk */
     bool m_issue2ndHitWarning; /**< Flag to switch on/off a warning on the 2nd TDC hit */

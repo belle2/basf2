@@ -22,10 +22,10 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig(): m_ecltaunn_threshold{-1.5} {}
+    TRGGRLConfig(): m_ecltaunn_threshold{-0.6015625, -1.001953125, -0.568359375, -0.939453125, -1.111328125, -0.583984375, -0.708984375, -0.37890625, -0.474609375, -0.591796875} {}
 
     /** Getter functions*/
-    float get_ecltaunn_threshold() const
+    std::vector<float> get_ecltaunn_threshold() const
     {
       return m_ecltaunn_threshold;
     }
@@ -173,10 +173,18 @@ namespace Belle2 {
     {
       return m_ecltaunn_I_input;
     }
+    std::vector<std::vector<int>> get_ecltaunn_W_input_layer() const
+    {
+      return m_ecltaunn_W_input_layer;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_I_input_layer() const
+    {
+      return m_ecltaunn_I_input_layer;
+    }
 
 
     /** Setter functions*/
-    void set_ecltaunn_threshold(float i)
+    void set_ecltaunn_threshold(const std::vector<float>& i)
     {
       m_ecltaunn_threshold = i;
     }
@@ -324,13 +332,21 @@ namespace Belle2 {
     {
       m_ecltaunn_I_input = i;
     };
+    void set_ecltaunn_W_input_layer(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_W_input_layer = i;
+    };
+    void set_ecltaunn_I_input_layer(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_I_input_layer = i;
+    };
 
 
 
   private:
 
-    /** MVA Threshold of ecltaunn bit */
-    float m_ecltaunn_threshold;
+    /** MVA Thresholds for 10 MLP outputs */
+    std::vector<float> m_ecltaunn_threshold;
 
     /** Number of networks.
       For network specific parameters you can give either a list with
@@ -387,6 +403,9 @@ namespace Belle2 {
     std::vector<std::vector<int>> m_ecltaunn_saturation;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_W_input;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
+    /** Input layer quantization: per-input W and I bit widths for the first dense layer */
+    std::vector<std::vector<int>> m_ecltaunn_W_input_layer;
+    std::vector<std::vector<int>> m_ecltaunn_I_input_layer;
 
 
     ClassDef(TRGGRLConfig, 6);  /**< ClassDef, must be the last term before the closing {}*/

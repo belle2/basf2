@@ -11,25 +11,23 @@
 import basf2 as b2
 import generators as ge
 import simulation as si
-# import L1trigger as l1
+
 import reconstruction as re
 import mdst as mdst
 import glob as glob
-# import sys
+
 
 # set database conditions (in addition to default)
 
 # b2.conditions.prepend_testing_payloads("/home/t2k/taichiro/public/localdb_grl_rel10_iov0011_ver2/database.txt")
 
-# b2.conditions.prepend_testing_payloads("/home/belle/nkzw/basf2/payloads/MCri.taunn/database.txt")
+b2.conditions.prepend_testing_payloads("/home/belle/nkzw/basf2/payloads/MCri.taunn/database.txt")
 # b2.conditions.prepend_testing_payloads("/home/belle2/zhaoxy/basf2/localdb/database.txt")
-# b2.conditions.prepend_testing_payloads("/home/t2k/taichiro/public/localdb_trggrl_20260421//database.txt")
-b2.conditions.prepend_testing_payloads("/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/tools/localdb/database.txt")
-
+b2.conditions.prepend_testing_payloads("/home/t2k/taichiro/public/localdb_trggrl_20260421//database.txt")
 # b2.conditions.prepend_testing_payloads("/home/belle2/zhaoxy/development/trg/grl/tools/localdb/database.txt")
 # b2.conditions.prepend_testing_payloads("/home/belle/liyb/service/trigger/development/basf2/localdb/database.txt")
 # b2.conditions.prepend_testing_payloads("/home/t2k/taichiro/public/localdb_grl_rel10_iov0011_20250829/database.txt")
-# b2.conditions.prepend_testing_payloads("/home/belle2/zhaoxy/development/localdb/database.txt")
+b2.conditions.prepend_testing_payloads("/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/tools/localdb/database.txt")
 
 # background (collision) files
 bg = glob.glob('./*.root')

@@ -9,6 +9,8 @@
 #include <framework/database/DBImportObjPtr.h>
 #include <trg/grl/dbobjects/TRGGRLConfig.h>
 #include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace Belle2;
 
@@ -24,9 +26,14 @@ void setgrlconfig()
     {0,    0,   -1,   -1}  // 0
   };
 
-  float ecltaunn_threshold[N_config] = {
-    -1.5
-    };
+  // 10 thresholds for 10 MLP outputs: any output[i] > threshold[i] triggers TauNN
+  std::vector<float> ecltaunn_threshold[N_config] = {
+    {
+      -0.6015625, -1.001953125, -0.568359375, -0.939453125, -1.111328125,
+        -0.583984375, -0.708984375, -0.37890625, -0.474609375, -0.591796875
+      }
+  };
+  // firmware: 6 dense layers (Dense 0-5)
   unsigned ecltaunn_nMLP[N_config] = {
     1
   };
@@ -34,7 +41,8 @@ void setgrlconfig()
     false
   };
   std::vector<std::vector<float>> ecltaunn_nHidden[N_config];
-  std::vector<float> eclaunn_nHidden_0 = {64, 64, 64};  // hidden layer 0: 64 neurons, hidden layer 1: 64 neurons, hidden layer 2: 64 neurons, matching firmware 24x64x64x64x10 structure
+  // firmware: 24 -> 64 -> 64 -> 64 -> 64 -> 64 -> 10 (input + 5 hidden + output)
+  std::vector<float> eclaunn_nHidden_0 = {64, 64, 64, 64, 64};
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
@@ -48,183 +56,301 @@ void setgrlconfig()
   std::vector<float> ecltaunn_i_ecl_sector[N_config]; //only 24 is supported for now
   ecltaunn_i_ecl_sector[0].push_back(1 * 6 * 4);
 
-  char wfilename[N_config][10][1000] = {{{
-        "/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/data/all_weights.txt"
-      }
-    }
+  // firmware: 6 dense layer weight files, merged in order
+  // w3.txt(24*64=1536) + w6.txt(64*64=4096) + w9.txt(64*64=4096) + w12.txt(64*64=4096) + w15.txt(64*64=4096) + w18.txt(64*10=640) = 18560
+  const char* weight_files[] = {
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w3.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w6.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w9.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w12.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w15.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w18.txt"
   };
+  const char* bias_files[] = {
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b3.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b6.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b9.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b12.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b15.txt",
+    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b18.txt"
+  };
+
+  // Load and merge all weight files
   std::vector<std::vector<float>> ecltaunn_weight[N_config];
   for (int i = 0; i < N_config; i++) {
-    for (unsigned j = 0; j < ecltaunn_nMLP[i]; j++) {
-      std::ifstream wfile(wfilename[i][j]);
+    std::vector<float> all_weights;
+    for (unsigned j = 0; j < 6; j++) {  // 6 weight files
+      std::ifstream wfile(weight_files[j]);
       if (!wfile.is_open()) {
+        std::cout << "trg-grl-writedb: cannot open weight file: " << weight_files[j] << std::endl;
         return;
-      } else {
-        float element;
-        std::vector<float> ecltaunn_weight_temp;
-        while (wfile >> element) {
-          ecltaunn_weight_temp.push_back(element);
-        }
-        ecltaunn_weight[i].push_back(ecltaunn_weight_temp);
       }
+      std::cout << "trg-grl-writedb: loading weight file: " << weight_files[j] << std::endl;
+
+      // Read entire file content, replace commas with spaces
+      std::stringstream buffer;
+      buffer << wfile.rdbuf();
+      std::string content = buffer.str();
+
+      // Replace commas with spaces
+      for (char& c : content) {
+        if (c == ',') c = ' ';
+      }
+
+      // Read all floats from processed string
+      std::stringstream ss(content);
+      float element;
+      int count = 0;
+      while (ss >> element) {
+        all_weights.push_back(element);
+        count++;
+        if (count <= 3) {
+          std::cout << "    element[" << (count - 1) << "] = " << element << std::endl;
+        }
+      }
+      std::cout << "  file loaded " << count << " elements" << std::endl;
+      std::cout << "  loaded " << all_weights.size() << " total elements so far" << std::endl;
     }
+    ecltaunn_weight[i] = std::vector<std::vector<float>> { all_weights }; // One MLP expert contains all weights
+    std::cout << "trg-grl-writedb: loaded weights total: " << all_weights.size() << " elements" << std::endl;
   }
 
-  char bfilename[N_config][10][1000] = {{{
-        "/home/belle2/liuzd/group/zhaoxinyue/development/trg/grl/data/all_bias.txt"
-      }
-    }
-  };
+  // Load and merge all bias files
   std::vector<std::vector<float>> ecltaunn_bias[N_config];
   for (int i = 0; i < N_config; i++) {
-    for (unsigned j = 0; j < ecltaunn_nMLP[i]; j++) {
-      std::ifstream bfile(bfilename[i][j]);
+    std::vector<float> all_biases;
+    for (unsigned j = 0; j < 6; j++) {  // 6 bias files
+      std::ifstream bfile(bias_files[j]);
       if (!bfile.is_open()) {
+        std::cout << "trg-grl-writedb: cannot open bias file: " << bias_files[j] << std::endl;
         return;
-      } else {
-        float element;
-        std::vector<float> ecltaunn_bias_temp;
-        while (bfile >> element) {
-          ecltaunn_bias_temp.push_back(element);
-        }
-        ecltaunn_bias[i].push_back(ecltaunn_bias_temp);
       }
+      std::cout << "trg-grl-writedb: loading bias file: " << bias_files[j] << std::endl;
+
+      // Read entire file content, replace commas with spaces
+      std::stringstream buffer;
+      buffer << bfile.rdbuf();
+      std::string content = buffer.str();
+
+      // Replace commas with spaces
+      for (char& c : content) {
+        if (c == ',') c = ' ';
+      }
+
+      // Read all floats from processed string
+      std::stringstream ss(content);
+      float element;
+      int count = 0;
+      while (ss >> element) {
+        all_biases.push_back(element);
+        count++;
+      }
+      std::cout << "  file loaded " << count << " elements" << std::endl;
     }
+    ecltaunn_bias[i] = std::vector<std::vector<float>> { all_biases }; // One MLP expert contains all biases
+    std::cout << "trg-grl-writedb: loaded biases: " << all_biases.size() << " elements" << std::endl;
   }
 
+  // firmware: 6 layers (Dense_0, Dense_1, Dense_2, Dense_3, Dense_4, Dense_5)
+  // bias params: Layer 0-3 use ap_ufixed<2,32>, Layer 4 uses ap_fixed<4,2>, Layer 5 uses ap_fixed<6,1>
   std::vector<std::vector<int>> total_bit_bias[N_config] = {
-    {{ 12, 12, 12, 12 }}   // total bits: all layers use b0=12 from firmware (kbi quantization)
+    {{ 2, 2, 2, 2, 4, 6 }}   // total bits
   };
   std::vector<std::vector<int>> int_bit_bias[N_config] {
-    {{ 6, 6, 6, 6 }}   // integer bits: all layers use i0=6 from firmware (kbi quantization)
+    {{ 32, 32, 32, 32, 2, 1 }}   // integer bits
   };
   std::vector<std::vector<bool>> is_signed_bias[N_config] {
-    {{ true, true, true, true }}  // all biases are signed
+    {{ false, false, false, false, true, true }}
   };
   std::vector<std::vector<int>> rounding_bias[N_config] {
-    {{ 1, 1, 1, 1 }}   // 1 = RND (round to nearest), matching firmware
+    {{ 0, 0, 0, 0, 0, 0 }}   // 0 = truncate
   };
   std::vector<std::vector<int>> saturation_bias[N_config] {
-    {{ 2, 2, 2, 2 }}   // 2 = SAT_SYM (symmetric saturation), matching firmware
+    {{ 2, 2, 2, 2, 2, 2 }}   // 2 = saturate
   };
 
 ////////////////////////////////////////////////////////////////////////////
+  // firmware accum params: ap_fixed<18,16>, ap_fixed<17,16>, ap_fixed<15,15>, ap_fixed<13,9>, ap_fixed<17,8>, ap_fixed<19,10>
   std::vector<std::vector<int>> total_bit_accum[N_config] {
-    {{ 18, 18, 18, 18 }}   // total bits for accumulator: input_bits(16) + weight_bits(12) - 10 = 18
+    {{ 18, 17, 15, 13, 17, 19 }}
   };
   std::vector<std::vector<int>> int_bit_accum[N_config] {
-    {{ 12, 12, 12, 12 }}   // integer bits for accumulator: input_int(6) + weight_int(6) = 12
+    {{ 16, 16, 15, 9, 8, 10 }}
   };
   std::vector<std::vector<bool>> is_signed_accum[N_config] {
-    {{ true, true, true, true }}
+    {{ true, true, true, true, true, true }}
   };
   std::vector<std::vector<int>> rounding_accum[N_config] {
-    {{ 1, 1, 1, 1 }}   // 1 = RND, matching firmware
+    {{ 1, 1, 1, 1, 1, 1 }}   // 1 = round (AP_RND)
   };
   std::vector<std::vector<int>> saturation_accum[N_config] {
-    {{ 2, 2, 2, 2 }}   // 2 = SAT_SYM, matching firmware
+    {{ 2, 2, 2, 2, 2, 2 }}   // 2 = wrap
   };
 ////////////////////////////////////////////////////////////////////
+  // firmware weight params: ap_fixed<9,4>, ap_fixed<7,3>, ap_fixed<6,2>, ap_ufixed<6,0>, ap_fixed<10,1>, ap_fixed<7,1>
   std::vector<std::vector<int>> total_bit_weight[N_config] = {
-    {{ 12, 12, 12, 12 }}   // total bits: all layers use b0=12 from firmware (kbi quantization)
+    {{ 9, 7, 6, 6, 10, 7 }}
   };
-
   std::vector<std::vector<int>> int_bit_weight[N_config] = {
-    {{ 6, 6, 6, 6 }}   // integer bits: all layers use i0=6 from firmware (kbi quantization)
+    {{ 4, 3, 2, 0, 1, 1 }}
   };
-
   std::vector<std::vector<bool>> is_signed_weight[N_config] = {
-    {{ true, true, true, true }}  // all weights are signed
+    {{ true, true, true, false, true, true }}  // Layer 3 is unsigned (ap_ufixed)
   };
-
   std::vector<std::vector<int>> rounding_weight[N_config] = {
-    {{ 1, 1, 1, 1 }}      // 1 = RND (round to nearest), matching firmware
+    {{ 0, 0, 0, 0, 0, 0 }}      // 0 = truncate
   };
-
   std::vector<std::vector<int>> saturation_weight[N_config] = {
-    {{ 2, 2, 2, 2 }}      // 2 = SAT_SYM (symmetric saturation), matching firmware
+    {{ 2, 2, 2, 2, 2, 2 }}      // 2 = wrap
   };
 
 ///////////////////////////////////////////////////////////////////////////////////////
+  // firmware relu params: ap_fixed<14,14>, ap_fixed<13,13>, ap_fixed<12,12>, ap_ufixed<9,8>, ap_ufixed<13,7>
   std::vector<std::vector<int>> total_bit_relu[N_config] = {
-    {{ 16, 16, 16 }}   // total bits: i0(6) + f0(10) = 16 from firmware (kif quantization)
+    {{ 14, 13, 12, 9, 13 }}  // 5 relu layers (Layer 0-4, last layer has no relu)
   };
-
   std::vector<std::vector<int>> int_bit_relu[N_config] = {
-    {{ 6, 6, 6 }}   // integer bits: i0=6 from firmware (kif quantization)
+    {{ 14, 13, 12, 8, 7 }}
   };
-
   std::vector<std::vector<bool>> is_signed_relu[N_config] = {
-    {{ false, false, false }}  // ReLU outputs are unsigned (always positive)
+    {{ true, true, true, false, false }}  // Layer 3, 4 are unsigned
   };
-
   std::vector<std::vector<int>> rounding_relu[N_config] = {
-    {{ 1, 1, 1 }}       // 1 = RND (round to nearest), matching firmware
+    {{ 0, 0, 0, 0, 0 }}       // 0 = truncate
   };
-
   std::vector<std::vector<int>> saturation_relu[N_config] = {
-    {{ 0, 0, 0 }}       // 0 = WRAP (no saturation for ReLU), matching firmware
+    {{ 2, 2, 2, 2, 2 }}       // 2 = saturate
   };
 
 //////////////////////////////////////////////////////////////////////////////////////
+  // firmware general quantization params: ap_fixed<16,16>, ap_fixed<16,16>, ap_fixed<15,15>, ap_fixed<10,9>
   std::vector<std::vector<int>> total_bit[N_config] {
-    {{ 16, 16, 16, 16 }}   // total bits: i0(6) + f0(10) = 16 from firmware (kif quantization)
+    {{ 16, 16, 15, 10, 14 }}
   };
   std::vector<std::vector<int>> int_bit[N_config] {
-    {{ 6, 6, 6, 6 }}   // integer bits: i0=6 from firmware (kif quantization)
+    {{ 16, 16, 15, 9, 8 }}
   };
   std::vector<std::vector<bool>> is_signed[N_config] {
-    {{true, true, true, true}}  // layer outputs are signed
+    {{ true, true, true, true, true }}
   };
   std::vector<std::vector<int>> rounding[N_config] {
-    {{1, 1, 1, 1}}   // 1 = RND, matching firmware
+    {{ 1, 1, 1, 1, 1 }}   // 1 = round
   };
   std::vector<std::vector<int>> saturation[N_config] {
-    {{0, 0, 0, 0}}   // 0 = WRAP, matching firmware for datalane
+    {{ 2, 2, 2, 2, 2 }}
   };
 
 
-  std::vector<std::vector<std::vector<int>>> W_input[N_config] {
+  // firmware: 5 hidden layers (Dense_0-4), 64 neurons each
+  // dense_0_iq: ap_fixed<12,13>, dense_1_iq: ap_fixed<14,14>, dense_2_iq: ap_fixed<13,13>
+  // dense_3_iq: ap_fixed<12,12>, dense_4_iq: ap_ufixed<9,9>
+  // TRGGRLConfig expects 3D: [MLP][layer][neuron] but since nMLP=1, it's [1][5][64]
+  // To simplify, use 2D and wrap in 3D when setting to db
+  std::vector<std::vector<int>> W_input_2d[N_config];
+  std::vector<std::vector<int>> I_input_2d[N_config];
+  for (int i = 0; i < N_config; i++) {
+    // Layer 0 (dense_1_iq): 64 inputs, sparse quantization
+    // Non-zero entries from firmware: out[i] = ap_fixed<W,I>(inp[i])
+    // out[i] = 0 means input is zeroed
+    W_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 8, 0, 9, 0, 5, 6, 6,
+      0, 0, 0, 7, 0, 8, 7, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 7, 5, 6,
+      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 6, 6, 5, 0, 6, 8,
+      0, 9, 9, 0
+    });
+    I_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0, 10, 11, 11,
+      0, 0, 0, 12, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 13, 10, 10,
+      12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 10, 11, 11, 0, 11, 12,
+      0, 12, 14, 0
+    });
+    // Layer 1 (dense_2_iq): 64 inputs, sparse quantization
+    W_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 8, 0, 7, 0, 0, 0, 0, 0, 0,
+      7, 0, 0, 6, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 8, 0, 10, 0,
+      0, 6, 0, 0, 0, 0, 7, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 8
+    });
+    I_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 12, 0, 12, 0, 0, 0, 0, 0, 0,
+      12, 0, 0, 11, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 13, 0, 13, 0,
+      0, 11, 0, 0, 0, 0, 12, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 13
+    });
+    // Layer 2 (dense_3_iq): 64 inputs, sparse quantization
+    W_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+    I_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+    // Layer 3 (dense_4_iq): 64 inputs, sparse quantization (ap_ufixed)
+    W_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+    I_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      9, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+    // Layer 4 (dense_5_iq): 64 inputs, sparse quantization (ap_ufixed)
+    W_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+    I_input_2d[i].push_back(std::vector<int> {
+      0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0
+    });
+  }
+  // Wrap 2D in 3D for TRGGRLConfig (which expects 3D)
+  std::vector<std::vector<std::vector<int>>> W_input[N_config];
+  std::vector<std::vector<std::vector<int>>> I_input[N_config];
+  for (int i = 0; i < N_config; i++) {
+    W_input[i].push_back(W_input_2d[i]);  // MLP 0
+    I_input[i].push_back(I_input_2d[i]);  // MLP 0
+  }
+  std::cout << "  W_input[0].size=" << W_input[0].size() << " (should be 1)" << std::endl;
+  if (W_input[0].size() > 0) {
+    std::cout << "  W_input[0][0].size=" << W_input[0][0].size() << " (should be 5 layers)" << std::endl;
+    if (W_input[0][0].size() > 0) {
+      std::cout << "  W_input[0][0][0].size=" << W_input[0][0][0].size() << " (should be 64 neurons)" << std::endl;
+    }
+  }
+
+  // Input layer quantization parameters for the first dense layer (24 inputs)
+  // firmware dense_0_iq uses per-input ap_fixed types (W, I):
+  // out[0]=<10,13>, [1]=<11,13>, [2]=<10,13>, [3]=<9,12>, [4]=<8,11>, [5]=<6,10>,
+  // [6]=<8,9>, [7]=<8,9>, [8]=<5,9>, [9]=<5,9>, [10]=<5,9>, [11]=<4,9>,
+  // [12]=<5,10>, [13]=<5,10>, [14]=<4,10>, [15]=<4,10>, [16]=<3,10>, [17]=<3,10>,
+  // [18]=<5,10>, [19]=<5,10>, [20]=<5,10>, [21]=<3,10>, [22]=<3,10>, [23]=<3,10>
+  // W_input_layer: 1 layer, 24 total_bit values
+  std::vector<std::vector<std::vector<int>>> W_input_layer[N_config] {
     {
       {
-        { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 },  // layer 0 (input): 24 inputs, ap_ufixed<12,12> matching firmware
-        {
-          13, 10, 16, 13, 13, 13, 13, 13, 13, 13, 15, 14, 14, 15, 12, 16, 16, 15, 14, 16, 14, 13, 14, 14,
-          15, 13, 11, 13, 12, 13, 15, 14, 15, 14, 14, 14, 10, 15, 15, 15, 14, 12, 14, 15, 11, 12, 15, 13,
-          15, 14, 15, 13, 11, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-        },  // layer 1 (hidden 0): 64 neurons, unique W per neuron from firmware
-        {
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-        },  // layer 2 (hidden 1): 64 neurons, matching firmware
-        {
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
-          16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-        }   // layer 3 (hidden 2): 64 neurons, matching firmware
+        { 10, 11, 10, 9, 8, 6, 8, 8, 5, 5, 5, 4, 5, 5, 4, 4, 3, 3, 5, 5, 5, 3, 3, 3 }
       }
     }
   };
-  std::vector<std::vector<std::vector<int>>> I_input[N_config] {
+  // I_input_layer: 1 layer, 24 int_bit values
+  std::vector<std::vector<std::vector<int>>> I_input_layer[N_config] {
     {
       {
-        { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 },  // layer 0 (input): 24 inputs, ap_ufixed<12,12> matching firmware
-        {
-          12, 9, 14, 11, 12, 13, 13, 13, 10, 11, 13, 13, 14, 12, 12, 13, 15, 12, 12, 15, 12, 11, 12, 11,
-          13, 13, 11, 11, 12, 13, 12, 14, 11, 13, 13, 13, 10, 14, 14, 14, 12, 12, 13, 14, 9, 11, 12, 10,
-          14, 12, 14, 13, 10, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16
-        },  // layer 1 (hidden 0): 64 neurons, unique I per neuron from firmware
-        {
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
-        },  // layer 2 (hidden 1): 64 neurons, matching firmware
-        {
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
-          6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6
-        }   // layer 3 (hidden 2): 64 neurons, matching firmware
+        { 13, 13, 13, 12, 11, 10, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }
       }
     }
   };
@@ -272,6 +398,8 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_saturation(saturation[i]);
       db_grlconfig->set_ecltaunn_W_input(W_input[i]);
       db_grlconfig->set_ecltaunn_I_input(I_input[i]);
+      db_grlconfig->set_ecltaunn_W_input_layer(W_input_layer[i][0]);
+      db_grlconfig->set_ecltaunn_I_input_layer(I_input_layer[i][0]);
 
       db_grlconfig.import(iov);
     }
@@ -315,6 +443,8 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_saturation(saturation[i]);
       db_grlconfig->set_ecltaunn_W_input(W_input[i]);
       db_grlconfig->set_ecltaunn_I_input(I_input[i]);
+      db_grlconfig->set_ecltaunn_W_input_layer(W_input_layer[i][0]);
+      db_grlconfig->set_ecltaunn_I_input_layer(I_input_layer[i][0]);
 
       db_grlconfig.import(iov);
     }

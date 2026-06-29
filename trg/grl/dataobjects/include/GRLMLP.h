@@ -107,6 +107,11 @@ namespace Belle2 {
     void set_saturation(const std::vector<int>& i) { m_saturation = i; }
     void set_W_input(const std::vector<std::vector<int>>& i) { m_W_input = i; }
     void set_I_input(const std::vector<std::vector<int>>& i) { m_I_input = i; }
+    /** Input layer quantization parameters */
+    void set_W_input_layer(const std::vector<std::vector<int>>& i) { m_W_input_layer = i; }
+    void set_I_input_layer(const std::vector<std::vector<int>>& i) { m_I_input_layer = i; }
+    std::vector<std::vector<int>> get_W_input_layer() const { return m_W_input_layer; }
+    std::vector<std::vector<int>> get_I_input_layer() const { return m_I_input_layer; }
 
     /** check if weights are default values or set by some trainer */
     void Trained(bool trained) { m_trained = trained; }
@@ -146,6 +151,9 @@ namespace Belle2 {
     std::vector<int> m_saturation;
     std::vector<std::vector<int>> m_W_input;
     std::vector<std::vector<int>> m_I_input;
+    /** Input layer quantization: per-input W and I bit widths for the first dense layer */
+    std::vector<std::vector<int>> m_W_input_layer;
+    std::vector<std::vector<int>> m_I_input_layer;
 
     /** Indicator whether the weights are just default values or have
      *  been set by some trainer (set to true when setWeights() is first called). */
@@ -158,7 +166,7 @@ namespace Belle2 {
     std::vector<float> m_output_scale;
 
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 4);
+    ClassDef(GRLMLP, 5);
   };
 }
 #endif

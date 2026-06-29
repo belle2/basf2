@@ -46,11 +46,11 @@ namespace Belle2 {
        */
       std::vector<std::vector<float>> nHidden;
       /** train result as output */
-      bool targetresult = true;
+      int targetresult = 10;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
-      /** Output scale for all networks (10 outputs × 2 values each). */
-      std::vector<std::vector<float>> outputScale = {{0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1.}};
+      /** Output scale for all networks. */
+      std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
 
 
       /** Number of CDC sectors. */
@@ -88,6 +88,9 @@ namespace Belle2 {
       std::vector<std::vector<int>> saturation;
       std::vector<std::vector<std::vector<int>>> W_input;
       std::vector<std::vector<std::vector<int>>> I_input;
+      /** Input layer quantization: per-input W and I bit widths for the first dense layer */
+      std::vector<std::vector<std::vector<int>>> W_input_layer;
+      std::vector<std::vector<std::vector<int>>> I_input_layer;
     };
 
 
@@ -125,7 +128,7 @@ namespace Belle2 {
     /** Run an expert MLP.
      * @param isector index of the MLP
      * @param input vector of input values
-     * @return output values (10 classifiers for multi-label classification) */
+     * @return output values (classifier) - all 10 outputs for firmware compatibility */
     std::vector<float> runMLP(unsigned isector,  const std::vector<float>& input);
 
   private:

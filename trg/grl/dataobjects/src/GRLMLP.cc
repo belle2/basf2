@@ -12,7 +12,7 @@
 using namespace Belle2;
 
 GRLMLP::GRLMLP():
-  m_n_nodes{24, 64, 64, 64, 10}, m_trained(false), m_target_vars(10), m_output_scale{  0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1., 0., 1.}
+  m_n_nodes{24, 24, 24, 24, 1}, m_trained(false), m_target_vars(1), m_output_scale{  0., 1.}
 {
   m_weights.assign(n_weights_cal(), 0.);
   m_bias.assign(n_bias_cal(), 0.);

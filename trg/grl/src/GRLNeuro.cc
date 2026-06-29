@@ -9,8 +9,6 @@
 #include <framework/logging/Logger.h>
 #include <trg/grl/GRLNeuro.h>
 #include <trg/grl/dataobjects/GRLMLP.h>
-#include <trg/grl/firmware_layer0_calculator.h>
-#include <trg/grl/firmware_output_layer_calculator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
@@ -28,7 +26,6 @@
 #include <array>
 #include <cstdint>
 #include <utility>
-#include <random>
 using namespace Belle2;
 using namespace CDC;
 using namespace std;
@@ -92,8 +89,8 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     const auto quantize = [](float scaled_val, int mode) -> int64_t {
       using QuantizerFuncPtr = int64_t(*)(float);
       static constexpr QuantizerFuncPtr quantizers[] = {
-        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },  // AP_TRN: floor toward negative infinity
-        [](float x) -> int64_t { return static_cast<int64_t>(std::round(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x + 0.5f)); },
         [](float x) -> int64_t {
           return (x >= 0) ? static_cast<int64_t>(std::floor(x))
           : static_cast<int64_t>(std::ceil(x));
@@ -182,54 +179,78 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     // --- 6. Final Conversion ---
     return static_cast<float>(fixed_val) * scale;
   }
-  // for total_bits < int_bits case: matches Xilinx HLS ap_fixed behavior
-  // ap_ufixed<W, I> with W < I means:
-  // 1. First: wrap (mod 2^I) - note: uses 2^I not 2^W
-  // 2. Then: round to representable values (step = 2^(I-W))
-  // 3. Finally: wrap to W bits if result exceeds representable range
+  // for total_bits < int_bits case (e.g., ap_fixed<8,11>)
   else {
-    const int shift_bits = int_bits - total_bits;
-    const double step = std::pow(2.0, shift_bits);  // 2^(I-W)
-    const int64_t wrap_range = 1LL << int_bits;  // 2^I
+    // When W < I, the ap_fixed value has negative fractional bits.
+    // Firmware behavior is: quantize val / 2^(I-W), wrap that W-bit integer,
+    // then multiply back by 2^(I-W).
+    const int shift_amount = int_bits - total_bits;
+    const float scale = std::ldexp(1.0f, shift_amount);
 
-    // Step 1: Wrap (mod 2^I)
-    double wrapped = fmod(val, static_cast<double>(wrap_range));
-    if (wrapped < 0) wrapped += wrap_range;
+    const auto quantize = [](float scaled_val, int mode) -> int64_t {
+      switch (mode)
+      {
+        case 0:  // AP_TRN
+          return static_cast<int64_t>(std::floor(scaled_val));
+        case 1:  // AP_RND
+          return static_cast<int64_t>(std::floor(scaled_val + 0.5f));
+        case 2:  // AP_RND_ZERO
+          return (scaled_val >= 0) ? static_cast<int64_t>(std::floor(scaled_val))
+          : static_cast<int64_t>(std::ceil(scaled_val));
+        case 3:  // AP_RND_MIN_INF
+          return static_cast<int64_t>(std::floor(scaled_val));
+        case 4:  // AP_RND_INF
+          return static_cast<int64_t>(std::ceil(scaled_val));
+        case 5:  // AP_RND_CONV
+          return llrint(scaled_val);
+        default:
+          return static_cast<int64_t>(std::trunc(scaled_val));
+      }
+    };
 
-    // Step 2: Round to nearest representable value (step = 2^(I-W))
-    double rounded;
-    if (quant_mode == 1) {  // AP_RND
-      rounded = std::round(wrapped / step) * step;
-    } else {  // AP_TRN
-      rounded = std::floor(wrapped / step) * step;
+    int64_t fixed_val = quantize(val / scale, quant_mode);
+    const int64_t mask = (1LL << total_bits) - 1;
+
+    if (overflow_mode == 2) {  // AP_WRAP
+      fixed_val &= mask;
+      if (is_signed) {
+        const int64_t sign_bit = 1LL << (total_bits - 1);
+        if (fixed_val & sign_bit) {
+          fixed_val -= (1LL << total_bits);
+        }
+      }
+    } else {
+      const int64_t min_val = is_signed ? -(1LL << (total_bits - 1)) : 0;
+      const int64_t max_val = is_signed ? ((1LL << (total_bits - 1)) - 1) : ((1LL << total_bits) - 1);
+      if (overflow_mode == 1 && (fixed_val < min_val || fixed_val > max_val)) {
+        fixed_val = 0;
+      } else {
+        fixed_val = std::clamp(fixed_val, min_val, max_val);
+      }
     }
 
-    // Step 3: Wrap to W bits if result exceeds representable range
-    // For ap_ufixed<W,I>, max representable value is (2^W - 1) * 2^(I-W)
-    const double max_val = ((1LL << total_bits) - 1) * step;
-    if (rounded > max_val) {
-      // Apply AP_WRAP: take lower W bits of the integer representation
-      int64_t int_repr = static_cast<int64_t>(rounded / step);
-      int_repr &= ((1LL << total_bits) - 1);  // Keep only lower W bits
-      rounded = static_cast<double>(int_repr) * step;
-    }
-
-    return static_cast<float>(rounded);
+    return static_cast<float>(fixed_val) * scale;
   }
-
 }
 
-
+// ---  Direct sim_ap_fixed calls for firmware compatibility ---
+// Parameters from firmware/defines.h:
+// input_layer_t: ap_fixed<13,13>
+// dense_0_iq_t: ap_fixed<12,13>
+// dense_0_weight_t: ap_fixed<9,4>
+// dense_0_accum_t: ap_fixed<18,16>
+// dense_0_t: ap_fixed<16,16>
+// dense_0_relu_t: ap_fixed<14,14>
+// dense_5_iq_t: ap_ufixed<13,8>
+// result_t: ap_fixed<19,10>
+// quant_mode: 0=trunc, 1=round
+// overflow_mode: 2=wrap, 4=AP_SAT_SYM
 
 
 void
 GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
-
-  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP
-          << " nHidden.size=" << p.nHidden.size()
-          << " outputScale.size=" << p.outputScale.size());
 
   // ------------------------------------------------------------------
   // Basic parameter validation (fatal in initialize)
@@ -243,8 +264,8 @@ GRLNeuro::initialize(const Parameters& p)
     B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
   }
 
-  unsigned short nTarget = 10;  // 10 outputs matching firmware architecture
-  if (!p.targetresult) {
+  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
+  if (nTarget < 1) {
     B2FATAL("No outputs! Turn on targetresult.");
   }
 
@@ -310,6 +331,8 @@ GRLNeuro::initialize(const Parameters& p)
   // inputs
   check_size(p.W_input, "W_input");
   check_size(p.I_input, "I_input");
+  check_size(p.W_input_layer, "W_input_layer");
+  check_size(p.I_input_layer, "I_input_layer");
 
   // ------------------------------------------------------------------
   // Initialize MLPs
@@ -342,7 +365,7 @@ GRLNeuro::initialize(const Parameters& p)
     }
 
     nNodes.push_back(nTarget);
-    unsigned short targetVars = nTarget;  // 10 outputs matching firmware architecture
+    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
 
     const vector<float>& outputScale = pick(p.outputScale);
 
@@ -386,12 +409,12 @@ GRLNeuro::initialize(const Parameters& p)
     // inputs
     grlmlp_temp.set_W_input(pick(p.W_input));
     grlmlp_temp.set_I_input(pick(p.I_input));
+    // input layer quantization parameters
+    grlmlp_temp.set_W_input_layer(pick(p.W_input_layer));
+    grlmlp_temp.set_I_input_layer(pick(p.I_input_layer));
 
     m_MLPs.push_back(std::move(grlmlp_temp));
   }
-
-  B2DEBUG(10, "GRLNeuro::initialize finished. created "
-          << m_MLPs.size() << " MLP(s).");
 }
 
 
@@ -429,43 +452,38 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<int> saturation = expert.get_saturation();
   vector<vector<int>> W_input = expert.get_W_input();
   vector<vector<int>> I_input = expert.get_I_input();
+  // Input layer quantization parameters
+  vector<vector<int>> W_input_layer = expert.get_W_input_layer();
+  vector<vector<int>> I_input_layer = expert.get_I_input_layer();
 
-
-
-  //input layer
+  // Use actual input instead of hardcoded values
   vector<float> layerinput = input;
 
-  // Random test inputs (0-4095) with fixed seed for reproducibility
-  std::mt19937 rng(42);  // Fixed seed for reproducibility
-  std::uniform_int_distribution<int> dist(0, 4095);
-
-  for (size_t i = 0; i < layerinput.size() && i < 24; ++i) {
-    layerinput[i] = static_cast<float>(dist(rng));
-  }
-
-  // quantize the inputs (detector data format) - matching firmware config
-  // firmware uses ap_ufixed<12,12> for inputs: 12 bits total, 12 bits integer (no fractional bits)
-  const int W_arr[24] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
-  const int I_arr[24] = { 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12 };
-
-  for (size_t i = 0; i < layerinput.size() && i < 24; ++i) {
-    // Directly quantize to ap_ufixed<12,12> format matching firmware
-    // Use quant_mode=0 (AP_TRN) for truncation toward negative infinity
-    // Use overflow_mode=2 (AP_WRAP) for modular wrap-around (negative values wrap to large positive)
-    layerinput[i] = sim_ap_fixed(layerinput[i], W_arr[i], I_arr[i], false, 0, 2, 0);
-  }
-
-
-  B2INFO("=== runMLP sector " << isector << " ===");
-  B2INFO("Input layer (24 quantized inputs):");
+  // DEBUG: Use random inputs for testing (fixed seed for reproducibility)
+  std::srand(100);
   for (size_t i = 0; i < layerinput.size(); ++i) {
-    B2INFO("  input[" << i << "] = " << layerinput[i]);
+    layerinput[i] = static_cast<float>(std::rand()) / RAND_MAX * 8192.0f - 4096.0f;  // random in [-4096, 4095]
   }
 
-  // Save original 24 quantized inputs for output layer calculator
-  std::vector<double> original_inputs(24, 0.0);
-  for (size_t i = 0; i < 24 && i < layerinput.size(); ++i) {
-    original_inputs[i] = static_cast<double>(layerinput[i]);
+  // Input layer quantization: firmware uses TWO steps:
+  // Step 1: float -> input_layer_t (ap_fixed<13,13>) with AP_RND, AP_SAT_SYM
+  // Step 2: input_layer_t -> dense_0_iq_t (per-input ap_fixed<W,I>) with AP_RND, AP_WRAP
+
+  // First, quantize raw input to input_layer_t (ap_fixed<13,13>)
+  // Firmware: ap_fixed<13,13> with AP_TRN (signed: floor toward -inf), AP_WRAP (defaults)
+  for (size_t i = 0; i < layerinput.size(); ++i) {
+    // AP_TRN for signed = floor (toward -inf), AP_WRAP
+    layerinput[i] = sim_ap_fixed(layerinput[i], 13, 13, true, 3, 2, 0);  // signed, quant_mode=3 (floor), overflow_mode=2 (AP_WRAP)
+  }
+
+  // Use W_input_layer[0] and I_input_layer[0] for the first MLP (broadcast if size==1)
+  const auto& w_layer = (W_input_layer.size() == 1) ? W_input_layer[0] : W_input_layer[0];
+  const auto& i_layer = (I_input_layer.size() == 1) ? I_input_layer[0] : I_input_layer[0];
+
+  // Step 2: dense_0_iq quantization with per-input W, I
+  for (size_t i = 0; i < layerinput.size(); ++i) {
+    // dense_0_iq quantization: signed, quant_mode=1 (AP_RND), overflow_mode=2 (AP_WRAP)
+    layerinput[i] = sim_ap_fixed(layerinput[i], w_layer[i], i_layer[i], true, 1, 2, 0);
   }
 
   //hidden layer and output layer
@@ -474,124 +492,80 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
-
-  for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
+  for (unsigned iw_layer = 0; iw_layer < num_layers - 1; iw_layer++) {
     //read bias
-    unsigned num_neurons = expert.get_number_of_nodes_layer(i_layer + 1);
+    unsigned num_neurons = expert.get_number_of_nodes_layer(iw_layer + 1);
     layeroutput.clear();
     layeroutput.assign(num_neurons, 0.);
+    layeroutput.shrink_to_fit();
 
-    if (i_layer == 0) {
-      // Use firmware calculation logic for hidden layer 0
-      std::vector<double> firmware_inputs(layerinput.begin(), layerinput.end());
-      std::vector<double> firmware_outputs = FirmwareLayer0Calculator::computeLayer0(firmware_inputs);
-
-      for (unsigned io = 0; io < num_neurons && io < firmware_outputs.size(); ++io) {
-        layeroutput[io] = static_cast<float>(firmware_outputs[io]);
-      }
-
-      // Skip weight and bias processing for layer 0 (handled by firmware calculator)
-      // But we still need to advance iw to skip layer 0 weights
-      unsigned num_inputs = layerinput.size();
-      iw += num_inputs * num_neurons;
-      num_total_neurons += num_neurons;
-
-      B2INFO("Hidden layer " << i_layer << " after ReLU (" << num_neurons << " neurons):");
-      for (unsigned io = 0; io < num_neurons && io < 53; ++io) {
-        B2INFO("  layer[" << i_layer << "].out[" << io << "] = " << layeroutput[io]);
-      }
-      //input to next layer
-      layerinput.clear();
-      layerinput.assign(num_neurons, 0);
-      for (unsigned i = 0; i < num_neurons; ++i) {
-        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer + 1][i], I_input[i_layer + 1][i], false, 0, 2, 0);
-      }
-      continue;  // Skip to next layer
-    }
-
-    // Skip hidden layer 1 and hidden layer 2 computation (handled by output layer calculator)
-    if (i_layer == 1 || i_layer == 2) {
-      unsigned num_inputs = layerinput.size();
-      iw += num_inputs * num_neurons;
-      num_total_neurons += num_neurons;
-
-      B2INFO("Hidden layer " << i_layer << " skipped (computation handled by output layer firmware calculator)");
-
-      // Keep layerinput unchanged for next iteration
-      continue;
-    }
 
     for (unsigned io = 0; io < num_neurons; ++io) {
       float bias_raw = bias[io + num_total_neurons];
-      float bias_fixed   = sim_ap_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
-                                        rounding_bias[i_layer], saturation_bias[i_layer], 0);
-      float bias_contrib = sim_ap_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                        rounding_accum[i_layer], saturation_accum[i_layer], 0);
+      float bias_fixed   = sim_ap_fixed(bias_raw, total_bit_bias[iw_layer], int_bit_bias[iw_layer], is_signed_bias[iw_layer],
+                                        rounding_bias[iw_layer], saturation_bias[iw_layer], 0);
+      float bias_contrib = sim_ap_fixed(bias_fixed, total_bit_accum[iw_layer], int_bit_accum[iw_layer], is_signed_accum[iw_layer],
+                                        rounding_accum[iw_layer], saturation_accum[iw_layer], 0);
       layeroutput[io] = bias_contrib;
     }
     num_total_neurons += num_neurons;
 
     //input*weight
     unsigned num_inputs = layerinput.size();
+
     for (unsigned ii = 0; ii < num_inputs; ++ii) {
       float input_val = layerinput[ii];
       for (unsigned io = 0; io < num_neurons; ++io) {
         float weight_raw = weights[iw];
-        float weight_fixed = sim_ap_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
-                                          rounding_weight[i_layer], saturation_weight[i_layer], 0);
+        float weight_fixed = sim_ap_fixed(weight_raw, total_bit_weight[iw_layer], int_bit_weight[iw_layer], is_signed_weight[iw_layer],
+                                          rounding_weight[iw_layer], saturation_weight[iw_layer], 0);
         float product = input_val * weight_fixed;
-        float contrib = sim_ap_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                     rounding_accum[i_layer], saturation_accum[i_layer], 0);
-        layeroutput[io] += contrib;
+        float contrib = sim_ap_fixed(product, total_bit_accum[iw_layer], int_bit_accum[iw_layer], is_signed_accum[iw_layer],
+                                     rounding_accum[iw_layer], saturation_accum[iw_layer], 0);
+        layeroutput[io] = sim_ap_fixed(layeroutput[io] + contrib, total_bit_accum[iw_layer], int_bit_accum[iw_layer],
+                                       is_signed_accum[iw_layer], rounding_accum[iw_layer], saturation_accum[iw_layer], 0);
         ++iw;
       }
     }
+    //     input*weight done
 
-    if (i_layer < num_layers - 2) {
+    if (iw_layer < num_layers - 2) {
       //relu
       for (unsigned io = 0; io < num_neurons; ++io) {
-        float fixed_val = sim_ap_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
-                                       saturation[i_layer], 0);
+        float fixed_val = sim_ap_fixed(layeroutput[io], total_bit[iw_layer], int_bit[iw_layer], is_signed[iw_layer], 0,
+                                       saturation[iw_layer], 0);
         float relu_val = (fixed_val > 0) ? fixed_val : 0;
-        layeroutput[io] = sim_ap_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
-                                       rounding_relu[i_layer], saturation_relu[i_layer], 0);
+        layeroutput[io] = sim_ap_fixed(relu_val, total_bit_relu[iw_layer], int_bit_relu[iw_layer], is_signed_relu[iw_layer],
+                                       rounding_relu[iw_layer], saturation_relu[iw_layer], 0);
       }
-
-      B2INFO("Hidden layer " << i_layer << " after ReLU (" << num_neurons << " neurons):");
-      for (unsigned io = 0; io < num_neurons; ++io) {
-        B2INFO("  layer[" << i_layer << "].out[" << io << "] = " << layeroutput[io]);
-      }
-
       //input to next layer
       layerinput.clear();
       layerinput.assign(num_neurons, 0);
+      layerinput.shrink_to_fit();
 
       for (unsigned i = 0; i < num_neurons; ++i) {
-        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer + 1][i], I_input[i_layer + 1][i], false, 0, 2, 0);
+        // firmware: use ap_fixed with parameters from W_input/I_input
+        // quant_mode=1 (AP_RND), overflow_mode=2 (AP_WRAP)
+        // W=0 means this input is zeroed (sparse quantization)
+        if (W_input[iw_layer][i] == 0) {
+          layerinput[i] = 0.0f;
+        } else {
+          const bool iq_is_signed = (iw_layer != 3);  // dense_4_iq is ap_ufixed
+          layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[iw_layer][i], I_input[iw_layer][i], iq_is_signed, 1, 2, 0);
+        }
       }
-
     } else {
-      // output layer (linear activation, 10 outputs) - Use firmware calculation logic
-      // Pass original 24 quantized inputs to firmware calculator
-      std::vector<double> firmware_outputs = FirmwareOutputLayerCalculator::computeOutput(original_inputs);
-
-      vector<float> final_outputs(num_neurons);
-      for (unsigned io = 0; io < num_neurons && io < firmware_outputs.size(); ++io) {
-        final_outputs[io] = static_cast<float>(firmware_outputs[io]);
+      // Final output layer - return all 10 outputs
+      // firmware: result_t is ap_fixed<19,10> with default AP_TRN (signed floor), AP_WRAP
+      vector<float> final_output(10, 0.0f);
+      for (unsigned io = 0; io < 10; ++io) {
+        final_output[io] = sim_ap_fixed(layeroutput[io], 19, 10, true, 3, 2, 0);
       }
-
-      num_total_neurons += num_neurons;
-
-      B2INFO("Output layer (linear activation, " << num_neurons << " outputs):");
-      for (unsigned io = 0; io < num_neurons; ++io) {
-        B2INFO("  output[" << io << "] = " << final_outputs[io]);
-      }
-
-      return final_outputs;
+      return final_output;
     }
   }
 
-  return vector<float>();
+  return vector<float>(10, 0.0f);
 }
 
 

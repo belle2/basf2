@@ -450,12 +450,12 @@ namespace Belle2 {
       {1479, 11}, // wirecnt_tsf1
       {1467, 11}, // wirecnt_tsf0
 
-      {1980, 0}, // ml_tau_nn_output_0
-      {1966, 22}, // ml_tau_nn_output_9
-      {1943, 22}, // ml_tau_nn_output_8
-      {1920, 22}, // ml_tau_nn_output_7
-      {1897, 22}, // ml_tau_nn_output_6
-      {1874, 22}, // ml_tau_nn_output_5
+      {1975, 14}, // ml_tau_nn_output_0
+      {1960, 14}, // ml_tau_nn_output_9
+      {1941, 14}, // ml_tau_nn_output_8
+      {1930, 14}, // ml_tau_nn_output_7
+      {1915, 14}, // ml_tau_nn_output_6
+      {1900, 14}, // ml_tau_nn_output_5
       {1851, 287}, // ml_tau_nn_input
 
       {1671 - 216, 6}, // theta_11
@@ -583,15 +583,15 @@ namespace Belle2 {
       {755, 2}, // N_g_1GeV_1
       {752, 2}, // N_g_2GeV_1
       {749, 9}, // TSFL1_count
-      {739, 22}, // ml_tau_nn_output_4
-      {716, 22}, // ml_tau_nn_output_3
+      {731, 14}, // ml_tau_nn_output_4
+      {716, 14}, // ml_tau_nn_output_3
       {546, 31}, // map_TSF3_int_1 (63 downto 32)
       {514, 31}, // map_TSF3_int_0 (31 downto 0)
       {482, 31}, // map_TSF1_int_1 (63 downto 32)
       {450, 31}, // map_TSF1_int_0 (31 downto 0)
       {418, 2}, // N_ST
-      {415, 22}, // ml_tau_nn_output_2
-      {392, 22}, // ml_tau_nn_output_1
+      {415, 14}, // ml_tau_nn_output_2
+      {400, 14}, // ml_tau_nn_output_1
       {351, 31}, // map_ST_int_1 (63 downto 32)
       {319, 31}, // map_ST_int_0 (31 downto 0)
       {287, 31}, // map_veto_int_1 (63 downto 32)

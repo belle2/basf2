@@ -674,7 +674,7 @@ happen to fulfill all your selection criteria.
         import matplotlib.pyplot as plt
         import uproot
 
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['Mbc'], library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(['Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3))
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')
@@ -779,7 +779,7 @@ definitely read it to understand at least the basics.
         import matplotlib.pyplot as plt
         import uproot
 
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['isSignal', 'Mbc'], library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(['isSignal', 'Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3), by='isSignal')
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')

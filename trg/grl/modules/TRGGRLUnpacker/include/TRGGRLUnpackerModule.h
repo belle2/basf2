@@ -388,7 +388,6 @@ namespace Belle2 {
       e_map_ST_int_1,
       e_map_ST_int_0,
       e_map_veto_int_1,
-      e_map_veto_int_1,
       e_map_veto_int_0,
       e_map_TSF4_int_1,
       e_map_TSF4_int_0,

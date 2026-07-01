@@ -342,8 +342,8 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         abs_shifts_plot_df['run_idx'] = abs_shifts_plot_df['run'].map(run_to_idx)
         ax = sns.scatterplot(
             x='run_idx', y=f'absolute_shift_values_{algo}',
-            hue='name', data=abs_shifts_plot_df,
-            marker='o', s=40,
+            hue='name', style='name', data=abs_shifts_plot_df,
+            s=200, edgecolor='black', linewidth=0.5,
         )
         ax.set_ylim([-5, 5])
         ax.set_xlim([-0.5, len(run_values) - 0.5])
@@ -355,6 +355,7 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         plt.axhline(-2, color='black', linestyle=':')
         plt.setp(ax.get_xticklabels(), rotation=90)
         plt.ylabel(f'absolute shift ({algo}) (ns)')
+        plt.xlabel('Run')
         ax.legend(title='layer/side', ncol=2)
         plt.tight_layout()
         plt.savefig(output_dir / f'absolute_shift_{algo}.pdf')

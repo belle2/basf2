@@ -452,7 +452,7 @@ namespace Belle2 {
 
       {1975, 14}, // ml_tau_nn_output_0
       {1960, 14}, // ml_tau_nn_output_9
-      {1941, 14}, // ml_tau_nn_output_8
+      {1945, 14}, // ml_tau_nn_output_8
       {1930, 14}, // ml_tau_nn_output_7
       {1915, 14}, // ml_tau_nn_output_6
       {1900, 14}, // ml_tau_nn_output_5

@@ -18,7 +18,8 @@ def make_electron_collection(path_electron):
         "TriggerSkim",
         triggerLines=[
                     "software_trigger_cut&skim&accept_radee",
-                    "software_trigger_cut&skim&accept_bhabha_cdc"])
+                    "software_trigger_cut&skim&accept_bhabha_cdc"],
+        resultOnMissing=0)
     trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     prepare_cdst_analysis(path=path_electron)

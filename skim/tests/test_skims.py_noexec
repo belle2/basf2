@@ -40,6 +40,9 @@ def main():
         Registry.get_skim_function(skim)(
             analysisGlobaltag=analysisGlobaltag,
             pidGlobaltag=pidGlobaltag) for skim in Registry.names if skim[:2] != "f_" and "_invalid" not in skim]
+    for skim in SkimObjects:
+        if is_fei_skim(skim):
+            skim.FEIPrefix = 'FEIv1_2025_MC16ri_aldebaran_200'
     skims = CombinedSkim(*[skim for skim in SkimObjects if not is_combined_or_fei_skim(skim)])
     skims(path)
     feiSkims = CombinedSkim(*[skim for skim in SkimObjects if is_fei_skim(skim)])

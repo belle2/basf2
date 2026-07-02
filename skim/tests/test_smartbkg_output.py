@@ -62,7 +62,7 @@ class TestSmartbkgOutput(unittest.TestCase):
 
         file_path = b2.find_file("mdst16.root", "validation", False)
 
-        skim1 = feiHadronic()
+        skim1 = feiHadronic(feiPrefix="FEIv1_2025_MC16ri_aldebaran_200")
         skim2 = LowMassOneTrack()
 
         var.addAlias("smartBkgPrediction1", "eventExtraInfo(SmartBKG_Prediction_feiHadronic)")

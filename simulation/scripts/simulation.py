@@ -262,8 +262,8 @@ def add_simulation(
                 StoreDspWithExtraMCInfo=True,
                 NoElectronicNoise=not ECLElectronicNoise,
             )
-            if bkgfiles is not None:
-                ecl_digitizer.param('Background', 1)
+        if bkgfiles is not None:
+            ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization

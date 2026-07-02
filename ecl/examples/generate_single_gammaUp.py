@@ -243,6 +243,7 @@ else:
     add_simulation(
         main,
         simulateECLUpgrade=not args.NoUpgrade,
+        ECLElectronicNoise=not args.NoElectronicNoise,
         bkgfiles=bkg,
     )
 

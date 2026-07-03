@@ -49,12 +49,6 @@ namespace Belle2 {
       return Environment::Instance().isMC();
     }
 
-    bool eventType(const Particle*)
-    {
-      StoreArray<MCParticle> mcparticles;
-      return (mcparticles.getEntries()) > 0 ? 0 : 1;
-    }
-
     bool isContinuumEvent(const Particle*)
     {
       return (isNotContinuumEvent(nullptr) == 1 ? 0 : 1);

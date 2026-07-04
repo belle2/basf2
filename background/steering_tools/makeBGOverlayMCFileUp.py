@@ -18,7 +18,7 @@ import sys
 # Prepare a root file for BG overlay using simulated BG samples
 #
 # Usage:
-#    basf2 makeBGOverlayMCFile.py phase [scaleFactor PXDmode]
+#    basf2 makeBGOverlayMCFile.py phase [scaleFactor PXDmode ECLmode]
 # Arguments:
 #    phase        one of: phase2, phase3, phase31
 #    scaleFactor  overall scaling factor (default=1)

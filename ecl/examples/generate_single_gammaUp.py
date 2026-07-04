@@ -41,7 +41,7 @@ parser.add_argument(
     default='0',
     help=(
         'bg scenarios, according to UWG CDR: 0, S1, S2, S3, '
-        'Exp26r1485, Exp26r1968, Exp30r3493, Exp33r0274'
+        'Exp26r1485, Exp26r1968, Exp30r3493, Exp33r0274, MCbgo'
     ),
 )
 parser.add_argument(
@@ -65,6 +65,15 @@ parser.add_argument(
         'simulating the waveform digitization (True/False)'
     ),
 )
+parser.add_argument(
+    '-bgoPath',
+    default='BGforOverlay.root',
+    type=str,
+    help=(
+        'Path to the simulated bgOverlay file to be loaded '
+        'when option -bg MCbgo is chosen'
+    ),
+)
 args = parser.parse_args()
 
 print(args.nevt, ' , ', args.bg, ' , ', args.enrg)
@@ -84,8 +93,6 @@ else:
         f'./ParticleGunOutput_photon_{args.enrg}GeV_bg'
         f'{args.bg}{elec_noise_str}_WF.root'
     )
-print(fname)
-
 
 # suppress messages and warnings during processing:
 set_log_level(LogLevel.WARNING)
@@ -213,6 +220,10 @@ else:
             DATA_PROD_DIR
             + 'nominal_phase3/prerelease-08-00-00a/'
             + 'overlay_scenario3/BGx1/set0/*root'
+        )
+    elif args.bg == 'MCbgo':
+        bkg_file = (
+            args.bgoPath
         )
     elif args.bg == 'Exp26r1485':
         bkg_file = (

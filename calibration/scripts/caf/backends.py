@@ -1693,7 +1693,9 @@ class LSF(Batch):
                                   "FINISHED": "completed",
                                   "EXIT": "failed",
                                   "PEND": "submitted",
-                                  "USUSP": "failed"
+                                  "USUSP": "failed",
+                                  "PSUSP": "failed",
+                                  "SSUSP": "failed"
                                   }
 
         def __init__(self, job, job_id):

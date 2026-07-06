@@ -18,12 +18,14 @@ import sys
 # Prepare a root file for BG overlay using simulated BG samples
 #
 # Usage:
-#    basf2 makeBGOverlayMCFile.py phase [scaleFactor ECLmode ECLnoise]
+#    basf2 makeBGOverlayMCFile.py phase [scenario ECLmode ECLnoise scaleFactor]
 # Arguments:
 #    phase        one of: phase2, phase3, phase31
-#    scaleFactor  overall scaling factor (default=1)
+#    scenario     upgrade scenario (default=S1, options: S2, S3)
 #    ECLmode      one of: newDSP, current (default=newDSP)
 #    ECLnoise     one of: noise, noNoise (default=noise)
+#    evnts        number of events to generate (default=100)
+#    scaleFactor  overall scaling factor (default=1)
 # Default output file: BGforOverlay.root
 # -----------------------------------------------------------------------------------
 
@@ -44,14 +46,45 @@ if len(argvs) > 1:
         sys.exit()
 else:
     B2ERROR('No argument given specifying the running phase')
-    print('Usage: basf2 ' + argvs[0] + ' phase2/phase3/phase31 [scaleFactor=1 ' +
+    print('Usage: basf2 ' + argvs[0] + ' phase2/phase3/phase31 [scenario=S1 ' +
           'ECLmode=newDSP/current] ' + 'ECLnoise=noise/noNoise]')
     print()
     sys.exit()
 
-scaleFactor = 1.0
+scenario = "S1"
 if len(argvs) > 2:
-    scaleFactor = float(argvs[2])
+    scenario = argvs[2]
+
+SCALE_FACTORS = {
+    "S1": [
+        ("Coulomb_LER", 8.5432),
+        ("Brems_LER", 8.5432),
+        ("Touschek_LER", 8.4938),
+        ("Coulomb_HER", 1.5556),
+        ("Brems_HER", 1.5556),
+        ("Touschek_HER", 0.4444),
+    ],
+    "S2": [
+        ("Coulomb_LER", 21.3580),
+        ("Brems_LER", 21.3580),
+        ("Touschek_LER", 21.2346),
+        ("Coulomb_HER", 3.8889),
+        ("Brems_HER", 3.8889),
+        ("Touschek_HER", 1.1111),
+    ],
+    "S3": [
+        ("Coulomb_LER", 42.7160),
+        ("Brems_LER", 42.7160),
+        ("Touschek_LER", 42.4691),
+        ("Coulomb_HER", 7.7778),
+        ("Brems_HER", 7.7778),
+        ("Touschek_HER", 2.2222),
+    ],
+}
+
+if scenario not in SCALE_FACTORS.keys():
+    B2ERROR('Upgrade scenario was not correclty setup. ')
+    sys.exit()
 
 ECLup = True
 ECLmode = 'new'
@@ -66,6 +99,14 @@ ECLelec = 'noise'
 if len(argvs) > 4 and argvs[4] == 'noNoise':
     ECLnoise = False
     ECLelec = 'noNoise'
+
+evnt_num = 100
+if len(argvs) > 5:
+    evnt_num = int(argvs[5])
+
+scaleFactor = 1.0
+if len(argvs) > 6:
+    scaleFactor = float(argvs[6])
 
 # background files
 if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
@@ -105,7 +146,7 @@ set_log_level(LogLevel.WARNING)
 main = create_path()
 
 # Set number of events to generate
-main.add_module('EventInfoSetter', evtNumList=[1000], expList=[expNo])
+main.add_module('EventInfoSetter', evtNumList=[evnt_num], expList=[expNo])
 
 # Gearbox: access to xml files
 main.add_module('Gearbox')
@@ -126,64 +167,20 @@ for m in main.modules():
         # m.param("scaleFactors",[('Coulomb_LER',6.92), ('Brems_LER',6.92),
         # ('Touschek_LER',6.88), ('Coulomb_HER',1.26), ('Brems_HER',1.26),
         # ('Touschek_HER',0.36)]
-        m.param("scaleFactors", [('Coulomb_LER', 8.5432), ('Brems_LER', 8.5432), ('Touschek_LER', 8.4938),
-                ('Coulomb_HER', 1.5556), ('Brems_HER', 1.5556), ('Touschek_HER', 0.4444)])
+        m.param("scaleFactors", SCALE_FACTORS[scenario])
 
-"""
-if gatedMode:
-    # Beam background mixer
-    main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor,
-                    minTimePXD=-20000.0, maxTimePXD=20000.0)
-
-    # Emulate injection vetos for PXD
-    main.add_module('PXDInjectionVetoEmulator')
-
-    # PXD digitizer (no data reduction!)
-    main.add_module('PXDDigitizer')
-else:
-    # Beam background mixer
-    main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor)
-
-    # PXD digitizer (no data reduction!)
-    main.add_module('PXDDigitizer', IntegrationWindow=False)
-
-# SVD digitization
-add_svd_simulation(main)
-# SVD overlay of random trigger data to add SVD Noise & xTalk
-main.add_module('BGOverlayInput', skipExperimentCheck=True, bkgInfoName='BackgroundInfoSVDOverlay', inputFileNames=SVDOverlayFiles)
-main.add_module('BGOverlayExecutor', bkgInfoName='BackgroundInfoSVDOverlay')
-main.add_module('SVDShaperDigitSorter')
-
-# CDC digitization
-main.add_module('CDCDigitizer')
-
-# TOP digitization
-main.add_module('TOPDigitizer')
-
-# ARICH digitization
-main.add_module('ARICHDigitizer')
-"""
 # ECL digitization
 if ECLup:
     main.add_module('ECLDigitizerModuleUp', DiodeDeposition=True, HadronPulseShapes=False,
                     NoElectronicNoise=not ECLnoise, WaveformMaker=True, CompressionAlgorithm=compression)
 else:
     main.add_module('ECLDigitizer', WaveformMaker=True, CompressionAlgorithm=compression)
-"""
-# KLM digitization
-main.add_module('KLMDigitizer')
 
-# ECL trigger (generate BGOverlay dataobject for ecl trigger)
-main.add_module('TRGECLBGTCHit')
-"""
 # Output: digitized hits only
-# branches = ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-#            'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
 branches = ['EventLevelTriggerTimeInfo', 'ECLWaveforms']
-# if gatedMode:
-#    branches += ['PXDInjectionBGTiming']
+
 main.add_module('RootOutput',
-                outputFileName='BGforOverlay_' + argvs[1] + '_x' + str(scaleFactor) + '_' + ECLmode + '_' + ECLelec + '.root',
+                outputFileName='BGforOverlay_' + argvs[1] + '_' + str(scenario) + '_' + ECLmode + '_' + ECLelec + '.root',
                 branchNames=branches)
 
 # Show progress of processing

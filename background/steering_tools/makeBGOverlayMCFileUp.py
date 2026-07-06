@@ -10,7 +10,7 @@
 
 from basf2 import create_path, set_log_level, B2ERROR, B2INFO, LogLevel, process
 import os
-from svd import add_svd_simulation
+# from svd import add_svd_simulation
 import glob
 import sys
 
@@ -18,12 +18,13 @@ import sys
 # Prepare a root file for BG overlay using simulated BG samples
 #
 # Usage:
-#    basf2 makeBGOverlayMCFile.py phase [scaleFactor PXDmode ECLmode]
+#    basf2 makeBGOverlayMCFile.py phase [scaleFactor PXDmode ECLmode ECLnoise]
 # Arguments:
 #    phase        one of: phase2, phase3, phase31
 #    scaleFactor  overall scaling factor (default=1)
 #    PXDmode      one of: ungated, gated (default=ungated)
 #    ECLmode      one of: newDSP, current (default=newDSP)
+#    ECLnoise     one of: noise, noNoise (default=noise)
 # Default output file: BGforOverlay.root
 # -----------------------------------------------------------------------------------
 
@@ -60,12 +61,18 @@ if len(argvs) > 3 and argvs[3] == 'gated':
     mode = 'gated'
 
 ECLup = True
-ECLmode = 'new DSP'
+ECLmode = 'new'
 if len(argvs) > 4 and argvs[4] == 'current':
     ECLup = False
-    ECLmode = 'current DSP'
+    ECLmode = 'current'
 else:
     compression = 2
+
+ECLnoise = True
+ECLelec = 'noise'
+if len(argvs) > 5 and argvs[5] == 'noNoise':
+    ECLnoise = False
+    ECLelec = 'noNoise'
 
 # background files
 if 'BELLE2_BACKGROUND_MIXING_DIR' not in os.environ:
@@ -93,7 +100,8 @@ if len(SVDOverlayFiles) == 0:
     sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
-       str(compression) + ' PXD in ' + mode + ' mode' + ' and with ' + ECLmode + ' ECL electronics. ')
+       str(compression) + ' PXD in ' + mode + ' mode' + ' and with ' + ECLmode +
+       ' ECL electronics, ' + ECLelec + ' elec for ECL. ')
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 B2INFO('With scaling factor: ' + str(scaleFactor))
 B2INFO('With SVD xTalk&Noise files from folder ' + str(SVDOverlayDir))
@@ -104,7 +112,7 @@ set_log_level(LogLevel.WARNING)
 main = create_path()
 
 # Set number of events to generate
-main.add_module('EventInfoSetter', evtNumList=[100], expList=[expNo])
+main.add_module('EventInfoSetter', evtNumList=[1000], expList=[expNo])
 
 # Gearbox: access to xml files
 main.add_module('Gearbox')
@@ -115,6 +123,7 @@ main.add_module('Geometry')
 # Simulate the EventLevelTriggerTimeInfo (empty object for now)
 main.add_module('SimulateEventLevelTriggerTimeInfo')
 
+"""
 if gatedMode:
     # Beam background mixer
     main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor,
@@ -147,26 +156,29 @@ main.add_module('TOPDigitizer')
 
 # ARICH digitization
 main.add_module('ARICHDigitizer')
-
+"""
 # ECL digitization
 if ECLup:
     main.add_module('ECLDigitizerModuleUp', DiodeDeposition=True, HadronPulseShapes=False,
-                    NoElectronicNoise=False, WaveformMaker=True, CompressionAlgorithm=compression)
+                    NoElectronicNoise=not ECLnoise, WaveformMaker=True, CompressionAlgorithm=compression)
 else:
     main.add_module('ECLDigitizer', WaveformMaker=True, CompressionAlgorithm=compression)
-
+"""
 # KLM digitization
 main.add_module('KLMDigitizer')
 
 # ECL trigger (generate BGOverlay dataobject for ecl trigger)
 main.add_module('TRGECLBGTCHit')
-
+"""
 # Output: digitized hits only
-branches = ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-            'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
-if gatedMode:
-    branches += ['PXDInjectionBGTiming']
-main.add_module('RootOutput', outputFileName='BGforOverlay.root', branchNames=branches)
+# branches = ['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
+#            'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits']
+branches = ['EventLevelTriggerTimeInfo', 'ECLWaveforms']
+# if gatedMode:
+#    branches += ['PXDInjectionBGTiming']
+main.add_module('RootOutput',
+                outputFileName='BGforOverlay_' + argvs[1] + '_x' + str(scaleFactor) + '_' + ECLmode + '_' + ECLelec + '.root',
+                branchNames=branches)
 
 # Show progress of processing
 main.add_module('Progress')

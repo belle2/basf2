@@ -18,7 +18,7 @@ import sys
 # Prepare a root file for BG overlay using simulated BG samples
 #
 # Usage:
-#    basf2 makeBGOverlayMCFile.py phase [scenario ECLmode ECLnoise scaleFactor]
+#    basf2 makeBGOverlayMCFileUp.py phase [scenario ECLmode ECLnoise evnts scaleFactor]
 # Arguments:
 #    phase        one of: phase2, phase3, phase31
 #    scenario     upgrade scenario (default=S1, options: S2, S3)
@@ -82,23 +82,33 @@ SCALE_FACTORS = {
     ],
 }
 
-if scenario not in SCALE_FACTORS.keys():
+if scenario not in SCALE_FACTORS:
     B2ERROR('Upgrade scenario was not correclty setup. ')
     sys.exit()
 
 ECLup = True
 ECLmode = 'new'
-if len(argvs) > 3 and argvs[3] == 'current':
-    ECLup = False
-    ECLmode = 'current'
+if len(argvs) > 3:
+    if argvs[3] == 'current':
+        ECLup = False
+        ECLmode = 'current'
+    elif argvs[3] == 'newDSP':
+        compression = 2
+    else:
+        B2ERROR("ECLmode must be either 'newDSP' or 'current'")
+        sys.exit()
 else:
     compression = 2
 
 ECLnoise = True
 ECLelec = 'noise'
-if len(argvs) > 4 and argvs[4] == 'noNoise':
-    ECLnoise = False
-    ECLelec = 'noNoise'
+if len(argvs) > 4:
+    if argvs[4] == 'noNoise':
+        ECLnoise = False
+        ECLelec = 'noNoise'
+    elif argvs[4] != 'noise':
+        B2ERROR("ECLnoise must be either 'noise' or 'noNoise'")
+        sys.exit()
 
 evnt_num = 100
 if len(argvs) > 5:
@@ -163,10 +173,6 @@ main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFact
 # set background scale factors
 for m in main.modules():
     if m.name() == "BeamBkgMixer":
-        # scenario 1: lumi scale 0.81 applied globally to get the scale factors used relative to commented values
-        # m.param("scaleFactors",[('Coulomb_LER',6.92), ('Brems_LER',6.92),
-        # ('Touschek_LER',6.88), ('Coulomb_HER',1.26), ('Brems_HER',1.26),
-        # ('Touschek_HER',0.36)]
         m.param("scaleFactors", SCALE_FACTORS[scenario])
 
 # ECL digitization

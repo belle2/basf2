@@ -25,6 +25,17 @@ namespace Belle2 {
                         int nSteps = 100);
 
       /**
+       *  Fits a proper line to the facet like fit() and returns the chi2,
+       *  but only commits the fitted line to the facet if the chi2 is at most maxChi2.
+       *
+       *  Avoids the construction of the line and its covariance matrix for facets
+       *  that fail the cut anyway.
+       */
+      static double fitWithChi2Cut(const TrackingUtilities::CDCFacet& facet,
+                                   double maxChi2,
+                                   int nSteps = 100);
+
+      /**
        *  Fit a line the positions xyl and the weights.
        *
        *  @param fromFacet First facet from the pair of facets
@@ -34,6 +45,18 @@ namespace Belle2 {
       static TrackingUtilities::UncertainParameterLine2D fit(const TrackingUtilities::CDCFacet& fromFacet,
                                                              const TrackingUtilities::CDCFacet& toFacet,
                                                              int nSteps = 100);
+
+      /**
+       *  Calculate only the chi2 of a line fitted to the hits of the two facets.
+       *
+       *  Returns the same value as fit(fromFacet, toFacet, 0).chi2() but avoids
+       *  the construction of the line and its covariance matrix.
+       *
+       *  @param fromFacet First facet from the pair of facets
+       *  @param toFacet   Second facet from the pair of facets
+       */
+      static double fitChi2(const TrackingUtilities::CDCFacet& fromFacet,
+                            const TrackingUtilities::CDCFacet& toFacet);
 
       /**
        *  Fit a line the positions xyl and the weights.

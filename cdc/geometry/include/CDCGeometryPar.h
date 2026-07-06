@@ -1034,6 +1034,23 @@ namespace Belle2 {
       void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
+       * Return the min. drift time (ns) with already computed closest alpha and theta points.
+       * Called by getMinDriftTime and getDriftLength to share the interpolation point search.
+       * @param[in] layer Layer ID.
+       * @param[in] lr Left/Right (used only for warning messages).
+       * @param[in] alpha incident angle (in rphi plane) w.r.t. the cell (rad, used only for warning messages).
+       * @param[in] theta incident angle (polar angle) (rad, used only for warning messages).
+       * @param[in] wal weight of the second closest alpha point.
+       * @param[in] ial the two closest alpha points.
+       * @param[in] ilr the left/right passage corresponding to the closest alpha points.
+       * @param[in] wth weight of the second closest theta point.
+       * @param[in] ith the two closest theta points.
+       */
+      double getMinDriftTimeWithXtPoints(unsigned short layer, unsigned short lr, double alpha, double theta,
+                                         double wal, const unsigned short ial[2], const unsigned short ilr[2],
+                                         double wth, const unsigned short ith[2]) const;
+
+      /**
        * Set the desizend wire parameters.
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID

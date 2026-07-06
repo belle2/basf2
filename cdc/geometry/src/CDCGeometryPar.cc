@@ -2303,10 +2303,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
   }
 
   double dist = 0.;
-
-  //calculate min. drift time
-  double minTime = calculateMinTime ? getMinDriftTime(iCLayer, lr, alpha, theta) : inputMinTime;
-  double delta = time - minTime;
+  double delta = 0.;
 
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
@@ -2323,6 +2320,11 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
     double wth(0.);
     unsigned short ith[2] = {0};
     getClosestThetaPoints(alpha, theta, wth, ith);
+
+    //calculate min. drift time reusing the interpolation points computed above
+    double minTime = calculateMinTime ? getMinDriftTimeWithXtPoints(iCLayer, lr, alpha, theta, wal, ial, ilr, wth, ith)
+                     : inputMinTime;
+    delta = time - minTime;
 
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
@@ -2403,22 +2405,32 @@ double CDCGeometryPar::getMinDriftTime(const unsigned short iCLayer, const unsig
     return 0.;
   }
 
-  double minTime = 0.;
-
   //convert incoming- to outgoing-lr
   unsigned short lro = getOutgoingLR(lr, alpha);
 
   if (!m_linearInterpolationOfXT) {
     B2FATAL("linearInterpolationOfXT = false is not allowed now !");
-  } else {
-    double wal(0.);
-    unsigned short ial[2] = {0};
-    unsigned short ilr[2] = {lro, lro};
-    getClosestAlphaPoints(alpha, wal, ial, ilr);
-    double wth(0.);
-    unsigned short ith[2] = {0};
-    getClosestThetaPoints(alpha, theta, wth, ith);
+  }
 
+  double wal(0.);
+  unsigned short ial[2] = {0};
+  unsigned short ilr[2] = {lro, lro};
+  getClosestAlphaPoints(alpha, wal, ial, ilr);
+  double wth(0.);
+  unsigned short ith[2] = {0};
+  getClosestThetaPoints(alpha, theta, wth, ith);
+
+  return getMinDriftTimeWithXtPoints(iCLayer, lr, alpha, theta, wal, ial, ilr, wth, ith);
+}
+
+double CDCGeometryPar::getMinDriftTimeWithXtPoints(const unsigned short iCLayer, const unsigned short lr,
+                                                   const double alpha, const double theta,
+                                                   const double wal, const unsigned short ial[2], const unsigned short ilr[2],
+                                                   const double wth, const unsigned short ith[2]) const
+{
+  double minTime = 0.;
+
+  {
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
 

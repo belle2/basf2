@@ -18,11 +18,10 @@ import sys
 # Prepare a root file for BG overlay using simulated BG samples
 #
 # Usage:
-#    basf2 makeBGOverlayMCFile.py phase [scaleFactor PXDmode ECLmode ECLnoise]
+#    basf2 makeBGOverlayMCFile.py phase [scaleFactor ECLmode ECLnoise]
 # Arguments:
 #    phase        one of: phase2, phase3, phase31
 #    scaleFactor  overall scaling factor (default=1)
-#    PXDmode      one of: ungated, gated (default=ungated)
 #    ECLmode      one of: newDSP, current (default=newDSP)
 #    ECLnoise     one of: noise, noNoise (default=noise)
 # Default output file: BGforOverlay.root
@@ -46,7 +45,7 @@ if len(argvs) > 1:
 else:
     B2ERROR('No argument given specifying the running phase')
     print('Usage: basf2 ' + argvs[0] + ' phase2/phase3/phase31 [scaleFactor=1 ' +
-          'PXDmode=ungated/gated]')
+          'ECLmode=newDSP/current] ' + 'ECLnoise=noise/noNoise]')
     print()
     sys.exit()
 
@@ -54,15 +53,9 @@ scaleFactor = 1.0
 if len(argvs) > 2:
     scaleFactor = float(argvs[2])
 
-gatedMode = False
-mode = 'ungated'
-if len(argvs) > 3 and argvs[3] == 'gated':
-    gatedMode = True
-    mode = 'gated'
-
 ECLup = True
 ECLmode = 'new'
-if len(argvs) > 4 and argvs[4] == 'current':
+if len(argvs) > 3 and argvs[3] == 'current':
     ECLup = False
     ECLmode = 'current'
 else:
@@ -70,7 +63,7 @@ else:
 
 ECLnoise = True
 ECLelec = 'noise'
-if len(argvs) > 5 and argvs[5] == 'noNoise':
+if len(argvs) > 4 and argvs[4] == 'noNoise':
     ECLnoise = False
     ECLelec = 'noNoise'
 
@@ -100,7 +93,7 @@ if len(SVDOverlayFiles) == 0:
     sys.exit()
 
 B2INFO('Making BG overlay sample for ' + argvs[1] + ' with ECL compression = ' +
-       str(compression) + ' PXD in ' + mode + ' mode' + ' and with ' + ECLmode +
+       str(compression) + ' and with ' + ECLmode +
        ' ECL electronics, ' + ECLelec + ' elec for ECL. ')
 B2INFO('Using background samples from folder ' + os.environ['BELLE2_BACKGROUND_MIXING_DIR'])
 B2INFO('With scaling factor: ' + str(scaleFactor))
@@ -122,6 +115,19 @@ main.add_module('Geometry')
 
 # Simulate the EventLevelTriggerTimeInfo (empty object for now)
 main.add_module('SimulateEventLevelTriggerTimeInfo')
+
+# Beam background mixer
+main.add_module('BeamBkgMixer', backgroundFiles=bg, overallScaleFactor=scaleFactor)
+
+# set background scale factors
+for m in main.modules():
+    if m.name() == "BeamBkgMixer":
+        # scenario 1: lumi scale 0.81 applied globally to get the scale factors used relative to commented values
+        # m.param("scaleFactors",[('Coulomb_LER',6.92), ('Brems_LER',6.92),
+        # ('Touschek_LER',6.88), ('Coulomb_HER',1.26), ('Brems_HER',1.26),
+        # ('Touschek_HER',0.36)]
+        m.param("scaleFactors", [('Coulomb_LER', 8.5432), ('Brems_LER', 8.5432), ('Touschek_LER', 8.4938),
+                ('Coulomb_HER', 1.5556), ('Brems_HER', 1.5556), ('Touschek_HER', 0.4444)])
 
 """
 if gatedMode:

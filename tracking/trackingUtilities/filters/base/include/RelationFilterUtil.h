@@ -63,8 +63,6 @@ namespace Belle2 {
                               unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
-          StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
           for (AObject* to : possibleTos) {
@@ -76,6 +74,7 @@ namespace Belle2 {
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
               B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
+              StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
               if (m_eventLevelTrackingInfo.isValid()) {
                 if (std::is_base_of<AObject, CKFToPXDState>::value) {
                   m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();

@@ -77,9 +77,10 @@ void Chi2FacetFilter::initialize()
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
   constexpr const int nSteps = 1;
-  const double chi2 = FacetFitter::fit(facet, nSteps);
-
   ISuperLayer iSL = facet.getISuperLayer();
+  // The fit line is only stored on the facet if the chi2 passes the cut below
+  const double chi2 = FacetFitter::fitWithChi2Cut(facet, m_chi2CutByISuperLayer[iSL], nSteps);
+
   if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {
     return NAN;
   } else {

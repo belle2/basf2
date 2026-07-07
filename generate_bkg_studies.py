@@ -43,7 +43,7 @@ parser.add_argument(
     default=3,
     type=int,
     help="Experiment phase for the background simulation. ",
-    choices=["2", "3", "31"],
+    choices=[2, 3, 31],
 )
 parser.add_argument(
     "-scenario",
@@ -109,6 +109,15 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
+    '--runNoBg',
+    default=False,
+    action='store_true',
+    help=(
+        "Also run the photon scan without machine background, "
+        "i.e. by calling generate_single_gammaUp.py with -bg 0. "
+    ),
+)
+parser.add_argument(
     '--dryRun',
     default=DRY_RUN,
     action='store_true',
@@ -122,8 +131,8 @@ PHASE = f"phase{args.phase}"
 if args.scenario:
     SCENARIOS = [args.scenario]
 
-if args.enrg:
-    ENERGIES_GEV = [args.enrg]
+if args.enrg is not None:
+    ENERGIES_GEV = [str(args.enrg)]
 
 OVERLAY_EVENTS = args.nBgo
 PHOTON_EVENTS = args.nEvt
@@ -133,6 +142,8 @@ RUN_CURRENT = args.runCurrent
 
 RUN_WITH_NOISE = args.runNoise
 RUN_WITHOUT_NOISE = args.runNoNoise
+
+RUN_NO_BG = args.runNoBg
 
 OVERWRITE = False
 DRY_RUN = args.dryRun
@@ -170,11 +181,12 @@ def overlay_filename(phase, scenario, no_upgrade, no_noise):
     return f"BGforOverlay_{phase}_{scenario}_{ecl_mode_label}_{elec_label}.root"
 
 
-def photon_output_filename(energy_str, no_upgrade, no_noise):
+def photon_output_filename(energy_str, bg_mode, no_upgrade, no_noise):
     elec_noise_str = "_NoElecNoise" if no_noise else ""
+    bg_label = "0" if bg_mode == "0" else "MCbgo"
     if not no_upgrade:
-        return f"ParticleGunOutput_photon_{energy_str}GeV_bgMCbgo_Up{elec_noise_str}_WF.root"
-    return f"ParticleGunOutput_photon_{energy_str}GeV_bgMCbgo{elec_noise_str}_WF.root"
+        return f"ParticleGunOutput_photon_{energy_str}GeV_bg{bg_label}_Up{elec_noise_str}_WF.root"
+    return f"ParticleGunOutput_photon_{energy_str}GeV_bg{bg_label}{elec_noise_str}_WF.root"
 
 
 def scenario_dir_name(scenario, no_upgrade, no_noise):
@@ -198,15 +210,17 @@ def build_overlay_command(phase, scenario, no_upgrade, no_noise, overlay_events)
     ]
 
 
-def build_photon_command(energy_str, photon_events, no_upgrade, no_noise, bgo_path):
+def build_photon_command(energy_str, photon_events, bg_mode, no_upgrade, no_noise, bgo_path=None):
     cmd = [
         PYTHON_EXE,
         GEN_SCRIPT,
         "-nevt", str(photon_events),
-        "-bg", "MCbgo",
-        "-enrg", energy_str,
-        "-bgoPath", str(bgo_path),
+        "-bg", bg_mode,
+        "-enrg", str(energy_str),
     ]
+
+    if bg_mode == "MCbgo":
+        cmd.extend(["-bgoPath", str(bgo_path)])
 
     if no_upgrade:
         cmd.append("--NoUpgrade")
@@ -216,10 +230,10 @@ def build_photon_command(energy_str, photon_events, no_upgrade, no_noise, bgo_pa
 
     return cmd
 
-
 # ============================================================
 # Main
 # ============================================================
+
 
 def main():
     ensure_environment()
@@ -271,6 +285,35 @@ def main():
                 for energy_str in ENERGIES_GEV:
                     photon_out = scenario_dir / photon_output_filename(
                         energy_str=energy_str,
+                        bg_mode="MCbgo",
+                        no_upgrade=no_upgrade,
+                        no_noise=no_noise,
+                    )
+                    if OVERWRITE or not photon_out.exists():
+                        photon_cmd = build_photon_command(
+                            energy_str=energy_str,
+                            photon_events=PHOTON_EVENTS,
+                            bg_mode="MCbgo",
+                            no_upgrade=no_upgrade,
+                            no_noise=no_noise,
+                            bgo_path=overlay_file.resolve(),
+                        )
+                        run(photon_cmd, cwd=scenario_dir)
+                    else:
+                        print(f"[SKIP] Output already exists: {photon_out}")
+
+                    total_photon_jobs += 1
+    # 3) Optionally run the same photon scan without backgrounds (-bg 0)
+    if RUN_NO_BG:
+        for no_upgrade in electronics_modes:
+            for no_noise in noise_modes:
+                nobg_dir = RESULTS_DIR / PHASE / scenario_dir_name("NoBG", no_upgrade, no_noise)
+                nobg_dir.mkdir(parents=True, exist_ok=True)
+
+                for energy_str in ENERGIES_GEV:
+                    photon_out = nobg_dir / photon_output_filename(
+                        energy_str=energy_str,
+                        bg_mode="0",
                         no_upgrade=no_upgrade,
                         no_noise=no_noise,
                     )
@@ -279,11 +322,11 @@ def main():
                         photon_cmd = build_photon_command(
                             energy_str=energy_str,
                             photon_events=PHOTON_EVENTS,
+                            bg_mode="0",
                             no_upgrade=no_upgrade,
                             no_noise=no_noise,
-                            bgo_path=overlay_file.resolve(),
                         )
-                        run(photon_cmd, cwd=scenario_dir)
+                        run(photon_cmd, cwd=nobg_dir)
                     else:
                         print(f"[SKIP] Output already exists: {photon_out}")
 

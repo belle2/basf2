@@ -80,8 +80,10 @@ int HerwigFragHelper::addHepMCToGraph(HepMC::GenEvent* evt,
                     mom.x() * mom_conv * Unit::GeV,
                     mom.y() * mom_conv * Unit::GeV,
                     mom.z() * mom_conv * Unit::GeV));
-    p.setEnergy(mom.t() * mom_conv * Unit::GeV);
     p.setMass((*rp)->generated_mass() * mom_conv);
+    // Recalculate E from p and m so the 4-momentum is exactly on-shell
+    const double e2 = p.getMomentum().Mag2() + p.getMass() * p.getMass();
+    p.setEnergy(e2 > 0.0 ? std::sqrt(e2) : 0.0);
 
     if (pv) {
       auto pos = pv->position();
@@ -92,14 +94,15 @@ int HerwigFragHelper::addHepMCToGraph(HepMC::GenEvent* evt,
 
     p.addStatus(MCParticle::c_PrimaryParticle);
 
+    // All status 1 photons here are Herwig QED shower / FSR photons;
+    // KKMC photons go through the sidecar files.
     const bool isFinal = !dv && status == 1;
     if (isFinal)                     p.addStatus(MCParticleGraph::GraphParticle::c_StableInGenerator);
     if (pdg_code == 22 && isFinal)   p.addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
 
-    // setVirtual() status code set - full set of virtual status codes
-    const bool isVirtual = (status == 2 || status == 21 || status == 22 ||
-                            status == 23 || status == 51 || status == 52);
-    if (isVirtual) p.setVirtual();
+    // Note: No virtual-particle flagging needed. Herwig 7.2.0 HepMC output contains only status
+    // 1 (final), 4 (beam, skipped) and 11 (intermediates). The virtual particle
+    // (KKMC gamma*/Z0) receives c_IsVirtual via the sidecar.
 
     // Parent linking: barcode map first, fall back to PDG-code match for beam/skipped parents
     if (pv) {

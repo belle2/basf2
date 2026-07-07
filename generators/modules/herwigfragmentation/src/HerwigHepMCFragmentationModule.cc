@@ -15,6 +15,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <framework/particledb/EvtGenDatabasePDG.h>
 
 #include <HepMC/IO_GenEvent.h>
 #include <HepMC/GenEvent.h>
@@ -327,8 +328,11 @@ bool HerwigHepMCFragmentationModule::loadKKMCSidecar(int globalEvtNum,
 
     p.setPDG(entry.pdg);
     p.setMomentum(ROOT::Math::XYZVector(entry.px, entry.py, entry.pz));
-    p.setEnergy(entry.e);
     p.setMass(entry.mass);
+    // Recalculate E from p and m so the 4-momentum is exactly on-shell
+    const double e2 = entry.px * entry.px + entry.py * entry.py
+                      + entry.pz * entry.pz + entry.mass * entry.mass;
+    p.setEnergy(e2 > 0.0 ? std::sqrt(e2) : 0.0);
     p.setProductionVertex(ROOT::Math::XYZVector(entry.vx, entry.vy, entry.vz));
     p.setProductionTime(entry.vt);
     p.setStatus(entry.status);
@@ -362,17 +366,19 @@ bool HerwigHepMCFragmentationModule::applyEvtGenDecays()
       // Layer 1: skip particles that already have daughters
       if (gp.getFirstDaughter() != 0) continue;
 
-      // Layer 2a: Herwig 7.2.0 assigns PDG 10433 to D_s1(2460); remap to 20433
+      // Layer 2a: Herwig 7.2.0 uses PDG 10433 for D_s1(2460); EvtGen calls it D_s1+.
       // Remove if upgraded Herwig resolved this issue.
       if (std::abs(gp.getPDG()) == 10433) {
-        const int corrected = (gp.getPDG() > 0) ? 20433 : -20433;
-        B2WARNING("Correcting PDG " << gp.getPDG() << " -> " << corrected
-                  << " (Herwig 7.2.0 mesons.in PDG swap)");
-        gp.setPDG(corrected);
+        const char* name = (gp.getPDG() > 0) ? "D_s1+" : "D_s1-";
+        const auto* part = EvtGenDatabasePDG::Instance()->GetParticle(name);
+        if (part) gp.setPDG(part->PdgCode());
       }
 
-      // Layer 2b: Herwig uses non-standard PDG 10221 for f'_0 (f_0(1370))
-      if (gp.getPDG() == 10221) gp.setPDG(30221);
+      // Layer 2b: Herwig uses PDG 10221 for f_0(1370); EvtGen calls it f'_0
+      if (gp.getPDG() == 10221) {
+        const auto* part = EvtGenDatabasePDG::Instance()->GetParticle("f'_0");
+        if (part) gp.setPDG(part->PdgCode());
+      }
 
       // Layer 3: skip particles absent from evt.pdl
       const EvtId id = EvtPDL::evtIdFromStdHep(gp.getPDG());

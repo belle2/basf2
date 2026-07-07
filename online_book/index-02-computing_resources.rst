@@ -37,7 +37,7 @@ For a brief overview of the relevant commands, you can refer to the
 `IBM Quick Reference Guide <https://www.ibm.com/docs/en/spectrum-lsf/10.1.0?topic=started-quick-reference>`_. More details on the capabilities
 of LSF can also be found from this page.  
 
-.. _onlinebook_grid
+.. _onlinebook_grid:
 
 Grid
 ----

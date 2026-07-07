@@ -153,7 +153,6 @@ you, e.g.::
 import itertools
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import textwrap
 from datetime import datetime
@@ -237,8 +236,6 @@ def my_basf2_mva_teacher(
     exclude_variables=None,
     fast_bdt_option=[200, 8, 3, 0.1]  # nTrees, nCuts, nLevels, shrinkage
 ):
-
-    # conditions.testing_payloads = ['localdb/database.txt']  # this line of code is probably redundant
     """
     My custom wrapper for basf2 mva teacher.  Adapted from code in ``trackfindingcdc_teacher``.
 
@@ -2522,146 +2519,6 @@ class RecoTrackQEValidationPlotsTask(PlotsFromHarvestingValidationBaseTask):
             num_processes=MasterTask.num_processes,
             fast_bdt_option=self.fast_bdt_option,
         )
-
-
-#   As far as I can tell this   #
-#    this task is not needed    #
-
-
-class QEWeightsLocalDBCreatorTask(Basf2Task):
-    """
-    Collect weightfile identifiers from different teacher tasks and merge them
-    into a local database for testing.
-    """
-    #: Number of events to generate for the training data set.
-    n_events_training = b2luigi.IntParameter()
-    #: Experiment number of the conditions database, e.g. defines simulation geometry
-    experiment_number = b2luigi.IntParameter()
-    #: Define which kind of process shall be used. Decide between simulating BBBAR or BHABHA,
-    # MUMU, YY, DDBAR, UUBAR, SSBAR, CCBAR, reconstructing DATA or already simulated
-    # files (USESIMBB/EE) or running on existing reconstructed files (USERECBB/EE)
-    process_type = b2luigi.Parameter(
-        #: \cond
-        default="BBBAR"
-        #: \endcond
-    )
-    #: Feature/variable to use as truth label for the CDC track quality estimator.
-    cdc_training_target = b2luigi.Parameter()
-    #: Hyperparameter option of the FastBDT algorithm. default are the FastBDT default values.
-    fast_bdt_option = b2luigi.ListParameter(
-        #: \cond
-        hashed=True, default=[200, 8, 3, 0.1]
-        #: \endcond
-    )
-    #: Variable to indicate if the task is vxd, cdc or reco
-    task_types = b2luigi.ListParameter(hashed=True)
-    #: code names for tasks to be called
-    TASK_MAP = {
-        "vxd": VXDQETeacherTask,
-        "cdc": CDCQETeacherTask,
-        "rec": RecoTrackQETeacherTask,
-    }
-
-    def requires(self):
-        """
-        Required teacher tasks
-        """
-        for key in self.task_types:
-            if key == 'vxd':
-                yield self.TASK_MAP[key](
-                    n_events_training=self.n_events_training,
-                    process_type=self.process_type,
-                    experiment_number=self.experiment_number,
-                    exclude_variables=getattr(MasterTask, f"exclude_variables_{key}", []),
-                    fast_bdt_option=self.fast_bdt_option,
-                    )
-            if key == 'cdc':
-                yield self.TASK_MAP[key](
-                    n_events_training=self.n_events_training,
-                    process_type=self.process_type,
-                    training_target=self.cdc_training_target,
-                    experiment_number=self.experiment_number,
-                    exclude_variables=getattr(MasterTask, f"exclude_variables_{key}", []),
-                    fast_bdt_option=self.fast_bdt_option,
-                    )
-            if key == 'rec':
-                yield self.TASK_MAP[key](
-                    n_events_training=self.n_events_training,
-                    process_type=self.process_type,
-                    cdc_training_target=self.cdc_training_target,
-                    experiment_number=self.experiment_number,
-                    exclude_variables=getattr(MasterTask, f"exclude_variables_{key}", []),
-                    fast_bdt_option=self.fast_bdt_option,
-                    )
-
-    def output(self):
-        """
-        Local database
-        """
-        yield self.add_to_output("localdb.tar")
-
-    def process(self):
-        """
-        Create local database
-        """
-        current_path = Path.cwd()
-        task_cls = [self.TASK_MAP[k] for k in self.task_types]
-        # remove existing local databases in output directories
-        self._clean()
-        # "Upload" the weightfiles of all 3 teacher tasks into the same localdb
-        for task in task_cls:  # (VXDQETeacherTask, CDCQETeacherTask, RecoTrackQETeacherTask):
-            # Extract xml identifier input file name before switching working directories, as it returns relative paths
-            weightfile_identifier_path = os.path.abspath(self.get_input_file_names(
-                task.get_weightfile_identifier(task, fast_bdt_option=self.fast_bdt_option) + '.xml')[0])
-            # As localdb is created in working directory, chdir into desired output path
-            try:
-                localdb_archive_path = Path("output/localdb.tar").absolute()
-                output_dir = localdb_archive_path.parent
-                os.chdir(output_dir)
-                # Same as basf2_mva_upload on the command line, creates localdb directory in current working dir
-                basf2_mva.upload(
-                    weightfile_identifier_path,
-                    task.object_name,
-                    self.experiment_number, 0,
-                    self.experiment_number, -1,
-                )
-                print('Weightfile_identifier_path:', weightfile_identifier_path, '\n')
-                print('task.weightfile_identifier_basename:', task.weightfile_identifier_basename, '\n')
-            finally:  # Switch back to working directory of b2luigi, even if upload failed
-                os.chdir(current_path)
-
-        # Pack localdb into tar archive, so that we can have on single output file instead
-        shutil.make_archive(
-            base_name=localdb_archive_path.as_posix().split('.')[0],
-            format="tar",
-            root_dir=output_dir,
-            base_dir="localdb",
-            verbose=True,
-        )
-
-    def _clean(self):
-        """
-        Remove local database and tar archives in output directory
-        """
-        localdb_archive_path = Path(self.get_output_file_name("localdb.tar"))
-        localdb_path = localdb_archive_path.parent / "localdb"
-
-        if localdb_path.exists():
-            print(f"Deleting localdb\n{localdb_path}\nwith contents\n ",
-                  "\n  ".join(f.name for f in localdb_path.iterdir()))
-            shutil.rmtree(localdb_path, ignore_errors=False)  # recursively delete localdb
-
-        if localdb_archive_path.is_file():
-            print(f"Deleting {localdb_archive_path}")
-            os.remove(localdb_archive_path)
-
-    def on_failure(self, exception):
-        """
-        Cleanup: Remove local database to prevent existing outputs when task did not finish successfully
-        """
-        self._clean()
-        # Run existing on_failure from parent class
-        super().on_failure(exception)
 
 
 class MasterTask(b2luigi.WrapperTask):

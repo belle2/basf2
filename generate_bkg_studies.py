@@ -16,6 +16,9 @@ REPO_ROOT = Path(__file__).resolve().parent
 MAKE_BGO_SCRIPT = REPO_ROOT / "background" / "steering_tools" / "makeBGOverlayMCFileUp.py"
 GEN_SCRIPT = REPO_ROOT / "ecl" / "examples" / "generate_single_gammaUp.py"
 
+DEST_ROOT = Path("/group/belle2/users2022/smoneta")
+RESULTS_DIR = DEST_ROOT / "scan_outputs"
+
 BASF2_EXE = "basf2"
 PYTHON_EXE = sys.executable
 
@@ -26,8 +29,8 @@ ENERGIES_GEV = ["0.1", "0.2", "0.3", "0.4", "0.5"]
 OVERLAY_EVENTS = 100
 PHOTON_EVENTS = 1000
 
-RUN_UPGRADE = True
-RUN_CURRENT = True
+RUN_UPGRADE = False
+RUN_CURRENT = False
 
 RUN_WITH_NOISE = False
 RUN_WITHOUT_NOISE = True
@@ -130,8 +133,6 @@ RUN_CURRENT = args.runCurrent
 
 RUN_WITH_NOISE = args.runNoise
 RUN_WITHOUT_NOISE = args.runNoNoise
-
-RESULTS_DIR = REPO_ROOT / "scan_outputs"
 
 OVERWRITE = False
 DRY_RUN = args.dryRun

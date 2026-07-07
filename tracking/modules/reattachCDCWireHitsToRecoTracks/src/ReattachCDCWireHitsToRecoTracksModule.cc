@@ -87,7 +87,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
     const double d0Estimate(trajectory2D.getClosest(ROOT::Math::XYVector(0, 0)).R());
     const double z0Estimate(trajectorySZ.getZ0());
-    if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
+    if (std::abs(d0Estimate) < m_maximumAbsD0 and std::abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {
         m_mapToHitsOnTrack[&recoTrack] = recoTrack.getSortedCDCHitList();
       }

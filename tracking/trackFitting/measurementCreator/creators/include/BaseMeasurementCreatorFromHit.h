@@ -39,7 +39,7 @@ namespace Belle2 {
     explicit BaseMeasurementCreatorFromHit(const genfit::MeasurementFactory<genfit::AbsMeasurement>& measurementFactory);
 
     /** Destructor **/
-    virtual ~BaseMeasurementCreatorFromHit() { }
+    ~BaseMeasurementCreatorFromHit() override { }
 
     /** Overload this method to create measurement track points from a given hit. **/
     virtual std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,

@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+import argparse
 
 ##########################################################################
 #
@@ -17,8 +18,6 @@ GEN_SCRIPT = REPO_ROOT / "ecl" / "examples" / "generate_single_gammaUp.py"
 
 BASF2_EXE = "basf2"
 PYTHON_EXE = sys.executable
-
-PHASE = "phase3"
 
 SCENARIOS = ["S1", "S2", "S3"]
 
@@ -33,10 +32,109 @@ RUN_CURRENT = True
 RUN_WITH_NOISE = True
 RUN_WITHOUT_NOISE = True
 
+DRY_RUN = False
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-phase",
+    default=3,
+    type=int,
+    help="Experiment phase for the background simulation. ",
+    choices=["2", "3", "31"],
+)
+parser.add_argument(
+    "-scenario",
+    type=str,
+    default=None,
+    help=(
+        "Background scenario to be considered. "
+        f"If not passed, run over {', '.join(SCENARIOS)}. "
+    ),
+)
+parser.add_argument(
+    "-enrg",
+    default=None,
+    type=float,
+    help=(
+        "Generated photon energy for particle gun (in GeV). "
+        f"If not passed, scan over {', '.join(ENERGIES_GEV)}. "
+    ),
+)
+parser.add_argument(
+    "-nBgo",
+    default=OVERLAY_EVENTS,
+    type=int,
+    help=(
+        "Number of background overlay events "
+        "to be generated from background mixing. "
+    ),
+)
+parser.add_argument(
+    "-nEvt",
+    default=PHOTON_EVENTS,
+    type=int,
+    help="Number of events to be generated for particle gun",
+)
+parser.add_argument(
+    "--runUpgrade",
+    default=RUN_UPGRADE,
+    action="store_true",
+    help="Simulate reconstruction with ECL upgraded electronics. ",
+)
+parser.add_argument(
+    "--runCurrent",
+    default=RUN_CURRENT,
+    action="store_true",
+    help="Simulate reconstruction with current ECL electronics. ",
+)
+parser.add_argument(
+    '--runNoise',
+    default=RUN_WITH_NOISE,
+    action='store_true',
+    help=(
+        "Run with enabled electronic noise in the ECL digitizer "
+        "when simulating the waveform digitization. "
+    ),
+)
+parser.add_argument(
+    '--runNoNoise',
+    default=RUN_WITHOUT_NOISE,
+    action='store_true',
+    help=(
+        "Run with disabled electronic noise in the ECL digitizer "
+        "when simulating the waveform digitization. "
+    ),
+)
+parser.add_argument(
+    '--dryRun',
+    default=DRY_RUN,
+    action='store_true',
+    help="Dry run for testing submission. ",
+)
+
+args = parser.parse_args()
+
+PHASE = f"phase{args.phase}"
+
+if args.scenario:
+    SCENARIOS = [args.scenario]
+
+if args.enrg:
+    ENERGIES_GEV = [args.enrg]
+
+OVERLAY_EVENTS = args.nBgo
+PHOTON_EVENTS = args.nEvt
+
+RUN_UPGRADE = args.runUpgrade
+RUN_CURRENT = args.runCurrent
+
+RUN_WITH_NOISE = args.runNoise
+RUN_WITHOUT_NOISE = args.runNoNoise
+
 RESULTS_DIR = REPO_ROOT / "scan_outputs"
 
 OVERWRITE = False
-DRY_RUN = False
+DRY_RUN = args.dryRun
 
 # ============================================================
 # Utility

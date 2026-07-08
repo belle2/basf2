@@ -238,36 +238,6 @@ The module can be used for:
 
 For more information and examples how to use the decay strings correctly, please see :ref:`DecayString` and :ref:`Grammar_for_custom_MCMatching`.
 
-.. _MCDecayString:
-
----------------
-MC decay string
----------------
-
-Analysis module to search for a generator-level decay string for given particle.
-
-~~~~~~~~~~~~~~~~~~
-Using decay hashes
-~~~~~~~~~~~~~~~~~~
-
-The use of decay hashes is demonstrated in :code:`B2A502-WriteOutDecayHash.py` and :code:`B2A503-ReadDecayHash.py`.
-
-:code:`B2A502-WriteOutDecayHash.py` creates one ROOT file, via `modularAnalysis.variablesToNtuple`
-containing the requested variables including the two decay hashes, and a second root file containing the two decay hashes
-and the full decay string.
-The decay strings can be related to the candidates that they are associated with by matching up the decay hashes.
-An example of this using python is shown in :code:`B2A503-ReadDecayHash.py`.
-
-.. code-block:: python
-
-  path.add_module('ParticleMCDecayString', listName='my_particle_list', fileName='my_hashmap.root')
-
-This will produce a file with all of the decay strings in it, along with the decayHash
-(hashes the MC decay string of the mother particle) and decayHashExtended
-(hashes the decay string of the mother and daughter particles).
-The mapping of hashes to full MC decay strings is stored in a ROOT file determined by the fileName parameter.
-
-Then the variables ``extraInfo(decayHash)`` and ``extraInfo(decayHashExtended)`` are available in the `VariableManager`.
 
 .. _GeneratedDecayModes:
 

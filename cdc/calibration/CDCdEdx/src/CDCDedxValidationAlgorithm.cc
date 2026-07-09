@@ -137,7 +137,9 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   m_tedges = &vtlocaledges[0];
 
   std::array<std::array<std::vector<TH1D*>, 2>, 13> hdedx_mom;
-  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor, hdedx_oned;
+  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor;
+  std::array<std::vector<TH1D*>, 3> hdedx_oned;
+
   TH1D* htimes = new TH1D(Form("htimes_%s", m_suffix.data()), "", m_tbins, m_tedges);
 
   const double momBinWidth = (m_momMax - m_momMin) / m_momBins;
@@ -151,7 +153,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
                           "cos#theta > 0.6 and cos#theta <= 0.8", "cos#theta > 0.8"
                          };
   std::string stype[2] = {"posi", "elec"};
-  std::string sLayer[2] = {"IL", "OL"};
+  std::string sLayer[3] = {"SL0", "SL1", "SL2-8"};
 
   // Define histograms for momentum bins and charge types
   for (int ic = 0; ic < 13; ic++) {
@@ -166,11 +168,15 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     hdedx_inj[ir].resize(m_tbins);
     hdedx_inj_nocor[ir].resize(m_tbins);
     hdedx_mom_peaks[ir].resize(4);
-    hdedx_oned[ir].resize(m_eaBin);
 
     defineHisto(hdedx_inj[ir], "inj", m_sring[ir].data());
     defineHisto(hdedx_inj_nocor[ir], "inj", Form("nocor_%s", m_sring[ir].data()));
     defineHisto(hdedx_mom_peaks[ir], "mom_peaks", Form("%s", stype[ir].data()));
+
+  }
+
+  for (unsigned int ir = 0; ir < 3; ir++) {
+    hdedx_oned[ir].resize(m_eaBin);
     defineHisto(hdedx_oned[ir], "oned", Form("%s", sLayer[ir].data()));
   }
 
@@ -236,7 +242,8 @@ void CDCDedxValidationAlgorithm::radeeValidation()
       int ibin = std::floor((entaval - m_eaMin) / eaBW);
       if (ibin < 0 || ibin >= m_eaBin) continue;
 
-      int mL = (layer->at(j) < 8) ? 0 : 1;
+      int lay = layer->at(j);
+      int mL = (lay < 8) ? 0 : ((lay < 14) ? 1 : 2);
       hdedx_oned[mL][ibin]->Fill(dedxhit->at(j));
     }
   }
@@ -250,8 +257,9 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   for (int it = 0; it < 2; ++it) {
     printCanvas(hdedx_inj[it], Form("plots/injection/dedx_vs_inj_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
     printCanvas(hdedx_inj_nocor[it], Form("plots/injection/dedx_vs_inj_nocor_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
-    printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
   }
+  for (int it = 0; it < 3; ++it)
+    printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
 
   printCanvasdEdx(hdedx_mom_peaks, Form("plots/mom/dedxpeaks_vs_mom_%s", m_suffix.data()), "mom");
 
@@ -354,11 +362,12 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
   int xbins = 0;
   double xmin = 0.0, xmax = 0.0;
   double binWidth = 0.0;
+  int dedxbins = m_dedxBins;
 
   if (var == "mom") {
     xbins = m_momBins; xmin = m_momMin; xmax = m_momMax;
   } else if (var == "oned") {
-    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax; m_dedxBins = 250;
+    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax; dedxbins = 250;
   } else if (var == "costh") {
     xbins = m_cosBins; xmin = m_cosMin; xmax = m_cosMax;
   } else if (var == "inj") {
@@ -368,7 +377,7 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
   }  else if (var == "cos_peaks") {
     xbins = 4; xmin = m_cosMin; xmax = m_cosMax;
   }  else {
-    xbins = c_nSenseWires; m_dedxBins = 250;
+    xbins = c_nSenseWires; dedxbins = 250;
   }
 
   if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks" || var == "oned") {
@@ -389,7 +398,7 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
       title = Form("%s, time(%s)", stype.data(), label.data());
       name = Form("h%s_%s_%s_t%d", var.data(),  m_suffix.data(), stype.data(), ic);
     }
-    htemp[ic] = new TH1D(name.data(), "", m_dedxBins, m_dedxMin, m_dedxMax);
+    htemp[ic] = new TH1D(name.data(), "", dedxbins, m_dedxMin, m_dedxMax);
     htemp[ic]->SetTitle(Form("%s;dedx;entries", title.data()));
   }
 }

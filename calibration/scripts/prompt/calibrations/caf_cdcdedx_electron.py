@@ -246,13 +246,13 @@ def pre_collector(name='rg'):
     if (name == "validation"):
         basf2.B2INFO("no trigger skim")
     elif (name == "timegain" or name == "onedcell"):
-        trg_bhabhaskim = reco_path.add_module(
-            "TriggerSkim",
-            triggerLines=[
-                "software_trigger_cut&skim&accept_radee",
-                "software_trigger_cut&skim&accept_bhabha_cdc",
-                ],
-            resultOnMissing=0)
+        trg_bhabhaskim = basf2.register_module("TriggerSkim")
+        trg_bhabhaskim.param("triggerLines", [
+            "software_trigger_cut&skim&accept_radee",
+            "software_trigger_cut&skim&accept_bhabha_cdc",
+        ])
+        trg_bhabhaskim.param("resultOnMissing", 0)
+        trg_bhabhaskim.set_log_level(basf2.logging.log_level.ERROR)
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
         ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
         ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
@@ -304,7 +304,13 @@ def collector(granularity='all', name=''):
     else:
         col = register_module('CDCDedxElectronCollector', cleanupCuts=True)
         if name == "timegain":
-            CollParam = {'isRun': True, 'isInjTime': True, 'isRadee': True, 'granularity': 'run'}
+            CollParam = {
+                'isRun': True,
+                'isInjTime': True,
+                'isRadee': True,
+                'isBhabha': False,
+                'granularity': 'run'
+            }
 
         elif name == "coslayer":
             CollParam = {'isCharge': True, 'isCosth': True, 'islLayer': True, 'islDedx': True, 'granularity': granularity}
@@ -327,6 +333,7 @@ def collector(granularity='all', name=''):
                 'isDedxhit': True,
                 'isEntaRS': True,
                 'isRadee': True,
+                'isBhabha': False,
                 'granularity': granularity}
 
         else:

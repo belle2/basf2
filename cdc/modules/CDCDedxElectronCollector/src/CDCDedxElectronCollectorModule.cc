@@ -164,7 +164,7 @@ void CDCDedxElectronCollectorModule::collect()
       // If bhabha_cdc exists, use only bhabha_cdc
       eRadBhabha = (m_trgResult->getResult(bhabhaCDC) == SoftwareTriggerCutResult::c_accept);
     } else if (fresults.find(radee) != fresults.end()) {
-      // Otherwise fall back to radee
+      // Otherwise use radee
       eRadBhabha = (m_trgResult->getResult(radee) == SoftwareTriggerCutResult::c_accept);
     }
 

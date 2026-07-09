@@ -20,9 +20,10 @@ an event and, if it is kept, weighting it with the inverse neural network output
 .. note:: Datasets produced using Smart Background are weighted and must be treated as such when analyzed! The weights 
   are stored in the event extra info as ``weight_<SkimName>``.
 
-.. warning:: If you are saving the generated events to mdst format (e.g. using :py:func:`mdst.add_mdst_output`), you 
-  have to make sure that the event extra info (where the weights are stored) is also saved! You can do this for example 
-  by setting ``additionalBranches=["EventExtraInfo"]`` in :py:func:`mdst.add_mdst_output`.
+.. warning:: If you are saving the generated events to mdst format, you have to make sure that the event extra info 
+  (where the weights are stored) is also saved! If you use the ``mdstOutput=True`` option of 
+  :py:class:`skim.core.CombinedSkim` (recommended), this happens automatically. If you are explicitly using 
+  :py:func:`mdst.add_mdst_output`, you can do this by setting ``additionalBranches=["EventExtraInfo"]``.
 
 .. warning:: If you are running event generation and skimming in the same steering file, you have to pass 
   ``roundToMdstPrecision=True`` to the skim. This is mandatory for the FEI skims (as large discrepancies have been observed there) 

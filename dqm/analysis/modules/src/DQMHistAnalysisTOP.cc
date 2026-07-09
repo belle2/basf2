@@ -440,6 +440,7 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
   int alarmState = c_Gray;
   m_text2->Clear();
   if (m_evtMonitorFract) delete m_evtMonitorFract;
+  m_evtMonitorFract = nullptr;
 
   auto* h = findHist("TOP/BoolEvtMonitor");
   if (h) {

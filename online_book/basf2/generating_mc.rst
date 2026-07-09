@@ -381,7 +381,7 @@ easily get all the relevant information: :ref:`b2help-particles`.
     * Producing MC samples by ourselves should be used only for running quick tests or debugging.
 
     * Producing MC signal samples is not a trivial task, because the correct branching fractions and decay models
-      must be used for all the final states under study. Contact the contact the `Data Production liaison`_ of your
+      must be used for all the final states under study. Contact the `Data Production liaison`_ of your
       physics Working Group for producing large MC signal samples in the correct way.
 
 

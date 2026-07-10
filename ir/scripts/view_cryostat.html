@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belle II Cryostat Geometry Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1950px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .info {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4488ff;
+        }
+        .info h2 {
+            margin-top: 0;
+            color: #2266cc;
+        }
+        .svg-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: auto;
+            background-color: white;
+        }
+        .controls {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4488ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #2266cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Belle II Cryostat Geometry - Interactive Viewer</h1>
+        
+        <div class="info">
+            <h2>How to Use</h2>
+            <ul>
+                <li><strong>Hover over any component</strong> to see its details in a tooltip:
+                    <ul>
+                        <li><strong>Component name</strong> (e.g., A1spc1)</li>
+                        <li><strong>Description</strong> (e.g., "Right HER Beam pipe space 1")</li>
+                        <li><strong>Material</strong> (e.g., Vacuum, Steel, Tungsten)</li>
+                        <li><strong>Mother volume</strong> (the volume that contains this component)</li>
+                        <li><strong>Daughter volumes</strong> (components inside this volume)</li>
+                    </ul>
+                </li>
+                <li><strong>Get close to a vertex</strong> (corner of a volume) to see:
+                    <ul>
+                        <li><strong>Plane number</strong> and whether it's an inner or outer radius</li>
+                        <li><strong>Exact Z and R coordinates</strong> in cm</li>
+                    </ul>
+                </li>
+                <li><strong>Click on a component</strong> to activate it:
+                    <ul>
+                        <li>Component gets <strong>red outline</strong></li>
+                        <li><strong>Information panel</strong> appears on the right showing all details</li>
+                        <li><strong>Complete table</strong> of planes with Z, R_inner, R_outer coordinates</li>
+                        <li>Click again or use <strong>× button</strong> to close</li>
+                    </ul>
+                </li>
+                <li><strong>Click on a material</strong> in the legend (right side):
+                    <ul>
+                        <li>All components of that material get <strong>red outlines</strong></li>
+                        <li>No info panel shown - useful for quick overview</li>
+                        <li>Click again to deselect</li>
+                    </ul>
+                </li>
+                <li><strong>Click on a volume</strong> in the list (right side):
+                    <ul>
+                        <li>All 106 volumes listed <strong>alphabetically</strong> in multiple columns</li>
+                        <li>Click any name to activate with <strong>full details</strong></li>
+                        <li>Quick navigation alternative to clicking on the diagram</li>
+                    </ul>
+                </li>
+                <li>Components <strong>highlight</strong> when you hover over them</li>
+                <li>Scroll to zoom, drag to pan (browser dependent)</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <button onclick="resetZoom()">Reset View</button>
+            <button onclick="zoomIn()">Zoom In</button>
+            <button onclick="zoomOut()">Zoom Out</button>
+        </div>
+
+        <div class="svg-container" id="svg-container">
+            <object id="svg-object" data="cryostat_cross_section.svg" type="image/svg+xml" width="1900" height="800">
+                Your browser does not support SVG
+            </object>
+        </div>
+
+        <div class="info" style="margin-top: 20px;">
+            <h2>About the Geometry</h2>
+            <p>
+                This interactive visualization shows a radial cross-section (R-Z view) of the Belle II Cryostat geometry.
+                The cryostat contains the superconducting magnets (QCS) that are part of the interaction region.
+            </p>
+            <ul>
+                <li><strong>Z axis (horizontal)</strong>: Longitudinal position along the beam line (cm)</li>
+                <li><strong>R axis (vertical)</strong>: Radial distance from the beam axis (cm)</li>
+                <li><strong>Right side (positive Z)</strong>: Forward direction (HER and LER beam pipes, A/B/C components)</li>
+                <li><strong>Left side (negative Z)</strong>: Backward direction (D/E/F components)</li>
+            </ul>
+            <p>
+                Generated from: <code>ir/data/Cryostat.xml</code><br>
+                Total volumes: 106<br>
+                Z range: -792 to +876 cm<br>
+                R range: ±82.5 cm<br>
+                Features: Click activation, material filtering, volume list navigation, volume hierarchy,
+                vertex detection, plane table display
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function resetZoom() {
+            document.getElementById('svg-object').setAttribute('width', '1900');
+            document.getElementById('svg-object').setAttribute('height', '800');
+        }
+
+        function zoomIn() {
+            var obj = document.getElementById('svg-object');
+            var width = parseInt(obj.getAttribute('width'));
+            var height = parseInt(obj.getAttribute('height'));
+            obj.setAttribute('width', width * 1.2);
+            obj.setAttribute('height', height * 1.2);
+        }
+
+        function zoomOut() {
+            var obj = document.getElementById('svg-object');
+            var width = parseInt(obj.getAttribute('width'));
+            var height = parseInt(obj.getAttribute('height'));
+            obj.setAttribute('width', width / 1.2);
+            obj.setAttribute('height', height / 1.2);
+        }
+    </script>
+</body>
+</html>

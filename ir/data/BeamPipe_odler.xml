@@ -123,18 +123,18 @@
     </Lv3AuCoat>
 
     <IPBeamPipe_FWD>
-      <sec name="Z0" unit="cm">13.60</sec>
-      <sec name="Z1" unit="cm">13.75</sec>
-      <sec name="Z2" unit="cm">13.75</sec>
-      <sec name="Z3" unit="cm">13.95</sec>
+      <sec name="Z0" unit="cm">13.6</sec>
+      <sec name="Z1" unit="cm">13.95</sec>
+      <sec name="Z2" unit="cm">13.95</sec>
+      <sec name="Z3" unit="cm">14.25</sec>
       <sec name="Z4" unit="cm">14.25</sec>
-      <sec name="Z5" unit="cm">15.75</sec>
+      <sec name="Z5" unit="cm">15.85</sec>
       <sec name="Z6" unit="cm">15.85</sec>
-      <sec name="Z7" unit="cm">15.85</sec>
+      <sec name="Z7" unit="cm">16.05</sec>
       <sec name="Z8" unit="cm">16.05</sec>
-      <sec name="Z9" unit="cm">19.00</sec>
-      <sec name="Z10" unit="cm">19.00</sec>
-      <sec name="Z11" unit="cm">20.10</sec>
+      <sec name="Z9" unit="cm">19.1</sec>
+      <sec name="Z10" unit="cm">19.1</sec>
+      <sec name="Z11" unit="cm">20.1</sec>
       <sec name="RI0" unit="cm">0.0</sec>
       <sec name="RI1" unit="cm">0.0</sec>
       <sec name="RI2" unit="cm">0.0</sec>
@@ -147,20 +147,60 @@
       <sec name="RI9" unit="cm">0.0</sec>
       <sec name="RI10" unit="cm">0.0</sec>
       <sec name="RI11" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">1.35</sec>
-      <sec name="RO1" unit="cm">1.35</sec>
-      <sec name="RO2" unit="cm">1.50</sec>
-      <sec name="RO3" unit="cm">1.50</sec>
-      <sec name="RO4" unit="cm">1.80</sec>
-      <sec name="RO5" unit="cm">1.80</sec>
-      <sec name="RO6" unit="cm">1.90</sec>
-      <sec name="RO7" unit="cm">2.15</sec>
-      <sec name="RO8" unit="cm">2.35</sec>
-      <sec name="RO9" unit="cm">2.35</sec>
-      <sec name="RO10" unit="cm">4.0234</sec>
-      <sec name="RO11" unit="cm">4.0234</sec>
+      <sec name="RO0" unit="cm">1.8</sec>
+      <sec name="RO1" unit="cm">1.8</sec>
+      <sec name="RO2" unit="cm">2.15</sec>
+      <sec name="RO3" unit="cm">2.15</sec>
+      <sec name="RO4" unit="cm">2.35</sec>
+      <sec name="RO5" unit="cm">2.35</sec>
+      <sec name="RO6" unit="cm">3.1</sec>
+      <sec name="RO7" unit="cm">3.1</sec>
+      <sec name="RO8" unit="cm">3.1</sec>
+      <sec name="RO9" unit="cm">3.1</sec>
+      <sec name="RO10" unit="cm">4.1</sec>
+      <sec name="RO11" unit="cm">4.1</sec>
       <Material>Ta</Material>
     </IPBeamPipe_FWD>
+
+    <VacFWD>
+      <sec name="Z0" unit="cm">8.0</sec>
+      <sec name="Z1" unit="cm">13.6</sec>
+      <sec name="Z2" unit="cm">13.6</sec>
+      <sec name="Z3" unit="cm">13.95</sec>
+      <sec name="Z4" unit="cm">14.25</sec>
+      <sec name="Z5" unit="cm">15.85</sec>
+      <sec name="Z6" unit="cm">16.05</sec>
+      <sec name="Z7" unit="cm">19.1</sec>
+      <sec name="Z8" unit="cm">20.1</sec>
+      <sec name="Z9" unit="cm">21.1</sec>
+      <sec name="Z10" unit="cm">24.6</sec>
+      <sec name="Z11" unit="cm">25.6</sec>
+      <sec name="RI0" unit="cm">0.0</sec>
+      <sec name="RI1" unit="cm">0.0</sec>
+      <sec name="RI2" unit="cm">0.0</sec>
+      <sec name="RI3" unit="cm">0.0</sec>
+      <sec name="RI4" unit="cm">0.0</sec>
+      <sec name="RI5" unit="cm">0.0</sec>
+      <sec name="RI6" unit="cm">0.0</sec>
+      <sec name="RI7" unit="cm">0.0</sec>
+      <sec name="RI8" unit="cm">0.0</sec>
+      <sec name="RI9" unit="cm">0.0</sec>
+      <sec name="RI10" unit="cm">0.0</sec>
+      <sec name="RI11" unit="cm">0.0</sec>
+      <sec name="RO0" unit="cm">1.0299</sec>
+      <sec name="RO1" unit="cm">1.4999</sec>
+      <sec name="RO2" unit="cm">1.7999</sec>
+      <sec name="RO3" unit="cm">1.7999</sec>
+      <sec name="RO4" unit="cm">2.1499</sec>
+      <sec name="RO5" unit="cm">2.1499</sec>
+      <sec name="RO6" unit="cm">2.3499</sec>
+      <sec name="RO7" unit="cm">2.3499</sec>
+      <sec name="RO8" unit="cm">2.3499</sec>
+      <sec name="RO9" unit="cm">2.3499</sec>
+      <sec name="RO10" unit="cm">3.0999</sec>
+      <sec name="RO11" unit="cm">3.0999</sec>
+      <Material>Vacuum</Material>
+    </VacFWD>
 
     <BellowsPipe_FWD>
       <sec name="Z0" unit="cm">20.1</sec>
@@ -184,156 +224,77 @@
       <Material>Cu</Material>
     </BellowsPipe_FWD>
 
-    <IPChamber_FWD>
-      <!-- IP beampipe: 16mm ID (RI=0.8cm), Titanium (was Ta). OD keeps its
-           original tapered 21.6-28mm bulge (RO 1.08-1.4cm). -->
-      <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">8.5</sec>
-      <sec name="Z2" unit="cm">8.5</sec>
-      <sec name="Z3" unit="cm">11.5</sec>
-      <sec name="Z4" unit="cm">11.5</sec>
-      <sec name="Z5" unit="cm">12.65</sec>
-      <sec name="Z6" unit="cm">12.65</sec>
-      <sec name="Z7" unit="cm">13.60</sec>
-      <sec name="RI0" unit="cm">0.8</sec>
-      <sec name="RI1" unit="cm">0.8</sec>
-      <sec name="RI2" unit="cm">0.8</sec>
-      <sec name="RI3" unit="cm">0.8</sec>
-      <sec name="RI4" unit="cm">0.8</sec>
-      <sec name="RI5" unit="cm">0.8</sec>
-      <sec name="RI6" unit="cm">0.8</sec>
-      <sec name="RI7" unit="cm">0.8</sec>
-      <sec name="RO0" unit="cm">1.08</sec>
-      <sec name="RO1" unit="cm">1.08</sec>
-      <sec name="RO2" unit="cm">1.13</sec>
-      <sec name="RO3" unit="cm">1.13</sec>
-      <sec name="RO4" unit="cm">1.4</sec>
-      <sec name="RO5" unit="cm">1.4</sec>
-      <sec name="RO6" unit="cm">1.13</sec>
-      <sec name="RO7" unit="cm">1.13</sec>
-      <Material>Ti</Material>
-    </IPChamber_FWD>
+    <AdditionalShield_FWD>
+      <sec name="Z0" unit="mm">136.0</sec>
+      <sec name="RI0" unit="mm">26.5</sec>
+      <sec name="RO0" unit="mm">36.35</sec>
 
-    <VacFWD>
-      <!-- Straight central vacuum channel: ends where IPBeamPipe_FWD (solid crotch) begins -->
-      <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">8.9</sec>
-      <sec name="Z2" unit="cm">12.65</sec>
-      <sec name="Z3" unit="cm">13.60</sec>
-      <sec name="RI0" unit="cm">0.0</sec>
-      <sec name="RI1" unit="cm">0.0</sec>
-      <sec name="RI2" unit="cm">0.0</sec>
-      <sec name="RI3" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">0.8</sec>
-      <sec name="RO1" unit="cm">0.8</sec>
-      <sec name="RO2" unit="cm">0.8</sec>
-      <sec name="RO3" unit="cm">0.8</sec>
-      <Material>Vacuum</Material>
-    </VacFWD>
+      <sec name="Z1" unit="mm">158.5</sec>
+      <sec name="RI1" unit="mm">26.5</sec>
+      <sec name="RO1" unit="mm">43.23</sec>
 
-    <IPChamber_BWD>
-      <!-- IP beampipe: 16mm ID (RI=0.8cm), Titanium (was Ta). OD keeps its
-           original tapered 21.6-28mm bulge (RO 1.08-1.4cm). -->
-      <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">-8.5</sec>
-      <sec name="Z2" unit="cm">-8.5</sec>
-      <sec name="Z3" unit="cm">-8.9</sec>
-      <sec name="RI0" unit="cm">0.8</sec>
-      <sec name="RI1" unit="cm">0.8</sec>
-      <sec name="RI2" unit="cm">0.8</sec>
-      <sec name="RI3" unit="cm">0.8</sec>
-      <sec name="RO0" unit="cm">1.08</sec>
-      <sec name="RO1" unit="cm">1.13</sec>
-      <sec name="RO2" unit="cm">1.4</sec>
-      <sec name="RO3" unit="cm">1.4</sec>
-      <Material>Ti</Material>
-    </IPChamber_BWD>
+      <sec name="Z2" unit="mm">158.5</sec>
+      <sec name="RI2" unit="mm">32.0</sec>
+      <sec name="RO2" unit="mm">43.23</sec>
 
-    <VacBWD>
-      <!-- Straight central vacuum channel: ends where IPBeamPipe_BWD (solid crotch) begins -->
-      <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">-8.9</sec>
-      <sec name="RI0" unit="cm">0.0</sec>
-      <sec name="RI1" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">0.8</sec>
-      <sec name="RO1" unit="cm">0.8</sec>
-      <Material>Vacuum</Material>
-    </VacBWD>
-
-  <AdditionalShield_FWD>
-      <!-- RI follows IPBeamPipe_FWD outer + 0.3 mm at the sampled Z planes.
-           The creator subtracts the IPBeamPipe solid, so intermediate overlaps
-           in the Z=13-16 cm taper are resolved automatically. -->
-      <sec name="Z0" unit="cm">13.60</sec>
-      <sec name="RI0" unit="cm">1.38</sec>
-      <sec name="RO0" unit="cm">4.135</sec>
-
-      <sec name="Z1" unit="cm">15.85</sec>
-      <sec name="RI1" unit="cm">1.93</sec>
-      <sec name="RO1" unit="cm">4.823</sec>
-
-      <sec name="Z2" unit="cm">15.85</sec>
-      <sec name="RI2" unit="cm">2.18</sec>
-      <sec name="RO2" unit="cm">4.823</sec>
-
-      <sec name="Z3" unit="cm">19.10</sec>
-      <sec name="RI3" unit="cm">2.38</sec>
-      <sec name="RO3" unit="cm">5.817</sec>
+      <sec name="Z3" unit="mm">191.0</sec>
+      <sec name="RI3" unit="mm">32.0</sec>
+      <sec name="RO3" unit="mm">53.17</sec>
 
       <Material>W</Material>
       <Desc>Additional Shield Forward</Desc>
     </AdditionalShield_FWD>
 
     <BellowsShield_FWD>
-      <sec name="Z0" unit="cm">19.10</sec>
-      <sec name="RI0" unit="cm">4.20</sec>
-      <sec name="RO0" unit="cm">5.817</sec>
+      <sec name="Z0" unit="mm">191.0</sec>
+      <sec name="RI0" unit="mm">42.0</sec>
+      <sec name="RO0" unit="mm">53.17</sec>
 
-      <sec name="Z1" unit="cm">21.10</sec>
-      <sec name="RI1" unit="cm">4.20</sec>
-      <sec name="RO1" unit="cm">6.428</sec>
+      <sec name="Z1" unit="mm">211.0</sec>
+      <sec name="RI1" unit="mm">42.0</sec>
+      <sec name="RO1" unit="mm">59.28</sec>
 
-      <sec name="Z2" unit="cm">21.10</sec>
-      <sec name="RI2" unit="cm">5.092</sec>
-      <sec name="RO2" unit="cm">6.428</sec>
+      <sec name="Z2" unit="mm">211.0</sec>
+      <sec name="RI2" unit="mm">50.92</sec>
+      <sec name="RO2" unit="mm">59.28</sec>
 
-      <sec name="Z3" unit="cm">35.073</sec>
-      <sec name="RI3" unit="cm">9.363</sec>
-      <sec name="RO3" unit="cm">10.7</sec>
+      <sec name="Z3" unit="mm">350.73</sec>
+      <sec name="RI3" unit="mm">93.63</sec>
+      <sec name="RO3" unit="mm">102.0</sec>
 
-      <sec name="Z4" unit="cm">35.192</sec>
-      <sec name="RI4" unit="cm">9.40</sec>
-      <sec name="RO4" unit="cm">10.7</sec>
+      <sec name="Z4" unit="mm">351.92</sec>
+      <sec name="RI4" unit="mm">94.0</sec>
+      <sec name="RO4" unit="mm">102.0</sec>
 
-      <sec name="Z5" unit="cm">43.80</sec>
-      <sec name="RI5" unit="cm">9.40</sec>
-      <sec name="RO5" unit="cm">10.7</sec>
+      <sec name="Z5" unit="mm">480.0</sec>
+      <sec name="RI5" unit="mm">94.0</sec>
+      <sec name="RO5" unit="mm">102.0</sec>
 
-      <sec name="Z6" unit="cm">43.80</sec>
-      <sec name="RI6" unit="cm">9.40</sec>
-      <sec name="RO6" unit="cm">12.7</sec>
+      <sec name="Z6" unit="mm">480.0</sec>
+      <sec name="RI6" unit="mm">94.0</sec>
+      <sec name="RO6" unit="mm">117.0</sec>
 
-      <sec name="Z7" unit="cm">54.80</sec> <!-- 49.30 + 5.5cm (55mm) extension -->
-      <sec name="RI7" unit="cm">10.70</sec>
-      <sec name="RO7" unit="cm">12.7</sec>
+      <sec name="Z7" unit="mm">490.0</sec>
+      <sec name="RI7" unit="mm">94.0</sec>
+      <sec name="RO7" unit="mm">117.0</sec>
 
       <Material>W</Material>
       <Desc>Forward Tungsten Bellows Shield</Desc>
     </BellowsShield_FWD>
 
     <IPBeamPipe_BWD>
-      <sec name="Z0" unit="cm">-8.90</sec>
-      <sec name="Z1" unit="cm">-9.05</sec>
-      <sec name="Z2" unit="cm">-9.05</sec>
-      <sec name="Z3" unit="cm">-9.18</sec>
+      <sec name="Z0" unit="cm">-8.9</sec>
+      <sec name="Z1" unit="cm">-9.18</sec>
+      <sec name="Z2" unit="cm">-9.18</sec>
+      <sec name="Z3" unit="cm">-9.95</sec>
       <sec name="Z4" unit="cm">-9.95</sec>
-      <sec name="Z5" unit="cm">-11.60</sec>
-      <sec name="Z6" unit="cm">-11.70</sec>
-      <sec name="Z7" unit="cm">-11.70</sec>
-      <sec name="Z8" unit="cm">-11.90</sec>
-      <sec name="Z9" unit="cm">-19.00</sec>
-      <sec name="Z10" unit="cm">-19.00</sec>
-      <sec name="Z11" unit="cm">-20.10</sec>
+      <sec name="Z5" unit="cm">-11.7</sec>
+      <sec name="Z6" unit="cm">-11.7</sec>
+      <sec name="Z7" unit="cm">-11.9</sec>
+      <sec name="Z8" unit="cm">-11.9</sec>
+      <sec name="Z9" unit="cm">-19.1</sec>
+      <sec name="Z10" unit="cm">-19.1</sec>
+      <sec name="Z11" unit="cm">-20.1</sec>
       <sec name="RI0" unit="cm">0.0</sec>
       <sec name="RI1" unit="cm">0.0</sec>
       <sec name="RI2" unit="cm">0.0</sec>
@@ -346,20 +307,60 @@
       <sec name="RI9" unit="cm">0.0</sec>
       <sec name="RI10" unit="cm">0.0</sec>
       <sec name="RI11" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">0.93</sec>
-      <sec name="RO1" unit="cm">0.93</sec>
-      <sec name="RO2" unit="cm">1.03</sec>
-      <sec name="RO3" unit="cm">1.03</sec>
-      <sec name="RO4" unit="cm">1.80</sec>
-      <sec name="RO5" unit="cm">1.80</sec>
-      <sec name="RO6" unit="cm">1.90</sec>
-      <sec name="RO7" unit="cm">2.15</sec>
-      <sec name="RO8" unit="cm">2.35</sec>
-      <sec name="RO9" unit="cm">2.35</sec>
-      <sec name="RO10" unit="cm">4.0234</sec>
-      <sec name="RO11" unit="cm">4.0234</sec>
+      <sec name="RO0" unit="cm">1.8</sec>
+      <sec name="RO1" unit="cm">1.8</sec>
+      <sec name="RO2" unit="cm">2.15</sec>
+      <sec name="RO3" unit="cm">2.15</sec>
+      <sec name="RO4" unit="cm">2.35</sec>
+      <sec name="RO5" unit="cm">2.35</sec>
+      <sec name="RO6" unit="cm">3.1</sec>
+      <sec name="RO7" unit="cm">3.1</sec>
+      <sec name="RO8" unit="cm">3.1</sec>
+      <sec name="RO9" unit="cm">3.1</sec>
+      <sec name="RO10" unit="cm">4.1</sec>
+      <sec name="RO11" unit="cm">4.1</sec>
       <Material>Ta</Material>
     </IPBeamPipe_BWD>
+
+    <VacBWD>
+      <sec name="Z0" unit="cm">-8.0</sec>
+      <sec name="Z1" unit="cm">-13.6</sec>
+      <sec name="Z2" unit="cm">-13.6</sec>
+      <sec name="Z3" unit="cm">-13.95</sec>
+      <sec name="Z4" unit="cm">-14.25</sec>
+      <sec name="Z5" unit="cm">-15.85</sec>
+      <sec name="Z6" unit="cm">-16.05</sec>
+      <sec name="Z7" unit="cm">-19.1</sec>
+      <sec name="Z8" unit="cm">-20.1</sec>
+      <sec name="Z9" unit="cm">-21.1</sec>
+      <sec name="Z10" unit="cm">-24.6</sec>
+      <sec name="Z11" unit="cm">-25.6</sec>
+      <sec name="RI0" unit="cm">0.0</sec>
+      <sec name="RI1" unit="cm">0.0</sec>
+      <sec name="RI2" unit="cm">0.0</sec>
+      <sec name="RI3" unit="cm">0.0</sec>
+      <sec name="RI4" unit="cm">0.0</sec>
+      <sec name="RI5" unit="cm">0.0</sec>
+      <sec name="RI6" unit="cm">0.0</sec>
+      <sec name="RI7" unit="cm">0.0</sec>
+      <sec name="RI8" unit="cm">0.0</sec>
+      <sec name="RI9" unit="cm">0.0</sec>
+      <sec name="RI10" unit="cm">0.0</sec>
+      <sec name="RI11" unit="cm">0.0</sec>
+      <sec name="RO0" unit="cm">1.0299</sec>
+      <sec name="RO1" unit="cm">1.4999</sec>
+      <sec name="RO2" unit="cm">1.7999</sec>
+      <sec name="RO3" unit="cm">1.7999</sec>
+      <sec name="RO4" unit="cm">2.1499</sec>
+      <sec name="RO5" unit="cm">2.1499</sec>
+      <sec name="RO6" unit="cm">2.3499</sec>
+      <sec name="RO7" unit="cm">2.3499</sec>
+      <sec name="RO8" unit="cm">2.3499</sec>
+      <sec name="RO9" unit="cm">2.3499</sec>
+      <sec name="RO10" unit="cm">3.0999</sec>
+      <sec name="RO11" unit="cm">3.0999</sec>
+      <Material>Vacuum</Material>
+    </VacBWD>
 
     <BellowsPipe_BWD>
       <sec name="Z0" unit="cm">-20.1</sec>
@@ -384,56 +385,50 @@
     </BellowsPipe_BWD>
 
 <BellowsShield_BWD>
-      <!-- Mirror of BellowsShield_FWD, except Z7 stays at the original
-           -49.30cm rather than carrying over FWD's own 49.30+5.5cm (55mm)
-           extension - that extra flange length was FWD-specific and
-           shouldn't have been copied to BWD. -->
-      <sec name="Z0" unit="cm">-19.10</sec>
-      <sec name="RI0" unit="cm">4.20</sec>
-      <sec name="RO0" unit="cm">5.817</sec>
+      <sec name="Z0" unit="mm">-410.0</sec>
+      <sec name="RI0" unit="mm">94.0</sec>
+      <sec name="RO0" unit="mm">117.0</sec>
 
-      <sec name="Z1" unit="cm">-21.10</sec>
-      <sec name="RI1" unit="cm">4.20</sec>
-      <sec name="RO1" unit="cm">6.428</sec>
+      <sec name="Z1" unit="mm">-400.0</sec>
+      <sec name="RI1" unit="mm">94.0</sec>
+      <sec name="RO1" unit="mm">117.0</sec>
 
-      <sec name="Z2" unit="cm">-21.10</sec>
-      <sec name="RI2" unit="cm">5.092</sec>
-      <sec name="RO2" unit="cm">6.428</sec>
+      <sec name="Z2" unit="mm">-400.0</sec>
+      <sec name="RI2" unit="mm">94.0</sec>
+      <sec name="RO2" unit="mm">102.0</sec>
 
-      <sec name="Z3" unit="cm">-35.073</sec>
-      <sec name="RI3" unit="cm">9.363</sec>
-      <sec name="RO3" unit="cm">10.7</sec>
+      <sec name="Z3" unit="mm">-351.92</sec>
+      <sec name="RI3" unit="mm">94.0</sec>
+      <sec name="RO3" unit="mm">102.0</sec>
 
-      <sec name="Z4" unit="cm">-35.192</sec>
-      <sec name="RI4" unit="cm">9.40</sec>
-      <sec name="RO4" unit="cm">10.7</sec>
+      <sec name="Z4" unit="mm">-350.73</sec>
+      <sec name="RI4" unit="mm">93.63</sec>
+      <sec name="RO4" unit="mm">102.0</sec>
 
-      <sec name="Z5" unit="cm">-43.80</sec>
-      <sec name="RI5" unit="cm">9.40</sec>
-      <sec name="RO5" unit="cm">10.7</sec>
+      <sec name="Z5" unit="mm">-211.0</sec>
+      <sec name="RI5" unit="mm">50.92</sec>
+      <sec name="RO5" unit="mm">59.28</sec>
 
-      <sec name="Z6" unit="cm">-43.80</sec>
-      <sec name="RI6" unit="cm">9.40</sec>
-      <sec name="RO6" unit="cm">12.7</sec>
+      <sec name="Z6" unit="mm">-211.0</sec>
+      <sec name="RI6" unit="mm">42.0</sec>
+      <sec name="RO6" unit="mm">59.28</sec>
 
-      <!-- Z6-Z7 flange is a plain rectangular block (RI/RO both constant),
-           15mm wide in Z (was 5.5cm, ending at -49.30cm). -->
-      <sec name="Z7" unit="cm">-45.30</sec>
-      <sec name="RI7" unit="cm">9.40</sec>
-      <sec name="RO7" unit="cm">12.7</sec>
+      <sec name="Z7" unit="mm">-191.0</sec>
+      <sec name="RI7" unit="mm">42.0</sec>
+      <sec name="RO7" unit="mm">53.17</sec>
 
       <Material>W</Material>
       <Desc>Backward Tungsten Bellows Shield</Desc>
     </BellowsShield_BWD>
 
     <AdditionalShield_BWD>
-      <sec name="Z0" unit="cm">-19.10</sec>
-      <sec name="RI0" unit="cm">3.15</sec>
-      <sec name="RO0" unit="cm">5.317</sec>
+      <sec name="Z0" unit="mm">-191.0</sec>
+      <sec name="RI0" unit="mm">31.5</sec>
+      <sec name="RO0" unit="mm">53.17</sec>
 
-      <sec name="Z1" unit="cm">-13.75</sec>
-      <sec name="RI1" unit="cm">3.15</sec>
-      <sec name="RO1" unit="cm">3.681</sec>
+      <sec name="Z1" unit="mm">-137.5</sec>
+      <sec name="RI1" unit="mm">31.5</sec>
+      <sec name="RO1" unit="mm">36.81</sec>
 
       <Material>W</Material>
       <Desc>Additional Shield Backward</Desc>
@@ -682,6 +677,46 @@
       <sec name="R1" unit="cm">1.0</sec>
       <Material>Vacuum</Material>
     </Lv2VacLERDwn>
+
+    <PXDMountFwd>
+      <sec name="Z1" unit="cm">14.6</sec>
+      <sec name="R1" unit="cm">2.35</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="R2" unit="cm">0.25</sec>
+      <sec name="L1" unit="cm">2.075</sec>
+      <sec name="L2" unit="cm">0.75</sec>
+      <Material>W</Material>
+    </PXDMountFwd>
+
+    <PXDMountFixtureFwd>
+      <sec name="Z1" unit="cm">14.6</sec>
+      <sec name="R1" unit="cm">3.2</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="I1" unit="cm">1.2</sec>
+      <sec name="T1" unit="cm">0.25</sec>
+      <sec name="T2" unit="cm">0.15</sec>
+      <Material>Cu</Material>
+    </PXDMountFixtureFwd>
+
+    <PXDMountBwd>
+      <sec name="Z1" unit="cm">10.8</sec>
+      <sec name="R1" unit="cm">2.35</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="R2" unit="cm">0.25</sec>
+      <sec name="L1" unit="cm">2.075</sec>
+      <sec name="L2" unit="cm">0.75</sec>
+      <Material>W</Material>
+    </PXDMountBwd>
+
+    <PXDMountFixtureBwd>
+      <sec name="Z1" unit="cm">10.8</sec>
+      <sec name="R1" unit="cm">3.2</sec>
+      <sec name="D1" unit="cm">2.4</sec>
+      <sec name="I1" unit="cm">1.2</sec>
+      <sec name="T1" unit="cm">0.25</sec>
+      <sec name="T2" unit="cm">0.15</sec>
+      <Material>Cu</Material>
+    </PXDMountFixtureBwd>
 
   </Content>
 </DetectorComponent>

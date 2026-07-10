@@ -43,34 +43,34 @@ bool TRGSummary::test() const
 
 bool TRGSummary::testInput(unsigned int bit) const
 {
-  if (bit >= c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgDataSize) {
     B2ERROR("Requested input trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested input trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = bit / c_trgWordSize;
-  int iBit = bit % c_trgWordSize;
+  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
+  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
   return (m_inputBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testFtdl(unsigned int bit) const
 {
-  if (bit >= c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgDataSize) {
     B2ERROR("Requested ftdl trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested FTDL trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = bit / c_trgWordSize;
-  int iBit = bit % c_trgWordSize;
+  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
+  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
   return (m_ftdlBits[iWord] & (1u << iBit)) != 0;
 }
 
 bool TRGSummary::testPsnm(unsigned int bit) const
 {
-  if (bit >= c_trgWordSize * c_ntrgWords) {
+  if (bit >= c_trgDataSize) {
     B2ERROR("Requested psnm trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested PSNM trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = bit / c_trgWordSize;
-  int iBit = bit % c_trgWordSize;
+  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
+  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
   return (m_psnmBits[iWord] & (1u << iBit)) != 0;
 }
 
@@ -86,7 +86,7 @@ unsigned int TRGSummary::getInputBitNumber(const std::string& name) const
     throw std::runtime_error("No input trigger map in the given globaltags");
   }
 
-  for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
+  for (unsigned int bit = 0; bit < c_trgDataSize; bit++) {
     if (std::string(inputBits->getinbitname((int)bit)) == name) {
       return bit;
     }
@@ -108,7 +108,7 @@ unsigned int TRGSummary::getOutputBitNumber(const std::string& name) const
     throw std::runtime_error("No input trigger map in the given globaltags");
   }
 
-  for (unsigned int bit = 0; bit < c_trgWordSize * c_ntrgWords; bit++) {
+  for (unsigned int bit = 0; bit < c_trgDataSize; bit++) {
     if (std::string(ftdlBits->getoutbitname((int)bit)) == name) {
       return bit;
     }
@@ -131,12 +131,11 @@ std::string TRGSummary::getInfoHTML() const
   htmlOutput
       << "<tr><td>Bit</td><td>Input Bits</td><td>Final Trg DL</td><td>Prescaled Trg and Mask</td></tr>";
 
-  for (unsigned int currentBit = 0;
-       currentBit < (c_ntrgWords * c_trgWordSize); currentBit++) {
+  for (unsigned int currentBit = 0; currentBit < c_trgDataSize; currentBit++) {
     htmlOutput << "<tr>";
 
-    const auto currentWord = currentBit / c_trgWordSize;
-    const auto currentBitInWord = currentBit % c_trgWordSize;
+    const auto currentWord = (currentBit >> 5); // equals currentBit / c_trgWordSize;
+    const auto currentBitInWord = (currentBit & 0x1F); // equals currentBit % c_trgWordSize;
 
     const auto ftdlBit =
       (getFtdlBits(currentWord) & ((unsigned int)1 << currentBitInWord)) > 0;

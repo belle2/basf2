@@ -15,6 +15,7 @@
 #include <framework/database/DBStore.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 /* ROOT headers. */
 #include <TMinuit.h>
@@ -85,12 +86,10 @@ static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
   boostDifference[2] = beamBoost.Z() - s_BoostVector.Z();
   double boostChi2 = s_BoostVectorInverseCovariance.Similarity(boostDifference);
   double invariantMass = pBeam.M();
-  double massChi2 = pow((invariantMass - s_InvariantMass) /
-                        s_InvariantMassError, 2);
+  double massChi2 = square((invariantMass - s_InvariantMass) / s_InvariantMassError);
   double angleHER = ROOT::Math::VectorUtil::Angle(pHER, s_DirectionHER);
   double angleLER = ROOT::Math::VectorUtil::Angle(pLER, s_DirectionLER);
-  double angleChi2 = pow(angleHER / s_AngleError, 2) +
-                     pow(angleLER / s_AngleError, 2);
+  double angleChi2 = square(angleHER / s_AngleError) + square(angleLER / s_AngleError);
   fval = boostChi2 + massChi2 + angleChi2;
 }
 
@@ -272,8 +271,7 @@ void BeamParametersFitter::fit()
       pBeam.Pz() * cosThetaX * cosThetaY)) / fittedInvariantMass;
   double sigmaInvariantMass = m_CollisionInvariantMass->getMassSpread();
   double k = sqrt(sigmaInvariantMass * sigmaInvariantMass /
-                  (pow(herPartial * pHER.E(), 2) +
-                   pow(lerPartial * pLER.E(), 2)));
+                  (square(herPartial * pHER.E()) + square(lerPartial * pLER.E())));
   double herSpread = k * pHER.E();
   double lerSpread = k * pLER.E();
   B2INFO("Invariant mass spread: " << sigmaInvariantMass);

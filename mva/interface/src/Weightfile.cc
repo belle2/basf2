@@ -101,6 +101,11 @@ namespace Belle2 {
     {
       char* directory_template = strdup((fs::temp_directory_path() / "Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
+      if (directory == nullptr) {
+        int err = errno;
+        free(directory_template);
+        throw std::runtime_error(std::string("mkdtemp failed: ") + std::strerror(err));
+      }
       std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
       m_filenames.emplace_back(directory);
       free(directory_template);

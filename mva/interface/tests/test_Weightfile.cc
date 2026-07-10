@@ -335,7 +335,13 @@ namespace {
     EXPECT_FALSE(std::filesystem::exists(std::filesystem::path(filename).parent_path()));
 
     char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2Sub.XXXXXX").c_str());
-    auto tempdir = std::string(mkdtemp(directory_template));
+    auto directory = mkdtemp(directory_template);
+    if (directory == nullptr) {
+      int err = errno;
+      free(directory_template);
+      GTEST_SKIP() << "Skipping part of test GetFileName: failed to create local temporary directory: " << std::strerror(err);
+    }
+    auto tempdir = std::string(directory);
     setenv("TMPDIR", tempdir.c_str(), 1);
     {
       MVA::Weightfile weightfile2;

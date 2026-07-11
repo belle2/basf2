@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/MathHelpers.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -307,11 +308,11 @@ namespace Belle2 {
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
-    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError, 2) +
-                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError, 2) +
-                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError, 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError(), 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError(), 2));
+    error = prob * sqrt(square(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError) +
+                        square(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError) +
+                        square(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError) +
+                        square(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError()) +
+                        square(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError()));
   }
 
   /** finds all possible combinations of U and V Clusters for SVDClusters.

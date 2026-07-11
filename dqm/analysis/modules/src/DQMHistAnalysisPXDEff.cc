@@ -301,21 +301,15 @@ void DQMHistAnalysisPXDEffModule::event()
       replace(buff.begin(), buff.end(), '.', '_');
 
       std::string locationHits = "track_hits_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationHits = m_histogramDirectoryName + "/" + locationHits;
-      }
       std::string locationMatches = "matched_cluster_" + buff;
-      if (m_histogramDirectoryName != "") {
-        locationMatches = m_histogramDirectoryName + "/" + locationMatches;
-      }
 
-      auto Hits = findHist(locationHits, true);// check if updated
-      auto Matches = findHist(locationMatches, true);// check if updated
+      auto Hits = findHist(m_histogramDirectoryName, locationHits, true);// check if updated
+      auto Matches = findHist(m_histogramDirectoryName, locationMatches, true);// check if updated
 
       if (Hits == nullptr && Matches == nullptr) continue; // none updated
 
-      if (Hits == nullptr) Hits = findHist(locationHits); // actually, this should not happen ...
-      if (Matches == nullptr) Matches = findHist(locationMatches); // ... as updates should coincide
+      if (Hits == nullptr) Hits = findHist(m_histogramDirectoryName, locationHits); // actually, this should not happen ...
+      if (Matches == nullptr) Matches = findHist(m_histogramDirectoryName, locationMatches); // ... as updates should coincide
 
       // Finding only one of them should only happen in very strange situations... still better check
       if (Hits && Matches) {

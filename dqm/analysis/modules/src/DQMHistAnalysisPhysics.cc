@@ -157,7 +157,7 @@ void DQMHistAnalysisPhysicsModule::event()
   if (m_IsPhysicsRun == true) {
 
     m_ratio_text->Clear();
-    auto m_hphysicsresults = findHist("PhysicsObjects/physicsresults", true);// check if updated
+    auto m_hphysicsresults = findHist("PhysicsObjects", "physicsresults", true);// check if updated
     if (m_hphysicsresults) {
       double had_ntot = m_hphysicsresults->GetBinContent(2);
       double hadb2_ntot = m_hphysicsresults->GetBinContent(3);
@@ -213,7 +213,7 @@ void DQMHistAnalysisPhysicsModule::event()
         m_cmUPSmumu->Update();
         UpdateCanvas(m_cmUPSmumu);
       } else {
-        hmUPSmumu = findHist("PhysicsObjects/mUPS", true);// only if updated
+        hmUPSmumu = findHist("PhysicsObjects", "mUPS", true);// only if updated
         if (hmUPSmumu and hmUPSmumu->GetEntries() < m_minEntriesUPSmumu) {
           // only if integral plot is below delta entries
           m_cmUPSmumu->cd();
@@ -223,7 +223,7 @@ void DQMHistAnalysisPhysicsModule::event()
       }
     }
     if (m_cmUPSee) {
-      auto hmUPSee = getDelta("PhysicsObjects/mUPSe");// check if updated
+      auto hmUPSee = getDelta("PhysicsObjects", "mUPSe");// check if updated
       if (hmUPSee) {
         m_cmUPSee->cd();
         fitUpsilonFromHisto(hmUPSee, m_cmUPSee_text, "M(ee) [GeV/c^2]", "UPSee", m_pvPrefix + "mUPSee");
@@ -231,7 +231,7 @@ void DQMHistAnalysisPhysicsModule::event()
         m_cmUPSee->Update();
         UpdateCanvas(m_cmUPSee);
       } else {
-        hmUPSee = findHist("PhysicsObjects/mUPSe", true);// only if updated
+        hmUPSee = findHist("PhysicsObjects", "mUPSe", true);// only if updated
         if (hmUPSee and hmUPSee->GetEntries() < m_minEntriesUPSee) {
           // only if integral plot is below delta entries
           m_cmUPSee->cd();
@@ -251,7 +251,7 @@ void DQMHistAnalysisPhysicsModule::event()
 }
 void DQMHistAnalysisPhysicsModule::endRun()
 {
-  auto m_hphysicsresults = findHist("PhysicsObjects/physicsresults");
+  auto m_hphysicsresults = findHist("PhysicsObjects", "physicsresults");
   if (m_hphysicsresults) {
     double had_ntot = m_hphysicsresults->GetBinContent(2);
     double hadb2_ntot = m_hphysicsresults->GetBinContent(3);

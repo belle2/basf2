@@ -56,7 +56,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
       m_out_of_time_digits[pv_name] = 0;
 
       std::string hist_name    = "ECL/out_of_time_" + var_name;
-      auto hist = (TH1F*)findHist(hist_name, m_onlyIfUpdated);
+      auto hist = (TH1F*)findHist(hist_name, "", m_onlyIfUpdated);
 
       if (!hist) continue;
 

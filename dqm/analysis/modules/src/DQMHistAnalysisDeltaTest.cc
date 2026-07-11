@@ -135,7 +135,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   // it would be nicer to plot oldest first, left as exercise for reader
   m_cTest->cd(6);
   for (int i = 0; i < 99; i++) {
-    auto h = getDelta(fullname, i, false);
+    auto h = getDelta(fullname, "", i, false);
     if (h == nullptr) break;
     if (i == 0) {
       h->Draw("hist");

@@ -84,8 +84,10 @@ namespace Belle2 {
     {
       if (t < 0.0)
         return 0.0;
-      else
+      else {
+        // Replace pow(1.+t, -10) by a division and a sequential calculation of the tenth power for improved execution time
         return 149.012 * square(t) / (pow4(1.0 + t) * pow4(1.0 + t) * square(1.0 + t));
+      }
     }
 
     /** Adjacent-channel waveform U-side.

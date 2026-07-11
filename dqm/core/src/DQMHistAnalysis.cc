@@ -151,7 +151,7 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
 }
 
 
-TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool updated)
+TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool was_updated)
 {
   std::string fullname = dirname + "/" + histname;
   if (dirname.size() == 0) fullname = histname; // assume contains dirname

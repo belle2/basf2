@@ -243,7 +243,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& dirname,
-                         const std::string& histname, bool onlyIfUpdated = false);
+                         const std::string& histname = "", bool onlyIfUpdated = false);
 
     /**
      * Find reference histogram.
@@ -254,7 +254,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findRefHist(const std::string& dirname,
-                            const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
+                            const std::string& histname = "", ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /** Using the original and reference, create scaled version
      * @param scaling scaling algorithm
@@ -354,7 +354,7 @@ namespace Belle2 {
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(const std::string& dirname, const std::string& histname = "", int n = 0, bool onlyIfUpdated = true);
 
     /**
      * Add Delta histogram parameters.

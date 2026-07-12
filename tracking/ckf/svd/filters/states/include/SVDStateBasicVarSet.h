@@ -62,9 +62,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class SVDStateBasicVarNames {
+  class SVDStateBasicVarNames : public TrackingUtilities::VarNames<BaseSVDStateFilter::Object> {
+
   public:
-    using Object = BaseSVDStateFilter::Object;
     /// Number of variables to be generated.
     static const size_t nVars = TrackingUtilities::size(svdStateBasicVarNames);
 

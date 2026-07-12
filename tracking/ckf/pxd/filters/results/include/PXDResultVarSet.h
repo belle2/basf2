@@ -50,11 +50,13 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDResultVarNames {
+  class PXDResultVarNames : public TrackingUtilities::VarNames<CKFToPXDResult> {
+
   public:
-    using Object = CKFToPXDResult;
     /// Number of variables to be generated.
     // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
+    // at least tell cppcheck that everything is fine
+    // cppcheck-suppress duplInheritedMember
     static const size_t nVars = TrackingUtilities::size(pxdResultVarNames);
 
     /// Get the name of the column.

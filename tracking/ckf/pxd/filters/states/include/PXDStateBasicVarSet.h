@@ -69,9 +69,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class PXDStateBasicVarNames {
+  class PXDStateBasicVarNames : public TrackingUtilities::VarNames<BasePXDStateFilter::Object> {
+
   public:
-    using Object = BasePXDStateFilter::Object;
     /// Number of variables to be generated.
     static const size_t nVars = TrackingUtilities::size(pxdStateBasicVarNames);
 

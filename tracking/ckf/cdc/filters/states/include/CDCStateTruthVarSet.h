@@ -21,9 +21,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CDCStateTruthVarNames {
+  class CDCStateTruthVarNames : public TrackingUtilities::VarNames<BaseCDCStateFilter::Object> {
+
   public:
-    using Object = BaseCDCStateFilter::Object;
     /// Number of variables to be generated.
     static const size_t nVars = TrackingUtilities::size(cdcStateTruthVarNames);
 

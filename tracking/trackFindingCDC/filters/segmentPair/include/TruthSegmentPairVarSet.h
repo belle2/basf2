@@ -30,11 +30,12 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct TruthSegmentPairVarNames {
-      using Object = TrackingUtilities::CDCSegmentPair;
+    struct TruthSegmentPairVarNames : public TrackingUtilities::VarNames<TrackingUtilities::CDCSegmentPair> {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
+      // at least tell cppcheck that everything is fine
+      // cppcheck-suppress duplInheritedMember
       static const size_t nVars = TrackingUtilities::size(truthSegmentPairVarNames);
 
       /// Getter for the name at the given index

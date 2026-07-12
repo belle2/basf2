@@ -37,11 +37,13 @@ namespace Belle2 {
     };
 
     /// Class vehicle to transport the variable names
-    struct HitGapTrackRelationVarNames {
-      using Object = TrackingUtilities::Relation<const TrackingUtilities::CDCTrack>;
+    struct HitGapTrackRelationVarNames : public
+      TrackingUtilities::VarNames<TrackingUtilities::Relation<const TrackingUtilities::CDCTrack> > {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
+      // at least tell cppcheck that everything is fine
+      // cppcheck-suppress duplInheritedMember
       static const size_t nVars = TrackingUtilities::size(hitGapTrackRelationVarNames);
 
       /// Getter for the name at the given index

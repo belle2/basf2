@@ -26,7 +26,6 @@ namespace Belle2 {
     struct FilterVarNames {
       using Object = typename AFilter::Object;
 
-
       /// Number of variables to be generated
       static const size_t nVars;
 

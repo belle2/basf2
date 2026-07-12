@@ -37,7 +37,6 @@ namespace Belle2 {
     struct FitlessFacetVarNames {
       using Object = const TrackingUtilities::CDCFacet;
 
-
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       static const size_t nVars = TrackingUtilities::size(fitlessFacetVarNames);

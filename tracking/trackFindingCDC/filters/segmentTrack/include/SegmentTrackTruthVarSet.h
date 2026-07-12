@@ -31,7 +31,6 @@ namespace Belle2 {
     struct SegmentTrackTruthVarNames {
       using Object = BaseSegmentTrackFilter::Object;
 
-
       /// Number of variables to be generated
       static const size_t nVars = TrackingUtilities::size(segmentTrackTruthVarNames);
 

@@ -31,7 +31,6 @@ namespace Belle2 {
     struct BasicTrackRelationVarNames {
       using Object = TrackingUtilities::Relation<const TrackingUtilities::CDCTrack>;
 
-
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       static const size_t nVars = TrackingUtilities::size(basicTrackRelationVarNames);

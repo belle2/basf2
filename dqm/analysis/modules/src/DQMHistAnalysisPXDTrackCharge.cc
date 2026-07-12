@@ -405,7 +405,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge && any_enought_flag) {
+  if (any_enought_flag) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);

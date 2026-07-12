@@ -59,7 +59,7 @@ namespace Belle2 {
     CKFToPXDFindlet();
 
     /// Default destructor
-    ~CKFToPXDFindlet();
+    ~CKFToPXDFindlet() override;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

@@ -23,7 +23,9 @@ namespace Belle2 {
 
     /// Vehicle class to transport the variable names
     template<class AFilter>
-    struct FilterVarNames : public VarNames<typename AFilter::Object> {
+    struct FilterVarNames {
+      using Object = typename AFilter::Object;
+
 
       /// Number of variables to be generated
       static const size_t nVars;

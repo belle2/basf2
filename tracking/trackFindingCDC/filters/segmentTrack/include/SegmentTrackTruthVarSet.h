@@ -28,7 +28,9 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct SegmentTrackTruthVarNames : public TrackingUtilities::VarNames<BaseSegmentTrackFilter::Object> {
+    struct SegmentTrackTruthVarNames {
+      using Object = BaseSegmentTrackFilter::Object;
+
 
       /// Number of variables to be generated
       static const size_t nVars = TrackingUtilities::size(segmentTrackTruthVarNames);

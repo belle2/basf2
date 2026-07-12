@@ -32,7 +32,7 @@ namespace Belle2 {
     SectorMapBootstrapModule();
 
     //! Destructor
-    ~SectorMapBootstrapModule()
+    ~SectorMapBootstrapModule() override
     {
       if (m_ptrDBObjPtr != nullptr) delete m_ptrDBObjPtr;
     };

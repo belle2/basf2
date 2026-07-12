@@ -80,9 +80,9 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class CDCPathBasicVarNames : public TrackingUtilities::VarNames<BaseCDCPathFilter::Object> {
-
+  class CDCPathBasicVarNames {
   public:
+    using Object = BaseCDCPathFilter::Object;
     /// Number of variables to be generated.
     static const size_t nVars = TrackingUtilities::size(cdcPathBasicVarNames);
 

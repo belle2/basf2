@@ -24,7 +24,7 @@ namespace Belle2 {
     /** Constructor */
     TrackDQMModule();
     /* Destructor */
-    ~TrackDQMModule() { }
+    ~TrackDQMModule() override { }
 
     /** Module functions */
     virtual void initialize() override;

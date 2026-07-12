@@ -60,7 +60,7 @@ namespace Belle2 {
 
 
     /** Destructor of the module. */
-    ~RawSecMapMergerModule() {}
+    ~RawSecMapMergerModule() override {}
 
 
     /** returns all names of root-files fitting given parameter mapName  */

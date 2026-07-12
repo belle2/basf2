@@ -24,7 +24,7 @@ namespace Belle2 {
     /** Constructor */
     TrackingHLTDQMModule();
     /** Destructor */
-    ~TrackingHLTDQMModule() { }
+    ~TrackingHLTDQMModule() override { }
 
     /** Module functions */
     void initialize() override;

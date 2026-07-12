@@ -39,7 +39,7 @@ namespace Belle2 {
 
     HitXPModule();
 
-    ~HitXPModule();
+    ~HitXPModule() override;
 
     /** Initialize the Module.
      * This method is called only once before the actual event processing starts.   */

@@ -30,7 +30,7 @@ namespace Belle2 {
     MCPXDROICreatorModule();
 
     /** Empty destructor */
-    virtual ~MCPXDROICreatorModule() {};
+    virtual ~MCPXDROICreatorModule() override {};
 
     /** init the module */
     virtual void initialize() override;

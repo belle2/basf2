@@ -142,7 +142,7 @@ namespace Belle2 {
     /** Return the charge of the cluster (in ADC count) calibrated with a factor of ~0.6 for pxd hits.
      * This factor can be seen in data (and is calculated from that) and has probably something to do with
      * the different readout of the hit types. */
-    double getCalibratedCharge(const ClusterType& cluster) const
+    static double getCalibratedCharge(const ClusterType& cluster)
     {
       const double charge = cluster.getCharge();
       const double calibration = getCalibration();

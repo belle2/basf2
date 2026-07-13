@@ -47,8 +47,8 @@ bool TRGSummary::testInput(unsigned int bit) const
     B2ERROR("Requested input trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested input trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
-  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
   return (m_inputBits[iWord] & (1u << iBit)) != 0;
 }
 
@@ -58,8 +58,8 @@ bool TRGSummary::testFtdl(unsigned int bit) const
     B2ERROR("Requested ftdl trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested FTDL trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
-  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
   return (m_ftdlBits[iWord] & (1u << iBit)) != 0;
 }
 
@@ -69,8 +69,8 @@ bool TRGSummary::testPsnm(unsigned int bit) const
     B2ERROR("Requested psnm trigger bit number is out of range" << LogVar("bit", bit));
     throw std::out_of_range("The requested PSNM trigger bit is out of range: " + std::to_string(bit));
   }
-  int iWord = (bit >> 5);   // equals bit / c_trgWordSize;
-  int iBit = (bit & 0x1F);  // equals bit % c_trgWordSize;
+  int iWord = bit / c_trgWordSize;
+  int iBit = bit % c_trgWordSize;
   return (m_psnmBits[iWord] & (1u << iBit)) != 0;
 }
 
@@ -134,8 +134,8 @@ std::string TRGSummary::getInfoHTML() const
   for (unsigned int currentBit = 0; currentBit < c_trgDataSize; currentBit++) {
     htmlOutput << "<tr>";
 
-    const auto currentWord = (currentBit >> 5); // equals currentBit / c_trgWordSize;
-    const auto currentBitInWord = (currentBit & 0x1F); // equals currentBit % c_trgWordSize;
+    const auto currentWord = currentBit / c_trgWordSize;
+    const auto currentBitInWord = currentBit % c_trgWordSize;
 
     const auto ftdlBit =
       (getFtdlBits(currentWord) & ((unsigned int)1 << currentBitInWord)) > 0;

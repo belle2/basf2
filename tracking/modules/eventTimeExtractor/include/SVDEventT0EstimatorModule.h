@@ -34,7 +34,7 @@ namespace Belle2 {
     SVDEventT0EstimatorModule();
 
     /** default destructor*/
-    virtual ~SVDEventT0EstimatorModule();
+    virtual ~SVDEventT0EstimatorModule() override;
 
     /** Initialize the SVDEventT0Estimator.*/
     virtual void initialize() override;

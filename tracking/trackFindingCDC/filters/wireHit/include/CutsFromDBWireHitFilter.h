@@ -26,7 +26,7 @@ namespace Belle2 {
       CutsFromDBWireHitFilter();
 
       /// Default destructor.
-      virtual ~CutsFromDBWireHitFilter() = default;
+      virtual ~CutsFromDBWireHitFilter() override = default;
 
       /// Called at the beginning of the processing.
       void initialize() final;

@@ -37,7 +37,7 @@ namespace Belle2 {
 
 
       /** destructor */
-      ~TrackFinderVXDAnalizerModule() {}
+      ~TrackFinderVXDAnalizerModule() override {}
 
 
       /** initialize function */

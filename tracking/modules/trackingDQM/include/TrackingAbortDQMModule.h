@@ -37,7 +37,7 @@ namespace Belle2 {
     TrackingAbortDQMModule();
 
     /* Destructor */
-    virtual ~TrackingAbortDQMModule();
+    virtual ~TrackingAbortDQMModule() override;
 
     /** Module function initialize */
     void initialize() override final;

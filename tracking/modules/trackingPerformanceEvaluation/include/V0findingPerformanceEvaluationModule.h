@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~V0findingPerformanceEvaluationModule();
+    ~V0findingPerformanceEvaluationModule() override;
 
     /**
      * Initializer.

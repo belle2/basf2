@@ -65,9 +65,10 @@ namespace Belle2 {
 
     /** Main function: Estimate p over q for the given cluster and the path length calculated using the given tracking seeds
      * with the fit parameters. */
-    double estimateQOverP(const ClusterType& cluster, const ROOT::Math::XYZVector& momentum, const ROOT::Math::XYZVector& position,
-                          short charge,
-                          const FitParameters& fitParameters, const CorrectionFitParameters& correctionFitParameters) const
+    static double estimateQOverP(const ClusterType& cluster, const ROOT::Math::XYZVector& momentum,
+                                 const ROOT::Math::XYZVector& position,
+                                 short charge,
+                                 const FitParameters& fitParameters, const CorrectionFitParameters& correctionFitParameters)
     {
       const VXDMomentumEstimationTools<ClusterType>& tools = VXDMomentumEstimationTools<ClusterType>::getInstance();
 
@@ -80,8 +81,8 @@ namespace Belle2 {
 
     /** Main function: Estimate p over q for the given cluster and the thickness of the cluster
      * with the fit parameters. */
-    double estimateQOverPWithThickness(const ClusterType& cluster, short charge, const FitParameters& fitParameters,
-                                       const CorrectionFitParameters& correctionFitParameters) const
+    static double estimateQOverPWithThickness(const ClusterType& cluster, short charge, const FitParameters& fitParameters,
+                                              const CorrectionFitParameters& correctionFitParameters)
     {
       const VXDMomentumEstimationTools<ClusterType>& tools = VXDMomentumEstimationTools<ClusterType>::getInstance();
 

@@ -46,7 +46,7 @@ namespace Belle2 {
       BridgingWireHitRelationFilter();
 
       /// Default destructor
-      ~BridgingWireHitRelationFilter();
+      ~BridgingWireHitRelationFilter() override;
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

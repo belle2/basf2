@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~TrackingPerformanceEvaluationModule();
+    ~TrackingPerformanceEvaluationModule() override;
 
     /**
      * Initializer.

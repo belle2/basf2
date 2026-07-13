@@ -28,7 +28,7 @@ namespace Belle2 {
       explicit WholeWireHitRelationFilter(int neighborhoodDegree = 2);
 
       /// Default destructor
-      ~WholeWireHitRelationFilter();
+      ~WholeWireHitRelationFilter() override;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

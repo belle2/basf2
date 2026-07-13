@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EffPlotsModule();
+    ~EffPlotsModule() override;
 
     /**
      * Initializer.

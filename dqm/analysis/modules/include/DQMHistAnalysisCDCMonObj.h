@@ -67,12 +67,12 @@ namespace Belle2 {
     /**
      * Get mean of ADC histogram excluding 0-th bin.
      */
-    float getHistMean(TH1D* h) const;
+    static float getHistMean(TH1D* h) const;
 
     /**
      * Get median of ADC histogram excluding 0-th bin.
      */
-    float getHistMedian(TH1D* h) const;
+    static float getHistMedian(TH1D* h) const;
 
     /**
      * Get board/channel from layer/wire.

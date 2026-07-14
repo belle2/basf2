@@ -67,8 +67,8 @@ namespace Belle2 {
     /**
      * Plot the fit and return TCanvas with the plot
      */
-    TCanvas* plotArgusFit(RooDataHist* dataE0, RooAddPdf&  sumB0, RooArgusBG& argus,
-                          RooGaussian& gauss, RooRealVar& eNow, TString nTag = "");
+    static TCanvas* plotArgusFit(RooDataHist* dataE0, RooAddPdf&  sumB0, RooArgusBG& argus,
+                                 RooGaussian& gauss, RooRealVar& eNow, TString nTag = "");
 
     /**
      * Fit the histograms and return the fitted parameters
@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
      * Reads first exp.run number and integrated lumi from merged histogram title
      */
-    std::unordered_map<std::string, double>  parseTitle(const std::string& title);
+    static std::unordered_map<std::string, double>  parseTitle(const std::string& title);
 
   protected:
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */

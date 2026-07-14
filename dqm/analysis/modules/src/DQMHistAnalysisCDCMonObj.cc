@@ -160,7 +160,7 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
 {
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
@@ -169,7 +169,7 @@ float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
   return m;
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
+float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h)
 {
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin

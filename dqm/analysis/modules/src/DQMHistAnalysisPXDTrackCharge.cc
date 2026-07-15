@@ -260,7 +260,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       if (hh1->GetEntries() > 50) {
 
-        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, dynamic_cast<const TH1*>(hh1));
         auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
         /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 

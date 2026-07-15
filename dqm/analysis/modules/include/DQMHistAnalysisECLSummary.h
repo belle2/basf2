@@ -39,6 +39,8 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLSummaryModule();
 
+  private:
+
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */
@@ -68,7 +70,6 @@ namespace Belle2 {
                                              const std::vector< std::vector<short> >& neighbours,
                                              double max_deviation, bool occupancy_histogram);
 
-  private:
     /** Definition for different ECL alarm types */
     struct ECLAlarmType {
       std::string name; /**< Internal name */
@@ -116,9 +117,8 @@ namespace Belle2 {
     std::map<int, int> getChannelsWithChi2Problems();
 
     /** Draw grid with TLine primitives for the specified histogram */
-    void drawGrid(TH2* hist);
+    static void drawGrid(TH2* hist);
 
-  private:
     /** Prefix to use for PVs registered by this module.
      *  DQM framework will also prepend either 'TEST:' or 'DQM:' prefix.
      */

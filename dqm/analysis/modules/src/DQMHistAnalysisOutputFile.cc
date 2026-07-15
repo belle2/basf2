@@ -158,8 +158,11 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
                       break;
                     }
                   }
-                  ((TH1*)obj)->SetName(tok);
-                  obj->Write();
+                  auto obj2 = dynamic_cast<TH1*> obj; // actually inheritance checked above, so it should be a TH1
+                  if (obj2) {
+                    obj2->SetName(tok);
+                    obj2->Write();
+                  }
                   old->cd();
                 }
               }

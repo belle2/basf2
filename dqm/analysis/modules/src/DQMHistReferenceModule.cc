@@ -101,8 +101,9 @@ void DQMHistReferenceModule::loadReferenceHistos()
           // now read histograms
           while ((histKey = (TKey*)nextHistkey())) {
             if (histKey->IsFolder()) continue;
-            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
-              addRefHist(detName, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
+            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) { // maybe not needed with the dynamic cast check below
+              auto h = dynamic_cast<TH1*>(histKey->ReadObj());
+              if (h) addRefHist(detName, h); // ReadObj -> I own it, tranfer ownership to function
             }
           }
           delete runtypeDir; // always non-zero as checked above ... runtype or "default"

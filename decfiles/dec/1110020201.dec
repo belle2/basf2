@@ -8,25 +8,24 @@
 # Cuts: None
 # Date: 20260609
 
-Alias MyK*0 K*0
-Alias Myanti-K*0 anti-K*0
-ChargeConj MyK*0 Myanti-K*0
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
 
 Decay Upsilon(4S)
-0.5 B0sig anti-B0 VSS_BMIX dm;
-0.5 anti-B0sig B0 VSS_BMIX dm;
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
 
 Decay B0sig
-1.0 MyK*0 K_L0 K_L0           PHSP;
+1.0 K*0sig K_L0 K_L0           PHSP;
 Enddecay
 
 CDecay anti-B0sig
 
-Decay MyK*0
+Decay K*0sig
 1.0 K+ pi-    VSS;
 Enddecay
 
-CDecay Myanti-K*0
+CDecay anti-K*0sig
 
 End

@@ -267,13 +267,13 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
     m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
-    m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
     if (m_hTDCs[i] == nullptr || m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0) {
       nDeadTDC += 1;
       tdcEdges.push_back(0);
       tdcSlopes.push_back(0);
     } else {
       double init_p0 = m_hTDCs[i]->GetBinContent(700 + 60);
+      m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
@@ -309,10 +309,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     if (i < 8) tdcwindow = 416;
     else tdcwindow = 768;
     m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
-    m_hHits[i]->SetTitle(Form("hHit%d", i));
     if (m_hHits[i] != nullptr && m_hHits[i]->GetEntries() > 0) {
       int nhitSumL = 0;
       int nBins = m_nSenseWires[i];
+      m_hHits[i]->SetTitle(Form("hHit%d", i));
       for (int j = 0; j < nBins; ++j) {
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }

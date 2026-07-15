@@ -230,7 +230,7 @@ void DQMHistInjectionModule::event()
   {
     // LER
     auto Hits = findHist("TOP", "TOPOccInjLER");
-    auto Trigger = findHist("TOP", "TOPEOccInjLER");
+    auto Triggers = findHist("TOP", "TOPEOccInjLER");
     if (Hits && Triggers) {
       m_hInjectionLERTOP->Divide(Hits, Triggers, 100, 8192);
     }
@@ -241,7 +241,7 @@ void DQMHistInjectionModule::event()
   {
     // HER
     auto Hits = findHist("TOP", "TOPOccInjHER");
-    auto Trigger = findHist("TOP", "TOPEOccInjHER");
+    auto Triggers = findHist("TOP", "TOPEOccInjHER");
     if (Hits && Triggers) {
       m_hInjectionHERTOP->Divide(Hits, Triggers, 100, 8192);
     }

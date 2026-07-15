@@ -157,7 +157,7 @@ void DQMHistAnalysisInput2Module::event()
   // first check sub-directories
   pFile->cd();
   TIter next(pFile->GetListOfKeys());
-  while (auto key = dynamic_cast_<TKey*>(next())) {
+  while (auto key = dynamic_cast<TKey*>(next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (cl->InheritsFrom("TDirectory")) {
       TDirectory* d = (TDirectory*)key->ReadObj();
@@ -166,7 +166,7 @@ void DQMHistAnalysisInput2Module::event()
       d->cd();
       TIter nextd(d->GetListOfKeys());
 
-      while (auto dkey = dynamic_cast_<TKey*>(nextd())) {
+      while (auto dkey = dynamic_cast<TKey*>(nextd())) {
         if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
           addToHistList(inputHistList, dirname, dkey);
         }

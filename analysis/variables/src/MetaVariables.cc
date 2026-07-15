@@ -3475,6 +3475,83 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr varForNthDaughterOfType(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 4) {
+        B2FATAL("Number of arguments for varForNthDaughterOfType must be 4");
+      }
+      // Get abs pdg id
+      std::string argPtype = arguments[0];
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(argPtype.c_str());
+      int absPdg = -1;
+      if (part != nullptr) {
+        absPdg = std::abs(part->PdgCode());
+      } else {
+        try {
+          absPdg = std::abs(convertString<int>(argPtype));
+        } catch (const std::exception&) { }
+      }
+      if (absPdg == -1 || pdgDatabase->GetParticle(absPdg) == nullptr) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argPtype << "' is neither a valid particle name nor a PDG code");
+      }
+      // Get particle index
+      std::string argIndex = arguments[1];
+      int index = 0;
+      try {
+        index = convertString<int>(argIndex);
+      } catch (const std::exception&) { }
+      if (index <= 0) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argIndex << "' is not a valid positive integer");
+      }
+      // Get variable
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+      // Get depth
+      int depth = 1;
+      std::string argDepth = arguments[3];
+      try {
+        depth = convertString<int>(argDepth);
+      } catch (const std::exception&) {
+        depth = -1;
+      }
+      if (depth <= 0) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argDepth << "' is not a valid positive integer");
+      }
+
+      auto func = [absPdg, index, var, depth](const Particle * particle) -> double {
+        int nFound = 0;
+        std::vector<Particle*> currentLevel = particle->getDaughters();
+        std::vector<Particle*> nextLevel;
+        for (int d = 0; d < depth; d++)
+        {
+          if (currentLevel.size() == 0) return Const::doubleNaN;
+          for (unsigned i = 0; i < currentLevel.size(); i++) {
+            Particle* p = currentLevel[i];
+            if (std::abs(p->getPDGCode()) == absPdg) {
+              nFound++;
+              if (nFound == index) {
+                auto result = var->function(p);
+                if (std::holds_alternative<double>(result)) {
+                  return std::get<double>(result);
+                } else if (std::holds_alternative<int>(result)) {
+                  return std::get<int>(result);
+                } else if (std::holds_alternative<bool>(result)) {
+                  return std::get<bool>(result);
+                } else return Const::doubleNaN;
+              }
+            }
+            std::vector<Particle*> newParticles = p->getDaughters();
+            nextLevel.insert(nextLevel.end(), newParticles.begin(), newParticles.end());
+          }
+          currentLevel.clear();
+          std::swap(currentLevel, nextLevel);
+        }
+        return Const::doubleNaN;
+      };
+
+      return func;
+    }
+
     Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1) {
@@ -4051,6 +4128,9 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, depth)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter of the given type.
+Particle type can be given as pdg code or by particle name. Depth controls how many generations of daughters are searched (depth=1 only direct daughters, depth=2 also granddaughters, ...).
+If no daughter of the type can be found at given depth, returns nan.)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",

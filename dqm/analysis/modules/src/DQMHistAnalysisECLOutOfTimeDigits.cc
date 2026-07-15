@@ -32,8 +32,8 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
 void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 {
   // Register EPICS PVs
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name  = event_type + std::string(":") + ecl_part;
       registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
@@ -47,8 +47,8 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
 {
   //== Get DQM info
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = event_type + std::string(":") + ecl_part;
       std::string var_name = pv_name;
       std::replace(var_name.begin(), var_name.end(), ':', '_');
@@ -84,8 +84,8 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
 
   TF1 gaus("fit_func", "gaus");
 
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name   = event_type + std::string(":") + ecl_part;
       std::string hist_name = "ECL/out_of_time_" + pv_name;
       std::string var_name  = "out_of_time_digits_" + pv_name;

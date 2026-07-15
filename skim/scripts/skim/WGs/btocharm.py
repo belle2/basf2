@@ -297,7 +297,7 @@ class B0toDh_Kpipi(BaseSkim):
         loadStdDplus_Kpipi(path=path)
 
     def build_lists(self, path):
-        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.3"
+        Bcuts = "5.26 < Mbc and abs(deltaE) < 0.3"
         ma.reconstructDecay("B0:Dh_Kpipi_pi -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
         ma.reconstructDecay("B0:Dh_Kpipi_K  -> D-:Kpipi K+:GoodTrack", Bcuts, 0, path=path)
         ma.copyLists('B0:Dh_Kpipi', ['B0:Dh_Kpipi_pi', 'B0:Dh_Kpipi_K'], path=path)

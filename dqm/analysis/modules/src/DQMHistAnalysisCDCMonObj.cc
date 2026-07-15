@@ -268,7 +268,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   for (int i = 0; i < 300; ++i) {
     m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
     m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
-    if (m_hTDCs[i] == nullptr) || m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0) {
+    if (m_hTDCs[i] == nullptr || m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0) {
       nDeadTDC += 1;
       tdcEdges.push_back(0);
       tdcSlopes.push_back(0);

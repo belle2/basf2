@@ -62,14 +62,14 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   };
 
   // Prepare EPICS PVs
-  for (auto& alarm : m_ecl_alarms) {
+  for (const auto& alarm : m_ecl_alarms) {
     // By crate
     for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
       std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
       registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
     // Totals
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = (boost::format("%s:%s") % ecl_part % alarm.name).str();
       registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
@@ -315,7 +315,7 @@ void DQMHistAnalysisECLSummaryModule::terminate()
 std::pair<int, DQMHistAnalysisECLSummaryModule::ECLAlarmType> DQMHistAnalysisECLSummaryModule::getAlarmByName(std::string name)
 {
   int index = 0;
-  for (auto& alarm_info : m_ecl_alarms) {
+  for (const auto& alarm_info : m_ecl_alarms) {
     if (alarm_info.name == name) return {index, alarm_info};
     index++;
   }
@@ -355,7 +355,7 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
     return;
   }
 
-  for (auto& alarm : m_ecl_alarms) {
+  for (const auto& alarm : m_ecl_alarms) {
     // Update the list of masked channels
     m_mask[alarm.name].clear();
     for (int i = 0; i < c_max_masked_channels; i++) {
@@ -370,7 +370,7 @@ void DQMHistAnalysisECLSummaryModule::updateAlarmConfig()
 
 bool DQMHistAnalysisECLSummaryModule::getMaskedChannels(std::map<std::string, dbr_sts_long_array>& mask_info)
 {
-  for (auto& alarm : m_ecl_alarms) {
+  for (const auto& alarm : m_ecl_alarms) {
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
     chid mask_chid = getEpicsPVChID(mask_pv_name);
 
@@ -416,12 +416,12 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //=== Get number of dead/cold/hot channels
   // cppcheck-suppress unassignedVariable
-  for (auto& [cell_id, error_bitmask] : getChannelsWithOccupancyProblems()) {
+  for (const auto& [cell_id, error_bitmask] : getChannelsWithOccupancyProblems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
   //=== Get number of channels with bad_chi2
   // cppcheck-suppress unassignedVariable
-  for (auto& [cell_id, error_bitmask] : getChannelsWithChi2Problems()) {
+  for (const auto& [cell_id, error_bitmask] : getChannelsWithChi2Problems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
 
@@ -435,11 +435,11 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   }
 
   static std::vector<std::string> indices = {"dead", "cold", "hot", "bad_chi2"};
-  for (auto& index_name : indices) {
+  for (const auto& index_name : indices) {
     int alarm_index = getAlarmByName(index_name).first;
     int alarm_bit   = 1 << alarm_index;
 
-    for (auto& [cid, error_bitmask] : error_bitmasks) {
+    for (const auto& [cid, error_bitmask] : error_bitmasks) {
       if ((error_bitmask & alarm_bit) == 0) continue;
 
       bool masked = (m_mask[index_name].find(cid) != m_mask[index_name].end());
@@ -485,7 +485,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       }
 
       if (main_hist && main_hist->GetEntries() > 0) {
-        for (auto& overlay : {overlay_hist, overlay_hist_green}) {
+        for (const auto& overlay : {overlay_hist, overlay_hist_green}) {
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
             if (overlay->GetBinContent(bin_id) == 0) continue;
             // Do not adjust bin height for dead channels
@@ -531,7 +531,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       }
     }
     // Export totals
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = (boost::format("%s:%s") % ecl_part % alarm.name).str();
       if (update_mirabelle) {
         std::string var_name = pv_name;
@@ -687,7 +687,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
     std::vector<short> neighb = neighbours[cid - 1];
     std::multiset<double> values_sorted;
-    for (auto& neighbour_cid : neighb) {
+    for (const auto& neighbour_cid : neighb) {
       values_sorted.insert(hist->GetBinContent(neighbour_cid));
     }
 

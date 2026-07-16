@@ -349,7 +349,7 @@ class ZpVisible(BaseSkim):
         zp_list = []
 
         track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
-        muon_id_cut = "muonID > 0.5"
+        muon_id_cut = "muonID > 0.2"
 
         ma.cutAndCopyList("mu+:zp", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
 

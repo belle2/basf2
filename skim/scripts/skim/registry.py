@@ -255,6 +255,7 @@ _RegisteredSkims = [
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
     ("18520300", "dark", "DielectronPlusMissingEnergy"),
     ("18520400", "dark", "LFVZpVisible"),
+    ("18520600", "dark", "ZpVisible"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),

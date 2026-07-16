@@ -415,12 +415,10 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   std::map<int, int> error_bitmasks;
 
   //=== Get number of dead/cold/hot channels
-  // cppcheck-suppress unassignedVariable
   for (const auto& [cell_id, error_bitmask] : getChannelsWithOccupancyProblems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
   //=== Get number of channels with bad_chi2
-  // cppcheck-suppress unassignedVariable
   for (const auto& [cell_id, error_bitmask] : getChannelsWithChi2Problems()) {
     error_bitmasks[cell_id] |= error_bitmask;
   }
@@ -509,7 +507,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   //== Update EPICS PVs or MiraBelle monObjs
 
   for (size_t alarm_idx = 0; alarm_idx < alarm_counts.size(); alarm_idx++) {
-    auto& alarm = m_ecl_alarms[alarm_idx];
+    const auto& alarm = m_ecl_alarms[alarm_idx];
     std::map<std::string, int> total;
     // Convert values per crate to totals
     for (size_t crate = 0; crate < alarm_counts[alarm_idx].size(); crate++) {
@@ -614,13 +612,9 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
   if (hist->Integral() <= 0) return retval;
 
   //=== Extract alarm details
-  // cppcheck-suppress unassignedVariable
   const auto& [dead_index, dead_alarm] = getAlarmByName("dead");
-  // cppcheck-suppress unassignedVariable
   const auto& [cold_index, cold_alarm] = getAlarmByName("cold");
-  // cppcheck-suppress unassignedVariable
   const auto& [hot_index,  hot_alarm ] = getAlarmByName("hot");
-  // cppcheck-suppress unassignedVariable
   const auto& [chi2_index, chi2_alarm] = getAlarmByName("bad_chi2");
 
   double min_required_events;
@@ -637,7 +631,6 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
   if (total_events < min_required_events) return retval;
 
-  int dead_bit = 1 << dead_index;
   int cold_bit = 1 << cold_index;
   int hot_bit  = 1 << hot_index;
   int chi2_bit = 1 << chi2_index;
@@ -650,6 +643,7 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     if (total_events >= dead_alarm.required_statistics) {
       double min_occupancy;
       const std::string run_type = getRunType();
+      const int dead_bit = 1 << dead_index;
       if (run_type == "physics") {
         // For physics runs, occupancy should be higher than 0.01%
         min_occupancy = 1e-4;

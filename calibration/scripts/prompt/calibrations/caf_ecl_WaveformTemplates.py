@@ -31,7 +31,8 @@ settings = CalibrationSettings(
     expert_config={
         "C2_MinEnergyThreshold": 2.0,
         "nFilesCollector": 50,
-        "nParallelAlgos": 1
+        "nParallelAlgos": 1,
+        "EfsiDimsSlsiOdts": 100
     },
     produced_payloads=["ECLDigitWaveformParameters"])
 

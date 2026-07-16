@@ -160,18 +160,18 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1* h)
 {
-  TH1D* hist = (TH1D*)h->Clone();
+  auto hist = static_cast<TH1*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float m = hist->GetMean();
   delete hist;
   return m;
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1* h)
 {
-  TH1D* hist = (TH1D*)h->Clone();
+  auto hist = static_cast<TH1*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only ADC=0 entries
   double quantiles[1] = {0.0}; // One element to store median

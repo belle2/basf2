@@ -4129,8 +4129,9 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, depth)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter of the given type.
-Particle type can be given as pdg code or by particle name. Depth controls how many generations of daughters are searched (depth=1 only direct daughters, depth=2 also granddaughters, ...).
-If no daughter of the type can be found at given depth, returns nan.)DOC", Manager::VariableDataType::c_double);
+Particle type can be given as pdg code or by particle name. Depth controls how many generations of daughters are searched (``depth=1`` only direct daughters, ``depth=2`` also granddaughters, ...).
+E.g. ``varForNthDaughterOfType(111, 1, E, 2)`` will return the energy of the first pi0 found searching all daughters and then granddaughters of the given particle.
+If no nth daughter of the given type can be found at given depth, returns NaN.)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",

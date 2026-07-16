@@ -3910,20 +3910,20 @@ namespace {
     B_grandDaughterIndices_1.push_back(gamma1->getArrayIndex());
     B_grandDaughterIndices_1.push_back(gamma2->getArrayIndex());
     momentum_1 = gamma1->get4Vector() + gamma2->get4Vector();
-    const Particle* eta = particles.appendNew(momentum_1, 221, Particles::c_Unflavored, B_grandDaughterIndices_1);
+    const Particle* eta = particles.appendNew(momentum_1, 221, Particle::c_Unflavored, B_grandDaughterIndices_1);
 
     const Particle* pi0_Dstar = particles.appendNew(PxPyPzEVector(3.5, 1, 1, 1), 111);
     B_grandDaughterIndices_0.push_back(D0->getArrayIndex());
     B_grandDaughterIndices_0.push_back(pi0_Dstar->getArrayIndex());
     momentum_0 = D0->get4Vector() + pi0_Dstar->get4Vector();
-    const Particle* Dstar0 = particles.appendNew(momentum_0, 423, Particles::c_Unflavored, B_grandDaughterIndices_0);
+    const Particle* Dstar0 = particles.appendNew(momentum_0, 423, Particle::c_Unflavored, B_grandDaughterIndices_0);
 
-    const Particle* muminus = particles.appendNew(PxPyPzVector(4.5, 1, 1, 1), 13);
+    const Particle* muminus = particles.appendNew(PxPyPzEVector(4.5, 1, 1, 1), 13);
     B_daughterIndices.push_back(Dstar0->getArrayIndex());
     B_daughterIndices.push_back(eta->getArrayIndex());
     B_daughterIndices.push_back(muminus->getArrayIndex());
     momentum = Dstar0->get4Vector() + eta->get4Vector() + muminus->get4Vector();
-    const Particle* Bminus = particles.appendNew(momentum, -521, Particles::c_Unflavored, B_daughterIndices);
+    const Particle* Bminus = particles.appendNew(momentum, -521, Particle::c_Unflavored, B_daughterIndices);
 
     // Test many combinations of n and depth
     const Manager::Var* var_pdg_pi0_1 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 1, px, 3)");

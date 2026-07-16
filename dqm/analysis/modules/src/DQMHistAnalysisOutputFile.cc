@@ -116,18 +116,18 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
         TIter nextfile(files) ;
         TObject* file ;
 
-        while ((file = (TObject*)nextfile())) {
+        while ((file = dynamic_cast<TObject*>(nextfile()))) {
           if (file->InheritsFrom("TFile")) {
             B2INFO("File name: " << file->GetName() << " title " << file->GetTitle());
             if (file == &f || file->GetName() == m_filename) continue;
 
-            TList* list = ((TFile*)file)->GetListOfKeys() ;
+            TList* list = (static_cast<TFile*>(file))->GetListOfKeys() ;
             if (list) {
               TIter next(list) ;
               TKey* key ;
               TObject* obj ;
 
-              while ((key = (TKey*)next())) {
+              while ((key = dynamic_cast<TKey*>(next()))) {
                 TString skey(key->GetClassName());
                 if (skey.BeginsWith(TString("Belle2::"))) continue;
                 TClass clkey(key->GetClassName());

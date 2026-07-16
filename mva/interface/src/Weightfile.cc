@@ -99,17 +99,12 @@ namespace Belle2 {
 
     std::string Weightfile::generateFileName(const std::string& suffix)
     {
-      char* directory_template = strdup((fs::temp_directory_path() / "Basf2MVA.XXXXXX").c_str());
-      auto directory = mkdtemp(directory_template);
-      if (directory == nullptr) {
-        int err = errno;
-        free(directory_template);
-        throw std::runtime_error(std::string("mkdtemp failed: ") + std::strerror(err));
+      std::string directory_template = (fs::temp_directory_path() / "Basf2MVA.XXXXXX").string();
+      if (mkdtemp(directory_template.data()) == nullptr) {
+        throw std::runtime_error(std::string("mkdtemp failed: ") + std::strerror(errno));
       }
-      std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
-      m_filenames.emplace_back(directory);
-      free(directory_template);
-      return tmpfile;
+      m_filenames.push_back(directory_template);
+      return directory_template + "/weightfile" + suffix;
     }
 
     void Weightfile::addFile(const std::string& identifier, const std::string& custom_weightfile)

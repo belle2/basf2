@@ -3881,10 +3881,6 @@ namespace {
   {
     DataStore::Instance().setInitializeActive(true);
     StoreArray<Particle> particles;
-    // StoreObjPtr<ParticleList> BList("B+:vartest"); ??
-    // BList.registerInDataStore();
-    // BList.create();
-    // BList->initialize(521, "B+:vartest");
     PxPyPzEVector momentum;
     PxPyPzEVector momentum_0;
     PxPyPzEVector momentum_1;

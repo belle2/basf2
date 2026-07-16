@@ -1,13 +1,12 @@
-# EventType: 1220012200
-# Descriptor: [B+ -> K*+ K_L0 K_L0]
-# NickName: Bplus_Ksplust0KLKL
+# EventType: 1220012100
+# Descriptor: [B+ -> K*+ n anti-n]
+# NickName: Bu_Kstpnn
 # Tested: No
 # PhysicsWG: EWP
 # Responsible: Merna Abumusabh
 # Email: merna.abumusabh@iphc.cnrs.fr
 # Cuts: None
-# Date: 20260609
-
+# Date: 20260610
 
 Alias K*+sig K*+
 Alias K*-sig K*-
@@ -21,16 +20,17 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0 K*+sig K_L0 K_L0                 PHSP;
+1.0  K*+sig n0 anti-n0    PHSP;
 Enddecay
+
 CDecay B-sig
 
 Decay K*+sig
-0.5      K+  pi0                        VSS;
-0.5      K_S0  pi+                        VSS;
+0.5      K+  pi0sig                        VSS;
+0.5      K_S0sig  pi+                        VSS;
 Enddecay
 
-CDecay K*-sig
+CDecay  K*-sig
 
 Decay K_S0sig
 1.0    pi- pi+ PHSP;

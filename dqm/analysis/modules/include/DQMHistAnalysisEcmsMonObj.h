@@ -13,7 +13,7 @@
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
-#include <TH1D.h>
+#include <TH1.h>
 #include <RooDataHist.h>
 #include <RooAddPdf.h>
 #include <RooArgusBG.h>
@@ -73,7 +73,7 @@ namespace Belle2 {
     /**
      * Fit the histograms and return the fitted parameters
      */
-    std::unordered_map<std::string, double>  fitEcmsBB(TH1D* hB0, TH1D* hBp);
+    std::unordered_map<std::string, double>  fitEcmsBB(TH1* hB0, TH1* hBp);
 
     /**
      * Reads first exp.run number and integrated lumi from merged histogram title

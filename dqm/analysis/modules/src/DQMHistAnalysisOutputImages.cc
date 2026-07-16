@@ -71,9 +71,8 @@ void DQMHistAnalysisOutputImagesModule::event()
   auto& clist = getCanvasUpdatedList();
   int saved_canvases = 0;
 
-  while ((obj = (TObject*)nextkey())) {
-    if (obj->IsA()->InheritsFrom("TCanvas")) {
-      TCanvas* c = (TCanvas*) obj;
+  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+    if (auto c = dynamic_cast<TCanvas*>(obj); c != nullptr) {
       auto process_canvas = m_canvasSaveDefault;
 
       auto it = clist.find(c->GetName());

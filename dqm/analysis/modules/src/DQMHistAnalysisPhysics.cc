@@ -15,12 +15,12 @@
 #include <TROOT.h>
 #include <RooRealVar.h>
 #include <RooDataHist.h>
-#include "RooCBShape.h"
-#include "RooCrystalBall.h"
-#include "RooChebychev.h"
-#include "RooAddPdf.h"
-#include "RooPlot.h"
-#include "RooFitResult.h"
+#include <RooCBShape.h>
+#include <RooCrystalBall.h>
+#include <RooChebychev.h>
+#include <RooAddPdf.h>
+#include <RooPlot.h>
+#include <RooFitResult.h>
 
 using namespace std;
 using namespace Belle2;

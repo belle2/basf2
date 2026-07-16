@@ -66,13 +66,13 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   TIter nextRefDirKey(refFile->GetListOfKeys());
   TKey* refDirKey;
-  while ((refDirKey = (TKey*)nextRefDirKey())) {
+  while ((refDirKey = dynamic_cast<TKey*>(nextRefDirKey()))) {
     if (refDirKey->IsFolder() && string(refDirKey->GetName()) == string("ref")) {
-      TDirectory* refDir = (TDirectory*)refDirKey->ReadObj(); // ReadObj -> I own it, delete later
+      TDirectory* refDir = static_cast<TDirectory*>(refDirKey->ReadObj()); // ReadObj -> I own it, delete later
       TIter nextDetDirKey(refDir->GetListOfKeys());
       TKey* detDirKey;
       // detector folders
-      while ((detDirKey = (TKey*)nextDetDirKey())) {
+      while ((detDirKey = dynamic_cast<TKey*>(nextDetDirKey()))) {
         if (!detDirKey->IsFolder()) continue;
         TDirectory* detDir = ((TDirectory*)detDirKey->ReadObj());
         TIter nextRunTypeDirKey(detDir->GetListOfKeys()); // ReadObj -> Now I own this, so delete later

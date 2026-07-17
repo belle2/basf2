@@ -176,26 +176,26 @@
               (100k attempts, all failed) and report a bogus multi-meter
               "protrusion" at a nonsensical Z. HER/LER don't reach each
               other's territory in this Z range, so no B1spc1 clipping
-              is needed either. Z0=300.5mm (not 300mm) so this stub's
-              start cap doesn't exactly coincide with A1spc1's own start
-              plane. NOTE: OverlapChecker still reports a small residual
-              protrusion (~0.1mm, right at this Z=300.5mm endcap) that
-              *shrinks* but doesn't fully vanish as R is reduced further
-              (tried down to 10.0mm/1.3mm margin, still ~0.1mm) - this
-              points to a G4 boolean-solid tolerance/edge-sampling
-              artifact at the seam where A1spc1's own internal
-              Union/Subtraction pieces meet, not a true geometric
-              conflict; the actual Ta sleeves (A2Ta etc.) report zero
-              overlaps. Left at 10.9mm rather than over-shrinking the
-              wall for no benefit. -->
+              is needed either. Z0=300.8mm (not 300mm): A1spc1 is
+              intersected with TubeR, whose front plane is at GLOBAL
+              Z=300mm, while this stub lives in the HER frame tilted by
+              41.5mrad. The start-cap corner at local (x=+R, z=Z0) sits
+              at global z = Z0*cos(41.5mrad) - R*sin(41.5mrad), so with
+              Z0=300.5 it reached 299.79 - i.e. 0.21mm outside TubeR
+              (this was the earlier residual ~0.2mm protrusion, which
+              shrank with R exactly as this formula predicts - it was a
+              real tilt effect, not a sampling artifact). Containment
+              needs Z0 >= (300 + 10.9*0.0415)/cos = 300.71; 300.8 leaves
+              ~0.09mm margin. -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">300.5</sec>
+         <sec name="Z0" unit="mm">300.8</sec>
          <sec name="Z1" unit="mm">320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>A1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right HER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -281,6 +281,7 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>A1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right HER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
@@ -654,17 +655,18 @@
               sleeve replaces that whole region. R=10.9mm (see A2wal1 for
               why this needs more headroom than the nominal 11.3mm) so it
               fits inside B1spc1's own 11.3mm boundary with real margin.
-              Intersect(B1spc1) was dropped (see A2wal1 for why). Z0=300.5mm
-              (not 300mm) so this stub's start cap doesn't exactly coincide
-              with B1spc1's own start plane (see A2wal1 for why). -->
+              Intersect(B1spc1) was dropped (see A2wal1 for why). Z0=300.8mm
+              (not 300mm): the start cap must clear TubeR's global Z=300mm
+              front plane despite the 41.5mrad tilt (see A2wal1). -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">300.5</sec>
+         <sec name="Z0" unit="mm">300.8</sec>
          <sec name="Z1" unit="mm">320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8</sec>
          <sec name="r1" unit="mm">8</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right LER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -746,6 +748,7 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right LER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
@@ -824,6 +827,11 @@
          <sec name="r1" unit="cm">3.625</sec>
          <sec name="r2" unit="cm">4.262</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <!-- Intersect with the final (clipped) mother solid: B1spc1 loses
+              the region ceded to A1spc1 (HER space), which cuts into this
+              magnet's outer radius near Z~123-164cm. Same pattern as
+              B4mag3p1/p5. -->
+         <Intersect>B1spc1</Intersect>
          <Material>SUS316L</Material>
          <Desc>Magnet 2 (b3 corrector)</Desc>
       </Straight>
@@ -849,6 +857,7 @@
          <sec name="r0" unit="cm">5.38</sec>
          <sec name="r1" unit="cm">5.38</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>Cryo_G-10</Material>
          <Desc>Magnet 3 part 2 (QC2RP)</Desc>
       </Straight>
@@ -861,6 +870,7 @@
          <sec name="r0" unit="cm">5.922</sec>
          <sec name="r1" unit="cm">5.922</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SC_COIL</Material>
          <Desc>Magnet 3 part 3 (QC2RP)</Desc>
       </Straight>
@@ -873,6 +883,7 @@
          <sec name="r0" unit="cm">6.806</sec>
          <sec name="r1" unit="cm">6.806</sec>
          <MotherVolume>B1spc1</MotherVolume>
+         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 3 part 4 (QC2RP)</Desc>
       </Straight>
@@ -1706,6 +1717,7 @@
          <sec name="R2" unit="mm">91.6</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S1</Desc>
       </Straight>
@@ -1719,6 +1731,7 @@
          <sec name="R1" unit="mm">92.78</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S2</Desc>
       </Straight>
@@ -1730,8 +1743,10 @@
          <sec name="r1" unit="mm">86.67</sec>
          <sec name="R0" unit="mm">87.439</sec>
          <sec name="R1" unit="mm">87.439</sec>
-         <Intersect>C1wal1</Intersect>
+         <!-- No Intersect(C1wal1): mirror of F7lyr3s2e, see its comment.
+              The plain polycone is already fully contained in C6spc1. -->
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy S2</Desc>
       </Straight>
@@ -1745,6 +1760,7 @@
          <sec name="R1" unit="mm">100.32</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S3</Desc>
       </Straight>
@@ -1759,6 +1775,7 @@
          <sec name="R1" unit="mm">103.02</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S4</Desc>
       </Straight>
@@ -1772,6 +1789,7 @@
          <sec name="R1" unit="mm">106.8</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S5</Desc>
       </Straight>
@@ -1785,6 +1803,7 @@
          <sec name="R1" unit="mm">115.54</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S6</Desc>
       </Straight>
@@ -1798,6 +1817,7 @@
          <sec name="R1" unit="mm">130.42</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S7</Desc>
       </Straight>
@@ -1811,6 +1831,7 @@
          <sec name="R1" unit="mm">135.14</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S8</Desc>
       </Straight>
@@ -2137,17 +2158,18 @@
               sleeve replaces that whole region. R=10.9mm (see A2wal1 for
               why this needs more headroom than the nominal 11.3mm) so it
               fits inside D1spc1's own 11.3mm boundary with real margin.
-              Intersect(D1spc1) was dropped (see A2wal1 for why). Z0=-300.5mm
-              (not -300mm) so this stub's start cap doesn't exactly coincide
-              with D1spc1's own start plane (see A2wal1 for why). -->
+              Intersect(D1spc1) was dropped (see A2wal1 for why). Z0=-300.8mm
+              (not -300mm): the start cap must clear TubeL's global Z=-300mm
+              front plane despite the 41.5mrad tilt (see A2wal1). -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">-300.5</sec>
+         <sec name="Z0" unit="mm">-300.8</sec>
          <sec name="Z1" unit="mm">-320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>D1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left HER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -2222,6 +2244,7 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>D1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left HER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
@@ -2592,17 +2615,18 @@
               sleeve replaces that whole region. R=10.9mm (see A2wal1 for
               why this needs more headroom than the nominal 11.3mm) so it
               fits inside E1spc1's own 11.3mm boundary with real margin.
-              Intersect(E1spc1) was dropped (see A2wal1 for why). Z0=-300.5mm
-              (not -300mm) so this stub's start cap doesn't exactly coincide
-              with E1spc1's own start plane (see A2wal1 for why). -->
+              Intersect(E1spc1) was dropped (see A2wal1 for why). Z0=-300.8mm
+              (not -300mm): the start cap must clear TubeL's global Z=-300mm
+              front plane despite the 41.5mrad tilt (see A2wal1). -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">-300.5</sec>
+         <sec name="Z0" unit="mm">-300.8</sec>
          <sec name="Z1" unit="mm">-320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8</sec>
          <sec name="r1" unit="mm">8</sec>
          <MotherVolume>E1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left LER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -2682,6 +2706,7 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>E1spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left LER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
@@ -2759,6 +2784,7 @@
          <sec name="r1" unit="cm">3.625</sec>
          <sec name="r2" unit="cm">4.262</sec>
          <MotherVolume>E1spc1</MotherVolume>
+         <Intersect>E1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 2 (b3 corrector)</Desc>
       </Straight>
@@ -2808,6 +2834,7 @@
          <sec name="r0" unit="cm">6.806</sec>
          <sec name="r1" unit="cm">6.806</sec>
          <MotherVolume>E1spc1</MotherVolume>
+         <Intersect>E1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 3 part 4 (QC2RP)</Desc>
       </Straight>
@@ -3641,6 +3668,7 @@
          <sec name="R2" unit="mm">91.6</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S1</Desc>
       </Straight>
@@ -3654,6 +3682,7 @@
          <sec name="R1" unit="mm">92.78</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S2</Desc>
       </Straight>
@@ -3665,8 +3694,15 @@
          <sec name="r1" unit="mm">86.67</sec>
          <sec name="R0" unit="mm">87.439</sec>
          <sec name="R1" unit="mm">87.439</sec>
-         <Intersect>F1wal1</Intersect>
+         <!-- No Intersect(F1wal1): at |Z|~700mm the D/E beam spaces only
+              reach ~52mm from the solenoid axis (offset 29mm + R 22.5mm),
+              far below this ring's inner radius of 86.67mm, and F6spc1
+              spans R=93.7-99.3mm here, so the plain polycone is already
+              fully contained. The Intersect with F1wal1's deep boolean
+              solid made G4's surface point sampler return a bogus point
+              (reported as a 51cm "protrusion" at R=750mm). -->
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy S2</Desc>
       </Straight>
@@ -3680,6 +3716,7 @@
          <sec name="R1" unit="mm">100.32</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S3</Desc>
       </Straight>
@@ -3694,6 +3731,7 @@
          <sec name="R1" unit="mm">103.02</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S4</Desc>
       </Straight>
@@ -3707,6 +3745,7 @@
          <sec name="R1" unit="mm">106.8</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S5</Desc>
       </Straight>
@@ -3720,6 +3759,7 @@
          <sec name="R1" unit="mm">115.54</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S6</Desc>
       </Straight>
@@ -3733,6 +3773,7 @@
          <sec name="R1" unit="mm">130.42</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S7</Desc>
       </Straight>
@@ -3746,6 +3787,7 @@
          <sec name="R1" unit="mm">135.14</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
+         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S8</Desc>
       </Straight>

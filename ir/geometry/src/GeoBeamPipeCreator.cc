@@ -572,6 +572,7 @@ namespace Belle2 {
       G4VSolid* geo_IPBeamPipe_BWD = nullptr;
       G4VSolid* geo_BellowsShield_FWD = nullptr;
       G4VSolid* geo_AdditionalShield_FWD = nullptr;
+      G4VSolid* geo_AdditionalShield_BWD = nullptr;
       G4LogicalVolume* logi_IPBeamPipe_FWD = nullptr;
       G4LogicalVolume* logi_IPBeamPipe_BWD = nullptr;
       G4LogicalVolume* logi_IPChamber_FWD = nullptr;
@@ -624,6 +625,12 @@ namespace Belle2 {
                    newParts[i] == "IPBeamPipe_BWD" || newParts[i] == "BellowsPipe_BWD") {
           // Mother volume is the solid polycone (RI = 0)
           geo = new G4Polycone("geo_" + newParts[i], 0, 2 * M_PI, num, Z, rI, rO);
+        } else if (newParts[i] == "AdditionalShield_FWD" && geo_IPBeamPipe_FWD != nullptr) {
+          G4Polycone* raw_shield = new G4Polycone("raw_" + newParts[i], 0, 2 * M_PI, num, Z, rI, rO);
+          geo = new G4SubtractionSolid("geo_" + newParts[i], raw_shield, geo_IPBeamPipe_FWD, G4Translate3D(0, 0, 0));
+        } else if (newParts[i] == "AdditionalShield_BWD" && geo_IPBeamPipe_BWD != nullptr) {
+          G4Polycone* raw_shield = new G4Polycone("raw_" + newParts[i], 0, 2 * M_PI, num, Z, rI, rO);
+          geo = new G4SubtractionSolid("geo_" + newParts[i], raw_shield, geo_IPBeamPipe_BWD, G4Translate3D(0, 0, 0));
         } else {
           geo = new G4Polycone("geo_" + newParts[i], 0, 2 * M_PI, num, Z, rI, rO);
         }
@@ -659,11 +666,13 @@ namespace Belle2 {
           double x_her = z_center * std::sin(angle_her);
           double z_her = z_center * std::cos(angle_her);
           G4Tubs* solid_vac_her = new G4Tubs("solid_vac_her_" + newParts[i], 0, r_her_hole, tilted_length / 2.0, 0, 2 * M_PI);
-          G4LogicalVolume* logi_vac_her = new G4LogicalVolume(solid_vac_her, Materials::get("Vacuum"), "logi_vac_her_" + newParts[i]);
+          G4Transform3D transform_her = G4Translate3D(x_her, 0, z_her) * G4RotateY3D(angle_her);
+          G4VSolid* clipped_vac_her = new G4IntersectionSolid("solid_vac_her_" + newParts[i] + "_clipped", solid_vac_her, geo,
+                                                              transform_her.inverse());
+          G4LogicalVolume* logi_vac_her = new G4LogicalVolume(clipped_vac_her, Materials::get("Vacuum"), "logi_vac_her_" + newParts[i]);
           if (flag_limitStep) logi_vac_her->SetUserLimits(new G4UserLimits(stepMax));
           setVisibility(*logi_vac_her, false);
 
-          G4Transform3D transform_her = G4Translate3D(x_her, 0, z_her) * G4RotateY3D(angle_her);
           new G4PVPlacement(transform_her, logi_vac_her, "phys_vac_her_" + newParts[i], logi, false, 0);
 
           // LER daughter
@@ -671,11 +680,15 @@ namespace Belle2 {
           double x_ler = z_center * std::sin(angle_ler);
           double z_ler = z_center * std::cos(angle_ler);
           G4Tubs* solid_vac_ler = new G4Tubs("solid_vac_ler_" + newParts[i], 0, r_ler_hole, tilted_length / 2.0, 0, 2 * M_PI);
-          G4LogicalVolume* logi_vac_ler = new G4LogicalVolume(solid_vac_ler, Materials::get("Vacuum"), "logi_vac_ler_" + newParts[i]);
+          G4Transform3D transform_ler = G4Translate3D(x_ler, 0, z_ler) * G4RotateY3D(angle_ler);
+          G4VSolid* clipped_vac_ler_0 = new G4IntersectionSolid("solid_vac_ler_" + newParts[i] + "_c0", solid_vac_ler, geo,
+                                                                transform_ler.inverse());
+          G4VSolid* clipped_vac_ler = new G4SubtractionSolid("solid_vac_ler_" + newParts[i] + "_clipped", clipped_vac_ler_0, solid_vac_her,
+                                                             transform_ler.inverse() * transform_her);
+          G4LogicalVolume* logi_vac_ler = new G4LogicalVolume(clipped_vac_ler, Materials::get("Vacuum"), "logi_vac_ler_" + newParts[i]);
           if (flag_limitStep) logi_vac_ler->SetUserLimits(new G4UserLimits(stepMax));
           setVisibility(*logi_vac_ler, false);
 
-          G4Transform3D transform_ler = G4Translate3D(x_ler, 0, z_ler) * G4RotateY3D(angle_ler);
           new G4PVPlacement(transform_ler, logi_vac_ler, "phys_vac_ler_" + newParts[i], logi, false, 0);
         }
 
@@ -688,7 +701,7 @@ namespace Belle2 {
         if (newParts[i] == "BellowsPipe_FWD") { logi_BellowsPipe_FWD = logi; }
         if (newParts[i] == "BellowsPipe_BWD") { logi_BellowsPipe_BWD = logi; }
         if (newParts[i] == "AdditionalShield_FWD") { geo_AdditionalShield_FWD = geo; logi_AdditionalShield_FWD = logi; }
-        if (newParts[i] == "AdditionalShield_BWD") { logi_AdditionalShield_BWD = logi; }
+        if (newParts[i] == "AdditionalShield_BWD") { geo_AdditionalShield_BWD = geo; logi_AdditionalShield_BWD = logi; }
 
         // Place volume at origin, unrotated as requested
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi, "phys_" + newParts[i], &topVolume, false, 0);
@@ -1210,8 +1223,11 @@ namespace Belle2 {
           G4Translate3D(0, 0, -Flange_D - Flange_T * 2));
       G4SubtractionSolid* geo_CuFlangeBwd_x = new G4SubtractionSolid("geo_CuFlangeBwd_x_name", geo_CuFlangeBwd_x2, geo_Lv1TaHERUp,
           transform_Lv1TaHERUp);
-      G4SubtractionSolid* geo_CuFlangeBwd   = new G4SubtractionSolid("geo_CuFlangeBwd_name",  geo_CuFlangeBwd_x,  geo_Lv1TaLERDwn,
+      G4SubtractionSolid* geo_CuFlangeBwd_x3   = new G4SubtractionSolid("geo_CuFlangeBwd_x3_name",  geo_CuFlangeBwd_x,  geo_Lv1TaLERDwn,
           transform_Lv1TaLERDwn);
+      G4SubtractionSolid* geo_CuFlangeBwd   = new G4SubtractionSolid("geo_CuFlangeBwd_name",  geo_CuFlangeBwd_x3,
+          geo_AdditionalShield_BWD,
+          G4Translate3D(0, 0, 0));
 
       G4LogicalVolume* logi_CuFlangeBwd = new G4LogicalVolume(geo_CuFlangeBwd, mat_Lv1TaLERUp, "logi_CuFlangeBwd_name");
 

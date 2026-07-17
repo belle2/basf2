@@ -1,17 +1,19 @@
-# EventType: 1211550000
-# Descriptor: [B+ -> J/psi [-> e+ e-] pi+ pi- K+]
-# NickName: Bu_JpsipippimKp_ee
+# EventType: 1211452001
+# Descriptor: [B+ -> psi(2S) [-> J/psi [-> mu+ mu-] pi+ pi-] eta [-> gamma gamma] K+]
+# NickName: Bu_psi2setaKp_Jpsipippim_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
 # Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
-# Date: 20220601
+# Date: 20260717
 #
 # This decay model is intended for phase-space-dependent efficiency
 # determination. All exclusive decays have the PHSP distributuion.
 # Do not use it for one-dimensional analyses without proper reweighting.
+
+Alias etasig eta
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -19,13 +21,21 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0 J/psisig pi+ pi- K+ PHOTOS PHSP;
+1.0 psi(2S)sig etasig K+ PHOTOS PHSP;
 Enddecay
 
 CDecay B-sig
 
+Decay psi(2S)sig
+1.0 J/psisig pi+ pi- PHOTOS PHSP;
+Enddecay
+
 Decay J/psisig
-1.0 e+ e- PHOTOS PHSP;
+1.0 mu+ mu- PHOTOS PHSP;
+Enddecay
+
+Decay etasig
+1.0 gamma gamma PHSP;
 Enddecay
 
 End

@@ -1,37 +1,36 @@
 # EventType: 1111542002
-# Descriptor: [B0 -> (J/psi(1S) -> e+ e-) (omega -> pi+ pi- pi0(gamma gamma))]cc
-# NickName: Bd_JpsiOmega_ee_piplus_piminus_pizero
+# Descriptor: [B0 -> J/psi [-> e+ e-] pi- eta [-> gamma gamma] K+]
+# NickName: Bd_JpsipimetaKp_ee
+# Documentation: B -> charmonium decays.
 # Tested: Yes
-# Physics WG: EWP
-# Responsible: Noah Brenny
-# Email:  nbrenny@iastate.edu
+# PhysicsWG: Quarkonium
+# Responsible: Kirill Chilikin
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
-# Date: 20230525
+# Date: 20260717
 #
-#
-Alias      omegasig        omega
-ChargeConj omegasig        omegasig
-Define beta 0.3814 
-#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Alias etasig eta
+
 Decay Upsilon(4S)
-1.000     B0sig anti-B0sig B0 anti-B0               VSS_BMIX dm;
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
-#
+
 Decay B0sig
-1.000   J/psisig  omegasig                                 SVV_CP beta dm 1 Aplus phAplus Azero phAzero Aminus phAminus;  #[BF update - PG 09/2020]
+1.0 J/psisig pi- etasig K+ PHOTOS PHSP;
 Enddecay
+
 CDecay anti-B0sig
-#
-Decay omegasig
-1.000   pi-  pi+  pi0                                OMEGA_DALITZ;  # 1-Sum(other modes). PDG reports 0.892 \pm 0.07
-Enddecay
-#
+
 Decay J/psisig
-1.000   e+              e-                           PHOTOS VLL;
+1.0 e+ e- PHOTOS PHSP;
 Enddecay
-#
-Decay pi0
-1.000   gamma            gamma                         PHSP;
+
+Decay etasig
+1.0 gamma gamma PHSP;
 Enddecay
-#
+
 End

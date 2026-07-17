@@ -1,39 +1,36 @@
 # EventType: 1111442003
-# Descriptor: [B0 -> J/psi [-> mu+ mu-] eta [-> pi+ pi- pi0(-> gamma gamma)]]
-# NickName: Bd_Jpsieta_mumu_pipipi0
+# Descriptor: [B0 -> psi(2S) [-> mu+ mu-] pi- eta [-> gamma gamma] K+]
+# NickName: Bd_psi2spimetaKp_mumu
+# Documentation: B -> charmonium decays.
 # Tested: Yes
-# PhysicsWG: TDCPV
-# Responsible: Chao Chun Chang
-# Email: 410166066@m365.fju.edu.tw
+# PhysicsWG: Quarkonium
+# Responsible: Kirill Chilikin
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
-# Date: 20231208
+# Date: 20260717
 #
-Alias      etasig     eta
-ChargeConj etasig     etasig
-Alias      pi0sig     pi0
-ChargeConj pi0sig     pi0sig
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
 
-Define beta 0.3814  
-#
+Alias etasig eta
+
 Decay Upsilon(4S)
-1.000   B0  anti-B0  B0sig   anti-B0sig             VSS_BMIX dm;
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
-#
+
 Decay B0sig
-1.000   J/psisig       etasig                       SVS;
+1.0 psi(2S)sig pi- etasig K+ PHOTOS PHSP;
 Enddecay
+
 CDecay anti-B0sig
-#
-Decay J/psisig
-1.000   mu+            mu-                          VLL;
+
+Decay psi(2S)sig
+1.0 mu+ mu- PHOTOS PHSP;
 Enddecay
-#
+
 Decay etasig
-1.000   pi-     pi+     pi0sig                      ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173;
+1.0 gamma gamma PHSP;
 Enddecay
-#
-Decay pi0sig
-1.000   gamma gamma                                 PHSP;
-Enddecay
-#
+
 End

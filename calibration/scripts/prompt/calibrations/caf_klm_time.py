@@ -23,19 +23,24 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script
-settings = CalibrationSettings(name='KLM time',
-                               expert_username='amubarak',
-                               subsystem='klm',
-                               description=__doc__,
-                               input_data_formats=['cdst'],
-                               input_data_names=['hlt_mumu'],
-                               input_data_filters={
-                                   'hlt_mumu': [INPUT_DATA_FILTERS['Run Type']['physics'],
-                                                INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
-                                                INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]
-                               },
-                               depends_on=[],
-                               produced_payloads=["KLMTimeConstants", "KLMTimeCableDelay", "KLMTimeResolution"])
+settings = CalibrationSettings(
+    name='KLM time',
+    expert_username='amubarak',
+    subsystem='klm',
+    description=__doc__,
+    input_data_formats=['cdst'],
+    input_data_names=['hlt_mumu'],
+    input_data_filters={
+        'hlt_mumu': [
+            INPUT_DATA_FILTERS['Run Type']['physics'],
+            INPUT_DATA_FILTERS['Data Tag']['mumu_tight_or_highm_calib'],
+            INPUT_DATA_FILTERS['Data Quality Tag']['Good Or Recoverable']]},
+    depends_on=[],
+    produced_payloads=[
+                "KLMTimeConstants",
+                "KLMTimeCableDelay",
+                "KLMTimeResolution",
+        "KLMEventT0HitResolution"])
 
 
 ##############################

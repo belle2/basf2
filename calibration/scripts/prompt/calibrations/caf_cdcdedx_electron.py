@@ -246,14 +246,6 @@ def pre_collector(name='rg'):
     if (name == "validation"):
         basf2.B2INFO("no trigger skim")
     elif (name == "timegain" or name == "onedcell"):
-        trg_bhabhaskim = basf2.register_module("TriggerSkim")
-        trg_bhabhaskim.param("triggerLines", [
-            "software_trigger_cut&skim&accept_radee",
-            "software_trigger_cut&skim&accept_bhabha_cdc",
-        ])
-        trg_bhabhaskim.param("resultOnMissing", 0)
-        trg_bhabhaskim.set_log_level(basf2.logging.log_level.ERROR)
-        trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
         ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
         ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
@@ -309,6 +301,7 @@ def collector(granularity='all', name=''):
                 'isInjTime': True,
                 'isRadee': True,
                 'isBhabha': False,
+                'isTrgSel': True,
                 'granularity': 'run'
             }
 
@@ -334,6 +327,7 @@ def collector(granularity='all', name=''):
                 'isEntaRS': True,
                 'isRadee': True,
                 'isBhabha': False,
+                'isTrgSel': True,
                 'granularity': granularity}
 
         else:

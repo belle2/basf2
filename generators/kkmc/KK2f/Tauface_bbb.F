@@ -422,6 +422,8 @@ C switch to initialize that all modes are represented equally.
       INTEGER IUSER,SELUSER
       INTEGER USERACTIVE
       COMMON /USERACTIVE/ USERACTIVE(100)
+      INTEGER IPIKKPS
+      COMMON /IPIKKPS/ IPIKKPS
 C==========================================================================
 
 C      PARAMETER (NMODE=196,NM1=40,NM2=71,NM3=19,NM4=32,NM5=21,NM6=13)
@@ -910,6 +912,9 @@ C=================================================
           I = II+NLT+NM4+NM5+NM6  ! position on the whole list of decay channels
 
         KEY3(II)=KEYstrt3(II)
+
+C       To use phase space model, turn off ME for example for TAU-  -->  K0S, PI-, K0S
+        IF (IPIKKPS.EQ.1) KEY3(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=3

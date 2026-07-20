@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Generate a plot showing VTX + beampipe shielding cross-section.
 
@@ -195,10 +204,10 @@ def build_cdc_envelope(cdc_xml, name, line_color, line_dash):
 # ---------------------------------------------------------------------------
 
 def main():
-    from visualize_run2 import parse_polycone, generate_svg
+    from visualize_run2_helpers import parse_polycone, generate_svg
     import visualize_run2_helpers
 
-    repo_root = Path(__file__).resolve().parents[2]
+    repo_root = Path(__file__).resolve().parents[3]
     xml_file = repo_root / 'ir/data/Cryostat.xml'
 
     # ---------- Parse Cryostat XML ----------
@@ -398,7 +407,10 @@ def main():
     #     print(f"  Warning: FTL geometries not loaded: {e}")
 
     # ---------- Generation ----------
-    outfile = str(Path(__file__).resolve().parent / "shielding_study_vtx_beampipe_shield_no_ip.svg")
+    if len(sys.argv) > 1:
+        outfile = sys.argv[1]
+    else:
+        outfile = str(Path(__file__).resolve().parent / "shielding_study_vtx_beampipe_shield_no_ip.svg")
     title = "VTX + BeamPipe Shielding Cross-Section (R-Z, no IP shield)"
 
     # # Define visual holes bored through the beampipes
@@ -484,8 +496,7 @@ def main():
     vols_c_all = (volumes_base + bp_volumes + bp_shield_volumes + shields
                   + vtx_shapes + env_vtx + ftl_shapes + cdc_shapes)
 
-    generate_svg(vols_c_all, volumes_a, volumes_b, crossing_angle, output_file=outfile,
-                 custom_z_bounds=(-60.0, 100.0), custom_r_max=20.0)
+    generate_svg(vols_c_all, volumes_a, volumes_b, crossing_angle, output_file=outfile)
 
     # ---------- Post-process: add title + legend ----------
     with open(outfile, 'r') as f:

@@ -232,8 +232,7 @@
     </VacFWD>
 
     <IPChamber_BWD>
-      <!-- IP beampipe: 16mm ID (RI=0.8cm), Titanium (was Ta). OD keeps its
-           original tapered 21.6-28mm bulge (RO 1.08-1.4cm). -->
+      <!-- IP beampipe: 16mm ID (RI=0.8cm), Ta. Preliminary rough design from 080626. -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">-8.5</sec>
       <sec name="Z2" unit="cm">-8.5</sec>
@@ -250,7 +249,7 @@
     </IPChamber_BWD>
 
     <VacBWD>
-      <!-- Straight central vacuum channel: ends where IPBeamPipe_BWD (solid crotch) begins -->
+      <!-- Straight central vacuum channel: ends where IPBeamPipe_BWD begins -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">-8.9</sec>
       <sec name="RI0" unit="cm">0.0</sec>
@@ -263,7 +262,7 @@
   <AdditionalShield_FWD>
       <!-- RI follows IPBeamPipe_FWD outer + 0.3 mm at the sampled Z planes.
            The creator subtracts the IPBeamPipe solid, so intermediate overlaps
-           in the Z=13-16 cm taper are resolved automatically. -->
+           in the Z=13-16 cm taper are resolved. -->
       <sec name="Z0" unit="cm">13.60</sec>
       <sec name="RI0" unit="cm">1.38</sec>
       <sec name="RO0" unit="cm">4.135</sec>
@@ -386,8 +385,7 @@
 <BellowsShield_BWD>
       <!-- Mirror of BellowsShield_FWD, except Z7 stays at the original
            -49.30cm rather than carrying over FWD's own 49.30+5.5cm (55mm)
-           extension - that extra flange length was FWD-specific and
-           shouldn't have been copied to BWD. -->
+           extension. Needs to be updated when QCSL implementation is ready-->
       <sec name="Z0" unit="cm">-19.10</sec>
       <sec name="RI0" unit="cm">4.20</sec>
       <sec name="RO0" unit="cm">5.817</sec>

@@ -1,8 +1,18 @@
-# Cryostat Geometry Visualization Script
+<!--
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+-->
+
+# IR Region Geometry Visualization Script
 
 ## Overview
 
-The `visualize_cryostat.py` script generates an annotated SVG file showing a radial cross-section (R-Z view) of the Belle II Cryostat geometry from the `ir/data/Cryostat.xml` file.
+The `visualize_ir_region.py` script generates an annotated SVG file showing a radial cross-section (R-Z view) of the Belle II IR Region geometry from the `ir/data/IR Region.xml` file.
 
 ## Features
 
@@ -36,24 +46,24 @@ The `visualize_cryostat.py` script generates an annotated SVG file showing a rad
 
 ### Basic usage:
 ```bash
-python3 visualize_cryostat.py
+python3 visualize_ir_region.py
 ```
 
-This reads `ir/data/Cryostat.xml` and generates `cryostat_cross_section.svg` in the current directory.
+This reads `ir/data/IR Region.xml` and generates `shielding_study_vtx_beampipe_shield_no_ip.svg` in the current directory.
 
 ### Specify input and output files:
 ```bash
-python3 visualize_cryostat.py path/to/Cryostat.xml output.svg
+python3 visualize_ir_region.py path/to/IR Region.xml output.svg
 ```
 
 ### View with interactive features:
-Open `view_cryostat.html` in a web browser to view the SVG with an enhanced user interface that includes:
+Open `view_ir_region.html` in a web browser to view the SVG with an enhanced user interface that includes:
 - Instructions for using the hover annotations
 - Zoom controls
 - Information about the geometry
 - Better layout for viewing
 
-Alternatively, open `cryostat_cross_section.svg` directly in a web browser.
+Alternatively, open `shielding_study_vtx_beampipe_shield_no_ip.svg` directly in a web browser.
 
 **Note**: The SVG is 1900px wide to accommodate the volume list (3 columns on the right side).
 Make sure your browser window is wide enough to see all three columns of the volume list.
@@ -99,17 +109,17 @@ The script automatically assigns colors based on material type:
 
 ## Volumes Displayed
 
-The script parses and displays all polycone volumes in the Cryostat.xml file, including:
+The script parses and displays all polycone volumes in the IR Region.xml file, including:
 
 ### Right side (positive Z):
 - **A components**: Right HER (High Energy Ring) beam pipe and magnets
 - **B components**: Right LER (Low Energy Ring) beam pipe and magnets
-- **C components**: Cryostat vessel, shields, and superconducting magnets
+- **C components**: IR Region vessel, shields, and superconducting magnets
 
 ### Left side (negative Z):
 - **D components**: Left HER beam pipe and magnets
 - **E components**: Left LER beam pipe and magnets
-- **F components**: Cryostat vessel, shields, and superconducting magnets
+- **F components**: IR Region vessel, shields, and superconducting magnets
 
 ### Limit tubes:
 - **TubeR/TubeR2**: Right side boundary volumes
@@ -248,7 +258,7 @@ The script automatically scales the geometry to fit within the plot area while m
 
 ## Example Output Statistics
 
-For the Belle II Cryostat geometry:
+For the Belle II IR Region geometry:
 - **Number of volumes**: 106
 - **Number of materials**: 10 unique materials
 - **Volume list items**: 106 clickable entries in 3 columns
@@ -296,8 +306,8 @@ colors = {
 
 ## Related Files
 
-- **Input**: `ir/data/Cryostat.xml` - Geometry definition
-- **Script**: `visualize_cryostat.py` - Python script to generate SVG
-- **Output**: `cryostat_cross_section.svg` - Generated visualization
-- **Viewer**: `view_cryostat.html` - HTML wrapper for enhanced viewing experience
-- **C++ Creator**: `ir/geometry/src/GeoCryostatCreator.cc` - Geometry implementation
+- **Input**: `ir/data/IR Region.xml` - Geometry definition
+- **Script**: `visualize_ir_region.py` - Python script to generate SVG
+- **Output**: `shielding_study_vtx_beampipe_shield_no_ip.svg` - Generated visualization
+- **Viewer**: `view_ir_region.html` - HTML wrapper for enhanced viewing experience
+- **C++ Creator**: `ir/geometry/src/GeoIR RegionCreator.cc` - Geometry implementation

@@ -1,14 +1,675 @@
 #!/usr/bin/env python3
-"""
-Generate an annotated SVG radial cross-section of the Belle II Cryostat geometry.
-This script parses the Cryostat.xml file and creates a 2D R-Z view.
-"""
 
-import json as json_module
-from pathlib import Path
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import xml.etree.ElementTree as ET
-import sys
+import math
+import json as json_module
 
+
+def get_hms_geometries(repo_root):
+    hms_comp = repo_root / 'vxd/data/HeavyMetalShield.xml'
+    if not hms_comp.exists():
+        return []
+
+    tree = ET.parse(hms_comp)
+    root = tree.getroot()
+    content = root.find('Content')
+
+    shapes = []
+    for shield in content.findall('Shield'):
+        name = shield.get('name', 'HMS_Shield')
+        desc = shield.get('description', '')
+        mat = shield.find('Material').text if shield.find('Material') is not None else 'W'
+
+        planes = shield.findall('Plane')
+        z_vals = []
+        r_out = []
+        r_in = []
+        for p in planes:
+            # posZ
+            z_el = p.find('posZ')
+            z_val = float(z_el.text) * (0.1 if z_el.get('unit', 'mm') == 'mm' else 1.0)
+            z_vals.append(z_val)
+            # outerRadius
+            ro_el = p.find('outerRadius')
+            ro_val = float(ro_el.text) * (0.1 if ro_el.get('unit', 'mm') == 'mm' else 1.0)
+            r_out.append(ro_val)
+            # innerRadius
+            ri_el = p.find('innerRadius')
+            ri_val = float(ri_el.text) * (0.1 if ri_el.get('unit', 'mm') == 'mm' else 1.0)
+            r_in.append(ri_val)
+
+        if not z_vals:
+            continue
+
+        shapes.append({
+            'name': f"HMS_{name}",
+            'desc': desc,
+            'material': mat,
+            'z': z_vals,
+            'r_outer': r_out,
+            'r_inner': r_in,
+            'override_color': '#808080'  # W material color
+        })
+    return shapes
+
+
+def get_tracker_geometries(repo_root, system, comp_xml_name=None):
+    sys_lower = system.lower()
+    if comp_xml_name:
+        comp_xml = repo_root / f'{sys_lower}/data/{comp_xml_name}'
+    else:
+        comp_xml = repo_root / f'{sys_lower}/data/{system}-Components.xml'
+
+    # For VTX the default files use a variant suffix; try common alternatives
+    if not comp_xml.exists():
+        for suffix in ['CMOS5', 'CMOS6', '5layer-2025-baseline']:
+            alt = repo_root / f'{sys_lower}/data/{system}-Components-{suffix}.xml'
+            if alt.exists():
+                comp_xml = alt
+                break
+
+    if not comp_xml.exists():
+        return []
+
+    tree = ET.parse(comp_xml)
+    root = tree.getroot()
+
+    # Parse SensorBases for defaults (SVD specific)
+    sensor_bases = {}
+    for sb in root.findall('SensorBase'):
+        sb_type = sb.get('type')
+        if sb_type:
+            sensor_bases[sb_type] = sb
+
+    # Globally defined Components
+    global_comps = {}
+    for c in root.findall('Component'):
+        c_name = c.get('name')
+        if c_name:
+            global_comps[c_name] = c
+
+    sensors = {}
+    sensor_subcomps = {}
+    for sdef in root.findall('Sensor'):
+        stype = sdef.get('type')
+        width_el = sdef.find('width')
+        length_el = sdef.find('length')
+        height_el = sdef.find('height')
+        color_el = sdef.find('Color')
+        mat_el = sdef.find('Material')
+
+        # Try to resolve missing info from SensorBase
+        sbase_type = None
+        for xi in sdef.findall('.//{http://www.w3.org/2001/XInclude}include'):
+            if 'SensorBase' in xi.get('xpointer', ''):
+                if 'Slanted' in xi.get('xpointer', ''):
+                    sbase_type = 'Slanted'
+                if 'Barrel' in xi.get('xpointer', ''):
+                    sbase_type = 'Barrel'
+
+        if sbase_type and sbase_type in sensor_bases:
+            sb = sensor_bases[sbase_type]
+            if width_el is None:
+                width_el = sb.find('width')
+            if length_el is None:
+                length_el = sb.find('length')
+            if height_el is None:
+                height_el = sb.find('height')
+            if color_el is None:
+                color_el = sb.find('Color')
+            if mat_el is None:
+                mat_el = sb.find('Material')
+
+        if width_el is None or length_el is None or height_el is None:
+            continue
+
+        height_scale = 1.0 if height_el.get('unit') == 'mm' else 0.001 if height_el.get('unit') == 'um' else 0.1
+
+        sensors[stype] = {
+            'width': float(width_el.text) * (1.0 if width_el.get('unit') == 'mm' else 0.1),
+            'length': float(length_el.text) * (1.0 if length_el.get('unit') == 'mm' else 0.1),
+            'height': float(height_el.text) * height_scale,
+            'color': color_el.text if color_el is not None else '#006699',
+            'material': mat_el.text if mat_el is not None else 'Si',
+            'slanted': sdef.get('slanted', 'false').lower() == 'true'
+        }
+
+        # Parse subcomponents placed on this sensor
+        subcomps = []
+        for cplace in sdef.findall('Component'):
+            cname = cplace.get('name')
+            ctype = cplace.get('type')
+            target_c = cplace
+            # Check global comps if it uses type=... instead of inline name=...
+            if ctype and ctype in global_comps:
+                # Merge placement and global attributes (target_c has priority for placement)
+                target_c = global_comps[ctype]
+
+            v_els = cplace.findall('v')
+            w_els = cplace.findall('w')
+            woffset_el = cplace.find('woffset')
+
+            c_width_el = target_c.find('width')
+            c_length_el = target_c.find('length')
+            c_height_el = target_c.find('height')
+            c_color_el = target_c.find('Color')
+            c_mat_el = target_c.find('Material')
+
+            # Look in cplace if not found in target_c
+            if c_width_el is None:
+                c_width_el = cplace.find('width')
+            if c_length_el is None:
+                c_length_el = cplace.find('length')
+            if c_height_el is None:
+                c_height_el = cplace.find('height')
+            if c_color_el is None:
+                c_color_el = cplace.find('Color')
+            if c_mat_el is None:
+                c_mat_el = cplace.find('Material')
+
+            # Sometimes dimensions are inherited from xi:include in Component
+            if c_width_el is None or c_length_el is None:
+                continue
+
+            c_w = float(c_width_el.text) * (1.0 if c_width_el.get('unit') == 'mm' else 0.1)
+            c_l = float(c_length_el.text) * (1.0 if c_length_el.get('unit') == 'mm' else 0.1)
+            if c_height_el is not None:
+                c_height_scale = 1.0 if c_height_el.get('unit') == 'mm' else 0.001 if c_height_el.get('unit') == 'um' else 0.1
+                c_h = float(c_height_el.text) * c_height_scale
+            else:
+                c_h = 0.2
+
+            w_pos = w_els[0].text.strip() if w_els else 'above'
+            woffset = float(woffset_el.text) * (1.0 if woffset_el.get('unit') == 'mm' else 0.1) if woffset_el is not None else 0.0
+
+            c_color = c_color_el.text if c_color_el is not None else '#aaaaaa'
+            c_mat = c_mat_el.text if c_mat_el is not None else 'Unknown'
+
+            for v_el in v_els:
+                v_val = float(v_el.text) * (1.0 if v_el.get('unit') == 'mm' else 0.1)
+                subcomps.append({
+                    'name': cname or ctype or 'SubComp',
+                    'material': c_mat,
+                    'color': c_color,
+                    'w_pos': w_pos,
+                    'woffset': woffset,
+                    'v': v_val,
+                    'width': c_w,
+                    'length': c_l,
+                    'height': c_h
+                })
+
+        sensor_subcomps[stype] = subcomps
+
+    ladder_types = {}
+    for ldef in root.findall('Ladder'):
+        layer = ldef.get('layer')
+        if not layer:
+            continue
+
+        shift_el = ldef.find('shift')
+        rad_el = ldef.find('radius')
+        slant_ang_el = ldef.find('slantedAngle')
+        slant_rad_el = ldef.find('slantedRadius')
+
+        ladder_types[layer] = {
+            'shift': float(shift_el.text) if shift_el is not None else 0.0,
+            'radius': float(rad_el.text) if rad_el is not None else 0.0,
+            'slanted_angle': float(slant_ang_el.text) if slant_ang_el is not None else 0.0,
+            'slanted_radius': float(slant_rad_el.text) if slant_rad_el is not None else 0.0,
+            'sensors': []
+        }
+
+        for sens in ldef.findall('Sensor'):
+            ladder_types[layer]['sensors'].append({
+                'id': sens.get('id'),
+                'type': sens.get('type'),
+                'z': float(sens.text),
+                'flipV': sens.get('flipV', 'false').lower() == 'true',
+                'flipW': sens.get('flipW', 'false').lower() == 'true'
+            })
+
+    shapes = []
+
+    def add_shape(
+            sg_name,
+            desc,
+            mat,
+            color,
+            w,
+            h,
+            length_cm,
+            local_x_centers,
+            local_y_center,
+            z_center,
+            tilt_deg,
+            shift,
+            base_radius):
+        '''Helper to compute corners and add to shapes array'''
+        tilt_rad = math.radians(tilt_deg)
+        cos_t = math.cos(tilt_rad)
+        sin_t = math.sin(tilt_rad)
+
+        # Local dimensions (Z is local z, R is local y perpendicular)
+        local_z_corners = [-length_cm/2, length_cm/2, length_cm/2, -length_cm/2]
+        local_r_corners = [h/2, h/2, -h/2, -h/2]
+
+        z_vals = []
+        r_vals = []
+        for lz, lr in zip(local_z_corners, local_r_corners):
+            rot_z = lz * cos_t - lr * sin_t
+            rot_r = lz * sin_t + lr * cos_t
+            final_z = z_center + rot_z
+
+            y_coord = local_y_center + rot_r
+            x_coord_min = shift - w/2
+            x_coord_max = shift + w/2
+
+            global_r_min = math.sqrt(min(abs(x_coord_min), abs(x_coord_max))**2 + y_coord**2)
+            if x_coord_min < 0 and x_coord_max > 0:
+                global_r_min = abs(y_coord)
+            global_r_max = math.sqrt(max(abs(x_coord_min), abs(x_coord_max))**2 + y_coord**2)
+
+            z_vals.append(final_z)
+            r_vals.append((global_r_min, global_r_max))
+
+        r_out = [r_vals[0][1], r_vals[1][1], r_vals[2][1], r_vals[3][1]]
+        r_in = [r_vals[0][0], r_vals[1][0], r_vals[2][0], r_vals[3][0]]
+
+        svg_z = [z_vals[0], z_vals[1]]
+        svg_r_out = [r_out[0], r_out[1]]
+        svg_r_in = [r_in[3], r_in[2]]
+
+        shapes.append({
+            'name': sg_name,
+            'desc': desc,
+            'material': mat,
+            'mother': '',
+            'daughters': [],
+            'z': svg_z,
+            'r_outer': svg_r_out,
+            'r_inner': svg_r_in,
+            'override_color': color
+        })
+
+    for layer, lad in ladder_types.items():
+        base_radius = lad['radius'] / 10.0  # cm
+        shift = lad['shift'] / 10.0    # cm
+
+        for sinfo in lad['sensors']:
+            stype = sinfo['type']
+            z_center = sinfo['z'] / 10.0  # cm
+
+            sdef = sensors.get(stype)
+            if not sdef:
+                continue
+
+            w = sdef['width'] / 10.0
+            h = sdef['height'] / 10.0
+            length_cm = sdef['length'] / 10.0
+
+            is_slanted = sdef['slanted']
+            if is_slanted and lad['slanted_radius']:
+                local_r = lad['slanted_radius'] / 10.0
+                tilt_deg = -lad['slanted_angle']  # Tilt angle is inwards (negative)
+            else:
+                local_r = base_radius
+                tilt_deg = 0.0
+
+            # Add sensor active silicon
+            add_shape(f"{system}_L{layer}_{stype}_{sinfo['id']}",
+                      f"{system} Layer {layer} (Dim: {w*10:.1f}x{h*10:.2f}x{length_cm*10:.1f}mm)",
+                      sdef['material'], sdef['color'],
+                      w, h, length_cm, [0], local_r, z_center, tilt_deg, shift, base_radius)
+
+            # Subcomponents
+            subcomps = sensor_subcomps.get(stype, [])
+            for i, sc in enumerate(subcomps):
+                sc_w = sc['width'] / 10.0
+                sc_h = sc['height'] / 10.0
+                sc_l = sc['length'] / 10.0
+                sc_v = sc['v'] / 10.0
+
+                # Position logic
+                # 'v' is relative to bottom edge and denotes the CENTER of the subcomponent
+                local_z_offset = sc_v - length_cm/2
+                if sinfo['flipV']:
+                    local_z_offset = length_cm/2 - sc_v
+
+                # R offset mapping
+                w_pos = sc['w_pos']
+                sc_woffset = sc['woffset'] / 10.0
+                if w_pos == 'above' or w_pos == 'top':
+                    local_y_offset = h/2 + sc_woffset + sc_h/2
+                elif w_pos == 'below' or w_pos == 'bottom':
+                    local_y_offset = -h/2 - sc_woffset - sc_h/2
+                elif w_pos == 'center':
+                    local_y_offset = 0.0
+                else:
+                    local_y_offset = 0.0
+
+                if sinfo['flipW']:
+                    local_y_offset = -local_y_offset
+
+                # Apply tilt to offsets
+                tilt_rad = math.radians(tilt_deg)
+                cos_t = math.cos(tilt_rad)
+                sin_t = math.sin(tilt_rad)
+                global_z_center = z_center + local_z_offset * cos_t - local_y_offset * sin_t
+                global_y_center = local_r + local_z_offset * sin_t + local_y_offset * cos_t
+
+                # We reuse the tilt of the sensor for the subcomponent
+                add_shape(f"{system}_L{layer}_{stype}_{sinfo['id']}_{sc['name']}_{i}",
+                          f"{system} Layer {layer} Comp: {sc['name']}",
+                          sc['material'], sc['color'],
+                          sc_w, sc_h, sc_l, [0], global_y_center, global_z_center, tilt_deg, shift, base_radius)
+
+    return shapes
+
+
+def get_beampipe_geometries(repo_root):
+    # Manually parsing the Beampipe specific structure as in GeoBeamPipeCreator.cc
+    bp_comp = repo_root / 'ir/data/BeamPipe.xml'
+    if not bp_comp.exists():
+        return []
+
+    tree = ET.parse(bp_comp)
+    root = tree.getroot()
+    content = root.find('Content')
+    if content is None:
+        return []
+
+    shapes = []
+
+    def get_sec(element, name):
+        el = element.find(f"sec[@name='{name}']")
+        if el is not None:
+            return float(el.text) * (0.1 if el.get('unit', 'cm') == 'mm' else 1.0)
+        return 0.0
+
+    def get_color(mat):
+        colors = {
+            'Vacuum': '#e8f4f8', 'Ti': '#b8b8b8', 'Be': '#e0e0d0',
+            'Paraffin': '#ffddaa', 'Au': '#ffd700', 'Ta': '#a0a0a0',
+            'W': '#808080', 'Cu': '#d4a574'
+        }
+        return colors.get(mat, '#cccccc')
+
+    # Lv1SUS
+    lv1sus = content.find('Lv1SUS')
+    if lv1sus is not None:
+        L = [get_sec(lv1sus, f'L{i}') for i in range(1, 17)]
+        R = [get_sec(lv1sus, f'R{i}') for i in range(1, 12)]
+        mat = lv1sus.find('Material').text if lv1sus.find('Material') is not None else 'Ti'
+
+        Zs = [0.0]
+        for i in range(8):
+            Zs[0] -= L[i]
+        Zs.append(Zs[0] + L[0])
+        Zs.append(Zs[1])
+        Zs.append(Zs[2] + L[1])
+        Zs.append(Zs[3] + L[2])
+        Zs.append(Zs[4])
+        Zs.append(Zs[5] + L[3])
+        Zs.append(Zs[6] + L[4])
+        Zs.append(Zs[7] + L[5])
+        Zs.append(Zs[8] + L[6])
+        Zs.append(Zs[9] + L[7])
+        Zs.append(Zs[10] + L[8])
+        Zs.append(Zs[11] + L[9])
+        Zs.append(Zs[12] + L[10])
+        Zs.append(Zs[13] + L[11])
+        Zs.append(Zs[14] + L[12])
+        Zs.append(Zs[15])
+        Zs.append(Zs[16] + L[13])
+        Zs.append(Zs[17] + L[14])
+        Zs.append(Zs[18])
+        Zs.append(Zs[19] + L[15])
+
+        R_out = [R[0], R[0], R[1], R[1], R[2], R[3], R[3], R[4], R[4], R[5],
+                 R[5], R[5], R[6], R[6], R[7], R[7], R[8], R[9], R[9], R[10], R[10]]
+
+        shapes.append({
+            'name': 'BeamPipe_Lv1SUS',
+            'desc': 'Central IP Pipe',
+            'material': mat, 'mother': '', 'daughters': [],
+            'z': Zs[:len(R_out)],
+            'r_outer': R_out,
+            'r_inner': [0.0]*len(R_out),
+            'override_color': get_color(mat)
+        })
+
+    # Lv2OutTi
+    lv2outti = content.find('Lv2OutTi')
+    if lv2outti is not None:
+        mat = lv2outti.find('Material').text if lv2outti.find('Material') is not None else 'Ti'
+        z = [-get_sec(lv2outti, 'L1'), get_sec(lv2outti, 'L2')]
+        ro = [get_sec(lv2outti, 'R2'), get_sec(lv2outti, 'R2')]
+        ri = [get_sec(lv2outti, 'R1'), get_sec(lv2outti, 'R1')]
+        shapes.append({
+            'name': 'BeamPipe_Lv2OutTi', 'desc': '', 'material': mat, 'mother': '', 'daughters': [],
+            'z': z, 'r_outer': ro, 'r_inner': ri, 'override_color': '#333300'
+        })
+
+    # Lv2OutBe
+    lv2outbe = content.find('Lv2OutBe')
+    if lv2outbe is not None:
+        mat = lv2outbe.find('Material').text if lv2outbe.find('Material') is not None else 'Be'
+        z = [-get_sec(lv2outbe, 'L1'), get_sec(lv2outbe, 'L2')]
+        ro = [get_sec(lv2outbe, 'R2'), get_sec(lv2outbe, 'R2')]
+        ri = [get_sec(lv2outbe, 'R1'), get_sec(lv2outbe, 'R1')]
+        shapes.append({
+            'name': 'BeamPipe_Lv2OutBe', 'desc': '', 'material': mat, 'mother': '', 'daughters': [],
+            'z': z, 'r_outer': ro, 'r_inner': ri, 'override_color': '#333300'
+        })
+
+    # Lv2InBe
+    lv2inbe = content.find('Lv2InBe')
+    if lv2inbe is not None:
+        mat = lv2inbe.find('Material').text if lv2inbe.find('Material') is not None else 'Be'
+        z = [-get_sec(lv2inbe, 'L1'), get_sec(lv2inbe, 'L2')]
+        ro = [get_sec(lv2inbe, 'R2'), get_sec(lv2inbe, 'R2')]
+        ri = [get_sec(lv2inbe, 'R1'), get_sec(lv2inbe, 'R1')]
+        shapes.append({
+            'name': 'BeamPipe_Lv2InBe', 'desc': '', 'material': mat, 'mother': '', 'daughters': [],
+            'z': z, 'r_outer': ro, 'r_inner': ri, 'override_color': '#333300'
+        })
+
+    def parse_fwd_bwd(node_name, dir_sign=1.0):
+        node = content.find(node_name)
+        if node is not None:
+            mat = node.find('Material').text if node.find('Material') is not None else 'Ta'
+            L1 = get_sec(node, 'L1')
+            aR1 = get_sec(node, 'aR1')
+            aR2 = get_sec(node, 'aR2')
+            aL1 = get_sec(node, 'aL1')
+            aL2 = get_sec(node, 'aL2')
+            aL3 = get_sec(node, 'aL3')
+            D1 = get_sec(node, 'D1')
+
+            aR = [aR1, aR1, aR2, aR2]
+
+            if dir_sign > 0:
+                aL = [-L1/2, -L1/2 + aL1, -L1/2 + aL1 + aL2, -L1/2 + aL1 + aL2 + aL3]
+                z_shifted = [D1 + L1/2 + al for al in aL]
+            else:
+                # Fwd is dir_sign > 0. Bwd is < 0 but let's check code
+                # +Lv1TaBwd_L1 / 2.0 - (Lv1TaBwd_aL1 + Lv1TaBwd_aL2 + Lv1TaBwd_aL3) in Bwd
+                aL = [L1/2 - (aL1+aL2+aL3), L1/2 - (aL1+aL2), L1/2 - aL1, L1/2]
+                aR = [aR2, aR2, aR1, aR1]
+                z_shifted = [-D1 - L1/2 + al for al in aL]
+
+            shapes.append({
+                'name': f'BeamPipe_{node_name}', 'desc': '', 'material': mat, 'mother': '', 'daughters': [],
+                'z': z_shifted, 'r_outer': aR, 'r_inner': [0.0, 0.0, 0.0, 0.0], 'override_color': get_color(mat)
+            })
+
+    parse_fwd_bwd('Lv1TaFwd', 1.0)
+    parse_fwd_bwd('Lv1TaBwd', -1.0)
+
+    return shapes
+
+
+def get_support_geometries(repo_root, system):
+    """Generic parser for RotationSolid shapes in *-Support.xml files (SVD, VTX, etc.)"""
+    sys_lower = system.lower()
+    support_xml = repo_root / f'{sys_lower}/data/{system}-Support.xml'
+    if not support_xml.exists():
+        return []
+    try:
+        tree = ET.parse(support_xml)
+        root = tree.getroot()
+    except Exception:
+        return []
+
+    shapes = []
+    for rs in root.findall('.//RotationSolid'):
+        name = rs.find('Name').text if rs.find('Name') is not None else 'Support'
+        color = rs.find('Color').text if rs.find('Color') is not None else '#666'
+        mat = rs.find('Material').text if rs.find('Material') is not None else 'Unknown'
+
+        outer_pts = rs.find('OuterPoints')
+        inner_pts = rs.find('InnerPoints')
+        if outer_pts is None or inner_pts is None:
+            continue
+
+        z_out, r_out = [], []
+        for pt in outer_pts.findall('point'):
+            z_el = pt.find('z')
+            x_el = pt.find('x')
+            z_out.append(float(z_el.text) * (0.1 if z_el.get('unit', 'mm') == 'mm' else 1.0))
+            r_out.append(float(x_el.text) * (0.1 if x_el.get('unit', 'mm') == 'mm' else 1.0))
+
+        z_in, r_in = [], []
+        for pt in inner_pts.findall('point'):
+            z_el = pt.find('z')
+            x_el = pt.find('x')
+            z_in.append(float(z_el.text) * (0.1 if z_el.get('unit', 'mm') == 'mm' else 1.0))
+            r_in.append(float(x_el.text) * (0.1 if x_el.get('unit', 'mm') == 'mm' else 1.0))
+
+        if not z_out or not z_in:
+            continue
+
+        shapes.append({
+            'name': f"{system}_Support_{name}",
+            'desc': f"{system} support structure: {name}",
+            'material': mat,
+            'mother': '',
+            'daughters': [],
+            'z': z_out,
+            'r_outer': r_out,
+            'z_inner': z_in,
+            'r_inner': r_in,
+            'override_color': color
+        })
+
+    return shapes
+
+
+def get_run2_geometries(repo_root):
+    shapes = []
+    shapes.extend(get_beampipe_geometries(repo_root))
+    shapes.extend(get_hms_geometries(repo_root))
+    shapes.extend(get_tracker_geometries(repo_root, 'PXD'))
+    shapes.extend(get_tracker_geometries(repo_root, 'SVD'))
+    shapes.extend(get_support_geometries(repo_root, 'SVD'))
+    return shapes
+
+
+def get_envelope_geometries(repo_root, system, filename=None):
+    sys_lower = system.lower()
+    if filename:
+        env_xml = repo_root / sys_lower / 'data' / filename
+    else:
+        env_xml = repo_root / sys_lower / 'data' / f"{system}-Envelope.xml"
+
+    if not env_xml.exists():
+        return []
+
+    tree = ET.parse(env_xml)
+    root = tree.getroot()
+
+    outer = root.find('OuterPoints')
+    inner = root.find('InnerPoints')
+    if outer is None:
+        return []
+
+    def parse_pts(elem):
+        pts = []
+        if elem is None:
+            return pts
+        for p in elem.findall('point'):
+            z_el = p.find('z')
+            x_el = p.find('x')
+            unit = z_el.get('unit')
+            scale = 0.1 if unit == 'mm' else 1.0
+            z = float(z_el.text) * scale
+            x = float(x_el.text) * scale
+            pts.append((z, x))
+        return pts
+
+    outer_pts = parse_pts(outer)
+    inner_pts = parse_pts(inner)
+
+    if not outer_pts:
+        return []
+
+    all_z = sorted(list(set([p[0] for p in outer_pts] + [p[0] for p in inner_pts])))
+    if not all_z:
+        return []
+
+    def interpolate(pts, z):
+        if not pts:
+            return 0.0
+        if len(pts) == 1:
+            return pts[0][1]
+        for i in range(len(pts) - 1):
+            z1, r1 = pts[i]
+            z2, r2 = pts[i+1]
+            if (z1 <= z <= z2) or (z2 <= z <= z1):
+                if abs(z2 - z1) < 1e-6:
+                    return max(r1, r2)
+                return r1 + (r2 - r1) * (z - z1) / (z2 - z1)
+        z_start = pts[0][0]
+        z_end = pts[-1][0]
+        if z_start < z_end:
+            if z < z_start:
+                return pts[0][1]
+            return pts[-1][1]
+        else:
+            if z < z_end:
+                return pts[-1][1]
+            return pts[0][1]
+
+    r_outer = [interpolate(outer_pts, z) for z in all_z]
+    if inner_pts:
+        r_inner = [interpolate(inner_pts, z) for z in all_z]
+    else:
+        r_inner = [0.0] * len(all_z)
+
+    return [{
+        'name': f"{system}_Envelope",
+        'desc': f"{system} Envelope Boundary",
+        'material': 'Vacuum',
+        'z': all_z,
+        'r_outer': r_outer,
+        'r_inner': r_inner,
+        'override_color': 'none',
+        'is_outline': True,
+        'line_color': '#00aa44',
+        'line_dash': '5,5'
+    }]
+
+
+# --- Merged from visualize_cryostat.py ---
 
 def convert_to_cm(value, unit):
     """Convert value to cm based on unit."""
@@ -111,265 +772,8 @@ def get_color_for_material(material):
     return '#cccccc'
 
 
-def parse_envelope_outline(xml_file, component_name, color):
-    """Parse *-Envelope.xml and return outer border (and optional inner border)."""
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-
-    outer = root.find('.//OuterPoints')
-    if outer is None:
-        return None
-
-    z_outer = []
-    r_outer = []
-    for point in outer.findall('point'):
-        z_elem = point.find('z')
-        x_elem = point.find('x')
-        if z_elem is None or x_elem is None or z_elem.text is None or x_elem.text is None:
-            continue
-        z_outer.append(convert_to_cm(z_elem.text, z_elem.get('unit', 'cm')))
-        r_outer.append(abs(convert_to_cm(x_elem.text, x_elem.get('unit', 'cm'))))
-
-    if not z_outer or not r_outer:
-        return None
-
-    outline = {
-        'name': component_name,
-        'color': color,
-        'z': z_outer,
-        'r_outer': r_outer,
-    }
-
-    inner = root.find('.//InnerPoints')
-    if inner is not None:
-        z_inner = []
-        r_inner = []
-        for point in inner.findall('point'):
-            z_elem = point.find('z')
-            x_elem = point.find('x')
-            if z_elem is None or x_elem is None or z_elem.text is None or x_elem.text is None:
-                continue
-            z_inner.append(convert_to_cm(z_elem.text, z_elem.get('unit', 'cm')))
-            r_inner.append(abs(convert_to_cm(x_elem.text, x_elem.get('unit', 'cm'))))
-        if z_inner and r_inner:
-            outline['z_inner'] = z_inner
-            outline['r_inner'] = r_inner
-
-    return outline
-
-
-def parse_cdc_outline(xml_file, color):
-    """Parse CDC.xml MomVol and return border outline."""
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    momvol = root.find('.//MomVol')
-    if momvol is None:
-        return None
-
-    z_vals = []
-    r_outer = []
-    r_inner = []
-
-    # Sort ZBound elements by Z if needed, but usually they are defined in order.
-    # To be safe, we extract them into a list and sort by Z coordinate.
-    zbounds = []
-    for zb in momvol.findall('ZBound'):
-        z_elem = zb.find('Z')
-        rmax_elem = zb.find('Rmax')
-        rmin_elem = zb.find('Rmin')
-        if z_elem is None or rmax_elem is None or rmin_elem is None:
-            continue
-        z_v = convert_to_cm(z_elem.text, z_elem.get('unit', 'cm'))
-        router_v = abs(convert_to_cm(rmax_elem.text, rmax_elem.get('unit', 'cm')))
-        rinner_v = abs(convert_to_cm(rmin_elem.text, rmin_elem.get('unit', 'cm')))
-        zbounds.append((z_v, router_v, rinner_v))
-
-    zbounds.sort(key=lambda x: x[0])
-
-    for z_v, router_v, rinner_v in zbounds:
-        z_vals.append(z_v)
-        r_outer.append(router_v)
-        r_inner.append(rinner_v)
-
-    if not z_vals or not r_outer:
-        return None
-
-    return {
-        'name': 'CDC',
-        'color': color,
-        'z': z_vals,
-        'r_outer': r_outer,
-        'z_inner': z_vals,
-        'r_inner': r_inner,
-    }
-
-
-def get_cdc_covers(repo_root):
-    """Parse CDC-Covers.xml and return geometric shapes within R < 40cm."""
-    covers_xml = repo_root / 'cdc/data/CDC-Covers.xml'
-    if not covers_xml.exists():
-        return []
-
-    tree = ET.parse(covers_xml)
-    root = tree.getroot()
-
-    shapes = []
-    for cover in root.findall('Cover'):
-        cid = cover.get('id', '')
-        name_el = cover.find('Name')
-        name = name_el.text if name_el is not None else 'Cover'
-
-        def g(tag):
-            el = cover.find(tag)
-            return convert_to_cm(el.text, el.get('unit', 'mm')) if el is not None and el.text else 0.0
-
-        rmin1 = g('InnerR1')
-        rmin2 = g('InnerR2')
-        rmax1 = g('OuterR1')
-        rmax2 = g('OuterR2')
-
-        # Filter: only keep if within 60 cm (requested)
-        if max(rmax1, rmax2) > 60.0:
-            continue
-
-        thick = g('Thickness')
-        posZ = g('PosZ')
-
-        # Based on CDCCreator.cc: placed at (posZ - thick/2) with half-length thick/2
-        z_vals = [posZ - thick, posZ]
-        r_outer = [rmax1, rmax2]
-        r_inner = [rmin1, rmin2]
-
-        shapes.append({
-            'name': f"CDC_{name}_{cid}",
-            'desc': cover.get('desc', ''),
-            'material': 'Al',
-            'z': z_vals,
-            'r_outer': r_outer,
-            'r_inner': r_inner,
-            'override_color': '#44cc44'
-        })
-    return shapes
-
-
-def parse_heavymetalshield_outlines(xml_file, color):
-    """Parse HeavyMetalShield.xml planes and return border outlines for both shields."""
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    outlines = []
-
-    for shield in root.findall('.//Shield'):
-        name = shield.get('name', 'Shield')
-        z_values = []
-        r_outer = []
-        r_inner = []
-        for plane in shield.findall('Plane'):
-            z_elem = plane.find('posZ')
-            ri_elem = plane.find('innerRadius')
-            ro_elem = plane.find('outerRadius')
-            if z_elem is None or ro_elem is None or z_elem.text is None or ro_elem.text is None:
-                continue
-            z_values.append(convert_to_cm(z_elem.text, z_elem.get('unit', 'cm')))
-            r_outer.append(abs(convert_to_cm(ro_elem.text, ro_elem.get('unit', 'cm'))))
-            if ri_elem is not None and ri_elem.text is not None:
-                r_inner.append(abs(convert_to_cm(ri_elem.text, ri_elem.get('unit', 'cm'))))
-            else:
-                r_inner.append(0.0)
-
-        if z_values and r_outer:
-            outlines.append({
-                'name': f'HeavyMetalShield.{name}',
-                'color': color,
-                'z': z_values,
-                'r_outer': r_outer,
-                'z_inner': z_values,
-                'r_inner': r_inner,
-            })
-
-    return outlines
-
-
-def parse_beampipe_outline(xml_file, color):
-    """Parse BeamPipe.xml and build the actual Lv1SUS profile used in GeoBeamPipeCreator.
-
-    This follows the same Z/R construction as in ir/geometry/src/GeoBeamPipeCreator.cc
-    for `geo_Lv1SUS_name`, which is the central beam pipe section around the IP.
-    """
-    tree = ET.parse(xml_file)
-    root = tree.getroot()
-    lv1 = root.find('.//Lv1SUS')
-    if lv1 is None:
-        return None
-
-    def g(name):
-        sec = lv1.find(f"sec[@name='{name}']")
-        if sec is None or sec.text is None:
-            raise ValueError(f"Lv1SUS missing {name}")
-        return convert_to_cm(sec.text, sec.get('unit', 'cm'))
-
-    # L and R values used by the C++ creator.
-    L = {f"L{i}": g(f"L{i}") for i in range(1, 17)}
-    R = {f"R{i}": g(f"R{i}") for i in range(1, 12)}
-
-    # Reproduce Lv1SUS_Z[0..20] from GeoBeamPipeCreator.cc (in cm here).
-    z = [0.0] * 21
-    z[0] = -sum(L[f"L{i}"] for i in range(1, 9))
-    z[1] = z[0] + L["L1"]
-    z[2] = z[1]
-    z[3] = z[2] + L["L2"]
-    z[4] = z[3] + L["L3"]
-    z[5] = z[4]
-    z[6] = z[5] + L["L4"]
-    z[7] = z[6] + L["L5"]
-    z[8] = z[7] + L["L6"]
-    z[9] = z[8] + L["L7"]
-    z[10] = z[9] + L["L8"]
-    z[11] = z[10] + L["L9"]
-    z[12] = z[11] + L["L10"]
-    z[13] = z[12] + L["L11"]
-    z[14] = z[13] + L["L12"]
-    z[15] = z[14] + L["L13"]
-    z[16] = z[15]
-    z[17] = z[16] + L["L14"]
-    z[18] = z[17] + L["L15"]
-    z[19] = z[18]
-    z[20] = z[19] + L["L16"]
-
-    # Reproduce Lv1SUS_rO[0..20] from GeoBeamPipeCreator.cc.
-    ro = [0.0] * 21
-    ro[0] = R["R1"]
-    ro[1] = ro[0]
-    ro[2] = R["R2"]
-    ro[3] = ro[2]
-    ro[4] = R["R3"]
-    ro[5] = R["R4"]
-    ro[6] = ro[5]
-    ro[7] = R["R5"]
-    ro[8] = ro[7]
-    ro[9] = R["R6"]
-    ro[10] = ro[9]
-    ro[11] = ro[10]
-    ro[12] = R["R7"]
-    ro[13] = ro[12]
-    ro[14] = R["R8"]
-    ro[15] = ro[14]
-    ro[16] = R["R9"]
-    ro[17] = R["R10"]
-    ro[18] = ro[17]
-    ro[19] = R["R11"]
-    ro[20] = ro[19]
-
-    return {
-        'name': 'BeamPipe.Lv1SUS (actual)',
-        'color': color,
-        'z': z,
-        'r_outer': ro,
-    }
-
-
 def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
-                 output_file='cryostat_cross_section.svg', extra_outlines=None,
-                 custom_z_bounds=None, custom_r_max=None):
+                 output_file='cryostat_cross_section.svg', extra_outlines=None):
     """Generate SVG file with radial cross-section."""
 
     if extra_outlines is None:
@@ -391,16 +795,6 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             r_max = max(r_max, max(outline['r_outer']))
         if outline.get('r_inner'):
             r_max = max(r_max, max(outline['r_inner']))
-
-    # Override with custom bounds if provided
-    if custom_z_bounds:
-        z_min, z_max = custom_z_bounds
-    if custom_r_max:
-        r_max = custom_r_max
-
-    # Cap R at 80 cm as requested (only if custom_r_max not set)
-    if not custom_r_max and r_max > 80.0:
-        r_max = 80.0
 
     # Add margins
     z_range = z_max - z_min
@@ -435,15 +829,14 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
         f'<svg width="{width}" height="{height}" xmlns="http://www.w3.org/2000/svg">',
         '<defs>',
         '<style>',
-        '.volume { cursor: pointer; }',
+        '.volume { stroke: #333; stroke-width: 0.5; cursor: pointer; }',
         '.volume:hover { stroke: #000; stroke-width: 2; opacity: 1.0 !important; }',
         '.volume-active { stroke: #ff0000; stroke-width: 3; opacity: 1.0 !important; }',
         '.label { font-family: Arial, sans-serif; font-size: 10px; fill: #333; }',
         '.title { font-family: Arial, sans-serif; font-size: 16px; font-weight: bold; fill: #000; }',
         '.axis { stroke: #666; stroke-width: 1; }',
         '.axis-label { font-family: Arial, sans-serif; font-size: 12px; fill: #666; }',
-        '.grid { stroke: #bbb; stroke-width: 0.6; }',
-        '.grid-minor { stroke: #eee; stroke-width: 0.3; stroke-dasharray: 2,2; }',
+        '.grid { stroke: #ddd; stroke-width: 0.5; }',
         '.tooltip-box { fill: white; stroke: #333; stroke-width: 1; pointer-events: none; }',
         '.tooltip-text { font-family: Arial, sans-serif; font-size: 11px; fill: #000; pointer-events: none; }',
         '.tooltip-text-bold { font-family: Arial, sans-serif; font-size: 12px; '
@@ -743,69 +1136,26 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
         f'<rect x="0" y="0" width="{width}" height="{height}" fill="white"/>',
         '',
         '<!-- Title -->',
-        f'<text x="{width/2}" y="30" class="title" text-anchor="middle">'
-        'Belle II Post-LS2 VTX Upgrade - Radial Cross Section (R-Z view)</text>',
+        f'<text x="{width/2}" y="30" class="title" text-anchor="middle">Belle II Cryostat - Radial Cross Section (R-Z view)</text>',
         '',
         '<!-- Grid lines -->',
     ]
 
-    # Choose grid and label intervals adaptively based on z_range and r_max
-    z_span = z_max - z_min
-    if z_span <= 250.0:
-        # High resolution close-up (e.g., VTX / shielding study view)
-        z_grid_major = 10.0
-        z_grid_minor = 2.0
-        r_grid_major = 5.0
-        r_grid_minor = 1.0
-        r_labels_list = [i for i in range(0, int(r_max) + 5, 5)]
-        z_label_step = 10.0
-    else:
-        # Full view
-        z_grid_major = 100.0
-        z_grid_minor = 20.0
-        r_grid_major = 10.0
-        r_grid_minor = 2.0
-        r_labels_list = [0, 20, 40, 60]
-        z_label_step = 100.0
+    # Add vertical grid lines every 100 cm
+    for z in range(int(z_min/100)*100, int(z_max/100)*100 + 100, 100):
+        if z_min <= z <= z_max:
+            x = z_to_x(z)
+            svg_lines.append(f'<line x1="{x}" y1="{margin_top}" x2="{x}" y2="{height-margin_bottom}" class="grid"/>')
 
-    z_ticks = []
-    z_start = (int(z_min / z_grid_minor) - 1) * z_grid_minor
-    z_end = (int(z_max / z_grid_minor) + 1) * z_grid_minor
-    curr_z = z_start
-    while curr_z <= z_end:
-        if z_min <= curr_z <= z_max:
-            is_major = False
-            if abs(curr_z % z_grid_major) < 1e-5 or abs((curr_z % z_grid_major) - z_grid_major) < 1e-5:
-                is_major = True
-            z_ticks.append((curr_z, is_major))
-        curr_z += z_grid_minor
-
-    r_ticks = []
-    curr_r = 0.0
-    while curr_r <= r_max:
-        is_major = False
-        if abs(curr_r % r_grid_major) < 1e-5 or abs((curr_r % r_grid_major) - r_grid_major) < 1e-5:
-            is_major = True
-        r_ticks.append((curr_r, is_major))
-        curr_r += r_grid_minor
-
-    # Draw vertical grid lines
-    for z, is_major in z_ticks:
-        x = z_to_x(z)
-        cls = "grid" if is_major else "grid-minor"
-        svg_lines.append(f'<line x1="{x}" y1="{margin_top}" x2="{x}" y2="{height-margin_bottom}" class="{cls}"/>')
-
-    # Draw horizontal grid lines (both positive and negative R)
-    for r, is_major in r_ticks:
+    # Add horizontal grid lines
+    for r in range(0, int(r_max) + 10, 10):
         y_pos = r_to_y(r)
         y_neg = r_to_y(-r)
-        cls = "grid" if is_major else "grid-minor"
-        svg_lines.append(f'<line x1="{margin_left}" y1="{y_pos}" x2="{width-margin_right}" y2="{y_pos}" class="{cls}"/>')
-        if r > 0:
-            svg_lines.append(f'<line x1="{margin_left}" y1="{y_neg}" x2="{width-margin_right}" y2="{y_neg}" class="{cls}"/>')
+        svg_lines.append(f'<line x1="{margin_left}" y1="{y_pos}" x2="{width-margin_right}" y2="{y_pos}" class="grid"/>')
+        svg_lines.append(f'<line x1="{margin_left}" y1="{y_neg}" x2="{width-margin_right}" y2="{y_neg}" class="grid"/>')
 
     svg_lines.append('')
-    svg_lines.append('<!-- Axes & Ticks -->')
+    svg_lines.append('<!-- Axes -->')
 
     # Z axis (horizontal)
     y_axis = r_to_y(0)
@@ -818,33 +1168,13 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
     svg_lines.append(
         f'<text x="20" y="{height/2}" class="axis-label" text-anchor="middle" transform="rotate(-90 20 {height/2})">R (cm)</text>')
 
-    # Draw Z axis ticks on the horizontal axis
-    for z, is_major in z_ticks:
-        x = z_to_x(z)
-        tick_len = 6 if is_major else 3
-        svg_lines.append(f'<line x1="{x}" y1="{y_axis - tick_len}" x2="{x}" y2="{y_axis + tick_len}" class="axis"/>')
-
-    # Draw R axis ticks on the vertical axis
-    for r, is_major in r_ticks:
-        y_pos = r_to_y(r)
-        y_neg = r_to_y(-r)
-        tick_len = 6 if is_major else 3
-        svg_lines.append(f'<line x1="{x_axis - tick_len}" y1="{y_pos}" x2="{x_axis + tick_len}" y2="{y_pos}" class="axis"/>')
-        if r > 0:
-            svg_lines.append(f'<line x1="{x_axis - tick_len}" y1="{y_neg}" x2="{x_axis + tick_len}" y2="{y_neg}" class="axis"/>')
-
     # Add axis labels
-    z_label_start = (int(z_min / z_label_step) - 1) * z_label_step
-    z_label_end = (int(z_max / z_label_step) + 1) * z_label_step
-    curr_z = z_label_start
-    while curr_z <= z_label_end:
-        if z_min <= curr_z <= z_max:
-            x = z_to_x(curr_z)
-            lbl = f"{int(round(curr_z))}"
-            svg_lines.append(f'<text x="{x}" y="{height-margin_bottom+20}" class="axis-label" text-anchor="middle">{lbl}</text>')
-        curr_z += z_label_step
+    for z in range(int(z_min/100)*100, int(z_max/100)*100 + 100, 100):
+        if z_min <= z <= z_max:
+            x = z_to_x(z)
+            svg_lines.append(f'<text x="{x}" y="{height-margin_bottom+20}" class="axis-label" text-anchor="middle">{z}</text>')
 
-    for r in r_labels_list:
+    for r in [0, 20, 40, 60]:
         if r <= r_max:
             y_pos = r_to_y(r)
             svg_lines.append(f'<text x="{margin_left-10}" y="{y_pos+4}" class="axis-label" text-anchor="end">{r}</text>')
@@ -862,22 +1192,12 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
         r_rot = z * sin_a + r * cos_a
         return z_rot, r_rot
 
-    # Separate normal volumes and white masking holes
-    normal_c = [v for v in volumes_c if v.get('override_color') != '#ffffff']
-    white_c = [v for v in volumes_c if v.get('override_color') == '#ffffff']
-
-    normal_a = [v for v in volumes_a if v.get('override_color') != '#ffffff']
-    white_a = [v for v in volumes_a if v.get('override_color') == '#ffffff']
-
-    normal_b = [v for v in volumes_b if v.get('override_color') != '#ffffff']
-    white_b = [v for v in volumes_b if v.get('override_color') == '#ffffff']
-
     svg_lines.append('')
     svg_lines.append('<!-- Volumes -->')
 
     # Draw C volumes (central, no rotation)
     svg_lines.append('<!-- C volumes (Central, no rotation) -->')
-    for vol in normal_c:
+    for vol in volumes_c:
         if not vol['z'] or not vol['r_outer']:
             continue
 
@@ -891,11 +1211,9 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             points_upper.append(f"{z_to_x(z)},{r_to_y(r_out)}")
 
         # Add inner radius points in reverse
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             points_upper.append(f"{z_to_x(z)},{r_to_y(r_in)}")
 
         # Escape strings for JavaScript
@@ -911,22 +1229,11 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
         r_outer_json = json_module.dumps(vol['r_outer'])
         r_inner_json = json_module.dumps(vol['r_inner'])
 
-        # Determine rendering style
-        is_outline = vol.get('is_outline', False)
-        line_color = vol.get('line_color', color)
-        line_dash = vol.get('line_dash', '')
-        fill_val = "none" if is_outline else color
-        stroke_val = line_color if is_outline else "#333"
-        stroke_width = vol.get('line_width', "1.5" if is_outline else "0.5")
-        dash_attr = f'stroke-dasharray="{line_dash}"' if line_dash else ""
-
-        common_attrs = (
-            f'class="volume" fill="{fill_val}" stroke="{stroke_val}" '
-            f'stroke-width="{stroke_width}" {dash_attr} opacity="{vol.get("opacity", "0.7")}" '
-            f'data-volume-name="{name_escaped}" data-material="{mat_escaped}"'
-        )
-
-        svg_lines.append(f'<polygon points="{" ".join(points_upper)}" {common_attrs} ')
+        svg_lines.append(
+            f'<polygon points="{" ".join(points_upper)}" class="volume" '
+            f'fill="{color}" opacity="0.7" ')
+        svg_lines.append(f'  data-volume-name="{name_escaped}" ')
+        svg_lines.append(f'  data-material="{mat_escaped}" ')
         onmousemove_str = (
             f"  onmousemove=\"showTooltip(evt, '{name_escaped}', '{desc_escaped}', "
             f"'{mat_escaped}', '{mother_escaped}', '{daughters_escaped}', "
@@ -949,16 +1256,26 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             points_lower.append(f"{z_to_x(z)},{r_to_y(-r_out)}")
 
         # Add inner radius points in reverse
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             points_lower.append(f"{z_to_x(z)},{r_to_y(-r_in)}")
 
-        svg_lines.append(f'<polygon points="{" ".join(points_lower)}" {common_attrs} ')
+        svg_lines.append(
+            f'<polygon points="{" ".join(points_lower)}" class="volume" '
+            f'fill="{color}" opacity="0.7" ')
+        svg_lines.append(f'  data-volume-name="{name_escaped}" ')
+        svg_lines.append(f'  data-material="{mat_escaped}" ')
+        onmousemove_str = (
+            f"  onmousemove=\"showTooltip(evt, '{name_escaped}', '{desc_escaped}', "
+            f"'{mat_escaped}', '{mother_escaped}', '{daughters_escaped}', "
+            f"'{z_json}', '{r_outer_json}', '{r_inner_json}')\" ")
         svg_lines.append(onmousemove_str)
         svg_lines.append('  onmouseout="hideTooltip()" ')
+        onclick_str = (
+            f"  onclick=\"selectVolume(evt, '{name_escaped}', '{desc_escaped}', "
+            f"'{mat_escaped}', '{mother_escaped}', '{daughters_escaped}', "
+            f"'{z_json}', '{r_outer_json}', '{r_inner_json}')\">")
         svg_lines.append(onclick_str)
         svg_lines.append(f'  <title>{vol["name"]}: {vol["desc"]} ({vol["material"]})</title>')
         svg_lines.append('</polygon>')
@@ -967,7 +1284,7 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
     svg_lines.append('')
     svg_lines.append(f'<!-- A volumes (HER, rotated +{crossing_angle["HER"]:.4f} rad) -->')
     her_angle = crossing_angle['HER']
-    for vol in normal_a:
+    for vol in volumes_a:
         if not vol['z'] or not vol['r_outer']:
             continue
 
@@ -982,11 +1299,9 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
         # Add inner radius points in reverse
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             z_rot, r_rot = rotate_coordinates(z, r_in, her_angle)
             points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
@@ -1029,11 +1344,9 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             z_rot, r_rot = rotate_coordinates(z, -r_out, her_angle)
             points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             z_rot, r_rot = rotate_coordinates(z, -r_in, her_angle)
             points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
@@ -1052,7 +1365,7 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
     svg_lines.append('')
     svg_lines.append(f'<!-- B volumes (LER, rotated {crossing_angle["LER"]:.4f} rad) -->')
     ler_angle = crossing_angle['LER']
-    for vol in normal_b:
+    for vol in volumes_b:
         if not vol['z'] or not vol['r_outer']:
             continue
 
@@ -1066,11 +1379,9 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             z_rot, r_rot = rotate_coordinates(z, r_out, ler_angle)
             points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             z_rot, r_rot = rotate_coordinates(z, r_in, ler_angle)
             points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
@@ -1104,75 +1415,6 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
         svg_lines.append(onclick_str)
         svg_lines.append(f'  <title>{vol["name"]}: {vol["desc"]} ({vol["material"]})</title>')
         svg_lines.append('</polygon>')
-
-    # Draw white masking volumes at the very end to ensure they overlay correctly
-    svg_lines.append('')
-    svg_lines.append('<!-- White masking holes (drawn at the end) -->')
-
-    for vol in white_c:
-        points_upper = [f"{z_to_x(z)},{r_to_y(r)}" for z, r in zip(vol['z'], vol['r_outer'])]
-        z_inner = vol.get('z_inner', vol['z'])
-        r_inner = vol.get('r_inner', [0]*len(z_inner))
-        points_upper += [f"{z_to_x(z)},{r_to_y(r)}" for z, r in zip(reversed(z_inner), reversed(r_inner))]
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_upper)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
-
-        points_lower = [f"{z_to_x(z)},{r_to_y(-r)}" for z, r in zip(vol['z'], vol['r_outer'])]
-        points_lower += [f"{z_to_x(z)},{r_to_y(-r)}" for z, r in zip(reversed(z_inner), reversed(r_inner))]
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_lower)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
-
-    for vol in white_a:
-        points_upper = []
-        for z, r in zip(vol['z'], vol['r_outer']):
-            z_rot, r_rot = rotate_coordinates(z, r, her_angle)
-            points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        z_inner = vol.get('z_inner', vol['z'])
-        r_inner = vol.get('r_inner', [0]*len(z_inner))
-        for z, r in zip(reversed(z_inner), reversed(r_inner)):
-            z_rot, r_rot = rotate_coordinates(z, r, her_angle)
-            points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_upper)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
-
-        points_lower = []
-        for z, r in zip(vol['z'], vol['r_outer']):
-            z_rot, r_rot = rotate_coordinates(z, -r, her_angle)
-            points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        for z, r in zip(reversed(z_inner), reversed(r_inner)):
-            z_rot, r_rot = rotate_coordinates(z, -r, her_angle)
-            points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_lower)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
-
-    for vol in white_b:
-        points_upper = []
-        for z, r in zip(vol['z'], vol['r_outer']):
-            z_rot, r_rot = rotate_coordinates(z, r, ler_angle)
-            points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        z_inner = vol.get('z_inner', vol['z'])
-        r_inner = vol.get('r_inner', [0]*len(z_inner))
-        for z, r in zip(reversed(z_inner), reversed(r_inner)):
-            z_rot, r_rot = rotate_coordinates(z, r, ler_angle)
-            points_upper.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_upper)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
-
-        points_lower = []
-        for z, r in zip(vol['z'], vol['r_outer']):
-            z_rot, r_rot = rotate_coordinates(z, -r, ler_angle)
-            points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        for z, r in zip(reversed(z_inner), reversed(r_inner)):
-            z_rot, r_rot = rotate_coordinates(z, -r, ler_angle)
-            points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
-        svg_lines.append(
-            f'<polygon points="{" ".join(points_lower)}" fill="#ffffff" '
-            'stroke="#333" stroke-width="0.5" opacity="1.0" pointer-events="none"/>')
 
     # Draw outer border overlays for selected detector components.
     svg_lines.append('')
@@ -1220,11 +1462,9 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
             z_rot, r_rot = rotate_coordinates(z, -r_out, ler_angle)
             points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
-        z_inner_list = vol.get('z_inner', vol['z'])
-        r_inner_list = vol.get('r_inner', [])
-        for i in range(len(z_inner_list)-1, -1, -1):
-            z = z_inner_list[i]
-            r_in = r_inner_list[i] if i < len(r_inner_list) else 0
+        for i in range(len(vol['z'])-1, -1, -1):
+            z = vol['z'][i]
+            r_in = vol['r_inner'][i] if i < len(vol['r_inner']) else 0
             z_rot, r_rot = rotate_coordinates(z, -r_in, ler_angle)
             points_lower.append(f"{z_to_x(z_rot)},{r_to_y(r_rot)}")
 
@@ -1344,177 +1584,3 @@ def generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle,
     print(f"R range: {-r_max:.1f} to {r_max:.1f} cm")
     print(f"Number of volumes: {len(all_volumes)} (C: {len(volumes_c)}, "
           f"A: {len(volumes_a)}, B: {len(volumes_b)})")
-
-
-def main():
-    """
-    Main function to generate interactive SVG visualization of Belle II Cryostat.
-
-    Parses the Cryostat.xml geometry file and generates an interactive SVG
-    visualization showing a radial cross-section (R-Z view) with the following features:
-    - Hover tooltips showing component details and vertex coordinates
-    - Click-to-activate volumes with detailed information panel
-    - Material legend with click-to-highlight functionality
-    - Volume hierarchy display (mother/daughter relationships)
-
-    Command line arguments:
-        argv[1]: Path to Cryostat.xml file (default: 'ir/data/Cryostat.xml')
-        argv[2]: Output SVG file path (default: 'cryostat_cross_section.svg')
-
-    Returns:
-        int: 0 on success, 1 on error
-    """
-    xml_file = 'ir/data/Cryostat.xml'
-    if len(sys.argv) > 1:
-        xml_file = sys.argv[1]
-
-    output_file = 'PostLS2_shielding_Study_cross_section.svg'
-    if len(sys.argv) > 2:
-        output_file = sys.argv[2]
-
-    print(f"Parsing {xml_file}...")
-
-    try:
-        tree = ET.parse(xml_file)
-        root = tree.getroot()
-    except Exception as e:
-        print(f"Error parsing XML: {e}")
-        return 1
-
-    # Find Content element
-    content = root.find('.//Content')
-    if content is None:
-        print("No Content element found")
-        return 1
-
-    # Parse CrossingAngle
-    crossing_angle = {'HER': 0.0, 'LER': 0.0}
-    crossing_elem = content.find('CrossingAngle')
-    if crossing_elem is not None:
-        for sec in crossing_elem.findall('sec'):
-            name = sec.get('name')
-            unit = sec.get('unit', 'rad')
-            value = float(sec.text)
-            if unit == 'rad':
-                crossing_angle[name] = value
-            print(f"  CrossingAngle {name}: {value} {unit}")
-
-    # Parse additional component outlines.
-    repo_root = Path(__file__).resolve().parents[2]
-    extra_outlines = []
-
-    pxd_env = repo_root / 'pxd/data/PXD-Envelope.xml'
-    if pxd_env.exists():
-        outline = parse_envelope_outline(str(pxd_env), 'PXD', '#0000ff')
-        if outline:
-            extra_outlines.append(outline)
-
-    svd_env = repo_root / 'svd/data/SVD-Envelope.xml'
-    if svd_env.exists():
-        outline = parse_envelope_outline(str(svd_env), 'SVD', '#ff0000')
-        if outline:
-            extra_outlines.append(outline)
-
-    cdc_xml = repo_root / 'cdc/data/CDC.xml'
-    if cdc_xml.exists():
-        cdc_outline = parse_cdc_outline(str(cdc_xml), '#00aa00')
-        if cdc_outline:
-            # Add segments separately to avoid the long horizontal outer line at R~113cm
-            # 1. Inner boundary
-            extra_outlines.append({
-                'name': 'CDC Inner',
-                'color': '#00aa00',
-                'z': cdc_outline['z'],
-                'r_outer': cdc_outline['r_inner']
-            })
-            # 2. Backward side boundary (capped at 60cm as requested)
-            extra_outlines.append({
-                'name': 'CDC Backward',
-                'color': '#00aa00',
-                'z': [cdc_outline['z'][0], cdc_outline['z'][0]],
-                'r_outer': [cdc_outline['r_inner'][0], min(cdc_outline['r_outer'][0], 60.0)]
-            })
-            # 3. Forward side boundary (capped at 60cm as requested)
-            extra_outlines.append({
-                'name': 'CDC Forward',
-                'color': '#00aa00',
-                'z': [cdc_outline['z'][-1], cdc_outline['z'][-1]],
-                'r_outer': [cdc_outline['r_inner'][-1], min(cdc_outline['r_outer'][-1], 60.0)]
-            })
-
-    volumes_a = []  # HER (High Energy Ring) - positive angle
-    volumes_b = []  # LER (Low Energy Ring) - negative angle
-    volumes_c = []  # Central region - no rotation
-
-    cdc_covers = get_cdc_covers(repo_root)
-    if cdc_covers:
-        volumes_c.extend(cdc_covers)
-
-    # Parse all volume elements
-    for element in content:
-        # Skip certain elements
-        if element.tag in ['LimitStepLength', 'CrossingAngle']:
-            continue
-
-        # Check if it's a volume with polycone geometry
-        n_elem = element.find('N')
-        if n_elem is not None:
-            vol = parse_polycone(element)
-            if vol:
-                vol_name = vol['name']
-
-                # Filter out HMS if it leaked into Cryostat.xml (unlikely but safe)
-                if 'HMS' in vol_name:
-                    continue
-
-                # Filter Tungsten Shields: only keep the 20mm version (baseline)
-                if 'QCSTungstenShield' in vol_name and vol_name != 'QCSTungstenShield20mm':
-                    print(f"  Skipping inactive shield: {vol_name}")
-                    continue
-
-                # Categorize volumes by name prefix
-                if vol_name.startswith('A'):
-                    volumes_a.append(vol)
-                elif vol_name.startswith('B'):
-                    volumes_b.append(vol)
-                else:
-                    volumes_c.append(vol)
-                print(f"  Parsed: {vol['name']} ({vol['n_planes']} planes)")
-
-    # Parse Post-LS2 structures using visualize_run2_helpers
-    try:
-        sys.path.append(str(Path(__file__).resolve().parent))
-        import visualize_run2_helpers
-        postls2_shapes = visualize_run2_helpers.get_postls2_geometries(repo_root)
-        print(f"  Parsed Post-LS2 geometries: {len(postls2_shapes)} shapes")
-        volumes_c.extend(postls2_shapes)
-    except Exception as e:
-        print(f"  Warning: Post-LS2 geometries not loaded: {e}")
-
-    # Combine all volumes for processing
-    all_volumes = volumes_c + volumes_a + volumes_b
-
-    if not all_volumes:
-        print("No volumes found!")
-        return 1
-
-    # Build daughter volume relationships
-    for vol in all_volumes:
-        vol['daughters'] = []
-        # Find all volumes that have this volume as mother
-        for other_vol in all_volumes:
-            if other_vol.get('mother') == vol['name']:
-                vol['daughters'].append(other_vol['name'])
-
-    print(f"\nGenerating SVG with {len(all_volumes)} volumes...")
-    print(
-        f"  C volumes: {len(volumes_c)}, A volumes (HER, +{crossing_angle['HER']:.4f} rad): "
-        f"{len(volumes_a)}, B volumes (LER, {crossing_angle['LER']:.4f} rad): {len(volumes_b)}"
-    )
-    generate_svg(volumes_c, volumes_a, volumes_b, crossing_angle, output_file, extra_outlines=extra_outlines)
-
-    return 0
-
-
-if __name__ == '__main__':
-    sys.exit(main())

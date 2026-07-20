@@ -1,9 +1,18 @@
+<!--
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belle II Cryostat Geometry Viewer</title>
+    <title>Belle II IR Region Geometry Viewer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -60,7 +69,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔬 Belle II Cryostat Geometry - Interactive Viewer</h1>
+        <h1>🔬 Belle II IR Region Geometry - Interactive Viewer</h1>
         
         <div class="info">
             <h2>How to Use</h2>
@@ -114,7 +123,7 @@
         </div>
 
         <div class="svg-container" id="svg-container">
-            <object id="svg-object" data="cryostat_cross_section.svg" type="image/svg+xml" width="1900" height="800">
+            <object id="svg-object" data="shielding_study_vtx_beampipe_shield_no_ip.svg" type="image/svg+xml" width="1900" height="800">
                 Your browser does not support SVG
             </object>
         </div>
@@ -122,8 +131,8 @@
         <div class="info" style="margin-top: 20px;">
             <h2>About the Geometry</h2>
             <p>
-                This interactive visualization shows a radial cross-section (R-Z view) of the Belle II Cryostat geometry.
-                The cryostat contains the superconducting magnets (QCS) that are part of the interaction region.
+                This interactive visualization shows a radial cross-section (R-Z view) of the Belle II IR Region geometry.
+                The IR Region contains the VTX, Beampipe, and shielding components.
             </p>
             <ul>
                 <li><strong>Z axis (horizontal)</strong>: Longitudinal position along the beam line (cm)</li>
@@ -132,7 +141,7 @@
                 <li><strong>Left side (negative Z)</strong>: Backward direction (D/E/F components)</li>
             </ul>
             <p>
-                Generated from: <code>ir/data/Cryostat.xml</code><br>
+                Generated from: <code>various XML files in ir/data and vtx/data</code><br>
                 Total volumes: 106<br>
                 Z range: -792 to +876 cm<br>
                 R range: ±82.5 cm<br>

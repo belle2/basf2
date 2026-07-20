@@ -103,23 +103,33 @@ namespace Belle2 {
       /// HS unit size in y
       double m_unitY = 0;
 
+      /// Define some magic numbers
+      /// Maximum allowed recursion level
+      static const ushort c_maxAllowedRecusionLevel = 10;
+      /// Maximum number of HS sectors in x and y, also the size of some of the the Look-Up-Tables (LUTs) below
+      static constexpr ushort c_maxHSSectorNumber = (1 << c_maxAllowedRecusionLevel);
+      /// Bit mask for coordinate transformation, creates all-ones for the coordinate system conversion
+      static constexpr ushort c_xIndexBitMask = c_maxHSSectorNumber - 1;
+      /// Look-Up-Table size including the right-most value
+      static constexpr ushort c_maxLUTSize = c_maxHSSectorNumber + 1;
+
       /// Look-Up-Tables for values as cache to speed up calculation
       /// sine values of the Hough Space sector boarder coordinates
-      std::array<double, 16385> m_HSSinValuesLUT = {0};
+      std::array<double, c_maxLUTSize> m_HSSinValuesLUT = {0};
       /// cosine values of the Hough Space sector boarder coordinates
-      std::array<double, 16385> m_HSCosValuesLUT = {0};
+      std::array<double, c_maxLUTSize> m_HSCosValuesLUT = {0};
       /// sine values of the Hough Space sector center coordinates
-      std::array<double, 16384> m_HSCenterSinValuesLUT = {0};
+      std::array<double, c_maxHSSectorNumber> m_HSCenterSinValuesLUT = {0};
       /// cosine values of the Hough Space sector center coordinates
-      std::array<double, 16384> m_HSCenterCosValuesLUT = {0};
+      std::array<double, c_maxHSSectorNumber> m_HSCenterCosValuesLUT = {0};
       /// y values of the Hough Space sector boarders
-      std::array<double, 16385> m_HSYLUT = {0};
+      std::array<double, c_maxLUTSize> m_HSYLUT = {0};
       /// y values of the Hough Space sector centers
-      std::array<double, 16384> m_HSYCenterLUT = {0};
+      std::array<double, c_maxHSSectorNumber> m_HSYCenterLUT = {0};
       /// x values of the Hough Space sector boarders
-      std::array<double, 16385> m_HSXLUT = {0};
+      std::array<double, c_maxLUTSize> m_HSXLUT = {0};
       /// x values of the Hough Space sector centers
-      std::array<double, 16384> m_HSXCenterLUT = {0};
+      std::array<double, c_maxHSSectorNumber> m_HSXCenterLUT = {0};
 
       /// Map containing only active HS sectors, i.e. those with hits from enough layers contained in them.
       /// The keys are the global indices of the HS cell, the values are lists of pointers to the contained hits

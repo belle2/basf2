@@ -67,8 +67,7 @@ namespace Belle2 {
       void FindHoughSpaceCluster();
 
       /// Perform depth first search recursive algorithm to find clusters in the Hough Space
-      /// @param lastIndexX x-index of the last cell checked
-      /// @param lastIndexY y-index of the last cell checked
+      /// @param lastGlobalSectorIndex global index of the last sector checked
       void DepthFirstSearch(uint lastGlobalSectorIndex);
 
       // Parameters

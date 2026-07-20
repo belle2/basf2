@@ -99,7 +99,8 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
                                                 std::vector<std::vector<VXDHoughState*>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
-  m_activeSectors.clear();
+  m_activeSectorsMap.clear();
+  m_activeSectorsIndices.clear();
 
   const std::vector<VXDHoughState*> currentEventHitList = TrackingUtilities::as_pointers<VXDHoughState>(hits);
 
@@ -137,8 +138,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
-  const uint centerx = xmin + (uint)((xmax - xmin) / 2);
-  const uint centery = ymin + (uint)((ymax - ymin) / 2);
+  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);
+  const uint centery = ymin + (uint)((ymax - ymin) >> 1);
   const uint xIndexCache[3] = {xmin, centerx, xmax};
   const uint yIndexCache[3] = {ymin, centery, ymax};
 
@@ -156,8 +157,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
+    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];
+    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];
@@ -204,7 +205,9 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
         if (currentRecursion < m_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), std::make_pair(-layerFilter(layerHits), containedHits) });
+          const uint globalIndex = localIndexX + 16384 * (16384 - localIndexY);
+          m_activeSectorsMap.insert({globalIndex, containedHits});
+          m_activeSectorsIndices.push_back(globalIndex);
         }
       }
     }
@@ -216,28 +219,31 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
 {
   m_clusterCount = 1;
 
-  for (auto& currentCell : m_activeSectors) {
+  // Sort vector to create HS clusters from bottom left to top right
+  std::sort(m_activeSectorsIndices.begin(), m_activeSectorsIndices.end());
 
-    // cell content meanings:
-    // -3, -4  : active sector, not yet visited
-    // 0       : non-active sector (will never be visited, only checked)
-    // 1,2,3...: index of the clusters
-    if (currentCell.second.first > -1) continue;
+  for (const uint& currentGlobalSectorIndex : m_activeSectorsIndices) {
 
-    m_clusterInitialPosition = std::make_pair(currentCell.first.first, currentCell.first.second);
-    m_clusterSize = 1;
-    currentCell.second.first = m_clusterCount;
-
-    m_currentTrackCandidate.clear();
-    for (VXDHoughState* hit : currentCell.second.second) {
-      m_currentTrackCandidate.emplace_back(hit);
+    const auto currentCellHits = m_activeSectorsMap.find(currentGlobalSectorIndex);
+    if (currentCellHits == m_activeSectorsMap.end()) {
+      continue;
     }
 
+    // Get local (x, y) indices out of the globalSectorIndex
+    m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & 0x3FFF), 16384 - (currentGlobalSectorIndex >> 14));
+    m_clusterSize = 1;
+
+    m_currentTrackCandidate.clear();
+    for (VXDHoughState* hit : currentCellHits->second) {
+      m_currentTrackCandidate.emplace_back(hit);
+    }
+    // this sector now has been used and the hits have been processed, so it can be removed from the map
+    m_activeSectorsMap.erase(currentGlobalSectorIndex);
+
     // Check for HS sectors connected to each other which could form a cluster
-    DepthFirstSearch(currentCell.first.first, currentCell.first.second);
+    DepthFirstSearch(currentGlobalSectorIndex);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
       m_currentTrackCandidate.clear();
     }
@@ -245,40 +251,55 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
   }
 }
 
-void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
+void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSectorIndex)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
-  for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
-    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
-        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
-    for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
-      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
-          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
+  // Get local (x, y) indices out of the globalSectorIndex
+  const ushort lastLocalIndexX = (lastGlobalSectorIndex & 0x3FFF);
+  const ushort lastLocalIndexY = 16384 - (lastGlobalSectorIndex >> 14);
 
-      // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
-      if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;
+  // For the iterative / recursive serach, just check the direct neighbours in x and y direction
+  for (ushort currentLocalIndexY = lastLocalIndexY; currentLocalIndexY >= lastLocalIndexY - 1; currentLocalIndexY--) {
+    if (std::abs(static_cast<short>(m_clusterInitialPosition.second) - static_cast<short>(currentLocalIndexY)) >=
+        m_MaximumHSClusterSizeY
+        or m_clusterSize >= m_MaximumHSClusterSize or currentLocalIndexY > m_nVerticalSectors) {
+      return;
+    }
+
+    for (ushort currentLocalIndexX = lastLocalIndexX; currentLocalIndexX <= lastLocalIndexX + 1; currentLocalIndexX++) {
+      if (std::abs(static_cast<short>(m_clusterInitialPosition.first) - static_cast<short>(currentLocalIndexX)) >= m_MaximumHSClusterSizeX
+          or m_clusterSize >= m_MaximumHSClusterSize or currentLocalIndexX > m_nAngleSectors) {
+        return;
+      }
+
+      const uint currentGlobalSectorIndex = currentLocalIndexX + 16384 * (16384 - currentLocalIndexY);
+      // The currentGlobalSectorIndex sector is the current one has already been checked, so continue
+      if (currentGlobalSectorIndex == lastGlobalSectorIndex) {
+        continue;
+      }
 
       // first check bounds to avoid out-of-bound array access
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
-      if (currentIndexX < m_nAngleSectors and currentIndexY < m_nVerticalSectors) {
+      if (currentLocalIndexX < m_nAngleSectors and currentLocalIndexY < m_nVerticalSectors) {
 
-        auto activeSector = m_activeSectors.find({currentIndexX, currentIndexY});
+        const auto activeSectorHits = m_activeSectorsMap.find(currentGlobalSectorIndex);
         // Only continue searching if the current cluster is smaller than the maximum cluster size
-        if (activeSector != m_activeSectors.end() and activeSector->second.first < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
-          activeSector->second.first = m_clusterCount;
+        if (activeSectorHits != m_activeSectorsMap.end()) {
           m_clusterSize++;
 
-          // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
-          // so it's certain the key exists.
-          for (VXDHoughState* hit : activeSector->second.second) {
+          // No need to check whether currentGlobalSectorIndex exists as a key in m_activeSectorsMap as they were
+          // created at the same time so it's certain the key exists.
+          for (VXDHoughState* hit : activeSectorHits->second) {
             if (not TrackingUtilities::is_in(hit, m_currentTrackCandidate)) {
               m_currentTrackCandidate.emplace_back(hit);
             }
           }
+          // this sector now has been used and the hits have been processed, so it can be removed from the map
+          m_activeSectorsMap.erase(currentGlobalSectorIndex);
 
           // search in the next Hough Space cells...
-          DepthFirstSearch(currentIndexX, currentIndexY);
+          DepthFirstSearch(currentGlobalSectorIndex);
         }
       }
     }

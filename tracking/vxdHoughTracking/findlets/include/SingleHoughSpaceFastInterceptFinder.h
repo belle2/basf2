@@ -11,7 +11,7 @@
 
 #include <bitset>
 #include <array>
-#include <map>
+#include <unordered_map>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -45,9 +45,9 @@ namespace Belle2 {
 
       /// layer filter, checks if at least hits from 3 layers are in a set of hits
       /// @param layer bitset containing information whether there as a hit in a layer
-      inline unsigned short layerFilter(const std::bitset<8>& layer)
+      static inline unsigned short layerFilter(const std::bitset<8>& layer)
       {
-        uint layercount = layer.count();
+        ushort layercount = static_cast<ushort>(layer.count());
         return (layercount >= 3 ? layercount : 0);
       }
 
@@ -69,7 +69,7 @@ namespace Belle2 {
       /// Perform depth first search recursive algorithm to find clusters in the Hough Space
       /// @param lastIndexX x-index of the last cell checked
       /// @param lastIndexY y-index of the last cell checked
-      void DepthFirstSearch(uint lastIndexX, uint lastIndexY);
+      void DepthFirstSearch(uint lastGlobalSectorIndex);
 
       // Parameters
       /// maximum number of recursive calls of FastInterceptFinder2d
@@ -122,41 +122,19 @@ namespace Belle2 {
       /// x values of the Hough Space sector centers
       std::array<double, 16384> m_HSXCenterLUT = {0};
 
-      /// this sorting makes sure the clusters can be searched from bottom left of the HS to top right
-      /// normally, a C++ array looks like a matrix:
-      /// (0, 0   ) ... (maxX, 0   )
-      ///    ...            ...
-      /// (0, maxY) ... (maxX, maxY)
-      /// but for sorting we want it to be like regular coordinates
-      /// (0, maxY) ... (maxX, maxY)
-      ///    ...            ...
-      /// (0, 0   ) ... (maxX, 0   )
-      /// By setting the offset to the maximum allowed number of cells (2^14) and simplifying
-      /// (16384 - lhs.second) * 16384 + lhs.first < (16384 - rhs.second) * 16384 + rhs.first
-      /// to
-      /// (rhs.second - lhs.second) * 16384 < rhs.first - lhs.first
-      /// we get the formula below
-      struct paircompare {
-        /// comparison operator for the active HS sector map
-        bool operator()(const std::pair<uint, uint>& lhs, const std::pair<uint, uint>& rhs) const
-        {return ((int)rhs.second - (int)lhs.second) * 16384 < (int)rhs.first - (int)lhs.first;}
-      };
       /// Map containing only active HS sectors, i.e. those with hits from enough layers contained in them.
-      /// The keys are the indices of the HS cell, and the custom sort function above is used to sort the content.
-      /// The value is a pair consisting of the (negative) number of layers hit in a given cell,
-      /// and a vector containing the hit information of all hits that are contained in this cell.
-      /// During cluster finding the first value of the value-pair will be assigned the current cluster number.
-      std::map<std::pair<uint, uint>, std::pair<int, std::vector<VXDHoughState*>>, paircompare> m_activeSectors;
+      /// The keys are the global indices of the HS cell, the values are lists of pointers to the contained hits
+      std::unordered_map<uint, std::vector<VXDHoughState*>> m_activeSectorsMap;
+      /// Cache the global indices of the active sectors for sorted access
+      std::vector<uint> m_activeSectorsIndices;
 
       /// count the clusters
-      uint m_clusterCount = 0;
+      ushort m_clusterCount = 0;
       /// size of the current cluster
-      uint m_clusterSize = 0;
+      ushort m_clusterSize = 0;
 
       /// start cell of the recursive cluster finding in the Hough Space
-      std::pair<uint, uint> m_clusterInitialPosition = std::make_pair(0, 0);
-      /// center of gravity containing describing the current best track parameters in the Hough Space
-      std::pair<int, int> m_clusterCoG = std::make_pair(0, 0);
+      std::pair<ushort, ushort> m_clusterInitialPosition = std::make_pair(0, 0);
 
       /// the current track candidate
       std::vector<VXDHoughState*> m_currentTrackCandidate;

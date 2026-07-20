@@ -215,7 +215,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
           // xIndex + yIndex * ySize
           // A bit more complicated here though, since the y-axis is inverted on the fly.
           // Instead of starting the coordinate system in the top-left corner, it has to start in the bottom-left corner
-          // for creating HS clusters from bottom to top and from left to right.
+          // for creating HS clusters from bottom to top and from left to right, so this becomes
+          // xIndex + ySize * (ySize - yIndex)   (eq. 0)
           const uint globalIndex = localIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - localIndexY);
           m_activeSectorsMap.insert({globalIndex, containedHits});
           m_activeSectorsIndices.push_back(globalIndex);
@@ -240,7 +241,7 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
       continue;
     }
 
-    // Get local (x, y) indices out of the globalSectorIndex
+    // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
     m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & c_xIndexBitMask),
                                               c_maxHSSectorNumber - (currentGlobalSectorIndex >> c_maxAllowedRecusionLevel));
     m_clusterSize = 1;
@@ -267,7 +268,7 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
-  // Get local (x, y) indices out of the globalSectorIndex
+  // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
   const ushort lastLocalIndexX = (lastGlobalSectorIndex & c_xIndexBitMask);
   const ushort lastLocalIndexY = c_maxHSSectorNumber - (lastGlobalSectorIndex >> c_maxAllowedRecusionLevel);
 
@@ -285,6 +286,7 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
         return;
       }
 
+      // Calculate the global index for this sector by applying (eq. 0)
       const uint currentGlobalSectorIndex = currentLocalIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - currentLocalIndexY);
       // The currentGlobalSectorIndex sector is the current one has already been checked, so continue
       if (currentGlobalSectorIndex == lastGlobalSectorIndex) {

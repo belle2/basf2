@@ -96,9 +96,9 @@ C Similar tuning also applied to tau- -> PI- K0B PI0 nu
       DATA    IFKPIPI /1/
       COMMON /IFKPIPI/ IFKPIPI
 
-      INTEGER IPIKKPS
-      DATA    IPIKKPS /0/
-      COMMON /IPIKKPS/ IPIKKPS
+      INTEGER IPHSPAC
+      DATA    IPHSPAC /0/
+      COMMON /IPHSPAC/ IPHSPAC
 
 C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:
 C     IFCURR4PI = 0  CPC 146 2002, hep-ph/0201149 [Novosibirsk] [suggested default]
@@ -184,7 +184,7 @@ C  KeyA1 is used for formfactors actually not in use
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
       TauToElOrMu= XPAR(ITAUXPAR+910)
-      IPIKKPS = INT(XPAR(ITAUXPAR+930))
+      IPHSPAC = INT(XPAR(ITAUXPAR+930))
 C
       DO IUSER = 1,100
          USERACTIVE(IUSER) = 0

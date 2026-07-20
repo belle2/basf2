@@ -372,58 +372,6 @@ class ZpVisible(BaseSkim):
 
 
 @fancy_skim_header
-class TauTauTauTau(BaseSkim):
-    __authors__ = ["Luigi Corona"]
-    __description__ = "Skim for the four tau final state."
-    __contact__ = __liaison__
-    __category__ = "physics, dark sector"
-    ApplyHLTHadronCut = False
-
-    def load_standard_lists(self, path):
-        stdPi("all", path=path)
-        stdMu("all", path=path)
-        stdE("all", path=path)
-        stdK("all", path=path)
-
-    def build_lists(self, path):
-        """
-        **Physics channel**: ee --> tau tau tau tau
-        """
-        ftau_list = []
-
-        track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
-        muon_id_cut = "muonID > 0.2"
-        pion_id_cut = "pionID > 0.2"
-        electron_id_cut = "electronID > 0.2"
-        kaon_id_cut = "kaonID > 0.2"
-
-        ma.cutAndCopyList("pi+:ftau", "pi+:all", f"[{track_cuts} and {pion_id_cut}]", path=path)
-        ma.cutAndCopyList("mu+:ftau", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
-        ma.cutAndCopyList("e+:ftau", "e+:all", f"[{track_cuts} and {electron_id_cut}]", path=path)
-        ma.cutAndCopyList("K+:ftau", "K+:all", f"[{track_cuts} and {kaon_id_cut}]", path=path)
-
-        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6] and [M < 9.5]"
-
-        # Reconstruction: prompt with same charge
-        PiChannel = "pi+:ftau pi+:ftau pi-:all pi-:all"
-        MuChannel = "mu+:ftau mu+:ftau pi-:all pi-:all"
-        EChannel = "e+:ftau e+:ftau pi-:all pi-:all"
-        KChannel = "K+:ftau K+:ftau pi-:all pi-:all"
-
-        ma.reconstructDecay(f"vpho:ftau_pi -> {PiChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_mu -> {MuChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_e -> {EChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_k -> {KChannel}", Event_cuts_vis, path=path)
-
-        ftau_list.append("vpho:ftau_pi")
-        ftau_list.append("vpho:ftau_mu")
-        ftau_list.append("vpho:ftau_e")
-        ftau_list.append("vpho:ftau_k")
-
-        return ftau_list
-
-
-@fancy_skim_header
 class EGammaControlDark(BaseSkim):
     """
     **Physics channel**: ee → eγ

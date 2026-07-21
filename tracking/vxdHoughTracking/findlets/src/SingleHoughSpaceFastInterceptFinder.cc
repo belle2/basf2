@@ -62,7 +62,7 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
-  const uint maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
+  const ushort maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
   m_maxRecursionLevel = std::max(maxRecursionLevelFromSectors, m_maxRecursionLevel);
   B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than " << c_maxAllowedRecusionLevel <<
            ", but it is " << m_maxRecursionLevel <<
@@ -76,7 +76,7 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
            m_nVerticalSectors <= c_maxHSSectorNumber);
 
   m_unitX = (m_maximumX - m_minimumX) / (float)m_nAngleSectors;
-  for (uint i = 0; i < m_nAngleSectors; i++) {
+  for (ushort i = 0; i < m_nAngleSectors; i++) {
     float x = m_minimumX + m_unitX * (float)i;
     float xc = x + 0.5 * m_unitX;
 
@@ -92,7 +92,7 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
   m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
   m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (uint i = 0; i <= m_nVerticalSectors; i++) {
+  for (ushort i = 0; i <= m_nVerticalSectors; i++) {
     m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
     m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
   }
@@ -133,8 +133,8 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
 }
 
 
-void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, ushort xmin, ushort xmax,
-    ushort ymin, ushort ymax, ushort currentRecursion)
+void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits,
+    const ushort xmin, const ushort xmax, const ushort ymin, const ushort ymax, const ushort currentRecursion)
 {
   std::vector<VXDHoughState*> containedHits;
   containedHits.reserve(hits.size());
@@ -263,7 +263,7 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
   }
 }
 
-void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSectorIndex)
+void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(const uint lastGlobalSectorIndex)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 

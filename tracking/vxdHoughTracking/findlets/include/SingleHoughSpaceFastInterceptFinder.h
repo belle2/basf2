@@ -59,8 +59,8 @@ namespace Belle2 {
       /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
       /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
       /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-      void fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, ushort xmin, ushort xmax, ushort ymin, ushort ymax,
-                                 ushort currentRecursion);
+      void fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, const ushort xmin, const ushort xmax,
+                                 const ushort ymin, const ushort ymax, const ushort currentRecursion);
 
       /// Find Hough Space clusters. Loop over all found sectors in m_SectorArray and then calls
       /// the DepthFirstSearch function to recursively find the clusters
@@ -68,17 +68,17 @@ namespace Belle2 {
 
       /// Perform depth first search recursive algorithm to find clusters in the Hough Space
       /// @param lastGlobalSectorIndex global index of the last sector checked
-      void DepthFirstSearch(uint lastGlobalSectorIndex);
+      void DepthFirstSearch(const uint lastGlobalSectorIndex);
 
       // Parameters
       /// maximum number of recursive calls of FastInterceptFinder2d
-      uint m_maxRecursionLevel = 9;
+      ushort m_maxRecursionLevel = 9;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_nAngleSectors = 512;
+      ushort m_nAngleSectors = 512;
 
       /// number of sectors of the Hough Space on the vertical axis
-      uint m_nVerticalSectors = 512;
+      ushort m_nVerticalSectors = 512;
 
       /// vertical size of the Hough Space, defaults to the value for u-side
       float m_verticalHoughSpaceSize = 0.16;
@@ -89,13 +89,13 @@ namespace Belle2 {
       float m_maximumX = 3.168;
 
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MinimumHSClusterSize = 1;
+      ushort m_MinimumHSClusterSize = 1;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSize = 12;
+      ushort m_MaximumHSClusterSize = 12;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeX = 2;
+      ushort m_MaximumHSClusterSizeX = 2;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeY = 12;
+      ushort m_MaximumHSClusterSizeY = 12;
 
       // class variables
       /// HS unit size in x

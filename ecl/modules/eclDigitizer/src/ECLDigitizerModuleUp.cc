@@ -64,10 +64,10 @@ ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC(
   addParam("NoElectronicNoise", m_noElectronicNoise,
            "Flag to disable electronic noise when generating waveforms (default: false)", false);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: false)", false);
-  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 0u)", 0u);
+  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 2)", 2);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
-  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: true)",
-           true);
+  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: false)",
+           false);
   addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
   addParam("WaveformThresholdOverride", m_WaveformThresholdOverride,
            "If gt 0 value is applied to all crystals for waveform saving threshold. If lt 0 dbobject is used. (GeV)", -1.0);

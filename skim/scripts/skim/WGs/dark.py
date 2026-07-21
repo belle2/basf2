@@ -297,8 +297,19 @@ class LFVZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: ee --> e mu Z'; Z' --> e mu
+        **Physics channel**: `ee --> e mu Z'; Z' --> e mu`
+
+        Cuts applied:
+
+        *``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
+        *``electronID cut: electronID > 0.2``
+        *``muonID cut: muonID > 0.2``
+        *``At least one electron and one muon: formula(nParticlesInList(mu+:lfvzp) + nParticlesInList(e+:lfvzp)) > 1``
+        *``nCleanedTracks == 4, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        *``electron identified with electrondID > 0.2``
+        *``muon idenfied with muonID > 0.2``
         """
+
         lfvzp_list = []
 
         # Here we just want four good tracks to be reconstructed
@@ -343,7 +354,14 @@ class ZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: ee --> mu mu Z'; Z' --> x x, x = e, mu, tau
+        **Physics channel**: `ee --> mu mu Z'; Z' --> x x, x = e, mu, tau, pi, K`
+
+        Cuts applied:
+
+        *``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
+        *``muonID cut: muonID > 0.2``
+        *``nCleanedTracks < 5, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        *``Two prompt tracks satisfying [muonID > 0.2] and [abs(dz) < 2.0 and abs(dr) < 0.5]``
         """
         zp_list = []
 

@@ -9,8 +9,8 @@
 #include <dqm/analysis/modules/DQMHistAnalysisOutputFile.h>
 #include <TROOT.h>
 #include <TObject.h>
-#include "TKey.h"
-#include "TFile.h"
+#include <TKey.h>
+#include <TFile.h>
 #include <sstream>
 #include <iomanip>
 
@@ -45,9 +45,6 @@ DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   addParam("SavePerRun", m_savePerRun, "Whether save to file for each run (not usable in online analysis!)", false);
   B2DEBUG(20, "DQMHistAnalysisOutputFile: Constructor done.");
 }
-
-
-DQMHistAnalysisOutputFileModule::~DQMHistAnalysisOutputFileModule() { }
 
 void DQMHistAnalysisOutputFileModule::initialize()
 {

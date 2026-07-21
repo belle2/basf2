@@ -57,10 +57,6 @@ namespace Belle2 {
              "sampling phase [samples]", 7);
   }
 
-  TOPTriggerDigitizerModule::~TOPTriggerDigitizerModule()
-  {
-  }
-
   void TOPTriggerDigitizerModule::initialize()
   {
     // input
@@ -77,10 +73,6 @@ namespace Belle2 {
     if (m_samplingPhase < 0 or m_samplingPhase >= c_SamplingCycle)
       B2ERROR("samplingPhase must be positive and less than " << c_SamplingCycle);
 
-  }
-
-  void TOPTriggerDigitizerModule::beginRun()
-  {
   }
 
   void TOPTriggerDigitizerModule::event()
@@ -140,18 +132,6 @@ namespace Belle2 {
     }
 
   }
-
-
-  void TOPTriggerDigitizerModule::endRun()
-  {
-
-  }
-
-  void TOPTriggerDigitizerModule::terminate()
-  {
-
-  }
-
 
 } // end Belle2 namespace
 

@@ -45,9 +45,9 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importSampleTimeCalibration(std::string fileNames,
-                                     int firstExp = 0, int firstRun = 0,
-                                     int lastExp = -1, int lastRun = -1);
+    static void importSampleTimeCalibration(const std::string& fileNames,
+                                            int firstExp = 0, int firstRun = 0,
+                                            int lastExp = -1, int lastRun = -1);
 
 
     /**
@@ -59,9 +59,9 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importLocalT0Calibration(std::string fileNames,
-                                  int firstExp = 0, int firstRun = 0,
-                                  int lastExp = -1, int lastRun = -1);
+    static void importLocalT0Calibration(const std::string& fileNames,
+                                         int firstExp = 0, int firstRun = 0,
+                                         int lastExp = -1, int lastRun = -1);
 
 
     /**
@@ -72,8 +72,8 @@ namespace Belle2 {
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
      */
-    void importChannelT0(std::string fileName,
-                         int expNo, int firstRun, int lastRun);
+    static void importChannelT0(const std::string& fileName,
+                                int expNo, int firstRun, int lastRun);
 
 
     /**
@@ -86,8 +86,8 @@ namespace Belle2 {
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
      */
-    void importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
-                                int expNo, int firstRun, int lastRun);
+    static void importAsicShifts_BS13d(double s0, double s1, double s2, double s3,
+                                       int expNo, int firstRun, int lastRun);
 
     /**
      * Import module T0 calibration constants to database
@@ -98,9 +98,9 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importModuleT0Calibration(std::string fileName,
-                                   int firstExp = 0, int firstRun = 0,
-                                   int lastExp = -1, int lastRun = -1);
+    static void importModuleT0Calibration(const std::string& fileName,
+                                          int firstExp = 0, int firstRun = 0,
+                                          int lastExp = -1, int lastRun = -1);
 
     /**
      * Import module T0 calibration constants
@@ -110,8 +110,8 @@ namespace Belle2 {
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
      */
-    void importModuleT0(std::string fileName,
-                        int expNo, int firstRun, int lastRun);
+    static void importModuleT0(const std::string& fileName,
+                               int expNo, int firstRun, int lastRun);
 
     /**
      * Import common T0 calibration constants derived form the offline data reprocessing to database
@@ -123,9 +123,9 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importOfflineCommonT0Calibration(std::string fileName,
-                                          int firstExp = 0, int firstRun = 0,
-                                          int lastExp = -1, int lastRun = -1);
+    static void importOfflineCommonT0Calibration(const std::string& fileName,
+                                                 int firstExp = 0, int firstRun = 0,
+                                                 int lastExp = -1, int lastRun = -1);
 
 
     /**
@@ -137,19 +137,19 @@ namespace Belle2 {
      * @param lastRun last run number of IOV
      * @param roughlyCalibrated if true set payload status to roughly calibrated
      */
-    void importCommonT0(double value, double error,
-                        int expNo, int firstRun, int lastRun,
-                        bool roughlyCalibrated = false);
+    static void importCommonT0(double value, double error,
+                               int expNo, int firstRun, int lastRun,
+                               bool roughlyCalibrated = false);
 
     /**
      * Prints sample time calibration info about constants stored in database
      */
-    void printSampleTimeCalibrationInfo();
+    static void printSampleTimeCalibrationInfo();
 
     /**
      * Print sample time calibration constants stored in database
      */
-    void printSampleTimeCalibration();
+    static void printSampleTimeCalibration();
 
     /**
      * Import channel mask from a root file (given as 1D histograms, one per slot).
@@ -158,8 +158,8 @@ namespace Belle2 {
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
      */
-    void importChannelMask(std::string fileName,
-                           int expNo, int firstRun, int lastRun);
+    static void importChannelMask(const std::string& fileName,
+                                  int expNo, int firstRun, int lastRun);
 
     /**
      * Generate and import a (random, fake) channel mask for testing
@@ -170,9 +170,9 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void generateFakeChannelMask(double fractionDead, double fractionHot,
-                                 int firstExp = 0, int firstRun = 0,
-                                 int lastExp = -1, int lastRun = -1);
+    static void generateFakeChannelMask(double fractionDead, double fractionHot,
+                                        int firstExp = 0, int firstRun = 0,
+                                        int lastExp = -1, int lastRun = -1);
 
     /**
      * Import PMT Quantum Efficiency data to database
@@ -183,10 +183,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtQEData(std::string fileName,
-                         std::string treeName = "qePmtData",
-                         int firstExp = 0, int firstRun = 0,
-                         int lastExp = -1, int lastRun = -1);
+    static void importPmtQEData(const std::string& fileName,
+                                const std::string& treeName = "qePmtData",
+                                int firstExp = 0, int firstRun = 0,
+                                int lastExp = -1, int lastRun = -1);
 
     /**
      * Import PMT gain parameters data to database
@@ -197,10 +197,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtGainData(std::string fileName,
-                           std::string treeName = "gainPmtData",
-                           int firstExp = 0, int firstRun = 0,
-                           int lastExp = -1, int lastRun = -1);
+    static void importPmtGainData(const std::string& fileName,
+                                  const std::string& treeName = "gainPmtData",
+                                  int firstExp = 0, int firstRun = 0,
+                                  int lastExp = -1, int lastRun = -1);
 
     /**
      * Import PMT installation data to database
@@ -211,10 +211,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtInstallationData(std::string fileName,
-                                   std::string treeName = "installationPmtData",
-                                   int firstExp = 0, int firstRun = 0,
-                                   int lastExp = -1, int lastRun = -1);
+    static void importPmtInstallationData(const std::string& fileName,
+                                          const std::string& treeName = "installationPmtData",
+                                          int firstExp = 0, int firstRun = 0,
+                                          int lastExp = -1, int lastRun = -1);
 
     /**
      * Import PMT specifications from Hamamatsu (not to be used!)
@@ -225,10 +225,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtObsoleteData(std::string fileName,
-                               std::string treeName = "obsPmtData",
-                               int firstExp = 0, int firstRun = 0,
-                               int lastExp = -1, int lastRun = -1);
+    static void importPmtObsoleteData(const std::string& fileName,
+                                      const std::string& treeName = "obsPmtData",
+                                      int firstExp = 0, int firstRun = 0,
+                                      int lastExp = -1, int lastRun = -1);
 
     /**
      * Import gaussians fitting the TTS distributions
@@ -239,10 +239,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtTTSPar(std::string fileName,
-                         std::string treeName = "ttsPmtPar",
-                         int firstExp = 0, int firstRun = 0,
-                         int lastExp = -1, int lastRun = -1);
+    static void importPmtTTSPar(const std::string& fileName,
+                                const std::string& treeName = "ttsPmtPar",
+                                int firstExp = 0, int firstRun = 0,
+                                int lastExp = -1, int lastRun = -1);
 
     /**
      * Import histograms used for PMT TTS determination
@@ -253,10 +253,10 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtTTSHisto(std::string fileName,
-                           std::string treeName = "ttsPmtHisto",
-                           int firstExp = 0, int firstRun = 0,
-                           int lastExp = -1, int lastRun = -1);
+    static void importPmtTTSHisto(const std::string& fileName,
+                                  const std::string& treeName = "ttsPmtHisto",
+                                  int firstExp = 0, int firstRun = 0,
+                                  int lastExp = -1, int lastRun = -1);
 
     /**
      * Import fit results of pulse height distribution for channel gain and threshold efficiency
@@ -266,15 +266,15 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importPmtPulseHeightFitResult(std::string fileName,
-                                       int firstExp = 0, int firstRun = 0,
-                                       int lastExp = -1, int lastRun = -1);
+    static void importPmtPulseHeightFitResult(const std::string& fileName,
+                                              int firstExp = 0, int firstRun = 0,
+                                              int lastExp = -1, int lastRun = -1);
 
     /**
      * Example of exporting TTS histograms
      * @param outFileName name of the root file where data will be saved
      */
-    void exportPmtTTSHisto(std::string outFileName = "RetrievedHistos.root");
+    static void exportPmtTTSHisto(const std::string& outFileName = "RetrievedHistos.root");
 
     /**
      * Import front-end settings
@@ -286,8 +286,8 @@ namespace Belle2 {
      * @param firstRun first run number of IOV
      * @param lastRun last run number of IOV
      */
-    void importFrontEndSettings(int lookback, int readoutWin, int extraWin, int offset,
-                                int expNo, int firstRun, int lastRun);
+    static void importFrontEndSettings(int lookback, int readoutWin, int extraWin, int offset,
+                                       int expNo, int firstRun, int lastRun);
 
     /**
      * import a dummy payload of TOPCalModuleAlignment DB objects
@@ -296,8 +296,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalModuleAlignment(int firstExp = 0, int firstRun = 0,
-                                       int lastExp = -1, int lastRun = -1);
+    static void importDummyCalModuleAlignment(int firstExp = 0, int firstRun = 0,
+                                              int lastExp = -1, int lastRun = -1);
 
     /**
      * import a dummy payload of TOPCalCalModuleT0 DB objects
@@ -306,8 +306,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalModuleT0(int firstExp = 0, int firstRun = 0,
-                                int lastExp = -1, int lastRun = -1);
+    static void importDummyCalModuleT0(int firstExp = 0, int firstRun = 0,
+                                       int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelT0 DB objects
      * @param firstExp first experiment number of IOV
@@ -315,8 +315,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelT0(int firstExp = 0, int firstRun = 0,
-                                 int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelT0(int firstExp = 0, int firstRun = 0,
+                                        int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalTimebase DB objects
      * @param firstExp first experiment number of IOV
@@ -324,8 +324,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalTimebase(int firstExp = 0, int firstRun = 0,
-                                int lastExp = -1, int lastRun = -1);
+    static void importDummyCalTimebase(int firstExp = 0, int firstRun = 0,
+                                       int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelNoise DB objects
      * @param firstExp first experiment number of IOV
@@ -333,8 +333,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelNoise(int firstExp = 0, int firstRun = 0,
-                                    int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelNoise(int firstExp = 0, int firstRun = 0,
+                                           int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelPulseHeight DB objects
      * @param firstExp first experiment number of IOV
@@ -342,8 +342,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelPulseHeight(int firstExp = 0, int firstRun = 0,
-                                          int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelPulseHeight(int firstExp = 0, int firstRun = 0,
+                                                 int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelRQE DB objects
      * @param firstExp first experiment number of IOV
@@ -351,8 +351,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelRQE(int firstExp = 0, int firstRun = 0,
-                                  int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelRQE(int firstExp = 0, int firstRun = 0,
+                                         int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelThresholdEff DB objects
      * @param firstExp first experiment number of IOV
@@ -360,8 +360,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelThresholdEff(int firstExp = 0, int firstRun = 0,
-                                           int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelThresholdEff(int firstExp = 0, int firstRun = 0,
+                                                  int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalChannelThreshold DB objects
      * @param firstExp first experiment number of IOV
@@ -369,8 +369,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalChannelThreshold(int firstExp = 0, int firstRun = 0,
-                                        int lastExp = -1, int lastRun = -1);
+    static void importDummyCalChannelThreshold(int firstExp = 0, int firstRun = 0,
+                                               int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalCommonT0 DB objects
      * @param firstExp first experiment number of IOV
@@ -378,8 +378,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalCommonT0(int firstExp = 0, int firstRun = 0,
-                                int lastExp = -1, int lastRun = -1);
+    static void importDummyCalCommonT0(int firstExp = 0, int firstRun = 0,
+                                       int lastExp = -1, int lastRun = -1);
     /**
      * import a dummy payload of TOPCalIntegratedCharge DB objects
      * @param firstExp first experiment number of IOV
@@ -387,8 +387,8 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalIntegratedCharge(int firstExp = 0, int firstRun = 0,
-                                        int lastExp = -1, int lastRun = -1);
+    static void importDummyCalIntegratedCharge(int firstExp = 0, int firstRun = 0,
+                                               int lastExp = -1, int lastRun = -1);
 
     /**
      * import a dummy payload of TOPCalAsicShift DB objects
@@ -397,15 +397,15 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importDummyCalAsicShift(int firstExp = 0, int firstRun = 0,
-                                 int lastExp = -1, int lastRun = -1);
+    static void importDummyCalAsicShift(int firstExp = 0, int firstRun = 0,
+                                        int lastExp = -1, int lastRun = -1);
 
     /**
      * correct QE values in database for the reflection on window surface
      * be sure that you run the function only once!
      * see: BII-4230
      */
-    void correctTOPPmtQE();
+    static void correctTOPPmtQE();
 
     /**
      * payload TOPCalTimeWalk
@@ -418,18 +418,18 @@ namespace Belle2 {
      * @param lastExp first experiment number of IOV
      * @param lastRun last run number of IOV
      */
-    void importTimeWalk(PyObject* list, double a, double b,
-                        int firstExp = 0, int firstRun = 0,
-                        int lastExp = -1, int lastRun = -1);
+    static void importTimeWalk(PyObject* list, double a, double b,
+                               int firstExp = 0, int firstRun = 0,
+                               int lastExp = -1, int lastRun = -1);
     /**
      * for testing purposes only! - will be removed ...
      */
-    void importTest(int runNumber, double syncTimeBase);
+    static void importTest(int runNumber, double syncTimeBase);
 
     /**
      * for testing purposes only! - will be removed ...
      */
-    void importTest();
+    static void importTest();
 
 
   private:

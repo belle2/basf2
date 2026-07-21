@@ -22,9 +22,20 @@ bool EventT0::hasEventT0() const
 }
 
 /// Return the final event t0, if one is set. Else, return NAN.
-double EventT0::getEventT0() const
+double EventT0::getEventT0(bool fromTrackCreator) const
 {
   B2ASSERT("Not EventT0 available, but someone tried to access it. Check with hasEventT0() method before!", hasEventT0());
+
+  //if EventT0 is needed by Track Creator, first check SVD and CDC
+  //use the combined eventT0 only as last resort
+  if (fromTrackCreator) {
+    const auto svdT0 = this->getBestSVDTemporaryEventT0();
+    if (svdT0) return svdT0->eventT0;
+    else {
+      const auto cdcT0 = this->getBestCDCTemporaryEventT0();
+      if (cdcT0) return cdcT0->eventT0;
+    }
+  }
   return m_eventT0.eventT0;
 }
 

@@ -10,13 +10,14 @@
 #include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 #include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/UnionRecordingFilter.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::UnionRecordingFilter<ClusterFilterFactory>;
+template class TrackingUtilities::UnionRecordingFilter<ClusterFilterFactory>;
 
 std::vector<std::string> UnionRecordingClusterFilter::getValidVarSetNames() const
 {

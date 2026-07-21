@@ -21,7 +21,7 @@
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
 #    sampleType     one of: study, usual, PXD, ECL
-#    phase          2, 31 (= early phase 3) or 3
+#    phase          2, 31 (= Run 1, early phase 3) or 3
 #    sad            SAD file name from /home/belle/luka/public/SAD without bg type and ".root"
 #    outdir         output directory path
 # -------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ gearbox = b2.register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
-    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
+    gearbox.param('fileName', 'geometry/Belle2_Run1.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),

@@ -3786,6 +3786,151 @@
          <Desc>Shield for collimator D01H4 part 3</Desc>
       </Shield>
 
+      <ACSL>
+         <sec name="X0" unit="m">0.0</sec>
+         <sec name="Y0" unit="m">1.070</sec>
+         <sec name="Z0" unit="m">-3.460</sec>
+         <sec name="PHI" unit="rad">-0.0085</sec>
+         <sec name="box1_W" unit="m">1.6</sec>
+         <sec name="box1_H" unit="m">0.6</sec>
+         <sec name="box1_L" unit="m">0.37</sec>
+         <sec name="box2_W" unit="m">0.525</sec>
+         <sec name="box2_H" unit="m">0.6</sec>
+         <sec name="box2_L" unit="m">0.6</sec>
+         <sec name="box2_dX" unit="m">-0.5375</sec>
+         <sec name="box2_dY" unit="m">0</sec>
+         <sec name="box2_dZ" unit="m">-0.115</sec>
+
+         <sec name="trd1_X1" unit="m">0.3</sec>
+         <sec name="trd1_X2" unit="m">0.3</sec>
+         <sec name="trd1_Y1" unit="m">0.5125</sec>
+         <sec name="trd1_Y2" unit="m">0.0875</sec>
+         <sec name="trd1_Z" unit="m">0.205</sec>
+         <sec name="trd1_dX" unit="m">-0.595</sec>
+         <sec name="trd1_dY" unit="m">-0.2125</sec>
+         <sec name="trd1_dZ" unit="m">-0.115</sec>
+         <sec name="trd1_PHI" unit="rad">1.5708</sec>
+
+         <sec name="trd2_X1" unit="m">0.185</sec>
+         <sec name="trd2_X2" unit="m">0.185</sec>
+         <sec name="trd2_Y1" unit="m">0.5125</sec>
+         <sec name="trd2_Y2" unit="m">0.0875</sec>
+         <sec name="trd2_Z" unit="m">0.205</sec>
+         <sec name="trd2_dX" unit="m">0.595</sec>
+         <sec name="trd2_dY" unit="m">-0.2125</sec>
+         <sec name="trd2_dZ" unit="m">0</sec>
+         <sec name="trd2_PHI" unit="rad">-1.5708</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Additional concrete shield filling gap between end-of-tunnel concrete shield and QCS, left</Desc>
+      </ACSL>
+ 
+      <ACSR1>
+         <sec name="X0" unit="m">0.515</sec>
+         <sec name="Y0" unit="m">0.866</sec>
+         <sec name="Z0" unit="m">4.519</sec>
+         <sec name="Z01" unit="m">4.427</sec>
+         <sec name="PHI01" unit="rad">0</sec>
+         <sec name="PHI02" unit="rad">-1.5708</sec>
+         <sec name="PHI0" unit="rad">-1.5793</sec>
+         <sec name="X1" unit="mm">300</sec>
+         <sec name="X2" unit="mm">130</sec>
+	 <sec name="Y1" unit="mm">503.06</sec>
+         <sec name="Y2" unit="mm">301.75</sec>
+         <sec name="Z" unit="mm">287.5</sec>
+         <sec name="THETA" unit="rad">0.4297</sec>
+         <sec name="PHI" unit="rad">2.2721</sec>
+         <sec name="ANG" unit="rad">0</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Additional concrete shield filling gap between end-of-tunnel concrete shield and QCS, right part 1</Desc>
+      </ACSR1>
+
+      <ACSR2>
+         <sec name="X0" unit="m">-0.510</sec>
+         <sec name="Y0" unit="m">0.866</sec>
+         <sec name="Z0" unit="m">4.511</sec>
+         <sec name="PHI01" unit="rad">0</sec>
+         <sec name="PHI02" unit="rad">1.5708</sec>
+         <sec name="PHI0" unit="rad">1.5623</sec>
+         <sec name="X1" unit="mm">300</sec>
+         <sec name="X2" unit="mm">300</sec>
+	 <sec name="Y1" unit="mm">503.06</sec>
+         <sec name="Y2" unit="mm">301.75</sec>
+         <sec name="Z" unit="mm">287.5</sec>
+         <sec name="THETA" unit="rad">0.3368</sec>
+         <sec name="PHI" unit="rad">1.5708</sec>
+         <sec name="ANG" unit="rad">0</sec>
+         <Material>G4_CONCRETE</Material>
+         <Desc>Additional concrete shield filling gap between end-of-tunnel concrete shield and QCS, right part 2</Desc>
+      </ACSR2>
+
+      <APSL1>
+         <sec name="W" unit="m">2.52</sec>
+         <sec name="H" unit="m">1.23</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">0.755</sec>
+	 <sec name="Z0" unit="m">-3.2</sec>
+         <sec name="holeR" unit="m">1.2</sec>
+         <sec name="holeD" unit="m">0.1</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">-0.755</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield left, part 1</Desc>
+      </APSL1>
+
+      <APSL2>
+         <sec name="W" unit="m">2.52</sec>
+         <sec name="H" unit="m">1.32</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-0.8</sec>
+	 <sec name="Z0" unit="m">-3.2</sec>
+         <sec name="holeR" unit="m">1.2</sec>
+         <sec name="holeD" unit="m">0.1</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0.8</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield left, part 2</Desc>
+      </APSL2>
+
+      <APSR1>
+         <sec name="W" unit="m">2.52</sec>
+         <sec name="H" unit="m">1.23</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">0.755</sec>
+	 <sec name="Z0" unit="m">4.14</sec>
+         <sec name="holeR" unit="m">1.2</sec>
+         <sec name="holeD" unit="m">0.1</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">-0.755</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield right, part 1</Desc>
+      </APSR1>
+
+      <APSR2>
+         <sec name="W" unit="m">2.52</sec>
+         <sec name="H" unit="m">1.32</sec>
+         <sec name="L" unit="m">0.08</sec>
+         <sec name="X0" unit="m">0</sec>
+         <sec name="Y0" unit="m">-0.8</sec>
+	 <sec name="Z0" unit="m">4.14</sec>
+         <sec name="holeR" unit="m">1.2</sec>
+         <sec name="holeD" unit="m">0.1</sec>
+         <sec name="holeDX" unit="m">0</sec>
+         <sec name="holeDY" unit="m">0.8</sec>
+         <sec name="holeDZ" unit="m">0</sec>
+         <sec name="PHI" unit="rad">0</sec>
+         <Material>G4_POLYETHYLENE</Material>
+         <Desc>Additional polyethylene shield right, part 2</Desc>
+      </APSR2>
+
    </Content>
 </DetectorComponent>
 

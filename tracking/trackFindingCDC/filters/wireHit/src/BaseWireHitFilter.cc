@@ -7,9 +7,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/wireHit/BaseWireHitFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Filter<CDCWireHit>;
+template class TrackingUtilities::Filter<CDCWireHit>;

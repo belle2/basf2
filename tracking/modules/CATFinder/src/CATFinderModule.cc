@@ -1,0 +1,280 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+#include <tracking/modules/CATFinder/CATFinderModule.h>
+
+#include <tracking/dbobjects/CATFinderParameters.h>
+#include <tracking/gnnFinder/Utils.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+#include <cdc/geometry/CDCGeometryPar.h>
+#include <framework/database/DBAccessorBase.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <numeric>
+#include <utility>
+#include <vector>
+
+#include <Math/Vector3D.h>
+#include <TMatrixDSym.h>
+
+using namespace Belle2;
+using Belle2::MVA::ONNX::Tensor;
+
+REG_MODULE(CATFinder);
+
+CATFinderModule::CATFinderModule() : Module()
+{
+  setDescription("The GNN-based CDC AI Track Finder, also known as CATFinder.");
+  addParam("recoTracksStoreArrayName", m_CDCRecoTracksName, "Name of the output store array of CDC RecoTrack.",
+           m_CDCRecoTracksName);
+  addParam("catFinderWeightfileName", m_catFinderWeightfileName,
+           "Name of the CATFinder weightfile as stored in the conditions database.",
+           m_catFinderWeightfileName);
+}
+
+void CATFinderModule::initialize()
+{
+  m_CDCHits.isRequired();
+  m_wireHitVector.isRequired();
+  m_recoHitInformations.registerInDataStore();
+  m_CDCRecoTracks.registerInDataStore(m_CDCRecoTracksName);
+  m_CDCHits.registerRelationTo(m_CDCRecoTracks);
+  m_recoHitInformations.registerRelationTo(m_CDCHits);
+  m_CDCRecoTracks.registerRelationTo(m_recoHitInformations);
+}
+
+void CATFinderModule::beginRun()
+{
+  DBObjPtr<CATFinderParameters> parameters;
+  if (not parameters.isValid())
+    B2FATAL("CATFinderParameters is not valid");
+
+  auto weightfile = DBAccessorBase(DBStoreEntry::c_RawFile, m_catFinderWeightfileName, true);
+  const std::string filename = weightfile.getFilename();
+  if (filename == "")
+    B2FATAL(m_catFinderWeightfileName << " is not valid");
+
+  // Get the relevant parameters
+  m_tdcOffset               = parameters->getTDCOffset();
+  m_tdcScale                = parameters->getTDCScale();
+  m_adcClip                 = parameters->getADCClip();
+  m_slayerScale             = parameters->getSLayerScale();
+  m_clayerScale             = parameters->getCLayerScale();
+  m_layerScale              = parameters->getLayerScale();
+  m_spatialCoordinatesScale = parameters->getSpatialCoordinatesScale();
+  m_nInputFeatures          = parameters->getNInputFeatures();
+  m_latentSpaceNDim         = parameters->getLatentSpaceNDim();
+  m_tBeta                   = parameters->getTBeta();
+  m_tDistance               = parameters->getTDistance();
+  m_maxRadius               = parameters->getMaxRadius();
+  m_minNumberHits           = parameters->getMinNumberHits();
+  m_inputTFeaturesName      = parameters->getInputTFeaturesName();
+  m_outputTBetaName         = parameters->getOutputTBetaName();
+  m_outputTCoordinatesName  = parameters->getOutputTCoordinatesName();
+  m_outputTMomentumName     = parameters->getOutputTMomentumName();
+  m_outputTVertexName       = parameters->getOutputTVertexName();
+  m_outputTChargeName       = parameters->getOutputTChargeName();
+
+  // Get the weightfile and initialize the ONNX session
+
+  m_session = std::make_unique<MVA::ONNX::Session>(filename.c_str());
+}
+
+void CATFinderModule::event()
+{
+  CDC::CDCGeometryPar& cdcGeometryPar = CDC::CDCGeometryPar::Instance();
+
+  const std::vector<TrackingUtilities::CDCWireHit>& wireHitVector = *m_wireHitVector;
+
+  // Use only "unmasked" hits
+  unsigned int nHits = 0;
+  for (const auto& wireHit : wireHitVector) {
+    if (!wireHit.getAutomatonCell().hasMaskedFlag())
+      nHits++;
+  }
+
+  // Nothing to do if all the hits are already masked
+  if (nHits == 0)
+    return;
+
+  // Input tensore: features per hit
+  auto input_t    = Tensor<float>::make_shared({nHits, m_nInputFeatures});
+  // Output tensor: condensation score
+  auto beta_t     = Tensor<float>::make_shared({nHits, 1});
+  // Output tensor: predicted coordinates in the latent space
+  auto coord_t    = Tensor<float>::make_shared({nHits, 3});
+  // Output tensor: predicted momentum
+  auto momentum_t = Tensor<float>::make_shared({nHits, 3});
+  // Output tensor: predicted "vertex"
+  auto vertex_t   = Tensor<float>::make_shared({nHits, 3});
+  // Output tensor: predicted charge
+  auto charge_t   = Tensor<float>::make_shared({nHits, 1});
+
+  // Map from tensor row index back to the original wireHitVector index,
+  // needed later when adding CDC hits to the RecoTrack
+  std::vector<unsigned int> tensorIndexToHitIndex;
+  tensorIndexToHitIndex.reserve(nHits);
+
+  unsigned int iHit = 0;
+  for (unsigned int iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
+
+    // Again: skip the already masked hits
+    if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag())
+      continue;
+
+    // Prepare the input features
+    const CDCHit* cdcHit = wireHitVector[iWireHit].getHit();
+    const unsigned short clayer = cdcHit->getICLayer();
+    const unsigned short wire   = cdcHit->getIWire();
+    const auto wirePos = cdcGeometryPar.c_Aligned;
+
+    const double tdc_scaled  = (static_cast<double>(cdcHit->getTDCCount()) - m_tdcOffset) / m_tdcScale;
+    const double adc_clipped = cdcHit->getADCCount() > m_adcClip
+                               ? 1.
+                               : static_cast<double>(cdcHit->getADCCount()) / m_adcClip;
+
+    const B2Vector3D posForward  = cdcGeometryPar.wireForwardPosition(clayer, wire, wirePos);
+    const B2Vector3D posBackward = cdcGeometryPar.wireBackwardPosition(clayer, wire, wirePos);
+
+    // Prepare the tensor
+    input_t->at({iHit, 0}) = 0.5 * (posForward.x() + posBackward.x()) / m_spatialCoordinatesScale;
+    input_t->at({iHit, 1}) = 0.5 * (posForward.y() + posBackward.y()) / m_spatialCoordinatesScale;
+    input_t->at({iHit, 2}) = tdc_scaled;
+    input_t->at({iHit, 3}) = adc_clipped;
+    input_t->at({iHit, 4}) = static_cast<double>(cdcHit->getISuperLayer()) / m_slayerScale;
+    input_t->at({iHit, 5}) = static_cast<double>(clayer)                   / m_clayerScale;
+    input_t->at({iHit, 6}) = static_cast<double>(cdcHit->getILayer())      / m_layerScale;
+
+    tensorIndexToHitIndex.push_back(iWireHit);
+    ++iHit;
+  }
+
+  B2DEBUG(29, "CDCWireHits in the event: " << nHits);
+  if (nHits != iHit)
+    B2ERROR("Different number of hits: something went wrong...");
+
+  // Run the GNN inference
+  m_session->run(
+  {{m_inputTFeaturesName, input_t}},
+  {{m_outputTBetaName, beta_t}, {m_outputTCoordinatesName, coord_t}, {m_outputTMomentumName, momentum_t}, {m_outputTVertexName, vertex_t}, {m_outputTChargeName, charge_t}}
+  );
+
+  // Build an index array sorted by descending beta so we process the most probable condensation points first
+  std::vector<unsigned int> betaIndices(nHits);
+  std::iota(betaIndices.begin(), betaIndices.end(), 0);
+  std::sort(betaIndices.begin(), betaIndices.end(),
+  [&](unsigned int i1, unsigned int i2) { return beta_t->at({i1, 0}) > beta_t->at({i2, 0}); });
+
+  // A hit is a candidate condensation point only if its beta exceeds the threshold
+  std::vector<uint8_t> selectedBetas(nHits);
+  for (unsigned int i = 0; i < nHits; ++i)
+    selectedBetas[i] = static_cast<uint8_t>(beta_t->at({i, 0}) > m_tBeta);
+
+  // A new condensation point is accepted only if it lies farther than m_tDistance
+  // from every already-accepted point in latent coordinate space
+  std::vector<unsigned int> conPointIndices;
+  const float thresholdSquared = m_tDistance * m_tDistance;
+
+  // Returns true if hit i is outside the exclusion radius of every accepted condensation point
+  auto isOutOfRadius = [&](unsigned int i) {
+    for (unsigned int iConPoint : conPointIndices) {
+      double d = 0.0;
+      d += (coord_t->at({i, 0}) - coord_t->at({iConPoint, 0})) * (coord_t->at({i, 0}) - coord_t->at({iConPoint, 0}));
+      d += (coord_t->at({i, 1}) - coord_t->at({iConPoint, 1})) * (coord_t->at({i, 1}) - coord_t->at({iConPoint, 1}));
+      d += (coord_t->at({i, 2}) - coord_t->at({iConPoint, 2})) * (coord_t->at({i, 2}) - coord_t->at({iConPoint, 2}));
+      if (d <= thresholdSquared)
+        return false;
+    }
+    return true;
+  };
+
+  for (unsigned int i = 0; i < betaIndices.size(); ++i) {
+    unsigned int iBeta = betaIndices[i];
+    if (!selectedBetas[iBeta])
+      continue;  // Below the beta threshold: not a condensation point candidate
+    if (conPointIndices.empty() or isOutOfRadius(iBeta))
+      conPointIndices.push_back(iBeta);  // Accept as a new condensation point
+    else
+      selectedBetas[iBeta] = 0;  // Too close to an existing seed: let's discard it
+  }
+  B2DEBUG(29, "Condensation points in the event: " << conPointIndices.size());
+
+  // Convert the condensation points into RecoTracks: one condensation point -> one RecoTrack
+  for (unsigned int iConPoint : conPointIndices) {
+
+    std::vector<GNNFinder::Utils::KDTHit> kdtHits;
+    kdtHits.reserve(nHits);
+
+    // Collect all hits whose clustering coordinates fall within m_maxRadius of this seed
+    for (unsigned int i = 0; i < nHits; ++i) {
+      const double dx = coord_t->at({iConPoint, 0}) - coord_t->at({i, 0});
+      const double dy = coord_t->at({iConPoint, 1}) - coord_t->at({i, 1});
+      const double dz = coord_t->at({iConPoint, 2}) - coord_t->at({i, 2});
+      if (std::hypot(dx, dy, dz) < m_maxRadius) {
+        // Store the wire X and Y coordinatres together with the tensor row index for later lookup
+        kdtHits.push_back({input_t->at({i, 0}), input_t->at({i, 1}), static_cast<int>(i)});
+      }
+    }
+
+    // Reject tracks with too few hits
+    if (kdtHits.size() < m_minNumberHits)
+      continue;
+
+    // Retrieve predicted momentum, vertex and charge from the condensation point's output
+    const ROOT::Math::XYZVector momentum(
+      momentum_t->at({iConPoint, 0}), momentum_t->at({iConPoint, 1}), momentum_t->at({iConPoint, 2}));
+    const ROOT::Math::XYZVector position(
+      vertex_t->at({iConPoint, 0}) * m_spatialCoordinatesScale,
+      vertex_t->at({iConPoint, 1}) * m_spatialCoordinatesScale,
+      vertex_t->at({iConPoint, 2}) * m_spatialCoordinatesScale);
+    const int charge = (charge_t->at({iConPoint, 0}) >= 0.5) ? 1 : -1;
+
+    B2DEBUG(29, LogVar("Condensation point", iConPoint) << LogVar("Attached hits", kdtHits.size())
+            << LogVar("Momentum", std::sqrt(momentum.Mag2())) << LogVar("Vertex", std::sqrt(position.Mag2()))
+            << LogVar("Charge", charge));
+
+    if (std::isnan(position.X()) or std::isnan(momentum.X())) {
+      B2WARNING("Skipping track with NaN values.");
+      continue;
+    }
+
+    // Order hits along the helix from the innermost CDC wall outward,
+    // starting from where the predicted trajectory intersects the inner wall
+    GNNFinder::Utils::HitOrderer hitOrderer;
+    auto [startingX, startingY] = GNNFinder::Utils::intersectCylinderXY(position, momentum,
+                                  16);  // TODO: find a better way to represent 16...
+    std::vector<int> sortedIndices =
+      hitOrderer.orderHits(startingX, startingY, std::move(kdtHits));
+
+    // Create a new RecoTrack and seed it with the network predictions
+    RecoTrack* cdcRecotrack = m_CDCRecoTracks.appendNew();
+    cdcRecotrack->setPositionAndMomentum(position, momentum);
+    cdcRecotrack->setChargeSeed(charge);
+
+    // Use a loose covariance matrix as the seed uncertainty
+    auto seedCovariance = TMatrixDSym(6);
+    for (int j = 0; j < 6; ++j)
+      for (int k = 0; k < 6; ++k)
+        seedCovariance[j][k] = 1e-1;
+    cdcRecotrack->setSeedCovariance(seedCovariance);
+
+    // Add CDC hits in the sorted order
+    int iRecoTrackHit = 0;
+    for (int tensorIndex : sortedIndices) {
+      cdcRecotrack->addCDCHit(wireHitVector[tensorIndexToHitIndex[tensorIndex]].getHit(), iRecoTrackHit);
+      ++iRecoTrackHit;
+    }
+  }
+}

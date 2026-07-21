@@ -31,7 +31,6 @@ namespace Belle2 {
     TOPGeometryPar::~TOPGeometryPar()
     {
       if (m_geo) delete m_geo;
-      if (m_geoDB) delete m_geoDB;
       s_instance = 0;
     }
 
@@ -87,26 +86,23 @@ namespace Belle2 {
       m_fromDB = true;
       m_valid = false;
 
-      if (m_geoDB) delete m_geoDB;
-      m_geoDB = new DBObjPtr<TOPGeometry>();
-
-      if (!m_geoDB->isValid()) {
+      if (!m_geoDB.isValid()) {
         B2ERROR("TOPGeometry: no payload found in database");
         return;
       }
-      if ((*m_geoDB)->getWavelengthFilter().getName().empty()) {
+      if (m_geoDB->getWavelengthFilter().getName().empty()) {
         m_oldPayload = true;
         B2WARNING("TOPGeometry: obsolete payload revision (pixel independent PDE) - please, check global tags");
       }
-      if ((*m_geoDB)->getTTSes().empty()) {
+      if (m_geoDB->getTTSes().empty()) {
         B2WARNING("TOPGeometry: obsolete payload revision (nominal TTS only) - please, check global tags");
       }
-      if ((*m_geoDB)->arePDETuningFactorsEmpty()) {
+      if (m_geoDB->arePDETuningFactorsEmpty()) {
         B2WARNING("TOPGeometry: obsolete payload revision (before bugfix and update of optical properties) - please, check global tags");
       }
 
       // Make sure that we abort as soon as the geometry changes
-      m_geoDB->addCallback([]() {
+      m_geoDB.addCallback([]() {
         B2FATAL("Geometry cannot change during processing, "
                 "aborting (component TOP)");
       });
@@ -166,7 +162,7 @@ namespace Belle2 {
 
       TOPGeometry::useBasf2Units();
       if (m_fromDB) {
-        return &(**m_geoDB);
+        return &(*m_geoDB);
       } else {
         return m_geo;
       }
@@ -1000,7 +996,7 @@ namespace Belle2 {
       return out;
     }
 
-    double TOPGeometryPar::refractiveIndex(double lambda) const
+    double TOPGeometryPar::refractiveIndex(double lambda)
     {
       // parameters of SellMeier equation (Matsuoka-san, 24.11.2018)
       // from the specs of Corning HPFS 7980
@@ -1016,13 +1012,13 @@ namespace Belle2 {
       return sqrt(y);
     }
 
-    double TOPGeometryPar::getPhaseIndex(double energy) const
+    double TOPGeometryPar::getPhaseIndex(double energy)
     {
       double lambda = c_hc / energy;
       return refractiveIndex(lambda);
     }
 
-    double TOPGeometryPar::getGroupIndex(double energy) const
+    double TOPGeometryPar::getGroupIndex(double energy)
     {
       double lambda = c_hc / energy;
       double dl = 1.0; // [nm]

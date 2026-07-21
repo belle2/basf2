@@ -16,7 +16,7 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
-/* Basf2 headers */
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,7 +24,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/ExtHit.h>
 
-/* ROOT headers */
+/* ROOT headers. */
 #include <TH1D.h>
 #include <TH1I.h>
 #include <TH2D.h>
@@ -177,4 +177,3 @@ namespace Belle2 {
 
   };
 }
-

@@ -30,7 +30,7 @@ namespace Belle2 {
        * Constructor
        * @param opt PDF construction option
        */
-      ModuleAlignment(PDFConstructor::EPDFOption opt = PDFConstructor::c_Rough);
+      explicit ModuleAlignment(PDFConstructor::EPDFOption opt = PDFConstructor::c_Rough);
 
       /**
        * Sets module ID

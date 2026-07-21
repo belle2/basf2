@@ -167,6 +167,11 @@ namespace Belle2 {
     double trackNECLClusters(const Particle* part);
 
     /**
+     * returns the quality indicator of the track, a classification of fake vs. real track.
+     */
+    double trackQualityIndicator(const Particle* part);
+
+    /**
      * returns the number of CDC hits in the event not assigned to any track
      */
     double nExtraCDCHits(const Particle*);
@@ -201,6 +206,11 @@ namespace Belle2 {
      * returns the number of VXD hits not assigned to any track
      */
     double nExtraVXDHits(const Particle*);
+
+    /**
+     * returns the number of PXD hits not assigned to any track
+     */
+    double nExtraPXDHits(const Particle*);
 
     /**
      * returns time of first SVD sample relative to event T0

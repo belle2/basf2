@@ -31,7 +31,7 @@ namespace Belle2 {
       SoftwareTriggerResultPrinterModule();
 
       /// default virtual constructor because this is a derived class using virtual methods
-      virtual ~SoftwareTriggerResultPrinterModule() = default;
+      virtual ~SoftwareTriggerResultPrinterModule() override = default;
 
       /// Require the needed store object.
       void initialize() override;

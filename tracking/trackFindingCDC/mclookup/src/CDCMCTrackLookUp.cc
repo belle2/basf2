@@ -11,10 +11,11 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.icc.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class TrackFindingCDC::CDCMCHitCollectionLookUp<CDCTrack>;
 

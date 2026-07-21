@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDDQMClustersModule.h"
+#include <pxd/modules/pxdDQM/PXDDQMClustersModule.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,7 +24,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;

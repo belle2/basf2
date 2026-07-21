@@ -55,6 +55,7 @@ Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
 Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
+Untested method PIDLikelihood::setCDCnLayerHitsUsed
 Untested method PIDLikelihood::setLogLikelihood
 Untested method PIDLikelihood::subtractMaximum
 Untested method ECLCluster::addHypothesis
@@ -76,6 +77,9 @@ Untested method ECLCluster::setEnergyRaw
 Untested method ECLCluster::setHypothesis
 Untested method ECLCluster::setIsTrack
 Untested method ECLCluster::setLAT
+Untested method ECLCluster::setLogEnergy
+Untested method ECLCluster::setLogEnergyHighestCrystal
+Untested method ECLCluster::setLogEnergyRaw
 Untested method ECLCluster::setMaxECellId
 Untested method ECLCluster::setMinTrkDistance
 Untested method ECLCluster::setMinTrkDistanceID
@@ -116,6 +120,7 @@ Untested method KLMCluster::setClusterTrackRotationAngle
 Untested method KLMCluster::setClusterTrackSeparation
 Untested method KLMCluster::setClusterTrackSeparationAngle
 Untested method KLMCluster::setInnermostLayer
+Untested method KLMCluster::setKLMnDigits
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
 Untested method KLMCluster::setShapeStdDev1
@@ -1464,6 +1469,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -237.148
   getLogL(<type: mu->): -235.226
   getLogL(<type: pi+>): -236.735
@@ -1498,6 +1504,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -229.125
   getLogL(<type: mu->): -206.665
   getLogL(<type: pi+>): -198.153
@@ -1532,6 +1539,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -214.557
   getLogL(<type: mu->): -209.726
   getLogL(<type: pi+>): -206.568
@@ -1566,6 +1574,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -470.973
   getLogL(<type: mu->): -451.127
   getLogL(<type: pi+>): -436.931
@@ -1600,6 +1609,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -211.732
   getLogL(<type: mu->): -183.793
   getLogL(<type: pi+>): -182.678
@@ -1634,6 +1644,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -724.958
   getLogL(<type: mu->): -730.074
   getLogL(<type: pi+>): -700.699
@@ -1668,6 +1679,7 @@ PIDLikelihood#6:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -246.377
   getLogL(<type: mu->): -214.439
   getLogL(<type: pi+>): -214.079
@@ -1702,6 +1714,7 @@ PIDLikelihood#7:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -128.762
   getLogL(<type: mu->): -537.3
   getLogL(<type: pi+>): -137.239
@@ -1736,6 +1749,7 @@ PIDLikelihood#8:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -155.525
   getLogL(<type: mu->): -156.684
   getLogL(<type: pi+>): -150.982
@@ -1770,6 +1784,7 @@ PIDLikelihood#9:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -11.6571
   getLogL(<type: mu->): -360.79
   getLogL(<type: pi+>): -15.0801
@@ -1804,6 +1819,7 @@ PIDLikelihood#10:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -102.135
   getLogL(<type: mu->): -79.4087
   getLogL(<type: pi+>): -77.8299
@@ -3480,6 +3496,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 3
   getMomentum(): (-0.280272,0.497352,0.300189,0.814642)
   getMomentumMag(): 0.645
@@ -3513,6 +3530,7 @@ KLMCluster#1:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 2
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (-0.0713354,0.12004,0.163483,0.542072)
   getMomentumMag(): 0.215
@@ -7763,6 +7781,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -141.776
   getLogL(<type: mu->): -122.109
   getLogL(<type: pi+>): -123.873
@@ -7797,6 +7816,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -459.202
   getLogL(<type: mu->): -433.691
   getLogL(<type: pi+>): -415.77
@@ -7831,6 +7851,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -360.257
   getLogL(<type: mu->): -331.192
   getLogL(<type: pi+>): -331.051
@@ -7865,6 +7886,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -164.955
   getLogL(<type: mu->): -166.949
   getLogL(<type: pi+>): -164.492
@@ -7899,6 +7921,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -467.22
   getLogL(<type: mu->): -441.948
   getLogL(<type: pi+>): -441.35
@@ -7933,6 +7956,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -398.468
   getLogL(<type: mu->): -372.007
   getLogL(<type: pi+>): -366.164
@@ -7967,6 +7991,7 @@ PIDLikelihood#6:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -101.978
   getLogL(<type: mu->): -84.6791
   getLogL(<type: pi+>): -85.1544
@@ -8001,6 +8026,7 @@ PIDLikelihood#7:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -62.05
   getLogL(<type: mu->): -61.9305
   getLogL(<type: pi+>): -60.431
@@ -8035,6 +8061,7 @@ PIDLikelihood#8:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -4.67852
   getLogL(<type: mu->): -4.65956
   getLogL(<type: pi+>): -4.6714
@@ -8069,6 +8096,7 @@ PIDLikelihood#9:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -74.4783
   getLogL(<type: mu->): -68.5622
   getLogL(<type: pi+>): -68.9007
@@ -8103,6 +8131,7 @@ PIDLikelihood#10:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -15.5681
   getLogL(<type: mu->): -12.2133
   getLogL(<type: pi+>): -9.6861
@@ -8137,6 +8166,7 @@ PIDLikelihood#11:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -18.9509
   getLogL(<type: mu->): -14.2997
   getLogL(<type: pi+>): -11.8802
@@ -8171,6 +8201,7 @@ PIDLikelihood#12:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -127.219
   getLogL(<type: mu->): -124.088
   getLogL(<type: pi+>): -123.099
@@ -8205,6 +8236,7 @@ PIDLikelihood#13:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -54.11
   getLogL(<type: mu->): -51.0057
   getLogL(<type: pi+>): -50.4948
@@ -15463,6 +15495,7 @@ PIDLikelihood#0:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -259.555
   getLogL(<type: mu->): -239.917
   getLogL(<type: pi+>): -240.294
@@ -15497,6 +15530,7 @@ PIDLikelihood#1:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -653.939
   getLogL(<type: mu->): -692.582
   getLogL(<type: pi+>): -680.755
@@ -15531,6 +15565,7 @@ PIDLikelihood#2:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -347.392
   getLogL(<type: mu->): -381.508
   getLogL(<type: pi+>): -364.223
@@ -15565,6 +15600,7 @@ PIDLikelihood#3:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -495.584
   getLogL(<type: mu->): -483.451
   getLogL(<type: pi+>): -507.193
@@ -15599,6 +15635,7 @@ PIDLikelihood#4:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -273.805
   getLogL(<type: mu->): -257.73
   getLogL(<type: pi+>): -255.299
@@ -15633,6 +15670,7 @@ PIDLikelihood#5:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -517.243
   getLogL(<type: mu->): -560.694
   getLogL(<type: pi+>): -565.312
@@ -15667,6 +15705,7 @@ PIDLikelihood#6:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -460.851
   getLogL(<type: mu->): -459.839
   getLogL(<type: pi+>): -454.283
@@ -15701,6 +15740,7 @@ PIDLikelihood#7:
   areAllAvailable(<set: ARICH>): True
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -204.84
   getLogL(<type: mu->): -175.906
   getLogL(<type: pi+>): -169.317
@@ -15735,6 +15775,7 @@ PIDLikelihood#8:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -174.586
   getLogL(<type: mu->): -185.925
   getLogL(<type: pi+>): -172.619
@@ -15769,6 +15810,7 @@ PIDLikelihood#9:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): True
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -46.7445
   getLogL(<type: mu->): -46.9882
   getLogL(<type: pi+>): -47.0084
@@ -15803,6 +15845,7 @@ PIDLikelihood#10:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -10.7895
   getLogL(<type: mu->): -9.45969
   getLogL(<type: pi+>): -10.4452
@@ -15837,6 +15880,7 @@ PIDLikelihood#11:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): False
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -4.23853
   getLogL(<type: mu->): -6.25089
   getLogL(<type: pi+>): -7.05551
@@ -15871,6 +15915,7 @@ PIDLikelihood#12:
   areAllAvailable(<set: ARICH>): False
   areAllAvailable(<set: ECL>): True
   areAllAvailable(<set: KLM>): False
+  getCDCnLayerHitsUsed(): -1
   getLogL(<type: e->): -406.864
   getLogL(<type: mu->): -392.965
   getLogL(<type: pi+>): -391.562
@@ -18559,6 +18604,7 @@ KLMCluster#0:
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00  0.000000e+00 
      0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00  1.000000e+00 
   getInnermostLayer(): 1
+  getKLMnDigits(): 0
   getLayers(): 1
   getMomentum(): (0.127258,0.109732,0.134124,0.542072)
   getMomentumMag(): 0.215

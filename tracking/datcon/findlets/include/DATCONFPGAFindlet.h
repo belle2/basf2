@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/datcon/findlets/SVDShaperDigitConverter.h>
 #include <tracking/datcon/findlets/DATCONSVDClusterizer.h>
 #include <tracking/datcon/findlets/DATCONSVDClusterLoaderAndPreparer.h>
@@ -28,9 +28,9 @@ namespace Belle2 {
    * Findlet for performing the DATCON ROI calculation close to the implementation
    * on FPGA.
    */
-  class DATCONFPGAFindlet : public TrackFindingCDC::Findlet<> {
+  class DATCONFPGAFindlet : public TrackingUtilities::Findlet<> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<>;
+    using Super = TrackingUtilities::Findlet<>;
 
   public:
     /// Constructor for adding the subfindlets

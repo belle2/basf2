@@ -32,23 +32,11 @@ namespace Belle2 {
      */
     TOPXTalkChargeShareSetterModule();
 
-    /** destructor */
-    virtual ~TOPXTalkChargeShareSetterModule() override;
-
     /** initialize */
     virtual void initialize() override;
 
-    /** beginRun */
-    virtual void beginRun() override;
-
     /** event */
     virtual void event() override;
-
-    /** endRun */
-    virtual void endRun() override;
-
-    /** terminate */
-    virtual void terminate() override;
 
     /**
      * Examine whether the give hit is cross talk hits using waveform information
@@ -58,7 +46,7 @@ namespace Belle2 {
      * @param height   pulse height of the corresponding hit in a unit of ADC count
      * @return true if the given hit is identified as cross talk
      */
-    bool isCrossTalk(std::vector<short> wfm, int iRawTime, short height);
+    bool isCrossTalk(const std::vector<short>& wfm, int iRawTime, short height);
 
 
   private:

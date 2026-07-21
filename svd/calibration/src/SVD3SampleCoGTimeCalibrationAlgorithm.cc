@@ -99,9 +99,9 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
           __hEventT0vsCoG__->GetZaxis()->SetRange(ij + 1, ij + 1);
-          auto hEventT0vsCoG  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
-          auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1);
-          auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1);
+          auto hEventT0vsCoG  = static_cast<TH2D*>(__hEventT0vsCoG__->Project3D("yxe"));
+          auto hEventT0       = static_cast<TH1D*>(__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1));
+          auto hEventT0nosync = static_cast<TH1D*>(__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1));
 
           hEventT0vsCoG->SetName(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           hEventT0->SetName(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
@@ -143,7 +143,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           f2->SetParameters(m_interceptLowerLine, m_angularCoefficientLowerLine);
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-              double bcx = ((TAxis*)hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
+              double bcx = static_cast<TAxis*>(hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
               double bcy = ((TAxis*)hEventT0vsCoG->GetYaxis())->GetBinCenter(j);
               if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);

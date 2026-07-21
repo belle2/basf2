@@ -22,8 +22,6 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisTRGECLModule();
-    //! Destructor
-    ~DQMHistAnalysisTRGECLModule();
     //! initialization
     void initialize() override final;
     //! begin run

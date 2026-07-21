@@ -15,7 +15,7 @@
 
 using namespace Belle2;
 
-TrackFindingCDC::Weight MCTruthEclSeedFilter::operator()(const BaseCDCStateFilter::Object& pair)
+TrackingUtilities::Weight MCTruthEclSeedFilter::operator()(const BaseCDCStateFilter::Object& pair)
 {
   const auto& path = *(pair.first);
   const auto& state = *(pair.second);

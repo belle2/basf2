@@ -7,31 +7,33 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/segment/SegmentFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCSegment2D;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class TrackFindingCDC::Chooseable<BaseSegmentFilter>;
-    extern template class TrackFindingCDC::ChooseableFilter<SegmentFilterFactory>;
+    // extern template class TrackingUtilities::Chooseable<BaseSegmentFilter>;
+    // extern template class TrackingUtilities::ChooseableFilter<SegmentFilterFactory>;
 
     /// Deletes fake segments that have been rejected by a filter
-    class SegmentRejecter : public Findlet<CDCSegment2D&> {
+    class SegmentRejecter : public TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCSegment2D&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCSegment2D&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -44,14 +46,14 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm
-      void apply(std::vector<CDCSegment2D>& segment2Ds) final;
+      void apply(std::vector<TrackingUtilities::CDCSegment2D>& segment2Ds) final;
 
     private:
       /// Parameter : Switch to delete the segments instead of marking them as background.
       bool m_param_deleteRejected = false;
 
       /// Reference to the filter to be used to filter
-      ChooseableFilter<SegmentFilterFactory> m_segmentFilter;
+      TrackingUtilities::ChooseableFilter<SegmentFilterFactory> m_segmentFilter;
     };
   }
 }

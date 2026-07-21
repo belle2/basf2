@@ -7,22 +7,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <vector>
 
 namespace Belle2 {
 
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /// Findlet to exports CDCTracks as RecoTracks
-    class CDCMCCloneLookUpFiller : public Findlet<CDCTrack&> {
+    class CDCMCCloneLookUpFiller : public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&>;
 
     public:
       /// Short description of the findlet
@@ -32,7 +35,7 @@ namespace Belle2 {
       void beginEvent() final;
 
       /// Write give tracks into track store array
-      void apply(std::vector<CDCTrack>& cdcTracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& cdcTracks) final;
     };
   }
 }

@@ -113,7 +113,7 @@ class TauLFV(BaseSkim):
     __category__ = "physics, tau"
 
     ApplyHLTHadronCut = False
-    produce_on_tau_samples = False  # retention is too high on taupair
+    produce_on_tau_samples = True  # Retention is ~13% on MC16rd taupair
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -329,7 +329,7 @@ class TauGeneric(BaseSkim):
     __category__ = "physics, tau"
 
     ApplyHLTHadronCut = False
-    produce_on_tau_samples = False  # retention is too high on taupair
+    produce_on_tau_samples = False  # Retention ~72% on MC16rd taupair, too high
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -459,7 +459,7 @@ class TauThrust(BaseSkim):
     __category__ = "physics, tau"
 
     ApplyHLTHadronCut = False
-    produce_on_tau_samples = False  # retention is too high on taupair
+    produce_on_tau_samples = False  # Retention is ~62% on MC16rd taupair, too high
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -622,7 +622,7 @@ class TauKshort(BaseSkim):
     __category__ = "physics, tau"
 
     ApplyHLTHadronCut = False
-    produce_on_tau_samples = False  # retention is too high on taupair
+    produce_on_tau_samples = True  # Retention is ~2% on MC16rd taupair
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):

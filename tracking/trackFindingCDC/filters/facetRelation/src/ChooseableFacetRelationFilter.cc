@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseFacetRelationFilter>;
-template class TrackFindingCDC::ChooseableFilter<FacetRelationFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseFacetRelationFilter>;
+template class TrackingUtilities::ChooseableFilter<FacetRelationFilterFactory>;

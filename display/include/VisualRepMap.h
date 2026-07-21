@@ -30,13 +30,13 @@ namespace Belle2 {
     void select(const TObject* object) const;
 
     /** Deselect all other objects. */
-    void selectOnly(const TEveElement* eveObj) const;
+    static void selectOnly(const TEveElement* eveObj);
 
     /** Select related objects. */
     void selectRelated(TEveElement* eveObj) const;
 
     /** Clear existing selection in Eve Browser. */
-    void clearSelection() const;
+    static void clearSelection();
 
     /** are we currently in a select() call?
      *

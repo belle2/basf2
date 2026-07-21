@@ -49,6 +49,8 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("isEntaRS", m_isEntaRS, "true for adding enta tree branch. ", false);
   addParam("isDedxhit", m_isDedxhit, "true for adding dedxhit tree branch. ", false);
   addParam("isADCcorr", m_isADCcorr, "true for adding adc tree branch. ", false);
+  addParam("islLayer", m_islLayer, "true for adding layers for ldedx tree branch. ", false);
+  addParam("islDedx", m_islDedx, "true for adding layer dedx tree branch. ", false);
   addParam("isBhabha", m_isBhabha, "true for bhabha events", true);
   addParam("isRadee", m_isRadee, "true for radee events", false);
   addParam("isTrgSel", m_isTrgSel, "true to enable trigger sel inside module", false);
@@ -78,15 +80,14 @@ void CDCDedxElectronCollectorModule::prepare()
   hestats->GetXaxis()->SetBinLabel(5, "unclean");
   hestats->GetXaxis()->SetBinLabel(6, "selected");
 
-  auto htstats = new TH1I("htstats", "track Stats", 7, -0.5, 6.5);
+  auto htstats = new TH1I("htstats", "track Stats", 6, -0.5, 5.5);
   htstats->SetFillColor(kYellow);
   htstats->GetXaxis()->SetBinLabel(1, "alltrk");
   htstats->GetXaxis()->SetBinLabel(2, "vtx");
   htstats->GetXaxis()->SetBinLabel(3, "inCDC");
   htstats->GetXaxis()->SetBinLabel(4, "whits");
   htstats->GetXaxis()->SetBinLabel(5, "weop");
-  htstats->GetXaxis()->SetBinLabel(6, "radee");
-  htstats->GetXaxis()->SetBinLabel(7, "selected");
+  htstats->GetXaxis()->SetBinLabel(6, "selected");
 
   if (m_isInjTime) {
     ttree->Branch<double>("injtime", &m_injTime);
@@ -111,6 +112,9 @@ void CDCDedxElectronCollectorModule::prepare()
   if (m_isEntaRS)ttree->Branch("entaRS", &m_entaRS);
   if (m_isDedxhit)ttree->Branch("dedxhit", &m_dedxhit);
   if (m_isADCcorr)ttree->Branch("adccorr", &m_adccorr);
+
+  if (m_islLayer)ttree->Branch("lLayer", &m_lLayer);
+  if (m_islDedx)ttree->Branch("ldedx", &m_ldedx);
 
   // Collector object registration
   registerObject<TH1D>("means", means);
@@ -138,7 +142,8 @@ void CDCDedxElectronCollectorModule::collect()
     //release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee
     const std::map<std::string, int>& fresults = m_trgResult->getResults();
     if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() and
-        fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()) {
+        (fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()
+         || fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end())) {
       B2WARNING("Can't find required bhabha/radee trigger identifiers");
       hestats->Fill(2);
       return;
@@ -147,8 +152,9 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") ==
-                             SoftwareTriggerCutResult::c_accept);
+    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") == SoftwareTriggerCutResult::c_accept)
+                            || (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") == SoftwareTriggerCutResult::c_accept);
+
 
     if (!m_isBhabha && !m_isRadee) {
       B2WARNING("requested not-supported event type: going back");
@@ -214,6 +220,7 @@ void CDCDedxElectronCollectorModule::collect()
     m_injTime = dedxTrack->getInjectionTime();
     m_injRing = dedxTrack->getInjectionRing();
     m_nhits = dedxTrack->size();
+    m_nlhits = dedxTrack->getNLayerHits();
 
     htstats->Fill(0);
 
@@ -251,24 +258,6 @@ void CDCDedxElectronCollectorModule::collect()
       htstats->Fill(4);
     }
 
-    //if dealing with radee here (do a safe side cleanup)
-    if (m_isRadee) {
-      if (nTracks != 2)continue; //exactly 2 tracks
-      bool goodradee = false;
-      //checking if dedx of other track is restricted
-      //will not do too much as radee is clean enough
-      for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[std::abs(jdedx - 1)];
-        if (!dedxOtherTrack)continue;
-        if (std::abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
-        goodradee = true;
-        break;
-      }
-      if (!goodradee)continue;
-      htstats->Fill(5);
-    }
-
-
     // Make sure to remove all the data in vectors from the previous track
     if (m_isWire)m_wire.clear();
     if (m_isLayer)m_layer.clear();
@@ -294,8 +283,16 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_isADCcorr)m_adccorr.push_back(dedxTrack->getADCCount(i));
     }
 
+    // Make sure to remove all the data in vectors from the previous track
+    if (m_islLayer)m_lLayer.clear();
+    if (m_islDedx)m_ldedx.clear();
+
+    for (int i = 0; i < m_nlhits; ++i) {
+      if (m_islLayer)m_lLayer.push_back(dedxTrack->getLayer(i));
+      if (m_islDedx)m_ldedx.push_back(dedxTrack->getLayerDedx(i));
+    }
     // Track and/or hit information filled as per config
-    htstats->Fill(6);
+    htstats->Fill(5);
     hmeans->Fill(m_dedx);
     tree->Fill();
   }

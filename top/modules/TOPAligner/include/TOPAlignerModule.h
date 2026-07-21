@@ -40,12 +40,6 @@ namespace Belle2 {
     TOPAlignerModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPAlignerModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

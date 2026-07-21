@@ -1,0 +1,33 @@
+# EventType: 1211011000
+# NickName: Bu_Ketac,etac_gg=PHSP,PHOTOS
+# Descriptor: Upsilon(4S) -> B+ B-, B+ -> K+ eta_c, eta_c -> gamma gamma
+
+# Responsible:
+#    - Hyuna Kim 
+#    - Gaurav Sharma, IITM India
+# Date: 2026-04-13
+
+
+
+Alias      MyB+    B+
+Alias      MyB-    B-
+Alias      Myetc   eta_c
+
+Decay Upsilon(4S)
+  0.50   B-   MyB+   VSS;
+  0.50   B+   MyB-   VSS;
+Enddecay
+
+Decay MyB+
+  1.0    K+   Myetc   PHOTOS PHSP;
+Enddecay
+
+Decay MyB-
+  1.0    K-   Myetc   PHOTOS PHSP;
+Enddecay
+
+Decay Myetc
+  1.0    gamma   gamma   PHSP;
+Enddecay
+
+End

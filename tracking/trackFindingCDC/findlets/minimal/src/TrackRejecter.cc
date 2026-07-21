@@ -7,20 +7,21 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseTrackFilter>;
-template class TrackFindingCDC::ChooseableFilter<TrackFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseTrackFilter>;
+template class TrackingUtilities::ChooseableFilter<TrackFilterFactory>;
 
 TrackRejecter::TrackRejecter(const std::string& defaultFilterName)
   : m_trackFilter(defaultFilterName)

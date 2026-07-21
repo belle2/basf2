@@ -52,7 +52,7 @@ namespace {
       }
       objectName += object->GetName();
       if (objectClass->InheritsFrom(TH1::Class())) {
-        TH1* histogram{dynamic_cast<TH1*>(object)};
+        const TH1* histogram{dynamic_cast<TH1*>(object)};
         msgHandler.add(histogram, objectName);
         counter++;
       } else if (objectClass->InheritsFrom(TDirectory::Class())) {
@@ -114,9 +114,9 @@ int main(int argc, char* argv[])
   zmq::message_t message{&compressedBuffer[0], static_cast<size_t>(compressedSize)};
   size_t maximalUncompressedSize{128000000};
   std::vector<char> uncompressedBuffer;
-  uncompressedBuffer.reserve(maximalUncompressedSize);
+  uncompressedBuffer.resize(maximalUncompressedSize);
   int uncompressedSize{
-    LZ4_decompress_safe(message.data<char>(), &uncompressedBuffer[0],
+    LZ4_decompress_safe(message.data<char>(), uncompressedBuffer.data(),
                         message.size(), maximalUncompressedSize)
   };
   if (uncompressedSize <= 0) {

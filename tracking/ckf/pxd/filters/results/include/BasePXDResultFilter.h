@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/ckf/pxd/entities/CKFToPXDResult.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD results (on overlap check)
-  using BasePXDResultFilter = TrackFindingCDC::Filter<CKFToPXDResult>;
+  using BasePXDResultFilter = TrackingUtilities::Filter<CKFToPXDResult>;
 }

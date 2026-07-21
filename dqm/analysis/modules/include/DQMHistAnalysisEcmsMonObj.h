@@ -35,11 +35,6 @@ namespace Belle2 {
     DQMHistAnalysisEcmsMonObjModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisEcmsMonObjModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -79,6 +74,11 @@ namespace Belle2 {
      * Fit the histograms and return the fitted parameters
      */
     std::unordered_map<std::string, double>  fitEcmsBB(TH1D* hB0, TH1D* hBp);
+
+    /**
+     * Reads first exp.run number and integrated lumi from merged histogram title
+     */
+    std::unordered_map<std::string, double>  parseTitle(const std::string& title);
 
   protected:
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */

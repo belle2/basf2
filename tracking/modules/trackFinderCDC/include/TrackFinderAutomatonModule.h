@@ -8,13 +8,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Module for the cellular automaton tracking for the CDC on regular events
-    class TFCDC_TrackFinderAutomatonModule : public FindletModule<TrackFinderAutomaton> {
+    class TFCDC_TrackFinderAutomatonModule : public TrackingUtilities::FindletModule<TrackFinderAutomaton> {
     };
   }
 }

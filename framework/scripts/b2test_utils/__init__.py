@@ -60,7 +60,8 @@ def require_file(filename, data_type="", py_case=None):
 
     Parameters:
         filename (str): relative filename to look for, either in a central place or in the current working directory
-        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"`` or ``"validation"``.
+        data_type (str): case insensitive data type to find.  Either empty string or one of ``"examples"``, ``"validation"``
+          or ``"starterkit"``.
         py_case (unittest.TestCase): if this is to be skipped within python's native unittest then pass the TestCase instance
 
     Returns:
@@ -444,6 +445,20 @@ def is_cdb_down() -> bool:
     tests that rely on the CDB in case of problems.
     """
     return os.environ.get("BELLE2_IS_CDB_DOWN", "no").lower() in [
+        "yes",
+        "1",
+        "y",
+        "on",
+    ]
+
+
+def is_rundb_down() -> bool:
+    """
+    Returns true if the RunDB is currently unavailable or slow to respond.
+    The 'BELLE2_IS_RUNDB_DOWN' environment variable can be used to dynamically exclude some
+    tests that rely on the RunDB in case of problems.
+    """
+    return os.environ.get("BELLE2_IS_RUNDB_DOWN", "no").lower() in [
         "yes",
         "1",
         "y",

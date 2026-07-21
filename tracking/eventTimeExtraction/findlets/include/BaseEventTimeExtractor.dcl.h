@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
@@ -15,11 +15,11 @@
 namespace Belle2 {
   /// Class to extract the event t0
   template<class ... AIOTypes>
-  class BaseEventTimeExtractor : public TrackFindingCDC::Findlet<AIOTypes...> {
+  class BaseEventTimeExtractor : public TrackingUtilities::Findlet<AIOTypes...> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::Findlet<AIOTypes...>;
+    using Super = TrackingUtilities::Findlet<AIOTypes...>;
 
   public:
     /// Returns true if the last run t0 extraction was successful

@@ -8,10 +8,70 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from basf2 import create_path, B2ERROR, B2INFO
-from basf2.utils import pretty_print_table
-import os
 import glob
+import os
+
+from basf2 import Module, Path, B2ERROR, B2INFO
+from basf2.utils import pretty_print_table
+from rawdata import add_unpackers
+from gdltrigger import filter_trigger_abort_gaps
+
+
+BGO_OBJECTS = (
+    'EventLevelTriggerTimeInfo',
+    'PXDDigits',
+    'SVDShaperDigits',
+    'CDCHits',
+    'TOPDigits',
+    'TOPInjectionVeto'
+    'ARICHDigits',
+    'ECLWaveforms',
+    'KLMDigits',
+    'TRGECLBGTCHits',
+    'TRGSummary'
+)
+
+
+class SelectTRGTypes(Module):
+    '''Select events according to given trigger types.'''
+
+    def __init__(self, trg_types=None):
+        '''Constructor.'''
+        super().__init__()
+        #: The trigger types
+        self.trg_types = trg_types
+
+    def initialize(self, trg_types=None):
+        '''Initialize the module.'''
+        from ROOT import Belle2
+        #: The trigger summary object
+        self.trg_summary = Belle2.PyStoreObj('TRGSummary')
+        self.trg_summary.isRequired()
+
+    def event(self):
+        '''Event processing.'''
+        self.return_value(0)
+
+        if not self.trg_summary.isValid():
+            # This should never happen: let's report without crashing the processing
+            B2ERROR('TRGSummary is not available: the event is discarded.')
+            return
+
+        for trg_type in self.trg_types:
+            if self.trg_summary.getTimType() == trg_type:
+                self.return_value(1)
+                return
+
+
+def get_trigger_types_for_bgo():
+    '''Get the default trigger types to be used for the Beam Background Overlay (BGO) production.'''
+    from ROOT import Belle2
+
+    trg_types = [
+        Belle2.TRGSummary.TTYP_DPHY,  # 5 -> delayed physics for background
+        Belle2.TRGSummary.TTYP_RAND,  # 7 -> random trigger events
+    ]
+    return trg_types
 
 
 def get_background_files(folder=None, output_file_info=True):
@@ -138,7 +198,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
 
     # Write out only non-empty events when producing samples for BG mixer
     if sampleType != 'study':
-        emptyPath = create_path()
+        emptyPath = Path()
         tagSetter.if_false(emptyPath)
 
     # Output to file. We don't need a TTreeIndex for background files and memory
@@ -146,3 +206,57 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
     # fewer and or smaller amounts of data have to be read for each GetEntry()
     path.add_module('RootOutput', outputFileName=fileName, branchNames=branches, excludeBranchNames=excludeBranches,
                     buildIndex=False, autoFlushSize=-500000)
+
+
+def add_bgo_modules(path, additionalBranches=None):
+    """
+    This function adds to the path all the necessary modules to produce Beam Background Overlay (BGO) files
+    starting from raw data.
+    This function already adds the ``RootOutput`` module with all the branch names correctly set.
+
+    Arguments:
+        path (Path): Path to add module to
+        additionalBranches (list): Additional objects/arrays of event durability to save
+    """
+
+    empty = Path()
+
+    # Gearbox
+    path.add_module('Gearbox')
+
+    # Geometry
+    path.add_module('Geometry')
+
+    # Unpack TRGSummary
+    path.add_module('TRGGDLUnpacker')
+    path.add_module('TRGGDLSummary')
+
+    # Show progress of processing
+    path.add_module('Progress')
+
+    # Select specific triggered events
+    selector = path.add_module(SelectTRGTypes(trg_types=get_trigger_types_for_bgo()))
+    selector.if_false(empty)
+
+    # Filter away the events falling in the trigger abort gaps
+    filter_trigger_abort_gaps(path)
+
+    # Unpack detector data
+    add_unpackers(path, components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM'])
+
+    # Convert ECLDsps to ECLWaveforms
+    compress = path.add_module('ECLCompressBGOverlay', CompressionAlgorithm=3)
+    compress.if_false(empty)
+
+    # Shift the time of KLMDigits
+    path.add_module('KLMDigitTimeShifter')
+
+    # ECL trigger unpacker and BGOverlay dataobject
+    path.add_module('TRGECLUnpacker')
+    path.add_module('TRGECLBGTCHit')
+
+    # Output
+    branches = list(BGO_OBJECTS)
+    if additionalBranches:
+        branches += additionalBranches
+    path.add_module('RootOutput', branchNames=branches)

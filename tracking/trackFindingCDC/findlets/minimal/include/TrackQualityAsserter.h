@@ -7,15 +7,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <string>
 #include <vector>
 
 namespace Belle2 {
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /**
      * This module applies configurable correction functions to all found tracks.
@@ -34,10 +37,10 @@ namespace Belle2 {
      * reduced strongly even when applying the correctly working
      * functions! Handle with care ;-)
      */
-    class TrackQualityAsserter: public Findlet<CDCTrack&> {
+    class TrackQualityAsserter: public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
       /// Type of the base class
-      using Super = Findlet<CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&>;
 
     public:
       /// Constructor setting up the default parameters
@@ -50,7 +53,7 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function to clean up the tracks
-      void apply(std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
     private:
       /// Parameter : The corrections to use.

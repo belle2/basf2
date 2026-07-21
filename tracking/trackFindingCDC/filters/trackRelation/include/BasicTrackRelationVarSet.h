@@ -7,14 +7,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
-#include <tracking/trackFindingCDC/utilities/Relation.h>
+#include <tracking/trackingUtilities/utilities/Relation.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+  namespace TrackFindingCDC {
 
     /// Names of the variables to be generated
     constexpr
@@ -26,13 +28,14 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct BasicTrackRelationVarNames : public VarNames<Relation<const CDCTrack> > {
+    struct BasicTrackRelationVarNames : public
+      TrackingUtilities::VarNames<TrackingUtilities::Relation<const TrackingUtilities::CDCTrack> > {
 
       /// Number of variables to be generated
       // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
       // at least tell cppcheck that everything is fine
       // cppcheck-suppress duplInheritedMember
-      static const size_t nVars = size(basicTrackRelationVarNames);
+      static const size_t nVars = TrackingUtilities::size(basicTrackRelationVarNames);
 
       /// Getter for the name at the given index
       static constexpr char const* getName(int iName)
@@ -45,11 +48,11 @@ namespace Belle2 {
      *  Class to compute floating point variables from a track relation
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class BasicTrackRelationVarSet : public VarSet<BasicTrackRelationVarNames> {
+    class BasicTrackRelationVarSet : public TrackingUtilities::VarSet<BasicTrackRelationVarNames> {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) final;
+      bool extract(const TrackingUtilities::Relation<const TrackingUtilities::CDCTrack>* ptrTrackRelation) final;
     };
   }
 }

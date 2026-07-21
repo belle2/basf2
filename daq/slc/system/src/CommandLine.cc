@@ -22,6 +22,6 @@ int CommandLine::run_shell(const string& cmdline, string& response)
   fgets(buf, 4096, fp);
   buf[strlen(buf) - 1] = '\0';
   response = std::string(buf);
-  fclose(fp);
+  pclose(fp);
   return 0;
 }

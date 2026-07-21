@@ -7,13 +7,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackNormalizer.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 
 #include <vector>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 std::string TrackNormalizer::getDescription()
 {

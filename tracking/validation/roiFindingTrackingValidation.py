@@ -17,7 +17,6 @@
   </description>
 </header>
 """
-#   <input>EvtGenSimNoBkg.root</input>
 
 from tracking import add_tracking_for_PXDDataReduction_simulation
 from tracking.validation.plot import ValidationPlot
@@ -27,10 +26,12 @@ import ROOT
 import basf2
 from svd import add_svd_reconstruction
 from simulation import add_simulation
+from validationgenerators import add_evtgen_for_validation
+
+# Here we can't use the standard samples because the PXD data reduction is simulated as well
+
 NAME = 'ROIFinding'  # not used?
 CONTACT = 'software-tracking@belle2.org'
-# INPUT_FILE = '../EvtGenSimNoBkg.root' #can't use it because PXDDataReduction in simulated
-# INPUT_FILE = 'simRootOutput.root'  # for debugging purposes
 OUTPUT_FILE = 'ROIFindingTrackingValidation.root'
 N_EVENTS = 1000
 
@@ -221,13 +222,9 @@ def run():
     path = basf2.create_path()
 
     path.add_module('EventInfoSetter', evtNumList=N_EVENTS)
-    path.add_module('EvtGenInput')
+    add_evtgen_for_validation(path)
     add_simulation(path, forceSetPXDDataReduction=True, usePXDDataReduction=False)
     add_svd_reconstruction(path, isROIsimulation=True)
-
-    #    path.add_module('RootInput', inputFileName=INPUT_FILE, entrySequences=["0:{}".format(N_EVENTS-1)])
-    # path.add_module('Gearbox')
-    # path.add_module('Geometry')
 
     pxd_unfiltered_digits = 'PXDDigits'
     pxd_filtered_digits = 'filteredPXDDigits'

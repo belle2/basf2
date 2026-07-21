@@ -45,7 +45,7 @@ namespace Belle2 {
     CDCDedxPIDCreatorModule();
 
     /** Destructor */
-    virtual ~CDCDedxPIDCreatorModule();
+    ~CDCDedxPIDCreatorModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;
@@ -127,9 +127,6 @@ namespace Belle2 {
     double m_removeHighest; /**< portion of events with high dE/dx to discard */
     bool m_useBackHalfCurlers; /**< whether to use the back half of curlers */
     bool m_trackLevel; /**< whether to use track-level or hit-level MC */
-    bool m_enableDebugOutput; /**< option to write out debugging information to CDCDedxTracks */
-    std::string m_likelihoodsName; /**< name of collection of PID likelihoods */
-    std::string m_dedxTracksName; /**< name of collection of debug output */
 
     // collections
     StoreArray<Track> m_tracks; /**< collection of tracks */

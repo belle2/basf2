@@ -13,6 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/core/Environment.h>
 
 using namespace std;
 using namespace Belle2;
@@ -55,6 +56,13 @@ void HepevtInputModule::initialize()
     //let's start with the first file:
     m_inputFileName = m_inputFileNames[m_iFile];
   }
+
+  unsigned int totalEvents = 0;
+  for (const auto& fileName : m_inputFileNames) {
+    totalEvents += m_hepevt.countEvents(fileName);
+  }
+  Environment::Instance().setNumberOfMCEvents(totalEvents);
+
   try {
     B2INFO("Opening first file: " << m_inputFileName);
     m_hepevt.open(m_inputFileName);

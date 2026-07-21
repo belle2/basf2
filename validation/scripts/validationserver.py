@@ -971,7 +971,7 @@ class ValidationRoot:
                 comparison_json_path, file_name, file_package, issue_id)
 
         issue_url = self.gitlab_config[default_section]['project_url'] \
-            + "/-/issues/" \
+            + "/-/work_items/" \
             + str(issue_id)
         raise cherrypy.HTTPRedirect(
             issue_url
@@ -1005,7 +1005,7 @@ class ValidationRoot:
             return "ERROR: Gitlab integration not set up, verify config file."
 
         issue_url = self.gitlab_config[default_section]['project_url'] \
-            + "/-/issues/" \
+            + "/-/work_items/" \
             + str(iid)
         raise cherrypy.HTTPRedirect(
                 issue_url
@@ -1035,7 +1035,7 @@ class ValidationRoot:
         project.save()
 
         issue_url = self.gitlab_config[default_section]['project_url'] \
-            + "/-/issues/" \
+            + "/-/work_items/" \
             + str(id)
 
         raise cherrypy.HTTPRedirect(

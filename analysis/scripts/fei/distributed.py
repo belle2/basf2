@@ -529,10 +529,10 @@ def merge_root_files(args, stage, roundMode=0):
         os.chdir(f'{args.directory}/collection')
         for f in rootfiles:
             inputs = [f'../jobs/{i}/{f}' for i in range(args.nJobs)]
-            cmd = f"analysis-fei-mergefiles -o {f} -i " + " ".join(inputs)
+            cmd = ['analysis-fei-mergefiles', '-o', f, '-i'] + inputs
             if 'training_input' in f:
-                cmd += f" -s {1.0-args.validation}"
-            ret = subprocess.call(cmd, shell=True)
+                cmd += ['-s', str(1.0-args.validation)]
+            ret = subprocess.call(cmd)
             if ret != 0:
                 raise RuntimeError('Error during merging root files')
 

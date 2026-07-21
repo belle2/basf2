@@ -37,11 +37,6 @@ namespace Belle2 {
     DQMHistAnalysisTRGEFFModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisTRGEFFModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

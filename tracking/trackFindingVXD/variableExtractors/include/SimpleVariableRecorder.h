@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/RootMergeable.h>
 #include <framework/pcore/ProcHandler.h>
-#include <tracking/trackFindingVXD/utilities/Named.h>
+#include <tracking/trackingUtilities/utilities/Named.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TROOT.h>
@@ -72,7 +72,7 @@ namespace Belle2 {
      */
     // cppcheck does not recognize that m_tfile is initialized by calling the other constructor
     // cppcheck-suppress uninitMemberVar
-    SimpleVariableRecorder(std::vector<Named<float*>>& namedVariables, const std::string& fileName,
+    SimpleVariableRecorder(std::vector<TrackingUtilities::Named<float*>>& namedVariables, const std::string& fileName,
                            const std::string& treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)
     {

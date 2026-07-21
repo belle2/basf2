@@ -11,12 +11,12 @@
 #include <vector>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 Weight AllSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToSVDState*>>& previousStates = pair.first;
   CKFToSVDState* currentState = pair.second;
 
   if (previousStates.size() < 3) {

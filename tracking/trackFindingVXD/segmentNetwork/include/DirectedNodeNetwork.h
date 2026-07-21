@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 
+#include <algorithm>
 #include <cstdint>
 #include <unordered_map>
 #include <vector>

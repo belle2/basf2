@@ -47,10 +47,10 @@ namespace Belle2 {
 
     private:
       /// Mean time of certain modules
-      TH1F* m_meanTimeHistogram;
+      TH1F* m_meanTimeHistogram = nullptr;
 
       /// Mean memory of certain modules
-      TH1F* m_meanMemoryHistogram;
+      TH1F* m_meanMemoryHistogram = nullptr;
 
       /// Time distribution of certain modules
       std::map<std::string, TH1F*> m_moduleTimeHistograms;
@@ -59,19 +59,19 @@ namespace Belle2 {
       std::map<std::string, TH1F*> m_moduleMemoryHistograms;
 
       /// Budget time distribution of all events
-      TH1F* m_fullTimeHistogram;
+      TH1F* m_fullTimeHistogram = nullptr;
 
       /// Processing time distribution of all events
-      TH1F* m_processingTimeHistogram;
+      TH1F* m_processingTimeHistogram = nullptr;
 
       /// Total memory usage distribution of all events
-      TH1F* m_fullMemoryHistogram;
+      TH1F* m_fullMemoryHistogram = nullptr;
 
       /// Mean budget time of events per unit
-      TH1F* m_fullTimeMeanPerUnitHistogram;
+      TH1F* m_fullTimeMeanPerUnitHistogram = nullptr;
 
       /// Mean processing time of events per unit
-      TH1F* m_processingTimeMeanPerUnitHistogram;
+      TH1F* m_processingTimeMeanPerUnitHistogram = nullptr;
 
       /// Budget time distribution of events per unit
       std::map<unsigned int, TH1F*> m_fullTimePerUnitHistograms;
@@ -83,40 +83,40 @@ namespace Belle2 {
       std::map<unsigned int, TH1F*> m_fullMemoryPerUnitHistograms;
 
       /// Number of processes per unit
-      TH1F* m_processesPerUnitHistogram;
+      TH1F* m_processesPerUnitHistogram = nullptr;
 
       /// Processing time distribution of events passing passive injection veto
-      TH1F* m_processingTimePassiveVeto;
+      TH1F* m_processingTimePassiveVeto = nullptr;
 
       /// Processing time distribution of events not passing passive injection veto
-      TH1F* m_processingTimeNotPassiveVeto;
+      TH1F* m_processingTimeNotPassiveVeto = nullptr;
 
       /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter timing cuts
-      TH1F* m_processingTimeNotPassiveVetoTimingCut;
+      TH1F* m_processingTimeNotPassiveVetoTimingCut = nullptr;
 
       /// Processing time distribution of events not passing passive injection veto and retained after HLTprefilter CDC-ECL cuts
-      TH1F* m_processingTimeNotPassiveVetoCDCECLCut;
+      TH1F* m_processingTimeNotPassiveVetoCDCECLCut = nullptr;
 
       /// Processing time vs nSVDShaperDigits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto;
+      TH2F* m_procTimeVsnSVDShaperDigitsPassiveVeto = nullptr;
 
       /// Processing time vs nSVDShaperDigits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnSVDShaperDigitsNotPassiveVeto;
+      TH2F* m_procTimeVsnSVDShaperDigitsNotPassiveVeto = nullptr;
 
       /// Processing time vs nCDCHits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnCDCHitsPassiveVeto;
+      TH2F* m_procTimeVsnCDCHitsPassiveVeto = nullptr;
 
       /// Processing time vs nCDCHits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnCDCHitsNotPassiveVeto;
+      TH2F* m_procTimeVsnCDCHitsNotPassiveVeto = nullptr;
 
       /// Processing time vs nECLDigits distribution of events passing passive injection veto
-      TH2F* m_procTimeVsnECLDigitsPassiveVeto;
+      TH2F* m_procTimeVsnECLDigitsPassiveVeto = nullptr;
 
       /// Processing time vs nECLDigits distribution of events not passing passive injection veto
-      TH2F* m_procTimeVsnECLDigitsNotPassiveVeto;
+      TH2F* m_procTimeVsnECLDigitsNotPassiveVeto = nullptr;
 
       /// Histogram to monitor injection strip
-      TH2F* m_TimeSinceLastInjectionVsTimeInBeamCycle;
+      TH2F* m_TimeSinceLastInjectionVsTimeInBeamCycle = nullptr;
 
       /// Storage for the last full time sum
       double m_lastFullTimeSum = 0;
@@ -134,16 +134,16 @@ namespace Belle2 {
       std::map<std::string, double> m_lastModuleTimeSum;
 
       /// Parameter: Create HLT unit number histograms?
-      bool m_param_create_hlt_unit_histograms;
+      bool m_param_create_hlt_unit_histograms = false;
 
       /// Parameter: Directory to put the generated histograms
       std::string m_param_histogramDirectoryName = "timing_statistics";
 
       /// Parameter: which modules should be shown in the overview list
-      std::vector<std::string> m_param_overviewModuleList = {"Sum_Wait", "Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
+      std::vector<std::string> m_param_overviewModuleList = {"Sum_Wait", "Sum_Initialization", "Sum_Unpackers", "Sum_HLT_Prefilter_Calculation", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
 
       /// Summary modules of the actual processing
-      std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_EventsofDoomBuster", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
+      std::vector<std::string> m_summaryModuleList = {"Sum_Initialization", "Sum_Unpackers", "Sum_HLT_Prefilter_Calculation", "Sum_Clustering", "Sum_Prefilter_Tracking", "Sum_Posttracking_Reconstruction", "Sum_HLT_Filter_Calculation", "Sum_HLT_DQM_before_filter", "Sum_HLT_Discard", "Sum_Postfilter_Reconstruction", "Sum_HLT_Skim_Calculation", "Sum_ROI_Finder", "Sum_HLT_DQM_filtered", "Sum_ROI_Payload_Assembler", "Sum_HLT_DQM_all_events", "Sum_Close_Event"};
 
       /// Store HLT unit number on initialization
       int m_hlt_unit = 0;
@@ -155,16 +155,16 @@ namespace Belle2 {
       const double m_fullTimeNBins = 250;
 
       /// Maximum for the histograms of processingTime
-      const double m_processingTimeMax = 10000;
+      const double m_processingTimeMax = 15000;
 
       /// Number of bins for the histograms of processingTime
-      const double m_processingTimeNBins = 250;
+      const double m_processingTimeNBins = 375;
 
       /// Maximum for the histograms of fullMemory
-      const double m_fullMemoryMax = 4000;
+      const double m_fullMemoryMax = 10000;
 
       /// Number of bins for the histograms of fullMemory
-      const double m_fullMemoryNBins = 100;
+      const double m_fullMemoryNBins = 250;
 
       /// Maximum for the histograms of nSVDShaperDigits
       const double m_nSVDShaperDigitsMax = 20000;

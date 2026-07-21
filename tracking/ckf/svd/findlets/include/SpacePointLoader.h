@@ -8,8 +8,8 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/findlets/base/StoreArrayLoader.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/StoreArrayLoader.h>
 
 #include <string>
 #include <vector>
@@ -20,9 +20,9 @@ namespace Belle2 {
   class ModuleParamList;
 
   /// Load the space points from the store array to the given vector.
-  class SpacePointLoader : public TrackFindingCDC::Findlet<const SpacePoint*> {
+  class SpacePointLoader : public TrackingUtilities::Findlet<const SpacePoint*> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const SpacePoint*>;
+    using Super = TrackingUtilities::Findlet<const SpacePoint*>;
 
   public:
     /// Add the sub findlet as a listener
@@ -36,7 +36,7 @@ namespace Belle2 {
 
   private:
     /// Findlet for actually loading the hits
-    TrackFindingCDC::StoreArrayLoader<const SpacePoint> m_storeArrayLoader;
+    TrackingUtilities::StoreArrayLoader<const SpacePoint> m_storeArrayLoader;
 
     /// Use only already used hits
     bool m_param_useAssignedHits = true;

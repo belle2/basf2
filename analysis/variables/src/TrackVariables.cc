@@ -290,6 +290,14 @@ namespace Belle2 {
       return count;
     }
 
+    double trackQualityIndicator(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return Const::doubleNaN;
+
+      return track->getQualityIndicator();
+    }
+
     // used in trackHelixExtTheta and trackHelixExtPhi
     ROOT::Math::XYZVector getPositionOnHelix(const TrackFitResult* trackFit, const std::vector<double>& pars)
     {
@@ -486,6 +494,17 @@ namespace Belle2 {
       if (!elti) return Const::doubleNaN;
       double out = 0.0;
       for (uint16_t ilayer = 1; ilayer < 7; ++ilayer)
+        out += elti->getNVXDClustersInLayer(ilayer);
+      return out;
+    }
+
+    //  The number of PXD hits not assigned to any track
+    double nExtraPXDHits(const Particle*)
+    {
+      StoreObjPtr<EventLevelTrackingInfo> elti;
+      if (!elti) return Const::doubleNaN;
+      double out = 0.0;
+      for (uint16_t ilayer = 1; ilayer < 3; ++ilayer)
         out += elti->getNVXDClustersInLayer(ilayer);
       return out;
     }
@@ -935,7 +954,20 @@ always 0 or 1 with newer versions of ECL reconstruction.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("trackQualityIndicator", trackQualityIndicator, R"DOC(
+Returns the quality indicator of the track, a classification of fake vs. real track.
+A value near zero means the track has a greater chance to be fake.
 
+.. note::
+
+        During reconstruction, the probability (given a certain sample composition) of a track
+        to originate from a charged particle rather than e.g. a random combination of hits from
+        different charged particles and background contributions is estimated. This estimate
+        includes information, that isn't used for the calculation of the p-value of the fit, e.g.
+        energy-deposition, timing, and cluster-shape information. 
+
+Returns NaN if called for something other than a track-based particle.
+    )DOC");
     REGISTER_VARIABLE("helixExtTheta(radius [cm], z fwd [cm], z bwd [cm], useHighestProbMass=0)", trackHelixExtTheta, R"DOC(
                       Returns theta of extrapolated helix parameters. If ``useHighestProbMass=1`` is set, the extrapolation will
                       use the track fit result for the mass hypothesis with the highest pValue.
@@ -997,6 +1029,7 @@ Returns NaN if there is no event-level tracking information available.
     //REGISTER_VARIABLE("nExtraVXDHitsInLayer(i)", nExtraVXDHitsInLayer,
     //"[Eventbased] The number VXD hits not assigned in the specified VXD layer");
     //REGISTER_VARIABLE("nExtraVXDHits", nExtraVXDHits, "[Eventbased] The number of VXD hits not assigned to any track");
+    REGISTER_VARIABLE("nExtraPXDHits", nExtraPXDHits, "[Eventbased] The number of PXD hits not assigned to any track");
     //REGISTER_VARIABLE("svdFirstSampleTime", svdFirstSampleTime, "[Eventbased] The time of first SVD sample relatvie to event T0");
     REGISTER_VARIABLE("trackFindingFailureFlag", trackFindingFailureFlag, R"DOC(
 [Eventbased] Returns a flag set by the tracking if there is reason to assume

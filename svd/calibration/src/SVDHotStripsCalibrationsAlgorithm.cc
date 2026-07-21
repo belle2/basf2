@@ -69,7 +69,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
 
     TH1F*& hOccupancy = map_hocc[std::make_tuple(layer, ladder, sensor, side)];
     if (hOccupancy == nullptr) {
-      hOccupancy = (TH1F*)hocc->Clone(Form("hocc_L%dL%dS%d_%d", layer, ladder, sensor, side));
+      hOccupancy = static_cast<TH1F*>(hocc->Clone(Form("hocc_L%dL%dS%d_%d", layer, ladder, sensor, side)));
     } else {
       hOccupancy->Add(hocc);
     }
@@ -84,7 +84,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   int nevents = 0;
   if (hNEvents) {
     f->WriteTObject(hNEvents.get());
-    nevents = ((TH1F*)hNEvents.get())->GetEntries();
+    nevents = (static_cast<TH1F*>(hNEvents.get()))->GetEntries();
   }
 
   for (const auto& key : map_hocc) {
@@ -92,7 +92,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     int nstrips = 768;
     if (!side && layer != 3) nstrips = 512;
 
-    TH1F* hOccupancy = (TH1F*)key.second;
+    TH1F* hOccupancy = static_cast<TH1F*>(key.second);
     if (nevents != 0) hOccupancy->Scale(1. / nevents);
     else B2ERROR("No events to compute the occupancy as strip_count/nevents");
 

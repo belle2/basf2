@@ -24,7 +24,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    explicit SubRecoTrackExtractor(std::vector<Named<float*>>& variableSet):
+    explicit SubRecoTrackExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet):
       VariableExtractor()
     {
       addVariable("CDC_QI", variableSet);
@@ -89,7 +89,7 @@ namespace Belle2 {
 
   protected:
     /// initialize statistics subsets of variables from clusters that get combined for SPTC
-    void initializeStats(const std::string& prefix, std::vector<Named<float*>>& variables)
+    void initializeStats(const std::string& prefix, std::vector<TrackingUtilities::Named<float*>>& variables)
     {
       addVariable(prefix + "_diff_Z", variables);
       addVariable(prefix + "_diff_Pt", variables);

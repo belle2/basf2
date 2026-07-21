@@ -12,25 +12,28 @@
 namespace Belle2 {
   class RecoTrack;
 
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
     class CDCTrajectory3D;
+  }
+  namespace TrackFindingCDC {
 
     /// Structure to summarize utility function to output a list of hits into a RecoTrack.
     struct RecoTrackUtil {
 
       /// For magnetic monopoles; estimates charge sign from all stereo hits, momentum direction from hits in closest superlayer, fixing magnitude with given value. Ignores building CDCTrajectory3D since it is based on a helix.
-      static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks, const double momentumSeedMagnitude);
+      static RecoTrack* storeInto(const TrackingUtilities::CDCTrack& track, StoreArray<RecoTrack>& recoTracks,
+                                  const double momentumSeedMagnitude);
 
       /// Copies the track information to the RecoTrack
-      static RecoTrack* storeInto(const CDCTrack& track, StoreArray<RecoTrack>& recoTracks);
+      static RecoTrack* storeInto(const TrackingUtilities::CDCTrack& track, StoreArray<RecoTrack>& recoTracks);
 
       /// Copies the trajectory information to the RecoTrack
-      static RecoTrack* storeInto(const CDCTrajectory3D& traj3D, StoreArray<RecoTrack>& recoTracks);
+      static RecoTrack* storeInto(const TrackingUtilities::CDCTrajectory3D& traj3D, StoreArray<RecoTrack>& recoTracks);
 
       /// Copies the trajectory information to the RecoTrack
       static RecoTrack*
-      storeInto(const CDCTrajectory3D& traj3D, const double bZ, StoreArray<RecoTrack>& recoTracks);
+      storeInto(const TrackingUtilities::CDCTrajectory3D& traj3D, const double bZ, StoreArray<RecoTrack>& recoTracks);
 
       /**
        *  Translates a range of hits and inserts them in the reco track.

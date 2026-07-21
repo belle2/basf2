@@ -123,12 +123,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "PXDOccInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "PXDEOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[0].histo = Triggers;
@@ -149,12 +149,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "PXDEOccInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[3].histo = Triggers;
@@ -176,12 +176,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "SVDOccInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "SVDTrgOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[0].histo = Triggers;
@@ -202,12 +202,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "SVDTrgOccInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   //m_nodes[3].histo = Triggers;
@@ -230,12 +230,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "ECLHitsInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ECLEHitsInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   if (Hits && Triggers) {
@@ -250,12 +250,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ECLEHitsInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   //Finding only one of them should only happen in very strange situations...
   if (Hits && Triggers) {
@@ -270,12 +270,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ECLEBurstsInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hBurstLERECL->Divide(Hits, Triggers);
@@ -290,12 +290,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ECLEBurstsInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hBurstHERECL->Divide(Hits, Triggers);
@@ -312,12 +312,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "TOPOccInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "TOPEOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionLERTOP->Divide(Hits, Triggers, 100, 8192);
@@ -331,12 +331,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "TOPEOccInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionHERTOP->Divide(Hits, Triggers, 100, 8192);
@@ -353,12 +353,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "ARICHOccInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ARICHEOccInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionLERARICH->Divide(Hits, Triggers);
@@ -372,12 +372,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "ARICHEOccInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionHERARICH->Divide(Hits, Triggers);
@@ -392,12 +392,12 @@ void DQMHistInjectionModule::event()
 
   locationHits = "KLMOccInjLER";
   locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "KLMTrigInjLER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionLERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
@@ -411,12 +411,12 @@ void DQMHistInjectionModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  Hits = (TH1*)findHist(locationHits.Data());
+  Hits = findHist(locationHits.Data());
   locationTriggers = "KLMTrigInjHER";
   if (m_histogramDirectoryName != "") {
     locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
+  Triggers = findHist(locationTriggers.Data());
 
   if (Hits && Triggers) {
     m_hInjectionHERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());

@@ -379,10 +379,10 @@ namespace Belle2 {
 
         std::multimap<double, const Hit*, std::greater<double>> weights;
         for (const auto& hit : m_times) {
-          double hitTime = hit.first;
           double weight = 0;
           const auto* pulseShape = hit.second.shape;
           if (pulseShape) {
+            double hitTime = hit.first;
             weight = fabs(pulseShape->getValue(cfdTime - hitTime));
           }
           if (weight > 0.01) {
@@ -518,7 +518,7 @@ namespace Belle2 {
         double hTime = hit.first;
         const auto* pulseShape = hit.second.shape;
         if (not pulseShape) continue;
-        pulseHeight += hit.second.pulseHeight * pulseShape->getValue(hTime - hitTime + peakTime);
+        pulseHeight += hit.second.pulseHeight * pulseShape->getValue(hitTime - hTime + peakTime);
       }
 
       double t = (*s_timeWalk)->getTimeWalk(pulseHeight);

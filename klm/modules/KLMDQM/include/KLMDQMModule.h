@@ -17,16 +17,22 @@
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
+#include <klm/time/KLMTime.h>
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawKLM.h>
 
 /* ROOT headers. */
 #include <TH1F.h>
 #include <TH2F.h>
+
+#include <array>
 
 namespace Belle2 {
 
@@ -120,6 +126,12 @@ namespace Belle2 {
     /** Max time for EKLM Scint */
     double m_EKLMScintTimeMax;
 
+    /** Min time for revo9DCArrivalTime for RPC. */
+    double m_Revo9DCArrivalTimeMin;
+
+    /** Max time for revo9DCArrivalTime for RPC. */
+    double m_Revo9DCArrivalTimeMax;
+
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -129,11 +141,44 @@ namespace Belle2 {
     /** Time: BKLM RPCs. */
     TH1F* m_TimeRPC;
 
+    /** Time: revo9DCArrivalTime for RPC. */
+    TH1F* m_TimeRevo9DCArrivalTime;
+
     /** Time: BKLM scintillators. */
     TH1F* m_TimeScintillatorBKLM;
 
     /** Time: EKLM scintillators. */
     TH1F* m_TimeScintillatorEKLM;
+
+    /** Charge: BKLM scintillators when FE != 0 */
+    TH1F* m_ChargeScintillatorBKLM;
+
+    /** Charge: EKLM scintillators when FE != 0 */
+    TH1F* m_ChargeScintillatorEKLM;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorBKLM_SingleStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 == 0 */
+    TH1F* m_ChargeScintillatorEKLM_SingleStrip;
+
+    /** Charge: BKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorBKLM_MultiStrip;
+
+    /** Charge: EKLM scintillators when FE != 0  & trigger bits 0x10 != 0 */
+    TH1F* m_ChargeScintillatorEKLM_MultiStrip;
+
+    /** Cluster charge (sum of scintillator digit charges), BKLM part. */
+    TH1F* m_ChargeClusterBKLM;
+
+    /** Cluster charge (sum of scintillator digit charges), EKLM part. */
+    TH1F* m_ChargeClusterEKLM;
+
+    /** Mean scintillator digit charge per cluster (BKLM contributors only). */
+    TH1F* m_AverageChargeClusterBKLM;
+
+    /** Mean scintillator digit charge per cluster (EKLM contributors only). */
+    TH1F* m_AverageChargeClusterEKLM;
 
     /** Plane occupancy: BKLM, phi readout. */
     TH1F* m_PlaneBKLMPhi;
@@ -148,9 +193,6 @@ namespace Belle2 {
     TH1F** m_ChannelHits[
     EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
     BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
-
-    /** Masked channels per sector. */
-    TH1F* m_MaskedChannelsPerSector;
 
     /** Number of digits: whole KLM. */
     TH1F* m_DigitsKLM;
@@ -175,6 +217,9 @@ namespace Belle2 {
 
     /** Trigger bits: EKLM scintillators. */
     TH1F* m_TriggerBitsEKLM;
+
+    /** Event-level background trigger summary (from TRGSummary). */
+    TH1F* m_EventBackgroundTriggerSummary;
 
     /** Number of KLM Digits after LER injection. */
     TH1F* m_DigitsAfterLERInj;
@@ -215,11 +260,17 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLMElementNumbers* m_eklmElementNumbers;
 
+    /** KLM time conversion (for revo9DCArrivalTime). */
+    KLMTime* m_klmTime;
+
     /** Raw FTSW. */
     StoreArray<RawFTSW> m_RawFtsws;
 
     /** Raw KLM. */
     StoreArray<RawKLM> m_RawKlms;
+
+    /** Trigger summary (event-level L1 bits). */
+    StoreObjPtr<TRGSummary> m_trgSummary;
 
     /** KLM digits. */
     StoreArray<KLMDigit> m_Digits;
@@ -229,6 +280,16 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
+
+    /** KLM clusters. */
+    StoreArray<KLMCluster> m_KLMClusters;
+
+    /** L1 timing trigger bits of interest for KLM DQM (event-level). */
+    static constexpr std::array<TRGSummary::ETimingType, 3> c_KlmL1Triggers = {
+      TRGSummary::ETimingType::TTYP_DPHY,
+      TRGSummary::ETimingType::TTYP_RAND,
+      TRGSummary::ETimingType::TTYP_POIS
+    };
 
   };
 

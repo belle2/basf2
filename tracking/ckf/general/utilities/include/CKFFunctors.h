@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/FunctorTag.h>
+#include <tracking/trackingUtilities/utilities/FunctorTag.h>
 
 namespace Belle2 {
   /// Helper Functor to get the Seed of a given result
   struct SeedGetter {
     /// Make it a functor
-    explicit operator TrackFindingCDC::FunctorTag();
+    explicit operator TrackingUtilities::FunctorTag();
 
     /// Returns the seed of an object
     template<class T>
@@ -26,7 +26,7 @@ namespace Belle2 {
   /// Helper Functor to get the Number of hits of a given result
   struct NumberOfHitsGetter {
     /// Make it a functor
-    explicit operator TrackFindingCDC::FunctorTag();
+    explicit operator TrackingUtilities::FunctorTag();
 
     /// Returns the number of hits of an object
     template<class T>
@@ -39,7 +39,7 @@ namespace Belle2 {
   /// Helper Functor to get the arc length of a given result
   struct GetArcLength {
     /// Make it a functor
-    explicit operator TrackFindingCDC::FunctorTag();
+    explicit operator TrackingUtilities::FunctorTag();
 
     /// Returns the weight of an object.
     template<class T, class SFINAE = decltype(&T::getArcLength)>

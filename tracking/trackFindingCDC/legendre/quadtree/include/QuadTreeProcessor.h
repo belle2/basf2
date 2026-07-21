@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeNode.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 #include <algorithm>
 #include <functional>
@@ -21,6 +21,9 @@
 #include <utility>
 
 namespace Belle2 {
+  namespace TrackingUtilities {
+    class CDCWireHit;
+  }
   namespace TrackFindingCDC {
 
     /**
@@ -144,7 +147,7 @@ namespace Belle2 {
        */
       std::vector<AData*> getAssignedItems()
       {
-        std::vector<const CDCWireHit*> result;
+        std::vector<const TrackingUtilities::CDCWireHit*> result;
         for (QuadTree* seededTree : m_seededTrees) {
           for (Item* item : seededTree->getItems()) {
             result.push_back(item->getPointer());

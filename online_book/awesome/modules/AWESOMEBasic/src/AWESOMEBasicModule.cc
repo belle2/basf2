@@ -25,7 +25,7 @@ using namespace Belle2::AWESOME;
 /**
  * We have to register the module to the Framework. The "Module" part of the
  * class name will be appended automatically so every module has to be named
- * <NAME>Module.
+ * "<NAME>Module".
  */
 REG_MODULE(AWESOMEBasic);
 
@@ -89,7 +89,7 @@ void AWESOMEBasicModule::event()
     int mcArrayIndex = -1;
     int pdgCode = 0;
     /* We assume there is only a single MCParticle related to the hit. */
-    MCParticle* mcParticle = hit.getRelated<MCParticle>();
+    const MCParticle* mcParticle = hit.getRelated<MCParticle>();
     if (mcParticle) {
       mcArrayIndex = mcParticle->getArrayIndex();
       pdgCode = mcParticle->getPDG();

@@ -33,7 +33,7 @@ namespace Belle2 {
      * Destructor
      */
 
-    virtual ~SVDdEdxCalibrationAlgorithm() {}
+    virtual ~SVDdEdxCalibrationAlgorithm() override {}
 
     /**
      * function to enable plotting
@@ -64,11 +64,6 @@ namespace Belle2 {
      * set the upper edge of the dEdx binning for the payloads
      */
     void setMinEvtsPerTree(const double& value) { m_MinEvtsPerTree = value; }
-
-    /**
-     * set the number of events to generate, per momentum bin, for the payloads
-     */
-    void setNEventsToGenerate(const int& value) { m_NToGenerate = value; }
 
     /**
      * reimplement the profile histogram calculation
@@ -114,7 +109,7 @@ namespace Belle2 {
     int m_MinEvtsPerTree =
       100;                                                 /**< number of events in TTree below which we don't try to fit */
     int m_NToGenerate =
-      500000;                                                     /**< the number of events to be generated in each momentum bin in the new payloads */
+      5e6;                                                     /**< the number of events to be generated in each momentum bin in the new payloads. Please do not change this number unless it's really needed. It is crucial that this is consistent between data and MC payloads, as it affects the minimal possible PID probability value after normalisation. */
     bool m_CustomProfile = 1; /**< reimplement profile histogram calculation instead of the ROOT implementation? */
     bool m_UsePionBGFunctionForEverything =
       0; /**< Assume that the dEdx:betagamma trend is the same for all hadrons; use the pion trend as representative */
@@ -167,7 +162,7 @@ namespace Belle2 {
         }
         // create a projection (1D histogram) in a given momentum bin
 
-        TH1D* MomentumSlice = (TH1D*)HistoToNormalise->ProjectionY("slice_tr", pbin, pbin);
+        TH1D* MomentumSlice = static_cast<TH1D*>(HistoToNormalise->ProjectionY("slice_tr", pbin, pbin));
         // normalise, but ignore the cases with empty histograms
         if (MomentumSlice->Integral(0, m_numDEdxBins + 1) > 0) {
           MomentumSlice->Scale(1. / MomentumSlice->Integral(0, m_numDEdxBins + 1));
@@ -187,10 +182,10 @@ namespace Belle2 {
     TH2F* PrepareNewHistogram(TH2F* DataHistogram, TString NewName, TF1* betagamma_function, TF1* ResolutionFunctionOriginal,
                               double bias_correction)
     {
-      TF1* ResolutionFunction = (TF1*) ResolutionFunctionOriginal->Clone(Form("%sClone",
-                                ResolutionFunctionOriginal->GetName())); // to avoid modifying the resolution function
+      TF1* ResolutionFunction = static_cast<TF1*>(ResolutionFunctionOriginal->Clone(Form("%sClone",
+                                                  ResolutionFunctionOriginal->GetName()))); // to avoid modifying the resolution function
       ResolutionFunction->SetRange(0, m_dedxMaxPossible); // allow the function to take values outside the histogram range
-      TH2F* DataHistogramNew = (TH2F*) DataHistogram->Clone(NewName);
+      TH2F* DataHistogramNew = static_cast<TH2F*>(DataHistogram->Clone(NewName));
 
       DataHistogramNew->Reset();
 
@@ -199,12 +194,20 @@ namespace Belle2 {
         ResolutionFunction->FixParameter(1, mean_dEdx_value + bias_correction);
 
         // create a projection (1D histogram) in a given momentum bin
-        TH1D* MomentumSlice = (TH1D*)DataHistogramNew->ProjectionY("slice", pbin, pbin);
+        TH1D* MomentumSlice = static_cast<TH1D*>(DataHistogramNew->ProjectionY("slice", pbin, pbin));
 
         // fill manually (instead of FillRandom) to also preserve events in the overflow bin
         // this is needed for the correct normalisation
         for (int iEvent = 0; iEvent < m_NToGenerate; iEvent++) {
           MomentumSlice->Fill(ResolutionFunction->GetRandom());
+        }
+
+        // get rid of the empty bins: set their bin content to 0.5 (i.e. smaller than 1 event)
+        // this is to allow for a well-defined log-likelihood calculation
+        for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
+          if (MomentumSlice->GetBinContent(dedxbin) < 1) {
+            MomentumSlice->SetBinContent(dedxbin, 0.5);
+          };
         }
 
         // normalise each momentum slice to unity, but ignore the cases with empty histograms
@@ -225,7 +228,7 @@ namespace Belle2 {
     /**
     * Reimplement the Profile histogram calculation for a 2D histogram. The standard ROOT implementation takes the mean Y at a given X, which produces biased results in case of rapidly-rising distributions with non-Gaussian resolutions. We fit in slices to extract the mean more precisely.
     */
-    TH1F* PrepareProfile(TH2F* DataHistogram, TString NewName)
+    TH1D* PrepareProfile(TH2F* DataHistogram, TString NewName)
     {
 // define our resolution function: Crystal Ball. Parameter [1] is the mean and [2] is the relative width.
       TF1* ResolutionFunction = new TF1("ResolutionFunction", "[0]*ROOT::Math::crystalball_function(x,[4],[3],[2]*[1],[1])", 100e3,
@@ -243,16 +246,16 @@ namespace Belle2 {
 
       ResolutionFunction->SetRange(0, m_dedxMaxPossible); // allow the function to take values outside the histogram range
 
-      TH1F* DataHistogramNew = (TH1F*)DataHistogram->ProfileX()->ProjectionX();
-      TH1F* DataHistogramClone = (TH1F*)DataHistogramNew->Clone(Form("%sClone",
-                                                                DataHistogramNew->GetName())); // preserve the original profile for uncertainty cross-checks
+      TH1D* DataHistogramNew = static_cast<TH1D*>(DataHistogram->ProfileX()->ProjectionX());
+      TH1D* DataHistogramClone = static_cast<TH1D*>(DataHistogramNew->Clone(Form("%sClone",
+                                                    DataHistogramNew->GetName()))); // preserve the original profile for uncertainty cross-checks
       DataHistogramNew->SetName(NewName);
       DataHistogramNew->SetTitle(NewName);
       DataHistogramNew->Reset();
 
       for (int pbin = 1; pbin <= m_numBGBins; pbin++) {
         // create a projection (1D histogram) in a given momentum bin
-        TH1F* MomentumSlice = (TH1F*)DataHistogram->ProjectionY("slice", pbin, pbin);
+        TH1D* MomentumSlice = static_cast<TH1D*>(DataHistogram->ProjectionY("slice", pbin, pbin));
 
         if (MomentumSlice->Integral() < 1) continue;
 // guesstimate the starting fit values

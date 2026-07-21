@@ -7,16 +7,17 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/combined/StereoHitFinder.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseStereoHitFilter>;
-template class TrackFindingCDC::ChooseableFilter<StereoHitFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseStereoHitFilter>;
+template class TrackingUtilities::ChooseableFilter<StereoHitFilterFactory>;
 
 StereoHitFinder::StereoHitFinder() : Super()
 {

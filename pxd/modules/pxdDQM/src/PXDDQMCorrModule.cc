@@ -11,7 +11,7 @@
 
 #include <framework/core/HistoModule.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

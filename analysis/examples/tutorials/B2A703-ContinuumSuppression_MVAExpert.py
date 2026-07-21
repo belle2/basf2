@@ -99,7 +99,7 @@ trainVars = [
     'thrustOm',
     'cosTBTO',
     'cosTBz',
-    'KSFWVariables(et)',
+    'KSFWVariables(pt_sum)',
     'KSFWVariables(mm2)',
     'KSFWVariables(hso00)',
     'KSFWVariables(hso01)',
@@ -140,7 +140,7 @@ expertVars = ['extraInfo(FastBDT)', 'transformedNetworkOutput(FastBDT,0.1,1.0)']
 # Create output file with all sets of variables.
 ma.variablesToNtuple(decayString='B0',
                      variables=trainVars + targetVar + expertVars,
-                     treename='tree',
+                     treename='B0',
                      filename=outfile,
                      path=main)
 

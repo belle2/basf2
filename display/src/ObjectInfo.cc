@@ -36,7 +36,7 @@ namespace {
         B2WARNING(cl->GetName() << "::" << name << " has return type " << m->GetReturnTypeName() <<
                   " instead of std::string, cannot show info.");
       else
-        gInterpreter->ExecuteWithArgsAndReturn(m, (void*)obj, 0, 0, &str);
+        gInterpreter->ExecuteWithArgsAndReturn(m, const_cast<void*>(static_cast<const void*>(obj)), 0, 0, &str);
     }
     return str;
   }

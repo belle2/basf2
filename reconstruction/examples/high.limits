@@ -1,5 +1,5 @@
-Clustering 200
-Simulation 950
-Prefilter_Tracking 1230
+Clustering 50
+Simulation 1500
+Prefilter_Tracking 1000
 Posttracking_Reconstruction 220
 Postfilter_Reconstruction 150

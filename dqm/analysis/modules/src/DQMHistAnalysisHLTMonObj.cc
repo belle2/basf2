@@ -23,6 +23,7 @@
 #include <RooGaussian.h>
 #include <RooMsgService.h>
 #include <RooRealVar.h>
+#include <RooPlot.h>
 
 // C++ headers
 #include <regex>
@@ -43,10 +44,6 @@ DQMHistAnalysisHLTMonObjModule::DQMHistAnalysisHLTMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-DQMHistAnalysisHLTMonObjModule::~DQMHistAnalysisHLTMonObjModule()
-{
-}
-
 void DQMHistAnalysisHLTMonObjModule::initialize()
 {
   // make monitoring object related to this module
@@ -59,6 +56,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_c_hardware = new TCanvas("Hardware", "hardware", 1000, 1000);
   m_c_l1 = new TCanvas("L1", "l1", 750, 400);
   m_c_ana_eff_shifter = new TCanvas("ana_eff_shifter", "ana_eff_shifter", 1000, 1000);
+  m_c_nks = new TCanvas("Ks", "Ks_histograms", 1000, 1000);
 
   // add canvases to MonitoringObject
   m_monObj->addCanvas(m_c_filter);
@@ -66,6 +64,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
   m_monObj->addCanvas(m_c_hardware);
   m_monObj->addCanvas(m_c_l1);
   m_monObj->addCanvas(m_c_ana_eff_shifter);
+  m_monObj->addCanvas(m_c_nks);
 
 
   //--- HLTPrefilter monitoring ---//
@@ -89,7 +88,7 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
   //--- Signal and Background yields ---//
   m_sig = new RooRealVar("N_{sig}", "SIGNAL EVENTS", 1000, 10, 5000000);
-  m_bkg = new RooRealVar("N_{bkg}", "SIGNAL EVENTS", 2000, 100, 20000000);
+  m_bkg = new RooRealVar("N_{bkg}", "BACKGROUND EVENTS", 2000, 100, 20000000);
 
   //--- Total fit pdf ---//
   m_KsPdf = new RooAddPdf("m_KsPdf", "Two Gaussian + Pol1 background", RooArgList(*m_double_gauss, *m_chebpol), RooArgList(*m_sig,
@@ -185,12 +184,24 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
   m_monObj->setVariable("n_hlt", n_hlt);
+
   double n_l1 = 0.;
-  if (h_l1) n_l1 = h_l1->GetEntries();
-  m_monObj->setVariable("n_l1", n_l1);
-  double n_procs = 0.;
-  if (h_procs) n_procs = h_procs->GetEntries();
-  m_monObj->setVariable("n_procs", n_procs);
+  if (h_l1) {
+    n_l1 = h_l1->GetEntries();
+    m_monObj->setVariable("n_l1", n_l1);
+    for (int i = 2; i <= h_l1->GetXaxis()->GetNbins(); i++) {
+      std::string label = "n_l1_HLT" + std::to_string(i - 1);
+      m_monObj->setVariable(label, h_l1->GetBinContent(i));
+    }
+  }
+
+  if (h_procs) {
+    m_monObj->setVariable("n_procs", h_procs->GetEntries());
+    for (int i = 2; i <= h_procs->GetXaxis()->GetNbins(); i++) {
+      std::string label = "n_procs_HLT" + std::to_string(i - 1);
+      m_monObj->setVariable(label, h_procs->GetBinContent(i));
+    }
+  }
 
   if (h_skim) {
     // loop bins, add variable to monObj named as "effCS_" + bin label w/o "accept"
@@ -352,6 +363,7 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
   double nKs_all = 0;
+  double nKs_uncertainty_all = 0;
   double nKs_active = 0;
   double nKs_activeNotTime = 0;
   double nKs_activeNotCDCECL = 0;
@@ -361,18 +373,48 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   auto m_hKshortActiveNotTimeH = findHist("PhysicsObjects/hist_nKshortActiveNotTimeH");
   auto m_hKshortActiveNotCDCECLH = findHist("PhysicsObjects/hist_nKshortActiveNotCDCECLH");
 
+  // Create RooPlot objects
+  // All Ks candidates
+  RooPlot* m_KshortAll_frame =
+    m_KsInvMass->frame(RooFit::Title("All events"));
+  m_KshortAll_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortAll_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto
+  RooPlot* m_KshortActive_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto"));
+  m_KshortActive_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActive_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto after Prefilter (timing cut)
+  RooPlot* m_KshortActiveNotTime_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto (Prefilter Time)"));
+  m_KshortActiveNotTime_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActiveNotTime_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+  // Ks from Active veto after Prefilter (CDC-ECL cut)
+  RooPlot* m_KshortActiveNotCDCECL_frame =
+    m_KsInvMass->frame(RooFit::Title("Active veto (Prefilter CDC+ECL)"));
+  m_KshortActiveNotCDCECL_frame->GetXaxis()->SetTitle("M_{#pi^{+}#pi^{-}} [GeV/c^{2}]");
+  m_KshortActiveNotCDCECL_frame->GetYaxis()->SetTitle("Candidates / (2 MeV/c^{2})");
+
   if (m_hKshortAllH) {
     RooDataHist* KsHist_all = new RooDataHist("KsHist_all", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortAllH);
     m_KsPdf->fitTo(*KsHist_all, RooFit::Minos(true));
     nKs_all = m_sig->getValV();
+    nKs_uncertainty_all = m_sig->getError();
+    KsHist_all->plotOn(m_KshortAll_frame) ;
+    m_KsPdf->plotOn(m_KshortAll_frame);
+    m_KsPdf->paramOn(m_KshortAll_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_all;
   }
   m_monObj->setVariable("nKs_all_hlt", nKs_all);
+  m_monObj->setVariable("nKs_uncertainty_all_hlt", nKs_uncertainty_all);
 
   if (m_hKshortActiveH) {
     RooDataHist* KsHist_active = new RooDataHist("KsHist_active", "Histogram data", RooArgList(*m_KsInvMass), m_hKshortActiveH);
     m_KsPdf->fitTo(*KsHist_active, RooFit::Minos(true));
     nKs_active = m_sig->getValV();
+    KsHist_active->plotOn(m_KshortActive_frame) ;
+    m_KsPdf->plotOn(m_KshortActive_frame);
+    m_KsPdf->paramOn(m_KshortActive_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_active;
   }
   m_monObj->setVariable("nKs_activeVeto_hlt", nKs_active);
@@ -382,6 +424,9 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
                                                         m_hKshortActiveNotTimeH);
     m_KsPdf->fitTo(*KsHist_activeNotTime, RooFit::Minos(true));
     nKs_activeNotTime = m_sig->getValV();
+    KsHist_activeNotTime->plotOn(m_KshortActiveNotTime_frame) ;
+    m_KsPdf->plotOn(m_KshortActiveNotTime_frame);
+    m_KsPdf->paramOn(m_KshortActiveNotTime_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_activeNotTime;
   }
   m_monObj->setVariable("nKs_activeVetoPrefilterTime_hlt", nKs_activeNotTime);
@@ -391,11 +436,26 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
                                                           m_hKshortActiveNotCDCECLH);
     m_KsPdf->fitTo(*KsHist_activeNotCDCECL, RooFit::Minos(true));
     nKs_activeNotCDCECL = m_sig->getValV();
+    KsHist_activeNotCDCECL->plotOn(m_KshortActiveNotCDCECL_frame) ;
+    m_KsPdf->plotOn(m_KshortActiveNotCDCECL_frame);
+    m_KsPdf->paramOn(m_KshortActiveNotCDCECL_frame, RooFit::Layout(0.6, 0.9, 0.9));
     delete KsHist_activeNotCDCECL;
   }
-
   m_monObj->setVariable("nKs_activeVetoPrefilterCDCECL_hlt", nKs_activeNotCDCECL);
 
+  // set the contents of Ks canvas
+  m_c_nks->Clear(); // clear existing content
+  m_c_nks->cd();
+  m_c_nks->Divide(2, 2);
+
+  m_c_nks->cd(1);
+  m_KshortAll_frame->Draw();
+  m_c_nks->cd(2);
+  m_KshortActive_frame->Draw();
+  m_c_nks->cd(3);
+  m_KshortActiveNotTime_frame->Draw();
+  m_c_nks->cd(4);
+  m_KshortActiveNotCDCECL_frame->Draw();
 
   B2DEBUG(20, "DQMHistAnalysisHLTMonObj : endRun called");
 }

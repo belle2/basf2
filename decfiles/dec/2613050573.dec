@@ -1,0 +1,30 @@
+# EventType: 2613050573
+# Descriptor: [ccbar anti-Xicm2anti-LKS0Km anti-L2anti-PmPip KS02PipPim]
+# NickName: anti-Xicm2anti-LKS0Km_anti-L2anti-PmPip_KS02PipPim
+# PhysicsWG: Charm
+# Responsible: Young Jun Kim 
+# Date: 20251222 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias Myanti-Lambda anti-Lambda0
+Alias MyKS0 K_S0
+
+Decay anti-Xi_c-
+1.000 Myanti-Lambda MyKS0 K-       PHSP;
+Enddecay
+
+Decay Myanti-Lambda
+1.000 anti-p- pi+       PHSP;
+Enddecay
+
+Decay MyKS0
+1.000 pi+ pi-       PHSP;
+Enddecay
+
+End
+

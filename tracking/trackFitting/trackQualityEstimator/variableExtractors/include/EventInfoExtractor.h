@@ -21,7 +21,7 @@ namespace Belle2 {
   public:
 
     /// Define names of variables that get extracted
-    explicit EventInfoExtractor(std::vector<Named<float*>>& variableSet):
+    explicit EventInfoExtractor(std::vector<TrackingUtilities::Named<float*>>& variableSet):
       VariableExtractor()
     {
       addVariable("__experiment__", variableSet);

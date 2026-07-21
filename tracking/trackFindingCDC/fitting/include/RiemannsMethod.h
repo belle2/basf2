@@ -8,8 +8,10 @@
 #pragma once
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrajectory2D;
+  }
+  namespace TrackFindingCDC {
     class CDCObservations2D;
 
     /// Class implementing the Riemann fit for two dimensional trajectory circle
@@ -20,7 +22,7 @@ namespace Belle2 {
       RiemannsMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
-      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
+      void update(TrackingUtilities::CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
 
     private:
       /**
@@ -28,7 +30,7 @@ namespace Belle2 {
        *
        *  This method is used if there is drift length information is available from the observations.
        */
-      void updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
+      void updateWithoutDriftLength(TrackingUtilities::CDCTrajectory2D& trajectory2D,
                                     CDCObservations2D& observations2D) const;
 
       /**
@@ -36,7 +38,7 @@ namespace Belle2 {
        *
        *  This method is used if there is no  drift length information is available from the observations.
        */
-      void updateWithDriftLength(CDCTrajectory2D& trajectory2D,
+      void updateWithDriftLength(TrackingUtilities::CDCTrajectory2D& trajectory2D,
                                  CDCObservations2D& observations2D) const;
 
     public:

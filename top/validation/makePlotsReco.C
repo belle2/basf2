@@ -27,6 +27,7 @@ void makePlotsReco()
   // open the file with input data (flat ntuple)
 
   TFile* input = TFile::Open("../TOPNtupleRecoTest.root");
+  // cppcheck-suppress cstyleCast
   TTree* top = (TTree*) input->Get("top");
 
   // open the output file for the validation histograms

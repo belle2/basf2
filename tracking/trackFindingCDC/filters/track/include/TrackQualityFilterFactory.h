@@ -9,12 +9,12 @@
 
 #include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseTrackFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseTrackFilter>;
 
     /** Derived class of TrackFilterFactory with a truth target that also discards clones
      * Probably this whole class could be removed if TrackFilterFactory would be templated with the

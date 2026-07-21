@@ -9,17 +9,16 @@
 
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dbobjects/TrackFlippingCuts.h>
 
 /**
  * module to revert the recotracks.
  */
 namespace Belle2 {
+  class RecoTrack;
+  class Track;
+  class TrackFlippingCuts;
+
   /// Module to revert RecoTracks.
   class RecoTracksReverterModule : public Module {
 
@@ -30,6 +29,9 @@ namespace Belle2 {
     /// Declare required StoreArray
     void initialize() override;
 
+    /// Begin run
+    void beginRun() override;
+
     /// Event processing
     void event() override;
 
@@ -39,7 +41,7 @@ namespace Belle2 {
     /// Name of the output StoreArray
     std::string m_outputStoreArrayName;
     /// the flipping cuts can be read from the DB
-    OptionalDBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
+    DBObjPtr<TrackFlippingCuts> m_flipCutsFromDB{"TRKTrackFlipAndRefit_MVA_cuts"};
     /// Store Array of the input tracks
     StoreArray<RecoTrack> m_inputRecoTracks;
     /// Store Array of the output tracks

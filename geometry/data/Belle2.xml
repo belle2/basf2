@@ -41,6 +41,7 @@
   <xi:include href="../beast/fangs/FANGS-Materials.xml"/>
   <xi:include href="../beast/plume/PLUME-Materials.xml"/>
   <xi:include href="../beast/qcsmonitor/QCSMONITOR-Materials.xml"/>
+
   <!-- Magnetic field -->
   <xi:include href="../geometry/MagneticFieldConstant.xml"/>
   <xi:include href="../geometry/MagneticFieldConstant4LimitedRSVD.xml"/>
@@ -49,8 +50,10 @@
   <xi:include href="../geometry/MagneticField2d.xml"/>
   <xi:include href="../geometry/MagneticField3dQuadBeamline.xml"/>
   <xi:include href="../geometry/MagneticField3dTotalVolume.xml"/>
+
   <!-- Accelerator -->
   <xi:include href="SuperKEKB.xml"/>
+
   <!-- Subdedectors -->
   <xi:include href="../structure/COIL.xml"/>
   <xi:include href="../structure/STR.xml"/>
@@ -67,6 +70,7 @@
   <xi:include href="../arich/ARICH.xml"/>
   <xi:include href="../ecl/ECL.xml"/>
   <xi:include href="../klm/KLM.xml"/>
+
   <!-- phase 2 specific subdetectors -->
   <DetectorComponent name="BeamPipe-phase2" isDefault="false">
     <xi:include href="../ir/BeamPipe-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
@@ -104,15 +108,18 @@
   <DetectorComponent name="ServiceGapsMaterial-phase2" isDefault="false">
     <xi:include href="../structure/ServiceGaps-phase2.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-  <!-- early phase 3 Service Gaps -->
-  <DetectorComponent name="ServiceGapsMaterial-earlyPhase3" isDefault="false">
-    <xi:include href="../structure/ServiceGaps-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+
+  <!-- Run 1 Service Gaps -->
+  <DetectorComponent name="ServiceGapsMaterial-Run1" isDefault="false">
+    <xi:include href="../structure/ServiceGaps-Run1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-  <!-- early phase 3 PXD -->
-  <DetectorComponent name="PXD-earlyPhase3" isDefault="false">
-    <xi:include href="../pxd/PXD-earlyPhase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
+
+  <!-- Run 1 PXD -->
+  <DetectorComponent name="PXD-Run1" isDefault="false">
+    <xi:include href="../pxd/PXD-Run1.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-  <!-- early phase 3 and phase3 Beast system -->
+
+  <!-- Run 1 and Run 2 Beast system -->
   <DetectorComponent name="MICROTPC" isDefault="false">
     <xi:include href="../beast/microtpc/MICROTPC-phase3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
@@ -173,4 +180,20 @@
   <Muid>
     <xi:include href="../klm/MuidParameters.xml"/>
   </Muid>
+
+  <!-- Run 1 beam pipe -->
+  <DetectorComponent name="BeamPipe-Run1" isDefault="false">
+    <xi:include href="../ir/BeamPipe-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- Run 1 cryostat -->
+  <DetectorComponent name="Cryostat-Run1" isDefault="false">
+    <xi:include href="../ir/Cryostat-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
+  <!-- Run 1 far beam line -->
+  <DetectorComponent name="FarBeamLine-Run1" isDefault="false">
+    <xi:include href="../ir/FarBeamLine-Run1.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+
 </Detector>

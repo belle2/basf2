@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 #include <tracking/vxdHoughTracking/findlets/SVDHoughTracking.h>
 
 namespace Belle2 {
   /**
    * Full Hough Transformation based SVD track finding.
    */
-  class SVDHoughTrackingModule : public TrackFindingCDC::FindletModule<vxdHoughTracking::SVDHoughTracking> {
+  class SVDHoughTrackingModule : public TrackingUtilities::FindletModule<vxdHoughTracking::SVDHoughTracking> {
 
   public:
     /// Set description

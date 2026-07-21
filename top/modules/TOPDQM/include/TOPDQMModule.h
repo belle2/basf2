@@ -13,6 +13,7 @@
 #include <top/dataobjects/TOPRecBunch.h>
 #include <top/dataobjects/TOPTimeZero.h>
 #include <top/dataobjects/TOPProductionEventDebug.h>
+#include <top/dataobjects/TOPUnpackerErrors.h>
 #include <top/dbobjects/TOPCalCommonT0.h>
 
 // Basf2 headers.
@@ -26,6 +27,7 @@
 #include <TH1F.h>
 #include <TH1D.h>
 #include <TH2F.h>
+#include <TH2D.h>
 #include <TProfile.h>
 #include <TProfile2D.h>
 
@@ -46,11 +48,6 @@ namespace Belle2 {
      * Constructor
      */
     TOPDQMModule();
-
-    /**
-     * Destructor
-     */
-    virtual ~TOPDQMModule();
 
     /**
      * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
@@ -89,7 +86,7 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
 
     // histograms
-    TH1D* m_BoolEvtMonitor = 0; /**< Event desynchronization monitoring */
+    TH2D* m_BoolEvtMonitor = 0; /**< Event desynchronization monitoring */
     TH2F* m_window_vs_slot = 0; /**< Histogram window w.r.t reference vs. slot number */
     TH1F* m_eventT0 = 0; /**< reconstructed event T0 */
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
@@ -136,6 +133,8 @@ namespace Belle2 {
     TH1F* m_injVetoFlagDiff = 0; /**< check if injection veto flags differ in the event */
     TH2F* m_PSBypassMode = 0; /**< PS-bypass mode vs. boardstack */
 
+    TProfile* m_unpackErr = 0; /**< fraction of events with boardstack unpacker errors */
+
     // other
     int m_numModules = 0; /**< number of TOP modules */
     double m_bunchTimeSep = 0; /**< bunch separation time */
@@ -147,6 +146,7 @@ namespace Belle2 {
     StoreArray<TOPTimeZero> m_timeZeros; /**< reconstructed event T0 in case of cosmics */
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
+    StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
 
     // dbobjects
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */

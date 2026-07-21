@@ -38,11 +38,6 @@ namespace Belle2 {
     BGOverlayInputModule();
 
     /**
-     * Destructor
-     */
-    ~BGOverlayInputModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
@@ -58,12 +53,6 @@ namespace Belle2 {
      * Event processor.
      */
     void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    void endRun() override;
 
     /**
      * Termination action.

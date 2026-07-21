@@ -43,7 +43,8 @@ MeasurementAdder::MeasurementAdder(
   const std::string& storeArrayNameOfVTXHits,
   const std::string& storeArrayNameOfBKLMHits,
   const std::string& storeArrayNameOfEKLMHits,
-  const bool initializeCDCTranslators) :
+  const bool initializeCDCTranslators,
+  bool fromTrackCreator) :
   m_param_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
   m_param_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_param_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
@@ -58,7 +59,7 @@ MeasurementAdder::MeasurementAdder(
     // Create new Translators and give them to the CDCRecoHits.
     CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
                                new CDC::RealisticCDCGeometryTranslator(true),
-                               new CDC::RealisticTDCCountTranslator(true),
+                               new CDC::RealisticTDCCountTranslator(true, fromTrackCreator),
                                true);
   }
   createGenfitMeasurementFactory();

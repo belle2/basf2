@@ -10,7 +10,7 @@
 #include <tracking/vxdHoughTracking/findlets/LimitedOnHitApplier.dcl.h>
 #include <tracking/vxdHoughTracking/findlets/PathLengthToggledApplier.dcl.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/PathFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
@@ -18,11 +18,11 @@ namespace Belle2 {
 
     // Guard to prevent repeated instantiations
     extern template class
-    PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+    PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackingUtilities::ChooseableFilter<PathFilterFactory>>>;
 
                              /// Alias to apply the () operator to all items filtered by CKF SVD layer states
                              using ChooseablePathFilter =
-                               PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackFindingCDC::ChooseableFilter<PathFilterFactory>>>;
+                               PathLengthToggledApplier<VXDHoughState, LimitedOnHitApplier<VXDHoughState, TrackingUtilities::ChooseableFilter<PathFilterFactory>>>;
 
   }
 }

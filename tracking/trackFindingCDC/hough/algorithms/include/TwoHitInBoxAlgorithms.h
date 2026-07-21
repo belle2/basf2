@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -28,8 +28,8 @@ namespace Belle2 {
        * Returns the sum of the resulting weights of both algorithms (of not NAN).
        */
       template<class AObject>
-      Weight operator()(const AObject& object,
-                        const HoughBox* box)
+      TrackingUtilities::Weight operator()(const AObject& object,
+                                           const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         AnotherHitInBoxAlgorithm anotherHitInBoxAlgorithm;

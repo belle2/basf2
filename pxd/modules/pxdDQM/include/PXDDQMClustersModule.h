@@ -10,8 +10,8 @@
 
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include "TH1D.h"
-#include "TH2D.h"
+#include <TH1D.h>
+#include <TH2D.h>
 
 namespace Belle2 {
   class PXDDAQStatus;

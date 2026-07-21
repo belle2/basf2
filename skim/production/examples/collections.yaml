@@ -1,6 +1,107 @@
-proc13_chunk3_4S : 
-- proc13_chunk3_all_4S_v1
-- proc13_chunk3_had_4S_v1
-
-MC15rd_exp14_4S : 
-- FlaggedSkimTest_MC15rd_mixed_exp14
+# Example collections.yaml for use with `jobLauncher_skimSubmit.py`
+# (Un)comment blocks as required to be skimmed
+# MC collections from https://gitlab.desy.de/belle2/data-production/mc/-/wikis/MC16rd-Collections#introduction
+proc16prompt:
+  # hlt_hadron
+  - proc16_4S_had_v1
+  - exp30_to_exp35_had_4S_v1
+  #- proc16_offres_had_v1
+  #- exp30_to_exp35_had_4Soffres_v1
+  #- proc16_5Sscan_had_v1
+  ## all
+  #- proc16_4S_all_v1
+  #- proc16_offres_all_v1
+  #- exp30_to_exp35_all_4S_v1
+  #- exp30_to_exp35_all_4Soffres_v1
+  #- proc16_5Sscan_all_v1
+MC16rd:
+  # Run1, Main, 4S
+  - MC16rd_proc16_ccbar_Run1_4S_v2
+  - MC16rd_proc16_charged_Run1_4S_v2 
+  - MC16rd_proc16_ddbar_Run1_4S_v2
+  - MC16rd_proc16_mixed_Run1_4S_v2
+  - MC16rd_proc16_ssbar_Run1_4S_v2
+  - MC16rd_proc16_taupair_Run1_4S_v2
+  - MC16rd_proc16_uubar_Run1_4S_v2
+  ## Run1,  LowMult, 4S
+  #- MC16rd_proc16_ee_Run1_4S_v2
+  #- MC16rd_proc16_eeee_Run1_4S_v2
+  #- MC16rd_proc16_eemumu_Run1_4S_v2
+  #- MC16rd_proc16_gg_Run1_4S_v2
+  #- MC16rd_proc16_hhISR_Run1_4S_v2
+  #- MC16rd_proc16_llXX_Run1_4S_v2
+  #- MC16rd_proc16_mumu_Run1_4S_v2
+  ## Run1, Main, 4S_offres
+  #- MC16rd_proc16_ccbar_Run1_4S_offres_v2
+  #- MC16rd_proc16_ddbar_Run1_4S_offres_v2
+  #- MC16rd_proc16_ssbar_Run1_4S_offres_v2
+  #- MC16rd_proc16_taupair_Run1_4S_offres_v2
+  #- MC16rd_proc16_uubar_Run1_4S_offres_v2
+  ## Run1,  Low-Mult, 4S_offres
+  #- MC16rd_proc16_ee_Run1_4S_offres_v2
+  #- MC16rd_proc16_eeee_Run1_4S_offres_v2
+  #- MC16rd_proc16_eemumu_Run1_4S_offres_v2
+  #- MC16rd_proc16_gg_Run1_4S_offres_v2
+  #- MC16rd_proc16_hhISR_Run1_4S_offres_v2
+  #- MC16rd_proc16_llXX_Run1_4S_offres_v2
+  #- MC16rd_proc16_mumu_Run1_4S_offres_v2
+  ## Run1,  Main, 5S_scan
+  #- MC16rd_proc16_ccbar_exp21_5S_scan_v1
+  #- MC16rd_proc16_charged_10653_exp21_v1
+  #- MC16rd_proc16_charged_10701_exp21_v1
+  #- MC16rd_proc16_charged_10746_exp21_v1
+  #- MC16rd_proc16_charged_10805_exp21_v1
+  #- MC16rd_proc16_ddbar_exp21_5S_scan_v1
+  #- MC16rd_proc16_mixed_10653_exp21_v1
+  #- MC16rd_proc16_mixed_10701_exp21_v1
+  #- MC16rd_proc16_mixed_10746_exp21_v1
+  #- MC16rd_proc16_mixed_10805_exp21_v1
+  #- MC16rd_proc16_ssbar_exp21_5S_scan_v1
+  #- MC16rd_proc16_uubar_exp21_5S_scan_v1
+  #- MC16rd_proc16_taupair_exp21_5S_scan_v1
+  ## Run1,  Low-Mult, 5S_scan
+  #- MC16rd_proc16_ee_exp21_5S_scan_v1
+  #- MC16rd_proc16_eeee_exp21_5S_scan_v1
+  #- MC16rd_proc16_eemumu_exp21_5S_scan_v1
+  #- MC16rd_proc16_gg_exp21_5S_scan_v1
+  #- MC16rd_proc16_hhISR_exp21_5S_scan_v1
+  #- MC16rd_proc16_llXX_exp21_5S_scan_v1
+  #- MC16rd_proc16_mumu_exp21_5S_scan_v1
+  ## Run1, Excited, 5S_scan (no BstarBstar 10653)
+  #- MC16rd_proc16_BstarB_10653_exp21_v1
+  #- MC16rd_proc16_BstarB_10701_exp21_v1
+  #- MC16rd_proc16_BstarB_10746_exp21_v1
+  #- MC16rd_proc16_BstarB_10805_exp21_v1
+  #- MC16rd_proc16_BstarBstar_10701_exp21_v1
+  #- MC16rd_proc16_BstarBstar_10746_exp21_v1
+  #- MC16rd_proc16_BstarBstar_10805_exp21_v1
+  ## Run2, Main, 4S
+  - MC16rd_prompt_ccbar_Run2_4S_v1
+  - MC16rd_prompt_charged_Run2_4S_v1
+  - MC16rd_prompt_ddbar_Run2_4S_v1
+  - MC16rd_prompt_mixed_Run2_4S_v1
+  - MC16rd_prompt_ssbar_Run2_4S_v1
+  - MC16rd_prompt_taupair_Run2_4S_v1
+  - MC16rd_prompt_uubar_Run2_4S_v1
+  ## Run2,  Low-Mult, 4S
+  #- MC16rd_prompt_ee_Run2_4S_v1
+  #- MC16rd_prompt_eeee_Run2_4S_v1
+  #- MC16rd_prompt_eemumu_Run2_4S_v1
+  #- MC16rd_prompt_gg_Run2_4S_v1
+  #- MC16rd_prompt_hhISR_Run2_4S_v1
+  #- MC16rd_prompt_llXX_Run2_4S_v1
+  #- MC16rd_prompt_mumu_Run2_4S_v1
+  ## Run2, Main, 4S_offres
+  #- MC16rd_prompt_ccbar_Run2_4S_offres_v1
+  #- MC16rd_prompt_ddbar_Run2_4S_offres_v1
+  #- MC16rd_prompt_ssbar_Run2_4S_offres_v1
+  #- MC16rd_prompt_taupair_Run2_4S_offres_v1
+  #- MC16rd_prompt_uubar_Run2_4S_offres_v1
+  ## Run2,  Low-Mult, 4S_offres
+  #- MC16rd_prompt_ee_Run2_4S_offres_v1
+  #- MC16rd_prompt_eeee_Run2_4S_offres_v1
+  #- MC16rd_prompt_eemumu_Run2_4S_offres_v1
+  #- MC16rd_prompt_gg_Run2_4S_offres_v1
+  #- MC16rd_prompt_hhISR_Run2_4S_offres_v1
+  #- MC16rd_prompt_llXX_Run2_4S_offres_v1
+  #- MC16rd_prompt_mumu_Run2_4S_offres_v1

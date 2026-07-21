@@ -10,12 +10,12 @@
 #include <tracking/ckf/cdc/entities/CDCCKFState.h>
 #include <tracking/ckf/cdc/entities/CDCCKFPath.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 
-TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
+TrackingUtilities::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStateFilter::Object& pair)
 {
   const CDCCKFPath* path = pair.first;
   const CDCCKFState& state = *(pair.second);
@@ -46,11 +46,11 @@ TrackFindingCDC::Weight RoughCDCfromEclStateFilter::operator()(const BaseCDCStat
 
 void RoughCDCfromEclStateFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistance"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalHitDistance"),
                                 m_maximalHitDistance,
                                 "Maximal allowed hit distance",
                                 m_maximalHitDistance);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maximalHitDistanceEclSeed"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalHitDistanceEclSeed"),
                                 m_maximalHitDistanceSeed,
                                 "Maximal allowed hit distance",
                                 m_maximalHitDistanceSeed);

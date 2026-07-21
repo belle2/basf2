@@ -7,9 +7,9 @@
  **************************************************************************/
 #include <tracking/ckf/general/filters/NonIPCrossingStateFilter.dcl.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
@@ -20,7 +20,7 @@
 
 namespace Belle2 {
   template <class AllStateFilter>
-  TrackFindingCDC::Weight NonIPCrossingStateFilter<AllStateFilter>::operator()(const Object& pair)
+  TrackingUtilities::Weight NonIPCrossingStateFilter<AllStateFilter>::operator()(const Object& pair)
   {
     if (std::isnan(AllStateFilter::operator()(pair))) {
       return NAN;
@@ -44,13 +44,13 @@ namespace Belle2 {
       }
     }();
 
-    const TrackFindingCDC::Vector3D& position = static_cast<TrackFindingCDC::Vector3D>(firstMeasurement.getPos());
-    const TrackFindingCDC::Vector3D& momentum = static_cast<TrackFindingCDC::Vector3D>(firstMeasurement.getMom());
+    const TrackingUtilities::Vector3D& position = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getPos());
+    const TrackingUtilities::Vector3D& momentum = static_cast<TrackingUtilities::Vector3D>(firstMeasurement.getMom());
 
-    const TrackFindingCDC::CDCTrajectory2D trajectory2D(position.xy(), 0, momentum.xy(), cdcTrack->getChargeSeed());
+    const TrackingUtilities::CDCTrajectory2D trajectory2D(position.xy(), 0, momentum.xy(), cdcTrack->getChargeSeed());
 
-    const TrackFindingCDC::Vector3D& hitPosition = static_cast<TrackFindingCDC::Vector3D>(spacePoint->getPosition());
-    const TrackFindingCDC::Vector2D origin(0, 0);
+    const TrackingUtilities::Vector3D& hitPosition = static_cast<TrackingUtilities::Vector3D>(spacePoint->getPosition());
+    const TrackingUtilities::Vector2D origin(0, 0);
 
     const double deltaArcLengthHitOrigin = trajectory2D.calcArcLength2DBetween(hitPosition.xy(), origin);
     const double deltaArcLengthTrackHit = trajectory2D.calcArcLength2D(hitPosition.xy());
@@ -66,7 +66,7 @@ namespace Belle2 {
   template <class AllStateFilter>
   void NonIPCrossingStateFilter<AllStateFilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "direction"), m_param_directionAsString,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "direction"), m_param_directionAsString,
                                   "The direction where the extrapolation will happen.");
   }
 

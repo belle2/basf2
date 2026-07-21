@@ -52,6 +52,6 @@ namespace Belle2 {
     /// Runs during the defineHisto() function
     virtual void inDefineHisto() override;
     /// Describe process (gives debug output)
-    void describeProcess(const std::string& functionName);
+    static void describeProcess(const std::string& functionName);
   };
 }

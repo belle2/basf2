@@ -10,21 +10,21 @@
 #include <display/InfoWidget.h>
 #include <framework/logging/Logger.h>
 
-#include "TEveScene.h"
-#include "TEveManager.h"
-#include "TEveBrowser.h"
-#include "TEveProjectionAxes.h"
-#include "TEveViewer.h"
-#include "TEveWindowManager.h"
-#include "TGMenu.h"
-#include "TGStatusBar.h"
-#include "TGTab.h"
-#include "TGLPhysicalShape.h"
-#include "TGLLogicalShape.h"
-#include "TGLWidget.h"
-#include "TVirtualX.h"
+#include <TEveScene.h>
+#include <TEveManager.h>
+#include <TEveBrowser.h>
+#include <TEveProjectionAxes.h>
+#include <TEveViewer.h>
+#include <TEveWindowManager.h>
+#include <TGMenu.h>
+#include <TGStatusBar.h>
+#include <TGTab.h>
+#include <TGLPhysicalShape.h>
+#include <TGLLogicalShape.h>
+#include <TGLWidget.h>
+#include <TVirtualX.h>
 
-#include "TString.h"
+#include <TString.h>
 
 using namespace Belle2;
 
@@ -413,16 +413,14 @@ void SplitGLView::toggleShowScale()
 void SplitGLView::itemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)
 {
   // Item has been clicked, based on mouse button do:
-
   static const TEveException eh("SplitGLView::itemClicked ");
   TEveElement* re = static_cast<TEveElement*>(item->GetUserData());
   if (re == 0) return;
   TObject* obj = re->GetObject(eh);
   if (obj->InheritsFrom("TEveViewer")) {
     TGLViewer* v = static_cast<TEveViewer*>(obj)->GetGLViewer();
-    //v->Activated();
     if (v->InheritsFrom("TGLEmbeddedViewer")) {
-      TGLEmbeddedViewer* ev = (TGLEmbeddedViewer*)v;
+      TGLEmbeddedViewer* ev = static_cast<TGLEmbeddedViewer*>(v);
       gVirtualX->SetInputFocus(ev->GetGLWidget()->GetId());
     }
   }

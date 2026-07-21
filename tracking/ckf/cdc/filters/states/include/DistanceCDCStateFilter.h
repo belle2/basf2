@@ -8,7 +8,7 @@
 #pragma once
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -17,7 +17,7 @@ namespace Belle2 {
   class DistanceCDCStateFilter : public BaseCDCStateFilter {
   public:
     /// Return the weight based on the distance
-    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
     /// Expose the parameters
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
   private:

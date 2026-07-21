@@ -383,7 +383,7 @@ The last step is to install :doc:`gbasf2:index`. For that purpose, please switch
 on your machine, and follow the steps for `gbasf2 installation <https://xwiki.desy.de/xwiki/rest/p/78b3b/#HgBasf2installationprocedure>`_.
 
 In the following, an adaption for the :doc:`gbasf2:index` package is discussed, which is required until the GitLab issue
-`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
+`BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/work_items/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
 
 Within the file ``BelleDIRAC/gbasf2/lib/ds/manager.py`` in function ``putDatasetMetadata(...)``, the lines
 

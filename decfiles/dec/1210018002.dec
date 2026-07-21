@@ -1,0 +1,30 @@
+# Description:
+#   Decay of Upsilon(4S) -> B+ B-, with B+ -> K+ eta (PHSP).
+#
+# EventType: 1210018002
+#
+# Nickname: B+_K+eta
+#
+# Candidates: B+ -> K+ eta
+#
+# Responsible:
+#    - Hyuna Kim 
+#    - Gaurav Sharma, IITM India
+# Date: 2026-03-28
+
+Alias      MyB+     B+
+Alias      MyB-     B-
+ChargeConj MyB+     MyB-
+
+Decay Upsilon(4S)
+  0.500   MyB+  B-    VSS;
+  0.500   MyB-  B+    VSS;
+Enddecay
+
+Decay MyB+
+  1.000   K+    eta    PHSP;
+Enddecay
+CDecay MyB-
+
+
+End

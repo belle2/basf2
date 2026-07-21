@@ -32,14 +32,8 @@ namespace Belle2 {
     }
 
 
-    ChannelMapper::~ChannelMapper()
-    {
-      if (m_mappingDB) delete m_mappingDB;
-    }
-
     void ChannelMapper::initialize(const GearDir& channelMapping)
     {
-
       clear();
 
       string path = channelMapping.getPath();
@@ -171,16 +165,13 @@ namespace Belle2 {
     {
       m_type = c_default;
 
-      if (m_mappingDB) delete m_mappingDB;
-      m_mappingDB = new DBArray<TOPChannelMap>();
-
-      if (!m_mappingDB->isValid()) {
+      if (!m_mappingDB.isValid()) {
         clear();
         return;
       }
       update();
 
-      m_mappingDB->addCallback(this, &ChannelMapper::update);
+      m_mappingDB.addCallback(this, &ChannelMapper::update);
 
       const auto& logSystem = LogSystem::Instance();
       if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
@@ -202,7 +193,7 @@ namespace Belle2 {
 
     unsigned ChannelMapper::getChannel(int pixel) const
     {
-      if (!isPixelIDValid(pixel)) return c_invalidChannel;
+      if (!isPixelIDValid(pixel)) return c_invalidChannel; // cppcheck-suppress knownConditionTrueFalse
 
       unsigned pix = pixel - 1;
       unsigned pixRow = pix / c_numPixelColumns;
@@ -230,7 +221,7 @@ namespace Belle2 {
                                            unsigned& boardstack,
                                            unsigned& carrier,
                                            unsigned& asic,
-                                           unsigned& chan) const
+                                           unsigned& chan)
     {
       chan = channel % c_numChannels;
       channel /= c_numChannels;
@@ -267,9 +258,9 @@ namespace Belle2 {
 
     }
 
-    int ChannelMapper::getPmtID(int pixel) const
+    int ChannelMapper::getPmtID(int pixel)
     {
-      if (not isPixelIDValid(pixel)) return 0;
+      if (not isPixelIDValid(pixel)) return 0; // cppcheck-suppress knownConditionTrueFalse
       pixel--;
       int pmtRow = pixel / 256;
       int pmtCol = (pixel % 64) / 4;
@@ -343,9 +334,9 @@ namespace Belle2 {
     void ChannelMapper::update()
     {
       clear();
-      if (!m_mappingDB->isValid()) return;
+      if (!m_mappingDB.isValid()) return;
 
-      for (const auto& map : *m_mappingDB) {
+      for (const auto& map : m_mappingDB) {
         m_channels[map.getRow()][map.getColumn()] = &map;
         m_pixels[map.getASICNumber()][map.getASICChannel()] = &map;
       }

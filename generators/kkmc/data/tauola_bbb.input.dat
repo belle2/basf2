@@ -31,9 +31,9 @@ BeginX
  2901            0e0      EQUALBR
  2902            2e0      FF2PIRHO
  2903            1e0      IRCHL3PI
- 2904            0e0      IFKPIPI
+ 2904            1e0      IFKPIPI
  2905            0e0      IFCURR4PI
- 2909            0e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
+ 2909            1e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
  2910            0e0      TauToElOrMu = 1: swap e/mu decay for alternate events
 ********************************************************************************
 EndX

@@ -14,12 +14,16 @@
 /* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
   class ECLCluster;
   class ECLShower;
   class ECLCalDigit;
   class MCParticle;
+  class EventLevelClusteringInfo;
+  class EventLevelTriggerTimeInfo;
+
 
   namespace ECL {
     class ECLNeighbours;
@@ -80,5 +84,8 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusterArray; /**< Array of ECLClusters */
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Array of ECLCalDigits */
     StoreArray<MCParticle> m_mcParticleArray; /**< Array of MCParticles */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_eventLevelTriggerTimeInfo; /**< EventLevelTriggerTimeInfo */
+
   };
 }

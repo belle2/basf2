@@ -28,8 +28,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisEventT0TriggerJitterModule();
-    /** Destructor */
-    ~DQMHistAnalysisEventT0TriggerJitterModule();
 
     /** create TCanvas and MonitoringObject */
     void initialize() override final;

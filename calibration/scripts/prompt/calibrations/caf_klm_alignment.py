@@ -39,7 +39,7 @@ from prompt.calibrations.caf_klm_channel_status import settings as caf_klm_chann
 # Test with experiment 12 physics data:
 # ~350000 events correspond to ~1300000 Millepede entries.
 settings = CalibrationSettings(
-    name="KLM alignmnent",
+    name="KLM alignment",
     expert_username="nbrenny",
     subsystem="klm",
     description=__doc__,
@@ -66,14 +66,9 @@ settings = CalibrationSettings(
                             "events_per_file": 1000,
                             "millepede_entries": 1000000,
                             "millepede_entries_exp7": 500000},
-    produced_payloads=["EKLMAlignment_CORRECTIONS",
-                       "BKLMAlignment_CORRECTIONS",
+    produced_payloads=["BKLMAlignment",
                        "EKLMAlignment",
-                       "BKLMAlignment",
-                       "EKLMAlignment_ERRORS",
-                       "BKLMAlignment_ERRORS",
-                       "EKLMSegmentAlignment_ERRORS",
-                       "EKLMSegmentAlignment_CORRECTIONS"])
+                       "EKLMSegmentAlignment"])
 
 
 def select_input_files(file_to_iov_physics, file_to_iov_cosmic,

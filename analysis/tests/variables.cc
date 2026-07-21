@@ -1101,6 +1101,15 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 2.0);
 
+    // Test if min and max have correct behavior with bool variables
+    var = Manager::Instance().getVariable("min(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.0);
+
+    var = Manager::Instance().getVariable("max(passesCut(E > 1), passesCut(pz > 1))");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.0);
+
     var = Manager::Instance().getVariable("log10(px)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.0);
@@ -1129,6 +1138,16 @@ namespace {
     var = Manager::Instance().getVariable("acos(0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.5707963267948966);
+
+    // atan2(1, 1) = 45 degrees = pi/4
+    var = Manager::Instance().getVariable("atan2(py, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.3258176636684826);
+
+    // atan2(1, 0) = 90 degrees = pi/2
+    var = Manager::Instance().getVariable("atan2(pz, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.4464413322481353);
 
   }
 
@@ -5295,7 +5314,7 @@ namespace {
     EXPECT_TRUE(std::isnan(std::get<double>(var->function(particle_with_no_cs))));
 
     // check that FS1 set as third argument, throws a B2ERROR
-    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(et, mask, FS1)"));
+    EXPECT_B2ERROR(Manager::Instance().getVariable("KSFWVariables(pt_sum, mask, FS1)"));
   }
 
   TEST_F(MetaVariableTest, CleoConeCS)

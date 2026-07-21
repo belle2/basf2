@@ -9,8 +9,8 @@
 #include <tracking/trackFindingCDC/display/Colors.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -21,6 +21,7 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 /// The default color to be used.
 const std::string c_bkgHitColor = "orange";
@@ -180,7 +181,7 @@ std::string MCSegmentIdColorMap::map(int index __attribute__((unused)), const CD
 {
   TrackFindingCDC::CDCMCHitLookUp mcHitLookUp;
   mcHitLookUp.getInstance();
-  TrackFindingCDC::Index inTrackiSegment = mcHitLookUp.getInTrackSegmentId(&hit);
+  Index inTrackiSegment = mcHitLookUp.getInTrackSegmentId(&hit);
 
   if (inTrackiSegment < 0) {
     return (c_bkgHitColor);

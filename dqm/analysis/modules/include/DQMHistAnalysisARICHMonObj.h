@@ -30,11 +30,6 @@ namespace Belle2 {
     DQMHistAnalysisARICHMonObjModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisARICHMonObjModule();
-
-    /**
      * Initialize the Module.
      */
     void initialize() override final;

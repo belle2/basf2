@@ -10,10 +10,10 @@
 #include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.dcl.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 namespace Belle2 {
   namespace vxdHoughTracking {
@@ -30,7 +30,7 @@ namespace Belle2 {
     {
       m_pathFilter.exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "twoHitFilterLimit"),
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "twoHitFilterLimit"),
                                     m_applyTwoHitFilterIfMoreChildStates,
                                     "Use the TwoHitFilter (path length == 1) if there are more child states than this value.",
                                     m_applyTwoHitFilterIfMoreChildStates);
@@ -38,7 +38,7 @@ namespace Belle2 {
 
     template <class AHit, class APathFilter, class AResult>
     void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::apply(std::vector<AHit*>& hits,
-        const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
+        const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
         std::vector<AResult>& results)
     {
       B2ASSERT("Expected relation to be sorted", std::is_sorted(relations.begin(), relations.end()));
@@ -52,7 +52,7 @@ namespace Belle2 {
         }
       }
 
-      std::vector<TrackFindingCDC::WithWeight<const AHit*>> path;
+      std::vector<TrackingUtilities::WithWeight<const AHit*>> path;
       for (const AHit* seedHit : seedHits) {
         B2DEBUG(29, "Starting with new seed...");
 
@@ -66,21 +66,21 @@ namespace Belle2 {
     }
 
     template <class AHit, class APathFilter, class AResult>
-    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AHit*>>&
+    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(std::vector<TrackingUtilities::WithWeight<const AHit*>>&
         path,
-        const std::vector<TrackFindingCDC::WeightedRelation<AHit>>& relations,
+        const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
         std::vector<AResult>& results)
     {
       // Implement only graph traversal logic and leave the extrapolation and selection to the
       // rejecter.
       const AHit* currentHit = path.back();
       auto continuations =
-        TrackFindingCDC::asRange(std::equal_range(relations.begin(), relations.end(), currentHit));
+        TrackingUtilities::asRange(std::equal_range(relations.begin(), relations.end(), currentHit));
 
-      std::vector<TrackFindingCDC::WithWeight<AHit*>> childHits;
-      for (const TrackFindingCDC::WeightedRelation<AHit>& continuation : continuations) {
+      std::vector<TrackingUtilities::WithWeight<AHit*>> childHits;
+      for (const TrackingUtilities::WeightedRelation<AHit>& continuation : continuations) {
         AHit* childHit = continuation.getTo();
-        TrackFindingCDC::Weight weight = continuation.getWeight();
+        TrackingUtilities::Weight weight = continuation.getWeight();
         // the state may still include information from an other round of processing, so lets set it back
 
         if (std::count(path.begin(), path.end(), childHit)) {
@@ -93,7 +93,7 @@ namespace Belle2 {
       }
 
       // Do everything with child states, linking, extrapolation, teaching, discarding, what have you.
-      const std::vector<TrackFindingCDC::WithWeight<const AHit*>>& constPath = path;
+      const std::vector<TrackingUtilities::WithWeight<const AHit*>>& constPath = path;
       if (path.size() > 1 or childHits.size() > m_applyTwoHitFilterIfMoreChildStates) {
         m_pathFilter.apply(constPath, childHits);
       }
@@ -107,11 +107,11 @@ namespace Belle2 {
       }
 
       // Traverse the tree from each new state on
-      std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::GreaterOf<TrackFindingCDC::GetWeight>());
+      std::sort(childHits.begin(), childHits.end(), TrackingUtilities::GreaterOf<TrackingUtilities::GetWeight>());
 
       B2DEBUG(29, "Having found " << childHits.size() << " child states.");
 
-      for (const TrackFindingCDC::WithWeight<AHit*>& childHit : childHits) {
+      for (const TrackingUtilities::WithWeight<AHit*>& childHit : childHits) {
         path.emplace_back(childHit, childHit.getWeight());
         traverseTree(path, relations, results);
         path.pop_back();

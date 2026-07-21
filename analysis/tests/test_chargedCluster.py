@@ -31,7 +31,7 @@ class TestChargedCluster(unittest.TestCase):
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:ecl', 'clusterE>0', path=main)
-        ma.fillParticleList('pi+:klm', 'klmClusterEnergy>0', path=main)
+        ma.fillParticleList('pi+:klm', 'klmClusterInnermostLayer>0', path=main)
 
         ma.fillParticleListFromChargedCluster('gamma:bestecl', 'pi+:ecl', '',
                                               useOnlyMostEnergeticECLCluster=True, path=main)

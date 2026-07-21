@@ -19,7 +19,7 @@ from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
 
-__liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
+__liaison__ = "Yijia Chen <chenyj24@m.fudan.edu.cn>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 

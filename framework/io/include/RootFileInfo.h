@@ -50,6 +50,8 @@ namespace Belle2 {
        * branches in the set of required branches. Throw a std::runtime_error
        * if not */
       void checkMissingBranches(const std::set<std::string>& required, bool persistent = false);
+      /** Return a reference to the underlying TFile for read access to non-tree objects */
+      TFile& getFile() { return *m_file; }
     private:
       /** Pointer to the file object */
       std::unique_ptr<TFile> m_file;

@@ -26,10 +26,6 @@ DQMHistAnalysisDAQMonObjModule::DQMHistAnalysisDAQMonObjModule()
   B2DEBUG(20, "DQMHistAnalysisDAQMonObj: Constructor done.");
 }
 
-DQMHistAnalysisDAQMonObjModule::~DQMHistAnalysisDAQMonObjModule()
-{
-}
-
 void DQMHistAnalysisDAQMonObjModule::initialize()
 {
   m_monObj = getMonitoringObject("daq");
@@ -50,16 +46,16 @@ void DQMHistAnalysisDAQMonObjModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisDAQMonObj: endRun called.");
 
-  auto* PXDDataSize = (TH1F*)findHist("DAQ/PXDDataSize");
-  auto* SVDDataSize = (TH1F*)findHist("DAQ/SVDDataSize");
-  auto* CDCDataSize = (TH1F*)findHist("DAQ/CDCDataSize");
-  auto* TOPDataSize = (TH1F*)findHist("DAQ/TOPDataSize");
-  auto* ARICHDataSize = (TH1F*)findHist("DAQ/ARICHDataSize");
-  auto* ECLDataSize = (TH1F*)findHist("DAQ/ECLDataSize");
-  auto* KLMDataSize = (TH1F*)findHist("DAQ/KLMDataSize");
-  auto* TRGDataSize = (TH1F*)findHist("DAQ/TRGDataSize");
-  auto* HLTDataSize = (TH1F*)findHist("DAQ/HLTDataSize");
-  auto* TotalDataSize = (TH1F*)findHist("DAQ/TotalDataSize");
+  auto* PXDDataSize = findHist("DAQ/PXDDataSize");
+  auto* SVDDataSize = findHist("DAQ/SVDDataSize");
+  auto* CDCDataSize = findHist("DAQ/CDCDataSize");
+  auto* TOPDataSize = findHist("DAQ/TOPDataSize");
+  auto* ARICHDataSize = findHist("DAQ/ARICHDataSize");
+  auto* ECLDataSize = findHist("DAQ/ECLDataSize");
+  auto* KLMDataSize = findHist("DAQ/KLMDataSize");
+  auto* TRGDataSize = findHist("DAQ/TRGDataSize");
+  auto* HLTDataSize = findHist("DAQ/HLTDataSize");
+  auto* TotalDataSize = findHist("DAQ/TotalDataSize");
 
   m_monObj->setVariable("PXDEventSize", PXDDataSize ? PXDDataSize->GetMean() : 0,
                         PXDDataSize ? PXDDataSize->GetMeanError() : -1);

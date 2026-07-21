@@ -68,8 +68,7 @@ def PXDHalfShellsAlignment(files, tags):
     # Not needed for di-muon skim cdst or mdst, but needed to re-run reconstruction
     # with possibly changed global tags
     # raw.add_unpackers(path)
-    reco.add_mc_reconstruction(path, pruneTracks=False, components=components)
-    path.add_module('DAFRecoFitter')
+    reco.add_reconstruction(path, pruneTracks=False, components=components)
 
     collector = b2.register_module('MillepedeCollector',
                                    tracks=['RecoTracks'],

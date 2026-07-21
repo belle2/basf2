@@ -1,0 +1,6 @@
+Changes in the generators package
+---------------------------------
+
+GeneratedVertexDisplacer module
++++++++++++++++++++++++++++++++
+Module will now cause a B2FATAL if the user tries to displace a particle with non-zero lifetime, as this will lead to unexpected results. 

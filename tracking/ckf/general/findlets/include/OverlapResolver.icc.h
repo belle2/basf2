@@ -11,11 +11,11 @@
 
 #include <tracking/ckf/general/utilities/CKFFunctors.h>
 
-#include <tracking/trackFindingCDC/utilities/Functional.h>
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Functional.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/VectorRange.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParam.h>
 #include <framework/logging/Logger.h>
@@ -33,11 +33,11 @@ namespace Belle2 {
   {
     m_filter.exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "enableOverlapResolving"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "enableOverlapResolving"),
                                   m_param_enableOverlapResolving,
                                   "Enable the overlap resolving.",
                                   m_param_enableOverlapResolving);
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useBestNInSeed"),
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "useBestNInSeed"),
                                   m_param_useBestNInSeed,
                                   "In seed mode, use only the best seeds.",
                                   m_param_useBestNInSeed);
@@ -53,15 +53,15 @@ namespace Belle2 {
     }
 
     // Sort results by seed, as it makes the next operations faster
-    std::sort(results.begin(), results.end(), TrackFindingCDC::LessOf<SeedGetter>());
+    std::sort(results.begin(), results.end(), TrackingUtilities::LessOf<SeedGetter>());
 
     // resolve overlaps in each seed separately
-    const auto& groupedBySeed = TrackFindingCDC::adjacent_groupby(results.begin(), results.end(), SeedGetter());
-    for (const TrackFindingCDC::VectorRange<Object>& resultsWithSameSeed : groupedBySeed) {
+    const auto& groupedBySeed = TrackingUtilities::adjacent_groupby(results.begin(), results.end(), SeedGetter());
+    for (const TrackingUtilities::VectorRange<Object>& resultsWithSameSeed : groupedBySeed) {
 
       m_resultsWithWeight.clear();
       for (Object& result : resultsWithSameSeed) {
-        TrackFindingCDC::Weight weight = m_filter(result);
+        TrackingUtilities::Weight weight = m_filter(result);
         if (std::isnan(weight)) {
           continue;
         }
@@ -70,12 +70,12 @@ namespace Belle2 {
 
       if (not m_resultsWithWeight.empty()) {
         // sort results so that 'std::max' below picks path with highest weight if multiple paths have same size
-        std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackFindingCDC::GreaterWeight());
+        std::sort(m_resultsWithWeight.begin(), m_resultsWithWeight.end(), TrackingUtilities::GreaterWeight());
 
         const unsigned int useBestNResults = std::min(m_resultsWithWeight.size(), m_param_useBestNInSeed);
         const auto& lastItemToUse = std::next(m_resultsWithWeight.begin(), useBestNResults);
         const auto& longestElement = *(std::max_element(m_resultsWithWeight.begin(), lastItemToUse,
-                                                        TrackFindingCDC::LessOf<NumberOfHitsGetter>()));
+                                                        TrackingUtilities::LessOf<NumberOfHitsGetter>()));
         filteredResults.push_back(*(longestElement));
       }
     }

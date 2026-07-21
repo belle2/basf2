@@ -297,7 +297,7 @@ class LFVZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: `ee --> e mu Z'; Z' --> e mu`
+        **Physics channel**: :math:`e^{+}e^{-} \\to e\\mu Z^{\\prime}; Z^{\\prime} \\to e\\mu`
 
         Cuts applied:
 
@@ -354,7 +354,8 @@ class ZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: `ee --> mu mu Z'; Z' --> x x, x = e, mu, tau, pi, K`
+        **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}Z^{\\prime};`
+        :math:`Z^{\\prime} \to x^{+}x^{-} \\ (x = e, \\mu, \\tau, \\pi, K)`
 
         Cuts applied:
 

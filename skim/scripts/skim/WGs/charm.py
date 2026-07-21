@@ -1514,10 +1514,29 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
                          numBest=10,
                          path=path)
 
-        ClusterCut = 'abs(clusterTiming) < 200 and abs(formula(clusterTiming/clusterErrorTiming)) < 2.0 and E > 0.1'
-        ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
-        ma.reconstructDecay("pi0:hadtag -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
-        ma.cutAndCopyList("gamma:hadtag", "gamma:tag", ClusterCut, path=path)
+        ClusterQualityCut = (
+            'abs(clusterTiming) < 200 and '
+            'abs(formula(clusterTiming/clusterErrorTiming)) < 2.0'
+        )
+
+        ma.fillParticleList(
+            "gamma:tag",
+            "E > 0.05 and " + ClusterQualityCut,
+            path=path
+        )
+
+        ma.reconstructDecay(
+            "pi0:hadtag -> gamma:tag gamma:tag",
+            "0.115 < M < 0.160",
+            path=path
+        )
+
+        ma.cutAndCopyList(
+            "gamma:hadtag",
+            "gamma:tag",
+            "E > 0.1",
+            path=path
+        )
 
         d0cuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
         # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
@@ -2205,7 +2224,7 @@ class LambdacToGeneric(BaseSkim):
             f"Z0:inc1{suffix}", cut=f"daughter(0,useCMSFrame(p)) > {p_cms}", path=path
         )
 
-        DList = [f"Z0:inc1{suffix}",]
+        DList = [f"Z0:inc1{suffix}", ]
 
         return DList
 

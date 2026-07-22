@@ -47,7 +47,7 @@ namespace Belle2 {
     bool m_energyLossBrems = true;
     /// Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit
     bool m_noiseBrems = true;
-    /// Determines if the magnetic field cache is on/ff in Genfit
+    /// Determines if the magnetic field cache is on/off in Genfit
     bool m_useBFieldCache = false;
     /// Multiple scattering model
     std::string m_mscModel = "Highland";

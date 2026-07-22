@@ -52,8 +52,12 @@ namespace Belle2 {
       return;
     }
 
-    // Sort results by seed, as it makes the next operations faster
-    std::sort(results.begin(), results.end(), TrackingUtilities::LessOf<SeedGetter>());
+    // Sort results by seed, as it makes the next operations faster.
+    // Use stable_sort: SeedGetter returns the seed pointer, so results sharing a
+    // seed compare equal, and a plain std::sort would leave their relative order
+    // dependent on the seed's heap address. stable_sort preserves the deterministic
+    // generation order of same-seed results.
+    std::stable_sort(results.begin(), results.end(), TrackingUtilities::LessOf<SeedGetter>());
 
     // resolve overlaps in each seed separately
     const auto& groupedBySeed = TrackingUtilities::adjacent_groupby(results.begin(), results.end(), SeedGetter());

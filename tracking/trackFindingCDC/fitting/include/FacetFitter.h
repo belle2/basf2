@@ -9,6 +9,8 @@
 
 #include <tracking/trackingUtilities/numerics/Matrix.h>
 
+#include <limits>
+
 namespace Belle2 {
   namespace TrackingUtilities {
     class UncertainParameterLine2D;
@@ -20,20 +22,17 @@ namespace Belle2 {
     class FacetFitter {
 
     public:
-      /// Fits a proper line to facet and returns the chi2.
-      static double fit(const TrackingUtilities::CDCFacet& facet,
-                        int nSteps = 100);
-
       /**
-       *  Fits a proper line to the facet like fit() and returns the chi2,
-       *  but only commits the fitted line to the facet if the chi2 is at most maxChi2.
+       *  Fits a proper line to the facet and returns the chi2.
        *
-       *  Avoids the construction of the line and its covariance matrix for facets
-       *  that fail the cut anyway.
+       *  The fitted line is committed to the facet only if its chi2 is at most maxChi2.
+       *  With the default maxChi2 = infinity the line is always committed; passing a
+       *  finite maxChi2 skips the construction of the line and its covariance matrix
+       *  for facets that fail the cut anyway.
        */
-      static double fitWithChi2Cut(const TrackingUtilities::CDCFacet& facet,
-                                   double maxChi2,
-                                   int nSteps = 100);
+      static double fit(const TrackingUtilities::CDCFacet& facet,
+                        int nSteps = 100,
+                        double maxChi2 = std::numeric_limits<double>::infinity());
 
       /**
        *  Fit a line the positions xyl and the weights.

@@ -16,6 +16,8 @@
 
 #include <Eigen/Core>
 
+#include <cmath>
+
 #include <Math/Vector2D.h>
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
@@ -256,23 +258,7 @@ namespace {
   }
 }
 
-double FacetFitter::fit(const CDCFacet& facet, int nSteps)
-{
-  // Measurement matrix
-  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
-
-  // Weight matrix
-  Matrix<double, 3, 1> w = Matrix<double, 3, 1>::Zero();
-
-  const ROOT::Math::XYVector support = fillFacetObservations(facet, xyl, w);
-
-  UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
-  fitLine.passiveMoveBy(-support);
-  facet.setFitLine(fitLine);
-  return fitLine.chi2();
-}
-
-double FacetFitter::fitWithChi2Cut(const CDCFacet& facet, double maxChi2, int nSteps)
+double FacetFitter::fit(const CDCFacet& facet, int nSteps, double maxChi2)
 {
   // Measurement matrix
   Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
@@ -284,9 +270,11 @@ double FacetFitter::fitWithChi2Cut(const CDCFacet& facet, double maxChi2, int nS
 
   LineFitPrecursor precursor = fitPrecursor(std::move(xyl), std::move(w), nSteps);
 
-  // Only construct and set the fit line if the fit passes the cut.
-  // A NaN chi2 fails the comparison and no line is set.
-  if (precursor.chi2 <= maxChi2) {
+  // Construct and commit the fit line only when it is wanted: always for an
+  // infinite maxChi2, otherwise only if the fit passes the cut. Skipping it for
+  // failing facets avoids building the line and its covariance matrix. A NaN chi2
+  // fails "chi2 <= maxChi2", so it is committed only in the unbounded case.
+  if (std::isinf(maxChi2) or precursor.chi2 <= maxChi2) {
     const int ndf = 1;
     UncertainParameterLine2D fitLine = lineFromPrecursor(precursor, ndf);
     fitLine.passiveMoveBy(-support);

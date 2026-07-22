@@ -422,6 +422,8 @@ C switch to initialize that all modes are represented equally.
       INTEGER IUSER,SELUSER
       INTEGER USERACTIVE
       COMMON /USERACTIVE/ USERACTIVE(100)
+      INTEGER IPHSPAC
+      COMMON /IPHSPAC/ IPHSPAC
 C==========================================================================
 
 C      PARAMETER (NMODE=196,NM1=40,NM2=71,NM3=19,NM4=32,NM5=21,NM6=13)
@@ -747,6 +749,9 @@ C=================================================
 
         KEY4(II)=KEYstrt4(II)
 
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY4(II) = 1
+
         JLIST(I) = I
         NPIK(I-NLT)=4
 
@@ -828,6 +833,9 @@ C=================================================
 
         KEY5(II)=KEYstrt5(II)
 
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY5(II) = 1
+
         JLIST(I) = I
         NPIK(I-NLT)=5
 
@@ -868,6 +876,9 @@ C=================================================
           I = II+NLT+NM4+NM5  ! position on the whole list of decay channels
 
         KEY6(II)=KEYstrt6(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY6(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=NPIK6(I-NLT-NM4-NM5)
@@ -910,6 +921,9 @@ C=================================================
           I = II+NLT+NM4+NM5+NM6  ! position on the whole list of decay channels
 
         KEY3(II)=KEYstrt3(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY3(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=3
@@ -991,6 +1005,9 @@ C=================================================
           I = II+NLT+NM4+NM5+NM6+NM3  ! position on the whole list of decay channels
 
         KEY2(II)=KEYstrt2(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY2(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=2

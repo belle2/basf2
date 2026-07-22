@@ -144,8 +144,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
-  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);
-  const uint centery = ymin + (uint)((ymax - ymin) >> 1);
+  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
+  const uint centery = ymin + (uint)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
   const uint xIndexCache[3] = {xmin, centerx, xmax};
   const uint yIndexCache[3] = {ymin, centery, ymax};
 
@@ -163,8 +163,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];
+    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
+    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];
@@ -242,6 +242,13 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
     }
 
     // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+    // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+    // (currentGlobalSectorIndex & c_xIndexBitMask)
+    // equals % c_maxHSSectorNumber, i.e.
+    // currentGlobalSectorIndex % c_maxHSSectorNumber.
+    // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+    // >> c_maxAllowedRecusionLevel
+    // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
     m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & c_xIndexBitMask),
                                               c_maxHSSectorNumber - (currentGlobalSectorIndex >> c_maxAllowedRecusionLevel));
     m_clusterSize = 1;
@@ -269,10 +276,17 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
   // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+  // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+  // (currentGlobalSectorIndex & c_xIndexBitMask)
+  // equals % c_maxHSSectorNumber, i.e.
+  // currentGlobalSectorIndex % c_maxHSSectorNumber.
+  // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+  // >> c_maxAllowedRecusionLevel
+  // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
   const ushort lastLocalIndexX = (lastGlobalSectorIndex & c_xIndexBitMask);
   const ushort lastLocalIndexY = c_maxHSSectorNumber - (lastGlobalSectorIndex >> c_maxAllowedRecusionLevel);
 
-  // For the iterative / recursive serach, just check the direct neighbours in x and y direction
+  // For the iterative / recursive search, just check the direct neighbours in x and y direction
   for (ushort currentLocalIndexY = lastLocalIndexY; currentLocalIndexY >= lastLocalIndexY - 1; currentLocalIndexY--) {
     if (std::abs(static_cast<short>(m_clusterInitialPosition.second) - static_cast<short>(currentLocalIndexY)) >=
         m_MaximumHSClusterSizeY
@@ -288,7 +302,8 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
 
       // Calculate the global index for this sector by applying (eq. 0)
       const uint currentGlobalSectorIndex = currentLocalIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - currentLocalIndexY);
-      // The currentGlobalSectorIndex sector is the current one has already been checked, so continue
+      // If currentGlobalSectorIndex == lastGlobalSectorIndex, the sector in check is the "parent" we came from
+      // and thus has already been checked, so continue
       if (currentGlobalSectorIndex == lastGlobalSectorIndex) {
         continue;
       }

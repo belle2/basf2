@@ -3926,24 +3926,28 @@ namespace {
     const Manager::Var* var_pdg_pi0_2 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 3)");
     const Manager::Var* var_pdg_pi0_3 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 3, px, 3)");
     const Manager::Var* var_pdg_pi0_4 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 1)");
+    const Manager::Var* var_pdg_pi0_5 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px)");
     const Manager::Var* var_name_pi0 = Manager::Instance().getVariable("varForNthDaughterOfType(pi0, 1, px, 3)");
     const Manager::Var* var_pdg_gamma_1 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 3)");
     const Manager::Var* var_pdg_gamma_2 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 2, px, 3)");
     const Manager::Var* var_pdg_gamma_3 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 3, px, 3)");
     const Manager::Var* var_pdg_gamma_4 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 1)");
     const Manager::Var* var_name_mu_1 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px, 1)");
+    const Manager::Var* var_name_mu_2 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px)");
     const Manager::Var* var_pdg_kshort_1 = Manager::Instance().getVariable("varForNthDaughterOfType(310, 1, px, 3)");
 
     EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_1->function(Bminus)), 3.5);
     EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_2->function(Bminus)), 0.5);
     EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_3->function(Bminus))));
     EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_4->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_5->function(Bminus))));
     EXPECT_FLOAT_EQ(std::get<double>(var_name_pi0->function(Bminus)), 3.5);
     EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_1->function(Bminus)), 1.5);
     EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_2->function(Bminus)), 2.5);
     EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_3->function(Bminus))));
     EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_4->function(Bminus))));
     EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_1->function(Bminus)), 4.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_2->function(Bminus)), 4.5);
     EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_kshort_1->function(Bminus))));
   }
 

@@ -3477,8 +3477,8 @@ namespace Belle2 {
 
     Manager::FunctionPtr varForNthDaughterOfType(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 4) {
-        B2FATAL("Number of arguments for varForNthDaughterOfType must be 4");
+      if (arguments.size() > 4 || arguments.size() < 3) {
+        B2FATAL("Number of arguments for varForNthDaughterOfType must be 3 or 4");
       }
       // Get abs pdg id
       std::string argPtype = arguments[0];
@@ -3508,14 +3508,16 @@ namespace Belle2 {
       const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
       // Get depth
       int depth = 1;
-      std::string argDepth = arguments[3];
-      try {
-        depth = convertString<int>(argDepth);
-      } catch (const std::exception&) {
-        depth = -1;
-      }
-      if (depth <= 0) {
-        B2FATAL("varForNthDaughterOfType: argument '" << argDepth << "' is not a valid positive integer");
+      if (arguments.size() == 4) {
+        std::string argDepth = arguments[3];
+        try {
+          depth = convertString<int>(argDepth);
+        } catch (const std::exception&) {
+          depth = -1;
+        }
+        if (depth <= 0) {
+          B2FATAL("varForNthDaughterOfType: argument '" << argDepth << "' is not a valid positive integer");
+        }
       }
 
       auto func = [absPdg, index, var, depth](const Particle * particle) -> double {
@@ -4128,7 +4130,7 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, depth)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter of the given type.
+    REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, depth = 1)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter of the given type.
 Particle type can be given as pdg code or by particle name. Depth controls how many generations of daughters are searched (``depth=1`` only direct daughters, ``depth=2`` also granddaughters, ...).
 E.g. ``varForNthDaughterOfType(111, 1, E, 2)`` will return the energy of the first pi0 found searching all daughters and then granddaughters of the given particle.
 If no nth daughter of the given type can be found at given depth, returns NaN.)DOC", Manager::VariableDataType::c_double);

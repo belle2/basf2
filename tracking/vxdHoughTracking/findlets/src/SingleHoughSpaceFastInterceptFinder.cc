@@ -138,8 +138,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
-  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);
-  const uint centery = ymin + (uint)((ymax - ymin) >> 1);
+  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
+  const uint centery = ymin + (uint)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
   const uint xIndexCache[3] = {xmin, centerx, xmax};
   const uint yIndexCache[3] = {ymin, centery, ymax};
 
@@ -157,8 +157,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
     // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];
+    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
+    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
 
     for (int j = 0; j < 2; ++j) {
       const uint lowerIndex = yIndexCache[j];

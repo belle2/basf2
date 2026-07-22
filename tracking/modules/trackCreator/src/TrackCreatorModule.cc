@@ -99,7 +99,7 @@ void TrackCreatorModule::event()
 
   // Here, the last parameter is fromTrackCreator, necessary to set the priority of eventT0
   const bool fromTrackCreator = !m_trackFitResultColName.ends_with("_flipped");
-  TrackFitter trackFitter(DAFConfiguration::c_Default, "", "", "", "", "", true, fromTrackCreator);
+  TrackFitter trackFitter(DAFConfiguration::c_Default, "", "", "", "", "", "", true, fromTrackCreator);
   TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_beamSpotAsTVector, m_beamAxisAsTVector);
   for (auto& recoTrack : m_RecoTracks) {
     for (const auto& pdg : m_pdgCodes) {

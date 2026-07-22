@@ -259,7 +259,7 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
   const ushort lastLocalIndexX = (lastGlobalSectorIndex & 0x3FFF);
   const ushort lastLocalIndexY = 16384 - (lastGlobalSectorIndex >> 14);
 
-  // For the iterative / recursive serach, just check the direct neighbours in x and y direction
+  // For the iterative / recursive search, just check the direct neighbours in x and y direction
   for (ushort currentLocalIndexY = lastLocalIndexY; currentLocalIndexY >= lastLocalIndexY - 1; currentLocalIndexY--) {
     if (std::abs(static_cast<short>(m_clusterInitialPosition.second) - static_cast<short>(currentLocalIndexY)) >=
         m_MaximumHSClusterSizeY
@@ -274,7 +274,8 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
       }
 
       const uint currentGlobalSectorIndex = currentLocalIndexX + 16384 * (16384 - currentLocalIndexY);
-      // The currentGlobalSectorIndex sector is the current one has already been checked, so continue
+      // If currentGlobalSectorIndex == lastGlobalSectorIndex, the sector in check is the "parent" we came from
+      // and thus has already been checked, so continue
       if (currentGlobalSectorIndex == lastGlobalSectorIndex) {
         continue;
       }

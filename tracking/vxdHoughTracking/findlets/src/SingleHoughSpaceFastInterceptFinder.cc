@@ -76,26 +76,20 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
            m_nVerticalSectors <= c_maxHSSectorNumber);
 
   m_unitX = (m_maximumX - m_minimumX) / (float)m_nAngleSectors;
+  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
+
   for (ushort i = 0; i < m_nAngleSectors; i++) {
     float x = m_minimumX + m_unitX * (float)i;
     float xc = x + 0.5 * m_unitX;
 
-    m_HSXLUT[i] = x;
     m_HSSinValuesLUT[i] = sin(x);
     m_HSCosValuesLUT[i] = cos(x);
     m_HSCenterSinValuesLUT[i] = sin(xc);
     m_HSCenterCosValuesLUT[i] = cos(xc);
-    m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_nAngleSectors] = m_maximumX;
   m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
   m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
-  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (ushort i = 0; i <= m_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
-  }
   B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
@@ -172,8 +166,10 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       if (lowerIndex == upperIndex) continue;
 
       const ushort localIndexY = lowerIndex;
-      const float& localUpperCoordinate = m_HSYLUT[lowerIndex];
-      const float& localLowerCoordinate = m_HSYLUT[upperIndex];
+      // Sector counting for y starts at positive values, i.e. the topmost sector has index 0,
+      // and the bottommost sector has the highest index
+      const float& localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
+      const float& localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
 
       // reset layerHits and containedHits
       layerHits = 0;

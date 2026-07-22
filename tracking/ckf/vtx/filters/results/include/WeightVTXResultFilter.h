@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/vtx/filters/results/VTXResultVarSet.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 
@@ -16,7 +16,7 @@ namespace Belle2 {
   class WeightVTXResultFilter : public BaseVTXResultFilter {
   public:
     /// Return the sum of CKF VTX weights
-    TrackFindingCDC::Weight operator()(const CKFToVTXResult& result) override
+    TrackingUtilities::Weight operator()(const CKFToVTXResult& result) override
     {
       return result.getWeightSum();
     }

@@ -7,14 +7,14 @@
  **************************************************************************/
 #include <tracking/ckf/vtx/filters/results/VTXResultFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/vtx/filters/results/VTXResultVarSet.h>
 #include <tracking/ckf/vtx/filters/results/RelationVTXResultVarSet.h>
@@ -23,7 +23,7 @@
 #include <tracking/ckf/vtx/filters/results/WeightVTXResultFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter using the truth/teacher information
@@ -82,10 +82,10 @@ std::unique_ptr<BaseVTXResultFilter>
 VTXResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseVTXResultFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseVTXResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseVTXResultFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseVTXResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingVTXResultFilter>();

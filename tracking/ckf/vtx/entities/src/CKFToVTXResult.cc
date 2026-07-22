@@ -8,7 +8,7 @@
 
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -16,12 +16,12 @@
 
 using namespace Belle2;
 
-CKFToVTXResult::CKFToVTXResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& path) :
+CKFToVTXResult::CKFToVTXResult(const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& path) :
   Super(path, path.back()->getMeasuredStateOnPlane())
 {
   B2ASSERT("Path should not be empty", not path.empty());
 
-  for (const TrackFindingCDC::WithWeight<const CKFToVTXState*>& state : path) {
+  for (const TrackingUtilities::WithWeight<const CKFToVTXState*>& state : path) {
     const RecoTrack* relatedVTXTrack = state->getRelatedVTXTrack();
     if (m_relatedVTXRecoTrack) {
       B2ASSERT("There is a state with a different VTX track in it!", m_relatedVTXRecoTrack == relatedVTXTrack);
@@ -34,7 +34,7 @@ CKFToVTXResult::CKFToVTXResult(const std::vector<TrackFindingCDC::WithWeight<con
 void CKFToVTXResult::addToRecoTrack(RecoTrack& recoTrack) const
 {
   unsigned int sortingParameter = 0;
-  for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(getHits())) {
+  for (const SpacePoint* spacePoint : TrackingUtilities::reversedRange(getHits())) {
     RelationVector<VTXCluster> relatedClusters = spacePoint->getRelationsTo<VTXCluster>();
     for (const VTXCluster& cluster : relatedClusters) {
       recoTrack.addVTXHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_CDCtoVTXCKF);

@@ -11,12 +11,12 @@
 #include <vector>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 Weight AllVTXStateFilter::operator()(const BaseVTXStateFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& previousStates = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& previousStates = pair.first;
   CKFToVTXState* currentState = pair.second;
 
   if (previousStates.size() < 3) {

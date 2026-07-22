@@ -54,7 +54,7 @@ namespace Belle2 {
    * and collects space points.
    * All implementation is done in the corresponding findlet.
    */
-  class CDCToVTXSpacePointCKFModule : public TrackFindingCDC::FindletModule<CKFToVTXFindlet> {
+  class CDCToVTXSpacePointCKFModule : public TrackingUtilities::FindletModule<CKFToVTXFindlet> {
 
   public:
     /// Set description
@@ -70,7 +70,7 @@ namespace Belle2 {
    * VTX track, then filters the combinations.
    * All implementation is done in the corresponding findlet.
    */
-  class CDCToVTXSeedCKFModule : public TrackFindingCDC::FindletModule<CKFToVTXSeedFindlet> {
+  class CDCToVTXSeedCKFModule : public TrackingUtilities::FindletModule<CKFToVTXSeedFindlet> {
 
   public:
     /// Set description

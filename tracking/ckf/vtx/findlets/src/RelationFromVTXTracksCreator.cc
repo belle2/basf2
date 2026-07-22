@@ -9,8 +9,8 @@
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/utilities/ReversedRange.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/ReversedRange.h>
 
 #include <framework/core/ModuleParamList.h>
 
@@ -30,21 +30,21 @@ RelationFromVTXTracksCreator::~RelationFromVTXTracksCreator() = default;
 
 void RelationFromVTXTracksCreator::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "vtxTracksStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "vtxTracksStoreArrayName"),
                                 m_param_vtxTracksStoreArrayName,
                                 "Store Array name for tracks coming from VXDTF2.");
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "cdcTracksStoreArrayName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "cdcTracksStoreArrayName"),
                                 m_param_cdcTracksStoreArrayName,
                                 "Store Array name for tracks coming from CDCTF.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "spacePointTrackCandidatesName"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "spacePointTrackCandidatesName"),
                                 m_param_spacePointTrackCandidateName,
                                 "Store Array name for the SpacePointTrackCandidates coming from VXDTF2.",
                                 m_param_spacePointTrackCandidateName);
 }
 
 void RelationFromVTXTracksCreator::apply(std::vector<CKFToVTXState>& seedStates, std::vector<CKFToVTXState>& states,
-                                         std::vector<TrackFindingCDC::WeightedRelation<CKFToVTXState>>& relations)
+                                         std::vector<TrackingUtilities::WeightedRelation<CKFToVTXState>>& relations)
 {
   for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     if (vxdRecoTrack.getRelated<RecoTrack>(m_param_cdcTracksStoreArrayName)) {
@@ -59,7 +59,7 @@ void RelationFromVTXTracksCreator::apply(std::vector<CKFToVTXState>& seedStates,
     B2ASSERT("There should be a related SPTC!", spacePointTrackCand);
     const std::vector<const SpacePoint*> spacePoints = spacePointTrackCand->getSortedHits();
 
-    for (const SpacePoint* spacePoint : TrackFindingCDC::reversedRange(spacePoints)) {
+    for (const SpacePoint* spacePoint : TrackingUtilities::reversedRange(spacePoints)) {
       const auto hasSpacePoint = [spacePoint](const CKFToVTXState & state) {
         return state.getHit() == spacePoint;
       };

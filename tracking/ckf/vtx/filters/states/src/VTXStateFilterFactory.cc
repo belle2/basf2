@@ -7,18 +7,18 @@
  **************************************************************************/
 #include <tracking/ckf/vtx/filters/states/VTXStateFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AndFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NegativeFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/SloppyFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AndFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NegativeFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/SloppyFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/general/filters/AdvanceFilter.h>
 #include <tracking/ckf/general/filters/KalmanFilter.h>
@@ -34,7 +34,7 @@
 #include <tracking/ckf/vtx/filters/states/NonIPCrossingVTXStateFilter.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter for VTX - CDC relations.
@@ -110,7 +110,7 @@ std::unique_ptr<BaseVTXStateFilter>
 VTXStateFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseVTXStateFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseVTXStateFilter>>();
   } else if (filterName == "all") {
     return std::make_unique<AllVTXStateFilter>();
   } else if (filterName == "non_ip_crossing") {

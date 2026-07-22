@@ -11,13 +11,13 @@
 #include <tracking/ckf/vtx/filters/relations/SectorMapBasedVTXPairFilter.h>
 #include <tracking/ckf/vtx/filters/relations/LooseVTXPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 VTXPairFilterFactory::VTXPairFilterFactory(const std::string& defaultFilterName)
@@ -53,10 +53,10 @@ std::unique_ptr<BaseVTXPairFilter>
 VTXPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BaseVTXPairFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BaseVTXPairFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BaseVTXPairFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BaseVTXPairFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "sensor") {
     return std::make_unique<SensorVTXPairFilter>();

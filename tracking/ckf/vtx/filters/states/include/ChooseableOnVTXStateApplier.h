@@ -10,13 +10,13 @@
 #include <tracking/ckf/general/findlets/LayerToggledApplier.dcl.h>
 #include <tracking/ckf/general/findlets/LimitedOnStateApplier.dcl.h>
 #include <tracking/ckf/vtx/filters/states/VTXStateFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   // Guard to prevent repeated instantiations
   extern template class LayerToggledApplier<CKFToVTXState,
-                                            LimitedOnStateApplier<CKFToVTXState, TrackFindingCDC::ChooseableFilter<VTXStateFilterFactory>>>;
+                                            LimitedOnStateApplier<CKFToVTXState, TrackingUtilities::ChooseableFilter<VTXStateFilterFactory>>>;
                                             /// Alias to apply the () operator to all items filtered by CKF VTX layer states
                                             using ChooseableOnVTXStateApplier =
-                                            LayerToggledApplier<CKFToVTXState, LimitedOnStateApplier<CKFToVTXState, TrackFindingCDC::ChooseableFilter<VTXStateFilterFactory>>>;
+                                              LayerToggledApplier<CKFToVTXState, LimitedOnStateApplier<CKFToVTXState, TrackingUtilities::ChooseableFilter<VTXStateFilterFactory>>>;
 }

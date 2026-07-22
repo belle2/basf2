@@ -12,14 +12,14 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool VTXStateTruthVarSet::extract(const BaseVTXStateFilter::Object* pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& previousStates = pair->first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& previousStates = pair->first;
   const CKFToVTXState* state = pair->second;
 
-  std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>> allStates = previousStates;
+  std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>> allStates = previousStates;
   allStates.emplace_back(state, 0);
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();

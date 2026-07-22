@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 
 namespace Belle2 {
   /// Base filter for CKF VTX results (on overlap check)
-  using BaseVTXResultFilter = TrackFindingCDC::Filter<CKFToVTXResult>;
+  using BaseVTXResultFilter = TrackingUtilities::Filter<CKFToVTXResult>;
 }

@@ -7,21 +7,21 @@
  **************************************************************************/
 #include <tracking/ckf/vtx/filters/states/SimpleVTXStateFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBFieldUtil.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// Helper function to extract the numbered pt-range out of a momentum vector
-  unsigned int getPTRange(const TrackFindingCDC::Vector3D& momentum)
+  unsigned int getPTRange(const TrackingUtilities::Vector3D& momentum)
   {
     const double pT = momentum.xy().norm();
     if (pT > 0.4) {
@@ -40,7 +40,7 @@ constexpr const SimpleVTXStateFilter::MaximalValueArray SimpleVTXStateFilter::m_
 
 void SimpleVTXStateFilter::beginRun()
 {
-  m_cachedBField = TrackFindingCDC::CDCBFieldUtil::getBFieldZ();
+  m_cachedBField = TrackingUtilities::CDCBFieldUtil::getBFieldZ();
   B2WARNING("The cuts in this class (SimpleVTXStateFilter) have not yet been optimized on MC. "
             "Please be aware that the results obtained are neither optimal nor representative for the "
             "real capabilities of the VTX. Please use the MVA filters for filtering states - "
@@ -49,7 +49,7 @@ void SimpleVTXStateFilter::beginRun()
 
 Weight SimpleVTXStateFilter::operator()(const BaseVTXStateFilter::Object& pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& previousStates = pair.first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& previousStates = pair.first;
   CKFToVTXState* currentState = pair.second;
 
   const auto* spacePoint = currentState->getHit();

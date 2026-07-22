@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -17,15 +17,15 @@ namespace Belle2 {
 
   /// Relate the VTX and CDC tracks in the given relations also in the store array.
   class VTXRelationApplier : public
-    TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> {
+    TrackingUtilities::Findlet<const TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>> {
   public:
     /// The parent findlet
-    using Super = TrackFindingCDC::Findlet<const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>;
+    using Super = TrackingUtilities::Findlet<const TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>;
 
     void initialize() final;
 
     /// Copy the relations to the store array
-    void apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>&
+    void apply(const std::vector<TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>&
                relationsCDCToVTX) final;
 
     /// Expose parameters
@@ -36,7 +36,7 @@ namespace Belle2 {
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_writeOutDirectionAsString = "both";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_writeOutDirection = TrackingUtilities::EForwardBackward::c_Unknown;
     /// Create relations from this store array.
     std::string m_param_fromRelationsStoreArrayName = "CDCRecoTracks";
     /// Create relations to this store array.

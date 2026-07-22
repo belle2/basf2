@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 
@@ -22,14 +22,14 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class RelationVTXResultVarNames : public TrackFindingCDC::VarNames<CKFToVTXResult> {
+  class RelationVTXResultVarNames : public TrackingUtilities::VarNames<CKFToVTXResult> {
 
   public:
     /// Number of variables to be generated.
     // we shouldn't use public member variables but we do want to rewrite all related code using setters/getters
     // at least tell cppcheck that everything is fine
     // cppcheck-suppress duplInheritedMember
-    static const size_t nVars = TrackFindingCDC::size(relationVTXResultVarNames);
+    static const size_t nVars = TrackingUtilities::size(relationVTXResultVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -43,7 +43,7 @@ namespace Belle2 {
    * Var set used in the VTX-CDC-Merger for calculating the probability of a VTX-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class RelationVTXResultVarSet : public TrackFindingCDC::VarSet<RelationVTXResultVarNames> {
+  class RelationVTXResultVarSet : public TrackingUtilities::VarSet<RelationVTXResultVarNames> {
   public:
     /// Generate and assign the variables from the object.
     bool extract(const CKFToVTXResult* object) final;

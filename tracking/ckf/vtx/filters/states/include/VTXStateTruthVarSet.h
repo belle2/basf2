@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -33,11 +33,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class VTXStateTruthVarNames : public TrackFindingCDC::VarNames<BaseVTXStateFilter::Object> {
+  class VTXStateTruthVarNames : public TrackingUtilities::VarNames<BaseVTXStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(vtxStateTruthVarNames);
+    static const size_t nVars = TrackingUtilities::size(vtxStateTruthVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -51,7 +51,7 @@ namespace Belle2 {
    * Var set used in the VXD-CDC-Merger for calculating the probability of a VXD-CDC-track match,
    * which knows the truth information if two tracks belong together or not.
    */
-  class VTXStateTruthVarSet : public TrackFindingCDC::VarSet<VTXStateTruthVarNames> {
+  class VTXStateTruthVarSet : public TrackingUtilities::VarSet<VTXStateTruthVarNames> {
 
   public:
     /// Generate and assign the variables from the object.

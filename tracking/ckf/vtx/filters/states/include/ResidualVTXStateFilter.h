@@ -16,7 +16,7 @@ namespace Belle2 {
   class ResidualVTXStateFilter : public BaseVTXStateFilter {
   public:
     /// Return 1/residual and cut at the maximum residual.
-    TrackFindingCDC::Weight operator()(const BaseVTXStateFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseVTXStateFilter::Object& pair) final;
 
     /// Expose the maximal residual
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

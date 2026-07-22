@@ -9,11 +9,11 @@
 
 #include <tracking/ckf/vtx/filters/relations/LayerVTXRelationFilter.dcl.h>
 #include <tracking/ckf/vtx/filters/relations/VTXPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// A chooseable filter for picking out the relations between states
-  extern template class LayerVTXRelationFilter<TrackFindingCDC::ChooseableFilter<VTXPairFilterFactory>>;
+  extern template class LayerVTXRelationFilter<TrackingUtilities::ChooseableFilter<VTXPairFilterFactory>>;
   /// A chooseable filter for picking out the relations between states
-  using ChooseableVTXRelationFilter = LayerVTXRelationFilter<TrackFindingCDC::ChooseableFilter<VTXPairFilterFactory>>;
+  using ChooseableVTXRelationFilter = LayerVTXRelationFilter<TrackingUtilities::ChooseableFilter<VTXPairFilterFactory>>;
 }

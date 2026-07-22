@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/general/findlets/SpacePointTagger.dcl.h>
 #include <tracking/ckf/general/findlets/TrackLoader.h>
@@ -49,9 +49,9 @@ namespace Belle2 {
    * implement a new state class and a new hit selector (and maybe the store array handling). The rest should be taken
    * care by the framework.
    */
-  class CKFToVTXFindlet : public TrackFindingCDC::Findlet<> {
+  class CKFToVTXFindlet : public TrackingUtilities::Findlet<> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<>;
+    using Super = TrackingUtilities::Findlet<>;
 
   public:
     /// Constructor, for setting module description and parameters.
@@ -104,7 +104,7 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToVTXState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToVTXState>> m_relations;
+    std::vector<TrackingUtilities::WeightedRelation<CKFToVTXState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToVTXResult> m_results;
     /// Vector for storing the filtered results

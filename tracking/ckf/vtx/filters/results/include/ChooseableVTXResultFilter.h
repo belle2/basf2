@@ -9,13 +9,13 @@
 
 #include <tracking/ckf/vtx/filters/results/BaseVTXResultFilter.h>
 #include <tracking/ckf/vtx/filters/results/VTXResultFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.dcl.h>
 
 namespace Belle2 {
   /// Filter to weight the CKF VTX results
-  extern template class TrackFindingCDC::Chooseable<BaseVTXResultFilter>;
+  extern template class TrackingUtilities::Chooseable<BaseVTXResultFilter>;
   /// Filter to weight the VTX clusters
-  extern template class TrackFindingCDC::ChooseableFilter<VTXResultFilterFactory>;
+  extern template class TrackingUtilities::ChooseableFilter<VTXResultFilterFactory>;
   /// Alias for filter to weight the VTX clusters
-  using ChooseableVTXResultFilter = TrackFindingCDC::ChooseableFilter<VTXResultFilterFactory>;
+  using ChooseableVTXResultFilter = TrackingUtilities::ChooseableFilter<VTXResultFilterFactory>;
 }

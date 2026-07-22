@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/vtx/filters/results/VTXResultVarSet.h>
 
 namespace Belle2 {
   /// Base filter for CKF VTX results (on overlap check)
-  class SizeVTXResultFilter : public TrackFindingCDC::ChoosableFromVarSetFilter<VTXResultVarSet> {
+  class SizeVTXResultFilter : public TrackingUtilities::ChoosableFromVarSetFilter<VTXResultVarSet> {
   public:
-    SizeVTXResultFilter() : TrackFindingCDC::ChoosableFromVarSetFilter<VTXResultVarSet>("number_of_hits")
+    SizeVTXResultFilter() : TrackingUtilities::ChoosableFromVarSetFilter<VTXResultVarSet>("number_of_hits")
     {
 
     }

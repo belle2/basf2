@@ -20,7 +20,26 @@
 #include <framework/core/ModuleParam.h>
 #include <framework/logging/Logger.h>
 
+#include <type_traits>
+#include <utility>
+
 namespace Belle2 {
+
+  namespace overlapResolverDetail {
+    /**
+     * Type trait detecting whether a type provides a callable const getArrayIndex() member.
+     * This is the primary template, selected when T has no getArrayIndex() member.
+     */
+    template<class T, class = void>
+    struct HasGetArrayIndex : std::false_type {};
+
+    /**
+     * Specialization selected when T exposes a const getArrayIndex() member.
+     */
+    template<class T>
+struct HasGetArrayIndex<T, std::void_t<decltype(std::declval<const T&>().getArrayIndex())>> : std::true_type {};
+  }
+
   template<class AFilter>
   OverlapResolver<AFilter>::OverlapResolver() : Super()
   {
@@ -52,12 +71,21 @@ namespace Belle2 {
       return;
     }
 
+    // The seed ordering below relies on getSeed()->getArrayIndex(); require it explicitly
+    // so a future instantiation with an unsuitable seed type fails with a clear message.
+    using SeedType = std::remove_cv_t<std::remove_pointer_t<
+                     decltype(std::declval<typename AFilter::Object>().getSeed())>>;
+    static_assert(overlapResolverDetail::HasGetArrayIndex<SeedType>::value,
+                  "OverlapResolver orders seed groups by getSeed()->getArrayIndex() to keep the "
+                  "order reproducible; the result seed type must provide a getArrayIndex() method.");
+
     // Sort results by seed, as it makes the next operations faster.
-    // Use stable_sort: SeedGetter returns the seed pointer, so results sharing a
-    // seed compare equal, and a plain std::sort would leave their relative order
-    // dependent on the seed's heap address. stable_sort preserves the deterministic
-    // generation order of same-seed results.
-    std::stable_sort(results.begin(), results.end(), TrackingUtilities::LessOf<SeedGetter>());
+    // Order by the seed's array index rather than its heap address.
+    // Note that a seed here is a RecoTrack* from a StoreArray, so getArrayIndex() is well defined.
+    std::stable_sort(results.begin(), results.end(),
+    [](const typename AFilter::Object & lhs, const typename AFilter::Object & rhs) {
+      return lhs.getSeed()->getArrayIndex() < rhs.getSeed()->getArrayIndex();
+    });
 
     // resolve overlaps in each seed separately
     const auto& groupedBySeed = TrackingUtilities::adjacent_groupby(results.begin(), results.end(), SeedGetter());

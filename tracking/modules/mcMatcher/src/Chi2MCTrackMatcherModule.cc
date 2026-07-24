@@ -206,7 +206,7 @@ void Chi2MCTrackMatcherModule::event()
     if (chi2Min < cutOff) {
       track.addRelationTo(mcPart_matched);
       // set relations between MC and PR RecoTracks, needed by tracking validation
-      RecoTrack* mcRecoTrack = mcPart_matched->getRelated<RecoTrack>(m_MCRecoTracksArrayName);
+      const RecoTrack* mcRecoTrack = mcPart_matched->getRelated<RecoTrack>(m_MCRecoTracksArrayName);
       RecoTrack* prRecoTrack = track.getRelated<RecoTrack>(m_PRRecoTracksArrayName);
       if (mcRecoTrack and prRecoTrack) {
         prRecoTrack->setMatchingStatus(RecoTrack::MatchingStatus::c_matched);

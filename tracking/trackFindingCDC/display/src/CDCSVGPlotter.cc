@@ -336,7 +336,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   // group them by their mcparticle id
   std::map<int, std::set<CDCSimHit*, FlightTimeOrder>> simHitsByMcParticleId;
   for (CDCSimHit* simHit : simHits) {
-    MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+    const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (mcParticle != nullptr) {
       int mcTrackId = mcParticle->getArrayIndex();
       simHitsByMcParticleId[mcTrackId].insert(simHit);

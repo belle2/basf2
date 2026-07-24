@@ -663,7 +663,7 @@ bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F mom
 void SPTCRefereeModule::copyToNewStoreArray(const Belle2::SpacePointTrackCand* trackCand,
                                             Belle2::StoreArray<Belle2::SpacePointTrackCand> newStoreArray)
 {
-  SpacePointTrackCand* newTC = newStoreArray.appendNew(*trackCand);
+  const SpacePointTrackCand* newTC = newStoreArray.appendNew(*trackCand);
   newTC->addRelationTo(trackCand);
   B2DEBUG(20, "Added new SPTC to StoreArray " << newStoreArray.getName() << " and registered relation to SPTC " <<
           trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
@@ -674,7 +674,7 @@ void SPTCRefereeModule::addToStoreArray(const Belle2::SpacePointTrackCand& track
                                         Belle2::StoreArray<Belle2::SpacePointTrackCand> storeArray,
                                         const Belle2::SpacePointTrackCand* origTrackCand)
 {
-  SpacePointTrackCand* newTC = storeArray.appendNew(trackCand);
+  const SpacePointTrackCand* newTC = storeArray.appendNew(trackCand);
   newTC->addRelationTo(origTrackCand);
   B2DEBUG(20, "Added new SPTC to StoreArray " << storeArray.getName() << " and registered relation to SPTC " <<
           origTrackCand->getArrayIndex() << " from Array " << origTrackCand->getArrayName());

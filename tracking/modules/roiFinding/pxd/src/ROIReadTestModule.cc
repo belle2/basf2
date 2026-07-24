@@ -45,7 +45,7 @@ void ROIReadTestModule::initialize()
 void ROIReadTestModule::event()
 {
   int length = m_ROIPayloads->getLength();
-  unsigned char* rootdata = (unsigned char*) m_ROIPayloads->getRootdata();
+  const unsigned char* rootdata = (unsigned char*) m_ROIPayloads->getRootdata();
 
   if (!m_pFile) return;
   for (int i = 0; i < 4 * length; i++) {

@@ -215,10 +215,10 @@ namespace Belle2 {
     newCreatedTrackCand.addHit(new genfit::WireTrackCandHit(Const::CDC, 2, -1, 2, 0));
 
     // convert it to a RecoTrack
-    RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfCDCHits,
-                                     m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
-                                     m_storeArrayNameOfHitInformation);
+    const RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
+                                           m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfCDCHits,
+                                           m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                           m_storeArrayNameOfHitInformation);
 
     // convert it back
 
@@ -256,10 +256,10 @@ namespace Belle2 {
     ASSERT_EQ(exportedTrackCand.getNHits(), m_recoTrack->getNumberOfTotalHits());
     ASSERT_EQ(m_recoTrack->getNumberOfTotalHits(), 3);
 
-    RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfCDCHits,
-                                     m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
-                                     m_storeArrayNameOfHitInformation);
+    const RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,
+                                           m_storeArrayNameOfPXDHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfCDCHits,
+                                           m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits,
+                                           m_storeArrayNameOfHitInformation);
 
     B2INFO("kjh");
 
@@ -295,7 +295,7 @@ namespace Belle2 {
     ASSERT_EQ(recoTrack->getNumberOfCDCHits(), 3);
 
     size_t this_i = offset;
-    for (auto pHit : recoTrack->getSortedCDCHitList()) {
+    for (const auto* pHit : recoTrack->getSortedCDCHitList()) {
       auto sortParam = recoTrack->getSortingParameter(pHit);
       ASSERT_EQ(this_i, sortParam);
       this_i++;

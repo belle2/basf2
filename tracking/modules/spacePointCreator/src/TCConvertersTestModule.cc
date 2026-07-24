@@ -215,7 +215,7 @@ std::vector<TCConvertersTestModule::trackCandHit> TCConvertersTestModule::getTra
 {
   std::vector<trackCandHit> tcHits;
   for (size_t iHit = 0; iHit < trackCand->getNHits(); ++iHit) {
-    genfit::TrackCandHit* hit = trackCand->getHit(iHit);
+    const genfit::TrackCandHit* hit = trackCand->getHit(iHit);
     tcHits.push_back(std::make_tuple(hit->getDetId(), hit->getHitId(), hit->getPlaneId(), hit->getSortingParameter()));
   }
   return tcHits;

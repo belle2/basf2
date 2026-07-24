@@ -463,7 +463,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
     //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
     const int nFromPdgCodes = m_fromPdgCodes.size();
     if (nFromPdgCodes not_eq 0) {
-      MCParticle* currentParent = aMcParticlePtr->getMother();
+      const MCParticle* currentParent = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
       bool foundParent = false;

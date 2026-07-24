@@ -279,7 +279,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_MinRadiusSq = beampipeRadius * beampipeRadius; // mm^2
 
   // Set up the MUID-specific geometry
-  bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
+  const bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
   m_BarrelHalfLength = bklmGeometry->getHalfLength() * CLHEP::cm; // in G4 units (mm)
   m_EndcapHalfLength = 0.5 * eklmGeometry.getSectionPosition()->getLength(); // in G4 units (mm)
@@ -984,7 +984,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
   ExtState extState = {&b2track, pdgCode, false, 0.0, 0.0,                               // for EXT and MUID
                        G4ThreeVector(0, 0, 1), 0.0, 0, 0, 0, -1, -1, -1, -1, 0, 0, false // for MUID only
                       };
-  RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
+  const RecoTrack* recoTrack = b2track.getRelatedTo<RecoTrack>();
   if (recoTrack == nullptr) {
     B2WARNING("Track without associated RecoTrack: skipping extrapolation for this track.");
     extState.pdgCode = 0; // prevent start of extrapolation in swim()
@@ -1236,9 +1236,9 @@ void TrackExtrapolateG4e::createExtHit(const ExtHitStatus status, const ExtState
     mom = -mom;
   G4ErrorSymMatrix covariance(6, 0);
   fromG4eToPhasespace(g4eState, covariance);
-  ExtHit* extHit = m_extHits.appendNew(extState.tof, extState.pdgCode, detID, copyID, status,
-                                       extState.isCosmic,
-                                       pos, mom, covariance);
+  const ExtHit* extHit = m_extHits.appendNew(extState.tof, extState.pdgCode, detID, copyID, status,
+                                             extState.isCosmic,
+                                             pos, mom, covariance);
   // If called standalone, there will be no associated track
   if (extState.track != nullptr)
     extState.track->addRelationTo(extHit);
@@ -1421,12 +1421,12 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
     ROOT::Math::XYZVector tposAtHitPlane(intersection.positionAtHitPlane.x(),
                                          intersection.positionAtHitPlane.y(),
                                          intersection.positionAtHitPlane.z());
-    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode,
-                                                     intersection.inBarrel, intersection.isForward,
-                                                     intersection.sector, intersection.layer,
-                                                     tpos, tposAtHitPlane,
-                                                     extState.tof, intersection.time,
-                                                     intersection.chi2);
+    const KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode,
+                                                           intersection.inBarrel, intersection.isForward,
+                                                           intersection.sector, intersection.layer,
+                                                           tpos, tposAtHitPlane,
+                                                           extState.tof, intersection.time,
+                                                           intersection.chi2);
     if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
@@ -1522,7 +1522,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
   int matchingLayer = intersection.layer + 1;
   G4ThreeVector n(m_BarrelSectorPerp[intersection.sector]);
   for (int h = 0; h < m_klmHit2ds.getEntries(); ++h) {
-    KLMHit2d* hit = m_klmHit2ds[h];
+    const KLMHit2d* hit = m_klmHit2ds[h];
     if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
     if (hit->getLayer() != matchingLayer)
@@ -1625,7 +1625,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
   int matchingEndcap = (intersection.isForward ? 2 : 1);
   G4ThreeVector n(0.0, 0.0, (intersection.isForward ? 1.0 : -1.0));
   for (int h = 0; h < m_klmHit2ds.getEntries(); ++h) {
-    KLMHit2d* hit = m_klmHit2ds[h];
+    const KLMHit2d* hit = m_klmHit2ds[h];
     if (hit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
     if (hit->getLayer() != matchingLayer)

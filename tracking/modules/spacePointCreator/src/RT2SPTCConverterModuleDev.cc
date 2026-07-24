@@ -184,7 +184,7 @@ void RT2SPTCConverterModule::event()
 
     SpacePointTrackCand spacePointTC;
     if (m_mcParticlesPresent) {
-      MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
+      const MCParticle* mcParticle = recoTrack.getRelatedTo<MCParticle>();
       if (mcParticle) {
         spacePointTC = SpacePointTrackCand(spacePointStatePair.first, mcParticle->getPDG(), mcParticle->getCharge(),
                                            recoTrack.getArrayIndex());

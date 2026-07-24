@@ -532,7 +532,16 @@ namespace {
   /** small helper function to convert any python object to a string representation */
   std::string pythonObjectToString(const boost::python::object& obj)
   {
+    // boost::python::extract<std::string> triggers a false-positive
+    // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     return boost::python::extract<std::string>(obj.attr("__str__")());
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
 
   /** small helper function to convert a python dict containing arbitrary
@@ -590,8 +599,17 @@ namespace {
       // inspect module to get the filename/linenumbers
       object inspect = import("inspect");
       auto frame = inspect.attr("currentframe")();
+      // boost::python::extract<std::string> triggers a false-positive
+      // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
       const std::string function = extract<std::string>(frame.attr("f_code").attr("co_name"));
       const std::string file = extract<std::string>(frame.attr("f_code").attr("co_filename"));
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
       int line = extract<int>(frame.attr("f_lineno"));
 
       // Everything done, send it away

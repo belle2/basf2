@@ -138,7 +138,17 @@ namespace {
   /** small helper function to convert any python object to a string representation */
   std::string pythonObjectToString(const boost::python::object& obj)
   {
+    // boost::python::extract<std::string> triggers a false-positive
+    // -Wmaybe-uninitialized in GCC (it cannot see that boost initialises the
+    // rvalue storage before the string is copied out); silence it here.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     return boost::python::extract<std::string>(obj.attr("__str__")());
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
   /** set the seed from an abitary python object */
   void setPythonSeed(const boost::python::object& obj)

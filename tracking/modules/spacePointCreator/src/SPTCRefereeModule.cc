@@ -597,13 +597,10 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
   if (trueHit == nullptr) {B2FATAL("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
-  // cppcheck-suppress nullPointerRedundantCheck
   VxdID vxdID = trueHit->getSensorID();
 
   const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0), true); // global position
-  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum(), true); // global momentum
 
   B2DEBUG(20, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " <<

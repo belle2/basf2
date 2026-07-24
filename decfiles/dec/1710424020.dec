@@ -1,0 +1,20 @@
+# EventType: 1710424020
+# Descriptor: [vpho->pi0 pi0 [Y2S->mumu]]
+# NickName: vpho_pi0pi0_Y2S_mumu
+# Cuts: None
+# Documentation: vpho decay processes to Upsilon(2S)
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: 
+# Email: 
+# Date:  
+
+
+Decay  vpho
+1   Upsilon(2S) pi0 pi0     VVPIPI;
+Enddecay
+
+Decay  Upsilon(2S)
+1    mu+ mu-                   VLL;
+Enddecay
+End

@@ -605,7 +605,7 @@ void ARICHDatabaseImporter::importCosmicTestGeometry()
   DBImportObjPtr<ARICHGeometryConfig> geoImport;
   geoImport.construct(*geoConfig);
 
-  ARICHGeometryConfig& geo = (ARICHGeometryConfig&)geoImport;
+  ARICHGeometryConfig& geo = *geoImport.operator->();
 
   GearDir masterDir(cosmic, "MasterVolume");
   ARICHGeoMasterVolume master = geo.getMasterVolume();

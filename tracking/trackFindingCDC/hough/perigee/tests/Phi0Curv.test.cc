@@ -418,7 +418,6 @@ namespace {
     timeItResult.printSummary();
   }
 
-  // cppcheck-suppress syntaxError
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_phi0_curv_prepared_event_hits)
   {
     std::string svgFileName = "phi0_curv_on_prepared_event_hits.svg";

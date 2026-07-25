@@ -66,17 +66,10 @@ namespace Belle2 {
         eventTTree.Write();
 
         auto walker = [&](const typename Super::Node * node) -> bool {
-          // cppcheck-suppress unreadVariable
           lowerX = node->getLowerX();
-          // cppcheck-suppress unreadVariable
           upperX = node->getUpperX();
-          // cppcheck-suppress unreadVariable
-          lowerY = node->getLowerY();
-          // cppcheck-suppress unreadVariable
           upperY = node->getUpperY();
-          // cppcheck-suppress unreadVariable
           weight = node->getWeight();
-          // cppcheck-suppress unreadVariable
           level = node->getLevel();
 
           weightTTree.Fill();

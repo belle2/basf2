@@ -343,7 +343,6 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
   if (tree == nullptr) B2FATAL("SectorMapBootstrapModule: tree not found! tree name: " << c_setupKeyNameTTreeName.c_str());
 
   TString* setupKeyName = nullptr;
-  // cppcheck-suppress nullPointerRedundantCheck
   tree->SetBranchAddress(c_setupKeyNameBranchName.c_str(),
                          & setupKeyName);
   if (setupKeyName == nullptr) B2FATAL("SectorMapBootstrapModule: setupKeyName not found");

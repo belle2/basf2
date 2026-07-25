@@ -1457,7 +1457,10 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
     **Selection Criteria**:
         * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with pionID > 0.01 and kaonID > 0.1
         * Cut on :math:`p^{+}` : abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1
-        * Cut on :math:`\\gamma` : E > 0.05
+        * Cut on photons used in :math:`\\pi^{0}` reconstruction:
+          ``E > 0.05``, ``abs(clusterTiming) < 200``, and
+          ``abs(clusterTiming/clusterErrorTiming) < 2.0``
+        * Additional cut on direct tag-side :math:`\\gamma` candidates: ``E > 0.1``
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma` : 0.115 < M < 0.160
         * Cut on tag side :math:`D^{0}` : 1.72 < M < 2.02 and p* > 2.0
         * Cut on tag side :math:`D^{+}` : 1.72 < M < 2.02 and p* > 2.0

@@ -168,8 +168,8 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       const ushort localIndexY = lowerIndex;
       // Sector counting for y starts at positive values, i.e. the topmost sector has index 0,
       // and the bottommost sector has the highest index
-      const float& localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
-      const float& localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
+      const float localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
+      const float localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
 
       // reset layerHits and containedHits
       layerHits = 0;

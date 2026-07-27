@@ -215,7 +215,7 @@ namespace Belle2 {
         }
       }
 
-      for (const auto& graph : deadBranches) {
+      for (const auto* graph : deadBranches) {
         m_subgraphs.erase(graph->getID());
         killed ++;
       }

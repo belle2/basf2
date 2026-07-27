@@ -644,7 +644,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 999, PACKAGENAME())) {
     std::stringstream output;
     output << "The candidates are: ";
-    for (auto& info : trueHitInfos) { output << info; }
+    for (const auto& info : trueHitInfos) { output << info; }
     B2DEBUG(29, output.str());
 
     std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);

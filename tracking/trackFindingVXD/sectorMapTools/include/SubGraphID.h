@@ -182,7 +182,7 @@ namespace Belle2 {
     {
       std::vector<FullSecID> ids;
 
-      for (auto& id : m_idChain) {
+      for (const auto& id : m_idChain) {
         ids.push_back(FullSecID(id));
       }
       return ids;

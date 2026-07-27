@@ -127,7 +127,7 @@ void SegmentNetworkProducerModule::initialize()
                                              true);
   }
 
-  for (std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
+  for (const std::string& anArrayName : m_PARAMSpacePointsArrayNames) {
     m_spacePoints.push_back(StoreArray<SpacePoint>(anArrayName));
     m_spacePoints.back().isRequired();
   }

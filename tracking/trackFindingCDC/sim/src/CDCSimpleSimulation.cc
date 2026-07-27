@@ -127,7 +127,7 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
   {
     std::vector<CDCWireHit> wireHits;
     wireHits.reserve(simpleSimHits.size());
-    for (SimpleSimHit& simpleSimHit : simpleSimHits) {
+    for (const SimpleSimHit& simpleSimHit : simpleSimHits) {
       wireHits.push_back(simpleSimHit.m_wireHit);
     }
 
@@ -174,7 +174,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
 
   std::vector<SimpleSimHit> simpleSimHits;
 
-  CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   const double outerWallCylinderR = wireTopology.getOuterCylindricalR();
 
   const double minR = globalHelix.minimalCylindricalR();
@@ -224,7 +224,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
 
       simpleSimHitsInLayer = createHitsForLayer(closestWire, globalHelix, arcLength2DOffset);
 
-      for (SimpleSimHit& simpleSimHit : simpleSimHitsInLayer) {
+      for (const SimpleSimHit& simpleSimHit : simpleSimHitsInLayer) {
         if (simpleSimHit.m_arcLength2D < maxArcLength2D) {
           simpleSimHits.push_back(simpleSimHit);
         }
@@ -262,7 +262,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
           std::vector<SimpleSimHit> secondSimpleSimHitsInLayer =
             createHitsForLayer(closestWire, globalHelix, secondArcLength2DOffset);
 
-          for (SimpleSimHit& simpleSimHit : secondSimpleSimHitsInLayer) {
+          for (const SimpleSimHit& simpleSimHit : secondSimpleSimHitsInLayer) {
             if (simpleSimHit.m_arcLength2D < maxArcLength2D) {
               simpleSimHits.push_back(simpleSimHit);
             }

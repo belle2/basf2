@@ -916,7 +916,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           ROOT::Math::XYZVector simMom = aCDCSimHitPtr->getMomentum();
           ROOT::Math::XYZVector simHitPosOnWire = aCDCSimHitPtr->getPosWire();
 
-          CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
+          const CDC::CDCGeometryPar& cdcGeometry = CDC::CDCGeometryPar::Instance();
           const unsigned short isRightHit = cdcGeometry.getNewLeftRightRaw(simHitPosOnWire, simHitPos, simMom);
 
           if (isRightHit) {

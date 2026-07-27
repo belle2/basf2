@@ -355,7 +355,7 @@ namespace Belle2 {
       virtual void afterFillDebugHook(QuadTreeChildren& children)
       {
         if (not m_debugOutput) return;
-        for (QuadTree& childNode : children) {
+        for (const QuadTree& childNode : children) {
           if (childNode.getLevel() != getLastLevel()) continue; // Only write the lowest level
           //m_debugOutputMap[ {childNode.getXMean(), childNode.getYMean()}] = childNode.getItems();
         }

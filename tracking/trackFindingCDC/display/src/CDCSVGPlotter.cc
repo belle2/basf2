@@ -483,7 +483,7 @@ void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjN
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -523,7 +523,7 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -579,7 +579,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segment " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;

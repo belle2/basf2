@@ -94,7 +94,7 @@ void EventDataPlotter::clear()
 BoundingBox EventDataPlotter::getBoundingBox() const
 {
   if (m_ptrPrimitivePlotter) {
-    PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
+    const PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
     return primitivePlotter.getBoundingBox();
   } else {
     return BoundingBox(0, 0, 0, 0);

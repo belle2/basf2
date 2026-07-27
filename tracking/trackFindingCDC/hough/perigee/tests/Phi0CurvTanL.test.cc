@@ -127,7 +127,7 @@ namespace {
     houghTree.raze();
 
     int iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
@@ -226,7 +226,7 @@ namespace {
     houghTree.raze();
 
     int iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 

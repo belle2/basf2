@@ -142,7 +142,7 @@ void SpacePointCreatorTestModule::event()
     for (auto& aSP : aStoreArrayInterface) {
       std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
 
-      for (genfit::PlanarMeasurement& measurement : tempMeasurements) {
+      for (const genfit::PlanarMeasurement& measurement : tempMeasurements) {
         hitOutput.push_back({aSP.getType(), measurement.clone()});
       }
     }

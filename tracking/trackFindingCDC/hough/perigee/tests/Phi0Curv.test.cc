@@ -78,7 +78,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
@@ -170,7 +170,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
@@ -271,7 +271,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
       const std::vector<CDCRLWireHit >& taggedHits = candidate.second;
 
@@ -382,7 +382,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
       const std::vector<CDCRLWireHit >& taggedHits = candidate.second;
 
@@ -464,7 +464,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 

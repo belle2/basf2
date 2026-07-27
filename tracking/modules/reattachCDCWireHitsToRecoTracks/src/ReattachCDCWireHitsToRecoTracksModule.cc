@@ -175,7 +175,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
       std::unordered_map<CDCWireHit*, double> previousArcLength;
       std::unordered_map<CDCWireHit*, double> currentArcLength;
       // Initialise the arc-length maps to zero and unset the taken and background flags.
-      for (HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
+      for (const HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
         previousArcLength[hitToAddInfo.hit] = 0.0;
         currentArcLength[hitToAddInfo.hit] = 0.0;
         (hitToAddInfo.hit)->getAutomatonCell().setTakenFlag(false);
@@ -184,7 +184,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
 
       unsigned int sortingParameter(0);
       for (CDCHit* hitOnTrack : m_mapToHitsOnTrack[&recoTrack]) {
-        for (HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
+        for (const HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
           CDCWireHit& hitToAdd = *(hitToAddInfo.hit);
           if (not hitToAdd.getAutomatonCell().hasTakenFlag()) {
 

@@ -322,7 +322,7 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
     m_BarrelSectorPhi[sector - 1].set(-std::sin(phi), std::cos(phi), 0.0);
   }
   KLMChannelIndex klmLayers(KLMChannelIndex::c_IndexLevelLayer);
-  for (KLMChannelIndex& klmLayer : klmLayers) {
+  for (const KLMChannelIndex& klmLayer : klmLayers) {
     if (klmLayer.getSubdetector() == KLMElementNumbers::c_BKLM)
       m_BarrelModuleMiddleRadius[klmLayer.getSection()][klmLayer.getSector() - 1][klmLayer.getLayer() - 1] =
         bklmGeometry->getActiveMiddleRadius(klmLayer.getSection(), klmLayer.getSector(), klmLayer.getLayer()); // in G4e units (cm)
@@ -398,7 +398,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
     }
     // Keep track of (re-)use of BKLMHit2ds
     std::vector<std::map<const Track*, double> > bklmHitUsed(m_klmHit2ds.getEntries());
-    for (auto& b2track : m_tracks) {
+    for (const auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesMuid) {
         int pdgCode = hypothesis.getPDGCode();
         if (hypothesis == Const::electron || hypothesis == Const::muon)
@@ -410,7 +410,7 @@ void TrackExtrapolateG4e::event(bool byMuid)
     } // Muid track loop
   } else { // event() called by Ext module
     G4ErrorPropagatorData::GetErrorPropagatorData()->SetTarget(m_TargetExt);
-    for (auto& b2track : m_tracks) {
+    for (const auto& b2track : m_tracks) {
       for (const auto& hypothesis : *m_HypothesesExt) {
         int pdgCode = hypothesis.getPDGCode();
         if (hypothesis == Const::electron || hypothesis == Const::muon) pdgCode = -pdgCode;

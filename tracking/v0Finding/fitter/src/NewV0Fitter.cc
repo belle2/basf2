@@ -312,7 +312,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   std::vector<bool> useInFit;
   const auto& recoHitInformations = origRecoTrack->getRecoHitInformations(true); // true to get sorted hits info
   useInFit.reserve(recoHitInformations.size());
-  for (const auto& hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
+  for (const auto* hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
 
   // get track representation for a given particle
   const auto* rep = getTrackRepresentation(origRecoTrack, abs(ptype.getPDGCode()));
@@ -322,7 +322,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   int removedHits = 0;
   unsigned firstHit = 0;
   for (unsigned i = 0; i < recoHitInformations.size(); i++) {
-    const auto& hitInfo = recoHitInformations[i];
+    const auto* hitInfo = recoHitInformations[i];
     if (not hitInfo->useInFit()) continue;
     try {
       auto state = origRecoTrack->getMeasuredStateOnPlaneFromRecoHit(hitInfo, rep); // a copy of
@@ -353,7 +353,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
     std::vector<unsigned> svdIndex;
     for (unsigned i = 0; i < useInFit.size(); i++) {
       if (not useInFit[i]) continue;
-      const auto& hitInfo = recoHitInformations[i];
+      const auto* hitInfo = recoHitInformations[i];
       if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) svdIndex.push_back(i);
       else break;
     }

@@ -149,7 +149,7 @@ namespace Belle2 {
       if (deadBranches.empty()) { B2DEBUG(20, "pruneGraph: no rare branches found - stopping pruning process."); return 0; }
 
       // kill selected ones:
-      for (auto* graph : deadBranches) {
+      for (const auto* graph : deadBranches) {
         nKilled += graph->getFound();
         m_subgraphs.erase(graph->getID());
       }

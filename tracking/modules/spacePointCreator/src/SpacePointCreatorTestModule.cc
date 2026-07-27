@@ -149,8 +149,8 @@ void SpacePointCreatorTestModule::event()
 
     for (unsigned i = 0; i < hitOutput.size(); i++) {
       track.insertMeasurement(hitOutput[i].second);
-      genfit::TrackPoint* point = track.getPointWithMeasurement(i);
-      genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
+      const genfit::TrackPoint* point = track.getPointWithMeasurement(i);
+      const genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
       B2DEBUG(20, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n");
       point->Print();
       B2DEBUG(20, " converted absMeasurement is of detID: " << rawPoint->getDetId() << ", hitID: " << rawPoint->getHitId());

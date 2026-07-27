@@ -70,7 +70,7 @@ namespace Belle2 {
 
     public:
       /// Clears all Monte Carlo information left from the last event
-      void clear();
+      static void clear();
 
       /// Dummy constructor to silence the intel-compiler warnings (NOTE: using "=default" will make the intel compilation fail)
       CDCMCHitCollectionLookUp() {};

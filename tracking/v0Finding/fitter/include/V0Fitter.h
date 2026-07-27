@@ -64,7 +64,7 @@ namespace Belle2 {
                      bool&  isHitRemoved);
 
     /// Get track hypotheses for a given v0 hypothesis.
-    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
+    static std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
 
   private:
 
@@ -129,7 +129,7 @@ namespace Belle2 {
      * @param vertex Result of the fit is returned via reference.
      * @return
      */
-    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+    static bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
@@ -137,8 +137,8 @@ namespace Belle2 {
 
     /// Extrapolate the fit results to the perigee to the vertex.
     /// If the daughter tracks have hits inside the V0 vertex, bits in the hasInnerHiStatus variable are set.
-    bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
-                             const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
+    static bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
+                                    const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,

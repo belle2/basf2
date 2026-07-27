@@ -116,7 +116,7 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
       return
         (a->getDataCache().layer > b->getDataCache().layer) or
         (a->getDataCache().layer == b->getDataCache().layer
-         and a->getHit()->getPosition().Perp() > b->getHit()->getPosition().Perp());
+         and a->getHit()->getPosition().Perp2() > b->getHit()->getPosition().Perp2());
     });
 
     rawTrackCandidates.emplace_back(trackCand);

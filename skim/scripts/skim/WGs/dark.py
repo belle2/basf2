@@ -361,7 +361,7 @@ class ZpVisible(BaseSkim):
 
         * ``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
         * ``muonID cut: muonID > 0.2``
-        * ``nCleanedTracks < 5, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        * ``nCleanedTracks < 6, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
         * ``Two prompt tracks satisfying [muonID > 0.2] and [abs(dz) < 2.0 and abs(dr) < 0.5]``
         """
         zp_list = []
@@ -371,7 +371,7 @@ class ZpVisible(BaseSkim):
 
         ma.cutAndCopyList("mu+:zp", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
 
-        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 5]"
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6]"
 
         # Z' fully reconstructed
         ZpVisChannel = "mu+:zp mu-:zp mu+:all mu-:all"

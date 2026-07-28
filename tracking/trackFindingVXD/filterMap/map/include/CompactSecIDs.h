@@ -370,8 +370,6 @@ namespace Belle2 {
     /// The hidden private method that recursively manage the size of everything.
     /// It returns the number of added sectors.
     /// It returns 0 in case of errors (memory exhausted, or sector redefinition.)
-    // SS: it is a recursive function, the cppckeck warning is a false positive according to IA
-    // cppcheck-suppress functionStatic
     template<  class TContainer,
                class ... Indexes >
     int privateAddSectors(TContainer& container,

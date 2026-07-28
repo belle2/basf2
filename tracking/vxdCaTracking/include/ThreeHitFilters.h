@@ -275,7 +275,7 @@ namespace Belle2 {
 
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter, returning unit: radius in [cm] (positive value)*/
-    double calcRadius(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, const B2Vector3D& circleCenter)
+    static double calcRadius(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, const B2Vector3D& circleCenter)
     {
       return ((circleCenter - a).Perp() + (circleCenter - b).Perp() + (circleCenter - c).Perp()) /
              3.;   // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
@@ -284,7 +284,7 @@ namespace Belle2 {
 
 
     /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter */
-    void calcCircleCenter(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, B2Vector3D& circleCenter)
+    static void calcCircleCenter(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, B2Vector3D& circleCenter)
     {
       // calculates the intersection point using Cramer's rule.
       // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule
@@ -316,8 +316,9 @@ namespace Belle2 {
 
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet. +1 represents a left-oriented curvature, -1 means having a right-oriented curvature. 0 means it is approximately straight. first vector should be outer hit, second = center hit, third is inner hit*/
-    int calcSign(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, const B2Vector3D& sigma_a, const B2Vector3D& sigma_b,
-                 const B2Vector3D& sigma_c)
+    static int calcSign(const B2Vector3D& a, const B2Vector3D& b, const B2Vector3D& c, const B2Vector3D& sigma_a,
+                        const B2Vector3D& sigma_b,
+                        const B2Vector3D& sigma_c)
     {
       B2Vector3D c2b = b - c;   c2b.SetZ(0.);
       B2Vector3D b2a = a - b;   b2a.SetZ(0.);

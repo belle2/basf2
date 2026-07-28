@@ -62,7 +62,7 @@ namespace Belle2 {
 
       /** of a vector of given particleIDs with their purities it returns the one which had the highest purity */
       template<class PurityType>
-      PurityType returnDominantParticleID(const std::vector<PurityType >& purities)
+      static PurityType returnDominantParticleID(const std::vector<PurityType >& purities)
       {
         PurityType bestResult = PurityType();
 

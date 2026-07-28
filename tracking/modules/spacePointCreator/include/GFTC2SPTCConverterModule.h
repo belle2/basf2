@@ -90,7 +90,7 @@ namespace Belle2 {
     };
 
     /** get the enum representation of an integer */
-    conversionStatus getFailEnum(int intToConvert)
+    static conversionStatus getFailEnum(int intToConvert)
     {
       switch (intToConvert) {
         case 1: return c_singleClusterSP;

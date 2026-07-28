@@ -77,7 +77,7 @@ namespace Belle2 {
 
     private:
       /// Fill a map with the number of hits for each track id contained in the given hit range.
-      std::map<ITrackType, size_t> getHitCountByMCTrackId(const ACDCHitCollection& hits) const;
+      static std::map<ITrackType, size_t> getHitCountByMCTrackId(const ACDCHitCollection& hits);
 
     public:
       /// Get the track id with the highest corresponding purity.

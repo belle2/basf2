@@ -85,9 +85,9 @@ namespace Belle2 {
       }
 
       /// Draw the results to a ROOT TCanvas
-      void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
-                         const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
-                         const typename AInBoxAlgorithm::HoughBox& node)
+      static void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
+                                const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
+                                const typename AInBoxAlgorithm::HoughBox& node)
       {
         TGraph* allHitsGraph = new TGraph();
         allHitsGraph->SetLineWidth(2);

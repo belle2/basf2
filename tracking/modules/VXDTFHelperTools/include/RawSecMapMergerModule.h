@@ -88,7 +88,7 @@ namespace Belle2 {
 
 
     /**  returns secIDs of current entry in the secBranches. */
-    std::vector<unsigned> getSecIDs(std::vector<BranchInterface<unsigned>>& secBranches, Long64_t entry)
+    static std::vector<unsigned> getSecIDs(std::vector<BranchInterface<unsigned>>& secBranches, Long64_t entry)
     {
       std::vector<unsigned> iDs;
       for (BranchInterface<unsigned>& branch : secBranches) {

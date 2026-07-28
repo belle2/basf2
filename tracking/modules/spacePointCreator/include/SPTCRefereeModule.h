@@ -228,7 +228,7 @@ namespace Belle2 {
     /** function to determine if any of the values in vector V are between the values of P
      * (i.e. any value of V is in [P.first, P.second) ) */
     template<typename T>
-    bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P)
+    static bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P)
     {
       return std::find_if(V.begin(), V.end(), [&P](const T & aValue) { return (aValue < P.second && aValue >= P.first);}) != V.end();
     }

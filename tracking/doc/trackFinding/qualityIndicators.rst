@@ -10,7 +10,8 @@ All of them show large potential to reject fake and clone tracks while truth tra
 As BDTs tend to enhance data-MC disagreements at their border regions (very truth-like or very fake-like), the quality indicators were
 revisited with respect to the data-MC disagreement that they introduce.
 
-Due to limited person power, only the CDC QI is activated at the moment. It was trained on MC13 with a very reduced set of
+Due to limited person power, only the CDC QI is activated, and the RecoTrack QI is available at the moment.
+The CDC QI was trained on MC13 with a very reduced set of
 quantities that showed reasonable data-MC agreements. The most important variables to separate fakes and clones from truth tracks are the
 number of super layers that contain hits of the track, z0 and the sz-slope.
 
@@ -25,6 +26,9 @@ in the SVD. Due to less "noise" due to fake and clone CDCTracks, the SVD track f
 As a consequence, **the overall track finding efficiency increases** slightly (by up to 0.5%). This could be improved to more than 2% while
 the fake and clone rate are reduced further by choosing a tighter cut on the CDC QI as mentioned above.
 
+The RecoTrack QI was trained with CDC QI, VXD quantities and track quantities. It no longer needs VXD QI as input, as it directly
+use VXD quantities that used to train VXD QI. In the moment no cut on the RecoTrack QI is performed.
+Instead, **the RecoTrack QI is available at the analysis level by the variable :b2:var:`trackQualityIndicator`**.
 
 It is assumed that the modelling of more properties with large separation potential between fakes, clones and truth tracks improved in the
 last MC productions. Moreover, **the activation of the VXD- and Recotrack-QI would further increase the fake- and clone rejection by 50% and 30%**

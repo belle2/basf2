@@ -132,7 +132,6 @@
   <DetectorComponent name="CLAWS" isDefault="false">
     <xi:include href="../beast/claws/CLAWS3.xml" xpointer="xpointer(/DetectorComponent/*)"/>
   </DetectorComponent>
-
   <!-- Vertex detector upgrade specific subdetectors -->
   <DetectorComponent name="VTX-CMOS-5layer" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS5.xml" xpointer="xpointer(/DetectorComponent/*)" />
@@ -157,6 +156,9 @@
   </DetectorComponent>
   <DetectorComponent name="VTX-5layer-2025-baseline" isDefault="false">
     <xi:include href="../vtx/VTX-5layer-2025-baseline.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
+  <DetectorComponent name="VTX-5layer-2026-July-baseline" isDefault="false">
+     <xi:include href="../vtx/VTX-5layer-2026-July-baseline.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-6layer-staggered-L3mod-3xL12-2xL3456-wo82" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS6-staggered-L3mod-3xL12-2xL3456-wo82.xml" xpointer="xpointer(/DetectorComponent/*)" />

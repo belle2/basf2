@@ -80,7 +80,7 @@ namespace Belle2 {
 
 
     /** sets everything which is hit-dependent. */
-    std::string prepareNHitSpecificStuff(
+    static std::string prepareNHitSpecificStuff(
       unsigned nHits,
       const SectorMapConfig& config,
       std::vector<std::string>& secBranchNames,
@@ -100,7 +100,7 @@ namespace Belle2 {
 
 
     /**  fill the graphs with raw data fitting to their filters respectively. */
-    template <class FilterType> void trainGraph(
+    template <class FilterType> static void trainGraph(
       SectorGraph<FilterType>& mainGraph,
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
@@ -115,15 +115,15 @@ namespace Belle2 {
 
 
     /** for debugging: print data for crosschecks. for small sample sizes < 100 the whole sample will be printed, for bigger ones only 100 entries will be printed. */
-    void printData(
+    static void printData(
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
       std::vector<BranchInterface<double>>& filterBranches);
 
 
     /** for debugging purposes: print VXDTFFilters into a file of name of the sectorMapConfig. */
-    void printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters, std::string configName,
-                           unsigned int nHitCombinations, bool print2File);
+    static void printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters, std::string configName,
+                                  unsigned int nHitCombinations, bool print2File);
 
 
 
@@ -151,14 +151,14 @@ namespace Belle2 {
 
 
     /// WARNING TODO clean up and documentation!
-    template <class FilterType> void add4HitFilters(VXDTFFilters<SpacePoint>& filterContainer,
-                                                    SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
+    template <class FilterType> static void add4HitFilters(VXDTFFilters<SpacePoint>& filterContainer,
+                                                           SubGraph<FilterType>& subGraph, const SectorMapConfig&  config);
 
 
     /// updates the sublayer ID of the FullSecIDs used in the VXDTFFilters with the one used during the training contained in the SectorGraph
     /// @param mainGraph  : the graph from which the updated FullSecIDs are retrieved
     /// @param segFilters : the filters which need to be updated
-    template <class FilterType> unsigned updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
+    template <class FilterType> static unsigned updateFilterSubLayerIDs(SectorGraph<FilterType>& mainGraph,
         VXDTFFilters<SpacePoint>& segFilters);
 
 
@@ -281,7 +281,7 @@ namespace Belle2 {
      * layer and ladder
      * if ids size == 3 it checks that both segments satisfy the same requirement
      */
-    bool good(const std::vector< unsigned>& ids);
+    static bool good(const std::vector< unsigned>& ids);
   };
 
 }

@@ -13,7 +13,7 @@
 import math
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdPi
+from stdCharged import stdE, stdPi, stdMu
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
@@ -421,3 +421,68 @@ class PNbarHad(BaseSkim):
         vpholists = [f"vpho:p{mode}_{label}" for mode in ["1pi", "3pi", "5pi", "7pi", "1pi2K", "3pi2K", "5pi2K"]]
 
         return vpholists
+
+
+@fancy_skim_header
+class TauTauTauTau(BaseSkim):
+    __authors__ = ["Luigi Corona"]
+    __description__ = "Skim for the four tau final state."
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdMu("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+        """
+        **Physics channel**: `e^{+}e^{-} \\to \\tau^{+} \\tau^{-} \\tau^{+} \\tau^{-}`
+
+        Cuts applied:
+
+        * ``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
+        * ``electronID cut: electronID > 0.2``
+        * ``muonID cut: muonID > 0.2``
+        * ``pionID cut: pionID > 0.2``
+        * ``nCleanedTracks < 6, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        * ``total M  < 9.5 GeV``
+        * ``electrons identified with electrondID > 0.2``
+        * ``muons idenfied with muonID > 0.2``
+        * ``pions identifed with pionID > 0.2``
+        * `` we select events where particles with same PID have the same charge``
+        """
+        ftau_list = []
+
+        track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
+        muon_id_cut = "muonID > 0.2"
+        pion_id_cut = "pionID > 0.2"
+        electron_id_cut = "electronID > 0.2"
+
+        ma.cutAndCopyList("pi+:ftau", "pi+:all", f"[{pion_id_cut}]", path=path)
+        ma.cutAndCopyList("mu+:ftau", "mu+:all", f"[{muon_id_cut}]", path=path)
+        ma.cutAndCopyList("e+:ftau", "e+:all", f"[{electron_id_cut}]", path=path)
+
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6] and [M < 9.5]"
+
+        # Reconstruction: prompt with same charge
+        PiMuChannel = "pi+:ftau pi+:ftau mu-:ftau mu-:ftau"
+        PiEChannel = "pi+:ftau pi+:ftau e-:ftau e-:ftau"
+        MuEChannel = "mu+:ftau mu+:ftau e-:ftau e-:ftau"
+        MuMuChannel = "mu+:ftau mu+:ftau mu-:ftau mu-:ftau"
+        EEChannel = "e+:ftau e+:ftau e-:ftau e-:ftau"
+
+        ma.reconstructDecay(f"vpho:ftau_pimu -> {PiMuChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:ftau_pie -> {PiEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:ftau_mue -> {MuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:ftau_mumu -> {MuMuChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:ftau_ee -> {EEChannel}", Event_cuts_vis, path=path)
+
+        ftau_list.append("vpho:ftau_pimu")
+        ftau_list.append("vpho:ftau_pie")
+        ftau_list.append("vpho:ftau_mue")
+        ftau_list.append("vpho:ftau_mumu")
+        ftau_list.append("vpho:ftau_ee")
+
+        return ftau_list

@@ -1,6 +1,6 @@
-# EventType: 1211450000
-# Descriptor: [B+ -> J/psi [-> mu+ mu-] pi+ pi- K+]
-# NickName: Bu_JpsipippimKp_mumu
+# EventType: 1111448101
+# Descriptor: [B0 -> J/psi [-> mu+ mu-] pi0 [-> gamma gamma] eta [-> gamma gamma] K_S0 [-> pi+ pi-]]
+# NickName: Bu_Jpsipi0etaKS_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Quarkonium
@@ -13,19 +13,34 @@
 # determination. All exclusive decays have the PHSP distributuion.
 # Do not use it for one-dimensional analyses without proper reweighting.
 
+Alias pi0sig pi0
+Alias etasig eta
+Alias K_S0sig K_S0
+
 Decay Upsilon(4S)
-0.5 B+sig B- VSS;
-0.5 B-sig B+ VSS;
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
 
-Decay B+sig
-1.0 J/psisig pi+ pi- K+ PHOTOS PHSP;
+Decay B0sig
+1.0 J/psisig pi0sig etasig K_S0sig PHOTOS PHSP;
 Enddecay
 
-CDecay B-sig
+CDecay anti-B0sig
 
 Decay J/psisig
 1.0 mu+ mu- PHOTOS PHSP;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay etasig
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay K_S0sig
+1.0 pi+ pi- PHOTOS PHSP;
 Enddecay
 
 End

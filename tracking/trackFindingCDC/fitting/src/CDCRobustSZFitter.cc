@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
-CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ) const
+CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ)
 {
   // This seems to be some other algorithm
 
@@ -113,7 +113,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& 
   return trajectorySZ;
 }
 
-double CDCRobustSZFitter::getMedianZ0(const CDCSZObservations& szObservations, double tanLambda) const
+double CDCRobustSZFitter::getMedianZ0(const CDCSZObservations& szObservations, double tanLambda)
 {
   std::vector<double> z0s;
   z0s.reserve(szObservations.size());

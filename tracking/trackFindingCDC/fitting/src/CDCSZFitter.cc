@@ -206,7 +206,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
   update(trajectorySZ, observationsSZ);
 }
 
-void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ) const
+void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ)
 {
   trajectorySZ.clear();
   if (observationsSZ.size() < 3) {

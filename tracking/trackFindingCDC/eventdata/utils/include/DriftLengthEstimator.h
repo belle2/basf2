@@ -35,7 +35,7 @@ namespace Belle2 {
       double updateDriftLength(TrackingUtilities::CDCRecoHit2D& recoHit2D);
 
       /// Update the drift length of the reconstructed hit in place.
-      double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);
+      static double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);
 
       /**
        *  Re-estimate the drift length of all three contained drift circles.

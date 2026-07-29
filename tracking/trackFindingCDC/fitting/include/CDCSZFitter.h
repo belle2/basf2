@@ -54,7 +54,7 @@ namespace Belle2 {
                   const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D) const;
 
       /// Update the trajectory with a fit to the observations.
-      void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ) const;
+      static void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ);
     };
   }
 }

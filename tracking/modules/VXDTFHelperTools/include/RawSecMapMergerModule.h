@@ -108,7 +108,7 @@ namespace Belle2 {
 
 
     /**  build graph with secChains found in TChain. */
-    template <class FilterType> SectorGraph<FilterType> buildGraph(
+    template <class FilterType> static SectorGraph<FilterType> buildGraph(
       std::unique_ptr<TChain>& chain,
       std::vector<BranchInterface<unsigned>>& sectorBranches,
       std::vector<BranchInterface<double>>& filterBranches);

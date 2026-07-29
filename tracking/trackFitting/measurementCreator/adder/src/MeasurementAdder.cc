@@ -251,7 +251,7 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
 }
 
 void MeasurementAdder::addMeasurementsToRecoTrack(RecoTrack& recoTrack,
-                                                  const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators) const
+                                                  const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators)
 {
   for (const auto& measurementCreator : measurementCreators) {
     const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(recoTrack);

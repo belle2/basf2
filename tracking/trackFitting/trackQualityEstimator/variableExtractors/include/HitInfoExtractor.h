@@ -164,8 +164,6 @@ namespace Belle2 {
       m_variables.at(identifier + "_std") = stddev;
       m_variables.at(identifier + "_min") = values.front();
       m_variables.at(identifier + "_max") = values.back();
-      // only in the case size==0 there would be a negative container index, but that case is handled above. So the suppress for cppcheck:
-      // cppcheck-suppress negativeContainerIndex
       float median = (size % 2) ? values[size / 2] : 0.5 * (values[size / 2] + values[size / 2 - 1]);
       m_variables.at(identifier + "_median") = median;
     }

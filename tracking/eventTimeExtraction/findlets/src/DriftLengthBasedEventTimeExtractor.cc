@@ -88,7 +88,7 @@ void DriftLengthBasedEventTimeExtractor::apply(std::vector<RecoTrack*>& recoTrac
 
     const std::vector<CDCHit*>& cdcHits = recoTrack->getSortedCDCHitList();
     for (CDCHit* cdcHit : cdcHits) {
-      RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(cdcHit);
+      const RecoHitInformation* recoHitInformation = recoTrack->getRecoHitInformation(cdcHit);
       try {
         const genfit::MeasuredStateOnPlane& mSoP = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInformation);
         addEventT0AndWeight(mSoP, *cdcHit, *recoTrack, recoHitInformation, eventT0WithWeights);

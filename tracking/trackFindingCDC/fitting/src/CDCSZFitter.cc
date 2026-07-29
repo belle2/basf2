@@ -96,7 +96,6 @@ namespace {
     B2INFO("nSZ " << nSZ);
     nSZ /= std::copysign(nSZ.norm(), -nSZ(1)); // Making n2 negative to normalize to forward along s
     Eigen::Matrix<double, 3, 1> nWSZ;
-    // cppcheck-suppress constStatement
     nWSZ << -meansSZ.transpose() * nSZ, nSZ;
     B2INFO("nWSZ " << nWSZ);
 

@@ -123,7 +123,7 @@ void AsicBackgroundLibraryCreator::apply(const std::vector<CDCWireHit>& wireHits
     auto asicID = std::pair<int, int>(board, channel / 8);  // ASIC are groups of 8 channels
     groupedByAsic[asicID].push_back(&wireHit);
   };
-  for (auto& asicList :  groupedByAsic) {
+  for (const auto& asicList :  groupedByAsic) {
     selectAsic(asicList.second, tracks);
   };
 

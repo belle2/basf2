@@ -53,7 +53,7 @@ std::vector<std::string> RawSecMapMergerModule::getRootFiles(std::string mapName
   B2INFO("RawSecMapMerger::getRootFiles(): loading mapName: " << mapName);
 
   std::vector<std::string> files4ThisMap;
-  for (std::string& fileName : m_PARAMrootFileNames) {
+  for (const std::string& fileName : m_PARAMrootFileNames) {
     if (fileName.find(mapName) == string::npos) {
       B2DEBUG(20, "getRootFiles: fileName " << fileName << " was _not_ accepted for map " << mapName);
       continue;
@@ -74,7 +74,7 @@ std::unique_ptr<TChain> RawSecMapMergerModule::createTreeChain(const SectorMapCo
   unique_ptr<TChain> treeChain = unique_ptr<TChain>(new TChain((configuration.secMapName + nHitString).c_str()));
 
   std::vector<std::string> fileList = getRootFiles(configuration.secMapName);
-  for (std::string& file : fileList) { treeChain->Add(file.c_str()); }
+  for (const std::string& file : fileList) { treeChain->Add(file.c_str()); }
 
   return treeChain;
 }
@@ -186,7 +186,7 @@ template <class FilterType> SectorGraph<FilterType> RawSecMapMergerModule::build
 
   // creating main graph containing all subgraphs:
   std::vector<std::string> filterNames;
-  for (auto& entry : filterBranches) {
+  for (const auto& entry : filterBranches) {
     filterNames.push_back(entry.name);
   }
   SectorGraph<FilterType> mainGraph(filterNames);
@@ -456,7 +456,7 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
                                VXDTFFilters<SpacePoint>::threeHitFilter_t ()));
   std::string filterVals;
 
-  for (auto& filterNameToFunction : filterNameToFunctions) {
+  for (const auto& filterNameToFunction : filterNameToFunctions) {
     string filterName = filterNameToFunction.first ;
     filterVals += filterName + ": "
                   + std::to_string(filterCutsMap.at(filterName).getMin())

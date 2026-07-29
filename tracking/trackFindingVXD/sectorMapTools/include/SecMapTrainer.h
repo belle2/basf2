@@ -263,7 +263,7 @@ namespace Belle2 {
         twoHitFilters.push_back(filterNameToFunction.first);
 
       m_rootInterface.initialize2Hit(twoHitFilters);
-      for (auto& nameToFunction : TwoSPfilterNamesToFunctions)
+      for (const auto& nameToFunction : TwoSPfilterNamesToFunctions)
         m_filterMill.add2HitFilter(nameToFunction);
 
 
@@ -276,9 +276,9 @@ namespace Belle2 {
         threeHitFilters.push_back(filterNameToFunction.first);
 
       m_rootInterface.initialize3Hit(threeHitFilters);
-      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+      for (const auto& nameToFunction : ThreeSPfilterNamesToFunctions)
         m_filterMill.add3HitFilter(nameToFunction);
-      for (auto& nameToFunction : ThreeSPfilterNamesToFunctions)
+      for (const auto& nameToFunction : ThreeSPfilterNamesToFunctions)
         m_filterMill.add3HitFilter(nameToFunction);
 
 

@@ -336,7 +336,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   // group them by their mcparticle id
   std::map<int, std::set<CDCSimHit*, FlightTimeOrder>> simHitsByMcParticleId;
   for (CDCSimHit* simHit : simHits) {
-    MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+    const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (mcParticle != nullptr) {
       int mcTrackId = mcParticle->getArrayIndex();
       simHitsByMcParticleId[mcTrackId].insert(simHit);
@@ -483,7 +483,7 @@ void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjN
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -523,7 +523,7 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -579,7 +579,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segment " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;

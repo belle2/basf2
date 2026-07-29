@@ -98,7 +98,7 @@ namespace Belle2 {
 
       return privateAddSectors(m_compactSectorsIDMap,
                                normalizedUsup, normalizedVsup,
-                               fullSecIDs,
+                               fullSecIDs, m_sectorCounter,
                                layer, ladder, sensor);
 
     }
@@ -372,11 +372,12 @@ namespace Belle2 {
     /// It returns 0 in case of errors (memory exhausted, or sector redefinition.)
     template<  class TContainer,
                class ... Indexes >
-    int privateAddSectors(TContainer& container,
-                          const std::vector< double >&     normalizedUsup,
-                          const std::vector< double >&     normalizedVsup,
-                          const std::vector< std::vector< FullSecID > >& fullSecIDs,
-                          short unsigned int index, Indexes ... indexes)
+    static int privateAddSectors(TContainer& container,
+                                 const std::vector< double >&     normalizedUsup,
+                                 const std::vector< double >&     normalizedVsup,
+                                 const std::vector< std::vector< FullSecID > >& fullSecIDs,
+                                 sectorID_t& sectorCounter,
+                                 short unsigned int index, Indexes ... indexes)
     {
       try {
         if ((int) container.size() < (int)index + 1)
@@ -384,17 +385,18 @@ namespace Belle2 {
       } catch (...) { return 0; }
       return privateAddSectors(container[ index ],
                                normalizedUsup, normalizedVsup,
-                               fullSecIDs, indexes...);
+                               fullSecIDs, sectorCounter, indexes...);
     }
 
 
     /// The hidden private method that end the recursion.
     /// It returns the number of added sectors.
     /// In particular it return 0 if sectors are already defined on the sensor.
-    int privateAddSectors(SectorsOnSensor<sectorID_t>&            sectors,
-                          const std::vector< double>&                  normalizedUsup,
-                          const std::vector< double>&                  normalizedVsup,
-                          const std::vector< std::vector< FullSecID > >&    fullSecIDs)
+    static int privateAddSectors(SectorsOnSensor<sectorID_t>&            sectors,
+                                 const std::vector< double>&                  normalizedUsup,
+                                 const std::vector< double>&                  normalizedVsup,
+                                 const std::vector< std::vector< FullSecID > >&    fullSecIDs,
+                                 sectorID_t& sectorCounter)
     {
       if (sectors.size() != 0)
         return 0;
@@ -412,7 +414,7 @@ namespace Belle2 {
               sectors.resize(secID + 1);
           } catch (...) { return addedSectors; }
 
-          sectors[ secID ] = ++m_sectorCounter ;
+          sectors[ secID ] = ++sectorCounter ;
           addedSectors++;
         }
       return addedSectors;

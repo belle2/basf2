@@ -1,6 +1,6 @@
-# EventType: 1111449101
-# Descriptor: [B0 -> chi_c1 [-> J/psi [-> mu+ mu-] gamma] pi0 [-> gamma gamma] eta [-> gamma gamma] K_S0 [-> pi+ pi-]]
-# NickName: Bu_chic1pi0etaKS_Jpsigamma_mumu
+# EventType: 1211572101
+# Descriptor: [B+ -> J/psi [-> e+ e-] pi+ eta [-> pi+ pi- pi0 [-> gamma gamma]] K_S0 [-> pi+ pi-]]
+# NickName: Bu_JpsipipetaKS_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Quarkonium
@@ -18,21 +18,18 @@ Alias etasig eta
 Alias K_S0sig K_S0
 
 Decay Upsilon(4S)
-1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
 Enddecay
 
-Decay B0sig
-1.0 chi_c1sig pi0sig etasig K_S0sig PHOTOS PHSP;
+Decay B+sig
+1.0 J/psisig pi+ etasig K_S0sig PHOTOS PHSP;
 Enddecay
 
-CDecay anti-B0sig
-
-Decay chi_c1sig
-1.0 J/psisig gamma PHSP;
-Enddecay
+CDecay B-sig
 
 Decay J/psisig
-1.0 mu+ mu- PHOTOS PHSP;
+1.0 e+ e- PHOTOS PHSP;
 Enddecay
 
 Decay pi0sig
@@ -40,7 +37,7 @@ Decay pi0sig
 Enddecay
 
 Decay etasig
-1.0 gamma gamma PHSP;
+1.0 pi+ pi- pi0sig PHOTOS PHSP;
 Enddecay
 
 Decay K_S0sig

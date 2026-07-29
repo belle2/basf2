@@ -48,10 +48,10 @@ namespace Belle2 {
       void updateDriftLength(TrackingUtilities::CDCSegment2D& segment);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
+      static void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);
+      static void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = true;

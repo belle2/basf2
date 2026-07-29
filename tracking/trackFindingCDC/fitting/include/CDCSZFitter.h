@@ -30,28 +30,28 @@ namespace Belle2 {
 
       /// Returns the fitted sz trajectory of the track with the z-information of all stereo hits of the number
       /// of stereo hits is big enough. Else return the basic assumption.
-      TrackingUtilities::CDCTrajectorySZ fitWithStereoHits(const TrackingUtilities::CDCTrack& track) const;
+      static TrackingUtilities::CDCTrajectorySZ fitWithStereoHits(const TrackingUtilities::CDCTrack& track);
 
       /// Returns a fitted trajectory
-      TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment2D& stereoSegment,
-                                             const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D) const;
+      static TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment2D& stereoSegment,
+                                                    const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D);
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment3D& segment3D) const;
+      static TrackingUtilities::CDCTrajectorySZ fit(const TrackingUtilities::CDCSegment3D& segment3D);
 
       /// Fits a linear sz trajectory to the s and z coordinates given in the observations.
-      TrackingUtilities::CDCTrajectorySZ fit(CDCSZObservations observationsSZ) const;
+      static TrackingUtilities::CDCTrajectorySZ fit(CDCSZObservations observationsSZ);
 
       /// Legacy - Fits a linear sz trajectory to the x and y coordinates interpreted as sz space
-      TrackingUtilities::CDCTrajectorySZ fit(const CDCObservations2D& observations2D) const;
+      static TrackingUtilities::CDCTrajectorySZ fit(const CDCObservations2D& observations2D);
 
       /// Updates the trajectory of the axial stereo segment pair inplace
-      void update(const TrackingUtilities::CDCSegmentPair& segmentPair) const;
+      static void update(const TrackingUtilities::CDCSegmentPair& segmentPair);
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
-      void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ,
-                  const TrackingUtilities::CDCSegment2D& stereoSegment,
-                  const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D) const;
+      static void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ,
+                         const TrackingUtilities::CDCSegment2D& stereoSegment,
+                         const TrackingUtilities::CDCTrajectory2D& axialTrajectory2D);
 
       /// Update the trajectory with a fit to the observations.
       static void update(TrackingUtilities::CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ);

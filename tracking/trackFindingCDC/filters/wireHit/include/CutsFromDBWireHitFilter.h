@@ -51,7 +51,7 @@ namespace Belle2 {
       /** Check if value <= upper_value
        If upper_value == -1, then return true */
       template <typename T>
-      bool isLessThanOrEqualTo(const T& value, const T& upper_value) const;
+      static bool isLessThanOrEqualTo(const T& value, const T& upper_value);
 
       /// Cut values from the Data Base.
       std::unique_ptr<DBObjPtr<CDCWireHitRequirements> > m_CDCWireHitRequirementsFromDB;

@@ -39,14 +39,14 @@ namespace Belle2 {
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      TrackingUtilities::CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations) const;
+      static TrackingUtilities::CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations);
 
       /**
        *  Implements the weighted Theil-Sen line fit algorithm
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      TrackingUtilities::CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations) const;
+      static TrackingUtilities::CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations);
 
 
     private:

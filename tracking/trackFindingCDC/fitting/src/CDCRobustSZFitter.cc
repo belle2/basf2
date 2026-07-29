@@ -55,7 +55,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObserva
   }
 }
 
-CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObservations) const
+CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObservations)
 {
   std::vector<double> tanLambdas;
   tanLambdas.reserve(szObservations.size() * (szObservations.size() - 1) / 2);
@@ -78,7 +78,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObserv
   return trajectorySZ;
 }
 
-CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& szObservations) const
+CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& szObservations)
 {
   std::vector<WithWeight<double> > weightedTanLambdas;
   Weight totalWeight = 0;

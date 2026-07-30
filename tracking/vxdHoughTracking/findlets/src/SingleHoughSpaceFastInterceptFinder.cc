@@ -64,11 +64,17 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
 
   const uint maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
   m_maxRecursionLevel = std::max(maxRecursionLevelFromSectors, m_maxRecursionLevel);
-  if (m_maxRecursionLevel > 14) {
-    B2ERROR("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
-            m_maxRecursionLevel <<
-            ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.");
-  }
+  B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than " << c_maxAllowedRecusionLevel <<
+           ", but it is " << m_maxRecursionLevel <<
+           ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
+           m_maxRecursionLevel <= c_maxAllowedRecusionLevel);
+  B2ASSERT("The maximum number of angleSectors must not be larger than " << c_maxHSSectorNumber <<
+           ", but it is " << m_nAngleSectors << ", please choose a smaller value for nAngleSectors.",
+           m_nAngleSectors <= c_maxHSSectorNumber);
+  B2ASSERT("The maximum number of verticalSectors must not be larger than " << c_maxHSSectorNumber <<
+           ", but it is " << m_nVerticalSectors << ", please choose a smaller value for nAngleSectors.",
+           m_nVerticalSectors <= c_maxHSSectorNumber);
+
   m_unitX = (m_maximumX - m_minimumX) / (double)m_nAngleSectors;
   for (uint i = 0; i < m_nAngleSectors; i++) {
     double x = m_minimumX + m_unitX * (double)i;
@@ -205,7 +211,13 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
         if (currentRecursion < m_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          const uint globalIndex = localIndexX + 16384 * (16384 - localIndexY);
+          // As usual in creating a 2D-array as 1D, calculate the global index as
+          // xIndex + yIndex * ySize
+          // A bit more complicated here though, since the y-axis is inverted on the fly.
+          // Instead of starting the coordinate system in the top-left corner, it has to start in the bottom-left corner
+          // for creating HS clusters from bottom to top and from left to right, so this becomes
+          // xIndex + ySize * (ySize - yIndex)   (eq. 0)
+          const uint globalIndex = localIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - localIndexY);
           m_activeSectorsMap.insert({globalIndex, containedHits});
           m_activeSectorsIndices.push_back(globalIndex);
         }
@@ -229,8 +241,16 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
       continue;
     }
 
-    // Get local (x, y) indices out of the globalSectorIndex
-    m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & 0x3FFF), 16384 - (currentGlobalSectorIndex >> 14));
+    // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+    // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+    // (currentGlobalSectorIndex & c_xIndexBitMask)
+    // equals % c_maxHSSectorNumber, i.e.
+    // currentGlobalSectorIndex % c_maxHSSectorNumber.
+    // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+    // >> c_maxAllowedRecusionLevel
+    // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
+    m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & c_xIndexBitMask),
+                                              c_maxHSSectorNumber - (currentGlobalSectorIndex >> c_maxAllowedRecusionLevel));
     m_clusterSize = 1;
 
     m_currentTrackCandidate.clear();
@@ -255,9 +275,16 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
-  // Get local (x, y) indices out of the globalSectorIndex
-  const ushort lastLocalIndexX = (lastGlobalSectorIndex & 0x3FFF);
-  const ushort lastLocalIndexY = 16384 - (lastGlobalSectorIndex >> 14);
+  // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+  // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+  // (currentGlobalSectorIndex & c_xIndexBitMask)
+  // equals % c_maxHSSectorNumber, i.e.
+  // currentGlobalSectorIndex % c_maxHSSectorNumber.
+  // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+  // >> c_maxAllowedRecusionLevel
+  // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
+  const ushort lastLocalIndexX = (lastGlobalSectorIndex & c_xIndexBitMask);
+  const ushort lastLocalIndexY = c_maxHSSectorNumber - (lastGlobalSectorIndex >> c_maxAllowedRecusionLevel);
 
   // For the iterative / recursive search, just check the direct neighbours in x and y direction
   for (ushort currentLocalIndexY = lastLocalIndexY; currentLocalIndexY >= lastLocalIndexY - 1; currentLocalIndexY--) {
@@ -273,7 +300,8 @@ void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSector
         return;
       }
 
-      const uint currentGlobalSectorIndex = currentLocalIndexX + 16384 * (16384 - currentLocalIndexY);
+      // Calculate the global index for this sector by applying (eq. 0)
+      const uint currentGlobalSectorIndex = currentLocalIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - currentLocalIndexY);
       // If currentGlobalSectorIndex == lastGlobalSectorIndex, the sector in check is the "parent" we came from
       // and thus has already been checked, so continue
       if (currentGlobalSectorIndex == lastGlobalSectorIndex) {

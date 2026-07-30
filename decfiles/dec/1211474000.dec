@@ -1,5 +1,5 @@
 # EventType: 1211474000
-# Descriptor: [B+ -> psi(2S) [-> J/psi [-> mu+ mu-] pi+ pi-] pi0 [-> gamma gamma] eta [-> pi+ pi- pi0sig [-> gamma gamma]] K+]
+# Descriptor: [B+ -> psi(2S) [-> J/psi [-> mu+ mu-] pi+ pi-] pi0 [-> gamma gamma] eta [-> pi+ pi- pi0 [-> gamma gamma]] K+]
 # NickName: Bu_psi2spi0etaKp_Jpsipippim_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes

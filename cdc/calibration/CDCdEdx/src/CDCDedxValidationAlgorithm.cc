@@ -850,14 +850,11 @@ void CDCDedxValidationAlgorithm::plotEventStats()
 
 void CDCDedxValidationAlgorithm::DatabaseIN(int experiment, int run)
 {
-  if (m_EventMetaData.isValid()) {
-    m_EventMetaData->setExperiment(experiment);
-    m_EventMetaData->setRun(run);
-  }
-
   auto& dbConfiguration = Conditions::Configuration::getInstance();
+
   dbConfiguration.overrideGlobalTags();
   dbConfiguration.setGlobalTags({"online"});
+
   if (!m_testingPayloadName.empty() && m_GlobalTagName.empty()) {
     dbConfiguration.prependTestingPayloadLocation(m_testingPayloadName);
   } else if (m_testingPayloadName.empty() && !m_GlobalTagName.empty()) {
@@ -865,12 +862,21 @@ void CDCDedxValidationAlgorithm::DatabaseIN(int experiment, int run)
   } else
     B2FATAL("Setting both testing payload and Global Tag or setting no one of them.");
 
+  StoreObjPtr<EventMetaData> EventMetaData;
+
   /* Mimic a module initialization. */
   DataStore::Instance().setInitializeActive(true);
-  m_EventMetaData.registerInDataStore();
+  EventMetaData.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  if (!m_EventMetaData.isValid())
-    m_EventMetaData.construct(1, run, experiment);
+
+  if (!EventMetaData.isValid())
+    EventMetaData.construct(1, run, experiment);
+
+  else {
+    EventMetaData->setEvent(1);
+    EventMetaData->setExperiment(experiment);
+    EventMetaData->setRun(run);
+  }
 
   /* Database instance and configuration. */
   DBStore& dbStore = DBStore::Instance();

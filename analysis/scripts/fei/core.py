@@ -402,7 +402,8 @@ class PreReconstruction:
                         'pi0:veto',
                         {
                             'InvM': 'pi0vetoMass',
-                            'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEnergyAsymmetry',
+                            'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEneAsy',
+                            'cosHelicityAngleMomentum': 'pi0vetoCosHelMom',
                         },
                         path=Ddaughter_roe_path
                     )

@@ -122,14 +122,6 @@ namespace Belle2 {
       std::array<float, c_maxHSSectorNumber> m_HSCenterSinValuesLUT = {0};
       /// cosine values of the Hough Space sector center coordinates
       std::array<float, c_maxHSSectorNumber> m_HSCenterCosValuesLUT = {0};
-      /// y values of the Hough Space sector boarders
-      std::array<float, c_maxLUTSize> m_HSYLUT = {0};
-      /// y values of the Hough Space sector centers
-      std::array<float, c_maxHSSectorNumber> m_HSYCenterLUT = {0};
-      /// x values of the Hough Space sector boarders
-      std::array<float, c_maxLUTSize> m_HSXLUT = {0};
-      /// x values of the Hough Space sector centers
-      std::array<float, c_maxHSSectorNumber> m_HSXCenterLUT = {0};
 
       /// Map containing only active HS sectors, i.e. those with hits from enough layers contained in them.
       /// The keys are the global indices of the HS cell, the values are lists of pointers to the contained hits

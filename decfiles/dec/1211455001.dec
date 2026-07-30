@@ -13,6 +13,7 @@
 # determination. All exclusive decays have the PHSP distributuion.
 # Do not use it for one-dimensional analyses without proper reweighting.
 
+Alias pi0sig pi0
 Alias omegasig omega
 
 Decay Upsilon(4S)

@@ -1,5 +1,5 @@
 # EventType: 1211574001
-# Descriptor: [B+ -> psi(2S) [-> J/psi [-> e+ e-] pi+ pi-] pi0 [-> gamma gamma] omega [-> pi+ pi- pi0 [-> gamma gamma]] K+]
+# Descriptor: [B+ -> psi(2S) [-> J/psi [-> e+ e-] pi+ pi-] pi0 [-> gamma gamma] omega [-> pi+ pi- pi0sig [-> gamma gamma]] K+]
 # NickName: Bu_psi2spi0omegaKp_Jpsipippim_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
@@ -13,7 +13,7 @@
 # determination. All exclusive decays have the PHSP distributuion.
 # Do not use it for one-dimensional analyses without proper reweighting.
 
-Alias pi0 pi0
+Alias pi0sig pi0
 Alias omegasig omega
 
 Decay Upsilon(4S)
@@ -22,7 +22,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0 psi(2S)sig pi0 omegasig K+ PHOTOS PHSP;
+1.0 psi(2S)sig pi0sig omegasig K+ PHOTOS PHSP;
 Enddecay
 
 CDecay B-sig
@@ -35,12 +35,12 @@ Decay J/psisig
 1.0 e+ e- PHOTOS PHSP;
 Enddecay
 
-Decay pi0
+Decay pi0sig
 1.0 gamma gamma PHSP;
 Enddecay
 
 Decay omegasig
-1.0 pi+ pi- pi0 PHOTOS PHSP;
+1.0 pi+ pi- pi0sig PHOTOS PHSP;
 Enddecay
 
 End

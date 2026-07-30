@@ -94,8 +94,8 @@ PostCutConfiguration.bestCandidateCut.__doc__ = "Number of best-candidates to ke
 
 DecayChannel = collections.namedtuple(
     'DecayChannel',
-    'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto')
-DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None, False)
+    'name, label, decayString, daughters, mvaConfig, preCutConfig, decayModeID, pi0veto, extraModuleSpec')
+DecayChannel.__new__.__defaults__ = (None, None, None, None, None, None, None, False, None)
 DecayChannel.__doc__ = "Decay channel of a Particle."
 DecayChannel.name.__doc__ = "str:Name of the channel e.g. :code:`D0:generic_0`"
 DecayChannel.label.__doc__ = "Label used to identify the decay channel e.g. for weight files independent of decayModeID"
@@ -105,6 +105,7 @@ DecayChannel.mvaConfig.__doc__ = "MVAConfiguration object which is used for this
 DecayChannel.preCutConfig.__doc__ = "PreCutConfiguration object which is used for this channel."
 DecayChannel.decayModeID.__doc__ = "DecayModeID of this channel. Unique ID for each channel of this particle."
 DecayChannel.pi0veto.__doc__ = "If true, additional pi0veto variables are added to the MVAs, useful only for decays with gammas."
+DecayChannel.extraModuleSpec.__doc__ = "Dict {module,class,args,kwargs} to run an extra basf2 module for this channel."
 
 MonitoringVariableBinning = {'mcErrors': ('mcErrors', 513, -0.5, 512.5),
                              'mcParticleStatus': ('mcParticleStatus', 257, -0.5, 256.5),
@@ -172,7 +173,8 @@ class Particle:
     def __init__(self, identifier: str,
                  mvaConfig: MVAConfiguration,
                  preCutConfig: PreCutConfiguration = PreCutConfiguration(),
-                 postCutConfig: PostCutConfiguration = PostCutConfiguration()):
+                 postCutConfig: PostCutConfiguration = PostCutConfiguration(),
+                 extraModuleSpec: dict | None = None):
         """
         Creates a Particle without any decay channels. To add decay channels use addChannel method.
             @param identifier is the pdg name of the particle as a string
@@ -196,6 +198,8 @@ class Particle:
         self.preCutConfig = preCutConfig
         #: post cut configuration (see PostCutConfiguration)
         self.postCutConfig = postCutConfig
+        #: specifications for adding an extra module if provided by user
+        self.extraModuleSpec = extraModuleSpec
 
     def __eq__(self, a):
         """
@@ -228,7 +232,8 @@ class Particle:
                    daughters: typing.Sequence[str],
                    mvaConfig: MVAConfiguration = None,
                    preCutConfig: PreCutConfiguration = None,
-                   pi0veto: bool = False):
+                   pi0veto: bool = False,
+                   extraModuleSpec: dict | None = None):
         """
         Appends a new decay channel to the Particle object.
             @param daughters is a list of pdg particle names e.g. ['pi+','K-']
@@ -242,6 +247,9 @@ class Particle:
         mvaConfig = copy.deepcopy(self.mvaConfig if mvaConfig is None else mvaConfig)
         # Use default preCutConfig of this particle if no channel-specific config is given
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
+        # Use default extraModuleSpec of this particle if no channel-specific config is given
+        extraModuleSpec = (self.extraModuleSpec if extraModuleSpec is None else extraModuleSpec)
+
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:
             basf2.B2FATAL(
@@ -306,5 +314,6 @@ class Particle:
                                           mvaConfig=mvaConfig,
                                           preCutConfig=preCutConfig,
                                           decayModeID=decayModeID,
-                                          pi0veto=pi0veto))
+                                          pi0veto=pi0veto,
+                                          extraModuleSpec=extraModuleSpec))
         return self

@@ -228,7 +228,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
 
 ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHitsToRecoTracksModule::reconstruct(
   const CDCWireHit& wireHit,
-  const RecoTrack& recoTrack, const RecoHitInformation* const recoHitInformation) const
+  const RecoTrack& recoTrack, const RecoHitInformation* const recoHitInformation)
 {
   ReconstructionResults results;
 

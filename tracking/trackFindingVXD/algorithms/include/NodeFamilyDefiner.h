@@ -34,7 +34,7 @@ namespace Belle2 {
      * Performs a width first flood fill algorithm.
      * Returns total number of defined families.
      */
-    short defineFamilies(ContainerType& aNetwork)
+    static short defineFamilies(ContainerType& aNetwork)
     {
       short currentFamily = 0;
       for (NodeType* aNode : aNetwork) {
@@ -61,7 +61,7 @@ namespace Belle2 {
 
   private:
     /** Assign family to all connected nodes and return their neighbours.*/
-    NeighbourContainerType markNodes(short family, const NeighbourContainerType& neighbours)
+    static NeighbourContainerType markNodes(short family, const NeighbourContainerType& neighbours)
     {
       NeighbourContainerType newNeighbours;
       for (auto& neighbour : neighbours) {

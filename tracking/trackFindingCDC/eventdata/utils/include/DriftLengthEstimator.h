@@ -35,7 +35,7 @@ namespace Belle2 {
       double updateDriftLength(TrackingUtilities::CDCRecoHit2D& recoHit2D);
 
       /// Update the drift length of the reconstructed hit in place.
-      double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);
+      static double updateDriftLength(TrackingUtilities::CDCRecoHit3D& recoHit3D, double tanLambda);
 
       /**
        *  Re-estimate the drift length of all three contained drift circles.
@@ -48,10 +48,10 @@ namespace Belle2 {
       void updateDriftLength(TrackingUtilities::CDCSegment2D& segment);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
+      static void updateDriftLength(TrackingUtilities::CDCSegment3D& segment, double tanLambda);
 
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);
+      static void updateDriftLength(TrackingUtilities::CDCTrack& track, double tanLambda);
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = true;

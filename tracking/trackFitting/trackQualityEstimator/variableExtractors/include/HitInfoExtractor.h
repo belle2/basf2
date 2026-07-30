@@ -170,8 +170,8 @@ namespace Belle2 {
 
   private:
     /// Helper function to get Kalman fitter info from RecoHitInformation if available
-    genfit::KalmanFitterInfo* getKalmanFitterInfo(const RecoTrack& recoTrack,
-                                                  const RecoHitInformation* recoHitInformation)
+    static genfit::KalmanFitterInfo* getKalmanFitterInfo(const RecoTrack& recoTrack,
+                                                         const RecoHitInformation* recoHitInformation)
     {
       const genfit::TrackPoint* trackPointPtr = recoTrack.getCreatedTrackPoint(recoHitInformation);
       if (trackPointPtr) {
@@ -182,7 +182,7 @@ namespace Belle2 {
     }
     /// Helper function to safely get Chi2 from a KalmanFitterInfo object if available, and if not
     /// return nullopt
-    std::optional<float> getSmoothedChi2(const genfit::KalmanFitterInfo* kalmanFitterInfo)
+    static std::optional<float> getSmoothedChi2(const genfit::KalmanFitterInfo* kalmanFitterInfo)
     {
       try {
         return kalmanFitterInfo->getSmoothedChi2();

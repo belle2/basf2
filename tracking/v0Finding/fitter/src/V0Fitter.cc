@@ -182,7 +182,7 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
   return v0TrackFitResult;
 }
 
-std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const
+std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis)
 {
   if (v0Hypothesis == Const::Kshort) {
     return std::make_pair(Const::pion, Const::pion);

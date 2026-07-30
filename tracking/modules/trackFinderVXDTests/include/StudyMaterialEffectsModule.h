@@ -42,10 +42,10 @@ namespace Belle2 {
 
 
     /** takes SVDTrueHit and sensorID to get global position of the hit. If useEntry == true, the entry position is taken, else: exitPosition. */
-    B2Vector3D getGlobalPosition(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
+    static B2Vector3D getGlobalPosition(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
 
     /** takes SVDTrueHit and sensorID to get global momentum of the hit. If useEntry == true, the entry momentum is taken, else: exitMomentum. */
-    B2Vector3D getGlobalMomentumVector(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
+    static B2Vector3D getGlobalMomentumVector(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
 
     /** takes SpacePoint to get the (first) corresponding trueHit connected to the same particle. */
     const SVDTrueHit* getTrueHit(const SpacePoint& aSP);

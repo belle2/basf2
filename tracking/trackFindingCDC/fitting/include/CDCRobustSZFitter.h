@@ -32,26 +32,26 @@ namespace Belle2 {
        *    - Use RANSAC instead of Theil-Sen.
        *    - Think about the parameters better.
        */
-      TrackingUtilities::CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSZObservations& szObservations) const;
+      static TrackingUtilities::CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSZObservations& szObservations);
 
       /**
        *  Implements the original Theil-Sen line fit algorithm
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      TrackingUtilities::CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations) const;
+      static TrackingUtilities::CDCTrajectorySZ fitTheilSen(const CDCSZObservations& szObservations);
 
       /**
        *  Implements the weighted Theil-Sen line fit algorithm
        *
        *  Does not estimate the covariances of the fit parameters.
        */
-      TrackingUtilities::CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations) const;
+      static TrackingUtilities::CDCTrajectorySZ fitWeightedTheilSen(const CDCSZObservations& szObservations);
 
 
     private:
       /// Compute the median z0 intercept from the given observations and an estimated slope.
-      double getMedianZ0(const CDCSZObservations& szObservations, double tanLambda) const;
+      static double getMedianZ0(const CDCSZObservations& szObservations, double tanLambda);
     };
   }
 }

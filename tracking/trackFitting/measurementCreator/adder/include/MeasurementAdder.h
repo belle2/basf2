@@ -206,8 +206,8 @@ namespace Belle2 {
     }
 
     /// Helper: Go through all measurement creators in the given list and create the measurement without a given hit.
-    void addMeasurementsToRecoTrack(RecoTrack& recoTrack,
-                                    const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators) const;
+    static void addMeasurementsToRecoTrack(RecoTrack& recoTrack,
+                                           const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators);
   };
 }
 

@@ -153,7 +153,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
 }
 
 template<typename EntryType, typename MetaInfoType >
-size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const
+size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network)
 {
   size_t nLinks{};
   for (const auto& outerNodes : network) {

@@ -1,6 +1,6 @@
-# EventType: 1211574000
-# Descriptor: [B+ -> psi(2S) [-> J/psi [-> e+ e-] pi+ pi-] pi0 [-> gamma gamma] eta [-> pi+ pi- pi0 [-> gamma gamma]] K+]
-# NickName: Bu_psi2spi0etaKp_Jpsipippim_ee
+# EventType: 1211553001
+# Descriptor: [B+ -> chi_c1 [-> J/psi [-> e+ e-] gamma] omega [-> pi+ pi- pi0 [-> gamma gamma]] K+]
+# NickName: Bu_chic1omegaKp_Jpsigamma_ee
 # Documentation: B -> charmonium decays.
 # Tested: Yes
 # PhysicsWG: Quarkonium
@@ -14,7 +14,7 @@
 # Do not use it for one-dimensional analyses without proper reweighting.
 
 Alias pi0sig pi0
-Alias etasig eta
+Alias omegasig omega
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -22,13 +22,13 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0 psi(2S)sig pi0sig etasig K+ PHOTOS PHSP;
+1.0 chi_c1sig omegasig K+ PHOTOS PHSP;
 Enddecay
 
 CDecay B-sig
 
-Decay psi(2S)sig
-1.0 J/psisig pi+ pi- PHOTOS PHSP;
+Decay chi_c1sig
+1.0 J/psisig gamma PHSP;
 Enddecay
 
 Decay J/psisig
@@ -39,7 +39,7 @@ Decay pi0sig
 1.0 gamma gamma PHSP;
 Enddecay
 
-Decay etasig
+Decay omegasig
 1.0 pi+ pi- pi0sig PHOTOS PHSP;
 Enddecay
 

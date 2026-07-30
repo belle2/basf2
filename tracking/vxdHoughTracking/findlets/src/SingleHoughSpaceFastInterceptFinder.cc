@@ -62,7 +62,7 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
-  const uint maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
+  const ushort maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
   m_maxRecursionLevel = std::max(maxRecursionLevelFromSectors, m_maxRecursionLevel);
   B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than " << c_maxAllowedRecusionLevel <<
            ", but it is " << m_maxRecursionLevel <<
@@ -75,27 +75,21 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
            ", but it is " << m_nVerticalSectors << ", please choose a smaller value for nAngleSectors.",
            m_nVerticalSectors <= c_maxHSSectorNumber);
 
-  m_unitX = (m_maximumX - m_minimumX) / (double)m_nAngleSectors;
-  for (uint i = 0; i < m_nAngleSectors; i++) {
-    double x = m_minimumX + m_unitX * (double)i;
-    double xc = x + 0.5 * m_unitX;
+  m_unitX = (m_maximumX - m_minimumX) / (float)m_nAngleSectors;
+  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
 
-    m_HSXLUT[i] = x;
+  for (ushort i = 0; i < m_nAngleSectors; i++) {
+    float x = m_minimumX + m_unitX * (float)i;
+    float xc = x + 0.5 * m_unitX;
+
     m_HSSinValuesLUT[i] = sin(x);
     m_HSCosValuesLUT[i] = cos(x);
     m_HSCenterSinValuesLUT[i] = sin(xc);
     m_HSCenterCosValuesLUT[i] = cos(xc);
-    m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_nAngleSectors] = m_maximumX;
   m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
   m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
-  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (uint i = 0; i <= m_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
-  }
   B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
@@ -122,7 +116,7 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
       return
         (a->getDataCache().layer > b->getDataCache().layer) or
         (a->getDataCache().layer == b->getDataCache().layer
-         and a->getHit()->getPosition().Perp() > b->getHit()->getPosition().Perp());
+         and a->getHit()->getPosition().Perp2() > b->getHit()->getPosition().Perp2());
     });
 
     rawTrackCandidates.emplace_back(trackCand);
@@ -133,9 +127,8 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
 }
 
 
-void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, uint xmin, uint xmax,
-    uint ymin,
-    uint ymax, uint currentRecursion)
+void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits,
+    const ushort xmin, const ushort xmax, const ushort ymin, const ushort ymax, const ushort currentRecursion)
 {
   std::vector<VXDHoughState*> containedHits;
   containedHits.reserve(hits.size());
@@ -144,37 +137,39 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
-  const uint centerx = xmin + (uint)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
-  const uint centery = ymin + (uint)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
-  const uint xIndexCache[3] = {xmin, centerx, xmax};
-  const uint yIndexCache[3] = {ymin, centery, ymax};
+  const ushort centerx = xmin + (ushort)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
+  const ushort centery = ymin + (ushort)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
+  const ushort xIndexCache[3] = {xmin, centerx, xmax};
+  const ushort yIndexCache[3] = {ymin, centery, ymax};
 
   for (int i = 0; i < 2 ; ++i) {
-    const uint left  = xIndexCache[i];
-    const uint right = xIndexCache[i + 1];
-    const uint localIndexX = left;
+    const ushort left  = xIndexCache[i];
+    const ushort right = xIndexCache[i + 1];
+    const ushort localIndexX = left;
 
     if (left == right) continue;
 
-    const double& sinLeft     = m_HSSinValuesLUT[left];
-    const double& cosLeft     = m_HSCosValuesLUT[left];
-    const double& sinRight    = m_HSSinValuesLUT[right];
-    const double& cosRight    = m_HSCosValuesLUT[right];
+    const float& sinLeft     = m_HSSinValuesLUT[left];
+    const float& cosLeft     = m_HSCosValuesLUT[left];
+    const float& sinRight    = m_HSSinValuesLUT[right];
+    const float& cosRight    = m_HSCosValuesLUT[right];
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
-    // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];   // >> 1 equals a division by 2
+    // is quite large and the logic would become rather complex, so this is just an approximation which is good enough
+    const float sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
+    const float cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
 
     for (int j = 0; j < 2; ++j) {
-      const uint lowerIndex = yIndexCache[j];
-      const uint upperIndex = yIndexCache[j + 1];
+      const ushort lowerIndex = yIndexCache[j];
+      const ushort upperIndex = yIndexCache[j + 1];
 
       if (lowerIndex == upperIndex) continue;
 
-      const uint localIndexY = lowerIndex;
-      const double& localUpperCoordinate = m_HSYLUT[lowerIndex];
-      const double& localLowerCoordinate = m_HSYLUT[upperIndex];
+      const ushort localIndexY = lowerIndex;
+      // Sector counting for y starts at positive values, i.e. the topmost sector has index 0,
+      // and the bottommost sector has the highest index
+      const float localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
+      const float localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
 
       // reset layerHits and containedHits
       layerHits = 0;
@@ -182,20 +177,20 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       for (VXDHoughState* hit : hits) {
 
         const VXDHoughState::DataCache& hitData = hit->getDataCache();
-        const double& m = hitData.xConformal;
-        const double& a = hitData.yConformal;
+        const float& m = hitData.xConformal;
+        const float& a = hitData.yConformal;
 
-        const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
-        const double derivativeyRight  = m * -sinRight  + a * cosRight;
-        const double derivativeyCenter = m * -sinCenter + a * cosCenter;
+        const float derivativeyLeft   = m * -sinLeft   + a * cosLeft;
+        const float derivativeyRight  = m * -sinRight  + a * cosRight;
+        const float derivativeyCenter = m * -sinCenter + a * cosCenter;
 
         // Only interested in the rising arm of the sinosoidal curves.
         // Thus if derivative on both sides of the cell is negative, ignore and continue.
         if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
 
-        const double yLeft   = m * cosLeft   + a * sinLeft;
-        const double yRight  = m * cosRight  + a * sinRight;
-        const double yCenter = m * cosCenter + a * sinCenter;
+        const float yLeft   = m * cosLeft   + a * sinLeft;
+        const float yRight  = m * cosRight  + a * sinRight;
+        const float yCenter = m * cosCenter + a * sinCenter;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
@@ -271,7 +266,7 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
   }
 }
 
-void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastGlobalSectorIndex)
+void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(const uint lastGlobalSectorIndex)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 

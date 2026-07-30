@@ -59,8 +59,8 @@ namespace Belle2 {
       /// @param ymin minimum y-index of the sub-Hough Space in the current recursion step
       /// @param ymax maximum y-index of the sub-Hough Space in the current recursion step
       /// @param currentRecursion current recursion step, has to be < m_maxRecursionLevel
-      void fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, uint xmin, uint xmax, uint ymin, uint ymax,
-                                 uint currentRecursion);
+      void fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, const ushort xmin, const ushort xmax,
+                                 const ushort ymin, const ushort ymax, const ushort currentRecursion);
 
       /// Find Hough Space clusters. Loop over all found sectors in m_SectorArray and then calls
       /// the DepthFirstSearch function to recursively find the clusters
@@ -68,40 +68,40 @@ namespace Belle2 {
 
       /// Perform depth first search recursive algorithm to find clusters in the Hough Space
       /// @param lastGlobalSectorIndex global index of the last sector checked
-      void DepthFirstSearch(uint lastGlobalSectorIndex);
+      void DepthFirstSearch(const uint lastGlobalSectorIndex);
 
       // Parameters
       /// maximum number of recursive calls of FastInterceptFinder2d
-      uint m_maxRecursionLevel = 9;
+      ushort m_maxRecursionLevel = 9;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_nAngleSectors = 512;
+      ushort m_nAngleSectors = 512;
 
       /// number of sectors of the Hough Space on the vertical axis
-      uint m_nVerticalSectors = 512;
+      ushort m_nVerticalSectors = 512;
 
       /// vertical size of the Hough Space, defaults to the value for u-side
-      double m_verticalHoughSpaceSize = 0.16;
+      float m_verticalHoughSpaceSize = 0.16;
 
       /// minimum x value of the Hough Space, defaults to the value for u-side
-      double m_minimumX = -3.168;
+      float m_minimumX = -3.168;
       /// maximum x value of the Hough Space, defaults to the value for u-side
-      double m_maximumX = 3.168;
+      float m_maximumX = 3.168;
 
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MinimumHSClusterSize = 1;
+      ushort m_MinimumHSClusterSize = 1;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSize = 12;
+      ushort m_MaximumHSClusterSize = 12;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeX = 2;
+      ushort m_MaximumHSClusterSizeX = 2;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_MaximumHSClusterSizeY = 12;
+      ushort m_MaximumHSClusterSizeY = 12;
 
       // class variables
       /// HS unit size in x
-      double m_unitX = 0;
+      float m_unitX = 0;
       /// HS unit size in y
-      double m_unitY = 0;
+      float m_unitY = 0;
 
       /// Define some magic numbers
       /// Maximum allowed recursion level
@@ -115,21 +115,13 @@ namespace Belle2 {
 
       /// Look-Up-Tables for values as cache to speed up calculation
       /// sine values of the Hough Space sector boarder coordinates
-      std::array<double, c_maxLUTSize> m_HSSinValuesLUT = {0};
+      std::array<float, c_maxLUTSize> m_HSSinValuesLUT = {0};
       /// cosine values of the Hough Space sector boarder coordinates
-      std::array<double, c_maxLUTSize> m_HSCosValuesLUT = {0};
+      std::array<float, c_maxLUTSize> m_HSCosValuesLUT = {0};
       /// sine values of the Hough Space sector center coordinates
-      std::array<double, c_maxHSSectorNumber> m_HSCenterSinValuesLUT = {0};
+      std::array<float, c_maxHSSectorNumber> m_HSCenterSinValuesLUT = {0};
       /// cosine values of the Hough Space sector center coordinates
-      std::array<double, c_maxHSSectorNumber> m_HSCenterCosValuesLUT = {0};
-      /// y values of the Hough Space sector boarders
-      std::array<double, c_maxLUTSize> m_HSYLUT = {0};
-      /// y values of the Hough Space sector centers
-      std::array<double, c_maxHSSectorNumber> m_HSYCenterLUT = {0};
-      /// x values of the Hough Space sector boarders
-      std::array<double, c_maxLUTSize> m_HSXLUT = {0};
-      /// x values of the Hough Space sector centers
-      std::array<double, c_maxHSSectorNumber> m_HSXCenterLUT = {0};
+      std::array<float, c_maxHSSectorNumber> m_HSCenterCosValuesLUT = {0};
 
       /// Map containing only active HS sectors, i.e. those with hits from enough layers contained in them.
       /// The keys are the global indices of the HS cell, the values are lists of pointers to the contained hits

@@ -63,7 +63,7 @@ void DQMHistAnalysisInput2Module::beginRun()
 
 void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
 {
-  auto h = (TH1*)key->ReadObj();
+  auto h = dynamic_cast<TH1*>(key->ReadObj());
   if (h == nullptr) return; // would be strange, but better check
   std::string hname = h->GetName();
 
@@ -157,7 +157,7 @@ void DQMHistAnalysisInput2Module::event()
   // first check sub-directories
   pFile->cd();
   TIter next(pFile->GetListOfKeys());
-  while (auto key = (TKey*)next()) {
+  while (auto key = dynamic_cast<TKey*>(next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (cl->InheritsFrom("TDirectory")) {
       TDirectory* d = (TDirectory*)key->ReadObj();
@@ -166,7 +166,7 @@ void DQMHistAnalysisInput2Module::event()
       d->cd();
       TIter nextd(d->GetListOfKeys());
 
-      while (auto dkey = (TKey*)nextd()) {
+      while (auto dkey = dynamic_cast<TKey*>(nextd())) {
         if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
           addToHistList(inputHistList, dirname, dkey);
         }

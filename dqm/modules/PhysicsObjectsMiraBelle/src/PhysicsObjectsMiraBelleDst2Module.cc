@@ -95,11 +95,3 @@ void PhysicsObjectsMiraBelleDst2Module::event()
 //   pid[0][0] = I_like_coffee->getProbability();
 // }
 
-void PhysicsObjectsMiraBelleDst2Module::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleDst2Module::terminate()
-{
-}
-

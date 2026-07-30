@@ -85,8 +85,8 @@ void DQMHistDeltaHistoModule::event()
     queue<SSNODE*>& hq = m_histosQueues[histoname];
     if (hq.empty()) {
       SSNODE* n = new SSNODE;
-      n->histo = (TH1*)hh->Clone();
-      n->diff_histo = (TH1*)hh->Clone();
+      n->histo = dynamic_cast<TH1*>(hh->Clone());
+      n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
       n->time_modified = cur_mtime;
       hq.push(n);
     } else {
@@ -97,8 +97,8 @@ void DQMHistDeltaHistoModule::event()
             break;
           }
           SSNODE* n = new SSNODE;
-          n->histo = (TH1*)hh->Clone();
-          n->diff_histo = (TH1*)hh->Clone();
+          n->histo = dynamic_cast<TH1*>(hh->Clone());
+          n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
           n->diff_histo->Add(nn->histo, -1);
           n->time_modified = cur_mtime;
           hq.push(n);

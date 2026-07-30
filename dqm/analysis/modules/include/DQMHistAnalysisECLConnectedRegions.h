@@ -30,6 +30,8 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLConnectedRegionsModule();
 
+  private:
+
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */
@@ -40,8 +42,6 @@ namespace Belle2 {
     void endRun() override final;
     /** Terminate. */
     void terminate() override final;
-
-  private:
 
     /** Prefix to use for PVs registered by this module */
     std::string m_pvPrefix;

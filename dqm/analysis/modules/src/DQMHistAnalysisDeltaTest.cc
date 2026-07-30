@@ -86,7 +86,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   auto hh1 = findHist(m_histogramDirectoryName, m_histogramName, false);// even if no update
   if (hh1) {
     m_cTest->cd(1);
-    auto a = (TH1*)hh1->DrawClone("hist");
+    auto a = dynamic_cast<TH1*>(hh1->DrawClone("hist"));
     a->SetTitle("Hist always");
     data_Test2 = hh1->GetMean();
   }
@@ -94,7 +94,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   auto hh2 = findHist(m_histogramDirectoryName, m_histogramName, true);// only if updated
   if (hh2) {
     m_cTest->cd(2);
-    auto a = (TH1*)hh2->DrawClone("hist");
+    auto a = dynamic_cast<TH1*>(hh2->DrawClone("hist"));
     a->SetTitle("Hist only if updated");
   }
 
@@ -102,7 +102,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   auto hd2 = getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
   if (hd2) {
     m_cTest->cd(4);
-    auto a = (TH1*)hd2->DrawClone("hist");
+    auto a = dynamic_cast<TH1*>(hd2->DrawClone("hist"));
     a->SetTitle("Delta always");
   }
 
@@ -110,7 +110,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName, 0, true);// only if updated
   if (hd1) {
     m_cTest->cd(5);
-    auto a = (TH1*)hd1->DrawClone("hist");
+    auto a = dynamic_cast<TH1*>(hd1->DrawClone("hist"));
     a->SetTitle("Delta only if updated");
     data_Test1 = hd1->GetMean();
   }
@@ -123,7 +123,7 @@ void DQMHistAnalysisDeltaTestModule::event()
     // thus, no delta histogram is available
     if (hh1) {
       m_cTest->cd(3);
-      auto a = (TH1*)hh1->DrawClone("hist");
+      auto a = dynamic_cast<TH1*>(hh1->DrawClone("hist"));
       a->SetLineColor(2);
       a->SetTitle("initial sampling");
     }
@@ -135,7 +135,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   // it would be nicer to plot oldest first, left as exercise for reader
   m_cTest->cd(6);
   for (int i = 0; i < 99; i++) {
-    auto h = getDelta(fullname, i, false);
+    auto h = getDelta(fullname, "", i, false);
     if (h == nullptr) break;
     if (i == 0) {
       h->Draw("hist");
@@ -151,7 +151,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   if (it != getDeltaList().end()) {
     auto h = it->second.m_lastHist.get();
     if (h) {
-      auto a = (TH1*)h->DrawClone("hist");
+      auto a = dynamic_cast<TH1*>(h->DrawClone("hist"));
       a->SetTitle("last update histogram");
     }
   }

@@ -76,7 +76,7 @@ void DQMHistSnapshotsModule::event()
     SSNODE* n = find_snapshot(name);
     if (n == NULL) { // no existing snapshot, create new one
       n = new SSNODE;
-      n->histo = (TH1*) it.second.getHist()->Clone();
+      n->histo = dynamic_cast<TH1*>(it.second.getHist()->Clone());
 
       auto s = StringSplit(name, '/');
       auto dirname = s.at(0);
@@ -91,7 +91,7 @@ void DQMHistSnapshotsModule::event()
       if (check == 1) {
         if (h->GetEntries() > n->histo->GetEntries()) { // histogram has been updated
           delete n->histo;
-          n->histo = (TH1*)h->Clone();
+          n->histo = dynamic_cast<TH1*>(h->Clone());
           n->stale = 0;
         } else { // notify that the histogram is stale
           n->stale = 1;

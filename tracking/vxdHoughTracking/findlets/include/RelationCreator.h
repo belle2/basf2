@@ -43,12 +43,17 @@ namespace Belle2 {
                  std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations) override
       {
         // relations += hits -> hits in each track candidate
-        TrackingUtilities::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, 100000);
+        TrackingUtilities::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, m_maxRelations);
       };
+
+      void setMaxRelations(const ushort maxRelations) { m_maxRelations = maxRelations; }
 
     private:
       /// Subfindlet for the relation checking between seed and hits
       ARelationFilter m_relationFilter;
+
+      /// maximum number of relations that can be created per track candidate
+      ushort m_maxRelations = 100;
     };
 
   }

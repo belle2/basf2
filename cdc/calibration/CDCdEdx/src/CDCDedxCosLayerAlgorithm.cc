@@ -78,9 +78,16 @@ CalibrationAlgorithm::EResult CDCDedxCosLayerAlgorithm::calibrate()
     corrFactor[ig].assign(m_cosBin, 1.0);
   }
 
-  for (int iter = 0; iter < 3; iter++) {
+  constexpr int nIterations = 3;
+
+  for (int iter = 0; iter < nIterations; iter++) {
+
+    const bool isFirstIteration = (iter == 0);
+    const bool isFinalIteration = (iter == nIterations - 1);
+
+    const bool makeIterationSummary = isMakePlots && (isFirstIteration || isFinalIteration);
+
     // make histograms to store dE/dx values in bins of cos(theta)
-    // bin size can be arbitrary, but for now just make uniform bins
     std::array<std::vector<TH1D*>, m_kNGroups> hDedxCos_neg;
     std::array<std::vector<TH1D*>, m_kNGroups> hDedxCos_pos;
     std::array<std::vector<TH1D*>, m_kNGroups> hDedxCos_all;
@@ -147,7 +154,7 @@ CalibrationAlgorithm::EResult CDCDedxCosLayerAlgorithm::calibrate()
     }
 
     std::array<std::vector<double>, m_kNGroups> cosine;
-
+    std::array<std::array<std::vector<double>, 3>, 3> cosMeanSets;
     for (int il = 0; il < m_kNGroups; ++il) {
 
       int minGroup = 0, maxGroup = 0;
@@ -186,30 +193,38 @@ CalibrationAlgorithm::EResult CDCDedxCosLayerAlgorithm::calibrate()
         cosine[il].push_back(mean);
         if (mean > 0) corrFactor[il][ibin] *= (mean / 1.25);
       }
-      if (isMethodSep) {
-        std::array<std::vector<double>, 3> cosMeanSets = {vmean_neg, vmean_pos, cosine[il]};
-        plotmeanChargeOverlay(cosMeanSets, m_label[il], iter);
-      }
+      if (isMethodSep && makeIterationSummary) cosMeanSets[il] = {vmean_neg, vmean_pos, cosine[il]};
+
     }
 
-
-    if (isMakePlots) {
+    if (makeIterationSummary) {
 
       //1. dE/dx dist. for cosine bins
-
-      if (isMethodSep) {
-        plotdedxHist(hDedxCos_neg, Form("neg_iter%d", iter));
-        plotdedxHist(hDedxCos_pos, Form("pos_iter%d", iter));
-      }
-      plotdedxHist(hDedxCos_all, Form("all_iter%d", iter));
+      plotdedxHist(hDedxCos_all, hDedxCos_neg, hDedxCos_pos, iter);
+      // 2. charge overlay plots
+      if (isMethodSep)
+        plotmeanChargeOverlay(cosMeanSets, iter);
 
       //3. Inner and Outer layer dE/dx distributions
-      plotLayerDist(hDedxGroup, iter);
+      // plotLayerDist(hDedxGroup, iter);
 
       //5. draw the relative constants
       plotRelConst(corrFactor, iter);
     }
 
+    // Cleanup
+    for (int il = 0; il < m_kNGroups; ++il) {
+      delete hDedxGroup[il];
+
+      for (auto* hist : hDedxCos_neg[il])
+        delete hist;
+
+      for (auto* hist : hDedxCos_pos[il])
+        delete hist;
+
+      for (auto* hist : hDedxCos_all[il])
+        delete hist;
+    }
   }
 
   for (int il = 0; il < m_kNGroups; ++il)
@@ -228,6 +243,7 @@ CalibrationAlgorithm::EResult CDCDedxCosLayerAlgorithm::calibrate()
     plotEventStats();
 
   }
+
 
   m_suffix.clear();
   m_coscors.clear();
@@ -289,8 +305,8 @@ void CDCDedxCosLayerAlgorithm::defineHisto(std::array<std::vector<TH1D*>, m_kNGr
       hdedx[il][i]->SetTitle(Form("%s dE/dx dist (%s) in costh (%0.02f, %0.02f)",
                                   m_label[il].c_str(), chargeLabel.c_str(), coslow, coshigh));
 
-      // hdedx[il][i]->GetXaxis()->SetTitle("dE/dx");
-      // hdedx[il][i]->GetYaxis()->SetTitle("Entries");
+      hdedx[il][i]->GetXaxis()->SetTitle(" layer dE/dx");
+      hdedx[il][i]->GetYaxis()->SetTitle("Entries");
     }
   }
 }
@@ -331,41 +347,60 @@ void CDCDedxCosLayerAlgorithm::createPayload()
 }
 
 //--------------------------------------------------
-void CDCDedxCosLayerAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hdedx, const std::string& tag)
+void CDCDedxCosLayerAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hDedxCos_all,
+                                            std::array<std::vector<TH1D*>, 3>& hDedxCos_neg,
+                                            std::array<std::vector<TH1D*>, 3>& hDedxCos_pos, int iter)
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
-  int nx = 2;
-  int ny = 2;
+  int nx = isMethodSep ? 2 : 2;
+  int ny = isMethodSep ? 1 : 2;
   unsigned int nPads = nx * ny;
-
+  if (isMethodSep) ctmp.SetCanvasSize(1200, 600);
   ctmp.Divide(nx, ny);
   std::stringstream psname;
 
-  psname << Form("cdcdedx_coscorr_ldedx_%s_%s.pdf[", tag.c_str(), m_suffix.data());
+  psname << Form("cdcdedx_coscorr_ldedx_%s_iter%d.pdf[", m_suffix.data(), iter);
   ctmp.Print(psname.str().c_str());
   psname.str("");
-  psname << Form("cdcdedx_coscorr_ldedx_%s_%s.pdf", tag.c_str(), m_suffix.data());
+  psname << Form("cdcdedx_coscorr_ldedx_%s_iter%d.pdf", m_suffix.data(), iter);
 
   for (int il = 0; il < m_kNGroups; il++) {
 
     for (unsigned int ic = 0; ic < m_cosBin; ic++) {
+      if (!isMethodSep) {
+        ctmp.cd(ic % nPads + 1);
+        hDedxCos_all[il][ic]->SetFillColor(4 + il);
 
-      ctmp.cd(ic % nPads + 1);
-      hdedx[il][ic]->SetFillColor(4 + il);
+        hDedxCos_all[il][ic]->DrawClone("hist");
 
-      hdedx[il][ic]->SetTitle(Form("%s;ldedx;entries", hdedx[il][ic]->GetTitle()));
-      hdedx[il][ic]->DrawClone("hist");
+        if (ic % nPads == nPads - 1 || ic == m_cosBin - 1) {
+          ctmp.Print(psname.str().c_str());
+          gPad->Clear("D");
+          ctmp.Clear("D");
+        }
+      } else {
 
-      if (ic % nPads == nPads - 1 || ic == m_cosBin - 1) {
+        // left: electron
+        ctmp.cd(1);
+        hDedxCos_neg[il][ic]->SetFillColor(4 + il);
+        hDedxCos_neg[il][ic]->DrawCopy();
+
+
+        // right: positron
+        ctmp.cd(2);
+        hDedxCos_pos[il][ic]->SetFillColor(4 + il);
+        hDedxCos_pos[il][ic]->DrawCopy();
+
         ctmp.Print(psname.str().c_str());
-        gPad->Clear("D");
-        ctmp.Clear("D");
+        ctmp.Clear();
+        ctmp.Divide(nx, ny);
+
       }
     }
   }
   psname.str("");
-  psname << Form("cdcdedx_coscorr_ldedx_%s_%s.pdf]", tag.c_str(), m_suffix.data());
+  psname << Form("cdcdedx_coscorr_ldedx_%s_iter%d.pdf]", m_suffix.data(), iter);
   ctmp.Print(psname.str().c_str());
 }
 
@@ -458,7 +493,7 @@ void CDCDedxCosLayerAlgorithm::plotRelConst(const std::array<std::vector<double>
   leg->SetFillStyle(0);
 
   std::vector<TH1D*> hists;
-  std::vector<int> colors = {kRed, kBlue, kGreen + 2};
+  std::vector<int> colors = {kRed, kBlue, kBlack};
   double ymax = 0.0;
 
   for (int il = 0; il < m_kNGroups; il++) {
@@ -483,7 +518,6 @@ void CDCDedxCosLayerAlgorithm::plotRelConst(const std::array<std::vector<double>
 
     hists[il]->SetLineColor(colors[il]);
     hists[il]->SetStats(0);
-    hists[il]->SetLineWidth(2);
 
     // draw
     if (il == 0) {
@@ -508,6 +542,14 @@ void CDCDedxCosLayerAlgorithm::plotRelConst(const std::array<std::vector<double>
 //--------------------------------------------------
 void CDCDedxCosLayerAlgorithm::plotConstants()
 {
+
+  const std::string pdfName =
+    Form("cdcdedx_coscorr_fconsts_%s.pdf", m_suffix.data());
+
+  const std::string rootName =
+    Form("cdcdedx_coscorr_fconsts_%s.root", m_suffix.data());
+
+  TFile rootFile(rootName.c_str(), "RECREATE");
 
   for (int il = 0; il < m_kNGroups; il++) {
 
@@ -567,8 +609,19 @@ void CDCDedxCosLayerAlgorithm::plotConstants()
     line->SetLineStyle(2);
     line->Draw();
 
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.pdf", m_label[il].data(), m_suffix.data()));
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.root", m_label[il].data(), m_suffix.data()));
+    c.Update();
+
+    if (il == 0) {
+      c.Print((pdfName + "(").c_str());
+    } else if (il == m_kNGroups - 1) {
+      c.Print((pdfName + ")").c_str());
+    } else {
+      c.Print(pdfName.c_str());
+    }
+
+    // Save this canvas in the ROOT file
+    rootFile.cd();
+    c.Write();
 
     // cleanup
     delete hnew;
@@ -579,50 +632,66 @@ void CDCDedxCosLayerAlgorithm::plotConstants()
 }
 
 //--------------------------------------------------
-void CDCDedxCosLayerAlgorithm::plotmeanChargeOverlay(const std::array<std::vector<double>, 3>& mean, const std::string& sltag,
-                                                     int iter)
+void CDCDedxCosLayerAlgorithm::plotmeanChargeOverlay(const std::array<std::array<std::vector<double>, 3>, 3>& mean, int iter)
 {
-  TCanvas cconst(Form("cconst_%s_iter%d", sltag.c_str(), iter), "calibration Constants", 800, 600);
+
+  const std::string pdfName =
+    Form("cdcdedx_coscorr_relmean_%s_iter%d.pdf", m_suffix.data(), iter);
+
+  TCanvas cconst(Form("cconst_iter%d", iter), "calibration Constants", 800, 600);
   cconst.cd();
 
-  TLegend* leg = new TLegend(0.6, 0.8, 0.9, 0.9);
-  leg->SetBorderSize(0);
-  leg->SetFillStyle(0);
-
-  std::vector<TH1D*> hists;
-
   std::array<std::string, 3> labels = {"e^{+}", "e^{-}", "Average"};
-  std::vector<int> colors = {kRed, kBlue, kBlack + 2};
+  std::vector<int> colors = {kRed, kBlue, kBlack};
 
-  for (int il = 0; il < 3; il++) {
+  for (int isl = 0; isl < 3; isl++) {
+    cconst.Clear();
+    cconst.cd();
 
-    TH1D* h = new TH1D(Form("hconst_%d_%s_%s_iter%d", il, sltag.c_str(), m_suffix.data(), iter),
-                       Form("Relative mean %s, iter %d; cos(#theta); constant", sltag.c_str(), iter),
-                       m_cosBin, m_cosMin, m_cosMax);
+    TLegend leg(0.60, 0.80, 0.90, 0.90);
+    leg.SetBorderSize(0);
+    leg.SetFillStyle(0);
+    std::vector<TH1D*> hists;
+    hists.reserve(3);
 
-    for (unsigned int jea = 0; jea < m_cosBin; jea++) {
-      if (jea < mean[il].size())
-        h->SetBinContent(jea + 1, mean[il].at(jea));
+    for (int icharge = 0; icharge < 3; icharge++) {
+
+      TH1D* h = new TH1D(Form("hconst_%d_%s_%s_iter%d", icharge, m_label[isl].c_str(), m_suffix.data(), iter),
+                         Form("Relative mean %s, iter %d; cos(#theta); constant", m_label[isl].c_str(), iter),
+                         m_cosBin, m_cosMin, m_cosMax);
+
+      for (unsigned int jea = 0; jea < m_cosBin; jea++) {
+        if (jea < mean[isl][icharge].size())
+          h->SetBinContent(jea + 1, mean[isl][icharge].at(jea));
+      }
+
+      h->SetLineColor(colors[icharge]);
+      h->SetStats(0);
+
+      h->Draw(icharge == 0 ? "hist" : "hist same");
+
+      leg.AddEntry(h, labels[icharge].c_str(), "l");
+      hists.push_back(h);
     }
 
-    h->SetLineColor(colors[il]);
-    h->SetStats(0);
-    h->SetLineWidth(2);
+    leg.Draw();
+    cconst.Modified();
+    cconst.Update();
 
-    if (il == 0) h->Draw("hist");
-    else h->Draw("hist same");
+    // Save all SL plots into one multipage PDF
+    if (isl == 0) {
+      cconst.Print((pdfName + "(").c_str());
+    } else if (isl == 2) {
+      cconst.Print((pdfName + ")").c_str());
+    } else {
+      cconst.Print(pdfName.c_str());
+    }
+    // cconst.SaveAs(Form("cdcdedx_coscorr_relmean_iter%d_%s_%s.pdf", iter, sltag.c_str(), m_suffix.data()));
+    // cconst.SaveAs(Form("cdcdedx_coscorr_relmean_iter%d_%s_%s.root", iter, sltag.c_str(), m_suffix.data()));
 
-    leg->AddEntry(h, labels[il].c_str(), "l");
-    hists.push_back(h);
+    for (auto h : hists) delete h;
   }
-
-  leg->Draw();
-
-  cconst.SaveAs(Form("cdcdedx_coscorr_relmean_iter%d_%s_%s.pdf", iter, sltag.c_str(), m_suffix.data()));
-  cconst.SaveAs(Form("cdcdedx_coscorr_relmean_iter%d_%s_%s.root", iter, sltag.c_str(), m_suffix.data()));
-
-  for (auto h : hists) delete h;
-  delete leg;
+  // delete leg;
 }
 
 //------------------------------------

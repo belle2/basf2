@@ -143,7 +143,8 @@ namespace Belle2 {
     /**
     * function to draw the dE/dx histogram in costh bins
     */
-    void plotdedxHist(std::array<std::vector<TH1D*>, m_kNGroups>& hdedx, const std::string& tag);
+    void plotdedxHist(std::array<std::vector<TH1D*>, 3>& hDedxCos_all, std::array<std::vector<TH1D*>, 3>& hDedxCos_neg,
+                      std::array<std::vector<TH1D*>, 3>& hDedxCos_pos, int iter);
 
     /**
     * function to draw dedx dist. for Inner/outer layer
@@ -163,7 +164,7 @@ namespace Belle2 {
     /**
     * Plot overlay of positive, negative, and average cosine means for one SL group
     */
-    void plotmeanChargeOverlay(const std::array<std::vector<double>, 3>& cosine_pos, const std::string& sltag, int iter);
+    void plotmeanChargeOverlay(const std::array<std::array<std::vector<double>, 3>, 3>& mean, int iter);
 
     /**
     * function to draw the old/new final constants

@@ -242,7 +242,7 @@ namespace Belle2 {
          *
          * @return An `Ort::Value` pointing to the `Tensor`'s internal data.
          */
-        Ort::Value createOrtTensor()
+        Ort::Value createOrtTensor() override
         {
           return Ort::Value::CreateTensor(m_memoryInfo, m_values.data(),
                                           m_values.size(), m_shape.data(),

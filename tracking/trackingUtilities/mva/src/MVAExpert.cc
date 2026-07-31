@@ -123,10 +123,14 @@ void MVAExpert::Impl::beginRun()
       m_selectedNamedVariables = m_allNamedVariables;
     }
 
-    std::map<std::string, MVA::AbstractInterface*> supportedInterfaces =
+    const std::map<std::string, MVA::AbstractInterface*>& supportedInterfaces =
       MVA::AbstractInterface::getSupportedInterfaces();
     weightfile->getOptions(m_generalOptions);
-    m_expert = supportedInterfaces[m_generalOptions.m_method]->getExpert();
+    if (supportedInterfaces.find(m_generalOptions.m_method) == supportedInterfaces.end()) {
+      B2ERROR("Couldn't find method named " + m_generalOptions.m_method);
+      throw std::runtime_error("Couldn't find method named " + m_generalOptions.m_method);
+    }
+    m_expert = supportedInterfaces.at(m_generalOptions.m_method)->getExpert();
     m_expert->load(*weightfile);
 
     std::vector<float> dummy;

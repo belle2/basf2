@@ -65,7 +65,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
   m_binningVariables = manager.getVariables((*m_mvaWeights.get())->getBinningVariables());
 
   MVA::AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
   for (const auto& iterator : * (*m_mvaWeights.get())->getPhasespaceCategories()) {
 
@@ -77,9 +77,13 @@ void ECLChargedPIDMVAModule::initializeMVA()
 
     MVA::GeneralOptions general_options;
     weightfile.getOptions(general_options);
+    if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+      B2ERROR("Couldn't find method named " + general_options.m_method);
+      throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+    }
 
     // Store an MVA::Expert object.
-    m_experts[iterator.first] = supported_interfaces[general_options.m_method]->getExpert();
+    m_experts[iterator.first] = supported_interfaces.at(general_options.m_method)->getExpert();
     m_experts.at(iterator.first)->load(weightfile);
 
     B2DEBUG(22, "\t\tweightfile  at " << iterator.first << " successfully initialised.");

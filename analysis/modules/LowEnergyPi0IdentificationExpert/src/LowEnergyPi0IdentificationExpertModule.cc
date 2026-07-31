@@ -69,11 +69,15 @@ void LowEnergyPi0IdentificationExpertModule::beginRun()
 
 void LowEnergyPi0IdentificationExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
   weightfile.addSignalFraction(0.5);
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
+  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+    B2ERROR("Couldn't find method named " + general_options.m_method);
+    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+  }
+  m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;
   /* The number of input variables depends on the experiment. */

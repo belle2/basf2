@@ -83,13 +83,17 @@ void Utility::extract(const std::string& filename, const std::string& directory)
 {
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   auto weightfile = Weightfile::load(filename);
   weightfile.setRemoveTemporaryDirectories(false);
   setenv("TMPDIR", directory.c_str(), 1);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
-  auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+    B2ERROR("Couldn't find method named " + general_options.m_method);
+    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+  }
+  auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
   expertLocal->load(weightfile);
 
 }
@@ -98,12 +102,16 @@ std::string Utility::info(const std::string& filename)
 {
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   auto weightfile = Weightfile::load(filename);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  auto specific_options = supported_interfaces[general_options.m_method]->getOptions();
+  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+    B2ERROR("Couldn't find method named " + general_options.m_method);
+    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+  }
+  auto specific_options = supported_interfaces.at(general_options.m_method)->getOptions();
   specific_options->load(weightfile.getXMLTree());
 
   boost::property_tree::ptree temp_tree;
@@ -144,7 +152,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
   TTree tree("variables", "variables");
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
   for (auto& filename : filenames) {
 
@@ -159,7 +167,11 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     // otherwise this would apply to the expert as well.
     general_options.m_max_events = 0;
 
-    auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+    if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+      B2ERROR("Couldn't find method named " + general_options.m_method);
+      throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+    }
+    auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
     expertLocal->load(weightfile);
 
     bool isMulticlass = general_options.m_nClasses > 2;
@@ -291,16 +303,16 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_dataset(GeneralOptions gen
     }
   }
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
-    auto teacherLocal = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
+    auto teacherLocal = supported_interfaces.at(general_options.m_method)->getTeacher(general_options, specific_options);
     std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     auto weightfile = teacherLocal->train(data);
     std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> training_time = stop - start;
     B2INFO("Elapsed training time in ms " << training_time.count() << " for " << general_options.m_identifier);
     Weightfile::save(weightfile, general_options.m_identifier);
-    auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+    auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
     expertLocal->load(weightfile);
     return expertLocal;
   } else {

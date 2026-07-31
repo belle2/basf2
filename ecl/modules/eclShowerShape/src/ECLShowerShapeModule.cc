@@ -139,7 +139,7 @@ void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
     weightfile = MVA::Weightfile::loadFromFile(identifier);
   }
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
@@ -147,7 +147,11 @@ void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
   if (m_numZernikeMVAvariables != general_options.m_variables.size())
     B2FATAL("Expecting " << m_numZernikeMVAvariables << " variables, found " << general_options.m_variables.size());
 
-  expert = supported_interfaces[general_options.m_method]->getExpert();
+  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+    B2ERROR("Couldn't find method named " + general_options.m_method);
+    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+  }
+  expert = supported_interfaces.at(general_options.m_method)->getExpert();
   expert->load(weightfile);
 
   //create new dataset, if this is the barrel MVA (assumes FWD and BWD datasets are same size)

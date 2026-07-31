@@ -104,7 +104,7 @@ void MVAMultipleExpertsModule::beginRun()
 void MVAMultipleExpertsModule::init_mva(MVA::Weightfile& weightfile, unsigned int i)
 {
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   Variable::Manager& manager = Variable::Manager::Instance();
 
 
@@ -115,7 +115,11 @@ void MVAMultipleExpertsModule::init_mva(MVA::Weightfile& weightfile, unsigned in
   if (m_signal_fraction_override > 0)
     weightfile.addSignalFraction(m_signal_fraction_override);
 
-  m_experts[i] = supported_interfaces[general_options.m_method]->getExpert();
+  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
+    B2ERROR("Couldn't find method named " + general_options.m_method);
+    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
+  }
+  m_experts[i] = supported_interfaces.at(general_options.m_method)->getExpert();
   m_experts[i]->load(weightfile);
 
 

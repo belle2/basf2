@@ -1246,11 +1246,11 @@ Please note that other subdetectors may also have contributed, so store the vari
     
     VARIABLE_GROUP("Event (cDST only)");
     REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-[Eventbased][Calibration] The Event t0, is the time of the event relative to the trigger time.
+**[Calibration][Eventbased]** Returns :math:`t_0` which is the event time relative to the trigger time
 
-.. note::
+.. topic::
     The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
-    This eventT0 variable is the final combined value of all the event time measurements.
+    This variable is the final combined value of all the individual event time measurements.
     Currently, only the SVD and ECL are used in this combination.
 
 )DOC","ns");

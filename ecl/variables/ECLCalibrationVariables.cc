@@ -414,31 +414,51 @@ namespace Belle2 {
       return tce->getClusterEnergyThreshold();
     }
 
-    // These variables require cDST inputs and the eclTrackCalDigitMatch module run first
+    // These variables require cDST inputs and the ECLTrackCalDigitMatch module run first
     VARIABLE_GROUP("ECL calibration");
 
     REGISTER_VARIABLE("eclEnergy3FWDBarrel", eclEnergy3FWDBarrel, R"DOC(
-[Calibration] Returns energy sum of three crystals in forward barrel.
+**[Calibration]** Returns the energy sum of three crystals in the forward barrel of the ECL.
+
+.. attention::
+    This requires running the `ECLTrackCalDigitMatch` module first.
+
 )DOC");
 
     REGISTER_VARIABLE("eclEnergy3FWDEndcap", eclEnergy3FWDEndcap, R"DOC(
-[Calibration] Returns energy sum of three crystals in forward endcap.
+**[Calibration]** Returns the energy sum of three crystals in the forward endcap of the ECL.
+
+.. attention::
+    This requires running the `ECLTrackCalDigitMatch` module first.
+
 )DOC");
 
     REGISTER_VARIABLE("eclEnergy3BWDBarrel", eclEnergy3BWDBarrel, R"DOC(
-[Calibration] Returns energy sum of three crystals in backward barrel.
+**[Calibration]** Returns the energy sum of three crystals in the backward barrel of the ECL.
+
+.. attention::
+    This requires running the `ECLTrackCalDigitMatch` module first.
+
 )DOC");
 
     REGISTER_VARIABLE("eclEnergy3BWDEndcap", eclEnergy3BWDEndcap, R"DOC(
-[Calibration] Returns energy sum of three crystals in backward endcap.
+**[Calibration]** Returns the energy sum of three crystals in the backward endcap of the ECL.
+
+.. attention::
+    This requires running the `ECLTrackCalDigitMatch` module first.
+
 )DOC");
 
-    // These variables require cDST inputs and the eclTRGInformation module run first
+    // These variables require cDST inputs and the ECLTRGInformation module run first
     VARIABLE_GROUP("ECL trigger calibration");
 
     REGISTER_VARIABLE("clusterNumberOfTCs(i, j, k, l)", eclNumberOfTCsForCluster, R"DOC(
-[Calibration] Returns the number of TCs for this ECL cluster for a given TC theta ID range
-:math:`(i, j)` and hit window :math:`(k, l)`.
+**[Calibration]** Returns the number of trigger cells (TCs) for the ECL cluster for a given TC polar angle
+range :math:`(i, j)` and hit window :math:`(k, l)`.
+
+.. attention::
+    This requires running the `ECLTRGInformation` module first.
+
 )DOC");
     REGISTER_VARIABLE("clusterTCFADC(i, j, k, l)", eclTCFADCForCluster, R"DOC(
 [Calibration] Returns the total FADC sum related to this ECL cluster for a given TC theta ID

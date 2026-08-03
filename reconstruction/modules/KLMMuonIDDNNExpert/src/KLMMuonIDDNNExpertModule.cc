@@ -103,10 +103,6 @@ void KLMMuonIDDNNExpertModule::initializeMVA(MVA::Weightfile& weightfile)
   const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
-  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
-    B2ERROR("Couldn't find method named " + general_options.m_method);
-    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
-  }
   m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;

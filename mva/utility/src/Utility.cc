@@ -89,10 +89,6 @@ void Utility::extract(const std::string& filename, const std::string& directory)
   setenv("TMPDIR", directory.c_str(), 1);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
-  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
-    B2ERROR("Couldn't find method named " + general_options.m_method);
-    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
-  }
   auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
   expertLocal->load(weightfile);
 
@@ -107,10 +103,6 @@ std::string Utility::info(const std::string& filename)
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
-    B2ERROR("Couldn't find method named " + general_options.m_method);
-    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
-  }
   auto specific_options = supported_interfaces.at(general_options.m_method)->getOptions();
   specific_options->load(weightfile.getXMLTree());
 
@@ -167,10 +159,6 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     // otherwise this would apply to the expert as well.
     general_options.m_max_events = 0;
 
-    if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
-      B2ERROR("Couldn't find method named " + general_options.m_method);
-      throw std::runtime_error("Couldn't find method named " + general_options.m_method);
-    }
     auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
     expertLocal->load(weightfile);
 

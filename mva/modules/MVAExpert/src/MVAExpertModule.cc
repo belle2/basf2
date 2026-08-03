@@ -107,10 +107,6 @@ void MVAExpertModule::init_mva(MVA::Weightfile& weightfile)
   if (m_signal_fraction_override > 0)
     weightfile.addSignalFraction(m_signal_fraction_override);
 
-  if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
-    B2ERROR("Couldn't find method named " + general_options.m_method);
-    throw std::runtime_error("Couldn't find method named " + general_options.m_method);
-  }
   m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
 

@@ -627,13 +627,11 @@ namespace Belle2 {
 
       // set feature variables
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); i++) {
-        auto variable = m_general_options.m_variables[i];
         initialiseVarVariantForBranch(m_general_options.m_variables[i], m_input_variant[i]);
       }
 
       // set spectator variables
       for (unsigned int i = 0; i < m_general_options.m_spectators.size(); i++) {
-        auto variable = m_general_options.m_spectators[i];
         initialiseVarVariantForBranch(m_general_options.m_spectators[i], m_spectators_variant[i]);
       }
 

@@ -170,36 +170,36 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   double effErrorHi = 0.;
   double effWarnHi = 0.;
 
-  requestLimitsFromEpicsPVs("effLimits", m_effError, m_effWarning, effWarnHi, effErrorHi ;
+  requestLimitsFromEpicsPVs("effLimits", m_effError, m_effWarning, effWarnHi, effErrorHi);
 
-                            B2DEBUG(10, " SVD efficiency thresholds taken from EPICS configuration file:");
-                            B2DEBUG(10, "  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
-                                    m_statThreshold);
+  B2DEBUG(10, " SVD efficiency thresholds taken from EPICS configuration file:");
+  B2DEBUG(10, "  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
+          m_statThreshold);
 
-                            //build the legend
-                            m_legProblem->Clear();
-                            m_legProblem->AddText("ERROR!");
-                            m_legProblem->AddText("at least one sensor with:");
-                            m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
+  //build the legend
+  m_legProblem->Clear();
+  m_legProblem->AddText("ERROR!");
+  m_legProblem->AddText("at least one sensor with:");
+  m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
 
-                            m_legWarning->Clear();
-                            m_legWarning->AddText("WARNING!");
-                            m_legWarning->AddText("at least one sensor with:");
-                            m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
+  m_legWarning->Clear();
+  m_legWarning->AddText("WARNING!");
+  m_legWarning->AddText("at least one sensor with:");
+  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
 
-                            m_legNormal->Clear();
-                            m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
-                            m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
+  m_legNormal->Clear();
+  m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
+  m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
 
-                            m_legLowStat->Clear();
-                            m_legLowStat->AddText("Not enough statistics,");
-                            m_legLowStat->AddText("check again in a few minutes");
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("Not enough statistics,");
+  m_legLowStat->AddText("check again in a few minutes");
 
-                            m_legEmpty->Clear();
-                            m_legEmpty->AddText("Track/clusters plots are emtpy");
+  m_legEmpty->Clear();
+  m_legEmpty->AddText("Track/clusters plots are emtpy");
 
-                            m_effUstatus = good;
-                            m_effVstatus = good;
+  m_effUstatus = good;
+  m_effVstatus = good;
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()

@@ -45,7 +45,7 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
 void MVAMultipleExpertsModule::initialize()
 {
   // All specified ParticleLists are required to exist
-  for (auto& name : m_listNames) {
+  for (const auto& name : m_listNames) {
     StoreObjPtr<ParticleList> list(name);
     list.isRequired();
   }
@@ -222,7 +222,7 @@ void MVAMultipleExpertsModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo
 
 void MVAMultipleExpertsModule::event()
 {
-  for (auto& listName : m_listNames) {
+  for (const auto& listName : m_listNames) {
     StoreObjPtr<ParticleList> list(listName);
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {

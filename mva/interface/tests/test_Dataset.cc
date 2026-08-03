@@ -600,6 +600,7 @@ namespace {
     // Check for missing tree
     general_options.m_treename = "missing tree";
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -610,6 +611,7 @@ namespace {
     general_options.m_treename = "tree";
     general_options.m_variables = {"a", "b", "e", "f", "missing branch"};
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -621,6 +623,7 @@ namespace {
     general_options.m_variables = {"a", "b", "e", "f"};
     general_options.m_spectators = {"missing branch"};
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -632,6 +635,7 @@ namespace {
     general_options.m_datafiles = {"DOESNOTEXIST.root"};
     general_options.m_treename = "tree";
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -648,6 +652,7 @@ namespace {
     EXPECT_TRUE(std::filesystem::exists(general_options.m_datafiles[0]));
 
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -885,6 +890,7 @@ namespace {
     // Check for missing tree
     general_options.m_treename = "missing tree";
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -895,6 +901,7 @@ namespace {
     general_options.m_treename = "tree";
     general_options.m_variables = {"a", "b", "e", "f", "missing branch"};
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -906,6 +913,7 @@ namespace {
     general_options.m_variables = {"a", "b", "e", "f"};
     general_options.m_spectators = {"missing branch"};
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -917,6 +925,7 @@ namespace {
     general_options.m_datafiles = {"DOESNOTEXIST.root"};
     general_options.m_treename = "tree";
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 
@@ -933,6 +942,7 @@ namespace {
     EXPECT_TRUE(std::filesystem::exists(general_options.m_datafiles[0]));
 
     try {
+      // cppcheck-suppress unusedScopedObject
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
     } catch (...) {
 

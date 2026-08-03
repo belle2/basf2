@@ -146,7 +146,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
   AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
-  for (auto& filename : filenames) {
+  for (const auto& filename : filenames) {
 
     Belle2::EventMetaData emd(event, run, experiment);
     auto weightfile = Weightfile::load(filename, emd);
@@ -184,7 +184,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         result = r;
         branches[0]->Fill();
       }
@@ -200,7 +200,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
           result = r[iClass];
           branches[iClass]->Fill();
@@ -216,7 +216,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       float target = 0;
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
       auto targets = data.getTargets();
-      for (auto& t : targets) {
+      for (const auto& t : targets) {
         target = t;
         target_branch->Fill();
       }

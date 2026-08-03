@@ -516,11 +516,10 @@ events used for producing MC samples (both run-independent and run-dependent).
 Calibration
 ~~~~~~~~~~~
 
-There are several variables also available for calibration experts who are working on ``cdst`` format files.
+There are several variables also available for calibration experts who are working on ``cdst`` format files. They are
+identifiable based on their **[Calibration]** pre-tag.
 
-.. warning:: Many of these will not work for- and should not be used by- normal analyses.
-
-They have a **[Calibration]** pretag.
+.. attention:: These should not be used for normal analysis. 
 
 .. b2-variables::
    :group: Event (cDST only)

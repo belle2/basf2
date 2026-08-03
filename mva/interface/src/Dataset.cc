@@ -364,7 +364,7 @@ namespace Belle2 {
     }
 
 
-    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant) const
+    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant)
     {
       if (std::holds_alternative<double>(variant))
         return static_cast<float>(std::get<double>(variant));
@@ -495,7 +495,7 @@ namespace Belle2 {
       return values;
     }
 
-    bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname) const
+    bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname)
     {
       auto branch = tree->GetListOfBranches()->FindObject(branchname.c_str());
       return branch != nullptr;
@@ -586,7 +586,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantType(const std::string type, RootDatasetVarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantType(const std::string& type, RootDatasetVarVariant& varVariantTarget)
     {
       if (type == "Double_t")
         varVariantTarget = 0.0;
@@ -603,7 +603,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantForBranch(const std::string& branch_name, RootDatasetVarVariant& varVariantTarget)
     {
       std::string compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name);
       // try the branch as is first then fall back to root safe name.

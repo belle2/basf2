@@ -175,7 +175,8 @@ std::vector<std::vector<float>> MVAMultipleExpertsModule::analyse(Particle* part
   return responseValues;
 }
 
-void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float responseValue, unsigned int i)
+void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, const std::string& extraInfoName, float responseValue,
+                                                 unsigned int i)
 {
   if (particle->hasExtraInfo(extraInfoName)) {
     if (particle->getExtraInfo(extraInfoName) != responseValue) {

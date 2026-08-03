@@ -17,7 +17,7 @@ you skipped it and are just familiar with ROOT (and basic python syntax).
 This page might also be a useful page for a quick reference on how to exploit pandas. 
 
 If you are working with ntuples, the recommended way is to use the :ref:`VariablesToTable <v2t>` module to write out particle lists directly to ``parquet`` or ``hdf5`` format.
-In case this is not possible for you, cou can use uproot as described below.
+In case this is not possible for you, you can use uproot as described below.
 
 Importing ROOT files
 ---------------------------------

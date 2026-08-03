@@ -44,15 +44,14 @@ __all__ = [
 def modeSelector(
     bp_list,
     b0_list,
-    payload_cat_model='modeSelector_cat_model_v2',
-    payload_main_model='modeSelector_main_model_v2',
+    payload_cat_model='modeSelector_cat_model_v3',
+    payload_main_model='modeSelector_main_model_v3',
     output_variable='BplusScore',
     cat_model_path=None,
     main_model_path=None,
     addDstarVetoReco=True,
     training_mode=False,
     skip_nn_evaluation=False,
-    training_output='modeSelector_training.npz',
     store_fei_calib_weight=False,
     debug=False,
     debug_max_events=10,
@@ -85,6 +84,11 @@ def modeSelector(
         skip_nn_evaluation (bool): If True, skip loading and evaluating the neural networks
             and fill deterministic placeholder outputs instead. Intended for debugging or
             timing studies and emits a warning at module initialization.
+        training_mode (bool): If True, skip NN inference and instead expose per-event
+            features and MC truth as EventExtraInfo/ExtraInfo (``modeSelector_feat_XXXX``,
+            ``modeSelector_tr_*``, ``modeSelector_trainSigInputId``) for a
+            variablesToNtuple call in the steering script to dump. See
+            ``analysis/examples/modeSelector/produceTrainingInputs.py``. Default: False.
         addDstarVetoReco (bool): Whether to add D* veto reconstruction before the NN.
             Default: True
         store_fei_calib_weight (bool): If True, compute and store modeSelector_feiCalibWeight
@@ -141,7 +145,6 @@ def modeSelector(
         main_model_path=main_model_path,
         training_mode=training_mode,
         skip_nn_evaluation=skip_nn_evaluation,
-        training_output=training_output,
         store_fei_calib_weight=store_fei_calib_weight,
         debug=debug,
         debug_max_events=debug_max_events,

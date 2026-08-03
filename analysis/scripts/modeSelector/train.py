@@ -6,31 +6,59 @@ This script trains the two-stage ModeSelector:
 1. Category network (B0 vs B+ vs continuum classification)
 2. Main network (signal vs background classification using category output)
 
+Inputs are either produceTrainingInputs.py ROOT files or the .npz shards written by
+convert_training_inputs.py. Prefer the shards for anything beyond a few hundred ROOT
+files: reading the raw ROOT inputs costs ~11 s per file and is paid again on every
+invocation, i.e. twice per full training (category, then main).
+
 Usage:
     # Train category network (single file)
-    python3 train.py --input modeSelector_training.npz --network category --output networks/
+    python3 train.py --input modeSelector_training.root --network category --output networks/
 
     # Train category network (multiple files)
-    python3 train.py --input modeSelector_training_*.npz --network category --output networks/
+    python3 train.py --input modeSelector_training_*.root --network category --output networks/
+
+    # Train on pre-converted .npz shards (recommended for large samples)
+    python3 train.py --input 'converted/*.npz' --network category --use_sparse
 
     # Train main network (requires trained category network)
-    python3 train.py --input modeSelector_training.npz --network main --cat_model networks/net_category.pt --output networks/
+    python3 train.py --input modeSelector_training.root --network main \
+        --cat_model networks/net_category.pt --output networks/
 """
 
 import argparse
 import glob
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from modeSelector import config
+import uproot
 from scipy import sparse
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
+
+try:
+    from modeSelector import config
+except Exception:
+    # Training needs nothing from basf2 -- only the constants in config.py, which itself
+    # imports nothing. The package __init__ does pull in basf2 and ROOT (via
+    # ModeSelectorModule/dstarVeto/generatedDecayWeights), so importing config through the
+    # package would force a basf2 setup. Load it straight from the file instead, which is
+    # what lets train.py run in a standalone venv with a CUDA torch build (the basf2
+    # externals ship torch CPU-only).
+    #
+    # Deliberately broad: if a basf2 PYTHONPATH is inherited (HTCondor getenv=true) but the
+    # interpreter is the venv's, pybasf2's compiled module is found and fails to initialise
+    # with SystemError rather than ImportError.
+    import importlib.util
+    _config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.py')
+    _spec = importlib.util.spec_from_file_location('modeSelector_config', _config_path)
+    config = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(config)
 
 #: Main network label index for bad-tag background
 MAIN_BG_BAD_TAG = config.N_INPUT_IDS
@@ -41,19 +69,368 @@ MAIN_BG_CONT = config.N_INPUT_IDS + 2
 #: Total number of main network output labels
 MAIN_NUM_LABELS = config.N_INPUT_IDS + 3
 
+#: Per-event truth/label branches written to the 'events' tree, aliased as ms_tr_<name>
+EVENT_TRUTH_FIELDS = (
+    'is_cont', 'gen_pdg', 'bp_gen_decay_mode_id', 'b0_gen_decay_mode_id',
+    'bp_gen_fei_calib_weight', 'b0_gen_fei_calib_weight', 'bp_is_best',
+    'best_sigprob', 'best_bp_sigprob_iid', 'best_b0_sigprob_iid',
+    'bp_tag_is_gen', 'b0_tag_is_gen', 'fei_calib_weight',
+    'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp',
+)
+#: dtype used to cast each ms_tr_<name> branch back from the ROOT double it was stored as
+EVENT_TRUTH_DTYPES = {
+    'is_cont': np.int8, 'gen_pdg': np.int16,
+    'bp_gen_decay_mode_id': np.int16, 'b0_gen_decay_mode_id': np.int16,
+    'bp_gen_fei_calib_weight': np.float32, 'b0_gen_fei_calib_weight': np.float32,
+    'bp_is_best': np.int8, 'best_sigprob': np.float32,
+    'best_bp_sigprob_iid': np.int16, 'best_b0_sigprob_iid': np.int16,
+    'bp_tag_is_gen': np.int8, 'b0_tag_is_gen': np.int8, 'fei_calib_weight': np.float32,
+    'best_bp_iid': np.int16, 'best_bp_dp': np.float32,
+    'best_b0_iid': np.int16, 'best_b0_dp': np.float32,
+}
+
+
+#: Branches required in the 'events' tree of a training input file
+REQUIRED_EVENT_BRANCHES = tuple(f'ms_tr_{name}' for name in EVENT_TRUTH_FIELDS) + (
+    '__experiment__', '__run__', '__event__',
+)
+#: Branches read from (and required in) the 'sig_candidates' tree
+SIG_CANDIDATE_BRANCHES = (
+    '__experiment__', '__run__', '__event__',
+    'ms_sig_input_id', 'ms_sig_btag_index', 'ms_sig_delta_p', 'ms_sig_sigprob',
+)
+
+
+def _validate_trees(f, input_file):
+    """
+    Check that an open training input file has the trees and branches
+    _load_root_training_file() needs, raising ValueError naming what is missing.
+
+    Called on the already-open file rather than as a separate preflight pass: at grid
+    scale (>10k files) a standalone pass costs one extra open per file, which dominated
+    the old serial preflight loop (~1.1 s/file).
+    """
+    if 'events' not in f or 'sig_candidates' not in f:
+        raise ValueError(f"{input_file}: missing 'events' or 'sig_candidates' tree")
+
+    event_keys = set(f['events'].keys())
+    sig_keys = set(f['sig_candidates'].keys())
+    missing_event = [k for k in REQUIRED_EVENT_BRANCHES if k not in event_keys]
+    if not any(k.startswith('ms_feat_') for k in event_keys):
+        missing_event.append('ms_feat_*')
+    missing_sig = [k for k in SIG_CANDIDATE_BRANCHES if k not in sig_keys]
+    if missing_event or missing_sig:
+        raise ValueError(
+            f"{input_file}: missing branches events={missing_event} sig_candidates={missing_sig}"
+        )
+
+
+def _load_root_training_file(input_file):
+    """
+    Read one produceTrainingInputs.py ROOT output file ('events' + 'sig_candidates'
+    trees, written via variablesToNtuple) into the same key layout the rest of
+    load_and_sample_data() used to get from the legacy npz format.
+    """
+    with uproot.open(input_file) as f:
+        _validate_trees(f, input_file)
+        events = f['events']
+        # Pass the branch list explicitly. With expressions=None, uproot re-derives the
+        # full branch-name table once per branch; on this tree (1644 ms_feat_* branches
+        # plus truth/index branches, 1667 total) that name resolution costs ~17 s per
+        # file on top of the ~5 s of actual basket I/O.
+        ev_arrays = events.arrays(list(events.keys()), library='np')
+        sig_arrays = f['sig_candidates'].arrays(list(SIG_CANDIDATE_BRANCHES), library='np')
+
+    # The 'events' tree has one row per *processed* event, including events with no
+    # B+/B0 candidate at all -- ModeSelectorModule.event() returns before creating
+    # EventExtraInfo for those, so every ms_tr_*/ms_feat_* value comes back as NaN.
+    # Drop them here to match the legacy pipeline, which never appended such events.
+    valid_events = ~np.isnan(ev_arrays['ms_tr_is_cont'])
+    if not np.all(valid_events):
+        ev_arrays = {key: values[valid_events] for key, values in ev_arrays.items()}
+
+    n_events = len(ev_arrays['__event__'])
+    feat_indices = sorted(int(k[len('ms_feat_'):]) for k in ev_arrays if k.startswith('ms_feat_'))
+    feature_matrix = np.column_stack(
+        [ev_arrays[f'ms_feat_{i:04d}'] for i in feat_indices]
+    ).astype(np.float32)
+    feats = sparse.csr_matrix(feature_matrix)
+
+    data = {'features': feats}
+    for name in EVENT_TRUTH_FIELDS:
+        data[name] = ev_arrays[f'ms_tr_{name}'].astype(EVENT_TRUTH_DTYPES[name])
+
+    # Join sig_candidates rows to their event row via the (experiment, run, event)
+    # triplet written to both trees, mirroring the per-event dedup the module used
+    # to perform before writing the legacy CSR-style sig_* arrays directly.
+    sig_input_id = sig_arrays['ms_sig_input_id']
+    valid = ~np.isnan(sig_input_id)
+    # np.rec, not np.core.records: the latter is private in numpy 2 and raises there.
+    # np.rec is public in both 1.x and 2.x, so this works under the basf2 externals
+    # (numpy 1.26) and in a standalone venv with numpy 2.
+    event_key = np.rec.fromarrays(
+        [ev_arrays['__experiment__'], ev_arrays['__run__'], ev_arrays['__event__']],
+        names='exp,run,evt',
+    )
+    cand_key = np.rec.fromarrays(
+        [sig_arrays['__experiment__'][valid], sig_arrays['__run__'][valid], sig_arrays['__event__'][valid]],
+        names='exp,run,evt',
+    )
+    order = np.argsort(event_key)
+    sorted_event_key = event_key[order]
+    idx_in_sorted = np.searchsorted(sorted_event_key, cand_key)
+    if len(cand_key) and not np.array_equal(sorted_event_key[idx_in_sorted], cand_key):
+        raise ValueError(f"{input_file}: could not join sig_candidates rows to events by (experiment, run, event)")
+    cand_event_idx = order[idx_in_sorted]
+
+    row_order = np.argsort(cand_event_idx, kind='stable')
+    cand_event_idx = cand_event_idx[row_order]
+    data['sig_input_ids_values'] = sig_input_id[valid][row_order].astype(np.int16)
+    data['sig_btag_index_values'] = np.nan_to_num(
+        sig_arrays['ms_sig_btag_index'][valid][row_order], nan=-1
+    ).astype(np.int16)
+    data['sig_delta_p_values'] = sig_arrays['ms_sig_delta_p'][valid][row_order].astype(np.float32)
+    data['sig_sigprob_values'] = sig_arrays['ms_sig_sigprob'][valid][row_order].astype(np.float32)
+
+    counts = np.bincount(cand_event_idx, minlength=n_events)
+    sig_input_ids_offsets = np.zeros(n_events + 1, dtype=np.int32)
+    np.cumsum(counts, out=sig_input_ids_offsets[1:])
+    data['sig_input_ids_offsets'] = sig_input_ids_offsets
+
+    return data
+
+
+#: Version tag written into every .npz shard, checked on load
+NPZ_SHARD_VERSION = 1
+#: Packed ragged per-candidate arrays, all indexed by 'sig_input_ids_offsets'
+SIG_PACKED_VALUE_FIELDS = (
+    'sig_input_ids_values', 'sig_btag_index_values',
+    'sig_delta_p_values', 'sig_sigprob_values',
+)
+
+
+def concat_file_data(data_list):
+    """
+    Concatenate per-file dicts as returned by _load_root_training_file() into one dict
+    of the same layout.
+
+    Parameters:
+        data_list (list of dict): Per-file data dicts, in the order to concatenate.
+
+    Returns:
+        dict: Single dict with the feature matrices vertically stacked, the per-event
+        truth arrays concatenated, and the packed ragged sig_* arrays concatenated with
+        'sig_input_ids_offsets' rebased onto the combined value arrays.
+    """
+    if not data_list:
+        raise ValueError("concat_file_data() got no input dicts.")
+    if len(data_list) == 1:
+        return data_list[0]
+
+    out = {'features': sparse.vstack([d['features'] for d in data_list], format='csr')}
+    for name in EVENT_TRUTH_FIELDS:
+        out[name] = np.concatenate([d[name] for d in data_list])
+    for name in SIG_PACKED_VALUE_FIELDS:
+        out[name] = np.concatenate([d[name] for d in data_list])
+
+    # Each file's offsets start at 0; shift every file's tail by the running total so the
+    # combined offsets index the concatenated value arrays.
+    offsets = [np.zeros(1, dtype=np.int32)]
+    shift = 0
+    for d in data_list:
+        file_offsets = d['sig_input_ids_offsets']
+        offsets.append(file_offsets[1:].astype(np.int64) + shift)
+        shift += int(file_offsets[-1])
+    out['sig_input_ids_offsets'] = np.concatenate(offsets).astype(np.int64)
+
+    return out
+
+
+def save_npz_shard(path, data):
+    """
+    Write a per-file/merged data dict to a .npz shard readable by _load_npz_shard().
+
+    The CSR feature matrix is stored as its three component arrays plus its shape; all
+    other entries are stored as-is. Uncompressed (np.savez): the features are ~1.6%
+    dense, so a shard is small already and load speed matters more than size.
+
+    Parameters:
+        path (str): Output .npz path.
+        data (dict): Data dict as returned by _load_root_training_file()/concat_file_data().
+    """
+    feats = data['features'].tocsr()
+    arrays = {
+        'format_version': np.asarray(NPZ_SHARD_VERSION, dtype=np.int32),
+        'feat_data': feats.data.astype(np.float32, copy=False),
+        'feat_indices': feats.indices.astype(np.int32, copy=False),
+        'feat_indptr': feats.indptr.astype(np.int64, copy=False),
+        'feat_shape': np.asarray(feats.shape, dtype=np.int64),
+    }
+    for name in EVENT_TRUTH_FIELDS:
+        arrays[name] = data[name]
+    for name in SIG_PACKED_VALUE_FIELDS:
+        arrays[name] = data[name]
+    arrays['sig_input_ids_offsets'] = data['sig_input_ids_offsets']
+
+    np.savez(path, **arrays)
+
+
+def _load_npz_shard(input_file):
+    """
+    Read a .npz shard written by convert_training_inputs.py back into the same dict
+    layout _load_root_training_file() returns.
+    """
+    with np.load(input_file) as f:
+        version = int(f['format_version'])
+        if version != NPZ_SHARD_VERSION:
+            raise ValueError(
+                f"{input_file}: .npz shard format version {version}, "
+                f"expected {NPZ_SHARD_VERSION} -- regenerate with convert_training_inputs.py"
+            )
+        data = {
+            'features': sparse.csr_matrix(
+                (f['feat_data'], f['feat_indices'], f['feat_indptr']),
+                shape=tuple(f['feat_shape']),
+            )
+        }
+        for name in EVENT_TRUTH_FIELDS:
+            data[name] = f[name].astype(EVENT_TRUTH_DTYPES[name], copy=False)
+        for name in SIG_PACKED_VALUE_FIELDS:
+            data[name] = f[name]
+        data['sig_input_ids_offsets'] = f['sig_input_ids_offsets']
+
+    return data
+
+
+def load_training_file(input_file):
+    """
+    Load one training input, dispatching on file extension.
+
+    Parameters:
+        input_file (str): Either a produceTrainingInputs.py ROOT file or a .npz shard
+            written by convert_training_inputs.py.
+
+    Returns:
+        dict: Per-file data dict (see _load_root_training_file()).
+    """
+    if input_file.endswith('.npz'):
+        return _load_npz_shard(input_file)
+    return _load_root_training_file(input_file)
+
+
+def _process_one_file(args):
+    """
+    Load one input file and apply the per-event preselection and downsampling.
+
+    Module-level (rather than a closure) so it can be dispatched to a ProcessPoolExecutor.
+    Loading is GIL-bound on the numpy/scipy side, so a thread pool scales negatively here:
+    32 threads measured slower than a single thread on the v7 inputs.
+
+    Parameters:
+        args (tuple): (input_file, seed, fraction, cont_fraction, sigprob_thresh).
+
+    Returns:
+        tuple: (result, error). On success `result` is the tuple of sampled arrays and
+        `error` is None; on failure `result` is None and `error` is a message naming the
+        file, so one unreadable input among thousands does not abort the run.
+    """
+    input_file, seed, fraction, cont_fraction, sigprob_thresh = args
+
+    try:
+        data = load_training_file(input_file)
+    except Exception as exc:
+        return None, f"{input_file}: failed to read input file ({exc})"
+
+    feats = data['features']
+
+    is_cont = data['is_cont']
+    gen_pdg = data['gen_pdg']
+    bp_is_best = data['bp_is_best']
+    best_sigprob = data['best_sigprob']
+    best_bp_sigprob_iid = data['best_bp_sigprob_iid']
+    best_b0_sigprob_iid = data['best_b0_sigprob_iid']
+
+    bp_tag_is_gen = data['bp_tag_is_gen']
+    b0_tag_is_gen = data['b0_tag_is_gen']
+    bp_gen_decay_mode_id = data['bp_gen_decay_mode_id']
+    b0_gen_decay_mode_id = data['b0_gen_decay_mode_id']
+    bp_gen_fei_calib_weight = data['bp_gen_fei_calib_weight']
+    b0_gen_fei_calib_weight = data['b0_gen_fei_calib_weight']
+    fei_calib_weight = data['fei_calib_weight']
+
+    best_bp_iid = data['best_bp_iid']
+    best_bp_dp = data['best_bp_dp']
+    best_b0_iid = data['best_b0_iid']
+    best_b0_dp = data['best_b0_dp']
+    sig_input_ids_values = data['sig_input_ids_values']
+    sig_input_ids_offsets = data['sig_input_ids_offsets']
+    sig_btag_index_values = data['sig_btag_index_values']
+    sig_delta_p_values = data['sig_delta_p_values']
+    sig_sigprob_values = data['sig_sigprob_values']
+
+    # Keep events where the best candidate passes the sigProb threshold.
+    # Applies to all events including continuum.
+    presel = best_sigprob > sigprob_thresh
+
+    sample_prob = np.full(len(best_sigprob), fraction, dtype=np.float32)
+    sample_prob[is_cont == 1] *= cont_fraction
+    sample_prob = np.minimum(sample_prob, 1.0)
+
+    file_rng = np.random.default_rng(seed)
+    sampled = (file_rng.random(len(best_sigprob)) < sample_prob) & presel
+
+    keep_events = np.flatnonzero(sampled).astype(np.int64)
+
+    def _subset_packed(values, offsets, keep):
+        starts = offsets[keep]
+        ends = offsets[keep + 1]
+        lengths = (ends - starts).astype(np.int64)
+        out_offsets = np.zeros(len(keep) + 1, dtype=np.int64)
+        np.cumsum(lengths, out=out_offsets[1:])
+        total_len = int(out_offsets[-1])
+        if total_len == 0:
+            return np.empty(0, dtype=values.dtype), out_offsets
+        # Gather the kept slices without a Python-level loop over events: build the
+        # source index of every kept element from the per-slice start and a within-slice
+        # ramp (arange minus the offset each slice begins at in the output).
+        idx = np.arange(total_len, dtype=np.int64)
+        slice_of = np.repeat(np.arange(len(keep), dtype=np.int64), lengths)
+        src = idx - out_offsets[slice_of] + starts[slice_of]
+        return values[src], out_offsets
+
+    sig_iid_v_s, sig_off_s = _subset_packed(sig_input_ids_values, sig_input_ids_offsets, keep_events)
+    sig_btag_v_s, _ = _subset_packed(sig_btag_index_values, sig_input_ids_offsets, keep_events)
+    sig_dp_v_s, _ = _subset_packed(sig_delta_p_values, sig_input_ids_offsets, keep_events)
+    sig_sigprob_v_s, _ = _subset_packed(sig_sigprob_values, sig_input_ids_offsets, keep_events)
+
+    result = (feats[sampled],
+              is_cont[sampled], gen_pdg[sampled], bp_is_best[sampled], best_sigprob[sampled],
+              best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
+              best_bp_iid[sampled], best_bp_dp[sampled],
+              best_b0_iid[sampled], best_b0_dp[sampled],
+              sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s,
+              bp_tag_is_gen[sampled], b0_tag_is_gen[sampled],
+              bp_gen_decay_mode_id[sampled], b0_gen_decay_mode_id[sampled],
+              bp_gen_fei_calib_weight[sampled], b0_gen_fei_calib_weight[sampled],
+              fei_calib_weight[sampled])
+    return result, None
+
 
 def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
                          sigprob_thresh=config.DEFAULT_FEI_SIGPROB_THRESHOLD,
-                         random_state=None):
+                         random_state=None, n_workers=None):
     """
     Load training data and apply optional global downsampling.
 
     Parameters:
-        input_files (str or list of str): Path(s) to modeSelector_training.npz file(s).
+        input_files (str or list of str): Path(s) to modeSelector_training.root file(s)
+            produced by produceTrainingInputs.py, or to .npz shards written by
+            convert_training_inputs.py. The two may be mixed.
         fraction (float): Uniform BB sampling fraction applied after loading (default 1.0).
         cont_fraction (float): Additional continuum downscale relative to fraction (default 1.0).
         sigprob_thresh (float): Minimum signal probability threshold. Default: 0.001.
         random_state (int): Random seed.
+        n_workers (int): Loader processes (default: min(16, cpu_count())).
 
     Returns:
         features (sparse matrix): Sampled and filtered feature matrix (only has_inputs columns).
@@ -74,7 +451,7 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
             bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w) -- per-event arrays for FEI
             calibration weight computation. bp/b0_gen_dm_id are int16 with sentinel -1
             (missing) or 999 (rest calibration). stored_fei_calib_w is the pre-computed
-            event-level weight from the npz, used to verify recomputed weights in
+            event-level weight from the ROOT file, used to verify recomputed weights in
             compute_event_weights. bp/b0_gen_calib_w are float32 stored calibration weights
             from generatedDecayWeights.
     """
@@ -82,12 +459,15 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     if isinstance(input_files, str):
         input_files = [input_files]
 
-    # Expand any glob patterns and exclude _features.npz files
+    # Expand any glob patterns (e.g. grid downloads: many small *.root files).
+    # recursive=True is required for ** to descend into subdirectories; without it
+    # glob silently returns no matches and the pattern would fall through as a
+    # literal (nonexistent) file path below.
     expanded = []
     for f in input_files:
-        matches = glob.glob(f)
+        matches = glob.glob(f, recursive=True)
         expanded.extend(matches if matches else [f])
-    input_files = [f for f in expanded if not f.endswith('_features.npz')]
+    input_files = expanded
 
     if not input_files:
         raise ValueError("No input files found.")
@@ -96,45 +476,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     print("Resolved input parent directories:")
     for d in parent_dirs:
         print(f"  {d}")
-
-    # Preflight: verify all archives have required keys before parallel loading starts.
-    required_keys = (
-        'is_cont', 'gen_pdg', 'bp_is_best', 'best_sigprob',
-        'best_bp_sigprob_iid', 'best_b0_sigprob_iid',
-        'bp_tag_is_gen', 'b0_tag_is_gen',
-        'bp_gen_decay_mode_id', 'b0_gen_decay_mode_id',
-        'bp_gen_fei_calib_weight', 'b0_gen_fei_calib_weight',
-        'fei_calib_weight',
-        'best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp',
-        'sig_input_ids_values', 'sig_input_ids_offsets',
-        'sig_btag_index_values', 'sig_delta_p_values', 'sig_sigprob_values'
-    )
-    preflight_errors = []
-    for input_file in input_files:
-        features_file = input_file.replace('.npz', '_features.npz')
-        if not os.path.exists(features_file):
-            preflight_errors.append(
-                f"{input_file}: missing companion sparse features file '{features_file}'"
-            )
-            continue
-        try:
-            data = np.load(input_file, allow_pickle=True)
-            keys = set(data.files)
-        except Exception as exc:
-            preflight_errors.append(f"{input_file}: failed to read npz ({exc})")
-            continue
-        missing = [k for k in required_keys if k not in keys]
-        if missing:
-            preflight_errors.append(
-                f"{input_file}: missing keys {missing}; available keys: {sorted(keys)}"
-            )
-
-    if preflight_errors:
-        msg = ["Input preflight failed. Fix input files before training."]
-        msg.extend(preflight_errors[:20])
-        if len(preflight_errors) > 20:
-            msg.append(f"... and {len(preflight_errors) - 20} more files")
-        raise ValueError("\n".join(msg))
 
     if fraction > 1.0:
         raise ValueError(f"fraction must be <= 1.0, got {fraction}.")
@@ -145,83 +486,6 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     rng = np.random.default_rng(random_state)
     # Pre-generate per-file seeds so parallel workers are independent
     seeds = rng.integers(0, 2**31, size=len(input_files))
-
-    def _process_one_file(args):
-        input_file, seed = args
-        data = np.load(input_file, allow_pickle=True)
-        feats = sparse.load_npz(input_file.replace('.npz', '_features.npz'))
-
-        is_cont = data['is_cont']
-        gen_pdg = data['gen_pdg']
-        bp_is_best = data['bp_is_best']
-        best_sigprob = data['best_sigprob']
-        best_bp_sigprob_iid = data['best_bp_sigprob_iid']
-        best_b0_sigprob_iid = data['best_b0_sigprob_iid']
-
-        bp_tag_is_gen = data['bp_tag_is_gen']
-        b0_tag_is_gen = data['b0_tag_is_gen']
-        bp_gen_decay_mode_id = data['bp_gen_decay_mode_id']
-        b0_gen_decay_mode_id = data['b0_gen_decay_mode_id']
-        bp_gen_fei_calib_weight = data['bp_gen_fei_calib_weight']
-        b0_gen_fei_calib_weight = data['b0_gen_fei_calib_weight']
-        fei_calib_weight = data['fei_calib_weight']
-
-        best_bp_iid = data['best_bp_iid']
-        best_bp_dp = data['best_bp_dp']
-        best_b0_iid = data['best_b0_iid']
-        best_b0_dp = data['best_b0_dp']
-        sig_input_ids_values = data['sig_input_ids_values']
-        sig_input_ids_offsets = data['sig_input_ids_offsets']
-        sig_btag_index_values = data['sig_btag_index_values']
-        sig_delta_p_values = data['sig_delta_p_values']
-        sig_sigprob_values = data['sig_sigprob_values']
-
-        # Keep events where the best candidate passes the sigProb threshold.
-        # Applies to all events including continuum.
-        presel = best_sigprob > sigprob_thresh
-
-        sample_prob = np.full(len(best_sigprob), fraction, dtype=np.float32)
-        sample_prob[is_cont == 1] *= cont_fraction
-        sample_prob = np.minimum(sample_prob, 1.0)
-
-        file_rng = np.random.default_rng(seed)
-        sampled = (file_rng.random(len(best_sigprob)) < sample_prob) & presel
-
-        keep_events = np.flatnonzero(sampled).astype(np.int32)
-
-        def _subset_packed(values, offsets, keep):
-            out_offsets = np.empty(len(keep) + 1, dtype=np.int32)
-            out_offsets[0] = 0
-            chunks = []
-            total_len = 0
-            for i, evt_idx in enumerate(keep):
-                start = int(offsets[evt_idx])
-                end = int(offsets[evt_idx + 1])
-                chunk = values[start:end]
-                chunks.append(chunk)
-                total_len += (end - start)
-                out_offsets[i + 1] = total_len
-            if total_len > 0:
-                out_values = np.concatenate(chunks).astype(values.dtype, copy=False)
-            else:
-                out_values = np.empty(0, dtype=values.dtype)
-            return out_values, out_offsets
-
-        sig_iid_v_s, sig_off_s = _subset_packed(sig_input_ids_values, sig_input_ids_offsets, keep_events)
-        sig_btag_v_s, _ = _subset_packed(sig_btag_index_values, sig_input_ids_offsets, keep_events)
-        sig_dp_v_s, _ = _subset_packed(sig_delta_p_values, sig_input_ids_offsets, keep_events)
-        sig_sigprob_v_s, _ = _subset_packed(sig_sigprob_values, sig_input_ids_offsets, keep_events)
-
-        return (feats[sampled],
-                is_cont[sampled], gen_pdg[sampled], bp_is_best[sampled], best_sigprob[sampled],
-                best_bp_sigprob_iid[sampled], best_b0_sigprob_iid[sampled],
-                best_bp_iid[sampled], best_bp_dp[sampled],
-                best_b0_iid[sampled], best_b0_dp[sampled],
-                sig_iid_v_s, sig_off_s, sig_btag_v_s, sig_dp_v_s, sig_sigprob_v_s,
-                bp_tag_is_gen[sampled], b0_tag_is_gen[sampled],
-                bp_gen_decay_mode_id[sampled], b0_gen_decay_mode_id[sampled],
-                bp_gen_fei_calib_weight[sampled], b0_gen_fei_calib_weight[sampled],
-                fei_calib_weight[sampled])
 
     features_list = []
     is_cont_list, gen_pdg_list, bp_is_best_list, best_sigprob_list = [], [], [], []
@@ -235,42 +499,70 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
     bp_gen_calib_w_list, b0_gen_calib_w_list = [], []
     stored_fei_calib_w_list = []
 
-    n_workers = min(32, len(input_files))
-    with ThreadPoolExecutor(max_workers=n_workers) as executor:
-        future_list = [executor.submit(_process_one_file, (f, s))
-                       for f, s in zip(input_files, seeds)]
-        results = [f.result() for f in tqdm(future_list, desc="Loading files")]
+    if n_workers is None:
+        n_workers = min(16, os.cpu_count() or 1)
+    n_workers = max(1, min(n_workers, len(input_files)))
 
-    for result in results:
-        (feats,
-         is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
-         best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
-         bp_iid, bp_dp, b0_iid, b0_dp,
-         sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v,
-         bp_tg, b0_tg, bp_gd, b0_gd, bp_gcw, b0_gcw, stored_fcw) = result
-        features_list.append(feats)
-        is_cont_list.append(is_cont_r)
-        gen_pdg_list.append(gen_pdg_r)
-        bp_is_best_list.append(bp_is_best_r)
-        best_sigprob_list.append(best_sigprob_r)
-        best_bp_sigprob_iid_list.append(best_bp_sigprob_iid_r)
-        best_b0_sigprob_iid_list.append(best_b0_sigprob_iid_r)
-        best_bp_iid_list.append(bp_iid)
-        best_bp_dp_list.append(bp_dp)
-        best_b0_iid_list.append(b0_iid)
-        best_b0_dp_list.append(b0_dp)
-        sig_input_ids_values_list.append(sig_iid_v)
-        sig_input_ids_offsets_list.append(sig_off)
-        sig_btag_index_values_list.append(sig_btag_v)
-        sig_delta_p_values_list.append(sig_dp_v)
-        sig_sigprob_values_list.append(sig_sigprob_v)
-        bp_tag_is_gen_list.append(bp_tg)
-        b0_tag_is_gen_list.append(b0_tg)
-        bp_gen_dm_id_list.append(bp_gd)
-        b0_gen_dm_id_list.append(b0_gd)
-        bp_gen_calib_w_list.append(bp_gcw)
-        b0_gen_calib_w_list.append(b0_gcw)
-        stored_fei_calib_w_list.append(stored_fcw)
+    # Process pool, not threads: loading is dominated by numpy/scipy work that holds the
+    # GIL, so threads scale negatively here (32 threads measured ~2x slower per file than
+    # a single thread on the v7 inputs). Results stream in submission order and are
+    # appended straight to the per-field lists, so only one result is held beyond the
+    # lists themselves.
+    load_errors = []
+    with ProcessPoolExecutor(max_workers=n_workers) as executor:
+        results = executor.map(
+            _process_one_file,
+            [(f, s, fraction, cont_fraction, sigprob_thresh) for f, s in zip(input_files, seeds)],
+        )
+        results = tqdm(results, total=len(input_files), desc="Loading files")
+
+        for result, error in results:
+            if error is not None:
+                load_errors.append(error)
+                continue
+            (feats,
+             is_cont_r, gen_pdg_r, bp_is_best_r, best_sigprob_r,
+             best_bp_sigprob_iid_r, best_b0_sigprob_iid_r,
+             bp_iid, bp_dp, b0_iid, b0_dp,
+             sig_iid_v, sig_off, sig_btag_v, sig_dp_v, sig_sigprob_v,
+             bp_tg, b0_tg, bp_gd, b0_gd, bp_gcw, b0_gcw, stored_fcw) = result
+            features_list.append(feats)
+            is_cont_list.append(is_cont_r)
+            gen_pdg_list.append(gen_pdg_r)
+            bp_is_best_list.append(bp_is_best_r)
+            best_sigprob_list.append(best_sigprob_r)
+            best_bp_sigprob_iid_list.append(best_bp_sigprob_iid_r)
+            best_b0_sigprob_iid_list.append(best_b0_sigprob_iid_r)
+            best_bp_iid_list.append(bp_iid)
+            best_bp_dp_list.append(bp_dp)
+            best_b0_iid_list.append(b0_iid)
+            best_b0_dp_list.append(b0_dp)
+            sig_input_ids_values_list.append(sig_iid_v)
+            sig_input_ids_offsets_list.append(sig_off)
+            sig_btag_index_values_list.append(sig_btag_v)
+            sig_delta_p_values_list.append(sig_dp_v)
+            sig_sigprob_values_list.append(sig_sigprob_v)
+            bp_tag_is_gen_list.append(bp_tg)
+            b0_tag_is_gen_list.append(b0_tg)
+            bp_gen_dm_id_list.append(bp_gd)
+            b0_gen_dm_id_list.append(b0_gd)
+            bp_gen_calib_w_list.append(bp_gcw)
+            b0_gen_calib_w_list.append(b0_gcw)
+            stored_fei_calib_w_list.append(stored_fcw)
+
+    # Files that fail to open/read (e.g. corrupted or incomplete grid downloads) or are
+    # missing required branches are skipped with a warning rather than aborting the whole
+    # run -- expected at grid scale, where a handful of bad job outputs among thousands is
+    # common.
+    if load_errors:
+        print(f"\nWARNING: skipped {len(load_errors)}/{len(input_files)} unreadable input file(s):")
+        for err in load_errors[:20]:
+            print(f"  {err}")
+        if len(load_errors) > 20:
+            print(f"  ... and {len(load_errors) - 20} more files")
+
+    if not features_list:
+        raise ValueError("All input files failed to load. Fix input files before training.")
 
     # Concatenate across all files
     features = sparse.vstack(features_list, format='csr')
@@ -351,14 +643,17 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         np.concatenate(best_b0_dp_list),
     )
     if sig_input_ids_offsets_list:
-        global_offsets = [0]
+        # Rebase each file's offsets (which start at 0) onto the concatenated value
+        # arrays. Kept in numpy rather than building a Python list of ~1e8 ints, which
+        # costs several GB of boxed integers on the full v7 sample.
+        shifted_offsets = [np.zeros(1, dtype=np.int64)]
         shift = 0
         for file_offsets in sig_input_ids_offsets_list:
-            global_offsets.extend((file_offsets[1:] + shift).tolist())
-            shift = global_offsets[-1]
-        sig_input_ids_offsets = np.asarray(global_offsets, dtype=np.int32)
+            shifted_offsets.append(file_offsets[1:].astype(np.int64) + shift)
+            shift += int(file_offsets[-1])
+        sig_input_ids_offsets = np.concatenate(shifted_offsets)
     else:
-        sig_input_ids_offsets = np.zeros(features.shape[0] + 1, dtype=np.int32)
+        sig_input_ids_offsets = np.zeros(features.shape[0] + 1, dtype=np.int64)
 
     if sig_input_ids_values_list:
         sig_input_ids_values = np.concatenate(sig_input_ids_values_list).astype(np.int16, copy=False)
@@ -1062,7 +1357,8 @@ def main():
     """Parse command-line arguments and run the requested training."""
     parser = argparse.ArgumentParser(description='Train ModeSelector networks')
     parser.add_argument('--input', required=True, nargs='+',
-                        help='One or more modeSelector_training.npz paths (shell glob or space-separated list)')
+                        help='One or more modeSelector_training.root paths, or .npz shards from '
+                             'convert_training_inputs.py (shell glob or space-separated list)')
     parser.add_argument('--network', choices=['category', 'main'], required=True,
                         help='Which network to train')
     parser.add_argument('--cat_model', help='Trained category model (required for main network)')
@@ -1074,7 +1370,8 @@ def main():
     parser.add_argument('--batch_size', type=int, default=None,
                         help='Batch size (default: 16384 for category network, 32768 for main network)')
     parser.add_argument('--num_workers', type=int, default=None,
-                        help='Number of DataLoader worker processes (default: auto = min(8, max(1, cpu_count//2)))')
+                        help='Number of worker processes for input loading and the DataLoader '
+                             '(default: auto = min(8, max(1, cpu_count//2)))')
     parser.add_argument('--epochs', type=int, default=50, help='Number of epochs')
     parser.add_argument('--lr', type=float, default=5e-4, help='Initial learning rate')
     parser.add_argument('--lr_schedule', choices=['constant', 'cosine'], default='cosine',
@@ -1123,6 +1420,7 @@ def main():
         fraction=args.fraction,
         cont_fraction=args.cont_fraction,
         random_state=args.seed,
+        n_workers=resolved_num_workers,
     )
     is_cont, gen_pdg, bp_is_best, best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
 

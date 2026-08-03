@@ -33,7 +33,7 @@ from variables import variables as vm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', nargs='+',
-                    default=[b2.find_file('udst16_fei.root', 'validation')],
+                    default=[b2.find_file('udst16_feiHadronic.root', 'validation')],
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output',
                     help='Output parquet filename or stem (default: modeSelector_output)')
@@ -41,9 +41,9 @@ parser.add_argument('--cat-model', default=None,
                     help='Path to category MVA ONNX weightfile (omit to use payloads)')
 parser.add_argument('--main-model', default=None,
                     help='Path to main MVA ONNX weightfile (omit to use payloads)')
-parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v2',
+parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v3',
                     help='Conditions DB payload name for the category model')
-parser.add_argument('--main-payload-name', default='modeSelector_main_model_v2',
+parser.add_argument('--main-payload-name', default='modeSelector_main_model_v3',
                     help='Conditions DB payload name for the main model')
 parser.add_argument('--data', action='store_true',
                     help='Run in data mode: keep 10% of events with eventRandom and drop MC-only output variables')

@@ -65,19 +65,32 @@ def convert_network_to_onnx(pt_path, onnx_path):
 def _validate_onnx_export(model_with_softmax, onnx_path, input_size):
     """Check that the exported ONNX model produces the same output as the PyTorch model.
 
-    Uses a batch of 4 random inputs to exercise the dynamic batch dimension.
-    Raises RuntimeError if outputs do not match within default numpy tolerances.
+    Uses a batch of 4 inputs from a fixed seed to exercise the dynamic batch
+    dimension reproducibly. Tolerances are set for float32: torch and onnxruntime
+    accumulate the matmuls in a different order, which shifts individual softmax
+    probabilities of the 139-class main network by a few 1e-6. The numpy defaults
+    (atol=1e-8) are meant for float64 and reject those runs at random.
+    The predicted class is compared separately, since that is what the module uses.
+    Raises RuntimeError if outputs do not match.
     """
     import onnxruntime as ort
 
-    dummy = torch.randn(4, input_size)
+    generator = torch.Generator().manual_seed(0)
+    dummy = torch.randn(4, input_size, generator=generator)
     with torch.no_grad():
         pt_out = model_with_softmax(dummy).numpy()
     session = ort.InferenceSession(onnx_path)
     onnx_out = session.run(['output'], {'input': dummy.numpy()})[0]
-    if not np.allclose(pt_out, onnx_out):
+    if not np.allclose(pt_out, onnx_out, rtol=1e-4, atol=1e-6):
+        max_diff = float(np.abs(pt_out - onnx_out).max())
         raise RuntimeError(
-            'ONNX validation failed for ' + onnx_path + ': outputs do not match PyTorch model'
+            'ONNX validation failed for ' + onnx_path
+            + ': outputs do not match PyTorch model (max abs diff '
+            + f'{max_diff:.3e})'
+        )
+    if not (pt_out.argmax(axis=1) == onnx_out.argmax(axis=1)).all():
+        raise RuntimeError(
+            'ONNX validation failed for ' + onnx_path + ': predicted class does not match PyTorch model'
         )
     print(f"ONNX validation passed for {onnx_path}")
 
@@ -129,9 +142,9 @@ def main():
                         help='Directory for output ONNX files')
     parser.add_argument('--add-payloads', action='store_true',
                         help='Copy the exported ONNX files into localdb/database.txt')
-    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v2',
+    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v3',
                         help='Payload name for the category model')
-    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v2',
+    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v3',
                         help='Payload name for the main model')
     parser.add_argument('--first-exp', type=int, default=0,
                         help='First experiment of the interval of validity')

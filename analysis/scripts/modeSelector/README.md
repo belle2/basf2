@@ -136,8 +136,13 @@ values present in the training sample. Any other value (such as `1003`),
 is replaced with a default value. Both accepted and default value are defined in `config.py`.
 
 **`HAS_INPUTS`** - Hardcoded list of feature indices to keep (all-zero columns
-removed, blocks 7-8 and 10 excluded). To update, recompute with `train.py`
-(writes `has_inputs_recomputed.txt` on mismatch) and paste the result into `config.py`.
+removed, blocks 7-8 and 10 excluded), currently 976 indices. The list depends on
+which input_ids the training sample actually populates, so it has to be
+regenerated whenever the training dataset changes: `train.py` recomputes it from
+the data, and on mismatch it warns, writes `has_inputs_recomputed.txt` and
+proceeds with the recomputed list for that run. Paste that file's contents into
+`config.py` afterwards, otherwise inference selects a different set of columns
+than the network was trained on.
 
 **`FEI_CALIB_*`** - Per-decay-mode FEI calibration weights for two sigProb
 working points (0.001, 0.01).
@@ -160,6 +165,22 @@ This creates `localdb/database.txt`. To test, prepend it in a steering file with
 
 ```python
 basf2.conditions.prepend_testing_payloads('localdb/database.txt')
+```
+
+Once validated locally, the payloads are uploaded to a globaltag with
+`b2conditionsdb` (`b2conditionsdb tag create DEV <tag> "<description>"` once,
+then `b2conditionsdb upload <tag> localdb/database.txt`). A globaltag must
+be moved out of the `OPEN` state (for example to `TESTING`) before basf2 accepts
+it for processing. Payloads are immutable, so replacing a model means deleting
+the old iovs (`b2conditionsdb iovs delete <tag>`, with the tag reopened to
+`OPEN`) and uploading again, which creates a new revision.
+
+The payloads are not in the official analysis globaltag yet, so
+`getAnalysisGlobaltag()` alone will not resolve them. Until they are, prepend the
+globaltag holding them in addition to the analysis globaltag:
+
+```python
+basf2.conditions.prepend_globaltag('<tag holding the modeSelector payloads>')
 ```
 
 ### `generatedDecayWeights.py` -- add generated-decay calibration weights
@@ -308,8 +329,8 @@ modeSelector.modeSelector(
 |-----------|---------|-------------|
 | `bp_list` | required | B+ meson list name |
 | `b0_list` | required | B0 meson list name |
-| `payload_cat_model` | `'modeSelector_cat_model_v2'` | DB payload name for category model |
-| `payload_main_model` | `'modeSelector_main_model_v2'` | DB payload name for main model |
+| `payload_cat_model` | `'modeSelector_cat_model_v3'` | DB payload name for category model |
+| `payload_main_model` | `'modeSelector_main_model_v3'` | DB payload name for main model |
 | `output_variable` | `'BplusScore'` | EventExtraInfo name for the main signed score |
 | `cat_model_path` | `None` | Path to basf2 MVA weightfile for the category model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
 | `main_model_path` | `None` | Path to basf2 MVA weightfile for the main model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
@@ -350,74 +371,78 @@ modeSelector.modeSelector(
     bp_list='B+:feiHadronic',
     b0_list='B0:feiHadronic',
     training_mode=True,
-    training_output='modeSelector_training.npz',
     path=my_path,
 )
 ```
 
-Collects features and MC truth per event; writes at `terminate()`:
-- `modeSelector_training_features.npz` - sparse CSR feature matrix (shape `N x 1644`)
-- `modeSelector_training.npz` - event metadata + MC truth arrays (compressed)
+Skips NN inference and instead exposes per-event features and MC truth via
+`EventExtraInfo`/`ExtraInfo`, for a `variablesToNtuple` call in the steering
+script to dump to a ROOT file. No file I/O happens inside the module itself, so
+the output is written by basf2's own output modules and is downloadable when
+this is run via `gbasf2` (see `analysis/examples/modeSelector/produceTrainingInputs.py`
+and its README for the full steering script and a grid submission walkthrough).
 
-Arrays stored in `modeSelector_training.npz`:
+Values written per event:
 
-| Array | Shape | dtype | Sentinel | Description |
-|-------|-------|-------|----------|-------------|
-| `is_cont` | `(N,)` | int8 | - | 1 if continuum event (from best overall candidate) |
-| `gen_pdg` | `(N,)` | int16 | -1 | `mostcommonBTagPDG` of best overall candidate; -1 for continuum or missing |
-| `bp_is_best` | `(N,)` | int8 | - | 1 if best-sigProb candidate is in B+ sector |
-| `best_sigprob` | `(N,)` | float32 | - | sigProb of the best overall candidate |
-| `best_bp_sigprob_iid` | `(N,)` | int16 | -1 | input_id of best-sigProb B+ candidate |
-| `best_b0_sigprob_iid` | `(N,)` | int16 | -1 | input_id of best-sigProb B0 candidate |
-| `bp_tag_is_gen` | `(N,)` | int8 | 0 | best-sigProb B+: 1 if tag PDG is truth-compatible |
-| `b0_tag_is_gen` | `(N,)` | int8 | 0 | best-sigProb B0: 1 if tag PDG is truth-compatible |
-| `fei_calib_weight` | `(N,)` | float32 | 1.0 | pre-computed event-level FEI calibration weight (same logic as `compute_event_weights`; used for cross-validation in `train.py`) |
-| `bp_gen_decay_mode_id` | `(N,)` | int16 | -1 | best-sigProb B+: generated FEI decay mode id (999=rest, -1=missing) |
-| `b0_gen_decay_mode_id` | `(N,)` | int16 | -1 | best-sigProb B0: generated FEI decay mode id (999=rest, -1=missing) |
-| `bp_gen_fei_calib_weight` | `(N,)` | float32 | 1.0 | best-sigProb B+: stored FEI calibration weight from generated decay |
-| `b0_gen_fei_calib_weight` | `(N,)` | float32 | 1.0 | best-sigProb B0: stored FEI calibration weight from generated decay |
-| `best_bp_iid` | `(N,)` | int16 | -1 | input_id of best is_target candidate in B+ sector |
-| `best_bp_dp` | `(N,)` | float32 | inf | mostcommonBTagDeltaP of that candidate |
-| `best_b0_iid` | `(N,)` | int16 | -1 | input_id of best is_target candidate in B0 sector |
-| `best_b0_dp` | `(N,)` | float32 | inf | mostcommonBTagDeltaP of that candidate |
-| `sig_input_ids_values` | `(K,)` | int16 | - | Packed input_id values for deduplicated candidates with `isSignal == 1` |
-| `sig_input_ids_offsets` | `(N+1,)` | int32 | - | Ragged offsets for `sig_input_ids_values` per event |
-| `sig_btag_index_values` | `(K,)` | int16 | -1 | Packed `mostcommonBTagIndex` aligned with `sig_input_ids_values` |
-| `sig_delta_p_values` | `(K,)` | float32 | inf | Packed `mostcommonBTagDeltaP` aligned with `sig_input_ids_values` |
-| `sig_sigprob_values` | `(K,)` | float32 | -1 | Packed `extraInfo(SignalProbability)` aligned with `sig_input_ids_values` |
+| ExtraInfo name | Location | Description |
+|-----------------|----------|-------------|
+| `modeSelector_feat_0000` .. `modeSelector_feat_1643` | `EventExtraInfo` | The 1644 raw features (flattened `12 blocks x 136 input_ids` + 12 event-level scalars), same layout as the inference-mode feature array |
+| `modeSelector_tr_<name>` | `EventExtraInfo` | 17 per-event truth/label scalars: `is_cont`, `gen_pdg`, `bp_gen_decay_mode_id`, `b0_gen_decay_mode_id`, `bp_gen_fei_calib_weight`, `b0_gen_fei_calib_weight`, `bp_is_best`, `best_sigprob`, `best_bp_sigprob_iid`, `best_b0_sigprob_iid`, `bp_tag_is_gen`, `b0_tag_is_gen`, `fei_calib_weight`, `best_bp_iid`, `best_bp_dp`, `best_b0_iid`, `best_b0_dp` (same semantics as the legacy npz arrays of the same names) |
+| `modeSelector_trainSigInputId` | `ExtraInfo` on the deduplicated best-per-`input_id` candidate | Set (to that candidate's `input_id`) only on candidates with `isSignal == 1`; unset (NaN when read back) on all other candidates |
 
-`best_bp_iid/dp` and `best_b0_iid/dp` store the best is_target candidate per
-sector (smallest `mostcommonBTagDeltaP`, truth-compatible tag PDG,
-non-continuum). The `delta_p_thresh` cut is not applied at collection time;
-it stays in `train.build_mode_labels()`. For packed ragged arrays, event `i` is read
-as `values[offsets[i]:offsets[i+1]]`.
+`modeSelector_trainSigInputId` is set directly on the underlying `Particle`, so
+it is visible through any `ParticleList` that references the same candidate
+(e.g. a merged B+/B0 list built for a per-candidate ntuple dump).
 
 ---
 
 ### `train.py` -- neural network training
 
-Trains the category and main networks from the `.npz` files produced in training mode.
+Trains the category and main networks from the ROOT files produced in training mode.
 Training inputs are produced by running `analysis/examples/modeSelector/produceTrainingInputs.py`
-with `training_mode=True` (see `analysis/examples/modeSelector/README.md` for details).
+with `training_mode=True` (see `analysis/examples/modeSelector/README.md` for details,
+including grid submission).
 
 #### Usage
 
 ```bash
 # Step 1: train category network (B0 vs B+ vs continuum)
 python3 train.py \
-    --input modeSelector_training*.npz \
+    --input modeSelector_training*.root \
     --network category \
     --use_sparse
 
 # Step 2: train main network (requires trained category network)
 python3 train.py \
-    --input modeSelector_training*.npz \
+    --input modeSelector_training*.root \
     --network main \
     --cat_model networks/net_category.pt \
     --use_sparse
 ```
 
-`--input` accepts one or more `.npz` paths (space-separated or glob pattern, quoted or unquoted). `_features.npz` files are automatically excluded. Files are loaded in parallel using a thread pool. For each `modeSelector_training_X.npz`, a matching `modeSelector_training_X_features.npz` must exist in the same directory.
+`--input` accepts one or more `.root` paths, or `.npz` shards written by
+`convert_training_inputs.py` (space-separated or glob pattern, quoted or unquoted; the two
+may be mixed). Patterns are expanded with `glob.glob(..., recursive=True)`, so `**` descends
+into subdirectories (e.g. `<project>/**/*.root` for a downloaded gbasf2 project, whose
+outputs are nested one level below each dataset's `sub00`). Files are loaded in parallel
+using a process pool (`--num_workers`). Each ROOT file must contain the `events` and
+`sig_candidates` trees written by `produceTrainingInputs.py`; `load_and_sample_data()` joins
+`sig_candidates` rows back to their event via the `(__experiment__, __run__, __event__)`
+triplet written to both trees, then reassembles the same packed ragged `sig_*` arrays the
+training pipeline used to read directly from the legacy npz format. A grid submission (see
+the examples README) produces many small `.root` files (one per gbasf2 job); glob all of
+them as `--input`.
+
+**For anything beyond a few hundred ROOT files, convert first** with
+`convert_training_inputs.py` (see below) and train on the resulting `.npz` shards. Reading
+the raw ROOT inputs costs ~11 s per file and is paid again on every `train.py` invocation,
+i.e. twice per full training (category, then main).
+
+**Unreadable inputs**: files that fail to open/read (corrupted or incomplete grid downloads)
+or are missing required trees/branches are skipped with a printed warning rather than
+aborting the run. The check happens in the loader worker on the already-open file, so a bad
+input costs one open rather than a separate serial pass over every file. Training only
+aborts if *all* input files fail to load.
 
 Per-event preselection: for each event, the candidate with the highest sigProb is identified (across B+ and B0 lists). The event is kept only if that candidate satisfies `sigProb > 0.001`. 
 This matches the skim selection threshold, so no events are removed in practice.
@@ -450,7 +475,7 @@ the event remains in training and uses the fallback label assignment above.
 
 | Argument     | Default | Description |
 |--------------|---------|-------------|
-| `--input` | required | One or more `.npz` paths (space-separated or glob); `_features.npz` files excluded automatically |
+| `--input` | required | One or more `.root` or `.npz` paths (space-separated or glob) |
 | `--network` | required | `category` or `main` |
 | `--cat_model` | - | Trained category `.pt` (required for `--network main`) |
 | `--output` | `networks/` | Directory for saved models |
@@ -461,6 +486,7 @@ the event remains in training and uses the fallback label assignment above.
 | `--label_smoothing` | `0.0` | Label smoothing for CrossEntropyLoss (0 to disable) |
 | `--use_sparse` | flag | Sparse data loading (lower peak memory, slower) |
 | `--batch_size` | `None` | Batch size; defaults to 16384 (category) or 32768 (main) |
+| `--num_workers` | `None` | Worker processes for input loading and the DataLoader; default `min(8, max(1, cpu_count//2))` |
 
 `--use_sparse` is off by default, but in practice it is required for large training datasets.
 Without it, the full feature matrix is converted to a dense array and loaded into RAM at once,
@@ -499,18 +525,111 @@ ReLU activations, Xavier initialization (gain=0.5, bias=0.01).
 
 #### Training time
 
-The v2 models were trained on ~132.5M events on a GPU node (NAF cluster):
+The current models were trained on 91,658,960 events on a GPU node (NAF cluster):
 
-| Network | Epochs | Time/epoch | Total |
-|---------|--------|------------|-------|
-| Category | 24 (early stopping) | ~20 min | ~8 h |
-| Main | 45 (early stopping) | ~28 min | ~21 h |
+| Network | Epochs | Total time | Best epoch | Best val loss | Parameters | Input size |
+|---------|--------|------------|------------|----------------|------------|------------|
+| Category | 31 (early stopping) | 337 m 21 s (~5.6 h) | 26 | 0.790033 | 152,483 | 976 |
+| Main | 46 (early stopping) | 516 m 59 s (~8.6 h) | 41 | 0.952339 | 317,835 | 980 |
+
+`net_main.pt`'s input size (980) is `has_inputs` (976) + `cat_output` (3) +
+`charged_cat` (1), appended by `train.py` before training the main network.
+Overall validation accuracy was 0.6495 (category) and 0.6037 (main); see the
+class-level breakdown in the training job log for the confusable classes
+(`cross_deltaC1` in particular).
+
+Those numbers assume a CUDA-capable `torch`. Check that training really runs on the GPU
+before submitting a long job -- `train.py` prints the device it selected at startup, and
+
+```bash
+python3 -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+```
+
+should report `True`. The torch shipped with the basf2 externals is CPU-only, so use a
+separate environment with a CUDA build.
+
+**Training does not need basf2 at all.** It uses only torch/numpy/scipy/uproot plus the
+constants in `config.py`, which imports nothing; `train.py` and `convert_training_inputs.py`
+fall back to loading `config.py` directly by path when the `modeSelector` package (whose
+`__init__` pulls in basf2 and ROOT) is unavailable. So the supported setup is a standalone
+venv on a data disk, e.g.:
+
+```bash
+/usr/bin/python3.9 -m venv /data/dust/user/<user>/modeSelector_venv
+/data/dust/user/<user>/modeSelector_venv/bin/pip install \
+    --index-url https://download.pytorch.org/whl/cu124 torch==2.5.0
+/data/dust/user/<user>/modeSelector_venv/bin/pip install numpy scipy uproot tqdm
+```
+
+Put it on a data disk, not in AFS home -- it is ~6 GB. Run the scripts with the venv's
+interpreter and no `b2setup`. If the batch job uses `getenv = true`, `unset PYTHONPATH
+PYTHONHOME LD_LIBRARY_PATH` in the job script first: an inherited basf2 `PYTHONPATH` makes
+`pybasf2` visible to the venv interpreter, where it fails to initialise with `SystemError`
+(the import fallbacks catch this, but a clean environment is better).
+
+Loading the inputs is a separate cost from training and dominates when reading raw ROOT
+files -- see `convert_training_inputs.py` below.
 
 **Saved checkpoint** (`net_category.pt` / `net_main.pt`):
 `epoch`, `model_state_dict`, `optimizer_state_dict`, `val_loss`, `train_loss`, `history`, `has_inputs`, `config`.
 
 `history` is a dict with keys `train_loss`, `val_loss`, `disco_loss`, `lr` (one entry per epoch),
 used by `analysis/examples/modeSelector/plot_training.py`.
+
+---
+
+### `convert_training_inputs.py` -- ROOT to .npz shard conversion
+
+Converts `produceTrainingInputs.py` ROOT outputs into compact `.npz` shards that `train.py`
+reads directly. Run this once per training-input production; then point `train.py --input`
+at the shards.
+
+**Why**: the `events` tree stores one branch per feature (1644 `ms_feat_*`, 1667 total),
+split into ~50k small baskets per file. Reading one file costs ~11 s regardless of its size
+(~18 MB), so the full v7 sample (14364 files, 320 GB) takes ~44 core-hours to read -- paid
+again on every `train.py` invocation. The features are only ~1.6% dense, so the same events
+stored as CSR come to ~260 bytes/event: the full sample becomes ~32 GB of `.npz` that loads
+in minutes.
+
+No selection is applied during conversion. Shards hold exactly what the ROOT loader returns,
+so `--fraction`, `--cont_fraction` and the sigProb preselection remain train-time knobs and
+changing them does not require reconverting.
+
+```bash
+# one shard per gbasf2 dataset directory (parallelise over directories with HTCondor)
+python3 convert_training_inputs.py \
+    --input '<project>/ModeSelector_v7_ccbar_1/**/*.root' \
+    --output /path/to/converted \
+    --name ModeSelector_v7_ccbar_1
+
+# or everything at once, split into shards of 200 input files
+python3 convert_training_inputs.py \
+    --input '<project>/**/*.root' \
+    --output /path/to/converted \
+    --name ModeSelector_v7 --files_per_shard 200
+
+# then train
+python3 train.py --input '/path/to/converted/*.npz' --network category --use_sparse
+```
+
+Quote glob patterns containing `**` so that Python expands them recursively rather than the
+shell. Unreadable inputs are skipped with a warning, as in `train.py`.
+
+| Argument | Default | Description |
+|----------|---------|-------------|
+| `--input` | required | One or more ROOT paths (space-separated or glob) |
+| `--output` | required | Output directory for the `.npz` shard(s) |
+| `--name` | `shard` | Base name for the output shard(s) |
+| `--files_per_shard` | `None` | Split inputs into shards of this many files (default: one shard) |
+| `--num_workers` | `None` | Loader processes; default `min(16, cpu_count())` |
+| `--overwrite` | flag | Rewrite existing shards (default: skip them, so a partial run resumes) |
+
+**Shard format** (`NPZ_SHARD_VERSION = 1`): the CSR feature matrix as `feat_data` /
+`feat_indices` / `feat_indptr` / `feat_shape`, the 17 per-event truth arrays under their
+`EVENT_TRUTH_FIELDS` names, and the packed ragged `sig_*` arrays with
+`sig_input_ids_offsets` rebased across the merged files. Written uncompressed: the data is
+already small and load speed matters more than size. `train.py` refuses shards whose
+`format_version` does not match and tells you to reconvert.
 
 ---
 
@@ -535,9 +654,16 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
 - With `--add-payloads`, creates `localdb/database.txt` with the payload names specified.
 - Wraps the network with `nn.Softmax` before export (ONNX model outputs probabilities).
 - Input size and output classes are derived automatically from the checkpoint.
+- Validates each export by running a fixed-seed batch of 4 through both the
+  PyTorch model and `onnxruntime`, comparing probabilities with
+  `rtol=1e-4, atol=1e-6` and requiring the predicted class to be identical.
+  The tolerances are float32-appropriate: the two backends order their matmul
+  accumulations differently, which shifts individual probabilities of the
+  139-class main network by a few 1e-6. `np.allclose` defaults (`atol=1e-8`)
+  are meant for float64 and reject roughly 8% of runs at random.
 - `--cat-payload-name` / `--main-payload-name` set the payload names written
   into `localdb/database.txt`. These must match the `payload_cat_model` /
-  `payload_main_model` arguments passed to `modeSelector.modeSelector()`, currently defaults to `'modeSelector_cat_model_v2'` and `'modeSelector_main_model_v2'`.
+  `payload_main_model` arguments passed to `modeSelector.modeSelector()`, currently defaults to `'modeSelector_cat_model_v3'` and `'modeSelector_main_model_v3'`.
 - `--first-exp`, `--first-run`, `--final-exp`, `--final-run` control the
   interval of validity for local payload entries.
 

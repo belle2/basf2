@@ -45,26 +45,19 @@ class ModeSelectorModule(b2.Module):
         output_variable (str): Name of ExtraInfo variable for output score
         store_event_info (bool): Whether to store event-level info
     """
-    #: Training output fields for the full event feature array
-    TR_EVENT_FIELDS = ('all_features',)
-    #: Training output fields for the best-candidate MC truth per charge
-    TR_EVENT_BEST_FIELDS = ('best_bp_iid', 'best_bp_dp', 'best_b0_iid', 'best_b0_dp')
-    #: Training output fields stored for the best B+ and best B0 candidates
-    TR_BEST_FIELDS = ('pdg', 'dm', 'sigprob', 'is_cont', 'tag_pdg', 'gen_dm_id', 'gen_calib_weight')
     #: Prefix used for auxiliary ExtraInfo output variables
     AUXILIARY_OUTPUT_PREFIX = 'modeSelector'
 
     def __init__(
         self,
         particle_lists,
-        payload_cat_model='modeSelector_cat_model_v2',
-        payload_main_model='modeSelector_main_model_v2',
+        payload_cat_model='modeSelector_cat_model_v3',
+        payload_main_model='modeSelector_main_model_v3',
         output_variable='BplusScore',
         cat_model_path=None,
         main_model_path=None,
         training_mode=False,
         skip_nn_evaluation=False,
-        training_output='modeSelector_training.npz',
         store_fei_calib_weight=False,
         debug=False,
         debug_max_events=10,
@@ -87,28 +80,10 @@ class ModeSelectorModule(b2.Module):
         self.training_mode = training_mode
         #: Skip NN inference and fill deterministic placeholder outputs
         self.skip_nn_evaluation = skip_nn_evaluation
-        #: Output file for training mode
-        self.training_output = training_output
         #: Store modeSelector_feiCalibWeight in EventExtraInfo (MC only)
         self.store_fei_calib_weight = store_fei_calib_weight
         #: Flag to emit the gen-calib-weight missing warning at most once
         self._gen_calib_weight_missing_warned = False
-        #: Training storage (columnar buffers)
-        self._tr_event = {name: [] for name in self.TR_EVENT_FIELDS}
-        #: Per-event best-candidate MC truth fields
-        self._tr_event_best = {name: [] for name in self.TR_EVENT_BEST_FIELDS}
-        #: Best B+ candidate truth fields per event
-        self._tr_bp = {name: [] for name in self.TR_BEST_FIELDS}
-        #: Best B0 candidate truth fields per event
-        self._tr_b0 = {name: [] for name in self.TR_BEST_FIELDS}
-        #: Signal input_id values (CSR values array)
-        self._tr_sig_input_ids = []
-        #: Signal btag index values (CSR values array)
-        self._tr_sig_btag_index = []
-        #: Signal delta_p values (CSR values array)
-        self._tr_sig_delta_p = []
-        #: Signal sigprob values (CSR values array)
-        self._tr_sig_sigprob = []
         #: Debug mode
         self.debug = debug
         #: Max events to debug
@@ -165,6 +140,24 @@ class ModeSelectorModule(b2.Module):
             b2.B2INFO("ModeSelector: Running in TRAINING mode (saving features, no NN inference)")
             #: Indices of non-zero features kept after sparsity filtering (None in training mode)
             self.has_inputs = None
+
+            bp_calib_map = config.get_fei_calibration_map(521)
+            #: FEI calibration fallback factor for the B+ sector
+            self._bp_calib_rest = config.get_fei_calibration_rest(521)
+            #: Per-decay-mode FEI calibration lookup for the B+ sector
+            self._bp_calib_lookup = np.full(config.N_BP_MODES, self._bp_calib_rest, dtype=np.float32)
+            for _dm, _w in bp_calib_map.items():
+                if 0 <= _dm < config.N_BP_MODES:
+                    self._bp_calib_lookup[_dm] = _w
+
+            b0_calib_map = config.get_fei_calibration_map(511)
+            #: FEI calibration fallback factor for the B0 sector
+            self._b0_calib_rest = config.get_fei_calibration_rest(511)
+            #: Per-decay-mode FEI calibration lookup for the B0 sector
+            self._b0_calib_lookup = np.full(config.N_B0_MODES, self._b0_calib_rest, dtype=np.float32)
+            for _dm, _w in b0_calib_map.items():
+                if 0 <= _dm < config.N_B0_MODES:
+                    self._b0_calib_lookup[_dm] = _w
             return
 
         if self.skip_nn_evaluation:
@@ -447,21 +440,6 @@ class ModeSelectorModule(b2.Module):
 
         return event_features
 
-    def _append_training_row(self, block, row):
-        """Append a row dict into a columnar training block."""
-        for key in block:
-            block[key].append(row[key])
-
-    def _block_to_arrays(self, block, dtype_map=None):
-        """Convert a columnar training block (lists) into numpy arrays."""
-        arrays = {}
-        for key, values in block.items():
-            if dtype_map and key in dtype_map:
-                arrays[key] = np.asarray(values, dtype=dtype_map[key])
-            else:
-                arrays[key] = np.asarray(values)
-        return arrays
-
     def _compute_fei_calib_weight(self, best_bp, best_b0):
         """
         Compute event-level FEI calibration weight from the best candidates.
@@ -556,6 +534,109 @@ class ModeSelectorModule(b2.Module):
             for name, value in raw.items()
         }
 
+    def _compute_training_event_scalars(
+        self, bp_truth, b0_truth, best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp
+    ):
+        """
+        Compute the per-event training scalar fields written to EventExtraInfo.
+
+        best_bp_iid/best_bp_dp/best_b0_iid/best_b0_dp come from the truth-tag-matched
+        particle_by_input_id scan already performed in event(); everything else is
+        derived from the best-B+/best-B0 MC truth scalars for this event.
+        """
+        bp_pdg = bp_truth['pdg']
+        b0_pdg = b0_truth['pdg']
+        bp_dm = bp_truth['dm']
+        b0_dm = b0_truth['dm']
+        bp_sig = -1.0 if np.isnan(bp_truth['sigprob']) else float(bp_truth['sigprob'])
+        b0_sig = -1.0 if np.isnan(b0_truth['sigprob']) else float(b0_truth['sigprob'])
+        bp_is_cont = bp_truth['is_cont']
+        b0_is_cont = b0_truth['is_cont']
+        bp_gen_pdg = bp_truth['tag_pdg']
+        b0_gen_pdg = b0_truth['tag_pdg']
+        bp_gen_dm_id = -1 if np.isnan(bp_truth['gen_dm_id']) else int(bp_truth['gen_dm_id'])
+        b0_gen_dm_id = -1 if np.isnan(b0_truth['gen_dm_id']) else int(b0_truth['gen_dm_id'])
+        bp_gen_calib_weight = 1.0 if np.isnan(bp_truth['gen_calib_weight']) else float(bp_truth['gen_calib_weight'])
+        b0_gen_calib_weight = 1.0 if np.isnan(b0_truth['gen_calib_weight']) else float(b0_truth['gen_calib_weight'])
+
+        bp_is_best = 1 if bp_sig >= b0_sig else 0
+        best_sigprob = max(bp_sig, b0_sig)
+
+        is_cont_f = bp_is_cont if bp_is_best else b0_is_cont
+        is_cont = 1 if is_cont_f == 1.0 else 0
+
+        gen_pdg_f = bp_gen_pdg if bp_is_best else b0_gen_pdg
+        gen_pdg = -1 if is_cont == 1 else (-1 if np.isnan(gen_pdg_f) else int(gen_pdg_f))
+
+        bp_dm_i = -1 if np.isnan(bp_dm) else int(bp_dm)
+        b0_dm_i = -1 if np.isnan(b0_dm) else int(b0_dm)
+
+        best_bp_sigprob_iid = -1
+        if not np.isnan(bp_pdg) and not np.isnan(bp_dm):
+            offset = 0 if abs(int(bp_pdg)) == 521 else config.N_BP_MODES * 2
+            sign = 1 if bp_pdg > 0 else 0
+            best_bp_sigprob_iid = offset + bp_dm_i * 2 + sign
+
+        best_b0_sigprob_iid = -1
+        if not np.isnan(b0_pdg) and not np.isnan(b0_dm):
+            offset = 0 if abs(int(b0_pdg)) == 521 else config.N_BP_MODES * 2
+            sign = 1 if b0_pdg > 0 else 0
+            best_b0_sigprob_iid = offset + b0_dm_i * 2 + sign
+
+        bp_tag_is_gen = int(config.truth_tag_matches_pdg(bp_pdg, bp_gen_pdg, bp_dm))
+        b0_tag_is_gen = int(config.truth_tag_matches_pdg(b0_pdg, b0_gen_pdg, b0_dm))
+
+        use_bp = bp_is_best == 1
+        tag_is_gen_ev = bp_tag_is_gen if use_bp else b0_tag_is_gen
+        best_dp_ev = best_bp_dp if use_bp else best_b0_dp
+        sigprob_iid_ev = best_bp_sigprob_iid if use_bp else best_b0_sigprob_iid
+        bb_mask_ev = is_cont != 1
+        use_reco_ev = (tag_is_gen_ev == 1) and (best_dp_ev < config.DELTA_P_THRESH) and (sigprob_iid_ev >= 0)
+
+        fei_calib_weight = config.FEI_CALIB_CONT
+        bp_threshold = config.N_BP_MODES * 2
+
+        if bb_mask_ev and use_reco_ev:
+            if use_bp:
+                dm = min(max(best_bp_sigprob_iid // 2, 0), config.N_BP_MODES - 1)
+                fei_calib_weight = float(self._bp_calib_lookup[dm])
+            else:
+                dm = min(max((best_b0_sigprob_iid - bp_threshold) // 2, 0), config.N_B0_MODES - 1)
+                fei_calib_weight = float(self._b0_calib_lookup[dm])
+        elif bb_mask_ev:
+            abs_pdg_ev = abs(gen_pdg)
+            gen_dm_ev = bp_gen_dm_id if use_bp else b0_gen_dm_id
+            if abs_pdg_ev == 521:
+                fei_calib_weight = (
+                    float(self._bp_calib_lookup[gen_dm_ev])
+                    if 0 <= gen_dm_ev < config.N_BP_MODES else self._bp_calib_rest
+                )
+            elif abs_pdg_ev == 511:
+                fei_calib_weight = (
+                    float(self._b0_calib_lookup[gen_dm_ev])
+                    if 0 <= gen_dm_ev < config.N_B0_MODES else self._b0_calib_rest
+                )
+
+        return {
+            'is_cont': is_cont,
+            'gen_pdg': gen_pdg,
+            'bp_gen_decay_mode_id': bp_gen_dm_id,
+            'b0_gen_decay_mode_id': b0_gen_dm_id,
+            'bp_gen_fei_calib_weight': bp_gen_calib_weight,
+            'b0_gen_fei_calib_weight': b0_gen_calib_weight,
+            'bp_is_best': bp_is_best,
+            'best_sigprob': best_sigprob,
+            'best_bp_sigprob_iid': best_bp_sigprob_iid,
+            'best_b0_sigprob_iid': best_b0_sigprob_iid,
+            'bp_tag_is_gen': bp_tag_is_gen,
+            'b0_tag_is_gen': b0_tag_is_gen,
+            'fei_calib_weight': fei_calib_weight,
+            'best_bp_iid': best_bp_iid,
+            'best_bp_dp': best_bp_dp,
+            'best_b0_iid': best_b0_iid,
+            'best_b0_dp': best_b0_dp,
+        }
+
     def _print_debug_info(self, candidates_data, event_features, all_features, max_input_id):
         """Print debug information for preprocessing."""
         # Get event identification
@@ -609,9 +690,6 @@ class ModeSelectorModule(b2.Module):
 
     def terminate(self):
         """Called at the end of processing."""
-        if self.training_mode and self._tr_event['all_features']:
-            self._save_training_data()
-
         if self._presel_violation_count > 0:
             frac = self._presel_violation_count / max(self._presel_total_candidates, 1)
             _sep = "=" * 70
@@ -672,227 +750,6 @@ class ModeSelectorModule(b2.Module):
                 f"{self._empty_predicted_sector_high_conf_count}/{self._high_conf_event_count} event(s) "
                 f"({100.0 * high_conf_fallback_frac:.3f}%); used score fallback."
             )
-
-    def _save_training_data(self):
-        """Save collected training data to npz."""
-        from scipy import sparse
-
-        ev = self._block_to_arrays(
-            self._tr_event,
-            dtype_map={'all_features': np.float32}
-        )
-        ev_best = self._block_to_arrays(
-            self._tr_event_best,
-            dtype_map={
-                'best_bp_iid': np.int16,
-                'best_bp_dp': np.float32,
-                'best_b0_iid': np.int16,
-                'best_b0_dp': np.float32,
-            }
-        )
-        bp = self._block_to_arrays(self._tr_bp, dtype_map={key: np.float32 for key in self.TR_BEST_FIELDS})
-        b0 = self._block_to_arrays(self._tr_b0, dtype_map={key: np.float32 for key in self.TR_BEST_FIELDS})
-
-        n_events = len(ev['all_features'])
-        feature_arrays = ev['all_features']
-
-        # Convert to sparse for efficient storage
-        sparse_features = sparse.csr_matrix(feature_arrays)
-
-        best_bp_iid = ev_best['best_bp_iid']
-        best_bp_dp = ev_best['best_bp_dp']
-        best_b0_iid = ev_best['best_b0_iid']
-        best_b0_dp = ev_best['best_b0_dp']
-
-        # Compact per-event MC truth scalars (14 bytes/event)
-        bp_pdg = bp['pdg']
-        b0_pdg = b0['pdg']
-        bp_dm = bp['dm']
-        b0_dm = b0['dm']
-        bp_sig = np.nan_to_num(bp['sigprob'], nan=-1.0)
-        b0_sig = np.nan_to_num(b0['sigprob'], nan=-1.0)
-        bp_is_cont = bp['is_cont']
-        b0_is_cont = b0['is_cont']
-        bp_gen_pdg = bp['tag_pdg']
-        b0_gen_pdg = b0['tag_pdg']
-        bp_gen_dm_id = np.nan_to_num(bp['gen_dm_id'], nan=-1).astype(np.int16)
-        b0_gen_dm_id = np.nan_to_num(b0['gen_dm_id'], nan=-1).astype(np.int16)
-
-        if not self._gen_calib_weight_missing_warned:
-            has_bp = bp_sig > -1.0
-            has_b0 = b0_sig > -1.0
-            bp_gen_nan = np.isnan(bp['gen_calib_weight'])
-            b0_gen_nan = np.isnan(b0['gen_calib_weight'])
-            if ((has_bp & bp_gen_nan) | (has_b0 & b0_gen_nan)).any():
-                b2.B2WARNING(
-                    'ModeSelector training: extraInfo(genFEICalibWeight) is missing for some '
-                    'candidates with a reconstructed B meson. '
-                    'Add addGeneratedDecayWeights before ModeSelector in the basf2 path.'
-                )
-                self._gen_calib_weight_missing_warned = True
-
-        bp_gen_calib_weight = np.nan_to_num(bp['gen_calib_weight'], nan=1.0).astype(np.float32)
-        b0_gen_calib_weight = np.nan_to_num(b0['gen_calib_weight'], nan=1.0).astype(np.float32)
-
-        bp_is_best = (bp_sig >= b0_sig).astype(np.int8)
-        best_sigprob = np.maximum(bp_sig, b0_sig).astype(np.float32)
-
-        # choosing from Bp/B0 to have at least one candidate and not return NaN
-        is_cont_f = np.where(bp_is_best == 1, bp_is_cont, b0_is_cont)
-        is_cont = (is_cont_f == 1.0).astype(np.int8)
-
-        gen_pdg_f = np.where(bp_is_best == 1, bp_gen_pdg, b0_gen_pdg)
-        gen_pdg = np.where(is_cont == 1, -1, np.nan_to_num(gen_pdg_f, nan=-1)).astype(np.int16)
-
-        bp_dm_i = np.nan_to_num(bp_dm, nan=-1).astype(np.int16)
-        b0_dm_i = np.nan_to_num(b0_dm, nan=-1).astype(np.int16)
-
-        best_bp_sigprob_iid = np.full(n_events, -1, dtype=np.int16)
-        best_b0_sigprob_iid = np.full(n_events, -1, dtype=np.int16)
-        bp_valid = (~np.isnan(bp_pdg)) & (~np.isnan(bp_dm))
-        b0_valid = (~np.isnan(b0_pdg)) & (~np.isnan(b0_dm))
-        bp_offset = np.where(np.abs(bp_pdg) == 521, 0, config.N_BP_MODES * 2)
-        b0_offset = np.where(np.abs(b0_pdg) == 521, 0, config.N_BP_MODES * 2)
-        bp_sign = (bp_pdg > 0).astype(np.int16)
-        b0_sign = (b0_pdg > 0).astype(np.int16)
-        best_bp_sigprob_iid[bp_valid] = (bp_offset[bp_valid] + bp_dm_i[bp_valid] * 2 + bp_sign[bp_valid]).astype(np.int16)
-        best_b0_sigprob_iid[b0_valid] = (b0_offset[b0_valid] + b0_dm_i[b0_valid] * 2 + b0_sign[b0_valid]).astype(np.int16)
-
-        bp_tag_pdg = bp_gen_pdg
-        b0_tag_pdg = b0_gen_pdg
-        bp_tag_is_gen = np.fromiter(
-            (
-                int(config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id))
-                for pdg, tag_pdg, dm_id in zip(bp_pdg, bp_tag_pdg, bp_dm)
-            ),
-            dtype=np.int8,
-            count=n_events,
-        )
-        b0_tag_is_gen = np.fromiter(
-            (
-                int(config.truth_tag_matches_pdg(pdg, tag_pdg, dm_id))
-                for pdg, tag_pdg, dm_id in zip(b0_pdg, b0_tag_pdg, b0_dm)
-            ),
-            dtype=np.int8,
-            count=n_events,
-        )
-
-        # Packed per-event input_id lists where isSignal == 1 on the deduplicated
-        # candidate set (particle_by_input_id). Event i list is:
-        #   sig_input_ids_values[sig_input_ids_offsets[i]:sig_input_ids_offsets[i+1]]
-        sig_lengths = np.asarray([len(ids) for ids in self._tr_sig_input_ids], dtype=np.int32)
-        sig_input_ids_offsets = np.empty(n_events + 1, dtype=np.int32)
-        sig_input_ids_offsets[0] = 0
-        np.cumsum(sig_lengths, out=sig_input_ids_offsets[1:])
-        if sig_input_ids_offsets[-1] > 0:
-            sig_input_ids_values = np.concatenate(self._tr_sig_input_ids).astype(np.int16, copy=False)
-            sig_btag_index_values = np.concatenate(self._tr_sig_btag_index).astype(np.int16, copy=False)
-            sig_delta_p_values = np.concatenate(self._tr_sig_delta_p).astype(np.float32, copy=False)
-            sig_sigprob_values = np.concatenate(self._tr_sig_sigprob).astype(np.float32, copy=False)
-        else:
-            sig_input_ids_values = np.empty(0, dtype=np.int16)
-            sig_btag_index_values = np.empty(0, dtype=np.int16)
-            sig_delta_p_values = np.empty(0, dtype=np.float32)
-            sig_sigprob_values = np.empty(0, dtype=np.float32)
-
-        # Compute per-event FEI calibration weight (same logic as compute_event_weights in train.py)
-        bp_calib_map = config.get_fei_calibration_map(521)
-        bp_calib_rest = config.get_fei_calibration_rest(521)
-        bp_lookup = np.full(config.N_BP_MODES, bp_calib_rest, dtype=np.float32)
-        for _dm, _w in bp_calib_map.items():
-            if 0 <= _dm < config.N_BP_MODES:
-                bp_lookup[_dm] = _w
-
-        b0_calib_map = config.get_fei_calibration_map(511)
-        b0_calib_rest = config.get_fei_calibration_rest(511)
-        b0_lookup = np.full(config.N_B0_MODES, b0_calib_rest, dtype=np.float32)
-        for _dm, _w in b0_calib_map.items():
-            if 0 <= _dm < config.N_B0_MODES:
-                b0_lookup[_dm] = _w
-
-        use_bp = (bp_is_best == 1)
-        tag_is_gen_ev = np.where(use_bp, bp_tag_is_gen.astype(np.int8), b0_tag_is_gen.astype(np.int8))
-        best_dp_ev = np.where(use_bp, best_bp_dp, best_b0_dp)
-        sigprob_iid_ev = np.where(
-            use_bp,
-            best_bp_sigprob_iid.astype(np.int32),
-            best_b0_sigprob_iid.astype(np.int32),
-        )
-        bb_mask_ev = (is_cont != 1)
-        use_reco_ev = (tag_is_gen_ev == 1) & (best_dp_ev < config.DELTA_P_THRESH) & (sigprob_iid_ev >= 0)
-
-        fei_calib_weight = np.full(n_events, config.FEI_CALIB_CONT, dtype=np.float32)
-
-        bp_threshold = config.N_BP_MODES * 2
-        reco_mask_ev = bb_mask_ev & use_reco_ev
-        reco_bp_ev = reco_mask_ev & use_bp
-        if reco_bp_ev.any():
-            _dm = np.clip(best_bp_sigprob_iid[reco_bp_ev].astype(np.int32) // 2, 0, config.N_BP_MODES - 1)
-            fei_calib_weight[reco_bp_ev] = bp_lookup[_dm]
-        reco_b0_ev = reco_mask_ev & ~use_bp
-        if reco_b0_ev.any():
-            _dm = np.clip(
-                (best_b0_sigprob_iid[reco_b0_ev].astype(np.int32) - bp_threshold) // 2,
-                0, config.N_B0_MODES - 1,
-            )
-            fei_calib_weight[reco_b0_ev] = b0_lookup[_dm]
-
-        gen_mask_ev = bb_mask_ev & ~use_reco_ev
-        if gen_mask_ev.any():
-            abs_pdg_ev = np.abs(gen_pdg.astype(np.int32))
-            gen_dm_ev = np.where(
-                use_bp,
-                bp_gen_dm_id.astype(np.int32),
-                b0_gen_dm_id.astype(np.int32),
-            )
-            gen_bp_ev = gen_mask_ev & (abs_pdg_ev == 521)
-            if gen_bp_ev.any():
-                _dm = gen_dm_ev[gen_bp_ev]
-                _w = np.full(int(gen_bp_ev.sum()), bp_calib_rest, dtype=np.float32)
-                valid = (_dm >= 0) & (_dm < config.N_BP_MODES)
-                if valid.any():
-                    _w[valid] = bp_lookup[_dm[valid]]
-                fei_calib_weight[gen_bp_ev] = _w
-            gen_b0_ev = gen_mask_ev & (abs_pdg_ev == 511)
-            if gen_b0_ev.any():
-                _dm = gen_dm_ev[gen_b0_ev]
-                _w = np.full(int(gen_b0_ev.sum()), b0_calib_rest, dtype=np.float32)
-                valid = (_dm >= 0) & (_dm < config.N_B0_MODES)
-                if valid.any():
-                    _w[valid] = b0_lookup[_dm[valid]]
-                fei_calib_weight[gen_b0_ev] = _w
-
-        sparse.save_npz(self.training_output.replace('.npz', '_features.npz'), sparse_features)
-        np.savez_compressed(self.training_output,
-                            is_cont=is_cont,
-                            gen_pdg=gen_pdg,
-                            bp_gen_decay_mode_id=bp_gen_dm_id,
-                            b0_gen_decay_mode_id=b0_gen_dm_id,
-                            bp_gen_fei_calib_weight=bp_gen_calib_weight,
-                            b0_gen_fei_calib_weight=b0_gen_calib_weight,
-                            bp_is_best=bp_is_best,
-                            best_sigprob=best_sigprob,
-                            best_bp_sigprob_iid=best_bp_sigprob_iid,
-                            best_b0_sigprob_iid=best_b0_sigprob_iid,
-                            bp_tag_is_gen=bp_tag_is_gen,
-                            b0_tag_is_gen=b0_tag_is_gen,
-                            fei_calib_weight=fei_calib_weight,
-                            best_bp_iid=best_bp_iid,
-                            best_bp_dp=best_bp_dp,
-                            best_b0_iid=best_b0_iid,
-                            best_b0_dp=best_b0_dp,
-                            sig_input_ids_values=sig_input_ids_values,
-                            sig_input_ids_offsets=sig_input_ids_offsets,
-                            sig_btag_index_values=sig_btag_index_values,
-                            sig_delta_p_values=sig_delta_p_values,
-                            sig_sigprob_values=sig_sigprob_values)
-
-        n_bp_signal = int((best_bp_iid >= 0).sum())
-        n_b0_signal = int((best_b0_iid >= 0).sum())
-        b2.B2INFO(f"Saved {n_events} events to {self.training_output}")
-        b2.B2INFO(f"Sparse features: {self.training_output.replace('.npz', '_features.npz')}")
-        b2.B2INFO(f"is_target found: B+ sector {n_bp_signal} events, B0 sector {n_b0_signal} events")
-        b2.B2INFO(f"Mean best sigProb: {best_sigprob.mean():.4f}")
 
     def event(self):
         """Called for each event."""
@@ -973,19 +830,18 @@ class ModeSelectorModule(b2.Module):
         # Build feature array
         all_features, max_input_id, n_candidates = self._build_feature_array(candidates_data, event_features)
 
-        # Training mode: save features + MC truth, skip NN inference
+        # Training mode: expose features + MC truth via EventExtraInfo/ExtraInfo for
+        # variablesToNtuple to dump in the steering script, skip NN inference.
         if self.training_mode:
-            event_row = {
-                'all_features': all_features.copy(),
-            }
-            self._append_training_row(self._tr_event, event_row)
+            event_extra_info = Belle2.PyStoreObj('EventExtraInfo')
+            if not event_extra_info.isValid():
+                event_extra_info.create()
+
+            for i, value in enumerate(all_features):
+                event_extra_info.addExtraInfo(f'modeSelector_feat_{i:04d}', float(value))
 
             bp_truth = self._extract_mc_truth_scalars(best_bp)
             b0_truth = self._extract_mc_truth_scalars(best_b0)
-            bp_row = {name: bp_truth[name] for name in self.TR_BEST_FIELDS}
-            b0_row = {name: b0_truth[name] for name in self.TR_BEST_FIELDS}
-            self._append_training_row(self._tr_bp, bp_row)
-            self._append_training_row(self._tr_b0, b0_row)
 
             bp_threshold = config.N_BP_MODES * 2
             best_bp_iid = -1
@@ -1014,30 +870,18 @@ class ModeSelectorModule(b2.Module):
                         best_b0_iid = int(iid)
                         best_b0_dp = dp
 
-            sig_rows = []
+            # Mark the deduplicated best-per-input_id signal candidates so the
+            # per-candidate ntuple dump in the steering script can pick them out.
             for iid, particle in particle_by_input_id.items():
                 is_signal = vm.evaluate('isSignal', particle)
                 if not np.isnan(is_signal) and int(is_signal) == 1:
-                    btag_index = vm.evaluate('mostcommonBTagIndex', particle)
-                    delta_p = vm.evaluate('mostcommonBTagDeltaP', particle)
-                    sig_prob = vm.evaluate('extraInfo(SignalProbability)', particle)
-                    btag_index_i = -1 if np.isnan(btag_index) else int(btag_index)
-                    delta_p_f = np.inf if np.isnan(delta_p) else float(delta_p)
-                    sig_prob_f = -1.0 if np.isnan(sig_prob) else float(sig_prob)
-                    sig_rows.append((int(iid), btag_index_i, delta_p_f, sig_prob_f))
-            sig_rows.sort(key=lambda row: row[0])
-            self._tr_sig_input_ids.append(np.asarray([row[0] for row in sig_rows], dtype=np.int16))
-            self._tr_sig_btag_index.append(np.asarray([row[1] for row in sig_rows], dtype=np.int16))
-            self._tr_sig_delta_p.append(np.asarray([row[2] for row in sig_rows], dtype=np.float32))
-            self._tr_sig_sigprob.append(np.asarray([row[3] for row in sig_rows], dtype=np.float32))
+                    particle.addExtraInfo('modeSelector_trainSigInputId', int(iid))
 
-            event_best_row = {
-                'best_bp_iid': best_bp_iid,
-                'best_bp_dp': best_bp_dp,
-                'best_b0_iid': best_b0_iid,
-                'best_b0_dp': best_b0_dp,
-            }
-            self._append_training_row(self._tr_event_best, event_best_row)
+            training_scalars = self._compute_training_event_scalars(
+                bp_truth, b0_truth, best_bp_iid, best_bp_dp, best_b0_iid, best_b0_dp
+            )
+            for name, value in training_scalars.items():
+                event_extra_info.addExtraInfo(f'modeSelector_tr_{name}', float(value))
             return
 
         # --- Inference mode ---

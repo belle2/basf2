@@ -30,7 +30,7 @@ basf2 produceTrainingInputs.py -- \
 | Argument | Default | Description |
 |----------|---------|-------------|
 | `--input` | local MC file | Input ROOT file(s) |
-| `--output` | `modeSelector_training` | Output prefix for `.npz` files |
+| `--output` | `modeSelector_training` | Output prefix for the `.root` file |
 | `--cont-fraction` | `0.25` | Continuum keep fraction relative to the 30% BB base band |
 
 Random seed is fixed to 1337 for reproducible `eventRandom` cuts. 
@@ -40,19 +40,79 @@ continuum events. The inference example uses the complementary high band
 `eventRandom > 0.95`.
 The same seed should be set to retain independent samples.
 
-**Output files:**
+**Output file:**
 
-**`<output_prefix>.npz`** -- per-event truth and label data (compressed numpy archive, load with `np.load`):
-- **Event flags**: `is_cont` (continuum flag), `gen_pdg` (generated tag-B PDG), `bp_is_best` (B+ candidate has highest overall sigProb), `best_sigprob` (highest sigProb across all candidates)
-- **Generated decay**: `bp/b0_gen_decay_mode_id` (generated FEI mode index), `bp/b0_gen_fei_calib_weight` (FEI calibration weight from generated decay), `bp/b0_tag_is_gen` (truth-compatible tag PDG flag)
-- **Correctly reconstructed candidates** (`isSignal==1`, primary label source for `train.build_mode_labels()`): packed ragged arrays with CSR-style offsets (`sig_input_ids_offsets`) -- `sig_input_ids`, `sig_btag_index` (`mostcommonBTagIndex`), `sig_delta_p` (`mostcommonBTagDeltaP`), `sig_sigprob` (`SignalProbability`)
-- **Best-candidate truth** (pre-filtered for truth-compatible tag PDG; fallback labels when no `isSignal==1` candidate passes `DeltaP < 0.15`): `best_bp/b0_iid` (input_id), `best_bp/b0_dp` (DeltaP), `best_bp/b0_sigprob_iid` (input_id of highest-sigProb candidate per sector)
-- **Calibration weight**: `fei_calib_weight` (event-level FEI calibration weight: reco-based when a truth-compatible candidate with `DeltaP < threshold` exists, generated-decay-based otherwise)
+The script writes `<output_prefix>.root` via two `variablesToNtuple` calls added
+to the path (no manual file I/O happens inside the module -- see "Training mode"
+in `analysis/scripts/modeSelector/README.md`). Writing through basf2's own
+output modules is what makes this output downloadable when the script is run
+with `gbasf2` (see "Grid submission" below).
 
-**`<output_prefix>_features.npz`** -- sparse feature matrix in scipy CSR format, shape `N x 1644` (load with `scipy.sparse.load_npz`):
-- Columns 0-1631: flat feature matrix (12 feature blocks x 136 input_ids); zero where candidate is absent
-- Columns 1632-1643: event-level scalars (event shape variables, `ncandidates`, `max_input_id`, `scnd_max_input_id`, `__experiment__`)
-- `config.HAS_INPUTS` (952 indices) selects the non-trivially-zero columns used for training
+**`events` tree** -- one row per event:
+- **Features**: `ms_feat_0000` .. `ms_feat_1643`, the flattened 1644-value raw
+  feature array (12 feature blocks x 136 input_ids, plus 12 event-level scalars:
+  event shape variables, `ncandidates`, `max_input_id`, `scnd_max_input_id`,
+  `__experiment__`). `config.HAS_INPUTS` (976 indices) selects the
+  non-trivially-zero columns actually used for training.
+- **Event flags**: `ms_tr_is_cont` (continuum flag), `ms_tr_gen_pdg` (generated
+  tag-B PDG), `ms_tr_bp_is_best` (B+ candidate has highest overall sigProb),
+  `ms_tr_best_sigprob` (highest sigProb across all candidates)
+- **Generated decay**: `ms_tr_bp/b0_gen_decay_mode_id` (generated FEI mode
+  index), `ms_tr_bp/b0_gen_fei_calib_weight` (FEI calibration weight from
+  generated decay), `ms_tr_bp/b0_tag_is_gen` (truth-compatible tag PDG flag)
+- **Best-candidate truth** (pre-filtered for truth-compatible tag PDG; fallback
+  labels when no `isSignal==1` candidate passes `DeltaP < 0.15`):
+  `ms_tr_best_bp/b0_iid` (input_id), `ms_tr_best_bp/b0_dp` (DeltaP),
+  `ms_tr_best_bp/b0_sigprob_iid` (input_id of highest-sigProb candidate per sector)
+- **Calibration weight**: `ms_tr_fei_calib_weight` (event-level FEI calibration
+  weight: reco-based when a truth-compatible candidate with `DeltaP < threshold`
+  exists, generated-decay-based otherwise)
+
+**`sig_candidates` tree** -- one row per B+/B0 candidate (correctly reconstructed
+candidates, `isSignal==1`, are the primary label source for
+`train.build_mode_labels()`): `ms_sig_input_id` (set only on the deduplicated
+best-per-`input_id` signal candidate, `NaN` otherwise), `ms_sig_btag_index`
+(`mostcommonBTagIndex`), `ms_sig_delta_p` (`mostcommonBTagDeltaP`),
+`ms_sig_sigprob` (`SignalProbability`). `train.py`'s loader joins these rows
+back to their event via the automatic `__experiment__`/`__run__`/`__event__`
+columns present on both trees and reassembles the same packed ragged arrays
+the training pipeline has always used internally.
+
+---
+
+### Grid submission
+
+`produceTrainingInputs.py` can be submitted directly with `gbasf2` -- the same
+steering file is used locally and on the grid. Test locally first:
+
+```bash
+basf2 produceTrainingInputs.py -- --input <local_test_file.root> --output test_train -n 200
+```
+
+Then submit:
+
+```bash
+gbasf2 produceTrainingInputs.py -p modeSelector_train_<date> -s <release> \
+       -i <grid input dataset LPN> \
+       -- --output modeSelector_training
+
+gb2_ds_get modeSelector_train_<date>
+```
+
+gbasf2 splits jobs per input file, so the download will contain many small
+`<output_prefix>.root` files (one per job). Point `train.py` at all of them with
+a glob:
+
+```bash
+python3 analysis/scripts/modeSelector/train.py \
+    --input modeSelector_train_<date>/**/*.root --network category --use_sparse
+```
+
+`--input` is not passed explicitly on the grid job itself: gbasf2 overrides the
+`RootInput` file list with the job's assigned grid input file regardless of what
+`inputMdstList` was given in the script, so the script's hardcoded local
+`--input` default is harmless on the grid. See `online_book/computing/gbasf2.rst`
+for the general gbasf2 workflow (dataset discovery, monitoring, downloading).
 
 ---
 
@@ -98,8 +158,8 @@ basf2 applyModeSelector.py -- [options]
 | `--output` | `modeSelector_output` | Output file prefix |
 | `--cat-model` | unset | Category ONNX model. Omit to use payloads |
 | `--main-model` | unset | Main ONNX model. Omit to use payloads |
-| `--cat-payload-name` | `modeSelector_cat_model_v2` | Conditions DB payload name for the category model |
-| `--main-payload-name` | `modeSelector_main_model_v2` | Conditions DB payload name for the main model |
+| `--cat-payload-name` | `modeSelector_cat_model_v3` | Conditions DB payload name for the category model |
+| `--main-payload-name` | `modeSelector_main_model_v3` | Conditions DB payload name for the main model |
 | `--data` | off | Run on data: keep a fixed 10% `eventRandom` sample and drop MC-only output columns |
 
 **Output files:** `<output>.pq`, written via `VariablesToTable` from
@@ -162,6 +222,18 @@ MC-only output columns are skipped, and `eventRandom < 0.1` is applied instead.
 
 Omit `--cat-model` and `--main-model` to load models from the conditions database. Pass local MVA ONNX weightfile paths to override.
 
+The script prepends `getAnalysisGlobaltag()`, which does not contain the
+ModeSelector payloads yet. To load them from the conditions database, also
+prepend the globaltag they were uploaded to:
+
+```python
+b2.conditions.prepend_globaltag('<tag holding the modeSelector payloads>')
+```
+
+Alternatively point `--cat-model` / `--main-model` at the local
+`modeSelector_cat.root` / `modeSelector_main.root` weightfiles produced by
+`convert_to_onnx.py`, which needs no conditions database access at all.
+
 ---
 
 ## End-to-end training workflow
@@ -172,11 +244,11 @@ Omit `--cat-model` and `--main-model` to load models from the conditions databas
 
 2. Train category network:
    python3 analysis/scripts/modeSelector/train.py \
-           --input training_data/*.npz --network category --use_sparse
+           --input training_data/*.root --network category --use_sparse
 
 3. Train main network:
    python3 analysis/scripts/modeSelector/train.py \
-           --input training_data/*.npz --network main --cat_model networks/net_category.pt --use_sparse
+           --input training_data/*.root --network main --cat_model networks/net_category.pt --use_sparse
            
 4. Plot training diagnostics
    python3 analysis/examples/modeSelector/plot_training.py networks/net_category.pt networks/net_main.pt

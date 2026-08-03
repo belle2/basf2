@@ -160,6 +160,7 @@ basf2 applyModeSelector.py -- [options]
 | `--main-model` | unset | Main ONNX model. Omit to use payloads |
 | `--cat-payload-name` | `modeSelector_cat_model_v3` | Conditions DB payload name for the category model |
 | `--main-payload-name` | `modeSelector_main_model_v3` | Conditions DB payload name for the main model |
+| `--globaltag` | unset | Additional globaltag holding the payloads, prepended to the analysis globaltag |
 | `--data` | off | Run on data: keep a fixed 10% `eventRandom` sample and drop MC-only output columns |
 
 **Output files:** `<output>.pq`, written via `VariablesToTable` from
@@ -223,11 +224,11 @@ MC-only output columns are skipped, and `eventRandom < 0.1` is applied instead.
 Omit `--cat-model` and `--main-model` to load models from the conditions database. Pass local MVA ONNX weightfile paths to override.
 
 The script prepends `getAnalysisGlobaltag()`, which does not contain the
-ModeSelector payloads yet. To load them from the conditions database, also
-prepend the globaltag they were uploaded to:
+ModeSelector payloads yet, so the globaltag they were uploaded to has to be
+given explicitly:
 
-```python
-b2.conditions.prepend_globaltag('<tag holding the modeSelector payloads>')
+```bash
+basf2 applyModeSelector.py -- --globaltag <tag holding the modeSelector payloads>
 ```
 
 Alternatively point `--cat-model` / `--main-model` at the local

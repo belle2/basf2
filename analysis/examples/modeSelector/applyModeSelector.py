@@ -32,8 +32,7 @@ from b2pandas_utils import VariablesToTable
 from variables import variables as vm
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--input', nargs='+',
-                    default=[b2.find_file('udst16_feiHadronic.root', 'validation')],
+parser.add_argument('--input', nargs='+', default=None,
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_output',
                     help='Output parquet filename or stem (default: modeSelector_output)')
@@ -45,9 +44,15 @@ parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v3',
                     help='Conditions DB payload name for the category model')
 parser.add_argument('--main-payload-name', default='modeSelector_main_model_v3',
                     help='Conditions DB payload name for the main model')
+parser.add_argument('--globaltag', default=None,
+                    help='Additional globaltag holding the ModeSelector payloads, prepended to the analysis globaltag')
 parser.add_argument('--data', action='store_true',
                     help='Run in data mode: keep 10% of events with eventRandom and drop MC-only output variables')
 args = parser.parse_args()
+
+# Resolved after parsing so that --input works without the validation file installed
+if args.input is None:
+    args.input = [b2.find_file('udst16_feiHadronic.root', 'validation')]
 
 output_root, output_suffix = os.path.splitext(args.output)
 if output_suffix.lower() in ['.pq', '.parquet']:
@@ -70,6 +75,12 @@ ma.inputMdstList(
 
 # analysis globaltag for accessing payloads
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+
+# The ModeSelector payloads are not in the analysis globaltag yet, so the
+# globaltag holding them has to be given explicitly when loading from the
+# conditions database.
+if args.globaltag:
+    b2.conditions.prepend_globaltag(args.globaltag)
 
 # FEI list identifier
 fei_identifier = 'feiHadronic'

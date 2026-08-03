@@ -30,7 +30,7 @@ DELTA_M_CUT = (-0.05, 0.05)
 DELTA_P_THRESH = 0.15
 
 # Neutral B decay modes without flavour information in the truth tag.
-B0_FLAVOUR_AGNOSTIC_DMIDS = frozenset((23, 25))
+B0_FLAVOUR_AGNOSTIC_DMIDS = frozenset((13, 23, 25))
 
 # Network output sizes
 NUM_CAT_LABELS = 3   # B0, B+, continuum

@@ -17,6 +17,8 @@
 
 #include <framework/gearbox/Unit.h>
 
+#include <Math/Vector2D.h>
+
 #include <gtest/gtest.h>
 
 
@@ -51,8 +53,8 @@ TEST(TrackingUtilitiesTest, numerics_sign)
 TEST(TrackingUtilitiesTest, numerics_SinEqLine_isIncreasing)
 {
 
-  Vector2D lower(0.0, 1.0);
-  Vector2D upper(1.0, 2.0);
+  ROOT::Math::XYVector lower(0.0, 1.0);
+  ROOT::Math::XYVector upper(1.0, 2.0);
 
   EXPECT_EQ(EIncDec::c_Increasing, SinEqLine::getEIncDec(lower, upper));
 

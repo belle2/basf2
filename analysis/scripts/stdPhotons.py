@@ -10,6 +10,7 @@
 
 import b2bii
 import modularAnalysis as ma
+from basf2 import B2WARNING
 
 
 def stdPhotons(
@@ -22,8 +23,13 @@ def stdPhotons(
     Function to prepare one of several standardized types of photon lists:
 
     - 'gamma:all' with no cuts this will be polluted by tracks from outside the acceptance
+    - 'gamma:base' clusters in CDC acceptance with a loose timing cut
+      (``inCDCAcceptance and abs(clusterTiming) < 200``), replaces all deprecated lists
+
+    The following lists are **deprecated** and will be removed at the end of 2026:
+
     - 'gamma:cdc' all clusters inside the CDC tracking acceptance
-    - 'gamma:loose' (default) with some loose quality selections
+    - 'gamma:loose' with some loose quality selections
     - 'gamma:tight' like loose but with higher energy cuts depending on detector regions
     - 'gamma:pi0eff60_May2020' gamma list for 60% pi0 efficiency list, optimized in May 2020
     - 'gamma:pi0eff50_May2020' gamma list for 50% pi0 efficiency list, optimized in May 2020
@@ -31,8 +37,6 @@ def stdPhotons(
     - 'gamma:pi0eff30_May2020' gamma list for 30% pi0 efficiency list, optimized in May 2020
     - 'gamma:pi0eff20_May2020' gamma list for 20% pi0 efficiency list, optimized in May 2020
     - 'gamma:pi0eff10_May2020' gamma list for 10% pi0 efficiency list, optimized in May 2020
-    - 'gamma:pi0' gamma list for pi0 list
-    - 'gamma:pi0highE' gamma list for pi0 list, high energy selection
 
     -  For latest pi0 recommendations see https://belle2.pages.desy.de/performance/recommendations/
 
@@ -60,6 +64,19 @@ def stdPhotons(
                               `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_
                               for information on the names of available correction tables..
     """
+
+    _deprecated_photon_lists = {
+        'cdc', 'loose', 'tight',
+        'pi0eff10_May2020', 'pi0eff20_May2020', 'pi0eff30_May2020',
+        'pi0eff40_May2020', 'pi0eff50_May2020', 'pi0eff60_May2020',
+    }
+    if listtype in _deprecated_photon_lists:
+        B2WARNING(
+            f"The standard photon list 'gamma:{listtype}' is deprecated "
+            "and will be removed at the end of 2026. "
+            "Only the 'all' and 'base' lists will be kept. "
+            "Please update your analysis accordingly."
+        )
 
     # all photons (all neutral ECLClusters that have the c_nPhotons hypothesis)
     if listtype == 'all':
@@ -135,6 +152,13 @@ def stdPhotons(
             'gamma:pi0eff60_May2020',
             '[clusterNHits>1.5] and thetaInCDCAcceptance and \
              [[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
+            writeOut=True,
+            path=path
+        )
+    elif listtype == 'base':
+        ma.fillParticleList(
+            'gamma:base',
+            'inCDCAcceptance and [abs(clusterTiming) < 200]',
             writeOut=True,
             path=path
         )

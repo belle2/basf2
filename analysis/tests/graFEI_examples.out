@@ -1,6 +1,6 @@
 [INFO] Steering file: analysis/tests/graFEI_examples.py
 TFile: graFEI_ntupliser_B.root
-TTree: tree
+TTree: U4S
 No entry found
 TBranch: __experiment__
 TBranch: __run__
@@ -90,7 +90,7 @@ TBranch: Btag_py
 TBranch: Btag_pz
 TBranch: Btag_theta
 TFile: graFEI_ntupliser_Upsilon.root
-TTree: tree
+TTree: U4S
 TBranch: __experiment__, 1003
 TBranch: __run__, 0
 TBranch: __event__, 6

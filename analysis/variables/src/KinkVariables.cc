@@ -71,8 +71,8 @@ namespace Belle2 {
       return motherHelixAtKinkVertex.getMomentum(BzAtKinkVertex);
     }
 
-    double kinkDaughterMomentumAndCosThetaInMotherRF(const Particle* part, Const::ChargedStable motherType,
-                                                     Const::ChargedStable daughterType, bool returnCosTheta)
+    double kinkDaughterMomentumAndCosThetaInMotherRF(const Particle* part, const Const::ChargedStable& motherType,
+                                                     const Const::ChargedStable& daughterType, bool returnCosTheta)
     {
       const Kink* kink = part->getKink();
       if (!kink) return Const::doubleNaN;

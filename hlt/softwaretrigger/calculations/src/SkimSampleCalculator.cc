@@ -449,7 +449,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
       const TrackFitResult* trackFit1 = track1->getTrackFitResultWithClosestMass(Const::pion);
       if (!trackFit1) continue;
-      if (trackFit1->getHitPatternCDC().getNHits() <= 0) continue;
+      if (trackFit1->getHitPatternCDC().getNHits() == 0) continue;
 
       //------------Second track variables----------------
       for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
@@ -473,7 +473,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
 
         const TrackFitResult* trackFit2 = track2->getTrackFitResultWithClosestMass(Const::pion);
         if (!trackFit2) continue;
-        if (trackFit2->getHitPatternCDC().getNHits() <= 0) continue;
+        if (trackFit2->getHitPatternCDC().getNHits() == 0) continue;
 
         BhabhaCDC = 1;
 
@@ -545,7 +545,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const PIDLikelihood* p1Pid = part1->getPIDLikelihood();
       bool p1hasKLMid = 0;
       if (p1Pid) p1hasKLMid = p1Pid->isAvailable(Const::KLM);
-      const double p1isInCDC = Variable::inCDCAcceptance(part1);
+      const bool p1isInCDC = Variable::inCDCAcceptance(part1);
       const double p1clusPhi = Variable::eclClusterPhi(part1);
 
       const double Pp1 = V4p1CMS.R();
@@ -555,7 +555,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
       const double enECLTrack1 = eclTrack1->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
       const bool goodTrk1 = enECLTrack1 > 0 && enECLTrack1 < 0.5 && p1CDChits > 0
-                            && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC == 1;
+                            && ((p1hasKLMid == 0 && enECLTrack1 < 0.25 && p1MomLab < 2.0) || p1hasKLMid == 1) && p1isInCDC;
 
       //------------Second track variables----------------
       for (unsigned int l = k + 1; l < m_pionParticles->getListSize(); l++) {
@@ -585,7 +585,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const PIDLikelihood* p2Pid = part2->getPIDLikelihood();
         bool p2hasKLMid = 0;
         if (p2Pid) p2hasKLMid = p2Pid->isAvailable(Const::KLM);
-        const double p2isInCDC = Variable::inCDCAcceptance(part2);
+        const bool p2isInCDC = Variable::inCDCAcceptance(part2);
         const double p2clusPhi = Variable::eclClusterPhi(part2);
 
         const double Pp2 = V4p2CMS.R();
@@ -598,7 +598,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const double enECLTrack2 = eclTrack2->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);
 
         const bool goodTrk2 = enECLTrack2 > 0 && enECLTrack2 < 0.5 && p2CDChits > 0
-                              && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC == 1;
+                              && ((p2hasKLMid == 0 && enECLTrack2 < 0.25 && p2MomLab < 2.0) || p2hasKLMid == 1) && p2isInCDC;
 
         double eTotMumuTracks = enECLTrack1 + enECLTrack2;
         double EMumutot = eTotMumuTracks + eMumuTotGammas;
@@ -683,9 +683,9 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   if (m_KsParticles.isValid()) {
     for (unsigned int i = 0; i < m_KsParticles->getListSize(); i++) {
       const Particle* mergeKsCand = m_KsParticles->getParticle(i);
-      const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+      const bool isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
       const double KsCandMass = mergeKsCand->getMass();
-      if (KsCandMass > KsMassLow && KsCandMass < KsMassHigh && isKsCandGood == 1.) nKshort++;
+      if (KsCandMass > KsMassLow && KsCandMass < KsMassHigh && isKsCandGood) nKshort++;
     }
   }
 

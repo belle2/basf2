@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 #include <svd/reconstruction/SVDClusterTime.h>
 #include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 #include <TMath.h>
@@ -118,7 +119,7 @@ namespace Belle2 {
       double rawtimeError = 0;
       begin = selectedSamples.begin();
       for (float i = 0.; begin != end; ++begin, i += 1)
-        rawtimeError += TMath::Power((m_apvClockPeriod * i - rawtime) / norm, 2);
+        rawtimeError += square((m_apvClockPeriod * i - rawtime) / norm);
       rawtimeError = sqrt(rawtimeError) * noise;
 
       //compute the error on the calibrated time

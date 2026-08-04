@@ -400,7 +400,7 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
   int nWOmcParticles = 0;
   int nWOmother = 0;
   int nNonCommonAllMother = 0;
-  for (auto& daughter : particle->getDaughters()) {
+  for (const auto& daughter : particle->getDaughters()) {
     if (!daughter->getMCParticle()) {
       nWOmcParticles++;
       continue;
@@ -430,7 +430,7 @@ void MCMatcherParticlesModule::setCCbarTagMatch(const Particle* particle)
   int nHasDecayInFlight = 0;
   int nHasSevereMCError = 0;
   int nMissRecoDaughters = 0;
-  for (auto& daughter : particle->getDaughters()) { // TODO think about less strict conditions
+  for (const auto& daughter : particle->getDaughters()) { // TODO think about less strict conditions
     if (daughter->hasExtraInfo("ccbarTagNmissRecoDaughters")) {
       nHasMissingGamma    += daughter->getExtraInfo("ccbarTagNmissGamma");
       nHasMissingNeutrino += daughter->getExtraInfo("ccbarTagNmissNeutrino");

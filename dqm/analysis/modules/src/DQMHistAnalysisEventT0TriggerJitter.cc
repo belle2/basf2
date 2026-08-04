@@ -40,9 +40,6 @@ DQMHistAnalysisEventT0TriggerJitterModule::DQMHistAnalysisEventT0TriggerJitterMo
   addParam("printCanvas", m_printCanvas, "If true, prints pdf of the analysis canvas.", bool(false));
 }
 
-
-DQMHistAnalysisEventT0TriggerJitterModule::~DQMHistAnalysisEventT0TriggerJitterModule() { }
-
 void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
 {
   gROOT->cd();

@@ -19,6 +19,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 /* ROOT headers. */
 #include <Math/MinimizerOptions.h>
@@ -67,7 +68,7 @@ static double timeDensity(const double x[2], const double* par)
   polynomial = par[0];
   t0 = par[2] + par[4] * x[1];
   gauss = par[1] / (sqrt(2.0 * M_PI) * par[3]) *
-          exp(-0.5 * pow((x[0] - t0) / par[3], 2));
+          exp(-0.5 * square((x[0] - t0) / par[3]));
   return fabs(polynomial + gauss);
 }
 

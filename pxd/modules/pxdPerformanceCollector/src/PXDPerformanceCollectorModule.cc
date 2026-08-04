@@ -9,6 +9,7 @@
 #include <pxd/modules/pxdPerformanceCollector/PXDPerformanceCollectorModule.h>
 
 #include <framework/datastore/RelationArray.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -295,7 +296,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
   auto lambda0 = atan(track.tanLambda);
   if (fabs(lambda0) > m_maxAbsLambda)
     m_selectedRes = false;
-  auto sinTheta0 = 1. / sqrt(1. + pow(track.tanLambda, 2));
+  auto sinTheta0 = 1. / sqrt(1. + square(track.tanLambda));
   auto pBetaSinTheta3o2 = track.pt * 1.0 * sqrt(sinTheta0);
   if (pBetaSinTheta3o2 < m_minPBetaSinTheta3o2)
     m_selectedRes = false;

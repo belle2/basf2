@@ -23,12 +23,10 @@ namespace Belle2 {
     TestCalibDBAccessModule();
 
     /** Destructor.*/
-    virtual ~TestCalibDBAccessModule();
+    ~TestCalibDBAccessModule() override;
 
-    /// Initialize
-    virtual void initialize() override;
     /// Event()
-    virtual void event() override;
+    void event() override;
 
   private:
     DBObjPtr<TestCalibMean> m_obj_constant; /**< obj_constant */

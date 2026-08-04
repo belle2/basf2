@@ -28,7 +28,7 @@ namespace Belle2 {
     /** setter for Path. */
     void init(const std::string& to, bool doCopy, const std::vector<std::string>& mergeBack);
 
-    ~MergeDataStoreModule();
+    ~MergeDataStoreModule() override;
 
     virtual void initialize() override;
     virtual void event() override;

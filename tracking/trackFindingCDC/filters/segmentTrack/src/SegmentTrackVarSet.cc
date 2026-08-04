@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -19,6 +20,12 @@
 #include <cdc/topology/CDCWire.h>
 
 #include <tracking/trackingUtilities/numerics/ToFinite.h>
+
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -85,8 +92,8 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
   }
 
   // Calculate if it is out of the CDC
-  Vector3D frontRecoPos3D = front.reconstruct3D(trajectoryTrack2D);
-  Vector3D backRecoPos3D = back.reconstruct3D(trajectoryTrack2D);
+  const ROOT::Math::XYZVector& frontRecoPos3D = front.reconstruct3D(trajectoryTrack2D);
+  const ROOT::Math::XYZVector& backRecoPos3D = back.reconstruct3D(trajectoryTrack2D);
 
   if (segment->getStereoKind() != EStereoKind::c_Axial) {
     double forwardZ = front.getWire().getWireLine().forwardZ();
@@ -114,11 +121,11 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
     } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
-      double distanceFront = (front.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      double distanceFront = (front.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).R();
       if (distanceFront > maxmimumHitDistanceFront) {
         maxmimumHitDistanceFront = distanceFront;
       }
-      double distanceBack = (back.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).norm();
+      double distanceBack = (back.getWireHit().getRefPos2D() - recoHit.getRecoPos2D()).R();
       if (distanceBack > maxmimumHitDistanceBack) {
         maxmimumHitDistanceBack = distanceBack;
       }
@@ -169,8 +176,8 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
     double thetaFirstSegmentHit = -10;
 
     for (const CDCRecoHit2D& recoHit2D : *segment) {
-      Vector3D reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
-      const Vector2D& recoPos2D = recoHit2D.getRecoPos2D();
+      ROOT::Math::XYZVector reconstructedPosition = recoHit2D.reconstruct3D(trajectoryTrack2D);
+      const ROOT::Math::XYVector& recoPos2D = recoHit2D.getRecoPos2D();
       double perpS = trajectoryTrack2D.calcArcLength2D(recoPos2D);
 
 
@@ -180,7 +187,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
       }
 
       if (thetaFirstSegmentHit == -10) {
-        thetaFirstSegmentHit = reconstructedPosition.theta();
+        thetaFirstSegmentHit = reconstructedPosition.Theta();
       }
       sum_hit_z_distance += current_z_distance;
       if (current_z_distance > max_hit_z_distance) {
@@ -188,7 +195,7 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
       }
     }
 
-    double thetaTrack = trajectoryTrack3D.getFlightDirection3DAtSupport().theta();
+    double thetaTrack = trajectoryTrack3D.getFlightDirection3DAtSupport().Theta();
     stereo_quad_tree_distance = thetaTrack - thetaFirstSegmentHit;
   }
 
@@ -236,9 +243,9 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
   var<named("stereo_quad_tree_distance")>() = toFinite(stereo_quad_tree_distance, 0);
 
   var<named("pt_of_track")>() = toFinite(std::isnan(trajectoryTrack2D.getAbsMom2D()) ? 0.0 : trajectoryTrack2D.getAbsMom2D(), 0);
-  var<named("track_is_curler")>() = trajectoryTrack2D.getExit().hasNAN();
+  var<named("track_is_curler")>() = VectorUtil::hasNAN(trajectoryTrack2D.getExit());
 
-  var<named("superlayer_already_full")>() = not trajectoryTrack2D.getOuterExit().hasNAN() and hitsInSameRegion > 5;
+  var<named("superlayer_already_full")>() = not VectorUtil::hasNAN(trajectoryTrack2D.getOuterExit()) and hitsInSameRegion > 5;
 
   var<named("maxmimum_trajectory_distance_front")>() = toFinite(maxmimumTrajectoryDistanceFront, 999);
   var<named("maxmimum_trajectory_distance_back")>() = toFinite(maxmimumTrajectoryDistanceBack, 999);
@@ -253,7 +260,8 @@ bool SegmentTrackVarSet::extract(const BaseSegmentTrackFilter::Object* testPair)
 
   var<named("segment_super_layer")>() = segment->getISuperLayer();
 
-  double phiBetweenTrackAndSegment = trajectoryTrack2D.getMom2DAtSupport().angleWith(segment->front().getRecoPos2D());
+  double phiBetweenTrackAndSegment = ROOT::Math::VectorUtil::DeltaPhi(trajectoryTrack2D.getMom2DAtSupport(),
+                                     segment->front().getRecoPos2D());
 
   var<named("phi_between_track_and_segment")>() = toFinite(phiBetweenTrackAndSegment, 0);
   var<named("perp_s_of_front")>() = toFinite(perpSOfFront / radius, 0);

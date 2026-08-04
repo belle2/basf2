@@ -136,7 +136,7 @@ gearbox = b2.register_module('Gearbox')
 if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
-    gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
+    gearbox.param('fileName', 'geometry/Belle2_Run1.xml')
 elif phase == 32:
     gearbox.param('fileName', 'geometry/Belle2_Run2.xml')
 if sampleType == 'study':

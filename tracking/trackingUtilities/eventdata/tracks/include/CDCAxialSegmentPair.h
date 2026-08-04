@@ -28,7 +28,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor setting the contained segments to nullptr.
-      CDCAxialSegmentPair();
+      CDCAxialSegmentPair() = default;
 
       /// Constructor from two segments
       CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
@@ -152,10 +152,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the start segment
-      const CDCAxialSegment2D* m_startSegment;
+      const CDCAxialSegment2D* m_startSegment{nullptr};
 
       /// Reference to the end segment
-      const CDCAxialSegment2D* m_endSegment;
+      const CDCAxialSegment2D* m_endSegment{nullptr};
 
       /// Reference to the common trajectory
       mutable CDCTrajectory2D m_trajectory2D;

@@ -307,7 +307,7 @@ It is distributed by something called `/cvmfs <https://cernvm.cern.ch/fs/>`_.
 b2setup
 ~~~~~~~
 
-To set up your environment to work with ``basf2`` you first have to source the
+To set up your environment to work with ``basf2``, you first have to source the
 setup script...
 
 .. code-block:: bash

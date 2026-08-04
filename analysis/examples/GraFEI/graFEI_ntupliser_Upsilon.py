@@ -269,7 +269,7 @@ if __name__ == "__main__":
         "Upsilon(4S):graFEI",
         sorted(all_vars),
         filename="graFEI_UpsReco_example.root",
-        treename="tree",
+        treename="U4S",
         path=path,
     )
 

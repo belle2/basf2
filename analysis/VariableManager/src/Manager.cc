@@ -81,7 +81,7 @@ std::vector<const Variable::Manager::Var*> Variable::Manager::getVariables(const
 {
 
   std::vector<const Variable::Manager::Var*> variable_pointers;
-  for (auto& variable : variables) {
+  for (const auto& variable : variables) {
     const Var* x = getVariable(variable);
     if (x == nullptr) {
       B2WARNING("Couldn't find variable " << variable << " via the Variable::Manager. Check the name!");

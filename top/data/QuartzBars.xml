@@ -10,7 +10,7 @@
     <Width unit="mm">450.10</Width>
     <Thickness unit="mm">20.06</Thickness>
     <OpticalSurface>QuartzSurface_5</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="Zygo:SN-02">
@@ -21,7 +21,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.01</Thickness>
     <OpticalSurface>QuartzSurface_4</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="Zygo:SN-03">
@@ -32,7 +32,7 @@
     <Width unit="mm">450.14</Width>
     <Thickness unit="mm">19.96</Thickness>
     <OpticalSurface>QuartzSurface_3</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="Zygo:SN-04">
@@ -43,7 +43,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.00</Thickness>
     <OpticalSurface>QuartzSurface_4</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="Zygo:SN-05">
@@ -54,7 +54,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">19.98</Thickness>
     <OpticalSurface>QuartzSurface_3</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="OOW:SN-01">
@@ -65,7 +65,7 @@
     <Width unit="mm">450.35</Width>
     <Thickness unit="mm">19.82</Thickness>
     <OpticalSurface>QuartzSurface_1</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="OOW:SN-02">
@@ -76,7 +76,7 @@
     <Width unit="mm">450.04</Width>
     <Thickness unit="mm">19.98</Thickness>
     <OpticalSurface>QuartzSurface_2</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="OOW:SN-03">
@@ -87,7 +87,7 @@
     <Width unit="mm">449.73</Width>
     <Thickness unit="mm">19.85</Thickness>
     <OpticalSurface>QuartzSurface_1</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="OOW:SN-04">
@@ -98,7 +98,7 @@
     <Width unit="mm">449.58</Width>
     <Thickness unit="mm">19.79</Thickness>
     <OpticalSurface>QuartzSurface_2</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450478">
@@ -109,7 +109,7 @@
     <Width unit="mm">450.08</Width>
     <Thickness unit="mm">20.04</Thickness>
     <OpticalSurface>QuartzSurface_5</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450481">
@@ -120,7 +120,7 @@
     <Width unit="mm">450.11</Width>
     <Thickness unit="mm">19.99</Thickness>
     <OpticalSurface>QuartzSurface_7</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450479">
@@ -131,7 +131,7 @@
     <Width unit="mm">450.11</Width>
     <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface_6</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450480">
@@ -142,7 +142,7 @@
     <Width unit="mm">450.10</Width>
     <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface_6</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450680">
@@ -153,7 +153,7 @@
     <Width unit="mm">450.15</Width>
     <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface_8</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450681">
@@ -164,7 +164,7 @@
     <Width unit="mm">450.11</Width>
     <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface_7</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450683">
@@ -175,7 +175,7 @@
     <Width unit="mm">450.13</Width>
     <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface_8</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450685">
@@ -186,7 +186,7 @@
     <Width unit="mm">450.11</Width>
     <Thickness unit="mm">20.05</Thickness>
     <OpticalSurface>QuartzSurface_9</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450684">
@@ -197,7 +197,7 @@
     <Width unit="mm">450.10</Width>
     <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface_10</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450686">
@@ -208,7 +208,7 @@
     <Width unit="mm">450.09</Width>
     <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface_10</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450688">
@@ -219,7 +219,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.05</Thickness>
     <OpticalSurface>QuartzSurface_9</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450689">
@@ -230,7 +230,7 @@
     <Width unit="mm">450.14</Width>
     <Thickness unit="mm">19.97</Thickness>
     <OpticalSurface>QuartzSurface_16</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450687">
@@ -241,7 +241,7 @@
     <Width unit="mm">450.08</Width>
     <Thickness unit="mm">20.02</Thickness>
     <OpticalSurface>QuartzSurface_11</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450690">
@@ -252,7 +252,7 @@
     <Width unit="mm">450.08</Width>
     <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface_11</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="451368">
@@ -263,7 +263,7 @@
     <Width unit="mm">450.10</Width>
     <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface_16</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="451635">
@@ -274,7 +274,7 @@
     <Width unit="mm">450.15</Width>
     <Thickness unit="mm">20.05</Thickness>
     <OpticalSurface>QuartzSurface_12</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="451849">
@@ -285,7 +285,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.06</Thickness>
     <OpticalSurface>QuartzSurface_12</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450691">
@@ -296,7 +296,7 @@
     <Width unit="mm">450.10</Width>
     <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface_13</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450693">
@@ -307,7 +307,7 @@
     <Width unit="mm">450.17</Width>
     <Thickness unit="mm">20.07</Thickness>
     <OpticalSurface>QuartzSurface_13</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="450694">
@@ -318,7 +318,7 @@
     <Width unit="mm">450.13</Width>
     <Thickness unit="mm">20.03</Thickness>
     <OpticalSurface>QuartzSurface_14</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="451369">
@@ -329,7 +329,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.04</Thickness>
     <OpticalSurface>QuartzSurface_14</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="451370">
@@ -340,7 +340,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface_15</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="452291">
@@ -351,7 +351,7 @@
     <Width unit="mm">450.12</Width>
     <Thickness unit="mm">20.095</Thickness>
     <OpticalSurface>QuartzSurface_15</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="452339">
@@ -362,7 +362,7 @@
     <Width unit="mm">450.09</Width>
     <Thickness unit="mm">20.08</Thickness>
     <OpticalSurface>QuartzSurface_17</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
   <QuartzBar SerialNumber="452338">
@@ -373,7 +373,7 @@
     <Width unit="mm">450.08</Width>
     <Thickness unit="mm">20.09</Thickness>
     <OpticalSurface>QuartzSurface_17</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
   </QuartzBar>
 
 </QuartzBars>

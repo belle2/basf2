@@ -135,7 +135,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
 
@@ -174,7 +174,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       daughterProperties.push_back(Particle::PropertyFlags::c_Ordinary);
     }
@@ -229,7 +229,7 @@ namespace {
       Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       if (i % 2 == 0) {
-        Particle* grandDaughter = particles.appendNew(d);
+        const Particle* grandDaughter = particles.appendNew(d);
         newDaughters->appendDaughter(grandDaughter);
         ++nGrandDaughters;
       }
@@ -312,36 +312,47 @@ namespace {
 
 
     // create some particles
-    Particle* T1Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* T2Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track, 2));
+    const Particle* T1Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  211, Particle::c_Flavored, Particle::c_Track,
+                                                              1));
+    const Particle* T2Pion     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -211, Particle::c_Flavored, Particle::c_Track,
+                                                              2));
 
     // T1PionCopy is a copy of T1Pion (both are created from the same Track and are pions)
-    Particle* T1PionCopy = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 211, Particle::c_Flavored, Particle::c_Track, 1));
+    const Particle* T1PionCopy = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 211, Particle::c_Flavored, Particle::c_Track,
+                                                              1));
 
     // T1Kaon is not a coy of T1Pion (both are created from the same Track, but are of different hypothesis)
-    Particle* T1Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 1));
-    Particle* T2Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 2));
-    Particle* T3Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track, 3));
-    Particle* T4Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track, 4));
+    const Particle* T1Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track,
+                                                              1));
+    const Particle* T2Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track,
+                                                              2));
+    const Particle* T3Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0),  321, Particle::c_Flavored, Particle::c_Track,
+                                                              3));
+    const Particle* T4Kaon     = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), -321, Particle::c_Flavored, Particle::c_Track,
+                                                              4));
 
     // T1Gamma
-    Particle* T1Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                        0));
+    const Particle* T1Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                              Particle::c_ECLCluster,
+                                                              0));
     // T2Gamma
-    Particle* T2Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                        1));
+    const Particle* T2Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                              Particle::c_ECLCluster,
+                                                              1));
 
     // T3Gamma
-    Particle* T3Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored, Particle::c_ECLCluster,
-                                                        2));
+    const Particle* T3Gamma    = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), 22, Particle::c_Unflavored,
+                                                              Particle::c_ECLCluster,
+                                                              2));
     // T4KL
-    Particle* T4KL       = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), Const::Klong.getPDGCode(), Particle::c_Unflavored,
-                                                        Particle::c_ECLCluster,
-                                                        3));
+    const Particle* T4KL       = particles.appendNew(Particle(PxPyPzEVector(0, 0, 0, 0), Const::Klong.getPDGCode(),
+                                                              Particle::c_Unflavored,
+                                                              Particle::c_ECLCluster,
+                                                              3));
     MCParticle* MC1Pion = mcparticles. appendNew(MCParticle());
     MC1Pion->setPDG(Const::pion.getPDGCode());
     MC1Pion->set4Vector(PxPyPzEVector(0, 0, 0, 0));
-    Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
+    const Particle* T1PionFromMC     = particles.appendNew(Particle(MC1Pion));
 
     EXPECT_TRUE(T3Gamma->overlapsWith(T4KL));
     EXPECT_FALSE(T3Gamma->overlapsWith(T2Gamma));
@@ -530,7 +541,7 @@ namespace {
     T1Pion->addExtraInfo("test_var", 1.0);
     T1Pion->addRelationTo(MC1);
     Particle* T2Kaon     = particles.appendNew(Particle(PxPyPzEVector(2, 2, 2, 2), -321, Particle::c_Flavored, Particle::c_Track, 2));
-    MCParticle* MC2      = mcparticles. appendNew(MCParticle());
+    const MCParticle* MC2      = mcparticles. appendNew(MCParticle());
     MC1->setPDG(2);
     T2Kaon->addExtraInfo("test_var", 2.0);
     T2Kaon->addRelationTo(MC2);
@@ -564,7 +575,7 @@ namespace {
     EXPECT_EQ(roes.getEntries(), 1);
 
     // now make a copy of B0
-    Particle* B0_copy = copyParticle(B0);
+    const Particle* B0_copy = copyParticle(B0);
     // at this point the size of Particle/MCParticle/ROE StoreArray should be 11/3/1
     EXPECT_EQ(particles.getEntries(), 11);
     EXPECT_EQ(mcparticles.getEntries(), 3);

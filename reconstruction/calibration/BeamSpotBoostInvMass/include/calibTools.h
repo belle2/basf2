@@ -182,7 +182,7 @@ namespace Belle2 {
   inline double encodeNumber(double val, unsigned num)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
-    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+    static const long long fEnc   = 4294967296; // pow(2, 32), 32 binary digits  for encoded number
 
     int e; //exponent of the number
     double mantisa = std::frexp(val, &e);
@@ -204,7 +204,7 @@ namespace Belle2 {
   inline unsigned decodeNumber(double val)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
-    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+    static const long long fEnc   = 4294967296; // pow(2, 32), 32 binary digits  for encoded number
 
     int e;
     double mantisa = std::frexp(val, &e);

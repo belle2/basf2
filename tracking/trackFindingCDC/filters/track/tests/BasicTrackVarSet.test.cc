@@ -17,7 +17,8 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <cdc/topology/CDCWireTopology.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+
+#include <Math/Vector3D.h>
 
 #include <vector>
 
@@ -78,7 +79,8 @@ TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_one_hit_track)
   const CDCWireHit aWireHit(&aHit, driftLength);
   const CDCRLWireHit aRLWireHit(&aWireHit, ERightLeft::c_Unknown);
   double some_arbitrary_z_coord = 0.0;
-  const Vector3D aRecoPos(aRLWireHit.getRefPos2D(), some_arbitrary_z_coord);
+  const auto& tmp = aRLWireHit.getRefPos2D();
+  const ROOT::Math::XYZVector aRecoPos(tmp.X(), tmp.Y(), some_arbitrary_z_coord);
   const CDCRecoHit3D aCDCHit(aRLWireHit, aRecoPos, arcLength2D);
   const std::vector<CDCRecoHit3D> aHitVector{aCDCHit};
   const CDCTrack track(aHitVector);
@@ -138,7 +140,8 @@ TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_two_hit_track)
     cdcHits.emplace_back(128, adc_counts.at(i), wireIDs.at(i)); // store in vector to avoid nullptrs
     cdcWireHits.emplace_back(&cdcHits.at(i), drift_lengths.at(i));
     CDCRLWireHit aRLWireHit(&cdcWireHits.at(i), ERightLeft::c_Unknown);
-    Vector3D aRecoPos(aRLWireHit.getRefPos2D(), 0.0);
+    const auto& tmp = aRLWireHit.getRefPos2D();
+    ROOT::Math::XYZVector aRecoPos(tmp.X(), tmp.Y(), 0.0);
     cdcRecoHits.emplace_back(aRLWireHit, aRecoPos, arc_length_2Ds.at(i));
   }
 
@@ -202,7 +205,8 @@ TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_empty_s_for_thre
   }
   for (std::size_t i = 0; i < cdcWireHits.size(); i++) {
     const CDCRLWireHit aRLWireHit(&cdcWireHits.at(i), ERightLeft::c_Unknown);
-    const Vector3D aRecoPos(aRLWireHit.getRefPos2D(), 0.0);
+    const auto& tmp = aRLWireHit.getRefPos2D();
+    const ROOT::Math::XYZVector aRecoPos(tmp.X(), tmp.Y(), 0.0);
     cdcRecoHits.emplace_back(aRLWireHit, aRecoPos, arc_length_2Ds.at(i));
   }
 

@@ -166,7 +166,7 @@ namespace Belle2::BeamSpotCalib {
         s  /=  spls.size();
 
         for (unsigned i = 0; i < spls.size(); ++i) {
-          ss += pow(spls[i].vals[k] - s, 2);
+          ss += (spls[i].vals[k] - s) * (spls[i].vals[k] - s);
         }
 
         if (spls.size() > 1)
@@ -228,7 +228,7 @@ namespace Belle2::BeamSpotCalib {
       double m = getMean();
       double s = 0;
       for (auto x : vars)
-        s += pow(x - m, 2);
+        s += (x - m) * (x - m);
       if (vars.size() > 1)
         return sqrt(s / (vars.size() - 1));
       else
@@ -273,7 +273,7 @@ namespace Belle2::BeamSpotCalib {
     double C = sqrS(SizeXY);
     // By convention the range of angle is [-pi/2, pi/2],
     // the reason is the same as with straight line, e.g. it can point to pi/4 but also to -3/4*pi
-    double angle = 1. / 2 * atan2(2 * C, (pow(SizeX, 2) - pow(SizeY, 2)));
+    double angle = 1. / 2 * atan2(2 * C, ((SizeX * SizeX) - (SizeY * SizeY)));
     return angle;
   }
 
@@ -286,9 +286,9 @@ namespace Belle2::BeamSpotCalib {
    */
   std::pair<double, double> getSizeMinMax(double SizeX, double SizeY, double SizeXY)
   {
-    double A = pow(SizeX, 2) + pow(SizeY, 2);
-    double B = pow(SizeX, 2) * pow(SizeY, 2) - pow(SizeXY, 4);
-    double D = pow(A, 2) - 4 * B;
+    double A = (SizeX * SizeX) + (SizeY * SizeY);
+    double B = (SizeX * SizeX) * (SizeY * SizeY) - (SizeXY * SizeXY * SizeXY * SizeXY);
+    double D = A * A - 4 * B;
 
     if (D < 0) {
       B2FATAL("Problem with D value : " << D);
@@ -313,8 +313,8 @@ namespace Belle2::BeamSpotCalib {
   double getSize2MinMat(double SizeXX, double SizeYY, double SizeXY)
   {
     double A = SizeXX + SizeYY;
-    double B = SizeXX * SizeYY - pow(SizeXY, 2);
-    double D = pow(A, 2) - 4 * B;
+    double B = SizeXX * SizeYY - (SizeXY * SizeXY);
+    double D = A * A - 4 * B;
 
     if (D < 0) {
       B2FATAL("Problem with D value : " << D);
@@ -772,7 +772,7 @@ namespace Belle2::BeamSpotCalib {
         for (int k = 0; k < m.cols(); ++k)
           Ahat += m(i, k) * A(k, i);
 
-        double v = pow((r(i) - dataH(i)) / (1 - Ahat), 2);
+        double v = ((r(i) - dataH(i)) / (1 - Ahat)) * ((r(i) - dataH(i)) / (1 - Ahat));
         press += v;
         press2 += v * v;
       }
@@ -807,7 +807,7 @@ namespace Belle2::BeamSpotCalib {
    */
   VectorXd linearFitPos(MatrixXd mat, VectorXd r)
   {
-    const double s2MinLimit = pow(0.05, 2); //Minimal value of the BeamSpot eigenSize
+    const double s2MinLimit = 0.0025; // = pow(0.05, 2), Minimal value of the BeamSpot eigenSize
     B2ASSERT("Matrix size for size fit should be 3", mat.cols() == 3);
     MatrixXd matT = mat.transpose();
     MatrixXd A = matT * mat;
@@ -860,9 +860,12 @@ namespace Belle2::BeamSpotCalib {
     double eigHigh, phi;
     fEig.GetMinimumXY(eigHigh, phi);
 
-    pars[0] = eigHigh * pow(cos(phi), 2) + s2MinLimit * pow(sin(phi), 2);
-    pars[1] = eigHigh * pow(sin(phi), 2) + s2MinLimit * pow(cos(phi), 2);
-    pars[2] = sin(phi) * cos(phi) * (eigHigh - s2MinLimit);
+    const double cPhi = cos(phi);
+    const double sPhi = sin(phi);
+
+    pars[0] = eigHigh * (cPhi * cPhi) + s2MinLimit * (sPhi * sPhi);
+    pars[1] = eigHigh * (sPhi * sPhi) + s2MinLimit * (cPhi * cPhi);
+    pars[2] = sPhi * cPhi * (eigHigh - s2MinLimit);
 
 
     return pars;
@@ -1417,7 +1420,8 @@ namespace Belle2::BeamSpotCalib {
       double v2 = spl2.val(x);
       double e2 = spl2.err(x);
 
-      double d = pow(v2 - v1, 2) / pow(std::max(e1, e2), 2);
+      const double maxe = std::max(e1, e2);
+      double d = (v2 - v1) * (v2 - v1)  / (maxe * maxe);
       sum += d * step;
     }
     return sum;
@@ -1964,7 +1968,7 @@ namespace Belle2::BeamSpotCalib {
       const std::vector<double>& splitPoints)
   {
     const double xyPosLimit  = 70; //um
-    const double xySize2Limit = pow(40, 2); //um^2
+    const double xySize2Limit = 1600; //40 x 40 um^2
     const double zPosLimit   = 1200; //um
 
 

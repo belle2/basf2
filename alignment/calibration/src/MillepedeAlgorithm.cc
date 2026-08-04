@@ -90,11 +90,11 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   double paramChi2 = 0.;
 
   if (m_events.empty()) {
-    GlobalParamVector result(m_components);
+    GlobalParamVector resultVector(m_components);
     GlobalParamVector errors(m_components);
     GlobalParamVector corrections(m_components);
 
-    GlobalCalibrationManager::initGlobalVector(result);
+    GlobalCalibrationManager::initGlobalVector(resultVector);
     GlobalCalibrationManager::initGlobalVector(errors);
     GlobalCalibrationManager::initGlobalVector(corrections);
 
@@ -103,7 +103,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
     for (auto& exprun : expRuns) {
       auto event1 = EventMetaData(1, exprun.second, exprun.first);
-      result.loadFromDB(event1);
+      resultVector.loadFromDB(event1);
       errors.construct();
       corrections.construct();
       break;
@@ -112,7 +112,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     // Construct all remaining components not loaded from DB
     // to easily create new objects not previously in DB :-)
     // TODO: remove?
-    result.construct();
+    resultVector.construct();
 
 
 
@@ -140,7 +140,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
       if (m_invertSign) correction = - correction;
 
-      result.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
+      resultVector.updateGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
       errors.setGlobalParam(error, label.getUniqueId(), label.getElementId(), label.getParameterId());
       corrections.setGlobalParam(correction, label.getUniqueId(), label.getElementId(), label.getParameterId());
 
@@ -148,9 +148,9 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
 
     }
 
-    result.postReadFromResult(resultTuple);
+    resultVector.postReadFromResult(resultTuple);
 
-    for (auto object : result.releaseObjects()) {
+    for (auto object : resultVector.releaseObjects()) {
       saveCalibration(object);
     }
     for (auto object : errors.releaseObjects()) {
@@ -292,6 +292,7 @@ void MillepedeAlgorithm::prepareMilleBinary()
   // Create new mille binary
   auto milleBinary = new gbl::MilleBinary(milleFileName);
 
+  /*
   // Containers for GBL data
   double aValue(0.);
   double aErr(0.);
@@ -299,24 +300,28 @@ void MillepedeAlgorithm::prepareMilleBinary()
   std::vector<double>* derLocal;
   std::vector<int>* labGlobal;
   std::vector<double>* derGlobal;
+  */
 
   // Read vectors of GblData from tree branch
   std::vector<gbl::GblData>* currentGblData = new std::vector<gbl::GblData>();
   gblDataTree->SetBranchAddress("GblData", &currentGblData);
 
   B2INFO("Writing Millepede binary files...");
+  B2ERROR("Broken with GBL V02");
   for (unsigned int iRecord = 0; iRecord < gblDataTree->GetEntries(); ++iRecord) {
     gblDataTree->GetEntry(iRecord);
 
     if (!currentGblData)
       continue;
 
+    /*
     for (gbl::GblData& theData : *currentGblData) {
       theData.getAllData(aValue, aErr, indLocal, derLocal, labGlobal,
                          derGlobal);
       milleBinary->addData(aValue, aErr, *indLocal, *derLocal, *labGlobal,
                            *derGlobal);
     }
+    */
     milleBinary->writeRecord();
   }
   // Closes the file

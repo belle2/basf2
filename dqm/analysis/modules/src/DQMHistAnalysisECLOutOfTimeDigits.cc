@@ -32,8 +32,8 @@ DQMHistAnalysisECLOutOfTimeDigitsModule::DQMHistAnalysisECLOutOfTimeDigitsModule
 void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 {
   // Register EPICS PVs
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name  = event_type + std::string(":") + ecl_part;
       registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
@@ -47,16 +47,15 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::initialize()
 void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
 {
   //== Get DQM info
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = event_type + std::string(":") + ecl_part;
       std::string var_name = pv_name;
       std::replace(var_name.begin(), var_name.end(), ':', '_');
 
       m_out_of_time_digits[pv_name] = 0;
 
-      std::string hist_name    = "ECL/out_of_time_" + var_name;
-      auto hist = (TH1F*)findHist(hist_name, m_onlyIfUpdated);
+      auto hist = (TH1F*)findHist("ECL", "out_of_time_" + var_name, m_onlyIfUpdated);
 
       if (!hist) continue;
 
@@ -84,8 +83,8 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
 
   TF1 gaus("fit_func", "gaus");
 
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name   = event_type + std::string(":") + ecl_part;
       std::string hist_name = "ECL/out_of_time_" + pv_name;
       std::string var_name  = "out_of_time_digits_" + pv_name;
@@ -93,18 +92,9 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
       std::replace(hist_name.begin(), hist_name.end(), ':', '_');
       std::replace(var_name.begin(), var_name.end(), ':', '_');
 
-      // If enough statistics, obtain more detailed information for MiraBelle
-      auto hist = (TH1F*)findHist(hist_name);
-      if (hist && hist->GetEntries() > 1000) {
-        // Fit the histogram to get the peak of a distribution
-        hist->Fit(&gaus);
-        m_monObj->setVariable(var_name, gaus.GetParameter(1));
-        m_monObj->setVariable(var_name + "_stddev", gaus.GetParameter(2));
-      } else {
-        // Use simple mean from the histogram
-        m_monObj->setVariable(var_name, m_out_of_time_digits[pv_name]);
-        m_monObj->setVariable(var_name + "_stddev", 0);
-      }
+      // Use simple mean from the histogram
+      m_monObj->setVariable(var_name, m_out_of_time_digits[pv_name]);
+      m_monObj->setVariable(var_name + "_stddev", 0);
     }
   }
 }

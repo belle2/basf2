@@ -70,13 +70,13 @@ namespace {
 
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
       B2DEBUG(100, "Tags of the hits");
@@ -160,13 +160,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
       for (const CDCSegment2D* segment2D : segments) {

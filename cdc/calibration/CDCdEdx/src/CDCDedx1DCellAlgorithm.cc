@@ -14,7 +14,7 @@
 #include <TPad.h>
 #include <TRandom.h>
 #include <TStyle.h>
-
+#include <iostream>
 #include <cmath>
 
 using namespace Belle2;
@@ -82,14 +82,15 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   CreateBinMapping();
 
   if (isPrintLog) {
-    B2INFO("inner layers bins: " << m_eaBinLocal[0]);
-    B2INFO("outer layers bins: " << m_eaBinLocal[1]);
+    B2INFO("Superlayer0 bins: " << m_eaBinLocal[0]);
+    B2INFO("Superlayer1 bins: " << m_eaBinLocal[1]);
+    B2INFO("Superlayers2-8 bins: " << m_eaBinLocal[2]);
   }
 
   // dedxhit vector to store dE/dx values for each enta bin
-  std::vector<TH1D*> hdedxhit[2];
-  TH1D* hdedxlay[2];
-  TH1D* hentalay[2];
+  std::array<std::vector<TH1D*>, m_kNGroups> hdedxhit;
+  std::array<TH1D*, m_kNGroups> hdedxlay{};
+  std::array<TH1D*, m_kNGroups> hentalay{};
 
   TH2D* hptcosth = new TH2D("hptcosth", "pt vs costh dist;pt;costh", 1000, -8.0, 8.0, 1000, -1.0, 1.0);
 
@@ -119,11 +120,10 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       double entaval = enta->at(j);
       //Mapped bin corresponds to entaval
       int ibin = std::floor((entaval - m_eaMin) / m_eaBW);
-      if (ibin < 0 || ibin > m_eaBin) continue;
+      if (ibin < 0 || ibin >= m_eaBin) continue;
 
-      int mL = -1;
-      if (layer->at(j) < 8)mL = 0;
-      else mL = 1;
+      int lay = layer->at(j);
+      int mL = (lay < 8) ? 0 : ((lay < 14) ? 1 : 2);
 
       hdedxlay[mL]->Fill(dedxhit->at(j));
       if (rand < 10) hentalay[mL]->Fill(entaval);
@@ -133,8 +133,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       hdedxhit[mL][jbinea]->Fill(dedxhit->at(j));
     }
   }
-
-  for (int il = 0; il < 2; il++) {
+  std::vector<std::vector<double>> tempconst(m_kNGroups);
+  for (int il = 0; il < m_kNGroups; il++) {
 
     int minlay = 0, maxlay = 0;
 
@@ -142,9 +142,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       getTruncatedBins(hdedxlay[il], minlay, maxlay);
       hdedxlay[il]->SetTitle(Form("%s;%d;%d", hdedxlay[il]->GetTitle(), minlay, maxlay));
     }
-
-    std::vector<double>tempconst;
-    tempconst.reserve(m_eaBinLocal[il]);
+    tempconst[il].reserve(m_eaBinLocal[il]);
 
     for (int iea = 0; iea < m_eaBinLocal[il]; iea++) {
 
@@ -166,7 +164,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       double dedxmean;
       dedxmean = getTruncationMean(htemp, minbin, maxbin);
-      tempconst.push_back(dedxmean);
+      tempconst[il].push_back(dedxmean);
 
       hdedxhit[il][iea]->SetTitle(Form("%s, #mu_{truc} = %0.5f;%d;%d", hdedxhit[il][iea]->GetTitle(), dedxmean, minbin, maxbin));
     }
@@ -178,16 +176,17 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     for (int iea = 0; iea < m_eaBin; iea++) {
       int jea = iea;
       if (isVarBins)  jea = m_binIndex[il].at(iea);
-      layerconst.push_back(tempconst.at(jea));
+      layerconst.push_back(tempconst[il].at(jea));
     }
 
-    // plot the rel constants var/sym bins
-    if (isMakePlots)  plotRelConst(tempconst, layerconst, il);
     m_onedcors.push_back(layerconst);
 
     layerconst.clear();
-    tempconst.clear();
+
   }
+
+  // plot the rel constants var/sym bins
+  if (isMakePlots)  plotRelConst(tempconst);
 
   //Saving final constants
   createPayload();
@@ -210,7 +209,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     plotEventStats();
   }
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
     delete hentalay[il];
     delete hdedxlay[il];
     for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
@@ -219,10 +218,15 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
   delete hptcosth;
   m_eaBinLocal.clear();
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
     m_binValue[il].clear();
     m_binIndex[il].clear();
+
   }
+
+  m_suffix.clear();
+  tempconst.clear();
+  m_onedcors.clear();
   return c_OK;
 }
 
@@ -258,15 +262,28 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
   std::map<int, std::vector<double>> bounds;
   std::map<int, std::vector<int>> steps;
 
+  // number of intervals for each unique configuration
   const std::array<int, 2> nDev{8, 4};
-  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316}; //il boundaries
-  steps[0] = {9, 3, 2, 1, 1, 2, 3, 9};  //il steps
-  bounds[1] = {0, 38, 158, 278, 316}; //OL boundaries
-  steps[1] = {2, 1, 1, 2};  //OL steps
 
-  for (int il = 0; il < 2; il++) {
+  // config 0 -> used for SL = 0,1
+  bounds[0] = {0, 108, 123, 133, 158, 183, 193, 208, 316};
+  steps[0]  = {9, 3, 2, 1, 1, 2, 3, 9};
 
-    for (int ibin = 0; ibin <= nDev[il]; ibin++) bounds[il][ibin] = bounds[il][ibin] * m_binSplit;
+  // config 1 -> used for SL = 2-8
+  bounds[1] = {0, 38, 158, 278, 316};
+  steps[1]  = {2, 1, 1, 2};
+
+  // map SL -> configuration
+  const std::array<int, m_kNGroups> configIndex = {0, 0, 1};
+
+  for (int il = 0; il < m_kNGroups; il++) {
+
+    int icfg = configIndex[il];
+
+    std::vector<double> scaledBounds = bounds[icfg];
+    for (int ibin = 0; ibin <= nDev[icfg]; ibin++) {
+      scaledBounds[ibin] = scaledBounds[ibin] * m_binSplit;
+    }
 
     int ieaprime = -1, temp = -99, ibin = 0;
 
@@ -276,57 +293,69 @@ void CDCDedx1DCellAlgorithm::CreateBinMapping()
     for (int iea = 0; iea < m_eaBin; iea++) {
 
       if (isVarBins) {
-        if (iea % int(bounds[il][ibin + 1]) == 0 && iea > 0) ibin++;
-        int diff = iea - int(bounds[il][ibin]);
-        if (diff % steps[il][ibin] == 0) ieaprime++;
-      } else ieaprime = iea;
+        if (iea % int(scaledBounds[ibin + 1]) == 0 && iea > 0) ibin++;
+        int diff = iea - int(scaledBounds[ibin]);
+        if (diff % steps[icfg][ibin] == 0) ieaprime++;
+      } else {
+        ieaprime = iea;
+      }
 
       m_binIndex[il].push_back(ieaprime);
 
       if (ieaprime != temp) {
         double binwidth = m_eaBW;
-        if (isVarBins) binwidth =  m_eaBW * steps[il][ibin];
+        if (isVarBins) binwidth = m_eaBW * steps[icfg][ibin];
         double binvalue = pastbin + binwidth;
         pastbin = binvalue;
-        if (std::abs(binvalue) < 1e-5)binvalue = 0;
+        if (std::abs(binvalue) < 1e-5) binvalue = 0;
         m_binValue[il].push_back(binvalue);
       }
       temp = ieaprime;
     }
-    m_eaBinLocal.push_back(int(m_binValue[il].size()) - 1) ;
+
+    m_eaBinLocal.push_back(int(m_binValue[il].size()) - 1);
   }
+
   if (isMakePlots) plotMergeFactor(bounds, nDev, steps);
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::defineHisto(std::vector<TH1D*> hdedxhit[2],  TH1D* hdedxlay[2], TH1D* hentalay[2])
+
+void CDCDedx1DCellAlgorithm::defineHisto(std::array<std::vector<TH1D*>, m_kNGroups>& hdedxhit,
+                                         std::array<TH1D*, m_kNGroups>& hdedxlay,
+                                         std::array<TH1D*, m_kNGroups>& hentalay)
 {
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
 
     std::string title = Form("dedxhit dist (%s): %s ; dedxhit;entries", m_label[il].data(), m_runExp.data());
     hdedxlay[il] = new TH1D(Form("hdedxlay%s", m_label[il].data()), "", m_dedxBin, m_dedxMin, m_dedxMax);
-    hdedxlay[il]->SetTitle(Form("%s", title.data()));
+    hdedxlay[il]->SetTitle(title.c_str());
 
-    Double_t* nvarBins;
-    nvarBins = &m_binValue[il][0];
+    Double_t* nvarBins = m_binValue[il].data();
 
-    if (isVarBins) title = Form("entaRS dist (variable bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
-    else title = Form("entaRS dist (sym. bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
+    if (isVarBins)
+      title = Form("entaRS dist (variable bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
+    else
+      title = Form("entaRS dist (sym. bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
 
     hentalay[il] = new TH1D(Form("hentalay%s", m_label[il].data()), "", m_eaBinLocal[il], nvarBins);
-    hentalay[il]->SetTitle(Form("%s", title.data()));
+    hentalay[il]->SetTitle(title.c_str());
 
     for (int iea = 0; iea < m_eaBinLocal[il]; iea++) {
 
       double min = m_binValue[il].at(iea);
       double max = m_binValue[il].at(iea + 1);
-      double width =  max - min;
+      double width = max - min;
 
-      if (isPrintLog) B2INFO("bin: " << iea << " ], min:" << min << " , max: " << max << " , width: " << width);
+      if (isPrintLog)
+        B2INFO("bin: " << iea << " ], min:" << min << " , max: " << max << " , width: " << width);
 
       title = Form("%s: entaRS = (%0.03f to %0.03f)", m_label[il].data(), min, max);
-      hdedxhit[il].push_back(new TH1D(Form("hdedxhit_%s_bin%d", m_label[il].data(), iea), "", m_dedxBin, m_dedxMin, m_dedxMax));
-      hdedxhit[il][iea]->SetTitle(Form("%s", title.data()));
+
+      hdedxhit[il].push_back(new TH1D(Form("hdedxhit_%s_bin%d", m_label[il].data(), iea),
+                                      "", m_dedxBin, m_dedxMin, m_dedxMax));
+
+      hdedxhit[il][iea]->SetTitle(title.c_str());
     }
   }
 }
@@ -385,16 +414,16 @@ void CDCDedx1DCellAlgorithm::createPayload()
 
   B2INFO("dE/dx one cell calibration: Generating payloads");
 
-  for (unsigned int il = 0; il < 2; il++) {
+  for (unsigned int il = 0; il < m_kNGroups; il++) {
 
     if (isMerge) {
-      unsigned int nbins = m_DBOneDCell->getNBins(il);
+      unsigned int nbins = m_DBOneDCell->getNBins(getRepresentativeLayer(il));
 
       if (int(nbins) != m_eaBin)
         B2ERROR("merging failed because of unmatch bins (old " << m_eaBin << " new " << nbins << ")");
 
       for (unsigned int iea = 0; iea < nbins; iea++) {
-        double prev = m_DBOneDCell->getMean(8 * il + 1, iea);
+        double prev = m_DBOneDCell->getMean(getRepresentativeLayer(il), iea);
         m_onedcors[il][iea] *= prev;
       }
     }
@@ -409,7 +438,7 @@ void CDCDedx1DCellAlgorithm::createPayload()
 
       for (unsigned int iea = binLow; iea < binHigh; ++iea) {
         sum_new += m_onedcors[il][iea];
-        sum_prev += m_DBOneDCell->getMean(8 * il + 1, iea);
+        sum_prev += m_DBOneDCell->getMean(getRepresentativeLayer(il), iea);
         ++count;
       }
 
@@ -418,12 +447,12 @@ void CDCDedx1DCellAlgorithm::createPayload()
       return std::make_pair(avg_new, avg_prev);
     };
 
-    double negLow = -0.75, negHigh = -0.25;
-    double posLow = 0.25, posHigh = 0.75;
+    double negLow = -0.5, negHigh = -0.2;
+    double posLow = 0.2, posHigh = 0.5;
 
-    if (il == 0) {
-      negLow = -0.5; negHigh = -0.2;
-      posLow = 0.2; posHigh = 0.5;
+    if (il == 2) {
+      negLow = -0.75; negHigh = -0.25;
+      posLow = 0.25; posHigh = 0.75;
     }
 
     auto [avgNewNeg, avgPrevNeg] = computeAverages(negLow, negHigh);
@@ -443,53 +472,72 @@ void CDCDedx1DCellAlgorithm::createPayload()
       for (int ie = m_eaBin / 2; ie < m_eaBin; ie++) m_onedcors[il][ie] *= m_adjustFac;
 
   }
+
   //Saving constants
   B2INFO("dE/dx Calibration done for CDCDedx1DCell");
-  CDCDedx1DCell* gain = new CDCDedx1DCell(0, m_onedcors);
+  std::vector<unsigned int> layerToGroup(56);
+
+  for (unsigned int layer = 0; layer < 56; layer++) {
+    if (layer < 8) layerToGroup[layer] = 0;        // SL0
+    else if (layer < 14) layerToGroup[layer] = 1;  // SL1
+    else layerToGroup[layer] = 2;                  // SL2-8
+  }
+
+  CDCDedx1DCell* gain = new CDCDedx1DCell(0, m_onedcors, layerToGroup);
   saveCalibration(gain, "CDCDedx1DCell");
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotMergeFactor(std::map<int, std::vector<double>> bounds, const std::array<int, 2> nDev,
+void CDCDedx1DCellAlgorithm::plotMergeFactor(std::map<int, std::vector<double>> bounds,
+                                             const std::array<int, 2> nDev,
                                              std::map<int, std::vector<int>> steps)
 {
-
   TCanvas cmfactor("cmfactor", "Merging factors", 800, 400);
   cmfactor.Divide(2, 1);
 
-  for (int il = 0; il < 2; il++) {
-    Double_t* nvarBins;
-    nvarBins = &bounds[il][0];
+  std::array<TH1I*, 2> hists{};
 
-    TH1I* hist  = new TH1I(Form("hist_%s", m_label[il].data()), "", nDev[il], nvarBins);
-    hist->SetTitle(Form("Merging factor for %s bins;binindex;merge-factors", m_label[il].data()));
+  for (int icfg = 0; icfg < 2; icfg++) {
+    Double_t* nvarBins = bounds[icfg].data();
 
-    for (int ibin = 0; ibin < nDev[il]; ibin++) hist->SetBinContent(ibin + 1, steps[il][ibin]);
+    hists[icfg] = new TH1I(Form("hist_cfg%d", icfg), "", nDev[icfg], nvarBins);
 
-    cmfactor.cd(il + 1);
-    hist->SetFillColor(kYellow);
-    hist->Draw("hist");
-    delete hist;
+    if (icfg == 0)
+      hists[icfg]->SetTitle("Merging factor for SL0/SL1 bins;binindex;merge-factors");
+    else
+      hists[icfg]->SetTitle("Merging factor for SL2-8 bins;binindex;merge-factors");
+
+    for (int ibin = 0; ibin < nDev[icfg]; ibin++) {
+      hists[icfg]->SetBinContent(ibin + 1, steps[icfg][ibin]);
+    }
+
+    cmfactor.cd(icfg + 1);
+    hists[icfg]->SetFillColor(kYellow);
+    hists[icfg]->Draw("hist");
   }
 
-  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor%s.pdf", m_suffix.data()));
-  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor%s.root", m_suffix.data()));
+  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor_%s.pdf", m_suffix.data()));
+  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor_%s.root", m_suffix.data()));
+
+  for (int icfg = 0; icfg < 2; icfg++) {
+    delete hists[icfg];
+  }
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotdedxHist(std::vector<TH1D*> hdedxhit[2])
+void CDCDedx1DCellAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hdedxhit)
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
   ctmp.Divide(4, 4);
   std::stringstream psname;
 
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf[", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf[", m_suffix.data());
   ctmp.Print(psname.str().c_str());
   psname.str("");
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf", m_suffix.data());
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
 
     for (int jea = 0; jea < m_eaBinLocal[il]; jea++) {
 
@@ -515,18 +563,18 @@ void CDCDedx1DCellAlgorithm::plotdedxHist(std::vector<TH1D*> hdedxhit[2])
     }
   }
   psname.str("");
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf]", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf]", m_suffix.data());
   ctmp.Print(psname.str().c_str());
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotLayerDist(TH1D* hdedxlay[2])
+void CDCDedx1DCellAlgorithm::plotLayerDist(std::array<TH1D*, 3>& hdedxlay)
 {
 
   TCanvas cdedxlayer("layerdedxhit", "Inner and Outer Layer dedxhit dist", 900, 400);
-  cdedxlayer.Divide(2, 1);
+  cdedxlayer.Divide(3, 1);
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
     int minlay = 0, maxlay = 0;
     if (isFixTrunc) {
       minlay = std::stoi(hdedxlay[il]->GetXaxis()->GetTitle());
@@ -548,18 +596,18 @@ void CDCDedx1DCellAlgorithm::plotLayerDist(TH1D* hdedxlay[2])
     }
   }
 
-  cdedxlayer.SaveAs(Form("cdcdedx_1dcell_dedxlay%s.pdf", m_suffix.data()));
-  cdedxlayer.SaveAs(Form("cdcdedx_1dcell_dedxlay%s.root", m_suffix.data()));
+  cdedxlayer.SaveAs(Form("cdcdedx_1dcell_dedxlayer_%s.pdf", m_suffix.data()));
+  cdedxlayer.SaveAs(Form("cdcdedx_1dcell_dedxlayer_%s.root", m_suffix.data()));
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotQaPars(TH1D* hentalay[2], TH2D* hptcosth)
+void CDCDedx1DCellAlgorithm::plotQaPars(std::array<TH1D*, 3>& hentalay, TH2D* hptcosth)
 {
 
-  TCanvas ceadist("ceadist", "Enta distributions", 800, 400);
-  ceadist.Divide(2, 1);
+  TCanvas ceadist("ceadist", "Enta distributions", 1600, 800);
+  ceadist.Divide(3, 1);
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
 
     ceadist.cd(il + 1);
     gPad->SetLogy();
@@ -572,54 +620,81 @@ void CDCDedx1DCellAlgorithm::plotQaPars(TH1D* hentalay[2], TH2D* hptcosth)
   hptcosth->Draw("colz");
 
   cptcos.SaveAs(Form("cdcdedx_ptcosth_%s.pdf", m_suffix.data()));
-  ceadist.SaveAs(Form("cdcdedx_1dcell_enta%s.pdf", m_suffix.data()));
-  ceadist.SaveAs(Form("cdcdedx_1dcell_enta%s.root", m_suffix.data()));
+  ceadist.SaveAs(Form("cdcdedx_1dcell_enta_%s.pdf", m_suffix.data()));
+  ceadist.SaveAs(Form("cdcdedx_1dcell_enta_%s.root", m_suffix.data()));
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotRelConst(std::vector<double>tempconst, std::vector<double>layerconst, int il)
+void CDCDedx1DCellAlgorithm::plotRelConst(std::vector<std::vector<double>>& tempconst)
 {
 
-  TH1D* hconst, *hconstvar;
+  const std::string pdfName =
+    Form("cdcdedx_1dcell_relconst_%s.pdf", m_suffix.data());
 
-  Double_t* nvarBins;
-  nvarBins = &m_binValue[il][0];
+  const std::string rootName =
+    Form("cdcdedx_1dcell_relconst_%s.root", m_suffix.data());
 
-  hconst = new TH1D(Form("hconst%s", m_label[il].data()), "", m_eaBin, m_eaMin, m_eaMax);
-  std::string title = Form("calibration const dist: %s: (%s); entaRS (#alpha); entries", m_label[il].data(), m_runExp.data());
-  hconst->SetTitle(Form("%s", title.data()));
+  TFile rootFile(rootName.c_str(), "RECREATE");
 
-  hconstvar = new TH1D(Form("hconstvar%s", m_label[il].data()), "", m_eaBinLocal[il], nvarBins);
-  title = Form("calibration const dist (var bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
-  hconstvar->SetTitle(Form("%s", title.data()));
+  for (int il = 0; il < m_kNGroups; il++) {
 
-  if (isVarBins) {
-    for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
-      hconstvar->SetBinContent(iea + 1, tempconst.at(iea));
+
+    TH1D* hconst = new TH1D(Form("hconst%s", m_label[il].data()), "", m_eaBin, m_eaMin, m_eaMax);
+    std::string title = Form("calibration const dist: %s: (%s); entaRS (#alpha); entries", m_label[il].data(), m_runExp.data());
+    hconst->SetTitle(Form("%s", title.data()));
+
+    TH1D* hconstvar = nullptr;
+
+    if (isVarBins) {
+      Double_t* nvarBins;
+      nvarBins = &m_binValue[il][0];
+
+      hconstvar = new TH1D(Form("hconstvar%s", m_label[il].data()), "", m_eaBinLocal[il], nvarBins);
+      title = Form("calibration const dist (var bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
+      hconstvar->SetTitle(Form("%s", title.data()));
+
+      for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
+        hconstvar->SetBinContent(iea + 1, tempconst.at(il).at(iea));
+    }
+
+    for (int jea = 0; jea < m_eaBin; jea++) hconst->SetBinContent(jea + 1, m_onedcors.at(il).at(jea));
+
+    gStyle->SetOptStat("ne");
+    TCanvas cconst("cconst", "calibration Constants", 800, 400);
+    if (isVarBins) {
+      cconst.Divide(2, 1);
+      cconst.SetWindowSize(1000, 800);
+    }
+
+    cconst.cd(1);
+    hconst->SetFillColor(kYellow);
+    hconst->Draw("histo");
+    if (isVarBins && hconstvar) {
+      cconst.cd(2);
+      hconstvar->SetFillColor(kBlue);
+      hconstvar->Draw("hist");
+    }
+
+    cconst.Update();
+
+    if (m_kNGroups == 1) {
+      cconst.Print(pdfName.c_str());
+    } else if (il == 0) {
+      cconst.Print((pdfName + "(").c_str());
+    } else if (il == m_kNGroups - 1) {
+      cconst.Print((pdfName + ")").c_str());
+    } else {
+      cconst.Print(pdfName.c_str());
+    }
+
+    // Save this canvas in the ROOT file
+    rootFile.cd();
+    cconst.Write();
+
+    delete hconst;
+    delete hconstvar;
   }
-
-  for (int jea = 0; jea < m_eaBin; jea++) hconst->SetBinContent(jea + 1, layerconst.at(jea));
-
-  gStyle->SetOptStat("ne");
-  TCanvas cconst("cconst", "Calirbation Constants", 800, 400);
-  if (isVarBins) {
-    cconst.Divide(2, 1);
-    cconst.SetWindowSize(1000, 800);
-  }
-
-  cconst.cd(1);
-  hconst->SetFillColor(kYellow);
-  hconst->Draw("histo");
-  if (isVarBins) {
-    cconst.cd(2);
-    hconstvar->SetFillColor(kBlue);
-    hconstvar->Draw("hist");
-  }
-  cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.pdf", m_label[il].data(), m_suffix.data()));
-  cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.root", m_label[il].data(), m_suffix.data()));
-
-  delete hconst;
-  delete hconstvar;
+  rootFile.Close();
 }
 
 //--------------------------------------------------
@@ -627,11 +702,11 @@ void CDCDedx1DCellAlgorithm::plotConstants()
 {
 
   //Draw New/Old final constants
-  TH1D* hnewconst[2], *holdconst[2];
-  double min[2], max[2];
+  TH1D* hnewconst[m_kNGroups], *holdconst[m_kNGroups];
+  double min[m_kNGroups], max[m_kNGroups];
 
-  for (unsigned int il = 0; il < 2; il++) {
-    unsigned int nbins = m_DBOneDCell->getNBins(il);
+  for (unsigned int il = 0; il < m_kNGroups; il++) {
+    unsigned int nbins = m_DBOneDCell->getNBins(getRepresentativeLayer(il));
 
     std::string title = Form("final calibration const dist (%s): %s; entaRS (#alpha); entries", m_label[il].data(), m_runExp.data());
     hnewconst[il] = new TH1D(Form("hnewconst_%s", m_label[il].data()), "", m_eaBin, m_eaMin, m_eaMax);
@@ -642,7 +717,7 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     holdconst[il]->SetTitle(Form("%s", title.data()));
 
     for (unsigned int iea = 0; iea < nbins; iea++) {
-      double prev = m_DBOneDCell->getMean(8 * il + 1, iea);
+      double prev = m_DBOneDCell->getMean(getRepresentativeLayer(il), iea);
       holdconst[il]->SetBinContent(iea + 1, prev);
       hnewconst[il]->SetBinContent(iea + 1, m_onedcors[il][iea]);
     }
@@ -650,17 +725,21 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     max[il] = hnewconst[il]->GetMaximum();
   }
 
-  //Plotting final constants
-  if (max[1] < max[0])max[1] = max[0];
-  if (min[1] > min[0])min[1] = min[0];
+  //Ploting final constants
+  double globalMin = min[0];
+  double globalMax = max[0];
+  for (int il = 1; il < m_kNGroups; il++) {
+    if (min[il] < globalMin) globalMin = min[il];
+    if (max[il] > globalMax) globalMax = max[il];
+  }
 
   gStyle->SetOptStat("ne");
-  TCanvas cfconst("cfconst", "Final calirbation constants", 800, 400);
-  cfconst.Divide(2, 1);
+  TCanvas cfconst("cfconst", "Final calibration constants", 1600, 600);
+  cfconst.Divide(3, 1);
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
     cfconst.cd(il + 1);
-    hnewconst[il]->GetYaxis()->SetRangeUser(min[1] * 0.95, max[1] * 1.05);
+    hnewconst[il]->GetYaxis()->SetRangeUser(globalMin * 0.95, globalMax * 1.05);
     hnewconst[il]->SetLineColor(kBlack);
     hnewconst[il]->Draw("histo");
     holdconst[il]->SetLineColor(kRed);
@@ -672,10 +751,10 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     legend->Draw();
   }
 
-  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.pdf", m_suffix.data()));
-  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.root", m_suffix.data()));
+  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts_%s.pdf", m_suffix.data()));
+  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts_%s.root", m_suffix.data()));
 
-  for (int il = 0; il < 2; il++) {
+  for (int il = 0; il < m_kNGroups; il++) {
     delete hnewconst[il];
     delete holdconst[il];
   }
@@ -700,9 +779,9 @@ void CDCDedx1DCellAlgorithm::plotEventStats()
   cstats.cd(2);
   auto htstats = getObjectPtr<TH1I>("htstats");
   if (htstats) {
-    hestats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->SetName(Form("htstats_%s", m_suffix.data()));
+    htstats->SetStats(0);
     htstats->DrawCopy("");
-    hestats->SetStats(0);
   }
   cstats.Print(Form("cdcdedx_1dcell_stats_%s.pdf", m_suffix.data()));
 }

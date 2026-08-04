@@ -44,8 +44,7 @@ namespace Belle2 {
     /**
      * Prints out values of the specific ROE  mask
      */
-    void printMaskParticles(const std::vector<const Particle*>& maskParticles) const;
-
+    static void printMaskParticles(const std::vector<const Particle*>& maskParticles);
 
   };
 

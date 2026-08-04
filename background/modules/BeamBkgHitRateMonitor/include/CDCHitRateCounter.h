@@ -209,7 +209,7 @@ namespace Belle2 {
       /**
        * get the bin ID of the division.
        */
-      unsigned short getIPhiBin(unsigned short iSL, unsigned short iWireInLayer);
+      static unsigned short getIPhiBin(unsigned short iSL, unsigned short iWireInLayer);
 
     };
 

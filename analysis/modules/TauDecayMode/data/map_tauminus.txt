@@ -485,6 +485,7 @@
 .nu_tau.pi-.pi-.pi+.pi0.pi0.pi0.eta.a_00.f_1.gamma 259
 .nu_tau.pi-.pi-.pi+.pi0.pi0.eta.a_00.f_1 260
 .nu_tau.pi-.pi-.pi+.pi0.pi0.eta.a_00.f_1.gamma 260
+.nu_tau.pi-.gamma 261
 .nu_tau.pi- 303
 .nu_tau.K- 304
 .e-.gamma 305

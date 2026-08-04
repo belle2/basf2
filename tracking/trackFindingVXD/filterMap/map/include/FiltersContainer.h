@@ -57,7 +57,7 @@ namespace Belle2 {
     /// Destructor deleting all filters stored.
     virtual ~FiltersContainer()
     {
-      for (auto& filter : m_allSetupsFilters)
+      for (const auto& filter : m_allSetupsFilters)
         delete filter.second;
     }
 

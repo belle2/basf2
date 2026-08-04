@@ -372,7 +372,7 @@
     </Components>
   </Material>
 
-  <!-- Epoxy resin (FANGS-Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/fangs/data/FANGS-Materials.xml) -->
+  <!-- Epoxy resin (FANGS-Epoxy from https://gitlab.desy.de/belle2/software/basf2/-/blob/main/beast/fangs/data/FANGS-Materials.xml) -->
   <Material name="EPOXY1">
     <state>Solid</state>
     <density unit="g/cm3">1.13</density>
@@ -383,7 +383,7 @@
     </Components>
   </Material>
 
-  <!-- Epoxy resin (Epoxy_C15H44O7 from https://stash.desy.de/projects/B2/repos/basf2/browse/beast/ph1sustr/data/PH1SUSTR-Materials.xml) -->
+  <!-- Epoxy resin (Epoxy_C15H44O7 from https://gitlab.desy.de/belle2/software/basf2/-/blob/main/beast/ph1sustr/data/PH1SUSTR-Materials.xml) -->
   <Material name="EPOXY2">
     <state>Solid</state>
     <density unit="g/cm3">1.3</density>
@@ -394,7 +394,7 @@
     </Components>
   </Material>
 
-  <!-- Epoxy resin (Cryo_Epoxy from https://stash.desy.de/projects/B2/repos/basf2/browse/ir/data/IR-Materials.xml) -->
+  <!-- Epoxy resin (Cryo_Epoxy from https://gitlab.desy.de/belle2/software/basf2/-/blob/main/ir/data/IR-Materials.xml) -->
   <Material name="EPOXY3">
     <state>Solid</state>
     <density unit="g/cm3">1.3</density>

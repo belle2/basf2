@@ -24,7 +24,7 @@ namespace Belle2 {
     LayerSVDRelationFilter();
 
     /// Default destructor
-    ~LayerSVDRelationFilter();
+    ~LayerSVDRelationFilter() override;
 
     /// Return all states the given state is possible related to.
     std::vector<CKFToSVDState*> getPossibleTos(CKFToSVDState* from,

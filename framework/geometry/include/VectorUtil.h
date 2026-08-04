@@ -104,8 +104,7 @@ namespace Belle2 {
      * (like v1 being cartesian and v2 being polar) and would only work for 3-vectors.
      * However, we also need a 2D version, thus, this custom implementation.
      */
-    template <class Vector>
-    double CosTheta(const Vector&  v1, const Vector& v2)
+    inline double CosPhi(const ROOT::Math::XYVector&  v1, const ROOT::Math::XYVector& v2)
     {
       const double v1_r2 = v1.Mag2();
       const double v2_r2 = v2.Mag2();
@@ -122,42 +121,35 @@ namespace Belle2 {
       return arg;
     }
 
-
-    /**
-     * Calculate the angle (theta in the formula below) between two vectors
-     * @param[in] v1  Vector v1
-     * @param[in] v2  Vector v2
-     * \return    Angle between the two vectors
-     * \f[ \theta = \cos ^{-1} \frac { \vec{v1} \cdot \vec{v2} }{ | \vec{v1} | | \vec{v2} | } \f]
-     *
-     * There is a function with the same name in ROOT::Math::VectorUtil. However, that function only works for 3-vectors as it calls the
-     * ROOT version of CosTheta (see above). Thus, we need a custom version to be able to use it for 2D vectors, too.
-     */
-    template <class Vector>
-    double Angle(const Vector&  v1, const Vector& v2)
+    /// Calculated the two dimensional cross product.
+    inline double Cross(const ROOT::Math::XYVector& lhs, const ROOT::Math::XYVector& rhs)
     {
-      return std::acos(CosTheta(v1, v2));
+      return lhs.X() * rhs.Y() - lhs.Y() * rhs.X();
+    }
+
+    /// Calculated one of the two possible orthogonal vectors.
+    inline ROOT::Math::XYVector Orthogonal(const ROOT::Math::XYVector& a)
+    {
+      return ROOT::Math::XYVector(-a.Y(), a.X());
     }
 
     /**
      * Calculates the part of vector v1 that is orthogonal to the vector v2
      * @param[in] v1  Vector v1
-     * @param[in] v2  Vector v2
-     * \return    Part of v1 that is orthogonal to v2
+     * @param[in] relativeTo Vector to calculate the orthognal component relative to
+     * \return    Part of v1 that is orthogonal to relativeTo
      * Adapted from tracking/trackingUtilities/geometry/Vector2D:
-     * https://gitlab.desy.de/belle2/software/basf2/-/blob/main/tracking/trackingUtilities/geometry/include/Vector2D.h?ref_type=heads#L445
-     *
-     * Vector2D orthogonalVector(const Vector2D& relativTo) const
+     * Vector2D orthogonalVector(const Vector2D& relativeTo) const
      * {
-     *   return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal();
+     *   return relativeTo.scaled(relativeTo.cross(*this) / relativeTo.normSquared()).orthogonal();
      * }
-     * with v2 = relativTo and v1 = *this.
+     * with v1 = *this.
      */
-    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& v2)
+    inline ROOT::Math::XYVector orthogonalVector(const ROOT::Math::XYVector& v1, const ROOT::Math::XYVector& relativeTo)
     {
-      const double cross = v1.X() * v2.Y() - v1.Y() - v2.X();     // = relativTo.cross(*this)
-      const ROOT::Math::XYVector tmp = v2 * (cross / v2.Mag2());  // = relativTo.scaled(cross / relativTo.normSquared())
-      return ROOT::Math::XYVector(-tmp.Y(), tmp.X());             // = .orthogonal()
+      const double cross = Cross(relativeTo, v1);                                 // = relativeTo.cross(*this)
+      const ROOT::Math::XYVector tmp = relativeTo * (cross / relativeTo.Mag2());  // = relativeTo.scaled(cross / relativeTo.normSquared())
+      return Orthogonal(tmp);                                                     // = .orthogonal()
     }
 
     /**
@@ -165,9 +157,9 @@ namespace Belle2 {
      *
      * Functions with the same name exist in both the Vector2D and Vector3D classes in
      * tracking/trackingUtilities/geometry, and the implementation for both is
-     * VectorXD parallelVector(const VectorXD& relativTo) const
+     * VectorXD parallelVector(const VectorXD& relativeTo) const
      * {
-     *   return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared());
+     *   return relativeTo.scaled(relativeTo.dot(*this) / relativeTo.normSquared());
      * }
      *
      * There exists a similar function called ProjVector in ROOT::Math::VectorUtil, but that only works for 3D vectors,
@@ -181,9 +173,15 @@ namespace Belle2 {
       const double v2Mag2 = v2.Mag2();
       if (v2Mag2 == 0)
         return aVector();
-      const double dotp = v1.Dot(v2);           // = relativTo.dot(*this)
-      const aVector tmp = v2 * (dotp / v2Mag2); // = relativTo.scaled(dotp / relativTo.normSquared())
+      const double dotp = v1.Dot(v2);           // = relativeTo.dot(*this)
+      const aVector tmp = v2 * (dotp / v2Mag2); // = relativeTo.scaled(dotp / relativeTo.normSquared())
       return tmp;
+    }
+
+    /// Reflects this vector over line designated by the given vector.
+    inline ROOT::Math::XYVector flippedOver(const ROOT::Math::XYVector& inVec, const ROOT::Math::XYVector& reflectionLine)
+    {
+      return inVec - orthogonalVector(inVec, reflectionLine) * 2;
     }
 
   }

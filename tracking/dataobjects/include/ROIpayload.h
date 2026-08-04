@@ -91,7 +91,8 @@ namespace Belle2 {
     int getDHHID(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return (data[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x3F0) >> 4;  // & 0x3F0
     }
 
     /** Return MinVid (Row 1) of ROI j
@@ -101,8 +102,9 @@ namespace Belle2 {
     int getMinVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0xF) << 6) | ((((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH +
-             2 * j + 1] & 0xFC000000) >> 26) ;
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return ((data[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0xF) << 6) |
+             ((data[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0xFC000000) >> 26);
     }
 
     /** Return MaxVid (Row 2) of ROI j
@@ -112,7 +114,8 @@ namespace Belle2 {
     int getMaxVid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x3FF00) >> 8;
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return (data[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x3FF00) >> 8;
     }
 
     /** Return MinUid (Col 1) of ROI j
@@ -122,7 +125,8 @@ namespace Belle2 {
     int getMinUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x03FC0000) >> 18;
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return (data[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0x03FC0000) >> 18;
     }
 
     /** Return MaxUid (Col 2) of ROI j
@@ -132,7 +136,8 @@ namespace Belle2 {
     int getMaxUid(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j + 1]) & 0xFF;
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return data[HEADER_SIZE_WITH_LENGTH + 2 * j + 1] & 0xFF;
     }
 
     /** Return Type (Datcon or HLT) of ROI j
@@ -142,7 +147,8 @@ namespace Belle2 {
     int getType(int j) const
     {
       if (j < 0 || j >= getNrROIs()) return -1;
-      return (((ubig32_t*)m_rootdata)[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x400) >> 10;
+      const auto* data = reinterpret_cast<const ubig32_t*>(m_rootdata);
+      return (data[HEADER_SIZE_WITH_LENGTH + 2 * j] & 0x400) >> 10;
     }
 
   private:

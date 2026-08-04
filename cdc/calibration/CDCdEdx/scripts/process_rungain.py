@@ -131,5 +131,3 @@ def getRunGain(gtpath, gt):
             plt.tight_layout()
             pdf.savefig(fig)
             plt.close()
-
-    return df

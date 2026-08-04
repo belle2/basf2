@@ -28,10 +28,6 @@ DQMHistAnalysisMonObjModule::DQMHistAnalysisMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-DQMHistAnalysisMonObjModule::~DQMHistAnalysisMonObjModule()
-{
-}
-
 void DQMHistAnalysisMonObjModule::initialize()
 {
   // make monitoring object related to this module (use arich as an example)

@@ -61,10 +61,6 @@ BeamBkgTagSetterModule::BeamBkgTagSetterModule() : Module(),
 
 }
 
-BeamBkgTagSetterModule::~BeamBkgTagSetterModule()
-{
-}
-
 void BeamBkgTagSetterModule::initialize()
 {
   if (m_realTime <= 0) B2FATAL("invalid realTime: " << m_realTime);
@@ -116,10 +112,6 @@ void BeamBkgTagSetterModule::initialize()
   m_csiSimHits.isOptional();
 }
 
-void BeamBkgTagSetterModule::beginRun()
-{
-}
-
 void BeamBkgTagSetterModule::event()
 {
   int n = 0;
@@ -163,13 +155,4 @@ void BeamBkgTagSetterModule::event()
          " Event " << evtMetaData->getEvent() <<
          " number of SimHits = " << n);
 
-}
-
-
-void BeamBkgTagSetterModule::endRun()
-{
-}
-
-void BeamBkgTagSetterModule::terminate()
-{
 }

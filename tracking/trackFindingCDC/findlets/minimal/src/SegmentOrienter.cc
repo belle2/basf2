@@ -87,7 +87,7 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
         // Fix to outwards flying
         const CDCRecoHit2D& firstHit = segment.front();
         const CDCRecoHit2D& lastHit = segment.back();
-        if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
+        if (lastHit.getRecoPos2D().R() < firstHit.getRecoPos2D().R()) {
           outputSegments.push_back(segment.reversed());
         } else {
           outputSegments.push_back(segment);
@@ -106,7 +106,7 @@ void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
     for (const CDCSegment2D& segment : inputSegments) {
       const CDCRecoHit2D& firstHit = segment.front();
       const CDCRecoHit2D& lastHit = segment.back();
-      if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
+      if (lastHit.getRecoPos2D().R() < firstHit.getRecoPos2D().R()) {
         outputSegments.push_back(segment.reversed());
       } else {
         outputSegments.push_back(segment);

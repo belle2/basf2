@@ -253,13 +253,13 @@ namespace Belle2 {
           string nameVac = name + "Vac";
 
           //define geometry
-          string geo_vacuumxx_name = "geo_" + nameVac + "xx_name";
+          string geo_vacuumx_name = "geo_" + nameVac + "x_name";
           string geo_vacuum_name = "geo_" + nameVac + "_name";
 
-          G4VSolid* geo_vacuumxx, *geo_vacuum;
+          G4VSolid* geo_vacuumx, *geo_vacuum;
 
-          geo_vacuumxx = new G4Polycone(geo_vacuumxx_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(zero_r[0]), &(Polycone_r[0]));
-          geo_vacuum = new G4IntersectionSolid(geo_vacuumxx_name, geo_vacuumxx, geo_polycone);
+          geo_vacuumx = new G4Polycone(geo_vacuumx_name, 0.0, 2 * M_PI, N, &(Polycone_Z[0]), &(zero_r[0]), &(Polycone_r[0]));
+          geo_vacuum = new G4IntersectionSolid(geo_vacuum_name, geo_vacuumx, geo_polycone);
 
           vacuum.geo = geo_vacuum;
           vacuum.transform = polycone.transform;
@@ -857,7 +857,7 @@ namespace Belle2 {
         string phys_acsl_name = "phys_" + name + "_name";
         new G4PVPlacement(ACSL.transform, ACSL.logi, phys_acsl_name, &topVolume, false, 0);
 
-        // elements[name] = ACSL;
+        elements[name] = ACSL;
 
 
         //--------------
@@ -926,7 +926,7 @@ namespace Belle2 {
         string phys_acsr1_name = "phys_" + name + "_name";
         new G4PVPlacement(ACSR1.transform, ACSR1.logi, phys_acsr1_name, &topVolume, false, 0);
 
-        // elements[name] = ACSR1;
+        elements[name] = ACSR1;
 
         //--------------
         // Part 2
@@ -990,7 +990,7 @@ namespace Belle2 {
         string phys_acsr2_name = "phys_" + name + "_name";
         new G4PVPlacement(ACSR2.transform, ACSR2.logi, phys_acsr2_name, &topVolume, false, 0);
 
-        // elements[name] = ACSR2;
+        elements[name] = ACSR2;
 
 
         //--------------
@@ -1050,7 +1050,7 @@ namespace Belle2 {
         string phys_apsl1_name = "phys_" + name + "_name";
         new G4PVPlacement(APSL1.transform, APSL1.logi, phys_apsl1_name, &topVolume, false, 0);
 
-        // elements[name] = APSL1;
+        elements[name] = APSL1;
 
         //--------------
         // Part 2
@@ -1105,7 +1105,7 @@ namespace Belle2 {
         string phys_apsl2_name = "phys_" + name + "_name";
         new G4PVPlacement(APSL2.transform, APSL2.logi, phys_apsl2_name, &topVolume, false, 0);
 
-        // elements[name] = APSL2;
+        elements[name] = APSL2;
 
 
         //--------------
@@ -1165,7 +1165,7 @@ namespace Belle2 {
         string phys_apsr1_name = "phys_" + name + "_name";
         new G4PVPlacement(APSR1.transform, APSR1.logi, phys_apsr1_name, &topVolume, false, 0);
 
-        // elements[name] = APSR1;
+        elements[name] = APSR1;
 
         //--------------
         // Part 2
@@ -1220,7 +1220,7 @@ namespace Belle2 {
         string phys_apsr2_name = "phys_" + name + "_name";
         new G4PVPlacement(APSR2.transform, APSR2.logi, phys_apsr2_name, &topVolume, false, 0);
 
-        // elements[name] = APSR2;
+        elements[name] = APSR2;
 
 
         //---------------------------

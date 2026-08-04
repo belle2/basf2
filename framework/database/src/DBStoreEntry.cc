@@ -33,9 +33,9 @@ namespace Belle2 {
   DBStoreEntry DBStoreEntry::fromObject(const std::string& name, const TObject* obj, bool isRequired)
   {
     assert(obj);
-    bool isArray = dynamic_cast<const TClonesArray*>(obj) != nullptr;
-    TClass* objClass = isArray ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
-    return DBStoreEntry(c_Object, name, objClass, isArray, isRequired);
+    bool isArrayType = dynamic_cast<const TClonesArray*>(obj) != nullptr;
+    TClass* const objClass = isArrayType ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
+    return DBStoreEntry(c_Object, name, objClass, isArrayType, isRequired);
   }
 
   DBStoreEntry::~DBStoreEntry()
@@ -53,7 +53,7 @@ namespace Belle2 {
     // if we don't have intra run dependency we don't care about event number
     if (!m_intraRunDependency) return;
     // otherwise update the object and call notify all accessors on change
-    TObject* old = m_object;
+    TObject* const old = m_object;
     m_object = m_intraRunDependency->getObject(event);
     if (old != m_object) {
       B2DEBUG(35, "IntraRunDependency for " << m_name << ": new object (" << old << ", " << m_object << "), notifying accessors");

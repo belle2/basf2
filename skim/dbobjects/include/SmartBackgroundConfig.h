@@ -18,7 +18,7 @@ namespace Belle2 {
 
   /**
    * Config class for the Smart Background module.
-   * Saves mappings of pdg numbers, skim codes and activation function paramters so they can be saved to
+   * Saves mappings required for the SmartBackgroundModule so they can be saved to
    * and loaded from the conditions database.
    */
   class SmartBackgroundConfig : public TObject {
@@ -31,21 +31,19 @@ namespace Belle2 {
     SmartBackgroundConfig() { }
 
     /**
-     * Constructor setting all three maps
+     * Constructor setting all maps
      */
     SmartBackgroundConfig(const std::unordered_map<int, int>& pdgMapping,
                           const std::unordered_map<int, uint16_t>& skimcodesMapping,
                           const std::unordered_map<int, std::vector<float>>& paramMapping,
-                          const std::unordered_map<int, std::string>& skimnamesMapping,
                           const std::unordered_map<std::string, int32_t>& eventtypeMapping,
                           const float maxWeight) : m_pdgMapping(pdgMapping), m_skimcodesMapping(skimcodesMapping),
-      m_paramMapping(paramMapping), m_skimnamesMapping(skimnamesMapping), m_eventtypeMapping(eventtypeMapping),
-      m_maxWeight(maxWeight) { }
+      m_paramMapping(paramMapping), m_eventtypeMapping(eventtypeMapping), m_maxWeight(maxWeight) { }
 
     /**
      * Return pdg mapping.
      */
-    std::unordered_map<int, int> getPdgMapping() const
+    const std::unordered_map<int, int>& getPdgMapping() const
     {
       return m_pdgMapping;
     }
@@ -53,7 +51,7 @@ namespace Belle2 {
     /**
      * Return skimcodes mapping.
      */
-    std::unordered_map<int, uint16_t> getSkimcodesMapping() const
+    const std::unordered_map<int, uint16_t>& getSkimcodesMapping() const
     {
       return m_skimcodesMapping;
     }
@@ -61,23 +59,15 @@ namespace Belle2 {
     /**
      * Return parameter mapping.
      */
-    std::unordered_map<int, std::vector<float>> getParameterMapping() const
+    const std::unordered_map<int, std::vector<float>>& getParameterMapping() const
     {
       return m_paramMapping;
     }
 
     /**
-     * Return skim names mapping
-     */
-    std::unordered_map<int, std::string> getSkimnamesMapping() const
-    {
-      return m_skimnamesMapping;
-    }
-
-    /**
      * Return event type mapping
      */
-    std::unordered_map<std::string, int32_t> getEventtypeMapping() const
+    const std::unordered_map<std::string, int32_t>& getEventtypeMapping() const
     {
       return m_eventtypeMapping;
     }
@@ -108,11 +98,6 @@ namespace Belle2 {
     std::unordered_map<int, std::vector<float>> m_paramMapping;
 
     /**
-     * Mapping of skimcodes to skim names
-     */
-    std::unordered_map<int, std::string> m_skimnamesMapping;
-
-    /**
      * Mapping of event type names to integers
      */
     std::unordered_map<std::string, int32_t> m_eventtypeMapping;
@@ -124,8 +109,9 @@ namespace Belle2 {
 
     /**
      * Classdef
+     * Version 2: removed skimnamesMapping
      */
-    ClassDef(SmartBackgroundConfig, 1);
+    ClassDef(SmartBackgroundConfig, 2);
   };
 
 }

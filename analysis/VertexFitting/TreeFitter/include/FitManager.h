@@ -71,7 +71,7 @@ namespace TreeFitter {
     std::tuple<double, double> getDecayLength(const ParticleBase* pb) const;
 
     /**get decay length */
-    std::tuple<double, double> getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const;
+    static std::tuple<double, double> getDecayLength(const ParticleBase* pb, const FitParams& fitparams);
 
     /**get decay length */
     std::tuple<double, double> getDecayLength(Belle2::Particle& cand) const;

@@ -34,6 +34,15 @@ namespace Belle2 {
       m_filter.exposeParameters(moduleParamList, prefix);
     }
 
+    /** Set maximal candidates in flight
+     *
+     *  @param maximalCandidatesInFlight Maximum number of candidates to keep in flight
+     */
+    void setMaximalCandidatesInFlight(size_t maximalCandidatesInFlight)
+    {
+      m_maximalCandidatesInFlight = maximalCandidatesInFlight;
+    }
+
     /// main method of the findlet, out of all paths "newPaths" select the best N=m_maximalCandidatesInFlight
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {

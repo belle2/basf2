@@ -153,7 +153,7 @@ namespace Belle2 {
 
     double BelleFirstCDCHitX(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -163,7 +163,7 @@ namespace Belle2 {
 
     double BelleFirstCDCHitY(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -173,7 +173,7 @@ namespace Belle2 {
 
     double BelleFirstCDCHitZ(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -183,7 +183,7 @@ namespace Belle2 {
 
     double BelleLastCDCHitX(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -193,7 +193,7 @@ namespace Belle2 {
 
     double BelleLastCDCHitY(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -203,7 +203,7 @@ namespace Belle2 {
 
     double BelleLastCDCHitZ(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -214,7 +214,7 @@ namespace Belle2 {
     double BellePi0InvariantMassSignificance(const Particle* particle)
     {
       TMatrixFSym covarianceMatrix(Particle::c_DimMomentum);
-      for (auto daughter : particle->getDaughters()) {
+      for (const auto* daughter : particle->getDaughters()) {
         covarianceMatrix += daughter->getMomentumErrorMatrix();
       }
 
@@ -237,7 +237,7 @@ namespace Belle2 {
 
     double BelleTof(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -247,7 +247,7 @@ namespace Belle2 {
 
     double BelleTofQuality(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -257,7 +257,7 @@ namespace Belle2 {
 
     double BelleTofSigma(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -267,7 +267,7 @@ namespace Belle2 {
 
     double BellePathLength(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -277,7 +277,7 @@ namespace Belle2 {
 
     double BelleTofMass(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -293,7 +293,7 @@ namespace Belle2 {
 
     double BelledEdx(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -303,7 +303,7 @@ namespace Belle2 {
 
     double BelledEdxQuality(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -313,7 +313,7 @@ namespace Belle2 {
 
     double BelleACCnPe(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;
@@ -323,7 +323,7 @@ namespace Belle2 {
 
     double BelleACCQuality(const Particle* particle)
     {
-      auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
+      const auto* belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
         return Const::doubleNaN;

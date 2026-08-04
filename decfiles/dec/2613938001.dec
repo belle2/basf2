@@ -1,0 +1,30 @@
+# EventType: 2613938001
+# Descriptor: [ccbar Dsm2AntiD0Pim, AntiD02EtaEmMup]
+# NickName: Dsm2AntiD0Pim_D02EtaEmMup
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal
+# Date: 20260526 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyAntiD anti-D0
+Alias Myeta eta
+
+Decay D*-
+1.000 MyAntiD pi-                 VSS;
+Enddecay
+
+Decay MyAntiD
+1.000 Myeta e- mu+               PHSP;
+Enddecay
+
+Decay Myeta 
+1.000 gamma gamma          PHSP;
+Enddecay
+
+End
+

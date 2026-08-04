@@ -63,7 +63,7 @@ namespace Belle2 {
   inline ROOT::Math::XYZVector MagneticField::getField(const ROOT::Math::XYZVector& pos) const
   {
     ROOT::Math::XYZVector field;
-    for (auto c : m_components) {
+    for (const auto c : m_components) {
       if (c->inside(pos)) {
         // is it an exclusive component? If so return the field
         if (c->isExclusive()) return c->getField(pos);

@@ -23,9 +23,10 @@
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <framework/logging/Logger.h>
+
+#include <Math/Vector2D.h>
 
 #include <gtest/gtest.h>
 
@@ -34,14 +35,14 @@ using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 namespace {
-  const Vector2D generalCenter(6.0, 0);
+  const ROOT::Math::XYVector generalCenter(6.0, 0);
   const double generalRadius = 5.0;
 
   const Circle2D generalCircle(generalCenter, generalRadius);
 
-  std::vector<Vector2D> createGeneralCircleObservationCenters()
+  std::vector<ROOT::Math::XYVector> createGeneralCircleObservationCenters()
   {
-    std::vector<Vector2D> observationCenters;
+    std::vector<ROOT::Math::XYVector> observationCenters;
     // Setting up a trajectory traveling clockwise
     for (int iObservation = 11; iObservation > -12; --iObservation) {
       double y = iObservation / 2.0;
@@ -53,17 +54,17 @@ namespace {
 
   CDCObservations2D createGeneralCircleObservations(bool withDriftLength = true)
   {
-    std::vector<Vector2D> observationCenters = createGeneralCircleObservationCenters();
+    std::vector<ROOT::Math::XYVector> observationCenters = createGeneralCircleObservationCenters();
 
     CDCObservations2D observations2D;
     if (withDriftLength) {
-      for (const Vector2D& observationCenter : observationCenters) {
+      for (const ROOT::Math::XYVector& observationCenter : observationCenters) {
         double distance = generalCircle.distance(observationCenter);
         observations2D.fill(observationCenter, distance);
       }
     } else {
-      for (const Vector2D& observationCenter : observationCenters) {
-        Vector2D onCircle = generalCircle.closest(observationCenter);
+      for (const ROOT::Math::XYVector& observationCenter : observationCenters) {
+        ROOT::Math::XYVector onCircle = generalCircle.closest(observationCenter);
         observations2D.fill(onCircle, 0.0);
       }
     }
@@ -78,7 +79,7 @@ namespace {
     CDCTrajectory2D trajectory2D;
     fitter.update(trajectory2D, observations2D);
 
-    trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+    trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
     EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle->perigee().x(), 10e-7) <<
@@ -116,20 +117,20 @@ namespace {
   {
 
     CDCObservations2D observations2D;
-    observations2D.fill(Vector2D(0, 0), 0.5);
-    observations2D.fill(Vector2D(1, -1), -0.5);
-    observations2D.fill(Vector2D(2, 0), 0.5);
+    observations2D.fill(ROOT::Math::XYVector(0, 0), 0.5);
+    observations2D.fill(ROOT::Math::XYVector(1, -1), -0.5);
+    observations2D.fill(ROOT::Math::XYVector(2, 0), 0.5);
 
     CDCTrajectory2D trajectory2D;
 
     fitter.update(trajectory2D, observations2D);
 
-    trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+    trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
     EXPECT_EQ(0.0, fittedCircle->curvature()) << "AFitter " << typeid(fitter).name() << " failed.";
 
-    Vector2D perigee = trajectory2D.getGlobalPerigee();
+    ROOT::Math::XYVector perigee = trajectory2D.getGlobalPerigee();
     EXPECT_NEAR(0.0, perigee.x(), 10e-7);
     EXPECT_NEAR(-0.5, perigee.y(), 10e-7);
 
@@ -145,7 +146,7 @@ TEST(TrackFindingCDCTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_NoDrif
   const CDCFitter2D<ExtendedRiemannsMethod> fitter;
   CDCTrajectory2D trajectory2D = testGeneralCircleFitter(fitter, false);
 
-  trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+  trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
   const UncertainPerigeeCircle& perigeeCircle = trajectory2D.getLocalCircle();
   PerigeeCovariance perigeeCovariance = perigeeCircle.perigeeCovariance();
 

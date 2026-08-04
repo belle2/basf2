@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~BackgroundInfo() {}
+    ~BackgroundInfo() override {}
 
     /**
      * Set method that is used to add BG

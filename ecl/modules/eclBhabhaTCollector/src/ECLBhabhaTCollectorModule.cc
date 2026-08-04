@@ -662,7 +662,7 @@ void ECLBhabhaTCollectorModule::collect()
     /* Test if the loose track is also a tight track */
 
     // Number of hits in the CDC
-    if (nCDChits < 20) {
+    if (nCDChits < 1) {
       continue;
     }
 
@@ -886,8 +886,8 @@ void ECLBhabhaTCollectorModule::collect()
     // Absolute time should be in specified range condition.
     if (fabs(time) > m_timeAbsMax) continue;
 
-    // Fit quality flag -- choose only events with best fit quality
-    if (ecl_dig->getQuality() != 0) continue;
+    // Fit quality flag -- choose valid fit results with E > ~2 MeV
+    if (ecl_dig->getQuality() != 0 and ecl_dig->getQuality() != 3) continue;
 
     //== Save time and crystal information.  Fill plot after both electrons are tested
     crystalIDs[iCharge] = cid;

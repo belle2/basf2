@@ -14,17 +14,17 @@ Decay vpho
 Enddecay
 
 Alias MySigmap Sigma+
-Alias Mypi0sig pi0
+Alias Mypi0 pi0
 
 Decay Xi_c+
 1.000 MySigmap   K-    pi+       PHSP;
 Enddecay
 
 Decay MySigmap
-1.000 p+ Mypi0sig                   PHSP;
+1.000 p+ Mypi0                   PHSP;
 Enddecay
 
-Decay Mypi0sig
+Decay Mypi0
 1.000 gamma gamma                   PHSP;
 Enddecay
 

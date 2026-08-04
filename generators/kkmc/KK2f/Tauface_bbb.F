@@ -70,6 +70,13 @@ C initialization for 2 scalars
         ELSEIF(INUM.EQ.4.OR.INUM.EQ.66.OR.INUM.EQ.67) THEN
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0
+        ELSEIF(INUM.EQ.99) THEN
+          PROB1(INUM)=0.3
+          PROB2(INUM)=0.3
+          AM2(INUM) =0.02
+          GAM2(INUM)=0.02
+          AM3(INUM) =0.01
+          GAM3(INUM)=0.01
         ELSE
           PROB1(INUM)=1.0 !0.2
           PROB2(INUM)=0.0
@@ -191,7 +198,8 @@ C     XXXXA CORRESPOND TO S2 CHANNEL !
         GAMRA(MNUM)=GAMRO
         AMRB(MNUM) =AMRO
         GAMRB(MNUM)=GAMRO
-       ELSEIF((MNUM.EQ.13.OR.MNUM.EQ.14).OR.(MNUM.GE.26.AND.MNUM.LE.27).OR.(MNUM.GE.31.AND.MNUM.EQ.46)) THEN
+      ELSEIF((MNUM.EQ.13.OR.MNUM.EQ.14).OR.(MNUM.GE.26.AND.MNUM.LE.27).
+     C    OR.(MNUM.GE.31.AND.MNUM.LE.46).OR.(MNUM.GE.49.AND.MNUM.LE.57)) THEN
         PROB1(MNUM)=0.5
         PROB2(MNUM)=0.5
         AMRX (MNUM)=1.57
@@ -414,6 +422,8 @@ C switch to initialize that all modes are represented equally.
       INTEGER IUSER,SELUSER
       INTEGER USERACTIVE
       COMMON /USERACTIVE/ USERACTIVE(100)
+      INTEGER IPHSPAC
+      COMMON /IPHSPAC/ IPHSPAC
 C==========================================================================
 
 C      PARAMETER (NMODE=196,NM1=40,NM2=71,NM3=19,NM4=32,NM5=21,NM6=13)
@@ -478,24 +488,24 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 1, 2, 2,   2, 2, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
-     a                1, 1, 1, 1, 1,   1, 1, 1, 0, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
+     a                1, 1, 1, 1, 1,   1, 1, 1, 5, 1,
+     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
+     a                1, 1, 1, 1, 1,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
       DATA KEYstrt3 / 2, 2, 2, 2, 2,   2, 2, 3, 2, 2, 
      a                1, 1, 2, 2, 1,   1, 1, 1, 2, 2,
      a                2, 2, 2, 2, 2,   2, 2, 1, 1, 1,
      a                2, 2, 2, 2, 2,   2, 2, 2, 2, 2,
-     a                2, 2, 2, 2, 2,   2, 5, 5, 0, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
+     a                2, 2, 2, 2, 2,   2, 5, 5, 2, 2,
+     a                2, 2, 2, 2, 2,   2, 2, 0, 0, 0/
       DATA KEYstrt4 / 2, 2, 5, 5, 5,   5, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 0, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
-      DATA KEYstrt5 / 2, 2, 0, 2, 2,   2, 1, 1, 2, 0,
+      DATA KEYstrt5 / 2, 2, 0, 2, 2,   2, 1, 1, 2, 1,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
       DATA KEYstrt6 / 2, 2, 2, 2, 2,   2, 2, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
@@ -537,7 +547,7 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a               1,-1,-1, 2, 2, 0,3*0,    -1, 2, 2, 2, 2, 0,3*0,     ! new (may 2004)
      a              -1, 1, 1,-1,-1, 0,3*0,    -1,-1, 1, 1,-3, 0,3*0,     ! new (may 2004)
      a              -1,-1, 1, 2, 4, 0,3*0,    -1, 2, 2, 2, 2, 0,3*0,     ! new (may 2004)
-     a              -1,-1, 1, 2, 4, 0,3*0,    -1,-1, 1, 2, 4, 0,3*0,     ! new (may 2004)
+     a              -3, 1,-1, 2, 2, 0,3*0,    -1,-1, 1, 2, 4, 0,3*0,     ! new (apr 2026)
      a              -1,-1, 1, 2, 4, 0,3*0,    -1,-1, 1, 2, 4, 0,3*0,     ! new (sep 2004)
      a              -1,-1, 1, 2, 4, 0,3*0,    -1,-1, 1, 2, 4, 0,3*0,     ! new (sep 2004)
      a              -1,-1, 1, 2, 4, 0,3*0,    -1,-1, 1, 2, 4, 0,3*0,     ! new (sep 2004)
@@ -584,11 +594,11 @@ C AJWMOD fix sign bug, 2/22/99
      7              130, 9,-1, 0, 0, 0,3*0,   130, 9,-1, 0, 0, 0,3*0, ! new (may 2020) ! 44
      7              130, 9,-1, 0, 0, 0,3*0,   130, 9,-1, 0, 0, 0,3*0, ! new (may 2020) ! 46
      7              -1,11,-11, 0, 0, 0,3*0,  -1, 13,-13, 0, 0, 0,3*0, ! new (may 2020) ! 48
-     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
-     7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (may 2020) 
+     7              -3,223, 2, 0, 0, 0,3*0,  -3,223,  2, 0, 0, 0,3*0, ! new (apr 2026) ! 50
+     7              -3,223, 2, 0, 0, 0,3*0,  310,223,-1, 0, 0, 0,3*0, ! new (apr 2026) ! 52
+     7             310,223,-1, 0, 0, 0,3*0,  310,223,-1, 0, 0, 0,3*0, ! new (apr 2026) ! 54
+     7             130,223,-1, 0, 0, 0,3*0,  130,223,-1, 0, 0, 0,3*0, ! new (apr 2026) ! 56
+     7             130,223,-1, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0, ! new (apr 2026) ! 58
      7               2, 2,  2, 0, 0, 0,3*0,   2,  2,  2, 0, 0, 0,3*0/ ! new (may 2020) ostatnie 3
 
       DATA NOPIK2 /                            -1,  2,   0, 0, 0, 0,3*0, ! new (may 2004) !  1
@@ -641,27 +651,27 @@ C AJWMOD fix sign bug, 2/22/99
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 94
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 96
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 98
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 100
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 102
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 104
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 106
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 108
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 110
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 112
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 114
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 116
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 118
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 120
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 122
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 124
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 126
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 128
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 130
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 132
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 134
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 136
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 138
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0/ ! new (may 2020)  ostattnie 2
+     8             -1,    8,  0, 0, 0, 0,3*0,  221, 213, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 100
+     8             221, 213,  0, 0, 0, 0,3*0,  221, 213, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 102
+     8             221, 213,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 104
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 106
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 108
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 110
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 112
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 114
+     8             221, 323,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 116
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 118
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 120
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 122
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 124
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 126
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 128
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 130
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 132
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 134
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 136
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 138
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0/ ! new (jun 2026)  ostattnie 2
 
       DATA NOPIK1 /
      o               -1,0,  0,   0,0,0,3*0,     -3,0,  0,    0,0,0,3*0, ! new (may 2004) ! 2
@@ -738,6 +748,9 @@ C=================================================
           I = II+NLT  ! position on the whole list of decay channels
 
         KEY4(II)=KEYstrt4(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY4(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=4
@@ -820,6 +833,9 @@ C=================================================
 
         KEY5(II)=KEYstrt5(II)
 
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY5(II) = 1
+
         JLIST(I) = I
         NPIK(I-NLT)=5
 
@@ -832,7 +848,7 @@ C=================================================
         IF(II.EQ. 7) NAMES(I-NLT)='  TAU-  --> 2PI- 2PI+  K-      ' ! TauDecayModeBBB = 69 ! explicitly included
         IF(II.EQ. 8) NAMES(I-NLT)='  TAU-  --> 2PI- PI+ PI0 K0    ' ! TauDecayModeBBB = 70
         IF(II.EQ. 9) NAMES(I-NLT)='  TAU-  --> PI- 4PI0        old' ! TauDecayModeBBB = 71
-        IF(II.EQ.10) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 72
+        IF(II.EQ.10) NAMES(I-NLT)='  TAU-  --> K- PI- PI+ 2PI0    ' ! TauDecayModeBBB = 72
         IF(II.EQ.11) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 73
         IF(II.EQ.12) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 74
         IF(II.EQ.13) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx5xxxxxx   ' ! TauDecayModeBBB = 75
@@ -860,6 +876,9 @@ C=================================================
           I = II+NLT+NM4+NM5  ! position on the whole list of decay channels
 
         KEY6(II)=KEYstrt6(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY6(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=NPIK6(I-NLT-NM4-NM5)
@@ -902,6 +921,9 @@ C=================================================
           I = II+NLT+NM4+NM5+NM6  ! position on the whole list of decay channels
 
         KEY3(II)=KEYstrt3(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY3(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=3
@@ -954,15 +976,15 @@ C=================================================
         IF(II.EQ.46) NAMES(I-NLT)='  TAU-  --> PI-K0L ETA->P+P-Gam' ! TauDecayModeBBB = 148 ! (ME=14) explicitly included
         IF(II.EQ.47) NAMES(I-NLT)='  TAU-  --> PI- E+ E-          ' ! TauDecayModeBBB = 149
         IF(II.EQ.48) NAMES(I-NLT)='  TAU-  --> PI- MU+MU-         ' ! TauDecayModeBBB = 150
-        IF(II.EQ.49) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 151
-        IF(II.EQ.50) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 152
-        IF(II.EQ.51) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 153
-        IF(II.EQ.52) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 154
-        IF(II.EQ.53) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 155
-        IF(II.EQ.54) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 156
-        IF(II.EQ.55) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 157
-        IF(II.EQ.56) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 158
-        IF(II.EQ.57) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 159
+        IF(II.EQ.49) NAMES(I-NLT)='  TAU-  --> K-PI0 Om->Pi+Pi-Piz' ! TauDecayModeBBB = 151 ! (ME=13)
+        IF(II.EQ.50) NAMES(I-NLT)='  TAU-  --> K-PI0 Om->Pi+Pi-   ' ! TauDecayModeBBB = 152 ! (ME=13)
+        IF(II.EQ.51) NAMES(I-NLT)='  TAU-  --> K-PI0 Om->PizGamma ' ! TauDecayModeBBB = 153 ! (ME=13)
+        IF(II.EQ.52) NAMES(I-NLT)='  TAU-  --> PI-K0SOm->Pi+Pi-Piz' ! TauDecayModeBBB = 154 ! (ME=14)
+        IF(II.EQ.53) NAMES(I-NLT)='  TAU-  --> PI-K0SOm->Pi+Pi-   ' ! TauDecayModeBBB = 155 ! (ME=14)
+        IF(II.EQ.54) NAMES(I-NLT)='  TAU-  --> PI-K0SOm->PizGamma ' ! TauDecayModeBBB = 156 ! (ME=14)
+        IF(II.EQ.55) NAMES(I-NLT)='  TAU-  --> PI-K0LOm->Pi+Pi-Piz' ! TauDecayModeBBB = 157 ! (ME=14)
+        IF(II.EQ.56) NAMES(I-NLT)='  TAU-  --> PI-K0LOm->Pi+Pi-   ' ! TauDecayModeBBB = 158 ! (ME=14)
+        IF(II.EQ.57) NAMES(I-NLT)='  TAU-  --> PI-K0LOm->PizGamma ' ! TauDecayModeBBB = 159 ! (ME=14)
         IF(II.EQ.58) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 160
         IF(II.EQ.59) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 161
         IF(II.EQ.60) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx3xxxxxx   ' ! TauDecayModeBBB = 162
@@ -983,6 +1005,9 @@ C=================================================
           I = II+NLT+NM4+NM5+NM6+NM3  ! position on the whole list of decay channels
 
         KEY2(II)=KEYstrt2(II)
+
+C       To use phase space model, turn off implementation of any ME
+        IF (IPHSPAC.EQ.1) KEY2(II) = 1
 
         JLIST(I) = I
         NPIK(I-NLT)=2
@@ -1085,23 +1110,23 @@ C=================================================
         IF(II.EQ.96) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:3P0)  ' ! TauDecayModeBBB = 258 
         IF(II.EQ.97) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPP)  ' ! TauDecayModeBBB = 259 
         IF(II.EQ.98) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPG)  ' ! TauDecayModeBBB = 260 
-        IF(II.EQ.99) NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 261
-        IF(II.EQ.100)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 262
-        IF(II.EQ.101)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 263
-        IF(II.EQ.102)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 264
-        IF(II.EQ.103)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 265
-        IF(II.EQ.104)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 266
-        IF(II.EQ.105)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 267
-        IF(II.EQ.106)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 268
-        IF(II.EQ.107)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 269
-        IF(II.EQ.108)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 270
-        IF(II.EQ.109)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 271
-        IF(II.EQ.110)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 272
-        IF(II.EQ.111)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 273
-        IF(II.EQ.112)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 274
-        IF(II.EQ.113)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 275
-        IF(II.EQ.114)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 276
-        IF(II.EQ.115)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 277
+        IF(II.EQ.99) NAMES(I-NLT)='  TAU-  --> pi- gamma          ' ! TauDecayModeBBB = 261
+        IF(II.EQ.100)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(GG) ' ! TauDecayModeBBB = 262
+        IF(II.EQ.101)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(3P0)' ! TauDecayModeBBB = 263
+        IF(II.EQ.102)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(3PP)' ! TauDecayModeBBB = 264
+        IF(II.EQ.103)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(PPG)' ! TauDecayModeBBB = 265
+        IF(II.EQ.104)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(GG)  ' ! TauDecayModeBBB = 266
+        IF(II.EQ.105)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(3P0) ' ! TauDecayModeBBB = 267
+        IF(II.EQ.106)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(PPP) ' ! TauDecayModeBBB = 268
+        IF(II.EQ.107)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(PPG) ' ! TauDecayModeBBB = 269
+        IF(II.EQ.108)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(GG) ' ! TauDecayModeBBB = 270
+        IF(II.EQ.109)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(3P0)' ! TauDecayModeBBB = 271
+        IF(II.EQ.110)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(PPP)' ! TauDecayModeBBB = 272
+        IF(II.EQ.111)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(PPG)' ! TauDecayModeBBB = 273
+        IF(II.EQ.112)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(GG) ' ! TauDecayModeBBB = 274
+        IF(II.EQ.113)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(3P0)' ! TauDecayModeBBB = 275
+        IF(II.EQ.114)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(PPP)' ! TauDecayModeBBB = 276
+        IF(II.EQ.115)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(PPG)' ! TauDecayModeBBB = 277
         IF(II.EQ.116)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 278
         IF(II.EQ.117)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 279
         IF(II.EQ.118)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 280

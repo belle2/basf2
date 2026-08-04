@@ -157,7 +157,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @return track representation on success or nullptr on failure
      */
-    const genfit::AbsTrackRep* getTrackRepresentation(const RecoTrack* recoTrack, int pdgCode);
+    static const genfit::AbsTrackRep* getTrackRepresentation(const RecoTrack* recoTrack, int pdgCode);
 
     /**
      * Sets cardinal representation of a given genfit track and PDG code.
@@ -165,7 +165,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @return true on success
      */
-    bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
+    static bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
 
     /**
      * Genfit Rave vertex fit called by vertexFit method.
@@ -174,7 +174,7 @@ namespace Belle2 {
      * @param vertex fitted vertex [out]
      * @return true on success
      */
-    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+    static bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
 
     /**
      * Extrapolation of both tracks to the vertex. On success the return value indicates if tracks have inner hits
@@ -184,8 +184,8 @@ namespace Belle2 {
      * @param vertex vertex
      * @return value >= 0 on success, value < 0 on failure
      */
-    int extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, genfit::MeasuredStateOnPlane& stateMinus,
-                            const genfit::GFRaveVertex& vertex);
+    static int extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, genfit::MeasuredStateOnPlane& stateMinus,
+                                   const genfit::GFRaveVertex& vertex);
 
     /**
      * Make a copy of reco track.

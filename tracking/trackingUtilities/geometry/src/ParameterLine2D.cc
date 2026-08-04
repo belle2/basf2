@@ -7,30 +7,33 @@
  **************************************************************************/
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <ostream>
 
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-ParameterLine2D ParameterLine2D::touchingCircles(const Vector2D& fromCenter,
+ParameterLine2D ParameterLine2D::touchingCircles(const ROOT::Math::XYVector& fromCenter,
                                                  const double fromSignedRadius,
-                                                 const Vector2D& toCenter,
+                                                 const ROOT::Math::XYVector& toCenter,
                                                  const double toSignedRadius)
 {
-  Vector2D connecting = toCenter - fromCenter;
+  ROOT::Math::XYVector connecting = toCenter - fromCenter;
 
   // Normalize to the coordinate system vector, but keep the original norm
-  const double norm = connecting.normalize();
+  const double norm = connecting.R();
+  if (norm != 0.0) {
+    connecting *= (1. / norm);
+  }
 
   double kappa = (fromSignedRadius - toSignedRadius) / norm;
   double cokappa = sqrt(1 - kappa * kappa);
 
-  Vector2D fromPos = Vector2D(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
+  ROOT::Math::XYVector fromPos = VectorUtil::compose(connecting, kappa * fromSignedRadius, cokappa * fromSignedRadius);
   fromPos += fromCenter;
 
-  Vector2D toPos = Vector2D(connecting, kappa * toSignedRadius, cokappa * toSignedRadius);
+  ROOT::Math::XYVector toPos = VectorUtil::compose(connecting, kappa * toSignedRadius, cokappa * toSignedRadius);
   toPos += toCenter;
 
   return ParameterLine2D::throughPoints(fromPos, toPos);

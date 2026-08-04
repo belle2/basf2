@@ -152,7 +152,7 @@ void RestOfEventBuilderModule::addRemainingParticles(const Particle* particle, R
     StoreObjPtr<ParticleList> plist(particleListName);
     int m_part = plist->getListSize();
     for (int i = 0; i < m_part; i++) {
-      Particle* storedParticle = plist->getParticle(i);
+      const Particle* storedParticle = plist->getParticle(i);
 
       std::vector<const Particle*> storedParticleDaughters = storedParticle->getFinalStateDaughters();
       for (auto* storedParticleDaughter : storedParticleDaughters) {

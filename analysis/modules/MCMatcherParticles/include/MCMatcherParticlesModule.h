@@ -107,7 +107,7 @@ namespace Belle2 {
      * returns 1 if the eventParticle daughters were all caught in recParticles, 2 if partially and 0 if none.
      * it is used to check if a signal particle is still left on the signal side of the event (what is not caught by the tag side).
      */
-    int ccbarTagPartialHelper(
+    static int ccbarTagPartialHelper(
       const MCParticle* mcParticle,
       std::vector<const Particle*>& fspParticles,
       std::vector<const MCParticle*>& missedParticles
@@ -117,7 +117,7 @@ namespace Belle2 {
      * returns 1 if the mcParticle daughters were all caught in tag, 2 if partially and 0 if none.
      * it is used to check what if the signal side particle has been particle absorbed in the tag.
      */
-    int ccbarTagPartialHelper(
+    static int ccbarTagPartialHelper(
       const MCParticle* mcParticle,
       const std::vector<const Particle*>& fspParticles
     );

@@ -84,7 +84,7 @@ namespace Belle2::Conditions {
      * message */
     bool getTemporaryFile(const std::string& url, PayloadMetadata& meta, bool silentOnMissing);
     /** Return the filename of a payload to look for given a directory structure and some metadata */
-    std::string getFilename(EDirectoryLayout structure, const PayloadMetadata& payload) const;
+    static std::string getFilename(EDirectoryLayout structure, const PayloadMetadata& payload);
     /** List of configured lookup locations: The first one will always be the
      * cache directory and the last one will always be fallback url included in
      * the payload metadata */

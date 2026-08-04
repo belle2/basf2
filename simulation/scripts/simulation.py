@@ -9,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-from geometry import check_components
+from geometry import check_components, is_detector_present
 from L1trigger import add_trigger_simulation
 from pxd import add_pxd_simulation
 from svd import add_svd_simulation
@@ -134,6 +134,7 @@ def add_simulation(
         FilterEvents=False,
         usePXDGatedMode=False,
         skipExperimentCheckForBG=False,
+        ignoreRunNumberForBG=False,
         save_slow_pions_in_mc=False,
         save_all_charged_particles_in_mc=False):
     """
@@ -146,6 +147,8 @@ def add_simulation(
     @param FilterEvents: if True only the events that pass the L1 trigger will survive simulation, the other are discarded.
         Make sure you do need to filter events before you set the value to True.
     @param skipExperimentCheckForBG: If True, skip the check on the experiment number consistency between the basf2
+      process and the beam background files. Note that this check should be skipped only by experts.
+    @param ignoreRunNumberForBG: If True, skip the check on the run number consistency between the basf2
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
@@ -164,6 +167,7 @@ def add_simulation(
             bkginput = b2.register_module('BGOverlayInput')
             bkginput.param('inputFileNames', bkgfiles)
             bkginput.param('skipExperimentCheck', skipExperimentCheckForBG)
+            bkginput.param('ignoreRunNumbers', ignoreRunNumberForBG)
             path.add_module(bkginput)
         else:
             bkgmixer = b2.register_module('BeamBkgMixer')
@@ -172,7 +176,7 @@ def add_simulation(
                 bkgmixer.param('components', components)
             path.add_module(bkgmixer)
             if usePXDGatedMode:
-                if components is None or 'PXD' in components:
+                if is_detector_present("PXD", components):
                     # PXD is sensitive to hits in interval -20us to +20us
                     bkgmixer.param('minTimePXD', -20000.0)
                     bkgmixer.param('maxTimePXD', 20000.0)
@@ -214,30 +218,30 @@ def add_simulation(
     # have them in the path more than once
 
     # CDC digitization
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         cdc_digitizer = b2.register_module('CDCDigitizer')
         cdc_digitizer.param("Output2ndHit", generate_2nd_cdc_hits)
         path.add_module(cdc_digitizer)
 
     # TOP digitization
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         top_digitizer = b2.register_module('TOPDigitizer')
         path.add_module(top_digitizer)
 
     # ARICH digitization
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         arich_digitizer = b2.register_module('ARICHDigitizer')
         path.add_module(arich_digitizer)
 
     # ECL digitization
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)
 
     # KLM digitization
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         klm_digitizer = b2.register_module('KLMDigitizer')
         path.add_module(klm_digitizer)
 
@@ -246,7 +250,7 @@ def add_simulation(
         m = path.add_module('BGOverlayExecutor', components=['CDC', 'TOP', 'ARICH', 'KLM'])
         m.set_name('BGOverlayExecutor_CDC...KLM')
 
-    if components is None or 'TRG' in components:
+    if is_detector_present("TRG", components):
         if bkgfiles is not None and bkgOverlay:
             # BG Overlay for CDCTRG. That for KLMTRG is already covered by BG Overlay
             # for KLM. ECL and ECLTRG are already covered independently.
@@ -255,7 +259,7 @@ def add_simulation(
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
 
     # SVD digitization, BG Overlay, sorting and zero suppression
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_simulation(path)
         if bkgfiles is not None and bkgOverlay:
             m = path.add_module('BGOverlayExecutor', components=['SVD'])
@@ -264,7 +268,7 @@ def add_simulation(
         path.add_module('SVDZeroSuppressionEmulator')
 
     # PXD digitization, BG overlay, sorting and data reduction
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         if forceSetPXDDataReduction:
             pxd_digits_name = ''
             if usePXDDataReduction:

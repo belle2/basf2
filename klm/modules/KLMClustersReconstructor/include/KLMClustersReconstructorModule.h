@@ -16,6 +16,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/KLMCluster.h>
 
+/* C++ headers. */
+#include <string>
+#include <vector>
+
 namespace Belle2 {
 
   /**
@@ -29,8 +33,10 @@ namespace Belle2 {
      * Vertex position calculation mode.
      */
     enum PositionMode {
-      c_FullAverage, /**< Full average. */
-      c_FirstLayer,  /**< First layer only. */
+      c_FullAverage,        /**< Full average. */
+      c_FirstLayer,         /**< Innermost hit layer only. */
+      c_FirstTwoLayers,     /**< Two innermost layers with hits (BKLM then EKLM). */
+      c_SuccessiveTwoLayers /**< Innermost adjacent layer pair with hits; else FirstLayer. */
     };
 
     /**
@@ -94,6 +100,18 @@ namespace Belle2 {
 
     /** Clusterization mode. */
     enum ClusterMode m_ClusterMode;
+
+    /** If true, drop angular outliers after clustering and re-queue them for other clusters. */
+    bool m_RemoveOutlierHits;
+
+    /** Floor (minimum) angular threshold in rad; effective cut is max(floor, k*MAD). */
+    double m_OutlierTrimAngle;
+
+    /**
+     * Optional post-cluster hit filtering. No-op when m_RemoveOutlierHits is false.
+     * Outliers are appended to poolHits and poolHits is re-sorted by R.
+     */
+    void applyOutlierRemoval(std::vector<KLMHit2d*>& clusterHits, std::vector<KLMHit2d*>& poolHits);
 
     /** KLM clusters. */
     StoreArray<KLMCluster> m_KLMClusters;

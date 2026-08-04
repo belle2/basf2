@@ -38,7 +38,7 @@ namespace Belle2 {
     RT2SPTCConverterModule();
 
     /// Destructor
-    ~RT2SPTCConverterModule();
+    ~RT2SPTCConverterModule() override;
 
     /// Initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays)
     void initialize() override;

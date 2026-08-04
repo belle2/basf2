@@ -34,7 +34,7 @@ namespace Belle2 {
     explicit LogConnectionTxtFile(const std::string& filename, bool append = false);
 
     /** The LogConnectionTxtFile destructor. */
-    virtual ~LogConnectionTxtFile();
+    virtual ~LogConnectionTxtFile() override;
 
     /**
      * Sends a log message.

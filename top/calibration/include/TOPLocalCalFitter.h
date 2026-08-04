@@ -32,6 +32,12 @@ namespace Belle2 {
       /** Destructor */
       ~TOPLocalCalFitter() override;
 
+      /** Copy constructor (disabled) */
+      TOPLocalCalFitter(const TOPLocalCalFitter&) = delete;
+
+      /** Assignment operator (disabled) */
+      TOPLocalCalFitter& operator=(const TOPLocalCalFitter&) = delete;
+
       /** Sets the minimum number of entries to perform the calibration in one channel */
       void setMinEntries(int minEntries)
       {

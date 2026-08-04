@@ -14,7 +14,7 @@
   <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>
-    This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
+    This steering file produces 10000 cosmic ray events without background, for the Run 1 (early_phase3) geometry.
   </description>
 </header>
 """

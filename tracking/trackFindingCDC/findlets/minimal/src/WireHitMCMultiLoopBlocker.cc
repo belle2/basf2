@@ -15,13 +15,13 @@
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -82,7 +82,7 @@ void WireHitMCMultiLoopBlocker::apply(std::vector<CDCWireHit>& wireHits)
     const float absMom2D = mom3D.Rho();
     const float absMom3D = mom3D.R();
 
-    const Vector3D pos3D(0.0, 0.0, 0.0);
+    const ROOT::Math::XYZVector pos3D(0.0, 0.0, 0.0);
     const double bendRadius = CDCBFieldUtil::absMom2DToBendRadius(absMom2D, pos3D);
     const double bendCircumfence =  2 * M_PI * bendRadius;
     const double loopLength = bendCircumfence * absMom3D / absMom2D;

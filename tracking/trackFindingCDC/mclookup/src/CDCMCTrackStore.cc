@@ -16,11 +16,12 @@
 
 #include <tracking/trackingUtilities/utilities/Functional.h>
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <cdc/dataobjects/CDCHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -359,14 +360,15 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
     const CDCSimHit* ptrSimHit = simHitLookUp.getClosestPrimarySimHit(ptrHit);
     const CDCSimHit* ptrNextSimHit = simHitLookUp.getClosestPrimarySimHit(ptrNextHit);
 
-    Vector3D pos(ptrSimHit->getPosTrack());
-    Vector3D mom(ptrSimHit->getMomentum());
-    Vector3D nextMom(ptrNextSimHit->getMomentum());
-    Vector3D nextPos(ptrNextSimHit->getPosTrack());
+    ROOT::Math::XYZVector pos(ptrSimHit->getPosTrack());
+    ROOT::Math::XYZVector mom(ptrSimHit->getMomentum());
+    ROOT::Math::XYZVector nextMom(ptrNextSimHit->getMomentum());
+    ROOT::Math::XYZVector nextPos(ptrNextSimHit->getPosTrack());
 
-    if (pos.dotXY(nextPos) < 0) return true;
-    if ((nextPos - pos).dotXY(nextMom) < 0) return true;
-    if ((nextPos - pos).dotXY(mom) < 0) return true;
+    const auto dotXY = [](const ROOT::Math::XYZVector & lhs, const ROOT::Math::XYZVector & rhs) { return lhs.X() * rhs.X() + lhs.Y() * rhs.Y(); };
+    if (dotXY(pos, nextPos) < 0) return true;
+    if (dotXY(nextPos - pos, nextMom) < 0) return true;
+    if (dotXY(nextPos - pos, mom) < 0) return true;
 
     // TODO introduce a smarter check here
     return false;

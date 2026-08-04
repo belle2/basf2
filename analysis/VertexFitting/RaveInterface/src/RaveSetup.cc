@@ -47,8 +47,9 @@ void RaveSetup::initialize(int verbosity, double magneticField)
   getRawInstance()->m_initialized = true;
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(nullptr)/*, m_GFRaveVertexFactory(NULL)*/,
-  m_raveKinematicTreeFactory(nullptr), m_initialized(false)
+// cppcheck-suppress uninitMemberVar
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(nullptr), m_raveKinematicTreeFactory(nullptr),
+  m_initialized(false)
 {
 }
 

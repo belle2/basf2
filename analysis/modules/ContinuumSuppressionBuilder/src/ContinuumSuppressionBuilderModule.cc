@@ -43,7 +43,7 @@ REG_MODULE(ContinuumSuppressionBuilder);
 //                 Implementation
 //-----------------------------------------------------------------
 
-ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module()
+ContinuumSuppressionBuilderModule::ContinuumSuppressionBuilderModule() : Module(), m_Bfield(0.0)
 {
   // Set module properties
   setDescription("Creates for each Particle in the given ParticleLists a ContinuumSuppression dataobject and makes basf2 relation between them.");

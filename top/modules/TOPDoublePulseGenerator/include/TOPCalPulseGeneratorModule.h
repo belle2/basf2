@@ -31,12 +31,6 @@ namespace Belle2 {
     TOPCalPulseGeneratorModule();
 
     /**
-     * Destructor
-     */
-    virtual ~TOPCalPulseGeneratorModule()
-    {}
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

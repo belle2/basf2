@@ -17,6 +17,7 @@ from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
+__liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -27,7 +28,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
     """
     __authors__ = "Xing-Yu Zhou"
     __description__ = "Skim list for two track lepton (e+e- to e+e- and e+e- to mu+mu-) events for luminosity measurements."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -127,7 +128,7 @@ class LowMassTwoTrack(BaseSkim):
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
                       " in final state."
-    __contact__ = "Xing-Yu Zhou <xing-yu.zhou@desy.de>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -229,7 +230,7 @@ class SingleTagPseudoScalar(BaseSkim):
     """
 
     __authors__ = ["Hisaki Hayashii"]
-    __contact__ = "Hisaki Hayashii <hisaki.hayashii@desy.de>"
+    __contact__ = __liaison__
     __description__ = "A skim script to select events with one high-energy electron and one or more pi0/eta/eta mesons."
     __category__ = "physics, low multiplicity"
     ApplyHLTHadronCut = False
@@ -292,7 +293,7 @@ class LowMassOneTrack(BaseSkim):
     """
     __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
     __description__ = "Skim list for low mass events with one track and one hard photon in final state."
-    __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
+    __contact__ = __liaison__
     __category__ = "physics, low multiplicity"
 
     TestSampleProcess = "mumu"
@@ -338,3 +339,85 @@ class LowMassOneTrack(BaseSkim):
             ParticleLists.append(f"vpho:g_{tracks}{label}")
 
         return ParticleLists
+
+
+@fancy_skim_header
+class PNbarHad(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to p^{+}(\\bar{n})X_{had}`
+
+    **Decay Modes**:
+
+    1. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}`,
+    2. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})`,
+    3. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`,
+    4. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(K^{+}K^{-})`,
+    5. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})`,
+    6. :math:`e^{+}e^{-} \\to p^{+}(\\overline{n})\\pi^{-}(\\pi^{+}\\pi^{-})(\\pi^{+}\\pi^{-})(K^{+}K^{-})`,
+
+    **Selection Criteria**
+        * Tracks with ``dr < 1 and abs(dz) < 3``
+        * protons with ``protonID > 0.9``, one per event
+        * kaons with ``kaonID > 0.1`` and pions with ``pionID > 0.1``
+        * Limited to 2 and 8 tracks per event, according to decay mode
+        * Reconstructed candidates with ``[ 0.4 < mRecoil < 1.6 ] and pRecoil > 0.1 and [ 0.25 < pRecoiTheta  < 2.6 ]``
+    """
+    __authors__ = ["Savino Longo", "Shanette De La Motte"]
+    __description__ = "Skim list for analysing anti-neutrons via recoil against proton + light hadrons"
+    __contact__ = __liaison__
+    __category__ = "physics, low multiplicity"
+
+    TestSampleProcess = "uubar"
+    ApplyHLTHadronCut = False
+
+    def build_lists(self, path):
+        label = "PNbarHad"
+
+        # Cuts applied to signal protons and kaons/pions in hadronic system
+        trackIPcut = "dr < 1 and abs(dz) < 3"
+
+        # Cut applied to recoil system (nbar)
+        recoilCut = "[ 0.4 < mRecoil < 1.6 ] and pRecoil > 0.1 and [ 0.25 < pRecoilTheta  < 2.6 ]"
+
+        # List filling
+        ma.fillParticleList(f"p+:{label}", trackIPcut + " and protonID > 0.9", path=path)
+        ma.fillParticleList(f"pi+:{label}", trackIPcut + " and pionID > 0.1", path=path)
+        ma.fillParticleList(f"K+:{label}", trackIPcut + " and kaonID > 0.1", path=path)
+
+        # Apply event based cuts
+        vm.addAlias("nCleanedTracks", f"nCleanedTracks({trackIPcut})")
+        path = self.skim_event_cuts(f"[2 <= nCleanedTracks  <= 8] and countInList(p+:{label})==1", path=path)
+
+        # Reconstruction
+        ma.reconstructDecay(f'vpho:p1pi_{label} -> p+:{label} pi-:{label}', 'nCleanedTracks == 2 and ' + recoilCut, path=path)
+        ma.reconstructDecay(f'vpho:p3pi_{label} -> p+:{label} pi-:{label} pi+:{label} pi-:{label}',
+                            'nCleanedTracks == 4 and ' + recoilCut, path=path)
+        ma.reconstructDecay(
+            f'vpho:p5pi_{label} -> p+:{label} pi-:{label} pi+:{label} pi-:{label} pi+:{label} pi-:{label}',
+            'nCleanedTracks == 6 and ' +
+            recoilCut,
+            path=path)
+        ma.reconstructDecay(
+            f'vpho:p7pi_{label} -> p+:{label} pi-:{label} pi+:{label} pi-:{label} pi+:{label} pi-:{label} pi+:{label} pi-:{label}',
+            'nCleanedTracks == 8 and ' +
+            recoilCut,
+            path=path)
+
+        ma.reconstructDecay(
+            f'vpho:p1pi2K_{label} -> p+:{label} pi-:{label} K+:{label} K-:{label}',
+            'nCleanedTracks == 4 and ' + recoilCut,
+            path=path)
+        ma.reconstructDecay(
+            f'vpho:p3pi2K_{label} -> p+:{label} pi+:{label} pi-:{label} pi-:{label} K+:{label} K-:{label}',
+            'nCleanedTracks == 6 and ' +
+            recoilCut,
+            path=path)
+        ma.reconstructDecay(
+            f'vpho:p5pi2K_{label} -> p+:{label} pi+:{label} pi-:{label} pi+:{label} pi-:{label} pi-:{label} K+:{label} K-:{label}',
+            'nCleanedTracks == 8 and ' +
+            recoilCut,
+            path=path)
+
+        vpholists = [f"vpho:p{mode}_{label}" for mode in ["1pi", "3pi", "5pi", "7pi", "1pi2K", "3pi2K", "5pi2K"]]
+
+        return vpholists

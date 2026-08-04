@@ -449,11 +449,11 @@ namespace {
     // add the two photons as the two daughters of some particle and create the latter
     Particle dau0_noclst(dau0_4vec, 22);
     momentum += dau0_noclst.get4Vector();
-    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    const Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
     daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
     Particle dau1_noclst(dau1_4vec, 22);
     momentum += dau1_noclst.get4Vector();
-    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    const Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
     daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
     const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
 

@@ -23,7 +23,7 @@ namespace Belle2 {
 
     template <class AFilter>
     ChoosableFromVarSet<AFilter>::ChoosableFromVarSet(std::unique_ptr<AVarSet> varSet,
-                                                      std::string varName)
+                                                      const std::string& varName)
       : Super(std::move(varSet))
       , m_param_varName(varName)
     {

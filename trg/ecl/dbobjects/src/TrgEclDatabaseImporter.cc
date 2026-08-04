@@ -20,6 +20,7 @@
 
 // DB objects
 #include "trg/ecl/dbobjects/TRGECLFAMPara.h"
+#include "trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h"
 #include "trg/ecl/dbobjects/TRGECLTMMPara.h"
 #include "trg/ecl/dbobjects/TRGECLETMParameters.h"
 #include "trg/ecl/dbobjects/TRGECLBadRun.h"
@@ -109,13 +110,24 @@ void TrgEclDatabaseImporter::importFAMParameter(std::string InputFileName,
 
   int Id = 0;
   while (!stream.eof()) {
-    stream >> FAMId[Id]  >> ChannelId[Id] >> FPGAversion [Id]
-           >> TEreconstruction[Id] >> Threshold[Id] >>  Conversionfactor[Id]
-           >> Toffset[Id]  >> Wavemean[Id]  >> Wavesigma[Id];
+    stream >> FAMId[Id]
+           >> ChannelId[Id]
+           >> FPGAversion [Id]
+           >> TEreconstruction[Id]
+           >> Threshold[Id]
+           >>  Conversionfactor[Id]
+           >> Toffset[Id]
+           >> Wavemean[Id]
+           >> Wavesigma[Id];
     TCId[Id] = m_map->getTCIdFromFAMChannel(FAMId[Id], ChannelId[Id]);
     Id++;
+    if (Id == 624) {
+      break;
+    }
   }
   stream.close();
+  //-----------------------------------------------------------------
+
   Id = 0;
   int line = 0;
 
@@ -167,6 +179,45 @@ void TrgEclDatabaseImporter::importFAMParameter(std::string InputFileName,
 
   delete m_map ;
   B2RESULT("FAM parameters are imported to database.");
+
+}
+//
+//
+//
+void TrgEclDatabaseImporter::importFAMTCADCThreshold(std::string InputFileName)
+{
+  std::ifstream stream;
+  stream.open(InputFileName.c_str());
+  if (!stream) {
+    B2ERROR("openFile: " << InputFileName << " *** failed to open");
+    return;
+  }
+
+  DBImportArray<TRGECLFAMTCADCThreshold> DbTCADCThreshold;
+
+  // parameters to be imported to conditionDB
+  std::vector<int> TCId(c_NTC, 0);
+  std::vector<int> TCADCThreshold(c_NTC, 0);
+
+  int id = 0;
+  while (!stream.eof()) {
+    stream >> TCId[id]
+           >> TCADCThreshold[id];
+    id++;
+  }
+  stream.close();
+
+  //Import to DB
+  for (int iTCId = 0; iTCId < c_NTC; iTCId++) {
+    DbTCADCThreshold.appendNew(TCId[iTCId],
+                               TCADCThreshold[iTCId]);
+  }
+
+  IntervalOfValidity iov(m_startExp, m_startRun, m_endExp, m_endRun);
+
+  DbTCADCThreshold.import(iov);
+
+  B2RESULT("FAM TCADCThresholds are imported to database.");
 
 }
 //

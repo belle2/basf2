@@ -49,12 +49,6 @@ namespace Belle2 {
       return Environment::Instance().isMC();
     }
 
-    bool eventType(const Particle*)
-    {
-      StoreArray<MCParticle> mcparticles;
-      return (mcparticles.getEntries()) > 0 ? 0 : 1;
-    }
-
     bool isContinuumEvent(const Particle*)
     {
       return (isNotContinuumEvent(nullptr) == 1 ? 0 : 1);
@@ -651,7 +645,7 @@ namespace Belle2 {
         return Const::doubleNaN;
       }
       std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
-      auto tt = std::gmtime(&rawtime);  // GMT
+      const auto* tt = std::gmtime(&rawtime);  // GMT
       int y = tt->tm_year + 1900; // years since 1900
       int m = tt->tm_mon + 1;     // months since January
       int d = tt->tm_mday;        // day of the month
@@ -665,7 +659,7 @@ namespace Belle2 {
         return Const::doubleNaN;
       }
       std::time_t rawtime = trunc(evtMetaData->getTime() / 1e9);
-      auto tt = std::gmtime(&rawtime);
+      const auto* tt = std::gmtime(&rawtime);
       return tt->tm_year + 1900;
     }
 

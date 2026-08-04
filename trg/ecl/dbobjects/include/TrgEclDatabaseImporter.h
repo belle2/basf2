@@ -40,6 +40,8 @@ namespace Belle2 {
 
     //! Import FAM Parameters
     void importFAMParameter(std::string, std::string, std::string);
+    //! Import FAM TC ADC Threshold
+    void importFAMTCADCThreshold(std::string);
     //! Import TMM Parameters
     void importTMMParameter(std::string);
     //! Import ETM Parameters
@@ -51,6 +53,8 @@ namespace Belle2 {
     void printTCThreshold();
 
   private:
+    //! the number of total TC
+    const int c_NTC = 576;
     //! Start Experiment Number
     int m_startExp;
     //! Start Run Number

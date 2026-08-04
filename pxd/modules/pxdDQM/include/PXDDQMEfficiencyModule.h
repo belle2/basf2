@@ -14,9 +14,9 @@
 
 #include <vxd/geometry/GeoCache.h>
 
-#include "TH1F.h"
-#include "TH1D.h"
-#include "TH2F.h"
+#include <TH1F.h>
+#include <TH1D.h>
+#include <TH2F.h>
 
 
 namespace Belle2 {

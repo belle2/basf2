@@ -6,6 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/**************************************************************************
+ * Automated CDCTRG dead-channel payload writer (reads JSON config).
+ * Usage (inside basf2 build, after scons):
+ *   trg-cdc-deadch-writedb cdcdead_config.json
+ **************************************************************************/
+
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
@@ -14,22 +20,30 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/LogSystem.h>
 #include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
-#include <iostream>
+
+#include <algorithm>
+#include <cctype>
 #include <fstream>
-//#include <TFile.h>
-//#include <TH1F.h>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 using namespace Belle2;
 
 #define ONLINE 0
 //#define ONLINE 1
 
+struct DeadchConfig {
+  int run[4];
+  std::vector<int> mgr;
+};
+
 bool get_wire_mgr(int mask_sl[], int mask_layer[], int mask_ch[], int mgr)
 {
   int mgr_sl = mgr / 1000;
   int mgr_i  = (mgr - mgr_sl * 1000) / 10;
   int mgr_u  = mgr % 10;
-  //std::cout << mgr_sl << " " << mgr_i << " " << mgr_u << std::endl;
   //MGR0 0-4 :L3-7   lch0-159
   //MGR1 0-4 :L8-12  lch0-159
   //MGR2 0-5 :L14-18 lch0-191
@@ -41,244 +55,108 @@ bool get_wire_mgr(int mask_sl[], int mask_layer[], int mask_ch[], int mgr)
   //MGR8 0-11:L50-54 lch0-383
   //160*8 + 160*6 + 192*6 + 224*6 + 256*6 + 288*6 + 320*6 + 352*6 + 384*6 = 14336 = nSenseWires
 
-  //first inner layer
   for (int i = 0; i < 32; i++) {
-    mask_sl[i]                = mgr_sl;
-    mask_ch[i]                = mgr_i * 32 + i;
+    mask_sl[i] = mgr_sl;
+    mask_ch[i] = mgr_i * 32 + i;
     mask_layer[i] = 0;
-    if (mgr_u == 1)  mask_layer[i] += 3;
+    if (mgr_u == 1) mask_layer[i] += 3;
     if (mgr_sl == 0) mask_layer[i] += 2;
   }
-  //second inner layer
   for (int i = 0; i < 32; i++) {
-    mask_sl[i + 32]                = mgr_sl;
-    mask_ch[i + 32]                = mgr_i * 32 + i;
+    mask_sl[i + 32] = mgr_sl;
+    mask_ch[i + 32] = mgr_i * 32 + i;
     mask_layer[i + 32] = 1;
-    if (mgr_u == 1)  mask_layer[i + 32] += 3;
+    if (mgr_u == 1) mask_layer[i + 32] += 3;
     if (mgr_sl == 0) mask_layer[i + 32] += 2;
   }
-  //third inner layer
   for (int i = 0; i < 32; i++) {
-    mask_sl[i + 64]                = mgr_sl;
-    mask_ch[i + 64]                = mgr_i * 32 + i;
+    mask_sl[i + 64] = mgr_sl;
+    mask_ch[i + 64] = mgr_i * 32 + i;
     mask_layer[i + 64] = 2;
-    if (mgr_u == 1)  mask_layer[i + 64] += 3;
+    if (mgr_u == 1) mask_layer[i + 64] += 3;
     if (mgr_sl == 0) mask_layer[i + 64] += 2;
   }
-
   return true;
 }
 
+static std::string trim(const std::string& s)
+{
+  size_t b = 0;
+  while (b < s.size() && std::isspace(static_cast<unsigned char>(s[b]))) b++;
+  size_t e = s.size();
+  while (e > b && std::isspace(static_cast<unsigned char>(s[e - 1]))) e--;
+  return s.substr(b, e - b);
+}
 
-void setdeadch()
+static std::vector<int> parseIntList(const std::string& line)
+{
+  std::vector<int> out;
+  size_t lb = line.find('[');
+  size_t rb = line.find(']');
+  if (lb == std::string::npos || rb == std::string::npos || rb <= lb) return out;
+  std::string inner = line.substr(lb + 1, rb - lb - 1);
+  std::stringstream ss(inner);
+  std::string tok;
+  while (std::getline(ss, tok, ',')) {
+    tok = trim(tok);
+    if (!tok.empty()) out.push_back(std::stoi(tok));
+  }
+  return out;
+}
+
+static bool loadConfigs(const std::string& path, std::vector<DeadchConfig>& configs)
+{
+  std::ifstream ifs(path);
+  if (!ifs) {
+    std::cerr << "Cannot open config file: " << path << std::endl;
+    return false;
+  }
+
+  std::string line;
+  bool inConfigs = false;
+  DeadchConfig current{};
+  bool haveCurrent = false;
+
+  while (std::getline(ifs, line)) {
+    line = trim(line);
+    if (line.find("\"configs\"") != std::string::npos) {
+      inConfigs = true;
+      continue;
+    }
+    if (!inConfigs) continue;
+
+    if (line.find('}') != std::string::npos && haveCurrent) {
+      configs.push_back(current);
+      current = DeadchConfig{};
+      haveCurrent = false;
+    }
+    if (line.find("\"run\"") != std::string::npos) {
+      std::vector<int> run = parseIntList(line);
+      if (run.size() != 4) {
+        std::cerr << "Bad run array (need 4 values): " << line << std::endl;
+        return false;
+      }
+      for (int i = 0; i < 4; i++) current.run[i] = run[i];
+      haveCurrent = true;
+    }
+    if (line.find("\"mgr\"") != std::string::npos) {
+      current.mgr = parseIntList(line);
+    }
+  }
+
+  if (haveCurrent) configs.push_back(current);
+
+  if (configs.empty()) {
+    std::cerr << "No configs found in " << path << std::endl;
+    return false;
+  }
+  return true;
+}
+
+void setdeadchFromConfigs(const std::vector<DeadchConfig>& configs)
 {
   const static int MAX_N_LAYERS = 8;
-
-  const int N_config = 96;
-
-  const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
-    {0,    0,    7,  3585}, // 0
-    {7, 3586,    8,  1052}, // 1
-    {8, 1053,    8,  1108}, // 2
-    {8, 1109,    8,  1115}, // 3
-    {8, 1116,    8,  1832}, // 4
-    {8, 1833,    8,  1916}, // 5
-    {8, 1917,    8,  2528}, // 6
-    {8, 2529,    8,  2550}, // 7
-    {8, 2551,    8,  2578}, // 8
-    {8, 2579,    8,  2580}, // 9
-    {8, 2581,    9,    -1}, // 10
-    {10,    0,   10, 5210}, // 11
-    {10, 5211,   11,   -1}, // 12
-    {12,    0,   12, 1197}, // 13
-    {12, 1198,   12, 1294}, // 14
-    {12, 1295,   12, 2830}, // 15
-    {12, 2831,   12, 2846}, // 16
-    {12, 2847,   12, 2883}, // 17
-    {12, 2884,   12, 3212}, // 18
-    {12, 3213,   12, 3489}, // 19
-    {12, 3490,   12, 4214}, // 20
-    {12, 4215,   12, 4406}, // 21
-    {12, 4407,   12, 4419}, // 22
-    {12, 4420,   14, 1382}, // 23
-    {14, 1383,   16,  685}, // 24
-    {16,  686,   18,   90}, // 25
-    {18,   91,   20,  207}, // 26
-    {20,  208,   20,  208}, // 27
-    {20,  209,   20,  272}, // 28
-    {20,  273,   20,  273}, // 29
-    {20,  274,   22,  102}, // 30
-    {22,  103,   22,  121}, // 31
-    {22,  122,   22,  135}, // 32
-    {22,  136,   22,  334}, // 33
-    {22,  335,   22,  523}, // 34
-    {22,  524,   22,  568}, // 35
-    {22,  569,   22,  596}, // 36
-    {22,  597,   22,  604}, // 37
-    {22,  605,   23,   -1}, // 38
-    {24,    0,   24,  915}, // 39
-    {24,  916,   24,  923}, // 40
-    {24,  924,   24, 1184}, // 41
-    {24, 1185,   24, 1190}, // 42
-    {24, 1191,   24, 1404}, // 43
-    {24, 1405,   24, 1406}, // 44
-    {24, 1407,   24, 1599}, // 45
-    {24, 1600,   24, 1613}, // 46
-    {24, 1614,   24, 1618}, // 47
-    {24, 1619,   24, 1844}, // 48
-    {24, 1845,   24, 1852}, // 49
-    {24, 1853,   24, 2058}, // 50
-    {24, 2059,   24, 2061}, // 51
-    {24, 2062,   24, 2062}, // 52
-    {24, 2063,   24, 2315}, // 53
-    {24, 2316,   25,   99}, // 54
-    {25,  100,   25,  100}, // 55
-    {25,  101,   25,  314}, // 56
-    {25,  315,   25,  352}, // 57
-    {25,  353,   26,   96}, // 58
-    {26,   97,   26,  137}, // 59
-    {26,  138,   26,  147}, // 60
-    {26,  148,   26,  364}, // 61
-    {26,  365,   26,  368}, // 62
-    {26,  369,   26,  523}, // 63
-    {26,  524,   26,  531}, // 64
-    {26,  532,   26,  545}, // 65
-    {26,  546,   26,  564}, // 66
-    {26,  565,   26,  615}, // 67
-    {26,  616,   26,  644}, // 68
-    {26,  645,   26,  646}, // 69
-    {26,  647,   26,  904}, // 70
-    {26,  905,   26, 1389}, // 71
-    {26, 1390,   26, 1430}, // 72
-    {26, 1431,   26, 1431}, // 73
-    {26, 1432,   30, 1569}, // 74
-    {30, 1570,   30, 1755}, // 75 2024/2/26
-    {30, 1756,   30, 1923}, // 76 2024/3/4
-    {30, 1924,   30, 2979}, // 77 2024/3/8
-    {30, 2980,   33,   85}, // 78 2024/4/11
-    {33,   86,   33, 1010}, // 79 2024/5/18
-    {33, 1011,   33, 1062}, // 80 2024/6/21
-    {33, 1063,   34,   -1}, // 81 2024/6/23
-    {35,    0,   35,  307}, // 82 2024/10/2
-    {35,  308,   35,  344}, // 83 2024/10/11
-    {35,  345,   35,  414}, // 84 2024/10/13
-    {35,  415,   35,  777}, // 85 2024/10/16
-    {35,  778,   35, 1073}, // 86 2024/10/29
-    {35, 1074,   35, 1178}, // 87 2024/11/07
-    {35, 1179,   35, 1239}, // 88 2024/11/09
-    {35, 1240,   35, 1279}, // 89 2024/11/12
-    {35, 1280,   35, 1458}, // 90 2024/11/13
-    {35, 1459,   35, 1782}, // 91 2024/11/20
-    {35, 1783,   35, 1970}, // 92 2024/12/02
-    {35, 1971,   35, 2246}, // 93 2024/12/09
-    {35, 2247,   35, 2478}, // 94 2024/12/16
-    {35, 2479,   -1,  -1}   // 95 2024/12/20
-  };
-
-
-  std::vector<std::vector<int>> mgr(N_config);
-  //0  nomask
-  mgr[ 1].push_back(7010); //MGR7-1U1
-  mgr[ 2].push_back(7010); mgr[ 2].push_back(7071);
-  mgr[ 3].push_back(7010); mgr[ 3].push_back(7071); mgr[ 3].push_back(8110);
-  mgr[ 4].push_back(7010); mgr[ 4].push_back(7071);
-  mgr[ 5].push_back(7010); mgr[ 5].push_back(7071); mgr[ 5].push_back(1000);
-  mgr[ 6].push_back(7010); mgr[ 6].push_back(7071);
-  mgr[ 7].push_back(7010); mgr[ 7].push_back(7071); mgr[ 7].push_back(2030);
-  mgr[ 8].push_back(7010); mgr[ 8].push_back(7071);
-  mgr[ 9].push_back(7010); mgr[ 9].push_back(7071); mgr[ 9].push_back(6061);
-  mgr[10].push_back(7010); mgr[10].push_back(7071);
-  //11 nomask
-  mgr[12].push_back(7010);
-  mgr[13].push_back(7010); mgr[13].push_back(7090); mgr[13].push_back(3010);
-  mgr[14].push_back(7010); mgr[14].push_back(7090); mgr[14].push_back(3010); mgr[14].push_back(4040);
-  mgr[15].push_back(7010); mgr[15].push_back(7090); mgr[15].push_back(3010);
-  mgr[16].push_back(7010); mgr[16].push_back(7090);
-  mgr[17].push_back(7010); mgr[17].push_back(7090); mgr[17].push_back(3010);
-  mgr[18].push_back(7010); mgr[18].push_back(7090);
-  //19 nomask
-  mgr[20].push_back(3010);
-  //21 nomask
-  mgr[22].push_back(3031);
-  //23 nomask
-  mgr[24].push_back(3010);
-  //25 nomask
-  mgr[26].push_back(3010);
-  mgr[27].push_back(3010); mgr[27].push_back(2040); mgr[27].push_back(11); mgr[27].push_back(4060); mgr[27].push_back(4061);
-  mgr[27].push_back(8060); mgr[27].push_back(8061); mgr[27].push_back(8070);
-  mgr[28].push_back(3010);
-  mgr[29].push_back(3010); mgr[29].push_back(3031);
-  mgr[30].push_back(3010);
-  mgr[31].push_back(3010); mgr[31].push_back(8060); mgr[31].push_back(8061);
-  mgr[32].push_back(3010);
-  mgr[33].push_back(3010); mgr[33].push_back(8060); mgr[33].push_back(8061);
-  mgr[34].push_back(3010);
-  mgr[35].push_back(3010); mgr[35].push_back(4001);
-  mgr[36].push_back(3010);
-  mgr[37].push_back(3010); mgr[37].push_back(4001); mgr[37].push_back(5080);
-  mgr[38].push_back(3010);
-  mgr[39].push_back(3010); mgr[39].push_back(5050);
-  mgr[40].push_back(3010); mgr[40].push_back(5050); mgr[40].push_back(8021);
-  mgr[41].push_back(3010); mgr[41].push_back(5050);
-  mgr[42].push_back(3010); mgr[42].push_back(5050); mgr[42].push_back(21);
-  mgr[43].push_back(3010); mgr[43].push_back(5050);
-  mgr[44].push_back(3010); mgr[44].push_back(5050); mgr[44].push_back(30);
-  mgr[45].push_back(3010); mgr[45].push_back(5050);
-  mgr[46].push_back(3010); mgr[46].push_back(5050); mgr[46].push_back(1030);
-  mgr[47].push_back(3010); mgr[47].push_back(5050); mgr[47].push_back(1030); mgr[47].push_back(1011);
-  mgr[48].push_back(3010); mgr[48].push_back(5050); mgr[48].push_back(1030);
-  mgr[49].push_back(3010); mgr[49].push_back(5050); mgr[49].push_back(1030); mgr[49].push_back(2021);
-  mgr[50].push_back(3010); mgr[50].push_back(5050); mgr[50].push_back(1030);
-  mgr[51].push_back(3010); mgr[51].push_back(5050); mgr[51].push_back(1030); mgr[51].push_back(8020); mgr[51].push_back(8060);
-  mgr[51].push_back(8061);
-  mgr[52].push_back(3010); mgr[52].push_back(5050); mgr[52].push_back(1030); mgr[52].push_back(8060); mgr[52].push_back(8061);
-  mgr[53].push_back(3010); mgr[53].push_back(5050); mgr[53].push_back(1030); mgr[53].push_back(8020); mgr[53].push_back(8060);
-  mgr[53].push_back(8061);
-  mgr[54].push_back(3010); mgr[54].push_back(5450); mgr[54].push_back(1030);
-  mgr[55].push_back(3010); mgr[55].push_back(5050); mgr[55].push_back(1030); mgr[55].push_back(8020); mgr[55].push_back(8060);
-  mgr[55].push_back(8061);
-  mgr[56].push_back(3010); mgr[56].push_back(5050); mgr[56].push_back(1030);
-  mgr[57].push_back(3010); mgr[57].push_back(5050); mgr[57].push_back(1030); mgr[57].push_back(1000);
-  mgr[58].push_back(3010); mgr[58].push_back(5050); mgr[58].push_back(1030);
-  mgr[59].push_back(3010); mgr[59].push_back(5050); mgr[59].push_back(1030); mgr[59].push_back(6051);
-  mgr[60].push_back(3010); mgr[60].push_back(5050); mgr[60].push_back(1030); mgr[60].push_back(40);   mgr[60].push_back(6051);
-  mgr[60].push_back(6060);
-  mgr[61].push_back(3010); mgr[61].push_back(5050); mgr[61].push_back(1030);
-  mgr[62].push_back(3010); mgr[62].push_back(5050); mgr[62].push_back(1030); mgr[62].push_back(6080); mgr[62].push_back(6081);
-  mgr[63].push_back(3010); mgr[63].push_back(5050); mgr[63].push_back(1030);
-  mgr[64].push_back(3010); mgr[64].push_back(5050); mgr[64].push_back(1030); mgr[64].push_back(8041);
-  mgr[65].push_back(3010); mgr[65].push_back(5050); mgr[65].push_back(1030);
-  mgr[66].push_back(3010); mgr[66].push_back(5050); mgr[66].push_back(1030); mgr[66].push_back(1021); mgr[66].push_back(8041);
-  mgr[67].push_back(3010); mgr[67].push_back(5050); mgr[67].push_back(1030);
-  mgr[68].push_back(3010); mgr[68].push_back(5050); mgr[68].push_back(1030); mgr[68].push_back(30);
-  mgr[69].push_back(3010); mgr[69].push_back(30);   mgr[69].push_back(7000); mgr[69].push_back(7001); mgr[69].push_back(7010);
-  mgr[69].push_back(7011);
-  mgr[70].push_back(3010); mgr[70].push_back(30);
-  mgr[71].push_back(30);
-  //72 nomask
-  mgr[73].push_back(1010); mgr[73].push_back(2000); mgr[73].push_back(2001);
-  //74 nomask
-  mgr[75].push_back(3060); mgr[75].push_back(4050); mgr[75].push_back(4051);
-  mgr[76].push_back(6070);
-  mgr[77].push_back(4001); mgr[77].push_back(4011);
-  mgr[78].push_back(2051);
-  mgr[79].push_back(3051);
-  mgr[80].push_back(6070);
-  //81 no mask
-  mgr[82].push_back(2001); mgr[82].push_back(4001); mgr[82].push_back(5080);
-  mgr[83].push_back(4010);
-  mgr[84].push_back(4010);
-  mgr[85].push_back(4010); mgr[85].push_back(3050);
-  mgr[86].push_back(4010); mgr[86].push_back(5081);
-  mgr[87].push_back(4010); mgr[87].push_back(3050);
-  mgr[88].push_back(4010); mgr[88].push_back(4020); mgr[88].push_back(4021);
-  //89 no mask
-  mgr[90].push_back(4011); mgr[90].push_back(5001); mgr[90].push_back(5060); mgr[90].push_back(5081);
-  mgr[91].push_back(4020); mgr[91].push_back(4021); mgr[91].push_back(5081);
-  mgr[92].push_back(4020); mgr[92].push_back(4021);
-  mgr[93].push_back(4020); mgr[93].push_back(4021); mgr[93].push_back(4010); mgr[93].push_back(4011);
-  mgr[94].push_back(4020); mgr[94].push_back(4021); mgr[94].push_back(4010); mgr[94].push_back(4011);
-  mgr[95].push_back(4020); mgr[95].push_back(4021); mgr[95].push_back(4010); mgr[95].push_back(4011);
+  const int N_config = configs.size();
 
   auto badch_map = new bool[N_config][9][8][384]; //sl layer ch
   for (int i = 0; i < N_config; i++) {
@@ -291,7 +169,7 @@ void setdeadch()
     }
   }
 
-  //mask L54 for all runs
+  // mask L54 for all runs
   for (int i = 0; i < N_config; i++) {
     for (unsigned int j = 8; j < 9; j++) {
       for (unsigned int k = 4; k < 5; k++) {
@@ -302,37 +180,34 @@ void setdeadch()
     }
   }
 
-  //mask merger
-  for (int i = 0; i < N_config; i++) {
-    for (unsigned int j = 0; j < mgr[i].size(); j++) {
-      int mgr_sl[96];
-      int mgr_layer[96];
-      int mgr_ch[96];
-      get_wire_mgr(mgr_sl, mgr_layer, mgr_ch, mgr[i][j]);
-      //std::cout << mgr[i][j] << std::endl;
-      for (int k = 0; k < 96; k++) {
-        //std::cout << mgr_sl[k] << " " << mgr_layer[k] << " " << mgr_ch[k] << std::endl;
-        badch_map[i][mgr_sl[k]][mgr_layer[k]][mgr_ch[k]] = false;
+  // mask merger (ONLINE==0 only; ONLINE==1 uses config 0 with L54 mask only, no merger)
+  if (ONLINE == 0) {
+    for (int i = 0; i < N_config; i++) {
+      for (unsigned int j = 0; j < configs[i].mgr.size(); j++) {
+        int mgr_sl[96];
+        int mgr_layer[96];
+        int mgr_ch[96];
+        get_wire_mgr(mgr_sl, mgr_layer, mgr_ch, configs[i].mgr[j]);
+        for (int k = 0; k < 96; k++) {
+          badch_map[i][mgr_sl[k]][mgr_layer[k]][mgr_ch[k]] = false;
+        }
       }
     }
   }
 
   DBImportObjPtr<CDCTriggerDeadch> db_dead;
   db_dead.construct();
+
   if (ONLINE == 0) {
     for (int i = 0; i < N_config; i++) {
-      //std::cout << i << " " << run[i][0] << " " << run[i][1] << " " << run[i][2] << " " << run[i][3] << std::endl;
-      //for(int j=0;j<mgr[i].size();j++)std::cout << mgr[i][j] << std::endl;
-      IntervalOfValidity iov(run[i][0], run[i][1], run[i][2], run[i][3]);
+      const int* r = configs[i].run;
+      std::cout << "import config " << i << " iov=(" << r[0] << "," << r[1]
+                << "," << r[2] << "," << r[3] << ") n_mgr=" << configs[i].mgr.size() << std::endl;
+      IntervalOfValidity iov(r[0], r[1], r[2], r[3]);
       for (unsigned int j = 0; j < c_nSuperLayers; j++) {
         for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
           for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
-            if (!badch_map[i][j][k][l]) {
-              //std::cout << j << " " << k << " " << l << std::endl;
-              db_dead->setdeadch(j, k, l, false);
-            } else {
-              db_dead->setdeadch(j, k, l, true);
-            }
+            db_dead->setdeadch(j, k, l, badch_map[i][j][k][l]);
           }
         }
       }
@@ -344,26 +219,27 @@ void setdeadch()
       for (unsigned int j = 0; j < c_nSuperLayers; j++) {
         for (unsigned int k = 0; k < MAX_N_LAYERS; k++) {
           for (unsigned int l = 0; l < c_maxNDriftCells; l++) {
-            if (!badch_map[i][j][k][l]) {
-              //std::cout << j << " " << k << " " << l << std::endl;
-              db_dead->setdeadch(j, k, l, false);
-            } else {
-              db_dead->setdeadch(j, k, l, true);
-            }
+            db_dead->setdeadch(j, k, l, badch_map[i][j][k][l]);
           }
         }
       }
       db_dead.import(iov);
     }
   }
+
   delete[] badch_map;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+  std::string configPath = "cdcdead_config.json";
+  if (argc >= 2) configPath = argv[1];
 
-  setdeadch();
+  std::vector<DeadchConfig> configs;
+  if (!loadConfigs(configPath, configs)) return 1;
 
+  std::cout << "Loaded " << configs.size() << " config(s) from " << configPath << std::endl;
+  setdeadchFromConfigs(configs);
+  std::cout << "Done. localdb written in current working directory." << std::endl;
+  return 0;
 }
-
-

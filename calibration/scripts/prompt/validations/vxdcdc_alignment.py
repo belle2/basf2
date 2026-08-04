@@ -8,10 +8,12 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import os
 from glob import glob
 from pathlib import Path
 import argparse
+
+from subprocess import run, CalledProcessError
+from shutil import copy2
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -55,9 +57,19 @@ def run_validation(job_path, input_data_path=None, **kwargs):
         merged_file = output_dir / f"{input_type}.root"
 
         if len(root_files) > 1:
-            os.system(f"hadd -f {merged_file} {' '.join(root_files)}")
+            try:
+                run(
+                    ["hadd", "-f", merged_file, *root_files],
+                    capture_output=True,
+                    text=True,
+                )
+            except CalledProcessError as e:
+                print(f"hadd failed with exit code {e.returncode}")
+                print(e.stdout)
+                print(e.stderr)
+
         elif len(root_files) == 1:
-            os.system(f"cp {root_files[0]} {merged_file}")
+            copy2(root_files[0], merged_file)
         else:
             raise FileNotFoundError(f"No root files found for pattern: {filenames_pattern}")
 

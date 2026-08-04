@@ -31,7 +31,6 @@ DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
 
-//   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed", std::string("PXDINJ"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));
   B2DEBUG(1, "DQMHistInjection: Constructor done.");
 }
@@ -115,316 +114,188 @@ void DQMHistInjectionModule::beginRun()
 
 void DQMHistInjectionModule::event()
 {
-  TH1* Hits = nullptr, *Triggers = nullptr;
-  TString locationHits = "";
-  TString locationTriggers = "";
-  //PXD
-  m_histogramDirectoryName = "PXDINJ";
 
-  locationHits = "PXDOccInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "PXDEOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  // PXD
+  {
+    // LER
+    auto Hits = findHist("PXDOccInjLER");
+    auto Triggers = findHist("PXDINJ", "PXDEOccInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERPXD->Divide(Hits, Triggers);
+      m_hInjectionLERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
+    }
+    m_cInjectionLERPXD->Clear();
+    m_cInjectionLERPXD->cd(0);
+    m_hInjectionLERPXD->Draw("hist");
+    m_cInjectionLERPXDOcc->Clear();
+    m_cInjectionLERPXDOcc->cd(0);
+    m_hInjectionLERPXDOcc->Draw("hist");
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  //m_nodes[0].histo = Triggers;
-  if (Hits && Triggers) {
-    m_hInjectionLERPXD->Divide(Hits, Triggers);
-    m_hInjectionLERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
-  }
-
-  m_cInjectionLERPXD->Clear();
-  m_cInjectionLERPXD->cd(0);
-  m_hInjectionLERPXD->Draw("hist");
-
-  m_cInjectionLERPXDOcc->Clear();
-  m_cInjectionLERPXDOcc->cd(0);
-  m_hInjectionLERPXDOcc->Draw("hist");
-
-  locationHits = "PXDOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "PXDEOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  //m_nodes[3].histo = Triggers;
-  if (Hits && Triggers) {
-    m_hInjectionHERPXD->Divide(Hits, Triggers);
-    m_hInjectionHERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
+  {
+    // HER
+    auto Hits = findHist("PXDINJ", "PXDOccInjHER");
+    auto Triggers = findHist("PXDINJ", "PXDEOccInjHER");
+    //Finding only one of them should only happen in very strange situations...
+    if (Hits && Triggers) {
+      m_hInjectionHERPXD->Divide(Hits, Triggers);
+      m_hInjectionHERPXDOcc->Divide(Hits, Triggers, 100, 768 * 250); // to percent
+    }
+    m_cInjectionHERPXD->Clear();
+    m_cInjectionHERPXD->cd(0);
+    m_hInjectionHERPXD->Draw("hist");
+    m_cInjectionHERPXDOcc->Clear();
+    m_cInjectionHERPXDOcc->cd(0);
+    m_hInjectionHERPXDOcc->Draw("hist");
   }
 
-  m_cInjectionHERPXD->Clear();
-  m_cInjectionHERPXD->cd(0);
-  m_hInjectionHERPXD->Draw("hist");
-
-  m_cInjectionHERPXDOcc->Clear();
-  m_cInjectionHERPXDOcc->cd(0);
-  m_hInjectionHERPXDOcc->Draw("hist");
-
-  //SVD
-  m_histogramDirectoryName = "SVDInjection";
-
-  locationHits = "SVDOccInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "SVDTrgOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  // SVD
+  {
+    // LER
+    auto Hits = findHist("SVDInjection", "SVDOccInjLER");
+    auto Triggers = findHist("SVDInjection", "SVDTrgOccInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERSVD->Divide(Hits, Triggers);
+      m_hInjectionLERSVDOcc->Divide(Hits, Triggers, 100, 768 * 7 * 2); // to percent (L3V has 768 strips * 2 * 7 sides)
+    }
+    m_cInjectionLERSVD->Clear();
+    m_cInjectionLERSVD->cd(0);
+    m_hInjectionLERSVD->Draw("hist");
+    m_cInjectionLERSVDOcc->Clear();
+    m_cInjectionLERSVDOcc->cd(0);
+    m_hInjectionLERSVDOcc->Draw("hist");
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  //m_nodes[0].histo = Triggers;
-  if (Hits && Triggers) {
-    m_hInjectionLERSVD->Divide(Hits, Triggers);
-    m_hInjectionLERSVDOcc->Divide(Hits, Triggers, 100, 768 * 7 * 2); // to percent (L3V has 768 strips * 2 * 7 sides)
-  }
-
-  m_cInjectionLERSVD->Clear();
-  m_cInjectionLERSVD->cd(0);
-  m_hInjectionLERSVD->Draw("hist");
-
-  m_cInjectionLERSVDOcc->Clear();
-  m_cInjectionLERSVDOcc->cd(0);
-  m_hInjectionLERSVDOcc->Draw("hist");
-
-  locationHits = "SVDOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "SVDTrgOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  //m_nodes[3].histo = Triggers;
-  if (Hits && Triggers) {
-    m_hInjectionHERSVD->Divide(Hits, Triggers);
-    m_hInjectionHERSVDOcc->Divide(Hits, Triggers, 100, 768 * 2 * 7); // to percent (L3V has 768 strips * 2 * 7 sides)
+  {
+    // HER
+    auto Hits = findHist("SVDInjection", "SVDOccInjHER");
+    auto Triggers = findHist("SVDInjection", "SVDTrgOccInjHER");
+    if (Hits && Triggers) {
+      m_hInjectionHERSVD->Divide(Hits, Triggers);
+      m_hInjectionHERSVDOcc->Divide(Hits, Triggers, 100, 768 * 2 * 7); // to percent (L3V has 768 strips * 2 * 7 sides)
+    }
+    m_cInjectionHERSVD->Clear();
+    m_cInjectionHERSVD->cd(0);
+    m_hInjectionHERSVD->Draw("hist");
+    m_cInjectionHERSVDOcc->Clear();
+    m_cInjectionHERSVDOcc->cd(0);
+    m_hInjectionHERSVDOcc->Draw("hist");
   }
 
-  m_cInjectionHERSVD->Clear();
-  m_cInjectionHERSVD->cd(0);
-  m_hInjectionHERSVD->Draw("hist");
-
-  m_cInjectionHERSVDOcc->Clear();
-  m_cInjectionHERSVDOcc->cd(0);
-  m_hInjectionHERSVDOcc->Draw("hist");
-
-
-  //ECL
-  m_histogramDirectoryName = "ECLINJ";
-
-  locationHits = "ECLHitsInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEHitsInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  // ECL
+  {
+    // LER
+    auto Hits = findHist("ECLINJ", "ECLHitsInjLER");
+    auto Triggers = findHist("ECLINJ", "ECLEHitsInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERECL->Divide(Hits, Triggers);
+    }
+    m_cInjectionLERECL->Clear();
+    m_cInjectionLERECL->cd(0);
+    m_hInjectionLERECL->Draw("hist");
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  if (Hits && Triggers) {
-    m_hInjectionLERECL->Divide(Hits, Triggers);
+  {
+    // HER
+    auto Hits = findHist("ECLINJ", "ECLHitsInjHER");
+    auto Triggers = findHist("ECLINJ", "ECLEHitsInjHER");
+    if (Hits && Triggers) {
+      m_hInjectionHERECL->Divide(Hits, Triggers);
+    }
+    m_cInjectionHERECL->Clear();
+    m_cInjectionHERECL->cd(0);
+    m_hInjectionHERECL->Draw("hist");
   }
-
-  m_cInjectionLERECL->Clear();
-  m_cInjectionLERECL->cd(0);
-  m_hInjectionLERECL->Draw("hist");
-
-  locationHits = "ECLHitsInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  {
+    // Burst LER
+    auto Hits = findHist("ECLINJ", "ECLBurstsInjLER");
+    auto Triggers = findHist("ECLINJ", "ECLEBurstsInjLER");
+    if (Hits && Triggers) {
+      m_hBurstLERECL->Divide(Hits, Triggers);
+    }
+    m_cBurstLERECL->Clear();
+    m_cBurstLERECL->cd(0);
+    m_hBurstLERECL->Draw("hist");
   }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEHitsInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  //Finding only one of them should only happen in very strange situations...
-  if (Hits && Triggers) {
-    m_hInjectionHERECL->Divide(Hits, Triggers);
-  }
-
-  m_cInjectionHERECL->Clear();
-  m_cInjectionHERECL->cd(0);
-  m_hInjectionHERECL->Draw("hist");
-// =====
-  locationHits = "ECLBurstsInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEBurstsInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hBurstLERECL->Divide(Hits, Triggers);
+  {
+    // Burst HER
+    auto Hits = findHist("ECLINJ", "ECLBurstsInjHER");
+    auto Triggers = findHist("ECLINJ", "ECLEBurstsInjHER");
+    if (Hits && Triggers) {
+      m_hBurstHERECL->Divide(Hits, Triggers);
+    }
+    m_cBurstHERECL->Clear();
+    m_cBurstHERECL->cd(0);
+    m_hBurstHERECL->Draw("hist");
   }
 
-  m_cBurstLERECL->Clear();
-  m_cBurstLERECL->cd(0);
-  m_hBurstLERECL->Draw("hist");
-// =====
-
-  locationHits = "ECLBurstsInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  // TOP
+  {
+    // LER
+    auto Hits = findHist("TOP", "TOPOccInjLER");
+    auto Triggers = findHist("TOP", "TOPEOccInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERTOP->Divide(Hits, Triggers, 100, 8192);
+    }
+    m_cInjectionLERTOP->Clear();
+    m_cInjectionLERTOP->cd(0);
+    m_hInjectionLERTOP->Draw("hist");
   }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ECLEBurstsInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hBurstHERECL->Divide(Hits, Triggers);
-  }
-
-  m_cBurstHERECL->Clear();
-  m_cBurstHERECL->cd(0);
-  m_hBurstHERECL->Draw("hist");
-// =====
-
-
-  //TOP
-  m_histogramDirectoryName = "TOP";
-
-  locationHits = "TOPOccInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "TOPEOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionLERTOP->Divide(Hits, Triggers, 100, 8192);
+  {
+    // HER
+    auto Hits = findHist("TOP", "TOPOccInjHER");
+    auto Triggers = findHist("TOP", "TOPEOccInjHER");
+    if (Hits && Triggers) {
+      m_hInjectionHERTOP->Divide(Hits, Triggers, 100, 8192);
+    }
+    m_cInjectionHERTOP->Clear();
+    m_cInjectionHERTOP->cd(0);
+    m_hInjectionHERTOP->Draw("hist");
   }
 
-  m_cInjectionLERTOP->Clear();
-  m_cInjectionLERTOP->cd(0);
-  m_hInjectionLERTOP->Draw("hist");
-
-  locationHits = "TOPOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+  // ARICH
+  {
+    // LER
+    auto Hits = findHist("ARICH", "ARICHOccInjLER");
+    auto Triggers = findHist("ARICH", "ARICHEOccInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERARICH->Divide(Hits, Triggers);
+    }
+    m_cInjectionLERARICH->Clear();
+    m_cInjectionLERARICH->cd(0);
+    m_hInjectionLERARICH->Draw("hist");
   }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "TOPEOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  {
+    // HER
+    auto Hits = findHist("ARICH", "ARICHOccInjHER");
+    auto Triggers = findHist("ARICH", "ARICHEOccInjHER");
+    if (Hits && Triggers) {
+      m_hInjectionHERARICH->Divide(Hits, Triggers);
+    }
+    m_cInjectionHERARICH->Clear();
+    m_cInjectionHERARICH->cd(0);
+    m_hInjectionHERARICH->Draw("hist");
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionHERTOP->Divide(Hits, Triggers, 100, 8192);
-  }
-
-  m_cInjectionHERTOP->Clear();
-  m_cInjectionHERTOP->cd(0);
-  m_hInjectionHERTOP->Draw("hist");
-
-
-
-  //ARICH
-  m_histogramDirectoryName = "ARICH";
-
-  locationHits = "ARICHOccInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ARICHEOccInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionLERARICH->Divide(Hits, Triggers);
-  }
-
-  m_cInjectionLERARICH->Clear();
-  m_cInjectionLERARICH->cd(0);
-  m_hInjectionLERARICH->Draw("hist");
-
-  locationHits = "ARICHOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "ARICHEOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionHERARICH->Divide(Hits, Triggers);
-  }
-
-  m_cInjectionHERARICH->Clear();
-  m_cInjectionHERARICH->cd(0);
-  m_hInjectionHERARICH->Draw("hist");
 
   // KLM
-  m_histogramDirectoryName = "KLM";
-
-  locationHits = "KLMOccInjLER";
-  locationHits = m_histogramDirectoryName + "/" + locationHits;
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "KLMTrigInjLER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
+  {
+    // LER
+    auto Hits = findHist("KLM", "KLMOccInjLER");
+    auto Triggers = findHist("KLM", "KLMTrigInjLER");
+    if (Hits && Triggers) {
+      m_hInjectionLERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
+    }
+    m_cInjectionLERKLM->Clear();
+    m_cInjectionLERKLM->cd(0);
+    m_hInjectionLERKLM->Draw("hist");
   }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionLERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
+  {
+    // HER
+    auto Hits = findHist("KLM", "KLMOccInjHER");
+    auto Triggers = findHist("KLM", "KLMTrigInjHER");
+    if (Hits && Triggers) {
+      m_hInjectionHERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
+    }
+    m_cInjectionHERKLM->Clear();
+    m_cInjectionHERKLM->cd(0);
+    m_hInjectionHERKLM->Draw("hist");
   }
-
-  m_cInjectionLERKLM->Clear();
-  m_cInjectionLERKLM->cd(0);
-  m_hInjectionLERKLM->Draw("hist");
-
-  locationHits = "KLMOccInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  Hits = (TH1*)findHist(locationHits.Data());
-  locationTriggers = "KLMTrigInjHER";
-  if (m_histogramDirectoryName != "") {
-    locationTriggers = m_histogramDirectoryName + "/" + locationTriggers;
-  }
-  Triggers = (TH1*)findHist(locationTriggers.Data());
-
-  if (Hits && Triggers) {
-    m_hInjectionHERKLM->Divide(Hits, Triggers, 100, KLMElementNumbers::getTotalChannelNumber());
-  }
-
-  m_cInjectionHERKLM->Clear();
-  m_cInjectionHERKLM->cd(0);
-  m_hInjectionHERKLM->Draw("hist");
-
 }
 

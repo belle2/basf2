@@ -51,17 +51,28 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // wire gains
+  int nZeroWG = 0;
+
   for (unsigned int i = 0; i < c_nSenseWires; ++i) {
-    if (m_DBWireGains->getWireGain(i) == 0)
-      B2WARNING("Wire gain is zero for this wire: " << i);
+    if (m_DBWireGains->getWireGain(i) == 0) {
+      ++nZeroWG;
+      B2DEBUG(20, "Wire gain is zero for wire: " << i);
+    }
+  }
+
+  if (nZeroWG > 0) {
+    B2WARNING("Found " << nZeroWG << " wires with zero gain");
   }
 
   // cosine correction (store the bin edges for extrapolation)
-  unsigned int ncosbins = m_DBCosineCor->getSize();
-  for (unsigned int i = 0; i < ncosbins; ++i) {
-    double gain = m_DBCosineCor->getMean(i);
-    if (gain == 0)
-      B2ERROR("Cosine gain is zero for this bin " << i);
+  for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {
+    unsigned int ncosbins = m_DBCosineCor->getSize(il);
+
+    for (unsigned int i = 0; i < ncosbins; ++i) {
+      double gain = m_DBCosineCor->getMean(il, i);
+      if (gain == 0)
+        B2ERROR("Cosine gain is zero for this bin " << i);
+    }
   }
 
   // get the hadron correction parameters
@@ -74,7 +85,7 @@ void CDCDedxCorrectionModule::initialize()
 
   int jwire = -1;
   B2INFO("Creating CDCGeometryPar object");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
     int activewires = 0;
@@ -118,21 +129,8 @@ void CDCDedxCorrectionModule::event()
     if (costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
     if (costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
 
-
     double injtime = dedxTrack.getInjectionTime();
     double injring = dedxTrack.getInjectionRing();
-
-    //--------REMOVEBAL--------
-    //when CDST are reproduced with injection time
-    if (injtime == -1 || injring == -1) {
-      if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
-        injring = m_TTDInfo->isHER();
-        injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
-      }
-    }
-    dedxTrack.m_injring = injring;
-    dedxTrack.m_injtime = injtime;
-    //--------REMOVEBAL--------
 
     for (int i = 0; i < nhits; ++i) {
 
@@ -146,7 +144,8 @@ void CDCDedxCorrectionModule::event()
       double jEntaRS = dedxTrack.getEntaRS(i);
       double jPath = dedxTrack.getPath(i);
 
-      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_timeGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor *
+      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_timeGain * dedxTrack.getCosineCorrection(
+                            i) * dedxTrack.m_cosEdgeCor *
                           dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i) * dedxTrack.getNonLADCCorrection(i);
       if (dedxTrack.getWireGain(i) > 0)correction *= dedxTrack.getWireGain(i); //also keep dead wire
 
@@ -246,9 +245,9 @@ void CDCDedxCorrectionModule::OneDCorrection(int layer, double enta, double& ded
   else dedx = 0;
 }
 
-void CDCDedxCorrectionModule::CosineCorrection(double costh, double& dedx) const
+void CDCDedxCorrectionModule::CosineCorrection(unsigned int layer, double costh, double& dedx) const
 {
-  double coscor = m_DBCosineCor->getMean(costh);
+  double coscor = m_DBCosineCor->getMean(layer, costh);
   if (coscor != 0) dedx = dedx / coscor;
   else dedx = 0;
 }
@@ -292,7 +291,7 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
     WireGainCorrection(wireID, dedx, layer);
 
   if (m_cosineCor)
-    CosineCorrection(costheta, dedx);
+    CosineCorrection(layer, costheta, dedx);
 
   //only if constants are abs are for specific costh
   if (!m_relative && m_cosineEdge && (costheta <= -0.850 || costheta >= 0.950))
@@ -316,7 +315,7 @@ double CDCDedxCorrectionModule::GetCorrection(int& adc, int layer, int wireID, d
   if (m_wireGain) correction *= m_DBWireGains->getWireGain(wireID);
   if (m_twoDCell) correction *= m_DB2DCell->getMean(layer, doca, enta);
   if (m_oneDCell) correction *= m_DB1DCell->getMean(layer, enta);
-  if (m_cosineCor) correction *= m_DBCosineCor->getMean(costheta);
+  if (m_cosineCor) correction *= m_DBCosineCor->getMean(layer, costheta);
 
   //these last two are only for abs constant
   if (!m_relative) {

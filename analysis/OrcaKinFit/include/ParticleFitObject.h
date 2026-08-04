@@ -87,7 +87,7 @@ namespace Belle2 {
                                    );
 
       /// Virtual destructor
-      virtual ~ParticleFitObject();
+      virtual ~ParticleFitObject() override;
 
       /// Assign from anther object, if of same type
       virtual ParticleFitObject& assign(const BaseFitObject& source    ///< The source object

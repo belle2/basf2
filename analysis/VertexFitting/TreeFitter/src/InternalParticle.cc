@@ -207,7 +207,7 @@ namespace TreeFitter {
     int momindex = momIndex();
     fitparams.getStateVector().segment(momindex, 4) = Eigen::Matrix<double, 4, 1>::Zero(4);
 
-    for (auto daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       int daumomindex = daughter->momIndex();
       int maxrow = daughter->hasEnergy() ? 4 : 3;
 
@@ -229,7 +229,7 @@ namespace TreeFitter {
   {
     ErrCode status;
     ParticleBase::initCovariance(fitparams);
-    for (auto daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       status |= daughter->initCovariance(fitparams);
     }
     return status;
@@ -382,7 +382,7 @@ namespace TreeFitter {
                                              int depth) const
   {
 
-    for (auto daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       daughter->addToConstraintList(list, depth - 1);
     }
     if (tauIndex() >= 0 && m_lifetimeconstraint) {

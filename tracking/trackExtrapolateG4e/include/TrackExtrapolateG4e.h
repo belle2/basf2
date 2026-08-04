@@ -209,7 +209,7 @@ namespace Belle2 {
 
     //! Perform end-of-run actions.
     //! @param flag True if called by Muid module, false if called by Ext module.
-    void endRun(bool flag);
+    static void endRun(bool flag);
 
     //! Terminates this singleton.
     //! @param flag True if called by Muid module, false if called by Ext module.
@@ -255,13 +255,13 @@ namespace Belle2 {
     void getVolumeID(const G4TouchableHandle&, Const::EDetector&, int&);
 
     //! Convert the geant4e 5x5 covariance to phasespace 6x6 covariance
-    void fromG4eToPhasespace(const G4ErrorFreeTrajState&, G4ErrorSymMatrix&);
+    static void fromG4eToPhasespace(const G4ErrorFreeTrajState&, G4ErrorSymMatrix&);
 
     //! Convert the phasespace covariance to geant4e covariance
-    void fromPhasespaceToG4e(const G4ThreeVector&, const G4ErrorSymMatrix&, G4ErrorTrajErr&);
+    static void fromPhasespaceToG4e(const G4ThreeVector&, const G4ErrorSymMatrix&, G4ErrorTrajErr&);
 
     //! Convert the phasespace covariance to geant4e covariance
-    void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
+    static void fromPhasespaceToG4e(const TVector3&, const TMatrixDSym&, G4ErrorTrajErr&);
 
     //! Get the start point for a new reconstructed track with specific PDG hypothesis
     ExtState getStartPoint(const Track&, int, G4ErrorFreeTrajState&);

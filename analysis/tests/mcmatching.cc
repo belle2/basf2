@@ -84,7 +84,7 @@ namespace {
       if (m_pdg == pdg and m_particle)
         return m_particle;
 
-      for (auto& d : m_daughterDecays) {
+      for (const auto& d : m_daughterDecays) {
         Particle* res = d.getParticle(pdg);
         if (res)
           return res;
@@ -97,7 +97,7 @@ namespace {
       if (m_pdg == pdg and m_mcparticle)
         return m_mcparticle;
 
-      for (auto& d : m_daughterDecays) {
+      for (const auto& d : m_daughterDecays) {
         MCParticle* res = d.getMCParticle(pdg);
         if (res)
           return res;
@@ -666,8 +666,8 @@ namespace {
       //plus c_MissGamma because one photon was not reconstructed,
       //plus c_MissingResonance because non-FSPs were missed (MC matched particle (521) has lots of daughters)
 
-      Particle* pi0 = d.getParticle(111);
-      Decay* pi0decay = d.getDecay(111);
+      const Particle* pi0 = d.getParticle(111);
+      const Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(MCMatching::setMCTruth(pi0)) << pi0decay->getString();
       EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
       EXPECT_EQ(MCMatching::c_MisID | MCMatching::c_AddedWrongParticle | MCMatching::c_MissMassiveParticle | MCMatching::c_MissGamma |
@@ -675,8 +675,8 @@ namespace {
                 MCMatching::getMCErrors(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
-      Particle* p = d.getParticle(421);
-      Decay* d0decay = d.getDecay(421);
+      const Particle* p = d.getParticle(421);
+      const Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(MCMatching::setMCTruth(p)) << d0decay->getString();
       EXPECT_EQ(MCMatching::c_MisID | MCMatching::c_AddedWrongParticle | MCMatching::c_MissGamma | MCMatching::c_MissingResonance,
                 MCMatching::getMCErrors(p)) << d0decay->getString();
@@ -985,7 +985,7 @@ namespace {
     {
       Decay d(521, { -11, 12, 22});
       d.finalize();
-      MCParticle* photon = d.getMCParticle(22);
+      const MCParticle* photon = d.getMCParticle(22);
       EXPECT_FALSE(MCMatching::isFSR(photon));
 
       d.reconstruct({521, { -11}});
@@ -1257,9 +1257,9 @@ namespace {
       /** Reconstructed as Y(4S) -> [B0 -> mu+ mu-] [B0 -> [D- -> K+ pi- pi-] pi+] */
       d.reconstruct({300553, { {511, { -13, 13, 0, 0, {0, {0, 0}}}}, {511, {{ -411, {321, -211, -211}}, 211}} } });
 
-      Particle* Y4S = d.m_particle;
-      Particle* B1 = d.m_particle->getDaughters()[0];
-      Particle* B2 = d.m_particle->getDaughters()[1];
+      const Particle* Y4S = d.m_particle;
+      const Particle* B1 = d.m_particle->getDaughters()[0];
+      const Particle* B2 = d.m_particle->getDaughters()[1];
 
       // don't set any properties
       ASSERT_TRUE(MCMatching::setMCTruth(B1)) << d.getString();
@@ -1285,9 +1285,9 @@ namespace {
       /** Reconstructed as Y(4S) -> [B0 -> mu+ mu-] [B0 -> [D- -> K+ pi- pi-] pi+] */
       d.reconstruct({300553, { {511, { -13, 13, 0, 0, {0, {0, 0}}}}, {511, {{ -411, {321, -211, -211}}, 211}} } });
 
-      Particle* Y4S = d.m_particle;
+      const Particle* Y4S = d.m_particle;
       Particle* B1 = d.m_particle->getDaughters()[0];
-      Particle* B2 = d.m_particle->getDaughters()[1];
+      const Particle* B2 = d.m_particle->getDaughters()[1];
 
       int isIgnoreMissing = Particle::PropertyFlags::c_IsIgnoreRadiatedPhotons |
                             Particle::PropertyFlags::c_IsIgnoreIntermediate |
@@ -1320,8 +1320,8 @@ namespace {
       /** Reconstructed as B0 -> [D- -> pi- pi0] pi+ */
       d.reconstruct({511, {{ -411, { -211, 0, 0, {111, {22, 22}}}}, 211, {0, {0, 0}}}});
 
-      Particle* B = d.m_particle;
-      Particle* D = d.m_particle->getDaughters()[0];
+      const Particle* B = d.m_particle;
+      const Particle* D = d.m_particle->getDaughters()[0];
 
       // don't set any properties
 
@@ -1345,7 +1345,7 @@ namespace {
       d.reconstruct({511, {{ -411, { -211, 0, 0, {111, {22, 22}}}}, 211, {0, {0, 0}}}});
 
       Particle* B = d.m_particle;
-      Particle* D = d.m_particle->getDaughters()[0];
+      const Particle* D = d.m_particle->getDaughters()[0];
 
       int isIgnoreMissing = Particle::PropertyFlags::c_IsIgnoreIntermediate |
                             Particle::PropertyFlags::c_IsIgnoreMassive;

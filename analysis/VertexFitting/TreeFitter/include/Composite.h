@@ -24,7 +24,7 @@ namespace TreeFitter {
               bool massconstraint = false);
 
     /** destructor */
-    virtual ~Composite() {};
+    virtual ~Composite() override = default;
 
     /** init particle in case it has a mother */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;

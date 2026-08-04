@@ -210,7 +210,7 @@ namespace TreeFitter {
   {
     const ParticleBase* rc = (m_particle == particle) ? this : nullptr;
     if (!rc) {
-      for (auto* daughter : m_daughters) {
+      for (const auto* daughter : m_daughters) {
         rc = daughter->locate(particle);
         if (rc) {break;}
       }
@@ -221,7 +221,7 @@ namespace TreeFitter {
   void ParticleBase::retrieveIndexMap(indexmap& map) const
   {
     map.push_back(std::pair<const ParticleBase*, int>(this, index()));
-    for (auto* daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       daughter->retrieveIndexMap(map);
     }
   }
@@ -229,7 +229,7 @@ namespace TreeFitter {
   double ParticleBase::chiSquare(const FitParams& fitparams) const
   {
     double rc = 0;
-    for (auto* daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       rc += daughter->chiSquare(fitparams);
     }
     return rc;
@@ -238,7 +238,7 @@ namespace TreeFitter {
   int ParticleBase::nFinalChargedCandidates() const
   {
     int rc = 0;
-    for (auto* daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       rc += daughter->nFinalChargedCandidates();
     }
     return rc;

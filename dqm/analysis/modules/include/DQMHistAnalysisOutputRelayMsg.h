@@ -30,11 +30,6 @@ namespace Belle2 {
     DQMHistAnalysisOutputRelayMsgModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisOutputRelayMsgModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

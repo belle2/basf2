@@ -390,10 +390,6 @@ Each one does exactly as its name indicates: they rank particles in descending
 variable provided as a parameter.
 They append to each particle an `extraInfo` field with the name
 ``${variable}_rank``, with the best candidate having the value one (1).
-Notice that *each particle/anti-particle list is sorted separately*, i.e., if a
-certain event has multiple :math:`B^+` and :math:`B^-` candidates, and you apply
-the ranking function to any of the particle lists, each list will be ranked
-separately.
 
 Best candidate selection can then be performed by simply selecting the particle
 with the lowest rank.
@@ -478,7 +474,6 @@ random seed.
 
     * Best candidate selection can be performed with the `rankByHighest` and
       `rankByLowest` functions
-    * These functions sort particles and antiparticles separately
     * From light release ``light-2008-kronos``, a new helper function can be
       used to perform random candidate selection: `applyRandomCandidateSelection`
 

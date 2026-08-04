@@ -46,6 +46,18 @@ namespace Belle2 {
     /// Load in the reco tracks and the hits
     void apply(std::vector<RecoTrack*>& seeds) override;
 
+    /** Set minimal pT requirement for tracks
+     *
+     *  @param minimalPtRequirement Minimal pT in GeV/c
+     */
+    void setMinimalPtRequirement(double minimalPtRequirement) { m_param_minimalPtRequirement = minimalPtRequirement; }
+
+    /** Set whether to ignore tracks with CDC hits
+     *
+     *  @param ignoreTracksWithCDChits True to ignore tracks with CDC hits
+     */
+    void setIgnoreTracksWithCDChits(bool ignoreTracksWithCDChits) { m_noCDChits = ignoreTracksWithCDChits; }
+
   private:
     // Findlets
     /// Findlet for fitting the tracks

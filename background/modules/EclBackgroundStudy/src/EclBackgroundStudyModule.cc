@@ -33,10 +33,6 @@ namespace Belle2 {
     addParam("FileName", m_filename, "output file name", string("mytree.root"));
   }
 
-  EclBackgroundStudyModule::~EclBackgroundStudyModule()
-  {
-  }
-
   void EclBackgroundStudyModule::initialize()
   {
     // Print set parameters
@@ -113,10 +109,6 @@ namespace Belle2 {
 
     // increase the entry counter
     m_iEntry++;
-  }
-
-  void EclBackgroundStudyModule::endRun()
-  {
   }
 
   void EclBackgroundStudyModule::terminate()

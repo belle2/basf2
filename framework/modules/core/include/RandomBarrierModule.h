@@ -31,13 +31,12 @@ namespace Belle2 {
      */
     RandomBarrierModule();
 
-    ~RandomBarrierModule();
+    ~RandomBarrierModule() override;
 
     virtual void initialize() override;
     virtual void beginRun() override;
     virtual void endRun() override;
     virtual void event() override;
-    virtual void terminate() override;
 
   private:
   };

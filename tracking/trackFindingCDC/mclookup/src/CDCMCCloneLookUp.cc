@@ -101,9 +101,9 @@ void CDCMCCloneLookUp::fill(std::vector<CDCTrack>& cdcTracks)
   std::map<const ITrackType, std::vector<CDCTrack*>> matchedCDCTracksByMCID =
                                                     getMatchedCDCTracksByMCID(cdcTracks);
 
-  for (auto& mcIDAndCDCTracks : matchedCDCTracksByMCID) {
+  for (const auto& mcIDAndCDCTracks : matchedCDCTracksByMCID) {
     /// Vector of track pointers which are mapped to this mcTrackID
-    std::vector<CDCTrack*>& matchedTrackPtrs = mcIDAndCDCTracks.second;
+    const std::vector<CDCTrack*>& matchedTrackPtrs = mcIDAndCDCTracks.second;
 
     if (matchedTrackPtrs.size() == 1) { // only one matching track
       m_cdcTrackIsCloneMap[matchedTrackPtrs.at(0)] = false; // not clone

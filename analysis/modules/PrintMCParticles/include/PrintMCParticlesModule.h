@@ -35,7 +35,7 @@ namespace Belle2 {
     PrintMCParticlesModule();
 
     /** Destructor. */
-    virtual ~PrintMCParticlesModule() {}
+    virtual ~PrintMCParticlesModule() override = default;
 
     /** init. */
     virtual void initialize() override;

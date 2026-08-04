@@ -9,6 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -23,7 +25,7 @@ bool FitTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRel
   CDCTrajectory3D fromFit = fromTrack->getEndTrajectory3D();
   CDCTrajectory3D toFit   = toTrack->getStartTrajectory3D();
 
-  Vector3D commonOrigin = fromFit.getSupport();
+  const ROOT::Math::XYZVector& commonOrigin = fromFit.getSupport();
 
   fromFit.setLocalOrigin(commonOrigin);
   toFit.setLocalOrigin(commonOrigin);

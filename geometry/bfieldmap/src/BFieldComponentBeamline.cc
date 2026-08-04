@@ -10,6 +10,7 @@
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -156,7 +157,7 @@ namespace Belle2 {
           int imin = -1; double dmin = 1e100;
           for (unsigned int i = 0; i < m_triangleCenters.size(); i++) {
             const xy_t& p = m_triangleCenters[i];
-            double d = pow(p.x - x, 2) + pow(p.y - y, 2);
+            double d = square(p.x - x) + square(p.y - y);
             if (d < dmin) {imin = i; dmin = d;}
           }
           int k = iy + ny * ix;

@@ -57,10 +57,6 @@ namespace Belle2 {
     addParam("FileName", m_filename, "output file name", string("mytree.root"));
   }
 
-  BeamBkgNeutronModule::~BeamBkgNeutronModule()
-  {
-  }
-
   void BeamBkgNeutronModule::initialize()
   {
     // create/open the file
@@ -145,7 +141,7 @@ namespace Belle2 {
     for (Int_t hit = 0; hit < m_nSimHits[7]; hit++) {
       // get KLMSimHit
 //      EKLMSimHit* simHit = EKLMSimHits[hit];
-      KLMSimHit* simHit = KLMSimHits[hit];
+      const KLMSimHit* simHit = KLMSimHits[hit];
       Float_t posZ = simHit->getPositionZ();
       if (280.0 < posZ && posZ <  288.0) m_nSimHits[9]++;   // FWD EKLM innermost layer
       else if (400.0 < posZ && posZ <  406.0) m_nSimHits[10]++;  // FWD EKLM outermost layer
@@ -167,7 +163,7 @@ namespace Belle2 {
     detID = 1;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      PXDSimHit* simHit = PXDSimHits[iHit];
+      const PXDSimHit* simHit = PXDSimHits[iHit];
       // get related MCparticle
       if (relPXDSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relPXDSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -183,7 +179,7 @@ namespace Belle2 {
     detID = 2;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      SVDSimHit* simHit = SVDSimHits[iHit];
+      const SVDSimHit* simHit = SVDSimHits[iHit];
       // get related MCparticle
       if (relSVDSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relSVDSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -199,7 +195,7 @@ namespace Belle2 {
     detID = 3;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      CDCSimHit* simHit = CDCSimHits[iHit];
+      const CDCSimHit* simHit = CDCSimHits[iHit];
       // get related MCparticle
       if (relCDCSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relCDCSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -215,7 +211,7 @@ namespace Belle2 {
     detID = 4;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      ARICHSimHit* simHit = ARICHSimHits[iHit];
+      const ARICHSimHit* simHit = ARICHSimHits[iHit];
       // get related MCparticle
       if (relARICHSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relARICHSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -231,7 +227,7 @@ namespace Belle2 {
     detID = 5;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      TOPSimHit* simHit = TOPSimHits[iHit];
+      const TOPSimHit* simHit = TOPSimHits[iHit];
       // get related MCparticle
       if (relTOPSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relTOPSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -247,7 +243,7 @@ namespace Belle2 {
     detID = 6;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      ECLSimHit* simHit = ECLSimHits[iHit];
+      const ECLSimHit* simHit = ECLSimHits[iHit];
       // get related MCparticle
       if (relECLSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relECLSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -262,7 +258,7 @@ namespace Belle2 {
     detID = 7;
     // loop over simhits
     for (Int_t iHit = 0; iHit < m_nSimHits[detID]; iHit++) {
-      KLMSimHit* simHit = KLMSimHits[iHit];
+      const KLMSimHit* simHit = KLMSimHits[iHit];
       // get related MCparticle
       if (relKLMSimHitToMCParticle.getFirstElementTo(simHit)) {
         const MCParticle* currParticle = relKLMSimHitToMCParticle.getFirstElementTo(simHit)->from;
@@ -286,7 +282,7 @@ namespace Belle2 {
     // loop over bkgHits
     for (Int_t iHit = 0; iHit < nHits; iHit++) {
       // get one bkgHit
-      BeamBackHit* bkgHit = BeamBackHits[iHit];
+      const BeamBackHit* bkgHit = BeamBackHits[iHit];
       if (bkgHit->getPDG() == 2112) { /*neutron*/
         m_iEvent = m_iEntry;
         m_iden = bkgHit->getIdentifier();
@@ -350,10 +346,6 @@ namespace Belle2 {
     }
     // increase the entry counter
     m_iEntry++;
-  }
-
-  void BeamBkgNeutronModule::endRun()
-  {
   }
 
   void BeamBkgNeutronModule::terminate()

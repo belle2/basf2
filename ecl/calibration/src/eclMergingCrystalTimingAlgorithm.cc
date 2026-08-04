@@ -340,6 +340,34 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
                                         meanGoodCrystalCalibPerCrate_cosmic[crate_id_from_crystal - 1] ;
   }
 
+  //------------------------------------------------------------------------
+  //..For each crate, get the average Bhabha calibration using only crystals
+  //  with good Bhabha calibrations and cellID [673, 8160], the region with
+  //  consistently high statistics.
+  const int firstHiStatCellID = 673;
+  const int lastHiStatCellID = 8160;
+  int nGoodBhabhaPerCrate[m_numCrates] = {};
+  double averageBhabhaCalibPerCrate[m_numCrates] = {};
+
+  //..Find the good crystals and sum
+  for (int cellID = firstHiStatCellID; cellID <= lastHiStatCellID; cellID++) {
+    int crysID = cellID - 1;
+    int crateID = crystalMapper->getCrateID(cellID);
+    if (bhabhaCalibGoodQuality[crysID]) {
+      nGoodBhabhaPerCrate[crateID - 1]++;
+      averageBhabhaCalibPerCrate[crateID - 1] += bhabhaCalib[crysID];
+    }
+  }
+
+  //..Crate average
+  for (int crateID = 1; crateID <= m_numCrates; crateID++) {
+    if (nGoodBhabhaPerCrate[crateID - 1] != 0) {
+      averageBhabhaCalibPerCrate[crateID - 1] /= nGoodBhabhaPerCrate[crateID - 1];
+    }
+    B2INFO("crateID " << crateID << " nGood " << nGoodBhabhaPerCrate[crateID - 1] << " average Bhabha calib " <<
+           averageBhabhaCalibPerCrate[crateID - 1]);
+  }
+
 
   //------------------------------------------------------------------------
   /** Calculate the new ECLCrystalTimeOffset from existing payloads.  Use
@@ -397,7 +425,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
       /* If there is a radiative bhabha calibration for this crystal then
          use it otherwise use the cosmic calibration */
       if (bhabhaGammaCalib[ic] != 0 || bhabhaGammaCalibGoodQuality[ic]) {
-        newCalib[ic] = bhabhaGammaCalib[ic] ;
+        newCalib[ic] = bhabhaGammaCalib[ic] + averageBhabhaCalibPerCrate[crate_id_from_crystal - 1];
         newCalibUnc[ic] = fabs(bhabhaGammaCalibUnc[ic]);
         whichCalibUsed = "bhabhaGamma";
       } else {
@@ -532,7 +560,7 @@ CalibrationAlgorithm::EResult eclMergingCrystalTimingAlgorithm::calibrate()
 
 
   /* Re-save the new bhabha calibrations to a payload.  The bhabha calibrations have NOT
-     been changed; however, the best way of controlling which payloads get get uploaded to
+     been changed; however, the best way of controling which payloads get get uploaded to
      the GT as part of the prommp calibrations is to save a second copy in this calibration
      directory since we don't want to save all the payloads from the previous directory.
      See the "<calibration>.save_payloads = <True/False>" code in the airflow steering file.*/

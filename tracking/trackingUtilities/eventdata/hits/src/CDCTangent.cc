@@ -12,7 +12,6 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
@@ -81,12 +80,12 @@ CDCTangent CDCTangent::reversed() const
                     ParameterLine2D::throughPoints(getToRecoPos2D(), getFromRecoPos2D()));
 }
 
-Vector2D CDCTangent::getFromRecoDisp2D() const
+ROOT::Math::XYVector CDCTangent::getFromRecoDisp2D() const
 {
   return getFromRecoPos2D() - getFromRLWireHit().getRefPos2D();
 }
 
-Vector2D CDCTangent::getToRecoDisp2D() const
+ROOT::Math::XYVector CDCTangent::getToRecoDisp2D() const
 {
   return getToRecoPos2D() - getToRLWireHit().getRefPos2D();
 }

@@ -34,12 +34,12 @@ namespace Belle2 {
     /**
      * Returns calculated Cleo Cones constructed from all tracks
      */
-    std::vector<float> cleo_cone_with_all() { return m_cleo_cone_with_all; }
+    const std::vector<float>& cleo_cone_with_all() { return m_cleo_cone_with_all; }
 
     /**
      * Returns calculated Cleo Cones constructed from only ROE tracks
      */
-    std::vector<float> cleo_cone_with_roe() { return m_cleo_cone_with_roe; }
+    const std::vector<float>& cleo_cone_with_roe() { return m_cleo_cone_with_roe; }
 
   private:
 

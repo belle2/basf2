@@ -35,16 +35,15 @@ namespace Belle2 {
     PIDCalibrationWeight() {};
 
     /// Constructor with the initial WeightMatrix
-    PIDCalibrationWeight(WeightMatrix weightMatrix)
-    {
-      m_weightMatrix = weightMatrix;
-    };
+    explicit PIDCalibrationWeight(const WeightMatrix& weightMatrix)
+      : m_weightMatrix(weightMatrix)
+    {};
 
     /**
      * Set the WeightMatrix.
      * @param weightMatrix is the weight matrix to be set.
      */
-    void setWeightMatrix(WeightMatrix weightMatrix)
+    void setWeightMatrix(const WeightMatrix& weightMatrix)
     {
       m_weightMatrix = weightMatrix;
     };
@@ -52,7 +51,7 @@ namespace Belle2 {
     /**
      * Get the WeightMatrix.
      */
-    WeightMatrix getWeightMatrix() const
+    const WeightMatrix& getWeightMatrix() const
     {
       return m_weightMatrix;
     };
@@ -67,7 +66,7 @@ namespace Belle2 {
     {
       std::vector<double> weightVector = getWeights(pdg);
 
-      Const::EDetector det;
+      Const::EDetector det = Const::invalidDetector; // default value, will be overwritten
       boost::to_lower(detector);
       if (detector == "svd") det = Const::SVD;
       else if (detector == "cdc") det = Const::CDC;

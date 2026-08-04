@@ -65,7 +65,7 @@ namespace Belle2 {
         /**
          * Calculates the internal vector size from the product of the shape dimensions
          */
-        size_t sizeFromShape(const std::vector<int64_t>& shape)
+        static size_t sizeFromShape(const std::vector<int64_t>& shape)
         {
           size_t size = 1;
           for (auto n : shape) size *= n;
@@ -92,7 +92,7 @@ namespace Belle2 {
          *
          * @throws std::invalid_argument if any shape dimension is negative
          */
-        Tensor(std::vector<int64_t> shape)
+        explicit Tensor(std::vector<int64_t> shape)
           : m_values(sizeFromShape(shape)), m_shape(std::move(shape)),
             m_memoryInfo(
               Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU))
@@ -191,7 +191,7 @@ namespace Belle2 {
          *
          * @throws std::out_of_range if any index is out of bounds.
          */
-        auto& at(std::vector<size_t> index)
+        auto& at(const std::vector<size_t>& index)
         {
           size_t flat_index = 0;
           size_t stride = 1;
@@ -302,7 +302,7 @@ namespace Belle2 {
         *
         * @param filename Path to the ONNX model file.
         */
-        Session(const std::string filename);
+        explicit Session(const std::string& filename);
 
         /**
         * @brief Runs inference on the model using named Tensor maps.

@@ -30,6 +30,8 @@ namespace Belle2 {
      */
     DQMHistInjectionModule();
 
+  private:
+
     /**
      * Initializer.
      */

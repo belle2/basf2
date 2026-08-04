@@ -151,6 +151,7 @@ void TagVertexModule::initialize()
     B2FATAL("TagVertexModule : the singleTrack option is temporarily broken.");
 }
 
+// cppcheck-suppress uselessOverride
 void TagVertexModule::beginRun()
 {
   //TODO: set magnetic field for each run
@@ -172,7 +173,7 @@ void TagVertexModule::event()
   for (unsigned i = 0; i < m_plist->getListSize(); ++i) {
     resetReturnParams();
 
-    Particle* particle =  m_plist->getParticle(i);
+    const Particle* particle =  m_plist->getParticle(i);
     if (m_useMCassociation == "breco" || m_useMCassociation == "internal") BtagMCVertex(particle);
     bool ok = doVertexFit(particle);
     if (ok) deltaT(particle);
@@ -936,7 +937,7 @@ void TagVertexModule::deltaT(const Particle* Breco)
   m_truthTagVol = m_mcTagV.Dot(oboost);
 }
 
-Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, std::string fitType) const
+Particle* TagVertexModule::doVertexFitForBTube(const Particle* motherIn, const std::string& fitType) const
 {
   //make a copy of motherIn to not modify the original object
   Particle* mother = ParticleCopy::copyParticle(motherIn);

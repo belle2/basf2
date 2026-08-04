@@ -19,6 +19,9 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+
 #include <numeric>
 
 using namespace Belle2;
@@ -38,10 +41,10 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
 
   const CDCRecoHit3D& recoHit3D = CDCRecoHit3D::reconstruct(*rlWireHit, trajectory2D);
 
-  const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
+  const ROOT::Math::XYVector& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track->size();
-  const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
+  const ROOT::Math::XYZVector& reconstructedPosition = recoHit3D.getRecoPos3D();
   const double reconstructedDriftLength = recoHit3D.getSignedRecoDriftLength();
   const double reconstructedS = recoHit3D.getArcLength2D();
   const unsigned short int adcCount = rlWireHit->getWireHit().getHit()->getADCCount();
@@ -52,9 +55,9 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
   const CDCRecoHit3D & listRecoHit) { return sum + listRecoHit.getArcLength2D();});
 
   const CDCWire& wire = rlWireHit->getWire();
-  Vector2D wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
-  Vector2D disp2D = reconstructedPosition.xy() - wirePos;
-  const double xyDistance = disp2D.norm();
+  ROOT::Math::XYVector wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
+  ROOT::Math::XYVector disp2D = VectorUtil::getXYVector(reconstructedPosition) - wirePos;
+  const double xyDistance = disp2D.R();
 
   const auto nearestAxialHit = std::min_element(track->begin(), track->end(), [&reconstructedS](const CDCRecoHit3D & lhs,
   const CDCRecoHit3D & rhs) {
@@ -65,9 +68,9 @@ bool StereoHitVarSet::extract(const BaseStereoHitFilter::Object* testPair)
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
   var<named("reco_s")>() = toFinite(reconstructedS, 0);
   var<named("reco_z")>() = toFinite(reconstructedPosition.z(), 0);
-  var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
-  var<named("phi_hit")>() = reconstructedPosition.phi();
-  var<named("theta_hit")>() = reconstructedPosition.theta();
+  var<named("phi_track")>() = toFinite(startMomentum.Phi(), 0);
+  var<named("phi_hit")>() = reconstructedPosition.Phi();
+  var<named("theta_hit")>() = reconstructedPosition.Theta();
   var<named("drift_length")>() = reconstructedDriftLength;
   var<named("adc_count")>() = adcCount;
   var<named("xy_distance_zero_z")>() = toFinite(xyDistance, 0);

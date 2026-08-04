@@ -118,8 +118,6 @@ void ParticleMCDecayStringModule::event()
     m_decayHash = bitconverter.f;
     particle->addExtraInfo(c_ExtraInfoName, m_decayHash);
 
-    // cppcheck doesn't like this use of union and throws warnings
-    // cppcheck-suppress redundantAssignment
     bitconverter.i = decayHashExtended;
     m_decayHashExtended = bitconverter.f;
     particle->addExtraInfo(c_ExtraInfoNameExtended, m_decayHashExtended);
@@ -166,7 +164,7 @@ const MCParticle* ParticleMCDecayStringModule::getInitialParticle(const MCPartic
   if (mcPMother == nullptr) {
     return mcP;
   } else {
-    return getInitialParticle(mcPMother);
+    return ParticleMCDecayStringModule::getInitialParticle(mcPMother);
   }
 }
 
@@ -211,7 +209,7 @@ std::string ParticleMCDecayStringModule::getDecayStringFromParticle(const Partic
 
   if (not isFSP(p->getPDGCode())) {
     output += " (-->";
-    for (auto daughter : p->getDaughters()) {
+    for (const auto* daughter : p->getDaughters()) {
       output += getDecayStringFromParticle(daughter);
     }
     output += ")";
@@ -229,7 +227,7 @@ std::string ParticleMCDecayStringModule::getMCDecayStringFromParticle(const Part
   output = getMCDecayStringFromMCParticle(p->getRelatedTo<MCParticle>());
   // Some FSPs can have daughters, e.g. converted Photons and K-Shorts
   if (not isFSP(p->getPDGCode())) {
-    for (auto& daughter : p->getDaughters()) {
+    for (const auto& daughter : p->getDaughters()) {
       output += " | " + getMCDecayStringFromParticle(daughter);
     }
   }
@@ -268,7 +266,7 @@ std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mc
 
   if (not isFSP(mcPMother->getPDG())) {
     ss << " (-->";
-    for (auto daughter : mcPMother->getDaughters()) {
+    for (const auto* daughter : mcPMother->getDaughters()) {
       ss << buildMCDecayString(daughter, mcPMatched);
     }
     ss << ")";

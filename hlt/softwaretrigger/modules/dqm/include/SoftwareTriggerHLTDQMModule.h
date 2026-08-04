@@ -63,16 +63,16 @@ namespace Belle2 {
       std::vector<std::string> m_param_additionalL1Identifiers;
 
       /// Create total result histogram?
-      bool m_param_create_total_result_histograms;
+      bool m_param_create_total_result_histograms = false;
 
       /// Create exp/run/event number histograms?
-      bool m_param_create_exp_run_event_histograms;
+      bool m_param_create_exp_run_event_histograms = false;
 
       /// Create HLT unit number histograms?
-      bool m_param_create_hlt_unit_histograms;
+      bool m_param_create_hlt_unit_histograms = false;
 
       /// Create error flag histograms?
-      bool m_param_create_error_flag_histograms;
+      bool m_param_create_error_flag_histograms = false;
 
       /// Which variables should be reported?
       std::vector<std::string> m_param_variableIdentifiers;

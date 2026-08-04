@@ -94,7 +94,7 @@ namespace Belle2 {
     void MomentumConstraint::updateCache() const
     {
       nparams = 0;
-      for (auto fitobject : fitobjects) {
+      for (const auto* fitobject : fitobjects) {
         for (int ilocal = 0; ilocal < fitobject->getNPar(); ilocal++) {
           int iglobal = fitobject->getGlobalParNum(ilocal);
           if (!fitobject->isParamFixed(ilocal)) {

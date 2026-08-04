@@ -15,12 +15,12 @@
 #include <limits>
 
 // ROOT
-#include "TF1.h"
-#include "TFile.h"
-#include "TH2F.h"
-#include "TMath.h"
-#include "TROOT.h"
-#include "TTree.h"
+#include <TF1.h>
+#include <TFile.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
+#include <TTree.h>
 
 // Belle II
 #include <framework/logging/Logger.h>
@@ -131,7 +131,7 @@ static double TTSPDF(double x, double time, double deltaT, double sigma1, double
 // 2 TTSPDF
 // 1 crystal ball PDF for the extra peak at +1 ns we don't understand
 // 1 gaussian to help modelling the tail
-// cppcheck-suppress constParameter
+// cppcheck-suppress constParameterCallback
 static double laserPDF(double* x, double* p)
 {
   // Define parameters

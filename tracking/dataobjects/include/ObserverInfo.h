@@ -79,17 +79,17 @@ namespace Belle2 {
     /** add a new filter info:
      * @param info: the filterinfo to be added
     */
-    void addFilterInfo(FilterInfo info) { m_filterInfos.push_back(info); };
+    void addFilterInfo(const FilterInfo& info) { m_filterInfos.push_back(info); };
 
     /** returns the vector of spacepoints which have been used to evaluate the filters */
-    std::vector<SpacePointInfo> getHits() { return m_hits; };
+    const std::vector<SpacePointInfo>& getHits() const { return m_hits; };
 
     /** Returns the i-th hit
      * @param i: hit index
     */
     SpacePointInfo getHit(int i)
     {
-      if (i < 0 || i > (int)m_hits.size()) return SpacePointInfo();  // return a dummy object
+      if (i < 0 || i >= (int)m_hits.size()) return SpacePointInfo();  // return a dummy object
       else return m_hits[i];
     };
 

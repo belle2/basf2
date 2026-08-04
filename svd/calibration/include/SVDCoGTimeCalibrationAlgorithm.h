@@ -23,7 +23,7 @@ namespace Belle2 {
     explicit SVDCoGTimeCalibrationAlgorithm(const std::string& str);
 
     /** Destructor*/
-    virtual ~SVDCoGTimeCalibrationAlgorithm() {}
+    virtual ~SVDCoGTimeCalibrationAlgorithm() override {}
 
     /** Setter for m_allowedT0Shift*/
     void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}

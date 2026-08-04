@@ -32,10 +32,10 @@ namespace Belle2 {
     {
       bool hasRAVEProdVertex = true;
       std::vector<std::string> directions = {"x", "y", "z"};
-      for (auto ielement : directions) {
+      for (const auto& ielement : directions) {
         std::string prodVertPositionElement = boost::str(boost::format("prodVert%s") % boost::to_upper_copy(ielement));
         hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertPositionElement);
-        for (auto jelement : directions) {
+        for (const auto& jelement : directions) {
           std::string prodVertCovarianceElement = boost::str(boost::format("prodVertS%s%s") % ielement % jelement);
           hasRAVEProdVertex &= particle -> hasExtraInfo(prodVertCovarianceElement);
         }

@@ -36,7 +36,7 @@ namespace Belle2 {
     /** setter for Path. */
     void init(const std::string& option, bool eventMixing);
 
-    ~CreateConsistencyInfoModule();
+    ~CreateConsistencyInfoModule() override;
 
     virtual void initialize() override;
     virtual void event() override;

@@ -11,6 +11,8 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <ecl/dbobjects/ECLClusteringParameters.h>
 
 namespace Belle2 {
 
@@ -47,6 +49,7 @@ namespace Belle2 {
 
   private:
     double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
+    bool m_useParametersFromDatabase; /**< get clusterEnergyCutMin from payload */
     double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
     double m_clusterLossyFraction; /**< Maximum allowed fractional difference between nPhotons and neutralHadron number of crystals */
 
@@ -55,6 +58,9 @@ namespace Belle2 {
     StoreArray<ECLCluster> m_eclClusters; /**< ECLClusters */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< EventLevelClusteringInfo */
     StoreObjPtr<EventT0> m_eventT0; /**< Event T0 */
+
+    /** ECLClusteringParameters payload: includes value for clusterEnergyCutMin */
+    DBObjPtr<ECLClusteringParameters> m_eclClusteringParameters;
 
     int makeCluster(int, double); /**< Make a cluster from a given shower array index */
 

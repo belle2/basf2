@@ -510,7 +510,7 @@ double Particle::getCosHelicity(const Particle* mother) const
     pDaughter = boost * getDaughter(0)->get4Vector();
   } else if (getNDaughters() == 3) {
     if (getPDGCode() == Const::pi0.getPDGCode()) {  // pi0 Dalitz decay
-      for (auto& daughter : getDaughters()) {
+      for (const auto& daughter : getDaughters()) {
         if (daughter->getPDGCode() == Const::photon.getPDGCode()) {
           pDaughter = daughter->get4Vector();
         }

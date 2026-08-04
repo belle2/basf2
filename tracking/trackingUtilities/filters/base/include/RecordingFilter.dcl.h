@@ -43,12 +43,12 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      Recording(std::unique_ptr<AVarSet> varSet,
-                const std::string& defaultRootFileName = "records.root",
-                const std::string& defaultTreeName = "records");
+      explicit Recording(std::unique_ptr<AVarSet> varSet,
+                         const std::string& defaultRootFileName = "records.root",
+                         const std::string& defaultTreeName = "records");
 
       /// Default destructor
-      ~Recording();
+      ~Recording() override;
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -105,7 +105,7 @@ namespace Belle2 {
                                const std::string& defaultTreeName = "records");
 
       /// Default destructor
-      ~RecordingFilter();
+      ~RecordingFilter() override;
     };
   }
 }

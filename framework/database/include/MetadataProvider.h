@@ -164,7 +164,7 @@ namespace Belle2::Conditions {
      *
      * @param provider the actual metadata provider used for the job
      */
-    void printInfoMessage(const std::string& provider);
+    static void printInfoMessage(const std::string& provider);
 
     /** List of globaltags to consider */
     std::vector<std::string> m_tags;

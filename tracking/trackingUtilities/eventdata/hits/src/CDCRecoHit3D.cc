@@ -18,8 +18,7 @@
 #include <cdc/topology/CDCWire.h>
 #include <cdc/topology/EStereoKind.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
@@ -36,7 +35,7 @@ using namespace CDC;
 using namespace TrackingUtilities;
 
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
-                           const Vector3D& recoPos3D,
+                           const ROOT::Math::XYZVector& recoPos3D,
                            double arcLength2D)
   : m_rlWireHit(rlWireHit)
   , m_recoPos3D(recoPos3D)
@@ -50,15 +49,15 @@ CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit
   double arcLength2D = std::numeric_limits<double>::quiet_NaN();
 
   return CDCRecoHit3D(CDCRLWireHit::fromSimHit(wireHit, simHit),
-                      Vector3D{simHit.getPosTrack()},
+                      ROOT::Math::XYZVector{simHit.getPosTrack()},
                       arcLength2D);
 }
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
-  double arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
+  ROOT::Math::XYZVector recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
+  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
   return CDCRecoHit3D(recoHit2D.getRLWireHit(), recoPos3D, arcLength2D);
 }
 
@@ -66,8 +65,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
                                        ERightLeft rlInfo,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
-  double arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
+  ROOT::Math::XYZVector recoPos3D = wireHit->reconstruct3D(trajectory2D, rlInfo);
+  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
   CDCRLWireHit rlWireHit(wireHit, rlInfo);
   return CDCRecoHit3D(rlWireHit, recoPos3D, arcLength2D);
 }
@@ -75,8 +74,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCWireHit* wireHit,
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRLWireHit& rlWireHit,
                                        const CDCTrajectory2D& trajectory2D)
 {
-  Vector3D recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
-  double arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
+  ROOT::Math::XYZVector recoPos3D = rlWireHit.reconstruct3D(trajectory2D);
+  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
   return CDCRecoHit3D(rlWireHit, recoPos3D, arcLength2D);
 }
 
@@ -104,11 +103,11 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
     //in the common case the z fit has been derived from the reconstructed points generated
     //with the reconstruct method above in the other reconstruct method.
     //sticking to that method but using the average z from the sz fit
-    Vector3D recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
-    arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
+    ROOT::Math::XYZVector recoPos3D = recoHit2D.reconstruct3D(trajectory2D);
+    arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
 
   } else { /* if (stereoKind == EStereoKind::c_Axial)*/
-    Vector2D recoPos2D = trajectory2D.getClosest(recoHit2D.getRecoPos2D());
+    ROOT::Math::XYVector recoPos2D = trajectory2D.getClosest(recoHit2D.getRecoPos2D());
     arcLength2D = trajectory2D.calcArcLength2D(recoPos2D);
 
   }
@@ -117,11 +116,11 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
 
   // Reevaluating the z position eventually accounts for wire sag.
   const CDCWire& wire = recoHit2D.getWire();
-  const Vector2D recoWirePos2D = wire.getWirePos2DAtZ(z);
-  const Vector2D correctedRecoPos2D = trajectory2D.getClosest(recoWirePos2D);
+  const ROOT::Math::XYVector recoWirePos2D = wire.getWirePos2DAtZ(z);
+  const ROOT::Math::XYVector correctedRecoPos2D = trajectory2D.getClosest(recoWirePos2D);
   const double correctedPerpS = trajectory2D.calcArcLength2D(correctedRecoPos2D);
   const double correctedZ = trajectorySZ.mapSToZ(correctedPerpS);
-  const Vector3D correctedRecoPos3D(correctedRecoPos2D, correctedZ);
+  const ROOT::Math::XYZVector correctedRecoPos3D(correctedRecoPos2D.X(), correctedRecoPos2D.Y(), correctedZ);
 
   CDCRecoHit3D result(recoHit2D.getRLWireHit(), correctedRecoPos3D, correctedPerpS);
   result.snapToDriftCircle();
@@ -141,7 +140,7 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
 {
   if (first.getRLWireHit() == second.getRLWireHit()) {
     return CDCRecoHit3D(first.getRLWireHit(),
-                        Vector3D::average(first.getRecoPos3D(), second.getRecoPos3D()),
+                        VectorUtil::average(first.getRecoPos3D(), second.getRecoPos3D()),
                         (first.getArcLength2D() + second.getArcLength2D()) / 2);
   } else {
     B2ERROR("Averaging three dimensional hits which are on different oriented wire hits. Return "
@@ -150,13 +149,13 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
   }
 }
 
-Vector2D CDCRecoHit3D::getRecoDisp2D() const
+ROOT::Math::XYVector CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
   const double recoPosZ = getRecoPos3D().z();
 
-  Vector2D wirePos = wire.getWirePos2DAtZ(recoPosZ);
-  Vector2D disp2D = getRecoPos3D().xy() - wirePos;
+  ROOT::Math::XYVector wirePos = wire.getWirePos2DAtZ(recoPosZ);
+  ROOT::Math::XYVector disp2D = VectorUtil::getXYVector(getRecoPos3D()) - wirePos;
   return disp2D;
 }
 
@@ -175,14 +174,17 @@ void CDCRecoHit3D::snapToDriftCircle(bool switchSide)
   const CDCWire& wire = getWire();
   const double recoPosZ = getRecoPos3D().z();
 
-  Vector2D wirePos = wire.getWirePos2DAtZ(recoPosZ);
-  Vector2D disp2D = getRecoPos3D().xy() - wirePos;
+  ROOT::Math::XYVector wirePos = wire.getWirePos2DAtZ(recoPosZ);
+  ROOT::Math::XYVector disp2D = VectorUtil::getXYVector(getRecoPos3D()) - wirePos;
 
-  disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));
+  if (disp2D.R() != 0.0) {
+    disp2D *= (std::fabs(getSignedRecoDriftLength()) / disp2D.R());
+  }
   if (switchSide) {
     disp2D = -disp2D;
   }
-  m_recoPos3D = Vector3D(wirePos + disp2D, recoPosZ);
+  const auto& tmp = wirePos + disp2D;
+  m_recoPos3D = ROOT::Math::XYZVector(tmp.X(), tmp.Y(), recoPosZ);
 }
 
 void CDCRecoHit3D::setRecoDriftLength(double driftLength, bool snapRecoPos)
@@ -205,7 +207,7 @@ CDCRecoHit2D CDCRecoHit3D::stereoProjectToRef() const
   return getRecoHit2D();
 }
 
-Vector2D CDCRecoHit3D::getRecoWirePos2D() const
+ROOT::Math::XYVector CDCRecoHit3D::getRecoWirePos2D() const
 {
   return getWire().getWirePos2DAtZ(getRecoZ());
 }

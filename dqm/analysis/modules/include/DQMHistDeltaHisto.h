@@ -48,11 +48,6 @@ namespace Belle2 {
     DQMHistDeltaHistoModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistDeltaHistoModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;
@@ -81,7 +76,7 @@ namespace Belle2 {
      * Clear content of SSNODE
      * @param n Pointer to the SSNODE
      */
-    void clear_node(SSNODE* n);
+    static void clear_node(SSNODE* n);
 
     // Data members
   private:

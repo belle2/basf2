@@ -48,6 +48,19 @@
 
 namespace Belle2 {
   namespace Variable {
+    double requireDoubleForFrameVariable(const Variable::Manager::Var* var,
+                                         const Variable::Manager::VarVariant& value,
+                                         const std::string& frameFunction)
+    {
+      if (std::holds_alternative<double>(value)) {
+        return std::get<double>(value);
+      }
+
+      const char* returnedType = std::holds_alternative<int>(value) ? "int" : "bool";
+      B2ERROR("Meta function " << frameFunction << " expects a double variable, but '" << var->name
+              << "' returned " << returnedType << ". Returning NaN.");
+      return Const::doubleNaN;
+    }
 
     Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
     {
@@ -55,8 +68,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<RestFrame> frame(particle);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useRestFrame");
         };
         return func;
       } else {
@@ -70,8 +82,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<CMSFrame> frame;
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useCMSFrame");
         };
         return func;
       } else {
@@ -85,8 +96,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
           UseReferenceFrame<LabFrame> frame;
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useLabFrame");
         };
         return func;
       } else {
@@ -115,8 +125,7 @@ namespace Belle2 {
           Particle tmp(pSigB, -particle->getDaughter(daughterIndexTagB)->getPDGCode());
 
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useTagSideRecoilRestFrame");
         };
 
         return func;
@@ -141,8 +150,7 @@ namespace Belle2 {
                       << LogVar("Number of candidates in the list", listSize));
           const Particle* p = list->getParticle(0);
           UseReferenceFrame<RestFrame> frame(p);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useParticleRestFrame");
         };
         return func;
       } else {
@@ -171,8 +179,7 @@ namespace Belle2 {
           Particle pRecoil(recoil, 0);
           pRecoil.setVertex(particle->getVertex());
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useRecoilParticleRestFrame");
         };
         return func;
       } else {
@@ -200,8 +207,7 @@ namespace Belle2 {
           }
           Particle tmp(pSum, 0);
           UseReferenceFrame<RestFrame> frame(&tmp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useDaughterRestFrame");
         };
         return func;
       } else {
@@ -232,8 +238,7 @@ namespace Belle2 {
           /* Let's use 0 as PDG code to avoid wrong assumptions. */
           Particle pRecoil(recoil, 0);
           UseReferenceFrame<RestFrame> frame(&pRecoil);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useDaughterRecoilRestFrame");
         };
         return func;
       } else {
@@ -251,8 +256,7 @@ namespace Belle2 {
           StoreArray<MCParticle> mcparticles;
           Particle temp(mcparticles[index]);
           UseReferenceFrame<RestFrame> frame(&temp);
-          double result = std::get<double>(var->function(particle));
-          return result;
+          return requireDoubleForFrameVariable(var, var->function(particle), "useMCancestorBRestFrame");
         };
         return func;
       } else {
@@ -613,7 +617,7 @@ namespace Belle2 {
         // the list individually
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
-          Particle* iparticle = list->getParticle(i);
+          const Particle* iparticle = list->getParticle(i);
           if (particle->getMdstSource() == iparticle->getMdstSource())
             return 1;
         }
@@ -680,14 +684,14 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
               convertString<int>(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
 
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
@@ -743,19 +747,19 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
           {
             return false;
           }
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
               std::stod(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
               bool result = false;
@@ -1163,7 +1167,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1210,7 +1214,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1240,7 +1244,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1308,7 +1312,7 @@ namespace Belle2 {
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
           if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const MCParticle* mcPart = particle->getMCParticle();
               if (mcPart == nullptr)
                 return Const::doubleNaN;
@@ -1320,7 +1324,7 @@ namespace Belle2 {
             }
           } else
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
               if (dauPart == nullptr)
                 return Const::doubleNaN;
@@ -1401,7 +1405,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
           ROOT::Math::PxPyPzEVector pSum;
 
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1583,7 +1587,7 @@ namespace Belle2 {
     {
       if (arguments.size() > 0) {
         std::vector<const Variable::Manager::Var*> variables;
-        for (auto& argument : arguments)
+        for (const auto& argument : arguments)
           variables.push_back(Manager::Instance().getVariable(argument));
 
         auto func = [variables, arguments](const Particle * particle) -> double {
@@ -1674,7 +1678,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1721,7 +1725,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1849,6 +1853,22 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function atan");
+      }
+    }
+
+    Manager::FunctionPtr atan2(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* varY = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* varX = Manager::Instance().getVariable(arguments[1]);
+        auto func = [varY, varX](const Particle * particle) -> double {
+          double y = std::get<double>(varY->function(particle));
+          double x = std::get<double>(varX->function(particle));
+          return std::atan2(y, x);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function atan2");
       }
     }
 
@@ -2103,7 +2123,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
 
         auto func = [var, indexString](const Particle * particle) -> double {
-          // First get the partcile index. If not int, evaluate the variable
+          // First get the particle index. If not int, evaluate the variable
           int particleNumber = 0;
           try
           {
@@ -2116,12 +2136,12 @@ namespace Belle2 {
           }
 
           StoreArray<MCParticle> mcParticles("MCParticles");
-          if (particleNumber >= mcParticles.getEntries())
+          if (particleNumber < 0 or particleNumber >= mcParticles.getEntries())
           {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcParticle = mcParticles[particleNumber];
+          const MCParticle* mcParticle = mcParticles[particleNumber];
           Particle part = Particle(mcParticle);
           auto var_result = var->function(&part);
           if (std::holds_alternative<double>(var_result))
@@ -2153,7 +2173,7 @@ namespace Belle2 {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcUpsilon4S = mcParticles[0];
+          const MCParticle* mcUpsilon4S = mcParticles[0];
           if (mcUpsilon4S->isInitial()) mcUpsilon4S = mcParticles[2];
           if (mcUpsilon4S->getPDG() != 300553)
           {
@@ -2468,7 +2488,6 @@ namespace Belle2 {
           std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                     ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
-          // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
           StoreArray<Particle> tempParticles("tempParticles");
@@ -2685,7 +2704,7 @@ namespace Belle2 {
             for (int i = 0; i < nParticles; i++) {
               bool overlaps = false;
               Particle* part = listOfParticles->getParticle(i);
-              for (auto poolPart : particlePool) {
+              for (const auto* poolPart : particlePool) {
                 if (part->overlapsWith(poolPart)) {
                   overlaps = true;
                   break;
@@ -3407,7 +3426,7 @@ namespace Belle2 {
         } else {
           try {
             pdg_code = convertString<int>(arg);
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
         }
 
         if (pdg_code == -1) {
@@ -3463,14 +3482,21 @@ namespace Belle2 {
       }
 
       std::string arg = arguments[0];
-      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
-      int absPdg;
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(arg.c_str());
+      int absPdg = 0;
       if (part != nullptr) {
         absPdg = std::abs(part->PdgCode());
       } else {
         try {
-          absPdg = convertString<int>(arg);
-        } catch (std::exception& e) {}
+          absPdg = std::abs(convertString<int>(arg));
+        } catch (const std::exception&) {
+          absPdg = 0;
+        }
+
+        if (absPdg == 0 || pdgDatabase->GetParticle(absPdg) == nullptr) {
+          B2FATAL("nTrackFitResults: argument '" << arg << "' is neither a valid particle name nor a PDG code");
+        }
       }
 
       auto func = [absPdg](const Particle*) -> int {
@@ -3874,6 +3900,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable. The unit of the acos() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable. The unit of the atan() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("atan2(variableY, variableX)", atan2, "Returns the atan2 value (arctangent of y/x). The result is in ``rad``, and the correct quadrant is determined by the signs of the two arguments. Both arguments must not be zero at the same time.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);

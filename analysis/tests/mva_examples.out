@@ -1,6 +1,6 @@
 [INFO] Steering file: analysis/tests/mva_examples.py
 TFile: B2A711-DeepContinuumSuppression_Input.root
-TTree: tree
+TTree: B0
 TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 488480075

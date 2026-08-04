@@ -22,7 +22,7 @@ void FarBeamLineGeo::initialize(const GearDir& content)
 
   std::vector<std::string> names = {"TubeR", "TubeL", "ACSL", "ACSR1", "ACSR2", "APSL1", "APSL2", "APSR1", "APSR2"};
 
-  for (auto name : names) {
+  for (const auto& name : names) {
     GearDir sect(content, name + "/");
     addParameters(sect, name);
   }

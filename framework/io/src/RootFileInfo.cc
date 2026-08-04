@@ -13,6 +13,8 @@
 
 #include <TTree.h>
 #include <TFile.h>
+#include <TKey.h>
+#include <TClass.h>
 
 namespace Belle2::RootIOUtilities {
   RootFileInfo::RootFileInfo(const std::string& filename)
@@ -76,7 +78,7 @@ namespace Belle2::RootIOUtilities {
     return *cache;
   }
 
-  const std::set<std::string> RootFileInfo::getNtupleBranchNames(std::string treeName)
+  const std::set<std::string> RootFileInfo::getNtupleBranchNames(const std::string& treeName)
   {
     std::set<std::string> branches;
     auto* tree = dynamic_cast<TTree*>(m_file->Get(treeName.c_str()));
@@ -112,8 +114,12 @@ namespace Belle2::RootIOUtilities {
     std::set<std::string> treeNames;
     TList* keylist = m_file->GetListOfKeys();
     TIter next(keylist);
-    while (auto&& key = next()) {
-      if (strcmp(key->GetName(), "persistent") != 0) {
+    while (TObject* keyObj = next()) {
+      auto* key = dynamic_cast<TKey*>(keyObj);
+      if (!key) continue;
+      if (strcmp(key->GetName(), "persistent") == 0) continue;
+      TClass* cls = TClass::GetClass(key->GetClassName());
+      if (cls && cls->InheritsFrom(TTree::Class())) {
         treeNames.emplace(key->GetName());
       }
     }

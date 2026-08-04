@@ -7,12 +7,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-
 #include <tracking/trackingUtilities/numerics/SpecialFunctions.h>
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
 #include <framework/gearbox/Const.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -55,7 +55,7 @@ namespace {
   }
 }
 
-CosmicRayFlightTimeEstimator::CosmicRayFlightTimeEstimator(Vector3D triggerPoint)
+CosmicRayFlightTimeEstimator::CosmicRayFlightTimeEstimator(ROOT::Math::XYZVector triggerPoint)
   : m_halfPeriodAlphaFlightTimeFactor(getHalfPeriodAlphaFlightTime,
                                       512,
                                       0,

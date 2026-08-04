@@ -136,7 +136,10 @@ namespace Belle2 {
       m_variables.at(m_prefix + "N_SVD_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "N_PXD_hits") = recoTrack.getNumberOfPXDHits();
 
-      const genfit::FitStatus* rt_TrackFitStatus = recoTrack.getTrackFitStatus();
+      const genfit::FitStatus* rt_TrackFitStatus = nullptr;
+      if (recoTrack.hasTrackFitStatus()) {
+        rt_TrackFitStatus = recoTrack.getTrackFitStatus();
+      }
       if (rt_TrackFitStatus) {
         m_variables.at(m_prefix + "Fit_Charge") = rt_TrackFitStatus->getCharge();
         m_variables.at(m_prefix + "Fit_Chi2") = rt_TrackFitStatus->getChi2();

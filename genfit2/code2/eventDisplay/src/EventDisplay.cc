@@ -82,8 +82,8 @@ EventDisplay::EventDisplay() :
   trackId_(0),
   refit_(false),
   debugLvl_(0),
-  fitterId_(SimpleKalman),
-  mmHandling_(weightedAverage),
+  fitterId_(EFitterType::SimpleKalman),
+  mmHandling_(EMultipleMeasurementHandling::weightedAverage),
   squareRootFormalism_(false),
   dPVal_(1.E-3),
   dRelChi2_(0.2),
@@ -313,23 +313,23 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
 
       std::unique_ptr<AbsKalmanFitter> fitter;
       switch (fitterId_) {
-        case SimpleKalman:
+        case EFitterType::SimpleKalman:
           fitter.reset(new KalmanFitter(nMaxIter_, dPVal_));
           fitter->setMultipleMeasurementHandling(mmHandling_);
           (static_cast<KalmanFitter*>(fitter.get()))->useSquareRootFormalism(squareRootFormalism_);
           break;
 
-        case RefKalman:
+        case EFitterType::RefKalman:
           fitter.reset(new KalmanFitterRefTrack(nMaxIter_, dPVal_));
           fitter->setMultipleMeasurementHandling(mmHandling_);
           static_cast<KalmanFitterRefTrack*>(fitter.get())->setDeltaChi2Ref(dChi2Ref_);
           break;
 
-        case DafSimple:
+        case EFitterType::DafSimple:
           fitter.reset(new DAF(false));
           ( static_cast<KalmanFitter*>( (static_cast<DAF*>(fitter.get()))->getKalman() ) )->useSquareRootFormalism(squareRootFormalism_);
           break;
-        case DafRef:
+        case EFitterType::DafRef:
           fitter.reset(new DAF());
           ( static_cast<KalmanFitterRefTrack*>( (static_cast<DAF*>(fitter.get()))->getKalman() ) )->setDeltaChi2Ref(dChi2Ref_);
           break;
@@ -440,7 +440,7 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
             sameTypes = false;
         }
         if (!sameTypes) {
-          std::cerr<<"cannot draw trackpoint containing multiple Measurements of differend types"<<std::endl;
+          std::cerr<<"cannot draw trackpoint containing multiple Measurements of different types"<<std::endl;
           continue;
         }
       }
@@ -687,7 +687,7 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = errorScale_*std::sqrt(ev(0));
               double pseudo_res_1 = errorScale_*std::sqrt(ev(1));
-              // finished calcluating, got the values -----------------------------------
+              // finished calculating, got the values -----------------------------------
 
               // do autoscaling if necessary --------------------------------------------
               if(drawAutoScale_) {
@@ -816,7 +816,7 @@ void EventDisplay::drawEvent(unsigned int id, bool resetCam) {
               TMatrixT<double> eVec = eigen_values.GetEigenVectors();
               double pseudo_res_0 = errorScale_*std::sqrt(ev(0));
               double pseudo_res_1 = errorScale_*std::sqrt(ev(1));
-              // finished calcluating, got the values -----------------------------------
+              // finished calculating, got the values -----------------------------------
 
               // do autoscaling if necessary --------------------------------------------
               if(drawAutoScale_) {
@@ -1639,12 +1639,12 @@ void EventDisplay::guiSetDrawParams(){
 
 
 void EventDisplay::guiSelectFitterId(int val){
-  fitterId_ = eFitterType(val-1);
+  fitterId_ = EFitterType(val-1);
   gotoEvent(eventId_);
 }
 
 void EventDisplay::guiSelectMmHandling(int val){
-  mmHandling_ = eMultipleMeasurementHandling(val-1);
+  mmHandling_ = EMultipleMeasurementHandling(val-1);
   gotoEvent(eventId_);
 }
 

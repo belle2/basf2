@@ -10,7 +10,10 @@
 
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParamList.h>
+
+#include <tracking/dbobjects/SVDToCDCCKFParameters.h>
 
 using namespace Belle2;
 
@@ -39,6 +42,28 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
+}
+
+void CKFToCDCFindlet::beginRun()
+{
+  Super::beginRun();
+
+  DBObjPtr<SVDToCDCCKFParameters> payload;
+
+  if (!payload.isValid()) {
+    B2FATAL("CKFToCDCFindlet: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
+  }
+
+  // Payload parameters (INTs, FLOATs)
+  m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
+
+  m_treeSearcher.setMaximalDeltaPhi(payload->getMaximalDeltaPhi());
+  m_treeSearcher.setMaximalLayerJump(payload->getMaximalLayerJump());
+  m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());
+  m_treeSearcher.setPathMaximalCandidatesInFlight(payload->getPathMaximalCandidatesInFlight());
+  m_treeSearcher.setStateMaximalHitCandidates(payload->getStateMaximalHitCandidates());
+
+  B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload 'SVDToCDCCKFParameters'.");
 }
 
 void CKFToCDCFindlet::beginEvent()

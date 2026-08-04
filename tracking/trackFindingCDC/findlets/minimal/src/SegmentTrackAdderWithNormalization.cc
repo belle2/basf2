@@ -112,7 +112,8 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
 
       // Add hit with destination track nullptr
       for (const CDCRecoHit2D& recoHit : segment) {
-        recoHits3D.push_back({recoHit.getRLWireHit(), Vector3D(recoHit.getRecoPos2D()), 0});
+        const auto& tmp = recoHit.getRecoPos2D();
+        recoHits3D.push_back({recoHit.getRLWireHit(), ROOT::Math::XYZVector(tmp.X(), tmp.Y(), 0.0), 0});
         trackHitRelations.push_back({nullptr, 0, &recoHits3D.back()});
       }
     }
@@ -122,7 +123,6 @@ void SegmentTrackAdderWithNormalization::apply(std::vector<WeightedRelation<CDCT
   for (CDCTrack& track : tracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       recoHits3D.push_back(recoHit3D);
-      // cppcheck-suppress invalidContainer
       trackHitRelations.push_back({&track, -INFINITY, &recoHits3D.back()});
     }
   }

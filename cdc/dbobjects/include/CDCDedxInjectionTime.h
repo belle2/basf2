@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    CDCDedxInjectionTime(const std::vector<std::vector<double>>& vinjcalib): m_injectionvar(vinjcalib) {};
+    explicit CDCDedxInjectionTime(const std::vector<std::vector<double>>& vinjcalib): m_injectionvar(vinjcalib) {};
 
     /**
      * Destructor
@@ -42,13 +42,13 @@ namespace Belle2 {
      * @param svar is option for printing mean and reso calibration
      * @param sfx to add suffix in file save
      */
-    void printCorrection(std::string svar, std::string sfx) const;
+    void printCorrection(const std::string& svar, const std::string& sfx) const;
 
 
     /** Return vector of all constant vector of payload
      *
      */
-    std::vector<std::vector<double>> getConstVector() const
+    const std::vector<std::vector<double>>& getConstVector() const
     {
       return m_injectionvar;
     };
@@ -89,15 +89,17 @@ namespace Belle2 {
     */
     int getTimeBin(const std::vector<unsigned int>& array, unsigned int value) const
     {
-      int nabove, nbelow, middle;
-      nabove = array.size() + 1;
-      nbelow = 0;
+      int nabove = array.size() + 1;
+      int nbelow = 0;
+
       while (nabove - nbelow > 1) {
-        middle = (nabove + nbelow) / 2;
+        int middle = (nabove + nbelow) / 2;
+
         if (value == array[middle - 1]) return middle - 1;
-        if (value  < array[middle - 1]) nabove = middle;
-        else nbelow = middle;
+        if (value < array[middle - 1])  nabove = middle;
+        else  nbelow = middle;
       }
+
       return nbelow - 1;
     }
 
@@ -106,8 +108,7 @@ namespace Belle2 {
     * @param ring is injection ring number (0/1 for LER/HER)
     * @param time is injection time (large 0-20sec range)
     */
-    double getCorrection(std::string svar, unsigned int ring, unsigned int time) const;
-
+    double getCorrection(const std::string& svar, unsigned int ring, unsigned int time) const;
 
   private:
 

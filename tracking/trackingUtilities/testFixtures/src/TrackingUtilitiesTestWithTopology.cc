@@ -35,9 +35,9 @@ void TrackingUtilitiesTestWithTopology::TearDownTestCase()
 
 
 template<>
-bool Belle2::TestHelpers::allNear<TrackingUtilities::Vector3D>(const TrackingUtilities::Vector3D& expected,
-    const TrackingUtilities::Vector3D& actual,
-    double tolerance)
+bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                                         const ROOT::Math::XYZVector& actual,
+                                                         double tolerance)
 {
   bool xNear = std::fabs(expected.x() - actual.x()) < tolerance;
   bool yNear = std::fabs(expected.y() - actual.y()) < tolerance;

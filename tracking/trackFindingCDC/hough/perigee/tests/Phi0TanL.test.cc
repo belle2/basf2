@@ -77,7 +77,6 @@ namespace {
 
   const double curlCurv = 0.018;
 
-  // cppcheck-suppress syntaxError
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_phi0_tanl_on_hits)
   {
     std::string svgFileName = "phi0_tanl_on_hits.svg";
@@ -137,14 +136,14 @@ namespace {
 
 
     int iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
-      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
+      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Lower TanL " << houghBox.getLowerBound<ContinuousTanL>());
       B2DEBUG(100, "Upper TanL " << houghBox.getUpperBound<ContinuousTanL>());
 
@@ -232,14 +231,14 @@ namespace {
     houghTree.raze();
 
     int iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
-      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Lower Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
+      B2DEBUG(100, "Upper Phi0 " << houghBox.getUpperBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Lower TanL " << houghBox.getLowerBound<ContinuousTanL>());
       B2DEBUG(100, "Upper TanL " << houghBox.getUpperBound<ContinuousTanL>());
 

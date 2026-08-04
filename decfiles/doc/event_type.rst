@@ -271,7 +271,8 @@ Lepton Flag
 
 The **Lepton Flag** gives information about the presence or absence of electrons, muons, and taus in
 the forced part of the decay chain of the selected particle(s), as defined by the decay and selection
-flags. This flag specifically applies to General Flags of less than 5.
+flags. A Lepton Flag set to 4, 5 or 6 should only be used in cases where the leptons have opposite
+charge and the decay is not a LFV mode. This flag specifically applies to General Flags of less than 5.
 
 +-------------+-----------------------------+-----------+----------+
 | Lepton Flag | muons                       | electrons | taus     |

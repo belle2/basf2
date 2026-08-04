@@ -24,17 +24,21 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/Quadratic.h>
 
-#include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCHit.h>
+
+#include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -59,9 +63,9 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-  Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-  Vector2D recoPos2D = recoHit2D.getRecoPos2D();
-  double alpha = recoPos2D.angleWith(flightDirection);
+  ROOT::Math::XYVector flightDirection = recoHit2D.getFlightDirection2D();
+  ROOT::Math::XYVector recoPos2D = recoHit2D.getRecoPos2D();
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
@@ -91,14 +95,14 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
   const UncertainParameterLine2D& line = facet.getFitLine();
-  Vector2D flightDirection = line->tangential();
-  Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
-  double alpha = centralPos2D.angleWith(flightDirection);
+  ROOT::Math::XYVector flightDirection = line->tangential();
+  ROOT::Math::XYVector centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(centralPos2D, flightDirection);
   if (not m_param_useAlphaInDriftLength) {
     alpha = 0;
   }
 
-  auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
+  auto doUpdate = [&](CDCRLWireHit & rlWireHit, ROOT::Math::XYVector recoPos2D) {
     const CDCWire& wire = rlWireHit.getWire();
     const CDCHit* hit = rlWireHit.getWireHit().getHit();
     const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
@@ -140,15 +144,15 @@ double DriftLengthEstimator::updateDriftLength(CDCRecoHit3D& recoHit3D,
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-  Vector2D flightDirection = recoHit3D.getFlightDirection2D();
-  const Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
-  const Vector2D& recoPos2D = recoPos3D.xy();
-  double alpha = recoPos2D.angleWith(flightDirection);
+  ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
+  const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
+  const ROOT::Math::XYVector& recoPos2D = VectorUtil::getXYVector(recoPos3D);
+  double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
   const double beta = 1;
   double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
   if (std::isnan(tanLambda)) {
-    tanLambda = recoPos3D.z() / recoPos3D.cylindricalR();
+    tanLambda = recoPos3D.z() / recoPos3D.Rho();
   }
   const double theta = M_PI / 2 - std::atan(tanLambda);
   flightTimeEstimate *= hypot2(1, tanLambda);

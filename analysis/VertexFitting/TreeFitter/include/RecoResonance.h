@@ -28,7 +28,7 @@ namespace TreeFitter {
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** destructor */
-    virtual ~RecoResonance() {};
+    virtual ~RecoResonance() override = default;
 
     /** dimension of the vector */
     virtual int dim() const override

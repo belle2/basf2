@@ -117,8 +117,8 @@ TClass* DataStore::getTClassFromDefaultArrayName(const std::string& arrayName)
   if (arrayName.empty()) {
     return nullptr;
   } else if ('s' == arrayName.back()) {
-    std::string objectName = arrayName.substr(0, arrayName.size() - 1);
-    return getTClassFromDefaultObjectName(objectName);
+    std::string objectNameStr = arrayName.substr(0, arrayName.size() - 1);
+    return getTClassFromDefaultObjectName(objectNameStr);
   } else {
     return nullptr;
   }
@@ -166,7 +166,7 @@ std::string DataStore::arrayName(const TClass* t, const std::string& name)
 }
 
 
-bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor) const
+bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor)
 {
   // Check whether the existing entry and the requested object are both arrays or both single objects
   const char* entryType = (entry.isArray) ? "array" : "object";
@@ -646,7 +646,7 @@ std::vector<std::string> DataStore::getListOfRelatedArrays(const StoreAccessorBa
 
   //loop over all arrays
   EDurability durability = array.getDurability();
-  for (auto& mapEntry : m_storeEntryMap[durability]) {
+  for (const auto& mapEntry : m_storeEntryMap[durability]) {
     if (mapEntry.second.isArray) {
       const std::string& name = mapEntry.second.name;
 
@@ -667,7 +667,7 @@ std::vector<std::string> DataStore::getListOfArrays(const TClass* arrayClass, ED
   return getArrayNames("ALL", arrayClass, durability);
 }
 
-std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDurability durability) const
+std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDurability durability)
 {
   vector<string> list;
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
@@ -684,7 +684,7 @@ std::vector<std::string> DataStore::getListOfObjects(const TClass* objClass, EDu
   return list;
 }
 
-std::vector<std::string> DataStore::getListOfRelations(EDurability durability) const
+std::vector<std::string> DataStore::getListOfRelations(EDurability durability)
 {
   vector<string> list;
   const DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::EDurability(durability));
@@ -1166,7 +1166,7 @@ void DataStore::SwitchableDataStoreContents::clear()
 void DataStore::SwitchableDataStoreContents::reset(EDurability durability)
 {
   for (auto& map : m_entries) {
-    for (auto& mapEntry : map[durability]) {
+    for (const auto& mapEntry : map[durability]) {
       delete mapEntry.second.object;
     }
     map[durability].clear();

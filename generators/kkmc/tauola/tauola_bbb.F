@@ -1785,6 +1785,8 @@ C
       IF (MNUM.GE.31.AND.MNUM.LE.34) MNUM=7 
       IF (MNUM.GE.35.AND.MNUM.LE.38) MNUM=13 
       IF (MNUM.GE.39.AND.MNUM.LE.46) MNUM=14 
+      IF (MNUM.GE.49.AND.MNUM.LE.51) MNUM=13
+      IF (MNUM.GE.52.AND.MNUM.LE.57) MNUM=14
       IF ((MNUM.EQ.9.OR.MNUM.EQ.0).AND.IRCHL3PI.EQ.1) THEN ! so far rchl only for 3pi modes
          FPI=GETFPIRPT(1) ! GET  defined in in ffwid3pi.f  of RChL-currents
        ELSE
@@ -1908,7 +1910,7 @@ C
        BRAK= (GV**2+GA**2)*PT(4)*PIVEC(4) +2.*GV*GA*PT(4)*PIAKS(4)
      &      +2.*(GV**2-GA**2)*AMNUTA*AMTAU*BRAKM
        AMPLIT=(GFERMI)**2*BRAK/2.
-       IF (MNUM.GE.49) THEN   ! dead code under this if ! 20->31->47 (May 2020) -> 49 (Oct 2020) [SwB]
+       IF (MNUM.GT.58) THEN   ! dead code under this if ! 20->31->47 (May 2020) -> 49 (Oct 2020) -> 58 (Apr 2026) [SwB]
          PRINT *, 'MNUM=',MNUM
          ZNAK=-1.0
          XM1=0.0
@@ -1977,21 +1979,8 @@ C       PRINT 7003
         SSWT(JNPI)=0
         WTMAX(JNPI)=-1.
 
-C for 4pi phase space, need lots more trials at initialization,
-C or use the WTMAX determined with many trials for default model:
-        NTRIALS = 5000
-C cleo knew nothing about channels recently introduced
-        IF (JNPI.LE.2) THEN
-C         11.Oct.11: fix for BINP and KARLSRUHE currents added
-          WTMAX(JNPI) = PKORB(3,37+JNPI)
-          NTRIALS = 20000
-        END IF
-        IF (JNPI.GE.2.AND.JNPI.LE.6) THEN
-          NTRIALS = 50000
-        ENDIF
-        IF (JNPI.GE.NM4+NM5+NM6+47.AND.JNPI.LE.NM4+NM5+NM6+48) THEN
-           NTRIALS = 50000
-        ENDIF          
+C Universal solution is to use brute force, which is safe at this stage [SwB 2026]
+        NTRIALS = 50000
 !       write(*,*) 'jnpi=',jnpi, ntrials, a
         DO  I=1,NTRIALS
 
@@ -3360,7 +3349,7 @@ C
       INUM=JNPI-NM3-NM4- NM5- NM6
 
       AMF1 = DCDMAS(IDFFIN(1,JNPI),0)
-      AMF2 = DCDMAS(IDFFIN(2,JNPI),4)  
+      AMF2 = DCDMAS(IDFFIN(2,JNPI),4)
       AMF0 = AMNUTAD
 !      IF(INUM.GT.4) THEN
 !       write(*,*) inum,':',IDFFIN(1,IADDR),IDFFIN(2,IADDR),IDFFIN(3,IADDR),DCDMAS(IDFFIN(3,IADDR))
@@ -3493,6 +3482,7 @@ C
       DATA NPRIN/0/
       INTEGER LAMDEC
       COMMON /LAMDEC/ LAMDEC
+      LOGICAL PHFLAG
 C
       REAL    AMALFA            ! mass
       INTEGER ISALFA            ! spin
@@ -3501,6 +3491,10 @@ C
       REAL    GMALFA            ! width
       COMMON /AMALFA/ AMALFA,ISALFA,VCALFA,ACALFA,DMALFA,GMALFA
 C     
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOFF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
       JNPI=MODE-NLT
 C position of decaying particle
       IF(KTO.EQ. 1) THEN
@@ -3536,7 +3530,9 @@ c sigle scalar has no W
 C
 C W boson (W+ is 24)
         CALL TRALO4(KTO,PWB,PWB,AM)
-        CALL FILHEP(0,1,-24*ISGN,NPS,NPS,0,0,PWB,AM,.TRUE.)
+        PHFLAG=.TRUE.
+        IF (MODE.EQ.261.AND.OFF_PHOT.EQ.1) PHFLAG=.FALSE.
+        CALL FILHEP(0,1,-24*ISGN,NPS,NPS,0,0,PWB,AM,PHFLAG)
       ENDIF
 C
 C multi pi mode JNPI
@@ -3547,6 +3543,8 @@ C get multiplicity of mode JNPI
       DO I=1,ND
         KFPI=LUNPIK(IDFFIN(I,JNPI),-ISGN)
 C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
+        PHFLAG=.TRUE.
+        IF (MODE.EQ.261.AND.OFF_PHOT.EQ.1) PHFLAG=.FALSE.
         IDECAY=0
         IF ((KFPI.EQ.221).AND.  !eta
      c       (MODE.EQ.37.OR.MODE.EQ.38.OR.MODE.EQ.39.OR.MODE.EQ.40.OR.
@@ -3557,6 +3555,10 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c        MODE.EQ.145.OR.MODE.EQ.146.OR.MODE.EQ.147.OR.MODE.EQ.148.OR.
      c        MODE.EQ.242.OR.MODE.EQ.243.OR.MODE.EQ.244.OR.MODE.EQ.245.OR.
      c        MODE.EQ.246.OR.MODE.EQ.247.OR.MODE.EQ.248.OR.MODE.EQ.249.OR.
+     c        MODE.EQ.262.OR.MODE.EQ.263.OR.MODE.EQ.264.OR.MODE.EQ.265.OR.
+     c        MODE.EQ.266.OR.MODE.EQ.267.OR.MODE.EQ.268.OR.MODE.EQ.269.OR.
+     c        MODE.EQ.270.OR.MODE.EQ.271.OR.MODE.EQ.272.OR.MODE.EQ.273.OR.
+     c        MODE.EQ.274.OR.MODE.EQ.275.OR.MODE.EQ.276.OR.MODE.EQ.277.OR.
      c        MODE.EQ.350.OR.MODE.EQ.351.OR.MODE.EQ.352.OR.MODE.EQ.353.OR.
      c        MODE.EQ.354.OR.MODE.EQ.355.OR.MODE.EQ.356.OR.MODE.EQ.357))
      c        IDECAY=1    
@@ -3564,6 +3566,9 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c       (MODE.EQ.45.OR.MODE.EQ.46.OR.MODE.EQ.47.OR.
      c        MODE.EQ.48.OR.MODE.EQ.49.OR.MODE.EQ.50.OR.
      c        MODE.EQ.130.OR.MODE.EQ.131.OR.MODE.EQ.132.OR.
+     c        MODE.EQ.151.OR.MODE.EQ.152.OR.MODE.EQ.153.OR.
+     c        MODE.EQ.154.OR.MODE.EQ.155.OR.MODE.EQ.156.OR.
+     c        MODE.EQ.157.OR.MODE.EQ.158.OR.MODE.EQ.159.OR.
      c        MODE.EQ.236.OR.MODE.EQ.237.OR.MODE.EQ.238.OR.
      c        MODE.EQ.239.OR.MODE.EQ.240.OR.MODE.EQ.241.OR.
      c        MODE.EQ.250.OR.MODE.EQ.251.OR.MODE.EQ.252.OR.
@@ -3577,10 +3582,11 @@ C       PRINT *, 'DWLNEW: I, JNPI, -ISGN, KFPI = ',I,JNPI,-ISGN,KFPI
      c        MODE.EQ.253.OR.MODE.EQ.254.OR.MODE.EQ.255.OR.MODE.EQ.256.OR.
      c        MODE.EQ.257.OR.MODE.EQ.258.OR.MODE.EQ.259.OR.MODE.EQ.260))
      c       IDECAY=1
-        IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) IDECAY=1 ! a1+
-        IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+
-        IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+
-        IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+
+        IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) IDECAY=1 ! a1+-
+        IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) IDECAY=1 ! rho+-
+        IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.266.AND.MODE.LE.277)) IDECAY=2 ! K*+- [calling TDECAY twice]
+        IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) IDECAY=1 !a0+-
+        IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) IDECAY=1 !b1+-
         IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332).AND.(LAMDEC.EQ.1)) IDECAY=1 ! Lambda(bar)
         IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) IDECAY=1 ! f0
         IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) IDECAY=1 ! a0
@@ -3593,11 +3599,14 @@ C        IF(KFPI.NE.111)KFPI=KFPI*ISGN
         END DO
         CALL TRALO4(KTO,PPI,PPI,AM)
         IF(IS.EQ.0) NPS = -I
-        IF (IDECAY.EQ.1) THEN
-           CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,.TRUE.)
+        IF (IDECAY.EQ.2) THEN
+           CALL FILHEP(0,2,KFPI,NPS-2,NPS-2,0,0,PPI,AM,PHFLAG)
+           CALL TDECAY(KFPI,MODE,PPI,NDAU)
+        ELSE IF (IDECAY.EQ.1) THEN
+           CALL FILHEP(0,2,KFPI,NPS,NPS,0,0,PPI,AM,PHFLAG)
            CALL TDECAY(KFPI,MODE,PPI,NDAU)
         ELSE
-           CALL FILHEP(0,1,KFPI,NPS-NDAU,NPS-NDAU,0,0,PPI,AM,.TRUE.)
+           CALL FILHEP(0,1,KFPI,NPS-NDAU,NPS-NDAU,0,0,PPI,AM,PHFLAG)
         ENDIF
       END DO
       IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1) THEN
@@ -3637,7 +3646,8 @@ C
 C
       IS=0
       ISIGN = KFPI/ABS(KFPI)
-      IF (MODE.EQ.37.OR.
+      IF ((KFPI.EQ.221).AND.
+     c    (MODE.EQ.37.OR.
      c     MODE.EQ.41.OR.
      c     MODE.EQ.133.OR.
      c     MODE.EQ.137.OR.
@@ -3645,12 +3655,17 @@ C
      c     MODE.EQ.145.OR.
      c     MODE.EQ.242.OR.
      c     MODE.EQ.246.OR.
+     c     MODE.EQ.262.OR.
+     c     MODE.EQ.266.OR.
+     c     MODE.EQ.270.OR.
+     c     MODE.EQ.274.OR.
      c     MODE.EQ.350.OR.
-     c     MODE.EQ.354) THEN                    ! eta->gammagamma
+     c     MODE.EQ.354)) THEN                    ! eta->gammagamma
          ID1=22
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.38.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.38.OR.
      c        MODE.EQ.42.OR.
      c        MODE.EQ.134.OR.
      c        MODE.EQ.138.OR.
@@ -3658,12 +3673,17 @@ C
      c        MODE.EQ.146.OR.
      c        MODE.EQ.243.OR.
      c        MODE.EQ.247.OR.
+     c        MODE.EQ.263.OR.
+     c        MODE.EQ.267.OR.
+     c        MODE.EQ.271.OR.
+     c        MODE.EQ.275.OR.
      c        MODE.EQ.351.OR.
-     c        MODE.EQ.355) THEN                 ! eta->pi0pi0pi0
+     c        MODE.EQ.355)) THEN                 ! eta->pi0pi0pi0
          ID1= 111
          ID2= 111
          ID3= 111
-      ELSE IF (MODE.EQ.39.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.39.OR.
      c        MODE.EQ.43.OR.
      c        MODE.EQ.135.OR.
      c        MODE.EQ.139.OR.
@@ -3671,12 +3691,17 @@ C
      c        MODE.EQ.147.OR.
      c        MODE.EQ.244.OR.
      c        MODE.EQ.248.OR.
+     c        MODE.EQ.264.OR.
+     c        MODE.EQ.268.OR.
+     c        MODE.EQ.272.OR.
+     c        MODE.EQ.276.OR.
      c        MODE.EQ.352.OR.
-     c        MODE.EQ.356) THEN                 ! eta->pi+pi-pi0
+     c        MODE.EQ.356)) THEN                 ! eta->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.40.OR.
+      ELSE IF ((KFPI.EQ.221).AND.
+     c       (MODE.EQ.40.OR.
      c        MODE.EQ.44.OR.
      c        MODE.EQ.136.OR.
      c        MODE.EQ.140.OR.
@@ -3684,97 +3709,125 @@ C
      c        MODE.EQ.148.OR.
      c        MODE.EQ.245.OR.
      c        MODE.EQ.249.OR.
+     c        MODE.EQ.265.OR.
+     c        MODE.EQ.269.OR.
+     c        MODE.EQ.273.OR.
+     c        MODE.EQ.277.OR.
      c        MODE.EQ.353.OR.
-     c        MODE.EQ.357) THEN                 ! eta->pi+pi-gamma
+     c        MODE.EQ.357)) THEN                 ! eta->pi+pi-gamma
          ID1= 211
          ID2=-211
          ID3= 22
-      ELSE IF (MODE.EQ.45.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c       (MODE.EQ.45.OR.
      c        MODE.EQ.48.OR.
      c        MODE.EQ.130.OR.
+     c        MODE.EQ.151.OR.
+     c        MODE.EQ.154.OR.
+     c        MODE.EQ.157.OR.
      c        MODE.EQ.236.OR.
      c        MODE.EQ.239.OR.
      c        MODE.EQ.250.OR.
      c        MODE.EQ.358.OR.
-     c        MODE.EQ.361) THEN                 ! omega->pi+pi-pi0
+     c        MODE.EQ.361)) THEN                 ! omega->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.46.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c        (MODE.EQ.46.OR.
      c         MODE.EQ.49.OR.
      c         MODE.EQ.131.OR.
+     c         MODE.EQ.152.OR.
+     c         MODE.EQ.155.OR.
+     c         MODE.EQ.158.OR.
      c         MODE.EQ.237.OR.
      c         MODE.EQ.240.OR.
      c         MODE.EQ.251.OR.
      c         MODE.EQ.359.OR.
-     c         MODE.EQ.362) THEN                 ! omega->pi+pi-
+     c         MODE.EQ.362)) THEN                 ! omega->pi+pi-
          ID1= 211
          ID2=-211
          ID3=0
-      ELSE IF (MODE.EQ.47.OR.
+      ELSE IF ((KFPI.EQ.223).AND.
+     c        (MODE.EQ.47.OR.
      c         MODE.EQ.50.OR.
      c         MODE.EQ.132.OR.
+     c         MODE.EQ.153.OR.
+     c         MODE.EQ.156.OR.
+     c         MODE.EQ.159.OR.
      c         MODE.EQ.238.OR.
      c         MODE.EQ.241.OR.
      c         MODE.EQ.252.OR.
      c         MODE.EQ.360.OR.
-     c         MODE.EQ.363) THEN                 ! omega->pi0gamma
+     c         MODE.EQ.363)) THEN                 ! omega->pi0gamma
          ID1=111
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.230) THEN     ! phi->K+K-
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.230) THEN     ! phi->K+K-
          ID1= 321
          ID2=-321
          ID3=0
-      ELSE IF (MODE.EQ.231) THEN     ! phi->K0SK0L
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.231) THEN     ! phi->K0SK0L
          ID1= 310
          ID2= 130
          ID3=0
-      ELSE IF (MODE.EQ.232) THEN     ! phi->pi+pi-pi0
+      ELSE IF (KFPI.EQ.333.AND.MODE.EQ.232) THEN     ! phi->pi+pi-pi0
          ID1= 211
          ID2=-211
          ID3= 111
-      ELSE IF (MODE.EQ.233) THEN     ! f1->pi+pi-rho0(->pi+pi-)
+      ELSE IF (KFPI.EQ.20223.AND.MODE.EQ.233) THEN     ! f1->pi+pi-rho0(->pi+pi-)
          ID1= 211
          ID2=-211
          ID3= 113
-      ELSE IF (MODE.EQ.234.OR.(MODE.GE.253.AND.MODE.LE.256)) THEN ! f1->pi+a0-(->pi-eta)
+      ELSE IF ((KFPI.EQ.20223).AND.(MODE.EQ.234.OR.(MODE.GE.253.AND.MODE.LE.256))) THEN ! f1->pi+a0-(->pi-eta)
          ID1= 211
          ID2=-9000211
          ID3=0
-      ELSE IF (MODE.EQ.235.OR.(MODE.EQ.257.AND.MODE.LE.260)) THEN ! f1->pi0a00(->pi0eta)
+      ELSE IF ((KFPI.EQ.20223).AND.(MODE.EQ.235.OR.(MODE.EQ.257.AND.MODE.LE.260))) THEN ! f1->pi0a00(->pi0eta)
          ID1= 111
          ID2= 9000111
          ID3=0
-      ELSE IF (MODE.EQ.341) THEN !   a1- -> pi-gamma
+      ELSE IF ((ABS(KFPI).EQ.20213).AND.(MODE.EQ.341)) THEN !   a1- -> pi-gamma
          ID1=211*ISIGN
          ID2=22
          ID3=0
-      ELSE IF (MODE.EQ.342) THEN ! rho- -> pi-gamma
+      ELSE IF ((ABS(KFPI).EQ.213).AND.(MODE.EQ.342)) THEN ! rho- -> pi-gamma
          ID1=211*ISIGN
          ID2=22
          ID3=0
-      ELSE IF (MODE.GE.343.AND.MODE.LE.346) THEN ! a0- -> pi-eta
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.266.AND.MODE.LE.269)) THEN ! K*- -> K- pi0
+         ID1=321*ISIGN
+         ID2=111
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.270.AND.MODE.LE.273)) THEN ! K*- -> pi- K0S
+         ID1=211*ISIGN
+         ID2=310
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.323).AND.(MODE.GE.274.AND.MODE.LE.277)) THEN ! K*- -> pi- K0L
+         ID1=211*ISIGN
+         ID2=130
+         ID3=0
+      ELSE IF ((ABS(KFPI).EQ.9000211).AND.(MODE.GE.343.AND.MODE.LE.346)) THEN ! a0- -> pi-eta
          ID1=211*ISIGN
          ID2=221
          ID3=0
-      ELSE IF (MODE.GE.347.AND.MODE.LE.349) THEN ! b1- -> pi-omega
+      ELSE IF ((ABS(KFPI).EQ.10213).AND.(MODE.GE.347.AND.MODE.LE.349)) THEN ! b1- -> pi-omega
          ID1=211*ISIGN
          ID2=223
          ID3=0
-      ELSE IF (MODE.GE.329.AND.MODE.LE.332) THEN ! Lambda -> p pi- OR Lambdabar -> pbar pi+
+      ELSE IF ((ABS(KFPI).EQ.3122).AND.(MODE.GE.329.AND.MODE.LE.332)) THEN ! Lambda -> p pi- OR Lambdabar -> pbar pi+
          ID1=2212*ISIGN
          ID2=-211*ISIGN
          ID3=0
-      ELSE IF (MODE.GE.339.AND.MODE.LE.340) THEN ! f0(980)->pi+pi-
+      ELSE IF ((ABS(KFPI).EQ.9010221).AND.(MODE.GE.339.AND.MODE.LE.340)) THEN ! f0(980)->pi+pi-
          ID1= 211
          ID2=-211
          ID3=0
-      ELSE IF (MODE.GE.364.AND.MODE.LE.371) THEN ! a00(->pi0eta)
+      ELSE IF ((ABS(KFPI).EQ.9000111).AND.(MODE.GE.364.AND.MODE.LE.371)) THEN ! a00(->pi0eta)
          ID1=111
          ID2=221
          ID3=0
-      ELSE IF (MODE.EQ.372.OR.MODE.EQ.373) THEN ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
+      ELSE IF ((ABS(KFPI).EQ.94144).AND.(DMALFA.GT.0).AND.(MODE.EQ.372.OR.MODE.EQ.373)) THEN ! decay mode = 0:invi, 1:gammagamma, 2:e+e-, 3:mu+mu-, 4:pi+pi-, 5:pi0pi0, 6:pi0eta, 7:etaeta, 8:K+K-, 9:KS0KS0, 10:pi+K-, 11:pi-K+
          IF (DMALFA.EQ.1) THEN
             ID1=22
             ID2=22
@@ -4325,7 +4378,60 @@ C
       END
 
       SUBROUTINE DAM2PI_wrap(MNUM,PT,PN,PIM1,PIM2,AMPLIT,HV)
-      REAL  HV(4),PT(4),PN(4),PIM1(4),PIM2(4)
+      IMPLICIT NONE
+      REAL  PT(4),PN(4),PIM1(4),PIM2(4),AMPLIT,HV(4),FPI,FPIc,VUD,CE
+      REAL*8 PTD(4),PND(4),PIM1D(4),PIM2D(4)
+      REAL*8 AMPLITD1,HVD1(4),AMPLITD2,HVD2(4),AMPLITD,HVD(4)
+      INTEGER MNUM, I
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+      COMMON / PARMASD / AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+      REAL*8            AMTAUD,AMNUTAD,AMELD,AMNUED,AMMUD,AMNUMUD
+     *                 ,AMPIZD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D
+     *                 ,AMKD,AMKZD,AMKSTD,GAMKSTD
+      COMMON / DECPAR / GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      REAL*4            GFERMI,GV,GA,CCABIB,SCABIB,GAMEL
+      EXTERNAL pigamma_left, pigamma_right
+      DATA  FPIc /93.3E-3/
+C     omega is amplit; h_i is HV(i)
+C      write(*,*) 'USING DAM2PI_wrap'
+      DO  I=1,3
+         HV(I)=0.0
+      ENDDO
+      HV(4)=1.0
+      DO I = 1,4
+         PTD(I) = PT(I)
+         PND(I) = PN(I)
+         PIM1D(I)=PIM1(I)
+         PIM2D(I)=PIM2(I)
+      ENDDO
+      CALL pigamma_left(!AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+     C                  CV_LL,CV_LR,CS_RL,CS_RR,
+     C                  ONOF_L_IB, ONOF_L_V, ONOF_L_A, ONOF_L_VAINT,
+     C                  PTD,PND,PIM1D,PIM2D,AMPLITD1,HVD1)
+      CALL pigamma_right(!AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
+     C                  CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     C                  ONOF_R_IB, ONOF_R_V, ONOF_R_A, ONOF_R_VAINT,
+     C                  PTD,PND,PIM1D,PIM2D,AMPLITD2,HVD2)
+      AMPLITD = AMPLITD1 + AMPLITD2
+      DO I = 1,3
+C        HVD(I) = (AMPLITD1*HVD1(I) + AMPLITD2*HVD2(I))/(AMPLITD)
+         HVD(I) = 0.0D0
+         IF (AMPLITD1.GT.0.0D0) HVD(I) = HVD(I) + AMPLITD1*HVD1(I)
+         IF (AMPLITD2.GT.0.0D0) HVD(I) = HVD(I) + AMPLITD2*HVD2(I)
+         IF (AMPLITD.GT.0.0D0)  HVD(I) = HVD(I) / AMPLITD
+      ENDDO
+      FPI = FPIc
+      VUD = CCABIB
+      CE = 16.*GFERMI * GFERMI * AMTAUD * AMTAUD * FPI * FPI * VUD * VUD * (16.* ACOS(-1.) * ACOS(-1.) / 137. / 137.)
+      AMPLIT = AMPLITD * CE
+      DO I = 1,3
+         HV(I) = HVD(I)
+      ENDDO
       RETURN
       END
 

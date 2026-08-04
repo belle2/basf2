@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Returns name of an axis
      */
-    std::string getName() const { return m_axisName;}
+    const std::string& getName() const { return m_axisName;}
 
     /**
      * Sets name of an axis

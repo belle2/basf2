@@ -76,12 +76,8 @@ void IntervalOfValidity::makeValid()
   }
 }
 
-
-bool IntervalOfValidity::contains(const EventMetaData& event) const
+bool IntervalOfValidity::contains(int experiment, int run) const
 {
-  auto experiment = (int) event.getExperiment();
-  auto run = (int) event.getRun();
-
   // check for empty interval
   if (empty()) return false;
 
@@ -89,6 +85,13 @@ bool IntervalOfValidity::contains(const EventMetaData& event) const
   if (checkLowerBound(experiment, run) < 0) return false;
   if (checkUpperBound(experiment, run) > 0) return false;
   return true;
+}
+
+bool IntervalOfValidity::contains(const EventMetaData& event) const
+{
+  auto experiment = (int) event.getExperiment();
+  auto run = (int) event.getRun();
+  return contains(experiment, run);
 }
 
 IntervalOfValidity IntervalOfValidity::overlap(const IntervalOfValidity& iov) const

@@ -237,7 +237,7 @@ void DetectorOccupanciesDQMModule::event()
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash)
     return;
 
-  if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort)
+  if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTPrefilterDiscard)
     return;
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)

@@ -146,7 +146,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
   AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
-  for (auto& filename : filenames) {
+  for (const auto& filename : filenames) {
 
     Belle2::EventMetaData emd(event, run, experiment);
     auto weightfile = Weightfile::load(filename, emd);
@@ -184,7 +184,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         result = r;
         branches[0]->Fill();
       }
@@ -200,7 +200,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
           result = r[iClass];
           branches[iClass]->Fill();
@@ -216,7 +216,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       float target = 0;
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
       auto targets = data.getTargets();
-      for (auto& t : targets) {
+      for (const auto& t : targets) {
         target = t;
         target_branch->Fill();
       }
@@ -407,7 +407,6 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_splot(const GeneralOptions
   mc_general_options.m_identifier = general_options.m_identifier + "_pdf.xml";
   mc_general_options.m_method = "PDF";
   PDFOptions pdf_options;
-  // cppcheck-suppress unreadVariable
   auto pdf_expert = teacher_dataset(mc_general_options, pdf_options, mc_dataset);
 
   GeneralOptions combination_general_options = general_options;
@@ -443,7 +442,6 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_reweighting(const GeneralO
 
   GeneralOptions boost_general_options = general_options;
   boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
-  // cppcheck-suppress unreadVariable
   auto boost_expert = teacher_dataset(boost_general_options, specific_options, boost_dataset);
 
   GeneralOptions reweighter_general_options = general_options;

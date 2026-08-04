@@ -12,6 +12,9 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -113,18 +116,18 @@ bool SVDStateVarSet::extract(const BaseSVDStateFilter::Object* pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  Vector3D position = Vector3D(firstMeasurement.getPos());
-  Vector3D momentum = Vector3D(firstMeasurement.getMom());
+  const ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
-  const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
+  const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+  const ROOT::Math::XYVector& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
   const double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
-  Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
+  ROOT::Math::XYZVector trackPositionAtHit(trackPositionAtHit2D.X(), trackPositionAtHit2D.Y(), trackPositionAtHitZ);
 
   const auto calculateCharge = [](const auto & s) {
     return s.getCharge();

@@ -80,7 +80,8 @@ namespace Belle2 {
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfBKLMHits,
                      const std::string& storeArrayNameOfEKLMHits,
-                     const bool initializeCDCTranslators = true);
+                     const bool initializeCDCTranslators = true,
+                     bool fromTrackCreator = false);
 
     /**
      * Reset the internal measurement creator storage to the default settings.
@@ -180,9 +181,9 @@ namespace Belle2 {
 
     /// Helper: Go through all measurement creators in the given list and create the measurement with a given hit.
     template <class HitType, Const::EDetector detector>
-    void addMeasurementsFromHitToRecoTrack(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation, HitType* hit,
-                                           const std::vector<std::shared_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators,
-                                           std::map<genfit::TrackPoint*, RecoHitInformation*>& trackPointHitMapping) const
+    static void addMeasurementsFromHitToRecoTrack(RecoTrack& recoTrack, RecoHitInformation& recoHitInformation, HitType* hit,
+                                                  const std::vector<std::shared_ptr<BaseMeasurementCreatorFromHit<HitType, detector>>>& measurementCreators,
+                                                  std::map<genfit::TrackPoint*, RecoHitInformation*>& trackPointHitMapping)
     {
       if (not recoHitInformation.useInFit()) {
         return;
@@ -205,8 +206,8 @@ namespace Belle2 {
     }
 
     /// Helper: Go through all measurement creators in the given list and create the measurement without a given hit.
-    void addMeasurementsToRecoTrack(RecoTrack& recoTrack,
-                                    const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators) const;
+    static void addMeasurementsToRecoTrack(RecoTrack& recoTrack,
+                                           const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators);
   };
 }
 

@@ -34,7 +34,7 @@ namespace Belle2 {
     /** setter for Path. */
     void init(bool eventMixing, bool mergeSameFile);
 
-    ~SteerRootInputModule();
+    ~SteerRootInputModule() override;
 
     virtual void initialize() override;
     virtual void event() override;

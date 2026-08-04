@@ -18,8 +18,6 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
@@ -31,6 +29,8 @@
 #include <tracking/trackingUtilities/utilities/GetIterator.h>
 
 #include <framework/logging/Logger.h>
+
+#include <Math/Vector2D.h>
 
 #include <functional>
 #include <algorithm>
@@ -274,7 +274,7 @@ CDCSegment2D CDCSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& r
 {
   if (rlWireHitSegment.size() == 1) {
     CDCSegment2D segment2D;
-    Vector2D zeroDisp2D(0.0, 0.0);
+    ROOT::Math::XYVector zeroDisp2D(0.0, 0.0);
     segment2D.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
     segment2D.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
     segment2D.receiveISuperCluster();

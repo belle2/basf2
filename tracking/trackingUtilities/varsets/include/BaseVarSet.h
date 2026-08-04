@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Making destructor virtual
-      virtual ~BaseVarSet() = default;
+      ~BaseVarSet() override = default;
 
       /**
        *  Main method that extracts the variable values from the complex object.
@@ -82,7 +82,7 @@ namespace Belle2 {
         std::map<std::string, Float_t> result;
         std::vector<Named<Float_t*> > namedVariables = this->getNamedVariables(prefix);
         for (const Named<Float_t*>& namedVariable : namedVariables) {
-          Float_t* variable = namedVariable;
+          const Float_t* variable = namedVariable;
           result[namedVariable.getName()] = *variable;
         }
         return result;

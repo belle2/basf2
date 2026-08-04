@@ -194,7 +194,3 @@ void FlavorTaggerInfoFillerModule::event()
 
 }
 
-void FlavorTaggerInfoFillerModule::terminate()
-{
-}
-

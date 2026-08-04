@@ -148,7 +148,7 @@ namespace Belle2 {
       auto daughters = mcparticle->getDaughters();
 
       ROOT::Math::PxPyPzEVector  p4Daughters;
-      for (auto& double_daughter : daughter_indices) {
+      for (const auto& double_daughter : daughter_indices) {
         unsigned long daughter = std::lround(double_daughter);
         if (daughter >= daughters.size()) return Const::doubleNaN;
 
@@ -385,7 +385,7 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector pInitial = mcparticles[0]->get4Vector();
       ROOT::Math::PxPyPzEVector pDaughters;
       const std::vector<Particle*> daughters = part->getDaughters();
-      for (auto daughter : daughters) {
+      for (const auto* daughter : daughters) {
         const MCParticle* mcD = daughter->getMCParticle();
         if (!mcD) return Const::doubleNaN;
 
@@ -402,7 +402,7 @@ namespace Belle2 {
 
       if (mcparticle->getNDaughters() > 0) {
         const std::vector<MCParticle*> daughters = mcparticle->getDaughters();
-        for (auto daughter : daughters)
+        for (const auto* daughter : daughters)
           ResultP4 += MCInvisibleP4(daughter);
       } else if (isNeutrino)
         ResultP4 += mcparticle->get4Vector();
@@ -601,7 +601,7 @@ namespace Belle2 {
       const MCParticle* tmp_mcP = p->getMCParticle();
       if (!Const::chargedStableSet.contains(Const::ParticleType(std::abs(tmp_mcP->getPDG()))))
         return Const::doubleNaN;
-      Track* tmp_track = tmp_mcP->getRelated<Track>();
+      const Track* tmp_track = tmp_mcP->getRelated<Track>();
       if (tmp_track) {
         const TrackFitResult* tmp_tfr = tmp_track->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(tmp_mcP->getPDG())));
         if (!tmp_tfr) {
@@ -852,7 +852,6 @@ namespace Belle2 {
       // sort descending by weight
       std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                 ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
-      // cppcheck-suppress containerOutOfBounds
       return mcps.object(weightsAndIndices[0].second)->getPDG();
     }
 

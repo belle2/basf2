@@ -24,8 +24,6 @@
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCWireHit;
-    class Vector2D;
-    class Vector3D;
     class CDCSegment2D;
     class CDCSegment3D;
     class CDCSegmentPair;
@@ -76,13 +74,13 @@ namespace Belle2 {
       }
 
       /// Getter for the position of the first reconstructed hit.
-      const Vector3D& getStartRecoPos3D() const
+      const ROOT::Math::XYZVector& getStartRecoPos3D() const
       {
         return front().getRecoPos3D();
       }
 
       /// Getter for the position of the last reconstructed hit.
-      const Vector3D& getEndRecoPos3D() const
+      const ROOT::Math::XYZVector& getEndRecoPos3D() const
       {
         return back().getRecoPos3D();
       }

@@ -47,12 +47,9 @@ TrackingUtilities::Weight MCTruthCDCPathPairFilter::operator()(const BaseCDCPath
   const auto* rhsMCRecoTrack = rhsSeed.getMCRecoTrack();
   //  std::cout << "here " << lhsMCRecoTrack << " " << rhsMCRecoTrack << "\n";
 
-  if (not lhsMCRecoTrack and rhsMCRecoTrack) {
-    return -1;
-  } else if (lhsMCRecoTrack and not rhsMCRecoTrack) {
-    return 1;
-  } else if (not lhsMCRecoTrack and not rhsMCRecoTrack) {
-    // Well, we do not care...
+  if (!lhsMCRecoTrack || !rhsMCRecoTrack) {
+    if (!lhsMCRecoTrack && rhsMCRecoTrack) return -1;
+    if (lhsMCRecoTrack && !rhsMCRecoTrack) return 1;
     return 0;
   }
 

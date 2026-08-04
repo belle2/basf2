@@ -16,7 +16,8 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 
 #include <tracking/trackingUtilities/numerics/LookupTable.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <vector>
 
@@ -53,7 +54,7 @@ OffOriginExtension::roadSearch(const std::vector<const CDCWireHit*>& wireHits)
   CDCTrajectory2D trackTrajectory2D = fitter.fit(wireHits);
 
   double chi2 = trackTrajectory2D.getChi2();
-  Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
+  ROOT::Math::XYVector refPos = trackTrajectory2D.getGlobalPerigee();
 
   // change sign of the curvature; should be the same as the charge of the candidate
   double curv = trackTrajectory2D.getCurvature();
@@ -96,14 +97,14 @@ OffOriginExtension::roadSearch(const std::vector<const CDCWireHit*>& wireHits)
 }
 
 std::vector<const CDCWireHit*>
-OffOriginExtension::getHitsWRTtoRefPos(const Vector2D& refPos, float curv, float theta)
+OffOriginExtension::getHitsWRTtoRefPos(const ROOT::Math::XYVector& refPos, float curv, float theta)
 {
   float thetaPrecision = M_PI / (pow(2., m_levelPrecision + 1));
   float curvPrecision = 0.15 / (pow(2., m_levelPrecision));
 
   using YSpan = AxialHitQuadTreeProcessor::YSpan;
   YSpan curvSpan{curv - curvPrecision, curv + curvPrecision};
-  LookupTable<Vector2D> thetaSpan(&Vector2D::Phi, 1, theta - thetaPrecision, theta + thetaPrecision);
+  LookupTable<ROOT::Math::XYVector> thetaSpan(&VectorUtil::Phi, 1, theta - thetaPrecision, theta + thetaPrecision);
 
   AxialHitQuadTreeProcessor qtProcessor(refPos, curvSpan, &thetaSpan);
   qtProcessor.seed(m_allAxialWireHits);

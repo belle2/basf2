@@ -120,7 +120,7 @@ void VXDQETrainingDataCollectorModule::beginRun()
 
 void VXDQETrainingDataCollectorModule::event()
 {
-  for (SpacePointTrackCand& aTC : m_spacePointTrackCands) {
+  for (const SpacePointTrackCand& aTC : m_spacePointTrackCands) {
 
     if (not aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive)) {
       continue;

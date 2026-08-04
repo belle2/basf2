@@ -156,43 +156,43 @@ namespace Belle2 {
      * get map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
     * @return map
     */
-    std::map<std::string, const Track*> getTargetTrackLevel() const { return m_targetTrackLevel; }
+    const std::map<std::string, const Track*>& getTargetTrackLevel() const { return m_targetTrackLevel; }
 
     /**
      * get map containing the category name and the corresponding highest target track probability in Track Level
     * @return map
     */
-    std::map<std::string, float> getProbTrackLevel() const { return m_probTrackLevel; }
+    const std::map<std::string, float>& getProbTrackLevel() const { return m_probTrackLevel; }
 
     /**
      * get map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
     * @return map
     */
-    std::map<std::string, const Track*> getTargetEventLevel() const { return m_targetEventLevel; }
+    const std::map<std::string, const Track*>& getTargetEventLevel() const { return m_targetEventLevel; }
 
     /**
      * get map containing the category name and the corresponding highest category probability in Event Level
     * @return map
     */
-    std::map<std::string, float> getProbEventLevel() const { return m_probEventLevel; }
+    const std::map<std::string, float>& getProbEventLevel() const { return m_probEventLevel; }
 
     /**
      * get map containing the category name and the corresponding qr Output
     * @return map
     */
-    std::map<std::string, float> getQpCategory() const { return m_qpCategory; }
+    const std::map<std::string, float>& getQpCategory() const { return m_qpCategory; }
 
     /**
      * get map containing the category truth. 1 if the Category has a target or 0 else.
     * @return map
     */
-    std::map<std::string, float> getHasTrueTarget() const { return m_hasTrueTarget; }
+    const std::map<std::string, float>& getHasTrueTarget() const { return m_hasTrueTarget; }
 
     /**
      * get map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
      * @return map
      */
-    std::map<std::string, float> getIsTrueCategory() const { return m_isTrueCategory; }
+    const std::map<std::string, float>& getIsTrueCategory() const { return m_isTrueCategory; }
 
     /**
      * qr Output of the Combiner. Output of the FlavorTagger after the complete process.

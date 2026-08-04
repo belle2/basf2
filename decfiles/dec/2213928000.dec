@@ -1,0 +1,25 @@
+# EventType: 2213928000
+# Descriptor: [ccbar D02EtaEpMum, Eta2GammaGamma]
+# NickName: D02EtaEpMum_Eta2GammaGamma
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal
+# Date: 20260518 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias Myeta eta  
+
+Decay D0
+1.000 Myeta e+ mu-                 PHSP;
+Enddecay
+
+Decay Myeta
+1.000 gamma gamma               PHSP;
+Enddecay
+
+End
+

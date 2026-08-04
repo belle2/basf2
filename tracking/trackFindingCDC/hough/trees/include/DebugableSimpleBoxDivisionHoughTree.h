@@ -7,9 +7,10 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/SimpleBoxDivisionHoughTree.h>
+
+#include <Math/Vector3D.h>
 #include <TTree.h>
 #include <TFile.h>
-
 #include <TGraph.h>
 #include <TF1.h>
 #include <TCanvas.h>
@@ -65,17 +66,10 @@ namespace Belle2 {
         eventTTree.Write();
 
         auto walker = [&](const typename Super::Node * node) -> bool {
-          // cppcheck-suppress unreadVariable
           lowerX = node->getLowerX();
-          // cppcheck-suppress unreadVariable
           upperX = node->getUpperX();
-          // cppcheck-suppress unreadVariable
-          lowerY = node->getLowerY();
-          // cppcheck-suppress unreadVariable
           upperY = node->getUpperY();
-          // cppcheck-suppress unreadVariable
           weight = node->getWeight();
-          // cppcheck-suppress unreadVariable
           level = node->getLevel();
 
           weightTTree.Fill();
@@ -91,16 +85,16 @@ namespace Belle2 {
       }
 
       /// Draw the results to a ROOT TCanvas
-      void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
-                         const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
-                         const typename AInBoxAlgorithm::HoughBox& node)
+      static void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
+                                const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
+                                const typename AInBoxAlgorithm::HoughBox& node)
       {
         TGraph* allHitsGraph = new TGraph();
         allHitsGraph->SetLineWidth(2);
         allHitsGraph->SetLineColor(9);
 
         for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : allHits) {
-          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           allHitsGraph->SetPoint(allHitsGraph->GetN(), R, Z);
@@ -118,7 +112,7 @@ namespace Belle2 {
         foundHitsGraph->SetMarkerColor(2);
 
         for (const TrackingUtilities::CDCRecoHit3D& recoHit3D : foundHits) {
-          const TrackingUtilities::Vector3D& recoPos3D = recoHit3D.getRecoPos3D();
+          const ROOT::Math::XYZVector& recoPos3D = recoHit3D.getRecoPos3D();
           const double R = std::sqrt(recoPos3D.x() * recoPos3D.x() + recoPos3D.y() * recoPos3D.y());
           const double Z = recoPos3D.z();
           foundHitsGraph->SetPoint(foundHitsGraph->GetN(), R, Z);

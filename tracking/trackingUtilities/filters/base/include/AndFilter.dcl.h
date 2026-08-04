@@ -28,7 +28,7 @@ namespace Belle2 {
       AndFilter(std::unique_ptr<AFilter> lhsFilter, std::unique_ptr<AFilter> rhsFilter);
 
       /// Default destructor
-      ~AndFilter();
+      ~AndFilter() override;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

@@ -90,7 +90,7 @@ namespace Belle2 {
       }
 
       /// Make destructor of interface virtual
-      virtual ~FindletModule() = default;
+      ~FindletModule() override = default;
 
       /// Initialize the Module before event processing
       virtual void initialize() override
@@ -250,8 +250,8 @@ namespace Belle2 {
        *  @param input Should the parameter name state that this is an input.
        *  @return rname of the StoreVector
        */
-      std::string
-      getStoreVectorParameterName(std::string classMnemonic, int order, bool input) const
+      static std::string
+      getStoreVectorParameterName(std::string classMnemonic, int order, bool input)
       {
         std::string orderPrefix;
         if (order == 1) {
@@ -279,7 +279,7 @@ namespace Belle2 {
        *  @param input Should the parameter name state that this is an input.
        *  @return description for the StoreVector
        */
-      std::string getStoreVectorParameterDescription(const std::string& classMnemonic, int order, bool input) const
+      static std::string getStoreVectorParameterDescription(const std::string& classMnemonic, int order, bool input)
       {
         std::string orderPrefix;
         if (order == 1) {

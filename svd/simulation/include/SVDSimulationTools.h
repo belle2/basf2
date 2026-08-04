@@ -16,6 +16,7 @@
 #include <functional>
 #include <sstream>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/MathHelpers.h>
 
 namespace Belle2 {
   namespace SVD {
@@ -83,8 +84,10 @@ namespace Belle2 {
     {
       if (t < 0.0)
         return 0.0;
-      else
-        return 149.012 * pow(t, 2) * pow(1.0 + t, -10);
+      else {
+        // Replace pow(1.+t, -10) by a division and a sequential calculation of the tenth power for improved execution time
+        return 149.012 * square(t) / (pow4(1.0 + t) * pow4(1.0 + t) * square(1.0 + t));
+      }
     }
 
     /** Adjacent-channel waveform U-side.
@@ -110,7 +113,7 @@ namespace Belle2 {
       if (t < 0.0)
         return 0.0;
       else
-        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * pow(t, 2) + p[6] * pow(t, 3)) * exp(-p[7] * t);
+        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * square(t) + p[6] * cube(t)) * exp(-p[7] * t);
     }
 
     /** Adjacent-channel waveform V-side.
@@ -136,7 +139,7 @@ namespace Belle2 {
       if (t < 0.0)
         return 0.0;
       else
-        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * pow(t, 2) + p[6] * pow(t, 3)) * exp(-p[7] * t);
+        return (p[0] + p[1] * t) * exp(-p[2] * t) + (p[3] + p[4] * t + p[5] * square(t) + p[6] * cube(t)) * exp(-p[7] * t);
     }
 
 

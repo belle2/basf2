@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisSVDEfficiencyModule();
+    ~DQMHistAnalysisSVDEfficiencyModule() override;
 
     /**
      * Initializer.
@@ -68,9 +68,10 @@ namespace Belle2 {
   private:
 
     //parameters
-    double m_effError; /**<error level of the efficiency */
+    double m_effError; /**< error level of the efficiency */
     double m_effWarning; /**< warning level of the efficiency */
-    double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    double m_statThreshold; /**< minimal number of tracks per sensor to set green or red frame */
+    double m_nSigma; /**< number of sigmas to set the DQM status, where sigma = efficiency uncertainty*/
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
 
     //! Data members
@@ -98,12 +99,12 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrRPhiViewU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
     TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
 
-    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
+    static Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
     svdStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     svdStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 
-    void setEffStatus(float den, float eff, bool isU = false); /**< set efficiency status */
+    void setEffStatus(float den, float eff, float err, svdStatus& efficiencyStatus); /**< set efficiency status */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

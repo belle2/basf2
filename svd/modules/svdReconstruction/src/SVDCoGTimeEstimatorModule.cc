@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
+#include <framework/utilities/MathHelpers.h>
 #include <TMath.h>
 
 using namespace Belle2;
@@ -281,7 +282,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError(Belle2::SVDS
 
   for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
     Atot  += samples[k];
-    tmpResSq += TMath::Power(k * m_DeltaT - m_weightedMeanTime, 2);
+    tmpResSq += square(k * m_DeltaT - m_weightedMeanTime);
   }
 
   return m_amplitudeError / Atot * TMath::Sqrt(tmpResSq);

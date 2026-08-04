@@ -71,12 +71,12 @@ namespace Belle2 {
     /** Compute the transformation matrix d(q/p,u',v',u,v)/d(x,y,z,px,py,pz) from state at first track point (vertex)
      * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
      */
-    TMatrixD getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop);
+    static TMatrixD getGlobalToLocalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     /** Compute the transformation matrix d(x,y,z,px,py,pz)/d(q/p,u',v',u,v) from state at first track point (vertex)
      * @param msop MeasuredStateOnPlane - linearization point (track state @ plane) at which the transformation should be computed
      */
-    TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
+    static TMatrixD getLocalToGlobalTransform(const genfit::MeasuredStateOnPlane& msop);
 
     ///  Compute the transformation matrices d(q/p,u'v',u,v)/d(vx,vy,vz,px,py,pz,theta,phi,M) = dq/d(v,z) for
     ///  both particles in pair. Only for decays of type V0(*)->f+f- (same mass for f)
@@ -98,7 +98,7 @@ namespace Belle2 {
     ///
     /// Reference: Widl, Edmund ; Frühwirth R;  "Representation and Estimation of Trajectories from Two-body Decays", CMS-NOTE-2007-032, http://cds.cern.ch/record/1073690
     ///
-    std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(Particle& mother, double motherMass);
+    std::pair<TMatrixD, TMatrixD> getTwoBodyToLocalTransform(const Particle& mother, double motherMass);
 
     /** Write down a GBL trajectory (to TTree or binary file) */
     void storeTrajectory(gbl::GblTrajectory& trajectory);
@@ -107,7 +107,7 @@ namespace Belle2 {
      *  from BeamSpot
      @return tuple<B2Vector3D, TMatrixDSym> tuple with position and size as covariance matrix
      */
-    std::tuple<B2Vector3D, TMatrixDSym> getPrimaryVertexAndCov() const;
+    static std::tuple<B2Vector3D, TMatrixDSym> getPrimaryVertexAndCov();
 
 
   private:

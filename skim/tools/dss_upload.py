@@ -44,10 +44,10 @@ def get_argument_parser():
         "--singleProductions", action="store_true", help="xxx")
 
     parser.add_argument("-s", "--skims", required=(("--combinedSkims") in sys.argv),
-                        nargs=" + ", help="CombinedSkims that you want to register")
+                        nargs="+", help="CombinedSkims that you want to register")
 
     parser.add_argument("-p", "--prods", required=(("--singleProductions") in sys.argv),
-                        nargs=" + ", help="Single prods that you want to register")
+                        nargs="+", help="Single prods that you want to register")
 
     parser.add_argument("--printOnly", required=False, help="Print commands without executing them")
 

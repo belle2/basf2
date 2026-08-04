@@ -30,9 +30,6 @@ DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
   B2DEBUG(1, "DQMHistReference: Constructor done.");
 }
 
-
-DQMHistReferenceModule::~DQMHistReferenceModule() { }
-
 void DQMHistReferenceModule::initialize()
 {
   B2DEBUG(1, "DQMHistReference: initialized.");
@@ -69,13 +66,13 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   TIter nextRefDirKey(refFile->GetListOfKeys());
   TKey* refDirKey;
-  while ((refDirKey = (TKey*)nextRefDirKey())) {
+  while ((refDirKey = dynamic_cast<TKey*>(nextRefDirKey()))) {
     if (refDirKey->IsFolder() && string(refDirKey->GetName()) == string("ref")) {
-      TDirectory* refDir = (TDirectory*)refDirKey->ReadObj(); // ReadObj -> I own it, delete later
+      TDirectory* refDir = static_cast<TDirectory*>(refDirKey->ReadObj()); // ReadObj -> I own it, delete later
       TIter nextDetDirKey(refDir->GetListOfKeys());
       TKey* detDirKey;
       // detector folders
-      while ((detDirKey = (TKey*)nextDetDirKey())) {
+      while ((detDirKey = dynamic_cast<TKey*>(nextDetDirKey()))) {
         if (!detDirKey->IsFolder()) continue;
         TDirectory* detDir = ((TDirectory*)detDirKey->ReadObj());
         TIter nextRunTypeDirKey(detDir->GetListOfKeys()); // ReadObj -> Now I own this, so delete later
@@ -104,8 +101,9 @@ void DQMHistReferenceModule::loadReferenceHistos()
           // now read histograms
           while ((histKey = (TKey*)nextHistkey())) {
             if (histKey->IsFolder()) continue;
-            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) {
-              addRefHist(detName, (TH1*)histKey->ReadObj()); // ReadObj -> I own it, tranfer ownership to function
+            if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) { // maybe not needed with the dynamic cast check below
+              auto h = dynamic_cast<TH1*>(histKey->ReadObj());
+              if (h) addRefHist(detName, h); // ReadObj -> I own it, tranfer ownership to function
             }
           }
           delete runtypeDir; // always non-zero as checked above ... runtype or "default"

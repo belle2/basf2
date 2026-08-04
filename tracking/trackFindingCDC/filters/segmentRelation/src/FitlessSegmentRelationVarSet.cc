@@ -8,8 +8,10 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
 
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
-
 #include <tracking/trackingUtilities/numerics/Angle.h>
+
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -63,27 +65,27 @@ bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* p
   const CDCRecoHit2D& toFirstHit = toSegment.front();
   // const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const Vector2D fromHitPos = fromLastHit.getRecoPos2D();
-  const Vector2D toHitPos = toFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromHitPos = fromLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector toHitPos = toFirstHit.getRecoPos2D();
 
   // Fit
-  const Vector2D fromFitPos = fromFit.getClosest(fromHitPos);
-  const Vector2D toFitPos = toFit.getClosest(toHitPos);
-  const Vector2D fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toFitMom = toFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromFitPos = fromFit.getClosest(fromHitPos);
+  const ROOT::Math::XYVector toFitPos = toFit.getClosest(toHitPos);
+  const ROOT::Math::XYVector fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toFitMom = toFit.getFlightDirection2D(toHitPos);
 
-  const Vector2D fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
 
-  const double deltaPosPhi = fromFitPos.angleWith(toFitPos);
-  const double deltaMomPhi = fromFitMom.angleWith(toFitMom);
+  const double deltaPosPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitPos, toFitPos);
+  const double deltaMomPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, toFitMom);
   const double deltaAlpha = AngleUtil::normalised(deltaMomPhi - deltaPosPhi);
 
   finitevar<named("delta_pos_phi")>() = deltaPosPhi;
   finitevar<named("delta_mom_phi")>() = deltaMomPhi;
 
-  finitevar<named("from_delta_mom_phi")>() = fromFitMom.angleWith(fromOtherFitMom);
-  finitevar<named("to_delta_mom_phi")>() = toFitMom.angleWith(toOtherFitMom);
+  finitevar<named("from_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, fromOtherFitMom);
+  finitevar<named("to_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(toFitMom, toOtherFitMom);
   finitevar<named("delta_alpha")>() = deltaAlpha;
 
   finitevar<named("arc_length_front_offset")>() =

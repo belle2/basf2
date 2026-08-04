@@ -8,6 +8,7 @@
 
 #include <svd/modules/svdPerformance/SVDOccupancyAnalysisModule.h>
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <TMath.h>
 
@@ -107,8 +108,8 @@ void SVDOccupancyAnalysisModule::beginRun()
 
 
   TH1F h_zsVSoccSQ("zsVSoccSQ_L@layerL@ladderS@sensor@view",
-                   "Average Occupancy VS (ZS cut)^2 (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)", 100, TMath::Power(m_minZS,
-                       2) - 5, TMath::Power(m_maxZS, 2));
+                   "Average Occupancy VS (ZS cut)^2 (layer @layer, ladder @ladder, sensor @sensor, side@view/@side)", 100, square(m_minZS) - 5,
+                   square(m_maxZS));
   h_zsVSoccSQ.GetXaxis()->SetTitle("(ZS cut)^2");
   m_histo_zsOccSQ = new SVDHistograms<TH1F>(h_zsVSoccSQ);
 
@@ -175,7 +176,7 @@ void SVDOccupancyAnalysisModule::event()
 
       if (nOKSamples > 0) {
         m_histo_zsOcc->fill(theVxdID, side, m_minZS + z * step);
-        m_histo_zsOccSQ->fill(theVxdID, side, TMath::Power(m_minZS + z * step, 2));
+        m_histo_zsOccSQ->fill(theVxdID, side, square(m_minZS + z * step));
       }
     }
 

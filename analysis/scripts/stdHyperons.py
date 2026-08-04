@@ -33,6 +33,13 @@ def stdXi(fitter="TreeFit", addSuffix=False, path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:std`` list
     """
 
+    B2WARNING(
+        "stdXi is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
+
     suffix = ""
     if addSuffix:
         suffix = f"_{fitter}"
@@ -133,6 +140,13 @@ def stdXi0(gammatype='eff40', beamBackgroundMVAWeight="", fakePhotonMVAWeight=""
         path (basf2.Path): modules are added to this path building the ``Xi0:std`` list
     """
 
+    B2WARNING(
+        "stdXi0 is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
+
     if not isB2BII():
         stdLambdas(path=path)
         # 3.5 MeV Range around nominal mass (~7*sigma_core)
@@ -215,6 +229,13 @@ def stdOmega(fitter="TreeFit", addSuffix=False, path=None):
             depending on the chosen fitter
         path (basf2.Path): modules are added to this path building the ``Omega-:std`` list
     """
+
+    B2WARNING(
+        "stdOmega is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
 
     suffix = ""
     if addSuffix:
@@ -305,6 +326,13 @@ def goodXi(xitype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Xi-:veryloose``, ``Xi-:loose``, or ``Xi-:tight``, list
     """
 
+    B2WARNING(
+        "goodXi is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
+
     if not _std_hyperon_is_in_path("Xi-", path):
         B2WARNING("Could not find standard Xi particle list! Creating it with default options.")
         stdXi(path=path)
@@ -355,6 +383,13 @@ def goodXi0(xitype='loose', path=None):
         xitype (str): specify either ``veryloose``, ``loose``,  or ``tight`` for good ``ParticleList`` selection (default ``loose``)
         path (basf2.Path): modules are added to this path building the ``Xi0:veryloose``, ``Xi0:loose``, or ``Xi0:tight``, list
     """
+
+    B2WARNING(
+        "goodXi0 is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
 
     if not _std_hyperon_is_in_path("Xi0", path):
         B2WARNING("Could not find standard Xi0 particle list! Creating it with default options.")
@@ -410,6 +445,13 @@ def goodOmega(omegatype='loose', path=None):
         path (basf2.Path): modules are added to this path building the ``Omega-:veryloose``, ``Omega-:loose``,
                            or ``Omega-:tight``, list
     """
+
+    B2WARNING(
+        "goodOmega is deprecated and will be removed at the end of 2026. "
+        "Please replace it with a custom hyperon reconstruction and selection optimised for "
+        "your specific analysis. To provide feedback on the removal, see "
+        "https://gitlab.desy.de/belle2/software/basf2/-/work_items/11641"
+    )
 
     if not _std_hyperon_is_in_path("Omega-", path):
         B2WARNING("Could not find standard Omega particle list! Creating it with default options.")

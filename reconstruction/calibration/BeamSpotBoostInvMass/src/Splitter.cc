@@ -154,8 +154,8 @@ namespace Belle2 {
     }
     if (nEv == 0) nEv = 0.1;
 
-    //double loss = pow(rawTime - tBest, 2) + gapPenalty * pow(maxGap, 2);
-    //double loss = 1./nEv  + timePenalty * pow(rawTime, 2);
+    //double loss = (rawTime - tBest) * (rawTime - tBest) + gapPenalty * (maxGap * maxGap);
+    //double loss = 1./nEv  + timePenalty * (rawTime * rawTime);
 
     lossFun->SetParameters(rawTime, netTime, maxGap, nEv);
     double lossNew = lossFun->Eval(0);
@@ -261,8 +261,11 @@ namespace Belle2 {
     int nFound = 0;
     for (auto r : runs) { //Linear search over runs
       if (r.second.first <= t && t < r.second.second) {
-        rFound = r.first;
         ++nFound;
+        if (nFound == 2
+            && rFound.run == r.first.run - 1) // to fix corner case when a time is seen in two consecutive runs due to float rounding errors
+          --nFound;
+        rFound = r.first;
       }
     }
 

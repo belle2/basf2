@@ -1,0 +1,80 @@
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''
+Convenience function to add the SmartBackground module to the path
+and handle event selection/rejection.
+'''
+
+import basf2 as b2
+from skim.core import BaseSkim, CombinedSkim
+from skim.registry import Registry
+
+
+def add_smartbkg_filtering(
+        skim,
+        path,
+        empty_path=None,
+        debug_mode=False,
+        payload_weights="SmartBackgroundWeights_default",
+        payload_config="SmartBackgroundConfig_default",
+        event_type=None,
+        activation_params=None):
+    """
+        Adds event preselection based on the SmartBkg neural network.
+        Should be used only for directly skimmed MC productions.
+        Must be added to the path after generator.add_abc_generator but before simulation.add_simulation.
+        Given one or multiple skims, the model predicts the probability of each event passing each of the skims.
+        Events are then sampled for each skim according to this probability.
+        An event weight is stored for each skim in the event extra info as 'weight_<SkimName>',
+        either as the inverse probability if the event is sampled for that skim, or 0 otherwise.
+        If an event is sampled for none of the provided skims, it is rejected to the empty_path.
+        Use case is the reduction of simulation time for directly skimmed MC productions.
+
+        Parameters:
+            skim (skim.core.BaseSkim or skim.core.CombinedSkim): instance of the used skim
+            path (basf2.Path): main path with generator modules, used for pass events
+            empty_path (basf2.Path or None): path rejected events are given to (new empty path if None)
+            debug_mode (bool): enables debug mode (events are never rejected, instead the neural network prediction
+                               is written to the event extra info as 'SmartBKG_Prediction_<SkimName>')
+            payload_weights (str): name of the payload storing neural network weights in ONNX format
+            payload_config (str): name of the payload storing the SmartBackgroundConfig object
+            event_type (str or None): type of events that are generated, allowed values are
+                                      'charged', 'mixed', 'uubar', 'ddbar', 'ssbar', 'ccbar', 'taupair';
+                                      if None, automatically determined from the event extra info
+            activation_params (tuple(float, float) or None): custom parameters (a, b) for the activation function
+                                                             (useful for testing/validation);
+                                                             if None, prefitted values for the chosen skims are used
+    """
+
+    sbkg = b2.register_module("SmartBackground")
+    if isinstance(skim, CombinedSkim):
+        skim_codes = [int(s.code) for s in skim.Skims]
+    elif isinstance(skim, BaseSkim):
+        skim_codes = [int(skim.code)]
+    else:
+        b2.B2FATAL("add_smartbkg_filtering: skim argument must be instance of either" +
+                   " CombinedSkim or BaseSkim, received " + str(type(skim)))
+    skim_names = [Registry.decode_skim_code(str(code)) for code in skim_codes]
+    sbkg.param("skimCodes", skim_codes)
+    sbkg.param("skimNames", skim_names)
+    sbkg.param("debugMode", debug_mode)
+    sbkg.param("payloadWeights", payload_weights)
+    sbkg.param("payloadConfig", payload_config)
+    if event_type is not None:
+        sbkg.param("overrideEventType", True)
+        sbkg.param("eventType", event_type)
+    if activation_params is not None:
+        sbkg.param("overrideActivation", True)
+        if len(activation_params) != 2:
+            b2.B2FATAL("add_smartbkg_filtering: activation_override_params must be a list or tuple of two floats (a, b)")
+        sbkg.param("activationOverrideParams", [float(x) for x in activation_params])
+    path.add_module(sbkg)
+    if empty_path is None:
+        empty_path = b2.create_path()
+    sbkg.if_value("==0", empty_path)

@@ -140,7 +140,7 @@ void TOPRingPlotterModule::resetTree()
 }
 
 
-void TOPRingPlotterModule::fillPDF(Belle2::Const::ChargedStable ch, const Track* track, TH2F* histo, short* pixelArray,
+void TOPRingPlotterModule::fillPDF(const Belle2::Const::ChargedStable& ch, const Track* track, TH2F* histo, short* pixelArray,
                                    float* timeArray, int& arrayGuard, int& toyCounter)
 {
 

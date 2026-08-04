@@ -36,9 +36,6 @@ DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
 }
 
-
-DQMHistDeltaHistoModule::~DQMHistDeltaHistoModule() { }
-
 void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
@@ -82,14 +79,14 @@ void DQMHistDeltaHistoModule::event()
   time_t cur_mtime = m_evtMetaDataPtr->getTime();
 
   for (auto& histoname : m_monitoredHistos) {
-    TH1* hh = findHist(histoname.c_str());
+    auto hh = findHist(histoname.c_str());
     if (hh == nullptr) continue;
     if (hh->GetDimension() != 1) continue;
     queue<SSNODE*>& hq = m_histosQueues[histoname];
     if (hq.empty()) {
       SSNODE* n = new SSNODE;
-      n->histo = (TH1*)hh->Clone();
-      n->diff_histo = (TH1*)hh->Clone();
+      n->histo = dynamic_cast<TH1*>(hh->Clone());
+      n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
       n->time_modified = cur_mtime;
       hq.push(n);
     } else {
@@ -100,8 +97,8 @@ void DQMHistDeltaHistoModule::event()
             break;
           }
           SSNODE* n = new SSNODE;
-          n->histo = (TH1*)hh->Clone();
-          n->diff_histo = (TH1*)hh->Clone();
+          n->histo = dynamic_cast<TH1*>(hh->Clone());
+          n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
           n->diff_histo->Add(nn->histo, -1);
           n->time_modified = cur_mtime;
           hq.push(n);

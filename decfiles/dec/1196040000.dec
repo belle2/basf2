@@ -1,0 +1,95 @@
+# EventType: 1196040000
+# Descriptor: anti-B0 -> D_s- X inclusive decays
+# NickName: Bd_DsmX
+# Documentation: anti-B0 -> D_s- X inclusive decays
+# Responsible: Varsha Gautam
+# Email: a22ph09007@iitbbs.ac.in
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 04/03/2026
+#
+
+
+# Define Aliases
+Alias MyK*0 K*0
+Alias Myanti-K*0 anti-K*0
+ChargeConj MyK*0 Myanti-K*0
+Alias MyK_S0   K_S0
+Alias Myphi   phi
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+1.000 B0sig  anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+
+
+
+Decay anti-B0sig
+0.007236970   D+ D_s-                                      PHSP; 
+0.008044570   D*+ D_s-                                     SVS;  
+0.007400000   D_s*-  D+                                    SVS;
+0.017700000   D*+  D_s*-                                   SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;
+0.000424800   D'_1+ D_s-                                    SVS;
+0.000939870   D'_1+ D_s*-                                  SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.000963200   D_1+  D_s-                                     SVS;
+0.002131080   D_1+  D_s*-                                    SVV_HELAMP 0.48 0.0 0.734 0.0 0.48 0.0;
+0.001022400   D_2*+ D_s-                                    STS;
+0.001050000   D_2*+ D_s*-                                   PHSP;
+0.001800000   D_s-  D+  pi0                                PHSP;
+0.003700000   D_s-  D0  pi+                                PHSP;
+0.001800000   D_s*-  D+  pi0                               PHSP;
+0.003700000   D_s*-  D0  pi+                               PHSP;
+0.003000000   D_s-  D+  pi+  pi-                           PHSP;
+0.002200000   D_s-  D+  pi0  pi0                           PHSP;
+0.002200000   D_s-  D0  pi+  pi0                           PHSP;
+0.003000000   D_s*-  D+  pi+  pi-                          PHSP;
+0.002200000   D_s*-  D+  pi0  pi0                          PHSP;
+0.002200000   D_s*-  D0  pi+  pi0                          PHSP;
+0.007378570   D_s0*- D+                                     PHSP;
+0.017687170   D*+  D_s0*-                                  SVS; 
+0.003547860   D_s1-  D+                                    SVS;  
+0.009282570   D*+  D_s1-                                   SVV_HELAMP 0.4904 0. 0.7204 0. 0.4904 0.0; 
+0.000430000   D'_s1-  D+                                   PHSP;
+0.000830000   D'_s1-  D*+                                  PHSP;
+0.000021600   D_s-  pi+                                    PHSP; 
+0.000021000   D_s*-  pi+                                   SVS;
+0.000016000   rho+   D_s-                                  SVS;
+0.000041000   D_s*-  rho+                                  SVV_HELAMP 1.0 0.0 1.0 0.0 1.0 0.0;
+0.000008000   D_s-  pi+  pi0                               PHSP;
+0.000043000   a_1+  D_s-                                   SVS;
+0.000058000   D_s*-  pi+  pi0                              PHSP;
+0.000094000   D_s*-  a_1+                                  SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.000409680   D_s- D_0*+                  	               PHSP;
+0.000421060   D_s*- D_0*+                  	               SVS;
+0.000020000   D_s+  D_s-                                   PHSP;
+0.000024000   D_s*+  D_s-                                  SVS;
+0.000024000   D_s*-  D_s+                                  SVS;
+0.000030000   D_s*+  D_s*-                                 SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;   
+Enddecay
+CDecay B0sig
+
+
+Decay D_s-
+0.02250000      Myphi    pi-                               SVS;
+0.02500776      MyK*0    K-                                SVS;
+0.0103698278    MyK_S0   K-                                PHSP;
+Enddecay
+CDecay D_s+
+
+Decay MyK*0
+1.00      K+  pi-                                          VSS;
+Enddecay
+CDecay Myanti-K*0
+
+Decay MyK_S0
+1.00    pi+  pi-                                           PHSP;
+Enddecay
+
+Decay Myphi
+1.00  K+   K-                                              VSS;
+Enddecay
+End
+
+

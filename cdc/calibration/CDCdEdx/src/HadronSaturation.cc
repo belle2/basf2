@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/HadronSaturation.h>
+#include <framework/utilities/MathHelpers.h>
 using namespace Belle2;
 
 static HadronSaturation* HC_obj;
@@ -156,7 +157,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta,
       continue;
     }
 
-    chisq += pow((dedxcor - vdedxavg[j]) / m_dedxerror[i], 2);
+    chisq += square((dedxcor - vdedxavg[j]) / m_dedxerror[i]);
     B2INFO("\t " << i << ") " << dedxcor << "/" << vdedxavg[j] << ", error was "
            << m_dedxerror[i] << " De = " << hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) <<
            ": Final " << chisq);

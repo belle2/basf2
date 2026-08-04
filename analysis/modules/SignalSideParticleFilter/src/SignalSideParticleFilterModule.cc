@@ -43,7 +43,7 @@ void SignalSideParticleFilterModule::initialize()
 {
   StoreArray<Particle>().isRequired();
 
-  for (auto& iParticleListName : m_particleLists) {
+  for (const auto& iParticleListName : m_particleLists) {
 
     StoreObjPtr<ParticleList> iParticlelist;
     iParticlelist.isRequired(iParticleListName);
@@ -66,7 +66,7 @@ void SignalSideParticleFilterModule::event()
   if (!particle)
     return;
 
-  for (auto& iParticleListName : m_particleLists) {
+  for (const auto& iParticleListName : m_particleLists) {
     StoreObjPtr<ParticleList> iParticlelist(iParticleListName);
 
     if (!iParticlelist) {

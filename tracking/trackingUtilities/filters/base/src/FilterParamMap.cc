@@ -48,7 +48,7 @@ namespace Belle2 {
       }
 
       /// Retrieve the parameter (name,value) pairs
-      std::map<std::string, FilterParamVariant> getValues() const
+      const std::map<std::string, FilterParamVariant>& getValues() const
       {
         return m_param_filterParameters;
       }

@@ -17,6 +17,8 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -131,6 +133,6 @@ bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
   var<named("mean_number_of_neighbors")>() = 1.0 * totalNNeighbors / size;
 
   var<named("fit_prob")>() = trajectory.getPValue();
-  var<named("fitted_d0")>() = trajectory.getDist2D(Vector2D());
+  var<named("fitted_d0")>() = trajectory.getDist2D(ROOT::Math::XYVector());
   return true;
 }

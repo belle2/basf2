@@ -166,7 +166,7 @@ namespace Belle2::Conditions {
   }
 
   std::string PayloadProvider::getFilename(EDirectoryLayout structure,
-                                           const PayloadMetadata& payload) const
+                                           const PayloadMetadata& payload)
   {
     fs::path path("");
     switch (structure) {

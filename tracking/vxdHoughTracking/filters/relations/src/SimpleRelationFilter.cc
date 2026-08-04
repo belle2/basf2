@@ -30,14 +30,14 @@ void SimpleRelationFilter::exposeParameters(ModuleParamList* moduleParamList, co
 TrackingUtilities::Weight
 SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXDHoughState*>& relation)
 {
-  const VXDHoughState::DataCache& currentVXDHoughState = relation.first->getDataCache();
-  const VXDHoughState::DataCache& nextVXDHoughState = relation.second->getDataCache();
+  const VXDHoughState::DataCache& currentStateCache = relation.first->getDataCache();
+  const VXDHoughState::DataCache& nextStateCache = relation.second->getDataCache();
 
-  const double absThetaDiff = std::abs(currentVXDHoughState.theta - nextVXDHoughState.theta);
+  const double absThetaDiff = std::abs(currentStateCache.theta - nextStateCache.theta);
 
   // if the connection is possible in u, it should also be possible in v, but as there could in principle be a chance that the hits
   // are on different sensors (X.X.1 -> X.(X+-1).2 or X.X.2 -> X.(X+-1).1) check for a similar theta value instead of v
-  if (currentVXDHoughState.layer == nextVXDHoughState.layer) {
+  if (currentStateCache.layer == nextStateCache.layer) {
     if (absThetaDiff > m_SimpleThetaCutDeltaL0) {
       return NAN;
     }
@@ -47,7 +47,7 @@ SimpleRelationFilter::operator()(const std::pair<const VXDHoughState*, const VXD
     return 1.0;
   }
 
-  const ushort absLayerDiff = std::abs(currentVXDHoughState.layer - nextVXDHoughState.layer);
+  const ushort absLayerDiff = std::abs(currentStateCache.layer - nextStateCache.layer);
   if ((absLayerDiff == 1 and absThetaDiff < m_SimpleThetaCutDeltaL1) or
       (absLayerDiff == 2 and absThetaDiff < m_SimpleThetaCutDeltaL2)) {
     return 1.0;

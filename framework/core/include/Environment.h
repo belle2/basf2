@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Returns a list of file paths searched for module libraries.
      */
-    const std::list<std::string>& getModuleSearchPaths() const;
+    static const std::list<std::string>& getModuleSearchPaths();
 
     /**
      * Sets the path which points to the externals directory of the framework.

@@ -54,7 +54,7 @@ namespace Belle2 {
      * @param logLevel The log level.
      * @param debugLevel The debug level.
      */
-    LogConfig(ELogLevel logLevel = c_Default, int debugLevel = c_DefaultDebugLevel);
+    explicit LogConfig(ELogLevel logLevel = c_Default, int debugLevel = c_DefaultDebugLevel);
 
     /**
      * Converts a log level type to a string.

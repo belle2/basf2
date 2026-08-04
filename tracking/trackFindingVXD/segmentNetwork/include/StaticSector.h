@@ -75,8 +75,8 @@ namespace Belle2 {
     /** Get the pointer to the 4 Space Point filter assigned to the
     WARNING: not implemented yet. Will return a nullptr pointer in any case!
     */
-    const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
-                                  const FullSecID& /*innerID*/) const
+    static const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
+                                         const FullSecID& /*innerID*/)
     {
       B2WARNING("StaticSector:getFilter4sp  4 hit, all 4 hits are yet ignored in here! TODO: implement!");
       return nullptr;

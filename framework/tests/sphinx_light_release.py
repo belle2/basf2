@@ -56,5 +56,5 @@ if __name__ == "__main__":
         re.findall(ignoreonlinebook, x) or
         re.findall(ignoretrackmatching, x) or
         re.findall(ignoretrackingeventtimeextraction, x),
-        ['--light'] + ["-o", sphinx_output_dir] if sphinx_output_dir else []
+        ['--light'] + (["-o", sphinx_output_dir] if sphinx_output_dir else [])
     )

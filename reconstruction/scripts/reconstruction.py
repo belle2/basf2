@@ -14,7 +14,7 @@ os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
 
 import basf2
 
-from geometry import check_components
+from geometry import check_components, is_detector_present, are_detectors_present, is_any_detector_present
 
 from svd import add_svd_reconstruction
 from pxd import add_pxd_reconstruction
@@ -22,7 +22,6 @@ from pxd import add_pxd_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
-    add_mc_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
     add_postfilter_tracking_reconstruction,
     add_cr_tracking_reconstruction,
@@ -30,6 +29,7 @@ from tracking import (
 )
 
 from softwaretrigger.path_utils import (
+    add_prefilter_module,
     add_filter_software_trigger,
     add_skim_software_trigger
 )
@@ -75,14 +75,16 @@ def default_event_abort(module, condition, error_flag):
 def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calculation=True, skipGeometryAdding=False,
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        with_cdc_cellular_automaton=False,
-                       use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
-                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
+                       use_second_cdc_hits=False, svd_standalone_mode="VXDTF2",
+                       add_muid_hits=False, reconstruct_cdst=None,
+                       use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
                        create_intercepts_for_pxd_ckf=False,
                        append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                       switch_off_slow_modules_for_online=False):
+                       switch_off_slow_modules_for_online=False,
+                       use_cat_finder=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -112,6 +114,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param add_trigger_calculation: add the software trigger modules for monitoring (do not make any cut)
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -140,6 +145,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # Set the run for beam data
@@ -158,6 +165,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         append_full_grid_cdc_eventt0 = False
         legacy_ecl_charged_pid = True
 
+    # HLT pre-filter
+    add_prefilter_module(path, event_abort=default_event_abort)
+
     # pre-filter reconstruction
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -166,17 +176,18 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  trackFitHypotheses=trackFitHypotheses,
                                  with_cdc_cellular_automaton=with_cdc_cellular_automaton,
                                  use_second_cdc_hits=use_second_cdc_hits,
+                                 svd_standalone_mode=svd_standalone_mode,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
-                                 event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
+                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                                 use_cat_finder=use_cat_finder)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
-    if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
+    if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
         add_filter_software_trigger(path,
                                     use_random_numbers_for_prescale=use_random_numbers_for_hlt_prescale)
 
@@ -184,13 +195,14 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_postfilter_reconstruction(path,
                                   components=components,
                                   pruneTracks=pruneTracks,
+                                  trackFitHypotheses=trackFitHypotheses,
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
                                   legacy_ecl_charged_pid=legacy_ecl_charged_pid,
                                   switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
 
     # Add the modules calculating the software trigger skims
-    if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
+    if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
         add_skim_software_trigger(path)
 
 
@@ -201,14 +213,15 @@ def add_prefilter_reconstruction(path,
                                  trackFitHypotheses=None,
                                  with_cdc_cellular_automaton=False,
                                  use_second_cdc_hits=False,
+                                 svd_standalone_mode="VXDTF2",
                                  add_muid_hits=False,
                                  reconstruct_cdst=None,
-                                 event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                 switch_off_slow_modules_for_online=False):
+                                 switch_off_slow_modules_for_online=False,
+                                 use_cat_finder=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -226,13 +239,13 @@ def add_prefilter_reconstruction(path,
     :param with_cdc_cellular_automaton: If true, in the CDC track finding the cellular automaton algorithm will be used too,
         after the global algorithm (Legendre).
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
-        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
-        but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -247,6 +260,8 @@ def add_prefilter_reconstruction(path,
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -258,11 +273,6 @@ def add_prefilter_reconstruction(path,
 
     # Check components.
     check_components(components)
-
-    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    doom = path.add_module("EventsOfDoomBuster")
-    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
     add_prefilter_pretracking_reconstruction(path, components=components)
@@ -276,10 +286,12 @@ def add_prefilter_reconstruction(path,
         trackFitHypotheses=trackFitHypotheses,
         with_cdc_cellular_automaton=with_cdc_cellular_automaton,
         use_second_cdc_hits=use_second_cdc_hits,
+        svd_standalone_mode=svd_standalone_mode,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        use_cat_finder=use_cat_finder)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -302,6 +314,7 @@ def add_prefilter_reconstruction(path,
 def add_postfilter_reconstruction(path,
                                   components=None,
                                   pruneTracks=False,
+                                  trackFitHypotheses=None,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
                                   legacy_ecl_charged_pid=False,
@@ -312,6 +325,8 @@ def add_postfilter_reconstruction(path,
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
         reduce execution time.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -339,6 +354,7 @@ def add_postfilter_reconstruction(path,
         path,
         components=components,
         pruneTracks=False,
+        trackFitHypotheses=trackFitHypotheses,
         flip_recoTrack=flip_recoTrack,
         kink_finding=kink_finding
     )
@@ -457,44 +473,6 @@ def add_cosmics_reconstruction(
                                             add_muid_hits=add_muid_hits,
                                             cosmics=True,
                                             legacy_ecl_charged_pid=legacy_ecl_charged_pid)
-
-
-def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False):
-    """
-    This function adds the standard reconstruction modules with MC tracking
-    to a path.
-
-    @param components list of geometry components to include reconstruction for, or None for all components.
-    @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
-    """
-
-    # Set the run for beam data
-    basf2.declare_beam()
-
-    # Add modules that have to be run before track reconstruction
-    add_prefilter_pretracking_reconstruction(path,
-                                             components=components)
-
-    # tracking
-    add_mc_tracking_reconstruction(path,
-                                   components=components,
-                                   pruneTracks=False,
-                                   use_second_cdc_hits=use_second_cdc_hits)
-
-    # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_MC_Tracking')
-
-    # add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):
@@ -697,7 +675,7 @@ def add_arich_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ARICH' in components:
+    if is_detector_present("ARICH", components):
         path.add_module('ARICHFillHits')
         path.add_module('ARICHReconstructor',
                         storePhotons=1)  # enabled for ARICH DQM plots
@@ -711,7 +689,7 @@ def add_top_modules(path, components=None, cosmics=False):
     :param components: The components to use or None to use all standard components.
     :param cosmics: if True, steer TOP for cosmic reconstruction
     """
-    if components is None or 'TOP' in components:
+    if is_detector_present("TOP", components):
         path.add_module('TOPChannelMasker')
         if cosmics:
             path.add_module('TOPCosmicT0Finder')
@@ -722,13 +700,12 @@ def add_top_modules(path, components=None, cosmics=False):
 
 def add_cluster_expert_modules(path, components=None):
     """
-    Add the KLMExpert and ClusterMatcher modules to the path.
+    Add the ClusterMatcher module to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or ('KLM' in components and 'ECL' in components):
-        path.add_module('KLMExpert')
+    if are_detectors_present(["KLM", "ECL"], components):
         path.add_module('ClusterMatcher')
 
 
@@ -741,9 +718,9 @@ def add_pid_module(path, components=None, run_klm_dnn=True):
     :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path.
         This flag is automatically set to false on HLT and ExpressReco.
     """
-    if components is None or 'SVD' in components or 'CDC' in components:
+    if is_any_detector_present(["SVD", "CDC"], components):
         path.add_module('MdstPID')
-    if (components is None or 'KLM' in components) and run_klm_dnn:
+    if is_detector_present("KLM", components) and run_klm_dnn:
         path.add_module('KLMMuonIDDNNExpert')
 
 
@@ -754,7 +731,7 @@ def add_klm_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         path.add_module('KLMReconstructor')
         path.add_module('KLMClustersReconstructor')
         path.add_module('KLMClusterAna')
@@ -767,7 +744,7 @@ def add_klm_mc_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'KLM' in components:
+    if is_detector_present("KLM", components):
         path.add_module('MCMatcherKLMClusters')
 
 
@@ -780,15 +757,15 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     :param components: The components to use or None to use all standard components.
     """
     # Muid is needed for muonID computation AND ECLCluster-Track matching.
-    if components is None or ('CDC' in components and 'ECL' in components and 'KLM' in components):
+    if are_detectors_present(["CDC", "ECL", "KLM"], components):
         path.add_module('Muid',
                         addHitsToRecoTrack=add_hits_to_reco_track)
-    if components is not None and 'CDC' in components:
-        if ('ECL' not in components and 'KLM' in components):
+    if is_detector_present("CDC", components):
+        if not is_detector_present("ECL", components) and is_detector_present("KLM", components):
             basf2.B2WARNING('You added KLM to the components list but not ECL: the module Muid, that is necessary '
                             'for correct muonID computation, will not be added to your reconstruction path. '
                             'Make sure that this is fine for your purposes, otherwise please include also ECL.')
-        if ('ECL' in components and 'KLM' not in components):
+        if is_detector_present("ECL", components) and not is_detector_present("KLM", components):
             basf2.B2WARNING('You added ECL to the components list but not KLM: the module Muid, that is necessary '
                             'for correct ECLCluster-Track matching, will not be added to your reconstruction path. '
                             ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
@@ -801,7 +778,7 @@ def add_ecl_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         path.add_module('ECLWaveformFit')
         path.add_module('ECLDigitCalibrator')
         path.add_module('ECLEventT0')
@@ -824,7 +801,7 @@ def add_ecl_finalizer_module(path, components=None):
         :param components: The components to use or None to use all standard components.
         """
 
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         path.add_module('ECLFinalizer')
 
 
@@ -835,7 +812,7 @@ def add_ecl_track_cluster_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
+    if is_detector_present("ECL", components) and is_any_detector_present(["PXD", "SVD", "CDC"], components):
         path.add_module('ECLTrackClusterMatching')
 
 
@@ -846,7 +823,7 @@ def add_ecl_cluster_properties_modules(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components or 'CDC' in components)):
+    if is_detector_present("ECL", components) and is_any_detector_present(["PXD", "SVD", "CDC"], components):
         path.add_module('ECLClusterProperties')
 
 
@@ -857,7 +834,7 @@ def add_ecl_track_brem_finder(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or ('ECL' in components and ('PXD' in components or 'SVD' in components)):
+    if is_detector_present("ECL", components) and is_any_detector_present(["PXD", "SVD"], components):
         path.add_module('ECLTrackBremFinder')
 
 
@@ -870,7 +847,7 @@ def add_ecl_chargedpid_module(path, components=None, legacyMode=False):
     :param legacyMode: Uses the simple E/p based charged PID instead of the MVA based charged PID.
         This flag is automatically set to true on HLT and ExpressReco.
     """
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         # charged PID
         if legacyMode:
             path.add_module('ECLChargedPID')
@@ -886,7 +863,7 @@ def add_ecl_mc_matcher_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'ECL' in components:
+    if is_detector_present("ECL", components):
         path.add_module('MCMatcherECLClusters')
 
 
@@ -897,7 +874,7 @@ def add_ext_module(path, components=None):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     """
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         path.add_module('Ext')
 
 
@@ -910,7 +887,7 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False):
     :param for_cdst_analysis: if True, add only DedxPIDCreator module, otherwise add both
     """
     # CDC dE/dx PID
-    if components is None or 'CDC' in components:
+    if is_detector_present("CDC", components):
         if for_cdst_analysis:
             path.add_module('CDCDedxPIDCreator')
         else:
@@ -918,7 +895,7 @@ def add_dedx_modules(path, components=None, for_cdst_analysis=False):
             path.add_module('CDCDedxPIDCreator')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         if for_cdst_analysis:
             path.add_module('VXDDedxPIDRemaker')
         else:
@@ -933,9 +910,9 @@ def add_special_vxd_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
 
-    if not components or ('PXD' in components):
+    if is_detector_present("PXD", components):
         path.add_module("PXDClustersFromTracks")
-    if not components or ('SVD' in components):
+    if is_detector_present("SVD", components):
         path.add_module("SVDShaperDigitsFromTracks")
 
 
@@ -969,9 +946,9 @@ def prepare_cdst_analysis(path, components=None, mc=False, add_eventt0_combiner=
                                              components=components)
 
     # Needed to retrieve the PXD and SVD clusters out of the raw data
-    if components is None or 'SVD' in components:
+    if is_detector_present("SVD", components):
         add_svd_reconstruction(path)
-    if components is None or 'PXD' in components:
+    if is_detector_present("PXD", components):
         add_pxd_reconstruction(path)
 
     # check, this one may not be needed...

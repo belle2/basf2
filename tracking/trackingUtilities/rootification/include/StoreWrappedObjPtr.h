@@ -32,7 +32,7 @@ namespace Belle2 {
        *                    If an empty string is supplied, the type name will be used.
        *  @param durability Decides durability map used for getting the accessed object.
        */
-      StoreWrappedObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) :
+      explicit StoreWrappedObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) :
         StoreObjPtr<StoreWrapper<T> >(name, durability)
       {}
 

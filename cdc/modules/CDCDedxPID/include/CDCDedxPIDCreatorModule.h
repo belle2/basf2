@@ -45,7 +45,7 @@ namespace Belle2 {
     CDCDedxPIDCreatorModule();
 
     /** Destructor */
-    virtual ~CDCDedxPIDCreatorModule();
+    ~CDCDedxPIDCreatorModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;

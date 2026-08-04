@@ -49,7 +49,7 @@ namespace Belle2 {
       JetFitObject& operator= (const JetFitObject& rhs   ///< right hand side
                               );
 
-      virtual ~JetFitObject();
+      virtual ~JetFitObject() override;
 
       /// Return a new copy of itself
       virtual JetFitObject* copy() const override;

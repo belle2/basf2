@@ -11,8 +11,10 @@
 #include <tracking/trackingUtilities/geometry/SZLine.h>
 
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 #include <iosfwd>
 #include <cmath>
@@ -53,7 +55,7 @@ namespace Belle2 {
       }
 
       /// Constructor from all helix parameter, phi given as a unit vector
-      Helix(double curvature, const Vector2D& phi0Vec, double impact, double tanLambda, double z0)
+      Helix(double curvature, const ROOT::Math::XYVector& phi0Vec, double impact, double tanLambda, double z0)
         : m_circleXY(curvature, phi0Vec, impact)
         , m_szLine(tanLambda, z0)
       {
@@ -88,14 +90,14 @@ namespace Belle2 {
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach
       /// to the given point.
-      double arcLength2DToClosest(const Vector3D& point, bool firstPeriod = true) const;
+      double arcLength2DToClosest(const ROOT::Math::XYZVector& point, bool firstPeriod = true) const;
 
       /**
        *  Calculates the two dimensional arc length that is closest to two dimensional point
        *  in the xy projection.
        *  Always gives a solution in the first half period in the positive or negative direction
        */
-      double arcLength2DToXY(const Vector2D& point) const
+      double arcLength2DToXY(const ROOT::Math::XYVector& point) const
       {
         return circleXY().arcLengthTo(point);
       }
@@ -111,27 +113,27 @@ namespace Belle2 {
       }
 
       /// Calculates the point on the helix with the smallest total distance
-      Vector3D closest(const Vector3D& point, bool firstPeriod = true) const
+      ROOT::Math::XYZVector closest(const ROOT::Math::XYZVector& point, bool firstPeriod = true) const
       {
         double arcLength2D = arcLength2DToClosest(point, firstPeriod);
         return atArcLength2D(arcLength2D);
       }
 
       /// Calculates the point on the helix with the smallest perpendicular (xy) distance
-      Vector3D closestXY(const Vector2D& pointXY) const
+      ROOT::Math::XYZVector closestXY(const ROOT::Math::XYVector& pointXY) const
       {
         double arcLength2D = arcLength2DToXY(pointXY);
         return atArcLength2D(arcLength2D);
       }
 
       /// Calculates the distance of the point to the point of closest approach on the helix.
-      double distance(const Vector3D& point) const
+      double distance(const ROOT::Math::XYZVector& point) const
       {
-        return point.distance(closest(point));
+        return VectorUtil::Distance(point, closest(point));
       }
 
       /// Calculates the distance of the line parallel to the z axes through the given point
-      double distanceXY(const Vector2D& point) const
+      double distanceXY(const ROOT::Math::XYVector& point) const
       {
         return m_circleXY.distance(point);
       }
@@ -140,19 +142,19 @@ namespace Belle2 {
        *  Moves the coordinates system by the given vector. Updates perigee point in place.
        *  @return arcLength2D that has to be traversed to the new origin
        */
-      double passiveMoveBy(const Vector3D& by)
+      double passiveMoveBy(const ROOT::Math::XYZVector& by)
       {
         // First keep the necessary shift of the perpendicular travel distance to the new perigee
         // point.
-        double byS = circleXY().arcLengthTo(by.xy());
-        m_circleXY.passiveMoveBy(by.xy());
-        Vector2D bySZ(byS, by.z());
+        double byS = circleXY().arcLengthTo(VectorUtil::getXYVector(by));
+        m_circleXY.passiveMoveBy(VectorUtil::getXYVector(by));
+        ROOT::Math::XYVector bySZ(byS, by.z());
         m_szLine.passiveMoveBy(bySZ);
         return byS;
       }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      HelixJacobian passiveMoveByJacobian(const Vector3D& by) const;
+      HelixJacobian passiveMoveByJacobian(const ROOT::Math::XYZVector& by) const;
 
       /**
        *  Adjust the arclength measure to start n periods later.
@@ -161,27 +163,29 @@ namespace Belle2 {
       double shiftPeriod(int nPeriods)
       {
         double arcLength2D = nPeriods * fabs(perimeterXY());
-        m_szLine.passiveMoveBy(Vector2D(arcLength2D, 0.0));
+        m_szLine.passiveMoveBy(ROOT::Math::XYVector(arcLength2D, 0.0));
         return arcLength2D;
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from
       /// the perigee)
-      Vector3D atArcLength2D(double s) const
+      ROOT::Math::XYZVector atArcLength2D(double s) const
       {
-        return Vector3D(circleXY().atArcLength(s), szLine().map(s));
+        const auto& tmp = circleXY().atArcLength(s);
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), szLine().map(s));
       }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector3D atZ(double z) const
+      ROOT::Math::XYZVector atZ(double z) const
       {
-        return Vector3D(xyAtZ(z), z);
+        const auto& tmp = xyAtZ(z);
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), z);
       }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector2D xyAtZ(double z) const
+      ROOT::Math::XYVector xyAtZ(double z) const
       {
-        return Vector2D(circleXY().atArcLength(szLine().inverseMap(z)));
+        return ROOT::Math::XYVector(circleXY().atArcLength(szLine().inverseMap(z)));
       }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
@@ -221,15 +225,16 @@ namespace Belle2 {
       }
 
       /// Getter for the perigee point in the xy projection.
-      Vector2D perigeeXY() const
+      ROOT::Math::XYVector perigeeXY() const
       {
         return circleXY().perigee();
       }
 
       /// Getter for the perigee point of the helix.
-      Vector3D perigee() const
+      ROOT::Math::XYZVector perigee() const
       {
-        return Vector3D(perigeeXY(), z0());
+        const auto& tmp = perigeeXY();
+        return ROOT::Math::XYZVector(tmp.X(), tmp.Y(), z0());
       }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
@@ -276,19 +281,20 @@ namespace Belle2 {
       }
 
       /// Getter for the central point of the helix
-      Vector2D centerXY() const
+      ROOT::Math::XYVector centerXY() const
       {
         return circleXY().center();
       }
 
       /// Getter for the unit three dimensional tangential vector at the perigee point of the helix.
-      Vector3D tangential() const
+      ROOT::Math::XYZVector tangential() const
       {
-        return Vector3D(phi0Vec(), tanLambda()).unit();
+        const auto& tmp = phi0Vec();
+        return VectorUtil::unit(ROOT::Math::XYZVector(tmp.X(), tmp.Y(), tanLambda()));
       }
 
       /// Getter for the direction vector in the xy projection at the perigee of the helix.
-      const Vector2D& phi0Vec() const
+      const ROOT::Math::XYVector& phi0Vec() const
       {
         return circleXY().phi0Vec();
       }

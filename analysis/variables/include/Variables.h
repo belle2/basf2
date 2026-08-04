@@ -280,7 +280,7 @@ namespace Belle2 {
     /**
      * Helper function: Returns decay type of MCParticle
      */
-    void checkMCParticleDecay(MCParticle* mcp, int& decayType, bool recursive);
+    void checkMCParticleDecay(const MCParticle* mcp, int& decayType, bool recursive);
 
     /**
      * return always zero

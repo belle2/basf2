@@ -15,6 +15,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTrigger3DHTrack.h>
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -123,9 +124,10 @@ namespace Belle2 {
     void addTrackCandidateImproved(const std::string& collectionName,
                                    const RecoTrack& recoTrack);
 
-    /** Add a CDCTriggerTrack. */
+    /** Add a CDCTriggerTrack or CDCTrigger3DHTrack. */
+    template <typename TriggerTrack>
     void addCDCTriggerTrack(const std::string& collectionName,
-                            const CDCTriggerTrack& track);
+                            const TriggerTrack& trgTrack);
 
     /** Add all entries in the given 'hits' array (and the corresponding MCParticles) to the event scene. */
     template <class T> void addSimHits(const StoreArray<T>& hits)
@@ -216,8 +218,7 @@ namespace Belle2 {
      * Should be called by functions adding TEveElements to the event scene
      * (Hits are currently excluded).
      */
-    void addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation);
-
+    static void addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation);
 
     /** Add user-defined data (labels, points, etc.) */
     void showUserData(const DisplayData& displayData);
@@ -273,13 +274,13 @@ namespace Belle2 {
     /** @brief Create a box around o, oriented along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
-    TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
-                        float depth);
+    static TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
+                               float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
-    void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
-                   const genfit::AbsTrackRep* rep,
-                   TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
+    static void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+                          const genfit::AbsTrackRep* rep,
+                          TEvePathMark::EType_e markType, bool drawErrors, int markerPos = 1);
 
     /** adds given VXD hit to lines. */
     template <class SomeVXDHit> void addRecoHit(const SomeVXDHit* hit, TEveStraightLineSet* lines)

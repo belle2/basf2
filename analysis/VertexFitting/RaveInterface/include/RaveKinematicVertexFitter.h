@@ -168,15 +168,15 @@ namespace Belle2 {
     private:
 
       /** Convert the error matrix from P-M to P-E. It Requires an input error matrix in the form X,P,M */
-      TMatrixDSym ErrorMatrixMassToEnergy(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& MassErr);
+      static TMatrixDSym ErrorMatrixMassToEnergy(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& MassErr);
 
       /** Convert the error matrix from P-E to P-M. It Requires an input error matrix in the form X,P,E */
-      TMatrixDSym ErrorMatrixEnergyToMass(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& EnergyErr);
+      static TMatrixDSym ErrorMatrixEnergyToMass(const ROOT::Math::PxPyPzEVector& p4, const TMatrixDSym& EnergyErr);
 
       /** Start capturing the output of rave and divert it to log messages.
        * Capturing will finish as soon as the returned object goes out of scope
        */
-      IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> captureOutput();
+      static IOIntercept::InterceptorScopeGuard<IOIntercept::OutputToLogMessages> captureOutput();
     };
   }
 

@@ -92,7 +92,7 @@ void PXDRawHitSorterModule::event()
     Pixel px(rawhit, 0);
     // We need some protection against bad data
     if (sensorID.getLayerNumber() && sensorID.getLadderNumber() && sensorID.getSensorNumber()) {
-      if (PXDPixelMasker::getInstance().pixelOK(sensorID, px.getU(), px.getV())) {
+      if (rawhit->getCharge() > PXDPixelMasker::getInstance().getPixelThreshold(sensorID, px.getU(), px.getV())) {
         sensors[sensorID].insert(px);
       }
     }

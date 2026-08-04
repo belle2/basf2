@@ -28,7 +28,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                input_data_names=["beamorphysics", "cosmic"],
                                input_data_filters={
                                    "beamorphysics": [
-                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
+                                       INPUT_DATA_FILTERS["Data Tag"]["bhabha_combined_calib"],
                                        INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
                                        INPUT_DATA_FILTERS["Data Tag"]["hadron_calib"],
                                        INPUT_DATA_FILTERS["Data Tag"]["offip_calib"],
@@ -45,7 +45,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0
                                    },
                                depends_on=[],
-                               produced_payloads=["PXDDeadPixelPar", "PXDMaskedPixelPar"])
+                               produced_payloads=["PXDDeadPixelPar", "PXDMaskedPixelPar", "PXDOccupancyInfoPar"])
 
 
 def get_calibrations(input_data, **kwargs):

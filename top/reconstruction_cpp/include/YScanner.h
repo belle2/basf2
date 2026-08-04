@@ -365,7 +365,7 @@ namespace Belle2 {
        * Map entries correspond to different Gaussian widths due to different number of reflections.
        * @return photon energy distributions convoluted with multiple scattering and surface roughness
        */
-      const std::map<int, Table> getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
+      const std::map<int, Table>& getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
 
       /**
        * Returns the results of PDF expansion in y

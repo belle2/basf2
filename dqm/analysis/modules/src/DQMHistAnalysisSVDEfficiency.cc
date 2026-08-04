@@ -44,6 +44,8 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", double(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", double(0.94));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
+  addParam("nSigma", m_nSigma, "Number of sigmas to set the DQM status, where sigma = efficiency uncertainty",
+           double(3.));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
@@ -62,7 +64,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     // B2INFO("VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::SVD) continue;
@@ -120,12 +122,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "efficiencyLimits", "effLimits");
 
-  //find nEvents testing if histograms are present
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
-  if (hnEvnts == NULL) {
-    B2INFO("no events, nothing to do here");
-    return;
-  }
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -211,7 +207,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: event called.");
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  TH1* hnEvnts = findHist("SVDExpReco", "SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;
@@ -260,11 +256,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   Float_t erreffV = -1;
 
   // Efficiency for the U and V sides
-  TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
-  TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
+  auto found_tracksU = findHist("SVDEfficiency/TrackHitsU");
+  auto matched_clusU = findHist("SVDEfficiency/MatchedHitsU");
 
-  TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
-  TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
+  auto found_tracksV = findHist("SVDEfficiency/TrackHitsV");
+  auto matched_clusV = findHist("SVDEfficiency/MatchedHitsV");
 
   if (matched_clusU != NULL && found_tracksU != NULL && matched_clusV != NULL && found_tracksV != NULL) {
     B2DEBUG(10, "Before loop on sensors, size :" << m_SVDModules.size());
@@ -272,8 +268,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_effVstatus = good;
     for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
       B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
-      int bin = found_tracksU->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
-                                       m_SVDModules[i].getSensorNumber()));
+      int layer = m_SVDModules[i].getLayerNumber();
+      int ladder = m_SVDModules[i].getLadderNumber();
+      int sensor = m_SVDModules[i].getSensorNumber();
+      int bin = found_tracksU->FindBin(ladder, findBinY(layer, sensor));
       // U-side
       float numU = matched_clusU->GetBinContent(bin);
       float denU = found_tracksU->GetBinContent(bin);
@@ -284,7 +282,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       if (effU < effMinU) effMinU = effU;
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
-      B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
+      B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU << " +- " << erreffU);
 
       // V-side
       float numV = matched_clusV->GetBinContent(bin);
@@ -296,10 +294,18 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       if (effV < effMinV) effMinV = effV;
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
-      B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
+      B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV << " +- " << erreffV);
 
-      setEffStatus(denU, effU, true);
-      setEffStatus(denV, effV, false);
+      // Efficiency is already computed, and histograms are already filled at this point
+      // Fooling the setEffStatus for 6.x.1 and 6.x.5 to avoid issue due to small statistics
+      // At this point the den value is used only for the check on statistics
+      if (layer == 6 && (sensor == 1 || sensor == 5)) {
+        if (denU < 100) denU = 100; // If everything works, U and V side have same number of tracks
+        if (denV < 100) denV = 100;
+      }
+
+      setEffStatus(denU, effU, erreffU, m_effUstatus);
+      setEffStatus(denV, effV, erreffV, m_effVstatus);
 
       B2DEBUG(10, "Status U-side is " << m_effUstatus);
       B2DEBUG(10, "Status V-side is " << m_effVstatus);
@@ -307,11 +313,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   } else {
     if (matched_clusU == NULL || found_tracksU == NULL) {
       B2INFO("Histograms needed for U-side Efficiency computation are not found");
-      setEffStatus(-1, -1, true);
+      setEffStatus(-1, -1, 0, m_effUstatus);
     }
     if (matched_clusV == NULL || found_tracksV == NULL) {
       B2INFO("Histograms needed for V-side Efficiency computation are not found");
-      setEffStatus(-1, -1, false);
+      setEffStatus(-1, -1, 0, m_effVstatus);
     }
   }
 
@@ -339,11 +345,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
 
     // Efficiency for the U and V-side - 3 samples
-    TH2F* found3_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHits3U");
-    TH2F* matched3_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHits3U");
+    auto found3_tracksU = findHist("SVDEfficiency/TrackHits3U");
+    auto matched3_clusU = findHist("SVDEfficiency/MatchedHits3U");
 
-    TH2F* found3_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHits3V");
-    TH2F* matched3_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHits3V");
+    auto found3_tracksV = findHist("SVDEfficiency/TrackHits3V");
+    auto matched3_clusV = findHist("SVDEfficiency/MatchedHits3V");
 
     if (matched3_clusU != NULL && found3_tracksU != NULL && matched3_clusV != NULL && found3_tracksV != NULL) {
       B2DEBUG(10, "Before loop on sensors, size :" << m_SVDModules.size());
@@ -351,8 +357,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_effVstatus = good;
       for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
         B2DEBUG(10, "module " << i << "," << m_SVDModules[i]);
-        int bin = found3_tracksU->FindBin(m_SVDModules[i].getLadderNumber(), findBinY(m_SVDModules[i].getLayerNumber(),
-                                          m_SVDModules[i].getSensorNumber()));
+        int layer = m_SVDModules[i].getLayerNumber();
+        int ladder = m_SVDModules[i].getLadderNumber();
+        int sensor = m_SVDModules[i].getSensorNumber();
+        int bin = found3_tracksU->FindBin(ladder, findBinY(layer, sensor));
         // U-side
         float numU = matched3_clusU->GetBinContent(bin);
         float denU = found3_tracksU->GetBinContent(bin);
@@ -363,7 +371,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         if (effU < effMinU) effMinU = effU;
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
-        B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
+        B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU << " +- " << erreffU);
 
         // V-side
         float numV = matched3_clusV->GetBinContent(bin);
@@ -375,10 +383,18 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         if (effV < effMinV) effMinV = effV;
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
-        B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
+        B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV << " +- " << erreffV);
 
-        setEffStatus(denU, effU, true);
-        setEffStatus(denV, effV, false);
+        // Efficiency is already computed, and histograms are already filled at this point
+        // Fooling the setEffStatus for 6.x.1 and 6.x.5 to avoid issue due to small statistics
+        // At this point the den value is used only for the check on statistics
+        if (layer == 6 && (sensor == 1 || sensor == 5)) {
+          if (denU < 100) denU = 100; // If everything works, U and V side have the same number of tracks
+          if (denV < 100) denV = 100;
+        }
+
+        setEffStatus(denU, effU, erreffU, m_effUstatus);
+        setEffStatus(denV, effV, erreffV, m_effVstatus);
 
         B2DEBUG(10, "Status U-side is " << m_effUstatus);
         B2DEBUG(10, "Status V-side is " << m_effVstatus);
@@ -386,11 +402,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     } else {
       if (matched3_clusU == NULL || found3_tracksU == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        setEffStatus(-1, -1, true);
+        setEffStatus(-1, -1, 0, m_effUstatus);
       }
       if (matched3_clusV == NULL || found3_tracksV == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        setEffStatus(-1, -1, false);
+        setEffStatus(-1, -1, 0, m_effVstatus);
       }
     }
 
@@ -470,25 +486,18 @@ Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
 }
 
 
-void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool isU)
+void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, float err, svdStatus& efficiencyStatus)
 {
-  svdStatus* efficiencyStatus;
-
-  if (isU)
-    efficiencyStatus = &m_effUstatus;
-  else
-    efficiencyStatus = &m_effVstatus;
-
   if (den < 0) {
-    *efficiencyStatus = std::max(noStat, *efficiencyStatus);
+    efficiencyStatus = std::max(noStat, efficiencyStatus);
   } else if (den < m_statThreshold) {
-    *efficiencyStatus = std::max(lowStat, *efficiencyStatus);
-  } else if (eff > m_effWarning) {
-    *efficiencyStatus = std::max(good, *efficiencyStatus);
-  } else if ((eff <= m_effWarning) && (eff > m_effError)) {
-    *efficiencyStatus = std::max(warning, *efficiencyStatus);
-  } else if ((eff <= m_effError)) {
-    *efficiencyStatus = std::max(error, *efficiencyStatus);
+    efficiencyStatus = std::max(lowStat, efficiencyStatus);
+  } else if (eff + m_nSigma * err > m_effWarning) {
+    efficiencyStatus = std::max(good, efficiencyStatus);
+  } else if ((eff + m_nSigma * err <= m_effWarning) && (eff + m_nSigma * err > m_effError)) {
+    efficiencyStatus = std::max(warning, efficiencyStatus);
+  } else if ((eff + m_nSigma * err <= m_effError)) {
+    efficiencyStatus = std::max(error, efficiencyStatus);
   }
 }
 

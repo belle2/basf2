@@ -30,7 +30,7 @@ namespace Belle2 {
     class CDCSegmentPair {
     public:
       /// Default constructor - for ROOT compatibility.
-      CDCSegmentPair();
+      CDCSegmentPair() = default;
 
       /// Constructor from two segments
       CDCSegmentPair(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment);
@@ -233,10 +233,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the from segment
-      const CDCSegment2D* m_fromSegment;
+      const CDCSegment2D* m_fromSegment{nullptr};
 
       /// Reference to the to segment
-      const CDCSegment2D* m_toSegment;
+      const CDCSegment2D* m_toSegment{nullptr};
 
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;

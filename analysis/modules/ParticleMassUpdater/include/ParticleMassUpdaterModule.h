@@ -27,13 +27,9 @@ namespace Belle2 {
     /** Constructor. */
     ParticleMassUpdaterModule();
 
-    /** Initialises the module.
-     */
-    virtual void initialize() override;
     /** Method called for each event. */
     virtual void event() override;
     /** Write TTree to file, and close file if necessary. */
-    virtual void terminate() override;
   };
 } // end namespace Belle2
 

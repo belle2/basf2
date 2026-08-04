@@ -39,7 +39,7 @@ namespace Belle2 {
       explicit OnVarSet(std::unique_ptr<AVarSet> varSet);
 
       /// Default destructor
-      ~OnVarSet();
+      ~OnVarSet() override;
 
       /// No reassignment of variable set possible for now
       void initialize() override;
@@ -94,7 +94,7 @@ namespace Belle2 {
       FilterOnVarSet();
 
       /// Default destructor
-      ~FilterOnVarSet();
+      ~FilterOnVarSet() override;
     };
   }
 }

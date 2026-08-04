@@ -293,7 +293,7 @@ namespace Belle2 {
     }
 
 
-    double InverseRaytracer::getDeltaXE(double x, double xe, double ze, double xd, double zd) const
+    double InverseRaytracer::getDeltaXE(double x, double xe, double ze, double xd, double zd)
     {
       double z = sqrt(1 - x * x);
       double kx = (x - xd);

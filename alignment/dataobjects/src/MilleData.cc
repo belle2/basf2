@@ -18,9 +18,9 @@ void MilleData::merge(const MergeableNamed* other)
   auto* data = dynamic_cast<const MilleData*>(other);
   const vector<string>& files = data->getFiles();
   m_numRecords += data->m_numRecords;
-  for (auto& file : files) {
+  for (const auto& file : files) {
     bool exists = false;
-    for (auto& myfile : m_files) {
+    for (const auto& myfile : m_files) {
       if (myfile == file) {
         exists = true;
         break;

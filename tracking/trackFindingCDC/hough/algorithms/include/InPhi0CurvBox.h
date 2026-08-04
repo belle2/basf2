@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/hough/perigee/Phi0Rep.h>
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 #include <tracking/trackFindingCDC/hough/boxes/Box.h>
+#include <tracking/trackingUtilities/numerics/ESign.h>
 #include <cdc/topology/ILayer.h>
 
 #include <array>

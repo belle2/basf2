@@ -30,7 +30,7 @@ namespace Belle2 {
         return m_stream.gcount();
       }
       /** Close the file */
-      virtual ~FileContext() {}
+      virtual ~FileContext() override {}
     protected:
       /** stream to read data from */
       boost::iostreams::filtering_istream m_stream;
@@ -68,7 +68,7 @@ namespace Belle2 {
        */
       explicit FileHandler(const std::string& uri);
       /** empty, virtual destructor */
-      virtual ~FileHandler() {}
+      virtual ~FileHandler() override {}
       /** create a new FileContext by searching the file system for a file
        * named like path.
        * @param path name of the file, relative to the FileHandler search path

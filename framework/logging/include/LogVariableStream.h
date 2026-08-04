@@ -231,6 +231,7 @@ public:
     this->m_stringStream = std::stringstream();
     this->m_stringStream << lvs.m_stringStream.str();
     this->m_variables = lvs.m_variables;
+    this->m_logLevelOverride = lvs.m_logLevelOverride;
     return *this;
   }
 

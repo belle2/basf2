@@ -31,10 +31,10 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      SelectorMVA(bool belleFlag, bool trainFlag, std::string tFileName);
+      SelectorMVA(bool belleFlag, bool trainFlag, const std::string& tFileName);
 
       /** Destructor */
-      ~SelectorMVA();
+      ~SelectorMVA() override;
 
       /** Selector response that this pair of particles come from the same mc/actual particle */
       virtual float getResponse(Particle* iPart, Particle* jPart) override;

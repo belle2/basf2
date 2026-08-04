@@ -198,7 +198,6 @@ TBranch: gamma_0_clusterTheta, 0.8412
 TBranch: gamma_0_clusterTiming, 1.465
 TBranch: gamma_0_clusterTrackMatch, 0
 TBranch: gamma_0_clusterZernikeMVA, 0.9395
-TBranch: gamma_0_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: gamma_0_minC2TDist, 71.53
 TBranch: gamma_0_nECLClusterTrackMatches, 0
 TBranch: gamma_1_px, -0.107
@@ -237,7 +236,6 @@ TBranch: gamma_1_clusterTheta, 0.6785
 TBranch: gamma_1_clusterTiming, -0.9766
 TBranch: gamma_1_clusterTrackMatch, 0
 TBranch: gamma_1_clusterZernikeMVA, 0.7197
-TBranch: gamma_1_maxWeightedDistanceFromAverageECLTime, nan
 TBranch: gamma_1_minC2TDist, 122.1
 TBranch: gamma_1_nECLClusterTrackMatches, 0
 TTree: neutron
@@ -373,7 +371,6 @@ TBranch: clusterTheta, 0.6785
 TBranch: clusterTiming, -0.9766
 TBranch: clusterTrackMatch, 0
 TBranch: clusterZernikeMVA, 0.7197
-TBranch: maxWeightedDistanceFromAverageECLTime, nan
 TBranch: minC2TDist, 122.1
 TBranch: nECLClusterTrackMatches, 0
 TTree: muon

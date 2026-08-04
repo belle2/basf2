@@ -9,10 +9,7 @@
 
 // STL
 #include <vector>
-// BOOST
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics.hpp>
-namespace bacc = boost::accumulators;
+
 namespace Belle2 {
   /**
    * ECLLocalRunCalibAcc is the

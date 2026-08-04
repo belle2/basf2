@@ -32,43 +32,33 @@ namespace Belle2 {
     //! Constructor.
     EclBackgroundStudyModule();
 
-    //! Destructor.
-    virtual ~EclBackgroundStudyModule();
-
     /**
     * Initialize the Module.
     *
     * This method is called at the beginning of data processing.
     */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /**
     * Called when entering a new run.
     *
     * Set run dependent things like run header parameters, alignment, etc.
     */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /**
     * Event processor.
     *
     * Convert reads information from ECLHits/ECKSimHits and writes tree file.
     */
-    virtual void event();
-
-    /**
-    * End-of-run action.
-    *
-    * Save run-related stuff, such as statistics.
-    */
-    virtual void endRun();
+    virtual void event() override;
 
     /**
     * Termination action.
     *
     * Clean-up, close files, summarize statistics, etc.
     */
-    virtual void terminate();
+    virtual void terminate() override;
 
     /**
     *Prints module parameters.

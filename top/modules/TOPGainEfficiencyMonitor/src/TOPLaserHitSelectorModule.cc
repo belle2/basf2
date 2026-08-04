@@ -85,7 +85,6 @@ namespace Belle2 {
              (bool)false);
   }
 
-  TOPLaserHitSelectorModule::~TOPLaserHitSelectorModule() {}
 
   void TOPLaserHitSelectorModule::initialize()
   {
@@ -141,10 +140,6 @@ namespace Belle2 {
     const short nAsic = c_NPixelPerModule / c_NChannelPerAsic * c_NChannelPerPMT;
     m_nCalPulseHistogram = new TH1F("hNCalPulse", "number of calibration pulses identificed for each asic",
                                     nAsic, -0.5, nAsic - 0.5);
-  }
-
-  void TOPLaserHitSelectorModule::beginRun()
-  {
   }
 
   void TOPLaserHitSelectorModule::event()
@@ -247,14 +242,6 @@ namespace Belle2 {
       m_TimeHeightHistogramForFit[globalPixelId]->Fill(hitTime, pulseHeight);
     }
 
-  }
-
-  void TOPLaserHitSelectorModule::endRun()
-  {
-  }
-
-  void TOPLaserHitSelectorModule::terminate()
-  {
   }
 
 } // end Belle2 namespace

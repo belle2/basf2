@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~AlignableEKLMRecoHit();
+    ~AlignableEKLMRecoHit() override;
 
     /** @brief Labels and derivatives of residuals (local measurement coordinates) w.r.t. alignment/calibration parameters
     * Matrix "G" of derivatives valid for given prediction of track state:
@@ -107,4 +107,3 @@ namespace Belle2 {
   };
 
 }
-

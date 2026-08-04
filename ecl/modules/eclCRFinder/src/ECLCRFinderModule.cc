@@ -99,6 +99,8 @@ void ECLCRFinderModule::initialize()
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
   m_calDigitStoreArrPosition.resize(8737);
 
+  m_adj.resize(8737);
+  m_visited.resize(8737);
 }
 
 //-----------------------------------------------------------------
@@ -227,7 +229,7 @@ void ECLCRFinderModule::event()
   std::vector<std::vector<int>> connectedRegions_ABBC = getConnectedRegions(ABB, m_cellIdToDigitVec, 0);
 
   //final step: merge all CRs that share at least one crystal
-  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingSets(connectedRegions_ABBC);
+  std::vector<std::set<int>> connectedRegionsMerged_ABBC_sets = mergeVectorsUsingBFSTraversal(connectedRegions_ABBC);
 
   // Create CRs and add relations to digits.
   unsigned int connectedRegionID = 0;
@@ -264,14 +266,6 @@ void ECLCRFinderModule::terminate()
 
 }
 
-bool ECLCRFinderModule::areNeighbours(const int cellid1, const int cellid2, const int maptype)
-{
-  for (const auto& neighbour : m_neighbourMaps[maptype]->getNeighbours(cellid1)) {
-    if (neighbour == cellid2) return true;
-  }
-  return false;
-}
-
 std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;
@@ -294,27 +288,66 @@ std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int 
   return C;
 }
 
-std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingSets(std::vector<std::vector<int>>& A)
+std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A)
 {
+  std::vector<std::set<int>> output;
 
-  // Make empty list of sets "output"
-  std::vector< std::set<int> > output;
+  // 1. Data Structures for lookup
+  // We use a fixed-size adjacency list for all crystals (Max ID 8736)
+  std::vector<int> relevantNodes;
+  relevantNodes.reserve(A.size() * 4);
 
-  for (auto& vec : A) {
-    std::set<int> s(vec.begin(), vec.end());
+  for (int node = 0; node < 8737; ++node) {
+    m_adj[node].clear();
+    m_visited[node] = false;
+  }
 
-    //Check whether element intersects with any in output
-    for (auto it = output.begin(); it != output.end();) {
-      std::set<int> intersect;
-      std::set_intersection(it->begin(), it->end(), s.begin(), s.end(),
-                            std::inserter(intersect, intersect.begin()));
+  // 2. Build the Graph
+  // If a vector contains {1, 2, 3}, we mark them as connected neighbors.
+  for (const auto& group : A) {
+    if (group.empty()) continue;
 
-      if (!intersect.empty()) {
-        s.insert(it->begin(), it->end());
-        it = output.erase(it);
-      } else ++it;
+    int root = group[0];
+    relevantNodes.push_back(root);
+
+    for (size_t i = 1; i < group.size(); ++i) {
+      int neighbor = group[i];
+      relevantNodes.push_back(neighbor);
+
+      // Add bi-directional edges
+      m_adj[root].push_back(neighbor);
+      m_adj[neighbor].push_back(root);
     }
-    output.push_back(s);
+  }
+
+  // 3. Find Connected Components (BFS)
+  // We only iterate over nodes that actually appeared in the event.
+  for (int startNode : relevantNodes) {
+    if (m_visited[startNode]) continue;
+
+    // Start a new cluster
+    std::set<int> component;
+    std::vector<int> q; // BFS Queue
+
+    m_visited[startNode] = true;
+    q.push_back(startNode);
+    component.insert(startNode);
+
+    int head = 0;
+    while (head < static_cast<int>(q.size())) {
+      int u = q[head++];
+
+      for (int v : m_adj[u]) {
+        if (!m_visited[v]) {
+          m_visited[v] = true;
+          component.insert(v);
+          q.push_back(v);
+        }
+      }
+    }
+
+    // Move the finished component to output
+    output.push_back(std::move(component));
   }
 
   return output;
@@ -325,19 +358,27 @@ std::vector<std::vector<int>> ECLCRFinderModule::getConnectedRegions(const std::
 {
   std::vector<std::vector<int>> connectedRegions;
 
+  // We iterate 0..8737 for the seeds (A), as A is a sparse vector mapped to cellID
   for (unsigned int i = 0; i < A.size(); ++i) {
     if (A[i] > 0) {
       std::vector<int> region;
+      // Reserve with neighbor count to prevent reallocations
+      region.reserve(21);
       region.push_back(i);
 
-      for (unsigned int j = 0; j < B.size(); ++j) {
-        if (B[j] > 0 && areNeighbours(i, j, maptype)) {
-          region.push_back(j);
+      // Instead of looping j = 0 to 8737, we only loop over actual geometric neighbors.
+      const auto& neighbors = m_neighbourMaps[maptype]->getNeighbours(i);
+
+      for (int neighborID : neighbors) {
+        // We only care if this specific neighbor is active in vector B
+        if (neighborID < static_cast<int>(B.size()) && B[neighborID] > 0) {
+          region.push_back(neighborID);
         }
       }
 
       std::sort(region.begin(), region.end());
-      region.erase(unique(region.begin(), region.end()), region.end());
+      region.erase(std::unique(region.begin(), region.end()), region.end());
+
       connectedRegions.push_back(region);
     }
   }

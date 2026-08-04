@@ -91,7 +91,7 @@ void CDCBadWireCollectorModule::collect()
     if (pt < m_minimumPt) continue;
 
     // Request tracks coming from IP
-    if (d0 > 2 || z0 > 5) continue;
+    if (d0 > 2 || fabs(z0) > 5) continue;
 
     const Helix helixFit = fitresult->getHelix();
     buildEfficiencies(wiresInCDCTrack, helixFit);

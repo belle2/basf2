@@ -304,7 +304,7 @@ namespace Belle2 {
         // Get covariance matrix
         gsl_matrix_set_zero(V);
 
-        for (auto& fitobject : fitobjects) {
+        for (const auto& fitobject : fitobjects) {
           fitobject->addToGlobCov(V->block->data, V->tda);
         }
         if (debug > 1)  debug_print(V, "V");
@@ -458,7 +458,6 @@ namespace Belle2 {
         // lambda = Sinv*r + Sinv*Fxi*dxi
         // lambda is already set to Sinv*r, we just need to add Sinv*Fxi*dxi
 
-        // cppcheck-suppress duplicateCondition
         if (nunm > 0) {
           // Fxi is the part of Fetaxi containing the unmeasured quantities, if any
           gsl_matrix_view Fxi = gsl_matrix_submatrix(Fetaxi,  0, nmea, ncon, nunm);

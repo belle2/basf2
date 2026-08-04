@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/dataobjects/CDCRecoHit.h>
+#include <framework/utilities/MathHelpers.h>
 
 //Comment out the following line since it introduces dependence on cdclib (or circular dependence betw. cdc_objects and cdclib).
 //#include <cdc/geometry/CDCGeometryPar.h>
@@ -231,7 +232,7 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
     // radii.  The max distance between the mirror hits is twice the
     // maximal drift radius.
     double rMax = 1.5 * (m_wireID.getISuperLayer() == 0 ? 1. : 1.8);
-    double weight = 0.5 * pow(std::max(0., 1 - (mR + mL) / 2 / rMax), 2);
+    double weight = 0.5 * square(std::max(0., 1 - (mR + mL) / 2 / rMax));
     mopL->setWeight(weight);
     mopR->setWeight(weight);
   }

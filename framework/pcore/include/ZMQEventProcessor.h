@@ -23,7 +23,7 @@ namespace Belle2 {
     ZMQEventProcessor();
 
     /// Make sure we remove all sockets cleanly
-    virtual ~ZMQEventProcessor();
+    virtual ~ZMQEventProcessor() override;
 
     /// Processes the full module chain using parallel processing, starting with the first module in the given path.
     void process(const PathPtr& spath, long maxEvent);

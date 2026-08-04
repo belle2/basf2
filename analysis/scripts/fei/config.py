@@ -248,7 +248,7 @@ class Particle:
         # Use default preCutConfig of this particle if no channel-specific config is given
         preCutConfig = copy.deepcopy(self.preCutConfig if preCutConfig is None else preCutConfig)
         # Use default extraModuleSpec of this particle if no channel-specific config is given
-        extraModuleSpec = (self.extraModuleSpec if extraModuleSpec is None else extraModuleSpec)
+        extraModuleSpec = copy.deepcopy(self.extraModuleSpec if extraModuleSpec is None else extraModuleSpec)
 
         # At the moment all channels must have the same target variable. Why?
         if mvaConfig is not None and mvaConfig.target != self.mvaConfig.target:

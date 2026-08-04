@@ -92,17 +92,19 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
   if (fp) {
     uLong i, sum = adler32(0, 0, 0);
     char hexdigest[9];
-    Bytef* buf = (Bytef*) malloc(1024 * 1024 * sizeof(Bytef));
+    const size_t bufsize = 1024 * 1024 * sizeof(Bytef);
+    Bytef* buf = (Bytef*) malloc(bufsize);
     if (!buf) {
       fclose(fp);
       return "";
     }
-    while ((i = fread((void*) buf, 1, sizeof(buf), fp)) > 0) {
-      if (!i) break;
+    while ((i = fread((void*) buf, 1, bufsize, fp)) > 0) {
       sum = adler32(sum, buf, i);
     }
+    bool readError = ferror(fp) != 0;
     fclose(fp);
     free(buf);
+    if (readError) return "";
     // Adler32 checksums hex digests ARE zero padded although
     // HLT legacy presentation may differ.
     sprintf(hexdigest, "%08lx", sum);

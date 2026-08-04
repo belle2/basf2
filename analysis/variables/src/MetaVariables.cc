@@ -4133,7 +4133,7 @@ Ancestor type can be set up by PDG code or by particle name (check evt.pdl for v
     REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, maxDepth = 1)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter (``n`` starting at 1) of the given type.
 Particle type can be given as pdg code or by particle name (particles and antiparticles are treated the same, so e.g. ``211``, ``-211``, ``pi+`` and ``pi-`` will all match all charged pions). 
 Maximal depth controls how many generations of daughters are searched (``maxDepth=1`` only direct daughters, ``maxDepth=2`` also granddaughters, ...).
-E.g. ``varForNthDaughterOfType(pi+, 1, E, 2)`` will return the energy of the first charged pion found searching all daughters and then granddaughters of the given particle.
+As an example, when reconstructing ``B0:my_list -> [K_S0:pipi -> pi+:all pi-:all] [pi0:gg -> gamma:all gamma:all]`` then ``varForNthDaughterOfType(pi+, 1, E, 2)`` will return the energy of the first charged pion found searching all daughters and then granddaughters of the given particle, so in this case the pi+, and ``varForNthDaughterOfType(22, 2, E, 2)`` will return the energy of the second daughter of the pi0. (Note that the kinematic distributions of the two pi0 daughters are not the same, unless the ``gamma:all`` list was shuffled beforehand!)
 If no nth daughter of the given type can be found at given maximal depth, returns NaN.)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,

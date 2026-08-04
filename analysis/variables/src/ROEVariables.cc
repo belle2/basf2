@@ -2079,7 +2079,11 @@ namespace Belle2 {
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
-                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
+                          "Note that only KLM-cluster-based candidates are counted, so this is the mask-aware equivalent of ``nROE_KLMClusters``. "
+                          "Neutral hadron candidates built from ECL clusters (neutral hadron hypothesis, i.e. N2) are counted by ``nROE_Photons`` "
+                          "and ``nROE_ECLClusters`` instead. This only matters for a custom ROE: the default ``buildRestOfEvent`` adds neutral "
+                          "hadrons via ``K_L0:roe_default`` with an ``isFromKLM > 0`` cut, so no ECL-based ones are present.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,

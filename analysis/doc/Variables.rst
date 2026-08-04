@@ -505,10 +505,10 @@ New variables seem to be found to address this problem.
 Beam Background Overlay
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is a list of variables useful for studying the Beam Background Overlay
-events used for producing MC samples (both run-independent and run-dependent).
+These variables are useful for studying the beam background overlay used for
+producing MC samples (both run-independent and run-dependent)
 
-.. warning:: These variables will always return ``NaN`` when running on data.
+.. note:: These variables will always return ``NaN`` when running on data.
 
 .. b2-variables::
    :group: BeamBackgroundOverlay

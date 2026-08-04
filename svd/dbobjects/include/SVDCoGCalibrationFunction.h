@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <framework/utilities/MathHelpers.h>
+
 #include <TObject.h>
 
 #include <cmath>
@@ -161,12 +163,12 @@ namespace Belle2 {
     /** pol3 TB indep version implementation*/
     double pol3TBindep(double raw_time, int) const
     {
-      return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3);
+      return m_par[0] + m_par[1] * raw_time + m_par[2] * square(raw_time) + m_par[3] * cube(raw_time);
     };
     /** implementation of pol3 TB indep error*/
     double pol3TBindepErr(double raw_time, double raw_timeErr, int) const
     {
-      return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * pow(raw_time, 2));
+      return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * square(raw_time));
     };
 
 
@@ -174,14 +176,14 @@ namespace Belle2 {
     /** pol5 TB indep version implementation*/
     double pol5TBindep(double raw_time, int) const
     {
-      return m_par[0] + m_par[1] * raw_time + m_par[2] * pow(raw_time, 2) + m_par[3] * pow(raw_time, 3) + m_par[4] * pow(raw_time,
-             4) + m_par[5] * pow(raw_time, 5);
+      return m_par[0] + m_par[1] * raw_time + m_par[2] * square(raw_time) + m_par[3] * cube(raw_time) + m_par[4] * pow4(
+               raw_time) + m_par[5] * pow5(raw_time);
     };
     /** implementation of pol5 TB indep error*/
     double pol5TBindepErr(double raw_time, double raw_timeErr, int) const
     {
-      return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * pow(raw_time, 2) + 4 * m_par[4] * pow(raw_time,
-                            3) + 5 * m_par[5] * pow(raw_time, 4));
+      return raw_timeErr * (m_par[1] +  2 * m_par[2] * raw_time + 3 * m_par[3] * square(raw_time) + 4 * m_par[4] * cube(
+                              raw_time) + 5 * m_par[5] * pow4(raw_time));
     };
 
     /** ID = 3, elsTBindep VERSION: (TB independent)
@@ -203,7 +205,7 @@ namespace Belle2 {
       if (raw_time > m_par[3] - sqrt(-m_par[2]) / 4)
         return  std::numeric_limits<float>::quiet_NaN();
 
-      return raw_timeErr * (m_par[1] - m_par[2] / pow(raw_time - m_par[3], 2));
+      return raw_timeErr * (m_par[1] - m_par[2] / square(raw_time - m_par[3]));
     };
 
     /** current function ID */

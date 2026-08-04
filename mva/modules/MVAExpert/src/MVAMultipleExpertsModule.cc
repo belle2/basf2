@@ -45,7 +45,7 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
 void MVAMultipleExpertsModule::initialize()
 {
   // All specified ParticleLists are required to exist
-  for (auto& name : m_listNames) {
+  for (const auto& name : m_listNames) {
     StoreObjPtr<ParticleList> list(name);
     list.isRequired();
   }
@@ -175,7 +175,8 @@ std::vector<std::vector<float>> MVAMultipleExpertsModule::analyse(Particle* part
   return responseValues;
 }
 
-void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float responseValue, unsigned int i)
+void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, const std::string& extraInfoName, float responseValue,
+                                                 unsigned int i)
 {
   if (particle->hasExtraInfo(extraInfoName)) {
     if (particle->getExtraInfo(extraInfoName) != responseValue) {
@@ -222,7 +223,7 @@ void MVAMultipleExpertsModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo
 
 void MVAMultipleExpertsModule::event()
 {
-  for (auto& listName : m_listNames) {
+  for (const auto& listName : m_listNames) {
     StoreObjPtr<ParticleList> list(listName);
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {

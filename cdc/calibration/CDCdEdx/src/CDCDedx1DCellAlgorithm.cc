@@ -14,7 +14,7 @@
 #include <TPad.h>
 #include <TRandom.h>
 #include <TStyle.h>
-
+#include <iostream>
 #include <cmath>
 
 using namespace Belle2;
@@ -133,7 +133,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       hdedxhit[mL][jbinea]->Fill(dedxhit->at(j));
     }
   }
-
+  std::vector<std::vector<double>> tempconst(m_kNGroups);
   for (int il = 0; il < m_kNGroups; il++) {
 
     int minlay = 0, maxlay = 0;
@@ -142,9 +142,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       getTruncatedBins(hdedxlay[il], minlay, maxlay);
       hdedxlay[il]->SetTitle(Form("%s;%d;%d", hdedxlay[il]->GetTitle(), minlay, maxlay));
     }
-
-    std::vector<double>tempconst;
-    tempconst.reserve(m_eaBinLocal[il]);
+    tempconst[il].reserve(m_eaBinLocal[il]);
 
     for (int iea = 0; iea < m_eaBinLocal[il]; iea++) {
 
@@ -166,7 +164,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
       double dedxmean;
       dedxmean = getTruncationMean(htemp, minbin, maxbin);
-      tempconst.push_back(dedxmean);
+      tempconst[il].push_back(dedxmean);
 
       hdedxhit[il][iea]->SetTitle(Form("%s, #mu_{truc} = %0.5f;%d;%d", hdedxhit[il][iea]->GetTitle(), dedxmean, minbin, maxbin));
     }
@@ -178,16 +176,17 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     for (int iea = 0; iea < m_eaBin; iea++) {
       int jea = iea;
       if (isVarBins)  jea = m_binIndex[il].at(iea);
-      layerconst.push_back(tempconst.at(jea));
+      layerconst.push_back(tempconst[il].at(jea));
     }
 
-    // plot the rel constants var/sym bins
-    if (isMakePlots)  plotRelConst(tempconst, layerconst, il);
     m_onedcors.push_back(layerconst);
 
     layerconst.clear();
-    tempconst.clear();
+
   }
+
+  // plot the rel constants var/sym bins
+  if (isMakePlots)  plotRelConst(tempconst);
 
   //Saving final constants
   createPayload();
@@ -222,9 +221,12 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   for (int il = 0; il < m_kNGroups; il++) {
     m_binValue[il].clear();
     m_binIndex[il].clear();
-  }
-  m_suffix.clear();
 
+  }
+
+  m_suffix.clear();
+  tempconst.clear();
+  m_onedcors.clear();
   return c_OK;
 }
 
@@ -514,8 +516,8 @@ void CDCDedx1DCellAlgorithm::plotMergeFactor(std::map<int, std::vector<double>> 
     hists[icfg]->Draw("hist");
   }
 
-  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor%s.pdf", m_suffix.data()));
-  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor%s.root", m_suffix.data()));
+  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor_%s.pdf", m_suffix.data()));
+  cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor_%s.root", m_suffix.data()));
 
   for (int icfg = 0; icfg < 2; icfg++) {
     delete hists[icfg];
@@ -530,10 +532,10 @@ void CDCDedx1DCellAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hde
   ctmp.Divide(4, 4);
   std::stringstream psname;
 
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf[", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf[", m_suffix.data());
   ctmp.Print(psname.str().c_str());
   psname.str("");
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf", m_suffix.data());
 
   for (int il = 0; il < m_kNGroups; il++) {
 
@@ -561,7 +563,7 @@ void CDCDedx1DCellAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hde
     }
   }
   psname.str("");
-  psname << Form("cdcdedx_1dcell_dedxhit%s.pdf]", m_suffix.data());
+  psname << Form("cdcdedx_1dcell_dedxhit_%s.pdf]", m_suffix.data());
   ctmp.Print(psname.str().c_str());
 }
 
@@ -618,54 +620,81 @@ void CDCDedx1DCellAlgorithm::plotQaPars(std::array<TH1D*, 3>& hentalay, TH2D* hp
   hptcosth->Draw("colz");
 
   cptcos.SaveAs(Form("cdcdedx_ptcosth_%s.pdf", m_suffix.data()));
-  ceadist.SaveAs(Form("cdcdedx_1dcell_enta%s.pdf", m_suffix.data()));
-  ceadist.SaveAs(Form("cdcdedx_1dcell_enta%s.root", m_suffix.data()));
+  ceadist.SaveAs(Form("cdcdedx_1dcell_enta_%s.pdf", m_suffix.data()));
+  ceadist.SaveAs(Form("cdcdedx_1dcell_enta_%s.root", m_suffix.data()));
 }
 
 //--------------------------------------------------
-void CDCDedx1DCellAlgorithm::plotRelConst(std::vector<double>tempconst, std::vector<double>layerconst, int il)
+void CDCDedx1DCellAlgorithm::plotRelConst(std::vector<std::vector<double>>& tempconst)
 {
 
-  TH1D* hconst, *hconstvar;
+  const std::string pdfName =
+    Form("cdcdedx_1dcell_relconst_%s.pdf", m_suffix.data());
 
-  Double_t* nvarBins;
-  nvarBins = &m_binValue[il][0];
+  const std::string rootName =
+    Form("cdcdedx_1dcell_relconst_%s.root", m_suffix.data());
 
-  hconst = new TH1D(Form("hconst%s", m_label[il].data()), "", m_eaBin, m_eaMin, m_eaMax);
-  std::string title = Form("calibration const dist: %s: (%s); entaRS (#alpha); entries", m_label[il].data(), m_runExp.data());
-  hconst->SetTitle(Form("%s", title.data()));
+  TFile rootFile(rootName.c_str(), "RECREATE");
 
-  hconstvar = new TH1D(Form("hconstvar%s", m_label[il].data()), "", m_eaBinLocal[il], nvarBins);
-  title = Form("calibration const dist (var bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
-  hconstvar->SetTitle(Form("%s", title.data()));
+  for (int il = 0; il < m_kNGroups; il++) {
 
-  if (isVarBins) {
-    for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
-      hconstvar->SetBinContent(iea + 1, tempconst.at(iea));
+
+    TH1D* hconst = new TH1D(Form("hconst%s", m_label[il].data()), "", m_eaBin, m_eaMin, m_eaMax);
+    std::string title = Form("calibration const dist: %s: (%s); entaRS (#alpha); entries", m_label[il].data(), m_runExp.data());
+    hconst->SetTitle(Form("%s", title.data()));
+
+    TH1D* hconstvar = nullptr;
+
+    if (isVarBins) {
+      Double_t* nvarBins;
+      nvarBins = &m_binValue[il][0];
+
+      hconstvar = new TH1D(Form("hconstvar%s", m_label[il].data()), "", m_eaBinLocal[il], nvarBins);
+      title = Form("calibration const dist (var bins): %s: (%s); entaRS (#alpha);entries", m_label[il].data(), m_runExp.data());
+      hconstvar->SetTitle(Form("%s", title.data()));
+
+      for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
+        hconstvar->SetBinContent(iea + 1, tempconst.at(il).at(iea));
+    }
+
+    for (int jea = 0; jea < m_eaBin; jea++) hconst->SetBinContent(jea + 1, m_onedcors.at(il).at(jea));
+
+    gStyle->SetOptStat("ne");
+    TCanvas cconst("cconst", "calibration Constants", 800, 400);
+    if (isVarBins) {
+      cconst.Divide(2, 1);
+      cconst.SetWindowSize(1000, 800);
+    }
+
+    cconst.cd(1);
+    hconst->SetFillColor(kYellow);
+    hconst->Draw("histo");
+    if (isVarBins && hconstvar) {
+      cconst.cd(2);
+      hconstvar->SetFillColor(kBlue);
+      hconstvar->Draw("hist");
+    }
+
+    cconst.Update();
+
+    if (m_kNGroups == 1) {
+      cconst.Print(pdfName.c_str());
+    } else if (il == 0) {
+      cconst.Print((pdfName + "(").c_str());
+    } else if (il == m_kNGroups - 1) {
+      cconst.Print((pdfName + ")").c_str());
+    } else {
+      cconst.Print(pdfName.c_str());
+    }
+
+    // Save this canvas in the ROOT file
+    rootFile.cd();
+    cconst.Write();
+
+    delete hconst;
+    delete hconstvar;
   }
-
-  for (int jea = 0; jea < m_eaBin; jea++) hconst->SetBinContent(jea + 1, layerconst.at(jea));
-
-  gStyle->SetOptStat("ne");
-  TCanvas cconst("cconst", "calibration Constants", 800, 400);
-  if (isVarBins) {
-    cconst.Divide(2, 1);
-    cconst.SetWindowSize(1000, 800);
-  }
-
-  cconst.cd(1);
-  hconst->SetFillColor(kYellow);
-  hconst->Draw("histo");
-  if (isVarBins) {
-    cconst.cd(2);
-    hconstvar->SetFillColor(kBlue);
-    hconstvar->Draw("hist");
-  }
-  cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.pdf", m_label[il].data(), m_suffix.data()));
-  cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.root", m_label[il].data(), m_suffix.data()));
-
-  delete hconst;
-  delete hconstvar;
+  rootFile.Close();
 }
 
 //--------------------------------------------------
@@ -722,8 +751,8 @@ void CDCDedx1DCellAlgorithm::plotConstants()
     legend->Draw();
   }
 
-  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.pdf", m_suffix.data()));
-  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.root", m_suffix.data()));
+  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts_%s.pdf", m_suffix.data()));
+  cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts_%s.root", m_suffix.data()));
 
   for (int il = 0; il < m_kNGroups; il++) {
     delete hnewconst[il];

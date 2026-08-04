@@ -88,7 +88,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
   for (RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
     const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
-      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
+      const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
       if (not kalmanFitterInfo) {
         recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
       } else {

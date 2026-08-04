@@ -232,7 +232,7 @@ std::vector<float> AxialTrackCreatorHitHough::getDefaultCurvBounds(std::array<fl
   // Return highest level as prepared bin bounds.
   std::vector<float> result;
 
-  for (BinSpan& binSpan : binSpansByLevel[granularityLevel]) {
+  for (const BinSpan& binSpan : binSpansByLevel[granularityLevel]) {
     result.push_back(binSpan[0]);
     result.push_back(binSpan[1]);
   }

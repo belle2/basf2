@@ -154,8 +154,8 @@ namespace Belle2 {
     }
     if (nEv == 0) nEv = 0.1;
 
-    //double loss = pow(rawTime - tBest, 2) + gapPenalty * pow(maxGap, 2);
-    //double loss = 1./nEv  + timePenalty * pow(rawTime, 2);
+    //double loss = (rawTime - tBest) * (rawTime - tBest) + gapPenalty * (maxGap * maxGap);
+    //double loss = 1./nEv  + timePenalty * (rawTime * rawTime);
 
     lossFun->SetParameters(rawTime, netTime, maxGap, nEv);
     double lossNew = lossFun->Eval(0);

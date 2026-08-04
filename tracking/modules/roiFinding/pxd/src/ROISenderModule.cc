@@ -121,7 +121,7 @@ ROISenderModule::terminate()
   closeMessageQueue("on terminate");
   //  unlinkMessageQueue("on terminate");
   std::string str = "HLT Delay time distribution: ( ";
-  for (auto& a : m_histo) str += std::to_string(a) + ";";
+  for (const auto& a : m_histo) str += std::to_string(a) + ";";
   str += " )";
   B2RESULT(str);
 }

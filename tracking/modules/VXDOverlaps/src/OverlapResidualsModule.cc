@@ -745,7 +745,7 @@ void OverlapResidualsModule::event()
               if (svdSize_U_int < 128)
                 for (unsigned int d = 0; d < svdSize_U_int; d++) {
                   svdStripCharge_U_int.push_back(theRecoDigits_1[d]->getCharge());
-                  SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
+                  const SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
                   std::array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
                   std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_U_int));
                   svdStripTime_U_int.push_back(theRecoDigits_1[d]->getTime());
@@ -799,7 +799,7 @@ void OverlapResidualsModule::event()
               if (svdSize_U_ext < 128)
                 for (unsigned int d = 0; d < svdSize_U_ext; d++) {
                   svdStripCharge_U_ext.push_back(theRecoDigits_2[d]->getCharge());
-                  SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
+                  const SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
                   std::array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
                   std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_U_ext));
                   svdStripTime_U_ext.push_back(theRecoDigits_2[d]->getTime());
@@ -934,7 +934,7 @@ void OverlapResidualsModule::event()
               if (svdSize_V_int < 128)
                 for (unsigned int d = 0; d < svdSize_V_int; d++) {
                   svdStripCharge_V_int.push_back(theRecoDigits_1[d]->getCharge());
-                  SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
+                  const SVDShaperDigit* ShaperDigit_1 = theRecoDigits_1[d]->getRelated<SVDShaperDigit>();
                   std::array<float, 6> Samples_1 = ShaperDigit_1->getSamples();
                   std::copy(std::begin(Samples_1), std::end(Samples_1), std::back_inserter(svdStrip6Samples_V_int));
                   svdStripTime_V_int.push_back(theRecoDigits_1[d]->getTime());
@@ -988,7 +988,7 @@ void OverlapResidualsModule::event()
               if (svdSize_V_ext < 128)
                 for (unsigned int d = 0; d < svdSize_V_ext; d++) {
                   svdStripCharge_V_ext.push_back(theRecoDigits_2[d]->getCharge());
-                  SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
+                  const SVDShaperDigit* ShaperDigit_2 = theRecoDigits_2[d]->getRelated<SVDShaperDigit>();
                   std::array<float, 6> Samples_2 = ShaperDigit_2->getSamples();
                   std::copy(std::begin(Samples_2), std::end(Samples_2), std::back_inserter(svdStrip6Samples_V_ext));
                   svdStripTime_V_ext.push_back(theRecoDigits_2[d]->getTime());

@@ -301,7 +301,7 @@ double CDCSimHitLookUp::getClosestPrimaryDriftLength(const CDCHit* ptrHit) const
 }
 
 const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
-                                              const std::vector<CDCWireHit>& wireHits) const
+                                              const std::vector<CDCWireHit>& wireHits)
 {
   if (not ptrHit) return nullptr;
   ConstVectorRange<CDCWireHit> wireHit{std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit)};

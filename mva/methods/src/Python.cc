@@ -25,7 +25,7 @@
 
 namespace Belle2 {
   namespace MVA {
-    static std::string loadPythonFileAsString(std::string name)
+    static std::string loadPythonFileAsString(const std::string& name)
     {
       std::string filename = FileSystem::findFile(name);
       std::ifstream steering_file(filename);
@@ -142,7 +142,7 @@ namespace Belle2 {
         Since import_array is a weird macro we need this wrapper function
         to protect us from the return statement in this macro
       */
-      void* init_numpy()
+      static void* init_numpy()
       {
         // Import array is a macro which returns NUMPY_IMPORT_ARRAY_RETVAL
         import_array();

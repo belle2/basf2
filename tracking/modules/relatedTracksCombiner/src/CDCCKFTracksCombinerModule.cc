@@ -41,7 +41,7 @@ void CDCCKFTracksCombinerModule::initialize()
 
 void CDCCKFTracksCombinerModule::event()
 {
-  std::set <RecoTrack*> mergedTracks;
+  std::set <const RecoTrack*> mergedTracks;
   // Loop over all CDC reco tracks and add them to the store array if they do not have a match or combined them with
   // their VXD partner if they do.
   // For this, the fitted or seed state of the tracks is used - if they are already fitted or not.
@@ -89,7 +89,7 @@ void CDCCKFTracksCombinerModule::event()
   }
 
   // Now we have to add remaining tracks
-  for (RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
+  for (const RecoTrack& vxdRecoTrack : m_vxdRecoTracks) {
     auto alreadyIncluded = mergedTracks.count(&vxdRecoTrack) ;
 
     if (not alreadyIncluded) {

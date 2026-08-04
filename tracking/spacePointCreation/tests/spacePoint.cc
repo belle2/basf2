@@ -224,7 +224,7 @@ namespace Belle2 {
     TFile f2(fNameCluster.c_str());
     if (f2.IsZombie()) { B2ERROR("file could not be reopened!"); }
     else {
-      PXDCluster* retrievedCluster;
+      const PXDCluster* retrievedCluster;
       f2.GetListOfKeys()->Print();
 
       TIter next(f2.GetListOfKeys());
@@ -322,7 +322,7 @@ namespace Belle2 {
     TFile f4(fNameSP.c_str());
     if (f4.IsZombie()) { B2ERROR("file could not be reopened!"); }
     else {
-      SpacePoint* retrievedSpacePoint;
+      const SpacePoint* retrievedSpacePoint;
       f4.GetListOfKeys()->Print();
 
       TIter next(f4.GetListOfKeys());

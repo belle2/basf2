@@ -189,7 +189,7 @@ namespace Belle2 {
       // and then inverting the inverse-convariance matrix
 
       double inverse_covariance[3] = {0};
-      for (auto& v : discriminants) {
+      for (const auto& v : discriminants) {
         const unsigned int iBin = binning.getBin(v);
         double norm = (binning.m_signal_yield * binning.m_signal_pdf[iBin] + binning.m_bckgrd_yield * binning.m_bckgrd_pdf[iBin]);
         norm = norm * norm;
@@ -206,7 +206,7 @@ namespace Belle2 {
       // Finally calculate sPlot weights
       std::vector<float> splot_weights;
       splot_weights.reserve(2 * discriminants.size());
-      for (auto& v : discriminants) {
+      for (const auto& v : discriminants) {
         const unsigned int iBin = binning.getBin(v);
         double norm = (binning.m_signal_yield * binning.m_signal_pdf[iBin] + binning.m_bckgrd_yield * binning.m_bckgrd_pdf[iBin]);
         splot_weights.push_back((covariance[0] * binning.m_signal_pdf[iBin] + covariance[1] * binning.m_bckgrd_pdf[iBin]) / norm);

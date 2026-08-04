@@ -61,10 +61,10 @@ namespace Belle2 {
 
     public:
       /// Require the MC information store arrays.
-      void requireTruthInformation();
+      static void requireTruthInformation();
 
       /// Clears all Monte Carlo information present in the last event
-      void clear();
+      static void clear();
 
       /// Fill Monte Carlo look up maps from the DataStore
       void fill();

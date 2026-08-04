@@ -137,13 +137,13 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   newRecoTrack->m_genfitTrack.setCovSeed(covSeed);
 
   for (unsigned int hitIndex = 0; hitIndex < trackCand.getNHits(); hitIndex++) {
-    genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
+    const genfit::TrackCandHit* trackCandHit = trackCand.getHit(hitIndex);
     const int detID = trackCandHit->getDetId();
     const int hitID = trackCandHit->getHitId();
     const unsigned int sortingParameter = recreateSortingParameters ? hitIndex : static_cast<unsigned int>
                                           (trackCandHit->getSortingParameter());
     if (detID == Const::CDC) {
-      UsedCDCHit* cdcHit = cdcHits[hitID];
+      const UsedCDCHit* cdcHit = cdcHits[hitID];
       // Special case for CDC hits, we add a right-left information
       const genfit::WireTrackCandHit* wireHit = dynamic_cast<const genfit::WireTrackCandHit*>(trackCandHit);
       if (not wireHit) {
@@ -158,16 +158,16 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
       }
 
     } else if (detID == Const::SVD) {
-      UsedSVDHit* svdHit = svdHits[hitID];
+      const UsedSVDHit* svdHit = svdHits[hitID];
       newRecoTrack->addSVDHit(svdHit, sortingParameter);
     } else if (detID == Const::PXD) {
-      UsedPXDHit* pxdHit = pxdHits[hitID];
+      const UsedPXDHit* pxdHit = pxdHits[hitID];
       newRecoTrack->addPXDHit(pxdHit, sortingParameter);
     } else if (detID == Const::BKLM) {
-      UsedBKLMHit* bklmHit = bklmHits[hitID];
+      const UsedBKLMHit* bklmHit = bklmHits[hitID];
       newRecoTrack->addBKLMHit(bklmHit, sortingParameter);
     } else if (detID == Const::EKLM) {
-      UsedEKLMHit* eklmHit = eklmHits[hitID];
+      const UsedEKLMHit* eklmHit = eklmHits[hitID];
       newRecoTrack->addEKLMHit(eklmHit, sortingParameter);
     }
   }
@@ -270,7 +270,7 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
     double minimalWeight = *optionalMinimalWeight;
     const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
-      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
+      const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo();
       if (not kalmanFitterInfo) {
         return false;
       }

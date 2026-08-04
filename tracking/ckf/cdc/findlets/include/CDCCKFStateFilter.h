@@ -134,7 +134,7 @@ namespace Belle2 {
     TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
 
     /// Helper function to reconstruct the arc length and the hit distance of a state according to the trajectory
-    void reconstruct(CDCCKFState& state, const TrackingUtilities::CDCTrajectory3D& trajectory, const double lastArcLength) const
+    static void reconstruct(CDCCKFState& state, const TrackingUtilities::CDCTrajectory3D& trajectory, const double lastArcLength)
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
       const TrackingUtilities::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();

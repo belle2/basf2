@@ -20,7 +20,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
-CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ) const
+CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObservations& observationsSZ)
 {
   // This seems to be some other algorithm
 
@@ -55,7 +55,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObserva
   }
 }
 
-CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObservations) const
+CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObservations)
 {
   std::vector<double> tanLambdas;
   tanLambdas.reserve(szObservations.size() * (szObservations.size() - 1) / 2);
@@ -78,7 +78,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitTheilSen(const CDCSZObservations& szObserv
   return trajectorySZ;
 }
 
-CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& szObservations) const
+CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& szObservations)
 {
   std::vector<WithWeight<double> > weightedTanLambdas;
   Weight totalWeight = 0;
@@ -113,7 +113,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitWeightedTheilSen(const CDCSZObservations& 
   return trajectorySZ;
 }
 
-double CDCRobustSZFitter::getMedianZ0(const CDCSZObservations& szObservations, double tanLambda) const
+double CDCRobustSZFitter::getMedianZ0(const CDCSZObservations& szObservations, double tanLambda)
 {
   std::vector<double> z0s;
   z0s.reserve(szObservations.size());

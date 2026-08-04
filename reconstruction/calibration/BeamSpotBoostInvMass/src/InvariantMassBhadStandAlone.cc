@@ -266,7 +266,7 @@ namespace Belle2::InvariantMassBhadCalib {
           if (abs(mInv - mB) < 0.05)
             if (cand.R2 < 0.3)
               if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
-                double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                double eBC = sqrt(p * p + (mB * mB)); // beam constrained energy
                 if (eBC > 5.37) continue;
 
                 for (unsigned i = 0; i < limits.size(); ++i) {
@@ -394,8 +394,9 @@ namespace Belle2::InvariantMassBhadCalib {
 
     double s = 0, sw = 0;
     for (auto p : mumuVals) {
-      s  += p.first / pow(p.second, 2);
-      sw += 1. / pow(p.second, 2);
+      const double invSquared = 1. / (p.second * p.second);
+      s  += p.first * invSquared;
+      sw += invSquared;
     }
     const double mumuMean = s / sw;
     const double shiftInit = meanInit - mumuMean;
@@ -441,7 +442,7 @@ namespace Belle2::InvariantMassBhadCalib {
           if (abs(mInv - mB) < 0.05)
             if (cand.R2 < 0.3)
               if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
-                double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                double eBC = sqrt(p * p + (mB * mB)); // beam constrained energy
                 if (eBC > 5.37) continue;
 
                 for (unsigned i = 0; i < limits.size(); ++i) {

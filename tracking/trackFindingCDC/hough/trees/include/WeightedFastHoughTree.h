@@ -128,9 +128,9 @@ namespace Belle2 {
        */
       template <class AItemInDomainMeasure>
       std::vector<std::pair<ADomain, std::vector<T>>>
-      findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
-                               int maxLevel,
-                               const TrackingUtilities::Weight minWeight = NAN)
+      static findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
+                                      int maxLevel,
+                                      const TrackingUtilities::Weight minWeight = NAN)
       {
         auto skipLowWeightNode = [minWeight](const Node * node) {
           return not(node->getWeight() >= minWeight);

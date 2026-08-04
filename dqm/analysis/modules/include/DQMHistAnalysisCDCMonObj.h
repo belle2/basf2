@@ -34,6 +34,7 @@ namespace Belle2 {
      */
     DQMHistAnalysisCDCMonObjModule();
 
+  private:
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
@@ -63,16 +64,15 @@ namespace Belle2 {
      */
     void makeBadChannelList();
 
-
     /**
      * Get mean of ADC histogram excluding 0-th bin.
      */
-    float getHistMean(TH1D* h) const;
+    static float getHistMean(TH1* h);
 
     /**
      * Get median of ADC histogram excluding 0-th bin.
      */
-    float getHistMedian(TH1D* h) const;
+    static float getHistMedian(TH1* h);
 
     /**
      * Get board/channel from layer/wire.
@@ -83,7 +83,7 @@ namespace Belle2 {
      * Configure bins of TH2Poly.
      */
     void configureBins(TH2Poly* h);
-  protected:
+
     //TObjects for DQM analysis
     TCanvas* m_cMain = nullptr; /**< main panel */
     TCanvas* m_cADC = nullptr; /**< ADC panel */

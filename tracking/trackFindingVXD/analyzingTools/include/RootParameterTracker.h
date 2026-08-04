@@ -254,22 +254,22 @@ namespace Belle2 {
       }
       m_file->Close();
 
-      for (auto& algoData2tcType : m_algoDataDouble) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataDouble) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }
       }
 
-      for (auto& algoData2tcType : m_algoDataInt) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataInt) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }
       }
 
-      for (auto& algoData2tcType : m_algoDataVecDouble) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataVecDouble) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }

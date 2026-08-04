@@ -212,6 +212,7 @@ void CDCSVGPlotter::drawSegments(const std::string& storeObjName,
   drawStoreVector<const CDCSegment2D>(storeObjName, styling);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
@@ -253,6 +254,7 @@ void CDCSVGPlotter::drawSegmentTriples(const std::string& storeObjName,
   drawStoreVector<const CDCSegmentTriple>(storeObjName, styling);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawSegmentTripleTrajectories(const std::string& storeObjName,
                                                   const std::string& stroke,
                                                   const std::string& strokeWidth)
@@ -274,6 +276,7 @@ void CDCSVGPlotter::drawTracks(const std::string& storeObjName,
   drawStoreVector<const CDCTrack>(storeObjName, styling);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawTrackTrajectories(const std::string& storeObjName,
                                           const std::string& stroke,
                                           const std::string& strokeWidth)
@@ -295,6 +298,7 @@ void CDCSVGPlotter::drawRecoTracks(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack>(storeArrayName, styling);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
                                               const std::string& stroke,
                                               const std::string& strokeWidth)
@@ -306,6 +310,7 @@ void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack, drawTrajectories>(storeArrayName, styling);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawMCParticleTrajectories(const std::string& storeArrayName,
                                                const std::string& stroke,
                                                const std::string& strokeWidth)
@@ -336,7 +341,7 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   // group them by their mcparticle id
   std::map<int, std::set<CDCSimHit*, FlightTimeOrder>> simHitsByMcParticleId;
   for (CDCSimHit* simHit : simHits) {
-    MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+    const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
     if (mcParticle != nullptr) {
       int mcTrackId = mcParticle->getArrayIndex();
       simHitsByMcParticleId[mcTrackId].insert(simHit);
@@ -403,11 +408,13 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
   }
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawWrongRLHitsInSegments(const std::string& segmentsStoreObjName)
 {
   this->drawWrongRLHits<CDCSegment2D>(segmentsStoreObjName);
 }
 
+// cppcheck-suppress functionStatic ; false positive: member-template chain uses m_eventdataPlotter
 void CDCSVGPlotter::drawWrongRLHitsInTracks(const std::string& tracksStoreObjName)
 {
   this->drawWrongRLHits<CDCTrack>(tracksStoreObjName);
@@ -483,7 +490,7 @@ void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjN
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -523,7 +530,7 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segments: " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;
@@ -579,7 +586,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName
     return;
   }
 
-  std::vector<CDCSegment2D>& segments = *storedSegments;
+  const std::vector<CDCSegment2D>& segments = *storedSegments;
   B2INFO("#Segment " << segments.size());
 
   std::vector<const CDCAxialSegment2D*> axialSegments;

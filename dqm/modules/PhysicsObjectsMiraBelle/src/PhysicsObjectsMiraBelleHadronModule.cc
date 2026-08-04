@@ -159,13 +159,3 @@ void PhysicsObjectsMiraBelleHadronModule::event()
 
 }
 
-
-
-void PhysicsObjectsMiraBelleHadronModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleHadronModule::terminate()
-{
-}
-

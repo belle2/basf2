@@ -1013,11 +1013,15 @@ Returns the generated 4-momentum transfer squared :math:`q^2` calculated as
 
 where :math:`p_m` is the 4-momentum of the given (mother) particle,
 and :math:`p_{d_{i,j,...}}` are the daughter particles with indices :math:`i, j, ...` given as arguments .
-The ordering of daughters is as defined in the `DECAY_BELLE2.DEC <https://gitlab.desy.de/belle2/software/basf2/-/blob/main/decfiles/dec/DECAY_BELLE2.DEC?ref_type=heads>`_
-file used in the generation, with the numbering starting at :math:`n=0`.
+The ordering of daughters is as defined in the `DECAY_BELLE2.DEC`
+file used in the generation, with the numbering starting at :math:`n=0`. 
 
 Returns ``NaN`` if no related MC particle could be found ot if any of the given indices are larger than the number of daughters of
 the given particle. 
+
+.. admonition:: Remember
+
+      The `DECAY_BELLE2.DEC` can change between MC campaigns so make sure you look at the correct decay file corresponding to your MC samples.
 
 )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
@@ -1033,8 +1037,13 @@ no :math:`B` meson reconstructed or there is a failed truth-matching.
                       )DOC");
     REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
                       "Returns the generated particle array index of the particle's :math:`B` meson ancestor, or -1 if no :math:`B` meson or MC particle is found.");
-    REGISTER_VARIABLE("genMotherP", genMotherP,
-                      "Returns the generated momentum of the particle's MC mother\n\n", "GeV/c");
+    REGISTER_VARIABLE("genMotherP", genMotherP, R"DOC(
+Returns the equivalent of ``genParticle(genMotherID, p)`` and can be extended to any other (kinematic) variable by replacing the second argument.
+
+.. tip::
+      Check out the documentation for `genParticle(index, variable)` to better understand this. 
+
+)DOC", , "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
                       "Returns the generated particle array index of the particle's matched MC particle.");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
@@ -1210,7 +1219,7 @@ The process flags are:
 
 )DOC");
     REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns the status but of the matched MC particle, or ``NaN`` if the MC particle relation was not set. The particle status is explained in :ref:`Particle_status`");
+                      "Returns the status bit of the matched MC particle, or ``NaN`` if the MC particle relation was not set. The particle status is explained in :ref:`Particle_status`");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
                       "Returns 1 if the particle is matched to a primary MC particle, 0 if Particle is matched to secondary MC particle, "
                       "or ``NaN`` if no MC particle is found.");

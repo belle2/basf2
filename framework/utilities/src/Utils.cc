@@ -63,10 +63,19 @@ namespace {
       B2WARNING("getStatmSize failed to open /proc/pid/statm");
       return std::make_pair(0UL, 0UL);
     }
+    errno = 0;
     rewind(stream);
+    if (errno != 0) {
+      B2WARNING("getStatmSize failed to rewind open stream to /proc/pid/statm with error: " << std::strerror(errno));
+      return std::make_pair(0UL, 0UL);
+    }
     int nReadValues = fscanf(stream, "%lu %lu", &vmSizePages, &rssPages);
     if (nReadValues != 2) {
-      B2WARNING("getStatmSize failed to read virtual and resident memory from /proc/pid/statm");
+      if (errno != 0) {
+        B2WARNING("getStatmSize failed to read virtual and resident memory from /proc/pid/statm with error: " << std::strerror(errno));
+      } else {
+        B2WARNING("getStatmSize failed to read virtual and resident memory from /proc/pid/statm");
+      }
       return std::make_pair(0UL, 0UL);
     }
     return std::make_pair(vmSizePages * pageSizeKb, rssPages * pageSizeKb);

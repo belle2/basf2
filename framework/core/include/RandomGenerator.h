@@ -105,19 +105,19 @@ namespace Belle2 {
     double random01();
 
     /** Generate a random value in (0,1), both limits excluded. */
-    Double_t Rndm() { return random01(); }
+    Double_t Rndm() override { return random01(); }
     /** Generate a random value in (0,1), both limits excluded (backward compatibility with root < 6.08). */
-    Double_t Rndm(Int_t) { return Rndm(); }
+    Double_t Rndm(Int_t) override { return Rndm(); }
     /** Fill an array of floats with random values in (0,1), both limits excluded.
      * @param n number of floats to generate
      * @param array pointer to an array where the numbers should be stored
      */
-    void RndmArray(Int_t n, Float_t* array);
+    void RndmArray(Int_t n, Float_t* array) override;
     /** Fill an array of doubles with random values in (0,1), both limits excluded.
      * @param n number of doubles to generate
      * @param array pointer to an array where the numbers should be stored
      */
-    void RndmArray(Int_t n, Double_t* array);
+    void RndmArray(Int_t n, Double_t* array) override;
     /** Fill an array of unsigned 64bit integers with random values in
      * [0, UINT64_MAX], both limits included.
      * @param n number of ints to generate
@@ -190,7 +190,7 @@ namespace Belle2 {
      * Version 2: merge m_eventDependent and m_useEventData into a general
      * generator mode m_mode
      */
-    ClassDef(RandomGenerator, 2);
+    ClassDefOverride(RandomGenerator, 2);
   };
 
   inline uint64_t RandomGenerator::random64()

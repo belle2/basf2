@@ -424,15 +424,16 @@ def correctBrems(outputList,
     4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
     the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
-    Warning:
-        So far, there haven't been any comprehensive comparisons of the performance of the `BremsFinder` module, which
-        is called in this function, with the `BelleBremRecovery` module, which is called via the `correctBremsBelle`
-        function. If your analysis is very sensitive to the Bremsstrahlung corrections, it is currently advised to use
-        `correctBremsBelle`.
+    Tip:
+        Since release-08 (proc16 and MC16), `correctBrems` is the recommended way of performing the Bremsstrahlung
+        recovery and is preferred over `correctBremsBelle`. The cuts applied by the ``ECLTrackBremFinder`` module
+        used to be too tight, which is why the Belle-like approach was recommended in the past; they were loosened
+        for proc16 and MC16.
 
-        The reason is that studies by the tau WG revealed that in the past the cuts applied by the
-        ``ECLTrackBremFinder`` module were too tight. They were only loosened for proc16 and MC16. New performance
-        studies are needed to verify that now this module outperforms the Belle-like approach.
+        For the recommended selection of the Bremsstrahlung photons, the recommended values of the parameters
+        below and the studies these are based on, refer to :ref:`b2help-recommendation`
+        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_),
+        which is kept up to date with the current data-taking and processing campaign.
 
     Information:
         A detailed description of how the weights are set can be found directly at the documentation of the
@@ -499,8 +500,14 @@ def correctBremsBelle(outputListName,
     Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
     ``angleThreshold``.
 
+    Warning:
+        Since release-08 (proc16 and MC16), `correctBrems` is preferred over this function. Refer to
+        :ref:`b2help-recommendation`
+        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_)
+        for the current recommendation on the Bremsstrahlung recovery.
+
     Tip:
-        Studies by the tau WG show that using a rather wide opening angle (up to
+        If you still use this function, studies by the tau WG show that using a rather wide opening angle (up to
         0.2 rad) and rather low energetic photons results in good correction.
         However, this should only serve as a starting point for your own studies
         because the optimal criteria are likely mode-dependent

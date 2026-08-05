@@ -98,13 +98,18 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
       fclose(fp);
       return "";
     }
-    while ((i = fread((void*) buf, 1, bufsize, fp)) > 0) {
-      sum = adler32(sum, buf, i);
+    while (true) {
+      i = fread((void*) buf, 1, bufsize, fp);
+      if (ferror(fp)) {
+        free(buf);
+        fclose(fp);
+        return "";
+      }
+      if (i > 0) sum = adler32(sum, buf, i);
+      if (feof(fp)) break;
     }
-    bool readError = ferror(fp) != 0;
     fclose(fp);
     free(buf);
-    if (readError) return "";
     // Adler32 checksums hex digests ARE zero padded although
     // HLT legacy presentation may differ.
     sprintf(hexdigest, "%08lx", sum);

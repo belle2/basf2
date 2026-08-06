@@ -280,9 +280,15 @@ by setting ``storeCompact=True`` instead of using the default indented multi-lin
   import modularAnalysis as ma
   ma.printMCParticles(storeCompact=True, onlyPrimaries=True, suppressPrint=True, path=main)
 
-A typical value of the resulting string looks like::
+A typical value of the resulting string for a generic :math:`\Upsilon(4S) \to B\bar{B}` event looks like::
 
   Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> pi- [D0 -> pi- pi+]]
+
+For non-:math:`\Upsilon(4S)` events, e.g. continuum :math:`e^+e^- \to c\bar{c}` events, the top-level
+particles are instead the initial-state beam particles and the intermediate boson they produce, since
+these also have no mother particle in the generated event, for example::
+
+  e- e+ Z0 -> [D*+ -> [D0 -> [K_S0 -> pi+ pi-] pi+ pi- pi+ pi-] pi+] [pi0 -> gamma gamma] [rho- -> pi- [pi0 -> gamma gamma]] pi+ [D- -> K_L0 pi-]
 
 Here ``->`` separates a particle from its daughters, ``[...]`` groups a composite daughter together with
 its own descendants, and ``~`` prefixes secondary particles (i.e. particles created during the detector

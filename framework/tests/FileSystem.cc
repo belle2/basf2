@@ -91,9 +91,10 @@ namespace {
   {
     // Asserting existence of random test root file in framework/tests folder
     // If this file is ever removed, replace by other test file
-    ASSERT_TRUE(FileSystem::fileExists("framework/tests/chaintest_1.root"));
+    std::string absPath = FileSystem::findFile("framework/tests/chaintest_1.root");
+    ASSERT_NE(absPath, "");
     // Test adler32 and md5 check sums
-    EXPECT_EQ(FileSystem::calculateAdler32("framework/tests/chaintest_1.root"), "cf1b842e");
-    EXPECT_EQ(FileSystem::calculateMD5("framework/tests/chaintest_1.root"), "80b4730a4a521ff290ffc59c474fe255");
+    EXPECT_EQ(FileSystem::calculateAdler32(absPath), "cf1b842e");
+    EXPECT_EQ(FileSystem::calculateMD5(absPath), "80b4730a4a521ff290ffc59c474fe255");
   }
 }  // namespace

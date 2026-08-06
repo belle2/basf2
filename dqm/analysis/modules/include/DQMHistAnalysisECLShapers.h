@@ -30,6 +30,8 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLShapersModule();
 
+  private:
+
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */
@@ -41,7 +43,6 @@ namespace Belle2 {
     /** Terminate. */
     void terminate() override final {}
 
-  private:
     /** Prefix to use for PVs registered by this module */
     std::string m_pvPrefix;
 
@@ -49,7 +50,7 @@ namespace Belle2 {
     const static int c_collector_count = ECL::ECL_CRATES;
 
     /** Remove upper 10% of the values, return the maximum in the remaining 90% */
-    double robust_max(std::multiset<double> values);
+    static double robust_max(std::multiset<double> values);
 
     /** Max pedestal width array
      * [0] -> Max pedestal width in FWD endcap

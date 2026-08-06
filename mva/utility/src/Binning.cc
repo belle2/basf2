@@ -99,7 +99,7 @@ namespace Belle2 {
       std::sort(indices.begin(), indices.end(), [&](unsigned int i, unsigned int j) {return data[i] < data[j]; });
 
       double sum_weights = 0;
-      for (auto& w : weights)
+      for (const auto& w : weights)
         sum_weights += w;
       double weight_per_bin = sum_weights / nBins;
 

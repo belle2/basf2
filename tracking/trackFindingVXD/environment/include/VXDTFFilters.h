@@ -229,7 +229,7 @@ namespace Belle2 {
     {
       // TODO: sanity checks
       static twoHitFilter_t just_in_case;
-      const auto staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
+      const auto* staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
       // catch case when sector is not part of the sectorMap:
       if (staticSector == nullptr)
         return just_in_case;
@@ -482,7 +482,7 @@ namespace Belle2 {
       sp3tree->Branch("centerFullSecID", & centerFullSecID3sp);
       sp3tree->Branch("innerFullSecID", & innerFullSecID3sp);
 
-      for (auto staticSector : m_staticSectors) {
+      for (const auto* staticSector : m_staticSectors) {
         if (staticSector == nullptr)
           // Why there is an empty sector per layer?
           continue;

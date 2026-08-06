@@ -3877,6 +3877,80 @@ namespace {
                     10);
   }
 
+  TEST_F(MetaVariableTest, varForNthDaughterOfType)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    PxPyPzEVector momentum;
+    PxPyPzEVector momentum_0;
+    PxPyPzEVector momentum_1;
+    PxPyPzEVector momentum_0_0;
+    std::vector<int> B_daughterIndices;
+    std::vector<int> B_grandDaughterIndices_0;
+    std::vector<int> B_grandDaughterIndices_1;
+    std::vector<int> B_grandGrandDaughterIndices_0_0;
+
+    // Creation of B- -> (D*0 -> (D0 -> K- pi+ pi0) pi0) (eta -> gamma gamma) mu- [nu_mu]
+
+    const Particle* kplus = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), -321);
+    const Particle* piplus = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211);
+    const Particle* pi0_D = particles.appendNew(PxPyPzEVector(0.5, 1, 1, 1), 111);
+    B_grandGrandDaughterIndices_0_0.push_back(kplus->getArrayIndex());
+    B_grandGrandDaughterIndices_0_0.push_back(piplus->getArrayIndex());
+    B_grandGrandDaughterIndices_0_0.push_back(pi0_D->getArrayIndex());
+    momentum_0_0 = kplus->get4Vector() + piplus->get4Vector() + pi0_D->get4Vector();
+    const Particle* D0 = particles.appendNew(momentum_0_0, 421, Particle::c_Unflavored, B_grandGrandDaughterIndices_0_0);
+
+    const Particle* gamma1 = particles.appendNew(PxPyPzEVector(1.5, 1, 1, 1), 22);
+    const Particle* gamma2 = particles.appendNew(PxPyPzEVector(2.5, 1, 1, 1), 22);
+    B_grandDaughterIndices_1.push_back(gamma1->getArrayIndex());
+    B_grandDaughterIndices_1.push_back(gamma2->getArrayIndex());
+    momentum_1 = gamma1->get4Vector() + gamma2->get4Vector();
+    const Particle* eta = particles.appendNew(momentum_1, 221, Particle::c_Unflavored, B_grandDaughterIndices_1);
+
+    const Particle* pi0_Dstar = particles.appendNew(PxPyPzEVector(3.5, 1, 1, 1), 111);
+    B_grandDaughterIndices_0.push_back(D0->getArrayIndex());
+    B_grandDaughterIndices_0.push_back(pi0_Dstar->getArrayIndex());
+    momentum_0 = D0->get4Vector() + pi0_Dstar->get4Vector();
+    const Particle* Dstar0 = particles.appendNew(momentum_0, 423, Particle::c_Unflavored, B_grandDaughterIndices_0);
+
+    const Particle* muminus = particles.appendNew(PxPyPzEVector(4.5, 1, 1, 1), 13);
+    B_daughterIndices.push_back(Dstar0->getArrayIndex());
+    B_daughterIndices.push_back(eta->getArrayIndex());
+    B_daughterIndices.push_back(muminus->getArrayIndex());
+    momentum = Dstar0->get4Vector() + eta->get4Vector() + muminus->get4Vector();
+    const Particle* Bminus = particles.appendNew(momentum, -521, Particle::c_Unflavored, B_daughterIndices);
+
+    // Test many combinations of n and depth
+    const Manager::Var* var_pdg_pi0_1 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 1, px, 3)");
+    const Manager::Var* var_pdg_pi0_2 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 3)");
+    const Manager::Var* var_pdg_pi0_3 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 3, px, 3)");
+    const Manager::Var* var_pdg_pi0_4 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 1)");
+    const Manager::Var* var_pdg_pi0_5 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px)");
+    const Manager::Var* var_name_pi0 = Manager::Instance().getVariable("varForNthDaughterOfType(pi0, 1, px, 3)");
+    const Manager::Var* var_pdg_gamma_1 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 3)");
+    const Manager::Var* var_pdg_gamma_2 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 2, px, 3)");
+    const Manager::Var* var_pdg_gamma_3 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 3, px, 3)");
+    const Manager::Var* var_pdg_gamma_4 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 1)");
+    const Manager::Var* var_name_mu_1 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px, 1)");
+    const Manager::Var* var_name_mu_2 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px)");
+    const Manager::Var* var_pdg_kshort_1 = Manager::Instance().getVariable("varForNthDaughterOfType(310, 1, px, 3)");
+
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_1->function(Bminus)), 3.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_2->function(Bminus)), 0.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_3->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_4->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_5->function(Bminus))));
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_pi0->function(Bminus)), 3.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_1->function(Bminus)), 1.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_2->function(Bminus)), 2.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_3->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_4->function(Bminus))));
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_1->function(Bminus)), 4.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_2->function(Bminus)), 4.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_kshort_1->function(Bminus))));
+  }
+
   TEST_F(MetaVariableTest, isDescendantOfList)
   {
     DataStore::Instance().setInitializeActive(true);

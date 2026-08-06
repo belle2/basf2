@@ -519,7 +519,7 @@ void SVDROIFinderAnalysisModule::event()
       m_idmc = svdDigits_MCParticle[iSVDShaperDigit]->getCellID();
       m_vxdIDmc = svdDigits_MCParticle[iSVDShaperDigit]->getSensorID();
 
-      VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+      const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_vxdIDmc);
 
       if (isU)

@@ -60,6 +60,8 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
+DQMHistAnalysisSVDOccupancyModule::~DQMHistAnalysisSVDOccupancyModule() { }
+
 void DQMHistAnalysisSVDOccupancyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: initialized.");
@@ -322,7 +324,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: event called.");
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  TH1* hnEvnts = findHist("SVDExpReco", "SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;

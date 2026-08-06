@@ -26,7 +26,7 @@ namespace Belle2 {
      * @param rbuf Use the given RingBuffer for data
      */
     explicit RxModule(RingBuffer* rbuf);
-    virtual ~RxModule();
+    virtual ~RxModule() override;
 
     //! Module functions to be called from main process
     virtual void initialize() override;

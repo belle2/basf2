@@ -4,6 +4,11 @@ Changes in the analysis package in light-2607-k
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++
 * `modularAnalysis.scaleTrackMomenta` and `modularAnalysis.correctTrackEnergy` now let basf2 automatically choose the data or MC version of the correction payload: the suffix ``_data`` or ``_MC`` is appended to the given ``payloadName`` depending on whether the module runs on data or MC.
+* Updated the documentation of `modularAnalysis.correctBrems`, `modularAnalysis.correctBremsBelle` and the `BremsFinder` module to follow the current Bremsstrahlung recovery recommendation: since release-08 (proc16, MC16) `modularAnalysis.correctBrems` is preferred.
+
+Variables
++++++++++
+* Added metavariable `varForNthDaughterOfType`, which searches a given number of daughter generations of the given particle for the nth particle of the given type and, if such a particle exists, returns the given variable for it, otherwise NaN.
 
 Command line tools
 ++++++++++++++++++

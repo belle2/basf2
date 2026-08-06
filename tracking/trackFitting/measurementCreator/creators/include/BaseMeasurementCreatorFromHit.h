@@ -59,9 +59,9 @@ namespace Belle2 {
     genfit::AbsMeasurement* createCoordinateMeasurement(HitType* hit, const RecoHitInformation& recoHitInformation) const;
 
     /** Helper: Create a TrackPoint from a measurement with a given RecoHitInformation. */
-    genfit::TrackPoint* createTrackPointWithRecoHitInformation(genfit::AbsMeasurement* coordinateMeasurement,
-                                                               RecoTrack& recoTrack,
-                                                               const RecoHitInformation& recoHitInformation) const;
+    static genfit::TrackPoint* createTrackPointWithRecoHitInformation(genfit::AbsMeasurement* coordinateMeasurement,
+        RecoTrack& recoTrack,
+        const RecoHitInformation& recoHitInformation);
 
   private:
     /** A reference to the prefilled measurement factory. */

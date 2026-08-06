@@ -152,8 +152,21 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_radee") == SoftwareTriggerCutResult::c_accept)
-                            || (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") == SoftwareTriggerCutResult::c_accept);
+    bool eRadBhabha = false;
+
+    const std::string radee =
+      "software_trigger_cut&skim&accept_radee";
+
+    const std::string bhabhaCDC =
+      "software_trigger_cut&skim&accept_bhabha_cdc";
+
+    if (fresults.find(bhabhaCDC) != fresults.end()) {
+      // If bhabha_cdc exists, use only bhabha_cdc
+      eRadBhabha = (m_trgResult->getResult(bhabhaCDC) == SoftwareTriggerCutResult::c_accept);
+    } else if (fresults.find(radee) != fresults.end()) {
+      // Otherwise use radee
+      eRadBhabha = (m_trgResult->getResult(radee) == SoftwareTriggerCutResult::c_accept);
+    }
 
 
     if (!m_isBhabha && !m_isRadee) {

@@ -284,7 +284,7 @@ namespace Belle2 {
        * When a node is accepted as a result, we extract a vector with the items (back transformed to AData*)
        * and pass it together with the result node to the candidate receiver function.
        */
-      void callResultFunction(QuadTree* node, const CandidateReceiver& candidateReceiver) const
+      static void callResultFunction(QuadTree* node, const CandidateReceiver& candidateReceiver)
       {
         const std::vector<Item*>& foundItems = node->getItems();
         std::vector<AData*> candidate;
@@ -355,7 +355,7 @@ namespace Belle2 {
       virtual void afterFillDebugHook(QuadTreeChildren& children)
       {
         if (not m_debugOutput) return;
-        for (QuadTree& childNode : children) {
+        for (const QuadTree& childNode : children) {
           if (childNode.getLevel() != getLastLevel()) continue; // Only write the lowest level
           //m_debugOutputMap[ {childNode.getXMean(), childNode.getYMean()}] = childNode.getItems();
         }

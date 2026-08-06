@@ -156,14 +156,14 @@ namespace PurityCalcTests {
       DataStore::Instance().setInitializeActive(false);
 
       // populate datastore
-      MCParticle* mcPart1 = m_mcParticles.appendNew(createMCParticle());
-      MCParticle* mcPart2 = m_mcParticles.appendNew(createMCParticle());
+      const MCParticle* mcPart1 = m_mcParticles.appendNew(createMCParticle());
+      const MCParticle* mcPart2 = m_mcParticles.appendNew(createMCParticle());
 
       // add a PXD (ideal case: one TrueHit -> one MCParticle)
       VxdID pxdId(1, 1, 1);
-      PXDTrueHit* pTrueHit = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
+      const PXDTrueHit* pTrueHit = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
       mcPart1->addRelationTo(pTrueHit);
-      SpacePoint* spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
+      const SpacePoint* spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
       spacePoint->addRelationTo(pTrueHit, 1); // PXD has only one Cluster
       m_assignedClusters.push_back(1);
 
@@ -172,7 +172,7 @@ namespace PurityCalcTests {
       m_assignedClusters.push_back(1);
 
       // add a PXD (non-ideal case: more than one (i.e. two for the test) TrueHits -> 2 MCParticles)
-      PXDTrueHit* pTrueHit2 = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
+      const PXDTrueHit* pTrueHit2 = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
       mcPart2->addRelationTo(pTrueHit2);
       spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
       spacePoint->addRelationTo(pTrueHit, 1);
@@ -181,7 +181,7 @@ namespace PurityCalcTests {
 
       // add a PXD (non-ideal case: more than one (i.e. two for the test) TrueHits -> 1 MCParticles)
       // -> both TrueHits are related with the same MCParticle (probably a very rare corner case, but this is what testing is for)
-      PXDTrueHit* pTrueHit3 = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
+      const PXDTrueHit* pTrueHit3 = m_pxdTrueHits.appendNew(createTrueHit<PXDTrueHit>(pxdId));
       mcPart2->addRelationTo(pTrueHit3);
       spacePoint = m_spacePoints.appendNew(createSpacePoint(pxdId, true));
       spacePoint->addRelationTo(pTrueHit3, 1);
@@ -191,11 +191,11 @@ namespace PurityCalcTests {
       // NOTE: SVD only testing two Clusters SpacePoints since single Clusters are essentially the same as PXDs!
       // SVD: first set up some SVDTrueHits with differing relations to MCParticles
       VxdID svdId(3, 1, 1);
-      SVDTrueHit* sTH2MC1 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to mcParticle1
+      const SVDTrueHit* sTH2MC1 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to mcParticle1
       mcPart1->addRelationTo(sTH2MC1);
-      SVDTrueHit* sTH2MC2 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to mcParticle2
+      const SVDTrueHit* sTH2MC2 = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to mcParticle2
       mcPart2->addRelationTo(sTH2MC2);
-      SVDTrueHit* sTH2None = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to no MCParticle
+      const SVDTrueHit* sTH2None = m_svdTrueHits.appendNew(createTrueHit<SVDTrueHit>(svdId)); // related to no MCParticle
 
       // add a SVD (ideal case: two Clusters -> 1 TrueHit -> 1 MCParticle)
       spacePoint = m_spacePoints.appendNew(createSpacePoint(svdId, false, 0));   // add twoCluster SP

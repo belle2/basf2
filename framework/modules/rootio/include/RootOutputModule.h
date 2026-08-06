@@ -41,7 +41,7 @@ namespace Belle2 {
      *
      *  Deletion of objects, that were created in the Constructor.
      */
-    virtual ~RootOutputModule();
+    virtual ~RootOutputModule() override;
 
     /** Setting up of various stuff.
      *

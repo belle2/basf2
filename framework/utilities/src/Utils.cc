@@ -59,9 +59,13 @@ namespace {
     }
     unsigned long vmSizePages{0};
     unsigned long rssPages{0};
-    if (!stream) return std::make_pair(-1, -1);
+    if (!stream) return std::make_pair(0UL, 0UL);
+    errno = 0;
     rewind(stream);
-    fscanf(stream, "%lu %lu", &vmSizePages, &rssPages);
+    if (errno != 0) return std::make_pair(0UL, 0UL);
+    int nReadValues = fscanf(stream, "%lu %lu", &vmSizePages, &rssPages);
+    if (nReadValues != 2) return std::make_pair(0UL, 0UL);
+
     return std::make_pair(vmSizePages * pageSizeKb, rssPages * pageSizeKb);
   }
 }

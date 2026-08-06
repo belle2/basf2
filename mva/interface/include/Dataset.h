@@ -494,20 +494,20 @@ namespace Belle2 {
        * @param tree
        * @param branchname
        */
-      bool checkForBranch(TTree*, const std::string&) const;
+      static bool checkForBranch(TTree*, const std::string&);
 
       /**
        * Casts a VarVariant which can contain <double,int,bool,float> to float
        * @param variant the VarVariant to cast
        */
-      float castVarVariantToFloat(RootDatasetVarVariant&) const;
+      static float castVarVariantToFloat(RootDatasetVarVariant&);
 
       /**
        * Initialises the VarVariant.
        * @param type defines which alternative to use for the variant {Double_t, Float_t, Int_t, Bool_t}
        * @param varVariantTarget variant to initialise.
        */
-      void initialiseVarVariantType(const std::string, RootDatasetVarVariant&);
+      static void initialiseVarVariantType(const std::string&, RootDatasetVarVariant&);
 
       /**
        * Infers the type (double,float,int,bool) from the TTree and initialises the VarVariant
@@ -515,7 +515,7 @@ namespace Belle2 {
        * @param branch_name branch name in the datafile
        * @param varVariantTarget variant to initialise
        */
-      void initialiseVarVariantForBranch(const std::string, RootDatasetVarVariant&);
+      void initialiseVarVariantForBranch(const std::string&, RootDatasetVarVariant&);
     };
   }
 }

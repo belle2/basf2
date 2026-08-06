@@ -42,7 +42,7 @@ namespace Belle2 {
     RootInputModule();
 
     /** Destructor. */
-    virtual ~RootInputModule();
+    virtual ~RootInputModule() override;
 
     /** Initialize the Module */
     virtual void initialize() override;

@@ -14,7 +14,7 @@ namespace Belle2 {
   struct NodeCompatibilityCheckerBase {
 
     /** declares all nodes passed as compatible */
-    bool areCompatible(NodeType*, NodeType*) { return true; }
+    static bool areCompatible(NodeType*, NodeType*) { return true; }
   };
 
 } //Belle2 namespace

@@ -60,10 +60,10 @@ namespace Belle2 {
   private:
 
     /// puts several empty sectormaps into the framework
-    void bootstrapSectorMap(void);
+    static void bootstrapSectorMap(void);
     /** puts one empty sectormap into the framework:
       @param config: the configuration used to generate the empty sectormap */
-    void bootstrapSectorMap(const SectorMapConfig& config);
+    static void bootstrapSectorMap(const SectorMapConfig& config);
     /// writes a sectormap to a root file
     void persistSectorMap(void);
     /// retrieves SectorMap from file or from the DB

@@ -92,14 +92,21 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
   if (fp) {
     uLong i, sum = adler32(0, 0, 0);
     char hexdigest[9];
-    Bytef* buf = (Bytef*) malloc(1024 * 1024 * sizeof(Bytef));
+    const size_t bufsize = 1024 * 1024 * sizeof(Bytef);
+    Bytef* buf = (Bytef*) malloc(bufsize);
     if (!buf) {
       fclose(fp);
       return "";
     }
-    while ((i = fread((void*) buf, 1, sizeof(buf), fp)) > 0) {
-      if (!i) break;
-      sum = adler32(sum, buf, i);
+    while (true) {
+      i = fread((void*) buf, 1, bufsize, fp);
+      if (ferror(fp)) {
+        free(buf);
+        fclose(fp);
+        return "";
+      }
+      if (i > 0) sum = adler32(sum, buf, i);
+      if (feof(fp)) break;
     }
     fclose(fp);
     free(buf);

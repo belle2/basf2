@@ -93,7 +93,7 @@ namespace DirectedNodeNetworkTests {
         const PXDCluster* pxdCluster = m_pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
                                                                   aVxdID));
 
-        SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        const SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
         B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
@@ -299,8 +299,8 @@ namespace DirectedNodeNetworkTests {
         B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds));
 
         // get all nodes of outer node, expected: 1 inner and no outerNodes:
-        auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
-        auto& outerNodes = intNetwork.getNode(intArray3.at(index))->getOuterNodes();
+        const auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
+        const auto& outerNodes = intNetwork.getNode(intArray3.at(index))->getOuterNodes();
         EXPECT_EQ(1, innerNodes.size());
         EXPECT_EQ(1, outerNodes.size());
       }

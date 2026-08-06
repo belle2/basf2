@@ -101,7 +101,7 @@ namespace Belle2 {
       // Mark found hit as used and safe them with the trajectory
       /////////////////////////////////////////////////////////////////////////
       std::vector<const TrackingUtilities::CDCWireHit*> foundWireHits;
-      for (TrackingUtilities::CDCRLWireHit& rlWireHit : hits) {
+      for (const TrackingUtilities::CDCRLWireHit& rlWireHit : hits) {
         foundWireHits.push_back(&rlWireHit.getWireHit());
       }
 

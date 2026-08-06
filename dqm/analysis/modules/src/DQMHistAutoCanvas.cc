@@ -150,7 +150,7 @@ void DQMHistAutoCanvasModule::event()
           // reference only for 1dim and only if *both* not empty
           if (hist->Integral() != 0) { // ignore empty histogram
             // default scaling to number of entries
-            auto refCopy = findRefHist(it.first, ERefScaling::c_RefScaleEntries, hist);
+            auto refCopy = findRefHist(it.first, "", ERefScaling::c_RefScaleEntries, hist);
             if (refCopy and abs(refCopy->Integral()) > 0) { // only if we have entries in reference
               // Adjust the y scale to cover the reference
               if (refCopy->GetMaximum() > hist->GetMaximum())

@@ -135,21 +135,21 @@ namespace Belle2 {
      * @param hit: hit position
      * @return difference in y-slope between hit and semiplane
      */
-    double semiPlane(ROOT::Math::XYZVector vertex, ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
+    static double semiPlane(ROOT::Math::XYZVector vertex, ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if a omega value is in a given semiPlane.
      * @param semiPlane: slope of semiplane
      * @param omega: Signed curvature
      * @return true if in semiplane
      */
-    bool isInSemiPlane(double semiPlane, double omega);
+    static bool isInSemiPlane(double semiPlane, double omega);
 
     /** Get distance between two points.
      * @param center: center position
      * @param hit: hit position
      * @return Distance between the two hits
      */
-    double theDistance(ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
+    static double theDistance(ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if hitDistance is within a given annulus.
      * @param hitDistance: distance between two hits
@@ -157,7 +157,7 @@ namespace Belle2 {
      * @param dR: width of annulus
      * @return true if in annulus
      */
-    bool isInAnnulus(double hitDistance, double R, double dR);
+    static bool isInAnnulus(double hitDistance, double R, double dR);
 
     /** Function to check if a hitTime is within a given lapTime,
      * under consideration of m_fraction and with respect to first hit.
@@ -259,6 +259,6 @@ namespace Belle2 {
      * @param aTrueHit: pointer to vxd true hit
      * @return thetaMS value
      */
-    float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
+    static float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
   };
 }

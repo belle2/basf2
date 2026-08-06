@@ -1042,7 +1042,7 @@ Returns the equivalent of ``genParticle(genMotherID, p)`` and can be extended to
 .. tip::
       Check out the documentation for `genParticle(index, variable)` to better understand this. 
 
-)DOC", , "GeV/c");
+)DOC", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
                       "Returns the generated particle array index of the particle's matched MC particle.");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",

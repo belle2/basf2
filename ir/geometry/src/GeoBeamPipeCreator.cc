@@ -97,13 +97,8 @@ namespace Belle2 {
       //
       //###########################
 
-      double SafetyLength = m_config.getParameter("Safety.L1") * Unit::cm / Unit::mm;
-
       double stepMax = 5.0 * Unit::mm;
       int flag_limitStep = int(m_config.getParameter("LimitStepLength"));
-
-      double A11 = 0.03918;
-
       std::string prep;
       G4LogicalVolume* logi_Lv3AuCoat = nullptr;
 
@@ -588,10 +583,10 @@ namespace Belle2 {
                                            "IPChamber_BWD", "IPBeamPipe_BWD", "VacBWD", "BellowsPipe_BWD", "AdditionalShield_BWD", "BellowsShield_BWD"
                                           };
       // Counts: IPChamber_FWD=8, IPBeamPipe_FWD=12, VacFWD=4, BellowsPipe_FWD=6,
-      //         AdditionalShield_FWD=4, BellowsShield_FWD=8,
+      //         AdditionalShield_FWD=12, BellowsShield_FWD=8,
       //         IPChamber_BWD=4, IPBeamPipe_BWD=12, VacBWD=2, BellowsPipe_BWD=6,
-      //         AdditionalShield_BWD=2, BellowsShield_BWD=8
-      std::vector<int> newPartsNum = {8, 12, 4, 6, 4, 8, 4, 12, 2, 6, 2, 8};
+      //         AdditionalShield_BWD=4, BellowsShield_BWD=8
+      std::vector<int> newPartsNum = {8, 12, 4, 6, 12, 8, 4, 12, 2, 6, 4, 8};
 
       std::vector<std::string> colors = {"#333333", "#333333", "#CCCCCC", "#FFD700", "#555555", "#555555",
                                          "#333333", "#333333", "#CCCCCC", "#FFD700", "#555555", "#555555"

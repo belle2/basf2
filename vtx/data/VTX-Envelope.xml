@@ -1,53 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Envelope description="Envelope Volume for VTX">
-	<!-- FIXME: there is no space outside of the VTX volume to account for
-			 misalignment without causing overlaps. We should increase the envelope
-			 in each direction by a suitable amount, depending on HeavyMetalShield
-			 and BP endflange -->
+	<!-- InnerPoints re-derived 2026-08 to clear the AdditionalShield_FWD/BWD and
+		 BellowsShield_FWD/BWD tungsten shields (ir/data/BeamPipe.xml) by >=1.1mm
+		 radial margin everywhere the two overlap in Z, instead of the previous
+		 profile which overlapped the shields by up to ~2.35cm (z=43.8-52.5cm FWD)
+		 and ~0.35cm elsewhere, including at the AdditionalShield_BWD/BellowsShield_BWD
+		 junction (z=-19.1cm), where the two shield elements meet with different
+		 radii (5.317cm vs 5.817cm) and the larger of the two must be cleared.
+		 The active VTX sensor layers (up to R=13.46cm, |Z|<=35.3cm) stay well
+		 clear of the shields (>0.6cm radial gap in the worst case) and remain
+		 fully inside this envelope after the change.
+		 FIXME: this still gives zero margin for detector misalignment beyond the
+		 ~1mm shield clearance; revisit if alignment studies need more room. -->
 	<OuterPoints>
 		<point><z unit="mm">-400.000</z><x unit="mm">155.000</x></point>
 		<point><z unit="mm"> 525.000</z><x unit="mm">155.000</x></point>
 	</OuterPoints>
 	<InnerPoints>
-		<!-- Negative Z -->
+		<!-- Negative Z: raised where it would otherwise overlap AdditionalShield_BWD /
+			 BellowsShield_BWD -->
 		<point><z unit="mm">-400.000</z><x unit="mm">118.500</x></point>
 		<point><z unit="mm">-395.000</z><x unit="mm">118.500</x></point>
-		<point><z unit="mm">-394.900</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm">-360.182</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm">-350.000</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm">-318.417</z><x unit="mm"> 94.500</x></point>
-		<point><z unit="mm">-299.212</z><x unit="mm"> 88.500</x></point>
-		<point><z unit="mm">-265.962</z><x unit="mm"> 78.500</x></point>
-		<point><z unit="mm">-245.805</z><x unit="mm"> 72.500</x></point>
-		<point><z unit="mm">-191.000</z><x unit="mm"> 54.700</x></point>
+		<point><z unit="mm">-394.900</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">-360.182</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">-351.920</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">-350.730</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">-350.000</z><x unit="mm">107.877</x></point>
+		<point><z unit="mm">-318.417</z><x unit="mm"> 98.221</x></point>
+		<point><z unit="mm">-299.212</z><x unit="mm"> 92.349</x></point>
+		<point><z unit="mm">-265.962</z><x unit="mm"> 82.184</x></point>
+		<point><z unit="mm">-245.805</z><x unit="mm"> 76.021</x></point>
+		<point><z unit="mm">-211.000</z><x unit="mm"> 65.380</x></point>
+		<point><z unit="mm">-191.000</z><x unit="mm"> 59.270</x></point>
+		<point><z unit="mm">-190.000</z><x unit="mm"> 54.397</x></point>
 		<point><z unit="mm">-137.500</z><x unit="mm"> 38.500</x></point>
 		<point><z unit="mm">-137.400</z><x unit="mm"> 37.000</x></point>
 		<point><z unit="mm">-80.500</z><x unit="mm"> 37.000</x></point>
 		<point><z unit="mm">-80.000</z><x unit="mm"> 30.000</x></point>
 		<point><z unit="mm">-62.750</z><x unit="mm"> 12.750</x></point>
-		
-		<!-- Central Z -->
+
+		<!-- Central Z (unchanged - no shield present) -->
 		<point><z unit="mm">  90.000</z><x unit="mm"> 12.750</x></point>
 		<point><z unit="mm"> 107.644</z><x unit="mm"> 18.144</x></point>
 		<point><z unit="mm">119.500</z><x unit="mm"> 30.000</x></point>
-		
-		<!-- Positive Z -->
+
+		<!-- Positive Z: raised where it would otherwise overlap AdditionalShield_FWD /
+			 BellowsShield_FWD -->
 		<point><z unit="mm">119.600</z><x unit="mm"> 32.500</x></point>
-		<point><z unit="mm">191.000</z><x unit="mm"> 54.700</x></point>
-		<point><z unit="mm"> 232.000</z><x unit="mm"> 68.500</x></point>
-		<point><z unit="mm"> 247.212</z><x unit="mm"> 73.500</x></point>
-		<point><z unit="mm"> 300.000</z><x unit="mm"> 88.000</x></point>
-		<point><z unit="mm"> 311.000</z><x unit="mm"> 91.500</x></point>
-		<point><z unit="mm"> 311.100</z><x unit="mm"> 92.500</x></point>
-		<point><z unit="mm"> 331.268</z><x unit="mm"> 99.500</x></point>
-		<point><z unit="mm"> 350.000</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm"> 380.578</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm"> 402.754</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm"> 449.860</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm"> 469.900</z><x unit="mm">103.500</x></point>
-		<point><z unit="mm"> 470.000</z><x unit="mm">118.500</x></point>
-		<point><z unit="mm"> 495.000</z><x unit="mm">118.500</x></point>
-		<point><z unit="mm"> 495.100</z><x unit="mm">104.650</x></point>
-		<point><z unit="mm"> 525.000</z><x unit="mm">104.650</x></point>
+		<point><z unit="mm">136.000</z><x unit="mm"> 42.450</x></point>
+		<point><z unit="mm">137.500</z><x unit="mm"> 42.910</x></point>
+		<point><z unit="mm">139.500</z><x unit="mm"> 43.520</x></point>
+		<point><z unit="mm">142.500</z><x unit="mm"> 44.440</x></point>
+		<point><z unit="mm">157.500</z><x unit="mm"> 49.020</x></point>
+		<point><z unit="mm">158.500</z><x unit="mm"> 49.330</x></point>
+		<point><z unit="mm">160.500</z><x unit="mm"> 49.940</x></point>
+		<point><z unit="mm">190.000</z><x unit="mm"> 58.960</x></point>
+		<point><z unit="mm">191.000</z><x unit="mm"> 59.270</x></point>
+		<point><z unit="mm">211.000</z><x unit="mm"> 65.380</x></point>
+		<point><z unit="mm">232.000</z><x unit="mm"> 71.800</x></point>
+		<point><z unit="mm">247.212</z><x unit="mm"> 76.451</x></point>
+		<point><z unit="mm">300.000</z><x unit="mm"> 92.590</x></point>
+		<point><z unit="mm">311.000</z><x unit="mm"> 95.953</x></point>
+		<point><z unit="mm">311.100</z><x unit="mm"> 95.984</x></point>
+		<point><z unit="mm">331.268</z><x unit="mm">102.150</x></point>
+		<point><z unit="mm">350.000</z><x unit="mm">107.877</x></point>
+		<point><z unit="mm">350.730</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">351.920</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">380.578</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">402.754</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">438.000</z><x unit="mm">108.100</x></point>
+		<point><z unit="mm">438.000</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">449.860</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">469.900</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">470.000</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">495.000</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">495.100</z><x unit="mm">128.100</x></point>
+		<point><z unit="mm">525.000</z><x unit="mm">128.100</x></point>
 	</InnerPoints>
 </Envelope>

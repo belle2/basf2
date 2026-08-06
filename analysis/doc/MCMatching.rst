@@ -292,7 +292,16 @@ these also have no mother particle in the generated event, for example::
 
 Here ``->`` separates a particle from its daughters, ``[...]`` groups a composite daughter together with
 its own descendants, and ``~`` prefixes secondary particles (i.e. particles created during the detector
-simulation rather than by the generator). Because this string is written out per event, it can be stored
+simulation rather than by the generator). By default ``onlyPrimaries`` is ``False``, so these secondary
+particles are also included, for example if the primary :math:`\pi^-` above instead interacted in the
+detector material::
+
+  Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> [pi- -> ~gamma ~gamma] [D0 -> pi- pi+]]
+
+Setting ``onlyPrimaries=True`` (as in the first example) omits such secondary particles and their
+descendants entirely, which is usually the more useful setting for studying the generated decay itself.
+
+Because this string is written out per event, it can be stored
 alongside the other analysis variables (e.g. via `modularAnalysis.variablesToNtuple`) and then parsed
 offline, for example with a simple recursive-descent parser or even just string/regular-expression
 matching on the particle names, to study which decay chains actually occurred in each generated event.

@@ -308,6 +308,12 @@ matching on the particle names, to study which decay chains actually occurred in
 Unlike the numbered generated decay modes described below, this does not require every mode of interest
 to be enumerated in advance.
 
+.. important::
+        When running on all events, it is important to also set ``suppressPrint=True`` (as in the
+		example above). Otherwise the default indented tree is still built and printed via ``B2INFO``
+		for every event, in addition to being stored in ``storeCompact`` format, which can cause the
+		log files to explode in size.
+
 .. _GeneratedDecayModes:
 
 ---------------------

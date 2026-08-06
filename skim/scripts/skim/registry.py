@@ -254,7 +254,9 @@ _RegisteredSkims = [
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
     ("18520300", "dark", "DielectronPlusMissingEnergy"),
-    ("18520400", "dark", "LFVZpVisible"),
+    ("18520400", "dark", "LFVZpVisible_invalid"),  # pre-PromptRel9
+    ("18520401", "dark", "LFVZpVisible"),  # PromptRel9
+    ("18520600", "dark", "ZpVisible"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),

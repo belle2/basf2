@@ -115,3 +115,9 @@ Belle2FileCatalog.xml
 # ############### #
 *.o
 *.os
+
+# Local overlap-check output and large binary geometry data #
+# ########################################################## #
+/overlaps*.log
+/check_geometry_default.log
+geometry/data/MagneticField3dBeamline*.dat.gz

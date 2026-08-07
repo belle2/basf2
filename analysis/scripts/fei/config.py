@@ -182,6 +182,7 @@ class Particle:
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig intermediate pre cut configuration
             @param postCutConfig post cut configuration
+            @param extraPathSpec extra module specifications
         """
         #: pdg name of the particle with an optional additional user label separated by :
         self.identifier = identifier + ':generic' if len(identifier.split(':')) < 2 else identifier
@@ -240,6 +241,7 @@ class Particle:
             @param mvaConfig multivariate analysis configuration
             @param preCutConfig pre cut configuration object
             @param pi0veto if true, additional pi0veto variables are added to the MVA configuration
+            @param extraPathSpec extra module specifications
         """
         # Append generic label to all defined daughters if no label was set yet
         daughters = [d + ':generic' if ':' not in d else d for d in daughters]

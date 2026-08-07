@@ -57,7 +57,7 @@ settings = CalibrationSettings(
         # Fix one of the parameters in the dEdx:beta*gamma fit, which makes the fit much more stable.
         "FixUnstableFitParameter": True,
         # In case of large changes in dEdx:beta*gamma trend with time, might need to set to False.
-        "UsePionBGFunctionForEverything": True,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
+        "UsePionBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the pion fit for all hadrons?
         # (This can save us if the calibration failed due to e.g. kaon fit issue.)
         "UseProtonBGFunctionForEverything": False,  # if the dEdx:beta*gamma fit is unstable, use the proton fit for all hadrons?
         "NumROCpoints": 175,  # only for full validation: number of pionts for the ROC scan

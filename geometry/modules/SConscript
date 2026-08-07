@@ -6,5 +6,6 @@ env['LIBS'] = ['geometry_dbobjects', 'geometry', 'framework']
 conf = Configure(env)
 if conf.CheckHeader('G4GDMLParser.hh', language="C++"):
     env.Append(CPPDEFINES="HAS_GDML")
+    env.Append(LIBS=["$GEANT4_LIBS"])
 
 Return('env')

@@ -339,13 +339,13 @@ class PreReconstruction:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
 
-                # optionaly here we run custom modules that users provide by themselves in
-                # the channels list (useful for testing custom variables)
-                if channel.extraModuleSpec is not None:
-                    spec = channel.extraModuleSpec
+                # optionaly here we run custom modules, that users provide by themselves
+                # in the channels list (useful for testing custom variables)
+                if channel.extraPathSpec is not None:
+                    spec = channel.extraPathSpec
                     mod = importlib.import_module(spec["module"])
-                    extraModule = getattr(mod, spec["class"])(channel.name, *spec["args"], **spec["kwargs"])
-                    path.add_module(extraModule)
+                    registerFunc = getattr(mod, spec["function"])
+                    registerFunc(path, channel.name, *spec["args"], **spec["kwargs"])
 
                 if self.config.monitor:
                     if "tag" in (channel.name).lower():

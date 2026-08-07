@@ -8,3 +8,7 @@ Modules and Modular Analysis
 Command line tools
 ++++++++++++++++++
 * Removed deprecated ``-mc`` / ``--mccampaign`` argument and added release 9 as an option to ``-r`` / ``--release`` argument in :ref:`b2help-recommendation`
+
+FEI
++++
+* Added optional argument ``extraPathSpec`` to allow specifying inside the channels list to add additional basf2 modules to the FEI path.

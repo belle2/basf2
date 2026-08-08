@@ -26,8 +26,12 @@ in the SVD. Due to less "noise" due to fake and clone CDCTracks, the SVD track f
 As a consequence, **the overall track finding efficiency increases** slightly (by up to 0.5%). This could be improved to more than 2% while
 the fake and clone rate are reduced further by choosing a tighter cut on the CDC QI as mentioned above.
 
-The RecoTrack QI was trained with CDC QI, VXD quantities and track quantities. It no longer needs VXD QI as input, as it directly
-use VXD quantities that used to train VXD QI. In the moment no cut on the RecoTrack QI is performed.
+The RecoTrack QI was trained with CDC QI, VXD quantities and track quantities. The current weight file is trained on MC16, using the script
+:doxygen:`combined_quality_estimator_teacher.py <classcombined__quality__estimator__teacher_1_1MasterTask>`,
+which uses the official ``basf2_mva.teacher`` to train the BDT.
+It no longer needs VXD QI as input, as it directly use VXD quantities that used to train VXD QI.
+Since one track could contain two SVD parts, one before CDC and one after CDC, the current method can take this into account.
+In the moment no cut on the RecoTrack QI is performed.
 Instead, **the RecoTrack QI is available at the analysis level by the variable :b2:var:`trackQualityIndicator`**.
 
 It is assumed that the modelling of more properties with large separation potential between fakes, clones and truth tracks improved in the

@@ -1012,7 +1012,7 @@ Returns the generated 4-momentum transfer squared :math:`q^2` calculated as
 
 where :math:`p_m` is the 4-momentum of the given (mother) particle,
 and :math:`p_{d_{i,j,...}}` are the daughter particles with indices :math:`i, j, ...` given as arguments .
-The ordering of daughters is as defined in the `DECAY_BELLE2.DEC`
+The ordering of daughters is as defined in the ``DECAY_BELLE2.DEC``
 file used in the generation, with the numbering starting at :math:`n=0`. 
 
 Returns ``NaN`` if no related MC particle could be found ot if any of the given indices are larger than the number of daughters of
@@ -1020,7 +1020,7 @@ the given particle.
 
 .. admonition:: Remember
 
-      The `DECAY_BELLE2.DEC` can change between MC campaigns so make sure you look at the correct decay file corresponding to your MC samples.
+      The ``DECAY_BELLE2.DEC`` can change between MC campaigns so make sure you look at the correct decay file corresponding to your MC samples.
 
 )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
@@ -1040,7 +1040,7 @@ no :math:`B` meson reconstructed or there is a failed truth-matching.
 Returns the equivalent of ``genParticle(genMotherID, p)`` and can be extended to any other (kinematic) variable by replacing the second argument.
 
 .. tip::
-      Check out the documentation for `genParticle(index, variable)` to better understand this. 
+      Check out the documentation for ``genParticle(index, variable)`` to better understand this. 
 
 )DOC", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,

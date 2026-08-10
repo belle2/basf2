@@ -22,6 +22,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <cstdlib>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -142,12 +143,27 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
   CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
   CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, UncertainParameterLine2D());
 
+  // The shape of the hit triple does not depend on the right left passage hypotheses
+  const CDCRLWireHitTriple::Shape shape = facet.getShape();
+  if (m_param_feasibleRLOnly and
+      shape.getCellExtend() + std::abs(shape.getOClockDelta()) > 6) {
+    // No right left passage combination is feasible for this shape - skip all of them
+    return;
+  }
+
+  // The middle right left passage hypothesis is scanned in the innermost loop:
+  // facets that differ only in it share the same start to end fit line, such that
+  // most of the drift length update can be reused between them.
   for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
     facet.setStartRLInfo(startRLInfo);
-    for (ERightLeft middleRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-      facet.setMiddleRLInfo(middleRLInfo);
-      for (ERightLeft endRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-        facet.setEndRLInfo(endRLInfo);
+    for (ERightLeft endRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+      facet.setEndRLInfo(endRLInfo);
+
+      // Results of the drift length update shared between the middle right left passage hypotheses
+      DriftLengthEstimator::FacetDriftLengthCache driftLengthCache;
+
+      for (ERightLeft middleRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
+        facet.setMiddleRLInfo(middleRLInfo);
 
         // Reset the lines
         // The filter shall do the fitting of the tangent lines if it wants to.
@@ -155,25 +171,36 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
         facet.invalidateFitLine();
 
         if (m_param_feasibleRLOnly) {
-          Weight feasibleWeight = m_feasibleRLFacetFilter(facet);
-          if (std::isnan(feasibleWeight)) continue;
+          // Same check as m_feasibleRLFacetFilter(facet) but reusing the precomputed shape
+          if (not m_feasibleRLFacetFilter.isFeasible(shape, startRLInfo, middleRLInfo, endRLInfo)) continue;
         }
 
         if (m_param_updateDriftLength) {
-
-          // Reset drift length
-          facet.getStartRLWireHit().setRefDriftLength(startWireHit.getRefDriftLength());
-          facet.getMiddleRLWireHit().setRefDriftLength(middleWireHit.getRefDriftLength());
-          facet.getEndRLWireHit().setRefDriftLength(endWireHit.getRefDriftLength());
-
           if (m_param_leastSquareFit) {
-            /*double chi2 =*/FacetFitter::fit(facet);
-          } else {
-            facet.adjustFitLine();
-          }
+            // The fitted line depends on the middle hit drift length - no sharing possible
 
-          // Update drift length
-          m_driftLengthEstimator.updateDriftLength(facet);
+            // Reset drift length
+            facet.getStartRLWireHit().setRefDriftLength(startWireHit.getRefDriftLength());
+            facet.getMiddleRLWireHit().setRefDriftLength(middleWireHit.getRefDriftLength());
+            facet.getEndRLWireHit().setRefDriftLength(endWireHit.getRefDriftLength());
+
+            /*double chi2 =*/FacetFitter::fit(facet);
+
+            // Update drift length
+            m_driftLengthEstimator.updateDriftLength(facet);
+          } else {
+            if (not driftLengthCache.valid) {
+              // Reset drift length
+              facet.getStartRLWireHit().setRefDriftLength(startWireHit.getRefDriftLength());
+              facet.getMiddleRLWireHit().setRefDriftLength(middleWireHit.getRefDriftLength());
+              facet.getEndRLWireHit().setRefDriftLength(endWireHit.getRefDriftLength());
+
+              facet.adjustFitLine();
+            }
+
+            // Update drift length reusing the shareable results of the previous hypothesis
+            m_driftLengthEstimator.updateDriftLength(facet, driftLengthCache);
+          }
         }
 
         Weight weight = m_facetFilter(facet);
@@ -182,7 +209,7 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
           facet.getAutomatonCell().setCellWeight(weight);
           facets.insert(facets.end(), facet);
         }
-      } // end for endRLWireHit
-    } // end for middleRLWireHit
+      } // end for middleRLWireHit
+    } // end for endRLWireHit
   } // end for startRLWireHit
 }

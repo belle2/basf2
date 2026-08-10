@@ -995,7 +995,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("isSignal", isSignal,
                       "Returns 1.0 if the particle is correctly reconstructed, 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isSignalAcceptWrongFSPs", isSignalAcceptWrongFSPs,
-                      "Returns 1.0 if the particle is almost correctly reconstructed (**mis-identified final state particles are allowed**), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (mis-identified final state particles are allowed), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isPrimarySignal", isPrimarySignal,
                       "Returns 1.0 if the particle is correctly reconstructed and primary, 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isSignalAcceptBremsPhotons", isSignalAcceptBremsPhotons,
@@ -1047,16 +1047,16 @@ Returns the equivalent of ``genParticle(genMotherID, p)`` and can be extended to
                       "Returns the generated particle array index of the particle's matched MC particle.");
     REGISTER_VARIABLE("isSignalAcceptMissingNeutrino",
                       isSignalAcceptMissingNeutrino,
-                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing neutrinos are allowed**), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (missing neutrinos are allowed), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissingMassive",
                       isSignalAcceptMissingMassive,
-                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing massive particles are allowed**), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (missing massive particles are allowed), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissingGamma",
                       isSignalAcceptMissingGamma,
-                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing photons are allowed**), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (missing photons are allowed), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isSignalAcceptMissing",
                       isSignalAcceptMissing,
-                      "Returns 1.0 if the particle is almost correctly reconstructed (**missing particles are allowed**), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
+                      "Returns 1.0 if the particle is almost correctly reconstructed (missing particles are allowed), 0.0 if not, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isMisidentified", isMisidentified,
                       "Returns 1 if the particle is mis-identified (the wrong PDG code is assigned), 0 if PDG code is correct, and ``NaN`` if no related MC particle could be found.");
     REGISTER_VARIABLE("isWrongCharge", isWrongCharge,
@@ -1072,85 +1072,89 @@ Returns the PDG code of matched MC particle or ``NaN`` if no match could be foun
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
 
 )DOC");
-    REGISTER_VARIABLE("mcErrors", particleMCErrors,
-                      "Returns the bit pattern indicating the quality of MC matching. The bit pattern is explained in :ref:`Error_flags`.");
+    REGISTER_VARIABLE("mcErrors", particleMCErrors, R"DOC(
+Returns the bit pattern indicating the quality of MC matching. 
+
+.. note:: The bit pattern is explained in :ref:`Error_flags`.
+
+)DOC");
     REGISTER_VARIABLE("mcMatchWeight", particleMCMatchWeight, R"DOC(
-Returns the weight of the first (and largest) ``Particle -> MCParticle`` relation.")
+Returns the weight of the first (and largest) ``Particle -> MCParticle`` relation.
 )DOC");
     REGISTER_VARIABLE("nMCMatches", particleNumberOfMCMatch, 
                       "Returns the number of ``Particle -> MCParticle`` relations.");
     REGISTER_VARIABLE("mcDecayTime", particleMCMatchDecayTime, R"DOC(
-"Returns the decay time of matched MC particle, or ``NaN`` if no match is found. 
+Returns the decay time of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
 
 )DOC", "ns");
     REGISTER_VARIABLE("mcLifeTime", particleMCMatchLifeTime,R"DOC(
-"Returns the lifetime of matched MC particle, or ``NaN`` if no match is found. 
+Returns the lifetime of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "ns");
     REGISTER_VARIABLE("mcPX", particleMCMatchPX, R"DOC(
-"Returns the momentum component :math:`p_x` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the momentum component :math:`p_x` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "GeV/c");
     REGISTER_VARIABLE("mcPY", particleMCMatchPY,R"DOC(
-"Returns the momentum component :math:`p_y` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the momentum component :math:`p_y` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "GeV/c");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,R"DOC(
-"Returns the momentum component :math:`p_z` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the momentum component :math:`p_z` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "GeV/c");
     REGISTER_VARIABLE("mcPT", particleMCMatchPT,R"DOC(
-"Returns the transverse momentum component :math:`p_T` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the transverse momentum component :math:`p_T` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "GeV/c");
     REGISTER_VARIABLE("mcE", particleMCMatchE,R"DOC(
-"Returns the energy of matched MC particle, or ``NaN`` if no match is found. 
+Returns the energy of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "GeV");
     REGISTER_VARIABLE("mcP", particleMCMatchP,R"DOC(
-"Returns the total momentum :math:`p` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the total momentum :math:`p` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
   
 )DOC", "GeV/c");
     REGISTER_VARIABLE("mcPhi", particleMCMatchPhi,R"DOC(
-"Returns the azimuthal angle :math:`\phi` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the azimuthal angle :math:`\phi` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "rad");
     REGISTER_VARIABLE("mcTheta", particleMCMatchTheta,R"DOC(
-"Returns the polar angle :math:`\theta` of matched MC particle, or ``NaN`` if no match is found. 
+Returns the polar angle :math:`\theta` of matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
     
 )DOC", "rad");
     REGISTER_VARIABLE("nMCDaughters", mcParticleNDaughters,R"DOC(
-"Returns the number of daughters of the matched MC particle, or ``NaN`` if no match is found. 
+Returns the number of daughters of the matched MC particle, or ``NaN`` if no match is found. 
 
 .. attention::
     This requires running `matchMCTruth()` either on the reconstructed particle, or one of its ancestors, or a particle list filled with MC particle objects.
@@ -1161,12 +1165,13 @@ Returns the weight of the first (and largest) ``Particle -> MCParticle`` relatio
                       "GeV/:math:`\\text{c}^2`");
     REGISTER_VARIABLE("mcCosThetaBetweenParticleAndNominalB",
                       particleMCCosThetaBetweenParticleAndNominalB,
-                      "Returns the cosine of the angle between the CM momentum :math:`p_\mathrm{CM}` of the selected :math:`B` meson and its daughters. It is calculated using MC truth values, with all neutrinos descending from the :math:`B` removed.");
+                      "Returns the cosine of the angle between the CM momentum :math:`p_{CM}` of the selected :math:`B` meson and its daughters. It is calculated using MC truth values, with all neutrinos descending from the :math:`B` removed.");
     REGISTER_VARIABLE("mcSecPhysProc", mcParticleSecondaryPhysicsProcess, R"DOC(
 Returns the Geant4 process flag for the matched (secondary) MC particle, ``NaN`` if no MC particle is found, 0 if the matched MC particle is primary
 or -1 in the case of an unknown process.  
 
 The process flags are:
+
 * 1 - Coulomb scattering
 * 2 - Ionisation
 * 3 - Bremsstrahlung
@@ -1207,6 +1212,7 @@ The process flags are:
 
 .. note::
       The list of Geant4 processes was taken from the following sources:
+
       - `G4DecayProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/decay/include/G4DecayProcessType.hh>`_
       - `G4HadronicProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/hadronic/management/include/G4HadronicProcessType.hh>`_
       - `G4TransportationProcessType <https://github.com/Geant4/geant4/blob/v10.6.3/source/processes/transportation/include/G4TransportationProcessType.hh>`_
@@ -1217,8 +1223,12 @@ The process flags are:
       This code is shown by `modularAnalysis.printMCParticles` under the name of ``creation process`` when ``showStatus`` is set.
 
 )DOC");
-    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus,
-                      "Returns the status bit of the matched MC particle, or ``NaN`` if the MC particle relation was not set. The particle status is explained in :ref:`Particle_status`");
+    REGISTER_VARIABLE("mcParticleStatus", mcParticleStatus, R"DOC(
+Returns the status bit of the matched MC particle, or ``NaN`` if the MC particle relation was not set. 
+
+.. note:: The particle status is explained in :ref:`Particle_status`.
+
+)DOC");
     REGISTER_VARIABLE("mcPrimary", particleMCPrimaryParticle,
                       "Returns 1 if the particle is matched to a primary MC particle, 0 if Particle is matched to secondary MC particle, "
                       "or ``NaN`` if no MC particle is found.");
@@ -1274,47 +1284,47 @@ The process flags are:
     REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode, R"DOC(
 **[Eventbased]** Returns the decay ID for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
 )DOC");
     REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode, R"DOC(
-**[Eventbased]** Returns the decay ID for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+**[Eventbased]** Returns the decay ID for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
 )DOC");
     REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng, R"DOC(
-**[Eventbased]** Returns the prong for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+**[Eventbased]** Returns the prong for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event.
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
 )DOC");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng, R"DOC(
-**[Eventbased]** Returns the prong for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+**[Eventbased]** Returns the prong for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
 )DOC");
     REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar, R"DOC(
-**[Eventbased]** Returns the energy of radiated photon from the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+**[Eventbased]** Returns the energy of radiated photon from the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event.
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
 )DOC");
     REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar, R"DOC(
-**[Eventbased]** Returns the energy of radiated photon from the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+**[Eventbased]** Returns the energy of radiated photon from the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.
 
-.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+.. attention:: Calculating this variable requires using the ``TauDecayMarkerModule`` in your steering file.
 
 .. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
 
@@ -1377,28 +1387,28 @@ Returns 1.0 if the particle was seen in the KLM, 0.0 if not, or ``NaN`` for comp
 Returns the weight of the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation for the matched MC particle. It returns ``NaN``
 if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster. 
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
     REGISTER_VARIABLE("clusterBestMCMatchWeight", particleClusterBestMCMatchWeight, R"DOC(
 Returns the weight of the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation for the relation with the largest weight. It returns ``NaN``
 if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster.
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
     REGISTER_VARIABLE("clusterBestMCPDG", particleClusterBestMCPDGCode, R"DOC(
 Returns the PDG code of the MC particle for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation with the largest weight. It returns ``NaN``
 if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster.
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight, R"DOC(
 Returns the sum of all weights for the ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation. It returns ``NaN``
 if no ECL cluster is related to the particle.
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong, R"DOC(
@@ -1406,7 +1416,7 @@ Returns the sum of all weights for the ``ECLCluster`` :math:`\rightarrow` ``MCPa
 a daughter of a :math:`K_L^0`. It returns ``NaN`` if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster, and
 it returns 0 if there are no weights between the ECL cluster and :math:`K_L^0` particles. 
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
     REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong, R"DOC(
@@ -1415,7 +1425,7 @@ a daughter of a :math:`K_L^0`. If multiple :math:`K_L^0` are related to the ECL 
 It returns ``NaN`` if no ECL cluster is related to the reconstructed particle or if there are no MC matches for the cluster, and it returns 0 if there are
 no weights between the ECL cluster and :math:`K_L^0` particles. 
 
-.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`
+.. seealso:: The ``ECLCluster`` :math:`\rightarrow` ``MCParticle`` relation is described in detail in :ref:`ecl-mcmatching`.
 
 )DOC"); 
   }

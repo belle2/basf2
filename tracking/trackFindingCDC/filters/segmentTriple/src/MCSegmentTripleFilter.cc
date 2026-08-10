@@ -89,7 +89,7 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 
 
 
-void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple) const
+void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTriple)
 {
   if (segmentTriple.getTrajectorySZ().isFitted()) {
     // SZ trajectory has been fitted before. Skipping

@@ -96,8 +96,8 @@ namespace Belle2 {
 
     public:
       /// Retrieve the wire hit the given CDCHit form the given wire hits
-      const TrackingUtilities::CDCWireHit* getWireHit(const CDCHit* ptrHit,
-                                                      const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
+      static const TrackingUtilities::CDCWireHit* getWireHit(const CDCHit* ptrHit,
+                                                             const std::vector<TrackingUtilities::CDCWireHit>& wireHits);
 
       /// Retrieve the wire hit including right left passage information for the given CDCHit form the given wire hits
       TrackingUtilities::CDCRLWireHit getRLWireHit(const CDCHit* ptrHit,

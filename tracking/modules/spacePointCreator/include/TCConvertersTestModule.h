@@ -106,7 +106,7 @@ namespace Belle2 {
      * @returns vector of tuples, where get<0> is the detID, get<1> is the hitId, get<2> is the planeId
      * and get<3> is the sorting parameter
      */
-    std::vector<trackCandHit> getTrackCandHits(const genfit::TrackCand* trackCand);
+    static std::vector<trackCandHit> getTrackCandHits(const genfit::TrackCand* trackCand);
 
     /**
      * check if the same trackCandHits are contained in both vectors

@@ -28,7 +28,7 @@ namespace Belle2 {
       BaseSegmentTripleRelationFilter();
 
       /// Default destructor
-      ~BaseSegmentTripleRelationFilter();
+      ~BaseSegmentTripleRelationFilter() override;
 
       /// Returns the segment triples form the range that continue on the to site of the given segment triple.
       std::vector<const TrackingUtilities::CDCSegmentTriple*> getPossibleTos(

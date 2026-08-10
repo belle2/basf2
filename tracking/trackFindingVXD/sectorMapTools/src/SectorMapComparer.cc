@@ -51,7 +51,7 @@ void
 SectorMapComparer::setLeafAddresses(TTree* t, std::unordered_map<std::string, double>& filterVals,
                                     std::unordered_map<std::string, uint>& SecIDVals)
 {
-  TObjArray* leafList = t->GetListOfLeaves();
+  const TObjArray* leafList = t->GetListOfLeaves();
   for (TObject* o : *leafList) {
     TLeaf* l = (TLeaf*)o;
     std::string name = l->GetName();
@@ -135,7 +135,7 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   }
 
   // Creating histograms, using the list of leaves  for indexing the histograms
-  TObjArray* leafList = t_first->GetListOfLeaves();
+  const TObjArray* leafList = t_first->GetListOfLeaves();
   for (TObject* o : *leafList) {
     TLeaf* l_first = (TLeaf*)o;
     // no histograms for the sector ids
@@ -265,7 +265,7 @@ SectorMapComparer::showSetups(TString secmapFileName)
 void
 SectorMapComparer::findTrees(TDirectory* aDir, std::vector<std::string>&  listOfTrees)
 {
-  TList* keys = aDir->GetListOfKeys();
+  const TList* keys = aDir->GetListOfKeys();
   for (TObject* akey : *keys) {
 
     // there should be no check needed as each key should be attached to an object

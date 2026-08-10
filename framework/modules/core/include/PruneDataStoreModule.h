@@ -31,7 +31,7 @@ namespace Belle2 {
     PruneDataStoreModule();
 
     /** Virtual Constructor to prevent memory leaks */
-    virtual ~PruneDataStoreModule() = default;
+    virtual ~PruneDataStoreModule() override = default;
 
     /** Prepare regex checks */
     void initialize() override;

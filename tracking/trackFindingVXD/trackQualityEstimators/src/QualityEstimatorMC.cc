@@ -42,14 +42,14 @@ QualityEstimatorMC::MatchInfo QualityEstimatorMC::getBestMatchToMCClusters(std::
   for (SpacePoint const* spacePoint : measurements) {
 
     for (SVDCluster& cluster : spacePoint->getRelationsTo<SVDCluster>(m_svdClustersName)) {
-      for (RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
+      for (const RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
         // Increase number of matches to this RecoTrack
         matches[recoTrack.getArrayIndex()]++;
       }
     } // end loop SVDClusters
 
     for (PXDCluster& cluster : spacePoint->getRelationsTo<PXDCluster>(m_pxdClustersName)) {
-      for (RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
+      for (const RecoTrack& recoTrack : cluster.getRelationsWith<RecoTrack>(m_mcRecoTracksStoreArrayName)) {
         // Increase number of matches to this RecoTrack
         matches[recoTrack.getArrayIndex()] += 2;
       }

@@ -49,7 +49,6 @@ namespace Belle2 {
      * If storeSubsets is turned on, also the sub-paths are saved to vector 'paths'.
      * If a defined limit on the number of possible paths is exceeded, the search is aborted, and false is returned.
      */
-    // cppcheck-suppress constParameter
     bool findPaths(ContainerType& aNetwork, std::vector<Path>& paths, unsigned int pathLimit, bool storeSubsets = false)
     {
       m_storeSubsets = storeSubsets;

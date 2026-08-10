@@ -11,7 +11,6 @@
 #include <cdc/utilities/ClosestApproach.h>
 
 #include <framework/datastore/RelationArray.h>
-//#include <framework/datastore/RelationIndex.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -115,10 +114,6 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            500.);
   addParam("tMaxInner", m_tMaxInner, "Upper edge of time window in ns for the small-cell layers; valid only for UseDB4FEE=false",
            300.);
-  // The following doesn't make any sense. The only reasonable steerable would be a switch to decide if the jitter shall be
-  // activated. Then there has to be event by event jitter.
-  /*  addParam("EventTime",                   m_eventTime,
-             "It is a timing of event, which includes a time jitter due to the trigger system, set in ns",     float(0.0));*/
 
   //Switch for database
   addParam("UseDB4FEE", m_useDB4FEE, "Fetch and use FEE params. from database or not", true);
@@ -166,17 +161,12 @@ CDCDigitizerModule::CDCDigitizerModule() : Module(),
            m_effWForGasGainSmearing);
   addParam("ThetaOfPolyaFunction", m_thetaOfPolya, "Theta of Polya function for gas gain smearing", m_thetaOfPolya);
   addParam("ExtraADCSmearing", m_extraADCSmearing, "Switch for extra ADC smearing; true: on; false: off", m_extraADCSmearing);
-  //  addParam("SigmaForExtraADCSmearing", m_sigmaForExtraADCSmearing, "Gaussian sigma for extra ADC smearing; specify range [0,1]", m_sigmaForExtraADCSmearing);
 
   // Switch for optional relations
   addParam("MatchAllMCParticles", m_matchAllMCParticles, "Switch to store all MCRelations that produced a SimHit", false);
   addParam("MatchFirstMCParticles", m_matchFirstMCParticles,
            "Switch to store all MCRelations for the first three SimHits instead of only the first", false);
 
-#if defined(CDC_DEBUG)
-  cout << " " << endl;
-  cout << "CDCDigitizer constructor" << endl;
-#endif
 }
 
 void CDCDigitizerModule::initialize()
@@ -208,13 +198,6 @@ void CDCDigitizerModule::initialize()
   m_totalFudgeFactor  = m_cdcgp->getFudgeFactorForSigma(2);
   m_totalFudgeFactor *= m_addFudgeFactorForSigma;
   B2DEBUG(m_debugLevel, "totalFugeF in Digi= " << m_totalFudgeFactor);
-  /*
-      m_fraction = 1.0;
-      m_resolution1 = cdcgp.getNominalSpaceResol();
-      m_resolution2 = 0.;
-      m_mean1 = 0.;
-      m_mean2 = 0.;
-  */
 
   if (m_useDB4FEE) {
     m_fEElectronicsFromDB = new DBArray<CDCFEElectronics>;
@@ -225,18 +208,6 @@ void CDCDigitizerModule::initialize()
       B2FATAL("CDCDigitizer:: CDCFEElectronics not valid !");
     }
   }
-
-  /*
-  if (m_useDB4EDepToADC) {
-    m_eDepToADCConversionsFromDB = new DBObjPtr<CDCEDepToADCConversions>;
-    if ((*m_eDepToADCConversionsFromDB).isValid()) {
-      (*m_eDepToADCConversionsFromDB).addCallback(this, &CDCDigitizerModule::setEDepToADCConversions);
-      setEDepToADCConversions();
-    } else {
-      B2FATAL("CDCDigitizer:: CDCEDepToADCConversions not valid !");
-    }
-  }
-  */
 
   if (m_useDB4RunGain) {
     m_runGainFromDB = new DBObjPtr<CDCDedxRunGain>;
@@ -282,24 +253,6 @@ void CDCDigitizerModule::initialize()
     }
   }
 
-#if defined(CDC_DEBUG)
-  cout << " " << endl;
-  cout << "CDCDigitizer initialize" << endl;
-  //  cout << "m_tdcOffset= " <<  m_tdcOffset << endl;
-  cout << "m_tdcBinWidth= " <<  m_tdcBinWidth << endl;
-  cout << "m_tdcResol= " <<  m_tdcResol << endl;
-  cout << "m_driftV= " <<  m_driftV << endl;
-  cout << "m_driftVInv= " <<  m_driftVInv << endl;
-  cout << "m_propSpeedInv= " <<  m_propSpeedInv << endl;
-  /*
-    cout << "m_fraction= " <<  m_fraction << endl;
-    cout << "m_resolution1= " <<  m_resolution1 << endl;
-    cout << "m_resolution2= " <<  m_resolution2 << endl;
-    cout << "m_mean1= " <<  m_mean1 << endl;
-    cout << "m_mean2= " <<  m_mean2 << endl;
-  */
-#endif
-
   if (m_useDB4EDepToADC) {
     ushort firstLayerOffset = m_cdcgp->getOffsetOfFirstLayer();
     if (m_cdcgp->getEDepToADCMainFactor(firstLayerOffset, 0) == 0.) {
@@ -340,8 +293,6 @@ void CDCDigitizerModule::event()
   // Define adc map
   map<WireID, unsigned short> adcMap;
   map<WireID, unsigned short>::iterator iterADCMap;
-  //  map<WireID, double> adcMap;
-  //  map<WireID, double>::iterator iterADCMap;
 
   // signal map for trigger
   map<pair<WireID, unsigned>, SignalInfo> signalMapTrg;
@@ -380,7 +331,7 @@ void CDCDigitizerModule::event()
 
   // Set trigger timing jitter for this event
   double trigTiming = m_trigTimeJitter == 0. ? 0. : m_trigTimeJitter * (gRandom->Uniform() - 0.5);
-  //  std::cout << "trigTiming= " << trigTiming << std::endl;
+
   // Loop over all hits
   int nHits = m_simHits.getEntries();
   B2DEBUG(m_debugLevel, "Number of CDCSimHits in the current event: " << nHits);
@@ -393,11 +344,9 @@ void CDCDigitizerModule::event()
     if (m_wireID.getISuperLayer() < m_cdcgp->getOffsetOfFirstSuperLayer()) {
       B2FATAL("SimHit with wireID " << m_wireID << " is in CDC SuperLayer: " << m_wireID.getISuperLayer() << " which should not happen.");
     }
-    //    B2DEBUG(29, "Encoded wire number of current CDCSimHit: " << m_wireID);
 
     m_posFlag    = m_aCDCSimHit->getLeftRightPassageRaw();
     m_boardID    = m_cdcgp->getBoardID(m_wireID);
-    //    B2DEBUG(29, "m_boardID= " << m_boardID);
     m_posWire    = m_aCDCSimHit->getPosWire();
     m_posTrack   = m_aCDCSimHit->getPosTrack();
     m_momentum   = m_aCDCSimHit->getMomentum();
@@ -417,7 +366,6 @@ void CDCDigitizerModule::event()
 
     //skip correction for wire-position alignment if unnecessary
     if ((bwpAlign - bwp).Mag() == 0. && (fwpAlign - fwp).Mag() == 0.) m_align = false;
-    //    std::cout << "a m_align= " << m_align << std::endl;
 
     if (m_align || m_correctForWireSag) {
 
@@ -429,8 +377,6 @@ void CDCDigitizerModule::event()
         double bckYSag = bwp.Y();
         double forYSag = fwp.Y();
 
-        //        CDCGeometryPar::EWirePosition set = m_align ?
-        //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
         CDCGeometryPar::EWirePosition set = CDCGeometryPar::c_Aligned;
         const int layerID = m_wireID.getICLayer();
         const int  wireID = m_wireID.getIWire();
@@ -445,14 +391,11 @@ void CDCDigitizerModule::event()
       B2Vector3D posTrack = m_posTrack;
       B2Vector3D posWire = m_posWire;
 
-      //      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
       m_driftLength = ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
-      //      std::cout << "base-dl, sag-dl, diff= " << m_aCDCSimHit->getDriftLength() <<" "<< m_driftLength <<" "<< m_driftLength - m_aCDCSimHit->getDriftLength() << std::endl;
       m_posTrack = posTrack;
       m_posWire  = posWire;
 
       double deltaTime = 0.; //tentative (probably ok...)
-      //      double deltaTime = (posTrack - m_posTrack).Mag() / speed;
       m_flightTime += deltaTime;
       m_globalTime += deltaTime;
       m_posFlag = m_cdcgp->getNewLeftRightRaw(m_posWire, m_posTrack, m_momentum);
@@ -507,15 +450,13 @@ void CDCDigitizerModule::event()
     unsigned short adcCount = 0;
     makeSignalsAfterShapers(m_wireID, hitdE, stepLength, costh, adcCount, convFactorForThreshold);
     const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[m_boardID] : m_adcThreshold;
-    //    B2DEBUG(29, "adcTh,adcCount,convFactorForThreshold= " << adcTh <<" "<< adcCount <<" "<< convFactorForThreshold);
+
     if (adcCount < adcTh) adcCount = 0;
     iterADCMap = adcMap.find(m_wireID);
     if (iterADCMap == adcMap.end()) {
       adcMap.insert(make_pair(m_wireID, adcCount));
-      //      adcMap.insert(make_pair(m_wireID, hitdE));
     } else {
       iterADCMap->second += adcCount;
-      //      iterADCMap->second += hitdE;
     }
 
     //Apply energy threshold
@@ -539,8 +480,6 @@ void CDCDigitizerModule::event()
     unsigned short trigWindow = floor((hitDriftTime - tMin) * m_tdcBinWidthInv / 32);
     iterSignalMapTrg = signalMapTrg.find(make_pair(m_wireID, trigWindow));
     if (iterSignalMapTrg == signalMapTrg.end()) {
-      //      signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
-      //                                    SignalInfo(iHits, hitDriftTime, hitdE)));
       signalMapTrg.insert(make_pair(make_pair(m_wireID, trigWindow),
                                     SignalInfo(iHits, hitDriftTime, adcCount)));
     } else {
@@ -548,7 +487,6 @@ void CDCDigitizerModule::event()
         iterSignalMapTrg->second.m_driftTime = hitDriftTime;
         iterSignalMapTrg->second.m_simHitIndex = iHits;
       }
-      //      iterSignalMapTrg->second.m_charge += hitdE;
       iterSignalMapTrg->second.m_charge += adcCount;
     }
 
@@ -556,13 +494,11 @@ void CDCDigitizerModule::event()
     // N.B. The following lines for badwire must be after the above lines for trigger because badwires are different between trigger and tracking.
     // Badwires for trigger are taken into account separately in the tsim module
     if (m_cdcgp->isBadWire(m_wireID)) {
-      //      std::cout<<"badwire= " << m_wireID.getICLayer() <<" "<< m_wireID.getIWire() << std::endl;
       continue;
     }
     // Reject partly-dead wire as well
     double eff = 1.;
     if (m_cdcgp->isDeadWire(m_wireID, eff)) {
-      //      std::cout << "wid,eff= " << m_wireID << " " << eff << std::endl;
       if (eff < gRandom->Uniform()) continue;
     }
 
@@ -621,7 +557,6 @@ void CDCDigitizerModule::event()
 
     if (iterSignalMap == signalMap.end()) {
       // new entry
-      //      signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, hitdE)));
       signalMap.insert(make_pair(m_wireID, SignalInfo(iHits, hitDriftTime, adcCount, maxDriftL, minDriftL)));
       B2DEBUG(m_debugLevel, "Creating new Signal with encoded wire number: " << m_wireID);
     } else {
@@ -644,7 +579,6 @@ void CDCDigitizerModule::event()
         iterSignalMap->second.m_simHitIndex3 = iHits;
       }
       // ... total charge has to be updated.
-      //      iterSignalMap->second.m_charge += hitdE;
       iterSignalMap->second.m_charge += adcCount;
 
       // set max and min driftLs
@@ -666,20 +600,8 @@ void CDCDigitizerModule::event()
   for (iterSignalMap = signalMap.begin(); iterSignalMap != signalMap.end(); ++iterSignalMap) {
 
     //add time-walk (here for simplicity)
-    //    unsigned short adcCount = getADCCount(iterSignalMap->second.m_charge);
-    //    unsigned short adcCount = iterSignalMap->second.m_charge;
     iterADCMap = adcMap.find(iterSignalMap->first);
     unsigned short adcCount = iterADCMap != adcMap.end() ? iterADCMap->second : 0;
-    /*
-    unsigned short adcCount = 0;
-    if (iterADCMap != adcMap.end()) {
-      adcCount = getADCCount(iterSignalMap->first, iterADCMap->second, 1., 0.);
-      unsigned short boardID = m_cdcgp->getBoardID(iterSignalMap->first);
-      //      B2DEBUG(29, "boardID= " << boardID);
-      const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[boardID] : m_adcThreshold;
-      if (adcCount < adcTh) adcCount = 0;
-    }
-    */
 
     if (m_addTimeWalk) {
       B2DEBUG(m_debugLevel, "timewalk= " << m_cdcgp->getTimeWalk(iterSignalMap->first, adcCount));
@@ -728,7 +650,6 @@ void CDCDigitizerModule::event()
     }
 
     CDCHit* firstHit = m_cdcHits.appendNew(tdcCount, adcCount, iterSignalMap->first, 0, tot);
-    //    std::cout <<"firsthit?= " << firstHit->is2ndHit() << std::endl;
     //set a relation: CDCSimHit -> CDCHit
     cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex, iCDCHits);
 
@@ -801,18 +722,10 @@ void CDCDigitizerModule::event()
         CDCHit* secondHit = m_cdcHits.appendNew(tdcCount2, adcCount, iterSignalMap->first, 0, tot);
         secondHit->set2ndHitFlag();
         secondHit->setOtherHitIndices(firstHit);
-        //  std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
-        //  std::cout <<"1st-otherhitindex= " << firstHit->getOtherHitIndex() << std::endl;
-        //  std::cout <<"2nd-otherhitindex= " << secondHit->getOtherHitIndex() << std::endl;
-        //  secondHit->setOtherHitIndex(firstHit->getArrayIndex());
-        //  firstHit->setOtherHitIndex(secondHit->getArrayIndex());
-        //  std::cout <<"1st-otherhitindex= " << firstHit->getOtherHitIndex() << std::endl;
-        //  std::cout <<"2nd-otherhitindex= " << secondHit->getOtherHitIndex() << std::endl;
 
         //set a relation: CDCSimHit -> CDCHit
         ++iCDCHits;
         cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex2, iCDCHits);
-        //        std::cout << "settdc2 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
         //set a relation: MCParticle -> CDCHit
         rels = m_simHits[iterSignalMap->second.m_simHitIndex2]->getRelationsFrom<MCParticle>();
@@ -823,23 +736,17 @@ void CDCDigitizerModule::event()
           mcparticle->addRelationTo(secondHit, weight);
         }
       } else { //Check the 3rd hit when tdcCount = tdcCount2
-        //        std::cout << "tdcCount1=2" << std::endl;
         if (iterSignalMap->second.m_simHitIndex3 >= 0) {
           unsigned short tdcCount3 = static_cast<unsigned short>((getPositiveT0(iterSignalMap->first) - iterSignalMap->second.m_driftTime3) *
                                                                  m_tdcBinWidthInv + 0.5);
-          //          std::cout << "tdcCount3= " << tdcCount3 << " " << tdcCount << std::endl;
           if (tdcCount3 != tdcCount) {
             CDCHit* secondHit = m_cdcHits.appendNew(tdcCount3, adcCount, iterSignalMap->first, 0, tot);
             secondHit->set2ndHitFlag();
             secondHit->setOtherHitIndices(firstHit);
-            //      secondHit->setOtherHitIndex(firstHit->getArrayIndex());
-            //      firstHit->setOtherHitIndex(secondHit->getArrayIndex());
-            //      std::cout <<"2ndhit?= " << secondHit->is2ndHit() << std::endl;
 
             //set a relation: CDCSimHit -> CDCHit
             ++iCDCHits;
             cdcSimHitsToCDCHits.add(iterSignalMap->second.m_simHitIndex3, iCDCHits);
-            //            std::cout << "settdc3 " << firstHit->getTDCCount() << " " << secondHit->getTDCCount() << std::endl;
 
             //set a relation: MCParticle -> CDCHit
             rels = m_simHits[iterSignalMap->second.m_simHitIndex3]->getRelationsFrom<MCParticle>();
@@ -854,11 +761,6 @@ void CDCDigitizerModule::event()
       } //end of checking tdcCount 1=2 ?
     } //end of 2nd hit setting
 
-    //    std::cout <<"t0= " << m_cdcgp->getT0(iterSignalMap->first) << std::endl;
-    /*    unsigned short tdcInCommonStop = static_cast<unsigned short>((m_tdcOffset - iterSignalMap->second.m_driftTime) * m_tdcBinWidthInv);
-    float driftTimeFromTDC = static_cast<float>(m_tdcOffset - (tdcInCommonStop + 0.5)) * m_tdcBinWidth;
-    std::cout <<"driftT bf digitization, TDC in common stop, digitized driftT = " << iterSignalMap->second.m_driftTime <<" "<< tdcInCommonStop <<" "<< driftTimeFromTDC << std::endl;
-    */
     ++iCDCHits;
   }
 
@@ -868,14 +770,6 @@ void CDCDigitizerModule::event()
   // Store the results with trigger time window in a separate array
   // with corresponding relations.
   for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
-    /*
-    unsigned short adcCount = getADCCount(iterSignalMapTrg->first.first, iterSignalMapTrg->second.m_charge, 1., 0.);
-    unsigned short boardID = m_cdcgp->getBoardID(iterSignalMapTrg->first.first);
-    //    B2DEBUG(29, "boardID= " << boardID);
-    const unsigned short adcTh = m_useDB4FEE ? m_adcThresh[boardID] : m_adcThreshold;
-    if (adcCount < adcTh) adcCount = 0;
-    */
-    //    unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);
     unsigned short adcCount = iterSignalMapTrg->second.m_charge;
     unsigned short tdcCount =
       static_cast<unsigned short>((getPositiveT0(iterSignalMapTrg->first.first) -
@@ -892,19 +786,6 @@ void CDCDigitizerModule::event()
       mcparticle->addRelationTo(cdcHit, weight);
     }
   }
-
-  /*
-  std::cout << " " << std::endl;
-  RelationIndex<MCParticle, CDCHit> mcp_to_hit(mcParticles, cdcHits);
-  if (!mcp_to_hit) B2FATAL("No MCParticle -> CDCHit relation founf!");
-  typedef RelationIndex<MCParticle, CDCHit>::Element RelationElement;
-  int ncdcHits = cdcHits.getEntries();
-  for (int j = 0; j < ncdcHits; ++j) {
-    for (const RelationElement& rel : mcp_to_hit.getElementsTo(cdcHits[j])) {
-      std::cout << j << " " << cdcHits[j]->is2ndHit() <<" "<< rel.from->getIndex() << " " << rel.weight << std::endl;
-    }
-  }
-  */
 }
 
 double CDCDigitizerModule::smearDriftLength(const double driftLength, const double dDdt)
@@ -937,17 +818,10 @@ double CDCDigitizerModule::smearDriftLength(const double driftLength, const doub
     resolution = 0.;
   }
 
-#if defined(CDC_DEBUG)
-  cout << " " << endl;
-  cout << "CDCDigitizerModule::smearDriftLength" << endl;
-  cout << "tdcResol= " << m_tdcResol << endl;
-  cout << "dDdt,resolution= " << dDdt << " " << resolution << endl;
-#endif
-
   // Smear drift length
   double newDL = gRandom->Gaus(driftLength + mean, resolution);
   while (newDL <= 0.) newDL = gRandom->Gaus(driftLength + mean, resolution);
-  //  cout << "totalFugeF in Digi= " << m_totalFudgeFactor << endl;
+
   return newDL;
 }
 
@@ -967,31 +841,6 @@ double CDCDigitizerModule::getdDdt(const double driftL)
     double theta = m_cdcgp->getTheta(m_momentum);
     double t = m_cdcgp->getDriftTime(driftL, layer, leftRight, alpha, theta);
     dDdt = m_cdcgp->getDriftV(t, layer, leftRight, alpha, theta);
-
-#if defined(CDC_DEBUG)
-    cout << " " << endl;
-    cout << "CDCDigitizerModule::getdDdt" << endl;
-    cout << "**layer= " << layer << endl;
-    cout << "alpha= " << 180.*alpha / M_PI << std::endl;
-    if (layer == 55) {
-      int lr = 0;
-      for (int i = 0; i < 1000; ++i) {
-        t = 1.0 * i;
-        double d = m_cdcgp->getDriftLength(t, layer, lr, alpha, theta);
-        cout << t << " " << d << endl;
-      }
-
-      cout << " " << endl;
-
-      lr = 1;
-      for (int i = 0; i < 100; ++i) {
-        t = 5 * i;
-        double d = m_cdcgp->getDriftLength(t, layer, lr, alpha, theta);
-        cout << t << " " << d << endl;
-      }
-      exit(-1);
-    }
-#endif
   }
 
   return dDdt;
@@ -1011,19 +860,12 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
 
   if (m_useSimpleDigitization) {
     driftT = (driftLength / Unit::cm) * m_driftVInv;
-
-#if defined(CDC_DEBUG)
-    cout << " " << endl;
-    cout << "CDCDigitizerModule::getDriftTime" << endl;
-    cout << "driftvinv= " << m_driftVInv << endl;
-#endif
   } else {
     const unsigned short layer = m_wireID.getICLayer();
     const unsigned short leftRight = m_posFlag;
     double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
     double theta = m_cdcgp->getTheta(m_momentum);
     driftT = m_cdcgp->getDriftTime(driftLength, layer, leftRight, alpha, theta);
-    //    std::cout <<"alpha,theta,driftT= " << alpha <<" "<< theta <<" "<< driftT << std::endl;
   }
 
   if (addTof) {
@@ -1036,27 +878,17 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
     B2Vector3D backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
-    //    if (m_cdcgp->getSenseWireZposMode() == 1) {
     //TODO: replace the following with cached reference
-    //    std::cout << m_gcp->getInstance().getSenseWireZposMode() << std::endl;
     if (m_gcp->getSenseWireZposMode() == 1) {
       const unsigned short layer = m_wireID.getICLayer();
       propLength += m_cdcgp->getBwdDeltaZ(layer);
     }
-    //    B2DEBUG(29, "Propagation in wire length: " << propLength);
 
     if (m_useSimpleDigitization) {
       driftT += (propLength / Unit::cm) * m_propSpeedInv;
-
-#if defined(CDC_DEBUG)
-      cout << "pseedinv= " << m_propSpeedInv << endl;
-#endif
     } else {
       const unsigned short layer = m_wireID.getICLayer();
       driftT += (propLength / Unit::cm) * m_cdcgp->getPropSpeedInv(layer);
-#if defined(CDC_DEBUG)
-      cout << "layer,pseedinv= " << layer << " " << m_cdcgp->getPropSpeedInv(layer) << endl;
-#endif
     }
   }
 
@@ -1305,7 +1137,6 @@ void CDCDigitizerModule::addXTalk()
       B2WARNING("2nd TDC hit found, but not ready for it!");
     }
     WireID wid(aHit.getID());
-    //    B2DEBUG(m_debugLevel4XTalk, "Encoded wireid of current CDCHit: " << wid);
     short tdcCount = aHit.getTDCCount();
     short adcCount = aHit.getADCCount();
     short tot      = aHit.getTOT();
@@ -1332,8 +1163,6 @@ void CDCDigitizerModule::addXTalk()
             xTalkMap.insert(make_pair(widx, XTalkInfo(tdcCount4XTalk, xTalks[i].second.ADC, xTalks[i].second.TOT, status)));
           }
         }
-        //  } else {
-        //    cout<<"badwire= " << widx.getICLayer() <<" "<< widx.getIWire() << endl;
       }
     } //end of xtalk loop
   } //end of cdc hit loop
@@ -1351,7 +1180,6 @@ void CDCDigitizerModule::addXTalk()
 
     if (iterXTalkMap1 == xTalkMap1.end()) { // new entry
       xTalkMap1.insert(make_pair(wid, XTalkInfo(tdcCount, adcCount, tot, status)));
-      //      B2DEBUG(m_debugLevel4XTalk, "Creating a new xtalk hit with encoded wire no.: " << wid);
     } else { // not new; check if fastest
       if (tdcCount < iterXTalkMap1->second.m_tdc) {
         iterXTalkMap1->second.m_tdc = tdcCount;
@@ -1380,8 +1208,6 @@ void CDCDigitizerModule::addXTalk()
         const unsigned short tdc4Sg = aH.getTDCCount();
         const unsigned short adc4Sg = aH.getADCCount();
         const unsigned short tot4Sg = aH.getTOT();
-        //  B2DEBUG(m_debuglevel4XTalk, "Sg tdc,adc,tot= " << tdc4Sg << " " << adc4Sg << " " << tot4Sg);
-        //  B2DEBUG(m_debugLevel4XTalk, "Bg tdc,adc,tot= " << tdc4Bg << " " << adc4Bg << " " << tot4Bg);
 
         // If the BG hit is faster than the true hit, the TDC count is replaced, and
         // the relations are removed. ADC counts are summed up.
@@ -1418,7 +1244,6 @@ void CDCDigitizerModule::addXTalk()
         w2 *= 32;
         const unsigned short e1 = s1 - w1; //end time of 1st pulse
         const unsigned short e2 = s2 - w2; //end time of 2nd pulse
-        //  B2DEBUG(m_debuglevel4Xtalk, "s1,e1,w1,s2,e2,w2= " << s1 << " " << e1 << " " << w1 << " " << s2 << " " << e2 << " " << w2);
 
         double pulseW = w1 + w2;
         if (e1 <= e2) {
@@ -1451,6 +1276,5 @@ double CDCDigitizerModule::getPositiveT0(const WireID& wid)
 {
   double t0 = m_cdcgp->getT0(wid);
   if (t0 <= 0 && m_treatNegT0WiresAsGood) t0 = m_cdcgp->getMeanT0();
-  //  B2DEBUG(m_debugLevel, m_cdcgp->getT0(wid) <<" "<< m_cdcgp->getMeanT0() <<" "<< t0);
   return t0;
 }

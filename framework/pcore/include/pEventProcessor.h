@@ -29,7 +29,7 @@ namespace Belle2 {
     pEventProcessor();
 
     /** Destructor */
-    virtual ~pEventProcessor();
+    virtual ~pEventProcessor() override;
 
     /** Processes the full module chain, starting with the first module in the given path. */
     /**

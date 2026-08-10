@@ -144,8 +144,8 @@ namespace Belle2::BoostVectorCalib {
     double pMu0 = vecs[0].Mag();
     double pMu1 = vecs[1].Mag();
 
-    double C0 = 1. / sqrt(pow(mL / pMu0, 2) + 1);
-    double C1 = 1. / sqrt(pow(mL / pMu1, 2) + 1);
+    double C0 = 1. / sqrt((mL / pMu0) * (mL / pMu0) + 1);
+    double C1 = 1. / sqrt((mL / pMu1) * (mL / pMu1) + 1);
 
     double y0 = atanh(cos(th0) * C0);
     double y1 = atanh(cos(th1) * C1);

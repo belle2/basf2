@@ -37,13 +37,13 @@ namespace Belle2 {
     ~FilterInfo() {};
 
     /// getter function to get the name
-    std::string getName() { return m_name; };
+    const std::string& getName() const { return m_name; };
     /// returns the result of the filtervariable attached to this filter
-    double getResult() { return m_result; };
+    double getResult() const { return m_result; };
     /// returns if the event was accepted
-    bool getWasAccepted() { return m_wasAccepted; };
+    bool getWasAccepted() const { return m_wasAccepted; };
     /// returns if filter was evaluated
-    bool getWasUsed() { return m_wasUsed; };
+    bool getWasUsed() const { return m_wasUsed; };
 
   private:
     /// name of the FilterVariable

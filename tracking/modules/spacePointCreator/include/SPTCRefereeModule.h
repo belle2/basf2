@@ -148,12 +148,12 @@ namespace Belle2 {
      * @returns empty vector if it is not the case and the indices of the SpacePoints that are on a sensor if
      * there are SpacePoints on the same sensors
      */
-    const std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
+    static const std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
 
     /** Check if two subsequent SpacePoints are separated by at least the provided minDistance.
      * @returns empty vector if all SpacePoints are far enough apart, indices of SpacePoints that are not elsewise
      */
-    const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
+    static const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
 
     /** Check if the SpacePointTrackCand shows curling behavior.
      * @returns empty vector if it is not the case and the indices where the SpacePointTrackCand can be split into
@@ -203,7 +203,7 @@ namespace Belle2 {
      * @param trackCand pointer to the original SPTC (which is not in newStoreArray before this call!)
      * @param newStoreArray StoreArray where a copy of trackCand will be stored with a relation to the trackCand in its original StoreArray
      */
-    void
+    static void
     copyToNewStoreArray(const Belle2::SpacePointTrackCand* trackCand, Belle2::StoreArray<Belle2::SpacePointTrackCand> newStoreArray);
 
     /** register the SpacePointTrackCand (i.e. trackStub) in a new StoreArray and register also a relation to the original SpacePointTrackCand
@@ -217,7 +217,7 @@ namespace Belle2 {
     /** get the checked referee status of a SPTC (i.e. only which checks have been performed, but not the results)
      * at the moment returns the status of trackCand with c_removedHits, c_hitsOnSameSensor and c_hitsLowDistance reset!
      */
-    unsigned short int getCheckStatus(const Belle2::SpacePointTrackCand* trackCand);
+    static unsigned short int getCheckStatus(const Belle2::SpacePointTrackCand* trackCand);
 
     /** remove the SpacePoint passed to this function from the SpacePointTrackCand
      * @return indices of the SpacePoints that are in took the places of the ones that were removed (i.e. if (i,j,k) are passed -> (i,j-1,k-2) is returned)
@@ -228,7 +228,7 @@ namespace Belle2 {
     /** function to determine if any of the values in vector V are between the values of P
      * (i.e. any value of V is in [P.first, P.second) ) */
     template<typename T>
-    bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P)
+    static bool vectorHasValueBetween(std::vector<T> V, std::pair<T, T> P)
     {
       return std::find_if(V.begin(), V.end(), [&P](const T & aValue) { return (aValue < P.second && aValue >= P.first);}) != V.end();
     }

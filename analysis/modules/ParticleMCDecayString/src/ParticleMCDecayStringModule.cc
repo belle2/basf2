@@ -34,8 +34,7 @@ ParticleMCDecayStringModule::ParticleMCDecayStringModule() : Module(), m_tree(""
                  "The mapping hash <-> MC decay string in saved in a TTree by this module.  "
                  "The 32bit pattern must be saved as a float (because our extra info field, variable manager and ntuple output only supports float) "
                  "but they just represent 32 bits of a hash!  "
-                 "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  "
-                 "Details on the MC decay string format can be found here: `MCDecayString`");
+                 "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  ");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
   addParam("fileName", m_fileName, "Filename in which the hash strings are saved, if empty the strings are not saved",

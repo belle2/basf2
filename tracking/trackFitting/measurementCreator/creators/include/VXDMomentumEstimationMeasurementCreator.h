@@ -27,7 +27,7 @@ namespace Belle2 {
       BaseMeasurementCreatorFromCoordinateMeasurement<HitType, detector>(measurementFactory) {}
 
     /** Destructor. */
-    virtual ~VXDMomentumEstimationMeasurementCreator() { }
+    ~VXDMomentumEstimationMeasurementCreator() override { }
 
     /** Set the parameters of the fit functions and whether to use the thickness or not or the tracking seeds or not. */
     void setParameter(const std::string& parameterName, const std::string& parameterValue) override
@@ -84,7 +84,6 @@ namespace Belle2 {
         return {};
       }
 
-      // cppcheck-suppress nullPointerRedundantCheck
       PlanarVXDMomentumMeasurement<HitType>* momentumMeasurement = new PlanarVXDMomentumMeasurement<HitType>(*planarMeasurement, hit,
           &recoTrack);
       momentumMeasurement->setCorrectionFitParameters(m_correctionFitParameters);

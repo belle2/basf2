@@ -36,25 +36,25 @@ const CDCMCHitLookUp& CDCMCHitLookUp::getInstance()
 }
 
 
-void CDCMCHitLookUp::fill() const
+void CDCMCHitLookUp::fill()
 {
   return CDCMCManager::getInstance().fill();
 }
 
 
-const Belle2::CDCSimHit* CDCMCHitLookUp::getSimHit(const CDCHit* ptrHit) const
+const Belle2::CDCSimHit* CDCMCHitLookUp::getSimHit(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCMap().getSimHit(ptrHit);
 }
 
 
-const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit) const
+const Belle2::MCParticle* CDCMCHitLookUp::getMCParticle(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCMap().getMCParticle(ptrHit);
 }
 
 
-const ROOT::Math::XYVector CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit) const
+const ROOT::Math::XYVector CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit)
 {
   if (not ptrHit) return ROOT::Math::XYVector();
   const CDCHit& hit = *ptrHit;
@@ -72,7 +72,7 @@ const ROOT::Math::XYVector CDCMCHitLookUp::getRefPos2D(const CDCHit* ptrHit) con
 }
 
 
-float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
+float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit)
 {
 
   if (not ptrHit) return NAN;
@@ -82,70 +82,70 @@ float CDCMCHitLookUp::getRefDriftLength(const CDCHit* ptrHit) const
 }
 
 
-const ROOT::Math::XYZVector CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit) const
+const ROOT::Math::XYZVector CDCMCHitLookUp::getRecoPos3D(const CDCHit* ptrHit)
 {
   return CDCMCManager::getSimHitLookUp().getRecoPos3D(ptrHit);
 }
 
 
-const ROOT::Math::XYZVector CDCMCHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const
+const ROOT::Math::XYZVector CDCMCHitLookUp::getClosestPrimaryRecoPos3D(const CDCHit* ptrHit)
 {
   return CDCMCManager::getSimHitLookUp().getClosestPrimaryRecoPos3D(ptrHit);
 }
 
 
-bool CDCMCHitLookUp::isReassignedSecondary(const CDCHit* ptrHit) const
+bool CDCMCHitLookUp::isReassignedSecondary(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCMap().isReassignedSecondary(ptrHit);
 }
 
 
 
-const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
+const CDCSimHit* CDCMCHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit)
 {
   return CDCMCManager::getSimHitLookUp().getClosestPrimarySimHit(ptrHit);
 }
 
 
-ERightLeft CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit) const
+ERightLeft CDCMCHitLookUp::getRLInfo(const CDCHit* ptrHit)
 {
   return CDCMCManager::getSimHitLookUp().getRLInfo(ptrHit);
 }
 
 
-bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit) const
+bool CDCMCHitLookUp::isBackground(const CDCHit* ptrHit)
 {
   const CDCSimHit* ptrSimHit = getSimHit(ptrHit);
   return ptrSimHit ? ptrSimHit->getBackgroundTag() != BackgroundMetaData::bg_none : false;
 }
 
 
-ITrackType CDCMCHitLookUp::getMCTrackId(const CDCHit* ptrHit) const
+ITrackType CDCMCHitLookUp::getMCTrackId(const CDCHit* ptrHit)
 {
   const MCParticle* ptrMCParticle = getMCParticle(ptrHit);
   return ptrMCParticle ? ptrMCParticle->getArrayIndex() : INVALID_ITRACK;
 }
 
 
-Index CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getInTrackId(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCTrackStore().getInTrackId(ptrHit);
 }
 
 
-Index CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getInTrackSegmentId(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCTrackStore().getInTrackSegmentId(ptrHit);
 }
 
 
-Index CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getNPassedSuperLayers(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCTrackStore().getNPassedSuperLayers(ptrHit);
 }
 
 
-Index CDCMCHitLookUp::getNLoops(const CDCHit* ptrHit) const
+Index CDCMCHitLookUp::getNLoops(const CDCHit* ptrHit)
 {
   return CDCMCManager::getMCTrackStore().getNLoops(ptrHit);
 }

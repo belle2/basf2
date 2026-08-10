@@ -188,7 +188,7 @@ AxialTrackFinderHough::getDefaultFineRelaxationSchedule() const
 }
 
 std::vector<ParameterVariantMap>
-AxialTrackFinderHough::getDefaultRoughRelaxationSchedule() const
+AxialTrackFinderHough::getDefaultRoughRelaxationSchedule()
 {
   std::vector<ParameterVariantMap> result;
 

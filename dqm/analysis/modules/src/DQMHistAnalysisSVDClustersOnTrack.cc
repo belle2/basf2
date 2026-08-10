@@ -52,6 +52,8 @@ DQMHistAnalysisSVDClustersOnTrackModule::DQMHistAnalysisSVDClustersOnTrackModule
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
+DQMHistAnalysisSVDClustersOnTrackModule::~DQMHistAnalysisSVDClustersOnTrackModule() { }
+
 void DQMHistAnalysisSVDClustersOnTrackModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDClustersOnTrack: initialized.");
@@ -119,7 +121,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
   B2DEBUG(10, "DQMHistAnalysisSVDClustersOnTrack: event called.");
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  auto hnEvnts = findHist("SVDExpReco", "SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;
@@ -143,7 +145,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
 
   // cluster time for clusters of track
   double ratio3_6 = 0.;
-  TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
+  auto m_h = findHist("SVDClsTrk", "SVDTRK_ClusterTimeV456");
 
   int status;
   if (m_h != NULL) {
@@ -180,7 +182,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
 
   // cluster time for clusters of track for 3 samples
   if (m_3Samples) {
-    m_h = findHist("SVDClsTrk/SVDTRK_Cluster3TimeV456");
+    m_h = findHist("SVDClsTrk", "SVDTRK_Cluster3TimeV456");
 
     if (m_h != NULL) {
       m_hClusterOnTrackTimeL456V3Samples.Clear();

@@ -82,7 +82,7 @@ namespace Belle2 {
       }
 
       /// Write debug information into a ROOT file; not implemented
-      void writeDebugInfoToFile(const std::string& filename __attribute__((unused)))
+      static void writeDebugInfoToFile(const std::string& filename __attribute__((unused)))
       {
         //do nothing;
       }
@@ -92,9 +92,9 @@ namespace Belle2 {
        * FIXME this is a copy-paste from DebugableSimpleBoxDivisionHoughTree
        * It should be possible to unify it with this tree, but not sure of does worth it
        */
-      void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
-                         const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
-                         const typename AInBoxAlgorithm::HoughBox& node)
+      static void drawDebugPlot(const std::vector<TrackingUtilities::CDCRecoHit3D>& allHits,
+                                const std::vector<TrackingUtilities::CDCRecoHit3D>& foundHits,
+                                const typename AInBoxAlgorithm::HoughBox& node)
       {
         TGraph* allHitsGraph = new TGraph();
         allHitsGraph->SetLineWidth(2);

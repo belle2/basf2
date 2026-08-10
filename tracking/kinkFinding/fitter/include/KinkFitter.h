@@ -128,9 +128,9 @@ namespace Belle2 {
      * @return for daughter track, returns negative index of the hit, closest to the vertex
      * for mother track, returns positive index of the hit, closest to the vertex, counting from the end of the track
      */
-    int findHitPositionForReassignment(const RecoTrack* recoTrack,
-                                       ROOT::Math::XYZVector& vertexPos,
-                                       int direction);
+    static int findHitPositionForReassignment(const RecoTrack* recoTrack,
+                                              ROOT::Math::XYZVector& vertexPos,
+                                              int direction);
 
     /**
      * Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
@@ -152,8 +152,8 @@ namespace Belle2 {
      * @param recoTrackDaughter initial daughter track
      * @return true if the fit was successful and the result for two tracks improved
      */
-    bool refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, RecoTrack* recoTrackDaughterRefit,
-                                     const RecoTrack* recoTrackMother, const RecoTrack* recoTrackDaughter);
+    static bool refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, RecoTrack* recoTrackDaughterRefit,
+                                            const RecoTrack* recoTrackMother, const RecoTrack* recoTrackDaughter);
 
     /**
      * Flip and refit the daughter track.
@@ -223,8 +223,8 @@ namespace Belle2 {
      * @return false if can not extrapolate one of the tracks to vertex;
      * true otherwise
      */
-    bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
-                             const ROOT::Math::XYZVector& vertexPosition, unsigned int& reassignHitStatus);
+    static bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
+                                    const ROOT::Math::XYZVector& vertexPosition, unsigned int& reassignHitStatus);
 
     /**
      * Build TrackFitResult of the Kink Track.
@@ -243,8 +243,8 @@ namespace Belle2 {
      * @param covMatrix6 covariance matrix of the track state to be used in kFit
      * @param errMatrix7 error matrix of the track state to be prepared and used in kFit
      */
-    void errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
-                          TMatrixDSym& errMatrix7);
+    static void errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+                                 TMatrixDSym& errMatrix7);
 
 
   private:

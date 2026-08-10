@@ -308,9 +308,6 @@ namespace Belle2 {
     /** Global Tag name. */
     std::string m_GlobalTagName = "";
 
-    /** Event metadata. */
-    StoreObjPtr<EventMetaData> m_EventMetaData;
-
     DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< Injection time DB object */
   };
 } // namespace Belle2

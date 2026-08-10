@@ -1170,7 +1170,7 @@ class B0toDD_Kpipi_Kspi(BaseSkim):
 
     * :math:`B^{0}\\to D^{+}(\\to K^- \\pi^+ \\pi^+) D^{-}(\\to K^+ \\pi^- \\pi^-)`
     * :math:`B^{0}\\to D^{+}(\\to K^- \\pi^+ \\pi^+) D^{-}(\\to K_{\\rm S}^0 \\pi^-)`
-    * :math:`B^{0}\\to D^{+}(\\to K_{\\rm S}^0 \\pi^-) D^{-}(\\to K_{\\rm S}^0 \\pi^-)`
+    * :math:`B^{0}\\to D^{+}(\\to K_{\\rm S}^0 \\pi^+) D^{-}(\\to K_{\\rm S}^0 \\pi^-)`
 
     Cuts applied:
 

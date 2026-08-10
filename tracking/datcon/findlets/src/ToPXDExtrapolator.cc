@@ -59,7 +59,7 @@ void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTra
 {
   VxdID sensorID;
 
-  for (auto& uTrack : uTracks) {
+  for (const auto& uTrack : uTracks) {
     const double trackPhi = uTrack.first;
     const double trackRadius = uTrack.second;
 
@@ -67,7 +67,7 @@ void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTra
     extrapolateUTrack(trackPhi, trackRadius, 2, uExtrapolations);
   }
 
-  for (auto& vTrack : vTracks) {
+  for (const auto& vTrack : vTracks) {
     const double& trackLambda = -vTrack.first;
     const long tanLambda = convertFloatToInt(tan(trackLambda), 3);
 
@@ -76,10 +76,10 @@ void ToPXDExtrapolator::apply(const std::vector<std::pair<double, double>>& uTra
   }
 
   if (m_param_createPXDIntercepts) {
-    for (auto& uExtrapolatedHit : uExtrapolations) {
+    for (const auto& uExtrapolatedHit : uExtrapolations) {
       const VxdID& uHitSensorID = uExtrapolatedHit.first;
 
-      for (auto& vExtrapolatedHit : vExtrapolations) {
+      for (const auto& vExtrapolatedHit : vExtrapolations) {
         const VxdID& vHitSensorID = vExtrapolatedHit.first;
 
         if (uHitSensorID != vHitSensorID) {

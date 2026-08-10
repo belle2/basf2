@@ -685,11 +685,16 @@ void CDCDedxInjectTimeAlgorithm::plotRelConstants(std::map<int, std::vector<doub
     if (ir == 1)mleg->Draw("same");
   }
 
-  for (int ic = 0; ic < 2; ic++) {
-    cconst[ic]->SaveAs(Form("%s_relconst_%s_%s_%s.pdf", m_prefix.data(), sname[ic].data(), svar.data(), m_suffix.data()));
-    cconst[ic]->SaveAs(Form("%s_relconst_%s_%s_%s.root", m_prefix.data(), sname[ic].data(), svar.data(), m_suffix.data()));
-    delete cconst[ic];
-  }
+  const std::string rootName = Form("%s_relconst_%s_%s.root", m_prefix.data(), svar.data(), m_suffix.data());
+  TFile rootFile(rootName.c_str(), "RECREATE");
+
+  rootFile.cd();
+
+  cconst[0]->Write("cmeanconst");
+  cconst[1]->Write("cresoconst");
+
+  rootFile.Close();
+
   for (int ic = 0; ic < 2; ic++) {
 
     delete hmean[ic];
@@ -829,11 +834,32 @@ void CDCDedxInjectTimeAlgorithm::plotFinalConstants(std::map<int, std::vector<do
     }
   }
 
-  for (int ic = 0; ic < 2; ic++) {
-    cconst[ic]->SaveAs(Form("%s_finalconst_%s_%s.pdf", m_prefix.data(), sname[ic].data(), m_suffix.data()));
-    cconst[ic]->SaveAs(Form("%s_finalconst_%s_%s.root", m_prefix.data(), sname[ic].data(), m_suffix.data()));
-    delete cconst[ic];
+  const std::string pdfName = Form("%s_finalconst_%s.pdf", m_prefix.data(), m_suffix.data());
+
+  const std::string rootName = Form("%s_finalconst_%s.root", m_prefix.data(), m_suffix.data());
+
+// Save mean and resolution in one PDF.
+  cconst[0]->Print((pdfName + "(").c_str());
+  cconst[1]->Print((pdfName + ")").c_str());
+
+// Save both canvases and histograms in one ROOT file.
+  TFile rootFile(rootName.c_str(), "RECREATE");
+
+  rootFile.cd();
+
+  cconst[0]->Write("cmeanconst");
+  cconst[1]->Write("cresoconst");
+
+  for (unsigned int ir = 0; ir < c_rings; ++ir) {
+    for (unsigned int ip = 0; ip < c_type; ++ip) {
+      hmean[ir][ip]->Write();
+      hreso[ir][ip]->Write();
+    }
   }
+
+  rootFile.Close();
+
+  for (int ic = 0; ic < 2; ic++) delete cconst[ic];
 
   for (unsigned int ir = 0; ir < c_rings; ir++) {
     for (unsigned int ip = 0; ip < c_type; ip++) {

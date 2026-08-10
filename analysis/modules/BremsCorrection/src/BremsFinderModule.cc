@@ -80,10 +80,12 @@ Warning:
   Even in the event of no bremsstrahlung photons found, a new particle is still created, and the original one is still
   added as its daughter.
 
-Warning:
-  Studies have shown that the requirements that the energy of the photon must be between 0.2 and 1 times the track energy and
-  that only track-photon relations with a weight below three are considered, are too tight. Until these are relaxed and a new
-  processing is done (MC15 and proc 13) it might be better to use the alternative `BelleBremRecovery` module.
+Note:
+  The requirements applied by the **eclTrackBremFinder** module used to be too tight, so that for MC15 and proc13 and
+  earlier the alternative `BelleBremRecovery` module was recommended. They were relaxed for MC16 and proc16, and
+  since release-08 this module is the recommended one, see `modularAnalysis.correctBrems`. The current
+  recommendation on the photon selection and on the module parameters is provided by the
+  :ref:`b2help-recommendation` tool.
 
 See also:
   `eclTrackBremFinder module`_

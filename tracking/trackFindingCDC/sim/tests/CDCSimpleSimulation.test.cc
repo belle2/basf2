@@ -111,7 +111,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_prepared_event_rl_flags)
   std::string svgFileName = "rl_flags_prepared_event.svg";
   loadPreparedEvent();
 
-  for (CDCTrack& track : m_mcTracks) {
+  for (const CDCTrack& track : m_mcTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCRLWireHit& rlWireHit = recoHit3D.getRLWireHit();
       std::string color = "blue";

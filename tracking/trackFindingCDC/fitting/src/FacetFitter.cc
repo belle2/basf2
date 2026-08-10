@@ -17,6 +17,8 @@
 
 #include <Eigen/Core>
 
+#include <cmath>
+
 #include <Math/Functor.h>
 #include <Math/BrentMinimizer1D.h>
 
@@ -102,11 +104,39 @@ namespace {
     return Eigen::Vector2d(std::cos(phi), std::sin(phi));
   }
 
+  /**
+   *  Intermediate results of the line fit sufficient to construct the fitted line lazily.
+   *
+   *  Keeping the construction of the line and its covariance matrix separate allows
+   *  callers to compute only the chi2 and to build the line only when it is needed.
+   */
+  struct LineFitPrecursor {
+    /// The forward direction to which the observations were rotated
+    Vector2D coordinate;
+
+    /// The weighted averages of the rotated observations
+    Eigen::Array<double, 1, 3> averages;
+
+    /// The weighted covariances of the rotated observations
+    Eigen::Matrix<double, 3, 3> covariances;
+
+    /// The fitted direction relative to the rotated coordinate system
+    Eigen::Vector2d phiVec;
+
+    /// The chi2 of the fit
+    double chi2 = 0.0;
+
+    /// The sum of weights of the observations
+    double sumW = 0.0;
+  };
+
   template<int N>
-  UncertainParameterLine2D fit(Matrix<double, N, 3> xylIn,
-                               Matrix<double, N, 1> wIn,
-                               int nSteps)
+  LineFitPrecursor fitPrecursor(Matrix<double, N, 3> xylIn,
+                                Matrix<double, N, 1> wIn,
+                                int nSteps)
   {
+    LineFitPrecursor precursor;
+
     /// Rotate in forward direction
     Vector2D coordinate = getTangentialForwardDirection(xylIn);
     // Sometimes the calculation of the tangent fails due to misestimated dirft lengths
@@ -136,9 +166,27 @@ namespace {
     }
     chi2 *= w.sum();
 
+    precursor.coordinate = coordinate;
+    precursor.averages = averages;
+    precursor.covariances = covariances;
+    precursor.phiVec = phiVec;
+    precursor.chi2 = chi2;
+    precursor.sumW = w.sum();
+    return precursor;
+  }
+
+  /// Construct the fitted line from the precursor of a fit with N observations
+  UncertainParameterLine2D lineFromPrecursor(const LineFitPrecursor& precursor, int ndf)
+  {
+    const Vector2D& coordinate = precursor.coordinate;
+    const Eigen::Array<double, 1, 3>& averages = precursor.averages;
+    const Eigen::Matrix<double, 3, 3>& covariances = precursor.covariances;
+    const Eigen::Vector2d& phiVec = precursor.phiVec;
+    const double chi2 = precursor.chi2;
+
     double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
     double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
-    double p = w.sum();
+    double p = precursor.sumW;
 
     using namespace NLineParameterIndices;
     LinePrecision linePrecision;
@@ -158,70 +206,32 @@ namespace {
     unrotate(coordinate, tangential);
 
     ParameterLine2D parameterLine2D(support, tangential);
-    int ndf = N - 2;
     return UncertainParameterLine2D(parameterLine2D, lineCovariance, chi2, ndf);
+  }
+
+  template<int N>
+  UncertainParameterLine2D fit(Matrix<double, N, 3> xylIn,
+                               Matrix<double, N, 1> wIn,
+                               int nSteps)
+  {
+    LineFitPrecursor precursor = fitPrecursor(std::move(xylIn), std::move(wIn), nSteps);
+    int ndf = N - 2;
+    return lineFromPrecursor(precursor, ndf);
   }
 
 }
 
-double FacetFitter::fit(const CDCFacet& facet, int nSteps)
-{
-  // Measurement matrix
-  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
-
-  // Weight matrix
-  Matrix<double, 3, 1> w = Matrix<double, 3, 1>::Zero();
-
-  const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
-  const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
-  const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
-
-  const Vector2D support = middleRLWireHit.getWireHit().getRefPos2D();
-
-  const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-  const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
-  xyl(0, 0) = startWirePos2D.x() - support.x();
-  xyl(0, 1) = startWirePos2D.y() - support.y();
-  xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
-  w(0) = 1.0 / startDriftLengthVar;
-
-  const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-  const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
-  xyl(1, 0) = middleWirePos2D.x() - support.x();
-  xyl(1, 1) = middleWirePos2D.y() - support.y();
-  xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
-  w(1) = 1.0 / middleDriftLengthVar;
-
-  const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-  const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
-  xyl(2, 0) = endWirePos2D.x() - support.x();
-  xyl(2, 1) = endWirePos2D.y() - support.y();
-  xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
-  w(2) = 1.0 / endDriftLengthVar;
-
-  UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
-  fitLine.passiveMoveBy(-support);
-  facet.setFitLine(fitLine);
-  return fitLine.chi2();
-}
-
-
-UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
-                                          const CDCFacet& toFacet,
-                                          int nSteps)
-{
-  // Observations matrix
-  Matrix<double, 6, 3> xyl = Matrix<double, 6, 3>::Zero();
-
-  // Weight matrix
-  Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
-
-  const Vector2D support = Vector2D::average(fromFacet.getMiddleWireHit().getRefPos2D(),
-                                             toFacet.getMiddleWireHit().getRefPos2D());
+namespace {
+  /// Fill the observation and weight matrices for the fit of a single facet
+  Vector2D fillFacetObservations(const CDCFacet& facet,
+                                 Matrix<double, 3, 3>& xyl,
+                                 Matrix<double, 3, 1>& w)
   {
-    const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
-    const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();
-    const CDCRLWireHit& endRLWireHit = fromFacet.getEndRLWireHit();
+    const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
+    const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();
+    const CDCRLWireHit& endRLWireHit = facet.getEndRLWireHit();
+
+    const Vector2D support = middleRLWireHit.getWireHit().getRefPos2D();
 
     const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
     const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
@@ -243,38 +253,135 @@ UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
     xyl(2, 1) = endWirePos2D.y() - support.y();
     xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
     w(2) = 1.0 / endDriftLengthVar;
-  }
 
+    return support;
+  }
+}
+
+double FacetFitter::fit(const CDCFacet& facet, int nSteps, double maxChi2)
+{
+  // Measurement matrix
+  Matrix<double, 3, 3> xyl = Matrix<double, 3, 3>::Zero();
+
+  // Weight matrix
+  Matrix<double, 3, 1> w = Matrix<double, 3, 1>::Zero();
+
+  const Vector2D support = fillFacetObservations(facet, xyl, w);
+
+  LineFitPrecursor precursor = fitPrecursor(std::move(xyl), std::move(w), nSteps);
+
+  // Construct and commit the fit line only when it is wanted: always for an
+  // infinite maxChi2, otherwise only if the fit passes the cut. Skipping it for
+  // failing facets avoids building the line and its covariance matrix. A NaN chi2
+  // fails "chi2 <= maxChi2", so it is committed only in the unbounded case.
+  if (std::isinf(maxChi2) or precursor.chi2 <= maxChi2) {
+    const int ndf = 1;
+    UncertainParameterLine2D fitLine = lineFromPrecursor(precursor, ndf);
+    fitLine.passiveMoveBy(-support);
+    facet.setFitLine(fitLine);
+  }
+  return precursor.chi2;
+}
+
+
+namespace {
+  /// Fill the observation and weight matrices for the fit of a facet pair
+  Vector2D fillFacetPairObservations(const CDCFacet& fromFacet,
+                                     const CDCFacet& toFacet,
+                                     Matrix<double, 6, 3>& xyl,
+                                     Matrix<double, 6, 1>& w)
   {
-    const CDCRLWireHit& startRLWireHit = toFacet.getStartRLWireHit();
-    const CDCRLWireHit& middleRLWireHit = toFacet.getMiddleRLWireHit();
-    const CDCRLWireHit& endRLWireHit = toFacet.getEndRLWireHit();
+    const Vector2D support = Vector2D::average(fromFacet.getMiddleWireHit().getRefPos2D(),
+                                               toFacet.getMiddleWireHit().getRefPos2D());
+    {
+      const CDCRLWireHit& startRLWireHit = fromFacet.getStartRLWireHit();
+      const CDCRLWireHit& middleRLWireHit = fromFacet.getMiddleRLWireHit();
+      const CDCRLWireHit& endRLWireHit = fromFacet.getEndRLWireHit();
 
-    const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
-    const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
-    xyl(3, 0) = startWirePos2D.x() - support.x();
-    xyl(3, 1) = startWirePos2D.y() - support.y();
-    xyl(3, 2) = startRLWireHit.getSignedRefDriftLength();
-    w(3) = 1.0 / startDriftLengthVar;
+      const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
+      const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
+      xyl(0, 0) = startWirePos2D.x() - support.x();
+      xyl(0, 1) = startWirePos2D.y() - support.y();
+      xyl(0, 2) = startRLWireHit.getSignedRefDriftLength();
+      w(0) = 1.0 / startDriftLengthVar;
 
-    const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
-    const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
-    xyl(4, 0) = middleWirePos2D.x() - support.x();
-    xyl(4, 1) = middleWirePos2D.y() - support.y();
-    xyl(4, 2) = middleRLWireHit.getSignedRefDriftLength();
-    w(4) = 1.0 / middleDriftLengthVar;
+      const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
+      const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
+      xyl(1, 0) = middleWirePos2D.x() - support.x();
+      xyl(1, 1) = middleWirePos2D.y() - support.y();
+      xyl(1, 2) = middleRLWireHit.getSignedRefDriftLength();
+      w(1) = 1.0 / middleDriftLengthVar;
 
-    const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
-    const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
-    xyl(5, 0) = endWirePos2D.x() - support.x();
-    xyl(5, 1) = endWirePos2D.y() - support.y();
-    xyl(5, 2) = endRLWireHit.getSignedRefDriftLength();
-    w(5) = 1.0 / endDriftLengthVar;
+      const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
+      const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
+      xyl(2, 0) = endWirePos2D.x() - support.x();
+      xyl(2, 1) = endWirePos2D.y() - support.y();
+      xyl(2, 2) = endRLWireHit.getSignedRefDriftLength();
+      w(2) = 1.0 / endDriftLengthVar;
+    }
+
+    {
+      const CDCRLWireHit& startRLWireHit = toFacet.getStartRLWireHit();
+      const CDCRLWireHit& middleRLWireHit = toFacet.getMiddleRLWireHit();
+      const CDCRLWireHit& endRLWireHit = toFacet.getEndRLWireHit();
+
+      const double startDriftLengthVar = startRLWireHit.getRefDriftLengthVariance();
+      const Vector2D startWirePos2D = startRLWireHit.getWireHit().getRefPos2D();
+      xyl(3, 0) = startWirePos2D.x() - support.x();
+      xyl(3, 1) = startWirePos2D.y() - support.y();
+      xyl(3, 2) = startRLWireHit.getSignedRefDriftLength();
+      w(3) = 1.0 / startDriftLengthVar;
+
+      const double middleDriftLengthVar = middleRLWireHit.getRefDriftLengthVariance();
+      const Vector2D middleWirePos2D = middleRLWireHit.getWireHit().getRefPos2D();
+      xyl(4, 0) = middleWirePos2D.x() - support.x();
+      xyl(4, 1) = middleWirePos2D.y() - support.y();
+      xyl(4, 2) = middleRLWireHit.getSignedRefDriftLength();
+      w(4) = 1.0 / middleDriftLengthVar;
+
+      const double endDriftLengthVar = endRLWireHit.getRefDriftLengthVariance();
+      const Vector2D endWirePos2D = endRLWireHit.getWireHit().getRefPos2D();
+      xyl(5, 0) = endWirePos2D.x() - support.x();
+      xyl(5, 1) = endWirePos2D.y() - support.y();
+      xyl(5, 2) = endRLWireHit.getSignedRefDriftLength();
+      w(5) = 1.0 / endDriftLengthVar;
+    }
+
+    return support;
   }
+}
+
+UncertainParameterLine2D FacetFitter::fit(const CDCFacet& fromFacet,
+                                          const CDCFacet& toFacet,
+                                          int nSteps)
+{
+  // Observations matrix
+  Matrix<double, 6, 3> xyl = Matrix<double, 6, 3>::Zero();
+
+  // Weight matrix
+  Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
+
+  const Vector2D support = fillFacetPairObservations(fromFacet, toFacet, xyl, w);
 
   UncertainParameterLine2D fitLine{ ::fit(std::move(xyl), std::move(w), nSteps) };
   fitLine.passiveMoveBy(-support);
   return fitLine;
+}
+
+double FacetFitter::fitChi2(const CDCFacet& fromFacet,
+                            const CDCFacet& toFacet)
+{
+  // Observations matrix
+  Matrix<double, 6, 3> xyl = Matrix<double, 6, 3>::Zero();
+
+  // Weight matrix
+  Matrix<double, 6, 1> w = Matrix<double, 6, 1>::Zero();
+
+  fillFacetPairObservations(fromFacet, toFacet, xyl, w);
+
+  // The chi2 is invariant against the translation by the support point
+  constexpr const int nSteps = 0;
+  return fitPrecursor(std::move(xyl), std::move(w), nSteps).chi2;
 }
 
 

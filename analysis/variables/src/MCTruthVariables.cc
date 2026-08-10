@@ -1180,9 +1180,9 @@ The process flags are:
 * 11 - Rayleigh
 * 12 - Photo-electric effect
 * 13 - Compton scattering
-* 14 - Gamma conversion
-* 15 - Gamma conversion to mu mu
-* 16 - Gamma general process
+* 14 - Photon conversion
+* 15 - Photon conversion to mu mu
+* 16 - Photon general process
 * 21 - Cerenkov
 * 22 - Scintillation
 * 23 - Synchrotron radiation
@@ -1271,18 +1271,54 @@ The process flags are:
 )DOC","rad");
 
     VARIABLE_GROUP("Generated tau decay information");
-    REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode,
-                      "**[Eventbased]** Returns the decay ID for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
-    REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode,
-                      "**[Eventbased]** Returns the decay ID for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
-    REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng,
-                      "**[Eventbased]** Returns the prong for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
-    REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
-                      "**[Eventbased]** Returns the prong for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
-    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
-                      "**[Eventbased]** Returns the energy of radiated photon from the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
-    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
-                      "**[Eventbased]** Returns the energy of radiated photon from the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event.");
+    REGISTER_VARIABLE("tauPlusMCMode", tauPlusMcMode, R"DOC(
+**[Eventbased]** Returns the decay ID for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("tauMinusMCMode", tauMinusMcMode, R"DOC(
+**[Eventbased]** Returns the decay ID for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("tauPlusMCProng", tauPlusMcProng, R"DOC(
+**[Eventbased]** Returns the prong for the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng, R"DOC(
+**[Eventbased]** Returns the prong for the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar, R"DOC(
+**[Eventbased]** Returns the energy of radiated photon from the positive :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar, R"DOC(
+**[Eventbased]** Returns the energy of radiated photon from the negative :math:`\tau` lepton in a :math:`\tau\tau` generated event."
+
+.. attention:: Calculing this variable requires using the ``TauDecayMarkerModule`` in your steering file.
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible, R"DOC(

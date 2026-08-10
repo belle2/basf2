@@ -496,21 +496,101 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("MCParticle tag variables");
-    REGISTER_VARIABLE("BplusMode", BplusMode, "[Eventbased] It will return the decays mode of B+ particles");
-    REGISTER_VARIABLE("BminusMode", BminusMode, "[Eventbased] It will return the decays mode of B- particles");
-    REGISTER_VARIABLE("B0Mode", B0Mode, "[Eventbased] It will return the decays mode of B0 particles");
-    REGISTER_VARIABLE("Bbar0Mode", Bbar0Mode, "[Eventbased] It will return the decays mode of anti-B0 particles");
-    REGISTER_VARIABLE("Bs0Mode", Bs0Mode, "[Eventbased] It will return the decays mode of B_s0 particles");
-    REGISTER_VARIABLE("Bsbar0Mode", Bsbar0Mode, "[Eventbased] It will return the decays mode of anti-B_s0 particles");
-    REGISTER_VARIABLE("DstplusMode", DstplusMode, "[Eventbased] It will return the decays mode of D*+ particles");
-    REGISTER_VARIABLE("DstminusMode", DstminusMode, "[Eventbased] It will return the decays mode of D*- particles");
-    REGISTER_VARIABLE("DsplusMode", DsplusMode, "[Eventbased] It will return the decays mode of D_s+ particles");
-    REGISTER_VARIABLE("DsminusMode", DsminusMode, "[Eventbased] It will return the decays mode of D_s- particles");
-    REGISTER_VARIABLE("DplusMode", DplusMode, "[Eventbased] It will return the decays mode of D+ particles");
-    REGISTER_VARIABLE("DminusMode", DminusMode, "[Eventbased] It will return the decays mode of D- particles");
-    REGISTER_VARIABLE("D0Mode", D0Mode, "[Eventbased] It will return the decays mode of D0 particles");
-    REGISTER_VARIABLE("Dbar0Mode", Dbar0Mode, "[Eventbased] It will return the decays mode of anti-D0 particles");
-    REGISTER_VARIABLE("TauplusMode", TauplusMode, "[Eventbased] It will return the decays mode of tau+ particles");
-    REGISTER_VARIABLE("TauminusMode", TauminusMode, "[Eventbased] It will return the decays mode of tau- particles");
+    REGISTER_VARIABLE("BplusMode", BplusMode,  R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`B^+` particles.
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");    
+    REGISTER_VARIABLE("BminusMode", BminusMode, R"DOC(      
+**[Eventbased]** Returns the decay modes of :math:`B^-` particles.
+      
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC"); 
+    REGISTER_VARIABLE("B0Mode", B0Mode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`B^0` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC"); 
+    REGISTER_VARIABLE("Bbar0Mode", Bbar0Mode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`\overline{B}{}^0` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC"); 
+    REGISTER_VARIABLE("Bs0Mode", Bs0Mode, R"DOC(
+**[Eventbased]** Returns the decays mode of :math:`B^0_s` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("Bsbar0Mode", Bsbar0Mode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`\overline{B}{}^0_s` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DstplusMode", DstplusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^{*+}` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DstminusMode", DstminusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^{*-}` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DsplusMode", DsplusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^+_s` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DsminusMode", DsminusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^-_s` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DplusMode", DplusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^+` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("DminusMode", DminusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^-` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("D0Mode", D0Mode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`D^0` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("Dbar0Mode", Dbar0Mode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`\overline{D}{}^0` particles".
+
+.. note:: The list of decay modes is documented in :ref:`GeneratedDecayModes`.
+
+)DOC");
+    REGISTER_VARIABLE("TauplusMode", TauplusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`\tau^+` particles".
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
+    REGISTER_VARIABLE("TauminusMode", TauminusMode, R"DOC(
+**[Eventbased]** Returns the decay modes of :math:`\tau^-` particles".
+
+.. note:: The list of decay modes is documented in :ref:`TauDecayMCModes`.
+
+)DOC");
   }
 }

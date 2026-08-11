@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    PXDClusterChargeMapPar(int nBinsU = 4, int nBinsV = 6, float defaultValue = -1.0) : m_nBinsU(nBinsU), m_nBinsV(nBinsV),
+    explicit PXDClusterChargeMapPar(int nBinsU = 4, int nBinsV = 6, float defaultValue = -1.0) : m_nBinsU(nBinsU), m_nBinsV(nBinsV),
       m_defaultValue(defaultValue), m_sensorCalibrationMap() {}
 
     /** Get number of bins along sensor u side
@@ -88,7 +88,7 @@ namespace Belle2 {
       auto mapIter = m_sensorCalibrationMap.find(sensorID);
       if (mapIter != m_sensorCalibrationMap.end()) {
         // Found sensor, return calibration value
-        auto& calVec = mapIter->second;
+        const auto& calVec = mapIter->second;
         return calVec[globalID];
       }
       // Sensor not found, keep low profile and return default calibration value

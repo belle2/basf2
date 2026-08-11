@@ -104,7 +104,7 @@ namespace Belle2 {
       /// isFakedData
       bool isFakedData(void) const;
       /// get fixed size (byte)
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 20;
       };
@@ -182,7 +182,7 @@ namespace Belle2 {
         return sfnr_offset & 0xFF;
       };
       /// 8 words
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 16;
       };
@@ -218,7 +218,7 @@ namespace Belle2 {
         return trigger_nr_lo;
       };
       /// 100 words
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return (4 + 96) * 2;
       };
@@ -293,7 +293,7 @@ namespace Belle2 {
       const unsigned int crc32; ///< crc32
 
       /// 8*4 bytes might still be changed
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 32;
       };
@@ -402,17 +402,17 @@ namespace Belle2 {
         return trignr0;
       };
       /// check error and return error mask
-      void check_error(
+      static void check_error(
         PXDErrorFlags& errormask,
         int length,
         bool ignore_inv_size_flag = false
-      ) const;
+      );
       /// print
       void print(void) const;
       /// 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
-      inline int getMinSize(void) const {return 4 + 4 + 4;};
+      static inline int getMinSize(void) {return 4 + 4 + 4;};
       /// check inner crc (currently not implemented/needed)
-      unsigned int check_inner_crc(PXDErrorFlags& /*errormask*/, unsigned int /*length*/) const
+      static unsigned int check_inner_crc(PXDErrorFlags& /*errormask*/, unsigned int /*length*/)
       {
         // Parts of the data are now in the ONSEN Trigger frame,
         // therefore the inner CRC cannot be checked that easily!
@@ -432,7 +432,7 @@ namespace Belle2 {
       /// fixed length
 
       /// get fixed size
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 8;
       };
@@ -470,7 +470,7 @@ namespace Belle2 {
         return wordsinevent;
       }
       /// get fixed size
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 16;
       };
@@ -509,7 +509,7 @@ namespace Belle2 {
         return wordsineventlo | ((unsigned int)wordsineventhi << 16);
       }
       /// get fixed size
-      inline unsigned int getFixedSize(void) const
+      static inline unsigned int getFixedSize(void)
       {
         return 16;
       };
@@ -609,7 +609,7 @@ namespace Belle2 {
       /// get event nr lo (from data)
       inline unsigned int getEventNrLo(void) const
       {
-        return ((ubig16_t*)data)[1];
+        return (reinterpret_cast<const ubig16_t*>(data))[1];
       };
       /// check padding and return it
       void check_padding(PXDErrorFlags& errormask);

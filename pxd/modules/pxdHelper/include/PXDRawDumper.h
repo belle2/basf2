@@ -23,10 +23,10 @@ namespace Belle2 {
       StoreArray<RawPXD> m_storeRaw; ///< Store array of RawPXDs
 
       /** Get the trigger number */
-      bool getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned int& outerHLT);
+      static bool getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned int& outerHLT);
 
       /** Unpack the DHC frame */
-      bool unpack_dhc_frame(void* data, unsigned int& innerDHH, unsigned int& outerHLT);
+      static bool unpack_dhc_frame(void* data, unsigned int& innerDHH, unsigned int& outerHLT);
 
     public:
       /** Initialize */

@@ -60,16 +60,12 @@ namespace Belle2 {
       /** Constructor */
       PXDBackgroundModule();
       /** Destructor */
-      virtual ~PXDBackgroundModule();
+      virtual ~PXDBackgroundModule() override;
 
       /** Initialize module */
       virtual void initialize() override;
-      /** Start-of-run initializations */
-      virtual void beginRun() override;
       /** Event processing */
       virtual void event() override;
-      /** End-of-run tasks */
-      virtual void endRun() override;
       /** Final summary and cleanup */
       virtual void terminate() override;
 
@@ -92,21 +88,21 @@ namespace Belle2 {
        * @param sensorID VxdID of the sensor
        * @return SensorInfo object for the desired sensor.
        */
-      inline const PXD::SensorInfo& getInfo(VxdID sensorID) const;
+      static inline const PXD::SensorInfo& getInfo(VxdID sensorID);
       /** Return thickness of the sensor with the given sensor ID */
-      inline double getSensorThickness(VxdID sensorID) const;
+      static inline double getSensorThickness(VxdID sensorID);
       /** Return mass of the sensor with the given sensor ID */
       inline double getSensorMass(VxdID sensorID) const;
       /** Return area of the sensor with the given sensor ID */
-      inline double getSensorArea(VxdID sensorID) const;
+      static inline double getSensorArea(VxdID sensorID);
 
       /** Convert local sensor coordinates to global */
-      const ROOT::Math::XYZVector& pointToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
+      static const ROOT::Math::XYZVector& pointToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
       /** Convert local vector coordinates to global */
-      const ROOT::Math::XYZVector& vectorToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
+      static const ROOT::Math::XYZVector& vectorToGlobal(VxdID sensorID, const ROOT::Math::XYZVector& local);
 
       /** Get number of sensors in a layer */
-      inline int getNumSensors(int layerNum);
+      static inline int getNumSensors(int layerNum);
       /** Get total number of sensors */
       inline int getTotalSensors();
 
@@ -148,12 +144,12 @@ namespace Belle2 {
 
     };
 
-    inline const PXD::SensorInfo& PXDBackgroundModule::getInfo(VxdID sensorID) const
+    inline const PXD::SensorInfo& PXDBackgroundModule::getInfo(VxdID sensorID)
     {
       return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }
 
-    inline  double PXDBackgroundModule::getSensorThickness(VxdID sensorID) const
+    inline  double PXDBackgroundModule::getSensorThickness(VxdID sensorID)
     {
       return getInfo(sensorID).getThickness();
     }
@@ -164,7 +160,7 @@ namespace Belle2 {
       return info.getWidth() * info.getLength() * info.getThickness() * c_densitySi;
     }
 
-    inline  double PXDBackgroundModule::getSensorArea(VxdID sensorID) const
+    inline  double PXDBackgroundModule::getSensorArea(VxdID sensorID)
     {
       const PXD::SensorInfo& info = getInfo(sensorID);
       return info.getWidth() * info.getLength();

@@ -81,7 +81,7 @@ void PXDROIPlotModule::event()
     flag[it.getSensorID()] = true;
   }
 
-  for (auto& f : flag) {
+  for (const auto& f : flag) {
     c1->Clear();
     c1->cd();
     h->Reset();

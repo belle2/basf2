@@ -49,7 +49,7 @@ PXDLocalDAQFile::PXDLocalDAQFile(const std::string& filename):
 
 }
 
-void PXDLocalDAQFile::openFile(std::string filename)
+void PXDLocalDAQFile::openFile(const std::string& filename)
 {
 
   //open file in read mode and set stream correctly

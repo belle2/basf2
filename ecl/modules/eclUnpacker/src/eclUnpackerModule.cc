@@ -206,14 +206,6 @@ void ECLUnpackerModule::event()
 
 }
 
-void ECLUnpackerModule::endRun()
-{
-}
-
-void ECLUnpackerModule::terminate()
-{
-}
-
 // method to read collector data by 32-bit words
 unsigned int ECLUnpackerModule::readNextCollectorWord()
 {
@@ -311,7 +303,7 @@ void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
     iCrate = m_eclMapper.getCrateID(nodeID, iFINESSE, pcie40Data);
 
     // pointer to data from COPPER/FINESSE
-    m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
+    m_bufPtr = reinterpret_cast<unsigned int*>(rawCOPPERData->GetDetectorBuffer(n, iFINESSE));
 
     B2DEBUG_eclunpacker(21, "***** iEvt " << m_localEvtNum << " node " << std::hex << nodeID);
 

@@ -22,7 +22,7 @@ namespace Belle2 {
       eclLeakageAlgorithm();
 
       /** Destructor */
-      virtual ~eclLeakageAlgorithm() {}
+      virtual ~eclLeakageAlgorithm() override {}
 
       /** Setter for m_lowEnergyThreshold */
       void setLowEnergyThreshold(double lowEnergyThreshold) {m_lowEnergyThreshold = lowEnergyThreshold;}

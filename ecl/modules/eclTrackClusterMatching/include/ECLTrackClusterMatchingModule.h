@@ -33,7 +33,7 @@ namespace Belle2 {
     ECLTrackClusterMatchingModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~ECLTrackClusterMatchingModule();
+    virtual ~ECLTrackClusterMatchingModule() override;
 
     /** Use this to initialize resources or memory your module needs.
      *
@@ -48,15 +48,12 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-    /** Clean up anything created in initialize(). */
-    virtual void terminate() override;
-
   private:
     /** Check if status of extrapolated hit is entering of ECL. */
-    bool isECLEnterHit(const ExtHit& extHit) const;
+    static bool isECLEnterHit(const ExtHit& extHit);
 
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
-    bool isECLHit(const ExtHit& extHit) const;
+    static bool isECLHit(const ExtHit& extHit);
 
     /** Calculate matching quality based on phi and theta consistencies */
     double showerQuality(double deltaPhi, double deltaTheta, double pt, int eclDetectorRegion, int hitStatus) const;

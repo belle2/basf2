@@ -48,7 +48,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC1Algorithm::calibra
 
   for (int id = 0; id < ECLElementNumbers::c_NCrystals; id++) {
 
-    TH1F* hMaxResx = (TH1F*)maxResvsCrysID->ProjectionY("hMaxResx", id + 1, id + 1);
+    TH1D* hMaxResx = maxResvsCrysID->ProjectionY("hMaxResx", id + 1, id + 1);
 
     int Total = hMaxResx->GetEntries();
 

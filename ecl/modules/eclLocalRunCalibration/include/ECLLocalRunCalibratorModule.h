@@ -40,7 +40,12 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~ECLLocalRunCalibratorModule();
+    ~ECLLocalRunCalibratorModule() override;
+    /** Copy constructor (disabled). */
+    ECLLocalRunCalibratorModule(const ECLLocalRunCalibratorModule&) = delete;
+
+    /** Operator = (disabled). */
+    ECLLocalRunCalibratorModule& operator=(const ECLLocalRunCalibratorModule&) = delete;
     /**
      * Begin run.
      */
@@ -63,7 +68,7 @@ namespace Belle2 {
      * Decode time.
      * @param time is the raw time value.
      */
-    inline uint32_t decodeTrigTime(uint32_t time) const;
+    static uint32_t decodeTrigTime(uint32_t time);
     /**
      * Number of cell ids.
      */

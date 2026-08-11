@@ -11,8 +11,8 @@
 #include <framework/gearbox/Const.h>
 #include <vector>
 #include <cmath>
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -241,7 +241,7 @@ void ECLTrackClusterMatchingParametrizationExpertModule::terminate()
   }
 }
 
-bool ECLTrackClusterMatchingParametrizationExpertModule::isECLHit(const ExtHit& extHit) const
+bool ECLTrackClusterMatchingParametrizationExpertModule::isECLHit(const ExtHit& extHit)
 {
   if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
   ExtHitStatus extHitStatus = extHit.getStatus();

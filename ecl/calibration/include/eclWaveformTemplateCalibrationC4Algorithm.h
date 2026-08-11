@@ -22,13 +22,13 @@ namespace Belle2 {
       eclWaveformTemplateCalibrationC4Algorithm();
 
       /**..Destructor */
-      virtual ~eclWaveformTemplateCalibrationC4Algorithm() {}
+      virtual ~eclWaveformTemplateCalibrationC4Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
@@ -51,8 +51,8 @@ namespace Belle2 {
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC4Algorithm.root"; /**< file name for histogram output */
 
-      int m_firstCellID; /**< First crystal to calibrate */
-      int m_lastCellID; /**< Last crystal to calibrate */
+      int m_firstCellID = 0; /**< First crystal to calibrate */
+      int m_lastCellID = 0; /**< Last crystal to calibrate */
 
       int m_batchsize = 100;  /**< number of crystals in a batch */
       int m_numBatches = 88;  /**< number of batches */

@@ -9,11 +9,11 @@
 // modified from GEANT4 G4Transportation class
 
 #pragma once
-#include "G4ios.hh"
+#include <G4ios.hh>
 #include "globals.hh"
-#include "G4VRestDiscreteProcess.hh"
-#include "G4ParticleChangeForDecay.hh"
-#include "G4DecayProcessType.hh"
+#include <G4VRestDiscreteProcess.hh>
+#include <G4ParticleChangeForDecay.hh>
+#include <G4DecayProcessType.hh>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -30,7 +30,7 @@ namespace Belle2 {
      * Constructor
      * @param processName decay process name
      */
-    G4LongLivedNeutralDecay(const G4String& processName = "LongLivedNeutralDecay");
+    explicit G4LongLivedNeutralDecay(const G4String& processName = "LongLivedNeutralDecay");
 
     /**
      * Destructor

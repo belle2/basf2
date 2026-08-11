@@ -9,7 +9,7 @@
 #pragma once
 
 #include <globals.hh>
-#include "G4VDiscreteProcess.hh"
+#include <G4VDiscreteProcess.hh>
 
 class G4Track;
 

@@ -39,7 +39,7 @@ namespace Belle2 {
       CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy);
 
       //! Destructor
-      ~CDCSensitiveDetector() {}
+      ~CDCSensitiveDetector() override {}
 
       //! Register CDC hits collection into G4HCofThisEvent
       void Initialize(G4HCofThisEvent*) override;

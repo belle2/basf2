@@ -289,7 +289,7 @@ namespace Belle2 {
       /*!
          \return The version of the cdc geometry parameters.
       */
-      std::string version() const;
+      const std::string& version() const;
 
       //! The method to get cdc mother volume inner R
       /*!
@@ -401,7 +401,7 @@ namespace Belle2 {
       /*!
           \return The number of wire layers.
       */
-      unsigned nWireLayers() const;
+      static unsigned nWireLayers();
 
       //! Returns wire numbers in a layer
       /*!
@@ -1233,7 +1233,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------------------
 //  Inline functions
 //-----------------------------------------------------------------------------
-    inline std::string CDCGeometryPar::version() const
+    inline const std::string& CDCGeometryPar::version() const
     {
       return m_version;
     }
@@ -1358,7 +1358,7 @@ namespace Belle2 {
       return m_fieldWireDiameter;
     }
 
-    inline unsigned CDCGeometryPar::nWireLayers() const
+    inline unsigned CDCGeometryPar::nWireLayers()
     {
       return c_maxNSenseLayers;
     }

@@ -16,13 +16,13 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/geometry/B2Vector3.h>
 
-#include "G4Step.hh"
-#include "G4TransportationManager.hh"
-#include "G4Field.hh"
-#include "G4FieldManager.hh"
+#include <G4Step.hh>
+#include <G4TransportationManager.hh>
+#include <G4Field.hh>
+#include <G4FieldManager.hh>
 
-#include "CLHEP/Geometry/Vector3D.h"
-#include "CLHEP/Geometry/Point3D.h"
+#include <CLHEP/Geometry/Vector3D.h>
+#include <CLHEP/Geometry/Point3D.h>
 
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
@@ -1147,10 +1147,9 @@ line100:
       RelationElement::weight_type weight = mcPartToSimHit.getWeight(iRelation);
       if (weight > 0.) {
         trackIdOld = trackId;
-      } else if (weight <= 0. && trackId == trackIdOld) {
+      } else if (trackId == trackIdOld) {
         weight *= -1.;
         mcPartToSimHit.setToIndex(mcPartToSimHit.getToIndex(iRelation), weight);
-        trackIdOld = trackId;
       }
 
       CDCSimHit* sHit = m_CDCSimHits[mcPartToSimHit.getToIndex(iRelation)];

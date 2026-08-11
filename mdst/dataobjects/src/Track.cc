@@ -15,7 +15,7 @@
 using namespace Belle2;
 
 const TrackFitResult* Track::getTrackFitResultByName(const Const::ChargedStable& chargedStable,
-                                                     const std::string trackFitResultsName) const
+                                                     const std::string& trackFitResultsName) const
 {
   const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
   if (trackFitResultArrayIndex < 0) {
@@ -39,7 +39,7 @@ unsigned int Track::getNumberOfFittedHypotheses() const
 }
 
 
-std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResultsByName(const std::string trackFitResultsName) const
+std::vector<Track::ChargedStableTrackFitResultPair> Track::getTrackFitResultsByName(const std::string& trackFitResultsName) const
 {
   StoreArray<TrackFitResult> trackFitResults(trackFitResultsName);
   std::vector<Track::ChargedStableTrackFitResultPair> result;
@@ -78,7 +78,7 @@ std::vector < short int> Track::getValidIndices() const
 }
 
 const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
-    const std::string trackFitResultsName) const
+    const std::string& trackFitResultsName) const
 {
   // make sure at least one hypothesis exists. No B2 Track should exist which does not have at least
   // one hypothesis

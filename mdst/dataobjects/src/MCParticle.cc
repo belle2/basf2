@@ -55,7 +55,7 @@ vector<MCParticle*> MCParticle::getDaughters() const
   if (m_firstDaughter > 0) {
     fixParticleList();
     if (m_lastDaughter > m_plist->GetEntriesFast()) throw LastChildIndexOutOfRangError();
-    TClonesArray& plist = *m_plist;
+    const TClonesArray& plist = *m_plist;
     result.reserve(m_lastDaughter - m_firstDaughter + 1);
     for (int i = m_firstDaughter - 1; i < m_lastDaughter; i++) {
       result.push_back(static_cast<MCParticle*>(plist[i]));

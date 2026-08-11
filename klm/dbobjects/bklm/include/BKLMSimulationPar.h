@@ -60,7 +60,7 @@ namespace Belle2 {
     }
 
     //! Get the maximum multiplicity in the RPC strip cumulative prob density functions
-    int getMaxMultiplicity(void) const
+    static int getMaxMultiplicity(void)
     {
       return c_MAX_NHIT;
     }

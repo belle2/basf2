@@ -32,7 +32,7 @@ namespace Belle2 {
      * @param bin - tested bin
      * @return is this bin overlapping with existing bins or not
      */
-    bool isOverlappingBin(ParticleWeightingBinLimits* bin);
+    bool isOverlappingBin(const ParticleWeightingBinLimits* bin);
 
   public:
 
@@ -66,7 +66,7 @@ namespace Belle2 {
      * @param bin bin limits
      * @return key ID
      */
-    int findBin(ParticleWeightingBinLimits* bin) const;
+    int findBin(const ParticleWeightingBinLimits* bin) const;
 
     /**
      * Returns id of bin containing value

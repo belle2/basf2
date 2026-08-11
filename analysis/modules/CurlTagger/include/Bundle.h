@@ -43,13 +43,13 @@ namespace Belle2 {
     private:
 
       /** scaled impact parameter for selecting best track */
-      float scaledImpactParam(Particle* particle);
+      float scaledImpactParam(const Particle* particle);
 
       /** dr scale factor */
       double m_Gamma;
 
       /** used to rank particles by scaledImpactParam - currently unused*/
-      bool compareParticles(Particle* iPart, Particle* jPart);
+      bool compareParticles(const Particle* iPart, const Particle* jPart);
 
       /** flag for if the bundle is based on truth info, changes which labels are used */
       bool m_IsTruthBundle;

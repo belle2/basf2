@@ -96,11 +96,10 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   // Create relation: Particle <-> ContinuumSuppression
   particle->addRelationTo(qqVars);
 
-  std::vector<ROOT::Math::PxPyPzEVector> p_cms_sigB, p_cms_roe, p_cms_all;
+  std::vector<ROOT::Math::PxPyPzEVector> p_cms_sigB, p_cms_all;
 
   std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigA;
   std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigB;
-  std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe;
 
   std::vector<float> ksfwFS0;
   std::vector<float> ksfwFS1;
@@ -159,6 +158,8 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   const RestOfEvent* roe = particle->getRelated<RestOfEvent>();
 
   if (roe) {
+    std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
+    std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe;
 
     // Charged tracks
     //

@@ -936,9 +936,9 @@ namespace Belle2 {
 
         double output = 0.0;
 
-        double chargeTargetKaon = particle->getCharge();
         if (requestedVariable == "HaveOpositeCharges")
         {
+          double chargeTargetKaon = particle->getCharge();
           if (chargeTargetKaon * chargeTargetSlowPion == -1)
             output = 1;
         }

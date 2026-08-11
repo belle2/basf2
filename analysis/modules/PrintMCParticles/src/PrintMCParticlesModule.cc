@@ -162,7 +162,7 @@ void PrintMCParticlesModule::event()
 void PrintMCParticlesModule::filterPrimaryOnly(std::vector<MCParticle*>& particles) const
 {
   if (!m_onlyPrimaries or particles.empty()) return;
-  particles.erase(std::remove_if(particles.begin(), particles.end(), [](MCParticle * mc) {
+  particles.erase(std::remove_if(particles.begin(), particles.end(), [](const MCParticle * mc) {
     return not mc->hasStatus(MCParticle::c_PrimaryParticle);
   }), particles.end());
 }

@@ -129,7 +129,7 @@ namespace TreeFitter {
     return rc;
   }
 
-  bool ParticleBase::isAResonance(Belle2::Particle* particle)
+  bool ParticleBase::isAResonance(const Belle2::Particle* particle)
   {
     bool rc = false ;
     const int pdgcode = std::abs(particle->getPDGCode());
@@ -248,20 +248,20 @@ namespace TreeFitter {
   {
     assert(m_config);
     // only allow 2d for head of tree particles that are beam constrained
-    const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+    const int nDim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
     const int posindexmother = mother()->posIndex();
     const int posindex = posIndex();
     const int tauindex = tauIndex();
     const int momindex = momIndex();
 
     const double tau = fitparams.getStateVector()(tauindex);
-    Eigen::VectorXd x_vec = fitparams.getStateVector().segment(posindex, dim);
-    Eigen::VectorXd x_m   = fitparams.getStateVector().segment(posindexmother, dim);
-    Eigen::VectorXd p_vec = fitparams.getStateVector().segment(momindex, dim);
+    Eigen::VectorXd x_vec = fitparams.getStateVector().segment(posindex, nDim);
+    Eigen::VectorXd x_m   = fitparams.getStateVector().segment(posindexmother, nDim);
+    Eigen::VectorXd p_vec = fitparams.getStateVector().segment(momindex, nDim);
     const double mom = p_vec.norm();
     const double mom3 = mom * mom * mom;
 
-    if (3 == dim) {
+    if (3 == nDim) {
       // we can already set these
       //diagonal momentum
       p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1) + p_vec(2) * p_vec(2)) / mom3 ;
@@ -278,7 +278,7 @@ namespace TreeFitter {
       p.getH()(2, momindex + 0) = - tau * p_vec(2) * p_vec(0) / mom3 ;
       p.getH()(2, momindex + 1) = - tau * p_vec(2) * p_vec(1) / mom3 ;
 
-    } else if (2 == dim) {
+    } else if (2 == nDim) {
 
       // NOTE THAT THESE ARE DIFFERENT IN 2d
       p.getH()(0, momindex)     = tau * (p_vec(1) * p_vec(1)) / mom3 ;
@@ -296,9 +296,9 @@ namespace TreeFitter {
      *  that is why we do not extract the distance as a vector here
      */
     Eigen::VectorXd residuals = x_m + tau * p_vec / mom - x_vec;
-    p.getResiduals().segment(0, dim) = residuals;
+    p.getResiduals().segment(0, nDim) = residuals;
 
-    for (int row = 0; row < dim; ++row) {
+    for (int row = 0; row < nDim; ++row) {
       p.getH()(row, posindexmother + row) = 1;
       p.getH()(row, posindex + row) = -1;
       p.getH()(row, tauindex) = p_vec(row) / mom;
@@ -432,14 +432,14 @@ namespace TreeFitter {
 
       const int posindex = posIndex();
       const int mother_ps_index = mother()->posIndex();
-      const int dim  = m_config->m_originDimension; // TODO can we configure this to be particle specific?
+      const int nDim  = m_config->m_originDimension; // TODO can we configure this to be particle specific?
 
       // tau has different meaning depending on the dimension of the constraint
       // 2-> use x-y projection
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 > vertex_dist =
-        fitparams.getStateVector().segment(posindex, dim) - fitparams.getStateVector().segment(mother_ps_index, dim);
+        fitparams.getStateVector().segment(posindex, nDim) - fitparams.getStateVector().segment(mother_ps_index, nDim);
       const Eigen::Matrix < double, 1, -1, 1, 1, 3 >
-      mom = fitparams.getStateVector().segment(posindex, dim);
+      mom = fitparams.getStateVector().segment(posindex, nDim);
 
       // if an intermediate vertex is not well defined by a track or so it will be initialised with 0
       // same for the momentum of for example B0, it might be initialised with 0

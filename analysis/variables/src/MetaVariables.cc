@@ -757,6 +757,8 @@ namespace Belle2 {
           for (const auto& iListName : listNames)
           {
             try {
+              // only used to test whether the name is a number
+              // cppcheck-suppress ignoredReturnValue
               std::stod(iListName);
               continue;
             } catch (const std::exception& e) {}

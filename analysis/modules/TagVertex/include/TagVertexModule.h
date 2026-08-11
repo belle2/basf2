@@ -59,10 +59,6 @@ namespace Belle2 {
 
     /**
          * Called when entering a new run.
-         * Set run dependent things
-         */
-    virtual void beginRun() override;
-
     /**
      * Event processor.
      */

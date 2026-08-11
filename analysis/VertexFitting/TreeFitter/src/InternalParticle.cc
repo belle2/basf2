@@ -128,9 +128,9 @@ namespace TreeFitter {
           auto part_dau2 = particle()->getDaughter(1);
 
           auto recotrack_dau1 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau1](RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau1->getMdstSource(); });
+          [&part_dau1](const RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau1->getMdstSource(); });
           auto recotrack_dau2 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
-          [&part_dau2](RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau2->getMdstSource(); });
+          [&part_dau2](const RecoTrack * rt) { return rt->particle()->getMdstSource() == part_dau2->getMdstSource(); });
 
           if (recotrack_dau1 == trkdaughters.end() || recotrack_dau2 == trkdaughters.end()) {
             B2WARNING("V0 daughter particles do not match with RecoTracks.");
@@ -173,8 +173,8 @@ namespace TreeFitter {
         // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)
       } else if (mother() && mother()->posIndex() >= 0) {
         const int posindexmother = mother()->posIndex();
-        const int dim = m_config->m_originDimension; //TODO access mother
-        fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmother, dim);
+        const int nDim = m_config->m_originDimension; //TODO access mother
+        fitparams.getStateVector().segment(posindex, nDim) = fitparams.getStateVector().segment(posindexmother, nDim);
       } else {
         /** (0,0,0) is the best guess in any other case */
         fitparams.getStateVector().segment(posindex, 3) = Eigen::Matrix<double, 1, 3>::Zero(3);
@@ -196,8 +196,8 @@ namespace TreeFitter {
         mother() &&
         fitparams.getStateVector().segment<3>(posindex).isZero()) {
       const int posindexmom = mother()->posIndex();
-      const int dim = m_config->m_originDimension; //TODO access mother?
-      fitparams.getStateVector().segment(posindex, dim) = fitparams.getStateVector().segment(posindexmom, dim);
+      const int nDim = m_config->m_originDimension; //TODO access mother?
+      fitparams.getStateVector().segment(posindex, nDim) = fitparams.getStateVector().segment(posindexmom, nDim);
     }
     return initTau(fitparams);
   }
@@ -393,8 +393,8 @@ namespace TreeFitter {
     }
     if (m_geo_constraint) {
       assert(m_config);
-      const int dim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
-      list.push_back(Constraint(this, Constraint::geometric, depth, dim, 3));
+      const int nDim = m_config->m_originDimension == 2 && std::abs(m_particle->getPDGCode()) == m_config->m_headOfTreePDG ? 2 : 3;
+      list.push_back(Constraint(this, Constraint::geometric, depth, nDim, 3));
     }
     if (m_massconstraint) {
       list.push_back(Constraint(this, Constraint::mass, depth, 1, 3));
@@ -420,10 +420,10 @@ namespace TreeFitter {
     }
     const int momindex = momIndex();
     if (momindex > 0) {
-      const int dim = hasEnergy() ? 4 : 3;
-      Projection p(fitparams.getDimensionOfState(), dim);
+      const int nDim = hasEnergy() ? 4 : 3;
+      Projection p(fitparams.getDimensionOfState(), nDim);
       projectKineConstraint(fitparams, p);
-      fitparams.getStateVector().segment(momindex, dim) -= p.getResiduals().segment(0, dim);
+      fitparams.getStateVector().segment(momindex, nDim) -= p.getResiduals().segment(0, nDim);
     }
   }
 

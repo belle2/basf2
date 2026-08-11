@@ -270,11 +270,11 @@ Here is a list of variables that returns extra info of a given particle:
 .. b2-variables::
    :group: MetaFunctions
 
-MC matching and MC truth
+MC Truth
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here is a list of MC truth-related variables.
-For some variables, you will need to run truth matching in order to get sensible results.
+For some variables, you will need to run the MC matching module in order to get sensible results.
 
 .. code-block:: python
 

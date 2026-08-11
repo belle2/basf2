@@ -421,11 +421,9 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
             For secondary particles this includes creation process.
         suppressPrint (bool): if True printing the information on the log message is suppressed.
             Even if True, the branch ``__MCDecayString__`` is created.
-        storeCompact (bool): if True, store a compact single-line string in the
-            ``__MCDecayString__`` branch (e.g.
-            ``Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> pi- [D0 -> pi- pi+]]``)
-            instead of the full indented tree. Only affects the ROOT branch, not the
-            log output. Default False.
+        storeCompact (bool): if True, store a compact single-line string (see above) in the
+            ``__MCDecayString__`` branch instead of the full indented tree. Only affects the
+            ROOT branch, not the log output. Default False.
     """
 
     return path.add_module(

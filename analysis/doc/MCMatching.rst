@@ -292,16 +292,17 @@ these also have no mother particle in the generated event, for example::
 
 Here ``->`` separates a particle from its daughters, ``[...]`` groups a composite daughter together with
 its own descendants, and ``~`` prefixes secondary particles (i.e. particles created during the detector
-simulation rather than by the generator). Radiative photons are also given a distinct name so that they
-can be told apart from generator-level photons when parsing the string:
+simulation rather than by the generator). A particle whose PDG code is not known to ``TDatabasePDG`` is
+named ``UNKNOWN(<pdg code>)``.
+
+Radiative photons are also given a distinct name so that they can be told apart from generator-level
+photons when parsing the string:
 
 * ``gammaI`` for initial state radiation (based on MCParticle: ``c_IsISRPhoton``),
 * ``gammaF`` for final state radiation (based on MCParticle: ``c_IsFSRPhoton``),
 * ``gammaP`` for photons added by PHOTOS (based on MCParticle: ``c_IsPHOTOSPhoton``),
 
-A particle whose PDG code is not known to ``TDatabasePDG`` is named ``UNKNOWN(<pdg code>)``.
-
-For example if the muon in the decay above also radiated a PHOTOS photon::
+For example, if the muon in the decay above also radiated a PHOTOS photon::
 
   Upsilon(4S) -> [B+ -> mu+ nu_mu gamma gammaP] [B- -> pi- [D0 -> pi- pi+]]
 
@@ -315,7 +316,8 @@ descendants entirely, which is usually the more useful setting for studying the 
 
 If ``maxLevel`` limits the depth of the tree, a particle whose daughters are cut off by this limit has
 ``-> ...`` appended after it instead of showing its daughters, mirroring the ``→ …`` indicator used in
-the default indented tree. For example, with ``maxLevel=1`` the whole event above would collapse to::
+the default indented tree. For example, applying ``maxLevel=1`` to the first example above would collapse
+it to::
 
   Upsilon(4S) -> ...
 
@@ -330,10 +332,10 @@ Unlike the numbered generated decay modes described below, this does not require
 to be enumerated in advance.
 
 .. important::
-		When running on all events, it is important to also set ``suppressPrint=True`` (as in the
-		example above). Otherwise the default indented tree is still built and printed via ``B2INFO``
-		for every event, in addition to being stored in ``storeCompact`` format, which can cause the
-		log files to explode in size.
+        When running on all events, it is important to also set ``suppressPrint=True`` (as in the
+        example above). Otherwise the default indented tree is still built and printed via ``B2INFO``
+        for every event, in addition to being stored in ``storeCompact`` format, which can cause the
+        log files to explode in size.
 
 .. _GeneratedDecayModes:
 

@@ -55,6 +55,51 @@ def collect(**kwargs):
     return collector.strings
 
 
+class CreateMCParticles(basf2.Module):
+    """
+    Create a handful of standalone (motherless, daughterless) MCParticles to
+    deterministically exercise formatParticleCompact's special-case naming,
+    independent of whether real generated events happen to contain them.
+    """
+
+    def initialize(self):
+        """reimplementation"""
+        #: StoreArray the MCParticles are appended to
+        self.mcparticles = Belle2.PyStoreArray(Belle2.MCParticle.Class())
+        self.mcparticles.registerInDataStore()
+
+    def event(self):
+        """reimplementation"""
+        def add(pdg, status):
+            p = self.mcparticles.appendNew()
+            p.setPDG(pdg)
+            p.setStatus(status)
+
+        primary = Belle2.MCParticle.c_PrimaryParticle
+        add(22, primary | Belle2.MCParticle.c_IsISRPhoton)
+        add(22, primary | Belle2.MCParticle.c_IsFSRPhoton)
+        add(22, primary | Belle2.MCParticle.c_IsPHOTOSPhoton)
+        add(123456789, primary)  # not a real PDG code
+
+
+def collectSynthetic():
+    """
+    Run `modularAnalysis.printMCParticles` on a single event containing the
+    particles created by `CreateMCParticles` and return the resulting
+    ``MCDecayString`` value.
+    """
+
+    main = basf2.create_path()
+    main.add_module('EventInfoSetter', evtNumList=[1], runList=[0], expList=[0])
+    main.add_module(CreateMCParticles())
+    ma.printMCParticles(path=main, suppressPrint=True, storeCompact=True, onlyPrimaries=False)
+    collector = CollectMCDecayStrings()
+    main.add_module(collector)
+    with b2test_utils.show_only_errors():
+        basf2.process(main)
+    return collector.strings[0]
+
+
 class TestPrintMCParticlesStoreCompact(unittest.TestCase):
     """Tests for the ``storeCompact`` option of the `PrintMCParticles` module"""
 
@@ -83,6 +128,8 @@ class TestPrintMCParticlesStoreCompact(unittest.TestCase):
 
         strings = collect(storeCompact=True, maxLevel=1)
         self.assertTrue(len(strings) > 0, "no events processed")
+        self.assertTrue(any('-> ...' in decayString for decayString in strings),
+                        "expected at least one particle to actually be truncated by maxLevel=1")
         for decayString in strings:
             self.assertNotIn('->', decayString.replace('-> ...', ''),
                              "no real decay should survive maxLevel=1 truncation")
@@ -94,6 +141,12 @@ class TestPrintMCParticlesStoreCompact(unittest.TestCase):
         self.assertTrue(len(strings) > 0, "no events processed")
         for decayString in strings:
             self.assertNotIn('~', decayString)
+
+    def test_radiative_photons_and_unknown_pdg_are_named(self):
+        """ISR/FSR/PHOTOS photons and particles unknown to TDatabasePDG get distinct compact names"""
+
+        decayString = collectSynthetic()
+        self.assertEqual(decayString, 'gammaI gammaF gammaP UNKNOWN(123456789)')
 
 
 if __name__ == '__main__':

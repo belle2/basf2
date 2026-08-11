@@ -67,7 +67,7 @@ namespace Belle2 {
       /**
        * Returns path of temporary directory
        */
-      std::string getTempDir() const;
+      const std::string& getTempDir() const;
     private:
       std::string m_oldpwd; /**< previous working directory. */
       std::string m_tmpdir; /**< path of temporary director. */

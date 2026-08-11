@@ -214,6 +214,9 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
     }
 
     // Check whether the types match
+    // checkType() either returns true or aborts via B2FATAL, hence the condition
+    // looks always false to static analysis; keep the check as a safety net
+    // cppcheck-suppress knownConditionTrueFalse
     if (!checkType(entry, accessor)) return false;
 
     // Check whether the persistency type matches
@@ -294,6 +297,7 @@ DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
   const auto& it = m_storeEntryMap[accessor.getDurability()].find(accessor.getName());
 
+  // cppcheck-suppress knownConditionTrueFalse ; checkType() either returns true or aborts via B2FATAL
   if (it != m_storeEntryMap[accessor.getDurability()].end() and checkType((it->second), accessor)) {
     return &(it->second);
   } else {

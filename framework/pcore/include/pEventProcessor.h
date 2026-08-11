@@ -38,6 +38,7 @@ namespace Belle2 {
         \param maxEvent The maximum number of events that will be processed.
             If the number is smaller or equal 0, all events will be processed.
     */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     void process(const PathPtr& spath, long maxEvent);
 
     /** signal handler for Ctrl+C (async-safe)
@@ -75,7 +76,7 @@ namespace Belle2 {
      *
      * needs to be called at the end of every process.
      */
-    void clearFileList();
+    static void clearFileList();
 
     /** Return only modules which have the given Module flag set. */
     static ModulePtrList getModulesWithFlag(const ModulePtrList& modules, Module::EModulePropFlags flag);

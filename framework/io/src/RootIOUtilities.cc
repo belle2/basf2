@@ -56,8 +56,8 @@ std::set<std::string> RootIOUtilities::filterBranches(const std::set<std::string
     if (branchSet.empty() or branchSet.count(branch))
       out.insert(branch);
   }
-  std::set<std::string> excluderelations;
   if (!excludeBranchSet.empty()) {
+    std::set<std::string> excluderelations;
     //remove relations for excluded things
     for (const std::string& from : branchesToFilter) {
       for (const std::string& to : branchesToFilter) {
@@ -154,7 +154,7 @@ long RootIOUtilities::getEntryNumberWithEvtRunExp(TTree* tree, long event, long 
 void RootIOUtilities::buildIndex(TTree* tree)
 {
   std::string treeName = tree->GetName();
-  TBranch* const EventMetaDataBranch = tree->GetBranch("EventMetaData");
+  const TBranch* const EventMetaDataBranch = tree->GetBranch("EventMetaData");
   if ((strcmp(treeName.c_str(), "tree") == 0) && EventMetaDataBranch) {
     tree->BuildIndex("1000000*EventMetaData.m_experiment+EventMetaData.m_run", "EventMetaData.m_event");
   }

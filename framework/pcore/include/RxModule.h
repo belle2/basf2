@@ -31,9 +31,7 @@ namespace Belle2 {
     //! Module functions to be called from main process
     virtual void initialize() override;
 
-    virtual void beginRun() override;
     virtual void event() override;
-    virtual void endRun() override;
     virtual void terminate() override;
 
     /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */

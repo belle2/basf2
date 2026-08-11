@@ -63,7 +63,7 @@ namespace Belle2 {
       std::vector<GearDir> getNodes(const std::string& path = "") const;
 
       /** Return path of the current interface */
-      std::string getPath() const { return m_path; }
+      const std::string& getPath() const { return m_path; }
 
       /**
        * Get the parameter path as a string.
@@ -482,13 +482,13 @@ namespace Belle2 {
     protected:
 
       /** make sure the path really corresponds to an XPath node expression by removing trailing slashes */
-      std::string ensureNode(const std::string& path) const ;
+      static std::string ensureNode(const std::string& path);
       /** make sure the path really corresponds to a path by appending a trailing slash if necessary */
-      std::string ensurePath(const std::string& path) const;
+      static std::string ensurePath(const std::string& path);
       /** add [index] to the path (after stripping trailing slashes) */
-      std::string addIndex(const std::string& path, int index) const;
+      static std::string addIndex(const std::string& path, int index);
       /** joind to paths, inserting a slash if necessary */
-      std::string joinPath(const std::string& path, const std::string& subpath) const;
+      static std::string joinPath(const std::string& path, const std::string& subpath);
 
       /** path of the current interface */
       std::string m_path;

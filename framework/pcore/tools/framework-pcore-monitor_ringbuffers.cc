@@ -24,7 +24,7 @@
 
 void rbinfo(int shmid)
 {
-  const int* shmadr = (int*) shmat(shmid, nullptr, SHM_RDONLY);
+  const int* shmadr = static_cast<int*>(shmat(shmid, nullptr, SHM_RDONLY));
   if (shmadr == (int*) - 1) {
     B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
   }
@@ -50,7 +50,7 @@ std::vector<int> findRingBuffers()
   std::vector<int> buffer_SHMs;
   DIR* dir;
   if ((dir = opendir(std::filesystem::temp_directory_path().c_str())) != nullptr) {
-    struct dirent* ent;
+    const struct dirent* ent;
     while ((ent = readdir(dir)) != nullptr) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {
         int shmid, semid;

@@ -294,6 +294,7 @@ boost::python::list Framework::getRegisteredModulesPython()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
+// cppcheck-suppress unknownMacro
 BOOST_PYTHON_FUNCTION_OVERLOADS(process_overloads, Framework::process, 1, 2)
 #if !defined(__GNUG__) || defined(__ICC)
 #else

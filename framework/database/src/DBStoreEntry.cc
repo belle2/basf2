@@ -34,7 +34,7 @@ namespace Belle2 {
   {
     assert(obj);
     bool isArrayType = dynamic_cast<const TClonesArray*>(obj) != nullptr;
-    TClass* const objClass = isArrayType ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
+    const TClass* const objClass = isArrayType ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
     return DBStoreEntry(c_Object, name, objClass, isArrayType, isRequired);
   }
 
@@ -53,7 +53,7 @@ namespace Belle2 {
     // if we don't have intra run dependency we don't care about event number
     if (!m_intraRunDependency) return;
     // otherwise update the object and call notify all accessors on change
-    TObject* const old = m_object;
+    const TObject* const old = m_object;
     m_object = m_intraRunDependency->getObject(event);
     if (old != m_object) {
       B2DEBUG(35, "IntraRunDependency for " << m_name << ": new object (" << old << ", " << m_object << "), notifying accessors");
@@ -154,6 +154,9 @@ namespace Belle2 {
 
   void DBStoreEntry::overrideObject(TObject* obj, const IntervalOfValidity& iov)
   {
+    // checkType() either returns true or aborts via B2FATAL, hence the condition
+    // looks always false to static analysis; keep the check as a safety net
+    // cppcheck-suppress knownConditionTrueFalse
     if (!checkType(obj)) return;
 
     m_globaltag = "";
@@ -227,7 +230,7 @@ namespace Belle2 {
     if (object->InheritsFrom(IntraRunDependency::Class())) {
       object = static_cast<const IntraRunDependency*>(object)->getAnyObject();
     }
-    TClass* objClass = object->IsA();
+    const TClass* objClass = object->IsA();
     bool array = (objClass == TClonesArray::Class());
     if (array) {
       objClass = static_cast<const TClonesArray*>(object)->GetClass();

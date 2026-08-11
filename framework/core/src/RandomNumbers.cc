@@ -50,15 +50,15 @@ void RandomNumbers::initialize(const std::string& seed)
   if (!s_runRng) {
     s_runRng = new RandomGenerator("independent generator");
   }
-  auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
+  const auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
     delete gRandom;
     B2DEBUG(100, "Replacing gRandom from " << gRandom << " to " << gen);
   }
   gRandom = s_evtRng;
   s_evtRng->setMode(RandomGenerator::c_independent);
-  s_evtRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
-  s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
+  s_evtRng->setSeed(reinterpret_cast<const unsigned char*>(seed.c_str()), seed.size());
+  s_runRng->setSeed(reinterpret_cast<const unsigned char*>(seed.c_str()), seed.size());
 }
 
 bool RandomNumbers::isInitialized()

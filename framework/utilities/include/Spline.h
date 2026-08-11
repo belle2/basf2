@@ -24,6 +24,6 @@ namespace Belle2::Spline {
    * @param[out] C  Second derivative coefficients.
    * @param[out] D  Third derivative coefficients.
    */
-  void muidSpline(int n, double dx, double Y[], double B[], double C[], double D[]);
+  void muidSpline(int n, double dx, const double Y[], double B[], double C[], double D[]);
 
 }

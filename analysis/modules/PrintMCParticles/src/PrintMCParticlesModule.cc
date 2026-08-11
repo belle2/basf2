@@ -291,7 +291,7 @@ std::string PrintMCParticlesModule::formatParticleCompact(const MCParticle* mc, 
 
   if (not showDaughters) {
     if (not daughters.empty()) {
-      name += " ...";
+      name += " -> ...";
     }
     return name;
   }

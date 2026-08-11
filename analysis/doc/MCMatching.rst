@@ -311,6 +311,15 @@ example if the primary :math:`\pi^-` above instead interacted in the detector ma
 Setting ``onlyPrimaries=True`` (as in the first example) omits such secondary particles and their
 descendants entirely, which is usually the more useful setting for studying the generated decay itself.
 
+If ``maxLevel`` limits the depth of the tree, a particle whose daughters are cut off by this limit has
+``-> ...`` appended after it instead of showing its daughters, mirroring the ``→ …`` indicator used in
+the default indented tree. For example, with ``maxLevel=1`` the whole event above would collapse to::
+
+  Upsilon(4S) -> ...
+
+This truncation does not happen by default, since the default ``maxLevel=-1`` means the tree is never cut
+off.
+
 Because this string is written out per event, it can be stored
 alongside the other analysis variables (e.g. via `modularAnalysis.variablesToNtuple`) and then parsed
 offline, for example with a simple recursive-descent parser or even just string/regular-expression
@@ -319,7 +328,7 @@ Unlike the numbered generated decay modes described below, this does not require
 to be enumerated in advance.
 
 .. important::
-        When running on all events, it is important to also set ``suppressPrint=True`` (as in the
+		When running on all events, it is important to also set ``suppressPrint=True`` (as in the
 		example above). Otherwise the default indented tree is still built and printed via ``B2INFO``
 		for every event, in addition to being stored in ``storeCompact`` format, which can cause the
 		log files to explode in size.

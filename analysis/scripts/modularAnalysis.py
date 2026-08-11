@@ -398,9 +398,14 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     particles. Radiative photons are also given a distinct name to tell them
     apart from generator-level photons: ``gammaI`` for initial state
     radiation, ``gammaF`` for final state radiation, and ``gammaP`` for
-    photons added by PHOTOS. The compact string uses less storage space and is
-    easier to parse. Note that this only affects the ``__MCDecayString__``
-    branch in the ROOT file; the log output always shows the full indented tree.
+    photons added by PHOTOS. If ``maxLevel`` cuts off a particle that still
+    has further daughters, ``-> ...`` is appended after that particle instead
+    of showing its daughters, e.g. ``B+ -> ...``, just like the ``→ …``
+    indicator used in the default indented tree. This does not happen by
+    default, since the default ``maxLevel=-1`` means the tree is never
+    truncated. The compact string uses less storage space and is easier to
+    parse. Note that this only affects the ``__MCDecayString__`` branch in the
+    ROOT file; the log output always shows the full indented tree.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
@@ -414,7 +419,8 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         suppressPrint (bool): if True printing the information on the log message is suppressed.
             Even if True, the branch ``__MCDecayString__`` is created.
         storeCompact (bool): if True, store a compact single-line string in the
-            ``__MCDecayString__`` branch (e.g. ``Upsilon(4S) -> [B+ -> mu+ ...]``)
+            ``__MCDecayString__`` branch (e.g.
+            ``Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> pi- [D0 -> pi- pi+]]``)
             instead of the full indented tree. Only affects the ROOT branch, not the
             log output. Default False.
     """

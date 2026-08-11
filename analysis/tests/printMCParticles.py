@@ -79,12 +79,13 @@ class TestPrintMCParticlesStoreCompact(unittest.TestCase):
             self.assertLess(len(compactString), len(fullString))
 
     def test_max_level_truncates_compact_string(self):
-        """with maxLevel=1 the compact string should never show a decay ('->')"""
+        """with maxLevel=1 the only '->' allowed in the compact string is the truncation marker ('-> ...')"""
 
         strings = collect(storeCompact=True, maxLevel=1)
         self.assertTrue(len(strings) > 0, "no events processed")
         for decayString in strings:
-            self.assertNotIn('->', decayString)
+            self.assertNotIn('->', decayString.replace('-> ...', ''),
+                             "no real decay should survive maxLevel=1 truncation")
 
     def test_only_primaries_filters_secondaries(self):
         """with onlyPrimaries=True the compact string should not mark any particle as secondary ('~')"""

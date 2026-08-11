@@ -23,7 +23,7 @@
 #include <G4OpticalSurface.hh>
 #include <G4MaterialPropertiesTable.hh>
 
-#include "CLHEP/Units/PhysicalConstants.h"
+#include <CLHEP/Units/PhysicalConstants.h>
 
 using namespace std;
 

@@ -46,7 +46,7 @@ namespace Belle2 {
   private:
 
     //! Create unique and legal name for each solid, logical volume, physical volume
-    void assignName(std::vector<std::string>*, unsigned int, const G4String&, int);
+    static void assignName(std::vector<std::string>*, unsigned int, const G4String&, int);
 
     //! Write FBX definition for each solid's polyhedron
     void writeGeometryNode(G4VSolid*, const std::string&, unsigned long long);
@@ -91,7 +91,7 @@ namespace Belle2 {
     void writePVToParentPV(const std::string&, const std::string&, unsigned long long, unsigned long long);
 
     //! Create polyhedron for a boolean solid (recursive)
-    HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
+    static HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
 
     //! Once-only flag to write FBX only on the first event
     bool m_First{true};

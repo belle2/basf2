@@ -102,7 +102,7 @@ void KLMExpertModule::event()
   const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   //overwritten at the end of the cluster loop
-  KlId* klid = nullptr;
+  const KlId* klid = nullptr;
 
   // loop thru clusters in event and classify
   for (KLMCluster& cluster : m_klmClusters) {
@@ -120,7 +120,7 @@ void KLMExpertModule::event()
 
     // find nearest ecl cluster and calculate distance
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);
-    ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
+    const ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     // get variables of the closest ECL cluster might be removed in future

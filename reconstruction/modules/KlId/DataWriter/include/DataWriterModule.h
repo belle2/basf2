@@ -29,19 +29,13 @@ namespace Belle2 {
     DataWriterModule();
 
     /** Destructor */
-    virtual ~DataWriterModule();
+    virtual ~DataWriterModule() override;
 
     /** init */
     virtual void initialize() override;
 
-    /** beginn run */
-    virtual void beginRun() override;
-
     /** process event */
     virtual void event() override;
-
-    /** end run */
-    virtual void endRun() override;
 
     /** terminate */
     virtual void terminate() override;

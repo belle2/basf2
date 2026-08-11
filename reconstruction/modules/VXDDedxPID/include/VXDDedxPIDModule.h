@@ -52,7 +52,7 @@ namespace Belle2 {
     VXDDedxPIDModule();
 
     /** Destructor */
-    virtual ~VXDDedxPIDModule();
+    virtual ~VXDDedxPIDModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;
@@ -75,14 +75,14 @@ namespace Belle2 {
      * @param truncatedMeanErr  error for truncatedMean
      * @param dedx              input values
      */
-    void calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr, const std::vector<double>& dedx) const;
+    static void calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr, const std::vector<double>& dedx);
 
     /** returns traversed length through active medium of given hit */
     template <class HitClass> static double getTraversedLength(const HitClass* hit, const RecoTrack* recoTrack, double& p);
 
     /** save energy loss and hit information from SVD/PXDHits to track */
-    template <class HitClass> void saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
-                                              const RecoTrack* recoTrack) const;
+    template <class HitClass> static void saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
+                                                     const RecoTrack* recoTrack);
 
     // module steering parameters
     bool m_useIndividualHits; /**< use individual hits (true) or truncated mean (false) to determine likelihoods */

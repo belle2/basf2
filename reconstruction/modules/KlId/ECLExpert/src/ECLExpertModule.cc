@@ -102,10 +102,10 @@ void ECLExpertModule::event()
   const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   //overwritten at the end of the cluster loop
-  KlId* klid = nullptr;
+  const KlId* klid = nullptr;
 
   // loop thru clusters in event and classify
-  for (ECLCluster& cluster : m_eclClusters) {
+  for (const ECLCluster& cluster : m_eclClusters) {
 
     if (!cluster.hasHypothesis(eclHypothesis)) {continue;}
 

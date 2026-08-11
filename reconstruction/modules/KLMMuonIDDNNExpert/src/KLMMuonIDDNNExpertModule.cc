@@ -60,7 +60,7 @@ void KLMMuonIDDNNExpertModule::initialize()
   m_tracks.registerRelationTo(m_inputVariable);
 
   // setup KLM geometry
-  bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
+  const bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
 
   m_EndcapScintWidth = eklmGeometry.getStripGeometry()->getWidth() / CLHEP::cm; // in G4e units (cm)
@@ -94,10 +94,6 @@ void KLMMuonIDDNNExpertModule::beginRun()
   }
 }
 
-void KLMMuonIDDNNExpertModule::endRun()
-{
-}
-
 void KLMMuonIDDNNExpertModule::initializeMVA(MVA::Weightfile& weightfile)
 {
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
@@ -120,7 +116,7 @@ void KLMMuonIDDNNExpertModule::event()
 {
   for (Track& track : m_tracks) {
 
-    KLMMuidLikelihood* klmll = track.getRelatedTo<KLMMuidLikelihood>();
+    const KLMMuidLikelihood* klmll = track.getRelatedTo<KLMMuidLikelihood>();
 
     if (!klmll) continue;
 
@@ -163,7 +159,7 @@ void KLMMuonIDDNNExpertModule::event()
 
     std::map<int, int> Hit2dMap; // arrange KLMHit2d in the order of layer
     for (long unsigned int ii = 0; ii < KLMHit2drelation.size(); ii++) {
-      KLMHit2d* klmhit = KLMHit2drelation[ii];
+      const KLMHit2d* klmhit = KLMHit2drelation[ii];
       bool hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
       unsigned long int hit_layer = klmhit->getLayer();
 
@@ -178,7 +174,7 @@ void KLMMuonIDDNNExpertModule::event()
 
       nklmhits += 1;
 
-      KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
+      const KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
 
       float KFchi2 = KLMHit2drelation.weight(itermap->second);
       float width = getHitWidth(klmhit);

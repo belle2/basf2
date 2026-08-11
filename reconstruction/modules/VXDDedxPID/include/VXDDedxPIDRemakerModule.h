@@ -30,7 +30,7 @@ namespace Belle2 {
     VXDDedxPIDRemakerModule();
 
     /** Destructor */
-    virtual ~VXDDedxPIDRemakerModule()
+    virtual ~VXDDedxPIDRemakerModule() override
     {}
 
     /** Initialize the module */

@@ -16,7 +16,7 @@ namespace Belle2 {
 
 
   /** Get minimum inside and outside of the smaller window defined by i0, j0 */
-  inline std::pair<double, double> getMinima(std::vector<std::vector<double>> vals, int i0, int j0)
+  inline std::pair<double, double> getMinima(const std::vector<std::vector<double>>& vals, int i0, int j0)
   {
     int N = vals.size();
     int Nzoom = (N + 1) / 2;

@@ -35,7 +35,7 @@ namespace Belle2 {
     VXDGeometryPar() {}
 
     /** get prefix */
-    std::string getPrefix() const {return m_prefix;}
+    const std::string& getPrefix() const {return m_prefix;}
     /** set prefix */
     void setPrefix(const std::string& prefix) { m_prefix = prefix;}
     /** get global parameters */

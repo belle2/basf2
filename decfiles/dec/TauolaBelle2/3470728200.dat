@@ -3,7 +3,7 @@
 1                               * switch for KKMC-JETSET (1:on, 0:off)
 ********** Above is for basf *********
 
-* MCEventType: 3470728200 Descriptor: [tau- -> K_L0 pi- eta nu_tau] [tau+ -> e+/mu+ nu_e anti-nu_tau] + C.C (TauolaBelle2)
+* MCEventType: 3470728200 Descriptor: [tau- -> K_L0 pi- [eta -> gamma gamma] nu_tau] [tau+ -> e+/mu+ nu_e anti-nu_tau] + C.C (TauolaBelle2)
 
 BeginX
 ********************************************************************************
@@ -26,7 +26,7 @@ BeginX
 ********************************************************************************
   901              4      Ihvp  ! =1,2,3,4
 ********************************************************************************
- 2001          129e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
+ 2001          145e0      Jak1   =xpar(71)  First  Tau decay mask (tau-)
  2002            0e0      Jak2   =xpar(72)  Second Tau decay mask (tau+)
 ********************************************************************************
  2900            1e0      BBB    0: ORIG  1: BBB

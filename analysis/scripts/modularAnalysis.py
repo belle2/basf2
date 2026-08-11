@@ -398,9 +398,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
     particles. Radiative photons are also given a distinct name to tell them
     apart from generator-level photons: ``gammaI`` for initial state
     radiation, ``gammaF`` for final state radiation, and ``gammaP`` for
-    photons added by PHOTOS. If ``maxLevel`` cuts off a particle that still
-    has further daughters, ``-> ...`` is appended after that particle instead
-    of showing its daughters, e.g. ``B+ -> ...``, just like the ``→ …``
+    photons added by PHOTOS. A particle whose PDG code is not known to
+    ``TDatabasePDG`` is named ``UNKNOWN(<pdg code>)``.
+
+    If ``maxLevel`` cuts off a particle that still has further daughters,
+    ``-> ...`` is appended after that particle instead of showing its
+    daughters, e.g. ``B+ -> ...``, just like the ``→ …``
     indicator used in the default indented tree. This does not happen by
     default, since the default ``maxLevel=-1`` means the tree is never
     truncated. The compact string uses less storage space and is easier to

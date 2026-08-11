@@ -268,7 +268,7 @@ std::string PrintMCParticlesModule::formatParticleCompact(const MCParticle* mc, 
 {
   TDatabasePDG* pdb = TDatabasePDG::Instance();
   TParticlePDG* pdef = pdb->GetParticle(mc->getPDG());
-  std::string name = pdef ? pdef->GetTitle() : "[UNKNOWN]";
+  std::string name = pdef ? pdef->GetTitle() : "UNKNOWN(" + std::to_string(mc->getPDG()) + ")";
 
   if (name == "gamma") {
     if (mc->hasStatus(MCParticle::c_IsISRPhoton)) {

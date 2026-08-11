@@ -299,7 +299,9 @@ can be told apart from generator-level photons when parsing the string:
 * ``gammaF`` for final state radiation (based on MCParticle: ``c_IsFSRPhoton``),
 * ``gammaP`` for photons added by PHOTOS (based on MCParticle: ``c_IsPHOTOSPhoton``),
 
-for example if the muon in the decay above also radiated a PHOTOS photon::
+A particle whose PDG code is not known to ``TDatabasePDG`` is named ``UNKNOWN(<pdg code>)``.
+
+For example if the muon in the decay above also radiated a PHOTOS photon::
 
   Upsilon(4S) -> [B+ -> mu+ nu_mu gamma gammaP] [B- -> pi- [D0 -> pi- pi+]]
 

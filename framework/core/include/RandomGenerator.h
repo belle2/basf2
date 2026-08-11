@@ -190,7 +190,14 @@ namespace Belle2 {
      * Version 2: merge m_eventDependent and m_useEventData into a general
      * generator mode m_mode
      */
-    ClassDefOverride(RandomGenerator, 2);
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#endif
+    ClassDef(RandomGenerator, 2);
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif
   };
 
   inline uint64_t RandomGenerator::random64()

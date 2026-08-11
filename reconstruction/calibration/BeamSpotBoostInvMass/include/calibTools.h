@@ -104,7 +104,7 @@ namespace Belle2 {
       double Start, End;
       std::tie(Start, End) = Splitter::getStartEnd(r);
 
-      Eigen::Vector3d ipNow;
+      Eigen::Vector3d ipNow = Eigen::Vector3d::Zero();
       Eigen::MatrixXd ipeNow;
       Eigen::MatrixXd sizeMatNow;
 

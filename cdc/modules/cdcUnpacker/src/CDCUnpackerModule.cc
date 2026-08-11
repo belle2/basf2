@@ -268,7 +268,7 @@ void CDCUnpackerModule::event()
           std::vector<unsigned short> fadcs;
           std::vector<unsigned short> tdcs;
 
-          if (m_buffer.size() < fadcTdcChannels + 2 * fadcTdcChannels * nSamples) continue; // otherwise crash below
+          if (m_buffer.size() < static_cast<size_t>(fadcTdcChannels + 2 * fadcTdcChannels * nSamples)) continue; // otherwise crash below
 
           for (int iCh = 0; iCh < fadcTdcChannels; ++iCh) {
             const int offset = fadcTdcChannels;

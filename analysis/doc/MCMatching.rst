@@ -292,9 +292,19 @@ these also have no mother particle in the generated event, for example::
 
 Here ``->`` separates a particle from its daughters, ``[...]`` groups a composite daughter together with
 its own descendants, and ``~`` prefixes secondary particles (i.e. particles created during the detector
-simulation rather than by the generator). By default ``onlyPrimaries`` is ``False``, so these secondary
-particles are also included, for example if the primary :math:`\pi^-` above instead interacted in the
-detector material::
+simulation rather than by the generator). Radiative photons are also given a distinct name so that they
+can be told apart from generator-level photons when parsing the string:
+
+* ``gammaI`` for initial state radiation (based on MCParticle: ``c_IsISRPhoton``),
+* ``gammaF`` for final state radiation (based on MCParticle: ``c_IsFSRPhoton``),
+* ``gammaP`` for photons added by PHOTOS (based on MCParticle: ``c_IsPHOTOSPhoton``),
+
+for example if the muon in the decay above also radiated a PHOTOS photon::
+
+  Upsilon(4S) -> [B+ -> mu+ nu_mu gamma gammaP] [B- -> pi- [D0 -> pi- pi+]]
+
+By default ``onlyPrimaries`` is ``False``, so secondary particles are also included in the string, for
+example if the primary :math:`\pi^-` above instead interacted in the detector material::
 
   Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> [pi- -> ~gamma ~gamma] [D0 -> pi- pi+]]
 

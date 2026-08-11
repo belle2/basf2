@@ -395,9 +395,12 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
 
     Here ``->`` separates a particle from its daughters, ``[...]`` groups a
     composite daughter with its descendants, and ``~`` prefixes secondary
-    particles. The compact string uses less storage space and is easier to
-    parse. Note that this only affects the ``__MCDecayString__`` branch in the
-    ROOT file; the log output always shows the full indented tree.
+    particles. Radiative photons are also given a distinct name to tell them
+    apart from generator-level photons: ``gammaI`` for initial state
+    radiation, ``gammaF`` for final state radiation, and ``gammaP`` for
+    photons added by PHOTOS. The compact string uses less storage space and is
+    easier to parse. Note that this only affects the ``__MCDecayString__``
+    branch in the ROOT file; the log output always shows the full indented tree.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from

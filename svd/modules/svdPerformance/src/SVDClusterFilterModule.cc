@@ -72,10 +72,6 @@ void SVDClusterFilterModule::initialize()
 }
 
 
-void SVDClusterFilterModule::beginRun()
-{
-}
-
 
 void SVDClusterFilterModule::event()
 {
@@ -166,10 +162,3 @@ void SVDClusterFilterModule::create_outVxdID_set()
 
 }
 
-void SVDClusterFilterModule::endRun()
-{
-}
-
-void SVDClusterFilterModule::terminate()
-{
-}

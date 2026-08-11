@@ -67,7 +67,7 @@ namespace Belle2::SVD {
      * @param aStrip the raw strip to be added to the cluster
      * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
      */
-    bool add(VxdID vxdID, bool isUside, struct  StripInRawCluster& aStrip);
+    bool add(VxdID vxdID, bool isUside, const struct StripInRawCluster& aStrip);
 
     /**
      * @return true if the raw cluster candidate can be promoted to raw cluster (seedMaxSample > 0 and seedSNR > cutSeed)
@@ -107,7 +107,7 @@ namespace Belle2::SVD {
     /**
      * @return the vector of the strips in the cluster
      */
-    const std::vector<StripInRawCluster> getStripsInRawCluster() const { return m_strips; };
+    const std::vector<StripInRawCluster>& getStripsInRawCluster() const { return m_strips; };
 
     /**
      * @return the max sample (in ADC) of the seed strip

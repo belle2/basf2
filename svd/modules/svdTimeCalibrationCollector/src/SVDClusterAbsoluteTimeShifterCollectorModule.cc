@@ -35,7 +35,7 @@ SVDClusterAbsoluteTimeShifterCollectorModule::SVDClusterAbsoluteTimeShifterColle
 void SVDClusterAbsoluteTimeShifterCollectorModule::prepare()
 {
 
-  for (auto alg : m_timeAlgorithms) {
+  for (const auto& alg : m_timeAlgorithms) {
     m_svdClustersOnTrack[alg] = StoreArray<SVDCluster>();
     m_svdClustersOnTrack[alg].isRequired((m_svdClustersOnTrackPrefix + '_' + alg).data());
   }

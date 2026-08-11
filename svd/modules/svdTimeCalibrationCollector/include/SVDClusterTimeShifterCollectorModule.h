@@ -15,9 +15,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
 #include "vector"
-#include "TString.h"
-#include "TH1F.h"
-#include "TH3F.h"
+#include <TString.h>
+#include <TH1F.h>
+#include <TH3F.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 #include <framework/dataobjects/EventT0.h>

@@ -187,10 +187,6 @@ void SVDDataFormatCheckModule::endRun()
 }
 
 
-void SVDDataFormatCheckModule::terminate()
-{
-}
-
 
 
 

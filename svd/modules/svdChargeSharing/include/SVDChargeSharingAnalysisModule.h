@@ -130,6 +130,6 @@ namespace Belle2 {
                             Int_t nbinsY, Double_t minY, Double_t maxY,
                             const char* titleY, TList* histoList);
     /** Used to compare charge histograms for different cluster sizes. */
-    TCanvas* comparisonPlot(TH1F* h1, TH1F* h2, TH1F* h3);
+    static TCanvas* comparisonPlot(TH1F* h1, TH1F* h2, TH1F* h3);
   };
 }

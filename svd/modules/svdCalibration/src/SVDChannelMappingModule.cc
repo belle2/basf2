@@ -72,7 +72,7 @@ void SVDChannelMappingModule::event()
 
 
 
-  for (auto& it : m_Intercepts)
+  for (const auto& it : m_Intercepts)
     fillSensorInterHistos(&it);
 }
 

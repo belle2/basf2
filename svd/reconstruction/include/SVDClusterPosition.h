@@ -64,7 +64,7 @@ namespace Belle2::SVD {
   protected:
 
     /** helper, returns the sum of the strip charges*/
-    double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
+    static double getSumOfStripCharges(const Belle2::SVD::RawCluster& rawCluster);
     /** helper, returns the sum in quadrature of the strip noise*/
     double getClusterNoise(const Belle2::SVD::RawCluster& rawCluster);
 

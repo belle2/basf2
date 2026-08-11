@@ -28,7 +28,7 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDStripMaskingModule();
 
-    virtual ~SVDStripMaskingModule();
+    virtual ~SVDStripMaskingModule() override;
 
     /** Initialize the SVDStripMasking.*/
     virtual void initialize() override;

@@ -19,7 +19,7 @@
 #include <framework/database/DBObjPtr.h>
 
 
-#include "TH1F.h"
+#include <TH1F.h>
 
 #include <svd/dataobjects/SVDEventInfo.h>
 #include <svd/dataobjects/SVDCluster.h>
@@ -39,7 +39,7 @@ namespace Belle2 {
     SVDDQMHitTimeModule();
 
     /** Destructor */
-    virtual ~SVDDQMHitTimeModule();
+    virtual ~SVDDQMHitTimeModule() override;
 
     /** Definition of histograms */
     virtual void defineHisto() override;

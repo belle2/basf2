@@ -10,7 +10,7 @@
 #include <hlt/softwaretrigger/core/FinalTriggerDecisionCalculator.h>
 #include <svd/dataobjects/SVDEventInfo.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 #include <cmath>
 
@@ -123,11 +123,11 @@ void SVDDQMEfficiencyModule::event()
     double coorU = m_intercepts[inter]->getCoorU();
     double coorV = m_intercepts[inter]->getCoorV();
     VXD::SensorInfoBase info = m_geoCache.getSensorInfo(theVxdID);
-    int cellU = info.getUCellID(coorU);
     int cellV = info.getVCellID(coorV);
 
     const VXD::SensorInfoBase& theSensorInfo = m_geoCache.getSensorInfo(theVxdID);
     if (theSensorInfo.inside(coorU, coorV, -m_fiducialU, -m_fiducialV)) {
+      int cellU = info.getUCellID(coorU);
 
       //This track should be on the sensor
       if (m_saveExpertHistos)
@@ -255,7 +255,7 @@ void SVDDQMEfficiencyModule::defineHisto()
   }
 
   std::vector<VxdID> sensors = m_geoCache.getListOfSensors();
-  for (VxdID& avxdid : sensors) {
+  for (const VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_geoCache.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::SVD) continue;
     //Only interested in SVD sensors
@@ -295,7 +295,7 @@ void SVDDQMEfficiencyModule::defineHisto()
 
 
 
-bool SVDDQMEfficiencyModule::isGoodIntercept(SVDIntercept* inter)
+bool SVDDQMEfficiencyModule::isGoodIntercept(const SVDIntercept* inter)
 {
 
   RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(inter);

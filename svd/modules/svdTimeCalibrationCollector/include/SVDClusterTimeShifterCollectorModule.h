@@ -14,7 +14,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
-#include "vector"
+#include <vector>
 #include <TString.h>
 #include <TH1F.h>
 #include <TH3F.h>

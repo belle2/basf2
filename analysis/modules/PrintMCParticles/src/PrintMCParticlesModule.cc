@@ -177,7 +177,7 @@ void PrintMCParticlesModule::event()
 void PrintMCParticlesModule::filterPrimaryOnly(std::vector<MCParticle*>& particles) const
 {
   if (!m_onlyPrimaries or particles.empty()) return;
-  particles.erase(std::remove_if(particles.begin(), particles.end(), [](MCParticle * mc) {
+  particles.erase(std::remove_if(particles.begin(), particles.end(), [](const MCParticle * mc) {
     return not mc->hasStatus(MCParticle::c_PrimaryParticle);
   }), particles.end());
 }
@@ -299,7 +299,7 @@ std::string PrintMCParticlesModule::formatParticleCompact(const MCParticle* mc, 
   std::string result = name + " -> ";
   for (size_t i = 0; i < daughters.size(); ++i) {
     if (i > 0) result += " ";
-    auto* daughter = daughters[i];
+    const auto* daughter = daughters[i];
     std::string dstr = formatParticleCompact(daughter, level + 1);
 
     auto granddaughters = daughter->getDaughters();

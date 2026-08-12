@@ -24,7 +24,7 @@ namespace Belle2 {
       explicit SelectorCut(bool belleFlag);
 
       /** Destructor */
-      ~SelectorCut();
+      ~SelectorCut() override;
 
       /** Selector response that this pair of particles come from the same mc/actual particle */
       virtual float getResponse(Particle* iPart, Particle* jPart) override;

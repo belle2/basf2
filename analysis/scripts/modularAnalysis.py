@@ -2997,6 +2997,13 @@ def buildContinuumSuppression(list_name, roe_mask, ipprofile_fit=False, path=Non
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes basf2 relation between them.
 
+    .. note::
+        `buildRestOfEvent` must be called on the same ParticleList beforehand: every
+        Particle needs a related RestOfEvent object, otherwise the module stops with
+        a fatal error. Unless ``roe_mask`` is the default mask (``'all'`` or an empty
+        string), it must also have been created with `appendROEMask` or
+        `appendROEMasks`.
+
     :param list_name: name of the input ParticleList
     :param roe_mask: name of the ROE mask
     :param ipprofile_fit: turn on vertex fit of input tracks with IP profile constraint

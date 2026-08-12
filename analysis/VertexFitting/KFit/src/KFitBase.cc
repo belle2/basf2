@@ -208,6 +208,8 @@ KFitBase::getCorrelation(const int id1, const int id2, const int flag) const
         for (int i = 0; i < idx1; i++) index += m_TrackCount - 1 - i;
         index -= idx1 + 1;
         index += idx2;
+        // idx1 is min(id1, id2) and id1 != id2 here, so both branches are reachable
+        // cppcheck-suppress knownConditionTrueFalse
         if (id1 == idx1)
           return m_BeforeCorrelation[index + idx2];
         else

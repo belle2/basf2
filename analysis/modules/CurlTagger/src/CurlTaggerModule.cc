@@ -65,7 +65,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 
 CurlTaggerModule::~CurlTaggerModule() = default;
 
-bool CurlTaggerModule::passesPreSelection(Particle* p)
+bool CurlTaggerModule::passesPreSelection(const Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
   if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check

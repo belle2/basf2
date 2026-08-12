@@ -29,6 +29,7 @@ namespace Belle2 {
 // introduce the DecayStringParticle struct to boost:fusion
 // This enables direct parsing into the struct with the boost::spirit::qi package
 // It is necessary to call this in the global scope
+// cppcheck-suppress unknownMacro
 BOOST_FUSION_ADAPT_STRUCT(
   Belle2::DecayStringParticle,
   (std::string, m_strSelector)

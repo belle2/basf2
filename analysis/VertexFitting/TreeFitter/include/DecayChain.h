@@ -34,6 +34,12 @@ namespace TreeFitter {
     /**  destructor   */
     ~DecayChain();
 
+    /** Copying is not allowed: the chain owns its nodes. */
+    DecayChain(const DecayChain&) = delete;
+
+    /** Copying is not allowed: the chain owns its nodes. */
+    DecayChain& operator=(const DecayChain&) = delete;
+
     /** initialize the chain */
     ErrCode initialize(FitParams& par);
 

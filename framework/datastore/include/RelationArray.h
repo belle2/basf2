@@ -146,6 +146,7 @@ namespace Belle2 {
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     bool create(bool replace = false)
     {
       bool result = DataStore::Instance().createObject(0, replace, *this);

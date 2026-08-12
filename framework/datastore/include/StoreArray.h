@@ -322,6 +322,7 @@ namespace Belle2 {
 
   private:
     /** Creating StoreArrays is unnecessary, only used internally. */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     bool create(bool replace = false) { return StoreAccessorBase::create(replace); }
 
     /** Returns address of the next free position of the array.

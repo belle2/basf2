@@ -137,14 +137,14 @@ namespace Belle2 {
      * @param n number of ints to generate
      * @param array pointer to an array where the numbers should be stored
      */
-    void RndmArray(Int_t n, Int_t* array) { RndmArray(n, (UInt_t*) array); }
+    void RndmArray(Int_t n, Int_t* array) { RndmArray(n, reinterpret_cast<UInt_t*>(array)); }
 
     /** Fill an array of 64bit integers with random values in
      * [INT64_MIN, INT64_MAX], both limits included.
      * @param n number of ints to generate
      * @param array pointer to an array where the numbers should be stored
      */
-    void RndmArray(Int_t n, Long64_t* array) { RndmArray(n, (ULong64_t*) array); }
+    void RndmArray(Int_t n, Long64_t* array) { RndmArray(n, reinterpret_cast<ULong64_t*>(array)); }
 
     /** Fill an array with random data
      * @param n number of bytes to generate
@@ -153,7 +153,9 @@ namespace Belle2 {
     void RndmArray(Int_t n, unsigned char* array);
   private:
     /** override base class SetSeed to do nothing, we don't need it but it gets
-     * called by parent constructor */
+     * called by parent constructor. Kept for ROOT versions where the base class
+     * argument type is UInt_t, so it cannot be marked override nor be static. */
+    // cppcheck-suppress functionStatic
     void SetSeed(UInt_t) {}
     /** argument type was changed in root 6.08. */
     void SetSeed(ULong_t) override {}
@@ -234,7 +236,7 @@ namespace Belle2 {
   inline void RandomGenerator::RndmArray(Int_t n, UInt_t* array)
   {
     //Fill the most part of the array using 64bit numbers
-    RndmArray(n / 2, (ULong64_t*)array);
+    RndmArray(n / 2, reinterpret_cast<ULong64_t*>(array));
     //Only for uneven number of elements we need to fill the last one using a
     //32bit number
     if (n % 2) array[n - 1] = random32();

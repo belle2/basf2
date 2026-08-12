@@ -126,6 +126,8 @@ void PyStoreObj::ensureAttached() const
 {
   if (not m_storeEntry) {
     attach();
+    // attach() assigns the mutable m_storeEntry, which cppcheck does not track
+    // cppcheck-suppress identicalInnerCondition
     if (not m_storeEntry) {
       B2ERROR("PyStoreObj " << m_storeAccessor.readableName() << " has not been registered!");
     }

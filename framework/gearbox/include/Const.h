@@ -320,6 +320,7 @@ namespace Belle2 {
        * Addition of another set to this one.
        * @param set  The other set of detector IDs.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
       RestrictedDetectorSet& operator += (const DetectorSet& set) {DetectorSet::operator +=(set); checkSet(); return *this;}
 
       /**

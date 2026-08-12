@@ -153,23 +153,23 @@ namespace Belle2::gearbox {
   }
 
 
-  std::string Interface::ensureNode(const std::string& path) const
+  std::string Interface::ensureNode(const std::string& path)
   {
     return boost::trim_right_copy_if(path, boost::is_any_of("/"));
   }
 
-  std::string Interface::ensurePath(const std::string& path) const
+  std::string Interface::ensurePath(const std::string& path)
   {
     return ensureNode(path) + '/';
   }
 
-  std::string Interface::addIndex(const std::string& path, int index) const
+  std::string Interface::addIndex(const std::string& path, int index)
   {
     static boost::format index_fmt("%1%[%2%]");
     return (index_fmt % ensureNode(path) % index).str();
   }
 
-  std::string Interface::joinPath(const std::string& path, const std::string& subpath) const
+  std::string Interface::joinPath(const std::string& path, const std::string& subpath)
   {
     return ensurePath(path) + boost::trim_left_copy_if(subpath, boost::is_any_of("/"));
   }

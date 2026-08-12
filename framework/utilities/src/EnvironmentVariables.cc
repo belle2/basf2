@@ -17,7 +17,7 @@ namespace Belle2 {
 
   bool EnvironmentVariables::isSet(const std::string& name)
   {
-    char* envValue = std::getenv(name.c_str());
+    const char* envValue = std::getenv(name.c_str());
     return envValue != nullptr;
   }
 

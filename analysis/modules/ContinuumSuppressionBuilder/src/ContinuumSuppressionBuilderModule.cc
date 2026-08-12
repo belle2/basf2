@@ -96,10 +96,11 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   // Create relation: Particle <-> ContinuumSuppression
   particle->addRelationTo(qqVars);
 
-  std::vector<ROOT::Math::PxPyPzEVector> p_cms_sigB, p_cms_all;
+  std::vector<ROOT::Math::PxPyPzEVector> p_cms_sigB, p_cms_roe, p_cms_all;
 
   std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigA;
   std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_sigB;
+  std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe;
 
   std::vector<float> ksfwFS0;
   std::vector<float> ksfwFS1;
@@ -108,15 +109,6 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   std::vector<float> cleoConesROE;
 
   double et[2];
-
-  ROOT::Math::XYZVector thrustB;
-  ROOT::Math::XYZVector thrustO;
-
-  float thrustBm = -1;
-  float thrustOm = -1;
-  float cosTBTO  = -1;
-  float cosTBz   = -1;
-  float R2       = -1;
 
 
   // -- B Cand --------------------------------------------------------------------------
@@ -157,126 +149,125 @@ void ContinuumSuppressionBuilderModule::addContinuumSuppression(const Particle* 
   // -- ROE -----------------------------------------------------------------------------
   const RestOfEvent* roe = particle->getRelated<RestOfEvent>();
 
-  if (roe) {
-    std::vector<ROOT::Math::PxPyPzEVector> p_cms_roe;
-    std::vector<std::pair<ROOT::Math::PxPyPzEVector, int>> p_cms_q_roe;
+  if (!roe)
+    B2FATAL("No RestOfEvent is related to the particle from the list " << m_particleListName
+            << ": please run buildRestOfEvent on that list before buildContinuumSuppression.");
 
-    // Charged tracks
-    //
-    std::vector<const Particle*> chargedROEParticles = roe->getChargedParticles(m_ROEMask);
+  // Charged tracks
+  //
+  std::vector<const Particle*> chargedROEParticles = roe->getChargedParticles(m_ROEMask);
 
-    for (const Particle* chargedROEParticle : chargedROEParticles) {
+  for (const Particle* chargedROEParticle : chargedROEParticles) {
 
-      ROOT::Math::PxPyPzEVector p = ipProfileFit(chargedROEParticle);
+    ROOT::Math::PxPyPzEVector p = ipProfileFit(chargedROEParticle);
 
-      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * p;
+    ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * p;
 
+    p_cms_all.push_back(p_cms);
+    p_cms_roe.push_back(p_cms);
+
+    p_cms_q_roe.emplace_back(p_cms, chargedROEParticle->getCharge());
+
+    p_cms_missA -= p_cms;
+    p_cms_missB -= p_cms;
+    et[0] += p_cms.Pt();
+    et[1] += p_cms.Pt();
+  }
+
+  // ECLCluster
+  //
+  std::vector<const Particle*> roePhotons = roe->getPhotons(m_ROEMask);
+
+  for (const Particle* photon : roePhotons) {
+
+    if (photon->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
+
+      ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * photon->get4Vector();
       p_cms_all.push_back(p_cms);
       p_cms_roe.push_back(p_cms);
 
-      p_cms_q_roe.emplace_back(p_cms, chargedROEParticle->getCharge());
+      p_cms_q_roe.emplace_back(p_cms, photon->getCharge());
 
       p_cms_missA -= p_cms;
       p_cms_missB -= p_cms;
       et[0] += p_cms.Pt();
       et[1] += p_cms.Pt();
     }
-
-    // ECLCluster
-    //
-    std::vector<const Particle*> roePhotons = roe->getPhotons(m_ROEMask);
-
-    for (const Particle* photon : roePhotons) {
-
-      if (photon->getECLClusterEHypothesisBit() == ECLCluster::EHypothesisBit::c_nPhotons) {
-
-        ROOT::Math::PxPyPzEVector p_cms = T.rotateLabToCms() * photon->get4Vector();
-        p_cms_all.push_back(p_cms);
-        p_cms_roe.push_back(p_cms);
-
-        p_cms_q_roe.emplace_back(p_cms, photon->getCharge());
-
-        p_cms_missA -= p_cms;
-        p_cms_missB -= p_cms;
-        et[0] += p_cms.Pt();
-        et[1] += p_cms.Pt();
-      }
-    }
-
-    // Thrust variables
-    thrustB = Thrust::calculateThrust(p_cms_sigB);
-    thrustO = Thrust::calculateThrust(p_cms_roe);
-    thrustBm = thrustB.R();
-    thrustOm = thrustO.R();
-    cosTBTO  = fabs(thrustB.Unit().Dot(thrustO.Unit()));
-    cosTBz   = fabs(cos(thrustB.Theta()));
-
-    // Cleo Cones
-    CleoCones cc(p_cms_all, p_cms_roe, thrustB, true, true);
-    cleoConesAll = cc.cleo_cone_with_all();
-    cleoConesROE = cc.cleo_cone_with_roe();
-
-    // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
-    FoxWolfram FW(p_cms_all);
-    FW.calculateBasicMoments();
-    R2 = FW.getR(2);
-
-    // KSFW moments
-    ROOT::Math::PxPyPzEVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
-    double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
-    KsfwMoments KsfwM(Hso0_max,
-                      p_cms_q_sigA,
-                      p_cms_q_sigB,
-                      p_cms_q_roe,
-                      p_cms_missA,
-                      p_cms_missB,
-                      et);
-    // use_finalstate_for_sig == 0
-    KsfwM.usefinal(0);
-    ksfwFS0.push_back(KsfwM.mm2());
-    ksfwFS0.push_back(KsfwM.pt_sum());
-    ksfwFS0.push_back(KsfwM.Hso(0, 0));
-    ksfwFS0.push_back(KsfwM.Hso(0, 1));
-    ksfwFS0.push_back(KsfwM.Hso(0, 2));
-    ksfwFS0.push_back(KsfwM.Hso(0, 3));
-    ksfwFS0.push_back(KsfwM.Hso(0, 4));
-    ksfwFS0.push_back(KsfwM.Hso(1, 0));
-    ksfwFS0.push_back(KsfwM.Hso(1, 2));
-    ksfwFS0.push_back(KsfwM.Hso(1, 4));
-    ksfwFS0.push_back(KsfwM.Hso(2, 0));
-    ksfwFS0.push_back(KsfwM.Hso(2, 2));
-    ksfwFS0.push_back(KsfwM.Hso(2, 4));
-    ksfwFS0.push_back(KsfwM.Hoo(0));
-    ksfwFS0.push_back(KsfwM.Hoo(1));
-    ksfwFS0.push_back(KsfwM.Hoo(2));
-    ksfwFS0.push_back(KsfwM.Hoo(3));
-    ksfwFS0.push_back(KsfwM.Hoo(4));
-    // use_finalstate_for_sig == 1
-    KsfwM.usefinal(1);
-    ksfwFS1.push_back(KsfwM.mm2());
-    ksfwFS1.push_back(KsfwM.pt_sum());
-    ksfwFS1.push_back(KsfwM.Hso(0, 0));
-    ksfwFS1.push_back(KsfwM.Hso(0, 1));
-    ksfwFS1.push_back(KsfwM.Hso(0, 2));
-    ksfwFS1.push_back(KsfwM.Hso(0, 3));
-    ksfwFS1.push_back(KsfwM.Hso(0, 4));
-    ksfwFS1.push_back(KsfwM.Hso(1, 0));
-    ksfwFS1.push_back(KsfwM.Hso(1, 2));
-    ksfwFS1.push_back(KsfwM.Hso(1, 4));
-    ksfwFS1.push_back(KsfwM.Hso(2, 0));
-    ksfwFS1.push_back(KsfwM.Hso(2, 2));
-    ksfwFS1.push_back(KsfwM.Hso(2, 4));
-    ksfwFS1.push_back(KsfwM.Hoo(0));
-    ksfwFS1.push_back(KsfwM.Hoo(1));
-    ksfwFS1.push_back(KsfwM.Hoo(2));
-    ksfwFS1.push_back(KsfwM.Hoo(3));
-    ksfwFS1.push_back(KsfwM.Hoo(4));
-
-    // TODO: The following is from the original belle ksfwmoments.cc module.
-    //       Not sure if necessary here (i.e., will we be using rooksfw in belle II in the same way?).
-    //       printf("rooksfw::rooksfw: mm2=%f et=%f hoo2=%f hso02=%f\n",
-    //       m_mm2[0], et[0], m_Hoo[0][2], m_Hso[0][0][2]);
   }
+
+  // Thrust variables
+  ROOT::Math::XYZVector thrustB = Thrust::calculateThrust(p_cms_sigB);
+  ROOT::Math::XYZVector thrustO = Thrust::calculateThrust(p_cms_roe);
+  float thrustBm = thrustB.R();
+  float thrustOm = thrustO.R();
+  float cosTBTO  = fabs(thrustB.Unit().Dot(thrustO.Unit()));
+  float cosTBz   = fabs(cos(thrustB.Theta()));
+
+  // Cleo Cones
+  CleoCones cc(p_cms_all, p_cms_roe, thrustB, true, true);
+  cleoConesAll = cc.cleo_cone_with_all();
+  cleoConesROE = cc.cleo_cone_with_roe();
+
+  // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
+  FoxWolfram FW(p_cms_all);
+  FW.calculateBasicMoments();
+  float R2 = FW.getR(2);
+
+  // KSFW moments
+  ROOT::Math::PxPyPzEVector p_cms_B = T.rotateLabToCms() * particle->get4Vector();
+  double Hso0_max(2 * (2 * BeamEnergy - p_cms_B.E()));
+  KsfwMoments KsfwM(Hso0_max,
+                    p_cms_q_sigA,
+                    p_cms_q_sigB,
+                    p_cms_q_roe,
+                    p_cms_missA,
+                    p_cms_missB,
+                    et);
+  // use_finalstate_for_sig == 0
+  KsfwM.usefinal(0);
+  ksfwFS0.push_back(KsfwM.mm2());
+  ksfwFS0.push_back(KsfwM.pt_sum());
+  ksfwFS0.push_back(KsfwM.Hso(0, 0));
+  ksfwFS0.push_back(KsfwM.Hso(0, 1));
+  ksfwFS0.push_back(KsfwM.Hso(0, 2));
+  ksfwFS0.push_back(KsfwM.Hso(0, 3));
+  ksfwFS0.push_back(KsfwM.Hso(0, 4));
+  ksfwFS0.push_back(KsfwM.Hso(1, 0));
+  ksfwFS0.push_back(KsfwM.Hso(1, 2));
+  ksfwFS0.push_back(KsfwM.Hso(1, 4));
+  ksfwFS0.push_back(KsfwM.Hso(2, 0));
+  ksfwFS0.push_back(KsfwM.Hso(2, 2));
+  ksfwFS0.push_back(KsfwM.Hso(2, 4));
+  ksfwFS0.push_back(KsfwM.Hoo(0));
+  ksfwFS0.push_back(KsfwM.Hoo(1));
+  ksfwFS0.push_back(KsfwM.Hoo(2));
+  ksfwFS0.push_back(KsfwM.Hoo(3));
+  ksfwFS0.push_back(KsfwM.Hoo(4));
+  // use_finalstate_for_sig == 1
+  KsfwM.usefinal(1);
+  ksfwFS1.push_back(KsfwM.mm2());
+  ksfwFS1.push_back(KsfwM.pt_sum());
+  ksfwFS1.push_back(KsfwM.Hso(0, 0));
+  ksfwFS1.push_back(KsfwM.Hso(0, 1));
+  ksfwFS1.push_back(KsfwM.Hso(0, 2));
+  ksfwFS1.push_back(KsfwM.Hso(0, 3));
+  ksfwFS1.push_back(KsfwM.Hso(0, 4));
+  ksfwFS1.push_back(KsfwM.Hso(1, 0));
+  ksfwFS1.push_back(KsfwM.Hso(1, 2));
+  ksfwFS1.push_back(KsfwM.Hso(1, 4));
+  ksfwFS1.push_back(KsfwM.Hso(2, 0));
+  ksfwFS1.push_back(KsfwM.Hso(2, 2));
+  ksfwFS1.push_back(KsfwM.Hso(2, 4));
+  ksfwFS1.push_back(KsfwM.Hoo(0));
+  ksfwFS1.push_back(KsfwM.Hoo(1));
+  ksfwFS1.push_back(KsfwM.Hoo(2));
+  ksfwFS1.push_back(KsfwM.Hoo(3));
+  ksfwFS1.push_back(KsfwM.Hoo(4));
+
+  // TODO: The following is from the original belle ksfwmoments.cc module.
+  //       Not sure if necessary here (i.e., will we be using rooksfw in belle II in the same way?).
+  //       printf("rooksfw::rooksfw: mm2=%f et=%f hoo2=%f hso02=%f\n",
+  //       m_mm2[0], et[0], m_Hoo[0][2], m_Hso[0][0][2]);
 
   // Fill ContinuumSuppression with content
   qqVars->addThrustB(thrustB);

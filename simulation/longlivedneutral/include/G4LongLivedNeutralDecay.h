@@ -10,7 +10,7 @@
 
 #pragma once
 #include <G4ios.hh>
-#include "globals.hh"
+#include <globals.hh>
 #include <G4VRestDiscreteProcess.hh>
 #include <G4ParticleChangeForDecay.hh>
 #include <G4DecayProcessType.hh>

@@ -112,7 +112,7 @@ ROOT::Math::XYZVector BFieldComponentRadial::calculate(const ROOT::Math::XYZVect
     if (il <= 16) {
       double L = m_Layer * il;
       double l = dz_eklm - L;
-      int ingap = l < m_gapHeight;
+      bool ingap = l < m_gapHeight;
       ir += ingap && (r < m_slotRMin + m_gridPitchR);
 
       double zlg = L + m_endyokeZMin, zl0 = zlg - m_gapHeight, zl1 = zlg + m_ironPlateThickness;

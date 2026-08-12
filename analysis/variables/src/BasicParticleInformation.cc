@@ -79,61 +79,71 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("Basic particle information");
-    REGISTER_VARIABLE("isFromECL", particleIsFromECL, "Returns true if this particle was created from an ECLCluster, false otherwise.");
-    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM, "Returns true if this particle was created from a KLMCluster, false otherwise.");
-    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns true if this particle was created from a track, false otherwise.");
-    REGISTER_VARIABLE("isFromV0", particleIsFromV0, "Returns true if this particle was created from a V0, false otherwise.");
+    REGISTER_VARIABLE("isFromECL", particleIsFromECL,
+                      "Returns 1.0 if this particle was created from an ``ECLCluster`` or 0.0 otherwise.");
+    REGISTER_VARIABLE("isFromKLM", particleIsFromKLM,
+                      "Returns 1.0 if this particle was created from a ``KLMCluster`` or 0.0 otherwise.");
+    REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns 1.0 if this particle was created from a track or 0.0 otherwise.");
+    REGISTER_VARIABLE("isFromV0", particleIsFromV0, R"DOC(
+Returns 1.0 if this particle was created from a :ref:`V0 particle <tracking_v0Finding>` or 0.0 otherwise.
+)DOC");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
-      Returns mdst source used to create the particle. The meaning of the values are
+      Returns the mDST source use to create the particle. 
 
+      The meaning of the values are:
+      
       * 0: undefined
       * 1: created from track
-      * 2: created from ECL cluster
-      * 3: created from KLM cluster
-      * 4: created from V0
+      * 2: created from an ``ECLCluster``
+      * 3: created from a ``KLMCluster``
+      * 4: reated from a ref:`V0 particle <tracking_v0Finding>`
       * 5: MC particle
       * 6: composite particle
 
-      )DOC");
+)DOC");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, R"DOC(
-Store array index (0 - based) of the MDST object from which the Particle was created. 
-It's 0 for composite particles.
+Returns the store array index (0 - based) of the mDST object from which the particle was created. For composite particles, this returns 0.0.
 
-.. tip:: 
-    It is not a unique identifier of particle. For example, a pion and a gamma can have the same `mdstIndex`:
-    pions are created from tracks whereas gammas are created from ECL clusters; tracks and
-    ECL clusters are stored in different arrays. A photon may be created from ECL cluster with index 0 and a
-    pion may be created from track with index 0 will both have :b2:var:`mdstIndex` equal to 0, but they will be different particles.
-
-.. tip:: 
-    Two particles of the same type can also have the same :b2:var:`mdstIndex`. This would mean that they are created from the same object. 
+.. caution:: 
+    Two particles of the same type can also have the same :b2:var:`mdstIndex`. This would mean that they are created from the same object.
     For example, if pion and kaon have the same :b2:var:`mdstIndex` it means that they are created from the same track.
 
-.. tip::
+.. warning:: 
+    This variable is not a unique identifier of the particle. For example, a pion and a photon can have the same `mdstIndex`; even though
+    pions are created from tracks and photons are created from ECL clusters, as tracks and
+    ECL clusters are kept in different store arrays they can return the same index.
+
+.. seealso::
     If you are looking for unique identifier of the particle, please use :b2:var:`uniqueParticleIdentifier`.
-    )DOC");
+
+)DOC");
     REGISTER_VARIABLE("uniqueParticleIdentifier", uniqueParticleIdentifier, R"DOC(
-Returns unique identifier of final state particle.
-Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` value.)DOC");
+Returns the unique identifier of a final state particle.
+Particles created from the same object (e.g. from the same track) have different :b2:var:`uniqueParticleIdentifier` values.
 
-    REGISTER_VARIABLE("isUnspecified", particleIsUnspecified,
-                      "Returns true if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-), false otherwise");
+)DOC");
+
+    REGISTER_VARIABLE("isUnspecified", particleIsUnspecified, R"DOC(
+Returns 1.0 if the particle is marked as an unspecified object (like B0 -> @Xsd e+ e-) or 0.0 otherwise.
+
+.. note:: You can read more about how to define such particles here: :ref:`Marker of unspecified particle <Marker_of_unspecified_particle>`.
+
+)DOC");
     REGISTER_VARIABLE("chiProb", particlePvalue, R"DOC(
-A context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
+Returns a context-dependent :math:`\chi^2` probability for 'the fit' related to this particle.
 
-* If this particle is track-based, then this is the pvalue of the track fit (identical to :b2:var:`pValue`).
+The contexts are:
+
+* If this particle is track-based, then it returns the p-value of the track fit (identical to :b2:var:`pValue`).
+* If this particle is composite, and a vertex fit has been performed, then it returns the :math:`\chi^2` probability of the vertex fit result.
 * If this particle is cluster-based then this variable is currently unused.
-* If this particle is composite and a vertex fit has been performed, then this is the :math:`\chi^2` probability of the vertex fit result.
 
-.. tip:: 
-    If multiple vertex fits are performed then the last one sets the ``chiProb`` overwriting all previous.
+.. attention:: 
+    If multiple vertex fits have performed then the last one sets the ``chiProb`` value and overwrites all the previous ones.
 
-.. seealso:: :b2:var:`pValue` for tracks
-    )DOC");
-    REGISTER_VARIABLE("nDaughters", particleNDaughters,
-                      "Returns number of daughter particles");
-    REGISTER_VARIABLE("flavor", particleFlavorType,
-                      "Returns 1 if particle is flavored type, 0 if it is unflavored.");
-    REGISTER_VARIABLE("charge", particleCharge, "Returns electric charge of particle in units of :math:`e`.");
+)DOC");
+    REGISTER_VARIABLE("nDaughters", particleNDaughters, "Returns number of daughter particles or 0.0 otherwise for a particle with no daughters.");
+    REGISTER_VARIABLE("flavor", particleFlavorType, "Returns 1.0 if particle has flavour or 0.0 if it is unflavored.");
+    REGISTER_VARIABLE("charge", particleCharge, "Returns the electric charge of particle in units of :math:`e`.");
   }
 }

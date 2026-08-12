@@ -35,13 +35,21 @@ namespace Belle2 {
   class EvtBuffer {
 
   public:
-    EvtBuffer(int id)
+    explicit EvtBuffer(int id)
     {
       m_id = id;
       m_evtbuf = new int[NWORD_BUFFER];
       m_writable = true;
       m_readable = false;
     }
+
+    ~EvtBuffer()
+    {
+      delete [] m_evtbuf;
+    }
+
+    EvtBuffer(const EvtBuffer&) = delete;
+    EvtBuffer& operator=(const EvtBuffer&) = delete;
 
   public:
     bool write(int* buf, int nbyte)

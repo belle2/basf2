@@ -9,14 +9,14 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
-#include "TObject.h"
-#include "TText.h"
-#include "TH1.h"
-#include "TKey.h"
-#include "TFile.h"
-#include "TIterator.h"
-#include "TDirectory.h"
-#include "TList.h"
+#include <TObject.h>
+#include <TText.h>
+#include <TH1.h>
+#include <TKey.h>
+#include <TFile.h>
+#include <TIterator.h>
+#include <TDirectory.h>
+#include <TList.h>
 
 #include <stdio.h>
 #include <string>
@@ -32,16 +32,16 @@ void StreamHistogramsInDir(TDirectory* curdir, MsgHandler* hdl, int& numobjs)
   TKey* key = 0;
   int nkeys [[maybe_unused]] = 0;
   int nobjs [[maybe_unused]] = 0;
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     nkeys++;
     TObject* obj = key->ReadObj();
     if (obj->IsA()->InheritsFrom("TH1")) {
-      TH1* h1 = (TH1*) obj;
+      TH1* h1 = static_cast<TH1*>(obj);
       hdl->add(h1, h1->GetName());
       nobjs++;
       numobjs++;
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
-      TDirectory* tdir = (TDirectory*) obj;
+      TDirectory* tdir = static_cast<TDirectory*>(obj);
       printf("subdir: %s\n", tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       hdl->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;

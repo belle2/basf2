@@ -32,7 +32,7 @@ bool RunInfoBuffer::open(const std::string& nodename,
     LogFile::fatal("Failed to open %s", m_path.c_str());
     return false;
   }
-  char* buf = (char*)m_memory.map(0, size());
+  char* buf = static_cast<char*>(m_memory.map(0, size()));
   if (buf == NULL) {
     return false;
   }
@@ -40,7 +40,7 @@ bool RunInfoBuffer::open(const std::string& nodename,
   buf += m_mutex.size();
   m_cond = MCond(buf);
   buf += m_cond.size();
-  m_info = (ronode_info*)buf;
+  m_info = reinterpret_cast<ronode_info*>(buf);
   if (recreate) init();
   if (nodeid > 0) setNodeId(nodeid);
   return true;

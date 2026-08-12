@@ -73,7 +73,7 @@ void TrackAnaModule::event()
   h_multi->Fill((float)ntrk);
   //  printf ( "***** Generator Event List : Event %d ; multi = %d *****\n", evtno, npart );
   for (int i = 0; i < ntrk; i++) {
-    Track* trk = trklist[i];
+    const Track* trk = trklist[i];
     const TrackFitResult* fit = trk->getTrackFitResult(Const::pion);
     ROOT::Math::PxPyPzEVector p4 = fit->get4Momentum();
     h_p[0]->Fill(p4.Px());
@@ -81,10 +81,6 @@ void TrackAnaModule::event()
     h_p[2]->Fill(p4.Pz());
     h_p[3]->Fill(p4.E());
   }
-}
-
-void TrackAnaModule::endRun()
-{
 }
 
 

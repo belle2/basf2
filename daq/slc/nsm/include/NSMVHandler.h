@@ -75,7 +75,7 @@ namespace Belle2 {
     bool m_useget;
     bool m_useset;
     NSMVar m_var;
-    bool m_isdump;
+    bool m_isdump = false;
 
   };
 
@@ -96,7 +96,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerInt() {}
+    virtual ~NSMVHandlerInt() override {}
 
   public:
     bool handleGet(NSMVar& var) override;
@@ -131,7 +131,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerFloat() {}
+    virtual ~NSMVHandlerFloat() override {}
 
   private:
     bool handleGet(NSMVar& var) override;
@@ -166,7 +166,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerText() {}
+    virtual ~NSMVHandlerText() override {}
 
   private:
     bool handleGet(NSMVar& var) override;
@@ -203,7 +203,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerIntArray() {}
+    virtual ~NSMVHandlerIntArray() override {}
 
   public:
     bool handleGet(NSMVar& var) override;
@@ -236,7 +236,7 @@ namespace Belle2 {
     {
       m_var = val;
     }
-    virtual ~NSMVHandlerFloatArray() {}
+    virtual ~NSMVHandlerFloatArray() override {}
 
   public:
     bool handleGet(NSMVar& var) override;
@@ -262,7 +262,7 @@ namespace Belle2 {
                    const std::string& refname)
       : NSMVHandler("", name, true, true),
         m_callback(callback), m_refname(refname) {}
-    virtual ~NSMVHandlerRef() {}
+    virtual ~NSMVHandlerRef() override {}
 
   public:
     bool handleGet(NSMVar& var) override;

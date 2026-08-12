@@ -10,9 +10,9 @@
 
 #include <unistd.h>
 
-#include "TH1F.h"
-#include "TMemFile.h"
-#include "TObject.h"
+#include <TH1F.h>
+#include <TMemFile.h>
+#include <TObject.h>
 
 using namespace Belle2;
 using namespace std;

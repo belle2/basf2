@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   for (;;) {
     // Get a record from ringbuf
     int size;
-    while ((size = rbuf->remq((int*)evbuf)) == 0) {
+    while ((size = rbuf->remq(reinterpret_cast<int*>(evbuf))) == 0) {
       //    printf ( "Rx : evtbuf is not available yet....\n" );
       //      usleep(100);
       usleep(20);

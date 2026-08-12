@@ -28,21 +28,26 @@ namespace Belle2 {
   public:
     HistoServer(int port, const std::string& mapfile);
     ~HistoServer();
+    /** Copy constructor (disabled). */
+    HistoServer(const HistoServer&) = delete;
+
+    /** Operator = (disabled). */
+    HistoServer& operator=(const HistoServer&) = delete;
 
     int init();
 
     int server();  // Loop
 
   private:
-    EvtSocketRecv* m_sock;
-    EvtSocketManager* m_man;
+    EvtSocketRecv* m_sock = nullptr;
+    EvtSocketManager* m_man = nullptr;
     int m_port;
     int m_force_exit;
 
   private:
     std::string m_filename;
-    DqmMemFile* m_memfile;
-    HistoManager* m_hman;
+    DqmMemFile* m_memfile = nullptr;
+    HistoManager* m_hman = nullptr;
   };
 }
 

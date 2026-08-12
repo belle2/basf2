@@ -47,8 +47,10 @@ ERecoMaster::ERecoMaster(string conffile)
 
   // 4. Leave PID file
   FILE* f = fopen("pid.data", "w");
-  fprintf(f, "%d", getpid());
-  fclose(f);
+  if (f != NULL) {
+    fprintf(f, "%d", getpid());
+    fclose(f);
+  }
 
 
 }
@@ -202,11 +204,6 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
 
   return 0;
 
-}
-
-int ERecoMaster::Start(NSMmsg*, NSMcontext*)
-{
-  return 0;
 }
 
 int ERecoMaster::Stop(NSMmsg* msg, NSMcontext*)

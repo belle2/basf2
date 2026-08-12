@@ -94,7 +94,7 @@ int main(int argc, char** argv)
   }
   string shmname = string(conf.getconf("system", "unitname")) + ":" +
                    string(nodename);
-  RFFlowStat flow((char*)shmname.c_str());
+  RFFlowStat flow(const_cast<char*>(shmname.c_str()));
 
   printf("nodename = %s, nid = %d\n", nodename, nid);
   printf("id range : %d to %d\n", idlist[0], idlist[nid - 1]);

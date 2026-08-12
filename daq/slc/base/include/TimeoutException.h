@@ -19,7 +19,7 @@ namespace Belle2 {
     TimeoutException(const std::string& comment, ...);
     TimeoutException(int err, const std::string& comment, ...);
 #if __GNUC__ >= 7
-    ~TimeoutException() {}
+    ~TimeoutException() override {}
 #else
     ~TimeoutException() throw() {}
 #endif

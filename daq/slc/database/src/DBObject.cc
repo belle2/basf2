@@ -43,7 +43,7 @@ const DBObject& DBObject::operator=(const DBObject& obj)
 
 void DBObject::copy(const DBObject& obj)
 {
-  reset();
+  DBObject::reset();
   setDate(obj.getDate());
   setIndex(obj.getIndex());
   setId(obj.getId());
@@ -70,7 +70,10 @@ void DBObject::copy(const DBObject& obj)
 
 DBObject::~DBObject()
 {
-  reset();
+  try {
+    DBObject::reset();
+  } catch (...) {
+  }
 }
 
 int DBObject::getNObjects(const std::string& name) const
@@ -231,6 +234,7 @@ void DBObject::addValue(const std::string& name, const void* value,
   if (!hasValue(name)) {
     add(name, pro);
     void* v = malloc(size);
+    if (v == NULL) return;
     memcpy(v, value, size);
     m_value_m.insert(FieldValueList::value_type(name, v));
   } else {
@@ -463,9 +467,9 @@ const
       nv.value = value;
       nv.type = pro.getType();
       if (pro.getType() != DBField::TEXT) {
-        nv.buf = (void*)getValue(name);
+        nv.buf = const_cast<void*>(getValue(name));
       } else {
-        nv.buf = (void*)&getText(name);
+        nv.buf = const_cast<void*>(static_cast<const void*>(&getText(name)));
       }
       map.push_back(nv);
     }

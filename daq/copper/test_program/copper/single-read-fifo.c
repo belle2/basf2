@@ -37,7 +37,7 @@ int maxevent = 0;
 
 void do_reset(void *start)
 {
-    unsigned long *lp = (unsigned long *) (start + COPPER_FF_RST);
+    unsigned long *lp = (unsigned long *) ((char*)start + COPPER_FF_RST);
     //*lp = 0x1F;
     *lp = 0;
 }
@@ -116,7 +116,7 @@ void enable_single_read(unsigned char *start)
 
 void do_scan(void *start)
 {
-    unsigned long *lp = start;
+    const unsigned long *lp = start;
     int i;
 
     for (i = 0; i * 4 < 0x100; i++) {
@@ -177,7 +177,7 @@ void doit()
     return;
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     int ch;
     while ((ch = getopt(argc, argv, "c:hs:n:i:")) != -1) {

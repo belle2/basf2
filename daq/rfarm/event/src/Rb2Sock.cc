@@ -32,7 +32,7 @@ int Rb2Sock::SendEvent(void)
 {
   // Get a record from ringbuf
   int size;
-  while ((size = m_rbuf->remq((int*)m_evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(m_evtbuf))) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     //    usleep(100);
     usleep(20);

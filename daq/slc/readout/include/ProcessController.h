@@ -30,7 +30,7 @@ namespace Belle2 {
     {
       m_callback = NULL;
     }
-    ProcessController(RCCallback* callback)
+    explicit ProcessController(RCCallback* callback)
     {
       m_callback = callback;
     }
@@ -90,7 +90,7 @@ namespace Belle2 {
     std::string m_message;
     PThread m_th_log;
     PThread m_th_process;
-    int m_iopipe[2];
+    int m_iopipe[2] = {0, 0};
 
   };
 
@@ -104,7 +104,7 @@ namespace Belle2 {
   class ProcessSubmitter {
 
   public:
-    ProcessSubmitter(ProcessController* con, int iopipe[2])
+    ProcessSubmitter(ProcessController* con, const int iopipe[2])
       : m_con(con)
     {
       m_iopipe[0] = iopipe[0];
@@ -116,7 +116,7 @@ namespace Belle2 {
 
   private:
     ProcessController* m_con;
-    int m_iopipe[2];
+    int m_iopipe[2] = {0, 0};
 
   };
 

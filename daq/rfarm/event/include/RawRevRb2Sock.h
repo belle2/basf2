@@ -33,6 +33,11 @@ namespace Belle2 {
     /*! Constuctor and Destructor */
     RawRevRb2Sock(std::string rbuf, int port, std::string shmname, int id);
     ~RawRevRb2Sock(void);
+    /** Copy constructor (disabled). */
+    RawRevRb2Sock(const RawRevRb2Sock&) = delete;
+
+    /** Operator = (disabled). */
+    RawRevRb2Sock& operator=(const RawRevRb2Sock&) = delete;
 
     /*! Event function */
     int SendEvent(void);

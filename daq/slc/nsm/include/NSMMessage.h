@@ -61,7 +61,7 @@ namespace Belle2 {
     explicit NSMMessage(const DAQLogMessage& log);
     explicit NSMMessage(const NSMData& data);
     NSMMessage(const NSMMessage& msg);
-    virtual ~NSMMessage() { }
+    virtual ~NSMMessage() override { }
 
   public:
     const NSMMessage& operator=(const NSMMessage& msg);
@@ -115,7 +115,7 @@ namespace Belle2 {
     NSMmsg* getMsg() { return &m_nsm_msg; }
 
   private:
-    int try_read(int sock, char* buf, int datalen);
+    static int try_read(int sock, char* buf, int datalen);
 
   private:
     mutable NSMcontext* m_nsmc;

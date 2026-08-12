@@ -17,15 +17,15 @@ namespace Belle2 {
 
   public:
     FileWriter() {}
-    FileWriter(const FD& fd) : _fd(fd) {}
-    virtual ~FileWriter() {}
+    explicit FileWriter(const FD& fd) : _fd(fd) {}
+    virtual ~FileWriter() override {}
 
   public:
-    virtual size_t write(const void* v, size_t count)
+    virtual size_t write(const void* v, size_t count) override
     {
       return _fd.write(v, count);
     }
-    virtual bool available()
+    virtual bool available() override
     {
       return _fd.select();
     }

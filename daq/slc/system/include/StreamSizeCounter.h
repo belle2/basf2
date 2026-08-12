@@ -16,7 +16,7 @@ namespace Belle2 {
 
   public:
     StreamSizeCounter() : m_count(0) {}
-    virtual ~StreamSizeCounter() {}
+    virtual ~StreamSizeCounter() override {}
 
   public:
     size_t write(const void*, size_t) override;

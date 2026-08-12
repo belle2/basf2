@@ -8,8 +8,8 @@
 
 #include <unistd.h>
 
-#include "TMapFile.h"
-#include "TH1.h"
+#include <TMapFile.h>
+#include <TH1.h>
 
 int main(int /*argc*/, char** /*argv*/)
 {

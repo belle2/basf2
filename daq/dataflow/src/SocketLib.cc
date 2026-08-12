@@ -37,7 +37,7 @@ int SocketIO::put(int sock, char* data, int len)
 {
   int to_size = htonl(len);
   // printf("SocketIO::put(%d): sending size...\n",sock);
-  int br = write_data(sock, (char*)&to_size, 4);
+  int br = write_data(sock, reinterpret_cast<char*>(&to_size), 4);
   if (br < 0) {
     perror("put: sending size");
     return br;
@@ -51,7 +51,7 @@ int SocketIO::put(int sock, char* data, int len)
 int SocketIO::put_wordbuf(int sock, int* data, int len)
 {
   //  printf("SocketIO::put_wordbuf(%d): sending data...\n",sock);
-  int bcount = write_data(sock, (char*)data, len * sizeof(int));
+  int bcount = write_data(sock, reinterpret_cast<char*>(data), len * sizeof(int));
   if (bcount < 0) perror("put: sending data");
   if (bcount <= 0)
     return bcount;
@@ -95,7 +95,7 @@ int SocketIO::write_data(int sock, char* data, int len)
 int SocketIO::get(int sock, char* data, int len)
 {
   int gcount;
-  int br = read_data(sock, (char*)&gcount, 4);
+  int br = read_data(sock, reinterpret_cast<char*>(&gcount), 4);
   if (br <= 0) return br;
   gcount = ntohl(gcount);
   if (gcount > len) {
@@ -109,7 +109,7 @@ int SocketIO::get(int sock, char* data, int len)
 int SocketIO::get_wordbuf(int sock, int* wrdbuf, int len)
 {
   int gcount;
-  int br = read_data(sock, (char*)wrdbuf, sizeof(int));
+  int br = read_data(sock, reinterpret_cast<char*>(wrdbuf), sizeof(int));
   if (br <= 0) return br;
   //  gcount = ntohl(wrdbuf[0]);
   gcount = wrdbuf[0];
@@ -118,7 +118,7 @@ int SocketIO::get_wordbuf(int sock, int* wrdbuf, int len)
     printf("buffer too small : %d(%d)", gcount, len);
     exit(0);
   }
-  read_data(sock, (char*)&wrdbuf[1], (gcount - 1) * sizeof(int));
+  read_data(sock, reinterpret_cast<char*>(&wrdbuf[1]), (gcount - 1) * sizeof(int));
   //  printf ( "term = %8.8x\n", wrdbuf[gcount-1] );
   return (wrdbuf[0]);
 }
@@ -127,8 +127,8 @@ int SocketIO::get_pxd(int sock, char* data, int len)
 {
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;            // TODO should it be unsigned int?
-  int* pxdheadertable = (int*) &data[headerlen];  // TODO should it be unsigned int?
+  int* pxdheader = reinterpret_cast<int*>(data);            // TODO should it be unsigned int?
+  int* pxdheadertable = reinterpret_cast<int*>(&data[headerlen]);  // TODO should it be unsigned int?
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
   if (br <= 0) return br;
@@ -143,7 +143,7 @@ int SocketIO::get_pxd(int sock, char* data, int len)
     exit(0);
   }
   tablelen = 4 * framenr;
-  br = read_data(sock, (char*)&data[headerlen], tablelen);
+  br = read_data(sock, static_cast<char*>(&data[headerlen]), tablelen);
   if (br <= 0) return br;
   for (int i = 0; i < framenr; i++) {
     pxdheadertable[i] = ntohl(pxdheadertable[i]);
@@ -230,7 +230,7 @@ SocketRecv::SocketRecv(u_short p)
   //  printf ( "SocketRecv: SIGPIPE will be ignored\n" );
   //  fflush ( stdout );
 
-  if ((bind(s, (struct sockaddr*)&sa, sizeof(sa))) < 0) {
+  if ((bind(s, reinterpret_cast<struct sockaddr*>(&sa), sizeof(sa))) < 0) {
     m_errno = errno;
     perror("SocketRecv::bind");
     return;
@@ -263,10 +263,10 @@ int SocketRecv::accept()
   m_errno = 0;
   struct sockaddr_in isa;
   socklen_t i = sizeof(isa);
-  getsockname(m_sock, (struct sockaddr*)&isa, &i);
+  getsockname(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i);
 
   int t;
-  if ((t =::accept(m_sock, (struct sockaddr*)&isa, &i)) < 0) {
+  if ((t =::accept(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i)) < 0) {
     m_errno = errno;
     return (-1);
   }
@@ -379,6 +379,7 @@ int SocketRecv::err() const
   return m_errno;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 void SocketRecv::interrupt()
 {
   m_io.interrupt();
@@ -400,7 +401,7 @@ SocketSend::SocketSend(const char* node, u_short port)
 
   struct sockaddr_in sa;
   bzero(&sa, sizeof(sa));
-  bcopy(m_hp->h_addr, (char*)&sa.sin_addr, m_hp->h_length);
+  bcopy(m_hp->h_addr, reinterpret_cast<char*>(&sa.sin_addr), m_hp->h_length);
   sa.sin_family = m_hp->h_addrtype;
   sa.sin_port = htons((u_short)port);
 
@@ -421,7 +422,7 @@ SocketSend::SocketSend(const char* node, u_short port)
 
   int maxretry = 10;
 tryagain:
-  if (connect(s, (struct sockaddr*)&sa, sizeof(sa)) < 0) {
+  if (connect(s, reinterpret_cast<struct sockaddr*>(&sa), sizeof(sa)) < 0) {
     m_errno = errno;
     perror("SocketSend:connect");
     printf("connection error..... m_sock set to %d\n", m_sock);
@@ -457,7 +458,7 @@ int SocketSend::reconnect(int ntry)
 
   // Setup socket parameters again;
   bzero(&m_sa, sizeof(m_sa));
-  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
+  bcopy(m_hp->h_addr, reinterpret_cast<char*>(&m_sa.sin_addr), m_hp->h_length);
   m_sa.sin_family = m_hp->h_addrtype;
   m_sa.sin_port = htons((u_short)m_port);
 
@@ -483,7 +484,7 @@ int SocketSend::reconnect(int ntry)
 
   for (;;) {
     printf("SocketSend: reconnecting (trial %d) \n", ntry - maxretry + 1);
-    int istat = connect(m_sock, (struct sockaddr*)&m_sa, sizeof(m_sa));
+    int istat = connect(m_sock, reinterpret_cast<struct sockaddr*>(&m_sa), sizeof(m_sa));
     if (istat >= 0) {
       printf("SocketSend: reconnected\n");
       return 0;

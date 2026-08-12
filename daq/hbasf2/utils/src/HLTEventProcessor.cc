@@ -282,6 +282,7 @@ void HLTEventProcessor::processCore(PathPtr path)
   processTerminate(m_moduleList);
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 bool HLTEventProcessor::processEvent(PathIterator moduleIter, bool firstRound)
 {
   while (not moduleIter.isDone()) {
@@ -440,7 +441,8 @@ std::pair<unsigned int, unsigned int> HLTEventProcessor::checkChildProcesses()
 void HLTEventProcessor::release()
 {
   for (auto& socket : m_sockets) {
-    socket.release();
+    // deliberately leaked: the socket belongs to the parent process
+    (void) socket.release();
   }
   m_parent.reset();
 }

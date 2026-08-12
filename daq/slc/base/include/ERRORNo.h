@@ -15,6 +15,7 @@ namespace Belle2 {
   class ERRORNo : public Enum {
 
   public:
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     static const ERRORNo UNKNOWN;
     static const ERRORNo NSMONLINE;
     static const ERRORNo NSMSENDREQ;
@@ -24,9 +25,11 @@ namespace Belle2 {
 
   public:
     ERRORNo() {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     ERRORNo(const Enum& e) : Enum(e) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     ERRORNo(const char* label) { *this = label; }
-    ERRORNo(int id) { *this = id; }
+    explicit ERRORNo(int id) { *this = id; }
     ~ERRORNo() {}
 
   protected:

@@ -24,8 +24,8 @@ namespace Belle2 {
   class ERecoMasterCallback : public RCCallback {
 
   public:
-    ERecoMasterCallback(ConfigFile& config);
-    virtual ~ERecoMasterCallback() {}
+    explicit ERecoMasterCallback(ConfigFile& config);
+    virtual ~ERecoMasterCallback() override {}
 
   public:
     void initialize(const DBObject& obj) override;

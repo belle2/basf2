@@ -56,7 +56,7 @@ namespace Belle2 {
 
   public:
     Inotify() {}
-    virtual ~Inotify() {}
+    virtual ~Inotify() override {}
 
   public:
     void open();

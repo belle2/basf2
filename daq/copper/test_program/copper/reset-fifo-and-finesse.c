@@ -20,7 +20,7 @@
 void
 do_reset(void * start)
 {
-        volatile unsigned long * lp = (unsigned long *)(start + COPPER_FF_RST);
+        volatile unsigned long * lp = (unsigned long *)((char*)start + COPPER_FF_RST);
         *lp = 0x1F;
 	sleep(1);
         *lp = 0;
@@ -29,7 +29,7 @@ do_reset(void * start)
 void
 do_scan(void * start)
 {
-        unsigned long * lp = start;
+        const unsigned long * lp = start;
         int i;
 
         for (i=0; i*4<0x100; i++) {
@@ -80,7 +80,7 @@ doit()
         return;
 }
 
-main(int argc, char ** argv)
+int main(int argc, char ** argv)
 {
         doit();
         exit(0);

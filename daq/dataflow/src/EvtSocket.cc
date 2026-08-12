@@ -27,7 +27,7 @@ EvtSocketSend::~EvtSocketSend()
 int EvtSocketSend::send(EvtMessage* msg)
 {
   //  printf ( "EvtSocketSend : sending = %d\n", msg->size() );
-  return m_sock->put((char*)msg->buffer(), msg->size());
+  return m_sock->put(static_cast<char*>(msg->buffer()), msg->size());
 }
 
 EvtMessage* EvtSocketSend::recv()
@@ -89,7 +89,7 @@ EvtMessage* EvtSocketRecv::recv()
 
 int EvtSocketRecv::send(EvtMessage* msg)
 {
-  return m_sock->put((char*)msg->buffer(), msg->size());
+  return m_sock->put(static_cast<char*>(msg->buffer()), msg->size());
 }
 
 int EvtSocketRecv::send_buffer(int nbytes, char* buf)

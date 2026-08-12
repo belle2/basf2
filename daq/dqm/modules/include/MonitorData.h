@@ -10,8 +10,8 @@
 
 #include <framework/core/HistoModule.h>
 
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -24,7 +24,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     MonitorDataModule();
-    virtual ~MonitorDataModule();
+    virtual ~MonitorDataModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -46,10 +46,10 @@ namespace Belle2 {
     int m_nevt;
 
     //! Histograms
-    TH1F* h_ncpr;
-    TH1F* h_nevt;
-    TH1F* h_size;
-    TH2F* h_size2d;
+    TH1F* h_ncpr = nullptr;
+    TH1F* h_nevt = nullptr;
+    TH1F* h_size = nullptr;
+    TH2F* h_size2d = nullptr;
 
   };
 

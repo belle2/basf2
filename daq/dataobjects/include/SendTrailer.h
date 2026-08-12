@@ -19,7 +19,7 @@ namespace Belle2 {
     SendTrailer();
 
     //! Constructor using existing pointer to raw data buffer
-    SendTrailer(int*);
+    explicit SendTrailer(int*);
 
     //! Destructor
     ~SendTrailer();
@@ -34,7 +34,7 @@ namespace Belle2 {
 
     void SetMagicWord(); //!
 
-    int GetTrlNwords(); //!
+    static int GetTrlNwords(); //!
 
     int GetMagicWord(); //!
 

@@ -22,6 +22,12 @@ namespace Belle2 {
   public:
     RoiSenderCallback();
 
+    /** Copy constructor (disabled). */
+    RoiSenderCallback(const RoiSenderCallback&) = delete;
+
+    /** Operator = (disabled). */
+    RoiSenderCallback& operator=(const RoiSenderCallback&) = delete;
+
   private:
     /** overloaded functions from base class */
     void load(const DBObject&, const std::string&) override;

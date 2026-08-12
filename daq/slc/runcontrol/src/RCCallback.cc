@@ -342,10 +342,10 @@ void RCCallback::setState(const RCState& state)
 DBObject RCCallback::dbload(const std::string& path)
 {
   DBObject obj;
-  std::string pathin, table, config;
+  std::string table, config;
   LogFile::debug(path);
   if (path.find("db://") != std::string::npos) {
-    pathin = StringUtil::replace(path, "db://", "");
+    std::string pathin = StringUtil::replace(path, "db://", "");
     StringList s = StringUtil::split(pathin, '/');
     if (s.size() > 1) {
       table = s[0];
@@ -355,7 +355,6 @@ DBObject RCCallback::dbload(const std::string& path)
       config = s[0];
     }
   } else if (path.find("file://") != std::string::npos) {
-    pathin = StringUtil::replace(path, "file:/", "");
     return obj;
   }
   if (table.size() > 0 && config.size() > 0) {

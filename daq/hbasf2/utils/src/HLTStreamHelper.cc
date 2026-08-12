@@ -33,7 +33,7 @@ namespace {
     TIter nextkey(keylist);
     TKey* key = nullptr;
 
-    while ((key = (TKey*)nextkey())) {
+    while ((key = static_cast<TKey*>(nextkey()))) {
       TObject* obj = curdir->Get(key->GetName());
       TClass* objectClass = obj->IsA();
       std::string objectName = dirName;

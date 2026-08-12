@@ -12,8 +12,8 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/pcore/RbTuple.h>
 
-#include "TKey.h"
-#include "TText.h"
+#include <TKey.h>
+#include <TText.h>
 
 using namespace Belle2;
 using namespace std;
@@ -198,11 +198,11 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
   TKey* key = 0;
   int nkeys [[maybe_unused]] = 0;
   int nobjs [[maybe_unused]] = 0;
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     nkeys++;
     TObject* obj = curdir->FindObject(key->GetName());
     if (obj->IsA()->InheritsFrom("TH1")) {
-      TH1* h1 = (TH1*) obj;
+      TH1* h1 = static_cast<TH1*>(obj);
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
       //      if (h1->GetEntries() > 0) {    // Do not send empty histograms
       m_msg->add(h1, h1->GetName());
@@ -211,7 +211,7 @@ int DqmHistoManagerModule::StreamHistograms(TDirectory* curdir, MsgHandler* msg)
       //      }
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
-      TDirectory* tdir = (TDirectory*) obj;
+      TDirectory* tdir = static_cast<TDirectory*>(obj);
       //      m_msg->add(tdir, tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       m_msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;

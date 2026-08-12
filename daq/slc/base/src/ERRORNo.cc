@@ -18,35 +18,24 @@ const ERRORNo ERRORNo::DATABASE(31, "DATABASE");
 
 const ERRORNo& ERRORNo::operator=(const std::string& label)
 {
-  if (label == NSMSENDREQ.getLabel()) {
-    return NSMSENDREQ;
-  } else if (label == NSMONLINE.getLabel()) {
-    return NSMONLINE;
-  } else if (label == NSMMEMOPEN.getLabel()) {
-    return NSMMEMOPEN;
-  } else if (label == NSMINIT.getLabel()) {
-    return NSMINIT;
-  } else if (label == DATABASE.getLabel()) {
-    return DATABASE;
-  } else {
-    return UNKNOWN;
-  }
+  if (label == NSMSENDREQ.getLabel()) *this = NSMSENDREQ;
+  else if (label == NSMONLINE.getLabel()) *this = NSMONLINE;
+  else if (label == NSMMEMOPEN.getLabel()) *this = NSMMEMOPEN;
+  else if (label == NSMINIT.getLabel()) *this = NSMINIT;
+  else if (label == DATABASE.getLabel()) *this = DATABASE;
+  else *this = UNKNOWN;
+  return *this;
 }
 
 const ERRORNo& ERRORNo::operator=(int id)
 {
-  if (id == NSMSENDREQ.getId()) {
-    return NSMSENDREQ;
-  } else if (id == NSMONLINE.getId()) {
-    return NSMONLINE;
-  } else if (id == NSMMEMOPEN.getId()) {
-    return NSMMEMOPEN;
-  } else if (id == NSMINIT.getId()) {
-    return NSMINIT;
-  } else if (id == DATABASE.getId()) {
-    return DATABASE;
-  }
-  return UNKNOWN;
+  if (id == NSMSENDREQ.getId()) *this = NSMSENDREQ;
+  else if (id == NSMONLINE.getId()) *this = NSMONLINE;
+  else if (id == NSMMEMOPEN.getId()) *this = NSMMEMOPEN;
+  else if (id == NSMINIT.getId()) *this = NSMINIT;
+  else if (id == DATABASE.getId()) *this = DATABASE;
+  else *this = UNKNOWN;
+  return *this;
 }
 
 const ERRORNo& ERRORNo::operator=(const char* label)

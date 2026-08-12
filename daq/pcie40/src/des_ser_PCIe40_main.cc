@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+// cppcheck-suppress missingInclude ; daq/pcie40 has no include/ symlink tree
 #include "des_ser_PCIe40_main.h"
 using namespace std;
 
@@ -1113,7 +1114,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
     if (new_evtnum % 1000000 == 1000) {
       if (reduced_flag == 1) {
         time_t timer;
-        struct tm* t_st;
+        const struct tm* t_st;
         time(&timer);
         t_st = localtime(&timer);
         char timeStr[100];
@@ -1563,7 +1564,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
             nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     pthread_mutex_unlock(&(mtx_sender_log));
-    string err_str = err_buf;
+    const string& err_str = err_buf;
     throw (err_str);
   }
 
@@ -1609,7 +1610,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
   //  printf("### %.8x %.4x\n", buf[ 0 ], crc16);
   while (nwords != 0) {
 
-    unsigned char temp_buf = *((unsigned char*)(buf + nints) + (-(cnt % 4) + 3));
+    unsigned char temp_buf = *(static_cast<unsigned char*>((buf + nints)) + (-(cnt % 4) + 3));
     crc16 = CRC16Table0x1021[(crc16 >> (16 - CHAR_BIT)) ^ temp_buf ] ^ (crc16 << CHAR_BIT);
     //    printf("%.2x %.4x\n", temp_buf, crc16);
     if ((cnt % 4) == 3) {
@@ -1715,7 +1716,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
 void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch,
                   unsigned int* data_main, unsigned int* data_splitted,
                   int& event_nwords_main, int& event_nwords_splitted,
-                  unsigned int splitted_node_id, std::vector< int > splitted_ch)
+                  unsigned int splitted_node_id, const std::vector< int >& splitted_ch)
 {
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
   // pthread_mutex_lock(&(mtx_sender_log));
@@ -1765,8 +1766,10 @@ void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch
   data_splitted[ Belle2::RawHeader_latest::POS_NODE_ID ] = splitted_node_id;
 
   int cur_pos = 0;
+  // cppcheck-suppress unreadVariable ; kept for debugging
   int cur_ch_main = 0;
   int prev_ch_main = -1;
+  // cppcheck-suppress unreadVariable ; kept for debugging
   int cur_ch_splitted = 0;
   int prev_ch_splitted = -1;
   int cur_pos_main = Belle2::RawHeader_latest::RAWHEADER_NWORDS;
@@ -1890,7 +1893,7 @@ void* sender(void* arg)
   //
   // Get arguments
   //
-  sender_argv* snd_arg = (sender_argv*)arg;
+  const sender_argv* snd_arg = static_cast<sender_argv*>(arg);
   int sender_id = snd_arg->sender_id;
   unsigned int node_id = snd_arg->node_id;
   vector<int> valid_ch = snd_arg->valid_ch;
@@ -1964,7 +1967,7 @@ void* sender(void* arg)
     perror("Failed to set REUSEADDR");
   }
 
-  if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
+  if (bind(fd_listen, reinterpret_cast<struct sockaddr*>(&sock_listen), sizeof(struct sockaddr)) < 0) {
     pthread_mutex_lock(&(mtx_sender_log));
     printf("[FATAL] thread %d : %s : Failed to bind(%s). Maybe other programs have already occupied this port(%d). Exiting...\n",
            sender_id, hostnamebuf, strerror(errno),
@@ -1981,15 +1984,15 @@ void* sender(void* arg)
       printf("[WARNING] thread %d : Failed to run %s\n", sender_id,
              cmdline);
       pthread_mutex_unlock(&(mtx_sender_log));
+    } else {
+      while (fgets(buf, 256, fp) != NULL) {
+        pthread_mutex_lock(&(mtx_sender_log));
+        printf("[DEBUG] thread %d : Port %d is used by : %s\n", sender_id,
+               port_to, buf); fflush(stdout);
+        pthread_mutex_unlock(&(mtx_sender_log));
+      }
+      pclose(fp);
     }
-
-    while (fgets(buf, 256, fp) != NULL) {
-      pthread_mutex_lock(&(mtx_sender_log));
-      printf("[DEBUG] thread %d : Port %d is used by : %s\n", sender_id,
-             port_to, buf); fflush(stdout);
-      pthread_mutex_unlock(&(mtx_sender_log));
-    }
-    fclose(fp);
     exit(1);
   }
 
@@ -2019,7 +2022,7 @@ void* sender(void* arg)
   fflush(stdout);
   pthread_mutex_unlock(&(mtx_sender_log));
 
-  if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
+  if ((fd_accept = accept(fd_listen, reinterpret_cast<struct sockaddr*>(& (sock_accept)), &addrlen)) == 0) {
     char err_buf[500];
     pthread_mutex_lock(&(mtx_sender_log));
     sprintf(err_buf, "[FATAL] thread %d : %s : Failed to accept(%s). Exiting...",
@@ -2068,6 +2071,7 @@ void* sender(void* arg)
 #ifndef USE_ZMQ
   int buffer_id = 0;
 #endif
+  // cppcheck-suppress unreadVariable ; kept for debugging
   unsigned int tot_event_nwords = 0;
   for (
 #ifdef MAX_EVENT
@@ -2156,6 +2160,7 @@ void* sender(void* arg)
 #endif // SPLIT_ECL_ECLTRG
       unsigned int* eve_buff = NULL;
       unsigned int event_nwords = 0;
+      // cppcheck-suppress shadowVariable ; re-declared in the nested scope below
       int ret = 0;
 
 #ifdef SPLIT_ECL_ECLTRG
@@ -2207,6 +2212,7 @@ void* sender(void* arg)
           exprun = prev_exprun;
           evtnum = prev_evtnum;
 
+          // cppcheck-suppress shadowVariable ; deliberately re-checked in this scope
           int ret = 0;
 #ifdef SPLIT_ECL_ECLTRG
           if (k == 0) {
@@ -2247,7 +2253,7 @@ void* sender(void* arg)
         }
       }
 
-      if (eve_buff[ 1 ]  & 0xfffff000 != 0x7f7f0000 ||
+      if ((eve_buff[ 1 ] & 0xfffff000) != 0x7f7f0000 ||
           eve_buff[ event_nwords - 1  ] != 0x7fff0006) {
         pthread_mutex_lock(&(mtx_sender_log));
         printf("[FATAL] thread %d : %s : ERROR_EVENT : Invalid Magic word in header( pos=0x%x, %.8x ) and/or trailer( pos=0x%x, 0x%.8x ) : eve %u exp %d run %d sub %d : %s %s %d\n",
@@ -2298,6 +2304,7 @@ void* sender(void* arg)
     buff[ tot_event_nwords + NW_SEND_HEADER + 1 ] = 0x7fff0007;
 
 #ifndef NOT_SEND
+    // cppcheck-suppress unreadVariable ; kept for debugging
     ret = 0;
     int sent_bytes = 0;
     // pthread_mutex_lock(&(mtx_sender_log));
@@ -2324,7 +2331,7 @@ void* sender(void* arg)
     }
 
     while (true) {
-      if ((ret = write(fd_accept, (char*)buff + sent_bytes, (tot_event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
+      if ((ret = write(fd_accept, static_cast<char*>(buff) + sent_bytes, (tot_event_nwords + NW_SEND_HEADER + NW_SEND_TRAILER)
                        * sizeof(unsigned int) - sent_bytes)) <= 0) {
         if (errno == EINTR) {
           continue;
@@ -2645,7 +2652,7 @@ int main(int argc, char** argv)
   ///////////////////////////////////////////////
   // Make sender threads
   ///////////////////////////////////////////////
-  int   run_no;
+  int   run_no = 0;
   pthread_t sender_thr[NUM_SENDER_THREADS];
   //  std::thread sender_thr[NUM_SENDER_THREADS];
   sender_argv snd_argv[NUM_SENDER_THREADS];
@@ -2687,6 +2694,7 @@ int main(int argc, char** argv)
   unsigned int evtnum = 0;
   unsigned int exprun = 0;
   unsigned int prev_exprun = 0;
+  // cppcheck-suppress unreadVariable ; kept for debugging
   int errors = 0 ;
   unsigned int esize = 0 ;
   int total_pages = 0 ;
@@ -2943,14 +2951,18 @@ int main(int argc, char** argv)
           unsigned int sum_err_link_eve_jump = 0;
 
           if (evecnt != 1) {
+            // cppcheck-suppress unreadVariable ; kept for debugging
             unsigned int sum_err_flag_cnt = 0;
+            // cppcheck-suppress unreadVariable ; kept for debugging
             unsigned int sum_cur_evtnum = 0;
             unsigned int sum_crc_err_ch[ MAX_PCIE40_CH] = {0};
 
             for (int l = 0; l < NUM_SENDER_THREADS; l++) {
               sum_total_crc_good += total_crc_good[l];
               sum_total_crc_errors +=  total_crc_errors[l];
+              // cppcheck-suppress unreadVariable ; kept for debugging
               sum_err_flag_cnt +=  err_flag_cnt[l];
+              // cppcheck-suppress unreadVariable ; kept for debugging
               sum_cur_evtnum +=  cur_evtnum[l];
               sum_err_not_reduced += err_not_reduced[l];
               sum_err_bad_7f7f +=  err_bad_7f7f[l];
@@ -2970,6 +2982,7 @@ int main(int argc, char** argv)
               // }
 
               for (int m = 0; m <  MAX_PCIE40_CH; m++) {
+                // cppcheck-suppress unreadVariable ; kept for debugging
                 sum_crc_err_ch[m] += crc_err_ch[l][m];
               }
             }
@@ -2980,7 +2993,7 @@ int main(int argc, char** argv)
           double interval = cur_time - m_prev_time;
           m_prev_time = cur_time;
           time_t timer;
-          struct tm* t_st;
+          const struct tm* t_st;
           time(&timer);
           t_st = localtime(&timer);
           char timeStr[100];

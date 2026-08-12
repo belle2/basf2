@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
   // TODO: delete or not?
   RingBuffer* ringBuffer = new RingBuffer(ringBufferName.c_str());
-  RFFlowStat flow((char*)shmName.c_str(), shmID, ringBuffer);
+  RFFlowStat flow(const_cast<char*>(shmName.c_str()), shmID, ringBuffer);
   int* buffer = new int[MAXEVTSIZE];
 
   HLTMainLoop mainLoop;

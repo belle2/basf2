@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
   printf("file2socket::start\n");
   TCPServerSocket server_socket;
-  const std::string host = argv[2];
+  const std::string& host = argv[2];
   server_socket.open(host, atoi(argv[3]));
   // const int ninterval = atoi(argv[4]);
   printf("file2socket::accepting\n");

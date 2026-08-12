@@ -239,13 +239,13 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
   int rawcopper_nwords = rawdblk->TotalBufNwords();
 
   //Fill iov info.
-  iov[0].iov_base = (char*)send_header.GetBuffer();
+  iov[0].iov_base = reinterpret_cast<char*>(send_header.GetBuffer());
   iov[0].iov_len = sizeof(int) * send_header.GetHdrNwords();
 
-  iov[1].iov_base = (char*)rawdblk->GetWholeBuffer();
+  iov[1].iov_base = reinterpret_cast<char*>(rawdblk->GetWholeBuffer());
   iov[1].iov_len = sizeof(int) * rawcopper_nwords;
 
-  iov[2].iov_base = (char*)send_trailer.GetBuffer();
+  iov[2].iov_base = reinterpret_cast<char*>(send_trailer.GetBuffer());
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
   // Send Multiple buffers
@@ -301,15 +301,16 @@ int DesSer::sendByWriteV(RawDataBlockFormat* rawdblk)
     double retry_start = getTimeSec();
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
-      n += Send(m_socket_send, (char*)iov[ 0 ].iov_base + n, iov[ 0 ].iov_len - n);
+      n += Send(m_socket_send, static_cast<char*>(iov[ 0 ].iov_base) + n, iov[ 0 ].iov_len - n);
     }
 
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len)) {
-      n += Send(m_socket_send, (char*)iov[ 1 ].iov_base + (n - iov[ 0 ].iov_len), iov[ 1 ].iov_len - (n - iov[ 0 ].iov_len));
+      n += Send(m_socket_send, static_cast<char*>(iov[ 1 ].iov_base) + (n - iov[ 0 ].iov_len), iov[ 1 ].iov_len - (n - iov[ 0 ].iov_len));
     }
 
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len)) {
-      n += Send(m_socket_send, (char*)iov[ 2 ].iov_base + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
+      // cppcheck-suppress unreadVariable ; the tail send is best effort
+      n += Send(m_socket_send, static_cast<char*>(iov[ 2 ].iov_base) + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
                 iov[ 2 ].iov_len - (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len));
     }
     double retry_end = getTimeSec();
@@ -382,7 +383,7 @@ void DesSer::Accept(bool close_listen)
   int fd_listen;
   struct sockaddr_in sock_listen;
   sock_listen.sin_family = AF_INET;
-  sock_listen.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
+  sock_listen.sin_addr.s_addr = *reinterpret_cast<unsigned int*>(host->h_addr_list[0]);
 
   socklen_t addrlen = sizeof(sock_listen);
   sock_listen.sin_port = htons(m_port_to);
@@ -394,7 +395,7 @@ void DesSer::Accept(bool close_listen)
     perror("Failed to set REUSEADDR");
   }
 
-  if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
+  if (bind(fd_listen, reinterpret_cast<struct sockaddr*>(&sock_listen), sizeof(struct sockaddr)) < 0) {
     printf("[FATAL] Failed to bind. Maybe other programs have already occupied this port(%d). Exiting...\n",
            m_port_to); fflush(stdout);
     // Check the process occupying the port 30000.
@@ -436,7 +437,7 @@ void DesSer::Accept(bool close_listen)
   printf("[DEBUG] Accepting... : port %d server %s\n", m_port_to, m_hostname_local.c_str());
   fflush(stdout);
 
-  if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
+  if ((fd_accept = accept(fd_listen, reinterpret_cast<struct sockaddr*>(& (sock_accept)), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);

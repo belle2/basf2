@@ -71,7 +71,6 @@ void ConfigFile::read(const std::string& filename, bool overload)
 void ConfigFile::read(std::istream& is, bool overload)
 {
   std::string s;
-  std::string dir = "";
   while (is && getline(is, s)) {
     if (s.size() == 0 || s.at(0) == '#') continue;
     std::vector<std::string> str_v = StringUtil::split(s, ':');
@@ -92,7 +91,6 @@ void ConfigFile::read(std::istream& is, bool overload)
           str_v[1].append(str_v[i]);
         }
       }
-      std::string value = "";
       size_t i = 0;
       std::stringstream ss;
       for (; i < str_v[1].size(); i++) {

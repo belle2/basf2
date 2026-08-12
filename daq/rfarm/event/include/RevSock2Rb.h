@@ -22,6 +22,11 @@ namespace Belle2 {
     /*! Constuctor and Destructor */
     RevSock2Rb(std::string rbuf, std::string src, int port, std::string shmname, int id);
     ~RevSock2Rb(void);
+    /** Copy constructor (disabled). */
+    RevSock2Rb(const RevSock2Rb&) = delete;
+
+    /** Operator = (disabled). */
+    RevSock2Rb& operator=(const RevSock2Rb&) = delete;
 
     /*! Event function */
     int ReceiveEvent(void);

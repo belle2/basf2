@@ -63,7 +63,7 @@ void reset_fifo_and_finesse(int cprfd)
     ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
 }
 
-main(int argc, char ** argv)
+int main(int argc, char ** argv)
 {
     int event = 0;
     int ret, i = 0;
@@ -144,7 +144,7 @@ main(int argc, char ** argv)
 	{
 	    char *p = (char *) buffer;
 	    struct copper_header *header = (struct copper_header *) p;
-	    struct copper_footer *footer =
+	    const struct copper_footer *footer =
 		(struct copper_footer *) (p + ret -
 					  sizeof(struct copper_footer));
 

@@ -43,7 +43,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     Raw2DsModule();
-    virtual ~Raw2DsModule();
+    virtual ~Raw2DsModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -54,7 +54,7 @@ namespace Belle2 {
     void endRun() override;
     void terminate() override;
 
-    void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
+    static void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
 
   private:
     //! function to register data buffer in DataStore as RawCOPPERs

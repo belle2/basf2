@@ -22,10 +22,9 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     CertifyParallelModule();
-    virtual ~CertifyParallelModule();
+    virtual ~CertifyParallelModule() override;
 
     //! Module functions to be called from main process
-    void initialize() override;
 
     //! Module functions to be called from event process
     void beginRun() override;
@@ -34,7 +33,7 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    int m_nevent;
+    int m_nevent = 0;
 
 
   };

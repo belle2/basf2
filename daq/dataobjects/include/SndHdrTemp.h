@@ -23,7 +23,7 @@ namespace Belle2 {
     SndHdrTemp();
 
     //! Constructor using existing pointer to raw data buffer
-    SndHdrTemp(int*);
+    explicit SndHdrTemp(int*);
     //! Destructor
     ~SndHdrTemp();
 

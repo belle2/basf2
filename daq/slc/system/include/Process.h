@@ -30,13 +30,12 @@ namespace Belle2 {
     Process() : m_pid(-1) {}
 
     template<class WORKER>
-    Process(WORKER* worker, bool detached = true)
+    explicit Process(WORKER* worker, bool detached = true) : m_pid(fork())
     {
-      m_pid = fork();
       if (m_pid == 0) {
         signal(SIGINT, g_handler_int);
         if (detached) {
-          on_exit(g_handler_exit<WORKER>, (void*)worker);
+          on_exit(g_handler_exit<WORKER>, static_cast<void*>(worker));
         }
         worker->run();
         exit(0);
@@ -76,8 +75,8 @@ namespace Belle2 {
 
   private:
     pid_t m_pid;
-    int m_waitpid_result;
-    int m_waitpid_status;
+    int m_waitpid_result = 0;
+    int m_waitpid_status = 0;
 
   };
 

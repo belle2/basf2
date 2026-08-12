@@ -37,6 +37,7 @@ NSMCallback::NSMCallback(const int timeout)
 }
 
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 int NSMCallback::reset()
 {
   int revision = Callback::reset();
@@ -290,7 +291,7 @@ void NSMCallback::vlistset(NSMCommunicator& com)
   }
   for (size_t i = 0; i < vlist.size(); i++) {
     vlistentry_t& en(vlist[i]);
-    std::cout << StringUtil::form(StringUtil::form("%%-%ds ", length).c_str(), en.name.c_str())
+    std::cout << StringUtil::form(StringUtil::form("%%-%ds ", length), en.name.c_str())
               << " : " << en.type << " "
               << (en.useGet ? "get " : "")
               << (en.useSet ? "set " : "")  << std::endl;

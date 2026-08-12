@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     exit(1);
   }
 
-  string host_recv = argv[1];     //! hostname
+  const string& host_recv = argv[1];     //! hostname
   int shmflag = atoi(argv[2]);      //! Use shared memory -> 1; Without shm -> 0
   int port_send = atoi(argv[3]);      //! port number
   string nodename = argv[4];    //! Node name

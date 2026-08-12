@@ -31,7 +31,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     Rbuf2DsModule();
-    virtual ~Rbuf2DsModule();
+    virtual ~Rbuf2DsModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -50,7 +50,7 @@ namespace Belle2 {
     RingBuffer* m_rbuf;
 
     //! DataStore streamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     //! Compression Level
     int m_compressionLevel;

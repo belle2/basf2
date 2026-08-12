@@ -15,7 +15,7 @@ namespace Belle2 {
 
   class SocketManager {
   public:
-    SocketManager(int sock);
+    explicit SocketManager(int sock);
     ~SocketManager();
 
     int examine();

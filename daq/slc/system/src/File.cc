@@ -48,7 +48,7 @@ size_t File::write(const void* buf, size_t count)
   size_t c = 0;
   while (c < count) {
     errno = 0;
-    int ret = ::write(m_fd, ((unsigned char*)buf + c), (count - c));
+    int ret = ::write(m_fd, (static_cast<unsigned char*>(const_cast<void*>(buf)) + c), (count - c));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -71,7 +71,7 @@ size_t File::read(void* buf, size_t count)
   size_t c = 0;
   while (c < count) {
     errno = 0;
-    int ret = ::read(m_fd, ((unsigned char*)buf + c), (count - c));
+    int ret = ::read(m_fd, (static_cast<unsigned char*>(buf) + c), (count - c));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;

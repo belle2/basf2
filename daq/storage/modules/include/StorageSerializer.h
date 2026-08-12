@@ -27,7 +27,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     StorageSerializerModule();
-    virtual ~StorageSerializerModule();
+    virtual ~StorageSerializerModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -44,10 +44,10 @@ namespace Belle2 {
     int m_compressionLevel;
 
     //! DataStoreStreamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     //! Messaage handler
-    MsgHandler* m_msghandler;
+    MsgHandler* m_msghandler = nullptr;
 
     //! Ring Buffer to dump sampled output stream
     std::string m_obuf_name;
@@ -55,11 +55,11 @@ namespace Belle2 {
     SharedEventBuffer m_obuf;
 
     //! Exp number, Run number
-    unsigned int m_count;
-    unsigned int m_count_0;
-    int m_expno;
-    int m_runno;
-    unsigned long long m_nbyte;
+    unsigned int m_count = 0;
+    unsigned int m_count_0 = 0;
+    int m_expno = 0;
+    int m_runno = 0;
+    unsigned long long m_nbyte = 0;
     int m_nodeid;
 
   private:

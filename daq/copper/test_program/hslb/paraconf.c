@@ -190,6 +190,7 @@ main(int argc, char **argv)
     }
 
     while(argc > 1){
+      // cppcheck-suppress knownConditionTrueFalse ; argc is validated by the caller of this helper
       if(argc <2) {
         usage();
         exit(1);

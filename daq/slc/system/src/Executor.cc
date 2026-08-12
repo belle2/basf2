@@ -48,10 +48,10 @@ void Executor::addArg(const std::string& arg)
 bool Executor::execute(bool isdaemon)
 {
   char* argv[256];
-  argv[0] = (char*)m_path.c_str();
+  argv[0] = const_cast<char*>(m_path.c_str());
   std::cerr << "" << argv[0] << " ";
   for (size_t i = 0; i < m_arg_v.size(); i++) {
-    argv[i + 1] = (char*)m_arg_v[i].c_str();
+    argv[i + 1] = const_cast<char*>(m_arg_v[i].c_str());
     std::cerr << "" << argv[i + 1] << " ";
   }
   std::cerr << std::endl;

@@ -13,8 +13,8 @@
 
 #include <framework/pcore/MsgHandler.h>
 
-#include "TH1.h"
-#include "TDirectory.h"
+#include <TH1.h>
+#include <TDirectory.h>
 
 #include <string>
 #include <time.h>
@@ -29,7 +29,7 @@ namespace Belle2 {
 
     //! Constructor and Destructor
     DqmHistoManagerModule();
-    virtual ~DqmHistoManagerModule();
+    virtual ~DqmHistoManagerModule() override;
 
     //! module functions
     void initialize() override;
@@ -51,17 +51,17 @@ namespace Belle2 {
 
     bool        m_initmain; /**< True if initialize() was called. */
     bool        m_initialized;
-    int         m_nevent;
-    time_t      m_ptime;
-    time_t      m_dtime;
-    time_t      m_pstep;
-    time_t      m_dstep;
+    int         m_nevent = 0;
+    time_t      m_ptime = 0;
+    time_t      m_dtime = 0;
+    time_t      m_pstep = 0;
+    time_t      m_dstep = 0;
 
 
     // Socket interface
-    EvtSocketSend*  m_sock;
-    MsgHandler*     m_msg;
-    int             m_nobjs;
+    EvtSocketSend*  m_sock = nullptr;
+    MsgHandler*     m_msg = nullptr;
+    int             m_nobjs = 0;
 
 
 

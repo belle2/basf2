@@ -42,7 +42,7 @@ namespace Belle2 {
   public:
     //! Constructor / Destructor
     StorageDeserializerModule();
-    virtual ~StorageDeserializerModule();
+    virtual ~StorageDeserializerModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -54,7 +54,7 @@ namespace Belle2 {
     void terminate() override;
 
   private:
-    DataStorePackage* m_package;
+    DataStorePackage* m_package = nullptr;
     std::string m_ibuf_name;
     int m_ibuf_size;
     SharedEventBuffer m_ibuf;
@@ -64,12 +64,12 @@ namespace Belle2 {
     std::string m_nodename;
     int m_shmflag;
     unsigned long long m_count;
-    int m_expno;
-    int m_runno;
-    unsigned int m_evtno;
-    MsgHandler* m_handler;
+    int m_expno = 0;
+    int m_runno = 0;
+    unsigned int m_evtno = 0;
+    MsgHandler* m_handler = nullptr;
     //! DataStoreStreamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
     int m_eb2;
     std::vector<std::string> m_saveObjs;
 

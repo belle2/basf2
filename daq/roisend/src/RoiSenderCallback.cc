@@ -77,9 +77,10 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
   sprintf(idbuf, "%2.2d", 0);
 
   // Execute merger_merge
-  m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+  m_pid_merger = m_proc->Execute(merger, const_cast<char*>(shmname.c_str()), idbuf, onsenhost, onsenport, mergerport);
   if (m_pid_merger <= 0) {
-    LogFile::error("loading %s %s %s %s %s %s failed!", merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+    LogFile::error("loading %s %s %s %s %s %s failed!", merger, const_cast<char*>(shmname.c_str()), idbuf, onsenhost, onsenport,
+                   mergerport);
     setState(RCState::ERROR_ES);
     return;
   }
@@ -164,7 +165,7 @@ void RoiSenderCallback::recover(const DBObject&, const std::string&)
 
   char idbuf[11];// maxlength by cppcheck
   sprintf(idbuf, "%2.2d", 0);// why this?
-  m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+  m_pid_merger = m_proc->Execute(merger, const_cast<char*>(shmname.c_str()), idbuf, onsenhost, onsenport, mergerport);
   sleep(2); // WHY a sleep? if it is a race condition find & destroy!
 }
 

@@ -127,7 +127,7 @@ void Raw2DsModule::registerRawCOPPERs()
   unsigned int error_flag = 0;
   int size;
   int* evtbuf = new int[MAXEVTSIZE];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(static_cast<int*>(evtbuf))) == 0) {
     //    usleep(100);
     //    usleep(20);
     if (signalled != 0) return;
@@ -163,8 +163,8 @@ void Raw2DsModule::registerRawCOPPERs()
   RawDataBlock tempdblk;
   tempdblk.SetBuffer(bufbody, nwords, false, npackedevts, ncprs);
 
-  unsigned int utime = 0;
-  unsigned int ctime = 0;
+  unsigned int utime;
+  unsigned int ctime;
   unsigned long long int mtime = 0;
 
   int store_time_flag = 0;

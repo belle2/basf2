@@ -49,6 +49,7 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
       ERROR(fcntl);
       return -1;
     }
+    // cppcheck-suppress knownConditionTrueFalse ; timeout is a caller-supplied parameter
   } else if (timeout < 0) {
     ret = fcntl(sd, F_GETFL, O_NDELAY);
     if (ret == -1) {
@@ -81,7 +82,7 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
       ERROR(gethostbyname);
       return -1;
     }
-    in->sin_addr = *(struct in_addr*)(hoste->h_addr);
+    in->sin_addr = *reinterpret_cast<struct in_addr*>((hoste->h_addr));
   }
   in->sin_port = htons(port);
 
@@ -110,7 +111,7 @@ b2_create_tcp_socket(void)
   }
 #endif
 
-  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(int));
+  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&one), sizeof(int));
   if (ret == -1) {
     ERROR(setsockopt);
     return -1;
@@ -140,7 +141,7 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
     return -1;
   }
 
-  ret = bind(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  ret = bind(sd, reinterpret_cast<const struct sockaddr*>(&in), sizeof(struct sockaddr_in));
   if (ret == -1) {
     ERROR(bind);
     return -1;
@@ -176,7 +177,7 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
     return -1;
   }
 
-  ret = connect(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  ret = connect(sd, reinterpret_cast<const struct sockaddr*>(&in), sizeof(struct sockaddr_in));
   if (ret == -1 && errno != EINPROGRESS) {
     ERROR(connect);
     return -1;
@@ -190,7 +191,7 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 int
 b2_send(const int sd, const void* buf, const size_t size)
 {
-  unsigned char* ptr = (unsigned char*)buf;
+  unsigned char* ptr = static_cast<unsigned char*>(const_cast<void*>(buf));
   size_t n_bytes_remained = size;
 
 
@@ -237,7 +238,7 @@ b2_send(const int sd, const void* buf, const size_t size)
 int
 b2_recv(const int sd,       void* buf, const size_t size)
 {
-  unsigned char* ptr = (unsigned char*)buf;
+  unsigned char* ptr = static_cast<unsigned char*>(buf);
   size_t n_bytes_remained = size;
 
 

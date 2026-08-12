@@ -17,7 +17,7 @@ namespace Belle2 {
   class RunNumberTable {
 
   public:
-    RunNumberTable(DBInterface& db) : m_db(db) {}
+    explicit RunNumberTable(DBInterface& db) : m_db(db) {}
     ~RunNumberTable() {}
 
   public:

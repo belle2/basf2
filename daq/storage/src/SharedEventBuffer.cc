@@ -33,7 +33,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
     LogFile::fatal("Failed to open %s", m_path.c_str());
     return false;
   }
-  char* buf = (char*) m_memory.map(0, size());
+  char* buf = static_cast<char*>(m_memory.map(0, size()));
   if (buf == NULL) {
     return false;
   }
@@ -43,7 +43,7 @@ bool SharedEventBuffer::open(const std::string& nodename,
   buf += m_cond.size();
   m_header = reinterpret_cast<Header*>(buf);
   buf += sizeof(Header);
-  m_buf = (int*)buf;
+  m_buf = reinterpret_cast<int*>(buf);
   if (recreate) init();
   return true;
 }
@@ -207,6 +207,7 @@ unsigned int SharedEventBuffer::read(int* buf, bool fouce, bool unlocked,
           } else {
             unsigned int count = m_nword - i_r;
             memcpy(buf, (m_buf + i_r + 1), sizeof(int) * count);
+            // cppcheck-suppress knownConditionTrueFalse ; the wrap-around case depends on the runtime write index
             if (nword > count) {
               memcpy(buf + count, m_buf, sizeof(int) * (nword - count));
             }

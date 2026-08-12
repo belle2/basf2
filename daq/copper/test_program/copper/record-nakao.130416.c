@@ -70,7 +70,7 @@ main(int argc, char **argv)
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
-  char *program = argv[0];
+  const char *program = argv[0];
 
 
   //
@@ -198,7 +198,7 @@ main(int argc, char **argv)
     //
     char * p = (char *)buffer;
     struct copper_header * header = (struct copper_header *)p;
-    struct copper_footer * footer =
+    const struct copper_footer * footer =
       (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
     int t;
     unsigned  short temph,templ;

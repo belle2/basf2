@@ -45,8 +45,10 @@ RFMaster::RFMaster(string conffile)
 
   // 4. Leave PID file
   FILE* f = fopen("pid.data", "w");
-  fprintf(f, "%d", getpid());
-  fclose(f);
+  if (f != NULL) {
+    fprintf(f, "%d", getpid());
+    fclose(f);
+  }
 
 }
 

@@ -16,6 +16,7 @@ TimeoutException::TimeoutException(const std::string& format, ...)
 {
   va_list ap;
   char ss[1024 * 100];
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, format);
   vsnprintf(ss, sizeof(ss), format.c_str(), ap);
   va_end(ap);
@@ -27,6 +28,7 @@ TimeoutException::TimeoutException(int err, const std::string& format, ...)
   m_err = err;
   va_list ap;
   char ss[1024 * 100];
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, format);
   vsnprintf(ss, sizeof(ss), format.c_str(), ap);
   va_end(ap);

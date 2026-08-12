@@ -22,7 +22,7 @@ namespace Belle2 {
     ~RCConfig() {}
 
   public:
-    void print();
+    static void print();
     DBObject& getObject() { return m_obj; }
     const DBObject& getObject() const { return m_obj; }
     void setObject(const DBObject& obj) { m_obj = obj; }

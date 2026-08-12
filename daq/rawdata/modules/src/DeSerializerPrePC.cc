@@ -112,7 +112,7 @@ int DeSerializerPrePCModule::recvFD(int sock, char* buf, int data_size_byte, int
   int n = 0;
   while (1) {
     int read_size = 0;
-    if ((read_size = recv(sock, (char*)buf + n, data_size_byte - n, flag)) < 0) {
+    if ((read_size = recv(sock, static_cast<char*>(buf) + n, data_size_byte - n, flag)) < 0) {
       if (errno == EINTR) {
         continue;
       } else {
@@ -149,7 +149,7 @@ int DeSerializerPrePCModule::Connect()
       sleep(1234567);
       exit(1);
     }
-    socPC.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
+    socPC.sin_addr.s_addr = *reinterpret_cast<unsigned int*>(host->h_addr_list[0]);
     socPC.sin_port = htons(m_port_from[ i ]);
     int sd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -158,7 +158,7 @@ int DeSerializerPrePCModule::Connect()
 
     printf("[DEBUG] Connecting to %s port %d ...\n", m_hostname_from[ i ].c_str(), m_port_from[ i ]);
     while (1) {
-      if (connect(sd, (struct sockaddr*)(&socPC), sizeof(socPC)) < 0) {
+      if (connect(sd, reinterpret_cast<struct sockaddr*>((&socPC)), sizeof(socPC)) < 0) {
         perror("Failed to connect. Retrying...");
         usleep(500000);
       } else {
@@ -171,19 +171,19 @@ int DeSerializerPrePCModule::Connect()
     // check socket paramters
     int val, len;
     len = sizeof(val);
-    getsockopt(m_socket[ i ], SOL_SOCKET, SO_RCVBUF, &val, (socklen_t*)&len);
+    getsockopt(m_socket[ i ], SOL_SOCKET, SO_RCVBUF, &val, reinterpret_cast<socklen_t*>(&len));
 #ifdef DEBUG
     printf("[DEBUG] SO_RCVBUF %d\n", val);
 #endif
-    getsockopt(m_socket[ i ], SOL_SOCKET, SO_SNDBUF, &val, (socklen_t*)&len);
+    getsockopt(m_socket[ i ], SOL_SOCKET, SO_SNDBUF, &val, reinterpret_cast<socklen_t*>(&len));
 #ifdef DEBUG
     printf("[DEBUG] SO_SNDBUF %d\n", val);
 #endif
-    getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_MAXSEG, &val, (socklen_t*)&len);
+    getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_MAXSEG, &val, reinterpret_cast<socklen_t*>(&len));
 #ifdef DEBUG
     printf("[DEBUG] TCP_MAXSEG %d\n", val);
 #endif
-    getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_NODELAY, &val, (socklen_t*)&len);
+    getsockopt(m_socket[ i ], IPPROTO_TCP, TCP_NODELAY, &val, reinterpret_cast<socklen_t*>(&len));
 #ifdef DEBUG
     printf("[DEBUG] TCP_NODELAY %d\n", val);
 #endif
@@ -191,7 +191,7 @@ int DeSerializerPrePCModule::Connect()
       sockaddr_in sa;
       memset(&sa, 0, sizeof(sockaddr_in));
       socklen_t sa_len = sizeof(sa);
-      if (getsockname(m_socket[i], (struct sockaddr*)&sa, (socklen_t*)&sa_len) == 0) {
+      if (getsockname(m_socket[i], reinterpret_cast<struct sockaddr*>(&sa), static_cast<socklen_t*>(&sa_len)) == 0) {
         g_status.setInputPort(ntohs(sa.sin_port));
         g_status.setInputAddress(sa.sin_addr.s_addr);
       }
@@ -230,7 +230,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
   // Read header
   for (int i = 0; i < (int)(m_socket.size()); i++) {
 
-    recvFD(m_socket[ i ], (char*)send_hdr_buf, sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
+    recvFD(m_socket[ i ], reinterpret_cast<char*>(send_hdr_buf), sizeof(int)*SendHeader::SENDHDR_NWORDS, flag);
 
     SendHeader send_hdr;
     send_hdr.SetBuffer(send_hdr_buf);
@@ -289,7 +289,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
   //
   int total_recvd_byte = 0;
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    total_recvd_byte += recvFD(m_socket[ i ], (char*)temp_buf + total_recvd_byte,
+    total_recvd_byte += recvFD(m_socket[ i ], reinterpret_cast<char*>(temp_buf) + total_recvd_byte,
                                each_buf_nwords[ i ] * sizeof(int), flag);
 
     //
@@ -297,7 +297,8 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
     //
     unsigned temp_length = 0;
     for (int j = 0; j < each_buf_nodes[ i ] * each_buf_events[ i ]; j++) {
-      int this_length = *((int*)((char*)temp_buf + total_recvd_byte - each_buf_nwords[ i ] * sizeof(int) + temp_length));
+      int this_length = *(reinterpret_cast<int*>((reinterpret_cast<char*>(temp_buf) + total_recvd_byte - each_buf_nwords[ i ] * sizeof(
+                                                    int) + temp_length)));
       temp_length += this_length * sizeof(int);
     }
     if (temp_length != each_buf_nwords[ i ] * sizeof(int)) {
@@ -327,7 +328,7 @@ int* DeSerializerPrePCModule::recvData(int* delete_flag, int* total_buf_nwords, 
   // Read Traeiler
   int send_trl_buf[(unsigned int)(SendTrailer::SENDTRL_NWORDS) ];
   for (int i = 0; i < (int)(m_socket.size()); i++) {
-    recvFD(m_socket[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
+    recvFD(m_socket[ i ], reinterpret_cast<char*>(send_trl_buf), SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
   }
 
   return temp_buf;
@@ -352,7 +353,7 @@ void DeSerializerPrePCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int
   }
   m_totbytes += total_buf_nwords * sizeof(int);
 
-  temp_raw_datablk->SetBuffer((int*)temp_buf, total_buf_nwords, *delete_flag,
+  temp_raw_datablk->SetBuffer(static_cast<int*>(temp_buf), total_buf_nwords, *delete_flag,
                               num_events_in_sendblock, num_nodes_in_sendblock);
 
   //
@@ -405,11 +406,11 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
       if (raw_datablk->CheckFTSWID(entry_id)) {
         RawFTSW* temp_rawftsw = new RawFTSW;
         int block_id = 0;
-        temp_rawftsw->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+        temp_rawftsw->SetBuffer(static_cast<int*>(temp_buf) + raw_datablk->GetBufferPos(entry_id),
                                 raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
         if (temp_rawftsw->GetEveNo(block_id) < 10) {
           printf("[DEBUG] ######FTSW#########\n");
-          printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
+          printData(static_cast<int*>(temp_buf) + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
         }
 
 #ifdef DUMHSLB
@@ -438,12 +439,12 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
       } else if (raw_datablk->CheckTLUID(entry_id)) {
 
         RawTLU* temp_rawtlu = new RawTLU;
-        temp_rawtlu->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+        temp_rawtlu->SetBuffer(static_cast<int*>(temp_buf) + raw_datablk->GetBufferPos(entry_id),
                                raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
         if (temp_rawtlu->GetEveNo(0) < 10
            ) {
           printf("[DEBUG] ######TLU#########\n");
-          printData((int*)temp_buf + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
+          printData(static_cast<int*>(temp_buf) + raw_datablk->GetBufferPos(entry_id), raw_datablk->GetBlockNwords(entry_id));
         }
 
 #ifndef NO_DATA_CHECK
@@ -465,7 +466,7 @@ void DeSerializerPrePCModule::checkData(RawDataBlock* raw_datablk, unsigned int*
         //
 
         RawCOPPER* temp_rawcopper = new RawCOPPER;
-        temp_rawcopper->SetBuffer((int*)temp_buf + raw_datablk->GetBufferPos(entry_id),
+        temp_rawcopper->SetBuffer(static_cast<int*>(temp_buf) + raw_datablk->GetBufferPos(entry_id),
                                   raw_datablk->GetBlockNwords(entry_id), 0, 1, 1);
 
 #ifdef DUMHSLB

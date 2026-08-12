@@ -22,6 +22,11 @@ namespace Belle2 {
   public:
     EventSampler(std::vector<std::string> nodes, int port, std::string rbufname, int interval = 5000);
     ~EventSampler();
+    /** Copy constructor (disabled). */
+    EventSampler(const EventSampler&) = delete;
+
+    /** Operator = (disabled). */
+    EventSampler& operator=(const EventSampler&) = delete;
     int server();  // Loop
 
   private:

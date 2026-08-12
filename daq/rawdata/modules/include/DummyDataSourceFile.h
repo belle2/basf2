@@ -23,7 +23,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DummyDataSourceFileModule();
-    virtual ~DummyDataSourceFileModule();
+    virtual ~DummyDataSourceFileModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;

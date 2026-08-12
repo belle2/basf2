@@ -21,6 +21,11 @@ public:
   /*! Constuctor and Destructor */
   RawRevSock2Rb(std::string rbuf, std::string src, int port, std::string shmname, int id);
   ~RawRevSock2Rb(void);
+  /** Copy constructor (disabled). */
+  RawRevSock2Rb(const RawRevSock2Rb&) = delete;
+
+  /** Operator = (disabled). */
+  RawRevSock2Rb& operator=(const RawRevSock2Rb&) = delete;
 
   /*! Event function */
   int ReceiveEvent(void);

@@ -12,9 +12,8 @@
 using namespace Belle2;
 using namespace std;
 
-HistoRelay::HistoRelay(string& file, string& dest, int port)
+HistoRelay::HistoRelay(string& file, string& dest, int port) : m_dest(dest)
 {
-  m_dest = dest;
   m_port = port;
   m_memfile = new DqmMemFile(file);
   m_sock = new EvtSocketSend(m_dest, m_port);

@@ -43,7 +43,7 @@ int EventServer::server()
   int loop_counter [[maybe_unused]] = 0;
   while (m_force_exit == 0) {
     // Pick up a event from RingBuffer (non blocking)
-    int size = m_rbuf->remq((int*)evtbuffer);
+    int size = m_rbuf->remq(reinterpret_cast<int*>(evtbuffer));
     //    if ( size > 0 )
     //      printf ( "From RB : event size = %d\n", size );
 
@@ -57,7 +57,7 @@ int EventServer::server()
       //      printf ( "Event data data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();
       //      printf ( "size of recvsock = %d\n", recvsock.size() );
-      for (vector<int>::iterator it = recvsock.begin();
+      for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd, true)) {

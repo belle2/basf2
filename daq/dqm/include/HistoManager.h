@@ -13,13 +13,13 @@
 
 #include <daq/dqm/DqmMemFile.h>
 
-#include "TH1.h"
+#include <TH1.h>
 
 namespace Belle2 {
 
   class HistoManager {
   public:
-    HistoManager(DqmMemFile* mapfile);
+    explicit HistoManager(DqmMemFile* mapfile);
     ~HistoManager();
 
     // Register histogram

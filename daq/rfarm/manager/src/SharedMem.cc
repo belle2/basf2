@@ -67,7 +67,7 @@ SharedMem::SharedMem(const char* name, int size)
     perror("SharedMem::shmget");
     return;
   }
-  m_shmadr = (int*) shmat(m_shmid, 0, 0);
+  m_shmadr = static_cast<int*>(shmat(m_shmid, 0, 0));
   if (m_shmadr == (int*) - 1) {
     perror("SharedMem::shmat");
     return;
@@ -103,9 +103,9 @@ SharedMem::SharedMem(const char* name, int size)
     bool updateneeded = m_new;
     // 3.1 check if id of shm and semaphore in tmp file need update
     if (!m_new) {
-      int shmid = 0, semid = 0;
-      if (getIdFromTmpFileName(tmpPathName.c_str(), shmid, semid)) {
-        updateneeded = (shmid != m_shmid || semid != m_semid);
+      int shm_id = 0, sem_id = 0;
+      if (getIdFromTmpFileName(tmpPathName, shm_id, sem_id)) {
+        updateneeded = (shm_id != m_shmid || sem_id != m_semid);
         printf("tmp file %s content still uptodate\n", tmpPathName.c_str());
       } else {
         updateneeded = true; // could not open file or empty
@@ -133,7 +133,7 @@ SharedMem::SharedMem(const char* name, int size)
 SharedMem::SharedMem(int shm_id, int sem_id, int)  // the size comes from the existing segment
 {
   m_shmid = shm_id;
-  m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
+  m_shmadr = static_cast<int*>(shmat(m_shmid, 0, SHM_RDONLY));
   if (m_shmadr == (int*) - 1) {
     perror("SharedMem::shmat");
     return;

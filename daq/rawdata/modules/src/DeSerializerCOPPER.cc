@@ -357,7 +357,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
   int n = 0;
   while (1) {
     int read_size = 0;
-    if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
+    if ((read_size = read(fd, static_cast<char*>(buf) + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -548,7 +548,7 @@ void DeSerializerCOPPERModule::event()
     }
 
     if (m_dump_fname.size() > 0) {
-      dumpData((char*)temp_buf, m_size_word * sizeof(int));
+      dumpData(reinterpret_cast<char*>(temp_buf), m_size_word * sizeof(int));
     }
     m_totbytes += m_size_word * sizeof(int);
   }

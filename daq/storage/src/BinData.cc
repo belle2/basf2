@@ -36,9 +36,9 @@ BinData::~BinData() noexcept
 void BinData::setBuffer(void* buf)
 {
   if (buf != NULL) {
-    m_buf = (int*)buf;
-    m_header = (BinHeader*)buf;
-    m_body = (unsigned int*)(((char*)buf) + sizeof(BinHeader));
+    m_buf = static_cast<int*>(buf);
+    m_header = static_cast<BinHeader*>(buf);
+    m_body = reinterpret_cast<unsigned int*>(((static_cast<char*>(buf)) + sizeof(BinHeader)));
   } else {
     m_buf = NULL;
   }
@@ -53,7 +53,7 @@ unsigned int BinData::recvEvent(TCPSocket& socket)
   }
   const int nbytes_remains = getByteSize() - sizeof(BinHeader);
   count += socket.read(m_body, nbytes_remains);
-  m_trailer = (BinTrailer*)(((char*)m_body) + nbytes_remains - sizeof(BinTrailer));
+  m_trailer = reinterpret_cast<BinTrailer*>(((reinterpret_cast<char*>(m_body)) + nbytes_remains - sizeof(BinTrailer)));
   if (m_trailer->magic != TRAILER_MAGIC) {
     throw (IOException("unexpected header trailer magic %08x",
                        m_trailer->magic));

@@ -15,6 +15,14 @@ namespace Belle2 {
   public:
     bool open(const std::string& fileName, bool raw, const char* mode);
     virtual ~HLTFile();
+    /** Default constructor. */
+    HLTFile() = default;
+
+    /** Copy constructor (disabled). */
+    HLTFile(const HLTFile&) = delete;
+
+    /** Operator = (disabled). */
+    HLTFile& operator=(const HLTFile&) = delete;
 
     int put_wordbuf(int* data, int len);
     int put(char* data, int len);

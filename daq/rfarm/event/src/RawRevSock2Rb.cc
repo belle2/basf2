@@ -20,7 +20,7 @@ RawRevSock2Rb::RawRevSock2Rb(string rbuf, string src, int port, string shmname, 
   m_rbuf = new RingBuffer(rbuf.c_str());
   m_sock = new RSocketRecv(src.c_str(), (u_int)port);
   m_evtbuf = new char[MAXEVTSIZE];
-  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()), id, m_rbuf);
   m_buf = new int[MAXBUFSIZE];
 
 }

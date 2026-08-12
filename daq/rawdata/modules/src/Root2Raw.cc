@@ -91,7 +91,8 @@ void Root2RawModule::event()
   SendTrailer trl;
   trl.Initialize();
 
-  int* evtbuf = (int*) malloc(MAXEVTSIZE);
+  int* evtbuf = static_cast<int*>(malloc(MAXEVTSIZE));
+  if (evtbuf == NULL) B2FATAL("Root2Raw: cannot allocate the event buffer");
   int* databuf = evtbuf + hdr.GetHdrNwords();
 
   int nwords = hdr.GetHdrNwords();

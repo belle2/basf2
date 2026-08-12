@@ -96,10 +96,10 @@ void
 xlogtime(char* buf)
 {
   timeval now;
-  tm* cur;
+  const tm* cur;
 
   gettimeofday(&now, 0);
-  cur = localtime((time_t*)&now.tv_sec);
+  cur = localtime(static_cast<time_t*>(&now.tv_sec));
   /*
   static int lastday = -1;
   if (lastday != cur->tm_yday) {
@@ -224,7 +224,11 @@ main(int argc, const char** argv)
   }
   */
   // prompt
-  prompt = (char*)malloc(strlen(nodename) + 2);
+  prompt = static_cast<char*>(malloc(strlen(nodename) + 2));
+  if (prompt == NULL) {
+    fprintf(stderr, "rfctl: out of memory\n");
+    exit(-1);
+  }
   strcpy(prompt, nodename);
   strcat(prompt, ">");
 

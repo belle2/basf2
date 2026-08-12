@@ -29,7 +29,7 @@ using namespace std;
 char* timestamp()
 {
   struct timeval tb;
-  struct tm*     tp;
+  const struct tm*     tp;
   static char buf[256];
   //  struct tm      result;
   gettimeofday(&tb, NULL);
@@ -53,6 +53,7 @@ int main(int /*argc*/, char** /*argv*/)
     int is = read(infn, &buf[0], 4);
     int nw = ntohl(buf[0]);
     if (is <= 0) break;
+    // cppcheck-suppress unreadVariable ; body read is not validated here
     is = read(infn, &buf[1], (nw - 1) * 4);
     //    printf ( "nw = %d\n", nw );
     //    if ( abs(nw)> 1000 ) continue;

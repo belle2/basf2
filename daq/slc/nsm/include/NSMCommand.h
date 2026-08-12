@@ -44,8 +44,10 @@ namespace Belle2 {
 
   public:
     NSMCommand() {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     NSMCommand(const Enum& e) : Enum(e) {}
     NSMCommand(const NSMCommand& cmd) : Enum(cmd) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     NSMCommand(const char* label) { *this = label; }
     explicit NSMCommand(const std::string& label) { *this = label; }
     explicit NSMCommand(int id) { *this = id; }

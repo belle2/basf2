@@ -13,7 +13,7 @@
 void
 dump_binary(FILE* fp, const void* ptr, const size_t size)
 {
-  const unsigned int* p = (const unsigned int*)ptr;
+  const unsigned int* p = static_cast<const unsigned int*>(ptr);
   const size_t _size = size / sizeof(unsigned int);
 
 

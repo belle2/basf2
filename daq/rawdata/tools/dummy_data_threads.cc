@@ -70,7 +70,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
     sprintf(err_buf, "nwords value(%d) is invalid. Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
+    const string& err_str = err_buf;
     throw (err_str);
   }
 

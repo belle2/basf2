@@ -83,7 +83,7 @@ main(int argc, char **argv)
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
-  char *program = argv[0];
+  const char *program = argv[0];
 
 
   //
@@ -227,7 +227,7 @@ main(int argc, char **argv)
     //
     char * p = (char *)buffer;
     struct copper_header * header = (struct copper_header *)p;
-    struct copper_footer * footer =
+    const struct copper_footer * footer =
       (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
     int t;
     unsigned  short temph,templ;
@@ -260,7 +260,9 @@ main(int argc, char **argv)
  
 	  if((t-istart-3)%48==0)
             {
+              // cppcheck-suppress unreadVariable ; kept for debugging
               templ = buffer[t]&0xffff;
+              // cppcheck-suppress unreadVariable ; kept for debugging
               temph = (buffer[t]>>16)&0xffff;
 #ifdef FILE_OUT
               fprintf(fpw,"%04x,%04x\n", temph,templ);
@@ -269,7 +271,9 @@ main(int argc, char **argv)
 	    }
 	  else
             {
+              // cppcheck-suppress unreadVariable ; kept for debugging
               templ = buffer[t]&0xffff;
+              // cppcheck-suppress unreadVariable ; kept for debugging
               temph = (buffer[t]>>16)&0xffff;
 #ifdef FILE_OUT
               fprintf(fpw,"%04x,%04x,", temph,templ);

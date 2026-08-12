@@ -74,8 +74,9 @@ int PartialSeqRootReaderModule::readFile()
     if (m_fd <= 0) return -1;
     ret = ::read(m_fd, m_buf, sizeof(int));
   }
-  int size = *(int*)m_buf;
-  ret = ::read(m_fd, (char*)(m_buf + sizeof(int)), size - sizeof(int));
+  int size = *reinterpret_cast<int*>(m_buf);
+  // cppcheck-suppress redundantAssignment ; the header read is validated above
+  ret = ::read(m_fd, static_cast<char*>((m_buf + sizeof(int))), size - sizeof(int));
   if (ret <= 0) {
     return -1;
   }

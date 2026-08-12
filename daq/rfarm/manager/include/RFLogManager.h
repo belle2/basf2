@@ -13,7 +13,7 @@
 namespace Belle2 {
   class RFLogManager {
   public:
-    RFLogManager(const char* prefix, const char* lognode = NULL, const char* logdir = NULL);
+    explicit RFLogManager(const char* prefix, const char* lognode = NULL, const char* logdir = NULL);
     ~RFLogManager();
 
     // Read messages from fd and log them
@@ -32,8 +32,8 @@ namespace Belle2 {
     char* BuildMessage(const char* fmt, ...);
 
   private:
-    int today();
-    void timestamp(char*);
+    static int today();
+    static void timestamp(char*);
     int WriteLog(const char* type, const char* msg);
     int OpenLogFile(int today);
     int SwitchLogFile();
@@ -42,7 +42,7 @@ namespace Belle2 {
     int m_logdate;
     char m_logdir[1024];
     char m_id[256];
-    char m_strbuf[1024];
+    char m_strbuf[1024] = {};
     int m_fd;
     char m_lognode[1024];
 

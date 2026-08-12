@@ -9,7 +9,7 @@
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
-#include "TText.h"
+#include <TText.h>
 
 #include <stdio.h>
 #include <string>
@@ -41,8 +41,8 @@ int main(int argc, char** argv)
   (msg->header())->reserved[1] = numobjs;
 
   sock->send(msg);
-  delete(msg);
-  delete(sock);
+  delete (msg);
+  delete (sock);
 
   return 0;
 }

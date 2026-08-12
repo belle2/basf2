@@ -18,7 +18,7 @@ MMutex::MMutex(const MMutex& mutex)
 
 MMutex::MMutex(void* addr)
 {
-  set((pthread_mutex_t*)addr);
+  set(static_cast<pthread_mutex_t*>(addr));
 }
 
 MMutex::~MMutex() {}
@@ -42,7 +42,7 @@ bool MMutex::init()
 
 bool MMutex::set(void* addr)
 {
-  m_mu = (pthread_mutex_t*)addr;
+  m_mu = static_cast<pthread_mutex_t*>(addr);
   return true;
 }
 

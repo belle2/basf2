@@ -112,7 +112,7 @@ int RFLogManager::WriteLog(const char* prefix, const char* msg)
 void RFLogManager::timestamp(char* buf)
 {
   struct timeval tb;
-  struct tm*     tp;
+  const struct tm*     tp;
   //  struct tm      result;
   gettimeofday(&tb, NULL);
   tp = localtime(&tb.tv_sec);

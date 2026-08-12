@@ -11,9 +11,8 @@
 
 using namespace Belle2;
 
-NSMNode::NSMNode(const std::string& name)
+NSMNode::NSMNode(const std::string& name) : m_name(StringUtil::toupper(name))
 {
-  m_name = StringUtil::toupper(name);
   m_id = -1;
 }
 

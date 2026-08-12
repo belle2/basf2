@@ -62,8 +62,8 @@ namespace Belle2 {
     void clear();
 
   public:
-    const std::string getName() const  { return m_nodename; }
-    const std::string getPath() const  { return m_path; }
+    const std::string& getName() const  { return m_nodename; }
+    const std::string& getPath() const  { return m_path; }
     bool isAvailable() const  { return m_info != NULL; }
     ronode_info* get()  { return m_info; }
     unsigned int getNodeId() const  { return m_info->nodeid; }

@@ -22,14 +22,14 @@ namespace Belle2 {
 
   public:
     UDPSocket();
-    UDPSocket(unsigned int port);
+    explicit UDPSocket(unsigned int port);
     UDPSocket(unsigned int port,
               const std::string& hostname,
               bool boardcast = false);
     UDPSocket(unsigned int port,
               unsigned int addr,
               bool boardcast = false);
-    virtual ~UDPSocket() {}
+    virtual ~UDPSocket() override {}
 
   public:
     int bind();

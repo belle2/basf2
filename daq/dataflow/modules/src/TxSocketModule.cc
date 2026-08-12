@@ -49,6 +49,7 @@ void TxSocketModule::initialize()
 {
 
   // Open Socket
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_sock = new EvtSocketSend(m_dest, m_port);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 

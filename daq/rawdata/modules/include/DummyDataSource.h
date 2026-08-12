@@ -33,7 +33,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DummyDataSourceModule();
-    virtual ~DummyDataSourceModule();
+    virtual ~DummyDataSourceModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -55,7 +55,7 @@ namespace Belle2 {
     int m_nodeid;
 
     //! Number of events
-    unsigned int n_basf2evt;
+    unsigned int n_basf2evt = 0;
 
     /*     //! Compression Level */
     /*     int m_compressionLevel; */
@@ -71,7 +71,7 @@ namespace Belle2 {
     StoreArray<RawDataBlock> raw_datablkarray;
 #endif
 
-    double m_totbytes;
+    double m_totbytes = 0.0;
     //! Node name
     std::string m_nodename;
 
@@ -79,16 +79,16 @@ namespace Belle2 {
     int m_shmflag;
 
     //! start flag
-    int m_start_flag;
+    int m_start_flag = 0;
 
-    double m_start_time;
-    double m_prev_time;
-    int prev_event;
-    double m_prev_totbytes;
-    int m_prev_nevt;
+    double m_start_time = 0.0;
+    double m_prev_time = 0.0;
+    int prev_event = 0;
+    double m_prev_totbytes = 0.0;
+    int m_prev_nevt = 0;
 
     //! store time info.
-    double getTimeSec()
+    static double getTimeSec()
     {
       struct timeval t;
       gettimeofday(&t, NULL);

@@ -62,7 +62,7 @@ void reset_fifo_and_finesse(int cprfd)
     ioctl(cprfd, CPRIOSET_FF_RST, &val, sizeof(val));
 }
 
-main(int argc, char ** argv)
+int main(int argc, char ** argv)
 {
     int event = 0;
     int ret, i = 0;
@@ -90,6 +90,7 @@ main(int argc, char ** argv)
     }
 
 #if 1
+    // cppcheck-suppress redundantAssignment ; the ioctl/getc result is only used for the diagnostic below
     ret = ioctl(fd, CPRIO_INIT_RUN, 0);
     fprintf(stderr, "CPRIO_INIT_RUN ret = %d\n", ret);
 #endif
@@ -156,7 +157,7 @@ main(int argc, char ** argv)
 	{
 	    char *p = (char *) buffer;
 	    struct copper_header *header = (struct copper_header *) p;
-	    struct copper_footer *footer =
+	    const struct copper_footer *footer =
 		(struct copper_footer *) (p + ret -
 					  sizeof(struct copper_footer));
 
@@ -176,6 +177,7 @@ main(int argc, char ** argv)
 	    }
 	}
 
+ // cppcheck-suppress knownConditionTrueFalse ; the 1|| prefix is a hand-toggled debug switch
 	if (1 || event < 10) {
 #if 1
 	    printf("xor = %08lx\n", xor((unsigned long *) buffer, ret / 4));

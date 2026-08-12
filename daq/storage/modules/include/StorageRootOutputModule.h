@@ -45,7 +45,12 @@ namespace Belle2 {
      *
      *  Deletion of objects, that were created in the Constructor.
      */
-    virtual ~StorageRootOutputModule();
+    virtual ~StorageRootOutputModule() override;
+    /** Copy constructor (disabled). */
+    StorageRootOutputModule(const StorageRootOutputModule&) = delete;
+
+    /** Operator = (disabled). */
+    StorageRootOutputModule& operator=(const StorageRootOutputModule&) = delete;
 
     /** Setting up of various stuff.
      *
@@ -231,12 +236,12 @@ namespace Belle2 {
     /** Variables for online storage */
     int m_expno{0};
     int m_runno{0};
-    DBInterface* m_db;
+    DBInterface* m_db = nullptr;
     std::string m_runType;
     std::string m_HLTName;
     std::string m_disk;
     int m_nDisk;
-    int m_processNumber;
+    int m_processNumber = 0;
     bool m_firstEvent{false};
     bool m_ramdiskBuffer{false};
   };

@@ -32,12 +32,15 @@ namespace Belle2 {
 
   public:
     RCState() : NSMState(Enum::UNKNOWN) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RCState(const Enum& e) : NSMState(e) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RCState(const NSMState& num) : NSMState(num) {}
     RCState(const RCState& st) : NSMState(st) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RCState(const char* st) { *this = st; }
-    RCState(const std::string& st) { *this = st; }
-    RCState(int id) { *this = id; }
+    explicit RCState(const std::string& st) { *this = st; }
+    explicit RCState(int id) { *this = id; }
     ~RCState()  {}
 
   protected:

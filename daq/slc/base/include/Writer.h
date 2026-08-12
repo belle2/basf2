@@ -25,7 +25,7 @@ namespace Belle2 {
     virtual bool available() = 0;
 
   protected:
-    void reverse(void* buf, size_t len);
+    static void reverse(void* buf, size_t len);
 
   public:
     virtual void writeBool(bool);

@@ -61,7 +61,7 @@ bool got_sigterm = false;
 void
 dump_binary(FILE* fp, const void* ptr, const size_t size)
 {
-  const unsigned int* p = (const unsigned int*)ptr;
+  const unsigned int* p = static_cast<const unsigned int*>(ptr);
   const size_t _size = size / sizeof(unsigned int);
 
 
@@ -117,7 +117,7 @@ void plot_triggers(void)
   hlts.clear();
   for (auto h : hltused) hlts.push_back(h);
   if (!triggers.empty()) {
-    ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%u high=%u missing %lu delta %u max %u\n", *triggers.begin(),
+    ERR_FPRINTF(stderr, "[RESULT] merger_merge: trigger low=%d high=%u missing %zu delta %u max %u\n", *triggers.begin(),
                 *(--triggers.end()),
                 triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
@@ -125,7 +125,7 @@ void plot_triggers(void)
       int mod = it % hltcount;
       modmissing[hlts[mod]]++;
       if (i < 100) {
-        ERR_FPRINTF(stderr, "[INFO] Miss trig %u (%d) HLT%d\n", it, mod, hlts[mod]);
+        ERR_FPRINTF(stderr, "[INFO] Miss trig %d (%d) HLT%d\n", it, mod, hlts[mod]);
         i++;
         if (i == 100) {
           ERR_FPRINTF(stderr, "[WARNING] ... too many missing to report\n");
@@ -195,6 +195,7 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
       ERROR(fcntl);
       return -1;
     }
+    // cppcheck-suppress knownConditionTrueFalse ; timeout is a caller-supplied parameter
   } else if (timeout < 0) {
     ret = fcntl(sd, F_GETFL, O_NDELAY);
     if (ret == -1) {
@@ -226,7 +227,7 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
       ERROR(gethostbyname);
       return -1;
     }
-    in->sin_addr = *(struct in_addr*)(hoste->h_addr);
+    in->sin_addr = *reinterpret_cast<struct in_addr*>((hoste->h_addr));
   }
   in->sin_port = htons(port);
 
@@ -253,7 +254,7 @@ b2_create_tcp_socket(void)
   }
 #endif
 
-  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(int));
+  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&one), sizeof(int));
   if (ret == -1) {
     ERROR(setsockopt);
     return -1;
@@ -281,7 +282,7 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
     return -1;
   }
 
-  ret = bind(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  ret = bind(sd, reinterpret_cast<const struct sockaddr*>(&in), sizeof(struct sockaddr_in));
   if (ret == -1) {
     ERROR(bind);
     return -1;
@@ -315,7 +316,7 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
     return -1;
   }
 
-  ret = connect(sd, (const struct sockaddr*)&in, sizeof(struct sockaddr_in));
+  ret = connect(sd, reinterpret_cast<const struct sockaddr*>(&in), sizeof(struct sockaddr_in));
   if (ret == -1 && errno != EINPROGRESS) {
     ERROR(connect);
     return -1;
@@ -328,7 +329,7 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 int
 b2_send(const int sd, const void* buf, const size_t size)
 {
-  unsigned char* ptr = (unsigned char*)buf;
+  unsigned char* ptr = static_cast<unsigned char*>(const_cast<void*>(buf));
   size_t n_bytes_remained = size;
 
   for (;;) {
@@ -373,7 +374,7 @@ b2_send(const int sd, const void* buf, const size_t size)
 int
 b2_recv(const int sd,       void* buf, const size_t size)
 {
-  unsigned char* ptr = (unsigned char*)buf;
+  unsigned char* ptr = static_cast<unsigned char*>(buf);
   size_t n_bytes_remained = size;
 
   for (;;) {
@@ -480,7 +481,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   int one = 1, ret;
   // struct pollfd fds;
 
-  LOG_FPRINTF(stderr, "[INFO] merger_merge: Waiting for connection from hltout2merger on port %d\n", port);
+  LOG_FPRINTF(stderr, "[INFO] merger_merge: Waiting for connection from hltout2merger on port %u\n", port);
 
   sd = b2_create_accept_socket(port);
   if (sd == -1) {
@@ -495,7 +496,7 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     return -1;
   }
 
-  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&one, sizeof(int));
+  ret = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char*>(&one), sizeof(int));
   if (ret == -1) {
     ERROR(setsockopt);
     return -1;
@@ -616,6 +617,7 @@ void print_stat(void)
 // Main
 
 int
+// cppcheck-suppress constParameter ; main() keeps its standard signature
 main(int argc, char* argv[])
 {
   int current_runnr = -1; // problem: handover without abort
@@ -646,7 +648,7 @@ main(int argc, char* argv[])
   }
 
   /* argv copy */
-  char* p;
+  const char* p;
 
 //   p = argv[1]; // we do not want to change parameters, yet, even removing unused
 //   strcpy(shmname, p);
@@ -679,7 +681,7 @@ main(int argc, char* argv[])
   size_t n_bytes_from_hltout;
   size_t n_bytes_to_onsen;
 
-  unsigned char* buf = (unsigned char*)valloc(ROI_MAX_PACKET_SIZE);
+  unsigned char* buf = static_cast<unsigned char*>(valloc(ROI_MAX_PACKET_SIZE));
   if (!buf) {
     ERROR(valloc);
     exit(1);
@@ -711,7 +713,6 @@ main(int argc, char* argv[])
         sleep(sleep_sec);
 
         /* retry connection */
-        continue;
       }
     }
   }
@@ -780,8 +781,8 @@ main(int argc, char* argv[])
       int t;
       struct sockaddr_in isa;
       socklen_t i = sizeof(isa);
-      getsockname(sd_acc, (struct sockaddr*)&isa, &i);
-      if ((t =::accept(sd_acc, (struct sockaddr*)&isa, &i)) < 0) {
+      getsockname(sd_acc, reinterpret_cast<struct sockaddr*>(&isa), &i);
+      if ((t =::accept(sd_acc, reinterpret_cast<struct sockaddr*>(&isa), &i)) < 0) {
         //      m_errno = errno;
         ERR_FPRINTF(stderr, "[ERROR] Error on accepting new connection\n");
         ERR_FPRINTF(stderr, "[ERROR] %s terminated\n", argv[0]);
@@ -841,7 +842,7 @@ main(int argc, char* argv[])
             mycount[fd]++;
             if (0 /*event_count < 5 || event_count % 100000 == 0*/) {
               LOG_FPRINTF(stderr, "[INFO] merger_merge: ---- [ %d] received event from ROI transmitter\n", event_count);
-              LOG_FPRINTF(stderr, "[INFO] merger_merge: MM_get_packet() Returned %ld\n", n_bytes_from_hltout);
+              LOG_FPRINTF(stderr, "[INFO] merger_merge: MM_get_packet() Returned %zu\n", n_bytes_from_hltout);
               dump_binary(stderr, buf, n_bytes_from_hltout);
             }
           }
@@ -862,13 +863,13 @@ main(int argc, char* argv[])
           //    enum { HEADER_SIZE_WO_LENGTH = 3, HEADER_SIZE_WITH_LENGTH = 5, HEADER_SIZE_WITH_LENGTH_AND_CRC = 6};
 
           if (n_bytes_from_hltout >= 6 * 4) {
-            auto* iptr = (boost::endian::big_uint32_t*)ptr_head_to_onsen;
+            auto* iptr = reinterpret_cast<boost::endian::big_uint32_t*>(ptr_head_to_onsen);
             eventnr = iptr[3];
             runnr = (iptr[4] & 0x3FFF00) >> 8;
 //             ERR_FPRINTF(stderr, "%08X %08X %08X %08X %08X -> %08X %08X \n",
 //                         (unsigned int)iptr[0],(unsigned int) iptr[1],(unsigned int) iptr[2],(unsigned int) iptr[3],(unsigned int) iptr[4], eventnr, runnr);
           } else {
-            LOG_FPRINTF(stderr, "[ERROR] merger_merge: packet to small to hold useful header (%ld)\n", n_bytes_from_hltout);
+            LOG_FPRINTF(stderr, "[ERROR] merger_merge: packet to small to hold useful header (%zu)\n", n_bytes_from_hltout);
           }
 
           if (runnr > current_runnr) {
@@ -888,6 +889,7 @@ main(int argc, char* argv[])
             // seperate if, as we might set it in the if above
             if (enable_check) check_event_nr(eventnr);
             if (hlt_min[fd] == 0 or hlt_min[fd] > eventnr) hlt_min[fd] = eventnr;
+            // cppcheck-suppress unsignedLessThanZero ; only degenerate for eventnr == 0
             if (hlt_max[fd] < eventnr) hlt_max[fd] = eventnr;
           } // if we end the if here, we will send out old events to ONSEN!
 
@@ -934,12 +936,12 @@ main(int argc, char* argv[])
         int hltcount = hltused.size();
         if (triggers.empty()) {
           // workaround for empty vector, but keep same structure for monitor parsing (kibana)
-          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %zu delta %d max %u low mod %d low HLT %d\n",
                       event_number_max, event_number_max, missing_walk_index, triggers.size(),
                       0, event_number_max, -1, -1);
         } else {
           int mod = *triggers.begin() % hltcount;
-          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
+          ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %d high %u missing %u inflight %zu delta %u max %u low mod %d low HLT %d\n",
                       *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
                       *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);
         }
@@ -956,8 +958,8 @@ main(int argc, char* argv[])
         });
 
         ERR_FPRINTF(stderr, "[INFO] ALL, %u, %u, %u\n", minIt->second, maxIt->second, maxIt->second - minIt->second);
-        for (auto& h : hlt_max) ERR_FPRINTF(stderr, "[INFO] HLT%u, %u, %u, %u\n", fd_to_hlt[h.first], hlt_min[h.first], h.second,
-                                              h.second - hlt_min[h.first]);
+        for (const auto& h : hlt_max) ERR_FPRINTF(stderr, "[INFO] HLT%d, %u, %u, %u\n", fd_to_hlt[h.first], hlt_min[h.first], h.second,
+                                                    h.second - hlt_min[h.first]);
         hlt_min.clear();
         hlt_max.clear();
       }

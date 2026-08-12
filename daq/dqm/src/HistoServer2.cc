@@ -16,11 +16,10 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor / Destructor
-HistoServer2::HistoServer2(int port, const string& filename)
+HistoServer2::HistoServer2(int port, const string& filename) : m_filename(filename)
 {
   m_port = port;
   m_force_exit = 0;
-  m_filename = filename;
 }
 
 HistoServer2::~HistoServer2()
@@ -32,6 +31,7 @@ HistoServer2::~HistoServer2()
 
 int HistoServer2::init()
 {
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   m_hman = new HistoManager2(m_filename);
@@ -58,13 +58,13 @@ int HistoServer2::server()
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
       vector<int>& recvsock = m_man->connected_socket_list();
-      for (vector<int>::iterator it = recvsock.begin();
+      for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd)) {
           struct sockaddr_in isa;
           socklen_t isize = sizeof(isa);
-          getpeername(fd, (struct sockaddr*)&isa, &isize);
+          getpeername(fd, reinterpret_cast<struct sockaddr*>(&isa), &isize);
           char address[INET_ADDRSTRLEN];
           strcpy(address, inet_ntoa(isa.sin_addr));
           char* ptr = strrchr(address, '.');
@@ -132,7 +132,7 @@ int HistoServer2::server()
               //              printf("HistoServer2 : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
               // no update to histograms ...
             } else {
-              m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
+              m_hman->update(subdir, strlist.at(i), fd, static_cast<TH1*>(objlist.at(i)));
               updated = true; // histograms have been updated
             }
           }
@@ -157,12 +157,12 @@ int HistoServer2::server()
 
 void HistoServer2::write_state(void)
 {
-  char mbstr[100];
-  char mbstr2[100];
-  char mbstr3[100];
-  std::string name = "/tmp/dqm_hserver_state_" + m_filename;
+  const std::string& name = "/tmp/dqm_hserver_state_" + m_filename;
   FILE* fh = fopen(name.c_str(), "wt+");
   if (fh) {
+    char mbstr[100];
+    char mbstr2[100];
+    char mbstr3[100];
     time_t now = time(0);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
     strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&m_last_merge_time));

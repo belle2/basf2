@@ -78,7 +78,7 @@ void PXDSpacePointCreatorModule::event()
 
   for (unsigned int i = 0; i < uint(m_pxdClusters.getEntries()); ++i) {
     const PXDCluster* currentCluster = m_pxdClusters[i];
-    SpacePoint* newSP = m_spacePoints.appendNew((currentCluster));
+    const SpacePoint* newSP = m_spacePoints.appendNew((currentCluster));
     newSP->addRelationTo(currentCluster);
   }
 
@@ -91,7 +91,7 @@ void PXDSpacePointCreatorModule::event()
     for (int index = 0; index < m_spacePoints.getEntries(); index++) {
       const SpacePoint* sp = m_spacePoints[index];
 
-      PXDCluster* relatedCluster = sp->getRelatedTo<PXDCluster>(m_pxdClusters.getName());
+      const PXDCluster* relatedCluster = sp->getRelatedTo<PXDCluster>(m_pxdClusters.getName());
 
       B2DEBUG(10, "SpacePointCreatorModule(" << m_nameOfInstance << ")::event: spacePoint " << index <<
               " with type " << sp->getType() <<

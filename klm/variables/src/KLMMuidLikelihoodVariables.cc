@@ -29,7 +29,7 @@ namespace Belle2 {
     //! @returns the muon probability stored in the KLMMuidLikelihood dataobject
     double muidMuonProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getMuonPDFValue();
@@ -38,7 +38,7 @@ namespace Belle2 {
     //! @returns the pion probability stored in the KLMMuidLikelihood dataobject
     double muidPionProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getPionPDFValue();
@@ -47,7 +47,7 @@ namespace Belle2 {
     //! @returns the kaon probability stored in the KLMMuidLikelihood dataobject
     double muidKaonProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getKaonPDFValue();
@@ -56,7 +56,7 @@ namespace Belle2 {
     //! @returns the electron probability stored in the KLMMuidLikelihood dataobject
     double muidElectronProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getElectronPDFValue();
@@ -65,7 +65,7 @@ namespace Belle2 {
     //! @returns the proton probability stored in the KLMMuidLikelihood dataobject
     double muidProtonProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getProtonPDFValue();
@@ -74,7 +74,7 @@ namespace Belle2 {
     //! @returns the deuteron probability stored in the KLMMuidLikelihood dataobject
     double muidDeuteronProbability(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getDeuteronPDFValue();
@@ -83,7 +83,7 @@ namespace Belle2 {
     //! @returns the muon log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidMuonLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_mu();
@@ -92,7 +92,7 @@ namespace Belle2 {
     //! @returns the pion log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidPionLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_pi();
@@ -101,7 +101,7 @@ namespace Belle2 {
     //! @returns the kaon log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidKaonLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_K();
@@ -110,7 +110,7 @@ namespace Belle2 {
     //! @returns the electron log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidElectronLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_e();
@@ -119,7 +119,7 @@ namespace Belle2 {
     //! @returns the proton log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidProtonLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_p();
@@ -128,7 +128,7 @@ namespace Belle2 {
     //! @returns the deuteron log-likelihood stored in the KLMMuidLikelihood dataobject
     double muidDeuteronLogLikelihood(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getLogL_d();
@@ -137,7 +137,7 @@ namespace Belle2 {
     //! @return outcome of muon extrapolation (see MuidElementNumbers for the complete list of the outcome values)
     double muidOutcomeExtTrack(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getOutcome();
@@ -146,7 +146,7 @@ namespace Belle2 {
     //! @returns chi-squared for this extrapolation
     double muidChiSquared(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getChiSquared();
@@ -155,7 +155,7 @@ namespace Belle2 {
     //! @returns number of degrees of freedom in chi-squared calculation
     double muidDegreesOfFreedom(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getDegreesOfFreedom();
@@ -164,7 +164,7 @@ namespace Belle2 {
     //! @return outermost EKLM layer crossed by track during extrapolation
     double muidEndcapExtLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getEndcapExtLayer();
@@ -173,7 +173,7 @@ namespace Belle2 {
     //! @return outermost BKLM layer crossed by track during extrapolation
     double muidBarrelExtLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getBarrelExtLayer();
@@ -182,7 +182,7 @@ namespace Belle2 {
     //! @return outermost BKLM or EKLM layer crossed by track during extrapolation
     double muidExtLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getExtLayer();
@@ -191,7 +191,7 @@ namespace Belle2 {
     //! @return outermost EKLM layer with a matching hit
     double muidEndcapHitLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getEndcapHitLayer();
@@ -200,7 +200,7 @@ namespace Belle2 {
     //! @return outermost BKLM layer with a matching hit
     double muidBarrelHitLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getBarrelHitLayer();
@@ -209,7 +209,7 @@ namespace Belle2 {
     //! @return outermost BKLM or EKLM layer with a matching hit
     double muidHitLayer(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getHitLayer();
@@ -218,7 +218,7 @@ namespace Belle2 {
     //! @return layer-crossing bit pattern during extrapolation
     double muidExtLayerPattern(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getExtLayerPattern();
@@ -227,7 +227,7 @@ namespace Belle2 {
     //! @return matching-hit bit pattern
     double muidHitLayerPattern(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getHitLayerPattern();
@@ -236,7 +236,7 @@ namespace Belle2 {
     //! @return total number of matching BKLM hits
     double muidTotalBarrelHits(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getTotalBarrelHits();
@@ -245,7 +245,7 @@ namespace Belle2 {
     //! @return total number of matching EKLM hits
     double muidTotalEndcapHits(const Particle* particle)
     {
-      KLMMuidLikelihood* muid = getMuid(particle);
+      const KLMMuidLikelihood* muid = getMuid(particle);
       if (!muid)
         return std::numeric_limits<double>::quiet_NaN();
       return muid->getTotalEndcapHits();

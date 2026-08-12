@@ -229,7 +229,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   }
 
 
-  Frames_in_event = ((ubig32_t*)data.data())[1];
+  Frames_in_event = (reinterpret_cast<ubig32_t*>(data.data()))[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     if (!(m_suppressErrorMask[c_nrFRAME_NR])) {
       B2WARNING("Number of Frames invalid: Will not unpack anything. Header corrupted!" << LogVar("Frames in event", Frames_in_event));
@@ -265,7 +265,7 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
   for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
 
-    lo = ((ubig32_t*)tableptr)[j];
+    lo = (reinterpret_cast<ubig32_t*>(tableptr))[j];
     if (lo <= 0) {
       if (!(m_suppressErrorMask[c_nrFRAME_SIZE])) {
         B2WARNING("size of frame invalid");
@@ -294,10 +294,10 @@ void PXDUnpackerModule::unpack_rawpxd(RawPXD& px, int inx)
       B2DEBUG(29, "unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
       if (m_firmware > 0 && m_firmware < 10) {
         /// 1--9 is reserved for old firmware
-        unpack_dhc_frame_v01(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
+        unpack_dhc_frame_v01(ll + reinterpret_cast<char*>(dataptr), lo, j, Frames_in_event, daqpktstat);
       } else if (m_firmware >= 10) {
         /// 10-- is used for new firmware
-        unpack_dhc_frame_v10(ll + (char*)dataptr, lo, j, Frames_in_event, daqpktstat);
+        unpack_dhc_frame_v10(ll + reinterpret_cast<char*>(dataptr), lo, j, Frames_in_event, daqpktstat);
       } else {
         B2FATAL("Firmware Version not supported " << m_firmware);
       }
@@ -324,7 +324,7 @@ void PXDUnpackerModule::unpack_dhp_raw(void* data, unsigned int frame_len, unsig
                                        VxdID vxd_id)
 {
 //   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  ubig16_t* dhp_pix = (ubig16_t*)data;
+  ubig16_t* dhp_pix = reinterpret_cast<ubig16_t*>(data);
 
   //! *************************************************************
   //! Important Remark:
@@ -430,7 +430,7 @@ void PXDUnpackerModule::dump_dhp(void* data, unsigned int frame_len)
 {
   // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 2;
-  ubig16_t* d = (ubig16_t*)data;
+  ubig16_t* d = reinterpret_cast<ubig16_t*>(data);
 
   B2WARNING("HEADER --  $" << hex << d[0] << ",$" << hex << d[1] << ",$" << hex << d[2] << ",$" << hex << d[3] << " -- ");
 
@@ -453,7 +453,7 @@ void PXDUnpackerModule::dump_roi(void* data, unsigned int frame_len)
 {
   // called only for debugging purpose, will never be called in normal running
   unsigned int w = frame_len / 4;
-  ubig32_t* d = (ubig32_t*)data;
+  const ubig32_t* d = reinterpret_cast<ubig32_t*>(data);
 
   B2WARNING("HEADER --  $" << hex << d[0] << ",$" << hex << d[1] << ",$" << hex << d[2] << ",$" << hex << d[3] << " -- Len $" << hex
             << frame_len);
@@ -469,7 +469,7 @@ void PXDUnpackerModule::unpack_dhp_v01(void* data, unsigned int frame_len, unsig
                                        PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  ubig16_t* dhp_pix = (ubig16_t*)data;
+  ubig16_t* dhp_pix = reinterpret_cast<ubig16_t*>(data);
 
   unsigned int dhp_readout_frame_lo = 0;
   unsigned int dhp_header_type  = 0;
@@ -689,7 +689,7 @@ void PXDUnpackerModule::unpack_dhp_v10(void* data, unsigned int frame_len, unsig
                                        PXDDAQPacketStatus& daqpktstat)
 {
   unsigned int nr_words = frame_len / 2; // frame_len in bytes (excl. CRC)!!!
-  ubig16_t* dhp_pix = (ubig16_t*)data;
+  ubig16_t* dhp_pix = reinterpret_cast<ubig16_t*>(data);
 
   unsigned int dhp_readout_frame_lo = 0;
   unsigned int dhp_header_type  = 0;
@@ -961,7 +961,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
     found_mask_active_dhp = 0;
   }
 
-  dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
+  const dhc_frame_header_word0* hw = reinterpret_cast<dhc_frame_header_word0*>(data);
 
   dhc_frames dhc;
   dhc.set(data, hw->getFrameType(), len);
@@ -1155,7 +1155,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       B2DEBUG(29, "UNPACK FCE FRAME with len $" << hex << len);
-      unpack_fce((unsigned short*) data, len - 4, currentVxdId);
+      unpack_fce(reinterpret_cast<unsigned short*>(data), len - 4, currentVxdId);
 
       break;
     };
@@ -1529,7 +1529,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
           // Endian swapping is done in Constructor of RawRoi object
-          m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
+          m_storeROIs.appendNew(l, &(reinterpret_cast<unsigned int*>(data))[1]);
         }
       }
       break;
@@ -1738,7 +1738,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
     found_good_mask_active_dhp = 0;
   }
 
-  dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
+  const dhc_frame_header_word0* hw = reinterpret_cast<dhc_frame_header_word0*>(data);
 
   dhc_frames dhc;
   dhc.set(data, hw->getFrameType(), len);
@@ -1948,7 +1948,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 
       B2DEBUG(29, "UNPACK FCE FRAME with len $" << hex << len);
-      unpack_fce((unsigned short*) data, len - 4, currentVxdId);
+      unpack_fce(reinterpret_cast<unsigned short*>(data), len - 4, currentVxdId);
 
       break;
     };
@@ -2327,7 +2327,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v10(void* data, const int len, const in
           unsigned int l;
           l = (len - dhc.data_onsen_roi_frame->getMinSize()) / 8;
           // Endian swapping is done in Constructor of RawRoi object
-          m_storeROIs.appendNew(l, &((unsigned int*) data)[1]);
+          m_storeROIs.appendNew(l, &(reinterpret_cast<unsigned int*>(data))[1]);
         }
       }
       break;

@@ -69,7 +69,7 @@ namespace Belle2 {
     }
 
     GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, VXDGeoComponent& component,
-                                                      vector<VXDGeoPlacement> placements, bool originCenter, bool allowOutside)
+                                                      const vector<VXDGeoPlacement>& placements, bool originCenter, bool allowOutside)
     {
       GeoVXDAssembly assembly;
       B2DEBUG(100, "Creating component " << name);
@@ -81,7 +81,7 @@ namespace Belle2 {
       bool lengthResize = component.getLength() <= 0;
       bool heightResize = component.getHeight() <= 0;
 
-      for (VXDGeoPlacement& p : placements) {
+      for (const VXDGeoPlacement& p : placements) {
         //Test component already exists
         if (m_componentCache.find(p.getName()) == m_componentCache.end()) {
           B2FATAL("A component is requested that was not created before!");
@@ -141,8 +141,8 @@ namespace Belle2 {
 
       //Ok, all volumes set up, now add them together
       for (size_t i = 0; i < placements.size(); ++i) {
-        VXDGeoPlacement& p = placements[i];
-        VXDGeoComponent& s = subComponents[i];
+        const VXDGeoPlacement& p = placements[i];
+        const VXDGeoComponent& s = subComponents[i];
 
         G4Transform3D transform = getPosition(component, s, p, originCenter);
         if (p.getW() ==  VXDGeoPlacement::c_below || p.getW() == VXDGeoPlacement::c_above) {
@@ -497,7 +497,7 @@ namespace Belle2 {
 
         //Now create all the other components and place the Sensor
         if (!vxdGeometryPar.getGlobalParams().getOnlyActiveMaterial()) {
-          VXDGeoSensorPar& s = it->second;
+          const VXDGeoSensorPar& s = it->second;
           readSubComponents(s.getComponents(), GearDir(content, "Components/"), vxdGeometryPar);
         }
         // Read alignment for sensor
@@ -527,7 +527,7 @@ namespace Belle2 {
       return;
     }
 
-    void GeoVXDCreator::readComponent(const std::string& name, GearDir componentsDir, VXDGeometryPar& vxdGeometryPar)
+    void GeoVXDCreator::readComponent(const std::string& name, const GearDir& componentsDir, VXDGeometryPar& vxdGeometryPar)
     {
 
 

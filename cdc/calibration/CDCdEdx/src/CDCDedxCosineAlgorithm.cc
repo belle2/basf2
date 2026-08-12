@@ -118,6 +118,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   for (unsigned int i = 0; i < m_cosBin; ++i) {
 
     double meanDedx = 1.0; //This is what we need for calibration
+    // cppcheck-suppress unreadVariable ; overwritten before it is read
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double meanDedxErr = 0.0;
 
     if (!isMethodSep) {
@@ -313,7 +315,7 @@ void CDCDedxCosineAlgorithm::fitGaussianWithRange(TH1D*& temphist, TString& stat
 }
 
 //--------------------------------------------------
-void CDCDedxCosineAlgorithm::createPayload(std::vector<double> cosine)
+void CDCDedxCosineAlgorithm::createPayload(const std::vector<double>& cosine)
 {
   m_coscors.resize(m_kNGroups);
 
@@ -369,7 +371,7 @@ void CDCDedxCosineAlgorithm::plotdedxHist(std::vector<TH1D*>& hDedxCos_all,
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
-  int nx = isMethodSep ? 2 : 2;
+  int nx = 2;
   int ny = isMethodSep ? 1 : 2;
   unsigned int nPads = nx * ny;
   if (isMethodSep) ctmp.SetCanvasSize(1200, 600);
@@ -586,7 +588,7 @@ void CDCDedxCosineAlgorithm::plotConstants()
     }
 
     // --- Ratio ---
-    TH1D* hratio = (TH1D*)hnew->Clone(Form("hratio_%s", m_label[il].data()));
+    TH1D* hratio = static_cast<TH1D*>(hnew->Clone(Form("hratio_%s", m_label[il].data())));
     hratio->Divide(hold);
 
     TCanvas c(Form("c_%s", m_label[il].data()), Form("Final constants %s", m_label[il].data()), 1000, 500);

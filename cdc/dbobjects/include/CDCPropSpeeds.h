@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::vector<float> getSpeeds() const
+    const std::vector<float>& getSpeeds() const
     {
       return m_speeds;
     }

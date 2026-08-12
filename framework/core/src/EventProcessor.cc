@@ -472,7 +472,7 @@ void EventProcessor::processBeginRun(bool skipDB)
   MetadataService::Instance().addBasf2Status("beginning run");
 
   m_inRun = true;
-  auto dbsession = Database::Instance().createScopedUpdateSession(); // cppcheck-suppress unreadVariable
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();

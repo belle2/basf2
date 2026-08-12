@@ -193,24 +193,24 @@ namespace Belle2 {
     void writeData();
 
     /** add a variable with double format */
-    void addVariableToTree(const std::string& varName, double& varReference, TTree* tree);
+    static void addVariableToTree(const std::string& varName, double& varReference, TTree* tree);
 
     /** add a variable with int format */
-    void addVariableToTree(const std::string& varName, int& varReference, TTree* tree);
+    static void addVariableToTree(const std::string& varName, int& varReference, TTree* tree);
 
     /**
      * Tests if MCParticle is a primary one.
      * @param mcParticle: tested MCParticle
      * @return: true if MCParticle is a primary, else false is returned
      */
-    bool isPrimaryMcParticle(const MCParticle& mcParticle);
+    static bool isPrimaryMcParticle(const MCParticle& mcParticle);
 
     /**
      * Tests if MCParticle is a charged stable particle.
      * @param mcParticle: tested MCParticle
      * @return: true if MCParticle is charged stable, else false
      */
-    bool isChargedStable(const MCParticle& mcParticle);
+    static bool isChargedStable(const MCParticle& mcParticle);
   };
 
 } // end of namespace

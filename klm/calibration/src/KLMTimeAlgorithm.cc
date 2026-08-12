@@ -72,6 +72,8 @@ static double timeDensity(const double x[2], const double* par)
   return fabs(polynomial + gauss);
 }
 
+// the signature is imposed by TMinuit::SetFCN()
+// cppcheck-suppress constParameterCallback
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;
@@ -849,14 +851,14 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
       TH2F* hist2d = nullptr;
       if (fill2dHistograms) {
         if (iSub == KLMElementNumbers::c_BKLM) {
-          int iF = klmChannel.getSection();
-          int iS = klmChannel.getSector() - 1;
           int iL = klmChannel.getLayer() - 1;
-          int iP = klmChannel.getPlane();
-          int iC = klmChannel.getStrip() - 1;
 
           // Only create for scintillators (layers 0-1)
           if (iL < 2) {
+            int iF = klmChannel.getSection();
+            int iS = klmChannel.getSector() - 1;
+            int iP = klmChannel.getPlane();
+            int iC = klmChannel.getStrip() - 1;
             TString hn = Form("time_length_bklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
             double stripLength = 200;
             hist2d = new TH2F(hn.Data(),
@@ -973,7 +975,6 @@ void KLMTimeAlgorithm::timeDistance2dFit(
   const std::vector< std::pair<KLMChannelNumber, unsigned int> >& channels,
   double& delay, double& delayError)
 {
-  std::vector<struct Event> eventsChannel;
   int nFits = 1000;
   int nConvergedFits = 0;
   delay = 0;
@@ -1001,7 +1002,7 @@ void KLMTimeAlgorithm::timeDistance2dFit(
       for (int k = 0; k < c_NBinsDistance; ++k)
         s_BinnedData[j][k] = 0;
     }
-    eventsChannel = m_evts[channels[i].first];
+    std::vector<struct Event> eventsChannel = m_evts[channels[i].first];
     double averageTime = 0;
     for (const Event& event : eventsChannel) {
       double timeHit = event.time();
@@ -1165,7 +1166,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::vector< std::pair<KLMChannelNumber, unsigned int> > channelsEKLM;
   KLMChannelIndex klmChannels;
 
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     m_cFlag[channel] = ChannelCalibrationStatus::c_NotEnoughData;
 
@@ -2690,11 +2691,6 @@ std::pair<int, double> KLMTimeAlgorithm::tS_lowerStrip(const KLMChannelIndex& kl
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();
-  int iSub = klmChannel.getSubdetector();
-  int iF = klmChannel.getSection();
-  int iS = klmChannel.getSector();
-  int iL = klmChannel.getLayer();
-  int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   if (m_timeShift.find(cId) != m_timeShift.end()) {
     tS.first = iC;
@@ -2703,6 +2699,11 @@ std::pair<int, double> KLMTimeAlgorithm::tS_lowerStrip(const KLMChannelIndex& kl
     tS.first = iC;
     tS.second = 0.0;
   } else {
+    int iSub = klmChannel.getSubdetector();
+    int iF = klmChannel.getSection();
+    int iS = klmChannel.getSector();
+    int iL = klmChannel.getLayer();
+    int iP = klmChannel.getPlane();
     KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC - 1);
     tS = tS_lowerStrip(kCIndex);
   }
@@ -2770,11 +2771,6 @@ std::pair<int, double> KLMTimeAlgorithm::tR_lowerStrip(const KLMChannelIndex& kl
 {
   std::pair<int, double> tR;
   int cId = klmChannel.getKLMChannelNumber();
-  int iSub = klmChannel.getSubdetector();
-  int iF = klmChannel.getSection();
-  int iS = klmChannel.getSector();
-  int iL = klmChannel.getLayer();
-  int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   if (m_timeRes.find(cId) != m_timeRes.end()) {
     tR.first = iC;
@@ -2783,6 +2779,11 @@ std::pair<int, double> KLMTimeAlgorithm::tR_lowerStrip(const KLMChannelIndex& kl
     tR.first = iC;
     tR.second = 0.0;
   } else {
+    int iSub = klmChannel.getSubdetector();
+    int iF = klmChannel.getSection();
+    int iS = klmChannel.getSector();
+    int iL = klmChannel.getLayer();
+    int iP = klmChannel.getPlane();
     KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC - 1);
     tR = tR_lowerStrip(kCIndex);
   }

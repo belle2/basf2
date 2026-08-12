@@ -12,7 +12,7 @@ namespace Belle2 {
   /** Small struct to encode a position/momentum without additional overhead */
   struct MCTrajectoryPoint {
     /** Constructor to allow initialization */
-    MCTrajectoryPoint(float x_ = 0, float y_ = 0, float z_ = 0, float px_ = 0, float py_ = 0, float pz_ = 0):
+    explicit MCTrajectoryPoint(float x_ = 0, float y_ = 0, float z_ = 0, float px_ = 0, float py_ = 0, float pz_ = 0):
       x(x_), y(y_), z(z_), px(px_), py(py_), pz(pz_) {}
     float x;  /**< x coordinate */
     float y;  /**< y coordinate */

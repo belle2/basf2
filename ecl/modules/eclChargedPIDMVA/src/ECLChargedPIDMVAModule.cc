@@ -238,12 +238,12 @@ void ECLChargedPIDMVAModule::event()
   } // tracks
 }
 
-float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset, const float max) const
+float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset, const float max)
 {
   return std::log((value + offset) / (max + offset - value));
 }
 
-float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf) const
+float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf)
 {
   int binIndex = cdf->GetXaxis()->FindBin(value);
 
@@ -274,8 +274,8 @@ float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F*
 }
 
 
-std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vector<float> scores,
-    const std::vector<float>* decorrelationMatrix) const
+std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vector<float>& scores,
+    const std::vector<float>* decorrelationMatrix)
 {
   unsigned int n_scores = scores.size();
   std::vector<float> decor_scores(n_scores, 0.0);

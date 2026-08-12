@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "G4VPhysicsConstructor.hh"
+#include <G4VPhysicsConstructor.hh>
 
 class G4TheoFSGenerator;
 class G4FTFModel;
@@ -36,19 +36,19 @@ namespace Belle2 {
 
     private:
       /** Final state generator for QCD string models */
-      G4TheoFSGenerator* m_ftfp;
+      G4TheoFSGenerator* m_ftfp = nullptr;
 
       /** Fritiof string model */
-      G4FTFModel* m_stringModel;
+      G4FTFModel* m_stringModel = nullptr;
 
       /** Model to decay strings into hadrons */
-      G4ExcitedStringDecay* m_stringDecay;
+      G4ExcitedStringDecay* m_stringDecay = nullptr;
 
       /** Lund string fragmentation model */
-      G4LundStringFragmentation* m_fragModel;
+      G4LundStringFragmentation* m_fragModel = nullptr;
 
       /** Precompound model to deexcite post-collision nucleus */
-      G4GeneratorPrecompoundInterface* m_preCompoundModel;
+      G4GeneratorPrecompoundInterface* m_preCompoundModel = nullptr;
 
     };
 

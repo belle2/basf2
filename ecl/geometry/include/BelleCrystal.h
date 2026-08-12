@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "G4Types.hh"
+#include <G4Types.hh>
 
-#include "G4CSGSolid.hh"
-#include "G4Polyhedron.hh"
+#include <G4CSGSolid.hh>
+#include <G4Polyhedron.hh>
 #include <vector>
 
 namespace Belle2 {
@@ -137,8 +137,8 @@ namespace Belle2 {
       double getvolarea() const; /**< get volume area */
       const unsigned int* ivertx(unsigned int i) const; /**< get the ith vertex */
     private:
-      unsigned int nsides; /**< the number of sides */
-      double fDz; /**< Dz */
+      unsigned int nsides = 0; /**< the number of sides */
+      double fDz = 0.0; /**< Dz */
       std::vector<Plane_t> fPlanes; /**< vector of planes */
       std::vector<Point_t> fx; /**< vector of points */
 

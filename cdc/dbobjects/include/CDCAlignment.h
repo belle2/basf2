@@ -98,7 +98,7 @@ namespace Belle2 {
     }
 
     /// Destructor
-    ~CDCAlignment() {}
+    ~CDCAlignment() override {}
 
     // ------------- Interface to global Millepede calibration ----------------
     /// Get global unique id
@@ -114,7 +114,7 @@ namespace Belle2 {
       set(element, param, value);
     }
     /// list stored global parameters TODO FIXME CDC not ready
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
+    static std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams()
     {
       return {};
     }

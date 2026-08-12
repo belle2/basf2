@@ -35,17 +35,12 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMClusterAnaModule();
+    ~KLMClusterAnaModule() override;
 
     /**
      * Initializer.
      */
     void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     */
-    void beginRun() override;
 
     /**
      * This method is called for each event.

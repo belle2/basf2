@@ -33,7 +33,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxCosineAlgorithm() {}
+    virtual ~CDCDedxCosineAlgorithm() override {}
 
     /**
     * function to make flag active for method of sep
@@ -103,7 +103,7 @@ namespace Belle2 {
     /**
     * function to store new payload after full calibration
     */
-    void createPayload(std::vector<double> cosine);
+    void createPayload(const std::vector<double>& cosine);
 
     /**
     * function to draw the dE/dx histogram in costh bins
@@ -113,8 +113,8 @@ namespace Belle2 {
     /**
     * Set basic style (color, marker, title, y-range) for a TH1D histogram.
     */
-    void setHist(TH1D* h, int color, const char* title,
-                 double ymin, double ymax, int marker = 20)
+    static void setHist(TH1D* h, int color, const char* title,
+                        double ymin, double ymax, int marker = 20)
     {
       h->SetLineColor(color);
       h->SetLineWidth(2);
@@ -154,7 +154,7 @@ namespace Belle2 {
     * Representative CDC layer for each SL group (used to access group-wise constants):
     * SL0 => 1, SL1 => 9, SL2-8 => 17
     */
-    unsigned int getRepresentativeLayer(unsigned int igroup) const
+    static unsigned int getRepresentativeLayer(unsigned int igroup)
     {
       static const std::array<unsigned int, m_kNGroups> repLayer = {1, 9, 17};
       return repLayer.at(igroup);

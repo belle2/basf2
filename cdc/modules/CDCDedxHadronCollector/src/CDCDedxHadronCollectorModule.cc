@@ -42,7 +42,7 @@ void CDCDedxHadronCollectorModule::prepare()
   // build a map to relate input strings to the right particle type
   m_pdgMap = {{"pi+", "pion"}, {"K+", "kaon"}, {"mu+", "muon"}, {"e+", "electron"}, {"p+", "proton"}, {"deuteron", "deutron"}};
 
-  for (auto& x : m_pdgMap) {
+  for (const auto& x : m_pdgMap) {
 
     // strip the name of the particle lists to make this work
     std::string pdg = x.second;
@@ -103,7 +103,7 @@ void CDCDedxHadronCollectorModule::collect()
         continue;
       }
 
-      CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
+      const CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
       if (!dedxTrack) {
         B2WARNING("No related CDCDedxTrack...");
         continue;

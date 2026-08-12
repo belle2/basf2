@@ -16,8 +16,8 @@ void getResult(){
     n +=1;
     filename = "rootfile/output_"+id;
     TFile f(filename);
-    TH1D* hPval = (TH1D*)f.Get("trackfit/hPval");
-    TH1D* hNDF = (TH1D*)f.Get("trackfit/hNDF");
+    TH1D* hPval = static_cast<TH1D*>(f.Get("trackfit/hPval"));
+    TH1D* hNDF = static_cast<TH1D*>(f.Get("trackfit/hNDF"));
     if(hPval){
       pval += hPval->GetMean();
       ndf += hNDF->GetMean();

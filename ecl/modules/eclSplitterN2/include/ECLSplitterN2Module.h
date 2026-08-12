@@ -26,7 +26,7 @@ namespace Belle2 {
     ECLSplitterN2Module();
 
     /** Destructor. */
-    ~ECLSplitterN2Module();
+    ~ECLSplitterN2Module() override;
 
     /** Initialize. */
     virtual void initialize() override;

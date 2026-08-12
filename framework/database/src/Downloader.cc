@@ -140,7 +140,7 @@ namespace Belle2::Conditions {
   std::string Downloader::escapeString(const std::string& text)
   {
     //make sure we have an active curl session ...
-    auto session = ensureSession(); // cppcheck-suppress unreadVariable
+    auto session = ensureSession();
     char* escaped = curl_easy_escape(m_session->curl, text.c_str(), text.size());
     if (!escaped) {
       throw std::runtime_error("Could not escape string");
@@ -232,7 +232,7 @@ namespace Belle2::Conditions {
     while (input.good()) {
       input.read(buffer, 4096);
       if (input.gcount() == 0) break;
-      md5.Update((unsigned char*)buffer, input.gcount());
+      md5.Update(reinterpret_cast<unsigned char*>(buffer), input.gcount());
     }
     // finalize and return output
     md5.Final();

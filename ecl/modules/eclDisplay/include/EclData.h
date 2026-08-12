@@ -172,7 +172,7 @@ namespace Belle2 {
      * @param subsys ID of the ECL subsystem.
      * @return Whether crystal is in barrel or forward/backward endcap.
      */
-    bool isCrystalInSubsystem(int crystal, EclSubsystem subsys);
+    static bool isCrystalInSubsystem(int crystal, EclSubsystem subsys);
 
     /**
      * Return min time in time range.
@@ -231,15 +231,15 @@ namespace Belle2 {
     /**
      * Converts (phi_id, theta_id) pair to ECL CellId.
      */
-    int getChannel(int phi_id, int theta_id);
+    static int getChannel(int phi_id, int theta_id);
     /**
      * ECL CellId -> phi_id
      */
-    int getPhiId(int ch);
+    static int getPhiId(int ch);
     /**
      * ECL CellId -> theta_id
      */
-    int getThetaId(int ch);
+    static int getThetaId(int ch);
 
     /**
      * Excludes specific channel from the count of events and energy.
@@ -266,7 +266,7 @@ namespace Belle2 {
      * @param evtn Number of event.
      * @return If ECLDigit contains incorrect data, negative values are returned. Otherwise, return value is 0.
      */
-    int addEvent(ECLCalDigit* event, int evtn);
+    int addEvent(const ECLCalDigit* event, int evtn);
     /**
      * Fill energy per channel histogram for the specified EclSubsystem
      * (Barrel, forward endcap, backward endcap, all of them).

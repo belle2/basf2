@@ -50,15 +50,15 @@ void RandomNumbers::initialize(const std::string& seed)
   if (!s_runRng) {
     s_runRng = new RandomGenerator("independent generator");
   }
-  auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
+  const auto* gen = dynamic_cast<RandomGenerator*>(gRandom);
   if (!gen) {
     delete gRandom;
     B2DEBUG(100, "Replacing gRandom from " << gRandom << " to " << gen);
   }
   gRandom = s_evtRng;
   s_evtRng->setMode(RandomGenerator::c_independent);
-  s_evtRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
-  s_runRng->setSeed((const unsigned char*)seed.c_str(), seed.size());
+  s_evtRng->setSeed(reinterpret_cast<const unsigned char*>(seed.c_str()), seed.size());
+  s_runRng->setSeed(reinterpret_cast<const unsigned char*>(seed.c_str()), seed.size());
 }
 
 bool RandomNumbers::isInitialized()
@@ -138,7 +138,17 @@ namespace {
   /** small helper function to convert any python object to a string representation */
   std::string pythonObjectToString(const boost::python::object& obj)
   {
+    // boost::python::extract<std::string> triggers a false-positive
+    // -Wmaybe-uninitialized in GCC (it cannot see that boost initialises the
+    // rvalue storage before the string is copied out); silence it here.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     return boost::python::extract<std::string>(obj.attr("__str__")());
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
   /** set the seed from an abitary python object */
   void setPythonSeed(const boost::python::object& obj)

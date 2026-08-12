@@ -139,6 +139,18 @@ namespace Belle2 {
     /// sets and returns max. of y.
     float yMax(float newYMax);
 
+    // vote() is an intentional overload set. Derived planes such as
+    // TRGCDCHoughPlaneBoolean deliberately override only a subset and rely on a
+    // 'float charge' overload to disambiguate the 3- vs 4-argument forms (a
+    // plain 'using TRGCDCHoughPlaneBase::vote;' is not usable because the
+    // defaulted 'weight' argument would make vote(rx, ry, weight) ambiguous).
+    // The remaining base overloads are therefore hidden on purpose, so silence
+    // GCC's -Woverloaded-virtual here.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#endif
+
     /// Voring.
     virtual void vote(float rx,
                       float ry,
@@ -152,6 +164,10 @@ namespace Belle2 {
 
     /// Votes using a pattern.
     virtual void vote(float xOffset, int weight = 1);
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
     /// registers a pattern..
     virtual void registerPattern(unsigned id) = 0;
@@ -506,12 +522,23 @@ namespace Belle2 {
     vote(rx, ry, 0, weight);
   }
 
+  // intentional overload set (see the vote() declarations above): silence
+  // GCC's -Woverloaded-virtual for this inline definition as well
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
+#endif
+
   inline
   void
   TRGCDCHoughPlaneBase::vote(float, int)
   {
 // do nothing
   }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
   inline
   const  TRGCDCHoughTransformation&

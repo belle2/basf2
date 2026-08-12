@@ -29,16 +29,16 @@ void ECLDBTool::connect() const
 {
   auto& conf = Conditions::Configuration::getInstance();
   if (m_isLocal) {
-    conf.prependTestingPayloadLocation(m_dbName.c_str());
+    conf.prependTestingPayloadLocation(m_dbName);
   } else {
-    conf.prependGlobalTag(m_dbName.c_str());
+    conf.prependGlobalTag(m_dbName);
   }
 }
 // Write object and validity interval to a database.
 void ECLDBTool::write(TObject* const obj,
                       const IntervalOfValidity& iov) const
 {
-  Database::Instance().storeData(m_payloadName.c_str(),
+  Database::Instance().storeData(m_payloadName,
                                  obj, iov);
 }
 // Read object and validity interval from a database.
@@ -47,7 +47,7 @@ void ECLDBTool::read(TObject** obj,
                      const EventMetaData& event) const
 {
   auto data = Database::Instance().
-              getData(event, m_payloadName.c_str());
+              getData(event, m_payloadName);
   *obj = std::get<0>(data);
   *iov = new IntervalOfValidity(std::get<1>(data));
 }
@@ -56,7 +56,7 @@ void ECLDBTool::read(IntervalOfValidity** iov,
                      const EventMetaData& event) const
 {
   auto data = Database::Instance().
-              getData(event, m_payloadName.c_str());
+              getData(event, m_payloadName);
   auto obj = std::get<0>(data);
   *iov = new IntervalOfValidity(std::get<1>(data));
   delete obj;
@@ -67,7 +67,7 @@ void ECLDBTool::changeIoV(const EventMetaData& event,
                           const IntervalOfValidity& iov) const
 {
   auto data = Database::Instance().
-              getData(event, m_payloadName.c_str());
+              getData(event, m_payloadName);
   auto obj = std::get<0>(data);
   write(obj, iov);
   delete obj;

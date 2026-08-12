@@ -619,6 +619,7 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
   return false;
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
 void ZMQEventProcessor::processBeginRun(bool skipDB)
 {
   MetadataService::Instance().addBasf2Status("beginning run");
@@ -652,6 +653,7 @@ void ZMQEventProcessor::processBeginRun(bool skipDB)
 }
 
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
 void ZMQEventProcessor::processEndRun()
 {
   MetadataService::Instance().addBasf2Status("ending run");

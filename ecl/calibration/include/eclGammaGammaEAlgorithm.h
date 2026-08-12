@@ -25,13 +25,13 @@ namespace Belle2 {
       eclGammaGammaEAlgorithm();
 
       /**..Destructor */
-      virtual ~eclGammaGammaEAlgorithm() {}
+      virtual ~eclGammaGammaEAlgorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_cellIDLo */
       void setCellIDLo(int cellIDLo) {m_cellIDLo = cellIDLo;}

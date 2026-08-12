@@ -146,7 +146,7 @@ float PXDRecoHit::getShapeLikelyhood(const genfit::StateOnPlane& state) const
   return 0;
 }
 
-TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, std::vector<double> planarParameters,
+TVectorD PXDRecoHit::applyPlanarDeformation(TVectorD hitCoords, const std::vector<double>& planarParameters,
                                             const genfit::StateOnPlane& state) const
 {
   // Legendre parametrization of deformation

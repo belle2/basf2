@@ -69,7 +69,7 @@ namespace {
   double aNoise;
 
   //Function to minimize in photon template + hadron template fit. (chi2)
-  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+  // cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
   void fcnPhotonHadron(int&, double* grad, double& f, double* p, int)
   {
     double df[c_NFitPointsVector];
@@ -108,7 +108,7 @@ namespace {
   }
 
   //Function to minimize in photon template + hadron template + background photon fit. (chi2)
-  // cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+  // cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
   void fcnPhotonHadronBackgroundPhoton(int&, double* grad, double& f, double* p, int)
   {
     double df[c_NFitPointsVector];
@@ -479,14 +479,6 @@ void ECLWaveformFitModule::event()
       aECLDsp.setBackgroundPhotonTime(timeBackgroundPhoton);
     }
   }
-}
-
-void ECLWaveformFitModule::endRun()
-{
-}
-
-void ECLWaveformFitModule::terminate()
-{
 }
 
 void ECLWaveformFitModule::fitPhotonHadron(

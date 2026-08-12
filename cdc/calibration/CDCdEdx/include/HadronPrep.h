@@ -50,7 +50,7 @@ namespace Belle2 {
     /**
     * Constructor: set the input variables
     */
-    HadronPrep(int bgbins, double upperbg, double lowerbg, int cosbins, double uppercos, double lowercos, double cut);
+    HadronPrep(int bgbins, double lowerbg, double upperbg, int cosbins, double lowercos, double uppercos, double cut);
 
     /**
     * function to prepare sample for monitoring plots, bg curve fitting and sigma vs ionz fitting

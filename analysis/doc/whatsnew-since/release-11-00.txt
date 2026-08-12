@@ -5,6 +5,7 @@ Modules and Modular Analysis
 ++++++++++++++++++++++++++++
 * `modularAnalysis.scaleTrackMomenta` and `modularAnalysis.correctTrackEnergy` now let basf2 automatically choose the data or MC version of the correction payload: the suffix ``_data`` or ``_MC`` is appended to the given ``payloadName`` depending on whether the module runs on data or MC.
 * Updated the documentation of `modularAnalysis.correctBrems`, `modularAnalysis.correctBremsBelle` and the `BremsFinder` module to follow the current Bremsstrahlung recovery recommendation: since release-08 (proc16, MC16) `modularAnalysis.correctBrems` is preferred.
+* `modularAnalysis.printMCParticles` has a new ``storeCompact`` argument to store a compact single-line representation of the decay tree in the ``__MCDecayString__`` branch instead of the full indented tree.
 
 Variables
 +++++++++
@@ -13,3 +14,7 @@ Variables
 Command line tools
 ++++++++++++++++++
 * Removed deprecated ``-mc`` / ``--mccampaign`` argument and added release 9 as an option to ``-r`` / ``--release`` argument in :ref:`b2help-recommendation`
+
+FEI
++++
+* Added optional argument ``extraPathSpec`` to allow specifying inside the channels list to add additional basf2 modules to the FEI path.

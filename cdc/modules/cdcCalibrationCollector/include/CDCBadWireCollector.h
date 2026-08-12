@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCBadWireCollectorModule();
+      virtual ~CDCBadWireCollectorModule() override;
 
       /**
        * Initializes the Module.
@@ -62,8 +62,8 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
-                                         const Helix& helixFit) const;
+      static const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
+                                                const Helix& helixFit);
 
       StoreArray<Track> m_Tracks;                   /**< Tracks. */
       StoreArray<TrackFitResult> m_TrackFitResults; /**< Track fit results. */
@@ -79,10 +79,11 @@ namespace Belle2 {
 
       double m_minimumPt = 0;   /**< minimum pt required for track*/
       double m_minimumNDF = 0;   /**< minimum NDF required for track*/
-      unsigned short wireID;                   /**< wireID for hit-level wire monitoring */
-      unsigned short layerID;                  /**< layerID for hit-level wire monitoring */
-      float z;                                 /**< z of hit fot hit-level wire monitoring */
-      bool isFound;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
+      unsigned short wireID = 0;                   /**< wireID for hit-level wire monitoring */
+      unsigned short layerID = 0;                  /**< layerID for hit-level wire monitoring */
+      float z = 0.0;                                 /**< z of hit fot hit-level wire monitoring */
+      bool isFound =
+        false;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
     };
   }
 }

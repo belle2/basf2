@@ -103,7 +103,7 @@ void RingBuffer::openSHM(int nwords)
               ") failed. Most likely the system doesn't allow us to reserve the needed shared memory. Try 'echo 500000000 > /proc/sys/kernel/shmmax' as root to set a higher limit (500MB).");
     }
   }
-  m_shmadr = (int*) shmat(m_shmid, nullptr, 0);
+  m_shmadr = static_cast<int*>(shmat(m_shmid, nullptr, 0));
   if (m_shmadr == (int*) - 1) {
     B2FATAL("RingBuffer: Attaching to shared memory segment via shmat() failed");
   }
@@ -244,6 +244,7 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
     } else {
       if (m_bufinfo->rptr >= size + 2) { // buffer full and wptr>rptr
         // this should be dead code but I don't understand it well enough to delete it
+        // cppcheck-suppress knownConditionTrueFalse
         if (m_bufinfo->errtype != 0) {
           B2ERROR("insq: Error in errtype 1; current=" << m_bufinfo->errtype);
           return -1;
@@ -318,7 +319,7 @@ int RingBuffer::remq(int* buf)
     }
     return 0;
   }
-  int* r_ptr = m_buftop + m_bufinfo->rptr;
+  const int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
   if (nw <= 0) {
     printf("RingBuffer::remq : buffer size = %d, skipped\n", nw);
@@ -351,7 +352,7 @@ int RingBuffer::spyq(int* buf) const
   if (m_bufinfo->nbuf <= 0) {
     return 0;
   }
-  int* r_ptr = m_buftop + m_bufinfo->rptr;
+  const int* r_ptr = m_buftop + m_bufinfo->rptr;
   int nw = *r_ptr;
   if (nw <= 0) {
     printf("RingBuffer::spyq : buffer size = %d, skipped\n", nw);

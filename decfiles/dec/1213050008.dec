@@ -1,0 +1,29 @@
+# EventType: 1213050008
+# Descriptor: Y(4S) -> B+ B-
+#                     [B- -> Lambda_c+ [-> p+ K- pi+] anti-p- pi-] 
+#                     [B+ -> anything]
+# NickName: Bu_Lambdacppi_LambdactopKpi
+# Tested: Yes
+# Responsible: Xiaodong Shi, Yue Lu
+# Email: shixd@ihep.ac.cn, luy25@lnnu.edu.cn
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2026/07/28
+
+
+Decay Upsilon(4S)
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+
+Decay B-sig
+1.0  Lambda_c+sig anti-p- pi- PHSP;
+Enddecay
+CDecay B+sig
+
+Decay Lambda_c+sig
+1.0   p+  K-  pi+    PHSP;
+Enddecay
+CDecay anti-Lambda_c-sig
+
+End

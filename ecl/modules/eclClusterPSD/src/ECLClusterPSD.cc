@@ -273,11 +273,5 @@ void ECLClusterPSDModule::event()
 }
 
 // end run
-void ECLClusterPSDModule::endRun()
-{
-}
 
 // terminate
-void ECLClusterPSDModule::terminate()
-{
-}

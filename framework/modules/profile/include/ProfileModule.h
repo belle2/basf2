@@ -86,7 +86,7 @@ namespace Belle2 {
       /**
        * Constructor with initialization of memory usage and time to zero.
        */
-      MemTime(unsigned long vm = 0, unsigned long rssm = 0, double t = 0) : virtualMem(vm), rssMem(rssm), time(t) {};
+      explicit MemTime(unsigned long vm = 0, unsigned long rssm = 0, double t = 0) : virtualMem(vm), rssMem(rssm), time(t) {};
       unsigned long virtualMem;  /**< virtual memory usage */
       unsigned long rssMem;  /**< rss memory usage */
       double time;        /**< execution time */

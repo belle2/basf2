@@ -28,7 +28,7 @@ using namespace Belle2::bklm;
 
 REG_MODULE(KLMReconstructor)
 
-static bool compareSector(KLMDigit* d1, KLMDigit* d2)
+static bool compareSector(const KLMDigit* d1, const KLMDigit* d2)
 {
   int s1, s2;
   static const EKLMElementNumbers& elementNumbers =
@@ -40,22 +40,22 @@ static bool compareSector(KLMDigit* d1, KLMDigit* d2)
   return s1 < s2;
 }
 
-static bool comparePlane(KLMDigit* d1, KLMDigit* d2)
+static bool comparePlane(const KLMDigit* d1, const KLMDigit* d2)
 {
   return d1->getPlane() < d2->getPlane();
 }
 
-static bool compareStrip(KLMDigit* d1, KLMDigit* d2)
+static bool compareStrip(const KLMDigit* d1, const KLMDigit* d2)
 {
   return d1->getStrip() < d2->getStrip();
 }
 
-static bool compareTime(KLMDigit* d1, KLMDigit* d2)
+static bool compareTime(const KLMDigit* d1, const KLMDigit* d2)
 {
   return d1->getTime() < d2->getTime();
 }
 
-static bool sameSector(KLMDigit* d1, KLMDigit* d2)
+static bool sameSector(const KLMDigit* d1, const KLMDigit* d2)
 {
   return ((d1->getSection() == d2->getSection()) &&
           (d1->getLayer() == d2->getLayer()) &&
@@ -491,7 +491,7 @@ void KLMReconstructorModule::reconstructEKLMHits()
             hit2d->addRelationTo(*it8);
             hit2d->addRelationTo(*it9);
             for (i = 0; i < 2; i++) {
-              EKLMAlignmentHit* alignmentHit = m_eklmAlignmentHits.appendNew(i);
+              const EKLMAlignmentHit* alignmentHit = m_eklmAlignmentHits.appendNew(i);
               alignmentHit->addRelationTo(hit2d);
             }
             /* Exit the loop. Equivalent to selection of the earliest hit. */
@@ -508,10 +508,6 @@ void KLMReconstructorModule::reconstructEKLMHits()
   }
   m_EventLevelClusteringInfo->setNKLMDigitsMultiStripBWD(nKLMDigitsMultiStripBWD);
   m_EventLevelClusteringInfo->setNKLMDigitsMultiStripFWD(nKLMDigitsMultiStripFWD);
-}
-
-void KLMReconstructorModule::endRun()
-{
 }
 
 void KLMReconstructorModule::terminate()

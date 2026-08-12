@@ -32,7 +32,7 @@ namespace Belle2 {
     ExportGeometryModule();
 
     /** Destructor. */
-    virtual ~ExportGeometryModule();
+    virtual ~ExportGeometryModule() override;
 
     /**
      * Checks the validity of the module parameters.

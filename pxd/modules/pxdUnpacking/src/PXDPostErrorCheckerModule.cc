@@ -204,7 +204,7 @@ void PXDPostErrorCheckerModule::event()
 
   /// the following does only work with the overlapping trigger firmware.
   /// TODO make this check depending on firmware version database object (not yet existing)
-  for (auto& a : found_dhe) {
+  for (const auto& a : found_dhe) {
     if (a.second > 1) B2WARNING("More than one packet for same DHE ID " << a.first);
   }
   /// the following checks would require the (not yet existing) database object which marks the available modules

@@ -34,10 +34,6 @@ void EKLMDataCheckerModule::initialize()
   m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
-void EKLMDataCheckerModule::beginRun()
-{
-}
-
 void EKLMDataCheckerModule::event()
 {
   const uint16_t c_ChargeError = 0x0FFF;
@@ -46,7 +42,7 @@ void EKLMDataCheckerModule::event()
   StripData data;
   n = m_Digits.getEntries();
   for (i = 0; i < n; i++) {
-    KLMDigit* eklmDigit = m_Digits[i];
+    const KLMDigit* eklmDigit = m_Digits[i];
     if (eklmDigit->getSubdetector() != KLMElementNumbers::c_EKLM)
       continue;
     strip = m_ElementNumbers->stripNumber(
@@ -67,12 +63,8 @@ void EKLMDataCheckerModule::event()
   }
 }
 
-void EKLMDataCheckerModule::endRun()
-{
-}
-
-static bool compareBadDigitRate(EKLMDataCheckerModule::StripData& dat1,
-                                EKLMDataCheckerModule::StripData& dat2)
+static bool compareBadDigitRate(const EKLMDataCheckerModule::StripData& dat1,
+                                const EKLMDataCheckerModule::StripData& dat2)
 {
   return (double(dat1.nBadDigits) / dat1.nDigits) >
          (double(dat2.nBadDigits) / dat2.nDigits);

@@ -10,13 +10,13 @@
 #include <geometry/GeometryManager.h>
 #include <framework/gearbox/Unit.h>
 
-#include "G4VPhysicalVolume.hh"
-#include "G4LogicalVolume.hh"
-#include "G4UnitsTable.hh"
-#include "G4VExceptionHandler.hh"
-#include "G4StateManager.hh"
-#include "G4AffineTransform.hh"
-#include "G4VSolid.hh"
+#include <G4VPhysicalVolume.hh>
+#include <G4LogicalVolume.hh>
+#include <G4UnitsTable.hh>
+#include <G4VExceptionHandler.hh>
+#include <G4StateManager.hh>
+#include <G4AffineTransform.hh>
+#include <G4VSolid.hh>
 
 #include <regex>
 #include <utility>

@@ -25,12 +25,16 @@ namespace {
   class MockVariableType {
   public:
     /// Function of the variable which always returns the value of the object.
+    /// Part of the interface a variable must provide for GeneralCut, so it stays non-static.
+    // cppcheck-suppress functionStatic
     double function(const MockObjectType* object) const
     {
       return object->value;
     }
 
     /// Name of the variable.
+    /// Part of the interface a variable must provide for GeneralCut.
+    // cppcheck-suppress unusedStructMember
     const std::string name = "mocking_variable";
   };
 

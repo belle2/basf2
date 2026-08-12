@@ -179,7 +179,7 @@ namespace Belle2 {
     /*! Get Dsp Array
      * @return Dsp Array of variable length
      */
-    std::vector <int> getDspA() const
+    const std::vector <int>& getDspA() const
     {
       return m_DspAVector;
     }

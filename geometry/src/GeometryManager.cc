@@ -20,28 +20,28 @@
 #include <framework/dbobjects/MagneticField.h>
 #include <framework/database/DBStore.h>
 
-#include "G4Box.hh"
-#include "G4ThreeVector.hh"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
+#include <G4Box.hh>
+#include <G4ThreeVector.hh>
+#include <G4LogicalVolume.hh>
+#include <G4PVPlacement.hh>
 
-#include "G4RunManager.hh"
-#include "G4GeometryManager.hh"
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
-#include "G4RegionStore.hh"
-#include "G4SurfaceProperty.hh"
-#include "G4LogicalBorderSurface.hh"
-#include "G4LogicalSkinSurface.hh"
-#include "G4VisAttributes.hh"
-#include "G4VoxelLimits.hh"
+#include <G4RunManager.hh>
+#include <G4GeometryManager.hh>
+#include <G4PhysicalVolumeStore.hh>
+#include <G4LogicalVolumeStore.hh>
+#include <G4SolidStore.hh>
+#include <G4RegionStore.hh>
+#include <G4SurfaceProperty.hh>
+#include <G4LogicalBorderSurface.hh>
+#include <G4LogicalSkinSurface.hh>
+#include <G4VisAttributes.hh>
+#include <G4VoxelLimits.hh>
 
 //VGM stuff
-#include "Geant4GM/volumes/Factory.h"
-#include "RootGM/volumes/Factory.h"
-#include "VGM/volumes/IPlacement.h"
-#include "TGeoManager.h"
+#include <Geant4GM/volumes/Factory.h>
+#include <RootGM/volumes/Factory.h>
+#include <VGM/volumes/IPlacement.h>
+#include <TGeoManager.h>
 
 #include <memory>
 

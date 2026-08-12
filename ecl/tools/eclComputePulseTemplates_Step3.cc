@@ -104,6 +104,7 @@ TF1* FitPulse(TGraph* gin, int ShapeFlag, double* pulseInputPara)
   return ShpFloat;
 }
 //
+// cppcheck-suppress constParameter ; main() keeps its standard signature
 int main(int argc, char* argv[])
 {
   //
@@ -122,7 +123,7 @@ int main(int argc, char* argv[])
   double HadronValues_A[1000];
   double DiodeValues_A[1000];
   TFile* HadronShapeFile  = new TFile(OutputDirectory + Form("HadronShapes_Low%d_High%d.root", LowCellID, HighCellID));
-  TTree* chain = (TTree*) HadronShapeFile->Get("HadronTree");
+  TTree* chain = static_cast<TTree*>(HadronShapeFile->Get("HadronTree"));
   chain->SetBranchAddress("TimeAll_A", &TimeAll_A);
   chain->SetBranchAddress("ValuePhoton_A", &PhotonValues_A);
   chain->SetBranchAddress("ValueHadron_A", &HadronValues_A);

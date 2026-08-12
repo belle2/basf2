@@ -26,7 +26,7 @@ namespace Belle2 {
     class Digit {
     public:
       /** Constructor */
-      Digit(unsigned short u = 0, unsigned short v = 0): m_u(u), m_v(v) {}
+      explicit Digit(unsigned short u = 0, unsigned short v = 0): m_u(u), m_v(v) {}
       /** Comparison operator to provide unique ordering */
       bool operator<(const Digit& b)  const { return v() < b.v() || (v() == b.v() && u() < b.u()); }
       /** Equality operator to check for equality */

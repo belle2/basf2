@@ -46,7 +46,7 @@ KLMChannelNumber KLMElementNumbers::channelNumber(
 }
 
 KLMChannelNumber KLMElementNumbers::channelNumberBKLM(
-  int section, int sector, int layer, int plane, int strip) const
+  int section, int sector, int layer, int plane, int strip)
 {
   KLMChannelNumber channel;
   channel = BKLMElementNumbers::channelNumber(
@@ -54,7 +54,7 @@ KLMChannelNumber KLMElementNumbers::channelNumberBKLM(
   return channel + m_BKLMOffset;
 }
 
-KLMChannelNumber KLMElementNumbers::channelNumberBKLM(int bklmChannel) const
+KLMChannelNumber KLMElementNumbers::channelNumberBKLM(int bklmChannel)
 {
   return bklmChannel + m_BKLMOffset;
 }
@@ -72,7 +72,7 @@ KLMChannelNumber KLMElementNumbers::channelNumberEKLM(
   return channel;
 }
 
-KLMChannelNumber KLMElementNumbers::channelNumberEKLM(int eklmStrip) const
+KLMChannelNumber KLMElementNumbers::channelNumberEKLM(int eklmStrip)
 {
   return eklmStrip;
 }
@@ -133,7 +133,7 @@ KLMPlaneNumber KLMElementNumbers::planeNumber(
 }
 
 KLMPlaneNumber KLMElementNumbers::planeNumberBKLM(
-  int section, int sector, int layer, int plane) const
+  int section, int sector, int layer, int plane)
 {
   KLMPlaneNumber planeGlobal;
   planeGlobal = BKLMElementNumbers::planeNumber(section, sector, layer, plane);
@@ -163,7 +163,7 @@ KLMModuleNumber KLMElementNumbers::moduleNumber(
 }
 
 KLMModuleNumber KLMElementNumbers::moduleNumberBKLM(
-  int section, int sector, int layer) const
+  int section, int sector, int layer)
 {
   KLMModuleNumber module;
   module = BKLMElementNumbers::moduleNumber(section, sector, layer);
@@ -228,7 +228,7 @@ unsigned int KLMElementNumbers::getNChannelsModule(KLMModuleNumber module) const
 }
 
 KLMSectorNumber KLMElementNumbers::sectorNumberBKLM(
-  int section, int sector) const
+  int section, int sector)
 {
   KLMSectorNumber sect;
   sect = BKLMElementNumbers::sectorNumber(section, sector);
@@ -243,7 +243,7 @@ KLMSectorNumber KLMElementNumbers::sectorNumberEKLM(
   return sect;
 }
 
-int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
+int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer)
 {
   if (subdetector == c_BKLM)
     return layer;
@@ -251,7 +251,7 @@ int KLMElementNumbers::getExtrapolationLayer(int subdetector, int layer) const
     return BKLMElementNumbers::getMaximalLayerNumber() + layer;
 }
 
-int KLMElementNumbers::getMinimalPlaneNumber(int subdetector) const
+int KLMElementNumbers::getMinimalPlaneNumber(int subdetector)
 {
   if (subdetector == c_BKLM)
     return 0;

@@ -110,7 +110,9 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    CXXFLAGS=['-std=c++20'],
+    # clang::suppress is used to silence clang/cppcheck static analyzer
+    # findings; tell GCC to ignore this vendor attribute instead of warning
+    CXXFLAGS=['-std=c++20', '-Wno-attributes=clang::suppress'],
     FORTRANFLAGS=['-std=legacy'],
     FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems

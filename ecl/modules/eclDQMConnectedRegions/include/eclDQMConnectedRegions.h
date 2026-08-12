@@ -39,9 +39,9 @@ namespace Belle2 {
   private:
 
     /** Histogram to hold number of crystals in largest ECL connected region */
-    TH1F* m_largestCRCrystalsNum;
+    TH1F* m_largestCRCrystalsNum = nullptr;
     /** Histogram to hold number of local maximum in ECL connected region */
-    TH1F* m_largestCRLocalMaxNum;
+    TH1F* m_largestCRLocalMaxNum = nullptr;
     /** Histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
   };

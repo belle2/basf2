@@ -47,9 +47,11 @@ namespace {
   static int my_decstat[DataStoreStreamer::c_maxThreads];
 };
 
+// the signature is imposed by pthread_create()
+// cppcheck-suppress constParameterCallback
 void* RunDecodeEvtMessage(void* targ)
 {
-  auto* id = (int*)targ;
+  const auto* id = static_cast<const int*>(targ);
   //  DataStoreStreamer::Instance().decodeEvtMessage(*id);
   s_streamer->decodeEvtMessage(*id);
   return nullptr;
@@ -85,7 +87,7 @@ DataStoreStreamer::DataStoreStreamer(int complevel, bool handleMergeable, int ma
     }
     for (int i = 0; i < m_maxthread; i++) {
       //      args.evtbuf = m_evtbuf[i];
-      pthread_create(&m_pt[i], nullptr, RunDecodeEvtMessage, (void*)&m_id[i]);
+      pthread_create(&m_pt[i], nullptr, RunDecodeEvtMessage, static_cast<void*>(&m_id[i]));
     }
     pthread_attr_destroy(&thread_attr);
   }
@@ -121,7 +123,7 @@ void DataStoreStreamer::removeSideEffects()
 {
   DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::c_Persistent);
   for (auto& entryPair : map) {
-    DataStore::StoreEntry& entry = entryPair.second;
+    const DataStore::StoreEntry& entry = entryPair.second;
     if (isMergeable(entry.object)) {
       static_cast<Mergeable*>(entry.object)->removeSideEffects();
       static_cast<Mergeable*>(entry.object)->clear();
@@ -342,7 +344,7 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
     // Wait for event in queue becomes ready
     msghandler.clear();
 
-    while (my_evtbuf[id].size() <= 0) usleep(10);
+    while (my_evtbuf[id].empty()) usleep(10);
 
     // Pick up event buffer
     pthread_mutex_lock(&mutex_thread[id]);
@@ -490,10 +492,10 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
 
   // First call BuildCheck for regular class
   while (lnk) {
-    info = (TStreamerInfo*)lnk->GetObject();
+    info = static_cast<TStreamerInfo*>(lnk->GetObject());
 
     int ovlap = 0;
-    for (auto& itr : class_name) {
+    for (const auto& itr : class_name) {
       if (strcmp(itr.c_str(), info->GetName()) == 0) {
         ovlap = 1;
         B2DEBUG(100, "Regular Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");
@@ -523,10 +525,10 @@ int DataStoreStreamer::restoreStreamerInfos(const TList* list)
   // Then call BuildCheck for stl class
   lnk = list->FirstLink();
   while (lnk) {
-    info = (TStreamerInfo*)lnk->GetObject();
+    info = static_cast<TStreamerInfo*>(lnk->GetObject());
 
     int ovlap = 0;
-    for (auto& itr : class_name) {
+    for (const auto& itr : class_name) {
       if (strcmp(itr.c_str(), info->GetName()) == 0) {
         ovlap = 1;
         B2DEBUG(100, "STL Class Loop : The class " << info->GetName() << " has already appeared. Skipping...");

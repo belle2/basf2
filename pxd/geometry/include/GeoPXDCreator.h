@@ -32,7 +32,7 @@ namespace Belle2 {
       GeoPXDCreator(): VXD::GeoVXDCreator("PXD") {};
 
       /** The destructor of the GeoPXDCreator class. */
-      virtual ~GeoPXDCreator();
+      virtual ~GeoPXDCreator() override;
 
       /** The old create member: create the configuration object(s) on the fly
        * and call the geometry creation routine.*/
@@ -90,7 +90,7 @@ namespace Belle2 {
        * Read the sensor definitions from the gearbox
        * @param sensor Reference to the database containing the parameters
        */
-      PXDSensorInfoPar* readSensorInfo(const GearDir& sensor);
+      static PXDSensorInfoPar* readSensorInfo(const GearDir& sensor);
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
@@ -107,7 +107,7 @@ namespace Belle2 {
        * @param support Reference to the database containing the parameters
        * @param pxdGeometryPar PXD geometry
        */
-      void readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar);
+      static void readHalfShellSupport(const GearDir& support, PXDGeometryPar& pxdGeometryPar);
 
     private:
 

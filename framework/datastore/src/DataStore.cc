@@ -166,7 +166,7 @@ std::string DataStore::arrayName(const TClass* t, const std::string& name)
 }
 
 
-bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor)
+void DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& accessor)
 {
   // Check whether the existing entry and the requested object are both arrays or both single objects
   const char* entryType = (entry.isArray) ? "array" : "object";
@@ -181,8 +181,6 @@ bool DataStore::checkType(const StoreEntry& entry, const StoreAccessorBase& acce
     B2FATAL("Existing " << accessor.readableName() << " of type " << entryClass->GetName() << " doesn't match requested type " <<
             accessor.getClass()->GetName());
   }
-
-  return true;
 }
 
 
@@ -214,10 +212,7 @@ bool DataStore::registerEntry(const std::string& name, EDurability durability,
     }
 
     // Check whether the types match
-    // checkType() either returns true or aborts via B2FATAL, hence the condition
-    // looks always false to static analysis; keep the check as a safety net
-    // cppcheck-suppress knownConditionTrueFalse
-    if (!checkType(entry, accessor)) return false;
+    checkType(entry, accessor);
 
     // Check whether the persistency type matches
     if (entry.dontWriteOut != dontwriteout) {
@@ -297,8 +292,8 @@ DataStore::StoreEntry* DataStore::getEntry(const StoreAccessorBase& accessor)
 {
   const auto& it = m_storeEntryMap[accessor.getDurability()].find(accessor.getName());
 
-  // cppcheck-suppress knownConditionTrueFalse ; checkType() either returns true or aborts via B2FATAL
-  if (it != m_storeEntryMap[accessor.getDurability()].end() and checkType((it->second), accessor)) {
+  if (it != m_storeEntryMap[accessor.getDurability()].end()) {
+    checkType((it->second), accessor);
     return &(it->second);
   } else {
     return nullptr;

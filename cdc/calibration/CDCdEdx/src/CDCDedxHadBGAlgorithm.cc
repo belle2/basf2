@@ -164,7 +164,8 @@ void CDCDedxHadBGAlgorithm::createPayload()
   saveCalibration(sgains, "CDCDedxSigmaPars");
 }
 
-void CDCDedxHadBGAlgorithm::prepareSample(std::vector< std::string > particles, const std::string& filename, const std::string& sfx)
+void CDCDedxHadBGAlgorithm::prepareSample(const std::vector< std::string >& particles, const std::string& filename,
+                                          const std::string& sfx)
 {
 
   TFile* outfile = new TFile(filename.data(), "RECREATE");
@@ -183,7 +184,7 @@ void CDCDedxHadBGAlgorithm::prepareSample(std::vector< std::string > particles, 
 
 }
 
-void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, const std::string& sfx, const std::string& svar)
+void CDCDedxHadBGAlgorithm::SigmaFits(const std::vector< std::string >& particles, const std::string& sfx, const std::string& svar)
 {
   // only the muon samples are used for the sigma fits
   HadronCalibration hadcal;
@@ -234,7 +235,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
     std::vector<TH1F*>   hdedx_var;
 
     //define histograms
-    prep.defineHisto(hdedx_var, "chi", svar, particle.data());
+    prep.defineHisto(hdedx_var, "chi", svar, particle);
 
     // Create some containers to calculate averages
     std::vector<double> sumvar(nbins);
@@ -248,8 +249,8 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
     CDCDedxMeanPred mgpar;
     CDCDedxSigmaPred sgpar;
 
-    mgpar.setParameters(m_bgcurve.data());
-    sgpar.setParameters(m_bgsigma.data());
+    mgpar.setParameters(m_bgcurve);
+    sgpar.setParameters(m_bgsigma);
 
     CDCDedxHadSat had;
     had.setParameters("sat-pars.fit.txt");
@@ -341,7 +342,7 @@ void CDCDedxHadBGAlgorithm::SigmaFits(std::vector< std::string > particles, cons
       // fit the dE/dx distribution in bins of injection time'
       if (hdedx_var[i]->Integral() > 100) {
         gstatus stats;
-        prep.fit(hdedx_var[i],  particle.data(), stats);
+        prep.fit(hdedx_var[i],  particle, stats);
         if (stats == OK) {
           varmean[i] =  hdedx_var[i]->GetFunction("gaus")->GetParameter(1);
           varmeanerr[i] =  hdedx_var[i]->GetFunction("gaus")->GetParError(1);

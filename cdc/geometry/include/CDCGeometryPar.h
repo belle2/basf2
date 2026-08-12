@@ -65,7 +65,7 @@ namespace Belle2 {
       void clear();
 
       //! Print some debug information
-      void Print() const;
+      static void Print();
 
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
@@ -152,7 +152,7 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode dummy now.
        */
-      void readFFactor(const GearDir& gbxParams, int mode = 0);
+      static void readFFactor(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set spatial resolution (from DB).
@@ -995,14 +995,14 @@ namespace Belle2 {
        * @param lr    Left/Right flag.
        * @param alpha Track incident angle in rphi-plane (rad).
        */
-      unsigned short getOutgoingLR(const unsigned short lr, const double alpha) const;
+      static unsigned short getOutgoingLR(const unsigned short lr, const double alpha);
 
 
       /**
        * Converts incoming-  to outgoing-alpha.
        * @param alpha in rad.
        */
-      double getOutgoingAlpha(const double alpha) const;
+      static double getOutgoingAlpha(const double alpha);
 
 
       /**
@@ -1010,7 +1010,7 @@ namespace Belle2 {
        * @param alpha in rad.
        * @param theta in rad.
        */
-      double getOutgoingTheta(const double alpha, const double theta) const;
+      static double getOutgoingTheta(const double alpha, const double theta);
 
 
       /**
@@ -1095,7 +1095,7 @@ namespace Belle2 {
 
     private:
       /** Singleton class */
-      CDCGeometryPar(const CDCGeometry* = nullptr);
+      explicit CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */

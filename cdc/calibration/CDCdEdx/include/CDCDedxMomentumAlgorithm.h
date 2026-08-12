@@ -27,7 +27,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedxMomentumAlgorithm() {}
+    virtual ~CDCDedxMomentumAlgorithm() override {}
 
   protected:
 

@@ -39,6 +39,7 @@ double RealisticTDCCountTranslator::getDriftTime(unsigned short tdcCount,
   // N.B. No correction (+ or -0.5 count) is needed in the translation since no bias is in the real TDC count on average (info. from KEK electronics division).
   double driftTime = m_cdcp.getT0(wireID) - tdcCount * m_tdcBinWidth;
 
+  // cppcheck-suppress variableScope ; kept next to the related declarations for readability
   unsigned short layer = wireID.getICLayer();
 
   // Need to undo everything the digitization does in reverse order.

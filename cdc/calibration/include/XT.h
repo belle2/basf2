@@ -5,17 +5,17 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "TProfile.h"
-#include "TCanvas.h"
-#include "TF1.h"
-#include "TH1D.h"
+#include <TProfile.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TH1D.h>
 #include "Math/ChebyshevPol.h"
 #include "iostream"
 
 /**
  * helper function to initialize xt function with 5th order polynomial + linear.
  */
-// cppcheck-suppress constParameter
+// cppcheck-suppress constParameterCallback
 Double_t pol5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -36,7 +36,7 @@ Double_t pol5pol1(Double_t* x, Double_t* par)
 /**
  * helper function to initialize xt function with 5th order Chebshev Polynomial + linear.
  */
-// cppcheck-suppress constParameter
+// cppcheck-suppress constParameterCallback
 Double_t Cheb5pol1(Double_t* x, Double_t* par)
 {
   Double_t xx = x[0];
@@ -64,7 +64,7 @@ public:
    */
   explicit XT(TProfile* h1)
   {
-    m_h1 = (TProfile*)h1->Clone();
+    m_h1 = static_cast<TProfile*>(h1->Clone());
     m_h1->SetDirectory(0);
   }
   /**
@@ -72,7 +72,7 @@ public:
    */
   XT(TProfile* h1, int mode)
   {
-    m_h1 = (TProfile*)h1->Clone();
+    m_h1 = static_cast<TProfile*>(h1->Clone());
     m_h1->SetDirectory(0);
     m_mode = mode;
   }
@@ -82,7 +82,7 @@ public:
    */
   XT(TH1D* h1, int mode)
   {
-    m_h1 = (TProfile*)h1->Clone();
+    m_h1 = static_cast<TProfile*>(h1->Clone());
     m_h1->SetDirectory(0);
     m_mode = mode;
   }
@@ -253,7 +253,7 @@ void XT::FitPol5()
   double max_dif2 = 0.05;
   double par[8];
   m_h1->Fit("pol1", "MQ", "", m_tmin, 50);
-  TF1* f1 = (TF1*)m_h1->GetFunction("pol1");
+  TF1* f1 = static_cast<TF1*>(m_h1->GetFunction("pol1"));
   double p0 = f1->GetParameter(0);
   double p1 = f1->GetParameter(1);
   double f10 = f1->Eval(10);

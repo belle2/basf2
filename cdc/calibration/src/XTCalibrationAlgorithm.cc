@@ -156,14 +156,14 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
           TF1* fpol1;
           if (m_useSliceFit) {
             m_hist2d[l][lr][al][th]->FitSlicesY(0, 0, -1, 5);
-            m_hist2d_1[l][lr][al][th] = (TH1F*)gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th));
+            m_hist2d_1[l][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th)));
             if (!m_hist2d_1[l][lr][al][th]) {
               m_fitStatus[l][lr][al][th] = FitStatus::c_lowStat;
               B2WARNING("Error, not found results of slices fit");
               continue;
             }
             m_hist2d_1[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)m_hProf[l][lr][al][th]->GetFunction("pol1");
+            fpol1 = static_cast<TF1*>(m_hProf[l][lr][al][th]->GetFunction("pol1"));
           } else {
             /*Set Error for low statistic bin*/
             for (int n = 0; n < m_hProf[l][lr][al][th]->GetNbinsX(); ++n) {
@@ -172,7 +172,7 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
               }
             }
             m_hProf[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)m_hProf[l][lr][al][th]->GetFunction("pol1");
+            fpol1 = static_cast<TF1*>(m_hProf[l][lr][al][th]->GetFunction("pol1"));
           }
 
           if (fpol1) {
@@ -240,12 +240,14 @@ CalibrationAlgorithm::EResult XTCalibrationAlgorithm::calibrate()
           }
           if (xt->validate() == true) {
             m_fitStatus[l][lr][al][th] = xt->getFitStatus();
-            m_xtFunc[l][lr][al][th] = (TF1*)xt->getXTFunction();
+            m_xtFunc[l][lr][al][th] = static_cast<TF1*>(xt->getXTFunction());
 
             if (m_useSliceFit) {
-              m_hist2d_1[l][lr][al][th] = (TH1F*)xt->getFittedHisto();
+              // NOTE: getFittedHisto() returns a TProfile, not a TH1F; only Write()
+              // is called on the stored pointer afterwards
+              m_hist2d_1[l][lr][al][th] = reinterpret_cast<TH1F*>(xt->getFittedHisto());
             } else {
-              m_hProf[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
+              m_hProf[l][lr][al][th] = static_cast<TProfile*>(xt->getFittedHisto());
             }
           } else {
             m_fitStatus[l][lr][al][th] = c_fitFailure;

@@ -29,7 +29,7 @@ namespace Belle2 {
       SpaceResolutionCalibrationAlgorithm();
 
       /// Destructor
-      ~SpaceResolutionCalibrationAlgorithm() {}
+      ~SpaceResolutionCalibrationAlgorithm() override {}
 
       /// Set Debug mode.
       void setDebug(bool debug = false) {m_debug = debug; }
@@ -111,29 +111,29 @@ namespace Belle2 {
       bool m_storeHisto = false; /**<  Store histogram or not*/
       bool m_bField = true;                   /**< Work with BField, fit range and initial parameters is different incase B and noB */
       double m_threshold = 0.6 ; /**< minimal requirement for the fraction of fitted results */
-      double m_sigma[56][2][18][7][8]; /**<new sigma parameters.*/
-      TGraphErrors* m_gFit[56][2][18][7];  /**< sigma*sigma graph for fit*/
-      TGraphErrors* m_graph[56][2][18][7];    /**< sigma graph.*/
-      TH2F* m_hBiased[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of biased residual */
-      TH2F* m_hUnbiased[56][2][Max_nalpha][Max_ntheta]; /**< 2D histogram of unbiased residual */
-      TH1F* m_hMeanBiased[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram biased residual*/
-      TH1F* m_hSigmaBiased[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of biased residual*/
-      TH1F* m_hMeanUnbiased[56][2][Max_nalpha][Max_ntheta]; /**<  mean histogram of unbiased residual*/
-      TH1F* m_hSigmaUnbiased[56][2][Max_nalpha][Max_ntheta]; /**<  sigma histogram of ubiased residual*/
+      double m_sigma[56][2][18][7][8] = {}; /**<new sigma parameters.*/
+      TGraphErrors* m_gFit[56][2][18][7] = {};  /**< sigma*sigma graph for fit*/
+      TGraphErrors* m_graph[56][2][18][7] = {};    /**< sigma graph.*/
+      TH2F* m_hBiased[56][2][Max_nalpha][Max_ntheta] = {}; /**< 2D histogram of biased residual */
+      TH2F* m_hUnbiased[56][2][Max_nalpha][Max_ntheta] = {}; /**< 2D histogram of unbiased residual */
+      TH1F* m_hMeanBiased[56][2][Max_nalpha][Max_ntheta] = {}; /**<  mean histogram biased residual*/
+      TH1F* m_hSigmaBiased[56][2][Max_nalpha][Max_ntheta] = {}; /**<  sigma histogram of biased residual*/
+      TH1F* m_hMeanUnbiased[56][2][Max_nalpha][Max_ntheta] = {}; /**<  mean histogram of unbiased residual*/
+      TH1F* m_hSigmaUnbiased[56][2][Max_nalpha][Max_ntheta] = {}; /**<  sigma histogram of ubiased residual*/
       int m_fitStatus[56][2][Max_nalpha][Max_ntheta] = {{{{0}}}} ; /**< Fit flag; 1:OK ; 0:error*/
 
-      int m_nAlphaBins; /**<number of alpha bins*/
-      int m_nThetaBins;/**<number of  theta bins*/
-      float m_lowerAlpha[18];/**< Lower boundaries of alpha bins. */
-      float m_upperAlpha[18];/**< Upper boundaries of alpha bins. */
-      float m_iAlpha[18]; /**< represented alphas of alpha bins. */
-      float m_lowerTheta[7]; /**< Lower boundaries of theta bins. */
-      float m_upperTheta[7];/**< Upper boundaries of theta bins. */
-      float m_iTheta[7]; /**< represented alphas of theta bins. */
+      int m_nAlphaBins = 0; /**<number of alpha bins*/
+      int m_nThetaBins = 0;/**<number of  theta bins*/
+      float m_lowerAlpha[18] = {};/**< Lower boundaries of alpha bins. */
+      float m_upperAlpha[18] = {};/**< Upper boundaries of alpha bins. */
+      float m_iAlpha[18] = {}; /**< represented alphas of alpha bins. */
+      float m_lowerTheta[7] = {}; /**< Lower boundaries of theta bins. */
+      float m_upperTheta[7] = {};/**< Upper boundaries of theta bins. */
+      float m_iTheta[7] = {}; /**< represented alphas of theta bins. */
       unsigned short m_sigmaParamMode = 0; /**< sigma mode for this calibration.*/
 
-      double m_sigmaPost[56][2][18][7][8]; /**< sigma parameters before calibration */
-      unsigned short m_sigmaParamModePost; /**< sigma mode before this calibration.*/
+      double m_sigmaPost[56][2][18][7][8] = {}; /**< sigma parameters before calibration */
+      unsigned short m_sigmaParamModePost = 0; /**< sigma mode before this calibration.*/
 
       bool  m_textOutput = false; /**< output text file if true */
       std::string m_outputFileName = "sigma_new.dat"; /**< Output sigma filename*/

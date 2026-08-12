@@ -88,14 +88,14 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedxValidationAlgorithm() {}
+    virtual ~CDCDedxValidationAlgorithm() override {}
 
     /**
     * @brief Draw dE/dx per run histogram canvas.
     * @param htemp Histogram map (run number -> TH1D pointer)
     * @param namesfx Suffix to distinguish output
     */
-    void printCanvasRun(std::map<int, TH1D*>& htemp, std::string namesfx);
+    void printCanvasRun(const std::map<int, TH1D*>& htemp, const std::string& namesfx);
 
     /**
      * @brief Draw dE/dx histograms across bins.
@@ -103,7 +103,7 @@ namespace Belle2 {
      * @param namesfx Suffix to distinguish output
      * @param svar Variable name for binning
      */
-    void printCanvas(std::vector<TH1D*>& htemp, std::string namesfx, std::string svar);
+    void printCanvas(std::vector<TH1D*>& htemp, const std::string& namesfx, const std::string& svar);
 
     /**
      * @brief Perform Gaussian fit with range on a histogram.
@@ -123,7 +123,7 @@ namespace Belle2 {
      * @param var Variable name
      * @param stype charge type
      */
-    void defineHisto(std::vector<TH1D*>& htemp, std::string var, std::string stype);
+    void defineHisto(std::vector<TH1D*>& htemp, const std::string& var, const std::string& stype);
 
     /**
      * @brief Validate wire gain data using dE/dx histograms
@@ -137,7 +137,7 @@ namespace Belle2 {
      * @param namesfx Suffix to distinguish output
      * @param vdedx_mean Vector of mean dE/dx values
      */
-    void printCanvasWire(std::vector<TH1D*> temp, std::string namesfx, const std::vector<double>& vdedx_mean);
+    static void printCanvasWire(std::vector<TH1D*> temp, const std::string& namesfx, const std::vector<double>& vdedx_mean);
 
     /**
      * @brief Perform full Gaussian fit and extract parameters.
@@ -163,7 +163,7 @@ namespace Belle2 {
      * @brief Set bin edges for injection time.
      * @param vtlocaledges Vector of time bin edges
      */
-    void defineTimeBins(std::vector<double>& vtlocaledges);
+    static void defineTimeBins(std::vector<double>& vtlocaledges);
 
     /**
      * @brief Draw dE/dx histograms for momentum and cosine bins.
@@ -171,7 +171,7 @@ namespace Belle2 {
      * @param namesfx Suffix to distinguish output
      * @param svar Variable name ("momentum" or "cosTheta")
      */
-    void printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, std::string namesfx, std::string svar);
+    void printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, const std::string& namesfx, const std::string& svar);
 
     /**
      * @brief Get time bin label string
@@ -211,7 +211,7 @@ namespace Belle2 {
      * @param pt TPaveText object
      * @param color Color to apply
      */
-    void setTextCosmetics(TPaveText pt, Color_t color)
+    static void setTextCosmetics(TPaveText pt, Color_t color)
     {
       pt.SetBorderSize(0);
       pt.SetShadowColor(kWhite);
@@ -265,7 +265,7 @@ namespace Belle2 {
     /**
     * @brief Clear current DB pointers and state
     */
-    void resetDatabase();
+    static void resetDatabase();
 
   protected:
 
@@ -289,8 +289,9 @@ namespace Belle2 {
     double m_momMin; /**< min range of momentum */
     double m_momMax; /**< max range of momentum */
 
-    double* m_tedges; /**< internal time array (copy of vtlocaledges) */
-    unsigned int m_tbins;  /**< internal time bins */
+    std::vector<double> m_vtlocaledges; /**< internal time vector */
+    double* m_tedges = nullptr; /**< internal time array (points into m_vtlocaledges) */
+    unsigned int m_tbins = 0;  /**< internal time bins */
 
     int m_eaBin; /**< # of bins for entrance angle */
     double m_eaMin; /**< lower edge of entrance angle */

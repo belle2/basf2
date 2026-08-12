@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include "string"
-#include "TH2D.h"
-#include "TH1D.h"
-#include "TF1.h"
+#include <TH2D.h>
+#include <TH1D.h>
+#include <TF1.h>
 namespace Belle2 {
   namespace CDC {
     /**
@@ -82,14 +82,14 @@ namespace Belle2 {
       bool m_BField = true;  /**< with b field or none*/
 
       //double m_XT_fit[56][2][18][7][8];  /**< Fitted parameter*/
-      double xtold[56][2][18][7][8];     /**< Old parameter */
-      int fitflag[56][2][20][10];         /**< Fit flag */
-      TF1* xtf5r[56][2][20][10];          /**< XTFunction */
+      double xtold[56][2][18][7][8] = {};     /**< Old parameter */
+      int fitflag[56][2][20][10] = {};         /**< Fit flag */
+      TF1* xtf5r[56][2][20][10] = {};          /**< XTFunction */
 
-      TProfile* hprof[56][2][20][10];     /**< Profile xt histo*/
-      TH2D* hist2d[56][2][20][10];        /**< 2D histo of xt*/
-      TH2D* hist2d_draw[56][20][10];       /**< 2d histo for draw*/
-      TH1D* hist2d_1[56][2][20][10];       /**< 1D xt histo, results of slice fit*/
+      TProfile* hprof[56][2][20][10] = {};     /**< Profile xt histo*/
+      TH2D* hist2d[56][2][20][10] = {};        /**< 2D histo of xt*/
+      TH2D* hist2d_draw[56][20][10] = {};       /**< 2d histo for draw*/
+      TH1D* hist2d_1[56][2][20][10] = {};       /**< 1D xt histo, results of slice fit*/
       /*********************************
       Fit Flag
       =-1: low statistic
@@ -113,25 +113,25 @@ namespace Belle2 {
       //double m_theta[10][3];//alpha bin, 18bin, 0=low, 1 = up, 2 = alpha
       //      unsigned short m_xtParamMode;    /*!< Mode for xt parameterization */
       //unsigned short m_nXtParams;      /*!< no. of xt parameters per bin */
-      int m_nalpha; /**<number of alpha bins*/
-      int m_ntheta;/**<number of  theta bins*/
-      double l_alpha[18];/**< Lower boundaries of alpha bins. */
-      double u_alpha[18];/**< Upper boundaries of alpha bins. */
-      double ialpha[18]; /**< represented alphas of alpha bins. */
-      double l_theta[7]; /**< Lower boundaries of theta bins. */
-      double u_theta[7];/**< Upper boundaries of theta bins. */
-      double itheta[7]; /**< represented alphas of theta bins. */
+      int m_nalpha = 0; /**<number of alpha bins*/
+      int m_ntheta = 0;/**<number of  theta bins*/
+      double l_alpha[18] = {};/**< Lower boundaries of alpha bins. */
+      double u_alpha[18] = {};/**< Upper boundaries of alpha bins. */
+      double ialpha[18] = {}; /**< represented alphas of alpha bins. */
+      double l_theta[7] = {}; /**< Lower boundaries of theta bins. */
+      double u_theta[7] = {};/**< Upper boundaries of theta bins. */
+      double itheta[7] = {}; /**< represented alphas of theta bins. */
 
-      int nalpha_old; /**<number of alpha bins from input*/
-      int ntheta_old;/**<number of  theta bins from input*/
-      double l_alpha_old[18];/**< Lower boundaries of alpha bins from input */
-      double u_alpha_old[18];/**< Upper boundaries of alpha bins from input */
-      double ialpha_old[18]; /**< represented alphas of alpha bins from input. */
-      double l_theta_old[7]; /**< Lower boundaries of theta bins from input. */
-      double u_theta_old[7];/**< Upper boundaries of theta bins from input. */
-      double itheta_old[7]; /**< represented alphas of theta bins from input. */
+      int nalpha_old = 0; /**<number of alpha bins from input*/
+      int ntheta_old = 0;/**<number of  theta bins from input*/
+      double l_alpha_old[18] = {};/**< Lower boundaries of alpha bins from input */
+      double u_alpha_old[18] = {};/**< Upper boundaries of alpha bins from input */
+      double ialpha_old[18] = {}; /**< represented alphas of alpha bins from input. */
+      double l_theta_old[7] = {}; /**< Lower boundaries of theta bins from input. */
+      double u_theta_old[7] = {};/**< Upper boundaries of theta bins from input. */
+      double itheta_old[7] = {}; /**< represented alphas of theta bins from input. */
 
-      unsigned short xtmode_old; /**< XT mode old, 0-polynomial, 1 Cheb*/
+      unsigned short xtmode_old = 0; /**< XT mode old, 0-polynomial, 1 Cheb*/
       int m_MAXalpha = 18;        /**< max alpha bin*/
       int m_MAXtheta = 7;         /**< max theta bin*/
       unsigned short m_xtmode = 1; /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/

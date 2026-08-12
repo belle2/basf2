@@ -21,7 +21,7 @@ namespace Belle2 {
       {}
 
       /** Destructor. */
-      ~LinearGlobalADCCountTranslator() {}
+      ~LinearGlobalADCCountTranslator() override {}
 
       /** just multiply with the conversion factor and return. */
       float getCharge(unsigned short adcCount,

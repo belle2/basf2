@@ -44,7 +44,7 @@ void simBasics()
 {
   // open the file with simulated and reconstructed EvtGen particles
   TFile* input = TFile::Open("../EvtGenSimNoBkg.root");
-  TTree* tree = (TTree*) input->Get("tree");
+  TTree* tree = static_cast<TTree*>(input->Get("tree"));
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("simBasics.root", "recreate");

@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "G4VProcess.hh"
-#include "G4TransportationManager.hh"
-#include "G4PropagatorInField.hh"
-#include "G4ParticleChangeForTransport.hh"
+#include <G4VProcess.hh>
+#include <G4TransportationManager.hh>
+#include <G4PropagatorInField.hh>
+#include <G4ParticleChangeForTransport.hh>
 
 class G4SafetyHelper;
 class G4CoupledTransportation;
@@ -35,7 +35,7 @@ namespace Belle2 {
      * Constructor
      * @param  verbosityLevel
      */
-    G4LongLivedNeutralTransportation(G4int verbosityLevel = 1);
+    explicit G4LongLivedNeutralTransportation(G4int verbosityLevel = 1);
 
     /**
      * Destructor
@@ -162,13 +162,13 @@ namespace Belle2 {
      * No operation in  AtRestGPIL.
      */
     G4double AtRestGetPhysicalInteractionLength(const G4Track&,
-                                                G4ForceCondition*)
+                                                G4ForceCondition*) override
     { return -1.0; }
 
     /**
      * No operation in  AtRestDoIt.
      */
-    G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&)
+    G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&) override
     { return 0; }
 
     void StartTracking(G4Track* aTrack);

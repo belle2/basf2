@@ -25,13 +25,6 @@ ExtEnergyLoss::ExtEnergyLoss(const G4String& processName, G4ProcessType type)
     m_energyLossForExtrapolator = new EnergyLossForExtrapolator;
   }
   m_StepLimit = 1.0;  // fraction of kinetic energy that could be lost in one step
-  if (false) {
-    G4Track aTrack;
-    G4Step aStep;
-    double dummy;
-    AlongStepDoIt(aTrack, aStep);
-    GetContinuousStepLimit(aTrack, 0.0, 0.0, dummy);
-  }
 }
 
 ExtEnergyLoss::~ExtEnergyLoss()

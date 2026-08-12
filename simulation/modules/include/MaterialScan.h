@@ -36,7 +36,7 @@ namespace Belle2 {
       m_rootFile->mkdir(name.c_str());
     }
     /** Return the name of the scan */
-    std::string getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
     /** Return the number of rays necessary to perform the scan */
     virtual int getNRays() const = 0;
 
@@ -321,7 +321,7 @@ namespace Belle2 {
   private:
     /** Return a vector along the axis with the given name
      * @param name Name of the axis */
-    G4ThreeVector getAxis(char name);
+    static G4ThreeVector getAxis(char name);
 
     /** Pointer to the ROOT file for the histograms */
     TFile* m_rootFile;

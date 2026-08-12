@@ -54,7 +54,7 @@ namespace Belle2 {
     // Data members
 
     //! calculate checksum
-    static unsigned int calcXORChecksum(int* buf, int nwords);
+    static unsigned int calcXORChecksum(const int* buf, int nwords);
 
     //! Use shared memory
     int m_shmflag;
@@ -69,7 +69,7 @@ namespace Belle2 {
     int Send(int socket, char* buf, int size_bytes);
 
     //! print data contents
-    static void printData(int* buf, int nwords);
+    static void printData(const int* buf, int nwords);
 
     //! Check socket status
     int CheckConnection(int socket);

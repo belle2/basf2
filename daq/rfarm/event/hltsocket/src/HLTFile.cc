@@ -40,7 +40,7 @@ HLTFile::~HLTFile()
   }
 }
 
-int HLTFile::put(char* data, int len)
+int HLTFile::put(const char* data, int len)
 {
   if (not m_sfile) {
     B2ERROR("Trying to write to a closed file");
@@ -54,7 +54,7 @@ int HLTFile::put(char* data, int len)
   return bcount;
 }
 
-int HLTFile::put_wordbuf(int* data, int len)
+int HLTFile::put_wordbuf(const int* data, int len)
 {
   if (not m_rfile) {
     B2ERROR("Trying to write to a closed file!");

@@ -25,7 +25,7 @@ using namespace Belle2;
 RFEventServer* RFEventServer::s_instance = 0;
 //RFServerBase* RFServerBase::s_instance = 0;
 
-RFEventServer::RFEventServer(string conffile)
+RFEventServer::RFEventServer(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());

@@ -61,7 +61,7 @@ int HistoServer::server()
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
-      vector<int>& recvsock = m_man->connected_socket_list();
+      const vector<int>& recvsock = m_man->connected_socket_list();
       for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;

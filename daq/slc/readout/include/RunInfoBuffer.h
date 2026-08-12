@@ -99,7 +99,7 @@ namespace Belle2 {
     void addOutputCount(unsigned int count) { m_info->io[1].count += count; }
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
     event_header& getEventHeader() { return m_info->header; }
-    void copyEventHeader(int* buf);
+    void copyEventHeader(const int* buf);
     bool isNotReady()  { return (m_info) && m_info->state == NOTREADY; }
     bool isReady()  { return (m_info) && m_info->state == READY; }
     bool isRunning()  { return (m_info) && m_info->state == RUNNING; }

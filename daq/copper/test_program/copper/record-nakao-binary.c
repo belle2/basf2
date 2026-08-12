@@ -33,10 +33,10 @@ void closefile( )
 
 
 void
-show_event(unsigned long * head, int len)
+show_event(const unsigned long * head, int len)
 {
   int i,j,k;
-  char* temp_buf = (char*)buffer;
+  const char* temp_buf = (char*)buffer;
 /*   for (i=0; i<(len/4); i+= 8) { */
 /*     printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i, */
 /* 	   buffer[i], buffer[i+1], buffer[i+2], buffer[i+3], */
@@ -59,7 +59,7 @@ show_event(unsigned long * head, int len)
 
 
 unsigned long
-xor(unsigned long * start, int wordlen)
+xor(const unsigned long * start, int wordlen)
 {
   unsigned long ret = 0;
   while (wordlen--) {
@@ -226,7 +226,7 @@ main(int argc, char **argv)
     // Decode data
     //
     char * p = (char *)buffer;
-    struct copper_header * header = (struct copper_header *)p;
+    const struct copper_header * header = (struct copper_header *)p;
     const struct copper_footer * footer =
       (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
     int t;

@@ -21,7 +21,7 @@ SendTrailer::SendTrailer()
   //  cout << "SendTrailer NULL constructor" << endl;
 }
 
-SendTrailer::SendTrailer(int* buffer)
+SendTrailer::SendTrailer(const int* buffer)
 {
   memcpy(m_buffer, buffer, SENDTRL_NWORDS * sizeof(int));
 }
@@ -35,7 +35,7 @@ int* SendTrailer::GetBuffer()
   return m_buffer;
 }
 
-void SendTrailer::SetBuffer(int* bufin)
+void SendTrailer::SetBuffer(const int* bufin)
 {
   memcpy(m_buffer, bufin, SENDTRL_NWORDS * sizeof(int));
 }

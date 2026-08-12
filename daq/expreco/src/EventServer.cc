@@ -16,7 +16,7 @@ using namespace std;
 
 // constructor/destructor
 
-EventServer::EventServer(string rbufname, int port) : m_port(port)
+EventServer::EventServer(const string& rbufname, int port) : m_port(port)
 {
   // Attach to RingBuffer
   m_rbuf = new RingBuffer(rbufname.c_str());
@@ -55,7 +55,7 @@ int EventServer::server()
       //      int fd = recvsock[;
     } else if (exam_stat == 1 && size > 0) { //
       //      printf ( "Event data data ready on socket\n" );
-      vector<int>& recvsock = m_man->connected_socket_list();
+      const vector<int>& recvsock = m_man->connected_socket_list();
       //      printf ( "size of recvsock = %d\n", recvsock.size() );
       for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {

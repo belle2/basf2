@@ -43,7 +43,7 @@ int main(int argc, char** argv)
       //      usleep(100);
       usleep(20);
     }
-    EvtMessage* msg = new EvtMessage(evbuf);
+    const EvtMessage* msg = new EvtMessage(evbuf);
     if (msg->type() == MSG_TERMINATE) {
       printf("EoF found. Exitting.....\n");
       eof = 1;

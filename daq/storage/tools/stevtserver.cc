@@ -52,7 +52,7 @@ namespace Belle2 {
     EvtBuffer& operator=(const EvtBuffer&) = delete;
 
   public:
-    bool write(int* buf, int nbyte)
+    bool write(const int* buf, int nbyte)
     {
       m_mutex.lock();
       bool succeded = false;

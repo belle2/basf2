@@ -20,7 +20,7 @@ namespace Belle2 {
   class RevSock2Rb {
   public:
     /*! Constuctor and Destructor */
-    RevSock2Rb(std::string rbuf, std::string src, int port, std::string shmname, int id);
+    RevSock2Rb(const std::string& rbuf, std::string src, int port, std::string shmname, int id);
     ~RevSock2Rb(void);
     /** Copy constructor (disabled). */
     RevSock2Rb(const RevSock2Rb&) = delete;

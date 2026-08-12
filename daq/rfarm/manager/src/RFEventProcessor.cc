@@ -23,7 +23,7 @@
 using namespace std;
 using namespace Belle2;
 
-RFEventProcessor::RFEventProcessor(string conffile)
+RFEventProcessor::RFEventProcessor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());

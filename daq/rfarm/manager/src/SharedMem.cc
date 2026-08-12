@@ -169,12 +169,12 @@ bool SharedMem::IsCreated(void)
   return m_new;
 }
 
-std::string SharedMem::getTmpFileName(std::string user, std::string name)
+std::string SharedMem::getTmpFileName(const std::string& user, const std::string& name)
 {
   return string("/tmp/") + user + string("_SHM_") + name;
 }
 
-bool SharedMem::getIdFromTmpFileName(std::string filename, int& shmid, int& semid)
+bool SharedMem::getIdFromTmpFileName(const std::string& filename, int& shmid, int& semid)
 {
   char shminfo[256];
   int fd = open(filename.c_str(), O_RDONLY);

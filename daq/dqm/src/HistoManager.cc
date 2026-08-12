@@ -197,7 +197,7 @@ void HistoManager::clear()
 }
 
 
-void HistoManager::filedump(std::string outfile)
+void HistoManager::filedump(const std::string& outfile)
 {
   printf("dump to dqm file = %s\n", outfile.c_str());
   merge(); // Smart move to first merge, but necessary?

@@ -27,7 +27,7 @@ do_reset(void * start)
 }
 
 void
-do_scan(void * start)
+do_scan(const void * start)
 {
         const unsigned long * lp = start;
         int i;

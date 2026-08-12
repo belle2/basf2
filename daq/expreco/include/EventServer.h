@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class EventServer {
   public:
-    EventServer(std::string rbufname, int port);
+    EventServer(const std::string& rbufname, int port);
     ~EventServer();
     /** Copy constructor (disabled). */
     EventServer(const EventServer&) = delete;

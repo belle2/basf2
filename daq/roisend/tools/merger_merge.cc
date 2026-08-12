@@ -121,7 +121,7 @@ void plot_triggers(void)
                 *(--triggers.end()),
                 triggers.size(), *(--triggers.end()) - *triggers.begin(), event_number_max);
     int i = 0;
-    for (auto& it : triggers) {
+    for (const auto& it : triggers) {
       int mod = it % hltcount;
       modmissing[hlts[mod]]++;
       if (i < 100) {
@@ -605,7 +605,7 @@ void print_stat(void)
 {
   ERR_FPRINTF(stderr, "[INFO] --- STAT START ---\n");
   unsigned int sum = 0;
-  for (auto& it : mycount) {
+  for (const auto& it : mycount) {
     ERR_FPRINTF(stderr, "[INFO] (%s): %d\n", myconn[it.first].c_str(), it.second);
     if (it.first != 0) sum += it.second;
   }
@@ -796,7 +796,7 @@ main(int argc, char* argv[])
       LOG_FPRINTF(stderr, "[INFO] %d is IP <%s>\n", t, address);
       myconn[t] = address;
       // Assume IP4 and take last decimal as HLT number
-      char* ptr = strrchr(address, '.');
+      const char* ptr = strrchr(address, '.');
       if (ptr) {
         int nr = atoi(ptr + 1);
         hltused.insert(nr);

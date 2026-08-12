@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoEventProcessor::ERecoEventProcessor(string conffile)
+ERecoEventProcessor::ERecoEventProcessor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());

@@ -732,7 +732,7 @@ void DeSerializerPCModule::event()
   //
   // Main loop
   //
-  int* buf_rc = NULL;
+  const int* buf_rc = NULL;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {
     eve_copper_0 = 0;
     //

@@ -28,7 +28,7 @@ void NSMNodeDaemon::add(NSMCallback* callback,
   try {
     if (callback != NULL && host.size() > 0 && port > 0) {
       NSMCommunicator* com = new NSMCommunicator();
-      NSMNode& node(callback->getNode());
+      const NSMNode& node(callback->getNode());
       com->init(node, host, port);
       com->setCallback(callback);
       callback->init(*com);

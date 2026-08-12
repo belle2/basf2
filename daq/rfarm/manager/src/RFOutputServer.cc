@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-RFOutputServer::RFOutputServer(string conffile)
+RFOutputServer::RFOutputServer(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -147,7 +147,7 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
   //  char* hostbase = m_conf->getconf("processor", "hostbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  const char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
   char* port = m_conf->getconf("processor", "sender", "port");
 

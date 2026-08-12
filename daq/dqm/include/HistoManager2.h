@@ -16,7 +16,7 @@ namespace Belle2 {
 
   class HistoManager2 {
   public:
-    explicit HistoManager2(std::string name);
+    explicit HistoManager2(const std::string& name);
     ~HistoManager2();
 
     // Register histogram

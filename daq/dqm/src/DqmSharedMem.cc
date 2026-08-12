@@ -185,12 +185,12 @@ bool DqmSharedMem::IsCreated(void)
   return m_new;
 }
 
-std::string DqmSharedMem::getTmpFileName(std::string user, std::string name)
+std::string DqmSharedMem::getTmpFileName(const std::string& user, const std::string& name)
 {
   return string("/tmp/") + user + string("_SHM_") + name;
 }
 
-bool DqmSharedMem::getIdFromTmpFileName(std::string filename, int& shmid, int& semid)
+bool DqmSharedMem::getIdFromTmpFileName(const std::string& filename, int& shmid, int& semid)
 {
   char shminfo[256];
   int fd = open(filename.c_str(), O_RDONLY);

@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
+DesSerCOPPER::DesSerCOPPER(const string& host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
                            const std::string& nodename, int nodeid, int finesse_bitflag)
 {
   m_finesse_bit_flag = finesse_bitflag;
@@ -477,7 +477,7 @@ void DesSerCOPPER::initializeCOPPER()
   // Present slots to use
   //
   if (! m_use_slot) {
-    char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
+    const char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {

@@ -223,7 +223,7 @@ write_fpga(mgt_t mgt, int m012, int ch, int n)
    dump_fpga
 \* ---------------------------------------------------------------------- */
 static void
-dump_fpga(int conf, char *str)
+dump_fpga(int conf, const char *str)
 {
   printf("CONF register=%02x M012=%d INIT=%d DONE=%d%s%s\n",
 	 conf&0xff, conf&7, (conf>>3)&1, (conf>>7)&1,
@@ -233,7 +233,7 @@ dump_fpga(int conf, char *str)
    boot_fpga
 \* ---------------------------------------------------------------------- */
 static int
-boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
+boot_fpga(mgt_t mgt, const char *file, int verbose, int forced, int m012)
 {
   int i, ch, conf;
   int count = 1, length = 0;

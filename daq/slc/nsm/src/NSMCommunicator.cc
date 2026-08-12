@@ -194,7 +194,7 @@ void NSMCommunicator::setCallback(NSMCallback* callback)
     NSMCallback::NSMCommandList& req_v(callback->getCommandList());
     for (NSMCallback::NSMCommandList::iterator it = req_v.begin();
          it != req_v.end(); ++it) {
-      NSMCommand& command(*it);
+      const NSMCommand& command(*it);
       if (b2nsm_callback(command.getLabel(), NULL) < 0) {
         m_id = -1;
         throw (NSMHandlerException("Failed to register callback (%s)",

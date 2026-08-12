@@ -17,7 +17,7 @@
 namespace Belle2 {
   class ERecoMaster : public RFServerBase {
   public:
-    explicit ERecoMaster(std::string conf);
+    explicit ERecoMaster(const std::string& conf);
     ~ERecoMaster();
     /** Copy constructor (disabled). */
     ERecoMaster(const ERecoMaster&) = delete;

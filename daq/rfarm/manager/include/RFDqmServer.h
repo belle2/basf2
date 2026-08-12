@@ -22,7 +22,7 @@ namespace Belle2 {
 
   class RFDqmServer : public RFServerBase {
   public:
-    explicit RFDqmServer(std::string conffile);
+    explicit RFDqmServer(const std::string& conffile);
     ~RFDqmServer();
     /** Copy constructor (disabled). */
     RFDqmServer(const RFDqmServer&) = delete;

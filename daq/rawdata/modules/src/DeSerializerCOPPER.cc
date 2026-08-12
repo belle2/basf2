@@ -150,7 +150,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
   // Present slots to use
   //
   if (! m_use_slot) {
-    char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
+    const char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {

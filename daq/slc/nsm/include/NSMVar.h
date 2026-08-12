@@ -54,12 +54,12 @@ namespace Belle2 {
     {
       copy(name, FLOAT, 0, &value);
     }
-    NSMVar(const std::string& name, int len, int* value)
+    NSMVar(const std::string& name, int len, const int* value)
       : m_value(NULL)
     {
       copy(name, INT, len, value);
     }
-    NSMVar(const std::string& name, int len, float* value)
+    NSMVar(const std::string& name, int len, const float* value)
       : m_value(NULL)
     {
       copy(name, FLOAT, len, value);

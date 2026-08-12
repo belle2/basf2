@@ -486,7 +486,7 @@ const std::string DBObject::printSQL(const std::string& table, int id) const
   search(map, name_in, isfull);
   for (NameValueList::iterator it = map.begin();
        it != map.end(); ++it) {
-    NameValue& nv(*it);
+    const NameValue& nv(*it);
     std::string value = nv.value;
     std::string::size_type pos = value.find_first_of("(");
     DBField::Type type = DBField::TEXT;

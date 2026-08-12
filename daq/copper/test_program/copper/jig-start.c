@@ -38,7 +38,7 @@ enum finesse_generic_info {
 #include "cprfin-jig.h"
 
 void
-change_jig_regs(int * jigfd, char * key, int setcmd, int getcmd, int val)
+change_jig_regs(int * jigfd, const char * key, int setcmd, int getcmd, int val)
 {
     int i;
     int ret0, ret1, ret2;
@@ -150,7 +150,7 @@ int main()
 
   /* check copper FF_STA */
   {
-    char * p = getenv("FINESSE_SLOT");
+    const char * p = getenv("FINESSE_SLOT");
     // cppcheck-suppress unreadVariable ; kept for debugging
     int valNow = 0;
     if (p) {
@@ -224,7 +224,7 @@ int main()
 
   /* set data size from jig */
   {
-    char * p = getenv("FINESSE_MODE");
+    const char * p = getenv("FINESSE_MODE");
     int finesse_mode = 0;
     if (p)
       finesse_mode = strtol(p, 0, 0);

@@ -24,7 +24,7 @@ namespace Belle2 {
 
   class RFEventServer : public RFServerBase {
   public:
-    explicit RFEventServer(std::string conffile);
+    explicit RFEventServer(const std::string& conffile);
     ~RFEventServer();
     /** Copy constructor (disabled). */
     RFEventServer(const RFEventServer&) = delete;

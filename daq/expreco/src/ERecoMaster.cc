@@ -25,7 +25,7 @@ using namespace Belle2;
 
 
 // Main
-ERecoMaster::ERecoMaster(string conffile)
+ERecoMaster::ERecoMaster(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -90,7 +90,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   int* pars = nullptr;
 
   // 0. Configure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_LOAD", 0, pars);
@@ -99,7 +99,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   sleep(2);
 
   // 1. Configure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(distributor, "RC_LOAD", 0, pars);
@@ -111,7 +111,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -132,7 +132,7 @@ int ERecoMaster::Configure(NSMmsg*, NSMcontext*)
   sleep(10);
 
   // 3. Configure event sampler
-  char* sampler = m_conf->getconf("eventsampler", "nodename");
+  const char* sampler = m_conf->getconf("eventsampler", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(sampler, "RC_LOAD", 0, pars);
@@ -152,7 +152,7 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
   int* pars = nullptr;
 
   // Unconfigure sampler
-  char* sampler = m_conf->getconf("eventsampler", "nodename");
+  const char* sampler = m_conf->getconf("eventsampler", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(sampler, "RC_ABORT", 0, pars);
@@ -162,7 +162,7 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -186,7 +186,7 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
   printf("ERecoMaster: eventprocessors unconfigured.\n");
 
   // Unconfigure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(distributor, "RC_ABORT", 0, pars);
@@ -194,7 +194,7 @@ int ERecoMaster::UnConfigure(NSMmsg*, NSMcontext*)
   printf("ErecoMaster: distributor unconfigured.\n");
 
   // Unconfigure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_ABORT", 0, pars);
@@ -216,7 +216,7 @@ int ERecoMaster::Stop(NSMmsg* msg, NSMcontext*)
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -240,7 +240,7 @@ int ERecoMaster::Stop(NSMmsg* msg, NSMcontext*)
 
   // 2. Stop DqmServer node
   // Unconfigure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_STOP", 0, pars);
@@ -255,13 +255,13 @@ int ERecoMaster::Restart(NSMmsg*, NSMcontext*)
   int* pars = nullptr;
 
   // 0. Configure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   //  b2nsm_sendreq(dqmserver, "RF_RESTART", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_RECOVER", 0, pars);
   sleep(2);
 
   // 1. Configure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   //  b2nsm_sendreq(distributor, "RF_RESTART", 0, pars);
   b2nsm_sendreq(distributor, "RC_RECOVER", 0, pars);
   sleep(2);
@@ -269,7 +269,7 @@ int ERecoMaster::Restart(NSMmsg*, NSMcontext*)
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  const char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];

@@ -158,7 +158,7 @@ int* DeSerializerModule::shmGet(int fd, int size_words)
 
 
 
-unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcXORChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -169,7 +169,7 @@ unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
 }
 
 
-unsigned int  DeSerializerModule::calcSimpleChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcSimpleChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {

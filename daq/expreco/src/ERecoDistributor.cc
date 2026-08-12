@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoDistributor::ERecoDistributor(string conffile)
+ERecoDistributor::ERecoDistributor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -115,7 +115,7 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   m_nrecv = 0;
   int maxrecv = m_conf->getconfi("distributor", "receiver", "nnodes");
   int ridbase = m_conf->getconfi("distributor", "receiver", "idbase");
-  char* rhostbase = m_conf->getconf("distributor", "receiver", "hostbase");
+  const char* rhostbase = m_conf->getconf("distributor", "receiver", "hostbase");
   char* rbadlist = m_conf->getconf("distributor", "receiver", "badlist");
   char* port = m_conf->getconf("distributor", "receiver", "port");
   char* receiver = m_conf->getconf("distributor", "receiver", "script");

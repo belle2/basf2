@@ -480,7 +480,7 @@ void processNumbered(PathPtr startPath, const boost::python::list& outputAddress
   static bool already_executed = false;
   B2ASSERT("Can not run process() on HLT twice per file!", not already_executed);
 
-  auto& environment = Environment::Instance();
+  const auto& environment = Environment::Instance();
   B2ASSERT("HLT processing must happen in multiprocessing mode!", environment.getNumberProcesses() > 0);
 
   namespace py = boost::python;

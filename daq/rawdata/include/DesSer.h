@@ -51,7 +51,7 @@ namespace Belle2 {
     virtual void DataAcquisition() = 0;
 
     //! dump error data
-    static void printData(int* buf, int nwords);
+    static void printData(const int* buf, int nwords);
 
     //! # of events in a run
     int max_nevt = 0;
@@ -111,7 +111,7 @@ namespace Belle2 {
     unsigned int calcSimpleChecksum(int* buf, int nwords);
 
     //! calculate checksum
-    static unsigned int calcXORChecksum(int* buf, int nwords);
+    static unsigned int calcXORChecksum(const int* buf, int nwords);
 
 
     void clearNumUsedBuf()

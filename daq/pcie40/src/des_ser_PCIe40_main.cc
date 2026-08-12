@@ -150,7 +150,7 @@ void crc_calc(unsigned int& crc, const unsigned int& data)
   crc = (((crc) << 8) & 0xff00) ^ CRC16_XMODEM_TABLE[(((crc) >> 8) & 0xff)^byte1] ;
 }
 
-unsigned int get_crc(unsigned int* data, int length, unsigned int initial_value)
+unsigned int get_crc(const unsigned int* data, int length, unsigned int initial_value)
 {
   unsigned int result = initial_value ;
   //  printf("get_crc()\n");
@@ -168,7 +168,7 @@ int getEventNumber(const unsigned int* data)
   else return -1 ;
 }
 
-void printHeader(unsigned int* data)
+void printHeader(const unsigned int* data)
 {
   if (0 != data) {
     printf("Header  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
@@ -176,7 +176,7 @@ void printHeader(unsigned int* data)
   } else printf("No data\n")  ;
 }
 
-void printTrailer(unsigned int* data)
+void printTrailer(const unsigned int* data)
 {
   if (0 != data) {
     printf("Trailer  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
@@ -184,7 +184,7 @@ void printTrailer(unsigned int* data)
   } else printf("No data\n")  ;
 }
 
-void printData(unsigned int* data)
+void printData(const unsigned int* data)
 {
   if (0 != data) {
     printf("Data  : %8X%8X%8X%8X%8X%8X%8X%8X\n", data[7], data[6], data[5], data[4],
@@ -200,7 +200,7 @@ void writeToFile(std::ofstream& the_file, const unsigned int* data, int size)
   }
 }
 
-void printLine(unsigned int* data, int pos)
+void printLine(const unsigned int* data, int pos)
 {
   pos = pos - (pos % 8);
   printf("pos %.8x : ", pos);
@@ -211,7 +211,7 @@ void printLine(unsigned int* data, int pos)
   fflush(stdout);
 }
 
-void printEventData(unsigned int* data)
+void printEventData(const unsigned int* data)
 {
   int eventSize = ((data[ 0 ] & 0xFFFF)) - 1 ;     // minus header
   printf(" eve   0 : ");
@@ -222,7 +222,7 @@ void printEventData(unsigned int* data)
   fflush(stdout);
 }
 
-void printEventData(unsigned int* data, int size)
+void printEventData(const unsigned int* data, int size)
 {
   printf("%.8x : ", 0);
   if (0 != data) {
@@ -235,7 +235,7 @@ void printEventData(unsigned int* data, int size)
   fflush(stdout);
 }
 
-void printEventData(unsigned int* data, int size, int sender_id)
+void printEventData(const unsigned int* data, int size, int sender_id)
 {
   printf("thread %d : %.8x : ", sender_id, 0);
   if (0 != data) {
@@ -248,7 +248,7 @@ void printEventData(unsigned int* data, int size, int sender_id)
   fflush(stdout);
 }
 
-void printFullData(unsigned int* data)
+void printFullData(const unsigned int* data)
 {
   printf("Header  : %.8x %.8x %.8x %.8x %.8x %.8x %.8x %.8x\n",
          data[0], data[1], data[2], data[3],
@@ -357,6 +357,7 @@ void printEventNumberError(unsigned int*& data, const unsigned int evtnum, const
 }
 
 
+// cppcheck-suppress constParameterReference ; the reference lets the callee advance the pointer
 void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 {
   unsigned int event_length = data[ Belle2::RawHeader_latest::POS_NWORDS ];
@@ -530,6 +531,7 @@ void checkUtimeCtimeTRGType(unsigned int*& data, const int sender_id)
 }
 
 
+// cppcheck-suppress constParameterReference ; the reference lets the callee advance the pointer
 int checkDMAHeader(unsigned int*& data, unsigned int& size, double& dsize, int& total_pages, int& index_pages)
 {
   if (data == 0) {
@@ -814,7 +816,7 @@ void reduceHdrTrl(unsigned int* data, unsigned int& event_nwords)
 
 
 int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords, unsigned int& exprun,
-                   unsigned int& evtnum, unsigned int node_id, std::vector< int > valid_ch)
+                   unsigned int& evtnum, unsigned int node_id, const std::vector< int >& valid_ch)
 {
   int expected_number_of_links = valid_ch.size() ;
   int reduced_flag = 1; // 0 : not-reduced(error event) 1: reduced
@@ -1014,7 +1016,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
   unsigned int utime = data[ Belle2::RawHeader_latest::POS_TTUTIME ] ;
 
   unsigned int crc_init = 0xFFFF ;
-  unsigned int f_crc[ 4 ]  = { ctime, new_evtnum, utime, new_exprun } ;
+  const unsigned int f_crc[ 4 ]  = { ctime, new_evtnum, utime, new_exprun } ;
   unsigned int first_crc = 0;
 
   // find number of links
@@ -1321,7 +1323,7 @@ int checkEventData(int sender_id, unsigned int* data, unsigned int event_nwords,
     unsigned int crc_data = data[ cur_pos + linksize - 2 ] & 0xFFFF ;
     int size = linksize - non_crc_counts;
     unsigned int value = crc_data;
-    unsigned int* data_for_crc = data + cur_pos + CRC_START_POS;
+    const unsigned int* data_for_crc = data + cur_pos + CRC_START_POS;
 #ifdef CRC_CHECK
     if (get_crc(data_for_crc, size, first_crc) != value) {
       pthread_mutex_lock(&(mtx_sender_log));
@@ -1713,7 +1715,7 @@ int fillDataContents(int* buf, int nwords_per_fee, unsigned int node_id, int ncp
   return offset;
 }
 
-void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch,
+void split_Ecltrg(int sender_id, unsigned int* data, const std::vector< int >& valid_ch,
                   unsigned int* data_main, unsigned int* data_splitted,
                   int& event_nwords_main, int& event_nwords_splitted,
                   unsigned int splitted_node_id, const std::vector< int >& splitted_ch)

@@ -182,8 +182,8 @@ void ConfigFile::write(const std::string& path)
      << "" << std::endl;
   for (std::vector<std::string>::iterator it = m_label_v.begin();
        it != m_label_v.end(); ++it) {
-    std::string& label(*it);
-    std::string& value(m_value_m[label]);
+    const std::string& label(*it);
+    const std::string& value(m_value_m[label]);
     ss << label << " : " << value << std::endl;
   }
   ss << "" << std::endl
@@ -202,8 +202,8 @@ void ConfigFile::print()
             << "" << std::endl;
   for (std::vector<std::string>::iterator it = m_label_v.begin();
        it != m_label_v.end(); ++it) {
-    std::string& label(*it);
-    std::string& value(m_value_m[label]);
+    const std::string& label(*it);
+    const std::string& value(m_value_m[label]);
     std::cout << label << " : " << value << std::endl;
   }
   std::cout << "" << std::endl

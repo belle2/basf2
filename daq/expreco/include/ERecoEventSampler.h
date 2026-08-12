@@ -24,7 +24,7 @@
 namespace Belle2 {
   class ERecoEventSampler : public RFServerBase {
   public:
-    explicit ERecoEventSampler(std::string conffile);
+    explicit ERecoEventSampler(const std::string& conffile);
     ~ERecoEventSampler();
     /** Copy constructor (disabled). */
     ERecoEventSampler(const ERecoEventSampler&) = delete;

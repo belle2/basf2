@@ -32,7 +32,7 @@ int main(int argc, char** argv)
   int nnodes [[maybe_unused]] = 0;
   int maxnodes = conf->getconfi("processor", "nnodes");
   int idbase = conf->getconfi("processor", "idbase");
-  char* hostbase = conf->getconf("processor", "ctlhostbase");
+  const char* hostbase = conf->getconf("processor", "ctlhostbase");
   char* badlist = conf->getconf("processor", "badlist");
 
   vector<string> nodelist;

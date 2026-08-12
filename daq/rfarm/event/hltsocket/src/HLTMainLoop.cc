@@ -44,7 +44,7 @@ void HLTMainLoop::initSignalHandler()
   sigaction(SIGTERM, &action, NULL);
 }
 
-int HLTMainLoop::writeToRingBufferWaiting(RingBuffer* ringBuffer, int* buffer, unsigned int size)
+int HLTMainLoop::writeToRingBufferWaiting(RingBuffer* ringBuffer, const int* buffer, unsigned int size)
 {
   int irb = 0;
   while (isRunning()) {

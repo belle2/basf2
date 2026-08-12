@@ -24,7 +24,7 @@ namespace Belle2 {
 
   class ERecoDistributor : public RFServerBase {
   public:
-    explicit ERecoDistributor(std::string conffile);
+    explicit ERecoDistributor(const std::string& conffile);
     ~ERecoDistributor();
     /** Copy constructor (disabled). */
     ERecoDistributor(const ERecoDistributor&) = delete;

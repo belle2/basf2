@@ -135,7 +135,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int npar, int* pars)
+                       int npar, const int* pars)
 {
   init();
   m_nodename = node.getName();
@@ -146,7 +146,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int npar, int* pars,
+                       int npar, const int* pars,
                        const std::string& data)
 {
   init();
@@ -255,7 +255,7 @@ NSMMessage::NSMMessage(const DAQLogMessage& log)
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,
-                       int npar, int* pars)
+                       int npar, const int* pars)
 {
   init();
   m_reqname = cmd.getLabel();

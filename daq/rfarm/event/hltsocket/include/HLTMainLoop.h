@@ -16,7 +16,7 @@ namespace Belle2 {
     HLTMainLoop();
 
     static bool isRunning();
-    static int writeToRingBufferWaiting(RingBuffer* ringBuffer, int* buffer, unsigned int size);
+    static int writeToRingBufferWaiting(Belle2::RingBuffer* ringBuffer, const int* buffer, unsigned int size);
     static int readFromRingBufferWaiting(RingBuffer* ringBuffer, int* buffer);
 
   private:

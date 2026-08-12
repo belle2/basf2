@@ -17,7 +17,7 @@ using namespace std;
 
 EvtSocketManager::EvtSocketManager(EvtSocketRecv* evtsock)
 {
-  SocketRecv* sock = evtsock->sock();
+  const SocketRecv* sock = evtsock->sock();
 
   FD_ZERO(&m_allset);
   FD_SET(sock->sock(), &m_allset);

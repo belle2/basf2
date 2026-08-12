@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class EventSampler {
   public:
-    EventSampler(std::vector<std::string> nodes, int port, std::string rbufname, int interval = 5000);
+    EventSampler(const std::vector<std::string >& nodes, int port, const std::string& rbufname, int interval = 5000);
     ~EventSampler();
     /** Copy constructor (disabled). */
     EventSampler(const EventSampler&) = delete;

@@ -43,7 +43,7 @@ void do_reset(void *start)
 }
 
 void
-do_display_word(char * title, unsigned long offset, unsigned long value, int may_be_eof)
+do_display_word(const char * title, unsigned long offset, unsigned long value, int may_be_eof)
 {
     if (ninterest == 0) {
         if (may_be_eof) {
@@ -62,7 +62,7 @@ do_display_word(char * title, unsigned long offset, unsigned long value, int may
     }
 }
 
-int do_read_fifo(char *title, unsigned char *fifop)
+int do_read_fifo(const char *title, unsigned char *fifop)
 {
     int ret = 0;
     int ndup = 0;
@@ -114,7 +114,7 @@ void enable_single_read(unsigned char *start)
     *(unsigned long *) (start + COPPER_FF_RW) = 1;
 }
 
-void do_scan(void *start)
+void do_scan(const void *start)
 {
     const unsigned long *lp = start;
     int i;

@@ -213,7 +213,7 @@ void DesSer::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl, RawDataBlo
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i, rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
+      const char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -452,7 +452,7 @@ void DesSer::Accept(bool close_listen)
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
+      const char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
       print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
@@ -494,7 +494,7 @@ void DesSer::recordTime(int event, double* array)
 }
 
 
-unsigned int DesSer::calcXORChecksum(int* buf, int nwords)
+unsigned int DesSer::calcXORChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -504,7 +504,7 @@ unsigned int DesSer::calcXORChecksum(int* buf, int nwords)
 }
 
 
-void DesSer::printData(int* buf, int nwords)
+void DesSer::printData(const int* buf, int nwords)
 {
   printf("[DEBUG]");
   for (int i = 0; i < nwords; i++) {

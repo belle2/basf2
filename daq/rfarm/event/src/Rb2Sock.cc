@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-Rb2Sock::Rb2Sock(string rbuf, string dest, int port)
+Rb2Sock::Rb2Sock(const string& rbuf, string dest, int port)
 {
   //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(rbuf.c_str());

@@ -21,7 +21,7 @@ namespace Belle2 {
 
   class REvtSocketRecv {
   public:
-    REvtSocketRecv(std::string hostname, int port);
+    REvtSocketRecv(const std::string& hostname, int port);
     ~REvtSocketRecv();
     /** Copy constructor (disabled). */
     REvtSocketRecv(const REvtSocketRecv&) = delete;

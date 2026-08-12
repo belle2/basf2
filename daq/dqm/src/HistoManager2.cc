@@ -17,7 +17,7 @@ using namespace std;
 
 // Constructor / Destructor
 
-HistoManager2::HistoManager2(std::string name) : m_name(name)
+HistoManager2::HistoManager2(const std::string& name) : m_name(name)
 {
   clear();
   merge();

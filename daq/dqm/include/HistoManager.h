@@ -30,7 +30,7 @@ namespace Belle2 {
 
     bool merge(void);
     void clear(void);
-    void filedump(std::string outfile);
+    void filedump(const std::string& outfile);
 
   private:
     // List to handle histograms sent from different nodes

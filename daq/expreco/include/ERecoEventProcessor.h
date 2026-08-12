@@ -26,7 +26,7 @@ namespace Belle2 {
 
   class ERecoEventProcessor : public RFServerBase {
   public:
-    explicit ERecoEventProcessor(std::string conffile);
+    explicit ERecoEventProcessor(const std::string& conffile);
     ~ERecoEventProcessor();
     /** Copy constructor (disabled). */
     ERecoEventProcessor(const ERecoEventProcessor&) = delete;

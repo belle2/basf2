@@ -12,7 +12,7 @@ using namespace Belle2;
 
 // REvtSocketRecv
 
-REvtSocketRecv::REvtSocketRecv(std::string host, int port)
+REvtSocketRecv::REvtSocketRecv(const std::string& host, int port)
 {
   m_sock = new RSocketRecv(host.c_str(), (u_short)port);
   m_recbuf = new char[MAXEVTSIZE];

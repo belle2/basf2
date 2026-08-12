@@ -43,7 +43,7 @@ namespace {
       objectName += obj->GetName();
 
       if (objectClass->InheritsFrom(TH1::Class())) {
-        auto* h1 = dynamic_cast<TH1*>(obj);
+        const auto* h1 = dynamic_cast<TH1*>(obj);
         msg.add(h1, objectName);
       } else if (objectClass->InheritsFrom(TDirectory::Class())) {
         auto* tdir = dynamic_cast<TDirectory*>(obj);

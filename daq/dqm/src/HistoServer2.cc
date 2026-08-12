@@ -57,7 +57,7 @@ int HistoServer2::server()
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
-      vector<int>& recvsock = m_man->connected_socket_list();
+      const vector<int>& recvsock = m_man->connected_socket_list();
       for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;
@@ -67,7 +67,7 @@ int HistoServer2::server()
           getpeername(fd, reinterpret_cast<struct sockaddr*>(&isa), &isize);
           char address[INET_ADDRSTRLEN];
           strcpy(address, inet_ntoa(isa.sin_addr));
-          char* ptr = strrchr(address, '.');
+          const char* ptr = strrchr(address, '.');
           int nr = -1;
           if (ptr) {
             nr = atoi(ptr + 1);

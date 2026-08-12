@@ -24,7 +24,7 @@ namespace Belle2 {
 
   class RFOutputServer : public RFServerBase {
   public:
-    explicit RFOutputServer(std::string conffile);
+    explicit RFOutputServer(const std::string& conffile);
     ~RFOutputServer();
     /** Copy constructor (disabled). */
     RFOutputServer(const RFOutputServer&) = delete;

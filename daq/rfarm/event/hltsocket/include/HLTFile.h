@@ -24,8 +24,8 @@ namespace Belle2 {
     /** Operator = (disabled). */
     HLTFile& operator=(const HLTFile&) = delete;
 
-    int put_wordbuf(int* data, int len);
-    int put(char* data, int len);
+    int put_wordbuf(const int* data, int len);
+    int put(const char* data, int len);
     int get_wordbuf(int* data, int len);
     int get(char* data, int len);
 

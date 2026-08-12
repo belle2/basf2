@@ -170,7 +170,7 @@ bool RunInfoBuffer::reportNotReady()
   return true;
 }
 
-void RunInfoBuffer::copyEventHeader(int* buf)
+void RunInfoBuffer::copyEventHeader(const int* buf)
 {
   if (m_info == NULL) return;
   memcpy(&(m_info->header), buf, sizeof(event_header));

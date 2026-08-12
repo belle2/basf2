@@ -18,7 +18,7 @@ unsigned int buffer[1024 * 1024];
 int timeout;
 int terminated = 0;
 
-void show_event(unsigned int *head, int len)
+void show_event(const unsigned int *head, int len)
 {
     int i, j;
     for (i = 0; i + 1 < (len / 4); i += 8) {
@@ -33,7 +33,7 @@ void show_event(unsigned int *head, int len)
     printf("\n");
 }
 
-unsigned int xor(unsigned int *start, int wordlen)
+unsigned int xor(const unsigned int *start, int wordlen)
 {
     unsigned int ret = 0;
     while (wordlen--) {
@@ -143,7 +143,7 @@ int main(int argc, char ** argv)
 
 	{
 	    char *p = (char *) buffer;
-	    struct copper_header *header = (struct copper_header *) p;
+	    const struct copper_header *header = (struct copper_header *) p;
 	    const struct copper_footer *footer =
 		(struct copper_footer *) (p + ret -
 					  sizeof(struct copper_footer));

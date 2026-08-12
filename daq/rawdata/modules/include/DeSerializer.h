@@ -130,10 +130,10 @@ namespace Belle2 {
     int checkData(char* buf, int prev_eve, int* cur_eve);
 
     //! calculate checksum
-    static unsigned int calcSimpleChecksum(int* buf, int nwords);
+    static unsigned int calcSimpleChecksum(const int* buf, int nwords);
 
     //! calculate checksum
-    static unsigned int calcXORChecksum(int* buf, int nwords);
+    static unsigned int calcXORChecksum(const int* buf, int nwords);
 
     virtual void clearNumUsedBuf()
     {

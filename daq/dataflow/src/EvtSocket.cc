@@ -12,7 +12,7 @@ using namespace Belle2;
 
 // EvtSocketSend
 
-EvtSocketSend::EvtSocketSend(std::string host, int port)
+EvtSocketSend::EvtSocketSend(const std::string& host, int port)
 {
   m_sock = new SocketSend(host.c_str(), (u_short)port);
   m_recbuf = new char[MAXEVTSIZE];

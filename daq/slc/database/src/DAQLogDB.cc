@@ -110,7 +110,7 @@ DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablenam
     }
     DBRecordList record_v(db.loadRecords());
     for (size_t i = 0; i < record_v.size(); i++) {
-      DBRecord& record(record_v[i]);
+      const DBRecord& record(record_v[i]);
       logs.push_back(DAQLogMessage(record.get("n.name"),
                                    (LogFile::Priority)(record.getInt("priority")),
                                    record.get("l.message"), Date(record.getInt("date"))));
@@ -149,7 +149,7 @@ DAQLogMessageList DAQLogDB::getLogs(DBInterface& db, const std::string& tablenam
     db.execute(ss.str().c_str());
     DBRecordList record_v(db.loadRecords());
     for (size_t i = 0; i < record_v.size(); i++) {
-      DBRecord& record(record_v[i]);
+      const DBRecord& record(record_v[i]);
       logs.push_back(DAQLogMessage(record.get("name"),
                                    (LogFile::Priority)(record.getInt("priority")),
                                    record.get("message"), Date(record.getInt("date"))));

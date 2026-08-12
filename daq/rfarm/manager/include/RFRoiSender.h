@@ -18,7 +18,7 @@ namespace Belle2 {
 
   class RFRoiSender : public RFServerBase {
   public:
-    explicit RFRoiSender(std::string conffile);
+    explicit RFRoiSender(const std::string& conffile);
     ~RFRoiSender();
     /** Copy constructor (disabled). */
     RFRoiSender(const RFRoiSender&) = delete;

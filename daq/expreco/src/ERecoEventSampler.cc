@@ -21,7 +21,7 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoEventSampler::ERecoEventSampler(string conffile) : m_conffile(conffile)
+ERecoEventSampler::ERecoEventSampler(const string& conffile) : m_conffile(conffile)
 {
 
   // 0. Initialize configuration manager

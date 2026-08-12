@@ -17,7 +17,7 @@
 namespace Belle2 {
   class RFMaster : public RFServerBase {
   public:
-    explicit RFMaster(std::string conf);
+    explicit RFMaster(const std::string& conf);
     ~RFMaster();
     /** Copy constructor (disabled). */
     RFMaster(const RFMaster&) = delete;

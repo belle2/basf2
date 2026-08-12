@@ -44,7 +44,7 @@ xreopenlog()
   static char logprefix[1024];
   char logfile[2048];
   time_t now = time(0);
-  tm* cur = localtime(&now);
+  const tm* cur = localtime(&now);
   struct stat statbuf;
 
   if (! logprefix[0]) {

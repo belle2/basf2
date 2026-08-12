@@ -374,7 +374,7 @@ StringList DBObjectLoader::getDBlist(DBInterface& db,
     db.execute(ss.str());
     DBRecordList record_v(db.loadRecords());
     for (size_t i = 0; i < record_v.size(); i++) {
-      DBRecord& record(record_v[i]);
+      const DBRecord& record(record_v[i]);
       str.push_back(record.get("name") + "," + record.get("content") + "," +
                     record.get("id") + "," + record.get("tdate") + "," + record.get("utime"));
     }

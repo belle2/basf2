@@ -21,7 +21,7 @@ namespace Belle2 {
 
   class EvtSocketSend {
   public:
-    EvtSocketSend(std::string hostname, int port);
+    EvtSocketSend(const std::string& hostname, int port);
     ~EvtSocketSend();
     /** Copy constructor (disabled). */
     EvtSocketSend(const EvtSocketSend&) = delete;

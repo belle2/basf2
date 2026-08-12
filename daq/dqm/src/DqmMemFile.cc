@@ -187,7 +187,7 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   return 0;
 }
 
-bool DqmMemFile::SaveToFile(std::string outfile)
+bool DqmMemFile::SaveToFile(const std::string& outfile)
 {
   // we do not work on shared memory, thus can directly write w/o locking
 //   m_memfile->Write(0, TObject::kOverwrite);

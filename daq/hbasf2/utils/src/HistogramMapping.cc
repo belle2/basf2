@@ -45,7 +45,7 @@ HistogramMapping::HistogramMapping(std::unique_ptr<Belle2::EvtMessage> msg)
 
 void HistogramMapping::operator+=(const HistogramMapping& rhs)
 {
-  for (auto& keyValue : rhs.m_histograms) {
+  for (const auto& keyValue : rhs.m_histograms) {
     const auto& key = keyValue.first;
     const auto& histogram = keyValue.second;
 

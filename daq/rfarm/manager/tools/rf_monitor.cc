@@ -26,7 +26,7 @@ int main()
   char* conffile = getenv("RFARM_CONFFILE");
   RFConf conf(conffile);
 
-  char* format = conf.getconf("system", "nsmdata");
+  const char* format = conf.getconf("system", "nsmdata");
 
   // 1. Initialize NSM
   if (!b2nsm_init(MONITOR_NODE)) {
@@ -37,7 +37,7 @@ int main()
   printf("----- Control Nodes\n");
 
   // 1. Dump distributor node
-  char* node = conf.getconf("distributor", "nodename");
+  const char* node = conf.getconf("distributor", "nodename");
   const RfNodeInfo* nshm = static_cast<struct RfNodeInfo*>(b2nsm_openmem(node, format, 1));
   printf(" RFIN    : %8d %4d %5.2f %5.2f           ; %6.2f; %5.2f\n",
          nshm->nevent_in, nshm->nqueue_in, nshm->avesize_in,
@@ -54,7 +54,7 @@ int main()
   // 3. Dump processing nodes
   int maxnodes = conf.getconfi("processor", "nnodes");
   int idbase = conf.getconfi("processor", "idbase");
-  char* hostbase = conf.getconf("processor", "nodebase");
+  const char* hostbase = conf.getconf("processor", "nodebase");
   char* badlist = conf.getconf("processor", "badlist");
 
   char hostnode[512], idname[3];

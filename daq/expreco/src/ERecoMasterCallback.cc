@@ -102,7 +102,7 @@ void ERecoMasterCallback::setState(NSMNode& node, const RCState& state)
   int i = 0;
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); ++it) {
-    NSMNode& rnode(*it);
+    const NSMNode& rnode(*it);
     if (StringUtil::toupper(rnode.getName()) == StringUtil::toupper(node.getName())) {
       std::string vname = StringUtil::form("node[%d].rcstate", i);
       set(vname, state.getLabel());

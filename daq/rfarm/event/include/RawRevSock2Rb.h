@@ -19,7 +19,7 @@
 class RawRevSock2Rb {
 public:
   /*! Constuctor and Destructor */
-  RawRevSock2Rb(std::string rbuf, std::string src, int port, std::string shmname, int id);
+  RawRevSock2Rb(const std::string& rbuf, const std::string& src, int port, std::string shmname, int id);
   ~RawRevSock2Rb(void);
   /** Copy constructor (disabled). */
   RawRevSock2Rb(const RawRevSock2Rb&) = delete;

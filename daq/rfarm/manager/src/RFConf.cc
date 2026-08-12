@@ -72,6 +72,7 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
 
       /* sorry for this very tricky code... */
       const char* keyp = nullptr;
+      // cppcheck-suppress constVariablePointer ; the delimiter is overwritten below
       char* delp = nullptr;
       const char* valp = nullptr;
       for (p = buf; *p && *p != '#'; p++) {

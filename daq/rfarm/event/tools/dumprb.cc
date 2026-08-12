@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     printf("%s: rbufname \n", argv[0]);
     exit(-1);
   }
-  RingBuffer* rbuf = new RingBuffer(argv[1]);
+  const RingBuffer* rbuf = new RingBuffer(argv[1]);
   rbuf->dumpInfo();
 }
 

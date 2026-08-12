@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace std;
 
-RFRoiSender::RFRoiSender(string conffile)
+RFRoiSender::RFRoiSender(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());

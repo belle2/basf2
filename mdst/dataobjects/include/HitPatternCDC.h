@@ -159,7 +159,7 @@ namespace Belle2 {
     static const std::map<unsigned short, std::pair<unsigned short, unsigned short>> s_superLayerIndices;
 
     /** Getter for underlying bit set. Just for testing. */
-    std::bitset<64> getBitSet() const { return m_pattern; }
+    const std::bitset<64>& getBitSet() const { return m_pattern; }
 
     /** Reset the complete hit pattern. Just for testing. */
     void resetPattern() { m_pattern.reset(); }

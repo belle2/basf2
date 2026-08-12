@@ -226,10 +226,10 @@ namespace Belle2 {
     static const unsigned int s_svdVshift = 10; /**< for internal shifting to the SVD bits. */
 
     /** Getter for underlying bitset.*/
-    std::bitset<32> getBitset() const { return m_pattern; }
+    const std::bitset<32>& getBitset() const { return m_pattern; }
 
     /** Getter for the proper layer masks. Makes index handling more easy. */
-    std::bitset<32> getLayerMask(const unsigned short layerId) const { return HitPatternVXD::s_LayerMasks[layerId - 1]; }
+    static std::bitset<32> getLayerMask(const unsigned short layerId) { return HitPatternVXD::s_LayerMasks[layerId - 1]; }
 
   };
 }

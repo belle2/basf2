@@ -58,8 +58,6 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-         * Called when entering a new run.
-    /**
      * Event processor.
      */
     virtual void event() override;

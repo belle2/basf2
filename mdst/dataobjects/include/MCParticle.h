@@ -549,7 +549,7 @@ namespace Belle2 {
     unsigned short int m_status = 0;      /**< status code */
 
     bool m_validVertex = false;         /**< indication whether vertex and time information is useful or just default */
-    static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
+    static constexpr double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
 
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 

@@ -22,8 +22,6 @@
 using namespace std;
 using namespace Belle2;
 
-const double MCParticle::c_epsilon = 10e-7;
-
 
 void MCParticle::setMassFromPDG()
 {

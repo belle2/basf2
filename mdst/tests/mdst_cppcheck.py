@@ -17,6 +17,6 @@ from b2test_utils import check_error_free
 
 if __name__ == "__main__":
 
-    ignoreme = r"^((?!framework\/).)*$"
+    ignoreme = r"^((?!mdst\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "mdst",
                      lambda x: re.findall(ignoreme, x) or x == "'")

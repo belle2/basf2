@@ -34,13 +34,13 @@ namespace Belle2 {
     G4Material* material = geometry::Materials::get(content.getString("material"));
 
     //Now loop over all positions
-    for (GearDir& position : content.getNodes("position")) {
+    for (const GearDir& position : content.getNodes("position")) {
       //get the radial and z position
       const double r = position.getLength("radius");
       const double z = position.getLength("z");
       const double theta = position.getAngle("theta");
       //and loop over all phi positions
-      for (GearDir& sensor : position.getNodes("phi")) {
+      for (const GearDir& sensor : position.getNodes("phi")) {
         //we need angle and Id
         const double phi = sensor.getAngle();
         const int id = sensor.getInt("@id");

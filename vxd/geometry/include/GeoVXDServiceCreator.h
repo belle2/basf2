@@ -27,7 +27,7 @@ namespace Belle2 {
     class GeoVXDServiceCreator : public geometry::CreatorBase {
     private:
       //! Create a parameter object from the Gearbox XML parameters.
-      VXDServiceGeometryPar createConfiguration(const GearDir& param);
+      static VXDServiceGeometryPar createConfiguration(const GearDir& param);
 
       //! Create the geometry from a parameter object.
       void createGeometry(const VXDServiceGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
@@ -39,7 +39,7 @@ namespace Belle2 {
        * and call the geometry creation routine.*/
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {
-        VXDServiceGeometryPar config = createConfiguration(content);
+        static VXDServiceGeometryPar config = createConfiguration(content);
         createGeometry(config, topVolume, type);
       }
 

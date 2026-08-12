@@ -36,7 +36,7 @@ void CDCWireLayer::initialize()
   ILayer iCLayer = getICLayer();
 
   // values from CDCGeometryPar
-  CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
 
   const double* innerRadiusWireLayer = cdcgp.innerRadiusWireLayer();
   const double* outerRadiusWireLayer = cdcgp.outerRadiusWireLayer();

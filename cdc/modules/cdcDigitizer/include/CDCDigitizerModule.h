@@ -288,9 +288,9 @@ namespace Belle2 {
     /** Structure for saving the signal information. */
     struct SignalInfo {
       /** Constructor that initializes all members. */
-      SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0, float maxDriftL = 0, float minDriftL = 0,
-                 int simHitIndex2 = -1,
-                 float driftTime2 = std::numeric_limits<float>::max(), int simHitIndex3 = -1, float driftTime3 = std::numeric_limits<float>::max()) :
+      explicit SignalInfo(int simHitIndex = 0, float driftTime = 0, float charge = 0, float maxDriftL = 0, float minDriftL = 0,
+                          int simHitIndex2 = -1,
+                          float driftTime2 = std::numeric_limits<float>::max(), int simHitIndex3 = -1, float driftTime3 = std::numeric_limits<float>::max()) :
         m_simHitIndex(simHitIndex), m_driftTime(driftTime), m_charge(charge), m_maxDriftL(maxDriftL), m_minDriftL(minDriftL),
         m_simHitIndex2(simHitIndex2), m_driftTime2(driftTime2),
         m_simHitIndex3(simHitIndex3), m_driftTime3(driftTime3) {}

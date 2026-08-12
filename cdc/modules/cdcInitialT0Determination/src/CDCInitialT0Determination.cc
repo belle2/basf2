@@ -8,11 +8,11 @@
 #include "cdc/modules/cdcInitialT0Determination/CDCInitialT0Determination.h"
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/gearbox/Const.h>
-#include "TF1.h"
-#include "TDirectory.h"
-#include "TFile.h"
-#include "TGraphErrors.h"
-#include "TROOT.h"
+#include <TF1.h>
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TGraphErrors.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -59,7 +59,9 @@ void CDCInitialT0DeterminationModule::event()
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   for (const auto& hit : m_CDCHits) {
     WireID wireid(hit.getID());
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     unsigned short lay = wireid.getICLayer();
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     unsigned short w = wireid.getIWire();
     if (hit.getADCCount() > m_adcMin) {
       m_hTDC[lay][w]->Fill(hit.getTDCCount());

@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedx2DCellAlgorithm() {}
+    virtual ~CDCDedx2DCellAlgorithm() override {}
 
     /**
     *Set etna angle bins, Global in multiple of 8
@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
     * function to set rotation symmetry
     */
-    int GetRotationSymmericBin(int nbin, int ibin)
+    static int GetRotationSymmericBin(int nbin, int ibin)
     {
 
       if (nbin % 4 != 0)return -1;

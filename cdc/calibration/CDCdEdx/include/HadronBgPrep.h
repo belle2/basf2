@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
     * Constructor: set the input variables
     */
-    HadronBgPrep(int bgbins, double upperbg, double lowerbg, int cosbins, double uppercos, double lowercos, int injbins,
+    HadronBgPrep(int bgbins, double lowerbg, double upperbg, int cosbins, double lowercos, double uppercos, int injbins,
                  double lowerinj, double upperinj, int nhitbins, double lowernhit, double uppernhit, double cut);
 
     /**
@@ -70,28 +70,28 @@ namespace Belle2 {
     /**
     * function to plot the map of histograms
     */
-    void plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& suffix, int bins);
+    static void plotDist(std::map<int, std::vector<TH1F*>>& hist, const std::string& suffix, int bins);
 
     /**
     * function to plot the histograms
     */
-    void plotDist(std::vector<TH1F*>& hist, const std::string& suffix, int nbins);
+    static void plotDist(std::vector<TH1F*>& hist, const std::string& suffix, int nbins);
 
     /**
     * function to fill the parameters like mean and reso in the tree
     */
-    void setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
+    void setPars(TFile*& outfile, const std::string& pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
                  std::vector<TH1F*>& hionzsigma_bg, std::map<int, std::vector<TH1F*>>& hchi_inj);
 
     /**
     * function to perform gauss fit for input histogram
     */
-    void fitGaussianWRange(TH1F*& temphist, gstatus& status, double sigmaR);
+    static void fitGaussianWRange(TH1F*& temphist, gstatus& status, double sigmaR);
 
     /**
     * function to fit the histograms
     */
-    void fit(TH1F*& hist, const std::string& pdg, gstatus& status);
+    static void fit(TH1F*& hist, const std::string& pdg, gstatus& status);
 
     /**
     * function to draw the dedx vs costh histograms
@@ -103,7 +103,7 @@ namespace Belle2 {
     /**
     * function to set graph cosmetics
     */
-    void FormatGraph(TGraphErrors& gr, int flag, const std::string& name = "")
+    static void FormatGraph(TGraphErrors& gr, int flag, const std::string& name = "")
     {
       if (flag == 0) {
         gr.SetTitle(Form("%s;cos(#theta);#chi_{mean}", name.data()));
@@ -145,7 +145,7 @@ namespace Belle2 {
     /**
     * function to delete the histograms
     */
-    void deleteHistos(std::vector<TH1F*>& htemp)
+    static void deleteHistos(std::vector<TH1F*>& htemp)
     {
       for (auto& hist : htemp) hist->Delete();
     }
@@ -153,7 +153,7 @@ namespace Belle2 {
     /**
     * function to get the particle mass
     */
-    double getParticleMass(const std::string& particle)
+    static double getParticleMass(const std::string& particle)
     {
       double mass;
       if (particle == "pion") mass = Const::pion.getMass();

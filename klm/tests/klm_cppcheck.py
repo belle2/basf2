@@ -13,10 +13,10 @@ Perform code quality cppchecks for every commit to the klm package.
 """
 
 import re
-from b2test_utils import check_error_free, skip_test
+from b2test_utils import check_error_free
 
 if __name__ == "__main__":
-    skip_test("Test skipped due to the update of Cppcheck")
-    ignoreme = "nofile:0:0"
+
+    ignoreme = r"^((?!klm\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "klm",
                      lambda x: re.findall(ignoreme, x) or x == "'")

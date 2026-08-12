@@ -36,10 +36,10 @@ int main(int argc, char** argv)
   char* badlist = conf->getconf("processor", "badlist");
 
   vector<string> nodelist;
-  char hostname[512], idname[3], shmid[3];
+  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       sprintf(hostname, "%s%2.2d", hostbase, idbase + i);

@@ -115,10 +115,10 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
-  char idname[3], shmid[3];
+  char idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       int port = (idbase + i) + portbase;

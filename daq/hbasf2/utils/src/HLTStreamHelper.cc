@@ -283,7 +283,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
       }
 
       // Check the magic number of the Raw(ROB) header and trailer
-      if ((cprbuf[nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD)]
+      if ((cprbuf[nwds_buf - (static_cast<int>(RawTrailer_latest::RAWTRAILER_NWORDS)
+                              - static_cast<int>(RawTrailer_latest::POS_TERM_WORD))]
            != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER) ||
           ((cprbuf[RawHeader_latest::POS_VERSION_HDRNWORDS] & RawHeader_latest::MAGIC_MASK)
            != RawHeader_latest::MAGIC_WORD)) {

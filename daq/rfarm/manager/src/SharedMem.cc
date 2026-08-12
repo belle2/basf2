@@ -130,7 +130,7 @@ SharedMem::SharedMem(const char* name, int size)
 
 }
 
-SharedMem::SharedMem(int shm_id, int sem_id, int size)
+SharedMem::SharedMem(int shm_id, int sem_id, int)  // the size comes from the existing segment
 {
   m_shmid = shm_id;
   m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);

@@ -404,12 +404,13 @@ void DesSer::Accept(bool close_listen)
     sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", m_port_to);
     if ((fp = popen(cmdline, "r")) == NULL) {
       printf("[WARNING] Failed to run %s\n", cmdline);
-    }
-    while (fgets(buf, 256, fp) != NULL) {
-      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
+    } else {
+      while (fgets(buf, 256, fp) != NULL) {
+        printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", m_port_to, buf); fflush(stdout);
+      }
+      pclose(fp);
     }
     // Error message
-    fclose(fp);
     char temp_char[500];
     sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);

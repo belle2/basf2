@@ -346,7 +346,9 @@ int main(int argc, char** argv)
   int nconn = 0;
 
   while (1) {
-    //int nready = poll(client, maxi + 1, -1);
+    // poll() is what fills in revents below, so the accept loop cannot work
+    // without it
+    poll(client, maxi + 1, -1);
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);

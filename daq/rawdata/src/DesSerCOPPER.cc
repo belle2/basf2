@@ -371,7 +371,8 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
   //
   // Calcurate data size
   //
-  *m_size_word = m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH + (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
+  *m_size_word = m_bufary[ entry ][ static_cast<int>(m_pre_rawcpr.POS_DATA_LENGTH)
+                                    + static_cast<int>(m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
                  + m_pre_rawcpr.SIZE_COPPER_DRIVER_HEADER + m_pre_rawcpr.SIZE_COPPER_DRIVER_TRAILER
                  + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS +
                  m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.

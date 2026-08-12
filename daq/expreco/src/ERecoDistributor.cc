@@ -94,10 +94,10 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
 
-  char hostname[512], idname[3], shmid[3];
+  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       int port = (idbase + i) + portbase;
@@ -119,11 +119,11 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   char* port = m_conf->getconf("distributor", "receiver", "port");
   char* receiver = m_conf->getconf("distributor", "receiver", "script");
 
-  //  char hostname[512], idname[3], shmid[3];
+  //  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxrecv; i++) {
     sprintf(hostname, "%s%2.2d", rhostbase, ridbase + i);
-    sprintf(idname, "%2.2d", ridbase + i);
-    sprintf(shmid, "%2.2d", i + 20);
+    snprintf(idname, sizeof(idname), "%2.2d", ridbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i + 20);
     if (rbadlist == NULL  ||
         strstr(rbadlist, hostname) == 0) {
       printf("Running receiver for %s\n", hostname);

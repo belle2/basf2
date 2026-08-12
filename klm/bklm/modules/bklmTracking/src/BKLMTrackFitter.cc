@@ -153,7 +153,7 @@ double BKLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
 }
 
 //! Distance from track to a hit in the plane of the module
-double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
+double BKLMTrackFitter::distanceToHit(const KLMHit2d* hit,
                                       double& error,
                                       double& sigma)
 {
@@ -231,7 +231,7 @@ double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
 }
 
 //! Distance from track to a hit calculated in the global system
-double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
+double BKLMTrackFitter::globalDistanceToHit(const KLMHit2d* hit,
                                             double& error,
                                             double& sigma)
 {
@@ -367,7 +367,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(section, sector, 1);
 
   int n = 0;
-  for (KLMHit2d* hit : hitList) {
+  for (const KLMHit2d* hit : hitList) {
 
     if (hit->getSection() != section || hit->getSector() != sector) {
       continue;
@@ -478,7 +478,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
 }
 
 //! do fit in global system, handle tracks that go through multi-sectors
-double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
+double BKLMTrackFitter::fit1dTrack(const std::list< KLMHit2d* >& hitList,
                                    HepVector&  eta,
                                    HepSymMatrix&  error,
                                    int depDir,    int indDir)
@@ -511,7 +511,7 @@ double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
   const Belle2::bklm::Module* corMod;
 
   int n = 0;
-  for (KLMHit2d* hit : hitList) {
+  for (const KLMHit2d* hit : hitList) {
 
     // m_GeoPar = GeometryPar::instance();
     //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);

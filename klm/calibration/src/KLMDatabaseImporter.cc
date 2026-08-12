@@ -90,13 +90,13 @@ void KLMDatabaseImporter::importTimeWindow(KLMTimeWindow* timeWindow)
 }
 
 void KLMDatabaseImporter::loadStripEfficiency(
-  KLMStripEfficiency* stripEfficiency, std::string fileName)
+  KLMStripEfficiency* stripEfficiency, const std::string& fileName)
 {
   TFile* file = TFile::Open(fileName.c_str(), "r");
   if (!file) {
     B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** failed to open");
   } else {
-    TTree* tree = (TTree*)file->Get("tree");
+    TTree* tree = static_cast<TTree*>(file->Get("tree"));
     if (!tree) {
       B2ERROR("KLMDatabaseImporter: calibration file " << fileName << " *** no tree named 'tree' found");
       file->Close();

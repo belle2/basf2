@@ -66,7 +66,7 @@ void BKLMDigitAnalyzerModule::beginRun()
 {
   time_t rawTime;
   time(&rawTime);
-  struct tm* tm = gmtime(&rawTime);
+  const struct tm* tm = gmtime(&rawTime);
 
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
   m_runNumber = eventMetaData->getRun();
@@ -190,7 +190,7 @@ void BKLMDigitAnalyzerModule::event()
       if (digit.getSubdetector() != KLMElementNumbers::c_BKLM)
         continue;
 
-      KLMDigitRaw* digitRaw = digit.getRelatedTo<KLMDigitRaw>();
+      const KLMDigitRaw* digitRaw = digit.getRelatedTo<KLMDigitRaw>();
 
       m_histoLayerVsSector[1 - digit.getSection()]->Fill(digit.getLayer() - 1, digit.getSector() - 1);
 
@@ -230,10 +230,6 @@ void BKLMDigitAnalyzerModule::endRun()
       obj->Write("", TObject::kWriteDelete);
     m_outputRootFile->Close();
   }
-}
-
-void BKLMDigitAnalyzerModule::terminate()
-{
 }
 
 TH1F* BKLMDigitAnalyzerModule::createTH1(const char* name, const char* title, Int_t nbinsX, Double_t minX, Double_t maxX,

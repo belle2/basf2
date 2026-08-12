@@ -113,14 +113,14 @@ TStyle* Belle2Style()
 
 void SetBelle2Style()
 {
-  static TStyle* belle2Style = 0;
+  const static TStyle* belle2Style = 0;
   std::cout << "\nApplying BELLE2 style settings...\n" << std::endl ;
   if (belle2Style == 0) belle2Style = Belle2Style();
   gROOT->SetStyle("BELLE2");
   gROOT->ForceStyle();
 }
 
-void makeprob(TChain* chain, FILE* output, char* xmllabel)
+void makeprob(TChain* chain, FILE* output, const char* xmllabel)
 {
 
   //Check first 2 char of the strings if equal (==0) or not
@@ -132,144 +132,144 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
   bool isDeut = (strncmp(xmllabel, "De", 2) == 0);
 
   char label[80], title[80];
-  char detectorName[3][40] = { "BarrelAndEndcap", "BarrelOnly", "EndcapOnly" };
+  const char detectorName[3][40] = { "BarrelAndEndcap", "BarrelOnly", "EndcapOnly" };
   //List of all the possible outcome and relative explanations
-  char outcomeName[NOUTCOME][40] = { "",
-                                     "Barrel stop",
-                                     "Fwd Endcap stop",
-                                     "Barrel exit",
-                                     "Fwd Endcap exit",
-                                     "Bwd Endcap stop",
-                                     "Bwd Endcap exit",
-                                     "Fwd Endcap stop B0+E",
-                                     "Fwd Endcap stop B1+E",
-                                     "Fwd Endcap stop B2+E",
-                                     "Fwd Endcap stop B3+E",
-                                     "Fwd Endcap stop B4+E",
-                                     "Fwd Endcap stop B5+E",
-                                     "Fwd Endcap stop B6+E",
-                                     "Fwd Endcap stop B7+E",
-                                     "Fwd Endcap stop B8+E",
-                                     "Fwd Endcap stop B9+E",
-                                     "Fwd Endcap stop B10+E",
-                                     "Fwd Endcap stop B11+E",
-                                     "Fwd Endcap stop B12+E",
-                                     "Fwd Endcap stop B13+E",
-                                     "Fwd Endcap stop B14+E",
-                                     "Bwd Endcap stop B0+E",
-                                     "Bwd Endcap stop B1+E",
-                                     "Bwd Endcap stop B2+E",
-                                     "Bwd Endcap stop B3+E",
-                                     "Bwd Endcap stop B4+E",
-                                     "Bwd Endcap stop B5+E",
-                                     "Bwd Endcap stop B6+E",
-                                     "Bwd Endcap stop B7+E",
-                                     "Bwd Endcap stop B8+E",
-                                     "Bwd Endcap stop B9+E",
-                                     "Bwd Endcap stop B10+E",
-                                     "Bwd Endcap stop B11+E",
-                                     "Bwd Endcap stop B12+E",
-                                     "Bwd Endcap stop B13+E",
-                                     "Bwd Endcap stop B14+E",
-                                     "Fwd Endcap exit B0+E",
-                                     "Fwd Endcap exit B1+E",
-                                     "Fwd Endcap exit B2+E",
-                                     "Fwd Endcap exit B3+E",
-                                     "Fwd Endcap exit B4+E",
-                                     "Fwd Endcap exit B5+E",
-                                     "Fwd Endcap exit B6+E",
-                                     "Fwd Endcap exit B7+E",
-                                     "Fwd Endcap exit B8+E",
-                                     "Fwd Endcap exit B9+E",
-                                     "Fwd Endcap exit B10+E",
-                                     "Fwd Endcap exit B11+E",
-                                     "Fwd Endcap exit B12+E",
-                                     "Fwd Endcap exit B13+E",
-                                     "Fwd Endcap exit B14+E",
-                                     "Bwd Endcap exit B0+E",
-                                     "Bwd Endcap exit B1+E",
-                                     "Bwd Endcap exit B2+E",
-                                     "Bwd Endcap exit B3+E",
-                                     "Bwd Endcap exit B4+E",
-                                     "Bwd Endcap exit B5+E",
-                                     "Bwd Endcap exit B6+E",
-                                     "Bwd Endcap exit B7+E",
-                                     "Bwd Endcap exit B8+E",
-                                     "Bwd Endcap exit B9+E",
-                                     "Bwd Endcap exit B10+E",
-                                     "Bwd Endcap exit B11+E",
-                                     "Bwd Endcap exit B12+E",
-                                     "Bwd Endcap exit B13+E",
-                                     "Bwd Endcap exit B14+E"
-                                   };
-  char outcomeComment[NOUTCOME][100] = { "",
-                                         "soft tracks that range out (stop) within the barrel KLM",                             // outcome=1
-                                         "soft tracks that range out (stop) within the forward endcap KLM (no barrel hits)",    // outcome=2
-                                         "hard tracks that escape from the barrel KLM",                                         // outcome=3
-                                         "hard tracks that escape from the forward endcap KLM (no barrel hits)",                // outcome=4
-                                         "soft tracks that range out (stop) within the backward endcap KLM (no barrel hits)",   // outcome=5
-                                         "hard tracks that escape from the backward endcap KLM (no barrel hits)",               // outcome=6
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B0 hit(s)",      // outcome=7
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B1 hit(s)",      // outcome=8
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B2 hit(s)",      // outcome=9
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B3 hit(s)",      // outcome=10
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B4 hit(s)",      // outcome=11
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B5 hit(s)",      // outcome=12
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B6 hit(s)",      // outcome=13
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B7 hit(s)",      // outcome=14
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B8 hit(s)",      // outcome=15
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B9 hit(s)",      // outcome=16
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B10 hit(s)",      // outcome=17
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B11 hit(s)",      // outcome=18
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B12 hit(s)",      // outcome=19
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B13 hit(s)",      // outcome=20
-                                         "soft tracks that range out (stop) within the forward endcap KLM with B14 hit(s)",      // outcome=21
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B0 hit(s)",      // outcome=22
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B1 hit(s)",      // outcome=23
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B2 hit(s)",      // outcome=24
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B3 hit(s)",      // outcome=25
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B4 hit(s)",      // outcome=26
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B5 hit(s)",      // outcome=27
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B6 hit(s)",      // outcome=28
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B7 hit(s)",      // outcome=29
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B8 hit(s)",      // outcome=30
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B9 hit(s)",      // outcome=31
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B10 hit(s)",      // outcome=32
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B11 hit(s)",      // outcome=33
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B12 hit(s)",      // outcome=34
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B13 hit(s)",      // outcome=35
-                                         "soft tracks that range out (stop) within the backward endcap KLM with B14 hit(s)",      // outcome=36
-                                         "hard tracks that escape from the forward endcap KLM with B0 hit(s)",      // outcome=37
-                                         "hard tracks that escape from the forward endcap KLM with B1 hit(s)",      // outcome=38
-                                         "hard tracks that escape from the forward endcap KLM with B2 hit(s)",      // outcome=39
-                                         "hard tracks that escape from the forward endcap KLM with B3 hit(s)",      // outcome=40
-                                         "hard tracks that escape from the forward endcap KLM with B4 hit(s)",      // outcome=41
-                                         "hard tracks that escape from the forward endcap KLM with B5 hit(s)",      // outcome=42
-                                         "hard tracks that escape from the forward endcap KLM with B6 hit(s)",      // outcome=43
-                                         "hard tracks that escape from the forward endcap KLM with B7 hit(s)",      // outcome=44
-                                         "hard tracks that escape from the forward endcap KLM with B8 hit(s)",      // outcome=45
-                                         "hard tracks that escape from the forward endcap KLM with B9 hit(s)",      // outcome=46
-                                         "hard tracks that escape from the forward endcap KLM with B10 hit(s)",      // outcome=47
-                                         "hard tracks that escape from the forward endcap KLM with B11 hit(s)",      // outcome=48
-                                         "hard tracks that escape from the forward endcap KLM with B12 hit(s)",      // outcome=49
-                                         "hard tracks that escape from the forward endcap KLM with B13 hit(s)",      // outcome=50
-                                         "hard tracks that escape from the forward endcap KLM with B14 hit(s)",      // outcome=51
-                                         "hard tracks that escape from the backward endcap KLM with B0 hit(s)",      // outcome=52
-                                         "hard tracks that escape from the backward endcap KLM with B1 hit(s)",      // outcome=53
-                                         "hard tracks that escape from the backward endcap KLM with B2 hit(s)",      // outcome=54
-                                         "hard tracks that escape from the backward endcap KLM with B3 hit(s)",      // outcome=55
-                                         "hard tracks that escape from the backward endcap KLM with B4 hit(s)",      // outcome=56
-                                         "hard tracks that escape from the backward endcap KLM with B5 hit(s)",      // outcome=57
-                                         "hard tracks that escape from the backward endcap KLM with B6 hit(s)",      // outcome=58
-                                         "hard tracks that escape from the backward endcap KLM with B7 hit(s)",      // outcome=59
-                                         "hard tracks that escape from the backward endcap KLM with B8 hit(s)",      // outcome=60
-                                         "hard tracks that escape from the backward endcap KLM with B9 hit(s)",      // outcome=61
-                                         "hard tracks that escape from the backward endcap KLM with B10 hit(s)",      // outcome=62
-                                         "hard tracks that escape from the backward endcap KLM with B11 hit(s)",      // outcome=63
-                                         "hard tracks that escape from the backward endcap KLM with B12 hit(s)",      // outcome=64
-                                         "hard tracks that escape from the backward endcap KLM with B13 hit(s)",      // outcome=65
-                                         "hard tracks that escape from the backward endcap KLM with B14 hit(s)"
-                                       };      // outcome=66
+  const char outcomeName[NOUTCOME][40] = { "",
+                                           "Barrel stop",
+                                           "Fwd Endcap stop",
+                                           "Barrel exit",
+                                           "Fwd Endcap exit",
+                                           "Bwd Endcap stop",
+                                           "Bwd Endcap exit",
+                                           "Fwd Endcap stop B0+E",
+                                           "Fwd Endcap stop B1+E",
+                                           "Fwd Endcap stop B2+E",
+                                           "Fwd Endcap stop B3+E",
+                                           "Fwd Endcap stop B4+E",
+                                           "Fwd Endcap stop B5+E",
+                                           "Fwd Endcap stop B6+E",
+                                           "Fwd Endcap stop B7+E",
+                                           "Fwd Endcap stop B8+E",
+                                           "Fwd Endcap stop B9+E",
+                                           "Fwd Endcap stop B10+E",
+                                           "Fwd Endcap stop B11+E",
+                                           "Fwd Endcap stop B12+E",
+                                           "Fwd Endcap stop B13+E",
+                                           "Fwd Endcap stop B14+E",
+                                           "Bwd Endcap stop B0+E",
+                                           "Bwd Endcap stop B1+E",
+                                           "Bwd Endcap stop B2+E",
+                                           "Bwd Endcap stop B3+E",
+                                           "Bwd Endcap stop B4+E",
+                                           "Bwd Endcap stop B5+E",
+                                           "Bwd Endcap stop B6+E",
+                                           "Bwd Endcap stop B7+E",
+                                           "Bwd Endcap stop B8+E",
+                                           "Bwd Endcap stop B9+E",
+                                           "Bwd Endcap stop B10+E",
+                                           "Bwd Endcap stop B11+E",
+                                           "Bwd Endcap stop B12+E",
+                                           "Bwd Endcap stop B13+E",
+                                           "Bwd Endcap stop B14+E",
+                                           "Fwd Endcap exit B0+E",
+                                           "Fwd Endcap exit B1+E",
+                                           "Fwd Endcap exit B2+E",
+                                           "Fwd Endcap exit B3+E",
+                                           "Fwd Endcap exit B4+E",
+                                           "Fwd Endcap exit B5+E",
+                                           "Fwd Endcap exit B6+E",
+                                           "Fwd Endcap exit B7+E",
+                                           "Fwd Endcap exit B8+E",
+                                           "Fwd Endcap exit B9+E",
+                                           "Fwd Endcap exit B10+E",
+                                           "Fwd Endcap exit B11+E",
+                                           "Fwd Endcap exit B12+E",
+                                           "Fwd Endcap exit B13+E",
+                                           "Fwd Endcap exit B14+E",
+                                           "Bwd Endcap exit B0+E",
+                                           "Bwd Endcap exit B1+E",
+                                           "Bwd Endcap exit B2+E",
+                                           "Bwd Endcap exit B3+E",
+                                           "Bwd Endcap exit B4+E",
+                                           "Bwd Endcap exit B5+E",
+                                           "Bwd Endcap exit B6+E",
+                                           "Bwd Endcap exit B7+E",
+                                           "Bwd Endcap exit B8+E",
+                                           "Bwd Endcap exit B9+E",
+                                           "Bwd Endcap exit B10+E",
+                                           "Bwd Endcap exit B11+E",
+                                           "Bwd Endcap exit B12+E",
+                                           "Bwd Endcap exit B13+E",
+                                           "Bwd Endcap exit B14+E"
+                                         };
+  const char outcomeComment[NOUTCOME][100] = { "",
+                                               "soft tracks that range out (stop) within the barrel KLM",                             // outcome=1
+                                               "soft tracks that range out (stop) within the forward endcap KLM (no barrel hits)",    // outcome=2
+                                               "hard tracks that escape from the barrel KLM",                                         // outcome=3
+                                               "hard tracks that escape from the forward endcap KLM (no barrel hits)",                // outcome=4
+                                               "soft tracks that range out (stop) within the backward endcap KLM (no barrel hits)",   // outcome=5
+                                               "hard tracks that escape from the backward endcap KLM (no barrel hits)",               // outcome=6
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B0 hit(s)",      // outcome=7
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B1 hit(s)",      // outcome=8
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B2 hit(s)",      // outcome=9
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B3 hit(s)",      // outcome=10
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B4 hit(s)",      // outcome=11
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B5 hit(s)",      // outcome=12
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B6 hit(s)",      // outcome=13
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B7 hit(s)",      // outcome=14
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B8 hit(s)",      // outcome=15
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B9 hit(s)",      // outcome=16
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B10 hit(s)",      // outcome=17
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B11 hit(s)",      // outcome=18
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B12 hit(s)",      // outcome=19
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B13 hit(s)",      // outcome=20
+                                               "soft tracks that range out (stop) within the forward endcap KLM with B14 hit(s)",      // outcome=21
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B0 hit(s)",      // outcome=22
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B1 hit(s)",      // outcome=23
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B2 hit(s)",      // outcome=24
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B3 hit(s)",      // outcome=25
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B4 hit(s)",      // outcome=26
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B5 hit(s)",      // outcome=27
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B6 hit(s)",      // outcome=28
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B7 hit(s)",      // outcome=29
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B8 hit(s)",      // outcome=30
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B9 hit(s)",      // outcome=31
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B10 hit(s)",      // outcome=32
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B11 hit(s)",      // outcome=33
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B12 hit(s)",      // outcome=34
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B13 hit(s)",      // outcome=35
+                                               "soft tracks that range out (stop) within the backward endcap KLM with B14 hit(s)",      // outcome=36
+                                               "hard tracks that escape from the forward endcap KLM with B0 hit(s)",      // outcome=37
+                                               "hard tracks that escape from the forward endcap KLM with B1 hit(s)",      // outcome=38
+                                               "hard tracks that escape from the forward endcap KLM with B2 hit(s)",      // outcome=39
+                                               "hard tracks that escape from the forward endcap KLM with B3 hit(s)",      // outcome=40
+                                               "hard tracks that escape from the forward endcap KLM with B4 hit(s)",      // outcome=41
+                                               "hard tracks that escape from the forward endcap KLM with B5 hit(s)",      // outcome=42
+                                               "hard tracks that escape from the forward endcap KLM with B6 hit(s)",      // outcome=43
+                                               "hard tracks that escape from the forward endcap KLM with B7 hit(s)",      // outcome=44
+                                               "hard tracks that escape from the forward endcap KLM with B8 hit(s)",      // outcome=45
+                                               "hard tracks that escape from the forward endcap KLM with B9 hit(s)",      // outcome=46
+                                               "hard tracks that escape from the forward endcap KLM with B10 hit(s)",      // outcome=47
+                                               "hard tracks that escape from the forward endcap KLM with B11 hit(s)",      // outcome=48
+                                               "hard tracks that escape from the forward endcap KLM with B12 hit(s)",      // outcome=49
+                                               "hard tracks that escape from the forward endcap KLM with B13 hit(s)",      // outcome=50
+                                               "hard tracks that escape from the forward endcap KLM with B14 hit(s)",      // outcome=51
+                                               "hard tracks that escape from the backward endcap KLM with B0 hit(s)",      // outcome=52
+                                               "hard tracks that escape from the backward endcap KLM with B1 hit(s)",      // outcome=53
+                                               "hard tracks that escape from the backward endcap KLM with B2 hit(s)",      // outcome=54
+                                               "hard tracks that escape from the backward endcap KLM with B3 hit(s)",      // outcome=55
+                                               "hard tracks that escape from the backward endcap KLM with B4 hit(s)",      // outcome=56
+                                               "hard tracks that escape from the backward endcap KLM with B5 hit(s)",      // outcome=57
+                                               "hard tracks that escape from the backward endcap KLM with B6 hit(s)",      // outcome=58
+                                               "hard tracks that escape from the backward endcap KLM with B7 hit(s)",      // outcome=59
+                                               "hard tracks that escape from the backward endcap KLM with B8 hit(s)",      // outcome=60
+                                               "hard tracks that escape from the backward endcap KLM with B9 hit(s)",      // outcome=61
+                                               "hard tracks that escape from the backward endcap KLM with B10 hit(s)",      // outcome=62
+                                               "hard tracks that escape from the backward endcap KLM with B11 hit(s)",      // outcome=63
+                                               "hard tracks that escape from the backward endcap KLM with B12 hit(s)",      // outcome=64
+                                               "hard tracks that escape from the backward endcap KLM with B13 hit(s)",      // outcome=65
+                                               "hard tracks that escape from the backward endcap KLM with B14 hit(s)"
+                                             };      // outcome=66
   sprintf(label, "Muon ID PDFs for %s", xmllabel);
 
   //Histograms definition
@@ -320,10 +320,10 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
   TObjArray* fileElements = chain->GetListOfFiles();
   TIter next(fileElements);
   TChainElement* chEl = 0;
-  while ((chEl = (TChainElement*)next())) {
+  while ((chEl = static_cast<TChainElement*>(next()))) {
     //printf("Processing file %s ...\n", chEl->GetTitle());
     TFile file(chEl->GetTitle());
-    TTree* tree = (TTree*)file.Get("tree");
+    TTree* tree = static_cast<TTree*>(file.Get("tree"));
     tree->SetBranchStatus("*", 0);
     tree->SetBranchStatus("MCParticles*", 1);
     tree->SetBranchStatus("KLMMuidLikelihoods*", 1);
@@ -338,7 +338,7 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
     for (int event = 0; event < tree->GetEntriesFast(); ++event) {
       tree->GetEntry(event);
       if (mcParticles->GetEntriesFast() == 0) continue;
-      Belle2::MCParticle* mcp = (Belle2::MCParticle*)((*mcParticles)[0]);
+      Belle2::MCParticle* mcp = static_cast<Belle2::MCParticle*>((*mcParticles)[0]);
       Particle* particle = new Particle(mcp);
       // look for muon decay-in-flight or hard radiation/delta production by examining daughters
       if (isMuon) {
@@ -347,7 +347,7 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
           int firstDaughter = mcp->getFirstDaughter();
           int lastDaughter = mcp->getLastDaughter();
           for (int d = firstDaughter - 1; d < lastDaughter; ++d) {
-            Belle2::MCParticle* daughter = (Belle2::MCParticle*)((*mcParticles)[d]);
+            const Belle2::MCParticle* daughter = static_cast<Belle2::MCParticle*>((*mcParticles)[d]);
             int dPDG = abs(daughter->getPDG());
             if ((dPDG != 11) && (dPDG != 12) && (dPDG != 14) && (dPDG != 22)) continue; // electron or neutrino or gamma?
             //temp.SetVectM(daughter->getMomentum()*1000.0, (dPDG == 11 ? Const::electron.getMass() : 0.0));
@@ -376,7 +376,7 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
       double mcPhi = mcp->getMomentum().Phi() * 180.0 / TMath::Pi(); // degrees
       if ((mcTheta > 110.0) && (mcTheta < 125.0) && (mcPhi > 60.0) && (mcPhi < 120.0)) continue; // avoid chimney
       for (int m = 0; m < muids->GetEntriesFast(); ++m) {
-        Belle2::KLMMuidLikelihood* muid = (Belle2::KLMMuidLikelihood*)((*muids)[m]);
+        const Belle2::KLMMuidLikelihood* muid = (Belle2::KLMMuidLikelihood*)((*muids)[m]);
         //        if (fabs(mcMomentumZ - muid->getMomentum().Z())    > 60.0) continue;
         //        if (fabs(mcMomentumR - muid->getMomentum().Perp()) > 60.0) continue;
         int outcome = muid->getOutcome();
@@ -534,6 +534,8 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
   }
   for (int outcome = MuidElementNumbers::c_CrossBarrelStopInForwardMin; outcome < NOUTCOME; ++outcome) {
     for (int layer = 0; layer < MuidElementNumbers::getMaximalBarrelLayer() + 1; ++layer) {
+      // the first condition is implied by the loop bound but kept for symmetry with the checks below
+      // cppcheck-suppress knownConditionTrueFalse
       if ((outcome >= MuidElementNumbers::c_CrossBarrelStopInForwardMin)
           && (outcome <= MuidElementNumbers::c_CrossBarrelStopInForwardMax)
           && (layer > MuidElementNumbers::getMaximalEndcapForwardLayer() - 1)) continue; // like outcome == 2
@@ -558,7 +560,11 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
       for (int bin = 1; bin <= blayer + 1; ++bin) {
         wSum += layerHitW[layer][outcome]->GetBinContent(bin);
         vSum += layerHitV[layer][outcome]->GetBinContent(bin);
+        // blayer is reduced to [0, getMaximalBarrelLayer()] by the assignments above,
+        // but cppcheck evaluates the intermediate 'outcome - 7' value
+        // cppcheck-suppress arrayIndexOutOfBoundsCond
         wSumRef += layerHitW[blayer][3]->GetBinContent(bin);
+        // cppcheck-suppress arrayIndexOutOfBoundsCond
         vSumRef += layerHitV[blayer][3]->GetBinContent(bin);
       }
       if (wSum == 0.0) {
@@ -653,6 +659,8 @@ void makeprob(TChain* chain, FILE* output, char* xmllabel)
       int lastBin = layer + 1;
       if ((outcome != MuidElementNumbers::c_StopInBarrel)
           && (outcome != MuidElementNumbers::c_ExitBarrel)) lastBin += MuidElementNumbers::getMaximalBarrelLayer() + 1;
+      // the enclosing loop bound is 'outcome < NOUTCOME', so outcome stays in range
+      // cppcheck-suppress arrayIndexOutOfBoundsCond
       if (layerHitV[layer][outcome]->GetEntries() > 0.0) {
         if (outcome >= MuidElementNumbers::c_CrossBarrelStopInForwardMin) layerHitU[layer][outcome]->Divide(layerHitV[layer][outcome]);
         layerHitW[layer][outcome]->Divide(layerHitV[layer][outcome]);
@@ -906,6 +914,11 @@ int main(int argc, char** argv)
   chain = new TChain;
   chain->Add(argv[1]);
   output = std::fopen(argv[2], "a");
+  if (output == nullptr) {
+    std::printf("Cannot open output file %s\n", argv[2]);
+    delete chain;
+    return 1;
+  }
   makeprob(chain, output, argv[3]);
   std::fclose(output);
   delete chain;

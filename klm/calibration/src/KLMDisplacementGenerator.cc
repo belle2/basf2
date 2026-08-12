@@ -194,13 +194,13 @@ void KLMDisplacementGenerator::readDisplacementFromROOTFile(
   KLMAlignmentData* alignmentData;
   fillZeroDisplacements(alignment, segmentAlignment);
   f = new TFile(inputFile);
-  tEKLMModule = (TTree*)f->Get("eklm_module");
+  tEKLMModule = static_cast<TTree*>(f->Get("eklm_module"));
   tEKLMModule->SetBranchAddress("section", &iSection);
   tEKLMModule->SetBranchAddress("layer", &iLayer);
   tEKLMModule->SetBranchAddress("sector", &iSector);
   tEKLMModule->SetBranchAddress("param", &param);
   tEKLMModule->SetBranchAddress("value", &value);
-  tEKLMSegment = (TTree*)f->Get("eklm_segment");
+  tEKLMSegment = static_cast<TTree*>(f->Get("eklm_segment"));
   tEKLMSegment->SetBranchAddress("section", &iSection);
   tEKLMSegment->SetBranchAddress("layer", &iLayer);
   tEKLMSegment->SetBranchAddress("sector", &iSector);
@@ -361,12 +361,12 @@ void KLMDisplacementGenerator::studyAlignmentLimits(const char* outputFile)
 }
 
 void KLMDisplacementGenerator::saveDisplacement(
-  EKLMAlignment* alignment, EKLMSegmentAlignment* segmentAlignment,
+  const EKLMAlignment* alignment, const EKLMSegmentAlignment* segmentAlignment,
   const char* outputFile)
 {
   int iSection, iLayer, iSector, iPlane, iSegment, segment, param;
   float value;
-  KLMAlignmentData* alignmentData;
+  const KLMAlignmentData* alignmentData;
   TFile* f;
   TTree* tEKLMModule, *tEKLMSegment;
   f = new TFile(outputFile, "recreate");

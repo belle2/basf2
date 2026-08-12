@@ -143,7 +143,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMTimeAlgorithm();
+    ~KLMTimeAlgorithm() override;
 
     /**
      * Turn on debug mode (prints histograms and output running log).
@@ -846,76 +846,76 @@ namespace Belle2 {
     TH1F* hc_eventT0_scint_end = nullptr;
 
     /** Number of RPC hits per mu+ track. */
-    TH1F* h_nHits_plus_rpc;
+    TH1F* h_nHits_plus_rpc = nullptr;
 
     /** Number of RPC hits per mu- track. */
-    TH1F* h_nHits_minus_rpc;
+    TH1F* h_nHits_minus_rpc = nullptr;
 
     /** Number of BKLM scintillator hits per mu+ track. */
-    TH1F* h_nHits_plus_scint;
+    TH1F* h_nHits_plus_scint = nullptr;
 
     /** Number of BKLM scintillator hits per mu- track. */
-    TH1F* h_nHits_minus_scint;
+    TH1F* h_nHits_minus_scint = nullptr;
 
     /** Number of EKLM scintillator hits per mu+ track. */
-    TH1F* h_nHits_plus_scint_end;
+    TH1F* h_nHits_plus_scint_end = nullptr;
 
     /** Number of EKLM scintillator hits per mu- track. */
-    TH1F* h_nHits_minus_scint_end;
+    TH1F* h_nHits_minus_scint_end = nullptr;
 
     /** DeltaT0 vs inverse hit count for RPC. */
-    TH2F* h2_deltaT0_vs_v_rpc;
+    TH2F* h2_deltaT0_vs_v_rpc = nullptr;
 
     /** DeltaT0 vs inverse hit count for BKLM scintillator. */
-    TH2F* h2_deltaT0_vs_v_scint;
+    TH2F* h2_deltaT0_vs_v_scint = nullptr;
 
     /** DeltaT0 vs inverse hit count for EKLM scintillator. */
-    TH2F* h2_deltaT0_vs_v_scint_end;
+    TH2F* h2_deltaT0_vs_v_scint_end = nullptr;
 
     /** DeltaT0 RMS vs inverse hit count profile for RPC. */
-    TProfile* prof_deltaT0_rms_vs_v_rpc;
+    TProfile* prof_deltaT0_rms_vs_v_rpc = nullptr;
 
     /** DeltaT0 RMS vs inverse hit count profile for BKLM scintillator. */
-    TProfile* prof_deltaT0_rms_vs_v_scint;
+    TProfile* prof_deltaT0_rms_vs_v_scint = nullptr;
 
     /** DeltaT0 RMS vs inverse hit count profile for EKLM scintillator. */
-    TProfile* prof_deltaT0_rms_vs_v_scint_end;
+    TProfile* prof_deltaT0_rms_vs_v_scint_end = nullptr;
 
     /** DeltaT0 vs total hit count for RPC. */
-    TH2F* h2_deltaT0_vs_nhits_rpc;
+    TH2F* h2_deltaT0_vs_nhits_rpc = nullptr;
 
     /** DeltaT0 vs total hit count for BKLM scintillator. */
-    TH2F* h2_deltaT0_vs_nhits_scint;
+    TH2F* h2_deltaT0_vs_nhits_scint = nullptr;
 
     /** DeltaT0 vs total hit count for EKLM scintillator. */
-    TH2F* h2_deltaT0_vs_nhits_scint_end;
+    TH2F* h2_deltaT0_vs_nhits_scint_end = nullptr;
 
     /** Corrected EventT0 for RPC with low hit count. */
-    TH1F* hc_eventT0_rpc_lowN;
+    TH1F* hc_eventT0_rpc_lowN = nullptr;
 
     /** Corrected EventT0 for RPC with medium hit count. */
-    TH1F* hc_eventT0_rpc_midN;
+    TH1F* hc_eventT0_rpc_midN = nullptr;
 
     /** Corrected EventT0 for RPC with high hit count. */
-    TH1F* hc_eventT0_rpc_highN;
+    TH1F* hc_eventT0_rpc_highN = nullptr;
 
     /** Corrected EventT0 for BKLM scintillator with low hit count. */
-    TH1F* hc_eventT0_scint_lowN;
+    TH1F* hc_eventT0_scint_lowN = nullptr;
 
     /** Corrected EventT0 for BKLM scintillator with medium hit count. */
-    TH1F* hc_eventT0_scint_midN;
+    TH1F* hc_eventT0_scint_midN = nullptr;
 
     /** Corrected EventT0 for BKLM scintillator with high hit count. */
-    TH1F* hc_eventT0_scint_highN;
+    TH1F* hc_eventT0_scint_highN = nullptr;
 
     /** Corrected EventT0 for EKLM scintillator with low hit count. */
-    TH1F* hc_eventT0_scint_end_lowN;
+    TH1F* hc_eventT0_scint_end_lowN = nullptr;
 
     /** Corrected EventT0 for EKLM scintillator with medium hit count. */
-    TH1F* hc_eventT0_scint_end_midN;
+    TH1F* hc_eventT0_scint_end_midN = nullptr;
 
     /** Corrected EventT0 for EKLM scintillator with high hit count. */
-    TH1F* hc_eventT0_scint_end_highN;
+    TH1F* hc_eventT0_scint_end_highN = nullptr;
 
     /* Formulas used for fitting. */
 

@@ -93,7 +93,14 @@ void BelleMCOutputModule::beginRun()
   int length = m_OutputFileName.size();
   do {
     Belle::Belle_file_specification& file = fileManager.add();
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
     file.Spec(m_OutputFileName.substr(position, std::min(length, 8)).c_str());
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
     position += 8;
     length -= 8;
   } while (length > 0);

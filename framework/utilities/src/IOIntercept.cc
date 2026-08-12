@@ -173,6 +173,7 @@ namespace Belle2::IOIntercept {
     if (m_pipeReadFD >= 0) close(m_pipeReadFD);
   }
 
+  // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
   bool CaptureStream::start()
   {
     if (StreamInterceptor::start()) {
@@ -182,6 +183,7 @@ namespace Belle2::IOIntercept {
     return false;
   }
 
+  // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
   bool CaptureStream::finish()
   {
     if (StreamInterceptor::finish()) {
@@ -224,7 +226,6 @@ namespace Belle2::IOIntercept {
         break;
       }
       // is the message empty? cppcheck thinks that's always the case
-      // cppcheck-suppress knownConditionTrueFalse
       if (message.empty()) return;
       // add indentation
       boost::algorithm::replace_all(message, "\n", "\n" + indent);
@@ -233,6 +234,7 @@ namespace Belle2::IOIntercept {
     }
   }
 
+  // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
   bool OutputToLogMessages::finish()
   {
     bool result = CaptureStdOutStdErr::finish();

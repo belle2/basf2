@@ -87,7 +87,7 @@ bool PXDRawDumperModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned 
     return false;
   }
 
-  Frames_in_event = ((ubig32_t*)data.data())[1];
+  Frames_in_event = (reinterpret_cast<ubig32_t*>(data.data()))[1];
   if (Frames_in_event < 0 || Frames_in_event > 256) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << to_string(Frames_in_event));
     return false;
@@ -103,7 +103,7 @@ bool PXDRawDumperModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned 
   int ll = 0; // Offset in dataptr in bytes
   for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
-    lo = ((ubig32_t*)tableptr)[j];
+    lo = (reinterpret_cast<ubig32_t*>(tableptr))[j];
     if (lo <= 0) {
       B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       return false;
@@ -118,7 +118,7 @@ bool PXDRawDumperModule::getTrigNr(RawPXD& px, unsigned int& innerDHH, unsigned 
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
       B2INFO("unpack DHE(C) frame: " << j << " with size " << lo << " at byte offset in dataptr " << ll);
-      if (unpack_dhc_frame(ll + (char*)dataptr, innerDHH, tag)) return true;
+      if (unpack_dhc_frame(ll + reinterpret_cast<char*>(dataptr), innerDHH, tag)) return true;
       ll += lo; /// no rounding needed
     }
   }
@@ -131,11 +131,11 @@ bool PXDRawDumperModule::unpack_dhc_frame(void* data, unsigned int& innerDHH, un
 #define DHC_FRAME_HEADER_DATA_TYPE_DHC_START  0xB
 #define DHC_FRAME_HEADER_DATA_TYPE_DHC_END    0xC
 
-  switch (((*(ubig16_t*)data) & 0x7800) >> 11) {
+  switch (((*reinterpret_cast<ubig16_t*>(data)) & 0x7800) >> 11) {
     case DHC_FRAME_HEADER_DATA_TYPE_DHC_START: {
-      unsigned int hi = ((ubig16_t*)data)[2];
-      innerDHH = (hi << 16) | ((ubig16_t*)data)[1];
-      tag = ((ubig32_t*)data)[3];
+      unsigned int hi = (reinterpret_cast<ubig16_t*>(data))[2];
+      innerDHH = (hi << 16) | (reinterpret_cast<ubig16_t*>(data))[1];
+      tag = (reinterpret_cast<ubig32_t*>(data))[3];
       return true;
     }
     default:

@@ -42,16 +42,16 @@ namespace Belle2 {
     private:
 
       /** Process that limits the geant4e step length */
-      ExtStepLengthLimitProcess* m_StepLengthLimitProcess;
+      ExtStepLengthLimitProcess* m_StepLengthLimitProcess = nullptr;
 
       /** Process that limits the geant4e step length in magnetic field */
-      ExtMagFieldLimitProcess* m_MagFieldLimitProcess;
+      ExtMagFieldLimitProcess* m_MagFieldLimitProcess = nullptr;
 
       /** Process that limits the geant4e step length due to energy loss */
-      ExtEnergyLoss* m_ELossProcess;
+      ExtEnergyLoss* m_ELossProcess = nullptr;
 
       /** Pointer to the ExtMessenger that is used to control geant4e */
-      ExtMessenger* m_Messenger;
+      ExtMessenger* m_Messenger = nullptr;
 
     };
 

@@ -65,7 +65,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   if (!fullname) library = "lib" + library + ".so";
 
   B2DEBUG(100, "Loading shared library " << library);
-  void* libPointer = dlopen(library.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+  const void* libPointer = dlopen(library.c_str(), RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == nullptr) {
     B2ERROR("Could not open shared library file (error in dlopen) : " << dlerror());
@@ -93,13 +93,13 @@ std::string FileSystem::calculateAdler32(const std::string& filename)
     uLong i, sum = adler32(0, 0, 0);
     char hexdigest[9];
     const size_t bufsize = 1024 * 1024 * sizeof(Bytef);
-    Bytef* buf = (Bytef*) malloc(bufsize);
+    Bytef* buf = static_cast<Bytef*>(malloc(bufsize));
     if (!buf) {
       fclose(fp);
       return "";
     }
     while (true) {
-      i = fread((void*) buf, 1, bufsize, fp);
+      i = fread(static_cast<void*>(buf), 1, bufsize, fp);
       if (ferror(fp)) {
         free(buf);
         fclose(fp);
@@ -124,7 +124,7 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
 {
   // check given directories
   string fullpath;
-  for (auto dir : dirs) {
+  for (const auto& dir : dirs) {
     if (dir.empty())
       continue;
     fs::path dir_path = dir;
@@ -216,8 +216,8 @@ bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
   fl.l_len = 0;
 
   while (true) {
-    int lock = fcntl(m_file, F_SETLK, &fl);
-    if (lock == 0)
+    int lockResult = fcntl(m_file, F_SETLK, &fl);
+    if (lockResult == 0)
       return true;
     else if (std::chrono::steady_clock::now() > maxtime)
       break;

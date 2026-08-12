@@ -5,18 +5,22 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+// The shape structs below expose their parameters both as named members and as
+// the t[] array of an anonymous union; cppcheck does not see the named ones.
+// cppcheck-suppress-file unusedStructMember
 #include "ecl/geometry/shapes.h"
-#include "G4TessellatedSolid.hh"
-#include "G4TriangularFacet.hh"
-#include "G4QuadrangularFacet.hh"
+#include <G4TessellatedSolid.hh>
+#include <G4TriangularFacet.hh>
+#include <G4QuadrangularFacet.hh>
 #include <G4ExtrudedSolid.hh>
-#include "G4Trap.hh"
+#include <G4Trap.hh>
 #include "ecl/geometry/BelleCrystal.h"
 #include <iostream>
 #include <fstream>
 #include <iterator>
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
+#include <CLHEP/Matrix/Vector.h>
+#include <CLHEP/Matrix/Matrix.h>
 #include <G4TwoVector.hh>
 #include <G4Vector3D.hh>
 #include <framework/utilities/FileSystem.h>
@@ -88,7 +92,7 @@ namespace Belle2 {
       return G4ThreeVector(cx, cy, v.find(i0)->second.z());
     }
 
-    Point_t centerofgravity(Point_t* b, const Point_t* e)
+    Point_t centerofgravity(const Point_t* b, const Point_t* e)
     {
       double cx = 0, cy = 0, A = 0;
       int n = e - b;
@@ -109,7 +113,7 @@ namespace Belle2 {
     /** quadrilateral shape struct */
     struct quadrilateral_t: public shape_t {
       quadrilateral_t() {}
-      virtual ~quadrilateral_t() {}
+      virtual ~quadrilateral_t() override {}
       /** create map of vertices */
       virtual map<int, G4ThreeVector> make_verticies(double wrapthick) const = 0;
 
@@ -285,10 +289,10 @@ namespace Belle2 {
         struct {
           double A, B, H, a, b, h, alpha, beta, betap, gamma, Volume, Weight;
         };
-        double t[12];
+        double t[12] = {};
       };
       quadrilateral_barrel_t() {}
-      virtual ~quadrilateral_barrel_t() {}
+      virtual ~quadrilateral_barrel_t() override {}
 
       /** is trapped */
       bool istrap() const override
@@ -347,10 +351,10 @@ namespace Belle2 {
         struct {
           double A, B, C, D, a, b, c, d, H_aA, H_dD, dg13, dg24, dg57, dg68, a1, a2, a3, a4, Volume, Weight;
         };
-        double t[20];
+        double t[20] = {};
       };
       quadrilateral_endcap_t() {}
-      virtual ~quadrilateral_endcap_t() {}
+      virtual ~quadrilateral_endcap_t() override {}
 
       /** is trapped? */
       bool istrap() const override
@@ -414,11 +418,11 @@ namespace Belle2 {
         struct {
           double A, C, D, a, c, d, B, b, H_aA, H_dD, dg13, dg24, dg57, dg68, a1, a4, a2, a3, a9, Volume, Weight;
         };
-        double t[21];
+        double t[21] = {};
       };
       bool _adjusted; /**< are sizes adjusted? */
       pent_t(): _adjusted(false) {}
-      virtual ~pent_t() {}
+      virtual ~pent_t() override {}
 
       /** adjust sizes to have flat sides */
       void adjust()

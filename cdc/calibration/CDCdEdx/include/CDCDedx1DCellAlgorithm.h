@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedx1DCellAlgorithm() {}
+    virtual ~CDCDedx1DCellAlgorithm() override {}
 
     /**
     * function to set min/max range of entrance angle for calibration
@@ -130,7 +130,7 @@ namespace Belle2 {
     * Representative CDC layer for each SL group (used to access group-wise constants):
     * SL0 => 1, SL1 => 9, SL2-8 => 17
     */
-    unsigned int getRepresentativeLayer(unsigned int il) const
+    static unsigned int getRepresentativeLayer(unsigned int il)
     {
       static const std::array<unsigned int, m_kNGroups> repLayer = {1, 9, 17};
       return repLayer.at(il);
@@ -154,7 +154,7 @@ namespace Belle2 {
     /**
     * class function to set rotation symmetry
     */
-    int rotationalBin(int nbin, int ibin)
+    static int rotationalBin(int nbin, int ibin)
     {
       if (nbin % 4 != 0)return ibin;
       int jbin = ibin;
@@ -186,7 +186,7 @@ namespace Belle2 {
     /**
     * function to get truncated mean
     */
-    double getTruncationMean(TH1D* hist, int binlow, int binhigh);
+    static double getTruncationMean(TH1D* hist, int binlow, int binhigh);
 
     /**
     * function to generate final constants
@@ -241,8 +241,8 @@ namespace Belle2 {
 
     double m_eaMin; /**< lower edge of entrance angle */
     double m_eaMax; /**< upper edge of entrance angle */
-    double m_eaBW; /**< binwdith of entrance angle bin */
-    int m_eaBin; /**< # of bins for entrance angle */
+    double m_eaBW = 0.0; /**< binwdith of entrance angle bin */
+    int m_eaBin = 0; /**< # of bins for entrance angle */
     int m_eaB; /**< reset # of bins for entrance angle for each experiment */
 
     double m_dedxMin;  /**< lower edge of dedxhit */

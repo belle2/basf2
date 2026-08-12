@@ -133,7 +133,6 @@ namespace Belle2 {
       /// Gives the wire by its id in the layer.
       const CDCWire& getWire(IWire iWire) const
       {
-        // cppcheck-suppress returnTempReference
         return at(iWire);
       }
 

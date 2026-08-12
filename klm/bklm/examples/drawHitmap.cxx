@@ -14,7 +14,7 @@ void drawHitmap(TString inputFile)
     return;
   }
 
-  TTree* metaData = (TTree *)file->Get("extraInfo");
+  TTree* metaData = static_cast<TTree*>(file->Get("extraInfo"));
   int exp = -1;
   metaData->SetBranchAddress("exp", &exp);
   int run = -1;

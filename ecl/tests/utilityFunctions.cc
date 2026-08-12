@@ -8,8 +8,8 @@
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/utility/utilityFunctions.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include "TRandom.h"
-#include "TMath.h"
+#include <TRandom.h>
+#include <TMath.h>
 #include <gtest/gtest.h>
 
 using namespace std;

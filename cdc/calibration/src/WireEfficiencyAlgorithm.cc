@@ -123,7 +123,7 @@ void WireEfficiencyAlgorithm::buildEfficiencies()
 
     if (layerID < m_efficiencyList->GetEntries()) {
       TEfficiency* efficiencyInLayer =
-        (TEfficiency*)m_efficiencyList->At(layerID);
+        static_cast<TEfficiency*>(m_efficiencyList->At(layerID));
 
       efficiencyInLayer->Fill(isFound, z, wireID);
     }
@@ -143,9 +143,9 @@ void WireEfficiencyAlgorithm::detectBadWires()
     unsigned short layerNo = wireLayer.getICLayer();
 
     // need to use casting here because GetPassedHistogram assumes it returns TH1
-    auto efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerNo);
-    auto passed = (TH2F*)efficiencyInLayer->GetPassedHistogram();
-    auto total = (TH2F*)efficiencyInLayer->GetTotalHistogram();
+    auto efficiencyInLayer = static_cast<TEfficiency*>(m_efficiencyList->At(layerNo));
+    auto passed = const_cast<TH2F*>(static_cast<const TH2F*>(efficiencyInLayer->GetPassedHistogram()));
+    auto total = const_cast<TH2F*>(static_cast<const TH2F*>(efficiencyInLayer->GetTotalHistogram()));
 
     // Ignoring layers that have no hits at all
     if (!total->GetEntries()) continue;

@@ -208,7 +208,7 @@ namespace Belle2 {
 
   private:
     std::vector<adcAsicTuple>  m_library;   ///< Library
-    array<float, 8196>   m_pCrossTalk;      ///< x-talk probability
+    array<float, 8196>   m_pCrossTalk = {};      ///< x-talk probability
 
     ClassDef(CDCCrossTalkLibrary, 2); /**< ClassDef */
   };

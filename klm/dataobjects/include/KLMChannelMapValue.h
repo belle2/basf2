@@ -82,7 +82,7 @@ namespace Belle2 {
     void setDataAllChannels(const T data)
     {
       KLMChannelIndex klmChannels;
-      for (KLMChannelIndex& klmChannel : klmChannels)
+      for (const KLMChannelIndex& klmChannel : klmChannels)
         setChannelData(klmChannel.getKLMChannelNumber(), data);
     }
 

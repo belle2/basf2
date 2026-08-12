@@ -423,7 +423,6 @@ void PXDDQMClustersModule::event()
     int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit.getUCellID(), digit.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);

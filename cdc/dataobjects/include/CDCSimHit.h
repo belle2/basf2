@@ -264,11 +264,11 @@ namespace Belle2 {
               double flightTime,
               double edep,
               double stepLength,
-              B2Vector3D momentum,
-              B2Vector3D posWire,
-              B2Vector3D posIn,
-              B2Vector3D posOut,
-              B2Vector3D posTrack,
+              const B2Vector3D& momentum,
+              const B2Vector3D& posWire,
+              const B2Vector3D& posIn,
+              const B2Vector3D& posOut,
+              const B2Vector3D& posTrack,
               int leftRight,
               double globalTime): SimHitBase()
     {

@@ -94,6 +94,7 @@ namespace {
           Database::Instance().storeData("TObjects", &array, iov);
 
           FILE* f = fopen("file.xml", "w");
+          ASSERT_NE(f, nullptr);
           fprintf(f, "Experiment %d\n", experiment);
           fclose(f);
           Database::Instance().addPayload("file.xml", "file.xml", iov);
@@ -624,6 +625,7 @@ namespace {
           Database::Instance().storeData("TObjects", &array, iov);
 
           FILE* f = fopen("file.xml", "w");
+          ASSERT_NE(f, nullptr);
           fprintf(f, "Experiment %d\n", experiment);
           fclose(f);
           Database::Instance().addPayload("file.xml", "file.xml", iov);

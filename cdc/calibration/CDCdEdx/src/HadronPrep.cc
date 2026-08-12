@@ -45,7 +45,7 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, c
     hdedxvscosth_bg.push_back(new TH2F(title.data(), Form("%s;costh;dEdx", title.data()),
                                        440, -1.1, 1.1, 2600, -1.0, 25));
 
-    defineHisto(hdedx_bgcosth[i], Form("dedx_bg_%d_cos", i), pdg.data());
+    defineHisto(hdedx_bgcosth[i], Form("dedx_bg_%d_cos", i), pdg);
   }
 
 
@@ -141,13 +141,13 @@ void HadronPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile, c
   // // fit the histograms with Gaussian functions
   // // and extract the means and errors
 
-  setPars(outfile, hdedx_bgcosth, pdg.data());
+  setPars(outfile, hdedx_bgcosth, pdg);
 
   if (ismakePlots) {
 
     plotDist(hdedx_bgcosth, Form("fits_dedx_inbg_%s", suffix.data()), pdg.data());
     plotDist(hdedxvscosth_bg, Form("dist_dedx_vscos_scat_%s", suffix.data()), pdg.data());
-    plotGraph(suffix.data(), pdg.data());
+    plotGraph(suffix, pdg);
   }
 
   hdedxvscosth_bg.clear();
@@ -292,7 +292,7 @@ void HadronPrep::setPars(TFile*& outfile, std::map<int, std::vector<TH1F*>>& hde
       // fit the dE/dx distribution in bins of beta-gamma and cosine
       HadronBgPrep prep;
       gstatus stats;
-      prep.fit(hdedx_bgcosth[i][j],  pdg.data(), stats);
+      prep.fit(hdedx_bgcosth[i][j],  pdg, stats);
       if (stats == OK) {
         satdedx = m_means[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParameter(1);
         satdedxerr = m_errors[i][j] = hdedx_bgcosth[i][j]->GetFunction("gaus")->GetParError(1);

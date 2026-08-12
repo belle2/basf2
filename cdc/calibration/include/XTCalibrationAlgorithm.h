@@ -51,7 +51,7 @@ namespace Belle2 {
       XTCalibrationAlgorithm();
 
       /// Destructor
-      ~XTCalibrationAlgorithm() {}
+      ~XTCalibrationAlgorithm() override {}
 
       /// set to use BField
       void setBField(bool bfield) {m_bField = bfield;}
@@ -118,27 +118,27 @@ namespace Belle2 {
       bool m_bField = true;  /**< with b field or none*/
       double m_threshold = 0.6;  /**< minimal requirement for the fraction of fitted results */
 
-      TProfile* m_hProf[56][2][20][10];     /**< Profile xt histo*/
-      TH2F* m_hist2d[56][2][20][10];        /**< 2D histo of xt*/
-      TH2F* m_hist2dDraw[56][20][10];       /**< 2d histo for draw*/
-      TH1F* m_hist2d_1[56][2][20][10];      /**< 1D xt histo, results of slice fit */
-      TF1* m_xtFunc[56][2][20][10];         /**< XTFunction */
+      TProfile* m_hProf[56][2][20][10] = {};     /**< Profile xt histo*/
+      TH2F* m_hist2d[56][2][20][10] = {};        /**< 2D histo of xt*/
+      TH2F* m_hist2dDraw[56][20][10] = {};       /**< 2d histo for draw*/
+      TH1F* m_hist2d_1[56][2][20][10] = {};      /**< 1D xt histo, results of slice fit */
+      TF1* m_xtFunc[56][2][20][10] = {};         /**< XTFunction */
 
-      double m_xtPrior[56][2][18][7][8];     /**< parameters of XT before calibration */
+      double m_xtPrior[56][2][18][7][8] = {};     /**< parameters of XT before calibration */
 
-      int m_fitStatus[56][2][20][10];       /**< Fit flag */
+      int m_fitStatus[56][2][20][10] = {};       /**< Fit flag */
       bool m_useSliceFit = false; /**< Use slice fit or profile */
       int m_minEntriesRequired = 5000; /**< minimum number of hit per hitosgram. */
-      int m_nAlphaBins; /**<number of alpha bins*/
-      int m_nThetaBins; /**<number of  theta bins*/
+      int m_nAlphaBins = 0; /**<number of alpha bins*/
+      int m_nThetaBins = 0; /**<number of  theta bins*/
       int m_xtMode = c_Chebyshev;  /**< Mode of xt; 0 is polynomial;1 is Chebyshev.*/
-      int m_xtModePrior;   /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
-      float m_lowerAlpha[18];/**< Lower boundaries of alpha bins. */
-      float m_upperAlpha[18];/**< Upper boundaries of alpha bins. */
-      float m_iAlpha[18]; /**< Represented alpha in alpha bins. */
-      float m_lowerTheta[7];/**< Lower boundaries of theta bins. */
-      float m_upperTheta[7];/**< Upper boundaries of theta bins. */
-      float m_iTheta[7]; /**< Represented theta in theta bins. */
+      int m_xtModePrior = 0;   /**< Mode of xt before calibration; 0 is polynomial;1 is Chebyshev.*/
+      float m_lowerAlpha[18] = {};/**< Lower boundaries of alpha bins. */
+      float m_upperAlpha[18] = {};/**< Upper boundaries of alpha bins. */
+      float m_iAlpha[18] = {}; /**< Represented alpha in alpha bins. */
+      float m_lowerTheta[7] = {};/**< Lower boundaries of theta bins. */
+      float m_upperTheta[7] = {};/**< Upper boundaries of theta bins. */
+      float m_iTheta[7] = {}; /**< Represented theta in theta bins. */
       /// boundary parameter for fitting, semi-experiment number
       double m_par6[56] = {89, 91, 94, 99, 104, 107, 110, 117,
                            126, 144, 150, 157, 170, 180,

@@ -360,7 +360,7 @@ void FullSimModule::initialize()
   SteppingAction* steppingAction = new SteppingAction();
   steppingAction->setMaxNumberSteps(m_maxNumberSteps);
   steppingAction->setAbsorbersR(m_absorbers);
-  for (auto& rAbsorber : m_absorbers) {
+  for (const auto& rAbsorber : m_absorbers) {
     B2INFO("An absorber found at R = " << rAbsorber << " cm");
   }
   runManager.SetUserAction(steppingAction);
@@ -474,11 +474,6 @@ void FullSimModule::initialize()
 }
 
 
-void FullSimModule::beginRun()
-{
-  //Nothing to do: geometry and physics are run independent
-}
-
 
 void FullSimModule::event()
 {
@@ -489,11 +484,6 @@ void FullSimModule::event()
   RunManager::Instance().processEvent(eventMetaDataPtr->getEvent());
 }
 
-
-void FullSimModule::endRun()
-{
-  //Nothing to do: geometry and physics are run independent
-}
 
 void FullSimModule::terminate()
 {

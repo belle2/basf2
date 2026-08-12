@@ -64,6 +64,7 @@ struct crystalInfo {
   double MaxValDiode; /**< max. value diode */
 };
 
+// cppcheck-suppress constParameter ; main() keeps its standard signature
 int main(int argc, char* argv[])
 {
   //
@@ -130,7 +131,7 @@ int main(int argc, char* argv[])
       int high = (k + 1) * batch;
       //std::cout<<k<<std::endl;
       TFile* TempFile = new TFile(InputDirectory + Form("HadronPars_Low%d_High%d.root", low, high), "READ");
-      TTree* TempTree = (TTree*)  TempFile->Get("HadronWaveformInfo");
+      TTree* TempTree = static_cast<TTree*>(TempFile->Get("HadronWaveformInfo"));
       double tHadronShapePars_A[11];
       double tDiodeShapePars_A[11];
       double tMaxResidualHadron_A;

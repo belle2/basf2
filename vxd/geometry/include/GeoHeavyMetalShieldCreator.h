@@ -26,7 +26,7 @@ namespace Belle2 {
     class GeoHeavyMetalShieldCreator : public geometry::CreatorBase {
     private:
       //! Create a parameter object from the Gearbox XML parameters.
-      HeavyMetalShieldGeometryPar createConfiguration(const GearDir& param);
+      static HeavyMetalShieldGeometryPar createConfiguration(const GearDir& param);
 
       //! Create the geometry from a parameter object.
       void createGeometry(const HeavyMetalShieldGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);

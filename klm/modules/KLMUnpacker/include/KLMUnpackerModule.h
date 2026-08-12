@@ -43,7 +43,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMUnpackerModule();
+    ~KLMUnpackerModule() override;
 
     /**
      * Initializer.
@@ -59,16 +59,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 
@@ -117,7 +107,7 @@ namespace Belle2 {
      * @param[out] copper COPPER identifier.
      * @param[out] hslb   HSLB identifier.
      */
-    void convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const;
+    static void convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb);
 
     /* Module parameters. */
 

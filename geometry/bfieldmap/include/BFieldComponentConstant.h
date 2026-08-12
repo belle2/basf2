@@ -25,7 +25,7 @@ namespace Belle2 {
     BFieldComponentConstant() = default;
 
     /** The BFieldComponentConstant destructor. */
-    virtual ~BFieldComponentConstant() = default;
+    virtual ~BFieldComponentConstant() override = default;
 
     /**
      * Calculates the magnetic field vector at the specified space point.

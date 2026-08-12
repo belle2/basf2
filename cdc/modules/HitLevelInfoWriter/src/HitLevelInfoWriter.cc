@@ -611,7 +611,7 @@ double HitLevelInfoWriterModule::I2D(const double cosTheta, const double I) cons
 
 //---------------------------------------------------------------------------------------
 void HitLevelInfoWriterModule::calculateMeans(double* mean, double* truncMean, double* truncMeanErr,
-                                              const vector<double>& dedx) const
+                                              const vector<double>& dedx)
 {
   // Calculate the truncated average by skipping the lowest & highest
   // events in the array of dE/dx values
@@ -651,12 +651,12 @@ void HitLevelInfoWriterModule::calculateMeans(double* mean, double* truncMean, d
 }
 
 //---------------------------------------------------------------------------------------
-void HitLevelInfoWriterModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], CDCDedxTrack* dedxTrack,
-                                            double dedx) const
+void HitLevelInfoWriterModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], const CDCDedxTrack* dedxTrack,
+                                            double dedx)
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable pdgIter : set) {
+  for (const Const::ChargedStable& pdgIter : set) {
 
     // determine the predicted mean and resolution
     double mean = dedxTrack->getPmean(pdgIter.getIndex());
@@ -709,7 +709,7 @@ void HitLevelInfoWriterModule::clearEntries()
 }
 
 //---------------------------------------------------------------------------------------
-void HitLevelInfoWriterModule::bookOutput(string filename)
+void HitLevelInfoWriterModule::bookOutput(const string& filename)
 {
   // register output root file
   m_file.push_back(new TFile(filename.c_str(), "RECREATE"));

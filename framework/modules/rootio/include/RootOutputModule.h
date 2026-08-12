@@ -43,6 +43,12 @@ namespace Belle2 {
      */
     virtual ~RootOutputModule() override;
 
+    /** Copying is not allowed: the module owns raw pointers. */
+    RootOutputModule(const RootOutputModule&) = delete;
+
+    /** Copying is not allowed: the module owns raw pointers. */
+    RootOutputModule& operator=(const RootOutputModule&) = delete;
+
     /** Setting up of various stuff.
      *
      *  Opens a file and creates TTree(s)

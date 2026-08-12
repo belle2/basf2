@@ -46,7 +46,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC1Algorithm::calibrate
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    TH1F* hPP = (TH1F*)PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
+    TH1D* hPP = PPVsCrysID->ProjectionY("hPP", crysID + 1, crysID + 1);
 
     int Total = hPP->GetEntries();
     float fraction = 0.0;

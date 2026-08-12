@@ -33,19 +33,13 @@ namespace Belle2 {
       ECLLOMModule();
 
       /** Destructor. */
-      virtual ~ECLLOMModule();
+      virtual ~ECLLOMModule() override;
 
       /** Initialize variables. */
       virtual void initialize() override;
 
-      /** begin run.*/
-      virtual void beginRun() override;
-
       /** event per event. */
       virtual void event() override;
-
-      /** end run. */
-      virtual void endRun() override;
 
       /** terminate.*/
       virtual void terminate() override;
@@ -93,23 +87,23 @@ namespace Belle2 {
 
       //module parameters
       std::string m_testFileName; /**< Name of file to save output.*/
-      double m_thresholdFE; /**< Threshold [GeV] on signal for Forward Endcap .*/
-      double m_thresholdBE; /**< Threshold [GeV] on signal for Backward Endcap .*/
-      double m_thresholdBkg; /**< Threshold [GeV] on signal when sector considered as lighted. For quality signal calculation.*/
-      double m_discrTime; /**< Discriminator's signal duration in ns.*/
-      bool m_includeInnerFE; /**< Flag to include Inner part of the Forward Endcap.*/
-      bool m_saveSignal; /**< Flag to save signal wavefroms into file.*/
+      double m_thresholdFE = 0.0; /**< Threshold [GeV] on signal for Forward Endcap .*/
+      double m_thresholdBE = 0.0; /**< Threshold [GeV] on signal for Backward Endcap .*/
+      double m_thresholdBkg = 0.0; /**< Threshold [GeV] on signal when sector considered as lighted. For quality signal calculation.*/
+      double m_discrTime = 0.0; /**< Discriminator's signal duration in ns.*/
+      bool m_includeInnerFE = false; /**< Flag to include Inner part of the Forward Endcap.*/
+      bool m_saveSignal = false; /**< Flag to save signal wavefroms into file.*/
 
       //input data
       int m_evtNum; /**< Event number.*/
-      double m_BE_Waveform_100ns[16][64]; /**< Waveforms with 100ns sampling for Backward Endcap sectors.*/
-      double m_FE_Waveform_100ns[16][64]; /**< Waveforms with 100ns sampling for Forward Endcap sectors.*/
-      double m_mcen[2]; /**< Monte Carlo energy of the final state particles in main frame.*/
-      double m_mcth[2]; /**< Monte Carlo thetha of the final state particles in main frame.*/
-      double m_mcph[2]; /**< Monte Carlo phi of the final state particles in main frame.*/
-      double m_com_en[2]; /**< Monte Carlo energy of the final state particles in CMS frame.*/
-      double m_com_th[2]; /**< Monte Carlo thetha of the final state particles in CMS frame.*/
-      double m_com_ph[2]; /**< Monte Carlo phi of the final state particles in CMS frame.*/
+      double m_BE_Waveform_100ns[16][64] = {}; /**< Waveforms with 100ns sampling for Backward Endcap sectors.*/
+      double m_FE_Waveform_100ns[16][64] = {}; /**< Waveforms with 100ns sampling for Forward Endcap sectors.*/
+      double m_mcen[2] = {}; /**< Monte Carlo energy of the final state particles in main frame.*/
+      double m_mcth[2] = {}; /**< Monte Carlo thetha of the final state particles in main frame.*/
+      double m_mcph[2] = {}; /**< Monte Carlo phi of the final state particles in main frame.*/
+      double m_com_en[2] = {}; /**< Monte Carlo energy of the final state particles in CMS frame.*/
+      double m_com_th[2] = {}; /**< Monte Carlo thetha of the final state particles in CMS frame.*/
+      double m_com_ph[2] = {}; /**< Monte Carlo phi of the final state particles in CMS frame.*/
 
       /** MC particles. */
       StoreArray<MCParticle> m_MCParticles;
@@ -118,46 +112,49 @@ namespace Belle2 {
       StoreArray<TRGECLWaveform> m_TrgEclWaveforms;
 
       //important output
-      bool m_isBhabha; /**< Bha-bha signal for an event.*/
+      bool m_isBhabha = false; /**< Bha-bha signal for an event.*/
 
-      int m_BhNum; /**< Number of Bha-bha signals in an event. Could be >1.*/
-      double m_BE_Amplitude[16]; /**< Calculated amplitudes in sectors of Backward Endcap.*/
-      double m_FE_Amplitude[16]; /**< Calculated amplitudes in sectors of Forward Endcap.*/
-      double m_BESum_Amplitude[16]; /**< Calculated amplitudes in running sums of Backward Endcap.*/
-      double m_FESum_Amplitude[16]; /**< Calculated amplitudes in running sums of Forward Endcap.*/
-      double m_BE_Pedal[16]; /**< Calculated pedestal values for Backward Endcap.*/
-      double m_FE_Pedal[16]; /**< Calculated pedestal values for Forward Endcap.*/
-      double m_FESum_MaxAmp; /**< Maximum running sum amplitude in an event for Forward endcap.*/
-      double m_BESum_MaxAmp; /**< Maximum running sum amplitude in an event for Backward endcap.*/
-      int m_FESum_MaxId; /**< Id of a sector with maximum amplitude in Forward endcap.*/
-      int m_BESum_MaxId; /**< Id of a sector with maximum amplitude in Backward endcap.*/
+      int m_BhNum = 0; /**< Number of Bha-bha signals in an event. Could be >1.*/
+      double m_BE_Amplitude[16] = {}; /**< Calculated amplitudes in sectors of Backward Endcap.*/
+      double m_FE_Amplitude[16] = {}; /**< Calculated amplitudes in sectors of Forward Endcap.*/
+      double m_BESum_Amplitude[16] = {}; /**< Calculated amplitudes in running sums of Backward Endcap.*/
+      double m_FESum_Amplitude[16] = {}; /**< Calculated amplitudes in running sums of Forward Endcap.*/
+      double m_BE_Pedal[16] = {}; /**< Calculated pedestal values for Backward Endcap.*/
+      double m_FE_Pedal[16] = {}; /**< Calculated pedestal values for Forward Endcap.*/
+      double m_FESum_MaxAmp = 0.0; /**< Maximum running sum amplitude in an event for Forward endcap.*/
+      double m_BESum_MaxAmp = 0.0; /**< Maximum running sum amplitude in an event for Backward endcap.*/
+      int m_FESum_MaxId = 0; /**< Id of a sector with maximum amplitude in Forward endcap.*/
+      int m_BESum_MaxId = 0; /**< Id of a sector with maximum amplitude in Backward endcap.*/
 
       //validation output
-      TH2D* m_h2Coin; /**< Store number of coincedencies for i:j sectors (Forward:Backward) over all events.*/
-      TH2D* m_h2SumCoin; /**< Store number of coincedencies in running sums for i:j sectors (Forward:Backward) over all events.*/
-      TH2D* m_h2FEAmp; /**< Store sectors amplitudes for Forward endcap over all events.*/
-      TH2D* m_h2BEAmp; /**< Store sectors amplitudes for Backward endcap over all events.*/
-      TH1D* m_h1BEHits; /**< Store number of events when Backward sector i has signal exceeding Bha-Bha threshold over all events.*/
-      TH1D* m_h1FEHits; /**< Store number of events when Forward sector i has signal exceeding Bha-Bha threshold over all events.*/
+      TH2D* m_h2Coin = nullptr; /**< Store number of coincedencies for i:j sectors (Forward:Backward) over all events.*/
+      TH2D* m_h2SumCoin =
+        nullptr; /**< Store number of coincedencies in running sums for i:j sectors (Forward:Backward) over all events.*/
+      TH2D* m_h2FEAmp = nullptr; /**< Store sectors amplitudes for Forward endcap over all events.*/
+      TH2D* m_h2BEAmp = nullptr; /**< Store sectors amplitudes for Backward endcap over all events.*/
+      TH1D* m_h1BEHits =
+        nullptr; /**< Store number of events when Backward sector i has signal exceeding Bha-Bha threshold over all events.*/
+      TH1D* m_h1FEHits =
+        nullptr; /**< Store number of events when Forward sector i has signal exceeding Bha-Bha threshold over all events.*/
 
       //internal variables
-      TFile* m_testfile; /**< File to save output.*/
-      TTree* m_testtree; /**< Tree to store output.*/
-      int m_NSamples; /**< m_NSamples=631, number of samples for 10ns sampling.*/
-      double m_BE_Waveform_10ns[16][631]; /**< Waveforms with 10ns sampling for Backward Endcap sectors.*/
-      double m_FE_Waveform_10ns[16][631]; /**< Waveforms with 10ns sampling for Forward Endcap sectors.*/
-      double m_BESum_Waveform_10ns[16][631]; /**< Running sum's waveforms with 10ns sampling for Backward Endcap sectors.*/
-      double m_FESum_Waveform_10ns[16][631]; /**< Running sum's waveforms with 10ns sampling for Forward Endcap sectors.*/
-      bool m_FESum_Discr[16][631]; /**< Discriminators values for running sums of Forward Endcap.*/
-      bool m_BESum_Discr[16][631]; /**< Discriminators values for running sums of Backward Endcap.*/
-      bool m_FEQual_Discr[16][631]; /**< Discriminators values for Quality signal of Forward Endcap.*/
-      bool m_BEQual_Discr[16][631]; /**< Discriminators values for Quality signal of Backward Endcap.*/
-      bool m_isBhabhaPatternFE; /**< Quality signal for Forward endcap.*/
-      bool m_isBhabhaPatternBE; /**< Quality signal for Backward endcap.*/
-      int m_CoincidenceMatrix[16][16]; /**< Stores current coincidence duration [in samples] between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
-      int m_SumCoincidenceMatrix[16][16]; /**< Stores current coincidence duration [in samples] between running sums discriminators in i:j sectors (Forward:Backward).*/
-      int m_CoincidenceCounterMatrix[16][16]; /**< Stores number of concidences between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
-      int m_SumCoincidenceCounterMatrix[16][16]; /**< Stores number of concidences between running sums discriminators in i:j sectors (Forward:Backward).*/
+      TFile* m_testfile = nullptr; /**< File to save output.*/
+      TTree* m_testtree = nullptr; /**< Tree to store output.*/
+      int m_NSamples = 0; /**< m_NSamples=631, number of samples for 10ns sampling.*/
+      double m_BE_Waveform_10ns[16][631] = {}; /**< Waveforms with 10ns sampling for Backward Endcap sectors.*/
+      double m_FE_Waveform_10ns[16][631] = {}; /**< Waveforms with 10ns sampling for Forward Endcap sectors.*/
+      double m_BESum_Waveform_10ns[16][631] = {}; /**< Running sum's waveforms with 10ns sampling for Backward Endcap sectors.*/
+      double m_FESum_Waveform_10ns[16][631] = {}; /**< Running sum's waveforms with 10ns sampling for Forward Endcap sectors.*/
+      bool m_FESum_Discr[16][631] = {}; /**< Discriminators values for running sums of Forward Endcap.*/
+      bool m_BESum_Discr[16][631] = {}; /**< Discriminators values for running sums of Backward Endcap.*/
+      bool m_FEQual_Discr[16][631] = {}; /**< Discriminators values for Quality signal of Forward Endcap.*/
+      bool m_BEQual_Discr[16][631] = {}; /**< Discriminators values for Quality signal of Backward Endcap.*/
+      bool m_isBhabhaPatternFE = false; /**< Quality signal for Forward endcap.*/
+      bool m_isBhabhaPatternBE = false; /**< Quality signal for Backward endcap.*/
+      int m_CoincidenceMatrix[16][16] = {}; /**< Stores current coincidence duration [in samples] between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
+      int m_SumCoincidenceMatrix[16][16] = {}; /**< Stores current coincidence duration [in samples] between running sums discriminators in i:j sectors (Forward:Backward).*/
+      int m_CoincidenceCounterMatrix[16][16] = {}; /**< Stores number of concidences between waveforms exceeding threshold in i:j sectors (Forward:Backward).*/
+      int m_SumCoincidenceCounterMatrix[16][16] = {}; /**< Stores number of concidences between running sums discriminators in i:j sectors (Forward:Backward).*/
     };
   }//namespace ECL
 }//namespace Belle2

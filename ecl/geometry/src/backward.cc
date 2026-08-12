@@ -267,7 +267,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::backward);
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
-      shape_t* s = *it;
+      const shape_t* s = *it;
       wrapped_crystals.push_back(wrapped_crystal(s, "backward", 0.20 - 0.02));
     }
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {

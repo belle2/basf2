@@ -65,7 +65,7 @@ namespace Belle2 {
       void clear();
 
       //! Print some debug information
-      void Print() const;
+      static void Print();
 
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
@@ -152,7 +152,7 @@ namespace Belle2 {
        * @param gbxParams Gear Dir.
        * @param mode dummy now.
        */
-      void readFFactor(const GearDir& gbxParams, int mode = 0);
+      static void readFFactor(const GearDir& gbxParams, int mode = 0);
 
       /**
        * Set spatial resolution (from DB).
@@ -289,7 +289,7 @@ namespace Belle2 {
       /*!
          \return The version of the cdc geometry parameters.
       */
-      std::string version() const;
+      const std::string& version() const;
 
       //! The method to get cdc mother volume inner R
       /*!
@@ -401,7 +401,7 @@ namespace Belle2 {
       /*!
           \return The number of wire layers.
       */
-      unsigned nWireLayers() const;
+      static unsigned nWireLayers();
 
       //! Returns wire numbers in a layer
       /*!
@@ -995,14 +995,14 @@ namespace Belle2 {
        * @param lr    Left/Right flag.
        * @param alpha Track incident angle in rphi-plane (rad).
        */
-      unsigned short getOutgoingLR(const unsigned short lr, const double alpha) const;
+      static unsigned short getOutgoingLR(const unsigned short lr, const double alpha);
 
 
       /**
        * Converts incoming-  to outgoing-alpha.
        * @param alpha in rad.
        */
-      double getOutgoingAlpha(const double alpha) const;
+      static double getOutgoingAlpha(const double alpha);
 
 
       /**
@@ -1010,7 +1010,7 @@ namespace Belle2 {
        * @param alpha in rad.
        * @param theta in rad.
        */
-      double getOutgoingTheta(const double alpha, const double theta) const;
+      static double getOutgoingTheta(const double alpha, const double theta);
 
 
       /**
@@ -1112,7 +1112,7 @@ namespace Belle2 {
 
     private:
       /** Singleton class */
-      CDCGeometryPar(const CDCGeometry* = nullptr);
+      explicit CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */
@@ -1250,7 +1250,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------------------
 //  Inline functions
 //-----------------------------------------------------------------------------
-    inline std::string CDCGeometryPar::version() const
+    inline const std::string& CDCGeometryPar::version() const
     {
       return m_version;
     }
@@ -1375,7 +1375,7 @@ namespace Belle2 {
       return m_fieldWireDiameter;
     }
 
-    inline unsigned CDCGeometryPar::nWireLayers() const
+    inline unsigned CDCGeometryPar::nWireLayers()
     {
       return c_maxNSenseLayers;
     }

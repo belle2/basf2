@@ -508,7 +508,7 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
 {
 
   std::string fileName0;
-  CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+  const CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
   if (geom) {
     if (set == c_Base) {
       fileName0 = gcp.getDisplacementFile();
@@ -888,7 +888,7 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
 
   unsigned short np = 0;
   unsigned short iCL, iLR;
-  double sigma[c_nSigmaParams]; // cppcheck-suppress constVariable
+  double sigma[c_nSigmaParams];
   double theta, alpha;
 
   ifs >> m_sigmaParamMode >> np;
@@ -1375,7 +1375,7 @@ void CDCGeometryPar::setFFactor()
     }
   }
 
-  CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+  const CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
   m_fudgeFactorForSigma[0] *= gcp.getAddFudgeFactorForSigmaForData();
   m_fudgeFactorForSigma[1] *= gcp.getAddFudgeFactorForSigmaForMC();
   B2DEBUG(29, "fudge factors= " << m_fudgeFactorForSigma[0] << " " << m_fudgeFactorForSigma[1] << " " << m_fudgeFactorForSigma[2]);
@@ -1485,7 +1485,7 @@ double CDCGeometryPar::getEDepToADCConvFactor(unsigned short iCL, unsigned short
 }
 
 
-void CDCGeometryPar::Print() const
+void CDCGeometryPar::Print()
 {}
 
 const B2Vector3D CDCGeometryPar::wireForwardPosition(uint layerID, int cellID, EWirePosition set) const
@@ -1828,18 +1828,18 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
   const unsigned L = layerID;
   const unsigned C =  cellID;
 
-  const double offset = m_offSet[L];
+  const double offSet = m_offSet[L];
   //...Offset modification to be aligned to axial at z=0...
   const double phiSize = 2 * M_PI / double(m_nWires[L]);
 
-  const double phiF = phiSize * (double(C) + offset)
+  const double phiF = phiSize * (double(C) + offSet)
                       + phiSize * 0.5 * double(m_nShifts[L]) + m_globalPhiRotation;
 
   m_FWirPos[L][C][0] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * cos(phiF);
   m_FWirPos[L][C][1] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * sin(phiF);
   m_FWirPos[L][C][2] = (L < m_firstLayerOffset) ? 0. : m_zSForwardLayer[L];
 
-  const double phiB = phiSize * (double(C) + offset) + m_globalPhiRotation;
+  const double phiB = phiSize * (double(C) + offSet) + m_globalPhiRotation;
 
   m_BWirPos[L][C][0] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * cos(phiB);
   m_BWirPos[L][C][1] = (L < m_firstLayerOffset) ? 0. : m_rSLayer[L] * sin(phiB);
@@ -1896,6 +1896,7 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
 
   //calculate min. drift time
   double minTime = getMinDriftTime(iCLayer, lr, alpha, theta);
+  // cppcheck-suppress variableScope ; kept next to the related declarations for readability
   double delta = time - minTime;
 
   //convert incoming- to outgoing-lr
@@ -1912,8 +1913,8 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
     unsigned short ith[2] = {0};
     getClosestThetaPoints(alpha, theta, wth, ith);
 
-    unsigned short jal(0), jlr(0), jth(0);
-    double w = 0.;
+    unsigned short jal, jlr, jth;
+    double w;
 
     //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
     double timep = delta < 0. ? minTime - delta : time;
@@ -1935,7 +1936,7 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
         jlr = ilr[1];
         jth = ith[0];
         w = wal * (1. - wth);
-      } else if (k == 3) {
+      } else {  // k == 3
         jal = ial[1];
         jlr = ilr[1];
         jth = ith[1];
@@ -1995,8 +1996,8 @@ double CDCGeometryPar::getDriftLength0(const double time, const unsigned short i
     unsigned short ith[2] = {0};
     getClosestThetaPoints(alpha, theta, wth, ith);
 
-    unsigned short jal(0), jlr(0), jth(0);
-    double w = 0.;
+    unsigned short jal, jlr, jth;
+    double w;
 
     //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
     double timep = time;
@@ -2018,7 +2019,7 @@ double CDCGeometryPar::getDriftLength0(const double time, const unsigned short i
         jlr = ilr[1];
         jth = ith[0];
         w = wal * (1. - wth);
-      } else if (k == 3) {
+      } else {  // k == 3
         jal = ial[1];
         jlr = ilr[1];
         jth = ith[1];
@@ -2081,8 +2082,8 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
                      : inputMinTime;
     delta = time - minTime;
 
-    unsigned short jal(0), jlr(0), jth(0);
-    double w = 0.;
+    unsigned short jal, jlr, jth;
+    double w;
 
     //use xt reversed at (x=0,t=tmin) for delta<0 ("negative drifttime")
     double timep = delta < 0. ? minTime - delta : time;
@@ -2104,7 +2105,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
         jlr = ilr[1];
         jth = ith[0];
         w = wal * (1. - wth);
-      } else if (k == 3) {
+      } else {  // k == 3
         jal = ial[1];
         jlr = ilr[1];
         jth = ith[1];
@@ -2170,8 +2171,8 @@ double CDCGeometryPar::getMinDriftTimeWithXtPoints(const unsigned short iCLayer,
   double minTime = 0.;
 
   {
-    unsigned short jal(0), jlr(0), jth(0);
-    double w = 0.;
+    unsigned short jal, jlr, jth;
+    double w;
 
     double c[6] = {0.}, a[6] = {0.};
     for (unsigned k = 0; k < 4; ++k) {
@@ -2190,7 +2191,7 @@ double CDCGeometryPar::getMinDriftTimeWithXtPoints(const unsigned short iCLayer,
         jlr = ilr[1];
         jth = ith[0];
         w = wal * (1. - wth);
-      } else if (k == 3) {
+      } else {  // k == 3
         jal = ial[1];
         jlr = ilr[1];
         jth = ith[1];
@@ -2356,8 +2357,8 @@ double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLay
     getClosestThetaPoints4Sgm(alpha, theta, wth, ith);
 
     //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
-    unsigned short jal(0), jlr(0), jth(0);
-    double w = 0.;
+    unsigned short jal, jlr, jth;
+    double w;
     for (unsigned k = 0; k < 4; ++k) {
       if (k == 0) {
         jal = ial[0];
@@ -2374,7 +2375,7 @@ double CDCGeometryPar::getSigma(const double DriftL0, const unsigned short iCLay
         jlr = ilr[1];
         jth = ith[0];
         w = wal * (1. - wth);
-      } else if (k == 3) {
+      } else {  // k == 3
         jal = ial[1];
         jlr = ilr[1];
         jth = ith[1];
@@ -2480,14 +2481,14 @@ double CDCGeometryPar::getTheta(const B2Vector3D& momentum) const
 }
 
 
-unsigned short CDCGeometryPar::getOutgoingLR(const unsigned short lr, const double alpha) const
+unsigned short CDCGeometryPar::getOutgoingLR(const unsigned short lr, const double alpha)
 {
   unsigned short lro = (fabs(alpha) <= 0.5 * M_PI) ? lr : abs(lr - 1);
   return lro;
 }
 
 
-double CDCGeometryPar::getOutgoingAlpha(const double alpha) const
+double CDCGeometryPar::getOutgoingAlpha(const double alpha)
 {
   //convert incoming- to outgoing-alpha
   double alphao = alpha;
@@ -2500,7 +2501,7 @@ double CDCGeometryPar::getOutgoingAlpha(const double alpha) const
   return alphao;
 }
 
-double CDCGeometryPar::getOutgoingTheta(const double alpha, const double theta) const
+double CDCGeometryPar::getOutgoingTheta(const double alpha, const double theta)
 {
   //convert incoming- to outgoing-theta
   double thetao = fabs(alpha) >  0.5 * M_PI  ?  M_PI - theta  :  theta;

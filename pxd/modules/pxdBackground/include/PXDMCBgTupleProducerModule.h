@@ -81,9 +81,9 @@ namespace Belle2 {
        * @param sensorID VxdID of the sensor
        * @return SensorInfo object for the desired sensor.
        */
-      inline const PXD::SensorInfo& getInfo(VxdID sensorID) const;
+      static inline const PXD::SensorInfo& getInfo(VxdID sensorID);
       /** Return area of the sensor with the given sensor ID */
-      inline double getSensorArea(VxdID sensorID) const;
+      static inline double getSensorArea(VxdID sensorID);
       /** Get region id from region uBin and vBin */
       inline int getRegionID(int uBin, int vBin) const;
       /** Return area of the region with the given sensor ID and region vBin*/
@@ -116,12 +116,12 @@ namespace Belle2 {
       return uBin * m_nBinsV + vBin;
     }
 
-    inline const PXD::SensorInfo& PXDMCBgTupleProducerModule::getInfo(VxdID sensorID) const
+    inline const PXD::SensorInfo& PXDMCBgTupleProducerModule::getInfo(VxdID sensorID)
     {
       return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }
 
-    inline  double PXDMCBgTupleProducerModule::getSensorArea(VxdID sensorID) const
+    inline  double PXDMCBgTupleProducerModule::getSensorArea(VxdID sensorID)
     {
       const PXD::SensorInfo& info = getInfo(sensorID);
       return info.getWidth() * info.getLength();

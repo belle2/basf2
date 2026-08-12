@@ -46,7 +46,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC3Algorithm::calibra
   ECLDigitWaveformParameters* HadronDiodeParameters = new ECLDigitWaveformParameters();
 
   TFile* TempFile = new TFile(Form("HadronPars_Low%d_High%d.root", m_firstCellID, m_lastCellID), "READ");
-  TTree* TempTree = (TTree*)  TempFile->Get("HadronWaveformInfo");
+  TTree* TempTree = static_cast<TTree*>(TempFile->Get("HadronWaveformInfo"));
   double tHadronShapePars_A[11];
   double tDiodeShapePars_A[11];
   double tMaxResidualHadron_A;

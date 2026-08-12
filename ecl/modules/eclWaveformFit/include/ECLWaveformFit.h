@@ -130,7 +130,7 @@ namespace Belle2 {
 
     /** Destructor.
      */
-    ~ECLWaveformFitModule();
+    ~ECLWaveformFitModule() override;
 
     /** Initialize variables. */
     virtual void initialize() override;
@@ -141,12 +141,6 @@ namespace Belle2 {
     /** event per event.
      */
     virtual void event() override;
-
-    /** end run. */
-    virtual void endRun() override;
-
-    /** terminate.*/
-    virtual void terminate() override;
 
     /** ECLDigits Array Name.*/
     virtual const char* eclDigitArrayName() const

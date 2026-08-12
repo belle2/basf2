@@ -352,17 +352,8 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
   return tmpProjectedECLDigits;
 }
 
-void ECLShowerShapeModule::endRun()
-{
-}
-
-void ECLShowerShapeModule::terminate()
-{
-
-}
-
 double ECLShowerShapeModule::computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits,
-                                                  const double avgCrystalDimension) const
+                                                  const double avgCrystalDimension)
 {
 
 //   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
@@ -402,7 +393,7 @@ double ECLShowerShapeModule::computeLateralEnergy(const std::vector<ProjectedECL
   return sumE / (sumE + r0sq * (maxEnergy + secondMaxEnergy));
 }
 
-double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho) const
+double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho)
 {
   // Some explicit polynomials.
   if (n == 1 && m == 1) return rho;
@@ -462,7 +453,7 @@ double ECLShowerShapeModule::computeAbsZernikeMoment(const std::vector<Projected
 }
 
 double ECLShowerShapeModule::computeSecondMoment(const std::vector<ProjectedECLDigit>& projectedDigits,
-                                                 const double totalEnergy) const
+                                                 const double totalEnergy)
 {
   if (totalEnergy <= 0.0) return 0.0;
 
@@ -597,7 +588,7 @@ double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const
 
 
   // protect hypothesis.
-  if (hypothesis < 1 or hypothesis > 10) {
+  if (hypothesis < 1 or hypothesis > 9) {
     B2FATAL("Invalid hypothesis for second moment corrections.");
   }
 

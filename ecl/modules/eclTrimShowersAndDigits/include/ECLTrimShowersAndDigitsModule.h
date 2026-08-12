@@ -41,9 +41,6 @@ namespace Belle2 {
     /** Event */
     virtual void event() override;
 
-    /** Terminate */
-    virtual void terminate() override;
-
   private:
 
     bool selectShower(const ECLShower* shower); /**< keep the ECLShower or not */

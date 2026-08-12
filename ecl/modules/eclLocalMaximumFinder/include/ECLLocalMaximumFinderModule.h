@@ -44,7 +44,7 @@ namespace Belle2 {
     ECLLocalMaximumFinderModule();
 
     /** Destructor. */
-    virtual ~ECLLocalMaximumFinderModule();
+    virtual ~ECLLocalMaximumFinderModule() override;
 
     /** Initialize. */
     virtual void initialize() override;

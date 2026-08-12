@@ -23,9 +23,6 @@ namespace Belle2 {
      */
     ECLDumpGeometryModule();
 
-    /** Register input and output data */
-    virtual void initialize() override;
-
     /** Event */
     virtual void event() override;
 

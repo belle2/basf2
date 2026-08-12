@@ -96,12 +96,12 @@ void ECLDspData::unpackCoefVector(const std::vector<short int>& src, std::vector
     int size = src.size();
     int packed_size = src[--size];
 
-    int packed_start = size - packed_size;
     dst_size = packed_size * values_packed;
 
     dst.resize(dst_size);
 
     if (packed_size > 0) {
+      int packed_start = size - packed_size;
       int unpacked_index = 0;
       int dst_index = 0;
       const int shift = -6;

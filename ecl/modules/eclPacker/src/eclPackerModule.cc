@@ -409,19 +409,10 @@ void ECLPackerModule::event()
 
       newRawECL->PackDetectorBuf(pcie40_words, pcie40_nwords, rawcprpacker_info);
     } else { // COPPER data
-      newRawECL->PackDetectorBuf((int*)buff[0].data(), nwords[0], (int*)buff[1].data(), nwords[1],
+      newRawECL->PackDetectorBuf(reinterpret_cast<int*>(buff[0].data()), nwords[0], reinterpret_cast<int*>(buff[1].data()), nwords[1],
                                  nullptr, 0, nullptr, 0, rawcprpacker_info);
     }
   }
-}
-
-void ECLPackerModule::endRun()
-{
-  //TODO
-}
-
-void ECLPackerModule::terminate()
-{
 }
 
 void ECLPackerModule::setBuffLength(int bufLength)

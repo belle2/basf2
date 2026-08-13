@@ -21,7 +21,7 @@ namespace Belle2 {
     BoostVectorAlgorithm();
 
     /// Destructor
-    virtual ~BoostVectorAlgorithm() {}
+    virtual ~BoostVectorAlgorithm() override {}
 
     /// Set outer loss function (for calibration intervals)
     void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }

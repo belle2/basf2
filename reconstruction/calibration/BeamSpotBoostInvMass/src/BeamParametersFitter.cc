@@ -70,6 +70,8 @@ static ROOT::Math::PxPyPzEVector getMomentum(double energy, double thetaX, doubl
   return result;
 }
 
+// The signature is imposed by TMinuit::SetFCN(), 'par' cannot be declared as const.
+// cppcheck-suppress constParameterCallback
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;

@@ -201,14 +201,6 @@ void DataWriterModule::initialize()
 }//init
 
 
-void DataWriterModule::beginRun()
-{
-}
-
-void DataWriterModule::endRun()
-{
-}
-
 void DataWriterModule::event()
 {
   // Use the neutralHadron hypothesis for the ECL
@@ -240,7 +232,7 @@ void DataWriterModule::event()
     m_KLMTrackRotationAngle   = -999;
     m_KLMTrackClusterSepAngle = -999;
     auto trackSeperations = cluster.getRelationsTo<TrackClusterSeparation>();
-    TrackClusterSeparation* trackSep;
+    const TrackClusterSeparation* trackSep;
     float best_dist = 100000000;
     for (auto trackSeperation :  trackSeperations) {
       float dist = trackSeperation.getDistance();
@@ -272,7 +264,7 @@ void DataWriterModule::event()
 
     // findClosestECLCluster with the c_neutralHadron hypothesis
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos, eclHypothesis);
-    ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
+    const ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
     if (!(closestECLCluster == nullptr)) {
@@ -311,7 +303,7 @@ void DataWriterModule::event()
     m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<MCParticle>();
-    MCParticle* part        = mcParticleWeightPair.first;
+    const MCParticle* part  = mcParticleWeightPair.first;
 
     m_KLMTruth              = mcParticleIsKlong(part);
     m_isBeamBKG             = mcParticleIsBeamBKG(part);
@@ -338,7 +330,7 @@ void DataWriterModule::event()
       m_KLMMCTheta      = -999;
     }
 
-    KlId* klid = cluster.getRelatedTo<KlId>();
+    const KlId* klid = cluster.getRelatedTo<KlId>();
     if (klid) {
       m_KLMKLid = klid->getKlId();
     } else {
@@ -385,7 +377,7 @@ void DataWriterModule::event()
     if (isnan(m_ECLLAT))            { m_ECLLAT            = -999;}
     if (isnan(m_ECLZMVA))           { m_ECLZMVA           = -999;}
 
-    KlId* klid = cluster.getRelatedTo<KlId>();
+    const KlId* klid = cluster.getRelatedTo<KlId>();
     if (klid) {
       m_ECLKLid = klid->getKlId();
     } else {
@@ -408,7 +400,7 @@ void DataWriterModule::event()
 
 //    MCParticle* part       = cluster.getRelatedTo<MCParticle>();
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<MCParticle>();
-    MCParticle* part        = mcParticleWeightPair.first;
+    const MCParticle* part  = mcParticleWeightPair.first;
 
     m_isBeamBKG            = mcParticleIsBeamBKG(part);
     m_ECLTruth             = mcParticleIsKlong(part);

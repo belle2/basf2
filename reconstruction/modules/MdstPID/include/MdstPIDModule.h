@@ -98,7 +98,7 @@ namespace Belle2 {
      * @return log likelihood
      */
     template<class T>
-    float getLogL(const T* logl, const Const::ChargedStable& chargedStable) const
+    static float getLogL(const T* logl, const Const::ChargedStable& chargedStable)
     {
       return logl->getLogL(chargedStable);
     }
@@ -109,7 +109,7 @@ namespace Belle2 {
      * @param chargedStable particle
      * @return log likelihood
      */
-    float getLogL(const ECLPidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    static float getLogL(const ECLPidLikelihood* logl, const Const::ChargedStable& chargedStable)
     {
       return logl->getLogLikelihood(chargedStable);
     }
@@ -120,7 +120,7 @@ namespace Belle2 {
      * @param chargedStable particle
      * @return log likelihood
      */
-    float getLogL(const KLMMuidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    static float getLogL(const KLMMuidLikelihood* logl, const Const::ChargedStable& chargedStable)
     {
       return logl->getLogL(chargedStable.getPDGCode());
     }

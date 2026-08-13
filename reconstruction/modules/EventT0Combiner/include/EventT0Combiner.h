@@ -25,7 +25,7 @@ namespace Belle2 {
     EventT0CombinerModule();
 
     /** Destructor */
-    virtual ~EventT0CombinerModule() = default;
+    virtual ~EventT0CombinerModule() override = default;
 
     /** Initialize the module */
     void initialize() override;
@@ -37,7 +37,7 @@ namespace Belle2 {
   private:
 
     /// computes the new average between multiple, un-correlated sub-detector measurements
-    EventT0::EventT0Component computeCombination(std::vector<EventT0::EventT0Component> measurements) const;
+    static EventT0::EventT0Component computeCombination(const std::vector<EventT0::EventT0Component>& measurements);
 
     /// Access to global EventT0 which will be read and updated
     StoreObjPtr<EventT0> m_eventT0;

@@ -38,7 +38,7 @@ namespace Belle2 {
     DetectorOccupanciesDQMModule();
 
     /* Destructor */
-    virtual ~DetectorOccupanciesDQMModule();
+    virtual ~DetectorOccupanciesDQMModule() override;
 
     /** Module function initialize */
     void initialize() override final;
@@ -86,13 +86,13 @@ namespace Belle2 {
 
     //histograms (all)
     //index: 0 = passive veto; 1 = active veto
-    TH2F* m_BKLM_Plane_Occupancy[2]; /**< BKLM plane integrated occupancy */;
-    TH2F* m_BKLM_PlaneTrg_Occupancy[2]; /**< BKLM plane integrated occupancy w/ trgs */;
-    TH2F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
-    TH2F* m_EKLM_PlaneTrg_Occupancy[2]; /**< EKLM plane integrated occupancy w/ trgs */;
-    TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
-    TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
-    TProfile* m_ECL_Occupancy[2]; /**< ECL occupancy (hits above 5 MeV) */
+    TH2F* m_BKLM_Plane_Occupancy[2] = {nullptr, nullptr}; /**< BKLM plane integrated occupancy */;
+    TH2F* m_BKLM_PlaneTrg_Occupancy[2] = {nullptr, nullptr}; /**< BKLM plane integrated occupancy w/ trgs */;
+    TH2F* m_EKLM_Plane_Occupancy[2] = {nullptr, nullptr}; /**< EKLM plane integrated occupancy */;
+    TH2F* m_EKLM_PlaneTrg_Occupancy[2] = {nullptr, nullptr}; /**< EKLM plane integrated occupancy w/ trgs */;
+    TH1F* m_ARICH_Occupancy[2] = {nullptr, nullptr}; /**< ARICH Digit Occupancy*/
+    TH1F* m_TOP_Occupancy[2] = {nullptr, nullptr}; /**< TOP occupancy (good hits only) */
+    TProfile* m_ECL_Occupancy[2] = {nullptr, nullptr}; /**< ECL occupancy (hits above 5 MeV) */
   };
 
 }

@@ -242,7 +242,7 @@ void VXDDedxPIDModule::terminate()
 
 // calculateMeans need some change as we always remove highest 2 dE/dx values
 void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr,
-                                      const std::vector<double>& dedx) const
+                                      const std::vector<double>& dedx)
 {
   // Calculate the truncated average by skipping only highest two value
   std::vector<double> sortedDedx = dedx;
@@ -310,7 +310,7 @@ template <class HitClass> double VXDDedxPIDModule::getTraversedLength(const HitC
 
 
 template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track, const std::vector<HitClass*>& hits,
-                                                            const RecoTrack* recoTrack) const
+                                                            const RecoTrack* recoTrack)
 {
   const int numHits = hits.size();
   if (numHits == 0)

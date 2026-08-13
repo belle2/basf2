@@ -395,7 +395,7 @@ void ChargedPidMVAModule::initializeMVA()
 
   // The supported methods have to be initialized once (calling it more than once is safe).
   MVA::AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
   B2INFO("\tLoading weightfiles from the payload class for SIGNAL particle hypothesis: " << m_sig_pdg);
 
@@ -433,7 +433,7 @@ void ChargedPidMVAModule::initializeMVA()
             << " spectators");
 
     // Store an MVA::Expert object.
-    m_experts[idx] = supported_interfaces[general_options.m_method]->getExpert();
+    m_experts[idx] = supported_interfaces.at(general_options.m_method)->getExpert();
     m_experts.at(idx)->load(weightfile);
 
     B2DEBUG(12, "\t\tweightfile loaded successfully into expert[" << idx << "]!");

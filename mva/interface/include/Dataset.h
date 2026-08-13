@@ -395,7 +395,7 @@ namespace Belle2 {
       /**
        * Virtual destructor
        */
-      virtual ~ROOTDataset();
+      virtual ~ROOTDataset() override;
 
     protected:
       /** Typedef for variable types supported by the mva ROOTDataset, can be one of double, float, int or bool in std::variant */

@@ -92,7 +92,7 @@ void ECLClusterPSDModule::initializeMVA(const std::string& identifier,
   }
 
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
@@ -100,7 +100,7 @@ void ECLClusterPSDModule::initializeMVA(const std::string& identifier,
   if (m_numMVAvariables != general_options.m_variables.size())
     B2FATAL("Expecting " << m_numMVAvariables << " variables, found " << general_options.m_variables.size());
 
-  expert = supported_interfaces[general_options.m_method]->getExpert();
+  expert = supported_interfaces.at(general_options.m_method)->getExpert();
   expert->load(weightfile);
 
   //create new dataset

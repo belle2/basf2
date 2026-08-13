@@ -82,11 +82,11 @@ void KLMExpertModule::beginRun()
 void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
+  m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
 
   std::vector<float> dummy;

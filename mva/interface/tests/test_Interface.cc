@@ -48,9 +48,9 @@ namespace {
       MVA::Interface<TestOptions, TestTeacher, TestExpert> interface;
 
       EXPECT_EQ(interface.getName(), "Test");
-      auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+      const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
       EXPECT_TRUE(supported_interfaces.find("Test") != supported_interfaces.end());
-      EXPECT_EQ(supported_interfaces["Test"], &interface);
+      EXPECT_EQ(supported_interfaces.at("Test"), &interface);
 
       // These should just work
       interface.getOptions();
@@ -62,7 +62,7 @@ namespace {
     }
 
     // Now it should be removed again
-    auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+    const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
     EXPECT_TRUE(supported_interfaces.find("Test") == supported_interfaces.end());
 
 

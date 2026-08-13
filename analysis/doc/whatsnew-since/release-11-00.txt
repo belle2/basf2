@@ -1,5 +1,5 @@
-Changes in the analysis package in light-2607-k
------------------------------------------------
+Changes in the analysis package in light-2607-kasei
+---------------------------------------------------
 
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++
@@ -18,3 +18,32 @@ Command line tools
 FEI
 +++
 * Added optional argument ``extraPathSpec`` to allow specifying inside the channels list to add additional basf2 modules to the FEI path.
+
+Changes in the analysis package in light-2604-jellyfish
+-------------------------------------------------------
+
+Standard Particle Lists
++++++++++++++++++++++++
+* Deprecated most standard particle lists in `stdCharged`, `stdPhotons`, `stdPi0s`, and `stdHyperons`, with removal planned at the end of 2026. 
+
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* It is no longer possible to use ``tree`` as the name for a ``TTree`` saved with the `VariablesToNtuple` and `VariablesToEventBasedTree` modules. In particular, this affects the argument ``treeName`` of the function `modularAnalysis.variablesToNtuple`: ``variablesToNtuple(treeName='tree')`` will now result in a ``FATAL`` message from basf2.
+
+Variables
++++++++++
+* Added metavariable `atan2`, which returns the atan2 value (arctangent of y/x). The result is in radians. 
+* Added variables `nCDCDedxLayers`, which returns number of CDC layers with dE/dx measurements used in PID likelihood and `trackQualityIndicator`, which returns fake/real track classification (0 = likely fake).
+
+FlavorTagger
+++++++++++++
+* Updated TFlaT and added config for Belle.
+
+Changes in the analysis package in light-2603-ina
+-------------------------------------------------
+
+Variables
++++++++++
+* As a substitute for `klmClusterTrackDistance` which is only available for release-10 mDSTs, a new variable `klmClusterTrackDistance_helix_extrapolation` is provided for analysts to be used with release-09 or ealier mDSTs.
+* Added FEI-related variable :b2:var:`sigProbRank(bp_list, b0_list) <sigProbRank>` to rank candidates across both B+ and B0 lists by descending ``extraInfo(SignalProbability)``.
+* Added FEI-related variables `mostcommonBTagDeltaP` and `mostcommonBTagPDG` for accessing the generated B meson momentum difference and PDG code identified by `mostcommonBTagIndex`.

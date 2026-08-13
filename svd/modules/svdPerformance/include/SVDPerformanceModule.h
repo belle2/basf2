@@ -42,7 +42,7 @@ namespace Belle2 {
     SVDPerformanceModule();
 
     /** destructor */
-    virtual ~SVDPerformanceModule() {};
+    virtual ~SVDPerformanceModule() override {};
 
     virtual void initialize() override; /**< check StoreArrays & create rootfile */
     virtual void beginRun() override; /**< create histograms */
@@ -176,7 +176,7 @@ namespace Belle2 {
     TH2F* h_cltrkTime_L5uL5v = nullptr; /**< L5U time VS L5V time*/
 
     /** get sensor number*/
-    int getSensor(int layer, int sensor, bool isTB)
+    static int getSensor(int layer, int sensor, bool isTB)
     {
       int result = 0;
       if (isTB) {

@@ -76,7 +76,7 @@ void SVDOccupancyAnalysisModule::beginRun()
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::SVD) continue;
     m_SVDModules.push_back(aVxdID); // reorder, sort would be better

@@ -47,7 +47,7 @@ namespace Belle2::SVD {
     /**
      * @brief Destructor (default).
      */
-    virtual ~SVDVariablesToStorageModule() = default;
+    virtual ~SVDVariablesToStorageModule() override = default;
 
     /**
      * @brief Initializes the module. Called once before the main event loop.

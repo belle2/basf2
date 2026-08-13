@@ -92,17 +92,17 @@ void WaveFitter::doFit()
   auto result_low = boost::math::tools::brent_find_minima(
                       [this](double t)->double { return negLogLikelihood(t); }, -m_dt, 0.0, s_minimizer_precision
                     );
-  double t0_low = result_low.first;
   double lik_low = result_low.second;
   auto result_hi = boost::math::tools::brent_find_minima(
                      [this](double t)->double { return negLogLikelihood(t); }, 0.0, m_dt, s_minimizer_precision
                    );
-  double t0_hi = result_hi.first;
   double lik_hi = result_hi.second;
   if (lik_low < lik_hi) {
+    double t0_low = result_low.first;
     m_fittedTime = t0_low;
     m_fittedLik = lik_low;
   } else {
+    double t0_hi = result_hi.first;
     m_fittedTime = t0_hi;
     m_fittedLik = lik_hi;
   }
@@ -136,8 +136,8 @@ void WaveFitter::calculateFitErrors()
   // Errors on amplitudes - simple from the linear model
   double sum_w2 = 0;
   for (int i = 0; i < 6; ++i) {
-    double wave = m_wave(m_times[i] - m_fittedTime);
-    sum_w2 += wave * wave;
+    double waveVal = m_wave(m_times[i] - m_fittedTime);
+    sum_w2 += waveVal * waveVal;
   }
   double one_by_sqrtSumw2 = 1.0 / sqrt(sum_w2);
   for (unsigned int row = 0; row < m_data.size(); ++row)
@@ -162,12 +162,14 @@ void WaveFitter::calculateFittedData()
 {
   m_fittedData.resize(m_data.size());
   for (int i = 0; i < 6; ++i) {
-    double wave = m_wave(m_times[i] - m_fittedTime);
+    double waveVal = m_wave(m_times[i] - m_fittedTime);
     for (unsigned int row = 0; row < m_data.size(); ++row)
-      m_fittedData[row][i] = m_fittedAmplitudes[row] * wave;
+      m_fittedData[row][i] = m_fittedAmplitudes[row] * waveVal;
   }
 }
 
+// kept as the lower-order alternative to integral20()
+// cppcheck-suppress unusedPrivateFunction
 double WaveFitter::integral12(double lower, double upper, std::function<double(double)> f)
 {
   const unsigned int half_order = 6;

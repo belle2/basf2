@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 
   // read the BackgroundMetaData object or create a new one if it doesn't exist
   BackgroundMetaData* bgMetaData = 0;
-  TTree* tree = (TTree*) file->Get("persistent");
+  TTree* tree = static_cast<TTree*>(file->Get("persistent"));
   TTree* newTree = 0;
   if (!tree) {
     bgMetaData = dynamic_cast<BackgroundMetaData*>(file->Get("BackgroundMetaData"));

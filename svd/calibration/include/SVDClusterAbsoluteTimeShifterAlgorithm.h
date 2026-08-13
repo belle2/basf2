@@ -43,7 +43,7 @@ namespace Belle2 {
     void setTimeAlgorithm(const std::vector<TString>& lst) {m_timeAlgorithms = lst;}
 
     /** Get list of time algorithm */
-    std::vector<TString> getTimeAlgorithm() {return m_timeAlgorithms;}
+    const std::vector<TString>& getTimeAlgorithm() {return m_timeAlgorithms;}
 
     /** Set the minimum entries required in the histograms */
     void setMinEntries(const int& minEntries) {m_minEntries = minEntries;}

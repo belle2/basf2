@@ -34,22 +34,16 @@ namespace Belle2 {
     /** constructor */
     SVDClusterEvaluationTrueInfoModule();
 
-    virtual ~SVDClusterEvaluationTrueInfoModule();
+    virtual ~SVDClusterEvaluationTrueInfoModule() override;
 
     /** Initialize the SVDClusterEvaluationTrueInfo */
     virtual void initialize() override;
-
-    /** Called when entering a new run */
-    virtual void beginRun() override;
 
     /** This method is the core of the SVDClusterEvaluationTrueInfo */
     virtual void event() override;
 
     /** This method is called if the current run ends */
     virtual void endRun() override;
-
-    /** This method is called at the end of the event processing */
-    virtual void terminate() override;
 
 
     static const int m_Nsets =
@@ -169,16 +163,16 @@ namespace Belle2 {
     StoreObjPtr<SVDEventInfo> m_storeSVDEvtInfo;
 
     /** Function returning the index used for Histos */
-    int indexFromLayerSensorSide(int LayerNumber, int SensorNumber, int UVNumber);
+    static int indexFromLayerSensorSide(int LayerNumber, int SensorNumber, int UVNumber);
 
     /** Function returning "Internal" or "External" depending on the index */
-    TString IntExtFromIndex(int idx);
+    static TString IntExtFromIndex(int idx);
 
     /** Function returning "Forward" or "Backward" depending on the index */
-    TString FWFromIndex(int idx);
+    static TString FWFromIndex(int idx);
 
     /** Function returning "U" or "V" depending on the index */
-    TString UVFromIndex(int idx);
+    static TString UVFromIndex(int idx);
 
     /** Function returning a TH1F */
     TH1F* createHistogram1D(const char* name, const char* title,
@@ -193,20 +187,23 @@ namespace Belle2 {
                             const char* titleY, TList* histoList);
 
     /** Function returning a TGraph with Y axis limited to 1 given numerator and denumerator vectors and plotting the ratio and corresponding uncertainty */
-    void createEfficiencyGraph(const char* name, const char* title, int vNum[m_Nsets], int vDen[m_Nsets], TString xTitle,
-                               TString yTitle, TList* list);
+    static void createEfficiencyGraph(const char* name, const char* title, const int vNum[m_Nsets], const int vDen[m_Nsets],
+                                      TString xTitle,
+                                      TString yTitle, TList* list);
 
     /** Function choosing between the two following functions depending on the length of the provided arrays */
-    void createArbitraryGraphErrorChooser(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
-                                          float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list, int len);
+    static void createArbitraryGraphErrorChooser(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets],
+                                                 float y[m_Nsets],
+                                                 float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list, int len);
 
     /** Function returning an arbitrarily defined TGraph with arrays length equal to m_Nsets */
-    void createArbitraryGraphError_Std(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets], float y[m_Nsets],
-                                       float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list);
+    static void createArbitraryGraphError_Std(const char* name, const char* title, float x[m_Nsets], float xErr[m_Nsets],
+                                              float y[m_Nsets],
+                                              float yErr[m_Nsets], TString xTitle, TString yTitle, TList* list);
 
     /** Function returning an arbitrarily defined TGraph with arrays length equal to m_NsetsRed */
-    void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
-                                       float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
+    static void createArbitraryGraphError_Red(const char* name, const char* title, float x[m_NsetsRed], float xErr[m_NsetsRed],
+                                              float y[m_NsetsRed], float yErr[m_NsetsRed], TString xTitle, TString yTitle, TList* list);
 
     /** Function defining if a TH is good (based on charge and primaryness) */
     bool goodTrueHit(const SVDTrueHit* thino);

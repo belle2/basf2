@@ -96,7 +96,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   //  m_rootFilePtrREF->Print();
 
   //REF tree initialization
-  m_treeREF = (TTree*)m_rootFilePtrREF->Get("calibLocalDetailed");
+  m_treeREF = static_cast<TTree*>(m_rootFilePtrREF->Get("calibLocalDetailed"));
   m_treeREF->SetBranchAddress("run", &m_runREF, &b_runREF);
   m_treeREF->SetBranchAddress("layer", &m_layerREF, &b_layerREF);
   m_treeREF->SetBranchAddress("ladder", &m_ladderREF, &b_ladderREF);
@@ -117,7 +117,7 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   //  m_rootFilePtrCHECK->Print();
 
   //CHECK tree initialization
-  m_treeCHECK = (TTree*)m_rootFilePtrCHECK->Get("calibLocalDetailed");
+  m_treeCHECK = static_cast<TTree*>(m_rootFilePtrCHECK->Get("calibLocalDetailed"));
   m_treeCHECK->SetBranchAddress("run", &m_runCHECK, &b_runCHECK);
   m_treeCHECK->SetBranchAddress("layer", &m_layerCHECK, &b_layerCHECK);
   m_treeCHECK->SetBranchAddress("ladder", &m_ladderCHECK, &b_ladderCHECK);
@@ -135,8 +135,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
 
 
   ///MASKS
-  m_h2MaskREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Mask");
-  m_h2MaskCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Mask");
+  m_h2MaskREF = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrREF->Get("expert/h2Mask"));
+  m_h2MaskCHECK = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrCHECK->Get("expert/h2Mask"));
 
   TH1F template_mask("maskDIFF_L@layerL@ladderS@sensor@view@apv",
                      "Mask Deviation Distribution in @layer.@ladder.@sensor @view/@side",
@@ -150,8 +150,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
   m_hMaskSummaryCHECK = new SVDSummaryPlots("maskCHECKSummary@view", "CHECK Number Masked Strips @view/@side Side");
 
   ///NOISES
-  m_h2NoiseREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Noise");
-  m_h2NoiseCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Noise");
+  m_h2NoiseREF = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrREF->Get("expert/h2Noise"));
+  m_h2NoiseCHECK = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrCHECK->Get("expert/h2Noise"));
 
   TH1F template_noise("noiseDIFF_L@layerL@ladderS@sensor@view@apv",
                       "Noise Deviation Distribution in @layer.@ladder.@sensor @view/@side",
@@ -167,8 +167,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
 
 
   ///CALPEAKTIMES
-  m_h2CalpeakTimeREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakTime");
-  m_h2CalpeakTimeCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2CalPeakTime");
+  m_h2CalpeakTimeREF = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrREF->Get("expert/h2CalPeakTime"));
+  m_h2CalpeakTimeCHECK = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrCHECK->Get("expert/h2CalPeakTime"));
 
   TH1F template_calpeakTime("calpeakTimeDIFF_L@layerL@ladderS@sensor@view@apv",
                             //         "CalpeakTime Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
@@ -181,8 +181,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
                                               "Number of problematic APV chips due to CalPeakTime for @view/@side Side for @view/@side Side");
 
   ///CALPEAKADC
-  m_h2CalpeakADCREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2CalPeakADC");
-  m_h2CalpeakADCCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2CalPeakADC");
+  m_h2CalpeakADCREF = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrREF->Get("expert/h2CalPeakADC"));
+  m_h2CalpeakADCCHECK = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrCHECK->Get("expert/h2CalPeakADC"));
 
   TH1F template_calpeakADC("calpeakADCDIFF_L@layerL@ladderS@sensor@view@apv",
                            //         "CalpeakADC Deviation Distribution in @layer.@ladder.@sensor @view/@side APV @apv",
@@ -196,8 +196,8 @@ void SVDLocalCalibrationsCheckModule::beginRun()
 
 
   ///PEDESTALS
-  m_h2PedestalREF = (SVDHistograms<TH2F>*)m_rootFilePtrREF->Get("expert/h2Pedestal");
-  m_h2PedestalCHECK = (SVDHistograms<TH2F>*)m_rootFilePtrCHECK->Get("expert/h2Pedestal");
+  m_h2PedestalREF = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrREF->Get("expert/h2Pedestal"));
+  m_h2PedestalCHECK = static_cast<SVDHistograms<TH2F>*>(m_rootFilePtrCHECK->Get("expert/h2Pedestal"));
 
   TH1F template_pedestal("pedestalDIFF_L@layerL@ladderS@sensor@view@apv",
                          "Pedestal Deviation Distribution in @layer.@ladder.@sensor @view/@side",
@@ -450,13 +450,13 @@ void SVDLocalCalibrationsCheckModule::printFirstPage()
   else
     sprintf(input, " reference ID = %s",  m_idFileNameREF.c_str());
   pt_input->AddText(input);
-  ((TText*)pt_input->GetListOfLines()->Last())->SetTextColor(kRed);
+  (static_cast<TText*>(pt_input->GetListOfLines()->Last()))->SetTextColor(kRed);
   if (m_idFileNameCHECK == "checkID")
     sprintf(input, "calibration rootfile = %s", m_rootFileNameCHECK.c_str());
   else
     sprintf(input, "calibration ID = %s", m_idFileNameCHECK.c_str());
   pt_input->AddText(input);
-  ((TText*)pt_input->GetListOfLines()->Last())->SetTextColor(kBlue);
+  (static_cast<TText*>(pt_input->GetListOfLines()->Last()))->SetTextColor(kBlue);
   pt_input->SetTextSize(0.02);
   pt_input->SetTextAlign(12);
   pt_input->SetShadowColor(0);
@@ -682,7 +682,7 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   int count = 0;
   if (m_plotGoodAPVs) {
     TIter nextH_uGood(listUGOOD);
-    while ((objDiff = (TH1F*)nextH_uGood())) {
+    while ((objDiff = static_cast<TH1F*>(nextH_uGood()))) {
       objDiff->SetFillStyle(3004);
       if (count == 0)
         objDiff->Draw();
@@ -692,7 +692,7 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     }
   }
   TIter nextH_uBad(listUBAD);
-  while ((objDiff = (TH1F*)nextH_uBad())) {
+  while ((objDiff = static_cast<TH1F*>(nextH_uBad()))) {
     objDiff->SetFillStyle(0);
     if (count == 0)
       objDiff->Draw();
@@ -725,7 +725,7 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
   count = 0;
   if (m_plotGoodAPVs) {
     TIter nextH_vGood(listVGOOD);
-    while ((objDiff = (TH1F*)nextH_vGood())) {
+    while ((objDiff = static_cast<TH1F*>(nextH_vGood()))) {
       objDiff->SetFillStyle(3004);
       if (count == 0)
         objDiff->Draw();
@@ -734,7 +734,7 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
       count++;
     }
   }
-  while ((objDiff = (TH1F*)nextH_vBad())) {
+  while ((objDiff = static_cast<TH1F*>(nextH_vBad()))) {
     objDiff->SetFillStyle(0);
     if (count == 0)
       objDiff->Draw();

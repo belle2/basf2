@@ -10,8 +10,8 @@
 
 #include <framework/logging/Logger.h>
 
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 #include <map>
 
 namespace Belle2 {
@@ -27,7 +27,7 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDClusterTimeShifter(const TString& uniqueID = "")
+    explicit SVDClusterTimeShifter(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
     {
       m_svdClusterTimeShift.clear();

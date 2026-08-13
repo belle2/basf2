@@ -92,6 +92,7 @@ void SVDPerformanceModule::initialize()
           nameSensor += j + 1;
         else if (i == 1 || i == 2)
           nameSensor += j + 2;
+        // cppcheck-suppress knownConditionTrueFalse
         else if (i == 3)
           nameSensor += j + 3;
       } else
@@ -103,6 +104,7 @@ void SVDPerformanceModule::initialize()
         TString nameSide = "";
         if (k == 1)
           nameSide = "U";
+        // cppcheck-suppress knownConditionTrueFalse
         else if (k == 0)
           nameSide = "V";
 
@@ -816,7 +818,7 @@ void SVDPerformanceModule::endRun()
     dir_track->cd();
     TIter nextH_track(m_histoList_track);
     while ((obj = nextH_track())) {
-      if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
+      if (obj->InheritsFrom("TH1F"))(static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
       obj->Write();
     }
 
@@ -830,7 +832,7 @@ void SVDPerformanceModule::endRun()
       dir_layer->cd();
       TIter nextH_shaper(m_histoList_shaper[i]);
       while ((obj = nextH_shaper())) {
-        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
+        if (obj->InheritsFrom("TH1F"))(static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
         obj->Write();
       }
     }
@@ -845,7 +847,7 @@ void SVDPerformanceModule::endRun()
       dir_layer->cd();
       TIter nextH_reco(m_histoList_reco[i]);
       while ((obj = nextH_reco())) {
-        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
+        if (obj->InheritsFrom("TH1F"))(static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
         obj->Write();
       }
     }
@@ -859,7 +861,7 @@ void SVDPerformanceModule::endRun()
       dir_layer->cd();
       TIter nextH_cluster(m_histoList_cluster[i]);
       while ((obj = nextH_cluster())) {
-        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
+        if (obj->InheritsFrom("TH1F"))(static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
         obj->Write();
       }
     }
@@ -873,7 +875,7 @@ void SVDPerformanceModule::endRun()
       dir_layer->cd();
       TIter nextH_clTRK(m_histoList_clTRK[i]);
       while ((obj = nextH_clTRK())) {
-        if (obj->InheritsFrom("TH1F"))((TH1F*)obj)->Scale(1. / m_nEvents);
+        if (obj->InheritsFrom("TH1F"))(static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
         obj->Write();
       }
     }
@@ -882,7 +884,7 @@ void SVDPerformanceModule::endRun()
     TIter nextH_corr(m_histoList_corr);
     while ((obj = nextH_corr())) {
       if (obj->InheritsFrom("TH1F"))
-        ((TH1F*)obj)->Scale(1. / m_nEvents);
+        (static_cast<TH1F*>(obj))->Scale(1. / m_nEvents);
       obj->Write();
     }
 

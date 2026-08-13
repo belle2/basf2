@@ -47,7 +47,7 @@ namespace Belle2::SVD {
     /**
      * Destructor of the module.
      */
-    virtual ~SVDUnpackerModule();
+    virtual ~SVDUnpackerModule() override;
 
     /**
      *Initializes the Module.
@@ -62,16 +62,16 @@ namespace Belle2::SVD {
     std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
     std::string m_svdEventInfoName; /**< SVDEventInfo name */
 
-    int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
+    int m_wrongFTBcrc = 0; /**<FTB CRC no-Match counter*/
 
 
   private:
 
     /** how many FADCs we have */
-    unsigned short nFADCboards;
+    unsigned short nFADCboards = 0;
 
     /** pointer to APVforFADCmap filled by mapping procedure */
-    std::unordered_multimap<unsigned char, unsigned char>* APVmap;
+    std::unordered_multimap<unsigned char, unsigned char>* APVmap = 0;
 
     /** Pointer to online-to-offline map */
     std::unique_ptr<SVDOnlineToOfflineMap> m_map;
@@ -89,7 +89,7 @@ namespace Belle2::SVD {
     DBObjPtr<HardwareClockSettings> m_hwClock;
 
     /** additional function that prints raw data words */
-    void printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords);
+    static void printB2Debug(const uint32_t* data32, const uint32_t* data32_min, const uint32_t* data32_max, int nWords);
 
     // The following assumes i386 byte order: MSB comes last!
 
@@ -160,7 +160,7 @@ namespace Belle2::SVD {
 
 
     union {  // The 4 byte words of the stream can be interpreted as:
-      uint32_t m_data32; /**< Input 32-bit data word */
+      uint32_t m_data32 = 0; /**< Input 32-bit data word */
       FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
       MainHeader m_MainHeader;  /**< Implementation of FADC Header */
       APVHeader m_APVHeader;  /**< Implementation of APV Header */
@@ -219,16 +219,16 @@ namespace Belle2::SVD {
     unsigned short seenHeadersAndTrailers: 4;
 
     /** counters for specific ERRORS produced by the Unpacker */
-    int nTriggerMatchErrors; /**< counter of Trigger match errors */
-    int nEventMatchErrors; /**< counter of Event match errors */
-    int nUpsetAPVsErrors; /**< counter of upset APV errors */
-    int nSEURecoveryCase; /**< counter of SEU Special Recovery data cases */
-    int nErrorFieldErrors; /**< counter of event mismatch errors in FTB's ErrorField */
-    int nMissingAPVsErrors; /**< counter of missing APVs errors*/
-    int nFADCMatchErrors; /**< counter of FADC boards =/= n of RawData objects errors */
-    int nAPVErrors; /**< counter of APV errors*/
-    int nFTBFlagsErrors; /**< counter of errors in FTBFlags variable */
-    int nEventInfoMatchErrors; /**< counter of inconsistencies in SVDEventInfo within an event */
+    int nTriggerMatchErrors = 0; /**< counter of Trigger match errors */
+    int nEventMatchErrors = 0; /**< counter of Event match errors */
+    int nUpsetAPVsErrors = 0; /**< counter of upset APV errors */
+    int nSEURecoveryCase = 0; /**< counter of SEU Special Recovery data cases */
+    int nErrorFieldErrors = 0; /**< counter of event mismatch errors in FTB's ErrorField */
+    int nMissingAPVsErrors = 0; /**< counter of missing APVs errors*/
+    int nFADCMatchErrors = 0; /**< counter of FADC boards =/= n of RawData objects errors */
+    int nAPVErrors = 0; /**< counter of APV errors*/
+    int nFTBFlagsErrors = 0; /**< counter of errors in FTBFlags variable */
+    int nEventInfoMatchErrors = 0; /**< counter of inconsistencies in SVDEventInfo within an event */
 
     /** Map to store a list of missing APVs */
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_missingAPVs;
@@ -241,7 +241,8 @@ namespace Belle2::SVD {
 
 
 
-    int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
+    int m_relativeTimeShift =
+      0; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
 
     DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVDGlobal Configuration payload*/
 

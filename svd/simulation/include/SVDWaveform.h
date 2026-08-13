@@ -84,7 +84,7 @@ namespace Belle2 {
       SVDWaveform(const SVDWaveform& other)
       {
         m_charge = other.getCharge();
-        for (ElementaryWaveform elementary_waveform : other.getElementaryWaveforms())
+        for (const ElementaryWaveform& elementary_waveform : other.getElementaryWaveforms())
           m_elementaryWaveforms.push_back(elementary_waveform);
       }
 
@@ -117,8 +117,7 @@ namespace Belle2 {
       SVDWaveform& operator=(const SVDWaveform& other)
       {
         m_charge = other.getCharge();
-        m_elementaryWaveforms.clear();
-        std::copy(other.getElementaryWaveforms().begin(), other.getElementaryWaveforms().end(), m_elementaryWaveforms.begin());
+        m_elementaryWaveforms = other.getElementaryWaveforms();
         return *this;
       }
 
@@ -131,8 +130,8 @@ namespace Belle2 {
        * The function is normalized to peak value of 1.
        * @return Value of the waveform at t.
        */
-      double waveform(double t, double initTime, double charge, double tau,
-                      WaveformShape wfun = w_betaprime) const
+      static double waveform(double t, double initTime, double charge, double tau,
+                             WaveformShape wfun = w_betaprime)
       {
         double z = (t - initTime) / tau;
         return charge * wfun(z);
@@ -143,7 +142,7 @@ namespace Belle2 {
        * @param elemWaveform The SVDWaveform::ElementaryWaveform struct with parameters of a waveform.
        * @return The value of the waveform at time t.
        */
-      double waveform(double t, const ElementaryWaveform& elemWaveform) const
+      static double waveform(double t, const ElementaryWaveform& elemWaveform)
       { return waveform(t, elemWaveform.m_initTime, elemWaveform.m_charge, elemWaveform.m_tau, elemWaveform.m_wfun); }
 
       /** Make SVDWaveform a functor.
@@ -153,7 +152,7 @@ namespace Belle2 {
       double operator()(double t) const
       {
         double total_waveform = 0;
-        for (SVDWaveform::ElementaryWaveform elementary_waveform : m_elementaryWaveforms) {
+        for (const SVDWaveform::ElementaryWaveform& elementary_waveform : m_elementaryWaveforms) {
           total_waveform += waveform(t, elementary_waveform);
         }
         return total_waveform;
@@ -183,7 +182,7 @@ namespace Belle2 {
       {
         std::ostringstream os;
         size_t i = 0;
-        for (auto elementary_waveform : m_elementaryWaveforms)
+        for (const auto& elementary_waveform : m_elementaryWaveforms)
           os << ++i << '\t' << elementary_waveform.toString();
         return os.str();
       }

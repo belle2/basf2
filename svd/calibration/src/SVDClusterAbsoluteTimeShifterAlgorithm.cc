@@ -10,7 +10,7 @@
 #include <svd/dbobjects/SVDAbsoluteClusterTimeShift.h>
 
 #include <TF1.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TStyle.h>

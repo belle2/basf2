@@ -27,7 +27,7 @@ namespace Belle2 {
       float getCharge(unsigned short adcCount,
                       const WireID&,
                       bool,
-                      float, float)
+                      float, float) override
       {
         //        const float EnergyLossOffset =  1.6 * 1e-8; // GeV
         //        return (adcCount * m_conversionFactor + EnergyLossOffset);

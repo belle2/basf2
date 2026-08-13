@@ -656,7 +656,7 @@ void HitLevelInfoWriterModule::saveChiValue(double(&chi)[Const::ChargedStable::c
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable& pdgIter : set) {
+  for (const Const::ParticleType& pdgIter : set) {
 
     // determine the predicted mean and resolution
     double mean = dedxTrack->getPmean(pdgIter.getIndex());

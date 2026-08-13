@@ -64,6 +64,9 @@ namespace Belle2 {
     /** Constructor expecting a pointer to a B2Vector3 */
     explicit B2Vector3(const B2Vector3<DataType>* b2Vec3): m_coordinates {b2Vec3->X(), b2Vec3->Y(), b2Vec3->Z()} {};
     /** Constructor expecting a B2Vector3 of different type*/
+    // the implicit conversion between B2Vector3 of different types is intended;
+    // the second id keeps cppcheck quiet in translation units where this template is not instantiated
+    // cppcheck-suppress[noExplicitConstructor,unmatchedSuppression]
     template <typename OtherType> B2Vector3(const B2Vector3<OtherType>& b2Vec3):
       m_coordinates {static_cast<DataType>(b2Vec3.X()), static_cast<DataType>(b2Vec3.Y()), static_cast<DataType>(b2Vec3.Z())} {};
     /** Constructor expecting a pointer to a B2Vector3 of different type */
@@ -296,7 +299,7 @@ namespace Belle2 {
     /**  The angle w.r.t. another B2Vector3. */
     DataType Angle(const B2Vector3<DataType>& q) const
     {
-      const double ptot2 = Mag2() * q.Mag2();
+      const double ptot2 = static_cast<double>(Mag2()) * q.Mag2();
       if (ptot2 <= 0) {
         return 0.0;
       } else {
@@ -423,12 +426,16 @@ namespace Belle2 {
     /** access variable Z (= .at(2) without boundary check) */
     DataType z() const { return m_coordinates[2]; }
     /** access variable X (= .at(0) without boundary check) */
+    // X() forwards to the non-static member x(), so it cannot be static: this is a cppcheck false positive
+    // cppcheck-suppress[functionStatic,unmatchedSuppression]
     DataType X() const { return x(); }
     /** access variable Y (= .at(1)  without boundary check) */
     DataType Y() const { return y(); }
     /** access variable Z (= .at(2) without boundary check) */
     DataType Z() const { return z(); }
     /** access variable X (= .at(0) without boundary check) */
+    // Px() forwards to the non-static member x(), so it cannot be static: this is a cppcheck false positive
+    // cppcheck-suppress[functionStatic,unmatchedSuppression]
     DataType Px() const { return x(); }
     /** access variable Y (= .at(1) without boundary check) */
     DataType Py() const { return y(); }

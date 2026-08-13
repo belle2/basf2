@@ -370,29 +370,37 @@ namespace Belle2 {
     VARIABLE_GROUP("Helicity variables");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentum", cosHelicityAngleMomentum, R"DOC(
-                      If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters
-                      in the frame of the given particle (mother)
-                      and the momentum of the given particle in the lab frame.
+Returns the cosine of an angle whose definition changes depending on how many daughters the particle has; otherwise it returns 0.0.
 
-                      If the given particle has three daughters: cosine of the angle between the normal vector of the plane defined by 
-                      the momenta of the three daughters in the frame of the given particle (mother)
-                      and the momentum of the given particle in the lab frame.
+.. topic:: For two daughters
 
-                      Otherwise, it returns 0.)DOC");
+    The angle is between the vector defined by the momentum difference of the two daughters in the frame of the given particle
+    (the mother) and the momentum of the given particle in the lab frame.
+
+.. topic:: For three daughters
+
+    The angle is between the normal vector of the plane defined by the momenta of the daughters in the frame of the given particle
+    (the mother) and the momentum of the given particle in the lab frame.
+
+)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz", cosHelicityAngleMomentumPi0Dalitz, R"DOC(
-                      To be used for the decay :math:`\pi^0 \to e^+ e^- \gamma`: 
-                      cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)
-                      and the momentum of the given particle in the lab frame.
+Returns the cosine of the angle of the photon in the frame of the given particle (the mother) and the momentum
+of the given particle in the lab frame, otherwise it returns 0.0.
 
-                      One can call the variable for the decay :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-` as well.
+.. attention:: 
 
-                      Otherwise, it returns 0.)DOC");
+    This variable should only be used for the decays :math:`\pi^0 \to e^+ e^- \gamma` and
+    :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-`.
+
+)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum, R"DOC(
-                      Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
-                      assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
-                      automatically loaded by the function, given the accelerator's conditions.)DOC");
+Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
+assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
+automatically loaded by the function, given the accelerator's conditions.
+
+)DOC");
 
     REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle, R"DOC(
                       Cosine of the helicity angle between the momentum of the selected granddaughter and the direction opposite to the momentum of the provided particle 

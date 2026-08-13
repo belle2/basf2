@@ -270,7 +270,7 @@ void makeprob(TChain* chain, FILE* output, const char* xmllabel)
                                                "hard tracks that escape from the backward endcap KLM with B13 hit(s)",      // outcome=65
                                                "hard tracks that escape from the backward endcap KLM with B14 hit(s)"
                                              };      // outcome=66
-  sprintf(label, "Muon ID PDFs for %s", xmllabel);
+  snprintf(label, sizeof(label), "Muon ID PDFs for %s", xmllabel);
 
   //Histograms definition
   TH1D* layerHitU[15][NOUTCOME];
@@ -287,16 +287,16 @@ void makeprob(TChain* chain, FILE* output, const char* xmllabel)
   discardB = new TH1D("discardB", "discard denominator", 70, -0.5, 69.5);
   for (int outcome = 1; outcome < NOUTCOME; ++outcome) {
     for (int layer = 0; layer < 15; ++layer) {
-      sprintf(label, "LayerHitU-layer%02d-outcome%d", layer, outcome);
-      sprintf(title, "LayerHitU for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
+      snprintf(label, sizeof(label), "LayerHitU-layer%02d-outcome%d", layer, outcome);
+      snprintf(title, sizeof(title), "LayerHitU for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
       layerHitU[layer][outcome] = new TH1D(label, title, 32, -0.5, 31.5);
       layerHitU[layer][outcome]->Sumw2(true);
-      sprintf(label, "LayerHitV-layer%02d-outcome%d", layer, outcome);
-      sprintf(title, "LayerHitV for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
+      snprintf(label, sizeof(label), "LayerHitV-layer%02d-outcome%d", layer, outcome);
+      snprintf(title, sizeof(title), "LayerHitV for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
       layerHitV[layer][outcome] = new TH1D(label, title, 32, -0.5, 31.5);
       layerHitV[layer][outcome]->Sumw2(true);
-      sprintf(label, "LayerHitW-layer%02d-outcome%d", layer, outcome);
-      sprintf(title, "LayerHitW for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
+      snprintf(label, sizeof(label), "LayerHitW-layer%02d-outcome%d", layer, outcome);
+      snprintf(title, sizeof(title), "LayerHitW for %s: layer %02d (%s)", xmllabel, layer, outcomeName[outcome]);
       layerHitW[layer][outcome] = new TH1D(label, title, 32, -0.5, 31.5);
       layerHitW[layer][outcome]->Sumw2(true);
     }
@@ -304,12 +304,12 @@ void makeprob(TChain* chain, FILE* output, const char* xmllabel)
 
   for (int detector = 0; detector <= 2; ++detector) {
     for (int halfNdof = 0; halfNdof <= 20; ++halfNdof) {
-      sprintf(label, "ReducedChiSquaredA-%02ddof-detector%d", 2 * halfNdof, detector);
-      sprintf(title, "Reduced Chi-squared for %s: %02d dof (%s)", xmllabel, 2 * halfNdof, detectorName[detector]);
+      snprintf(label, sizeof(label), "ReducedChiSquaredA-%02ddof-detector%d", 2 * halfNdof, detector);
+      snprintf(title, sizeof(title), "Reduced Chi-squared for %s: %02d dof (%s)", xmllabel, 2 * halfNdof, detectorName[detector]);
       rchisqA[halfNdof][detector] = new TH1D(label, title, 100, 0.0, 10.0);
       rchisqA[halfNdof][detector]->Sumw2(true);
-      sprintf(label, "ReducedChiSquaredB-%02ddof-detector%d", 2 * halfNdof, detector);
-      sprintf(title, "Reduced Chi-squared for %s: %02d dof (%s)", xmllabel, 2 * halfNdof, detectorName[detector]);
+      snprintf(label, sizeof(label), "ReducedChiSquaredB-%02ddof-detector%d", 2 * halfNdof, detector);
+      snprintf(title, sizeof(title), "Reduced Chi-squared for %s: %02d dof (%s)", xmllabel, 2 * halfNdof, detectorName[detector]);
       rchisqB[halfNdof][detector] = new TH1D(label, title, 1000, 0.0, 100.0);  // 10x wider range for integration
       rchisqB[halfNdof][detector]->Sumw2(true);
     }
@@ -848,9 +848,9 @@ void makeprob(TChain* chain, FILE* output, const char* xmllabel)
   canvas->Clear();
   canvas->Divide(1, 1);
   canvas->GetPad(1)->SetLogy(1);
-  sprintf(label, "Muid-%s.pdf[", xmllabel); // open file without drawing
+  snprintf(label, sizeof(label), "Muid-%s.pdf[", xmllabel); // open file without drawing
   canvas->SaveAs(label);
-  sprintf(label, "Muid-%s.pdf", xmllabel); // save each canvas to same file
+  snprintf(label, sizeof(label), "Muid-%s.pdf", xmllabel); // save each canvas to same file
   canvas->cd(1);
   discardA->Divide(discardB);
   discardA->SetLineColor(kRed);
@@ -898,7 +898,7 @@ void makeprob(TChain* chain, FILE* output, const char* xmllabel)
     }
   }
 
-  sprintf(label, "Muid-%s.pdf]", xmllabel); // close file without drawing
+  snprintf(label, sizeof(label), "Muid-%s.pdf]", xmllabel); // close file without drawing
   canvas->SaveAs(label);
 
   printf("Done.\n");

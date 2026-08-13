@@ -110,9 +110,7 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    # clang::suppress is used to silence clang/cppcheck static analyzer
-    # findings; tell GCC to ignore this vendor attribute instead of warning
-    CXXFLAGS=['-std=c++20', '-Wno-attributes=clang::suppress'],
+    CXXFLAGS=['-std=c++20'],
     FORTRANFLAGS=['-std=legacy'],
     FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
@@ -186,15 +184,23 @@ if GetOption('extraccflags'):
 # Define this once centrally to not overlook it if this is not needed anymore for Genfit
 GBL_EIGEN_SUPPORT_ROOT = ["-DGBL_EIGEN_SUPPORT_ROOT"]
 
+# clang::suppress is used to silence clang/cppcheck static analyzer findings.
+# GCC doesn't know this vendor attribute and warns about it, so tell it to keep
+# quiet. clang and icpx understand the attribute natively and would instead warn
+# about the unknown -W option, so this must only be passed to GCC.
+GCC_SUPPRESS_ATTRIBUTES = ['-Wno-attributes=clang::suppress']
+
 # check for compiler and debug flags
 option = os.environ['BELLE2_OPTION']
 print(f'Compilation option from environment (see "b2code-option"): {option}')
 if option == 'debug':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'] + GBL_EIGEN_SUPPORT_ROOT)
+    global_env.Append(CXXFLAGS=GCC_SUPPRESS_ATTRIBUTES)
     global_env.Append(FORTRANFLAGS='-g')
     global_env.Append(F90FLAGS='-g')
 elif option == 'opt':
     global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'] + GBL_EIGEN_SUPPORT_ROOT)
+    global_env.Append(CXXFLAGS=GCC_SUPPRESS_ATTRIBUTES)
     global_env.Append(FORTRANFLAGS=['-O3'])
     global_env.Append(F90FLAGS=['-O3'])
     # LTO has been disabled with no visible impact on performance

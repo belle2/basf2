@@ -58,7 +58,7 @@ namespace Belle2 {
       G4double  currentMinimumStep,
       G4double& currentSafety,
       G4GPILSelection* selection
-    );
+    ) override;
 
     /**
      * G4VProcess::AlongStepDoIt() implementation,
@@ -69,7 +69,7 @@ namespace Belle2 {
     G4VParticleChange* AlongStepDoIt(
       const G4Track& track,
       const G4Step& stepData
-    );
+    ) override;
 
     /**
      * G4VProcess::PostStepDoIt() implementation,
@@ -80,7 +80,7 @@ namespace Belle2 {
     G4VParticleChange* PostStepDoIt(
       const G4Track& track,
       const G4Step&  stepData
-    );
+    ) override;
 
     /**
      * G4VProcess::PostStepGetPhysicalInteractionLength() implementation.
@@ -96,7 +96,7 @@ namespace Belle2 {
       const G4Track& track,
       G4double   previousStepSize,
       G4ForceCondition* pForceCond
-    );
+    ) override;
 
 
 
@@ -171,7 +171,7 @@ namespace Belle2 {
     G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&) override
     { return 0; }
 
-    void StartTracking(G4Track* aTrack);
+    void StartTracking(G4Track* aTrack) override;
     /**< Reset state for new (potentially resumed) track*/
 
     /**
@@ -179,7 +179,7 @@ namespace Belle2 {
      *
      * @param outStream Output file with a description of process
      */
-    virtual void ProcessDescription(std::ostream& outStream) const;
+    void ProcessDescription(std::ostream& outStream) const override;
 
     void PrintStatistics(std::ostream& outStr) const;
     /**< returns current logging info of the algorithm */

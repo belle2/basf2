@@ -122,7 +122,7 @@ namespace Belle2 {
 
   private:
 
-    ClassDef(CDCAlignment, 2); /**< Storage for CDC alignment constants (mainly now for Millepede) */
+    ClassDefOverride(CDCAlignment, 2); /**< Storage for CDC alignment constants (mainly now for Millepede) */
 
   };
 

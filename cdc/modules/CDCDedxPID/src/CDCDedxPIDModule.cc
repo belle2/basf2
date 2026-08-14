@@ -269,7 +269,7 @@ void CDCDedxPIDModule::event()
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
-    if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
+    if ((std::abs(costh + 0.860) < 0.010) || (std::abs(costh - 0.955) <= 0.005))isEdge = true;
     dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && isData && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
 
     bool isvalidTime = true;
@@ -607,11 +607,11 @@ void CDCDedxPIDModule::event()
     double pidvalues[Const::ChargedStable::c_SetSize];
     Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ParticleType& pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
     } else {
-      for (const Const::ChargedStable& pdgIter : set) {
+      for (const Const::ParticleType& pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
       }
     }
@@ -892,7 +892,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable& pdgIter : set) {
+  for (const Const::ParticleType& pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution

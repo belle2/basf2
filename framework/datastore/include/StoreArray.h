@@ -225,10 +225,11 @@ namespace Belle2 {
     {
       ensureCreated();
       //At() checks for out-of-range and returns NULL in that case
-      TObject* obj = (*m_storeArray)->At(i);
+      //type was checked by DataStore, so the cast is safe.
+      T* obj = static_cast<T*>((*m_storeArray)->At(i));
       if (obj == nullptr)
         throw std::out_of_range("Out-of-range access in StoreArray::operator[], for " + readableName() + ", index " + std::to_string(i));
-      return static_cast<T*>(obj); //type was checked by DataStore, so the cast is safe.
+      return obj;
     }
 
     /** Construct a new T object at the end of the array.

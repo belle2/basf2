@@ -18,6 +18,8 @@
 #include <TDirectory.h>
 #include <TMath.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 REG_MODULE(CDCDedxDQM);
@@ -197,7 +199,7 @@ void CDCDedxDQMModule::event()
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         double TrkEoverP = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / pTrk;
         if (TrkEoverP > 0) {
-          if (abs(TrkEoverP - 1.0) > 0.25)continue;
+          if (std::abs(TrkEoverP - 1.0) > 0.25)continue;
         }
       }
 

@@ -205,7 +205,7 @@ void DQMHistAnalysisARICHModule::event()
     B2INFO("Histogram named chipHit is not found.");
   }
 
-  TH1F* chDigit = (TH1F*)findHist("ARICH/chDigit");
+  TH1* chDigit = findHist("ARICH/chDigit");
   int nhot = 0;
   double avgOcc = 0;
   if (chDigit != NULL && nEvents != 0) {
@@ -220,7 +220,7 @@ void DQMHistAnalysisARICHModule::event()
   setEpicsPV("hotChannels", nhot);
 
   int ndeadHapd = 0;
-  TH1F* hapdDigit = (TH1F*)findHist("ARICH/hapdDigit");
+  TH1* hapdDigit = findHist("ARICH/hapdDigit");
   if (hapdDigit != NULL && avgOcc * 144. > 100.) {
     for (int i = 0; i < hapdDigit->GetNbinsX(); i++) {
       if (hapdDigit->GetBinContent(i + 1) == 0) ndeadHapd++;
@@ -230,7 +230,7 @@ void DQMHistAnalysisARICHModule::event()
 
   auto h_theta =  getDelta("ARICH", "theta", 0, false); // change this to false
   auto c_theta = findCanvas("ARICH/c_theta");
-  auto h_thetaInt = (TH1F*)findHist("ARICH/theta");
+  auto* h_thetaInt = findHist("ARICH/theta");
   if (h_theta != NULL && c_theta != NULL && h_thetaInt != NULL) {
     int binmax = h_theta->GetMaximumBin();
     double x = h_theta->GetXaxis()->GetBinCenter(binmax);

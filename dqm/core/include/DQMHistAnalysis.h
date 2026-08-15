@@ -25,7 +25,7 @@
 
 #ifdef _BELLE2_EPICS
 // EPICS
-#include "cadef.h"
+#include <cadef.h>
 #endif
 
 namespace Belle2 {

@@ -74,20 +74,21 @@ void DQMHistReferenceModule::loadReferenceHistos()
       // detector folders
       while ((detDirKey = dynamic_cast<TKey*>(nextDetDirKey()))) {
         if (!detDirKey->IsFolder()) continue;
-        TDirectory* detDir = ((TDirectory*)detDirKey->ReadObj());
+        TDirectory* detDir = static_cast<TDirectory*>(detDirKey->ReadObj());
         TIter nextRunTypeDirKey(detDir->GetListOfKeys()); // ReadObj -> Now I own this, so delete later
         TKey* runtypeDirKey;
         TDirectory* runtypeDir = nullptr;
         // run type folders (get the run type corresponding folder or use default one)
-        while ((runtypeDirKey = (TKey*)nextRunTypeDirKey())) {
+        while ((runtypeDirKey = dynamic_cast<TKey*>(nextRunTypeDirKey()))) {
           if (!runtypeDirKey->IsFolder()) continue;
           if (string(runtypeDirKey->GetName()) == run_type) {
             if (runtypeDir) delete runtypeDir; // if default was loaded before
-            runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it, delete later
+            runtypeDir = static_cast<TDirectory*>(runtypeDirKey->ReadObj()); // ReadObj -> I own it, delete later
             break; // break directly, otherwise "default" could overwrite it
           }
           // else we would check if default, which we load as backup
-          if (string(runtypeDirKey->GetName()) == "default") runtypeDir = (TDirectory*)runtypeDirKey->ReadObj(); // ReadObj -> I own it
+          // ReadObj -> I own it
+          if (string(runtypeDirKey->GetName()) == "default") runtypeDir = static_cast<TDirectory*>(runtypeDirKey->ReadObj());
         }
         string detName = detDir->GetName();
         // Attention, runtypeDir and runtypeDirKey could be zero here
@@ -99,7 +100,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
           TIter nextHistkey(runtypeDir->GetListOfKeys());
           TKey* histKey;
           // now read histograms
-          while ((histKey = (TKey*)nextHistkey())) {
+          while ((histKey = dynamic_cast<TKey*>(nextHistkey()))) {
             if (histKey->IsFolder()) continue;
             if (gROOT->GetClass(histKey->GetClassName())->InheritsFrom("TH1")) { // maybe not needed with the dynamic cast check below
               auto h = dynamic_cast<TH1*>(histKey->ReadObj());

@@ -94,8 +94,8 @@ void DQMHistAnalysisPhysicsModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisPhysics: beginRun called.");
 }
 
-void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix,
-                                                       std::string pvname)
+void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, const std::string& parts,
+                                                       const std::string& prefix, const std::string& pvname)
 {
   double xMin = histo->GetXaxis()->GetXmin();
   double xMax = histo->GetXaxis()->GetXmax();

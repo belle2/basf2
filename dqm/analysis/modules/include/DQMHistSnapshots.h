@@ -10,10 +10,10 @@
 
 // EPICS
 #ifdef _BELLE2_EPICS
-#include "cadef.h"
-// #include "dbDefs.h"
-// #include "epicsString.h"
-// #include "cantProceed.h"
+#include <cadef.h>
+// #include <dbDefs.h>
+// #include <epicsString.h>
+// #include <cantProceed.h>
 #endif
 
 #include <dqm/core/DQMHistAnalysis.h>

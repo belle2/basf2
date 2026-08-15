@@ -125,7 +125,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
         B2DEBUG(20, "Histo " << m_histoname << " found in mem");
-        hh1 = (TH1*)obj;
+        hh1 = dynamic_cast<TH1*>(obj);
       }
     } else {
       B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
@@ -174,7 +174,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     if (obj != NULL) {
       if (obj->IsA()->InheritsFrom("TH1")) {
         B2DEBUG(20, "Histo " << m_histoname << " found in mem");
-        hh1 = (TH1*)obj;
+        hh1 = dynamic_cast<TH1*>(obj);
         flag = true;
       }
     } else {

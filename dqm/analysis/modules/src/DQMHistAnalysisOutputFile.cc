@@ -99,7 +99,7 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
         B2INFO("found canvases");
         TIter next(seq) ;
         TObject* obj ;
-        while ((obj = (TObject*)next())) {
+        while ((obj = next())) {
           if (obj->InheritsFrom("TCanvas")) {
             B2DEBUG(1, "Saving canvas " << obj->GetName());
             obj->Write();

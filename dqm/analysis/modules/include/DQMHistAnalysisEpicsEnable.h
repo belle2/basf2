@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~DQMHistAnalysisEpicsEnableModule();
+    ~DQMHistAnalysisEpicsEnableModule() override;
 
     /**
      * Initialize the Module.

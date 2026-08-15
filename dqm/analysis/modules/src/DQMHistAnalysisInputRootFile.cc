@@ -205,7 +205,7 @@ void DQMHistAnalysisInputRootFileModule::event()
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (ts == 0) ts = key->GetDatime().Convert();
     if (cl->InheritsFrom("TDirectory")) {
-      TDirectory* d = (TDirectory*)key->ReadObj();
+      TDirectory* d = static_cast<TDirectory*>(key->ReadObj());
       std::string dirname = d->GetName();
 
       d->cd();

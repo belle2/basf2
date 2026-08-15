@@ -193,7 +193,7 @@ void DQMHistAnalysisCDCDedxModule::terminate()
 void DQMHistAnalysisCDCDedxModule::getMetadata()
 {
 
-  TH1D* h_Meta = (TH1D*)findHist("CDCDedx/hMeta");
+  const auto* h_Meta = findHist("CDCDedx/hMeta");
 
   if (h_Meta != nullptr) {
     m_nallevt = int(h_Meta->GetBinContent(1));
@@ -304,7 +304,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 
     m_c_ir_dedx->cd(3);
 
-    TH2D* hdEdxIRScat = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
+    auto* hdEdxIRScat = dynamic_cast<TH2*>(findHist("CDCDedx/hdEdxvsEvt"));
     if (hdEdxIRScat != nullptr) {
 
       setPadStyle(0.143, 0.045, 0.077, 0.0);
@@ -328,7 +328,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
   }
 
   //Intra rungain/reso variation
-  TH2D* hdEdxIRScatC = (TH2D*)findHist("CDCDedx/hdEdxvsEvt");
+  auto* hdEdxIRScatC = dynamic_cast<TH2*>(findHist("CDCDedx/hdEdxvsEvt"));
 
   if (hdEdxIRScatC != nullptr) {
 
@@ -382,7 +382,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxIR()
 void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 {
   //Draw Scattered plot
-  TH2D* hdEdxVsP = (TH2D*)findHist("CDCDedx/hdEdxVsP");
+  auto* hdEdxVsP = dynamic_cast<TH2*>(findHist("CDCDedx/hdEdxVsP"));
   if (hdEdxVsP != nullptr) {
 
     m_c_pr_dedx->cd(2);
@@ -415,7 +415,7 @@ void DQMHistAnalysisCDCDedxModule::drawBandPlot()
 void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 {
 
-  TH2D* hdEdxvsPhi = (TH2D*)findHist("CDCDedx/hdEdxvsPhi");
+  auto* hdEdxvsPhi = dynamic_cast<TH2*>(findHist("CDCDedx/hdEdxvsPhi"));
   if (hdEdxvsPhi != nullptr) {
 
     m_c_pr_dedx->cd(3);
@@ -429,7 +429,7 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
   }
 
   //plot # 2
-  TH2D* hdEdxvsCosth = (TH2D*)findHist("CDCDedx/hdEdxvsCosth");
+  auto* hdEdxvsCosth = dynamic_cast<TH2*>(findHist("CDCDedx/hdEdxvsCosth"));
   if (hdEdxvsCosth != nullptr) {
 
     m_c_pr_dedx->cd(4);
@@ -446,8 +446,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxCosPhi()
 void DQMHistAnalysisCDCDedxModule::drawDedxInjTime()
 {
 
-  TH2D* hinjtimeHer = (TH2D*)findHist("CDCDedx/hinjtimeHer");
-  TH2D* hinjtimeLer = (TH2D*)findHist("CDCDedx/hinjtimeLer");
+  auto* hinjtimeHer = dynamic_cast<TH2*>(findHist("CDCDedx/hinjtimeHer"));
+  auto* hinjtimeLer = dynamic_cast<TH2*>(findHist("CDCDedx/hinjtimeLer"));
 
   if (hinjtimeHer != nullptr && hinjtimeLer != nullptr) {
 
@@ -478,8 +478,8 @@ void DQMHistAnalysisCDCDedxModule::drawDedxInjTimeBin()
 {
 
   //Injection time variation
-  TH2D* hdEdxITHer = (TH2D*)findHist("CDCDedx/hinjtimeHer");
-  TH2D* hdEdxITLer = (TH2D*)findHist("CDCDedx/hinjtimeLer");
+  auto* hdEdxITHer = dynamic_cast<TH2*>(findHist("CDCDedx/hinjtimeHer"));
+  auto* hdEdxITLer = dynamic_cast<TH2*>(findHist("CDCDedx/hinjtimeLer"));
 
   if (hdEdxITHer != nullptr && hdEdxITLer != nullptr) {
 
@@ -548,8 +548,8 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
 {
 
   //Draw Scattered plot
-  TH2D* hWires = (TH2D*)findHist("CDCDedx/hWires");
-  TH2D* hWireStatus = (TH2D*)findHist("CDCDedx/hWireStatus");
+  auto* hWires = dynamic_cast<TH2*>(findHist("CDCDedx/hWires"));
+  auto* hWireStatus = dynamic_cast<TH2*>(findHist("CDCDedx/hWireStatus"));
   if (hWires != nullptr && hWireStatus != nullptr) {
 
     m_c_pr_dedx->cd(8);
@@ -583,7 +583,7 @@ void DQMHistAnalysisCDCDedxModule::drawWireStatus()
 }
 
 //-----------------------------------------------
-void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F*& hmean, TH1F*& hsigma, int nbin)
+void DQMHistAnalysisCDCDedxModule::setHistPars(TH2* hdEdx, TH1F* hmean, TH1F* hsigma, int nbin)
 {
 
   int fbin = hdEdx->FindFirstBinAbove(0, 1);
@@ -591,7 +591,7 @@ void DQMHistAnalysisCDCDedxModule::setHistPars(TH2D*& hdEdx, TH1F*& hmean, TH1F*
   for (int ibin = 0; ibin < nbin; ibin++) {
     int localbin = ibin + fbin;
     delete m_hdEdxIRInd;
-    m_hdEdxIRInd = (TH1*)hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
+    m_hdEdxIRInd = hdEdx->ProjectionY(Form("htemp_%d", localbin), localbin, localbin);
 
     double mean = 0.0, meanerr = 0.0;
     double sigma = 0.0, sigmaerr = 0.0;

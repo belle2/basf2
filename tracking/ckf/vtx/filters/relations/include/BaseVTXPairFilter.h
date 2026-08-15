@@ -7,10 +7,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
 
 namespace Belle2 {
   /// Base filter for CKF VTX states
-  using BaseVTXPairFilter = TrackFindingCDC::Filter<std::pair<const CKFToVTXState*, const CKFToVTXState*>>;
+  using BaseVTXPairFilter = TrackingUtilities::Filter<std::pair<const CKFToVTXState*, const CKFToVTXState*>>;
 }

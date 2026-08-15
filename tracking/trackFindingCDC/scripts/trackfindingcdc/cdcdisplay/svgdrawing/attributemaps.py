@@ -99,7 +99,7 @@ class ZeroDriftLengthStrokeWidthMap(CDCHitStrokeWidthMap):
         Function call to map the CDCHit id and object to a stroke width.
         """
 
-        wirehit = Belle2.TrackFindingCDC.CDCWireHit(cdcHit)
+        wirehit = Belle2.TrackingUtilities.CDCWireHit(cdcHit)
         if wirehit.getRefDriftLength() == 0.0:
             return 1
         else:
@@ -134,7 +134,7 @@ class ZeroDriftLengthColorMap(CDCHitColorMap):
         Function call to map the CDCHit id and object to a color.
         """
 
-        wirehit = Belle2.TrackFindingCDC.CDCWireHit(cdcHit)
+        wirehit = Belle2.TrackingUtilities.CDCWireHit(cdcHit)
         if wirehit.getRefDriftLength() == 0.0:
             return 'red'
         else:

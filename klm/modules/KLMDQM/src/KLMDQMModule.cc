@@ -16,6 +16,8 @@
 /* ROOT headers. */
 #include <TDirectory.h>
 
+#include <set>
+
 using namespace Belle2;
 
 REG_MODULE(KLMDQM);
@@ -26,10 +28,19 @@ KLMDQMModule::KLMDQMModule() :
   m_TimeRPC{nullptr},
   m_TimeScintillatorBKLM{nullptr},
   m_TimeScintillatorEKLM{nullptr},
+  m_ChargeScintillatorBKLM{nullptr},
+  m_ChargeScintillatorEKLM{nullptr},
+  m_ChargeScintillatorBKLM_SingleStrip{nullptr},
+  m_ChargeScintillatorEKLM_SingleStrip{nullptr},
+  m_ChargeScintillatorBKLM_MultiStrip{nullptr},
+  m_ChargeScintillatorEKLM_MultiStrip{nullptr},
+  m_ChargeClusterBKLM{nullptr},
+  m_ChargeClusterEKLM{nullptr},
+  m_AverageChargeClusterBKLM{nullptr},
+  m_AverageChargeClusterEKLM{nullptr},
   m_PlaneBKLMPhi{nullptr},
   m_PlaneBKLMZ{nullptr},
   m_PlaneEKLM{nullptr},
-  m_MaskedChannelsPerSector{nullptr},
   m_DigitsKLM{nullptr},
   m_DigitsRPC{nullptr},
   m_DigitsScintillatorBKLM{nullptr},
@@ -38,6 +49,7 @@ KLMDQMModule::KLMDQMModule() :
   m_DigitsMultiStripEKLM{nullptr},
   m_TriggerBitsBKLM{nullptr},
   m_TriggerBitsEKLM{nullptr},
+  m_EventBackgroundTriggerSummary{nullptr},
   m_DigitsAfterLERInj{nullptr},
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
@@ -49,7 +61,8 @@ KLMDQMModule::KLMDQMModule() :
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
-  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
+  m_eklmElementNumbers{&(EKLMElementNumbers::Instance())},
+  m_klmTime{&(KLMTime::Instance())}
 {
   setDescription("KLM data quality monitor.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -68,6 +81,10 @@ KLMDQMModule::KLMDQMModule() :
            "Min time for EKLM scintillator time histogram.", double(-5300));
   addParam("EKLMScintTimeMax", m_EKLMScintTimeMax,
            "Max time for EKLM scintillator time histogram.", double(-4300));
+  addParam("Revo9DCArrivalTimeMin", m_Revo9DCArrivalTimeMin,
+           "Min time for RPC hit revo9DCArrivalTime histogram.", double(-10000));
+  addParam("Revo9DCArrivalTimeMax", m_Revo9DCArrivalTimeMax,
+           "Max time for RPC hit revo9DCArrivalTime histogram.", double(3000));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -111,6 +128,49 @@ void KLMDQMModule::defineHisto()
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
              100, m_EKLMScintTimeMin, m_EKLMScintTimeMax);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
+  m_ChargeScintillatorBKLM =
+    new TH1F("charge_scintillator_bklm", "Scintillator charge (BKLM)",
+             256, 0., 512.);
+  m_ChargeScintillatorBKLM->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM =
+    new TH1F("charge_scintillator_eklm", "Scintillator charge (EKLM)",
+             256, 0., 512.);
+  m_ChargeScintillatorEKLM->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorBKLM_SingleStrip =
+    new TH1F("charge_scintillator_bklm_single_strip", "Scintillator charge (BKLM) single strip",
+             256, 0., 512.);
+  m_ChargeScintillatorBKLM_SingleStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM_SingleStrip =
+    new TH1F("charge_scintillator_eklm_single_strip", "Scintillator charge (EKLM) single strip",
+             256, 0., 512.);
+  m_ChargeScintillatorEKLM_SingleStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorBKLM_MultiStrip =
+    new TH1F("charge_scintillator_bklm_multi_strip", "Scintillator charge (BKLM) multi strip",
+             256, 0., 512.);
+  m_ChargeScintillatorBKLM_MultiStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeScintillatorEKLM_MultiStrip =
+    new TH1F("charge_scintillator_eklm_multi_strip", "Scintillator charge (EKLM) multi strip",
+             256, 0., 512.);
+  m_ChargeScintillatorEKLM_MultiStrip->GetXaxis()->SetTitle("Charge");
+  m_ChargeClusterBKLM =
+    new TH1F("charge_cluster_bklm", "BKLM Scintillator Clusters",
+             500, 0., 10000.);
+  m_ChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge");
+  m_ChargeClusterEKLM =
+    new TH1F("charge_cluster_eklm", "EKLM Clusters",
+             500, 0., 10000.);
+  m_ChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge");
+  m_AverageChargeClusterBKLM =
+    new TH1F("avg_charge_cluster_bklm", "Mean Cluster Charge (BKLM)",
+             256, 0., 512.);
+  m_AverageChargeClusterBKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
+  m_AverageChargeClusterEKLM =
+    new TH1F("avg_charge_cluster_eklm", "Mean Cluster Charge (EKLM)",
+             256, 0., 512.);
+  m_AverageChargeClusterEKLM->GetXaxis()->SetTitle("Cluster Charge / Number of Digits in Cluster");
+  m_TimeRevo9DCArrivalTime = new TH1F("time_revo9dc_arrival_time", "DC arrival hit time (RPC)",
+                                      500, m_Revo9DCArrivalTimeMin, m_Revo9DCArrivalTimeMax);
+  m_TimeRevo9DCArrivalTime->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
                             "BKLM plane occupancy (#phi readout)",
@@ -183,18 +243,6 @@ void KLMDQMModule::defineHisto()
     }
   }
   delete[] firstChannelNumbers;
-  /* Masked channels per sector:
-   * it is defined here, but filled by the analysis module. */
-  KLMSectorNumber totalSectors = m_SectorArrayIndex->getNElements();
-  m_MaskedChannelsPerSector = new TH1F("masked_channels", "Number of masked channels per sector",
-                                       totalSectors, -0.5, totalSectors - 0.5);
-  klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
-    std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
-    KLMSectorNumber sector = klmSector.getKLMSectorNumber();
-    KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
-    m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
-  }
   /* Number of digits. */
   m_DigitsKLM = new TH1F("digits_klm", "Number of KLM digits",
                          250.0, 0.0, 250.0);
@@ -227,6 +275,17 @@ void KLMDQMModule::defineHisto()
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
+
+  /* Event-level L1 trigger bits (TRGSummary). */
+  int nTimingBits = (int)c_KlmL1Triggers.size();          // TTYP_DPHY, TTYP_RAND, TTYP_POIS
+  m_EventBackgroundTriggerSummary = new TH1F("event_background_trigger_summary",
+                                             "Event background trigger summary;Trigger Decision;Events",
+                                             nTimingBits, 0.5, 0.5 + nTimingBits);
+  /* Keep labels explicit to match the actual trigger bits. */
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(1, "TTYP_DPHY");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(2, "TTYP_RAND");
+  m_EventBackgroundTriggerSummary->GetXaxis()->SetBinLabel(3, "TTYP_POIS");
+
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
   m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLM digits after LER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
@@ -280,9 +339,11 @@ void KLMDQMModule::initialize()
   REG_HISTOGRAM;
   m_RawFtsws.isOptional();
   m_RawKlms.isOptional();
+  m_trgSummary.isOptional();
   m_Digits.isOptional();
   m_BklmHit1ds.isOptional();
   m_Hit2ds.isOptional();
+  m_KLMClusters.isOptional();
 }
 
 void KLMDQMModule::beginRun()
@@ -297,6 +358,18 @@ void KLMDQMModule::beginRun()
   m_TimeRPC->Reset();
   m_TimeScintillatorBKLM->Reset();
   m_TimeScintillatorEKLM->Reset();
+  m_ChargeScintillatorBKLM->Reset();
+  m_ChargeScintillatorEKLM->Reset();
+  m_ChargeScintillatorBKLM_SingleStrip->Reset();
+  m_ChargeScintillatorEKLM_SingleStrip->Reset();
+  m_ChargeScintillatorBKLM_MultiStrip->Reset();
+  m_ChargeScintillatorEKLM_MultiStrip->Reset();
+  m_ChargeClusterBKLM->Reset();
+  m_ChargeClusterEKLM->Reset();
+  m_AverageChargeClusterBKLM->Reset();
+  m_AverageChargeClusterEKLM->Reset();
+  m_TimeRevo9DCArrivalTime->Reset();
+  m_klmTime->updateConstants(); //to get correct CTime
   /* Plane hits. */
   m_PlaneEKLM->Reset();
   m_PlaneBKLMPhi->Reset();
@@ -324,6 +397,9 @@ void KLMDQMModule::beginRun()
   /* Trigger bits. */
   m_TriggerBitsBKLM->Reset();
   m_TriggerBitsEKLM->Reset();
+  /* Event-level background trigger summary. */
+  if (m_EventBackgroundTriggerSummary != nullptr)
+    m_EventBackgroundTriggerSummary->Reset();
   /* Injection information. */
   m_DigitsAfterLERInj->Reset();
   m_TriggersLERInj->Reset();
@@ -350,6 +426,16 @@ void KLMDQMModule::beginRun()
 
 void KLMDQMModule::event()
 {
+  /* Event-level background trigger summary, filled once per event. */
+  if (m_trgSummary.isValid() && m_EventBackgroundTriggerSummary != nullptr) {
+    const int nTimingBits = (int)c_KlmL1Triggers.size();
+    // GDL Background triggers: TTYP_DPHY, TTYP_RAND, TTYP_POIS (event-level timing source)
+    for (int i = 0; i < nTimingBits; ++i) {
+      if (m_trgSummary->getTimType() == c_KlmL1Triggers[i])
+        m_EventBackgroundTriggerSummary->Fill((double)i + 1.0);
+    }
+  }
+
   int nDigits = m_Digits.getEntries();
   int nDigitsRPC = 0, nDigitsScintillatorBKLM = 0, nDigitsScintillatorEKLM = 0;
   int nDigitsMultiStripBKLM = 0, nDigitsMultiStripEKLM = 0;
@@ -404,6 +490,13 @@ void KLMDQMModule::event()
         uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
         if (feStatus != 0) {
           m_FE_EKLM_Plane_1->Fill(planeGlobal);
+          m_ChargeScintillatorEKLM->Fill(digit.getCharge());
+          uint16_t triggerBits = digitRaw->getTriggerBits();
+          if ((triggerBits & 0x10) != 0) {
+            m_ChargeScintillatorEKLM_MultiStrip->Fill(digit.getCharge());
+          } else {
+            m_ChargeScintillatorEKLM_SingleStrip->Fill(digit.getCharge());
+          }
         } else {
           m_FE_EKLM_Plane_0->Fill(planeGlobal);
         }
@@ -433,6 +526,7 @@ void KLMDQMModule::event()
       if (digit.inRPC()) {
         nDigitsRPC++;
         m_TimeRPC->Fill(digit.getTime());
+        m_TimeRevo9DCArrivalTime->Fill(digit.getRevo9DCArrivalTime() * m_klmTime->getCTimePeriod());
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
@@ -440,6 +534,13 @@ void KLMDQMModule::event()
           uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
           if (feStatus != 0) {
             m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
+            m_ChargeScintillatorBKLM->Fill(digit.getCharge());
+            uint16_t triggerBits = digitRaw->getTriggerBits();
+            if ((triggerBits & 0x10) != 0) {
+              m_ChargeScintillatorBKLM_MultiStrip->Fill(digit.getCharge());
+            } else {
+              m_ChargeScintillatorBKLM_SingleStrip->Fill(digit.getCharge());
+            }
           } else {
             m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
           }
@@ -508,6 +609,50 @@ void KLMDQMModule::event()
     int section = hit2d.getSection();
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());
+  }
+  /* Cluster charge from related scintillator digits (unique per cluster). */
+  if (m_KLMClusters.isValid()) {
+    for (KLMCluster& cluster : m_KLMClusters) {
+      std::set<const KLMDigit*> digitsSeen;
+      double sumChargeBKLM = 0.;
+      double sumChargeEKLM = 0.;
+      int nDigitsClusterBKLM = 0;
+      int nDigitsClusterEKLM = 0;
+      auto addDigits = [&](const RelationVector<KLMDigit>& digits) {
+        for (unsigned id = 0; id < digits.size(); ++id) {
+          const KLMDigit* digit = digits[id];
+          if (!digit->isGood())
+            continue;
+          if (!digitsSeen.insert(digit).second)
+            continue;
+          if (digit->getSubdetector() == KLMElementNumbers::c_EKLM && digit->getCharge() > 35.) {
+            sumChargeEKLM += digit->getCharge();
+            ++nDigitsClusterEKLM;
+          } else if (digit->getSubdetector() == KLMElementNumbers::c_BKLM && !digit->inRPC() && digit->getCharge() > 35.) {
+            sumChargeBKLM += digit->getCharge();
+            ++nDigitsClusterBKLM;
+          }
+        }
+      };
+      RelationVector<KLMHit2d> clusterHits = cluster.getRelationsTo<KLMHit2d>();
+      for (unsigned ih = 0; ih < clusterHits.size(); ++ih) {
+        KLMHit2d* hit2d = clusterHits[ih];
+        addDigits(hit2d->getRelationsTo<KLMDigit>());
+        RelationVector<BKLMHit1d> hit1ds = hit2d->getRelationsTo<BKLMHit1d>();
+        for (unsigned i1 = 0; i1 < hit1ds.size(); ++i1)
+          addDigits(hit1ds[i1]->getRelationsTo<KLMDigit>());
+      }
+      if (clusterHits.size() > 1 && sumChargeBKLM > 0.) {
+        m_ChargeClusterBKLM->Fill(sumChargeBKLM);
+        m_AverageChargeClusterBKLM->Fill(sumChargeBKLM /
+                                         static_cast<double>(nDigitsClusterBKLM));
+      }
+      if (clusterHits.size() > 1 && sumChargeEKLM > 0.) {
+        m_ChargeClusterEKLM->Fill(sumChargeEKLM);
+        m_AverageChargeClusterEKLM->Fill(sumChargeEKLM /
+                                         static_cast<double>(nDigitsClusterEKLM));
+      }
+    }
   }
 }
 

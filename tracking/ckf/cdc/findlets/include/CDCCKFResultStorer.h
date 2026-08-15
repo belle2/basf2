@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
@@ -21,9 +21,9 @@ namespace Belle2 {
   class ModuleParamInfo;
 
   /// Store resulting tracks and relations on the dataStore
-  class CDCCKFResultStorer : public TrackFindingCDC::Findlet<const CDCCKFResult> {
+  class CDCCKFResultStorer : public TrackingUtilities::Findlet<const CDCCKFResult> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const CDCCKFResult>;
+    using Super = TrackingUtilities::Findlet<const CDCCKFResult>;
 
   public:
     /// Expose the parameters of the sub findlets.
@@ -35,12 +35,30 @@ namespace Belle2 {
     /// Register the store arrays
     void initialize() override;
 
+    /** Set whether to export tracks
+     *
+     *  @param exportTracks True to export tracks
+     */
+    void setExportTracks(bool exportTracks) { m_param_exportTracks = exportTracks; }
+
+    /** Set whether to export all tracks
+     *
+     *  @param exportAllTracks True to export all tracks, even if they did not reach the center of the CDC
+     */
+    void setExportAllTracks(bool exportAllTracks) { m_param_exportAllTracks = exportAllTracks; }
+
+    /** Set whether to set the taken flag
+     *
+     *  @param setTakenFlag True to set the taken flag on tracks
+     */
+    void setSetTakenFlag(bool setTakenFlag) { m_param_setTakenFlag = setTakenFlag; }
+
   private:
     // Parameters
     /// Parameter for the distance given to the framework (can not handle EForwardBackward directly)
     std::string m_param_writeOutDirectionAsString = "both";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_writeOutDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_writeOutDirection = TrackingUtilities::EForwardBackward::c_Unknown;
     /// Export the tracks or not
     bool m_param_exportTracks = true;
     /// Export all tracks, even if they did not reach the center of the CDC
@@ -52,7 +70,7 @@ namespace Belle2 {
     /// Parameter for the direction of the CKF
     std::string m_param_trackFindingDirectionAsString = "forward";
     /// Direction parameter converted from the string parameters
-    TrackFindingCDC::EForwardBackward m_param_trackFindingDirection = TrackFindingCDC::EForwardBackward::c_Unknown;
+    TrackingUtilities::EForwardBackward m_param_trackFindingDirection = TrackingUtilities::EForwardBackward::c_Unknown;
     /// Set flag that hit is taken
     bool m_param_setTakenFlag = true;
     /// What was used to seed the CKF (typically c_SVDtoCDCCKF, c_ECLtoCDCCKF, c_VTXtoCDCCKF)

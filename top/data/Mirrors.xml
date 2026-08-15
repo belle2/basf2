@@ -13,7 +13,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_1</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -42,7 +42,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_3</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -71,7 +71,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_2</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -100,7 +100,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_4</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -129,7 +129,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_5</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -158,7 +158,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_6</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -187,7 +187,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_7</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -216,7 +216,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_8</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -245,7 +245,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_10</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -274,7 +274,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_11</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -303,7 +303,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_12</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -332,7 +332,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_13</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -361,7 +361,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_14</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -390,7 +390,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_9</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -419,7 +419,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_15</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -448,7 +448,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_16</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>
@@ -477,7 +477,7 @@
     <Xpos desc="center of curvature in x" unit="mm">0</Xpos>
     <Ypos desc="center of curvature in y" unit="mm">10</Ypos>
     <OpticalSurface>QuartzSurface_17</OpticalSurface>
-    <SigmaAlpha desc="G4 surface roughness">0.000125</SigmaAlpha>
+    <SigmaAlpha desc="G4 surface roughness">0.000250</SigmaAlpha>
     <mirrorThickness desc="thickness of mirror coating" unit="mm">0.1</mirrorThickness>
     <Surface name="Mirror coating">
       <Properties>

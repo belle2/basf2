@@ -9,14 +9,14 @@
 
 #include <tracking/ckf/cdc/filters/paths/BaseCDCPathFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 
 namespace Belle2 {
   /// Check if charge of fitted path corresponds to charge of seed
   class SeedChargeCDCPathFilter : public BaseCDCPathFilter {
   public:
     /// Main function: return the charge of the path
-    TrackFindingCDC::Weight operator()(const BaseCDCPathFilter::Object& path) final
+    TrackingUtilities::Weight operator()(const BaseCDCPathFilter::Object& path) final
     {
       // Not able to find any hits
       if (path.size() == 1) {

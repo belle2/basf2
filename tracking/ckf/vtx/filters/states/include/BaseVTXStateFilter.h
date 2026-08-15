@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
 
 namespace Belle2 {
   /// Base filter for CKF VTX states
   using BaseVTXStateFilter =
-    TrackFindingCDC::Filter<std::pair<const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>, CKFToVTXState*>>;
+    TrackingUtilities::Filter<std::pair<const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>, CKFToVTXState*>>;
 }

@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/vtx/filters/relations/SensorVTXPairFilter.h>
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 
 #include <vxd/geometry/GeoCache.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-TrackFindingCDC::Weight
+TrackingUtilities::Weight
 SensorVTXPairFilter::operator()(const std::pair<const CKFToVTXState*, const CKFToVTXState*>& relation)
 {
   const CKFToVTXState& fromState = *(relation.first);
@@ -74,8 +74,8 @@ SensorVTXPairFilter::operator()(const std::pair<const CKFToVTXState*, const CKFT
 
 void SensorVTXPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
                                 "Cut in phi for the difference between RecoTrack (seed) mSoP and current hit-based state.", m_param_PhiRecoTrackToHitCut);
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
                                 "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
 }

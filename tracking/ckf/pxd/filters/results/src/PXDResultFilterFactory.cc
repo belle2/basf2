@@ -7,14 +7,14 @@
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/results/PXDResultFilterFactory.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 #include <tracking/ckf/pxd/filters/results/PXDResultVarSet.h>
 #include <tracking/ckf/pxd/filters/results/PXDResultTruthVarSet.h>
@@ -22,7 +22,7 @@
 
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   /// MC filter using the truth/teacher information
@@ -70,10 +70,10 @@ std::unique_ptr<BasePXDResultFilter>
 PXDResultFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BasePXDResultFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BasePXDResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BasePXDResultFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BasePXDResultFilter>>();
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "recording") {
     return std::make_unique<RecordingPXDResultFilter>();

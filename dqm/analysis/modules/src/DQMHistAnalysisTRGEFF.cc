@@ -17,7 +17,7 @@
 #include <TClass.h>
 #include <TStyle.h>
 #include <TROOT.h>
-#include "TLatex.h"
+#include <TLatex.h>
 
 #include <fstream>
 #include <iostream>
@@ -40,11 +40,6 @@ DQMHistAnalysisTRGEFFModule::DQMHistAnalysisTRGEFFModule()
   setDescription("Modify and analyze the data quality histograms of TRGEFF");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("alert", m_enableAlert, "Enable color alert", true);
-}
-
-DQMHistAnalysisTRGEFFModule::~DQMHistAnalysisTRGEFFModule()
-{
-
 }
 
 void DQMHistAnalysisTRGEFFModule::initialize()

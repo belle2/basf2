@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -30,11 +30,11 @@ namespace Belle2 {
   void LayerPXDRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
     // use value from DB if parameter is set to -1
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitJumping"), m_param_hitJumping,
                                   "Make it possible to jump over N layers.", m_param_hitJumping);
 
     m_filter.exposeParameters(moduleParamList, prefix);
-    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
+    m_prefilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("pre", prefix));
 
     m_prefix = prefix;
   }
@@ -151,7 +151,7 @@ namespace Belle2 {
       }
 
       // Some loose prefiltering of possible states
-      TrackFindingCDC::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
+      TrackingUtilities::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
       if (std::isnan(weight)) {
         continue;
       }
@@ -163,7 +163,8 @@ namespace Belle2 {
   }
 
   template <class AFilter, class APrefilter>
-  TrackFindingCDC::Weight LayerPXDRelationFilter<AFilter, APrefilter>::operator()(const CKFToPXDState& from, const CKFToPXDState& to)
+  TrackingUtilities::Weight LayerPXDRelationFilter<AFilter, APrefilter>::operator()(const CKFToPXDState& from,
+      const CKFToPXDState& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

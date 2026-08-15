@@ -390,5 +390,9 @@ namespace Belle2 {
      **/
     Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments);
 
+    /**
+     * @return number of layers with measurements used in the CDC likelihood
+     */
+    double nCDCDedxLayers(const Particle* part);
   }
 } // Belle2 namespace

@@ -18,6 +18,8 @@ from stdCharged import stdPi, stdK
 import modularAnalysis as ma
 import stdV0s
 import vertex
+from variables import variables as vm
+import math as math
 
 
 def add_analysis_dqm(path):
@@ -34,13 +36,13 @@ def add_analysis_dqm(path):
     ma.fillParticleList('mu+:KLMDQM2', 'p>1.5 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
-    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
+    ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, writeOut=False, path=path)
     # std Kshorts-TreeFit
-    stdV0s.stdKshorts(path=path, fitter='TreeFit', updateAllDaughters=True, writeOut=True, addSuffix=True)
-    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
+    stdV0s.stdKshorts(path=path, fitter='TreeFit', updateAllDaughters=True, writeOut=False, addSuffix=True)
+    ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, writeOut=False, path=path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
-    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, True, path)
+    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, writeOut=False, path=path)
     ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
@@ -84,6 +86,7 @@ def add_mirabelle_dqm(path):
     MiraBelleDst1_path = b2.create_path()
     MiraBelleNotDst1_path = b2.create_path()
     MiraBelleDst2_path = b2.create_path()
+    MiraBelleTau_path = b2.create_path()
     # bhabha,hadrons
     MiraBelleBhabha_path = b2.create_path()
     MiraBellehadronb2_path = b2.create_path()
@@ -122,10 +125,18 @@ def add_mirabelle_dqm(path):
         resultOnMissing=0,
     )
     trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, b2.AfterConditionPath.CONTINUE)
+    trigger_skim_tau = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_tau_2trk", "software_trigger_cut&skim&accept_tau_Ntrk"],
+        expectedResult=1,
+        logicMode="or",
+        resultOnMissing=0,
+    )
+    trigger_skim_tau.if_value("==1", MiraBelleTau_path, b2.AfterConditionPath.CONTINUE)
     # bhabha,hadrons
     trigger_skim_bhabhaall = path.add_module(
         "TriggerSkim",
-        triggerLines=["software_trigger_cut&skim&accept_bhabha_all"],
+        triggerLines=["software_trigger_cut&skim&accept_bhabha_trk_ecl"],
         resultOnMissing=0,
     )
     trigger_skim_bhabhaall.if_value("==1", MiraBelleBhabha_path, b2.AfterConditionPath.CONTINUE)
@@ -165,7 +176,7 @@ def add_mirabelle_dqm(path):
     # MiraBelle D* (followed by D0 -> K pi pi0) path
     ma.fillParticleList('pi+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
     ma.fillParticleList('K+:MiraBelleDst2', 'abs(d0)<0.5 and abs(z0)<3', path=MiraBelleDst2_path)
-    stdPi0s(listtype='eff60_May2020', path=MiraBelleDst2_path)
+    stdPi0s(listtype='eff60_May2020', writeOut=False, path=MiraBelleDst2_path)
     ma.reconstructDecay(
         'D0:MiraBelleDst2_kpipi0 -> K-:MiraBelleDst2 pi+:MiraBelleDst2 pi0:eff60_May2020',
         '1.7 < M < 2.1',
@@ -175,6 +186,49 @@ def add_mirabelle_dqm(path):
     MiraBelleDst2 = b2.register_module('PhysicsObjectsMiraBelleDst2')
     MiraBelleDst2.param('DstListName', 'D*+:MiraBelleDst2_kpipi0')
     MiraBelleDst2_path.add_module(MiraBelleDst2)
+
+    # MiraBelle tau path
+    # The selections are inspired from TauGeneric skim to retain taupair events
+    # The retention rate for taupair MC is ~ 51%
+    # For other MC samples, the retention rate is < 7%
+    ma.fillParticleList('pi+:MiraBelleTau', 'abs(d0)<1 and abs(z0)<3', path=MiraBelleTau_path)
+    ma.fillParticleList('gamma:MiraBelleTau', 'E>0.1 and clusterNHits>1.5 and thetaInCDCAcceptance', path=MiraBelleTau_path)
+    ParticleListForEvent = ['pi+:MiraBelleTau', 'gamma:MiraBelleTau']
+    ma.buildEventShape(ParticleListForEvent,
+                       allMoments=False, foxWolfram=False, cleoCones=False,
+                       sphericity=False, jets=False, path=MiraBelleTau_path)
+    ma.buildEventKinematics(ParticleListForEvent, path=MiraBelleTau_path)
+
+    vm.addAlias("nGoodTracks", "nParticlesInList(pi+:MiraBelleTau)")
+    vm.addAlias("maxPt", "maxPtInList(pi+:MiraBelleTau)")
+    vm.addAlias("E_ECLtrk", "formula(totalECLEnergyOfParticlesInList(pi+:MiraBelleTau))")
+    vm.addAlias("maxOp", "useCMSFrame(maxOpeningAngleInList(pi+:MiraBelleTau))")
+
+    ma.cutAndCopyLists('pi+:MiraBelleTau_para', 'pi+:MiraBelleTau', 'cosToThrustOfEvent>0', path=MiraBelleTau_path)
+    ma.cutAndCopyLists('pi+:MiraBelleTau_anti', 'pi+:MiraBelleTau', 'cosToThrustOfEvent<0', path=MiraBelleTau_path)
+    vm.addAlias('pionInParaThrust', 'countInList(pi+:MiraBelleTau_para)')
+    vm.addAlias('pionInAntiThrust', 'countInList(pi+:MiraBelleTau_anti)')
+
+    PmissTheta_Threshold = math.radians(150)
+    maxOp_Threshold = math.radians(178)
+    Tau1x1Cuts = '[nGoodTracks == 2] and [3 < visibleEnergyOfEventCMS < 10]'
+    Tau1x1Cuts += f'and [missingMomentumOfEvent_theta < {PmissTheta_Threshold}]'
+    Tau1x1Cuts += f'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < {maxOp_Threshold}]'
+    Tau1x1Cuts += 'and [pionInParaThrust == 1 and pionInAntiThrust == 1]'
+    ma.reconstructDecay('Z0:physMiraBelleTau1x1 -> pi+:MiraBelleTau pi-:MiraBelleTau',
+                        f'{Tau1x1Cuts}', path=MiraBelleTau_path)
+
+    Tau1x3Cuts = '[nGoodTracks == 4] and [3 < visibleEnergyOfEventCMS < 10.5]'
+    Tau1x3Cuts += f'and [E_ECLtrk < 6] and [maxPt > 1] and [maxOp < {maxOp_Threshold}]'
+    Tau1x3Cuts += 'and [[pionInParaThrust == 1 and pionInAntiThrust == 3] or [pionInParaThrust == 3 and pionInAntiThrust == 1]]'
+    ma.reconstructDecay('Z0:physMiraBelleTau1x3 -> pi+:MiraBelleTau pi-:MiraBelleTau pi+:MiraBelleTau pi-:MiraBelleTau',
+                        f'{Tau1x3Cuts}', path=MiraBelleTau_path)
+
+    MiraBelleTau = b2.register_module('PhysicsObjectsMiraBelleTau')
+    MiraBelleTau.param('tautau1x1PListName', 'Z0:physMiraBelleTau1x1')
+    MiraBelleTau.param('tautau1x3PListName', 'Z0:physMiraBelleTau1x3')
+    MiraBelleTau_path.add_module(MiraBelleTau)
+
     # bhabha,hadrons
     ma.fillParticleList(
         'e+:physMiraBelle',

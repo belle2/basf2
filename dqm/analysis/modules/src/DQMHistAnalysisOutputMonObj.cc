@@ -11,9 +11,9 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include "TFile.h"
-#include "TTree.h"
-#include "TString.h"
+#include <TFile.h>
+#include <TTree.h>
+#include <TString.h>
 #include <time.h>
 
 
@@ -45,9 +45,6 @@ DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
 
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: Constructor done.");
 }
-
-
-DQMHistAnalysisOutputMonObjModule::~DQMHistAnalysisOutputMonObjModule() { }
 
 void DQMHistAnalysisOutputMonObjModule::initialize()
 {

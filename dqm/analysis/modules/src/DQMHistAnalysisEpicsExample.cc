@@ -36,11 +36,6 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: Constructor done.");
 }
 
-
-DQMHistAnalysisEpicsExampleModule::~DQMHistAnalysisEpicsExampleModule()
-{
-}
-
 void DQMHistAnalysisEpicsExampleModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: initialized.");

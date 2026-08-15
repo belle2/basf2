@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.dcl.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
 
 namespace Belle2 {
   /// Base filter for CKF VTX states
   template <class AFilter, class APrefilter = AFilter>
-  class LayerVTXRelationFilter : public TrackFindingCDC::RelationFilter<CKFToVTXState> {
+  class LayerVTXRelationFilter : public TrackingUtilities::RelationFilter<CKFToVTXState> {
     /// The parent class
-    using Super = TrackFindingCDC::RelationFilter<CKFToVTXState>;
+    using Super = TrackingUtilities::RelationFilter<CKFToVTXState>;
 
   public:
     using Super::operator();
@@ -34,7 +34,7 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     /// Give a final weight to the possibilities by asking the filter.
-    TrackFindingCDC::Weight operator()(const CKFToVTXState& from, const CKFToVTXState& to) override;
+    TrackingUtilities::Weight operator()(const CKFToVTXState& from, const CKFToVTXState& to) override;
 
     /// Initialize the maximal ladder cache
     void beginRun() final;

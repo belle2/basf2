@@ -1,0 +1,47 @@
+# EventType: 1193032000 
+# Descriptor: [B0 -> D- pi+ pi+ pi- pi0]cc
+# NickName: Bd_D3pipi0
+# Documentation: Remodelling of D3pipi0 through resonances to recover the Pythia model change (v6 to v8) for B->DX_had
+# Tested: Yes
+# PhysicsWG: Bhad
+# Responsible: Mattia MARFOLI
+# Email: marfoli@cppm.in2p3.fr
+# Cuts: None
+# Date: 20260403
+#
+
+Alias rho_prime+ rho(2S)+
+Alias rho_prime- rho(2S)-
+ChargeConj rho_prime+ rho_prime-
+
+# New particles
+# pdg.add_particle(’rho_mm+’,     700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=1,    spin=1)
+# pdg.add_particle(’rho_mm-’,    -700213, mass=2000e-3, width=1000e-3, max_width=1700e-3  ,charge=-1,   spin=1)
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.083059   rho_prime+  D-                         SVS; 
+0.008247   D-  eta  pi+                           PHSP;     
+0.381924   D*-  a_1+                              SVV_HELAMP 0.458 0.0 0.866 0.0 0.458 0.0; # Interpreting D*03pi BF as fully (D*0 a1(->3pi)) decay [BF update - LMH 06/2023]     
+0.031147   D_s0*+  D-                             PHSP; #[BF update - VG 2025] Based on PDG 2025, D_s0*+ == D_s0+
+0.440423   rho_mm+  D-                            SVS;        
+0.055200   D_1+  rho-                             PHSP; 
+Enddecay
+CDecay anti-B0sig
+
+Decay rho_prime+
+1.0           omega  pi+                          VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;                                    
+Enddecay
+CDecay rho_prime-
+
+Decay rho_mm+
+0.400000       rho0  pi+  pi0                     PHSP;
+0.400000       rho+  pi+  pi-                     PHSP;
+0.200000       rho-  pi+  pi+                     PHSP;
+Enddecay
+CDecay rho_mm-
+
+End

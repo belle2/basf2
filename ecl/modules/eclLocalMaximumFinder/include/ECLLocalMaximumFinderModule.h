@@ -12,9 +12,12 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
+#include <ecl/dbobjects/ECLClusteringParameters.h>
+
 
 class TTree;
 class TFile;
@@ -131,6 +134,7 @@ namespace Belle2 {
 
     // Module parameters
     double m_energyCut; /**< energy cut for seed */
+    bool m_useParametersFromDatabase; /**< get energyCut from payload */
     int m_isTrainingMode; /**< training mode for MVA methods (i.e. create weights) */
     std::string m_outfileName; /**< file name prefix of the training output file */
     std::string m_method; /**< Method to find the local maximum */
@@ -150,6 +154,9 @@ namespace Belle2 {
 
     /** Geometry */
     ECL::ECLGeometryPar* m_geom{nullptr};
+
+    /** ECLClusteringParameters payload: includes value for energyCut */
+    DBObjPtr<ECLClusteringParameters> m_eclClusteringParameters;
 
     /** Output training files and trees. */
     TFile* m_outfile{nullptr}; /**< outfiles that contain tree */

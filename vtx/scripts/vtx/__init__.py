@@ -15,7 +15,7 @@ from basf2 import B2INFO
 from basf2.utils import pretty_print_table
 
 # Dictionary containing global tag names for Belle II upgrade flavors with VTX
-valid_upgrade_globaltags = {"upgrade_globaltag_vtx_5layer": "upgrade_vtx_5layer_v3_2023_11_30",
+valid_upgrade_globaltags = {"upgrade_globaltag_vtx_5layer": "upgrade_vtx_5layer_2025_baseline_v4",
                             "upgrade_globaltag_vtx_tb_2020-03": "upgrade_2020-07-07_VTX-CMOS-testbeam-2020-03-12",
                             }
 
@@ -69,11 +69,14 @@ def get_upgrade_globaltag():
     if env_name not in os.environ:
         valid_gts = ", ".join(valid_upgrade_globaltags.values())
         raise RuntimeError(
-            "Environment variable {:s} not set. Pick a globaltag from {:s}. Terminanting this script.".format(
-                env_name, valid_gts))
+            f"Environment variable {
+                env_name:s} not set. Pick a globaltag like {
+                valid_gts:s}, \
+                refer to https://vtxupgrade.pages.desy.de/vtxdvpmt/wg1-performance/geometries-list/ for more details.\
+                Terminanting this script.")
     upgrade_globaltag = os.environ[env_name]
 
-    B2INFO("Using upgrade globaltag {}".format(upgrade_globaltag))
+    B2INFO(f"Using upgrade globaltag {upgrade_globaltag}")
 
     return upgrade_globaltag
 

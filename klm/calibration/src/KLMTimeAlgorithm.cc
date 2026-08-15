@@ -31,8 +31,8 @@
 #include <TTree.h>
 
 /* C++ headers. */
-#include <functional>  // ADD THIS
-#include <set>         // ADD THIS
+#include <functional>
+#include <set>
 
 using namespace Belle2;
 using namespace ROOT::Math;
@@ -185,7 +185,13 @@ void KLMTimeAlgorithm::readCalibrationDataFor2DFit(
   Event event;
   std::shared_ptr<TTree> timeCalibrationData;
   timeCalibrationData = getObjectPtr<TTree>("time_calibration_data");
+  timeCalibrationData->SetBranchAddress("Run", &event.Run);
+  timeCalibrationData->SetBranchAddress("Event", &event.Events);
+  timeCalibrationData->SetBranchAddress("nTrack", &event.nTrack);
+  timeCalibrationData->SetBranchAddress("Track_Charge", &event.Track_Charge);
+
   timeCalibrationData->SetBranchAddress("t0", &event.t0);
+  timeCalibrationData->SetBranchAddress("t0_uc", &event.t0_uc);
   timeCalibrationData->SetBranchAddress("flyTime", &event.flyTime);
   timeCalibrationData->SetBranchAddress("recTime", &event.recTime);
   timeCalibrationData->SetBranchAddress("dist", &event.dist);
@@ -197,6 +203,8 @@ void KLMTimeAlgorithm::readCalibrationDataFor2DFit(
   timeCalibrationData->SetBranchAddress("channelId", &event.channelId);
   timeCalibrationData->SetBranchAddress("inRPC", &event.inRPC);
   timeCalibrationData->SetBranchAddress("isFlipped", &event.isFlipped);
+  timeCalibrationData->SetBranchAddress("isGood", &event.isGood);
+  timeCalibrationData->SetBranchAddress("getADCcount", &event.getADCcount);
 
   m_evts.clear();
 
@@ -232,7 +240,13 @@ void KLMTimeAlgorithm::readCalibrationDataBatch(std::function<bool(const KLMChan
   Event event;
   std::shared_ptr<TTree> timeCalibrationData;
   timeCalibrationData = getObjectPtr<TTree>("time_calibration_data");
+  timeCalibrationData->SetBranchAddress("Run", &event.Run);
+  timeCalibrationData->SetBranchAddress("Event", &event.Events);
+  timeCalibrationData->SetBranchAddress("nTrack", &event.nTrack);
+  timeCalibrationData->SetBranchAddress("Track_Charge", &event.Track_Charge);
+
   timeCalibrationData->SetBranchAddress("t0", &event.t0);
+  timeCalibrationData->SetBranchAddress("t0_uc", &event.t0_uc);
   timeCalibrationData->SetBranchAddress("flyTime", &event.flyTime);
   timeCalibrationData->SetBranchAddress("recTime", &event.recTime);
   timeCalibrationData->SetBranchAddress("dist", &event.dist);
@@ -244,6 +258,8 @@ void KLMTimeAlgorithm::readCalibrationDataBatch(std::function<bool(const KLMChan
   timeCalibrationData->SetBranchAddress("channelId", &event.channelId);
   timeCalibrationData->SetBranchAddress("inRPC", &event.inRPC);
   timeCalibrationData->SetBranchAddress("isFlipped", &event.isFlipped);
+  timeCalibrationData->SetBranchAddress("isGood", &event.isGood);
+  timeCalibrationData->SetBranchAddress("getADCcount", &event.getADCcount);
 
   m_evts.clear();
 
@@ -284,8 +300,51 @@ void KLMTimeAlgorithm::createHistograms()
     m_UpperTimeBoundaryScintillatorsBKLM = -4400.0;
     m_LowerTimeBoundaryScintillatorsEKLM = -4950.0;
     m_UpperTimeBoundaryScintillatorsEKLM = -4650.0;
-
   }
+
+  // Create directory structure for per-channel histograms
+  // This must be done here (not in setupDatabase) because m_outFile is created just before this function is called
+  if (m_outFile && m_saveChannelHists) {
+    TDirectory* dir_channels = m_outFile->mkdir("channels", "Per-channel histograms", true);
+
+    // BKLM directories
+    TDirectory* dir_bklm = dir_channels->mkdir("BKLM", "", true);
+    TString sectionName[2] = {"Backward", "Forward"};
+    TString planeName[2] = {"Z", "Phi"};
+
+    for (int iF = 0; iF < 2; ++iF) {
+      TDirectory* dir_section = dir_bklm->mkdir(sectionName[iF].Data(), "", true);
+      for (int iS = 0; iS < 8; ++iS) {
+        TDirectory* dir_sector = dir_section->mkdir(Form("Sector_%d", iS + 1), "", true);
+        for (int iL = 0; iL < 15; ++iL) {
+          TDirectory* dir_layer = dir_sector->mkdir(Form("Layer_%d", iL + 1), "", true);
+          for (int iP = 0; iP < 2; ++iP) {
+            m_channelHistDir_BKLM[iF][iS][iL][iP] = dir_layer->mkdir(Form("Plane_%s", planeName[iP].Data()), "", true);
+          }
+        }
+      }
+    }
+
+    // EKLM directories
+    TDirectory* dir_eklm = dir_channels->mkdir("EKLM", "", true);
+    for (int iF = 0; iF < 2; ++iF) {
+      TDirectory* dir_section = dir_eklm->mkdir(sectionName[iF].Data(), "", true);
+      for (int iS = 0; iS < 4; ++iS) {
+        TDirectory* dir_sector = dir_section->mkdir(Form("Sector_%d", iS + 1), "", true);
+        int maxLayer = 12 + 2 * iF;  // 12 for backward, 14 for forward
+        for (int iL = 0; iL < maxLayer; ++iL) {
+          TDirectory* dir_layer = dir_sector->mkdir(Form("Layer_%d", iL + 1), "", true);
+          for (int iP = 0; iP < 2; ++iP) {
+            m_channelHistDir_EKLM[iF][iS][iL][iP] = dir_layer->mkdir(Form("Plane_%d", iP + 1), "", true);
+          }
+        }
+      }
+    }
+
+    m_outFile->cd();  // Return to root directory
+    B2INFO("Created directory structure for per-channel histograms.");
+  }
+
   int nBin = 80;
   int nBin_scint = 80;
 
@@ -382,6 +441,93 @@ void KLMTimeAlgorithm::createHistograms()
   hc_time_scint_end = new TH1F("hc_time_scint_end",
                                "Calibrated time distribution for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
                                m_LowerTimeBoundaryCalibratedScintillatorsEKLM, m_UpperTimeBoundaryCalibratedScintillatorsEKLM);
+
+  int nBin_t0 = 100;
+  h_eventT0_rpc = new TH1F("h_eventT0_rpc",
+                           "RPC: Event T0; T_{0}[ns]", nBin_t0, -100.0, 100.0);
+  h_eventT0_scint = new TH1F("h_eventT0_scint",
+                             "BKLM scintillator: Event T0; T_{0}[ns]", nBin_t0, -100.0, 100.0);
+  h_eventT0_scint_end = new TH1F("h_eventT0_scint_end",
+                                 "EKLM scintillator: Event T0; T_{0}[ns]", nBin_t0, -100.0, 100.0);
+
+  // Corrected EventT0 distributions between 2 muon tracks in an event.
+  hc_eventT0_rpc = new TH1F("hc_eventT0_rpc",
+                            "RPC: corrected Event T0; T_{0}^{+} - T_{0}^{-} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_scint = new TH1F("hc_eventT0_scint",
+                              "BKLM scintillator: corrected Event T0; T_{0}^{+} - T_{0}^{-} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_scint_end = new TH1F("hc_eventT0_scint_end",
+                                  "EKLM scintillator: corrected Event T0; T_{0}^{+} - T_{0}^{-} [ns]", nBin_t0, -20.0, 20.0);
+
+  // ==== NEW DIAGNOSTIC PLOTS ====
+
+  // Hit multiplicity distributions
+  h_nHits_plus_rpc = new TH1F("h_nHits_plus_rpc",
+                              "RPC: #mu^{+} hit multiplicity;N_{hits};Events", 100, 0, 100);
+  h_nHits_minus_rpc = new TH1F("h_nHits_minus_rpc",
+                               "RPC: #mu^{-} hit multiplicity;N_{hits};Events", 100, 0, 100);
+  h_nHits_plus_scint = new TH1F("h_nHits_plus_scint",
+                                "BKLM Scint: #mu^{+} hit multiplicity;N_{hits};Events", 30, 0, 30);
+  h_nHits_minus_scint = new TH1F("h_nHits_minus_scint",
+                                 "BKLM Scint: #mu^{-} hit multiplicity;N_{hits};Events", 30, 0, 30);
+  h_nHits_plus_scint_end = new TH1F("h_nHits_plus_scint_end",
+                                    "EKLM Scint: #mu^{+} hit multiplicity;N_{hits};Events", 30, 0, 30);
+  h_nHits_minus_scint_end = new TH1F("h_nHits_minus_scint_end",
+                                     "EKLM Scint: #mu^{-} hit multiplicity;N_{hits};Events", 30, 0, 30);
+
+  // ΔT0 vs variance weight v = 1/N+ + 1/N-
+  h2_deltaT0_vs_v_rpc = new TH2F("h2_deltaT0_vs_v_rpc",
+                                 "RPC: #DeltaT_{0} vs variance weight;v = 1/N^{+} + 1/N^{-};#DeltaT_{0} [ns]",
+                                 50, 0, 2.0, 100, -40, 40);
+  h2_deltaT0_vs_v_scint = new TH2F("h2_deltaT0_vs_v_scint",
+                                   "BKLM Scint: #DeltaT_{0} vs variance weight;v = 1/N^{+} + 1/N^{-};#DeltaT_{0} [ns]",
+                                   50, 0, 1.0, 100, -40, 40);
+  h2_deltaT0_vs_v_scint_end = new TH2F("h2_deltaT0_vs_v_scint_end",
+                                       "EKLM Scint: #DeltaT_{0} vs variance weight;v = 1/N^{+} + 1/N^{-};#DeltaT_{0} [ns]",
+                                       50, 0, 1.0, 100, -20, 20);
+
+  // Profile: RMS(ΔT0) vs v (should scale as √v if model is correct)
+  prof_deltaT0_rms_vs_v_rpc = new TProfile("prof_deltaT0_rms_vs_v_rpc",
+                                           "RPC: RMS(#DeltaT_{0}) vs v;v = 1/N^{+} + 1/N^{-};RMS(#DeltaT_{0}) [ns]",
+                                           20, 0, 2.0, "s");  // "s" option for RMS
+  prof_deltaT0_rms_vs_v_scint = new TProfile("prof_deltaT0_rms_vs_v_scint",
+                                             "BKLM Scint: RMS(#DeltaT_{0}) vs v;v = 1/N^{+} + 1/N^{-};RMS(#DeltaT_{0}) [ns]",
+                                             20, 0, 1.0, "s");
+  prof_deltaT0_rms_vs_v_scint_end = new TProfile("prof_deltaT0_rms_vs_v_scint_end",
+                                                 "EKLM Scint: RMS(#DeltaT_{0}) vs v;v = 1/N^{+} + 1/N^{-};RMS(#DeltaT_{0}) [ns]",
+                                                 20, 0, 1.0, "s");
+
+  // ΔT0 vs total hits
+  h2_deltaT0_vs_nhits_rpc = new TH2F("h2_deltaT0_vs_nhits_rpc",
+                                     "RPC: #DeltaT_{0} vs total hits;N^{+} + N^{-};#DeltaT_{0} [ns]",
+                                     50, 0, 200, 100, -40, 40);
+  h2_deltaT0_vs_nhits_scint = new TH2F("h2_deltaT0_vs_nhits_scint",
+                                       "BKLM Scint: #DeltaT_{0} vs total hits;N^{+} + N^{-};#DeltaT_{0} [ns]",
+                                       40, 0, 40, 100, -40, 40);
+  h2_deltaT0_vs_nhits_scint_end = new TH2F("h2_deltaT0_vs_nhits_scint_end",
+                                           "EKLM Scint: #DeltaT_{0} vs total hits;N^{+} + N^{-};#DeltaT_{0} [ns]",
+                                           40, 0, 40, 100, -20, 20);
+
+  // ΔT0 separated by hit multiplicity bins
+  hc_eventT0_rpc_lowN = new TH1F("hc_eventT0_rpc_lowN",
+                                 "RPC: #DeltaT_{0} (N^{+}+N^{-} < 10);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_rpc_midN = new TH1F("hc_eventT0_rpc_midN",
+                                 "RPC: #DeltaT_{0} (10 #leq N^{+}+N^{-} < 30);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_rpc_highN = new TH1F("hc_eventT0_rpc_highN",
+                                  "RPC: #DeltaT_{0} (N^{+}+N^{-} #geq 30);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+
+  hc_eventT0_scint_lowN = new TH1F("hc_eventT0_scint_lowN",
+                                   "BKLM Scint: #DeltaT_{0} (N^{+}+N^{-} < 5);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_scint_midN = new TH1F("hc_eventT0_scint_midN",
+                                   "BKLM Scint: #DeltaT_{0} (5 #leq N^{+}+N^{-} < 15);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+  hc_eventT0_scint_highN = new TH1F("hc_eventT0_scint_highN",
+                                    "BKLM Scint: #DeltaT_{0} (N^{+}+N^{-} #geq 15);#DeltaT_{0} [ns]", nBin_t0, -40.0, 40.0);
+
+  hc_eventT0_scint_end_lowN = new TH1F("hc_eventT0_scint_end_lowN",
+                                       "EKLM Scint: #DeltaT_{0} (N^{+}+N^{-} < 5);#DeltaT_{0} [ns]", nBin_t0, -20.0, 20.0);
+  hc_eventT0_scint_end_midN = new TH1F("hc_eventT0_scint_end_midN",
+                                       "EKLM Scint: #DeltaT_{0} (5 #leq N^{+}+N^{-} < 15);#DeltaT_{0} [ns]", nBin_t0, -20.0, 20.0);
+  hc_eventT0_scint_end_highN = new TH1F("hc_eventT0_scint_end_highN",
+                                        "EKLM Scint: #DeltaT_{0} (N^{+}+N^{-} #geq 15);#DeltaT_{0} [ns]", nBin_t0, -20.0, 20.0);
 
   if (!m_saveAllPlots) {
     B2INFO("Skipping debug histogram allocation (m_saveAllPlots = false)");
@@ -612,6 +758,9 @@ void KLMTimeAlgorithm::createHistograms()
       }
     }
   }
+
+  // NOTE: Directory structure for per-channel histograms is created in createHistograms()
+  // because m_outFile is not yet created when setupDatabase() is called.
 }
 
 void KLMTimeAlgorithm::fillTimeDistanceProfiles(
@@ -675,8 +824,9 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
     readCalibrationDataBatch(batch.second);
 
     // Temporary storage for per-channel 2D histograms (only if fill2dHistograms is true)
-    std::map<KLMChannelNumber, TH2F*> tempHistBKLM;
-    std::map<KLMChannelNumber, TH2F*> tempHistEKLM;
+    // Store pairs of (histogram, target directory) so we can write to correct folder
+    std::map<KLMChannelNumber, std::pair<TH2F*, TDirectory*>> tempHistBKLM;
+    std::map<KLMChannelNumber, std::pair<TH2F*, TDirectory*>> tempHistEKLM;
 
     for (KLMChannelIndex klmChannel = m_klmChannels.begin(); klmChannel != m_klmChannels.end(); ++klmChannel) {
       KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
@@ -715,7 +865,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
                               50, 0.0, stripLength,
                               50, m_LowerTimeBoundaryCalibratedScintillatorsBKLM,
                               m_UpperTimeBoundaryCalibratedScintillatorsBKLM);
-            tempHistBKLM[channel] = hist2d;
+            tempHistBKLM[channel] = std::make_pair(hist2d, m_channelHistDir_BKLM[iF][iS][iL][iP]);
           }
         } else { // EKLM
           int iF = klmChannel.getSection() - 1;
@@ -733,7 +883,7 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
                             50, 0.0, stripLength,
                             50, m_LowerTimeBoundaryCalibratedScintillatorsEKLM,
                             m_UpperTimeBoundaryCalibratedScintillatorsEKLM);
-          tempHistEKLM[channel] = hist2d;
+          tempHistEKLM[channel] = std::make_pair(hist2d, m_channelHistDir_EKLM[iF][iS][iL][iP]);
         }
       }
 
@@ -760,6 +910,13 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
             }
           } else {
             // Scintillator
+            if (m_applyChargeRestriction) {
+              uint16_t Charge = event.getADCcount;
+              if (Charge <= 30 || Charge >= 320) {
+                continue;
+              }
+            }
+
             if (hist2d)
               hist2d->Fill(distHit, timeHit);
 
@@ -769,7 +926,15 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
               profileBKLMScintillatorZ->Fill(distHit, timeHit);
             }
           }
-        } else { // EKLM
+        } else {
+          // EKLM
+          if (m_applyChargeRestriction) {
+            uint16_t Charge = event.getADCcount;
+            if (Charge <= 40 || Charge >= 350) {
+              continue;
+            }
+          }
+
           int iP = klmChannel.getPlane() - 1;
 
           if (hist2d)
@@ -785,12 +950,14 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
     }
 
     // Write and delete 2D histograms for this batch
+    // Use m_saveChannelHists (not m_saveAllPlots) since these are per-channel histograms
+    // and the directories are created based on m_saveChannelHists
     if (fill2dHistograms) {
-      for (auto& pair : tempHistBKLM) {
-        writeThenDelete_(pair.second, m_saveAllPlots);
+      for (auto& entry : tempHistBKLM) {
+        writeThenDelete_(entry.second.first, m_saveChannelHists, entry.second.second);
       }
-      for (auto& pair : tempHistEKLM) {
-        writeThenDelete_(pair.second, m_saveAllPlots);
+      for (auto& entry : tempHistEKLM) {
+        writeThenDelete_(entry.second.first, m_saveChannelHists, entry.second.second);
       }
     }
 
@@ -889,24 +1056,63 @@ void KLMTimeAlgorithm::timeDistance2dFit(
   delayError = sqrt(delayError) / (nConvergedFits - 1);
 }
 
-void KLMTimeAlgorithm::writeThenDelete_(TH1* h, bool write)
+void KLMTimeAlgorithm::writeThenDelete_(TH1* h, bool write, TDirectory* dir)
 {
   if (h == nullptr)
     return;
   if (write && m_outFile) {
+    // Follow the pattern from saveHist(): cd into directory, then SetDirectory, then Write
+    if (dir) {
+      dir->cd();
+      h->SetDirectory(dir);
+    } else {
+      m_outFile->cd();
+      h->SetDirectory(m_outFile);
+    }
     h->Write();
+    m_outFile->cd();  // Return to root directory
   }
   delete h;
 }
 
-void KLMTimeAlgorithm::writeThenDelete_(TH2* h, bool write)
+void KLMTimeAlgorithm::writeThenDelete_(TH2* h, bool write, TDirectory* dir)
 {
   if (h == nullptr)
     return;
   if (write && m_outFile) {
+    // Follow the pattern from saveHist(): cd into directory, then SetDirectory, then Write
+    if (dir) {
+      dir->cd();
+      h->SetDirectory(dir);
+    } else {
+      m_outFile->cd();
+      h->SetDirectory(m_outFile);
+    }
     h->Write();
+    m_outFile->cd();  // Return to root directory
   }
   delete h;
+}
+
+bool KLMTimeAlgorithm::passesADCCut(const Event& event, int subdetector, int layer_0indexed) const
+{
+  // If charge restriction is disabled, accept all hits
+  if (!m_applyChargeRestriction) {
+    return true;
+  }
+
+  uint16_t charge = event.getADCcount;
+
+  if (subdetector == KLMElementNumbers::c_BKLM) {
+    // FIXED: Use constant for RPC check (0-indexed comparison)
+    if (layer_0indexed >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
+      return true;  // RPC - no ADC cut
+    } else {
+      return (charge > 30 && charge < 320);  // Scintillator
+    }
+  } else {
+    return (charge > 40 && charge < 350);  // EKLM
+  }
 }
 
 CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
@@ -917,6 +1123,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_timeCableDelay = new KLMTimeCableDelay();
   m_timeConstants = new KLMTimeConstants();
   m_timeResolution = new KLMTimeResolution();
+  m_eventT0HitResolution = new KLMEventT0HitResolution();
 
   fcn_gaus = new TF1("fcn_gaus", "gaus");
   fcn_land = new TF1("fcn_land", "landau");
@@ -948,9 +1155,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_cFlag.clear();
   m_minimizerOptions.SetDefaultStrategy(2);
 
-  // ===================================================================
-  // COUNT EVENTS PER CHANNEL (lightweight scan, no full data load)
-  // ===================================================================
   B2INFO("Counting events per channel...");
   std::map<KLMChannelNumber, unsigned int> eventCounts;
   readCalibrationDataCounts(eventCounts);
@@ -989,23 +1193,19 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::sort(channelsBKLM.begin(), channelsBKLM.end(), compareEventNumber);
   std::sort(channelsEKLM.begin(), channelsEKLM.end(), compareEventNumber);
 
-  // ===================================================================
-  // TWO-DIMENSIONAL FIT (needs data for top channels only)
-  // ===================================================================
+  /* Two-dimensional fit using top channels only. */
   double delayBKLM, delayBKLMError;
   double delayEKLM, delayEKLMError;
 
-  // Load data for 2D fit channels only
+  /* Load data for 2D fit channels only. */
   readCalibrationDataFor2DFit(channelsBKLM, channelsEKLM);
   timeDistance2dFit(channelsBKLM, delayBKLM, delayBKLMError);
   timeDistance2dFit(channelsEKLM, delayEKLM, delayEKLMError);
-  m_evts.clear(); // Clear after 2D fit
+  m_evts.clear();
 
   B2INFO("2D fits complete, data cleared.");
 
-  // ===================================================================
-  // DEFINE 6 PROCESSING BATCHES
-  // ===================================================================
+  /* Define processing batches for channel calibration. */
   auto isRPCBackward = [](const KLMChannelIndex & ch) {
     return ch.getSubdetector() == KLMElementNumbers::c_BKLM &&
            ch.getLayer() >= BKLMElementNumbers::c_FirstRPCLayer &&
@@ -1082,6 +1282,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
       // Fill global histograms only
       for (const Event& event : eventsChannel) {
+        // Apply ADC cut early
+        if (!passesADCCut(event, iSub, iL))
+          continue;
+
         XYZVector diffD = XYZVector(event.diffDistX, event.diffDistY, event.diffDistZ);
         h_diff->Fill(diffD.R());
 
@@ -1093,7 +1297,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           continue;
 
         if (iSub == KLMElementNumbers::c_BKLM) {
-          if (iL > 1) {
+          // FIXED: Use constant instead of hardcoded value
+          if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
             h_time_rpc_tc->Fill(timeHit);
           } else {
             h_time_scint_tc->Fill(timeHit);
@@ -1163,7 +1368,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       TH1F* h_temp_tc = nullptr;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
-        if (iL > 1) {
+        // FIXED: Use constant instead of hardcoded value
+        if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
           hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
           ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s",
                     iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
@@ -1184,6 +1390,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       }
 
       for (const Event& event : eventsChannel) {
+        // Add ADC cut
+        if (!passesADCCut(event, iSub, iL))
+          continue;
+
         double timeHit = event.time();
         if (m_useEventT0)
           timeHit = timeHit - event.t0;
@@ -1196,7 +1406,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       double tmpMean_channel = fcn_gaus->GetParameter(1);
 
       if (iSub == KLMElementNumbers::c_BKLM) {
-        if (iL > 1) {
+        // FIXED: Use constant instead of hardcoded value
+        if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
           m_timeShift[channelId] = tmpMean_channel - tmpMean_rpc_global;
         } else {
           m_timeShift[channelId] = tmpMean_channel - tmpMean_scint_global;
@@ -1224,13 +1435,28 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     m_ProfileEKLMScintillatorPlane1, m_ProfileEKLMScintillatorPlane2, false);
 
   B2INFO("Effective light speed fitting.");
+
+  // Fit the RPC profiles (for diagnostics), but use fixed values if configured
   m_ProfileRpcPhi->Fit("fcn_pol1", "EMQ");
-  double delayRPCPhi = fcn_pol1->GetParameter(1);
+  double fittedDelayRPCPhi = fcn_pol1->GetParameter(1);
   double e_slope_rpc_phi = fcn_pol1->GetParError(1);
 
   m_ProfileRpcZ->Fit("fcn_pol1", "EMQ");
-  double delayRPCZ = fcn_pol1->GetParameter(1);
+  double fittedDelayRPCZ = fcn_pol1->GetParameter(1);
   double e_slope_rpc_z = fcn_pol1->GetParError(1);
+
+  // Use fixed RPC delay if configured (per BELLE2-NOTE-TE-2021-015: c_eff = 0.5c)
+  double delayRPCPhi, delayRPCZ;
+  if (m_useFixedRPCDelay) {
+    delayRPCPhi = m_fixedRPCDelay;
+    delayRPCZ = m_fixedRPCDelay;
+    B2INFO("Using fixed RPC propagation delay: " << m_fixedRPCDelay << " ns/cm (c_eff = 0.5c)"
+           << LogVar("Fitted phi (not used)", fittedDelayRPCPhi)
+           << LogVar("Fitted Z (not used)", fittedDelayRPCZ));
+  } else {
+    delayRPCPhi = fittedDelayRPCPhi;
+    delayRPCZ = fittedDelayRPCZ;
+  }
 
   m_ProfileBKLMScintillatorPhi->Fit("fcn_pol1", "EMQ");
   double slope_scint_phi = fcn_pol1->GetParameter(1);
@@ -1249,11 +1475,19 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   double e_slope_scint_plane2_end = fcn_pol1->GetParError(1);
 
   TString logStr_phi, logStr_z;
-  logStr_phi = Form("%.4f +/- %.4f ns/cm", delayRPCPhi, e_slope_rpc_phi);
-  logStr_z = Form("%.4f +/- %.4f ns/cm", delayRPCZ, e_slope_rpc_z);
-  B2INFO("Delay in RPCs:"
-         << LogVar("Fitted Value (phi readout) ", logStr_phi.Data())
-         << LogVar("Fitted Value (z readout) ", logStr_z.Data()));
+  if (m_useFixedRPCDelay) {
+    logStr_phi = Form("%.4f ns/cm (fixed)", delayRPCPhi);
+    logStr_z = Form("%.4f ns/cm (fixed)", delayRPCZ);
+    B2INFO("Delay in RPCs (using fixed value):"
+           << LogVar("Used Value (phi readout)", logStr_phi.Data())
+           << LogVar("Used Value (z readout)", logStr_z.Data()));
+  } else {
+    logStr_phi = Form("%.4f +/- %.4f ns/cm", delayRPCPhi, e_slope_rpc_phi);
+    logStr_z = Form("%.4f +/- %.4f ns/cm", delayRPCZ, e_slope_rpc_z);
+    B2INFO("Delay in RPCs:"
+           << LogVar("Fitted Value (phi readout)", logStr_phi.Data())
+           << LogVar("Fitted Value (z readout)", logStr_z.Data()));
+  }
   logStr_phi = Form("%.4f +/- %.4f ns/cm", slope_scint_phi, e_slope_scint_phi);
   logStr_z = Form("%.4f +/- %.4f ns/cm", slope_scint_z, e_slope_scint_z);
   B2INFO("Delay in BKLM scintillators:"
@@ -1324,7 +1558,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       TH1F* h_temp = nullptr;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
-        if (iL > 1) {
+        // FIXED: Use constant instead of hardcoded value
+        if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
           hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
           ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s",
                     iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
@@ -1346,6 +1581,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
       // Fill histogram
       for (const Event& event : eventsChannel) {
+        // Add ADC cut
+        if (!passesADCCut(event, iSub, iL))
+          continue;
+
         double timeHit = event.time();
         if (m_useEventT0)
           timeHit = timeHit - event.t0;
@@ -1353,7 +1592,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           continue;
 
         if (iSub == KLMElementNumbers::c_BKLM) {
-          if (iL > 1) {
+          // FIXED: Use constant instead of hardcoded value
+          if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
             double propgationT;
             if (iP == BKLMElementNumbers::c_ZPlane)
               propgationT = event.dist * delayRPCZ;
@@ -1416,7 +1656,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         m_etime_channel[channelId] = fcn_gaus->GetParError(1);
       }
 
-      writeThenDelete_(h_temp, m_saveChannelHists);
+      // Get the appropriate directory for this channel
+      TDirectory* dir = (iSub == KLMElementNumbers::c_BKLM) ?
+                        m_channelHistDir_BKLM[iF][iS][iL][iP] :
+                        m_channelHistDir_EKLM[iF][iS][iL][iP];
+      writeThenDelete_(h_temp, m_saveChannelHists, dir);
     }
 
     m_evts.clear();
@@ -1437,7 +1681,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
       int iL = klmChannel.getLayer() - 1;
-      if (iL > 1) {
+      // FIXED: Use constant instead of hardcoded value
+      if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         gre_time_channel_rpc->SetPoint(iChannel_rpc, channelId, m_time_channel[channelId]);
         gre_time_channel_rpc->SetPointError(iChannel_rpc, 0., m_etime_channel[channelId]);
         iChannel_rpc++;
@@ -1503,8 +1748,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     }
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
-      int iL = klmChannel.getLayer();
-      if (iL > 2) {
+      // FIXED: Use 0-indexed layer and constant
+      int iL = klmChannel.getLayer() - 1;
+      if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         gr_timeShift_channel_rpc->SetPoint(iChannel_rpc, channelId, m_timeShift[channelId]);
         iChannel_rpc++;
       } else {
@@ -1564,7 +1810,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       TH1F* hc_temp = nullptr;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
-        if (iL > 1) {
+        // FIXED: Use constant instead of hardcoded value
+        if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
           hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
           ht = Form("Calibrated time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s",
                     iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
@@ -1586,6 +1833,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       }
 
       for (const Event& event : eventsChannel) {
+        // Add ADC cut
+        if (!passesADCCut(event, iSub, iL))
+          continue;
+
         double timeHit = event.time();
         if (m_useEventT0)
           timeHit = timeHit - event.t0;
@@ -1593,7 +1844,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           continue;
 
         if (iSub == KLMElementNumbers::c_BKLM) {
-          if (iL > 1) {
+          // FIXED: Use constant instead of hardcoded value
+          if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
             double propgationT;
             if (iP == BKLMElementNumbers::c_ZPlane)
               propgationT = event.dist * delayRPCZ;
@@ -1661,7 +1913,11 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         mc_etime_channel[channelId] = fcn_gaus->GetParError(1);
       }
 
-      writeThenDelete_(hc_temp, m_saveChannelHists);
+      // Get the appropriate directory for this channel
+      TDirectory* dir = (iSub == KLMElementNumbers::c_BKLM) ?
+                        m_channelHistDir_BKLM[iF][iS][iL][iP] :
+                        m_channelHistDir_EKLM[iF][iS][iL][iP];
+      writeThenDelete_(hc_temp, m_saveChannelHists, dir);
     }
 
     m_evts.clear();
@@ -1680,7 +1936,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
       int iL = klmChannel.getLayer() - 1;
-      if (iL > 1) {
+      // FIXED: Use constant instead of hardcoded value
+      if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         gre_ctime_channel_rpc->SetPoint(icChannel_rpc, channelId, m_ctime_channel[channelId]);
         gre_ctime_channel_rpc->SetPointError(icChannel_rpc, 0., mc_etime_channel[channelId]);
         icChannel_rpc++;
@@ -1746,8 +2003,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     }
     int iSub = klmChannel.getSubdetector();
     if (iSub == KLMElementNumbers::c_BKLM) {
-      int iL = klmChannel.getLayer();
-      if (iL > 2) {
+      // FIXED: Use 0-indexed layer and constant
+      int iL = klmChannel.getLayer() - 1;
+      if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
         gr_timeRes_channel_rpc->SetPoint(icChannel_rpc, channelId, m_timeRes[channelId]);
         icChannel_rpc++;
       } else {
@@ -1760,6 +2018,376 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     }
   }
 
+  // ===================================================================
+  // FIFTH PASS: Di-muon EventT0 analysis for hit resolution calibration
+  // ===================================================================
+  B2INFO("Fifth pass: Computing di-muon ΔT0 for EventT0 hit resolution calibration...");
+
+  // Data structure for per-track T0 accumulation
+  struct TrackT0Info {
+    int charge;
+    int nHits_BKLM_Scint;
+    int nHits_BKLM_RPC_Phi;  // Split RPC by readout direction
+    int nHits_BKLM_RPC_Z;
+    int nHits_EKLM_Scint;
+    double sumT0_BKLM_Scint;
+    double sumT0_BKLM_RPC_Phi;
+    double sumT0_BKLM_RPC_Z;
+    double sumT0_EKLM_Scint;
+
+    TrackT0Info() : charge(0),
+      nHits_BKLM_Scint(0),
+      nHits_BKLM_RPC_Phi(0),
+      nHits_BKLM_RPC_Z(0),
+      nHits_EKLM_Scint(0),
+      sumT0_BKLM_Scint(0.0),
+      sumT0_BKLM_RPC_Phi(0.0),
+      sumT0_BKLM_RPC_Z(0.0),
+      sumT0_EKLM_Scint(0.0) {}
+  };
+
+  // Map: (Run, Event) -> (nTrack -> TrackT0Info)
+  std::map<std::pair<int, int>, std::map<int, TrackT0Info>> eventTrackMap;
+
+  // Process all data in batches to build event-track map
+  for (const auto& batch : batches) {
+    B2INFO("Processing batch for di-muon analysis: " << batch.first);
+    readCalibrationDataBatch(batch.second);
+
+    for (const auto& channelPair : m_evts) {
+      KLMChannelNumber chId = channelPair.first;
+      const std::vector<Event>& chEvents = channelPair.second;
+
+      // Get channel geometry
+      int subdetector, section, sector, layer, plane, strip;
+      m_ElementNumbers->channelNumberToElementNumbers(
+        chId, &subdetector, &section, &sector, &layer, &plane, &strip);
+
+      // Convert to 0-indexed immediately (consistent with loops 1-4)
+      int iSub = subdetector;
+      int iL = layer - 1;
+
+      for (const Event& event : chEvents) {
+        // Apply ADC cut with 0-indexed layer
+        if (!passesADCCut(event, iSub, iL))
+          continue;
+
+        // Event and track identification
+        std::pair<int, int> eventKey(event.Run, event.Events);
+        int trackIdx = event.nTrack;
+        int charge = event.Track_Charge;
+
+        // Compute calibrated time for this hit
+        double timeHit = event.time() - m_timeShift[chId];
+
+        if (timeHit <= -400e3)
+          continue;
+
+        // Apply propagation correction (using 0-indexed layer)
+        double propT = 0.0;
+        if (iSub == KLMElementNumbers::c_BKLM) {
+          if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
+            // RPC
+            if (plane == BKLMElementNumbers::c_ZPlane)
+              propT = event.dist * delayRPCZ;
+            else
+              propT = event.dist * delayRPCPhi;
+          } else {
+            // Scintillator
+            propT = event.dist * delayBKLM;
+          }
+        } else {
+          // EKLM
+          propT = event.dist * delayEKLM;
+        }
+
+        double t0_estimate = timeHit - propT;
+
+        // Accumulate per-track T0
+        TrackT0Info& trackInfo = eventTrackMap[eventKey][trackIdx];
+        trackInfo.charge = charge;
+
+        if (iSub == KLMElementNumbers::c_BKLM) {
+          if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
+            // RPC - split by readout direction
+            if (plane == BKLMElementNumbers::c_ZPlane) {
+              trackInfo.nHits_BKLM_RPC_Z++;
+              trackInfo.sumT0_BKLM_RPC_Z += t0_estimate;
+            } else {
+              trackInfo.nHits_BKLM_RPC_Phi++;
+              trackInfo.sumT0_BKLM_RPC_Phi += t0_estimate;
+            }
+          } else {
+            // Scintillator
+            trackInfo.nHits_BKLM_Scint++;
+            trackInfo.sumT0_BKLM_Scint += t0_estimate;
+          }
+        } else {
+          trackInfo.nHits_EKLM_Scint++;
+          trackInfo.sumT0_EKLM_Scint += t0_estimate;
+        }
+      }
+    }
+
+    m_evts.clear();
+  }
+
+  B2INFO("Event-track map built. Processing events for EventT0 histograms...");
+
+  // Accumulators for variance calculation using the Gaussian MLE
+  // Model: ΔT0_i ~ N(0, σ_hit^2 * v_i),  v_i = 1/N⁺_i + 1/N⁻_i
+  double sum_delta2_over_v_BKLM_Scint   = 0.0;
+  double sum_delta2_over_v_BKLM_RPC_Phi = 0.0;
+  double sum_delta2_over_v_BKLM_RPC_Z   = 0.0;
+  double sum_delta2_over_v_EKLM_Scint   = 0.0;
+
+  int nDimuon_BKLM_Scint   = 0;
+  int nDimuon_BKLM_RPC_Phi = 0;
+  int nDimuon_BKLM_RPC_Z   = 0;
+  int nDimuon_EKLM_Scint   = 0;
+
+  for (const auto& eventPair : eventTrackMap) {
+    const auto& trackMap = eventPair.second;
+
+    // Check if exactly 2 tracks (di-muon candidate)
+    if (trackMap.size() != 2)
+      continue;
+
+    auto it1 = trackMap.begin();
+    auto it2 = trackMap.begin();
+    ++it2;
+    const TrackT0Info& track1 = it1->second;
+    const TrackT0Info& track2 = it2->second;
+
+    // Check opposite charges
+    if (track1.charge * track2.charge >= 0)
+      continue;
+
+    // Identify mu+ and mu-
+    const TrackT0Info& muPlus  = (track1.charge > 0) ? track1 : track2;
+    const TrackT0Info& muMinus = (track1.charge > 0) ? track2 : track1;
+
+    // === BKLM Scintillator ===
+    if (muPlus.nHits_BKLM_Scint > 0 && muMinus.nHits_BKLM_Scint > 0) {
+      double t0_plus  = muPlus.sumT0_BKLM_Scint  / muPlus.nHits_BKLM_Scint;
+      double t0_minus = muMinus.sumT0_BKLM_Scint / muMinus.nHits_BKLM_Scint;
+      double deltaT0  = t0_plus - t0_minus;
+
+      // v = 1/N⁺ + 1/N⁻ for this event
+      double v = 1.0 / muPlus.nHits_BKLM_Scint + 1.0 / muMinus.nHits_BKLM_Scint;
+      int nTotal = muPlus.nHits_BKLM_Scint + muMinus.nHits_BKLM_Scint;
+
+      if (v <= 0.0)
+        continue;
+
+      // Accumulate for σ_hit^2 = (1/N_evt) Σ [ ΔT0^2 / v ]
+      sum_delta2_over_v_BKLM_Scint += (deltaT0 * deltaT0) / v;
+      nDimuon_BKLM_Scint++;
+
+      // Histograms for monitoring
+      h_eventT0_scint->Fill(t0_plus);
+      h_eventT0_scint->Fill(t0_minus);
+      hc_eventT0_scint->Fill(deltaT0);
+
+      // ==== NEW DIAGNOSTIC FILLS ====
+      h_nHits_plus_scint->Fill(muPlus.nHits_BKLM_Scint);
+      h_nHits_minus_scint->Fill(muMinus.nHits_BKLM_Scint);
+      h2_deltaT0_vs_v_scint->Fill(v, deltaT0);
+      prof_deltaT0_rms_vs_v_scint->Fill(v, deltaT0);
+      h2_deltaT0_vs_nhits_scint->Fill(nTotal, deltaT0);
+
+      // Fill multiplicity-binned histograms
+      if (nTotal < 5) {
+        hc_eventT0_scint_lowN->Fill(deltaT0);
+      } else if (nTotal < 15) {
+        hc_eventT0_scint_midN->Fill(deltaT0);
+      } else {
+        hc_eventT0_scint_highN->Fill(deltaT0);
+      }
+    }
+
+    // === BKLM RPC Phi ===
+    if (muPlus.nHits_BKLM_RPC_Phi > 0 && muMinus.nHits_BKLM_RPC_Phi > 0) {
+      double t0_plus  = muPlus.sumT0_BKLM_RPC_Phi  / muPlus.nHits_BKLM_RPC_Phi;
+      double t0_minus = muMinus.sumT0_BKLM_RPC_Phi / muMinus.nHits_BKLM_RPC_Phi;
+      double deltaT0  = t0_plus - t0_minus;
+
+      double v = 1.0 / muPlus.nHits_BKLM_RPC_Phi + 1.0 / muMinus.nHits_BKLM_RPC_Phi;
+      int nTotal = muPlus.nHits_BKLM_RPC_Phi + muMinus.nHits_BKLM_RPC_Phi;
+
+      if (v <= 0.0)
+        continue;
+
+      sum_delta2_over_v_BKLM_RPC_Phi += (deltaT0 * deltaT0) / v;
+      nDimuon_BKLM_RPC_Phi++;
+
+      h_eventT0_rpc->Fill(t0_plus);
+      h_eventT0_rpc->Fill(t0_minus);
+      hc_eventT0_rpc->Fill(deltaT0);
+
+      // Diagnostic fills
+      h_nHits_plus_rpc->Fill(muPlus.nHits_BKLM_RPC_Phi);
+      h_nHits_minus_rpc->Fill(muMinus.nHits_BKLM_RPC_Phi);
+      h2_deltaT0_vs_v_rpc->Fill(v, deltaT0);
+      prof_deltaT0_rms_vs_v_rpc->Fill(v, deltaT0);
+      h2_deltaT0_vs_nhits_rpc->Fill(nTotal, deltaT0);
+
+      if (nTotal < 10) {
+        hc_eventT0_rpc_lowN->Fill(deltaT0);
+      } else if (nTotal < 30) {
+        hc_eventT0_rpc_midN->Fill(deltaT0);
+      } else {
+        hc_eventT0_rpc_highN->Fill(deltaT0);
+      }
+    }
+
+    // === BKLM RPC Z ===
+    if (muPlus.nHits_BKLM_RPC_Z > 0 && muMinus.nHits_BKLM_RPC_Z > 0) {
+      double t0_plus  = muPlus.sumT0_BKLM_RPC_Z  / muPlus.nHits_BKLM_RPC_Z;
+      double t0_minus = muMinus.sumT0_BKLM_RPC_Z / muMinus.nHits_BKLM_RPC_Z;
+      double deltaT0  = t0_plus - t0_minus;
+
+      double v = 1.0 / muPlus.nHits_BKLM_RPC_Z + 1.0 / muMinus.nHits_BKLM_RPC_Z;
+      int nTotal = muPlus.nHits_BKLM_RPC_Z + muMinus.nHits_BKLM_RPC_Z;
+
+      if (v <= 0.0)
+        continue;
+
+      sum_delta2_over_v_BKLM_RPC_Z += (deltaT0 * deltaT0) / v;
+      nDimuon_BKLM_RPC_Z++;
+
+      h_eventT0_rpc->Fill(t0_plus);
+      h_eventT0_rpc->Fill(t0_minus);
+      hc_eventT0_rpc->Fill(deltaT0);
+
+      // Diagnostic fills
+      h_nHits_plus_rpc->Fill(muPlus.nHits_BKLM_RPC_Z);
+      h_nHits_minus_rpc->Fill(muMinus.nHits_BKLM_RPC_Z);
+      h2_deltaT0_vs_v_rpc->Fill(v, deltaT0);
+      prof_deltaT0_rms_vs_v_rpc->Fill(v, deltaT0);
+      h2_deltaT0_vs_nhits_rpc->Fill(nTotal, deltaT0);
+
+      if (nTotal < 10) {
+        hc_eventT0_rpc_lowN->Fill(deltaT0);
+      } else if (nTotal < 30) {
+        hc_eventT0_rpc_midN->Fill(deltaT0);
+      } else {
+        hc_eventT0_rpc_highN->Fill(deltaT0);
+      }
+    }
+
+    // === EKLM Scintillator ===
+    if (muPlus.nHits_EKLM_Scint > 0 && muMinus.nHits_EKLM_Scint > 0) {
+      double t0_plus  = muPlus.sumT0_EKLM_Scint  / muPlus.nHits_EKLM_Scint;
+      double t0_minus = muMinus.sumT0_EKLM_Scint / muMinus.nHits_EKLM_Scint;
+      double deltaT0  = t0_plus - t0_minus;
+
+      double v = 1.0 / muPlus.nHits_EKLM_Scint + 1.0 / muMinus.nHits_EKLM_Scint;
+      int nTotal = muPlus.nHits_EKLM_Scint + muMinus.nHits_EKLM_Scint;
+
+      if (v <= 0.0)
+        continue;
+
+      sum_delta2_over_v_EKLM_Scint += (deltaT0 * deltaT0) / v;
+      nDimuon_EKLM_Scint++;
+
+      h_eventT0_scint_end->Fill(t0_plus);
+      h_eventT0_scint_end->Fill(t0_minus);
+      hc_eventT0_scint_end->Fill(deltaT0);
+
+      // ==== NEW DIAGNOSTIC FILLS ====
+      h_nHits_plus_scint_end->Fill(muPlus.nHits_EKLM_Scint);
+      h_nHits_minus_scint_end->Fill(muMinus.nHits_EKLM_Scint);
+      h2_deltaT0_vs_v_scint_end->Fill(v, deltaT0);
+      prof_deltaT0_rms_vs_v_scint_end->Fill(v, deltaT0);
+      h2_deltaT0_vs_nhits_scint_end->Fill(nTotal, deltaT0);
+
+      // Fill multiplicity-binned histograms
+      if (nTotal < 5) {
+        hc_eventT0_scint_end_lowN->Fill(deltaT0);
+      } else if (nTotal < 15) {
+        hc_eventT0_scint_end_midN->Fill(deltaT0);
+      } else {
+        hc_eventT0_scint_end_highN->Fill(deltaT0);
+      }
+    }
+  }
+
+  B2INFO("Di-muon ΔT0 data collected."
+         << LogVar("BKLM Scint di-muon events", nDimuon_BKLM_Scint)
+         << LogVar("BKLM RPC Phi di-muon events", nDimuon_BKLM_RPC_Phi)
+         << LogVar("BKLM RPC Z di-muon events", nDimuon_BKLM_RPC_Z)
+         << LogVar("EKLM Scint di-muon events", nDimuon_EKLM_Scint));
+
+  // === Extract σ_hit using the Gaussian MLE ===
+  // σ_hit^2 = (1 / N_evt) Σ_i [ ΔT0_i^2 / (1/N⁺_i + 1/N⁻_i) ]
+
+  float sigma_BKLM_Scint     = 10.0f;  // Default fallback
+  float sigma_BKLM_Scint_err = 1.0f;
+  if (nDimuon_BKLM_Scint > 0) {
+    double sigma2 = sum_delta2_over_v_BKLM_Scint / static_cast<double>(nDimuon_BKLM_Scint);
+    sigma_BKLM_Scint = static_cast<float>(std::sqrt(sigma2));
+    // Uncertainty approximation (Gaussian statistics)
+    sigma_BKLM_Scint_err = sigma_BKLM_Scint / std::sqrt(2.0 * nDimuon_BKLM_Scint);
+  }
+
+  float sigma_RPC_Phi     = 10.0f;
+  float sigma_RPC_Phi_err = 1.0f;
+  if (nDimuon_BKLM_RPC_Phi > 0) {
+    double sigma2 = sum_delta2_over_v_BKLM_RPC_Phi / static_cast<double>(nDimuon_BKLM_RPC_Phi);
+    sigma_RPC_Phi = static_cast<float>(std::sqrt(sigma2));
+    sigma_RPC_Phi_err = sigma_RPC_Phi / std::sqrt(2.0 * nDimuon_BKLM_RPC_Phi);
+  }
+
+  float sigma_RPC_Z     = 10.0f;
+  float sigma_RPC_Z_err = 1.0f;
+  if (nDimuon_BKLM_RPC_Z > 0) {
+    double sigma2 = sum_delta2_over_v_BKLM_RPC_Z / static_cast<double>(nDimuon_BKLM_RPC_Z);
+    sigma_RPC_Z = static_cast<float>(std::sqrt(sigma2));
+    sigma_RPC_Z_err = sigma_RPC_Z / std::sqrt(2.0 * nDimuon_BKLM_RPC_Z);
+  }
+
+  // Compute combined RPC sigma (weighted average by number of events)
+  float sigma_RPC     = 10.0f;
+  float sigma_RPC_err = 1.0f;
+  int nDimuon_RPC_total = nDimuon_BKLM_RPC_Phi + nDimuon_BKLM_RPC_Z;
+  if (nDimuon_RPC_total > 0) {
+    // Weighted average by statistics
+    double w_phi = static_cast<double>(nDimuon_BKLM_RPC_Phi) / nDimuon_RPC_total;
+    double w_z   = static_cast<double>(nDimuon_BKLM_RPC_Z) / nDimuon_RPC_total;
+    sigma_RPC = w_phi * sigma_RPC_Phi + w_z * sigma_RPC_Z;
+    // Propagate uncertainties
+    sigma_RPC_err = std::sqrt(w_phi * w_phi * sigma_RPC_Phi_err * sigma_RPC_Phi_err +
+                              w_z * w_z * sigma_RPC_Z_err * sigma_RPC_Z_err);
+  }
+
+  float sigma_EKLM_Scint     = 10.0f;
+  float sigma_EKLM_Scint_err = 1.0f;
+  if (nDimuon_EKLM_Scint > 0) {
+    double sigma2 = sum_delta2_over_v_EKLM_Scint / static_cast<double>(nDimuon_EKLM_Scint);
+    sigma_EKLM_Scint = static_cast<float>(std::sqrt(sigma2));
+    sigma_EKLM_Scint_err = sigma_EKLM_Scint / std::sqrt(2.0 * nDimuon_EKLM_Scint);
+  }
+
+  B2INFO("Extracted per-hit resolutions using event-by-event weighting:"
+         << LogVar("σ_BKLM_Scint [ns]", sigma_BKLM_Scint) << LogVar("±", sigma_BKLM_Scint_err)
+         << LogVar("σ_RPC_Phi [ns]", sigma_RPC_Phi) << LogVar("±", sigma_RPC_Phi_err)
+         << LogVar("σ_RPC_Z [ns]", sigma_RPC_Z) << LogVar("±", sigma_RPC_Z_err)
+         << LogVar("σ_RPC_combined [ns]", sigma_RPC) << LogVar("±", sigma_RPC_err)
+         << LogVar("σ_EKLM_Scint [ns]", sigma_EKLM_Scint) << LogVar("±", sigma_EKLM_Scint_err));
+
+  // === Store in payload ===
+  m_eventT0HitResolution->setSigmaBKLMScint(sigma_BKLM_Scint, sigma_BKLM_Scint_err);
+  m_eventT0HitResolution->setSigmaRPC(sigma_RPC, sigma_RPC_err);              // Combined for backward compatibility
+  m_eventT0HitResolution->setSigmaRPCPhi(sigma_RPC_Phi, sigma_RPC_Phi_err);  // Direction-specific
+  m_eventT0HitResolution->setSigmaRPCZ(sigma_RPC_Z, sigma_RPC_Z_err);        // Direction-specific
+  m_eventT0HitResolution->setSigmaEKLMScint(sigma_EKLM_Scint, sigma_EKLM_Scint_err);
+
+  B2INFO("EventT0 hit resolution calibration complete and stored in payload.");
+
+  // Clear temporary data
+  eventTrackMap.clear();
+
   delete fcn_const;
   m_evts.clear();
   m_timeShift.clear();
@@ -1771,6 +2399,8 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   saveCalibration(m_timeCableDelay, "KLMTimeCableDelay");
   saveCalibration(m_timeConstants, "KLMTimeConstants");
   saveCalibration(m_timeResolution, "KLMTimeResolution");
+  saveCalibration(m_eventT0HitResolution, "KLMEventT0HitResolution");
+
   return CalibrationAlgorithm::c_OK;
 }
 
@@ -1779,14 +2409,61 @@ void KLMTimeAlgorithm::saveHist()
   m_outFile->cd();
   B2INFO("Save Histograms into Files.");
 
-  // ===================================================================
-  // VITAL PLOTS - Always saved
-  // ===================================================================
+  /* Save vital plots. */
   TDirectory* dir_monitor = m_outFile->mkdir("monitor_Hists", "", true);
   dir_monitor->cd();
   h_calibrated->SetDirectory(dir_monitor);
   hc_calibrated->SetDirectory(dir_monitor);
   h_diff->SetDirectory(dir_monitor);
+
+  m_outFile->cd();
+  TDirectory* dir_eventT0 = m_outFile->mkdir("EventT0", "", true);
+  dir_eventT0->cd();
+
+  // Original histograms
+  h_eventT0_rpc->SetDirectory(dir_eventT0);
+  h_eventT0_scint->SetDirectory(dir_eventT0);
+  h_eventT0_scint_end->SetDirectory(dir_eventT0);
+
+  hc_eventT0_rpc->SetDirectory(dir_eventT0);
+  hc_eventT0_scint->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_end->SetDirectory(dir_eventT0);
+
+  // ==== NEW DIAGNOSTIC PLOTS ====
+
+  // Hit multiplicity
+  h_nHits_plus_rpc->SetDirectory(dir_eventT0);
+  h_nHits_minus_rpc->SetDirectory(dir_eventT0);
+  h_nHits_plus_scint->SetDirectory(dir_eventT0);
+  h_nHits_minus_scint->SetDirectory(dir_eventT0);
+  h_nHits_plus_scint_end->SetDirectory(dir_eventT0);
+  h_nHits_minus_scint_end->SetDirectory(dir_eventT0);
+
+  // ΔT0 vs v
+  h2_deltaT0_vs_v_rpc->SetDirectory(dir_eventT0);
+  h2_deltaT0_vs_v_scint->SetDirectory(dir_eventT0);
+  h2_deltaT0_vs_v_scint_end->SetDirectory(dir_eventT0);
+
+  // Profile plots
+  prof_deltaT0_rms_vs_v_rpc->SetDirectory(dir_eventT0);
+  prof_deltaT0_rms_vs_v_scint->SetDirectory(dir_eventT0);
+  prof_deltaT0_rms_vs_v_scint_end->SetDirectory(dir_eventT0);
+
+  // ΔT0 vs total hits
+  h2_deltaT0_vs_nhits_rpc->SetDirectory(dir_eventT0);
+  h2_deltaT0_vs_nhits_scint->SetDirectory(dir_eventT0);
+  h2_deltaT0_vs_nhits_scint_end->SetDirectory(dir_eventT0);
+
+  // Multiplicity-binned ΔT0
+  hc_eventT0_rpc_lowN->SetDirectory(dir_eventT0);
+  hc_eventT0_rpc_midN->SetDirectory(dir_eventT0);
+  hc_eventT0_rpc_highN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_lowN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_midN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_highN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_end_lowN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_end_midN->SetDirectory(dir_eventT0);
+  hc_eventT0_scint_end_highN->SetDirectory(dir_eventT0);
 
   m_outFile->cd();
   TDirectory* dir_effC = m_outFile->mkdir("effC_Hists", "", true);
@@ -1832,9 +2509,7 @@ void KLMTimeAlgorithm::saveHist()
 
   B2INFO("Top file setup Done.");
 
-  // ===================================================================
-  // DEBUG PLOTS - Only saved if m_saveAllPlots is true
-  // ===================================================================
+  /* Save debug plots (only if m_saveAllPlots is true). */
   if (!m_saveAllPlots) {
     B2INFO("Skipping debug histogram directory creation (m_saveAllPlots = false)");
     m_outFile->cd();

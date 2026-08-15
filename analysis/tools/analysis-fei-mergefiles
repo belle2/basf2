@@ -254,7 +254,7 @@ if __name__ == '__main__':
         tfile.Close()
 
         import subprocess
-        ret = subprocess.call(f'hadd {outFile.replace(".root", "_tmp.root")} ' + ' '.join(inFiles), shell=True)
+        ret = subprocess.call(['hadd', outFile.replace(".root", "_tmp.root")] + inFiles)
         if ret != 0:
             sys.exit(ret)
 
@@ -279,7 +279,7 @@ if __name__ == '__main__':
                     validFileName.replace('.root', '_tmp.root') 
                 )
                 os.rename(validFileName, validFileName.replace('.root', '_tmp2.root'))
-                ret = subprocess.call(f'hadd {validFileName} {validFileName.replace(".root", "_tmp2.root")} {validFileName.replace(".root", "_tmp.root")}', shell=True)
+                ret = subprocess.call(['hadd', validFileName, validFileName.replace(".root", "_tmp2.root"), validFileName.replace(".root", "_tmp.root")])
                 if ret != 0:
                     sys.exit(ret)
                 os.remove(validFileName.replace('.root', '_tmp.root'))
@@ -287,7 +287,7 @@ if __name__ == '__main__':
 
             deleteExistingKeys(outFile, outFile.replace('.root', '_tmp.root'))
             os.rename(outFile, outFile.replace('.root', '_tmp2.root'))
-            ret = subprocess.call(f'hadd {outFile} {outFile.replace(".root", "_tmp2.root")} {outFile.replace(".root", "_tmp.root")}', shell=True)
+            ret = subprocess.call(['hadd', outFile, outFile.replace(".root", "_tmp2.root"), outFile.replace(".root", "_tmp.root")])
 
             if ret == 0:
                 os.remove(outFile.replace('.root', '_tmp.root'))

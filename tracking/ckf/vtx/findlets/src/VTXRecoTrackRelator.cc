@@ -9,7 +9,7 @@
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
@@ -25,10 +25,10 @@ void VTXRecoTrackRelator::exposeParameters(ModuleParamList* moduleParamList, con
 }
 
 void VTXRecoTrackRelator::apply(const std::vector<CKFToVTXResult>& results,
-                                std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToVTX)
+                                std::vector<TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>& relationsCDCToVTX)
 {
   for (const CKFToVTXResult& result : results) {
-    const TrackFindingCDC::Weight weight = m_overlapFilter(result);
+    const TrackingUtilities::Weight weight = m_overlapFilter(result);
     if (not std::isnan(weight)) {
       const RecoTrack* relatedVTXTrack = result.getRelatedVTXRecoTrack();
       relationsCDCToVTX.emplace_back(result.getSeed(), weight, relatedVTXTrack);

@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseClusterFilter>;
-template class TrackFindingCDC::ChooseableFilter<ClusterFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseClusterFilter>;
+template class TrackingUtilities::ChooseableFilter<ClusterFilterFactory>;

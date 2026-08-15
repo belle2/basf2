@@ -111,7 +111,7 @@ namespace Belle2::HistogramFactory {
     * @param low - lower boundary of axis range
     * @param up - upper boundary of axis range
     * @param title - title of the axis */
-    Axis(int nbins, double low, double up, std::string title)
+    Axis(int nbins, double low, double up, const std::string title)
     {
       m_nbins.Set(nbins);
       m_low.Set(low);
@@ -126,7 +126,7 @@ namespace Belle2::HistogramFactory {
     /** Set value of up */
     Axis& up(double up) { m_up.Set(up); return *this; }
     /** Set value of title */
-    Axis& title(std::string title) { m_title.Set(title); return *this; }
+    Axis& title(const std::string title) { m_title.Set(title); return *this; }
 
   private:
     /** number of bins in the axis */
@@ -226,9 +226,9 @@ namespace Belle2::HistogramFactory {
     Factory& nbinsyDefault(int nbinsy) {    m_nbinsy.Set(nbinsy); return *this; } /**< Sets nbinsy permanently. */
     Factory& ylowDefault(double ylow) {     m_ylow.Set(ylow);     return *this; } /**< Sets ylow permanently. */
     Factory& yupDefault(double yup) {       m_yup.Set(yup);       return *this; } /**< Sets yup permanently. */
-    Factory& xTitleDefault(std::string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
-    Factory& yTitleDefault(std::string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
-    Factory& zTitleDefault(std::string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
+    Factory& xTitleDefault(const std::string xTitle) { m_xTitle.Set(xTitle); return *this; } /**< Sets xTitle permanently. */
+    Factory& yTitleDefault(const std::string yTitle) { m_yTitle.Set(yTitle); return *this; } /**< Sets yTitle permanently. */
+    Factory& zTitleDefault(const std::string zTitle) { m_zTitle.Set(zTitle); return *this; } /**< Sets zTitle permanently. */
     /** @} */
 
     /** @name Named parameters
@@ -241,9 +241,9 @@ namespace Belle2::HistogramFactory {
     Factory& nbinsy(int nbinsy) {    m_nbinsy.SetTemporarily(nbinsy); return *this; } /**< Sets nbinsy temporarily */
     Factory& ylow(double ylow) {     m_ylow.SetTemporarily(ylow);     return *this; } /**< Sets ylow temporarily */
     Factory& yup(double yup) {       m_yup.SetTemporarily(yup);       return *this; } /**< Sets yup temporarily */
-    Factory& xTitle(std::string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
-    Factory& yTitle(std::string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
-    Factory& zTitle(std::string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
+    Factory& xTitle(const std::string xTitle) { m_xTitle.SetTemporarily(xTitle); return *this; } /**< Sets xTitle temporarily */
+    Factory& yTitle(const std::string yTitle) { m_yTitle.SetTemporarily(yTitle); return *this; } /**< Sets yTitle temporarily */
+    Factory& zTitle(const std::string zTitle) { m_zTitle.SetTemporarily(zTitle); return *this; } /**< Sets zTitle temporarily */
     /** @} */
 
   private:

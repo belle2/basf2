@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
+#include <tracking/trackingUtilities/ca/WithAutomatonCell.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   /// Type of a reco track with automaton cell
-  using CellularRecoTrack = TrackFindingCDC::WithAutomatonCell<const RecoTrack*>;
+  using CellularRecoTrack = TrackingUtilities::WithAutomatonCell<const RecoTrack*>;
 
   /// Returns a short name for class CellularRecoTrack to be used in names of parameters.
   inline std::string getClassMnemomicParameterName(const CellularRecoTrack* dispatchTag __attribute__((unused)))

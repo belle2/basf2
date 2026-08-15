@@ -11,7 +11,7 @@
 """
 <header>
   <output>MuonGenSimNoBkg.root</output>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>This steering file produces 10000 events with one Muon each
   and runs the detector simulation without mixing in background.</description>
@@ -67,14 +67,14 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "MuonGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with generic MuonGenSimNoBkg events",
     prefix="MuonGenSimNoBkg",
 )
 event_timing_plot(
     "../MuonGenSimNoBkg.root",
     "MuonGenSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Muon events",
     prefix="MuonGenSimNoBkg",
 )

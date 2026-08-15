@@ -30,11 +30,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDDAQModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDDAQModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

@@ -40,7 +40,7 @@ namespace Belle2 {
      * @param p parameter for type
      * @param a amount of deletas in the past
      */
-    HistDelta(EDeltaType t = c_Disabled, int p = 0, unsigned int a = 0);
+    explicit HistDelta(EDeltaType t = c_Disabled, int p = 0, unsigned int a = 0);
 
     /** Destructor
      */

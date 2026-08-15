@@ -1,0 +1,16 @@
+# EventType: 1700001010
+# Descriptor: [vpho->Y1S gamma]
+# NickName: vpho_gammaY1S
+# Cuts: None
+# Documentation: ee-> gamma Upsilon(1S) process 
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yijia Chen
+# Email: chenyj24@m.fudan.edu.cn 
+# Date: 20251219
+
+
+Decay vpho
+1.0   Upsilon  gamma  VECTORISR 1.0 1.0;
+Enddecay
+End

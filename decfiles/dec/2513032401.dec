@@ -1,0 +1,30 @@
+# EventType: 2513032401
+# Descriptor: [ccbar Lcm2antiLambda0pimpi0, antiLambda02PmPip]
+# NickName: Lcm2antiLambda0pimpi0_antiLambda02PmPip
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal
+# Date: 20260320 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyAntiLambda0 anti-Lambda0
+Alias Mypi0 pi0
+
+Decay anti-Lambda_c-
+1.000 MyAntiLambda0 pi- Mypi0       PHSP;
+Enddecay
+
+Decay MyAntiLambda0
+1.000 anti-p- pi+                  HypNonLepton 0.748 -6.5; 
+Enddecay
+
+Decay Mypi0
+1.000 gamma gamma             PHSP;
+Enddecay
+
+End
+

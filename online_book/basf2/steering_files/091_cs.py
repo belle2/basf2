@@ -48,7 +48,7 @@ simpleCSVariables = [
     "thrustOm",
     "cosTBTO",
     "cosTBz",
-    "KSFWVariables(et)",
+    "KSFWVariables(pt_sum)",
     "KSFWVariables(mm2)",
     "KSFWVariables(hso00)",
     "KSFWVariables(hso01)",
@@ -81,7 +81,7 @@ ma.variablesToNtuple(
     decayString="B0",
     variables=simpleCSVariables + ["Mbc", "isContinuumEvent"],
     filename="ContinuumSuppression.root",
-    treename="tree",
+    treename="ntuple",
     path=main,
 )
 

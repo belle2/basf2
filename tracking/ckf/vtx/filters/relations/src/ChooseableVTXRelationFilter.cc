@@ -7,9 +7,9 @@
  **************************************************************************/
 #include <tracking/ckf/vtx/filters/relations/ChooseableVTXRelationFilter.h>
 #include <tracking/ckf/vtx/filters/relations/LayerVTXRelationFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class Belle2::LayerVTXRelationFilter<ChooseableFilter<VTXPairFilterFactory>>;

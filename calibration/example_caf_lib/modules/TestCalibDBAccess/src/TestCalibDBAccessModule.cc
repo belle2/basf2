@@ -29,10 +29,6 @@ TestCalibDBAccessModule::TestCalibDBAccessModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void TestCalibDBAccessModule::initialize()
-{
-}
-
 TestCalibDBAccessModule::~TestCalibDBAccessModule()
 {
 }

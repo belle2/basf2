@@ -27,10 +27,6 @@ parameters.setHERtimeInBeamCycleMax(2.33)
 parameters.setECLDigitsMax(3300)
 parameters.setCDCHitsMax(2500)
 
-parameters.setHLTPrefilterPrescale(1000)
-
-parameters.setHLTPrefilterState(0)
-
 database = Database.Instance()
 
 iov = IntervalOfValidity(0, 0, -1, -1)

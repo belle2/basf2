@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~AlignableBKLMRecoHit()
+    ~AlignableBKLMRecoHit() override
     {
     }
 

@@ -575,6 +575,13 @@ namespace Belle2 {
       //! Get the displacement transformation of a module
       const HepGeom::Transform3D getModuleDisplacedGeo(int section, int sector, int layer) const;
 
+      //! Get layer area for BKLM
+      //! @param[in] section Section number (0=backward, 1=forward)
+      //! @param[in] sector  Sector number (1-based)
+      //! @param[in] layer   Layer number (1-based)
+      //! @return Area in cm^2
+      double getBKLMLayerArea(int section, int sector, int layer) const;
+
     private:
 
       //! Hidden constructor

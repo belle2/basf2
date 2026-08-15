@@ -9,7 +9,7 @@
 
 #include <tracking/ckf/cdc/filters/states/BaseCDCStateFilter.h>
 
-#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <tracking/trackingUtilities/numerics/Weight.h>
 #include <string>
 
 namespace Belle2 {
@@ -19,7 +19,7 @@ namespace Belle2 {
   class RoughCDCStateFilter : public BaseCDCStateFilter {
   public:
     /// return 1 if distance < m_maximalHitDistance, NAN otherwise
-    TrackFindingCDC::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
+    TrackingUtilities::Weight operator()(const BaseCDCStateFilter::Object& pair) final;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

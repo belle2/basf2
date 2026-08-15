@@ -182,7 +182,7 @@ def get_argument_parser():
         "-samples",
         type=str,
         default='',
-        help="the yaml file (with full path) to be used in ``b2skim-stats-submit``.\
+        help="The yaml file (with full path) to be used in ``b2skim-stats-submit``.\
         If not provided, ``b2skim-stats-submit`` defaults to the samples of the current campaign\
         i.e. ``/group/belle2/dataprod/mc/skimtraining/samplelists/testfiles.yaml`` on KEKCC.")
 
@@ -205,31 +205,107 @@ def init_info(info):
     return infoDict
 
 
-def getLPNs(collection, dataset_type, lpn_dir, mctype=None):  # Only works for proc13+prompt and MC15rd (not MCri)
-    with open(collection, 'r') as file:
-        yaml_collection = yaml.safe_load(file)
-    collectionDict = dict(yaml_collection)
+def getLPNs(collection, dataset_type, lpn_dir, mctype=None):  # No longer works with MCri
+    """Populate *_LPNs.txt files in `lpn_dir`.
 
-    if 'MC' in dataset_type:
-        col_dir = '/belle/collection/MC/'
-    elif 'data' in dataset_type:
-        col_dir = '/belle/collection/Data/'
-    else:  # for the test and for debugging purposes
-        col_dir = '/belle/collection/test/'
-    for key in collectionDict.keys():
-        if 'data' in dataset_type and 'MC' in key:
-            continue
-        if 'MC' in dataset_type and 'MC' not in key:
-            continue
-        for col in collectionDict[key]:
-            command = f'gb2_ds_search collection --list_datasets {col_dir}{col}'
-            print(f'executed: {command}')
-            result = subprocess.run(command.split(), capture_output=True, text=True, )
-            with open(f'{lpn_dir}{col}_LPNs.txt', 'w') as file:
-                file.write(result.stdout)
-            if result.returncode != 0:
-                print(f"Error executing command: {result.stderr}")
+    If `collection` is a YAML file, read collections and resolve them to LPNs using
+    `gb2_ds_search` (previous behavior).
 
+    Otherwise, treat `collection` as either:
+      - A path to a text file containing one LPN per line, or
+      - A single LPN path, or multiple LPN paths separated by commas/whitespace.
+
+    In these direct-LPN modes, write a file `manual_LPNs.txt` containing the provided LPNs.
+    """
+    # Case 1: YAML collections (existing behavior)
+    if os.path.isfile(collection) and collection.lower().endswith(('.yaml', '.yml')):
+        with open(collection, 'r') as file:
+            yaml_collection = yaml.safe_load(file)
+        collectionDict = dict(yaml_collection) if yaml_collection else {}
+
+        if 'MC' in dataset_type:
+            col_dir = '/belle/collection/MC/'
+        elif 'data' in dataset_type:
+            col_dir = '/belle/collection/Data/'
+        else:  # for tests/debugging
+            col_dir = '/belle/collection/test/'
+
+        for key in collectionDict.keys():
+            if 'data' in dataset_type and 'MC' in key:
+                continue
+            if 'MC' in dataset_type and 'MC' not in key:
+                continue
+            for col in collectionDict[key]:
+                each_col_dir = col_dir
+                # For case of unpublished collection
+                if "test" in col:
+                    each_col_dir = "/belle/collection/test/"
+                command = f'gb2_ds_search collection --list_datasets {each_col_dir}{col}'
+                print(f'executed: {command}')
+                result = subprocess.run(command.split(), capture_output=True, text=True)
+                with open(f'{lpn_dir}{col}_LPNs.txt', 'w') as file:
+                    file.write(result.stdout)
+                if result.returncode != 0:
+                    print(f"Error executing command: {result.stderr=}\n {result.stdout=}")
+    else:
+        # Branch 2: Direct LPNs -> group into {campaign}_{sample}_{energy}_LPNs.txt
+        print('No YAML collections supplied or file not found. Treating input as direct LPNs.')
+
+        # Collect LPNs
+        if isinstance(collection, str) and os.path.isfile(collection):
+            with open(collection, 'r') as f:
+                lpn_lines = [ln.strip() for ln in f if ln.strip() and not ln.strip().startswith('#')]
+        else:
+            parts = re.split(r'[\s,]+', str(collection).strip()) if isinstance(collection, str) else []
+            lpn_lines = [p for p in parts if p]
+
+        # Regex helpers
+        re_mc_proc = re.compile(r'MC\d+\w*_proc\d+')
+        re_proc = re.compile(r'proc\d+')
+        re_e = re.compile(r'e0\d+')
+        re_r = re.compile(r'r\d+')
+
+        grouped = {}  # (campaign, sample, energy) -> [lines]
+
+        for line in lpn_lines:
+            parts = [p for p in line.split('/') if p]
+
+            # campaign
+            campaign = next((p for p in parts if re_mc_proc.fullmatch(p)), None)
+            if campaign is None:
+                campaign = next((p for p in parts if re_proc.fullmatch(p)), None)
+            if campaign is None:
+                campaign = 'unknownCampaign'
+
+            # energy (segment after e0..)
+            energy = 'unknownEnergy'
+            for i, p in enumerate(parts[:-1]):
+                if re_e.fullmatch(p):
+                    energy = parts[i+1] if i+1 < len(parts) else 'unknownEnergy'
+                    break
+
+            # sample (segment after r0..)
+            sample = 'unknownSample'
+            for i, p in enumerate(parts[:-1]):
+                if re_r.fullmatch(p):
+                    sample = parts[i+1] if i+1 < len(parts) else 'unknownSample'
+                    break
+
+            grouped.setdefault((campaign, sample, energy), []).append(line)
+
+        total_groups = 0
+        total_lines = 0
+        for (campaign, sample, energy), lines in grouped.items():
+            fname = f"{campaign}_{sample}_{energy}_LPNs.txt"
+            out_path = os.path.join(lpn_dir, fname)
+            with open(out_path, 'w') as f:
+                f.write('\\n'.join(lines) + '\\n')
+            print(f"Wrote {len(lines)} LPN(s) to {out_path}")
+            total_groups += 1
+            total_lines += len(lines)
+        print(f"Direct LPNs grouped: {total_groups} files, {total_lines} lines total.")
+
+    # Continue with the existing splitting by experiment/prod, etc.
     # Split up the collection .txt files based on experiment and prod number:
 
     # Create a dictionary to store lines grouped by experiment and prod numbers
@@ -252,9 +328,13 @@ def getLPNs(collection, dataset_type, lpn_dir, mctype=None):  # Only works for p
                     if experiment_match and prod_match:
                         experiment_number = experiment_match.group()
                         prod_number = prod_match.group()
+                        if filename.endswith('_LPNs.txt'):
+                            prefix = filename[:-len('_LPNs.txt')]
+                        else:
+                            prefix = filename[:-4]
 
                         # Create a unique key for this combination of experiment and prod numbers
-                        key = f"{filename.rstrip('_LPNs.txt')}_{experiment_number}_{prod_number}_LPNs"
+                        key = f"{prefix}_{experiment_number}_{prod_number}_LPNs"
                         # Add the line to the corresponding list in the dictionary
                         if key not in lines_by_experiment_and_prod:
                             lines_by_experiment_and_prod[key] = []
@@ -332,20 +412,21 @@ def getJSONs(
                         # for MCri we sometimes get requests to produce them in 200/fb chunks, so
                         # we need to use -N 1 argument with b2skim-prod
                         print(f'Skimming FEI. Using --analysis-globaltag {info["fei_gt"]}')
-                        # TO DO: add FEI case
-                        command = ''
+                        command = f'b2skim-prod {yaml_dir}{yamlName} {stats_dir}SkimStats_{skim}.json -c {campaign} ' \
+                                  f' -r {release} -o {json_dir} {ri_rd} -s {skim} --analysis-globaltag {info["fei_gt"]}'
                     else:
                         print(f'Getting jsons for combined skim {skim} on {yamlName} using release {release}. '
                               f'Unlimited runs per production.')
                         command = f'b2skim-prod {yaml_dir}{yamlName} {stats_dir}SkimStats_{skim}.json -c {campaign} ' \
                                   f' -r {release} -o {json_dir} {ri_rd} -s {skim}'
-                    if gt:
-                        command += f' --analysis-globaltag {info["ana_gt"]}'
-                    if pidgt:
-                        command += f' --pid-globaltag {info["pid_gt"]}'
-                    if flagged:
-                        command += ' --flagged'
-                    print(command)
+                        # Currently FEI skims do not use additional global tags, PID global tags, nor are run in flagged mode.
+                        if gt:
+                            command += f' --analysis-globaltag {info["ana_gt"]}'
+                        if pidgt:
+                            command += f' --pid-globaltag {info["pid_gt"]}'
+                        if flagged:
+                            command += ' --flagged'
+                    print(f"{command=}")
                     counter_JSONs += 1
                     my_proc = subprocess.Popen(
                         command.split(),
@@ -393,10 +474,13 @@ def getJSONs(
                 print(command)
                 counter_JSONs += 1
                 my_proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                print(f"{my_proc=}")
                 my_proc.stdin.write(b'1\n')
                 stdout, stderr = my_proc.communicate()
-                print(f'stdout = {stdout}')
-                print(f'stderr = {stderr}')
+                print(f'{stdout=}')
+                print(f'{stderr=}')
+                if "[ERROR]" in stdout.decode('ascii'):
+                    raise RuntimeError("Check stdout, json has not been created for {yamlName}")
 
     print()
     print('# JSONs created: ', counter_JSONs)
@@ -415,13 +499,13 @@ def register(dataset_type, skim=None, json_dir=None, release=None, camp=None):
         skimPaths = glob.glob(f'{json_dir}skim/*/{release}/SkimScripts')
 
     print('# paths:', len(skimPaths))
-
+    print(f"{skimPaths=}")
     counter = 0
     for skimPath in skimPaths:
 
         jsonPath = skimPath.split('SkimScripts')[0]
         jsonPath = f'{jsonPath}*/*{skim}*.json'
-
+        print(f"{jsonPath=}")
         for path in glob.glob(jsonPath):
             if os.path.exists(path):
                 counter = counter+1
@@ -444,37 +528,50 @@ def upload_files(json_dir, release, campaignDict):
     '''
 
     prod_cmd = 'gb2_prod_status -g skim -s all'
+    print(f"{prod_cmd=}")
 
     try:
         result = subprocess.run(prod_cmd.split(), capture_output=True, text=True)
 
         if result.returncode == 0:
             output = '\n'.join(line for line in result.stdout.split('\n') if 'Initialized' in line or 'Registered' in line)
-            print(output)
+            print("{output=}")
 
             prodlines = output.strip().split('\n')
-
+            print(prodlines)
             prod_list = [line.split()[0] for line in prodlines]
             camp_list = [line.split()[1] for line in prodlines]
+            print(prod_list)
+            print(camp_list)
 
             # upload skim files
             for prod, camp in zip(prod_list, camp_list):
-
                 # Find the proper campaign directory according to the dictionary in the infoYaml.
                 # The directory name is defined by b2skim-prod (args.json step) using the info encoded in the registry yaml
+                foundcamp = False
                 for key, campList in campaignDict.items():
-                    for campName in campList:
-                        if campName in camp:
-                            camp = key
-                            break
+                    if foundcamp:
+                        # Once the campaign folder has been found, do not keep searching the remaining items of infoSkim["campaign"]
+                        break
+                    else:
+                        for campName in campList:
+                            if campName in camp:
+                                print(f"{campName=}, {camp=}")
+                                camp = key
+                                foundcamp = True
+                                break
 
                 script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
+                print(f"{script_dir=}")
+
                 command = ['gb2_prod_uploadFile', '-p', prod]
+                print(f"{command=}")
                 result_upload = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
+                print(f"{result_upload=}")
                 if result_upload.returncode != 0:
-                    print(f"Error uploading files for prod {prod}: {result_upload.stderr}")
+                    print(f"Error uploading files for prod {prod}: {result_upload.stdout}\n {result_upload.stderr=}")
         else:
-            print(f"Error running command: {result.stderr}")
+            print(f"Error running command: {result.stdout=}\n{result.stderr=}")
 
     except (subprocess.CalledProcessError, IndexError) as e:
         print("Error while running the command. Error:", e)
@@ -501,9 +598,9 @@ def approve_prods():
             for prod in prod_list:
                 result_approve = subprocess.run(['gb2_prod_approve', '-p', prod], capture_output=True, text=True)
                 if result_approve.returncode != 0:
-                    print(f"Error approving prod {prod}: {result_approve.stderr}")
+                    print(f"Error approving prod {prod}: {result_approve.stderr=}\n {result_approve.stdout=}")
         else:
-            print(f"Error running command: {result.stderr}")
+            print(f"Error running command: {result.stderr=}\n{result.stdout=}")
 
     except (subprocess.CalledProcessError, IndexError) as e:
         print("Error while running the command. Error:", e)
@@ -556,13 +653,14 @@ def getMCtype(mctype):
         'Main': ["mixed", "charged", "uubar", "ddbar", "ssbar", "ccbar", "taupair"],
         'LowMult': ["ee", "mumu", "gg", "eeee", "eemumu", "llXX", "hhISR"],
         'Excited': ["BstarBstar", "BstarB"],
+        'Whizard': ["mumumumu", "eetautau", "tautautautau", "mumutautau", "eeee", "eemumu"],
     }
 
     # check if the required MCtype is allowed
     splitted_mctype = mctype.split('_')
     for s in splitted_mctype:
         if s not in MCtypes.keys():
-            sys.exit("ERROR. the allowed --mctypes are: Main, LowMult, Excited and combination of them")
+            sys.exit("ERROR. the allowed --mctypes are: Main, LowMult, Excited, Whizard and combination of them")
 
     out = []
     for ty, tyList in MCtypes.items():
@@ -617,7 +715,7 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
-        if skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
+        elif skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
             # Systematic skims get submitted as single skims (not combined)
             command = ['b2skim-stats-submit', '-s', skim]
 
@@ -628,7 +726,7 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
             result = subprocess.run(command, capture_output=True, text=True)
 
             if result.returncode != 0:
-                print(f"Error submitting stats for {skim}: {result.stderr}")
+                print(f"Error submitting stats for {skim}: {result.stderr=}\n{result.stdout=}")
         else:
             # This is the {inputYaml} in '/MC/skim/stats' folder
             command = f'b2skim-stats-submit -c {stats_dir}{inputYaml.split("/")[-1]} {skim}'
@@ -645,7 +743,7 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
             print(command)
             result = subprocess.run(command.split(), capture_output=True, text=True)
             if result.returncode != 0:
-                print(f"Error executing command: {result.stderr}")
+                print(f"Error executing command: {result.stderr=}\n{result.stdout=}")
 
 
 def printStats(skims, stats_dir, flagged=False):
@@ -655,15 +753,16 @@ def printStats(skims, stats_dir, flagged=False):
             command = ['b2skim-stats-print', '-s', skim, '-J']
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
-                print(f"Error executing command: {result.stderr}")
+                print(f"Error executing command: {result.stderr=}\n{result.stdout=}")
         else:
             print(f'Printing combined skim {skim} stats to json file SkimStats_{skim}.json')
             command = ['b2skim-stats-print', '-c', skim, '-J']
             if flagged:
                 command.append('--flagged')
+            print(f"{command=}")
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
-                print(f"Error executing command: {result.stderr}")
+                print(f"Error executing command: {result.stderr=}\n {result.stdout=}")
         print(f'Moving to {stats_dir}')
         # move to MC folder
         shutil.move('SkimStats.json', f'{stats_dir}SkimStats_{skim}.json')

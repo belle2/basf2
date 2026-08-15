@@ -9,19 +9,19 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTriple/BaseSegmentTripleFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     // Guard to prevent repeated instantiations
-    extern template class FilterFactory<BaseSegmentTripleFilter>;
+    // extern template class TrackingUtilities::FilterFactory<BaseSegmentTripleFilter>;
 
     /// Factory that can create appropriate segment triple filters from associated names.
-    class SegmentTripleFilterFactory : public FilterFactory<BaseSegmentTripleFilter> {
+    class SegmentTripleFilterFactory : public TrackingUtilities::FilterFactory<BaseSegmentTripleFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseSegmentTripleFilter>;
+      using Super = TrackingUtilities::FilterFactory<BaseSegmentTripleFilter>;
 
     public:
       /// Constructor forwarding the default filter name

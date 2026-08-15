@@ -7,10 +7,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/wireHit/ChooseableWireHitFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::Chooseable<BaseWireHitFilter>;
-template class TrackFindingCDC::ChooseableFilter<WireHitFilterFactory>;
+template class TrackingUtilities::Chooseable<BaseWireHitFilter>;
+template class TrackingUtilities::ChooseableFilter<WireHitFilterFactory>;

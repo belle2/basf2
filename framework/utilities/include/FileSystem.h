@@ -49,7 +49,7 @@ namespace Belle2 {
      * @param path path to file/directory, assuming it's installed locally
      *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
      *             strictly required.
-     * @param dataType type of data, like "examples" or "validation".
+     * @param dataType type of data, like "examples", "validation" or "starterkit".
      * @param silent If true, no error message is printed when file could
      *             not be found.
      * @return absolute path to file in local directory, if it exists,

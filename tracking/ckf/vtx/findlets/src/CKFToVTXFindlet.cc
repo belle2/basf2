@@ -17,13 +17,13 @@
 #include <tracking/ckf/general/findlets/StateRejecter.icc.h>
 #include <tracking/ckf/general/findlets/ResultStorer.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 #include <tracking/ckf/vtx/filters/relations/LayerVTXRelationFilter.icc.h>
 
 #include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 CKFToVTXFindlet::~CKFToVTXFindlet() = default;
 
@@ -115,7 +115,7 @@ void CKFToVTXFindlet::apply()
   const auto hasLowHitNumber = [this](const CKFResult<RecoTrack, SpacePoint>& result) {
     return result.getHits().size() < m_param_minimalHitRequirement;
   };
-  TrackFindingCDC::erase_remove_if(m_results, hasLowHitNumber);
+  TrackingUtilities::erase_remove_if(m_results, hasLowHitNumber);
 
   m_overlapResolver.apply(m_results, m_filteredResults);
 

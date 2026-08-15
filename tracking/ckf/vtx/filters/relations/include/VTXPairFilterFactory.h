@@ -9,15 +9,15 @@
 
 #include <tracking/ckf/vtx/filters/relations/BaseVTXPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.dcl.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.dcl.h>
 
 namespace Belle2 {
   /// Factory that can create appropriate cluster filters from associated names.
-  class VTXPairFilterFactory : public TrackFindingCDC::FilterFactory<BaseVTXPairFilter> {
+  class VTXPairFilterFactory : public TrackingUtilities::FilterFactory<BaseVTXPairFilter> {
 
   private:
     /// Type of the base class
-    using Super = TrackFindingCDC::FilterFactory<BaseVTXPairFilter>;
+    using Super = TrackingUtilities::FilterFactory<BaseVTXPairFilter>;
 
   public:
     /// Constructor forwarding the default filter name

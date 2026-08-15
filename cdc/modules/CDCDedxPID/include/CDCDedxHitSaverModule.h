@@ -28,7 +28,7 @@ namespace Belle2 {
     CDCDedxHitSaverModule();
 
     /** Destructor */
-    virtual ~CDCDedxHitSaverModule();
+    ~CDCDedxHitSaverModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;

@@ -9,7 +9,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <tracking/mcMatcher/TrackMatchLookUp.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 using namespace Belle2;
 
@@ -29,7 +29,7 @@ void MCVXDCDCTrackMergerFindlet::exposeParameters(ModuleParamList* moduleParamLi
   m_bestMatchSelector.exposeParameters(moduleParamList, prefix);
   m_relationAdder.exposeParameters(moduleParamList, prefix);
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "onlyFittedCDCTracks"), m_param_onlyFittedCDCTracks,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "onlyFittedCDCTracks"), m_param_onlyFittedCDCTracks,
                                 "Only use fitted CDC tracks as otherwise the comparison with the CKF is unfair.",
                                 m_param_onlyFittedCDCTracks);
 }
@@ -43,7 +43,7 @@ void MCVXDCDCTrackMergerFindlet::apply()
   m_storeArrayMerger.apply(cdcRecoTrackVector, vxdRecoTrackVector);
 
   // Prepare the weighted relations for later
-  std::vector<TrackFindingCDC::WeightedRelation<RecoTrack*, RecoTrack* const>> weightedRelations;
+  std::vector<TrackingUtilities::WeightedRelation<RecoTrack*, RecoTrack* const>> weightedRelations;
   weightedRelations.reserve(cdcRecoTrackVector.size() * vxdRecoTrackVector.size());
 
   TrackMatchLookUp cdcMCLookUp("MCRecoTracks", m_storeArrayMerger.getCDCStoreArrayName());

@@ -12,13 +12,13 @@
 #include <tracking/ckf/pxd/filters/relations/InterceptDistancePXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/CylinderDistancePXDPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/Filter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 
 PXDPairFilterFactory::PXDPairFilterFactory(const std::string& defaultFilterName)
@@ -55,12 +55,12 @@ std::unique_ptr<BasePXDPairFilter>
 PXDPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::make_unique<TrackFindingCDC::AllFilter<BasePXDPairFilter>>();
+    return std::make_unique<TrackingUtilities::AllFilter<BasePXDPairFilter>>();
   }
 
   // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
-    return std::make_unique<TrackFindingCDC::NoneFilter<BasePXDPairFilter>>();
+    return std::make_unique<TrackingUtilities::NoneFilter<BasePXDPairFilter>>();
   }
 
   // cppcheck-suppress knownConditionTrueFalse

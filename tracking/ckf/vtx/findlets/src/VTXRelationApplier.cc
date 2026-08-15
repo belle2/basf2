@@ -8,7 +8,7 @@
 #include <tracking/ckf/vtx/findlets/VTXRelationApplier.h>
 #include <tracking/ckf/general/utilities/SearchDirection.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -31,10 +31,10 @@ void VTXRelationApplier::initialize()
   m_param_writeOutDirection = fromString(m_param_writeOutDirectionAsString);
 }
 
-void VTXRelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>>&
+void VTXRelationApplier::apply(const std::vector<TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>>&
                                relationsCDCToVTX)
 {
-  for (const TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relationsCDCToVTX) {
+  for (const TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>& relation : relationsCDCToVTX) {
     const RecoTrack* cdcTrack = relation.getFrom();
     const RecoTrack* vtxTrack = relation.getTo();
     cdcTrack->addRelationTo(vtxTrack, m_param_writeOutDirection);
@@ -43,13 +43,14 @@ void VTXRelationApplier::apply(const std::vector<TrackFindingCDC::WeightedRelati
 
 void VTXRelationApplier::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "writeOutDirection"),
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "writeOutDirection"),
                                 m_param_writeOutDirectionAsString,
                                 "Write out the relations with the direction of the VTX part as weight");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "fromRelationStoreArrayName"), m_param_fromRelationsStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "fromRelationStoreArrayName"),
+                                m_param_fromRelationsStoreArrayName,
                                 "Create relations from this store array.");
 
-  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "toRelationStoreArrayName"), m_param_toRelationsStoreArrayName,
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "toRelationStoreArrayName"), m_param_toRelationsStoreArrayName,
                                 "Create relations to this store array.");
 }

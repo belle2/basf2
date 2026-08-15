@@ -16,14 +16,15 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
 
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
-template class TrackFindingCDC::FilterFactory<BaseSegmentPairFilter>;
+template class TrackingUtilities::FilterFactory<BaseSegmentPairFilter>;
 
 SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

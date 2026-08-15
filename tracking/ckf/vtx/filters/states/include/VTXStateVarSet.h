@@ -7,9 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarSet.h>
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
+#include <tracking/trackingUtilities/varsets/VarSet.h>
+#include <tracking/trackingUtilities/varsets/VarNames.h>
+#include <tracking/trackingUtilities/varsets/FixedSizeNamedFloatTuple.h>
 
 #include <tracking/ckf/vtx/filters/states/BaseVTXStateFilter.h>
 
@@ -59,11 +59,11 @@ namespace Belle2 {
   };
 
   /// Vehicle class to transport the variable names
-  class VTXStateVarNames : public TrackFindingCDC::VarNames<BaseVTXStateFilter::Object> {
+  class VTXStateVarNames : public TrackingUtilities::VarNames<BaseVTXStateFilter::Object> {
 
   public:
     /// Number of variables to be generated.
-    static const size_t nVars = TrackFindingCDC::size(vtxStateVarNames);
+    static const size_t nVars = TrackingUtilities::size(vtxStateVarNames);
 
     /// Get the name of the column.
     constexpr
@@ -76,7 +76,7 @@ namespace Belle2 {
   /**
    * Var set used in the VTX-CDC-Merger for calculating the probability of a VTX-CDC-track match.
    */
-  class VTXStateVarSet : public TrackFindingCDC::VarSet<VTXStateVarNames> {
+  class VTXStateVarSet : public TrackingUtilities::VarSet<VTXStateVarNames> {
 
   public:
     /// Generate and assign the variables from the VTX-CDC object.

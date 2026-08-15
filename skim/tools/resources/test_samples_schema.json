@@ -49,6 +49,11 @@
               }
             ],
             "default": "BGx1"
+          },
+          "generator": {
+            "description": "Generator used to make MC process (i.e. if default or a new generator like Whizard)",
+            "type": "string",
+            "default": "default"
           }
         },
         "required": [

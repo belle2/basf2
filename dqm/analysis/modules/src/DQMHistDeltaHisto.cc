@@ -36,9 +36,6 @@ DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
 }
 
-
-DQMHistDeltaHistoModule::~DQMHistDeltaHistoModule() { }
-
 void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
@@ -82,7 +79,7 @@ void DQMHistDeltaHistoModule::event()
   time_t cur_mtime = m_evtMetaDataPtr->getTime();
 
   for (auto& histoname : m_monitoredHistos) {
-    TH1* hh = findHist(histoname.c_str());
+    auto hh = findHist(histoname.c_str());
     if (hh == nullptr) continue;
     if (hh->GetDimension() != 1) continue;
     queue<SSNODE*>& hq = m_histosQueues[histoname];

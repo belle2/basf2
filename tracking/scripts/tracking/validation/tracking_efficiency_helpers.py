@@ -194,8 +194,7 @@ def run_reconstruction(path, output_file_name, input_file_name='', useVTX=False)
         geometry.param("useDB", True)
         path.add_module(geometry)
 
-    add_reconstruction(path, get_reconstruction_components(), pruneTracks=False, useVTX=useVTX)
-    # add_mc_reconstruction(path, get_reconstruction_components(), pruneTracks=False, useVTX=useVTX)
+    add_reconstruction(path, get_reconstruction_components(), pruneTracks=0, useVTX=useVTX)
 
     tracking_efficiency = b2.register_module('StandardTrackingPerformance')
     # tracking_efficiency.logging.log_level = LogLevel.DEBUG

@@ -85,18 +85,26 @@ void KLMTimeCollectorModule::prepare()
 
   /* Initialization of output tree. */
   m_outTree = new TTree("time_calibration_data", "");
-  m_outTree->Branch("t0",        &m_Event.t0,        "t0/D");
-  m_outTree->Branch("flyTime",   &m_Event.flyTime,   "flyTime/D");
-  m_outTree->Branch("recTime",   &m_Event.recTime,   "recTime/D");
-  m_outTree->Branch("dist",      &m_Event.dist,      "dist/D");
-  m_outTree->Branch("diffDistX", &m_Event.diffDistX, "diffDistX/D");
-  m_outTree->Branch("diffDistY", &m_Event.diffDistY, "diffDistY/D");
-  m_outTree->Branch("diffDistZ", &m_Event.diffDistZ, "diffDistZ/D");
-  m_outTree->Branch("eDep",      &m_Event.eDep,      "eDep/D");
-  m_outTree->Branch("nPE",       &m_Event.nPE,       "nPE/D");
-  m_outTree->Branch("channelId", &m_Event.channelId, "channelId/I");
-  m_outTree->Branch("inRPC",     &m_Event.inRPC,     "inRPC/O");
-  m_outTree->Branch("isFlipped", &m_Event.isFlipped, "isFlipped/O");
+  m_outTree->Branch("t0",           &m_Event.t0,           "t0/D");
+  m_outTree->Branch("t0_uc",        &m_Event.t0_uc,        "t0_uc/D");
+  m_outTree->Branch("flyTime",      &m_Event.flyTime,      "flyTime/D");
+  m_outTree->Branch("recTime",      &m_Event.recTime,      "recTime/D");
+  m_outTree->Branch("dist",         &m_Event.dist,         "dist/D");
+  m_outTree->Branch("diffDistX",    &m_Event.diffDistX,    "diffDistX/D");
+  m_outTree->Branch("diffDistY",    &m_Event.diffDistY,    "diffDistY/D");
+  m_outTree->Branch("diffDistZ",    &m_Event.diffDistZ,    "diffDistZ/D");
+  m_outTree->Branch("eDep",         &m_Event.eDep,         "eDep/D");
+  m_outTree->Branch("nPE",          &m_Event.nPE,          "nPE/D");
+  m_outTree->Branch("channelId",    &m_Event.channelId,    "channelId/I");
+  m_outTree->Branch("inRPC",        &m_Event.inRPC,        "inRPC/O");
+  m_outTree->Branch("isFlipped",    &m_Event.isFlipped,    "isFlipped/O");
+  m_outTree->Branch("isGood",       &m_Event.isGood,       "isGood/O");
+  m_outTree->Branch("getADCcount",  &m_Event.getADCcount,  "getADCcount/s");
+
+  m_outTree->Branch("Run",          &m_Event.Run,          "Run/D");
+  m_outTree->Branch("Event",        &m_Event.Events,       "Event/D");
+  m_outTree->Branch("nTrack",       &m_Event.nTrack,       "nTrack/D");
+  m_outTree->Branch("Track_Charge", &m_Event.Track_Charge, "Track_Charge/D");
 
   registerObject<TTree>("time_calibration_data", m_outTree);
 
@@ -151,11 +159,16 @@ void KLMTimeCollectorModule::collect()
       return;
     const auto bestCDCEvtT0C = m_eventT0->getBestCDCTemporaryEventT0();
     m_Event.t0 = bestCDCEvtT0C->eventT0;
+
+    double Uncertainty = m_eventT0->getEventT0Uncertainty();
+    m_Event.t0_uc = Uncertainty;
   }
 
   /* Read event metadata. */
   int runId = eventMetaData->getRun();
   int evtId = eventMetaData->getEvent();
+  m_Event.Run = runId;
+  m_Event.Events = evtId;
 
   getObjectPtr<TH1D>("m_HevtT0_0")->Fill(m_Event.t0);
 
@@ -180,6 +193,10 @@ void KLMTimeCollectorModule::collect()
     // Good track selection
     const Particle* particle = inputList->getParticle(iT);
     const Track* track = particle->getTrack();
+
+    m_Event.nTrack = iT;
+    double T_Charge = particle->getCharge();
+    m_Event.Track_Charge = T_Charge;
 
     // Find data objects related to track
     RelationVector<ExtHit> extHits = track->getRelationsTo<ExtHit>();
@@ -312,6 +329,8 @@ void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klm
       m_Event.recTime = digitHit.getTime();
       m_Event.eDep = digitHit.getEnergyDeposit();
       m_Event.nPE = digitHit.getNPhotoelectrons();
+      m_Event.isGood = digitHit.isGood();
+      m_Event.getADCcount = digitHit.getCharge();
 
       getObjectPtr<TH2D>("m_HfTimeE")->Fill(m_Event.flyTime, digitHit.getLayer());
       getObjectPtr<TTree>("time_calibration_data")->Fill();
@@ -383,6 +402,8 @@ void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
         m_Event.eDep = digitHit.getEnergyDeposit();
         m_Event.nPE = digitHit.getNPhotoelectrons();
         m_Event.channelId = channelId_digit;
+        m_Event.isGood = digitHit.isGood();
+        m_Event.getADCcount = digitHit.getCharge();
 
         getObjectPtr<TH2D>("m_HfTimeB")->Fill(m_Event.flyTime, digitHit.getLayer());
         getObjectPtr<TTree>("time_calibration_data")->Fill();
@@ -452,6 +473,8 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
         m_Event.eDep = digitHit.getEnergyDeposit();
         m_Event.nPE = digitHit.getNPhotoelectrons();
         m_Event.channelId = channelId_digit;
+        m_Event.isGood = 0;
+        m_Event.getADCcount = 0;
 
         getObjectPtr<TH2D>("m_HfTimeB")->Fill(m_Event.flyTime, digitHit.getLayer());
         getObjectPtr<TTree>("time_calibration_data")->Fill();

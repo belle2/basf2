@@ -101,7 +101,7 @@ namespace Belle2 {
     }
 
 
-    TH1F PDF1Dim::getHistogram(std::string name, std::string title) const
+    TH1F PDF1Dim::getHistogram(const std::string& name, const std::string& title) const
     {
       TH1F h(name.c_str(), title.c_str(), m_logF.size(), m_minTime, m_maxTime);
       for (size_t i = 0; i < m_logF.size(); i++) {

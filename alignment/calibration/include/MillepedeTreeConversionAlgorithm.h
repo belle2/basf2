@@ -29,7 +29,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~MillepedeTreeConversionAlgorithm();
+    ~MillepedeTreeConversionAlgorithm() override;
 
     /**
      * Calibration.
@@ -49,4 +49,3 @@ namespace Belle2 {
   };
 
 }
-

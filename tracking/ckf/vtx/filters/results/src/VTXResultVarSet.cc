@@ -14,7 +14,7 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 VTXResultVarSet::VTXResultVarSet() : Super()
 {

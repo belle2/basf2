@@ -93,18 +93,9 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
       std::replace(hist_name.begin(), hist_name.end(), ':', '_');
       std::replace(var_name.begin(), var_name.end(), ':', '_');
 
-      // If enough statistics, obtain more detailed information for MiraBelle
-      auto hist = (TH1F*)findHist(hist_name);
-      if (hist && hist->GetEntries() > 1000) {
-        // Fit the histogram to get the peak of a distribution
-        hist->Fit(&gaus);
-        m_monObj->setVariable(var_name, gaus.GetParameter(1));
-        m_monObj->setVariable(var_name + "_stddev", gaus.GetParameter(2));
-      } else {
-        // Use simple mean from the histogram
-        m_monObj->setVariable(var_name, m_out_of_time_digits[pv_name]);
-        m_monObj->setVariable(var_name + "_stddev", 0);
-      }
+      // Use simple mean from the histogram
+      m_monObj->setVariable(var_name, m_out_of_time_digits[pv_name]);
+      m_monObj->setVariable(var_name + "_stddev", 0);
     }
   }
 }

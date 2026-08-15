@@ -24,11 +24,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDERModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDERModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

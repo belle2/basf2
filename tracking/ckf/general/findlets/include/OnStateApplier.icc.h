@@ -8,29 +8,29 @@
 #pragma once
 
 #include <tracking/ckf/general/findlets/OnStateApplier.dcl.h>
-#include <tracking/trackFindingCDC/numerics/WeightComperator.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/numerics/WeightComperator.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
 namespace Belle2 {
   template <class AState>
-  void OnStateApplier<AState>::apply(const std::vector<TrackFindingCDC::WithWeight<const AState*>>& currentPath,
-                                     std::vector<TrackFindingCDC::WithWeight<AState*>>& childStates)
+  void OnStateApplier<AState>::apply(const std::vector<TrackingUtilities::WithWeight<const AState*>>& currentPath,
+                                     std::vector<TrackingUtilities::WithWeight<AState*>>& childStates)
   {
     if (childStates.empty()) {
       return;
     }
 
-    for (TrackFindingCDC::WithWeight<AState*>& stateWithWeight : childStates) {
+    for (TrackingUtilities::WithWeight<AState*>& stateWithWeight : childStates) {
       AState& state = *stateWithWeight;
-      const TrackFindingCDC::Weight& weight = this->operator()({currentPath, &state});
+      const TrackingUtilities::Weight& weight = this->operator()({currentPath, &state});
       stateWithWeight.setWeight(weight);
     }
 
-    TrackFindingCDC::erase_remove_if(childStates, TrackFindingCDC::HasNaNWeight());
+    TrackingUtilities::erase_remove_if(childStates, TrackingUtilities::HasNaNWeight());
   };
 
   template <class AState>
-  TrackFindingCDC::Weight OnStateApplier<AState>::operator()(const Object& object __attribute__((unused)))
+  TrackingUtilities::Weight OnStateApplier<AState>::operator()(const Object& object __attribute__((unused)))
   {
     return NAN;
   };

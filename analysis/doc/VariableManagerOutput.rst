@@ -120,6 +120,34 @@ Here is the full function documentation of the `modularAnalysis` convenience fun
 .. autofunction:: modularAnalysis.variablesToHistogram
    :noindex:
 
+.. _v2t:
+
+VariablesToTable
+----------------
+
+Writes out variables to different file formats (for use with `pandas.DataFrame`_ tools).
+Analogous to `VariablesToNtuple <v2nt>`.
+The output format can be chosen based on the extension in the ``filename`` argument:
+``.csv`` for csv output,
+``.parquet`` or ``.pq`` for parquet output,
+``.h5``, ``.hdf`` or ``.hdf5`` for hdf5 output and
+``.feather`` or ``.arrow`` for feather output.
+
+.. _pandas.DataFrame: https://pandas.pydata.org
+
+.. note::
+        There is currently no `modularAnalysis` convenience function.
+        Instead you can add the module to your path explicitly (it only takes two lines).
+
+.. code-block:: python
+ 
+        from b2pandas_utils import VariablesToTable
+        v2t = VariablesToTable("pi+:all", list_of_interesting_variables,
+                                 filename="variables.parquet")
+        mypath.add_module(v2t)
+
+.. autoclass:: b2pandas_utils.VariablesToTable
+
 .. _v2hdf5:
 
 VariablesToHDF5
@@ -127,9 +155,6 @@ VariablesToHDF5
 
 Writes out variables to a flat HDF5 format file (for use with `pandas.DataFrame`_ tools).
 Analogous to `VariablesToNtuple <v2nt>`.
-
-
-.. _pandas.DataFrame: https://pandas.pydata.org
 
 .. note::
         There is currently no `modularAnalysis` convenience function.

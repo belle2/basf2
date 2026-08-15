@@ -8,9 +8,9 @@
 #pragma once
 
 #include <tracking/ckf/vtx/filters/relations/LayerVTXRelationFilter.dcl.h>
-#include <tracking/trackFindingCDC/filters/base/RelationFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RelationFilter.icc.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
@@ -101,7 +101,7 @@ namespace Belle2 {
         }
 
         // Some loose prefiltering of possible states
-        TrackFindingCDC::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
+        TrackingUtilities::Weight weight = m_prefilter(std::make_pair(currentState, nextState));
         if (std::isnan(weight)) {
           continue;
         }
@@ -116,15 +116,16 @@ namespace Belle2 {
   template <class AFilter, class APrefilter>
   void LayerVTXRelationFilter<AFilter, APrefilter>::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
   {
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "hitJumping"), m_param_hitJumping,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitJumping"), m_param_hitJumping,
                                   "Make it possible to jump over N layers.", m_param_hitJumping);
 
     m_filter.exposeParameters(moduleParamList, prefix);
-    m_prefilter.exposeParameters(moduleParamList, TrackFindingCDC::prefixed("pre", prefix));
+    m_prefilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed("pre", prefix));
   }
 
   template <class AFilter, class APrefilter>
-  TrackFindingCDC::Weight LayerVTXRelationFilter<AFilter, APrefilter>::operator()(const CKFToVTXState& from, const CKFToVTXState& to)
+  TrackingUtilities::Weight LayerVTXRelationFilter<AFilter, APrefilter>::operator()(const CKFToVTXState& from,
+      const CKFToVTXState& to)
   {
     return m_filter(std::make_pair(&from, &to));
   }

@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/ChoosableFromVarSetFilter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/ChoosableFromVarSetFilter.dcl.h>
 #include <tracking/ckf/pxd/filters/results/PXDResultVarSet.h>
 
 namespace Belle2 {
   /// Base filter for CKF PXD results (on overlap check)
-  class SizePXDResultFilter : public TrackFindingCDC::ChoosableFromVarSetFilter<PXDResultVarSet> {
+  class SizePXDResultFilter : public TrackingUtilities::ChoosableFromVarSetFilter<PXDResultVarSet> {
   public:
-    SizePXDResultFilter() : TrackFindingCDC::ChoosableFromVarSetFilter<PXDResultVarSet>("number_of_hits")
+    SizePXDResultFilter() : TrackingUtilities::ChoosableFromVarSetFilter<PXDResultVarSet>("number_of_hits")
     {
 
     }

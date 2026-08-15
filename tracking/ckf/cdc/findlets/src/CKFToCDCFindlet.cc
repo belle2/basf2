@@ -8,9 +8,12 @@
 
 #include <tracking/ckf/cdc/findlets/CKFToCDCFindlet.h>
 
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
 
+#include <framework/database/DBObjPtr.h>
 #include <framework/core/ModuleParamList.h>
+
+#include <tracking/dbobjects/SVDToCDCCKFParameters.h>
 
 using namespace Belle2;
 
@@ -41,6 +44,28 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
 }
 
+void CKFToCDCFindlet::beginRun()
+{
+  Super::beginRun();
+
+  DBObjPtr<SVDToCDCCKFParameters> payload;
+
+  if (!payload.isValid()) {
+    B2FATAL("CKFToCDCFindlet: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
+  }
+
+  // Payload parameters (INTs, FLOATs)
+  m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
+
+  m_treeSearcher.setMaximalDeltaPhi(payload->getMaximalDeltaPhi());
+  m_treeSearcher.setMaximalLayerJump(payload->getMaximalLayerJump());
+  m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());
+  m_treeSearcher.setPathMaximalCandidatesInFlight(payload->getPathMaximalCandidatesInFlight());
+  m_treeSearcher.setStateMaximalHitCandidates(payload->getStateMaximalHitCandidates());
+
+  B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload 'SVDToCDCCKFParameters'.");
+}
+
 void CKFToCDCFindlet::beginEvent()
 {
   Super::beginEvent();
@@ -51,12 +76,12 @@ void CKFToCDCFindlet::beginEvent()
   m_results.clear();
 }
 
-void CKFToCDCFindlet::apply(const std::vector<TrackFindingCDC::CDCWireHit>& wireHits)
+void CKFToCDCFindlet::apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits)
 {
   m_trackHandler.apply(m_vxdRecoTrackVector);
   m_seedCreator.apply(m_vxdRecoTrackVector, m_seeds);
 
-  const auto& wireHitPtrs = TrackFindingCDC::as_pointers<const TrackFindingCDC::CDCWireHit>(wireHits);
+  const auto& wireHitPtrs = TrackingUtilities::as_pointers<const TrackingUtilities::CDCWireHit>(wireHits);
 
   for (const auto& seed : m_seeds) {
     B2DEBUG(29, "Starting new seed");

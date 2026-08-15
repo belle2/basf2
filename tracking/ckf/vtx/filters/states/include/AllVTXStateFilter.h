@@ -13,6 +13,6 @@ namespace Belle2 {
   /// A very simple filter for all space points.
   class AllVTXStateFilter : public BaseVTXStateFilter {
   public:
-    TrackFindingCDC::Weight operator()(const BaseVTXStateFilter::Object& pair) override;
+    TrackingUtilities::Weight operator()(const BaseVTXStateFilter::Object& pair) override;
   };
 }

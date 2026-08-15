@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 
@@ -20,9 +20,9 @@ namespace Belle2 {
    * * ... and of VXD tracks
    * * fetch the RecoTracks from a StoreArray and write their pointers into two std::vectors
    */
-  class StoreArrayMerger : public TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*> {
+  class StoreArrayMerger : public TrackingUtilities::Findlet<RecoTrack*, RecoTrack*> {
     /// The parent class
-    using Super = TrackFindingCDC::Findlet<RecoTrack*, RecoTrack*>;
+    using Super = TrackingUtilities::Findlet<RecoTrack*, RecoTrack*>;
   public:
     /// Expose the parameters of the findlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

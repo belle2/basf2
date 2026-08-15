@@ -8,7 +8,6 @@
 #ifndef TRGRAWDATAModule_h
 #define TRGRAWDATAModule_h
 
-#include <iostream>
 #include <vector>
 
 #include <framework/core/HistoModule.h>
@@ -382,7 +381,7 @@ namespace Belle2 {
     int m_cntr_nw3_badrvc[50] = {0};
 
     int m_cntr_nwn[50] = {0};
-    int m_cntr_nwn_badvet[50] = {0};
+    // int m_cntr_nwn_badvet[50] = {0};
     int m_cntr_nwn_badtrg[50] = {0};
     int m_cntr_nwn_badrvc[50] = {0};
 

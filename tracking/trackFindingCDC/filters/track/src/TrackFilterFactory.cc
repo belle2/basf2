@@ -10,20 +10,21 @@
 #include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/MVAFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/RecordingFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/TruthVarFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/AllFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/NoneFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/RecordingFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/TruthVarFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/AllFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/NoneFilter.icc.h>
 
-#include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
-#include <tracking/trackFindingCDC/filters/base/FilterVarSet.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterFactory.icc.h>
+#include <tracking/trackingUtilities/filters/base/FilterVarSet.icc.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackingUtilities/varsets/VariadicUnionVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
@@ -34,7 +35,7 @@ namespace {
   using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
 
-template class TrackFindingCDC::FilterFactory<BaseTrackFilter>;
+template class TrackingUtilities::FilterFactory<BaseTrackFilter>;
 
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

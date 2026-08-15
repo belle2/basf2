@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/AllAxialSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 Weight AllAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axialSegmentPair)
 {

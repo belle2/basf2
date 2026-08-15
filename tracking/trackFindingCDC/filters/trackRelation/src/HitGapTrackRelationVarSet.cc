@@ -7,12 +7,13 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 
-#include <tracking/trackFindingCDC/numerics/Angle.h>
+#include <tracking/trackingUtilities/numerics/Angle.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {

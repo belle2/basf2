@@ -11,10 +11,10 @@
 """
 <header>
   <output>CosmicsSimNoBkg.root</output>
-  <contact>arul.prakash@physik.uni-muenchen.de</contact>
+  <contact>giacomo.pietro@kit.edu</contact>
   <cacheable/>
   <description>
-    This steering file produces 10000 cosmic ray events without background, for the early_phase3 geometry.
+    This steering file produces 10000 cosmic ray events without background, for the Run 1 (early_phase3) geometry.
   </description>
 </header>
 """
@@ -50,14 +50,14 @@ process(main, calculateStatistics=True)
 
 statistics_plots(
     "CosmicsSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkg",
 )
 event_timing_plot(
     "../CosmicsSimNoBkg.root",
     "CosmicsSimNoBkg_statistics.root",
-    contact="arul.prakash@physik.uni-muenchen.de",
+    contact="giacomo.pietro@kit.edu",
     job_desc="a standard simulation job with Cosmics events",
     prefix="CosmicsSimNoBkg",
 )

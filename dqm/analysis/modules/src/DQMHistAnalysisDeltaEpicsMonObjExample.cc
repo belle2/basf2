@@ -40,12 +40,6 @@ DQMHistAnalysisDeltaEpicsMonObjExampleModule::DQMHistAnalysisDeltaEpicsMonObjExa
 
 }
 
-DQMHistAnalysisDeltaEpicsMonObjExampleModule::~DQMHistAnalysisDeltaEpicsMonObjExampleModule()
-{
-  // destructor not needed
-  // EPICS singleton deletion not urgent -> can be done by framework
-}
-
 void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisDeltaEpicsMonObjExample: initialized.");

@@ -9,7 +9,7 @@
 #include <tracking/ckf/general/entities/CKFResult.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackingUtilities/numerics/WithWeight.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -22,7 +22,7 @@ namespace Belle2 {
 
   public:
     /// Constructor using a path.
-    explicit CKFToVTXResult(const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& path);
+    explicit CKFToVTXResult(const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& path);
 
     /// Called in the exporter findlet for adding this to a already created reco track.
     void addToRecoTrack(RecoTrack& recoTrack) const;

@@ -36,10 +36,6 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   B2DEBUG(99, "DQMHistOutputToEPICS: Constructor done.");
 }
 
-DQMHistOutputToEPICSModule::~DQMHistOutputToEPICSModule()
-{
-}
-
 void DQMHistOutputToEPICSModule::initialize()
 {
   for (auto& it : m_histlist) {

@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~BeamBkgHitRateMonitorModule();
+    virtual ~BeamBkgHitRateMonitorModule() override;
 
     /**
      * Initialize the Module.

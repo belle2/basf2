@@ -11,9 +11,9 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/utilities/Range.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackingUtilities/utilities/Range.h>
+#include <tracking/trackingUtilities/utilities/Algorithms.h>
+#include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
@@ -29,7 +29,7 @@ namespace Belle2 {
   {
     m_stateRejecter.exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "endEarly"), m_param_endEarly,
+    moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "endEarly"), m_param_endEarly,
                                   "Make it possible to have all subresults in the end result vector.",
                                   m_param_endEarly);
   }
@@ -37,17 +37,17 @@ namespace Belle2 {
   template <class AState, class AStateRejecter, class AResult>
   void TreeSearcher<AState, AStateRejecter, AResult>::apply(const std::vector<AState>& seededStates,
                                                             std::vector<AState>& hitStates,
-                                                            const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+                                                            const std::vector<TrackingUtilities::WeightedRelation<AState>>& relations,
                                                             std::vector<AResult>& results)
   {
     B2ASSERT("Expected relation to be sorted",
              std::is_sorted(relations.begin(), relations.end()));
 
     // TODO: May be better to just do this for each seed separately
-    const std::vector<AState*>& statePointers = TrackFindingCDC::as_pointers<AState>(hitStates);
+    const std::vector<AState*>& statePointers = TrackingUtilities::as_pointers<AState>(hitStates);
     m_automaton.applyTo(statePointers, relations);
 
-    std::vector<TrackFindingCDC::WithWeight<const AState*>> path;
+    std::vector<TrackingUtilities::WithWeight<const AState*>> path;
     for (const AState& state : seededStates) {
       B2DEBUG(29, "Starting with new seed...");
 
@@ -61,8 +61,8 @@ namespace Belle2 {
   }
 
   template <class AState, class AStateRejecter, class AResult>
-  void TreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<TrackFindingCDC::WithWeight<const AState*>>& path,
-      const std::vector<TrackFindingCDC::WeightedRelation<AState>>& relations,
+  void TreeSearcher<AState, AStateRejecter, AResult>::traverseTree(std::vector<TrackingUtilities::WithWeight<const AState*>>& path,
+      const std::vector<TrackingUtilities::WeightedRelation<AState>>& relations,
       std::vector<AResult>& results)
   {
     if (m_param_endEarly) {
@@ -74,12 +74,12 @@ namespace Belle2 {
     // rejecter.
     const AState* currentState = path.back();
     auto continuations =
-      TrackFindingCDC::asRange(std::equal_range(relations.begin(), relations.end(), currentState));
+      TrackingUtilities::asRange(std::equal_range(relations.begin(), relations.end(), currentState));
 
-    std::vector<TrackFindingCDC::WithWeight<AState*>> childStates;
-    for (const TrackFindingCDC::WeightedRelation<AState>& continuation : continuations) {
+    std::vector<TrackingUtilities::WithWeight<AState*>> childStates;
+    for (const TrackingUtilities::WeightedRelation<AState>& continuation : continuations) {
       AState* childState = continuation.getTo();
-      TrackFindingCDC::Weight weight = continuation.getWeight();
+      TrackingUtilities::Weight weight = continuation.getWeight();
       // the state may still include information from an other round of processing, so lets set it back
 
       if (std::count(path.begin(), path.end(), childState)) {
@@ -102,7 +102,7 @@ namespace Belle2 {
 
     // Do everything with child states, linking, extrapolation, teaching, discarding, what have
     // you.
-    const std::vector<TrackFindingCDC::WithWeight<const AState*>>& constPath = path;
+    const std::vector<TrackingUtilities::WithWeight<const AState*>>& constPath = path;
     m_stateRejecter.apply(constPath, childStates);
 
     if (childStates.empty()) {
@@ -120,7 +120,7 @@ namespace Belle2 {
     std::sort(childStates.begin(), childStates.end(), stateLess);
 
     B2DEBUG(29, "Having found " << childStates.size() << " child states.");
-    for (const TrackFindingCDC::WithWeight<AState*>& childState : childStates) {
+    for (const TrackingUtilities::WithWeight<AState*>& childState : childStates) {
       path.emplace_back(childState, childState.getWeight());
       traverseTree(path, relations, results);
       path.pop_back();

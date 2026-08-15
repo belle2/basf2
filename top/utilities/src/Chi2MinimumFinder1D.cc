@@ -103,9 +103,7 @@ namespace Belle2 {
     }
 
 
-    Chi2MinimumFinder1D::Minimum Chi2MinimumFinder1D::getMinimum(double yLeft,
-        double yCenter,
-        double yRight) const
+    Chi2MinimumFinder1D::Minimum Chi2MinimumFinder1D::getMinimum(double yLeft, double yCenter, double yRight)
     {
       // parabola: y = ax^2 + bx + c
       double DL = yLeft - yCenter;
@@ -119,7 +117,7 @@ namespace Belle2 {
     }
 
 
-    TH1F Chi2MinimumFinder1D::getHistogram(std::string name, std::string title) const
+    TH1F Chi2MinimumFinder1D::getHistogram(const std::string& name, const std::string& title) const
     {
       TH1F h(name.c_str(), title.c_str(), m_x.size(), m_xmin, m_xmax);
       for (unsigned i = 0; i < m_chi2.size(); i++) {

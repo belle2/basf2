@@ -11,11 +11,16 @@
 """\
 This module contains classes for plotting validation results.
 """
-from pxd.utils.plots import plot_in_module_efficiency, plot_efficiency_vs_run, \
-                            plot_module_efficiencies_in_DHHs, plot_efficiency_map, plot_ip_resolutions
+from pxd.utils.plots import (
+    plot_in_module_efficiency,
+    plot_efficiency_vs_run,
+    plot_module_efficiencies_in_DHHs,
+    plot_efficiency_map, plot_ip_resolutions,
+    )
 import uproot
 import ROOT
 import numpy as np
+import awkward as ak
 
 
 def analyse_root_file(file_name, tree_name="tree"):
@@ -30,7 +35,11 @@ def analyse_root_file(file_name, tree_name="tree"):
     tree = tfile.Get(tree_name)
     # Read pandas.DataFrame from some branches
     branches = ['exp', 'run', 'pxdid', 'uBin', 'vBin', 'nTrackPoints', 'nSelTrackPoints', 'nSelTrackClusters', 'nTrackClusters']
-    df = uproot.open(file_name)[tree_name].arrays(branches, library='pd')
+
+    awkward_array = uproot.open(file_name)[tree_name].arrays(branches)
+    df = ak.to_dataframe(awkward_array).reset_index()
+
+    # df = uproot.open(file_name)[tree_name].arrays(branches, library='pd')
     experiment_number = df.exp.min()
     run_range = (df.run.min(), df.run.max())
     prefix = f"e{experiment_number:05}_r{run_range[0]:04}-{run_range[1]:04}_"
@@ -57,10 +66,10 @@ def analyse_root_file(file_name, tree_name="tree"):
 
     plot_efficiency_vs_run(df=df_sum_all, max_err=0.01, save_to=prefix + "pxd_efficiency_vs_run.png")
 
-    # Calculate efficiences of modules
+    # Calculate efficiencies of modules
     df_module_sum = df.groupby(['exp', 'run', 'pxdid'])[["nTrackPoints", "nSelTrackPoints",
                                                          "nTrackClusters", "nSelTrackClusters"]].sum().reset_index()
-    df_module_sum["pxdid"] = df_module_sum["pxdid"].astype(np.int32)
+    df_module_sum["pxdid"] = df_module_sum["pxdid"].astype(np.int64)
     df_module_sum.calculate_eff(num="nTrackClusters", den="nTrackPoints", output_var="eff")
     df_module_sum.calculate_eff(num="nSelTrackClusters", den="nSelTrackPoints", output_var="eff_sel")
 

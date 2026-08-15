@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <string>
@@ -21,9 +21,9 @@ namespace Belle2 {
   /**
    * Findlet to calculate ROI on the PXD sensors based on input hits
    */
-  class ROICalculator : public TrackFindingCDC::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>> {
+  class ROICalculator : public TrackingUtilities::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>>;
+    using Super = TrackingUtilities::Findlet<const std::pair<VxdID, long>, const std::pair<VxdID, long>>;
 
   public:
     /// Find intercepts in the 2D Hough space

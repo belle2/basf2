@@ -8,21 +8,21 @@
 
 #include <tracking/ckf/vtx/filters/states/VTXStateBasicVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 using namespace std;
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 bool VTXStateBasicVarSet::extract(const BaseVTXStateFilter::Object* pair)
 {
-  const std::vector<TrackFindingCDC::WithWeight<const CKFToVTXState*>>& previousStates = pair->first;
+  const std::vector<TrackingUtilities::WithWeight<const CKFToVTXState*>>& previousStates = pair->first;
   CKFToVTXState* state = pair->second;
 
   const RecoTrack* seedTrack = previousStates.front()->getSeed();

@@ -9,9 +9,6 @@
 // THIS MODULE
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 
-//BOOST
-#include <boost/algorithm/string/predicate.hpp>
-
 // ROOT
 #include <TMath.h>
 
@@ -87,7 +84,7 @@ ECLShowerShapeModule::~ECLShowerShapeModule()
 void ECLShowerShapeModule::initializeMVAweightFiles(const std::string& identifier,
                                                     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation)
 {
-  if (not(boost::ends_with(identifier, ".root") or boost::ends_with(identifier, ".xml"))) {
+  if (not(identifier.ends_with(".root") or identifier.ends_with(".xml"))) {
     weightFileRepresentation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                DBObjPtr<DatabaseRepresentationOfWeightfile>(identifier));
   }

@@ -7,22 +7,25 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <vector>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
+  namespace TrackingUtilities {
     class CDCTrack;
+  }
+
+  namespace TrackFindingCDC {
 
     /** Findlet for inspecting and printing out CDCtracks on a R-z plane for debug purposes
      *
      * can be done before interfacing to genfit, while the track is just a vector of found hits
      */
-    class TrackInspector : public Findlet<CDCTrack&> {
+    class TrackInspector : public TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCTrack&>;
+      using Super = TrackingUtilities::Findlet<TrackingUtilities::CDCTrack&>;
 
     public:
       /// Short description of the findlet
@@ -32,10 +35,10 @@ namespace Belle2 {
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Print the tracks.
-      void apply(std::vector<CDCTrack>& tracks) final;
+      void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
       /// Remove tracks with no stereo hits
-      void removeIncompleteTracks(std::vector<CDCTrack>& tracks);
+      void removeIncompleteTracks(std::vector<TrackingUtilities::CDCTrack>& tracks);
 
     private:
       /// Flag to draw the CDCTrack (true) or not (false)

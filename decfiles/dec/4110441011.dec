@@ -1,0 +1,25 @@
+# EventType: 4110441011
+# Descriptor: [e+e- -> gamma (Xb ->pi+ pi- (Upsilon -> mu+ mu-))]
+# NickName: ee_bgamma_Xb_pipi_Ups_mumu
+# Documentation: Study of ee -> gamma  Xb 
+# Tested: Yes
+# PhysicsWG: Quarkonium
+# Responsible: Yijia Chen
+# Email: 2411020002@m.fudan.edu.cn
+# Cuts: None
+# Date: 20251024
+#
+#
+Decay vpho
+1.0 gamma Xb PHSP;
+Enddecay
+
+Decay Xb
+1.0 pi+ pi- Upsilon PHSP;
+Enddecay
+
+Decay Upsilon
+1 mu+ mu- PHOTOS VLL; 
+Enddecay
+
+End

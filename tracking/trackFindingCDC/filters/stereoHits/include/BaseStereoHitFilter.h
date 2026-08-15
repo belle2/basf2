@@ -7,19 +7,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/base/Filter.dcl.h>
+#include <tracking/trackingUtilities/filters/base/Filter.dcl.h>
 
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCRLWireHit;
+  namespace TrackingUtilities {
     class CDCTrack;
+    class CDCRLWireHit;
+  }
+  namespace TrackFindingCDC {
 
     // Guard to prevent repeated instantiations
-    extern template class Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
+    // extern template class TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const CDCRLWireHit>>;
 
     /// Base filter for stereo hit - track relations.
-    using BaseStereoHitFilter = Filter<WeightedRelation<CDCTrack, const CDCRLWireHit>>;
+    using BaseStereoHitFilter =
+      TrackingUtilities::Filter<TrackingUtilities::WeightedRelation<TrackingUtilities::CDCTrack, const TrackingUtilities::CDCRLWireHit>>;
   }
 }

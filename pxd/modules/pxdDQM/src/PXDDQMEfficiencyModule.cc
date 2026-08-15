@@ -17,8 +17,8 @@
 #include <framework/gearbox/Const.h>
 
 #include <Math/Vector3D.h>
-#include "TDirectory.h"
-#include "TMatrixDSym.h"
+#include <TDirectory.h>
+#include <TMatrixDSym.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------

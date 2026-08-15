@@ -66,7 +66,6 @@ cdcdedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'removeLowest': 0.05,
     'removeHighest': 0.25,
     'onlyPrimaryParticles': False,
-    'enableDebugOutput': True,
     'ignoreMissingParticles': False,
 }
 cdcdedx.param(cdcdedx_params)

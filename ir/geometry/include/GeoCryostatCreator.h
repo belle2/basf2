@@ -61,7 +61,7 @@ namespace Belle2 {
       GeoCryostatCreator();
 
       /** The destructor of the GeoCryostatCreator class. */
-      virtual ~GeoCryostatCreator();
+      virtual ~GeoCryostatCreator() override;
 
       /** Do not want a copy constructor */
       GeoCryostatCreator(const GeoCryostatCreator&) = delete;

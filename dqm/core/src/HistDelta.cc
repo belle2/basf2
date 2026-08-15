@@ -12,12 +12,11 @@
 
 using namespace Belle2;
 
-HistDelta::HistDelta(EDeltaType t, int p, unsigned int a)
+HistDelta::HistDelta(EDeltaType t, int p, unsigned int a) : m_lastHist{nullptr}
 {
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
-  m_lastHist = nullptr; // implied
   m_lastValue = 0; // implied
 }
 
@@ -44,7 +43,7 @@ void HistDelta::update(const TH1* currentHist)
   gROOT->cd(); // make sure we dont accidentally write the histograms to a open file
   // cover first update after start
   if (m_lastHist == nullptr) {
-    m_lastHist = std::unique_ptr<TH1> ((TH1*)(currentHist->Clone()));
+    m_lastHist = std::unique_ptr<TH1>(static_cast<TH1*>(currentHist->Clone()));
     m_lastHist->SetName(TString(currentHist->GetName()) + "_last");
     m_lastHist->Reset();
     m_updated = true;
@@ -74,7 +73,7 @@ void HistDelta::update(const TH1* currentHist)
 
   if (need_update) {
     m_updated = true;
-    auto delta = (TH1*)currentHist->Clone();
+    auto delta = static_cast<TH1*>(currentHist->Clone());
     delta->SetName(TString(delta->GetName()) + "_delta");
     delta->Add(m_lastHist.get(), -1.);
 

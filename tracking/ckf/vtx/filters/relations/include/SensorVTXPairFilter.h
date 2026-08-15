@@ -15,7 +15,7 @@ namespace Belle2 {
   class SensorVTXPairFilter : public BaseVTXPairFilter {
   public:
     /// Return the weight based on layer
-    TrackFindingCDC::Weight operator()(const std::pair<const CKFToVTXState*, const CKFToVTXState*>& relation) override;
+    TrackingUtilities::Weight operator()(const std::pair<const CKFToVTXState*, const CKFToVTXState*>& relation) override;
     /// Expose the parameters.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 

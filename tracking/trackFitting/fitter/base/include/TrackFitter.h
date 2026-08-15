@@ -151,9 +151,10 @@ namespace Belle2 {
                 const std::string& storeArrayNameOfVTXHits = "",
                 const std::string& storeArrayNameOfBKLMHits = "",
                 const std::string& storeArrayNameOfEKLMHits = "",
-                const bool initializeCDCTranslators = true):
+                const bool initializeCDCTranslators = true,
+                bool fromTrackCreator = false):
       m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits, storeArrayNameOfVTXHits,
-                         storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators)
+                         storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators, fromTrackCreator)
     {
       if (Environment::Instance().isCosmicRun()) {
         // Resetting with parameters for cosmics data

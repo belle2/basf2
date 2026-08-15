@@ -9,9 +9,7 @@
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 #include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <hlt/dbobjects/HLTPrefilterParameters.h>
 #include <hlt/utilities/HLTPrefilter.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
@@ -82,8 +80,6 @@ namespace Belle2::SoftwareTrigger {
     double m_goodMagneticRegionD0 = 26.5;
 
     /// Objects relevant to HLTPrefilter monitoring
-    /// HLTprefilterParameters Database OjbPtr
-    DBObjPtr<HLTPrefilterParameters> m_hltPrefilterParameters; /**< HLT prefilter parameters */
     /// Helper instance for timing based prefilter
     HLTPrefilter::TimingCutState m_timingPrefilter;
     /// Helper instance for CDC-ECL occupancy based prefilter

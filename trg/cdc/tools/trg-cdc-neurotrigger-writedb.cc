@@ -171,6 +171,7 @@ int main(int argc, char** argv)
         ppbool = true;
       } else {
         std::cout << "ERROR!: Wrong key argument for parameter ppbool:" << line << std::endl;
+        abort();
       }
       //define to use the ETF:
       nc->setUseETF(ppbool);

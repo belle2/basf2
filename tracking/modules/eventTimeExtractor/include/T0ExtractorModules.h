@@ -7,8 +7,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
-#include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
+#include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackingUtilities/findlets/base/FindletModule.h>
 #include <tracking/eventTimeExtraction/findlets/BaseEventTimeExtractorModule.dcl.h>
 
 #include <tracking/eventTimeExtraction/findlets/IterativeDriftLengthBasedEventTimeExtractor.h>
@@ -52,10 +52,10 @@ namespace Belle2 {
    * Module implementation using the CDCHitBasedT0Extractor
    */
   class CDCHitBasedT0ExtractionModule :
-    public TrackFindingCDC::FindletModule<HitBasedT0Extractor> {
+    public TrackingUtilities::FindletModule<HitBasedT0Extractor> {
 
     /// Type of the base class
-    using Super = TrackFindingCDC::FindletModule<HitBasedT0Extractor>;
+    using Super = TrackingUtilities::FindletModule<HitBasedT0Extractor>;
 
   public:
     /// Constructor setting the default store vector names

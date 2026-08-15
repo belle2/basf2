@@ -7,9 +7,9 @@
  **************************************************************************/
 #include <tracking/ckf/pxd/filters/relations/ChooseablePXDRelationFilter.h>
 #include <tracking/ckf/pxd/filters/relations/LayerPXDRelationFilter.icc.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
+#include <tracking/trackingUtilities/filters/base/ChooseableFilter.icc.h>
 
 using namespace Belle2;
-using namespace TrackFindingCDC;
+using namespace TrackingUtilities;
 
 template class Belle2::LayerPXDRelationFilter<ChooseableFilter<PXDPairFilterFactory>>;

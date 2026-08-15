@@ -1,6 +1,6 @@
 [INFO] Steering file: analysis/tests/mva_examples.py
 TFile: B2A711-DeepContinuumSuppression_Input.root
-TTree: tree
+TTree: B0
 TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 488480075
@@ -586,7 +586,7 @@ TBranch: thrustBm, 0.9894
 TBranch: thrustOm, 0.7283
 TBranch: cosTBTO, 0.5776
 TBranch: cosTBz, 0.3408
-TBranch: KSFWVariables__boet__bc, 9.376
+TBranch: KSFWVariables__bopt_sum__bc, 9.376
 TBranch: KSFWVariables__bomm2__bc, -9.255
 TBranch: KSFWVariables__bohso00__bc, 1.037
 TBranch: KSFWVariables__bohso02__bc, 0.1332

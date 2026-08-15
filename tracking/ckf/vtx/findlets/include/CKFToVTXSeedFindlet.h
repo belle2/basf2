@@ -7,15 +7,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXResult.h>
 #include <tracking/ckf/vtx/entities/CKFToVTXState.h>
-#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
 #include <tracking/ckf/general/findlets/TrackLoader.h>
 #include <tracking/ckf/general/findlets/StateCreatorWithReversal.dcl.h>
 #include <tracking/ckf/general/findlets/TreeSearcher.dcl.h>
-#include <tracking/trackFindingCDC/collectors/selectors/BestMatchSelector.h>
+#include <tracking/trackingUtilities/collectors/selectors/BestMatchSelector.h>
 #include <tracking/ckf/vtx/findlets/VTXStateRejecter.h>
 #include <tracking/ckf/svd/findlets/SpacePointLoader.h>
 #include <tracking/ckf/vtx/findlets/RelationFromVTXTracksCreator.h>
@@ -40,9 +40,9 @@ namespace Belle2 {
    * This module does only output relations - the combination
    * has to be done afterwards.
    */
-  class CKFToVTXSeedFindlet : public TrackFindingCDC::Findlet<> {
+  class CKFToVTXSeedFindlet : public TrackingUtilities::Findlet<> {
     /// Parent class
-    using Super = TrackFindingCDC::Findlet<>;
+    using Super = TrackingUtilities::Findlet<>;
 
   public:
     /// Constructor, for setting module description and parameters.
@@ -81,7 +81,7 @@ namespace Belle2 {
     /// Findlet transforming the hit results to track relations.
     VTXRecoTrackRelator m_recoTrackRelator;
     /// Greedy filter for the relations between VTX and CDC Reco Tracks
-    TrackFindingCDC::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
+    TrackingUtilities::BestMatchSelector<const RecoTrack, const RecoTrack> m_bestMatchSelector;
     /// Copy the result relations to the store array
     VTXRelationApplier m_relationApplier;
 
@@ -95,10 +95,10 @@ namespace Belle2 {
     /// States for the hits
     std::vector<CKFToVTXState> m_states;
     /// Relations between states
-    std::vector<TrackFindingCDC::WeightedRelation<CKFToVTXState>> m_relations;
+    std::vector<TrackingUtilities::WeightedRelation<CKFToVTXState>> m_relations;
     /// Vector for storing the results
     std::vector<CKFToVTXResult> m_results;
     /// Relations between CDC tracks and VTX tracks
-    std::vector<TrackFindingCDC::WeightedRelation<const RecoTrack, const RecoTrack>> m_relationsCDCToVTX;
+    std::vector<TrackingUtilities::WeightedRelation<const RecoTrack, const RecoTrack>> m_relationsCDCToVTX;
   };
 }

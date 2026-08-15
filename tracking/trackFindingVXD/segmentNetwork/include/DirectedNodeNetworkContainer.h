@@ -129,7 +129,7 @@ namespace Belle2 {
     }
 
     /** Passes parameters for creating a virtual interaction point */
-    void setVirtualInteractionPoint(B2Vector3D& pos, B2Vector3D& posError)
+    void setVirtualInteractionPoint(const B2Vector3D& pos, const B2Vector3D& posError)
     {
       m_VIPSpacePoint = new SpacePoint(pos, posError, {0.5, 0.5}, {false, false}, VxdID(0), Belle2::VXD::SensorInfoBase::VXD);
       m_VirtualInteractionPoint = new Belle2::TrackNode(m_VIPSpacePoint);

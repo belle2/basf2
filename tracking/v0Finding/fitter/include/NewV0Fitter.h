@@ -66,12 +66,12 @@ namespace Belle2 {
      * @param copiedRecoTracksName name of the StoreArray of copied RecoTracks
      * @param enableValidation on true store additional data for validation
      */
-    NewV0Fitter(const std::string& trackFitResultsName = "",
-                const std::string& v0sName = "",
-                const std::string& v0ValidationVerticesName = "",
-                const std::string& recoTracksName = "",
-                const std::string& copiedRecoTracksName = "CopiedRecoTracks",
-                bool enableValidation = false);
+    explicit NewV0Fitter(const std::string& trackFitResultsName = "",
+                         const std::string& v0sName = "",
+                         const std::string& v0ValidationVerticesName = "",
+                         const std::string& recoTracksName = "",
+                         const std::string& copiedRecoTracksName = "CopiedRecoTracks",
+                         bool enableValidation = false);
 
     /**
      * Initialization of cuts applied during the fit and store process.

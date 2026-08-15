@@ -129,6 +129,7 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   for (std::pair<const CDCWire*, int> wireAndOClockDirection :
        asRange(wireNeighbors.begin(), wireNeighbors.begin() + nWireNeighbors)) {
     const CDCWire* neighborWire = wireAndOClockDirection.first;
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int oClockDirection = wireAndOClockDirection.second;
 
     ConstVectorRange<CDCWireHit*> wireHitRange = findWireHitRange(neighborWire);

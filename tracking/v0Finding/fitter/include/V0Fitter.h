@@ -39,11 +39,11 @@ namespace Belle2 {
 
   public:
     /// Constructor for the V0Fitter.
-    V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
-             const std::string& v0ValidationVerticesName = "",
-             const std::string& recoTracksName = "",
-             const std::string& copiedRecoTracksName = "CopiedRecoTracks",
-             bool enableValidation = false);
+    explicit V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
+                      const std::string& v0ValidationVerticesName = "",
+                      const std::string& recoTracksName = "",
+                      const std::string& copiedRecoTracksName = "CopiedRecoTracks",
+                      bool enableValidation = false);
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
@@ -92,14 +92,14 @@ namespace Belle2 {
      * @param origRecoTrack original RecoTrack
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack);
+    RecoTrack* copyRecoTrack(const RecoTrack* origRecoTrack);
 
     /** Create a copy of RecoTrack and fit the Track.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG);
+    RecoTrack* copyRecoTrackAndFit(const RecoTrack* origRecoTrack, const int trackPDG);
 
     /** Remove inner hits from RecoTrack at once.
      * Hits are removed from the minus-end of the momentum direction.

@@ -23,7 +23,7 @@ namespace Belle2 {
     double kalmanStep(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
 
     /// Calculate the residual between the mSoP and the measurement in the state.
-    double calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
+    double calculateResidual(const genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state);
 
   private:
     /// Implementation using the general kalman stepper

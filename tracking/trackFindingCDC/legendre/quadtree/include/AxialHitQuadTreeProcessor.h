@@ -101,7 +101,7 @@ namespace Belle2 {
 
     public: // debug stuff
       /// Draw QuadTree node
-      void drawHits(std::vector<const TrackingUtilities::CDCWireHit*> hits, unsigned int color = 46) const;
+      void drawHits(const std::vector<const TrackingUtilities::CDCWireHit*>& hits, unsigned int color = 46) const;
       /// Draw QuadTree node
       void drawNode(QuadTree* node) const;
 
@@ -113,7 +113,7 @@ namespace Belle2 {
       ROOT::Math::XYVector m_localOrigin;
 
       /// Pinned lookup table for precomputed cosine and sine values
-      const TrackingUtilities::LookupTable<ROOT::Math::XYVector>* m_cosSinLookupTable;
+      const TrackingUtilities::LookupTable<ROOT::Math::XYVector>* m_cosSinLookupTable {};
 
       /// The curvature above which the trajectory is considered a curler.
       const double c_curlCurv = 0.02;

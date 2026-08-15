@@ -22,7 +22,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      CDCSVGPlotter(bool animate = false, bool forwardFade = false);
+      explicit CDCSVGPlotter(bool animate = false, bool forwardFade = false);
 
       /**
        * Make a copy of the current status of the plotter.

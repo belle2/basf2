@@ -107,7 +107,6 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   for (const CDCTrack& track : inputTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCWireHit& wireHit = recoHit3D.getWireHit();
-      if (inTracksByWireHit.count(&wireHit) == 0) inTracksByWireHit[&wireHit] = {nullptr, nullptr};
       inTracksByWireHit[&wireHit][0] = &track;
       // Prepare hits for the cellular automaton
       wireHit->unsetTemporaryFlags();
@@ -118,7 +117,6 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
   for (const CDCTrack& track : secondInputTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCWireHit& wireHit = recoHit3D.getWireHit();
-      if (inTracksByWireHit.count(&wireHit) == 0) inTracksByWireHit[&wireHit] = {nullptr, nullptr};
       inTracksByWireHit[&wireHit][1] = &track;
       // Prepare hits for the cellular automaton
       wireHit->unsetTemporaryFlags();

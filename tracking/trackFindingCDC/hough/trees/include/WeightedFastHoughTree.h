@@ -254,6 +254,7 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
+                // cppcheck-suppress constParameterReference ; the item is unwrapped as a non-const reference below
               [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> TrackingUtilities::Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 T & item(markableItem);
@@ -285,6 +286,7 @@ namespace Belle2 {
       }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which it extends and then calls
       void fell()
       {
         this->getTopNode().clear();
@@ -293,6 +295,7 @@ namespace Belle2 {
       }
 
       /// Like fell but also releases all memory the tree has acquired during long executions.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which it extends and then calls
       void raze()
       {
         this->fell();

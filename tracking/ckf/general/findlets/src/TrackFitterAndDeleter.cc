@@ -30,7 +30,7 @@ void TrackFitterAndDeleter::apply(std::vector<RecoTrack*>& recoTracks)
   }
 
   // Remove all non-fitted tracks
-  const auto trackWasNotFitted = [](RecoTrack * recoTrack) {
+  const auto trackWasNotFitted = [](const RecoTrack * recoTrack) {
     return not recoTrack->wasFitSuccessful();
   };
   TrackingUtilities::erase_remove_if(recoTracks, trackWasNotFitted);

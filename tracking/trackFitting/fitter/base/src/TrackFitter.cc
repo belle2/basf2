@@ -158,7 +158,7 @@ void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType 
   m_skipDirtyCheck = false;
 }
 
-void TrackFitter::resetFitterToUserSettings(DAFParameters* DAFParams)
+void TrackFitter::resetFitterToUserSettings(const DAFParameters* DAFParams)
 {
   if (DAFParams == nullptr)
     B2FATAL("DAF parameters are not available.");

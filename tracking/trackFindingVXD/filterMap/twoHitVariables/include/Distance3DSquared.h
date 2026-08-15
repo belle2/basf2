@@ -26,6 +26,7 @@ namespace Belle2 {
 
 
     /** calculates the squared distance between the hits (3D), returning unit: cm^2 for speed optimization */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static double value(const PointType& outerHit, const PointType& innerHit)
     {
 

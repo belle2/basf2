@@ -135,7 +135,7 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
              "Algorithms may relay on the sorting o the WireHits",
              std::is_sorted(wireHits.begin(), wireHits.end()));
 
-    m_sharedWireHits.reset(new const std::vector<CDCWireHit>(std::move(wireHits)));
+    m_sharedWireHits = std::make_shared<const std::vector<CDCWireHit>>(std::move(wireHits));
   }
 
   // TODO: Decide if the EventMeta should be incremented after write.
@@ -216,6 +216,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
     double localArcLength2D = arcLength2DOffset + globalArcLength2D;
 
 
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     std::vector<SimpleSimHit> simpleSimHitsInLayer;
     if (localArcLength2D > 0 and localArcLength2D < maxArcLength2D) {
 

@@ -125,16 +125,8 @@ SectorMapBootstrapModule::initialize()
 
 }
 
-void
-SectorMapBootstrapModule::beginRun()
-{
-}
 
 
-void
-SectorMapBootstrapModule::event()
-{
-}
 
 void
 SectorMapBootstrapModule::bootstrapSectorMap(void)
@@ -219,7 +211,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   segmentFilters->setConfig(config);
 
   // TO DO: The whole information must be retrieved from the geometry
-  CompactSecIDs compactSecIds;
 
   std::vector< double > uDividersMinusLastOne = config.uSectorDivider;
   uDividersMinusLastOne.pop_back();

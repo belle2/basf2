@@ -12,7 +12,7 @@
 #include <TObject.h>
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 #include <string>
-#include "TLatex.h"
+#include <TLatex.h>
 #include <TH1F.h>
 #include <TTree.h>
 
@@ -101,7 +101,8 @@ namespace Belle2 {
     /**  This method return true if a couple of hits resects the cuts constraints.
     * input (first hit, second hit, selected cut to apply, track parameter, it is first hit the IP?)
     */
-    bool segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, NoKickCuts::EParameters par, bool is0 = false);
+    bool segmentSelector(const hitXP& hit1, const hitXP& hit2, const std::vector<double>& selCut, NoKickCuts::EParameters par,
+                         bool is0 = false);
 
     /**  This method make some global cuts on the tracks (layer 3 and 6 required, d0 and z0 inside beam pipe).
     * Return false if this filter fails.

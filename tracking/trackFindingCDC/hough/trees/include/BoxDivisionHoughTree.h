@@ -63,6 +63,7 @@ namespace Belle2 {
       explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
         , m_sectorLevelSkip(sectorLevelSkip)
+          // cppcheck-suppress nullPointer ; false positive on the variadic pack expansion
         , m_overlaps((divisions * 0)...)
       {
       }

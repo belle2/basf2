@@ -101,7 +101,9 @@ void SVDEventT0EstimatorModule::event()
   for (auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
     const UncertainHelix uncertainHelix = constructUncertainHelix(recoTrack);
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     double d0 = uncertainHelix.getD0();
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     double z0 = uncertainHelix.getZ0();
 
     // selection on recoTracks

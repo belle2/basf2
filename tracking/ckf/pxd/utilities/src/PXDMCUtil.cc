@@ -43,11 +43,11 @@ bool MCUtil::pxdHitIsCorrect(const RecoTrack* mcRecoTrack, const SpacePoint* spa
   const auto& detector = recoHitInformationOfHit->getTrackingDetector();
 
   const auto& itToFirstEntryInDetector = std::find_if(recoHitInformationList.begin(), recoHitInformationList.end(),
-  [detector](RecoHitInformation * hitInformation) {
+  [detector](const RecoHitInformation * hitInformation) {
     return hitInformation->getTrackingDetector() == detector;
   });
   const auto& itToFirstEntryAfterDetector = std::find_if(itToFirstEntryInDetector, recoHitInformationList.end(),
-  [detector](RecoHitInformation * hitInformation) {
+  [detector](const RecoHitInformation * hitInformation) {
     return hitInformation->getTrackingDetector() != detector;
   });
 

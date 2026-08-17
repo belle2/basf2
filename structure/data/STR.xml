@@ -243,7 +243,7 @@
 		<outerRadius unit="cm">51.5</outerRadius>
 	      </Plane>
 	      <Plane id="3">
-		<posZ unit="cm">-116.1</posZ>  <!-- was -115.6, pulled 0.5mm to clear touching boundary with Layer1 at -115.6 cm -->
+		<posZ unit="cm">-115.6</posZ>
 		<innerRadius unit="cm">46.5</innerRadius>
 		<outerRadius unit="cm">46.5</outerRadius>
 	      </Plane>

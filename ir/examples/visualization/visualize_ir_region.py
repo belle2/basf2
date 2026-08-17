@@ -354,7 +354,7 @@ def main():
     vtx_shapes = []
     try:
         vtx_shapes = visualize_run2_helpers.get_tracker_geometries(
-            repo_root, 'VTX', comp_xml_name='VTX-Components-5layer-2025-baseline.xml')
+            repo_root, 'VTX', comp_xml_name='VTX-Components-5layer-2026-July-baseline.xml')
         for s in vtx_shapes:
             s['override_color'] = '#c000c0'   # Magenta
             s['is_filled'] = True
@@ -363,25 +363,31 @@ def main():
         print(f"  Warning: VTX geometries not loaded: {e}")
 
     # ---------- Load VTX Envelope ----------
+    # NOTE: generate_svg() only honors custom line color/width/dash for shapes
+    # passed via its dedicated `extra_outlines` argument; shapes bundled into
+    # the regular volume lists are always drawn as filled polygons with the
+    # default thin gray border, regardless of any 'line_color'/'is_outline'
+    # keys set on them. So the envelope outline is built as an extra_outlines
+    # entry here rather than appended to vols_c_all.
     print("Parsing VTX Envelope...")
-    env_vtx = []
+    extra_outlines = []
     try:
         env_vtx = visualize_run2_helpers.get_envelope_geometries(
             repo_root, 'VTX', filename='VTX-Envelope.xml')
-        for s in env_vtx:
-            s['line_color'] = '#ff0000'
-            s['line_dash'] = ''
-            s['line_width'] = 3
-            s['opacity'] = 1.0
-            s['is_outline'] = True
-            s['is_filled'] = False
-            s['name'] = 'VTX Envelope'
+        if env_vtx:
+            e = env_vtx[0]
+            extra_outlines.append({
+                'name': 'VTX Envelope',
+                'z': e['z'], 'r_outer': e['r_outer'],
+                'z_inner': e['z'], 'r_inner': e['r_inner'],
+                'color': '#ff0000',
+            })
+            print(f"  Parsed VTX envelope: Z=[{min(e['z']):.1f},{max(e['z']):.1f}] cm")
     except Exception as e:
         print(f"  Warning: VTX Envelope not loaded: {e}")
 
     # ---------- Parse CDC geometries ----------
     print("Parsing CDC (full)...")
-    cdc_shapes = []
     try:
         cdc_shapes = build_cdc_envelope(
             repo_root / 'cdc/data/CDC.xml',
@@ -389,6 +395,13 @@ def main():
             line_color='#444',
             line_dash='4,4'
         )
+        if cdc_shapes:
+            c = cdc_shapes[0]
+            extra_outlines.append({
+                'name': 'CDC Inner Boundary',
+                'z': c['z'], 'r_outer': c['r_outer'],
+                'color': '#444',
+            })
         print(f"  Parsed full CDC envelope: {len(cdc_shapes)} shapes")
     except Exception as e:
         print(f"  Warning: Full CDC geometries not loaded: {e}")
@@ -492,11 +505,13 @@ def main():
     # volumes_b_extended = list(volumes_b) + [ler_hole_fwd, ler_hole_bwd]
 
     # Order: cryostat walls first (central, HER, LER with crossing angles),
-    # then beampipe walls, shields on top, VTX, FTL, CDC
+    # then beampipe walls, shields on top, VTX, FTL.
+    # VTX Envelope and CDC boundary are drawn separately via extra_outlines.
     vols_c_all = (volumes_base + bp_volumes + bp_shield_volumes + shields
-                  + vtx_shapes + env_vtx + ftl_shapes + cdc_shapes)
+                  + vtx_shapes + ftl_shapes)
 
-    generate_svg(vols_c_all, volumes_a, volumes_b, crossing_angle, output_file=outfile)
+    generate_svg(vols_c_all, volumes_a, volumes_b, crossing_angle,
+                 output_file=outfile, extra_outlines=extra_outlines)
 
     # ---------- Post-process: add title + legend ----------
     with open(outfile, 'r') as f:

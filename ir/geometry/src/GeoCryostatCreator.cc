@@ -442,16 +442,7 @@ namespace Belle2 {
                                                                   A1spc1.transform.inverse());
       G4UnionSolid* geo_A1spc1_raw = new G4UnionSolid("geo_A1spc1_raw_name", geo_A1spc1xy, A1spc2.geo);
 
-      // A1spc1 (HER) excludes B1spc1's raw volume, as originally (this
-      // subtraction is one-directional by design: B1spc1 stays the
-      // generous, unclipped LER container that many far-from-IP B-series
-      // daughters (B4mag2, B4mag3pX, ...) rely on as a simple mother
-      // volume without their own Intersect/Subtract). A1spc1_raw is also
-      // registered below as its own named element so daughters that need
-      // to be clipped OUT of HER's raw territory without going through
-      // the (unclipped) B1spc1 - e.g. B2Ta/E2Ta's Ta sleeve, extended
-      // close enough to the IP that it would otherwise overlap A2Ta/D2Ta
-      // near X=0 - can Subtract(A1spc1_raw) directly.
+      // A1spc1 (HER) excludes B1spc1's raw volume
       G4VSolid* geo_LER_protect = new G4Tubs("geo_LER_protect", 0.0, 1.1 * unitFactor, 2500.0, 0.0, 2 * M_PI);
       G4VSolid* geo_A1spc1_clipped = new G4SubtractionSolid("geo_A1spc1_clipped", geo_A1spc1_raw, geo_LER_protect,
                                                             A1spc1.transform.inverse() * B1spc1.transform);
@@ -1020,12 +1011,12 @@ namespace Belle2 {
 
       // RVC connection structure (simplified shape)
       // FIXME RCV disabled for the moment
-      G4Tubs* geo_rvcR = new G4Tubs("geo_rvcR", 60, 60 + 60, (620 - 560) / 2., 0, 2 * M_PI);
-      G4LogicalVolume* logi_rvcR = new G4LogicalVolume(geo_rvcR, Materials::get("SUS316L"), "logi_rvcR_name");
+      //G4Tubs* geo_rvcR = new G4Tubs("geo_rvcR", 60, 60 + 60, (620 - 560) / 2., 0, 2 * M_PI);
+      //G4LogicalVolume* logi_rvcR = new G4LogicalVolume(geo_rvcR, Materials::get("SUS316L"), "logi_rvcR_name");
       //new G4PVPlacement(0, G4ThreeVector(0, 0, (620 + 560) / 2.), logi_rvcR, "phys_rvcR_name", &topVolume, false, 0);
 
-      G4Tubs* geo_rvcL = new G4Tubs("geo_rvcL", 60, 60 + 60, (-560 - (-620)) / 2., 0, 2 * M_PI);
-      G4LogicalVolume* logi_rvcL = new G4LogicalVolume(geo_rvcL, Materials::get("SUS316L"), "logi_rvcL_name");
+      //G4Tubs* geo_rvcL = new G4Tubs("geo_rvcL", 60, 60 + 60, (-560 - (-620)) / 2., 0, 2 * M_PI);
+      //G4LogicalVolume* logi_rvcL = new G4LogicalVolume(geo_rvcL, Materials::get("SUS316L"), "logi_rvcL_name");
       //new G4PVPlacement(0, G4ThreeVector(0, 0, (-620 - 560) / 2.), logi_rvcL, "phys_rvcL_name", &topVolume, false, 0);
 
       // Added 10 Nov 2018

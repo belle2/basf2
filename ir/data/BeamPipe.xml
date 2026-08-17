@@ -160,6 +160,7 @@
       <sec name="RO10" unit="cm">4.0234</sec>
       <sec name="RO11" unit="cm">4.0234</sec>
       <Material>Ta</Material>
+      <!-- RO0/RO1 widened to 1.42cm to clear the angled vacuum holes and fix a G4 overlap-->
     </IPBeamPipe_FWD>
 
     <BellowsPipe_FWD>
@@ -185,7 +186,7 @@
     </BellowsPipe_FWD>
 
     <IPChamber_FWD>
-      <!-- IP beampipe: 16mm ID (RI=0.8cm), Titanium (was Ta). -->
+      <!-- IP beampipe: 16mm ID, Titanium (was Ta); RI0-RI7 changed from a flat 0.8cm to a taper matching SAD's LER aperture model. -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">8.5</sec>
       <sec name="Z2" unit="cm">8.5</sec>
@@ -194,14 +195,14 @@
       <sec name="Z5" unit="cm">12.65</sec>
       <sec name="Z6" unit="cm">12.65</sec>
       <sec name="Z7" unit="cm">13.60</sec>
-      <sec name="RI0" unit="cm">0.8</sec>
-      <sec name="RI1" unit="cm">0.8</sec>
-      <sec name="RI2" unit="cm">0.8</sec>
-      <sec name="RI3" unit="cm">0.8</sec>
-      <sec name="RI4" unit="cm">0.8</sec>
-      <sec name="RI5" unit="cm">0.8</sec>
-      <sec name="RI6" unit="cm">0.8</sec>
-      <sec name="RI7" unit="cm">0.8</sec>
+      <sec name="RI0" unit="cm">0.569</sec>
+      <sec name="RI1" unit="cm">0.6386</sec>
+      <sec name="RI2" unit="cm">0.6386</sec>
+      <sec name="RI3" unit="cm">0.6632</sec>
+      <sec name="RI4" unit="cm">0.6632</sec>
+      <sec name="RI5" unit="cm">0.6726</sec>
+      <sec name="RI6" unit="cm">0.6726</sec>
+      <sec name="RI7" unit="cm">0.6804</sec>
       <sec name="RO0" unit="cm">1.08</sec>
       <sec name="RO1" unit="cm">1.08</sec>
       <sec name="RO2" unit="cm">1.13</sec>
@@ -214,7 +215,7 @@
     </IPChamber_FWD>
 
     <VacFWD>
-      <!-- Straight central vacuum channel: ends where IPBeamPipe_FWD (solid crotch) begins -->
+      <!-- Ends where IPBeamPipe_FWD begins; RO0-RO3 changed to match IPChamber_FWD's SAD taper. -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">8.9</sec>
       <sec name="Z2" unit="cm">12.65</sec>
@@ -223,23 +224,23 @@
       <sec name="RI1" unit="cm">0.0</sec>
       <sec name="RI2" unit="cm">0.0</sec>
       <sec name="RI3" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">0.8</sec>
-      <sec name="RO1" unit="cm">0.8</sec>
-      <sec name="RO2" unit="cm">0.8</sec>
-      <sec name="RO3" unit="cm">0.8</sec>
+      <sec name="RO0" unit="cm">0.569</sec>
+      <sec name="RO1" unit="cm">0.6419</sec>
+      <sec name="RO2" unit="cm">0.6726</sec>
+      <sec name="RO3" unit="cm">0.6804</sec>
       <Material>Vacuum</Material>
     </VacFWD>
 
     <IPChamber_BWD>
-      <!-- IP beampipe: 16mm ID (RI=0.8cm), Titanium (was Ta). -->
+      <!-- IP beampipe: 16mm ID, Titanium (was Ta); RI0-RI3 matches IPChamber_FWD's SAD taper, mirrored in |z|. -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">-8.5</sec>
       <sec name="Z2" unit="cm">-8.5</sec>
       <sec name="Z3" unit="cm">-8.9</sec>
-      <sec name="RI0" unit="cm">0.8</sec>
-      <sec name="RI1" unit="cm">0.8</sec>
-      <sec name="RI2" unit="cm">0.8</sec>
-      <sec name="RI3" unit="cm">0.8</sec>
+      <sec name="RI0" unit="cm">0.569</sec>
+      <sec name="RI1" unit="cm">0.6386</sec>
+      <sec name="RI2" unit="cm">0.6386</sec>
+      <sec name="RI3" unit="cm">0.6419</sec>
       <sec name="RO0" unit="cm">1.08</sec>
       <sec name="RO1" unit="cm">1.13</sec>
       <sec name="RO2" unit="cm">1.4</sec>
@@ -248,17 +249,18 @@
     </IPChamber_BWD>
 
     <VacBWD>
-      <!-- Straight central vacuum channel: ends where IPBeamPipe_BWD (solid crotch) begins -->
+      <!-- Ends where IPBeamPipe_BWD begins; RO0-RO1 matches IPChamber_FWD/VacFWD's SAD taper. -->
       <sec name="Z0" unit="cm">0.0</sec>
       <sec name="Z1" unit="cm">-8.9</sec>
       <sec name="RI0" unit="cm">0.0</sec>
       <sec name="RI1" unit="cm">0.0</sec>
-      <sec name="RO0" unit="cm">0.8</sec>
-      <sec name="RO1" unit="cm">0.8</sec>
+      <sec name="RO0" unit="cm">0.569</sec>
+      <sec name="RO1" unit="cm">0.6419</sec>
       <Material>Vacuum</Material>
     </VacBWD>
 
   <AdditionalShield_FWD>
+      <!-- (2026-07-25) RI densified from a sparse 5-point table to one breakpoint per IPBeamPipe_FWD Z-plane so it always stays >= IPBeamPipe_FWD's own RO + 0.05cm margin. -->
       <sec name="Z0" unit="cm">13.60</sec>
       <sec name="RI0" unit="cm">1.47</sec>
       <sec name="RO0" unit="cm">4.135</sec>
@@ -386,10 +388,7 @@
       <sec name="RO10" unit="cm">4.0234</sec>
       <sec name="RO11" unit="cm">4.0234</sec>
       <Material>Ta</Material>
-      <!-- RO0-RO3 widened from 0.93/0.93/1.03/1.03 to 1.40cm (2026-07-24): the
-           upper-side vacuum hole (16mm dia, angled at 41.5mrad from IP) needs
-           ~1.17-1.18cm radial clearance at these Z planes. The hole added 
-           at ir/geometry/src/GeoBeamPipeCreator.cc -->
+      <!-- RO0-RO3 widened to 1.40cm to clear the angled vacuum hole and match IPChamber_BWD's OD at Z=-8.90. -->
     </IPBeamPipe_BWD>
 
     <BellowsPipe_BWD>
@@ -415,9 +414,6 @@
     </BellowsPipe_BWD>
 
 <BellowsShield_BWD>
-      <!-- Mirror of BellowsShield_FWD, except Z7 stays at the original
-           -49.30cm rather than carrying over FWD's own 49.30+5.5cm (55mm)
-           extension -->
       <sec name="Z0" unit="cm">-19.10</sec>
       <sec name="RI0" unit="cm">4.20</sec>
       <sec name="RO0" unit="cm">5.817</sec>
@@ -457,9 +453,7 @@
     </BellowsShield_BWD>
 
     <AdditionalShield_BWD>
-      <!-- RI tracks IPBeamPipe_BWD's own RO + 0.05cm margin at every relevant
-           IPBeamPipe_BWD Z breakpoint within this shield's existing range,
-           -19.10 to -13.75cm (extent unchanged; 2026-07-25). -->
+      <!-- (2026-07-25) RI densified from a constant 3.15cm to track IPBeamPipe_BWD's own RO + 0.05cm margin through its flare at Z=-19.00,. -->
       <sec name="Z0" unit="cm">-19.10</sec>
       <sec name="RI0" unit="cm">4.0734</sec>
       <sec name="RO0" unit="cm">5.317</sec>
@@ -520,6 +514,8 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">-0.0415</sec>
+      <!-- Legacy Run1 crotch-absorber piece. -->
+      <Enable>0</Enable>
       <Material>Cu</Material>
     </Lv1TaLERUp>
 
@@ -542,6 +538,7 @@
       <sec name="RO4" unit="cm">2.14</sec>
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 piece, disabled for post-LS2. -->
       <Material>Ti</Material>
     </Lv1SUSLERUp>
 
@@ -576,6 +573,8 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 crotch-absorber piece, disabled
+           for post-LS2 (Enable read only from Lv1TaLERUp). -->
       <Material>Cu</Material>
     </Lv1TaHERDwn>
 
@@ -598,6 +597,7 @@
       <sec name="RO4" unit="cm">2.14</sec>
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 piece, disabled for post-LS2. -->
       <Material>Ti</Material>
     </Lv1SUSHERDwn>
 
@@ -638,6 +638,8 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">0.0415</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 crotch-absorber piece, disabled
+           for post-LS2 (Enable read only from Lv1TaLERUp). -->
       <Material>Cu</Material>
     </Lv1TaHERUp>
 
@@ -660,6 +662,7 @@
       <sec name="RO4" unit="cm">2.3</sec>
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 piece, disabled for post-LS2. -->
       <Material>Ti</Material>
     </Lv1SUSHERUp>
 
@@ -694,6 +697,8 @@
       <sec name="L11" unit="cm">62.5</sec>
       <sec name="L12" unit="cm">100.0</sec>
       <sec name="A1" unit="rad">-0.0415</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 crotch-absorber piece, disabled
+           for post-LS2 (Enable read only from Lv1TaLERUp). -->
       <Material>Cu</Material>
     </Lv1TaLERDwn>
 
@@ -716,6 +721,7 @@
       <sec name="RO4" unit="cm">2.3</sec>
       <sec name="RO5" unit="cm">2.14</sec>
       <sec name="RO6" unit="cm">2.14</sec>
+      <!-- See Lv1TaLERUp above: legacy Run1 piece, disabled for post-LS2. -->
       <Material>Ti</Material>
     </Lv1SUSLERDwn>
 

@@ -43,12 +43,7 @@
          <sec name="R1" unit="cm">18.44</sec>
       </TubeR2>
       <TubeL>
-         <!-- Mirror of TubeR (negated Z, same R/r): the old TubeL only
-              started at Z=-62.73cm, but the mirrored D1spc1/E1spc1 (from
-              A1spc1/B1spc1) need to reach Z=-30cm same as the right side -
-              without this, D1spc1 gets clipped away (Intersect with TubeL in
-              GeoCryostatCreator.cc) for Z=-30 to -62.73cm, leaving D2wal1/
-              E2wal1 placed entirely outside their own mother volume. -->
+         <!-- Mirror of TubeR (negated Z, same R/r). -->
          <N desc="Number of planes">6</N>
          <sec name="Z0" unit="cm">-30.0</sec>
          <sec name="Z1" unit="cm">-47.0</sec>
@@ -161,41 +156,15 @@
       </A1spc2>
       <Straight name="A2wal1">
          <!-- Thin stub between the QCS tip (Z=30cm, where A1spc1's own
-              radius is only 11.3mm) and Z=32.027cm, where A1spc1's radius
-              jumps to 22.5mm and the Ta sleeve (A2Ta, 20mm OD) can start.
-              The sleeve can't be pushed all the way to 30cm without also
-              widening A1spc1 itself in that innermost 11.3mm-radius
-              segment - that segment is left untouched here since it may
-              reflect a genuine minimum-aperture constraint at the tip,
-              not just a modeling artifact. The original flange bulge
-              (previously modeled a few mm further out) is gone now that
-              the Ta sleeve replaces that whole region. R=10.9mm (not the
-              nominal 11.3mm) for margin below A1spc1's own boundary.
-              Intersect(A1spc1) was dropped: applied to a solid this
-              short/thin it made G4's surface point sampler fail outright
-              (100k attempts, all failed) and report a bogus multi-meter
-              "protrusion" at a nonsensical Z. HER/LER don't reach each
-              other's territory in this Z range, so no B1spc1 clipping
-              is needed either. Z0=300.8mm (not 300mm): A1spc1 is
-              intersected with TubeR, whose front plane is at GLOBAL
-              Z=300mm, while this stub lives in the HER frame tilted by
-              41.5mrad. The start-cap corner at local (x=+R, z=Z0) sits
-              at global z = Z0*cos(41.5mrad) - R*sin(41.5mrad), so with
-              Z0=300.5 it reached 299.79 - i.e. 0.21mm outside TubeR
-              (this was the earlier residual ~0.2mm protrusion, which
-              shrank with R exactly as this formula predicts - it was a
-              real tilt effect, not a sampling artifact). Containment
-              needs Z0 >= (300 + 10.9*0.0415)/cos = 300.71; 300.8 leaves
-              ~0.09mm margin. -->
+              radius is only 11.3mm) and Z=32.027cm -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">300.8</sec>
+         <sec name="Z0" unit="mm">300.5</sec>
          <sec name="Z1" unit="mm">320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>A1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right HER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -252,27 +221,7 @@
       </Straight>
       <Straight name="A2Ta">
          <!-- Constant-thickness tube (16mm ID / 22mm OD), no taper: starts
-              at Z=32.027cm (closest to the QCS tip reachable without
-              widening A1spc1's own 11.3mm-radius innermost segment - see
-              A2wal1) and now runs all the way to Z=227.29cm, matching
-              A3wal1's own end point (the QCS exit).
-              KNOWN ISSUE (confirmed, not fixable from this element alone):
-              A2Ta's near-side wall (facing X=0) is missing from the
-              material scan for Z~32-40ish cm. Root cause: A1spc1 (this
-              element's mother) is built as raw_HER minus B1spc1's full
-              raw 22mm-radius disk (one-directional subtraction in
-              GeoCryostatCreator.cc, predating this session's shrink of
-              the sleeve from 20mm to 11mm radius) - that subtraction
-              carves away part of A1spc1's own territory near X=0 that
-              the old, bigger sleeve needed clearance from, and the new
-              thinner A2Ta's near wall happens to fall inside that
-              carved-out region. Since a daughter cannot exist where its
-              mother doesn't, neither adding nor removing Intersect(A1spc1)
-              here changes anything (verified empirically - both give an
-              identical zero). B2Ta doesn't have this problem because the
-              subtraction only runs A1spc1 minus B1spc1, never the reverse.
-              A real fix needs to touch A1spc1/D1spc1's construction in
-              GeoCryostatCreator.cc, not this XML block. -->
+              at Z=32.027cm to Z=227.29cm. -->
          <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">32.027</sec>
          <sec name="Z1" unit="cm">227.29</sec>
@@ -281,18 +230,12 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>A1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right HER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
       <Straight name="A2wal1cont">
          <!-- Continuation of the original A2wal1 profile beyond the Ta
-              sleeve, which now runs to the QCS exit (Z=227.29cm, matching
-              A3wal1's own end) instead of stopping at 120cm. Z=2272.9mm
-              falls exactly on the original profile's flat 1831-2450mm
-              segment (R=37.15mm/r=35.15mm), so no interpolation is
-              needed there - just the remaining original downstream
-              points beyond that. -->
+              sleeve -->
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="mm">2272.9</sec>
          <sec name="Z1" unit="mm">2450</sec>
@@ -335,33 +278,6 @@
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </Straight>
-      <!--Straight name="A4mag1">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">73.4</sec>
-         <sec name="Z1" unit="cm">115.1</sec>
-         <sec name="R0" unit="cm">2.6</sec>
-         <sec name="R1" unit="cm">2.6</sec>
-         <sec name="r0" unit="cm">2.1</sec>
-         <sec name="r1" unit="cm">2.1</sec>
-         <Intersect>A1spc1</Intersect>
-         <MotherVolume>A1spc1</MotherVolume>
-         <Material>SC_COIL</Material>
-         <Desc>Magnet 1 (Leak field cancel coils)</Desc>
-      </Straight-->
-      <!-- TODO update A4magp2* -->
-      <!--Straight name="A4mag2p1">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">116.9</sec>
-         <sec name="Z1" unit="cm">118.3</sec>
-         <sec name="R0" unit="cm">4.7</sec>
-         <sec name="R1" unit="cm">4.7</sec>
-         <sec name="r0" unit="cm">2.8</sec>
-         <sec name="r1" unit="cm">2.8</sec>
-         <Intersect>A1spc1</Intersect>
-         <MotherVolume>A1spc1</MotherVolume>
-         <Material>Cryo_G-10</Material>
-         <Desc>Magnet 2 part 1 (QC1RE)</Desc>
-      </Straight-->
       <Straight name="A4mag2p2">
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">118.3</sec>
@@ -601,12 +517,7 @@
          <!-- R2 tapered down from the original flat 2.2cm(22mm) to 1.2cm
               (12mm, just clearing B2Ta's 11mm-radius sleeve) - the flat
               22mm raw disk here (Z=32.027-67.5cm) was carving away a real
-              chunk of A1spc1's territory (A1spc1 = raw_HER minus this raw
-              B1spc1 disk, one-directional) that A2Ta's own near-side wall
-              needs now that it's only 11mm radius (was 20mm when this
-              22mm clearance was set). B1spc1 itself is unaffected since
-              B2Ta only needs 11mm; R3 at Z=67.5cm keeps the original 22mm
-              so nothing beyond this taper changes. -->
+              chunk of A1spc1 -->
          <sec name="R2" unit="cm">2.2</sec>
          <sec name="R3" unit="cm">2.2</sec>
          <sec name="R4" unit="cm">2.2</sec>
@@ -648,25 +559,15 @@
       </B1spc2>
       <Straight name="B2wal1">
          <!-- Thin stub between the QCS tip (Z=30cm, where B1spc1's own
-              radius is only 11.3mm) and Z=32.027cm, where B1spc1's radius
-              jumps to 22.5mm and the Ta sleeve (B2Ta, 20mm OD) can start.
-              See A2wal1 for why the sleeve can't be pushed all the way to
-              30cm. The original flange bulge is gone now that the Ta
-              sleeve replaces that whole region. R=10.9mm (see A2wal1 for
-              why this needs more headroom than the nominal 11.3mm) so it
-              fits inside B1spc1's own 11.3mm boundary with real margin.
-              Intersect(B1spc1) was dropped (see A2wal1 for why). Z0=300.8mm
-              (not 300mm): the start cap must clear TubeR's global Z=300mm
-              front plane despite the 41.5mrad tilt (see A2wal1). -->
+              radius is only 11.3mm) and Z=32.027cm. -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">300.8</sec>
+         <sec name="Z0" unit="mm">300.5</sec>
          <sec name="Z1" unit="mm">320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8</sec>
          <sec name="r1" unit="mm">8</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right LER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -728,51 +629,83 @@
          <Desc>Vacuum vessel</Desc>
       </Straight>
       <Straight name="B2Ta">
-         <!-- Constant-thickness tube (16mm ID / 22mm OD), no taper: starts
-              at Z=32.027cm (closest to the QCS tip reachable without
-              widening B1spc1's own 11.3mm-radius innermost segment - see
-              B2wal1) and now runs all the way to Z=227.30cm, matching
-              B3wal1's own end point (the QCS exit). At this smaller 11mm
-              outer radius the tilted HER/LER sleeves (A2Ta/B2Ta) no longer
-              reach each other's territory anywhere in this range, so no
-              Intersect/Subtract clipping is needed at all - unlike the
-              previous 20mm-OD design that needed Subtract(A1spc1_raw).
-              B3wal1's own inner bore comfortably contains this thinner
-              sleeve throughout. Material is now SUS316L (was Ta) - element
-              name kept as "B2Ta" for switch_shield.py compatibility. -->
-         <N desc="Number of planes">2</N>
+         <!-- (2026-08-06) Replaced the constant 8mm/11mm bore with a taper
+              matching SAD's own LER aperture model (SetIRApertLERPostLS2)" -->
+         <N desc="Number of planes">17</N>
          <sec name="Z0" unit="cm">32.027</sec>
-         <sec name="Z1" unit="cm">227.30</sec>
-         <sec name="R0" unit="mm">11.0</sec>
-         <sec name="R1" unit="mm">11.0</sec>
-         <sec name="r0" unit="mm">8.0</sec>
-         <sec name="r1" unit="mm">8.0</sec>
+         <sec name="Z1" unit="cm">33.426</sec>
+         <sec name="Z2" unit="cm">39.58</sec>
+         <sec name="Z3" unit="cm">45.7</sec>
+         <sec name="Z4" unit="cm">51.8</sec>
+         <sec name="Z5" unit="cm">57.9</sec>
+         <sec name="Z6" unit="cm">64.2</sec>
+         <sec name="Z7" unit="cm">108.2</sec>
+         <sec name="Z8" unit="cm">111.5</sec>
+         <sec name="Z9" unit="cm">114.85</sec>
+         <sec name="Z10" unit="cm">117.2</sec>
+         <sec name="Z11" unit="cm">119.2</sec>
+         <sec name="Z12" unit="cm">126.2</sec>
+         <sec name="Z13" unit="cm">159.0</sec>
+         <sec name="Z14" unit="cm">163.0</sec>
+         <sec name="Z15" unit="cm">175.0</sec>
+         <sec name="Z16" unit="cm">227.3</sec>
+         <sec name="R0" unit="cm">1.1</sec>
+         <sec name="R1" unit="cm">1.1</sec>
+         <sec name="R2" unit="cm">1.25</sec>
+         <sec name="R3" unit="cm">1.3991</sec>
+         <sec name="R4" unit="cm">1.5478</sec>
+         <sec name="R5" unit="cm">1.6965</sec>
+         <sec name="R6" unit="cm">1.85</sec>
+         <sec name="R7" unit="cm">1.85</sec>
+         <sec name="R8" unit="cm">1.8317</sec>
+         <sec name="R9" unit="cm">1.8131</sec>
+         <sec name="R10" unit="cm">1.8</sec>
+         <sec name="R11" unit="cm">1.8</sec>
+         <sec name="R12" unit="cm">2.54</sec>
+         <sec name="R13" unit="cm">2.54</sec>
+         <sec name="R14" unit="cm">2.6</sec>
+         <sec name="R15" unit="cm">3.815</sec>
+         <sec name="R16" unit="cm">3.815</sec>
+         <sec name="r0" unit="cm">0.8</sec>
+         <sec name="r1" unit="cm">0.8</sec>
+         <sec name="r2" unit="cm">0.95</sec>
+         <sec name="r3" unit="cm">1.0991</sec>
+         <sec name="r4" unit="cm">1.2478</sec>
+         <sec name="r5" unit="cm">1.3965</sec>
+         <sec name="r6" unit="cm">1.55</sec>
+         <sec name="r7" unit="cm">1.55</sec>
+         <sec name="r8" unit="cm">1.5317</sec>
+         <sec name="r9" unit="cm">1.5131</sec>
+         <sec name="r10" unit="cm">1.5</sec>
+         <sec name="r11" unit="cm">1.5</sec>
+         <sec name="r12" unit="cm">2.24</sec>
+         <sec name="r13" unit="cm">2.24</sec>
+         <sec name="r14" unit="cm">2.3</sec>
+         <sec name="r15" unit="cm">3.515</sec>
+         <sec name="r16" unit="cm">3.515</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Right LER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
       <Straight name="B2wal1cont">
-         <!-- Continuation of the original B2wal1 profile beyond the Ta
-              sleeve, which now runs to the QCS exit (Z=227.30cm, matching
-              B3wal1's own end) instead of stopping at 113cm. Z=2273mm
-              falls exactly on the original profile's flat 1750-2450mm
-              segment (R=37.15mm/r=35mm), so no interpolation is needed
-              there - just the remaining original downstream points
-              beyond that. -->
-         <N desc="Number of planes">4</N>
-         <sec name="Z0" unit="mm">2273</sec>
-         <sec name="Z1" unit="mm">2450</sec>
-         <sec name="Z2" unit="mm">2500</sec>
-         <sec name="Z3" unit="mm">3757</sec>
-         <sec name="R0" unit="mm">37.15</sec>
-         <sec name="R1" unit="mm">37.15</sec>
-         <sec name="R2" unit="mm">44</sec>
-         <sec name="R3" unit="mm">44</sec>
-         <sec name="r0" unit="mm">35</sec>
-         <sec name="r1" unit="mm">35</sec>
-         <sec name="r2" unit="mm">40</sec>
-         <sec name="r3" unit="mm">40</sec>
+         <!-- (2026-08-06) Added a Z=236/241cm breakpoint pair and adjusted
+              r/R to match SAD's own LER aperture model in this range -->
+         <N desc="Number of planes">5</N>
+         <sec name="Z0" unit="cm">227.3</sec>
+         <sec name="Z1" unit="cm">236.0</sec>
+         <sec name="Z2" unit="cm">241.0</sec>
+         <sec name="Z3" unit="cm">333.4</sec>
+         <sec name="Z4" unit="cm">375.7</sec>
+         <sec name="R0" unit="cm">3.815</sec>
+         <sec name="R1" unit="cm">3.815</sec>
+         <sec name="R2" unit="cm">4.355</sec>
+         <sec name="R3" unit="cm">4.3</sec>
+         <sec name="R4" unit="cm">4.3</sec>
+         <sec name="r0" unit="cm">3.515</sec>
+         <sec name="r1" unit="cm">3.515</sec>
+         <sec name="r2" unit="cm">4.055</sec>
+         <sec name="r3" unit="cm">4.0</sec>
+         <sec name="r4" unit="cm">4.0</sec>
          <Intersect>B1spc1</Intersect>
          <MotherVolume>B1spc1</MotherVolume>
          <Material>SUS316L</Material>
@@ -827,11 +760,6 @@
          <sec name="r1" unit="cm">3.625</sec>
          <sec name="r2" unit="cm">4.262</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <!-- Intersect with the final (clipped) mother solid: B1spc1 loses
-              the region ceded to A1spc1 (HER space), which cuts into this
-              magnet's outer radius near Z~123-164cm. Same pattern as
-              B4mag3p1/p5. -->
-         <Intersect>B1spc1</Intersect>
          <Material>SUS316L</Material>
          <Desc>Magnet 2 (b3 corrector)</Desc>
       </Straight>
@@ -857,7 +785,6 @@
          <sec name="r0" unit="cm">5.38</sec>
          <sec name="r1" unit="cm">5.38</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>Cryo_G-10</Material>
          <Desc>Magnet 3 part 2 (QC2RP)</Desc>
       </Straight>
@@ -870,7 +797,6 @@
          <sec name="r0" unit="cm">5.922</sec>
          <sec name="r1" unit="cm">5.922</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SC_COIL</Material>
          <Desc>Magnet 3 part 3 (QC2RP)</Desc>
       </Straight>
@@ -883,7 +809,6 @@
          <sec name="r0" unit="cm">6.806</sec>
          <sec name="r1" unit="cm">6.806</sec>
          <MotherVolume>B1spc1</MotherVolume>
-         <Intersect>B1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 3 part 4 (QC2RP)</Desc>
       </Straight>
@@ -900,19 +825,6 @@
          <Material>Cryo_Liq_He</Material>
          <Desc>Magnet 3 part 5 (QC2RP)</Desc>
       </Straight>
-      <!--Straight name="B4mag3p6">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">167.795</sec>
-         <sec name="Z1" unit="cm">217.347</sec>
-         <sec name="R0" unit="cm">9.3</sec>
-         <sec name="R1" unit="cm">9.3</sec>
-         <sec name="r0" unit="cm">6.806</sec>
-         <sec name="r1" unit="cm">6.806</sec>
-         <Intersect>B1spc1</Intersect>
-         <MotherVolume>B1spc1</MotherVolume>
-         <Material>Fe</Material>
-         <Desc>Magnet 3 part 6 (QC2RP)</Desc>
-      </Straight-->
       <Straight name="B4mag4p1">
          <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">264.10</sec>
@@ -1019,37 +931,7 @@
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </C1wal1>
-      <!--Straight name="C1wal2">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">760</sec>
-         <sec name="Z1" unit="mm">776</sec>   
-         <sec name="R0" unit="mm">183</sec>
-         <sec name="R1" unit="mm">183</sec-->
-         <!--Z2 unit="cm">64.85</Z2>
-         <sec name="Z3" unit="cm">95.24</sec>
-         <sec name="Z4" unit="cm">95.39</sec>
-         <sec name="Z5" unit="cm">101.80</sec>
-         <sec name="Z6" unit="cm">101.80</sec>
-         <sec name="Z7" unit="cm">102.80</sec-->
-         <!--R2 unit="cm">12.76</R2>
-         <sec name="R3" unit="cm">22.00</sec>
-         <sec name="R4" unit="cm">22.00</sec>
-         <sec name="R5" unit="cm">22.00</sec>
-         <sec name="R6" unit="cm">24.00</sec>
-         <sec name="R7" unit="cm">24.00</sec>
-         <sec name="r0" unit="cm">0.00</sec>
-         <sec name="r1" unit="cm">0.00</sec>
-         <sec name="r2" unit="cm">11.66</sec>
-         <sec name="r3" unit="cm">20.96</sec>
-         <sec name="r4" unit="cm">21.00</sec>
-         <sec name="r5" unit="cm">21.00</sec>
-         <sec name="r6" unit="cm">21.00</sec>
-         <sec name="r7" unit="cm">21.00</sec-->
-         <!--Intersect>C1wal1</Intersect>
-         <MotherVolume>C1wal1</MotherVolume>
-         <Material>W</Material>
-         <Desc>Tungsten shield forward</Desc>
-      </Straight-->
+
       <Straight name="C2spc1">
          <N desc="Number of planes">6</N>
          <sec name="Z0" unit="mm">310</sec>
@@ -1077,43 +959,24 @@
          <sec name="Z3" unit="mm">3470.95</sec>
          <sec name="Z4" unit="mm">3525.95</sec>
          <sec name="Z5" unit="mm">3605.0</sec>
-         <!--sec name="Z6" unit="cm">360.34</sec>
-         <sec name="Z7" unit="cm">372.90</sec>
-         <sec name="Z8" unit="cm">389.99</sec>
-         <sec name="Z9" unit="cm">391.00</sec-->
+
          <sec name="R0" unit="mm">294</sec>
          <sec name="R1" unit="mm">294</sec>
          <sec name="R2" unit="mm">294</sec>
          <sec name="R3" unit="mm">294</sec>
          <sec name="R4" unit="mm">332.5</sec>
          <sec name="R5" unit="mm">332.5</sec>
-         <!--sec name="R6" unit="cm">38.504</sec>
-         <sec name="R7" unit="cm">47.30</sec>
-         <sec name="R8" unit="cm">47.30</sec>
-         <sec name="R9" unit="cm">48.79</sec-->
          <sec name="r0" unit="mm">258.2</sec>
          <sec name="r1" unit="mm">258.2</sec>
          <sec name="r2" unit="mm">0</sec>
          <sec name="r3" unit="mm">0</sec>
          <sec name="r4" unit="mm">0</sec>
          <sec name="r5" unit="mm">0</sec>
-         <!--...-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C1wal1</MotherVolume>
          <Material>Vacuum</Material>
          <Desc>Vacuum space</Desc>
       </Straight>
-      <!--Straight name="C2spc3">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">391.0</sec>
-         <sec name="Z1" unit="cm">402.0</sec>
-         <sec name="R0" unit="cm">48.30</sec>
-         <sec name="R1" unit="cm">48.30</sec>
-         <Intersect>C1wal1</Intersect>
-         <MotherVolume>C1wal1</MotherVolume>
-         <Material>Air</Material>
-         <Desc>Open space</Desc>
-      </Straight-->
       <Straight name="C2spc3">
          <N desc="Number of planes">5</N>
          <sec name="Z0" unit="mm">3605</sec>
@@ -1172,57 +1035,7 @@
          <Material>SUS316L</Material>
          <Desc>Cold shield</Desc>
       </Straight>
-      <!--Straight name="C3wal3">
 
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">360.836</sec>
-      <sec name="Z1" unit="cm">363.336</sec>
-      <sec name="R0" unit="cm">38.0</sec>
-      <sec name="R1" unit="cm">38.0</sec>
-        	<Intersect>C1wal1</Intersect>
-
-        	<MotherVolume>C2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Vacuum vessel</Desc>
-
-        </Straight-->
-      <!--Straight name="C3wal4">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">233.50</sec>
-      <sec name="Z1" unit="cm">234.00</sec>
-      <sec name="R0" unit="cm">26.024</sec>
-      <sec name="R1" unit="cm">26.024</sec>
-        	<Intersect>C1wal1</Intersect>
-
-        	<MotherVolume>C2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Cold shield</Desc>
-
-        </Straight-->
-      <!--Straight name="C3wal5">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">389.99</sec>
-      <sec name="Z1" unit="cm">391.49</sec>
-      <sec name="R0" unit="cm">47.30</sec>
-      <sec name="R1" unit="cm">48.79</sec>
-        	<Intersect>C1wal1</Intersect>
-
-        	<MotherVolume>C2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Cold shield</Desc>
-
-        </Straight-->
       <Straight name="C4spc1">
          <N desc="Number of planes">11</N>
          <sec name="Z0" unit="mm">320</sec>
@@ -1286,49 +1099,14 @@
          <sec name="r0" unit="mm">36.5</sec>
          <sec name="r1" unit="mm">46.5</sec>
          <sec name="r2" unit="mm">66.9</sec>
-         <!--
-         <sec name="r3" unit="mm">59.77</sec>
-         <sec name="r3" unit="mm">165.5</sec>
-         <sec name="r4" unit="mm">165.5</sec>
-         <sec name="r5" unit="mm">220</sec>
-         <sec name="r6" unit="mm">220</sec>
-         <sec name="r7" unit="mm">220</sec>
-         -->
+
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C4spc1</MotherVolume>
          <Material>SUS316L</Material>
          <Desc>Helium vessel</Desc>
       </Straight>
       <Straight name="C4Wshield">
-         <!-- Made explicitly X-symmetric across the entire Z=32-64.03cm
-              shield (lower/-X side filled up to the same X level as the
-              upper/+X side, all the way through - not just a partial
-              window). The old definition used Intersect(C1wal1) for its
-              inner boundary, but C1wal1 = envelope - A1spc1(HER) -
-              B1spc1(LER), and A1spc1 is itself raw_HER minus B1spc1's raw
-              disk (a one-directional subtraction - see A2Ta/B1spc1
-              comments), so the HER/LER holes carved from C1wal1 are not
-              mirror images and the W fill was visibly lopsided. Fixed by
-              dropping Intersect(C1wal1) entirely and using an explicit,
-              symmetric inner radius (r0/r1/r2) instead, chosen to track the
-              beampipe's own crossing angle exactly: r(Z) = Z*tan(0.0415
-              rad) + 22mm [design assumption per this shield's original
-              comment - "the Ta sleeve, outer radius 22mm" - kept even
-              though A2Ta/B2Ta are now 11mm, per explicit instruction],
-              applied equally on both sides at all 3 Z planes - same slope
-              (tan(0.0415)) as A1spc1/B1spc1's own tilt, just not offset in
-              X, so it clears both sides symmetrically. This stays safely
-              inside C1wal1's real (asymmetric) footprint on both sides -
-              it's a conservative subset, not an attempt to exceed it - so
-              no overlap with A1spc1/B1spc1 is introduced. Outer radius
-              (R0/R1/R2) unchanged, still reuses C5wal1's own r0/r1/r2
-              (inner-surface) values exactly, matching the vessel wall's
-              actual taper, same as the original design. Z2=640.3mm matches
-              C5wal1's own "start of C7lyr5" breakpoint - the iron yoke
-              (C7lyr5) begins right there, so this is the natural full
-              extent of the fillable gap. MotherVolume=C4spc1 +
-              Subtract=C5wal1 places it in the actual vacuum pocket
-              immediately surrounding the beampipe. -->
+         <!-- W filling shield around the Z=32-64.03cm -->
          <N desc="Number of planes">3</N>
          <sec name="Z0" unit="mm">320</sec>
          <sec name="Z1" unit="mm">546.1</sec>
@@ -1355,36 +1133,6 @@
          <Material>SUS316L</Material>
          <Desc>Helium vessel</Desc>
       </Straight>
-      <!--<Straight name="C5wal3">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">255.60</sec>
-         <sec name="Z1" unit="cm">258.96</sec>
-         <sec name="R0" unit="cm">26.32</sec>
-         <sec name="R1" unit="cm">26.32</sec>
-         <Intersect>C1wal1</Intersect>
-         <MotherVolume>C4spc2</MotherVolume>
-         <Material>W</Material>
-         <Desc>Tungsten shield in front of QCS2</Desc>
-      </Straight>-->
-      <!--Straight name="C5wal4">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">239</sec>
-      <sec name="Z1" unit="cm">254</sec>
-      <sec name="R0" unit="cm">29.4</sec>
-      <sec name="R1" unit="cm">29.4</sec>
-      <sec name="r0" unit="cm">27.30</sec>
-      <sec name="r1" unit="cm">27.30</sec>
-        	<Intersect>C1wal1</Intersect>
-
-        	<MotherVolume>C2spc2</MotherVolume>
-
-        	<Material>W</Material>
-
-        	<Desc>Tungsten shield in front of QCS2</Desc>
-
-        </Straight-->
       <Straight name="C6spc1">
          <N desc="Number of planes">6</N>
          <sec name="Z0" unit="mm">325</sec>
@@ -1534,176 +1282,7 @@
          <Material>W</Material>
          <Desc>Tungsten shield 1</Desc>
       </Straight>
-      <!--Straight name="C7lyr2">
-         <N0 desc="Number of planes">54</N0>
-         <N desc="Number of planes">50</N>
-         <sec name="Z0" unit="cm">73.594</sec>
-         <sec name="Z1" unit="cm">75.314</sec>
-         <sec name="Z2" unit="cm">75.314</sec>
-         <sec name="Z3" unit="cm">88.127</sec>
-         <sec name="Z4" unit="cm">88.127</sec>
-         <sec name="Z5" unit="cm">88.260</sec>
-         <sec name="Z6" unit="cm">88.260</sec>
-         <sec name="Z7" unit="cm">98.744</sec>
-         <sec name="Z8" unit="cm">98.744</sec>
-         <sec name="Z9" unit="cm">99.054</sec>
-         <sec name="Z10" unit="cm">99.054</sec>
-         <sec name="Z11" unit="cm">104.551</sec>
-         <sec name="Z12" unit="cm">104.551</sec>
-         <sec name="Z13" unit="cm">104.862</sec>
-         <sec name="Z14" unit="cm">104.862</sec>
-         <sec name="Z15" unit="cm">109.802</sec>
-         <sec name="Z16" unit="cm">109.802</sec>
-         <sec name="Z17" unit="cm">109.915</sec>
-         <sec name="Z18" unit="cm">109.915</sec>
-         <sec name="Z19" unit="cm">115.413</sec>
-         <sec name="Z20" unit="cm">115.413</sec>
-         <sec name="Z21" unit="cm">115.728</sec>
-         <sec name="Z22" unit="cm">115.728</sec>
-         <sec name="Z23" unit="cm">121.420</sec>
-         <sec name="Z24" unit="cm">121.420</sec>
-         <sec name="Z25" unit="cm">121.535</sec>
-         <sec name="Z26" unit="cm">121.535</sec>
-         <sec name="Z27" unit="cm">129.844</sec>
-         <sec name="Z28" unit="cm">129.844</sec>
-         <sec name="Z29" unit="cm">130.973</sec>
-         <sec name="Z30" unit="cm">130.973</sec>
-         <sec name="Z31" unit="cm">138.578</sec>
-         <sec name="Z32" unit="cm">138.578</sec>
-         <sec name="Z33" unit="cm">138.899</sec>
-         <sec name="Z34" unit="cm">138.899</sec>
-         <sec name="Z35" unit="cm">151.135</sec>
-         <sec name="Z36" unit="cm">151.135</sec>
-         <sec name="Z37" unit="cm">164.192</sec>
-         <sec name="Z38" unit="cm">164.192</sec>
-         <sec name="Z39" unit="cm">164.319</sec>
-         <sec name="Z40" unit="cm">164.319</sec>
-         <sec name="Z41" unit="cm">175.749</sec>
-         <sec name="Z42" unit="cm">175.749</sec>
-         <sec name="Z43" unit="cm">175.888</sec>
-         <sec name="Z44" unit="cm">175.888</sec>
-         <sec name="Z45" unit="cm">197.452</sec>
-         <sec name="Z46" unit="cm">197.452</sec>
-         <sec name="Z47" unit="cm">197.523</sec>
-         <sec name="Z48" unit="cm">197.523</sec>
-         <sec name="Z49" unit="cm">220.500</sec-->
-         <!--sec name="Z50" unit="cm">220.500</sec>
-         <sec name="Z51" unit="cm">220.659</sec>
-         <sec name="Z52" unit="cm">220.659</sec>
-         <sec name="Z53" unit="cm">225.156</sec-->
-         <!--sec name="r0" unit="cm">10.069</sec>
-         <sec name="r1" unit="cm">10.069</sec>
-         <sec name="r2" unit="cm">10.302</sec>
-         <sec name="r3" unit="cm">10.302</sec>
-         <sec name="r4" unit="cm">10.302</sec>
-         <sec name="r5" unit="cm">10.302</sec>
-         <sec name="r6" unit="cm">10.680</sec>
-         <sec name="r7" unit="cm">10.680</sec>
-         <sec name="r8" unit="cm">10.680</sec>
-         <sec name="r9" unit="cm">10.680</sec>
-         <sec name="r10" unit="cm">11.449</sec>
-         <sec name="r11" unit="cm">11.449</sec>
-         <sec name="r12" unit="cm">11.449</sec>
-         <sec name="r13" unit="cm">11.449</sec>
-         <sec name="r14" unit="cm">12.936</sec>
-         <sec name="r15" unit="cm">12.936</sec>
-         <sec name="r16" unit="cm">12.936</sec>
-         <sec name="r17" unit="cm">12.936</sec>
-         <sec name="r18" unit="cm">13.514</sec>
-         <sec name="r19" unit="cm">13.514</sec>
-         <sec name="r20" unit="cm">13.514</sec>
-         <sec name="r21" unit="cm">13.514</sec>
-         <sec name="r22" unit="cm">14.525</sec>
-         <sec name="r23" unit="cm">14.525</sec>
-         <sec name="r24" unit="cm">14.525</sec>
-         <sec name="r25" unit="cm">14.525</sec>
-         <sec name="r26" unit="cm">15.411</sec>
-         <sec name="r27" unit="cm">15.411</sec>
-         <sec name="r28" unit="cm">15.411</sec>
-         <sec name="r29" unit="cm">15.411</sec>
-         <sec name="r30" unit="cm">16.510</sec>
-         <sec name="r31" unit="cm">16.510</sec>
-         <sec name="r32" unit="cm">16.510</sec>
-         <sec name="r33" unit="cm">16.510</sec>
-         <sec name="r34" unit="cm">17.505</sec>
-         <sec name="r35" unit="cm">17.505</sec>
-         <sec name="r36" unit="cm">17.505</sec>
-         <sec name="r37" unit="cm">17.505</sec>
-         <sec name="r38" unit="cm">17.505</sec>
-         <sec name="r39" unit="cm">17.505</sec>
-         <sec name="r40" unit="cm">18.250</sec>
-         <sec name="r41" unit="cm">18.250</sec>
-         <sec name="r42" unit="cm">18.250</sec>
-         <sec name="r43" unit="cm">18.250</sec>
-         <sec name="r44" unit="cm">18.903</sec>
-         <sec name="r45" unit="cm">18.903</sec>
-         <sec name="r46" unit="cm">18.903</sec>
-         <sec name="r47" unit="cm">18.903</sec>
-         <sec name="r48" unit="cm">19.510</sec>
-         <sec name="r49" unit="cm">19.510</sec-->
-         <!--sec name="r50" unit="cm">19.510</sec>
-         <sec name="r51" unit="cm">19.510</sec>
-         <sec name="r52" unit="cm">19.949</sec>
-         <sec name="r53" unit="cm">19.949</sec-->
-         <!--sec name="R0" unit="cm">10.567</sec>
-         <sec name="R1" unit="cm">10.567</sec>
-         <sec name="R2" unit="cm">10.567</sec>
-         <sec name="R3" unit="cm">10.567</sec>
-         <sec name="R4" unit="cm">11.066</sec>
-         <sec name="R5" unit="cm">11.066</sec>
-         <sec name="R6" unit="cm">11.066</sec>
-         <sec name="R7" unit="cm">11.066</sec>
-         <sec name="R8" unit="cm">11.963</sec>
-         <sec name="R9" unit="cm">11.963</sec>
-         <sec name="R10" unit="cm">11.963</sec>
-         <sec name="R11" unit="cm">11.963</sec>
-         <sec name="R12" unit="cm">13.458</sec>
-         <sec name="R13" unit="cm">13.458</sec>
-         <sec name="R14" unit="cm">13.458</sec>
-         <sec name="R15" unit="cm">13.458</sec>
-         <sec name="R16" unit="cm">13.757</sec>
-         <sec name="R17" unit="cm">13.757</sec>
-         <sec name="R18" unit="cm">13.757</sec>
-         <sec name="R19" unit="cm">13.757</sec>
-         <sec name="R20" unit="cm">14.954</sec>
-         <sec name="R21" unit="cm">14.954</sec>
-         <sec name="R22" unit="cm">14.954</sec>
-         <sec name="R23" unit="cm">14.954</sec>
-         <sec name="R24" unit="cm">15.751</sec>
-         <sec name="R25" unit="cm">15.751</sec>
-         <sec name="R26" unit="cm">15.751</sec>
-         <sec name="R27" unit="cm">15.751</sec>
-         <sec name="R28" unit="cm">16.748</sec>
-         <sec name="R29" unit="cm">16.748</sec>
-         <sec name="R30" unit="cm">16.748</sec>
-         <sec name="R31" unit="cm">16.748</sec>
-         <sec name="R32" unit="cm">18.044</sec>
-         <sec name="R33" unit="cm">18.044</sec>
-         <sec name="R34" unit="cm">18.044</sec>
-         <sec name="R35" unit="cm">18.044</sec>
-         <sec name="R36" unit="cm">17.745</sec>
-         <sec name="R37" unit="cm">17.745</sec>
-         <sec name="R38" unit="cm">18.493</sec>
-         <sec name="R39" unit="cm">18.493</sec>
-         <sec name="R40" unit="cm">18.493</sec>
-         <sec name="R41" unit="cm">18.493</sec>
-         <sec name="R42" unit="cm">19.241</sec>
-         <sec name="R43" unit="cm">19.241</sec>
-         <sec name="R44" unit="cm">19.241</sec>
-         <sec name="R45" unit="cm">19.241</sec>
-         <sec name="R46" unit="cm">19.741</sec>
-         <sec name="R47" unit="cm">19.741</sec>
-         <sec name="R48" unit="cm">19.741</sec>
-         <sec name="R49" unit="cm">19.741</sec-->
-         <!--sec name="R50" unit="cm">20.149</sec>
-         <sec name="R51" unit="cm">20.149</sec>
-         <sec name="R52" unit="cm">20.149</sec>
-         <sec name="R53" unit="cm">20.149</sec-->
-         <!--Intersect>C1wal1</Intersect>
-         <MotherVolume>C6spc1</MotherVolume>
-         <Material>Cryo_Epoxy</Material>
-         <Desc>Epoxy</Desc>
-      </Straight-->
+  
       <Straight name="C7lyr3s1">
          <N desc="Number of planes">3</N>
          <sec name="Z0" unit="mm">330</sec>
@@ -1717,7 +1296,6 @@
          <sec name="R2" unit="mm">91.6</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S1</Desc>
       </Straight>
@@ -1731,7 +1309,6 @@
          <sec name="R1" unit="mm">92.78</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S2</Desc>
       </Straight>
@@ -1743,10 +1320,8 @@
          <sec name="r1" unit="mm">86.67</sec>
          <sec name="R0" unit="mm">87.439</sec>
          <sec name="R1" unit="mm">87.439</sec>
-         <!-- No Intersect(C1wal1): mirror of F7lyr3s2e, see its comment.
-              The plain polycone is already fully contained in C6spc1. -->
+         <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy S2</Desc>
       </Straight>
@@ -1760,7 +1335,6 @@
          <sec name="R1" unit="mm">100.32</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S3</Desc>
       </Straight>
@@ -1775,7 +1349,6 @@
          <sec name="R1" unit="mm">103.02</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S4</Desc>
       </Straight>
@@ -1789,7 +1362,6 @@
          <sec name="R1" unit="mm">106.8</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S5</Desc>
       </Straight>
@@ -1803,7 +1375,6 @@
          <sec name="R1" unit="mm">115.54</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S6</Desc>
       </Straight>
@@ -1817,7 +1388,6 @@
          <sec name="R1" unit="mm">130.42</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S7</Desc>
       </Straight>
@@ -1831,7 +1401,6 @@
          <sec name="R1" unit="mm">135.14</sec>
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S8</Desc>
       </Straight>
@@ -2016,14 +1585,6 @@
          <sec name="R52" unit="cm">17.522</sec>
          <sec name="R53" unit="cm">18.399</sec>
          <sec name="R54" unit="cm">18.399</sec>
-         <!--sec name="R50" unit="cm">18.399</sec>
-         <sec name="R51" unit="cm">18.399</sec>
-         <sec name="R52" unit="cm">18.899</sec>
-         <sec name="R53" unit="cm">18.899</sec>
-         <sec name="R54" unit="cm">18.899</sec>
-         <sec name="R55" unit="cm">18.899</sec>
-         <sec name="R56" unit="cm">18.809</sec>
-         <sec name="R57" unit="cm">18.809</sec-->
          <Intersect>C1wal1</Intersect>
          <MotherVolume>C6spc1</MotherVolume>
          <Material>SUS316L</Material>
@@ -2151,25 +1712,15 @@
       </D1spc1>
       <Straight name="D2wal1">
          <!-- Thin stub between the QCS tip (Z=-30cm, where D1spc1's own
-              radius is only 11.3mm) and Z=-32.027cm, where D1spc1's radius
-              jumps to 22.5mm and the Ta sleeve (D2Ta, 20mm OD) can start.
-              See A2wal1 for why the sleeve can't be pushed all the way to
-              -30cm. The original flange bulge is gone now that the Ta
-              sleeve replaces that whole region. R=10.9mm (see A2wal1 for
-              why this needs more headroom than the nominal 11.3mm) so it
-              fits inside D1spc1's own 11.3mm boundary with real margin.
-              Intersect(D1spc1) was dropped (see A2wal1 for why). Z0=-300.8mm
-              (not -300mm): the start cap must clear TubeL's global Z=-300mm
-              front plane despite the 41.5mrad tilt (see A2wal1). -->
+              radius is only 11.3mm) and Z=-32.027cm. -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">-300.8</sec>
+         <sec name="Z0" unit="mm">-300.5</sec>
          <sec name="Z1" unit="mm">-320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>D1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left HER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -2227,15 +1778,7 @@
       </Straight>
       <Straight name="D2Ta">
          <!-- Constant-thickness tube (16mm ID / 22mm OD), no taper: starts
-              at Z=-32.027cm (closest to the QCS tip reachable without
-              widening D1spc1's own 11.3mm-radius innermost segment - see
-              D2wal1) and now runs all the way to Z=-227.29cm, matching
-              D3wal1's own end point (the QCS exit), mirroring A2Ta. At
-              this smaller 11mm outer radius the tilted HER/LER sleeves
-              (D2Ta/E2Ta) no longer reach each other's territory anywhere
-              in this range, so no Intersect/Subtract clipping is needed.
-              Material is now SUS316L (was Ta) - element name kept as
-              "D2Ta" for switch_shield.py compatibility. -->
+              at Z=-32.027cm to Z=-227.29cm -->
          <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">-32.027</sec>
          <sec name="Z1" unit="cm">-227.29</sec>
@@ -2244,17 +1787,12 @@
          <sec name="r0" unit="mm">8.0</sec>
          <sec name="r1" unit="mm">8.0</sec>
          <MotherVolume>D1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left HER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
       <Straight name="D2wal1cont">
          <!-- Continuation of the original D2wal1 profile beyond the Ta
-              sleeve, which now runs to the QCS exit (Z=-227.29cm,
-              matching D3wal1's own end) instead of stopping at -120cm.
-              Z=-2272.9mm falls exactly on the original profile's flat
-              -1831 to -2450mm segment (R=37.15mm/r=35.15mm), so no
-              interpolation is needed there. -->
+              sleeve, which now runs to the QCS exit Z=-227.29cm -->
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="mm">-2272.9</sec>
          <sec name="Z1" unit="mm">-2450</sec>
@@ -2297,33 +1835,6 @@
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </Straight>
-      <!--Straight name="D4mag1">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-73.4</sec>
-         <sec name="Z1" unit="cm">-115.1</sec>
-         <sec name="R0" unit="cm">2.6</sec>
-         <sec name="R1" unit="cm">2.6</sec>
-         <sec name="r0" unit="cm">2.1</sec>
-         <sec name="r1" unit="cm">2.1</sec>
-         <Intersect>D1spc1</Intersect>
-         <MotherVolume>D1spc1</MotherVolume>
-         <Material>SC_COIL</Material>
-         <Desc>Magnet 1 (Leak field cancel coils)</Desc>
-      </Straight-->
-      <!-- TODO update D4magp2* -->
-      <!--Straight name="D4mag2p1">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-116.9</sec>
-         <sec name="Z1" unit="cm">-118.3</sec>
-         <sec name="R0" unit="cm">4.7</sec>
-         <sec name="R1" unit="cm">4.7</sec>
-         <sec name="r0" unit="cm">2.8</sec>
-         <sec name="r1" unit="cm">2.8</sec>
-         <Intersect>D1spc1</Intersect>
-         <MotherVolume>D1spc1</MotherVolume>
-         <Material>Cryo_G-10</Material>
-         <Desc>Magnet 2 part 1 (QC1RE)</Desc>
-      </Straight-->
       <Straight name="D4mag2p2">
          <N desc="Number of planes">4</N>
          <sec name="Z0" unit="cm">-118.3</sec>
@@ -2615,18 +2126,17 @@
               sleeve replaces that whole region. R=10.9mm (see A2wal1 for
               why this needs more headroom than the nominal 11.3mm) so it
               fits inside E1spc1's own 11.3mm boundary with real margin.
-              Intersect(E1spc1) was dropped (see A2wal1 for why). Z0=-300.8mm
-              (not -300mm): the start cap must clear TubeL's global Z=-300mm
-              front plane despite the 41.5mrad tilt (see A2wal1). -->
+              Intersect(E1spc1) was dropped (see A2wal1 for why). Z0=-300.5mm
+              (not -300mm) so this stub's start cap doesn't exactly coincide
+              with E1spc1's own start plane (see A2wal1 for why). -->
          <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">-300.8</sec>
+         <sec name="Z0" unit="mm">-300.5</sec>
          <sec name="Z1" unit="mm">-320.27</sec>
          <sec name="R0" unit="mm">10.9</sec>
          <sec name="R1" unit="mm">10.9</sec>
          <sec name="r0" unit="mm">8</sec>
          <sec name="r1" unit="mm">8</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left LER Beam pipe (stub before Ta sleeve)</Desc>
       </Straight>
@@ -2688,48 +2198,81 @@
          <Desc>Vacuum vessel</Desc>
       </Straight>
       <Straight name="E2Ta">
-         <!-- Constant-thickness tube (16mm ID / 22mm OD), no taper: starts
-              at Z=-32.027cm (closest to the QCS tip reachable without
-              widening E1spc1's own 11.3mm-radius innermost segment - see
-              E2wal1) and now runs all the way to Z=-227.3cm, matching
-              E3wal1's own end point (the QCS exit), mirroring B2Ta. At
-              this smaller 11mm outer radius the tilted HER/LER sleeves
-              (D2Ta/E2Ta) no longer reach each other's territory anywhere
-              in this range, so no Intersect/Subtract clipping is needed.
-              Material is now SUS316L (was Ta) - element name kept as
-              "E2Ta" for switch_shield.py compatibility. -->
-         <N desc="Number of planes">2</N>
+         <!-- (2026-08-06) Replaced the constant 8mm/11mm bore with a taper
+              matching SAD's own LER aperture model SetIRApertLERPostLS2." -->
+         <N desc="Number of planes">17</N>
          <sec name="Z0" unit="cm">-32.027</sec>
-         <sec name="Z1" unit="cm">-227.3</sec>
-         <sec name="R0" unit="mm">11.0</sec>
-         <sec name="R1" unit="mm">11.0</sec>
-         <sec name="r0" unit="mm">8.0</sec>
-         <sec name="r1" unit="mm">8.0</sec>
+         <sec name="Z1" unit="cm">-33.426</sec>
+         <sec name="Z2" unit="cm">-39.58</sec>
+         <sec name="Z3" unit="cm">-45.7</sec>
+         <sec name="Z4" unit="cm">-51.8</sec>
+         <sec name="Z5" unit="cm">-57.9</sec>
+         <sec name="Z6" unit="cm">-64.2</sec>
+         <sec name="Z7" unit="cm">-108.185</sec>
+         <sec name="Z8" unit="cm">-111.5</sec>
+         <sec name="Z9" unit="cm">-114.85</sec>
+         <sec name="Z10" unit="cm">-117.185</sec>
+         <sec name="Z11" unit="cm">-119.185</sec>
+         <sec name="Z12" unit="cm">-126.185</sec>
+         <sec name="Z13" unit="cm">-158.985</sec>
+         <sec name="Z14" unit="cm">-162.985</sec>
+         <sec name="Z15" unit="cm">-174.985</sec>
+         <sec name="Z16" unit="cm">-227.3</sec>
+         <sec name="R0" unit="cm">1.1</sec>
+         <sec name="R1" unit="cm">1.1</sec>
+         <sec name="R2" unit="cm">1.25</sec>
+         <sec name="R3" unit="cm">1.3991</sec>
+         <sec name="R4" unit="cm">1.5478</sec>
+         <sec name="R5" unit="cm">1.6965</sec>
+         <sec name="R6" unit="cm">1.85</sec>
+         <sec name="R7" unit="cm">1.85</sec>
+         <sec name="R8" unit="cm">1.8316</sec>
+         <sec name="R9" unit="cm">1.813</sec>
+         <sec name="R10" unit="cm">1.8</sec>
+         <sec name="R11" unit="cm">1.8</sec>
+         <sec name="R12" unit="cm">2.5</sec>
+         <sec name="R13" unit="cm">2.5</sec>
+         <sec name="R14" unit="cm">2.6</sec>
+         <sec name="R15" unit="cm">3.815</sec>
+         <sec name="R16" unit="cm">3.815</sec>
+         <sec name="r0" unit="cm">0.8</sec>
+         <sec name="r1" unit="cm">0.8</sec>
+         <sec name="r2" unit="cm">0.95</sec>
+         <sec name="r3" unit="cm">1.0991</sec>
+         <sec name="r4" unit="cm">1.2478</sec>
+         <sec name="r5" unit="cm">1.3965</sec>
+         <sec name="r6" unit="cm">1.55</sec>
+         <sec name="r7" unit="cm">1.55</sec>
+         <sec name="r8" unit="cm">1.5316</sec>
+         <sec name="r9" unit="cm">1.513</sec>
+         <sec name="r10" unit="cm">1.5</sec>
+         <sec name="r11" unit="cm">1.5</sec>
+         <sec name="r12" unit="cm">2.2</sec>
+         <sec name="r13" unit="cm">2.2</sec>
+         <sec name="r14" unit="cm">2.3</sec>
+         <sec name="r15" unit="cm">3.515</sec>
+         <sec name="r16" unit="cm">3.515</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>SUS316L</Material>
          <Desc>Left LER additional beam pipe sleeve (SUS316L)</Desc>
       </Straight>
       <Straight name="E2wal1cont">
-         <!-- Continuation of the original E2wal1 profile beyond the Ta
-              sleeve, which now runs to the QCS exit (Z=-227.3cm, matching
-              E3wal1's own end) instead of stopping at -113cm. Z=-2273mm
-              falls exactly on the original profile's flat -1750 to
-              -2450mm segment (R=37.15mm/r=35mm), so no interpolation is
-              needed there. -->
+         <!-- (2026-08-06) Precision correction to match SAD's LER aperture
+              model exactly: SAD's L-side (backward) branch holds 3.515cm
+              out to s=244.985cm." -->
          <N desc="Number of planes">4</N>
-         <sec name="Z0" unit="mm">-2273</sec>
-         <sec name="Z1" unit="mm">-2450</sec>
-         <sec name="Z2" unit="mm">-2500</sec>
-         <sec name="Z3" unit="mm">-3757</sec>
-         <sec name="R0" unit="mm">37.15</sec>
-         <sec name="R1" unit="mm">37.15</sec>
-         <sec name="R2" unit="mm">44</sec>
-         <sec name="R3" unit="mm">44</sec>
-         <sec name="r0" unit="mm">35</sec>
-         <sec name="r1" unit="mm">35</sec>
-         <sec name="r2" unit="mm">40</sec>
-         <sec name="r3" unit="mm">40</sec>
+         <sec name="Z0" unit="cm">-227.3</sec>
+         <sec name="Z1" unit="cm">-244.985</sec>
+         <sec name="Z2" unit="cm">-249.985</sec>
+         <sec name="Z3" unit="cm">-375.7</sec>
+         <sec name="R0" unit="cm">3.815</sec>
+         <sec name="R1" unit="cm">3.815</sec>
+         <sec name="R2" unit="cm">4.3</sec>
+         <sec name="R3" unit="cm">4.3</sec>
+         <sec name="r0" unit="cm">3.515</sec>
+         <sec name="r1" unit="cm">3.515</sec>
+         <sec name="r2" unit="cm">4.0</sec>
+         <sec name="r3" unit="cm">4.0</sec>
          <Intersect>E1spc1</Intersect>
          <MotherVolume>E1spc1</MotherVolume>
          <Material>SUS316L</Material>
@@ -2784,7 +2327,6 @@
          <sec name="r1" unit="cm">3.625</sec>
          <sec name="r2" unit="cm">4.262</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <Intersect>E1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 2 (b3 corrector)</Desc>
       </Straight>
@@ -2834,7 +2376,6 @@
          <sec name="r0" unit="cm">6.806</sec>
          <sec name="r1" unit="cm">6.806</sec>
          <MotherVolume>E1spc1</MotherVolume>
-         <Intersect>E1spc1</Intersect> <!-- clip to final mother, see B4mag2 -->
          <Material>SUS316L</Material>
          <Desc>Magnet 3 part 4 (QC2RP)</Desc>
       </Straight>
@@ -2851,19 +2392,6 @@
          <Material>Cryo_Liq_He</Material>
          <Desc>Magnet 3 part 5 (QC2RP)</Desc>
       </Straight>
-      <!--Straight name="E4mag3p6">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-167.795</sec>
-         <sec name="Z1" unit="cm">-217.347</sec>
-         <sec name="R0" unit="cm">9.3</sec>
-         <sec name="R1" unit="cm">9.3</sec>
-         <sec name="r0" unit="cm">6.806</sec>
-         <sec name="r1" unit="cm">6.806</sec>
-         <Intersect>E1spc1</Intersect>
-         <MotherVolume>E1spc1</MotherVolume>
-         <Material>Fe</Material>
-         <Desc>Magnet 3 part 6 (QC2RP)</Desc>
-      </Straight-->
       <Straight name="E4mag4p1">
          <N desc="Number of planes">2</N>
          <sec name="Z0" unit="cm">-264.1</sec>
@@ -2970,37 +2498,6 @@
          <Material>SUS316L</Material>
          <Desc>Vacuum vessel</Desc>
       </F1wal1>
-      <!--Straight name="F1wal2">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="mm">-760</sec>
-         <sec name="Z1" unit="mm">-776</sec>   
-         <sec name="R0" unit="mm">183</sec>
-         <sec name="R1" unit="mm">183</sec-->
-         <!--Z2 unit="cm">64.85</Z2>
-         <sec name="Z3" unit="cm">-95.24</sec>
-         <sec name="Z4" unit="cm">-95.39</sec>
-         <sec name="Z5" unit="cm">-101.8</sec>
-         <sec name="Z6" unit="cm">-101.8</sec>
-         <sec name="Z7" unit="cm">102.80</sec-->
-         <!--R2 unit="cm">12.76</R2>
-         <sec name="R3" unit="cm">22.00</sec>
-         <sec name="R4" unit="cm">22.00</sec>
-         <sec name="R5" unit="cm">22.00</sec>
-         <sec name="R6" unit="cm">24.00</sec>
-         <sec name="R7" unit="cm">24.00</sec>
-         <sec name="r0" unit="cm">0.00</sec>
-         <sec name="r1" unit="cm">0.00</sec>
-         <sec name="r2" unit="cm">11.66</sec>
-         <sec name="r3" unit="cm">20.96</sec>
-         <sec name="r4" unit="cm">21.00</sec>
-         <sec name="r5" unit="cm">21.00</sec>
-         <sec name="r6" unit="cm">21.00</sec>
-         <sec name="r7" unit="cm">21.00</sec-->
-         <!--Intersect>F1wal1</Intersect>
-         <MotherVolume>F1wal1</MotherVolume>
-         <Material>W</Material>
-         <Desc>Tungsten shield forward</Desc>
-      </Straight-->
       <Straight name="F2spc1">
          <N desc="Number of planes">6</N>
          <sec name="Z0" unit="mm">-310</sec>
@@ -3028,43 +2525,23 @@
          <sec name="Z3" unit="mm">-3470.95</sec>
          <sec name="Z4" unit="mm">-3525.95</sec>
          <sec name="Z5" unit="mm">-3605</sec>
-         <!--sec name="Z6" unit="cm">360.34</sec>
-         <sec name="Z7" unit="cm">-372.9</sec>
-         <sec name="Z8" unit="cm">-389.99</sec>
-         <sec name="Z9" unit="cm">391.00</sec-->
          <sec name="R0" unit="mm">294</sec>
          <sec name="R1" unit="mm">294</sec>
          <sec name="R2" unit="mm">294</sec>
          <sec name="R3" unit="mm">294</sec>
          <sec name="R4" unit="mm">332.5</sec>
          <sec name="R5" unit="mm">332.5</sec>
-         <!--sec name="R6" unit="cm">38.504</sec>
-         <sec name="R7" unit="cm">47.30</sec>
-         <sec name="R8" unit="cm">47.30</sec>
-         <sec name="R9" unit="cm">48.79</sec-->
          <sec name="r0" unit="mm">258.2</sec>
          <sec name="r1" unit="mm">258.2</sec>
          <sec name="r2" unit="mm">0</sec>
          <sec name="r3" unit="mm">0</sec>
          <sec name="r4" unit="mm">0</sec>
          <sec name="r5" unit="mm">0</sec>
-         <!--...-->
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F1wal1</MotherVolume>
          <Material>Vacuum</Material>
          <Desc>Vacuum space</Desc>
       </Straight>
-      <!--Straight name="F2spc3">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-391</sec>
-         <sec name="Z1" unit="cm">-402</sec>
-         <sec name="R0" unit="cm">48.30</sec>
-         <sec name="R1" unit="cm">48.30</sec>
-         <Intersect>F1wal1</Intersect>
-         <MotherVolume>F1wal1</MotherVolume>
-         <Material>Air</Material>
-         <Desc>Open space</Desc>
-      </Straight-->
       <Straight name="F2spc3">
          <N desc="Number of planes">5</N>
          <sec name="Z0" unit="mm">-3605</sec>
@@ -3123,57 +2600,6 @@
          <Material>SUS316L</Material>
          <Desc>Cold shield</Desc>
       </Straight>
-      <!--Straight name="F3wal3">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">-360.836</sec>
-      <sec name="Z1" unit="cm">-363.336</sec>
-      <sec name="R0" unit="cm">38.0</sec>
-      <sec name="R1" unit="cm">38.0</sec>
-        	<Intersect>F1wal1</Intersect>
-
-        	<MotherVolume>F2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Vacuum vessel</Desc>
-
-        </Straight-->
-      <!--Straight name="F3wal4">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">-233.5</sec>
-      <sec name="Z1" unit="cm">-234</sec>
-      <sec name="R0" unit="cm">26.024</sec>
-      <sec name="R1" unit="cm">26.024</sec>
-        	<Intersect>F1wal1</Intersect>
-
-        	<MotherVolume>F2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Cold shield</Desc>
-
-        </Straight-->
-      <!--Straight name="F3wal5">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">-389.99</sec>
-      <sec name="Z1" unit="cm">-391.49</sec>
-      <sec name="R0" unit="cm">47.30</sec>
-      <sec name="R1" unit="cm">48.79</sec>
-        	<Intersect>F1wal1</Intersect>
-
-        	<MotherVolume>F2spc2</MotherVolume>
-
-        	<Material>SUS316L</Material>
-
-        	<Desc>Cold shield</Desc>
-
-        </Straight-->
       <Straight name="F4spc1">
          <N desc="Number of planes">11</N>
          <sec name="Z0" unit="mm">-320</sec>
@@ -3237,14 +2663,6 @@
          <sec name="r0" unit="mm">36.5</sec>
          <sec name="r1" unit="mm">46.5</sec>
          <sec name="r2" unit="mm">66.9</sec>
-         <!--
-         <sec name="r3" unit="mm">59.77</sec>
-         <sec name="r3" unit="mm">165.5</sec>
-         <sec name="r4" unit="mm">165.5</sec>
-         <sec name="r5" unit="mm">220</sec>
-         <sec name="r6" unit="mm">220</sec>
-         <sec name="r7" unit="mm">220</sec>
-         -->
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F4spc1</MotherVolume>
          <Material>SUS316L</Material>
@@ -3252,34 +2670,7 @@
       </Straight>
       <Straight name="F4Wshield">
          <!-- Made explicitly X-symmetric across the entire Z=-32 to
-              -64.03cm shield (lower/-X side filled up to the same X level
-              as the upper/+X side, all the way through - not just a
-              partial window). The old definition used Intersect(F1wal1) for
-              its inner boundary, but F1wal1 = envelope - D1spc1(HER) -
-              E1spc1(LER), and D1spc1 is itself raw_HER minus E1spc1's raw
-              disk (a one-directional subtraction, mirroring A1spc1/B1spc1),
-              so the HER/LER holes carved from F1wal1 are not mirror images
-              and the W fill was visibly lopsided. Fixed by dropping
-              Intersect(F1wal1) entirely and using an explicit, symmetric
-              inner radius (r0/r1/r2) instead, chosen to track the
-              beampipe's own crossing angle exactly: r(|Z|) = |Z|*tan(0.0415
-              rad) + 22mm [design assumption per this shield's original
-              comment - "the Ta sleeve, outer radius 22mm" - kept even
-              though D2Ta/E2Ta are now 11mm, per explicit instruction],
-              applied equally on both sides at all 3 Z planes - same slope
-              (tan(0.0415)) as D1spc1/E1spc1's own tilt, just not offset in
-              X, so it clears both sides symmetrically. This stays safely
-              inside F1wal1's real (asymmetric) footprint on both sides -
-              it's a conservative subset, not an attempt to exceed it - so
-              no overlap with D1spc1/E1spc1 is introduced. Outer radius
-              (R0/R1/R2) unchanged, still reuses F5wal1's own r0/r1/r2
-              (inner-surface) values exactly, matching the vessel wall's
-              actual taper, same as the original design. Z2=-640.3mm matches
-              F5wal1's own "start of F7lyr5" breakpoint - the iron yoke
-              (F7lyr5) begins right there, so this is the natural full
-              extent of the fillable gap. MotherVolume=F4spc1 +
-              Subtract=F5wal1 places it in the actual vacuum pocket
-              immediately surrounding the beampipe. -->
+              -64.03cm shield  (similiarly to C4W) -->
          <N desc="Number of planes">3</N>
          <sec name="Z0" unit="mm">-320</sec>
          <sec name="Z1" unit="mm">-546.1</sec>
@@ -3306,36 +2697,6 @@
          <Material>SUS316L</Material>
          <Desc>Helium vessel</Desc>
       </Straight>
-      <!--<Straight name="F5wal3">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-255.6</sec>
-         <sec name="Z1" unit="cm">-258.96</sec>
-         <sec name="R0" unit="cm">26.32</sec>
-         <sec name="R1" unit="cm">26.32</sec>
-         <Intersect>F1wal1</Intersect>
-         <MotherVolume>F4spc2</MotherVolume>
-         <Material>W</Material>
-         <Desc>Tungsten shield in front of QCS2</Desc>
-      </Straight>-->
-      <!--Straight name="F5wal4">
-
-        	<N desc="Number of planes">2</N>
-
-      <sec name="Z0" unit="cm">-239</sec>
-      <sec name="Z1" unit="cm">-254</sec>
-      <sec name="R0" unit="cm">29.4</sec>
-      <sec name="R1" unit="cm">29.4</sec>
-      <sec name="r0" unit="cm">27.30</sec>
-      <sec name="r1" unit="cm">27.30</sec>
-        	<Intersect>F1wal1</Intersect>
-
-        	<MotherVolume>F2spc2</MotherVolume>
-
-        	<Material>W</Material>
-
-        	<Desc>Tungsten shield in front of QCS2</Desc>
-
-        </Straight-->
       <Straight name="F6spc1">
          <N desc="Number of planes">6</N>
          <sec name="Z0" unit="mm">-325</sec>
@@ -3485,176 +2846,6 @@
          <Material>W</Material>
          <Desc>Tungsten shield 1</Desc>
       </Straight>
-      <!--Straight name="F7lyr2">
-         <N0 desc="Number of planes">54</N0>
-         <N desc="Number of planes">50</N>
-         <sec name="Z0" unit="cm">-73.594</sec>
-         <sec name="Z1" unit="cm">-75.314</sec>
-         <sec name="Z2" unit="cm">-75.314</sec>
-         <sec name="Z3" unit="cm">-88.127</sec>
-         <sec name="Z4" unit="cm">-88.127</sec>
-         <sec name="Z5" unit="cm">-88.26</sec>
-         <sec name="Z6" unit="cm">-88.26</sec>
-         <sec name="Z7" unit="cm">-98.744</sec>
-         <sec name="Z8" unit="cm">-98.744</sec>
-         <sec name="Z9" unit="cm">-99.054</sec>
-         <sec name="Z10" unit="cm">-99.054</sec>
-         <sec name="Z11" unit="cm">-104.551</sec>
-         <sec name="Z12" unit="cm">-104.551</sec>
-         <sec name="Z13" unit="cm">-104.862</sec>
-         <sec name="Z14" unit="cm">-104.862</sec>
-         <sec name="Z15" unit="cm">-109.802</sec>
-         <sec name="Z16" unit="cm">-109.802</sec>
-         <sec name="Z17" unit="cm">-109.915</sec>
-         <sec name="Z18" unit="cm">-109.915</sec>
-         <sec name="Z19" unit="cm">-115.413</sec>
-         <sec name="Z20" unit="cm">-115.413</sec>
-         <sec name="Z21" unit="cm">-115.728</sec>
-         <sec name="Z22" unit="cm">-115.728</sec>
-         <sec name="Z23" unit="cm">-121.42</sec>
-         <sec name="Z24" unit="cm">-121.42</sec>
-         <sec name="Z25" unit="cm">-121.535</sec>
-         <sec name="Z26" unit="cm">-121.535</sec>
-         <sec name="Z27" unit="cm">-129.844</sec>
-         <sec name="Z28" unit="cm">-129.844</sec>
-         <sec name="Z29" unit="cm">-130.973</sec>
-         <sec name="Z30" unit="cm">-130.973</sec>
-         <sec name="Z31" unit="cm">-138.578</sec>
-         <sec name="Z32" unit="cm">-138.578</sec>
-         <sec name="Z33" unit="cm">-138.899</sec>
-         <sec name="Z34" unit="cm">-138.899</sec>
-         <sec name="Z35" unit="cm">-151.135</sec>
-         <sec name="Z36" unit="cm">-151.135</sec>
-         <sec name="Z37" unit="cm">-164.192</sec>
-         <sec name="Z38" unit="cm">-164.192</sec>
-         <sec name="Z39" unit="cm">-164.319</sec>
-         <sec name="Z40" unit="cm">-164.319</sec>
-         <sec name="Z41" unit="cm">-175.749</sec>
-         <sec name="Z42" unit="cm">-175.749</sec>
-         <sec name="Z43" unit="cm">-175.888</sec>
-         <sec name="Z44" unit="cm">-175.888</sec>
-         <sec name="Z45" unit="cm">-197.452</sec>
-         <sec name="Z46" unit="cm">-197.452</sec>
-         <sec name="Z47" unit="cm">-197.523</sec>
-         <sec name="Z48" unit="cm">-197.523</sec>
-         <sec name="Z49" unit="cm">220.500</sec-->
-         <!--sec name="Z50" unit="cm">220.500</sec>
-         <sec name="Z51" unit="cm">-220.659</sec>
-         <sec name="Z52" unit="cm">-220.659</sec>
-         <sec name="Z53" unit="cm">225.156</sec-->
-         <!--sec name="r0" unit="cm">10.069</sec>
-         <sec name="r1" unit="cm">10.069</sec>
-         <sec name="r2" unit="cm">10.302</sec>
-         <sec name="r3" unit="cm">10.302</sec>
-         <sec name="r4" unit="cm">10.302</sec>
-         <sec name="r5" unit="cm">10.302</sec>
-         <sec name="r6" unit="cm">10.680</sec>
-         <sec name="r7" unit="cm">10.680</sec>
-         <sec name="r8" unit="cm">10.680</sec>
-         <sec name="r9" unit="cm">10.680</sec>
-         <sec name="r10" unit="cm">11.449</sec>
-         <sec name="r11" unit="cm">11.449</sec>
-         <sec name="r12" unit="cm">11.449</sec>
-         <sec name="r13" unit="cm">11.449</sec>
-         <sec name="r14" unit="cm">12.936</sec>
-         <sec name="r15" unit="cm">12.936</sec>
-         <sec name="r16" unit="cm">12.936</sec>
-         <sec name="r17" unit="cm">12.936</sec>
-         <sec name="r18" unit="cm">13.514</sec>
-         <sec name="r19" unit="cm">13.514</sec>
-         <sec name="r20" unit="cm">13.514</sec>
-         <sec name="r21" unit="cm">13.514</sec>
-         <sec name="r22" unit="cm">14.525</sec>
-         <sec name="r23" unit="cm">14.525</sec>
-         <sec name="r24" unit="cm">14.525</sec>
-         <sec name="r25" unit="cm">14.525</sec>
-         <sec name="r26" unit="cm">15.411</sec>
-         <sec name="r27" unit="cm">15.411</sec>
-         <sec name="r28" unit="cm">15.411</sec>
-         <sec name="r29" unit="cm">15.411</sec>
-         <sec name="r30" unit="cm">16.510</sec>
-         <sec name="r31" unit="cm">16.510</sec>
-         <sec name="r32" unit="cm">16.510</sec>
-         <sec name="r33" unit="cm">16.510</sec>
-         <sec name="r34" unit="cm">17.505</sec>
-         <sec name="r35" unit="cm">17.505</sec>
-         <sec name="r36" unit="cm">17.505</sec>
-         <sec name="r37" unit="cm">17.505</sec>
-         <sec name="r38" unit="cm">17.505</sec>
-         <sec name="r39" unit="cm">17.505</sec>
-         <sec name="r40" unit="cm">18.250</sec>
-         <sec name="r41" unit="cm">18.250</sec>
-         <sec name="r42" unit="cm">18.250</sec>
-         <sec name="r43" unit="cm">18.250</sec>
-         <sec name="r44" unit="cm">18.903</sec>
-         <sec name="r45" unit="cm">18.903</sec>
-         <sec name="r46" unit="cm">18.903</sec>
-         <sec name="r47" unit="cm">18.903</sec>
-         <sec name="r48" unit="cm">19.510</sec>
-         <sec name="r49" unit="cm">19.510</sec-->
-         <!--sec name="r50" unit="cm">19.510</sec>
-         <sec name="r51" unit="cm">19.510</sec>
-         <sec name="r52" unit="cm">19.949</sec>
-         <sec name="r53" unit="cm">19.949</sec-->
-         <!--sec name="R0" unit="cm">10.567</sec>
-         <sec name="R1" unit="cm">10.567</sec>
-         <sec name="R2" unit="cm">10.567</sec>
-         <sec name="R3" unit="cm">10.567</sec>
-         <sec name="R4" unit="cm">11.066</sec>
-         <sec name="R5" unit="cm">11.066</sec>
-         <sec name="R6" unit="cm">11.066</sec>
-         <sec name="R7" unit="cm">11.066</sec>
-         <sec name="R8" unit="cm">11.963</sec>
-         <sec name="R9" unit="cm">11.963</sec>
-         <sec name="R10" unit="cm">11.963</sec>
-         <sec name="R11" unit="cm">11.963</sec>
-         <sec name="R12" unit="cm">13.458</sec>
-         <sec name="R13" unit="cm">13.458</sec>
-         <sec name="R14" unit="cm">13.458</sec>
-         <sec name="R15" unit="cm">13.458</sec>
-         <sec name="R16" unit="cm">13.757</sec>
-         <sec name="R17" unit="cm">13.757</sec>
-         <sec name="R18" unit="cm">13.757</sec>
-         <sec name="R19" unit="cm">13.757</sec>
-         <sec name="R20" unit="cm">14.954</sec>
-         <sec name="R21" unit="cm">14.954</sec>
-         <sec name="R22" unit="cm">14.954</sec>
-         <sec name="R23" unit="cm">14.954</sec>
-         <sec name="R24" unit="cm">15.751</sec>
-         <sec name="R25" unit="cm">15.751</sec>
-         <sec name="R26" unit="cm">15.751</sec>
-         <sec name="R27" unit="cm">15.751</sec>
-         <sec name="R28" unit="cm">16.748</sec>
-         <sec name="R29" unit="cm">16.748</sec>
-         <sec name="R30" unit="cm">16.748</sec>
-         <sec name="R31" unit="cm">16.748</sec>
-         <sec name="R32" unit="cm">18.044</sec>
-         <sec name="R33" unit="cm">18.044</sec>
-         <sec name="R34" unit="cm">18.044</sec>
-         <sec name="R35" unit="cm">18.044</sec>
-         <sec name="R36" unit="cm">17.745</sec>
-         <sec name="R37" unit="cm">17.745</sec>
-         <sec name="R38" unit="cm">18.493</sec>
-         <sec name="R39" unit="cm">18.493</sec>
-         <sec name="R40" unit="cm">18.493</sec>
-         <sec name="R41" unit="cm">18.493</sec>
-         <sec name="R42" unit="cm">19.241</sec>
-         <sec name="R43" unit="cm">19.241</sec>
-         <sec name="R44" unit="cm">19.241</sec>
-         <sec name="R45" unit="cm">19.241</sec>
-         <sec name="R46" unit="cm">19.741</sec>
-         <sec name="R47" unit="cm">19.741</sec>
-         <sec name="R48" unit="cm">19.741</sec>
-         <sec name="R49" unit="cm">19.741</sec-->
-         <!--sec name="R50" unit="cm">20.149</sec>
-         <sec name="R51" unit="cm">20.149</sec>
-         <sec name="R52" unit="cm">20.149</sec>
-         <sec name="R53" unit="cm">20.149</sec-->
-         <!--Intersect>F1wal1</Intersect>
-         <MotherVolume>F6spc1</MotherVolume>
-         <Material>Cryo_Epoxy</Material>
-         <Desc>Epoxy</Desc>
-      </Straight-->
       <Straight name="F7lyr3s1">
          <N desc="Number of planes">3</N>
          <sec name="Z0" unit="mm">-330</sec>
@@ -3668,7 +2859,6 @@
          <sec name="R2" unit="mm">91.6</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S1</Desc>
       </Straight>
@@ -3682,7 +2872,6 @@
          <sec name="R1" unit="mm">92.78</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S2</Desc>
       </Straight>
@@ -3694,15 +2883,8 @@
          <sec name="r1" unit="mm">86.67</sec>
          <sec name="R0" unit="mm">87.439</sec>
          <sec name="R1" unit="mm">87.439</sec>
-         <!-- No Intersect(F1wal1): at |Z|~700mm the D/E beam spaces only
-              reach ~52mm from the solenoid axis (offset 29mm + R 22.5mm),
-              far below this ring's inner radius of 86.67mm, and F6spc1
-              spans R=93.7-99.3mm here, so the plain polycone is already
-              fully contained. The Intersect with F1wal1's deep boolean
-              solid made G4's surface point sampler return a bogus point
-              (reported as a 51cm "protrusion" at R=750mm). -->
+         <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_Epoxy</Material>
          <Desc>Epoxy S2</Desc>
       </Straight>
@@ -3716,7 +2898,6 @@
          <sec name="R1" unit="mm">100.32</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S3</Desc>
       </Straight>
@@ -3731,7 +2912,6 @@
          <sec name="R1" unit="mm">103.02</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S4</Desc>
       </Straight>
@@ -3745,7 +2925,6 @@
          <sec name="R1" unit="mm">106.8</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S5</Desc>
       </Straight>
@@ -3759,7 +2938,6 @@
          <sec name="R1" unit="mm">115.54</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S6</Desc>
       </Straight>
@@ -3773,7 +2951,6 @@
          <sec name="R1" unit="mm">130.42</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S7</Desc>
       </Straight>
@@ -3787,7 +2964,6 @@
          <sec name="R1" unit="mm">135.14</sec>
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
-         <sec name="ClipMother" unit="mm">0</sec>
          <Material>Cryo_NbTi</Material>
          <Desc>NbTi S8</Desc>
       </Straight>
@@ -3847,14 +3023,6 @@
          <sec name="Z51" unit="cm">-176.187</sec>
          <sec name="Z52" unit="cm">-176.187</sec>
          <sec name="Z53" unit="cm">-176.609</sec>
-         <!--sec name="Z50" unit="cm">176.609</sec>
-         <sec name="Z51" unit="cm">-197.822</sec>
-         <sec name="Z52" unit="cm">-197.822</sec>
-         <sec name="Z53" unit="cm">-198.317</sec>
-         <sec name="Z54" unit="cm">-198.317</sec>
-         <sec name="Z55" unit="cm">-220.959</sec>
-         <sec name="Z56" unit="cm">-220.959</sec>
-         <sec name="Z57" unit="cm">225.548</sec-->
          <sec name="r0" unit="mm">36.5</sec>
          <sec name="r1" unit="mm">36.5</sec>
          <sec name="r2" unit="mm">36.5</sec>
@@ -3909,14 +3077,6 @@
          <sec name="r51" unit="cm">16.892</sec>
          <sec name="r52" unit="cm">16.892</sec>
          <sec name="r53" unit="cm">16.892</sec>
-         <!--sec name="r50" unit="cm">17.651</sec>
-         <sec name="r51" unit="cm">17.651</sec>
-         <sec name="r52" unit="cm">17.651</sec>
-         <sec name="r53" unit="cm">17.651</sec>
-         <sec name="r54" unit="cm">18.443</sec>
-         <sec name="r55" unit="cm">18.443</sec>
-         <sec name="r56" unit="cm">18.443</sec>
-         <sec name="r57" unit="cm">18.443</sec-->
          <sec name="R0" unit="mm">44.5</sec>
          <sec name="R1" unit="mm">44.5</sec>
          <sec name="R2" unit="mm">39.7</sec>
@@ -3972,14 +3132,6 @@
          <sec name="R52" unit="cm">17.522</sec>
          <sec name="R53" unit="cm">18.399</sec>
          <sec name="R54" unit="cm">18.399</sec>
-         <!--sec name="R50" unit="cm">18.399</sec>
-         <sec name="R51" unit="cm">18.399</sec>
-         <sec name="R52" unit="cm">18.899</sec>
-         <sec name="R53" unit="cm">18.899</sec>
-         <sec name="R54" unit="cm">18.899</sec>
-         <sec name="R55" unit="cm">18.899</sec>
-         <sec name="R56" unit="cm">18.809</sec>
-         <sec name="R57" unit="cm">18.809</sec-->
          <Intersect>F1wal1</Intersect>
          <MotherVolume>F6spc1</MotherVolume>
          <Material>SUS316L</Material>
@@ -4024,39 +3176,6 @@
          <Material>Fe</Material>
          <Desc>Iron Yoke</Desc>
       </Straight>
-<!--
-      <Straight name="D5wal1">
-         <N desc="Number of planes">2</N>
-         <sec name="Z0" unit="cm">-117.6</sec>
-         <sec name="Z1" unit="cm">-121.6</sec>
-         <sec name="R0" unit="cm">2.23</sec>
-         <sec name="R1" unit="cm">2.23</sec>
-         <sec name="r0" unit="cm">1.47</sec>
-         <sec name="r1" unit="cm">1.95</sec>
-         <MotherVolume>D1spc1</MotherVolume>
-         <Material>W</Material>
-         <Desc>QCSL quench shield</Desc>
-      </Straight>
-      <Straight name="B5wal1">
-         <N desc="Number of planes">4</N>
-         <sec name="Z0" unit="cm">116.38</sec>
-         <sec name="Z1" unit="cm">119.02</sec>
-         <sec name="Z2" unit="cm">119.19</sec>
-         <sec name="Z3" unit="cm">120.38</sec>
-         <sec name="R0" unit="cm">2.02</sec>
-         <sec name="R1" unit="cm">2.82</sec>
-         <sec name="R2" unit="cm">2.82</sec>
-         <sec name="R3" unit="cm">2.82</sec>
-         <sec name="r0" unit="cm">1.90</sec>
-         <sec name="r1" unit="cm">1.93</sec>
-         <sec name="r2" unit="cm">1.93</sec>
-         <sec name="r3" unit="cm">2.05</sec>
-         <MotherVolume>B1spc1</MotherVolume>
-         <Material>W</Material>
-         <Desc>QCSR quench shield</Desc>
-      </Straight>
--->
-      <!-- Cryostat supports -->
 
       <Support name="CryostatSupportL">
          <sec name="W" unit="mm">1540</sec>
@@ -4285,158 +3404,3 @@
 
    </Content>
 </DetectorComponent>
-<!--
-
-      <sec name="Z0" unit="cm"></sec>
-      <sec name="Z1" unit="cm"></sec>
-      <sec name="Z2" unit="cm"></sec>
-      <sec name="Z3" unit="cm"></sec>
-      <sec name="Z4" unit="cm"></sec>
-      <sec name="Z5" unit="cm"></sec>
-      <sec name="Z6" unit="cm"></sec>
-      <sec name="Z7" unit="cm"></sec>
-      <sec name="Z8" unit="cm"></sec>
-      <sec name="Z9" unit="cm"></sec>
-      <sec name="Z10" unit="cm"></sec>
-      <sec name="Z11" unit="cm"></sec>
-      <sec name="Z12" unit="cm"></sec>
-      <sec name="Z13" unit="cm"></sec>
-      <sec name="Z14" unit="cm"></sec>
-      <sec name="Z15" unit="cm"></sec>
-      <sec name="Z16" unit="cm"></sec>
-      <sec name="Z17" unit="cm"></sec>
-      <sec name="Z18" unit="cm"></sec>
-      <sec name="Z19" unit="cm"></sec>
-      <sec name="Z20" unit="cm"></sec>
-      <sec name="Z21" unit="cm"></sec>
-      <sec name="Z22" unit="cm"></sec>
-      <sec name="Z23" unit="cm"></sec>
-      <sec name="Z24" unit="cm"></sec>
-      <sec name="Z25" unit="cm"></sec>
-      <sec name="Z26" unit="cm"></sec>
-      <sec name="Z27" unit="cm"></sec>
-      <sec name="Z28" unit="cm"></sec>
-      <sec name="Z29" unit="cm"></sec>
-      <sec name="Z30" unit="cm"></sec>
-      <sec name="Z31" unit="cm"></sec>
-      <sec name="Z32" unit="cm"></sec>
-      <sec name="Z33" unit="cm"></sec>
-      <sec name="Z34" unit="cm"></sec>
-      <sec name="Z35" unit="cm"></sec>
-      <sec name="Z36" unit="cm"></sec>
-      <sec name="Z37" unit="cm"></sec>
-      <sec name="Z38" unit="cm"></sec>
-      <sec name="Z39" unit="cm"></sec>
-      <sec name="Z40" unit="cm"></sec>
-      <sec name="Z41" unit="cm"></sec>
-      <sec name="Z42" unit="cm"></sec>
-      <sec name="Z43" unit="cm"></sec>
-      <sec name="Z44" unit="cm"></sec>
-      <sec name="Z45" unit="cm"></sec>
-      <sec name="Z46" unit="cm"></sec>
-      <sec name="Z47" unit="cm"></sec>
-      <sec name="Z48" unit="cm"></sec>
-      <sec name="Z49" unit="cm"></sec>
-      <sec name="r0" unit="cm"></sec>
-      <sec name="r1" unit="cm"></sec>
-      <sec name="r2" unit="cm"></sec>
-      <sec name="r3" unit="cm"></sec>
-      <sec name="r4" unit="cm"></sec>
-      <sec name="r5" unit="cm"></sec>
-      <sec name="r6" unit="cm"></sec>
-      <sec name="r7" unit="cm"></sec>
-      <sec name="r8" unit="cm"></sec>
-      <sec name="r9" unit="cm"></sec>
-      <sec name="r10" unit="cm"></sec>
-      <sec name="r11" unit="cm"></sec>
-      <sec name="r12" unit="cm"></sec>
-      <sec name="r13" unit="cm"></sec>
-      <sec name="r14" unit="cm"></sec>
-      <sec name="r15" unit="cm"></sec>
-      <sec name="r16" unit="cm"></sec>
-      <sec name="r17" unit="cm"></sec>
-      <sec name="r18" unit="cm"></sec>
-      <sec name="r19" unit="cm"></sec>
-      <sec name="r20" unit="cm"></sec>
-      <sec name="r21" unit="cm"></sec>
-      <sec name="r22" unit="cm"></sec>
-      <sec name="r23" unit="cm"></sec>
-      <sec name="r24" unit="cm"></sec>
-      <sec name="r25" unit="cm"></sec>
-      <sec name="r26" unit="cm"></sec>
-      <sec name="r27" unit="cm"></sec>
-      <sec name="r28" unit="cm"></sec>
-      <sec name="r29" unit="cm"></sec>
-      <sec name="r30" unit="cm"></sec>
-      <sec name="r31" unit="cm"></sec>
-      <sec name="r32" unit="cm"></sec>
-      <sec name="r33" unit="cm"></sec>
-      <sec name="r34" unit="cm"></sec>
-      <sec name="r35" unit="cm"></sec>
-      <sec name="r36" unit="cm"></sec>
-      <sec name="r37" unit="cm"></sec>
-      <sec name="r38" unit="cm"></sec>
-      <sec name="r39" unit="cm"></sec>
-      <sec name="r40" unit="cm"></sec>
-      <sec name="r41" unit="cm"></sec>
-      <sec name="r42" unit="cm"></sec>
-      <sec name="r43" unit="cm"></sec>
-      <sec name="r44" unit="cm"></sec>
-      <sec name="r45" unit="cm"></sec>
-      <sec name="r46" unit="cm"></sec>
-      <sec name="r47" unit="cm"></sec>
-      <sec name="r48" unit="cm"></sec>
-      <sec name="r49" unit="cm"></sec>
-      <sec name="R0" unit="cm"></sec>
-      <sec name="R1" unit="cm"></sec>
-      <sec name="R2" unit="cm"></sec>
-      <sec name="R3" unit="cm"></sec>
-      <sec name="R4" unit="cm"></sec>
-      <sec name="R5" unit="cm"></sec>
-      <sec name="R6" unit="cm"></sec>
-      <sec name="R7" unit="cm"></sec>
-      <sec name="R8" unit="cm"></sec>
-      <sec name="R9" unit="cm"></sec>
-      <sec name="R10" unit="cm"></sec>
-      <sec name="R11" unit="cm"></sec>
-      <sec name="R12" unit="cm"></sec>
-      <sec name="R13" unit="cm"></sec>
-      <sec name="R14" unit="cm"></sec>
-      <sec name="R15" unit="cm"></sec>
-      <sec name="R16" unit="cm"></sec>
-      <sec name="R17" unit="cm"></sec>
-      <sec name="R18" unit="cm"></sec>
-      <sec name="R19" unit="cm"></sec>
-      <sec name="R20" unit="cm"></sec>
-      <sec name="R21" unit="cm"></sec>
-      <sec name="R22" unit="cm"></sec>
-      <sec name="R23" unit="cm"></sec>
-      <sec name="R24" unit="cm"></sec>
-      <sec name="R25" unit="cm"></sec>
-      <sec name="R26" unit="cm"></sec>
-      <sec name="R27" unit="cm"></sec>
-      <sec name="R28" unit="cm"></sec>
-      <sec name="R29" unit="cm"></sec>
-      <sec name="R30" unit="cm"></sec>
-      <sec name="R31" unit="cm"></sec>
-      <sec name="R32" unit="cm"></sec>
-      <sec name="R33" unit="cm"></sec>
-      <sec name="R34" unit="cm"></sec>
-      <sec name="R35" unit="cm"></sec>
-      <sec name="R36" unit="cm"></sec>
-      <sec name="R37" unit="cm"></sec>
-      <sec name="R38" unit="cm"></sec>
-      <sec name="R39" unit="cm"></sec>
-      <sec name="R40" unit="cm"></sec>
-      <sec name="R41" unit="cm"></sec>
-      <sec name="R42" unit="cm"></sec>
-      <sec name="R43" unit="cm"></sec>
-      <sec name="R44" unit="cm"></sec>
-      <sec name="R45" unit="cm"></sec>
-      <sec name="R46" unit="cm"></sec>
-      <sec name="R47" unit="cm"></sec>
-      <sec name="R48" unit="cm"></sec>
-      <sec name="R49" unit="cm"></sec>
--->
-
-

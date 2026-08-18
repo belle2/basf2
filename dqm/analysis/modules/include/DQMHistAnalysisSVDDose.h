@@ -8,16 +8,10 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-#include <cadef.h>
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TCanvas.h>
 #include <TString.h>
 #include <TPaveText.h>
 #include <TH2.h>
-#include <TH1.h>
 #include <string>
 #include <vector>
 

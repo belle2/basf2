@@ -15,13 +15,6 @@
 #include <dqm/core/DQMHistAnalysis.h>
 #include <string>
 
-#ifdef _BELLE2_EPICS
-#include <cadef.h>
-#include <dbDefs.h>
-#include <epicsString.h>
-#include <cantProceed.h>
-#endif
-
 namespace Belle2 {
   /*! Write DQM Histogram Content to EPICS Arrays */
 

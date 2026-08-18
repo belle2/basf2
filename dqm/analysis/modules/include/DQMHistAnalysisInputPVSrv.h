@@ -16,15 +16,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <dqm/core/DQMHistAnalysis.h>
-//#include <THttpServer.h>
 
 #include <string>
-#ifdef _BELLE2_EPICS
-#include <cadef.h>
-#include <dbDefs.h>
-#include <epicsString.h>
-#include <cantProceed.h>
-#endif
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */

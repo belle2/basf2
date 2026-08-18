@@ -18,6 +18,13 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
+#ifdef _BELLE2_EPICS
+#include <dbDefs.h>
+#include <epicsString.h>
+#include <cantProceed.h>
+#endif
+
+
 using namespace std;
 using namespace Belle2;
 

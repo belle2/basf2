@@ -383,7 +383,6 @@ Returns the cosine of an angle whose definition changes depending on how many da
     (the mother) and the momentum of the given particle in the lab frame.
 
 )DOC");
-
     REGISTER_VARIABLE("cosHelicityAngleMomentumPi0Dalitz", cosHelicityAngleMomentumPi0Dalitz, R"DOC(
 Returns the cosine of the angle of the photon in the frame of the given particle (the mother) and the momentum
 of the given particle in the lab frame, otherwise it returns 0.0.
@@ -394,79 +393,87 @@ of the given particle in the lab frame, otherwise it returns 0.0.
     :math:`\pi^0 \to \gamma \gamma, \gamma \to e^+ e^-`.
 
 )DOC");
-
     REGISTER_VARIABLE("cosHelicityAngleBeamMomentum(i)", cosHelicityAngleBeamMomentum, R"DOC(
-Cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
+Returns the  cosine of the helicity angle of the :math:`i`-th daughter of the particle provided,
 assuming that the mother of the provided particle corresponds to the centre-of-mass system, whose parameters are
 automatically loaded by the function, given the accelerator's conditions.
 
 )DOC");
-
     REGISTER_VARIABLE("cosHelicityAngle(i, j)", cosHelicityAngle, R"DOC(
-                      Cosine of the helicity angle between the momentum of the selected granddaughter and the direction opposite to the momentum of the provided particle 
-                      in the reference frame of the selected daughter (:math:`\theta_1` and :math:`\theta_2` in the
-                      `PDG <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_ 2018, p. 722).
+Returns the cosine of the helicity angle between the momentum of the selected granddaughter (index ``j``) and
+the direction opposite to the momentum of the provided particle, both calculated in the reference frame of the selected daughter (index ``i``).
+This variable is useful for angular analyses of :math:`B`-meson decays into two vector particles.
 
-                      This variable needs two integer arguments: the first one, ``i``, is the index of the daughter and the second one, ``j`` is the index of the granddaughter.
+For example, for the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle
+is :math:`B^0` and the selected indices are (0, 0), the variable will return the angle between the momentum of the :math:`\mu^+` and the
+direction opposite to the momentum of the :math:`B^0`, with both momenta in the rest frame of the :math:`J/\psi`.
 
-                      For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, 
-                      if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the angle between the momentum of the :math:`\mu^+` and the direction opposite to the momentum of 
-                      the :math:`B^0`, both momenta in the rest frame of the :math:`J/\psi`.
+.. seealso:: Helicity angles are reviewed on p. 722 of this `PDG review <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_
 
-                      This variable is needed for angular analyses of :math:`B`-meson decays into two vector particles.)DOC");
-
+)DOC");
     REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle, R"DOC(
-                      Cosine of the acoplanarity angle (:math:`\Phi` in the `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_).
-                      Given a two-body decay, the acoplanarity angle is defined as
-                      the angle between the two decay planes in the reference frame of the mother. 
+Returns the cosine of the acoplanarity angle which, for a two-body decay, is defined as the angle between the two normal vectors
+of the decay planes in the reference frame of the mother. Each normal vector is defined as the cross product of the momentum of
+one daughter (in the frame of the mother) and the momentum of the granddaughters (in the frame of the daughter). The two integers
+``i`` and ``j`` index the first and second granddaughters, respectively. 
 
-                      We calculate the acoplanarity angle as the angle between the two
-                      normal vectors of the decay planes. Each normal vector is the cross product of the momentum of one daughter (in the frame of the mother) and the
-                      momentum of one of the granddaughters (in the reference frame of the daughter).
+For example, for the decay  :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle
+is :math:`B^0` and the selected indices are (0, 0), the variable will return the acoplanarity using the :math:`\mu^+` and :math:`K^+` granddaughters.
 
-                      This variable needs two integer arguments: the first one, ``i`` is the index of the first granddaughter, and the second one, ``j`` the index of the
-                      second granddaughter. 
+.. seealso:: The acoplanarity angle is reviewed in the `PDG polarisation review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_.
 
-                      For example, in the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected indices are (0, 0),
-                      the variable will return the acoplanarity using the :math:`\mu^+` and the :math:`K^+` granddaughters.)DOC");
-
+)DOC");
     REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary, R"DOC(
-                      Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
+Returns the cosine of the helicity angle (see ``cosHelicityAngle``) assuming the CM system as the mother rest frame.
 
+.. seealso:: Helicity angles are reviewed on p. 722 of this `PDG review <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_
+
+)DOC");
     REGISTER_VARIABLE("cosHelicityAngleDaughter(i[, j])", cosHelicityAngleDaughter, R"DOC(
-                      Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
-                      The optional second argument is the index of the granddaughter that defines the angle, default is 0.
+Returns the cosine of the helicity angle of the daughter at index ``i``. The optional second argument is the index of the granddaughter that defines the angle
+and by default is 0. 
 
-                      For example, in the decay: :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0` and the selected index is 0,
-                      the variable will return the helicity angle of the :math:`\mu^+`.
-                      If the selected index is 1 the variable will return the helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`).
-                      In rare cases if one wanted the helicity angle of the second granddaughter, indices 1,1 would return the helicity angle of the :math:`\pi^-`).
+For example, for the decay: :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle is :math:`B^0`
+and the selected index is 0, the variable will return the helicity angle of the :math:`\mu^+`. If the selected index is 1 the variable will return the
+helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`). In rare cases, if one wanted the helicity angle of the second granddaughter,
+indices (1, 1) would return the helicity angle of the :math:`\pi^-`.
 
-                      See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
+.. seealso:: Helicity angles are reviewed on p. 722 of this `PDG review <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_
 
+)DOC");
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle, R"DOC(
-Acoplanarity angle (see ``Particle::getAcoplanarity``) assuming a two body decay of the particle and its daughters.
-See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the acoplanarity angle.
+Returns the aplanarity angle, as described in the definition for ``cosAcoplanarityAngle``, assuming a two body decay of the particle and
+its daughters. 
+
+.. seealso:: Helicity angles are reviewed on p. 722 of this `PDG review <https://journals.aps.org/prd/abstract/10.1103/PhysRevD.98.030001>`_
 
 )DOC", "rad");
-
     REGISTER_VARIABLE("cosHelicityAngleForQuasiTwoBodyDecay(i, j)", cosHelicityAngleForQuasiTwoBodyDecay, R"DOC(
-                      Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
-                      daughter (i-th) in the reference frame of the sum of two selected daughters (i-th + j-th).
+Returns the cosine of the helicity angle between the momentum of the provided particle and the momentum of the daughter at
+index :math:`i` in the reference frame of the two selected daughters (at index :math:`i` and :math:`j`) combined. 
 
-                      The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given 
-                      particle must be three. Otherwise, the variable returns NaN.
+.. important:: 
+    The variable is supposed to be used for analyses of quasi-two-body decays. The number of daughters of the given particle
+    must be three, otherwise the variable returns ``NaN``.
 
-                      For example, in the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and
-                      the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` 
-                      and the momentum of the :math:`K^-`, both momenta in the rest frame of the :math:`K^- K^{*0}`.)DOC");
+For example, for the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and
+the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` and
+the momentum of the :math:`K^-`, both in the rest frame of the :math:`K^- K^{*0}` combination.
 
+)DOC");
     REGISTER_METAVARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(
-a triple-product of three momenta of offspring in the mother rest frame: :math:`C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)`. For examples,
-In a four-body decay M->D1D2D3D4, momentaTripleProduct(0,1,2) returns CT using the momenta of D1D2D3 particles. 
-In other decays involving secondary decay, e.g. for M->(R->D1D2)D3D4, momentaTripleProduct(0:0,1,2) returns C_T using momenta of D1D3D4 particles.
+Returns a triple product of the three momenta as defined by 
+
+.. math::
+    C_T=\vec{p}_i\cdot(\vec{p}_j\times\vec{p}_k)
+
+where :math:`i, j` and :math:`k` are indices of the daughters of the provided particle.
+
+For example, in a four body decay :math:`M \rightarrow d_1 d_2 d_3 d_4`, for the selected indices (0, 1, 2), the variable will return
+:math:`C_T` calculated using the momenta of the particles :math:`d_1, d_2` and :math:`d_3`. In instances of secondary decays such as
+:math:`M \rightarrow R (\rightarrow d_1 d_2) d_3 d_4`, the selected indices (0:0, 1, 2) returns :math:`C_T` calculated using the
+momenta of the particles :math:`d_1, d_3` and :math:`d_4`.
+
 )DOC", Manager::VariableDataType::c_double); 
 
   }

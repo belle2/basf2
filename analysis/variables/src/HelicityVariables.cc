@@ -452,13 +452,13 @@ its daughters.
 Returns the cosine of the helicity angle between the momentum of the provided particle and the momentum of the daughter at
 index :math:`i` in the reference frame of the two selected daughters (at index :math:`i` and :math:`j`) combined. 
 
-.. important:: 
-    The variable is supposed to be used for analyses of quasi-two-body decays. The number of daughters of the given particle
-    must be three, otherwise the variable returns ``NaN``.
-
 For example, for the decay :math:`\bar{B}^0 \to D^+ K^- K^{*0}`, if the provided particle is :math:`\bar{B}^0` and
 the selected indices are (1, 2), the variable will return the angle between the momentum of the :math:`\bar{B}^0` and
 the momentum of the :math:`K^-`, both in the rest frame of the :math:`K^- K^{*0}` combination.
+
+.. important:: 
+    The variable is supposed to be used for analyses of quasi-two-body decays. The number of daughters of the given particle
+    must be three, otherwise the variable returns ``NaN``.
 
 )DOC");
     REGISTER_METAVARIABLE("momentaTripleProduct(i,j,k)", momentaTripleProduct, R"DOC(

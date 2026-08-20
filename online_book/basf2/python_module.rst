@@ -106,8 +106,8 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
  
     Calling C++ functions from Python via the ``cppyy`` bindings that ROOT uses
     can leak memory when the function returns a ``std::vector``. This is a
-    known issue inside ROOT itself, not in ``basf2`` code, and has been present
-    since an update of external packages about 5 years ago.
+    known issue inside ROOT itself, not in ``basf2`` code, and has been present 
+    in externals v01-10-00 and later.
  
     A common case of encountering the problem is with ``particle.getDaughters()``, which
     returns a ``std::vector`` of daughter particles. In this specific case you

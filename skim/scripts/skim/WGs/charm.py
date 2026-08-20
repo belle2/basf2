@@ -1534,6 +1534,15 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             path=path
         )
 
+        # Dedicated pi0 list for the high-multiplicity D0 -> pi- pi+ pi0 pi0 mode.
+        ma.copyLists("pi0:hadtagDm8", ["pi0:hadtag"], path=path)
+        ma.rankByLowest(
+            "pi0:hadtagDm8",
+            variable="abs(dM)",
+            numBest=50,
+            path=path
+        )
+
         ma.cutAndCopyList(
             "gamma:hadtag",
             "gamma:tag",
@@ -1552,7 +1561,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             "pi-:hadtag pi+:hadtag",
             "pi-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
             "pi-:hadtag pi+:hadtag pi0:hadtag",
-            "pi-:hadtag pi+:hadtag pi0:hadtag pi0:hadtag",
+            "pi-:hadtag pi+:hadtag pi0:hadtagDm8 pi0:hadtagDm8",
             "K_S0:merged pi+:hadtag pi-:hadtag",
             "K_S0:merged pi+:hadtag pi-:hadtag pi0:hadtag",
             "K_S0:merged pi0:hadtag",
@@ -1563,6 +1572,15 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         D0List = []
         for chID, channel in enumerate(D0_channels):
             ma.reconstructDecay("D0:skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
+
+            if chID in (2, 8):
+                ma.rankByLowest(
+                    particleList="D0:skimDm" + str(chID),
+                    variable="abs(dM)",
+                    numBest=15,
+                    path=path
+                )
+
             D0List.append("D0:skimDm" + str(chID))
 
         Dp_channels = [
@@ -1582,9 +1600,26 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         DpList = []
         for chID, channel in enumerate(Dp_channels):
             ma.reconstructDecay("D+:skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
+
+            ma.rankByLowest(
+                particleList="D+:skimDm" + str(chID),
+                variable="abs(dM)",
+                numBest=15,
+                path=path
+            )
+
             DpList.append("D+:skimDm" + str(chID))
 
         ma.reconstructDecay("Sigma+:hadtag -> p+:hadtag pi0:hadtag", "1.08 < M < 1.3", path=path)
+
+        # Dedicated Sigma+ list for the high-multiplicity Lambda_c mode 13.
+        ma.copyLists("Sigma+:hadtagDm13", ["Sigma+:hadtag"], path=path)
+        ma.rankByLowest(
+            "Sigma+:hadtagDm13",
+            variable="abs(dM)",
+            numBest=100,
+            path=path
+        )
 
         LC_channels = [
                 "p+:hadtag K-:hadtag pi+:hadtag",
@@ -1600,7 +1635,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
                 "Lambda0:merged pi+:hadtag pi0:hadtag",
                 "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag",
                 "Sigma+:hadtag pi+:hadtag pi-:hadtag",
-                "Sigma+:hadtag pi+:hadtag pi-:hadtag pi0:hadtag",
+                "Sigma+:hadtagDm13 pi+:hadtag pi-:hadtag pi0:hadtag",
                 "Sigma+:hadtag pi0:hadtag"]
 
         LCcuts = "2.18 < M < 2.38 and useCMSFrame(p) > 2.0"
@@ -1635,11 +1670,19 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         ma.copyLists("D_s+:skim", DsList, path=path)
 
         ma.reconstructDecay("D*+:skim1 -> D0:skim pi+:hadtag", "0.135 < massDifference(0) < 0.155", 1, path=path)
+        ma.rankByLowest("D*+:skim1", variable="abs(dQ)", numBest=15, path=path)
+
         ma.reconstructDecay("D*+:skim2 -> D+:skim pi0:hadtag", "0.130 < massDifference(0) < 0.160", 2, path=path)
+        ma.rankByLowest("D*+:skim2", variable="abs(dQ)", numBest=15, path=path)
+
         ma.copyLists("D*+:skim", ["D*+:skim1", "D*+:skim2"], path=path)
 
         ma.reconstructDecay("D*0:skim1 -> D0:skim pi0:hadtag", "0.130 < massDifference(0) < 0.160", 1, path=path)
+        ma.rankByLowest("D*0:skim1", variable="abs(dQ)", numBest=15, path=path)
+
         ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", 2, path=path)
+        ma.rankByLowest("D*0:skim2", variable="abs(dQ)", numBest=15, path=path)
+
         ma.copyLists("D*0:skim", ["D*0:skim1", "D*0:skim2"], path=path)
 
         ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", path=path)
@@ -1730,7 +1773,21 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         ma.copyLists("D*+:skimSig", sigDstList, path=path)
 
+        ma.rankByLowest(
+            particleList="D*+:skimSig",
+            variable="abs(mRecoil - 2.010)",
+            numBest=500,
+            path=path
+        )
+
         ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.08 < DelM < 0.27", path=path)
+
+        ma.rankByLowest(
+            particleList="D0:skimSig",
+            variable="abs(DelM - 0.145)",
+            numBest=15,
+            path=path
+        )
 
         sigDzList = ["D0:skimSig"]
         return sigDzList

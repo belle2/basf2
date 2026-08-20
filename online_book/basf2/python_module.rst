@@ -102,6 +102,23 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
     PyStoreObj you can use the obj() member to get a reference to the underlying
     object itself: ``eventinfo.obj().getEvent()``
 
+.. warning::
+ 
+    Calling C++ functions from Python via the ``cppyy`` bindings that ROOT uses
+    can leak memory when the function returns a ``std::vector``. This is a
+    known issue inside ROOT itself, not in ``basf2`` code, and has been present
+    since an update of external packages about 5 years ago.
+ 
+    A common case of encountering the problem is with ``particle.getDaughters()``, which
+    returns a ``std::vector`` of daughter particles. In this specific case you
+    can avoid the leak by not calling ``getDaughters()`` directly, and instead
+    building the list yourself with ``particle.getNDaughters()`` and
+    ``particle.getDaughter(i)``.
+ 
+    If you are writing a Python module that loops over many events and calls
+    a ``basf2``/ROOT function returning a ``std::vector``, watch out for
+    similar leaks and consider whether an index-based alternative exists.
+
 
 More advanced examples
 ~~~~~~~~~~~~~~~~~~~~~~

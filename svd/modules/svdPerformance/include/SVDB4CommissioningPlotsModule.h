@@ -45,7 +45,7 @@ namespace Belle2 {
     SVDB4CommissioningPlotsModule();
 
     /** destructor */
-    virtual ~SVDB4CommissioningPlotsModule() {};
+    virtual ~SVDB4CommissioningPlotsModule() override {};
 
     virtual void initialize() override; /**< check StoreArrays & create rootfile */
     virtual void beginRun() override; /**< create histograms */

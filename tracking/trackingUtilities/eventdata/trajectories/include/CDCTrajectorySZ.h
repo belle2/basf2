@@ -8,7 +8,8 @@
 #pragma once
 
 #include <tracking/trackingUtilities/geometry/UncertainSZLine.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <TMath.h>
 
@@ -74,7 +75,7 @@ namespace Belle2 {
        *  coalined with the s axes
        */
       double getSZDist(const double s, const double z) const
-      { return getSZLine()->distance(Vector2D(s, z)) ; }
+      { return getSZLine()->distance(ROOT::Math::XYVector(s, z)) ; }
 
       /**
        *  Passively Shift the s coordinate by the amount given.
@@ -86,7 +87,7 @@ namespace Belle2 {
        *  by the same amount in both trajectories.
        */
       void passiveMoveS(const double deltaS)
-      { m_szLine.passiveMoveBy(Vector2D(deltaS, 0)); }
+      { m_szLine.passiveMoveBy(ROOT::Math::XYVector(deltaS, 0)); }
 
       /// Indicates if the line has been fitted
       bool isFitted() const

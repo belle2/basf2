@@ -24,11 +24,6 @@ using namespace Belle2::Simulation;
 EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& mcParticleGraph):
   G4UserEventAction(), m_mcCollectionName(mcCollectionName),  m_mcParticleGraph(mcParticleGraph)
 {
-  if (false) {
-    G4Event* event;
-    BeginOfEventAction(event);
-    EndOfEventAction(event);
-  }
   m_writeSimSteps = Environment::Instance().getWriteSimSteps();
   if (m_writeSimSteps)
     m_VREventStream = new std::ofstream;
@@ -74,7 +69,7 @@ void EventAction::EndOfEventAction(const G4Event*)
   vector<std::pair<unsigned int, bool> > indices;
   indices.resize(m_mcParticleGraph.size() + 1);
   for (unsigned int iParticle = 0; iParticle < m_mcParticleGraph.size(); ++iParticle) {
-    MCParticleGraph::GraphParticle& currParticle = m_mcParticleGraph[iParticle];
+    const MCParticleGraph::GraphParticle& currParticle = m_mcParticleGraph[iParticle];
     //assert(currParticle.getTrackID()<indices.size());
     indices[currParticle.getTrackID()] = std::make_pair(currParticle.getIndex() - 1, currParticle.getIgnore());
   }

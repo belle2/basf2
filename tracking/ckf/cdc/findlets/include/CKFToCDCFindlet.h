@@ -41,6 +41,8 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
+    void beginRun() override;
+
     /// Do the track/hit finding/merging.
     void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits) override;
 

@@ -30,7 +30,7 @@ globalTags = ['patch_main_release-08', 'patch_main_release-07_noTOP',
               'data_reprocessing_proc13', 'online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/gpfs/group/belle2/dataprod/Data/PromptReco/bucket16_calib/'
-bhabha_skim_dir = 'skim/bhabha_all_calib/cdst/sub00'
+bhabha_skim_dir = 'skim/bhabha_combined_calib/cdst/sub00'
 dimuon_skim_dir = 'skim/mumutight_calib/cdst/sub00/'
 main_output_dir = 'top_calibration'
 default_sample = 'dimuon'

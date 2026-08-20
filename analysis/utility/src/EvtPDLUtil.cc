@@ -12,7 +12,7 @@
 bool Belle2::EvtPDLUtil::hasAntiParticle(int pdgCode)
 {
   TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(pdgCode);
-  TParticlePDG* antiParticle = particle->AntiParticle();
+  const TParticlePDG* antiParticle = particle->AntiParticle();
 
   return antiParticle and (particle != antiParticle);
 }

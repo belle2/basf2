@@ -57,7 +57,7 @@ void PruneDataStoreModule::initialize()
   }
 }
 
-std::regex PruneDataStoreModule::compileAndCatch(std::string& regexString) const
+std::regex PruneDataStoreModule::compileAndCatch(std::string& regexString)
 {
   try {
     return std::regex(regexString);

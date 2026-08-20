@@ -516,7 +516,7 @@ void PXDROIFinderAnalysisModule::event()
         v2 = m_Vidmc;
       }
 
-      VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+      const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_vxdIDmc);
 
       m_coorUmc = aSensorInfo.getUCellPosition(m_Uidmc);   //pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();

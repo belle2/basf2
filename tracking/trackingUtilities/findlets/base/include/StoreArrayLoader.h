@@ -32,9 +32,9 @@ namespace Belle2 {
 
     public:
       /// Constructor taking the default name of the store vector which is the source for the import.
-      StoreArrayLoader(const std::string& storeArrayName = "",
-                       const std::string& classMnemomicName = "",
-                       const std::string& classMnemomicDescription = "")
+      explicit StoreArrayLoader(const std::string& storeArrayName = "",
+                                const std::string& classMnemomicName = "",
+                                const std::string& classMnemomicDescription = "")
         : m_param_storeArrayName(storeArrayName),
           m_classMnemomicName(classMnemomicName),
           m_classMnemomicDescription(classMnemomicDescription)

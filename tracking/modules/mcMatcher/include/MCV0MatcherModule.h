@@ -20,7 +20,7 @@ namespace Belle2 {
     MCV0MatcherModule();
 
     /** Destructor (empty). */
-    ~MCV0MatcherModule();
+    ~MCV0MatcherModule() override;
 
     /** Use this to initialize resources or memory your module needs.
      *

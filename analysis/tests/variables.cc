@@ -258,8 +258,8 @@ namespace {
       PxPyPzEVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
       PxPyPzEVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
       Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 22));
-      Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 22, Particle::c_Unflavored, Particle::c_Undefined, 1));
-      Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+      const Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 22, Particle::c_Unflavored, Particle::c_Undefined, 1));
+      const Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
 
       p0->appendDaughter(p1->getArrayIndex());
       p0->appendDaughter(p2->getArrayIndex());
@@ -827,7 +827,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 0, 0, 3.0), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -952,8 +952,10 @@ namespace {
     PxPyPzEVector vec1 = {0.0, +0.332174566, 0.0, T.getCMSEnergy() / 2.};
     PxPyPzEVector vec2 = {0.0, -0.332174566, 0.0, T.getCMSEnergy() / 2.};
     Particle* p0 = particles.appendNew(Particle(T.rotateCmsToLab() * vec0, 300553));
-    Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined, 1));
-    Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    const Particle* p1 = particles.appendNew(Particle(T.rotateCmsToLab() * vec1, 511, Particle::c_Unflavored, Particle::c_Undefined,
+                                                      1));
+    const Particle* p2 = particles.appendNew(Particle(T.rotateCmsToLab() * vec2, -511, Particle::c_Unflavored, Particle::c_Undefined,
+                                                      2));
 
     p0->appendDaughter(p1->getArrayIndex());
     p0->appendDaughter(p2->getArrayIndex());
@@ -1138,6 +1140,16 @@ namespace {
     var = Manager::Instance().getVariable("acos(0)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.5707963267948966);
+
+    // atan2(1, 1) = 45 degrees = pi/4
+    var = Manager::Instance().getVariable("atan2(py, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), -1.3258176636684826);
+
+    // atan2(1, 0) = 90 degrees = pi/2
+    var = Manager::Instance().getVariable("atan2(pz, px)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 1.4464413322481353);
 
   }
 
@@ -1403,7 +1415,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(2, 2, 2, 4.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1430,7 +1442,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(i * 1.0, 1, 1, 1), (i % 2) ? 211 : -211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1831,7 +1843,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1850,7 +1862,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1869,7 +1881,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 2.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1888,7 +1900,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? 213 : -213);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1907,7 +1919,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(-1, 1.0 - 2 * (i % 2), 1, i * 1.0 + 2.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -1964,7 +1976,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       auto* mcParticle = mcParticles.appendNew();
       mcParticle->setPDG((i % 2) ? -Const::electron.getPDGCode() : Const::pion.getPDGCode());
@@ -2033,11 +2045,11 @@ namespace {
     // add the two photons (now in the Lab frame) as the two daughters of some particle and create the latter
     Particle dau0_noclst(dau0_4vec_Lab, 22);
     momentum += dau0_noclst.get4Vector();
-    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    const Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
     daughterIndices_noclst.push_back(newDaughter0_noclst->getArrayIndex());
     Particle dau1_noclst(dau1_4vec_Lab, 22);
     momentum += dau1_noclst.get4Vector();
-    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    const Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
     daughterIndices_noclst.push_back(newDaughter1_noclst->getArrayIndex());
     const Particle* par_noclst = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices_noclst);
 
@@ -2117,12 +2129,12 @@ namespace {
 
     Particle dau0_noclst(dau0_4vec, 22);
     momentum_0 = dau0_4vec;
-    Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
+    const Particle* newDaughter0_noclst = particles.appendNew(dau0_noclst);
     daughterIndices0_noclst.push_back(newDaughter0_noclst->getArrayIndex());
     const Particle* par0_noclst = particles.appendNew(momentum_0, 111, Particle::c_Unflavored, daughterIndices0_noclst);
     Particle dau1_noclst(dau1_4vec, 22);
     momentum_1 = dau1_4vec;
-    Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
+    const Particle* newDaughter1_noclst = particles.appendNew(dau1_noclst);
     daughterIndices1_noclst.push_back(newDaughter1_noclst->getArrayIndex());
     const Particle* par1_noclst = particles.appendNew(momentum_1, 111, Particle::c_Unflavored, daughterIndices1_noclst);
 
@@ -2206,7 +2218,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -2246,7 +2258,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -2274,7 +2286,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       Particle d(PxPyPzEVector(1, 1, 1, i * 1.0 + 1.0), (i % 2) ? -11 : 211);
       momentum += d.get4Vector();
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
     }
     const Particle* p = particles.appendNew(momentum, 411, Particle::c_Unflavored, daughterIndices);
@@ -3322,7 +3334,7 @@ namespace {
     Particle KS(PxPyPzEVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
     KS.setPValue(0.1);
     momentum += KS.get4Vector();
-    Particle* newDaughters = particles.appendNew(KS);
+    const Particle* newDaughters = particles.appendNew(KS);
     daughterIndices.push_back(newDaughters->getArrayIndex());
     Particle Jpsi(PxPyPzEVector(-1, 1, 1, 3.548), 443, Particle::c_Unflavored, Particle::c_Composite, 1);
     Jpsi.setPValue(0.9);
@@ -3364,7 +3376,7 @@ namespace {
     for (int i = 0; i < nDaughters; i++) {
       PxPyPzEVector mom(1, i * 0.5, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? 111 : 113);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices.push_back(newDaughters->getArrayIndex());
       daughterMomenta.push_back(mom);
       momentum = momentum + mom;
@@ -3420,7 +3432,7 @@ namespace {
     for (int i = 0; i < 3; i++) {
       PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? 111 : 113);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
       daughterMomenta_1.push_back(mom);
       momentum_1 = momentum_1 + mom;
@@ -3438,7 +3450,7 @@ namespace {
     for (int i = 0; i < 2; i++) {
       PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? 111 : 113);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
       daughterMomenta_2.push_back(mom);
       momentum_2 = momentum_2 + mom;
@@ -3494,7 +3506,7 @@ namespace {
       d.updateMass(pdgCode);
       mom = d.get4Vector();
 
-      Particle* daughters = particles.appendNew(d);
+      const Particle* daughters = particles.appendNew(d);
       daughterIndices.push_back(daughters->getArrayIndex());
       momentum = momentum + mom;
     }
@@ -3520,7 +3532,7 @@ namespace {
       d.updateMass(pdgCode);
       mom = d.get4Vector();
 
-      Particle* daughters = particles.appendNew(d);
+      const Particle* daughters = particles.appendNew(d);
       daughterIndicesAlt.push_back(daughters->getArrayIndex());
       momentumAlt = momentumAlt + mom;
     }
@@ -3563,7 +3575,7 @@ namespace {
     for (int i = 0; i < 3; i++) {
       PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
       daughterMomenta_1.push_back(mom);
       momentum_1 = momentum_1 + mom;
@@ -3581,7 +3593,7 @@ namespace {
     for (int i = 0; i < 2; i++) {
       PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
       daughterMomenta_2.push_back(mom);
       momentum_2 = momentum_2 + mom;
@@ -3633,7 +3645,7 @@ namespace {
     for (int i = 0; i < 3; i++) {
       PxPyPzEVector mom(i * 0.2, 1, 1, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_1.push_back(newDaughters->getArrayIndex());
       daughterMomenta_1.push_back(mom);
       momentum_1 = momentum_1 + mom;
@@ -3661,7 +3673,7 @@ namespace {
     for (int i = 0; i < 2; i++) {
       PxPyPzEVector mom(1, 1, i * 0.3, i * 1.0 + 2.0);
       Particle d(mom, (i % 2) ? -11 : 211);
-      Particle* newDaughters = particles.appendNew(d);
+      const Particle* newDaughters = particles.appendNew(d);
       daughterIndices_2.push_back(newDaughters->getArrayIndex());
       daughterMomenta_2.push_back(mom);
       momentum_2 = momentum_2 + mom;
@@ -3863,6 +3875,80 @@ namespace {
     EXPECT_TRUE(std::isnan(std::get<double>(var_310->function(not_child_2))));
     EXPECT_FLOAT_EQ(int(std::get<double>(Manager::Instance().getVariable("varForFirstMCAncestorOfType(310, E)")->function(D_gd_0_0))),
                     10);
+  }
+
+  TEST_F(MetaVariableTest, varForNthDaughterOfType)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<Particle> particles;
+    PxPyPzEVector momentum;
+    PxPyPzEVector momentum_0;
+    PxPyPzEVector momentum_1;
+    PxPyPzEVector momentum_0_0;
+    std::vector<int> B_daughterIndices;
+    std::vector<int> B_grandDaughterIndices_0;
+    std::vector<int> B_grandDaughterIndices_1;
+    std::vector<int> B_grandGrandDaughterIndices_0_0;
+
+    // Creation of B- -> (D*0 -> (D0 -> K- pi+ pi0) pi0) (eta -> gamma gamma) mu- [nu_mu]
+
+    const Particle* kplus = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), -321);
+    const Particle* piplus = particles.appendNew(PxPyPzEVector(0.0, 1, 1, 1), 211);
+    const Particle* pi0_D = particles.appendNew(PxPyPzEVector(0.5, 1, 1, 1), 111);
+    B_grandGrandDaughterIndices_0_0.push_back(kplus->getArrayIndex());
+    B_grandGrandDaughterIndices_0_0.push_back(piplus->getArrayIndex());
+    B_grandGrandDaughterIndices_0_0.push_back(pi0_D->getArrayIndex());
+    momentum_0_0 = kplus->get4Vector() + piplus->get4Vector() + pi0_D->get4Vector();
+    const Particle* D0 = particles.appendNew(momentum_0_0, 421, Particle::c_Unflavored, B_grandGrandDaughterIndices_0_0);
+
+    const Particle* gamma1 = particles.appendNew(PxPyPzEVector(1.5, 1, 1, 1), 22);
+    const Particle* gamma2 = particles.appendNew(PxPyPzEVector(2.5, 1, 1, 1), 22);
+    B_grandDaughterIndices_1.push_back(gamma1->getArrayIndex());
+    B_grandDaughterIndices_1.push_back(gamma2->getArrayIndex());
+    momentum_1 = gamma1->get4Vector() + gamma2->get4Vector();
+    const Particle* eta = particles.appendNew(momentum_1, 221, Particle::c_Unflavored, B_grandDaughterIndices_1);
+
+    const Particle* pi0_Dstar = particles.appendNew(PxPyPzEVector(3.5, 1, 1, 1), 111);
+    B_grandDaughterIndices_0.push_back(D0->getArrayIndex());
+    B_grandDaughterIndices_0.push_back(pi0_Dstar->getArrayIndex());
+    momentum_0 = D0->get4Vector() + pi0_Dstar->get4Vector();
+    const Particle* Dstar0 = particles.appendNew(momentum_0, 423, Particle::c_Unflavored, B_grandDaughterIndices_0);
+
+    const Particle* muminus = particles.appendNew(PxPyPzEVector(4.5, 1, 1, 1), 13);
+    B_daughterIndices.push_back(Dstar0->getArrayIndex());
+    B_daughterIndices.push_back(eta->getArrayIndex());
+    B_daughterIndices.push_back(muminus->getArrayIndex());
+    momentum = Dstar0->get4Vector() + eta->get4Vector() + muminus->get4Vector();
+    const Particle* Bminus = particles.appendNew(momentum, -521, Particle::c_Unflavored, B_daughterIndices);
+
+    // Test many combinations of n and depth
+    const Manager::Var* var_pdg_pi0_1 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 1, px, 3)");
+    const Manager::Var* var_pdg_pi0_2 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 3)");
+    const Manager::Var* var_pdg_pi0_3 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 3, px, 3)");
+    const Manager::Var* var_pdg_pi0_4 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px, 1)");
+    const Manager::Var* var_pdg_pi0_5 = Manager::Instance().getVariable("varForNthDaughterOfType(111, 2, px)");
+    const Manager::Var* var_name_pi0 = Manager::Instance().getVariable("varForNthDaughterOfType(pi0, 1, px, 3)");
+    const Manager::Var* var_pdg_gamma_1 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 3)");
+    const Manager::Var* var_pdg_gamma_2 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 2, px, 3)");
+    const Manager::Var* var_pdg_gamma_3 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 3, px, 3)");
+    const Manager::Var* var_pdg_gamma_4 = Manager::Instance().getVariable("varForNthDaughterOfType(22, 1, px, 1)");
+    const Manager::Var* var_name_mu_1 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px, 1)");
+    const Manager::Var* var_name_mu_2 = Manager::Instance().getVariable("varForNthDaughterOfType(mu-, 1, px)");
+    const Manager::Var* var_pdg_kshort_1 = Manager::Instance().getVariable("varForNthDaughterOfType(310, 1, px, 3)");
+
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_1->function(Bminus)), 3.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_pi0_2->function(Bminus)), 0.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_3->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_4->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_pi0_5->function(Bminus))));
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_pi0->function(Bminus)), 3.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_1->function(Bminus)), 1.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_pdg_gamma_2->function(Bminus)), 2.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_3->function(Bminus))));
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_gamma_4->function(Bminus))));
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_1->function(Bminus)), 4.5);
+    EXPECT_FLOAT_EQ(std::get<double>(var_name_mu_2->function(Bminus)), 4.5);
+    EXPECT_TRUE(std::isnan(std::get<double>(var_pdg_kshort_1->function(Bminus))));
   }
 
   TEST_F(MetaVariableTest, isDescendantOfList)
@@ -4370,12 +4456,12 @@ namespace {
                    Const::pion.getPDGCode());
       motherMomentum += pip.get4Vector();
       pip.setMomentumVertexErrorMatrix(error);
-      Particle* newpip = particles.appendNew(pip);
+      const Particle* newpip = particles.appendNew(pip);
       Particle pim(PxPyPzEVector(-0.5, 0.774, 0, sqrt(.25 + 0.774 * 0.774 + Const::pionMass * Const::pionMass)),
                    -Const::pion.getPDGCode());
       motherMomentum += pim.get4Vector();
       pim.setMomentumVertexErrorMatrix(error);
-      Particle* newpim = particles.appendNew(pim);
+      const Particle* newpim = particles.appendNew(pim);
 
       error(0, 0) = 0.02;
       error(1, 1) = 0.1;
@@ -4572,7 +4658,7 @@ namespace {
     // d    3.22  1.34  2.54
 
     auto* particleAll = particles.appendNew(allTrack, Const::pion);
-    auto* particleNoSVD = particles.appendNew(noSVDTrack, Const::pion);
+    const auto* particleNoSVD = particles.appendNew(noSVDTrack, Const::pion);
     auto* particledEdx = particles.appendNew(dEdxTrack, Const::pion);
     auto* particleNoID = particles.appendNew(noPIDTrack, Const::pion);
 
@@ -4588,11 +4674,11 @@ namespace {
     EXPECT_FLOAT_EQ(deuteronID(particleAll), std::exp(3.22) / numsumexp);
 
     // smart PID that takes the hypothesis into account
-    auto* particleElectron = particles.appendNew(allTrack, Const::electron);
-    auto* particleMuon = particles.appendNew(allTrack, Const::muon);
-    auto* particleKaon = particles.appendNew(allTrack, Const::kaon);
-    auto* particleProton = particles.appendNew(allTrack, Const::proton);
-    auto* particleDeuteron = particles.appendNew(allTrack, Const::deuteron);
+    const auto* particleElectron = particles.appendNew(allTrack, Const::electron);
+    const auto* particleMuon = particles.appendNew(allTrack, Const::muon);
+    const auto* particleKaon = particles.appendNew(allTrack, Const::kaon);
+    const auto* particleProton = particles.appendNew(allTrack, Const::proton);
+    const auto* particleDeuteron = particles.appendNew(allTrack, Const::deuteron);
 
     EXPECT_FLOAT_EQ(particleID(particleAll), std::exp(1.4) / numsumexp); // there's already a pion
     EXPECT_FLOAT_EQ(particleID(particleElectron), std::exp(0.71) / numsumexp);
@@ -4812,7 +4898,7 @@ namespace {
       float decayTime = 5 * mcKs.getMass() / mcKs.getEnergy();
       mcKs.setDecayTime(decayTime);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);
-      MCParticle* newMCKs = mcParticles.appendNew(mcKs);
+      const MCParticle* newMCKs = mcParticles.appendNew(mcKs);
 
 
 
@@ -4821,7 +4907,7 @@ namespace {
       mcDp.setDecayVertex(1.0, 1.0, 0.0);
       mcDp.setMassFromPDG();
       mcDp.setStatus(MCParticle::c_PrimaryParticle);
-      MCParticle* newMCDp = mcParticles.appendNew(mcDp);
+      const MCParticle* newMCDp = mcParticles.appendNew(mcDp);
 
       // Insert Reco particle logic here
       PxPyPzEVector momentum;
@@ -4836,7 +4922,7 @@ namespace {
       error(6, 6) = 0.01;
       Particle pi(PxPyPzEVector(1.59607, 1.19705, 0, 2), 211);
       momentum += pi.get4Vector();
-      Particle* newpi = particles.appendNew(pi);
+      const Particle* newpi = particles.appendNew(pi);
 
 
       Particle Ks(PxPyPzEVector(1.164, 1.55200, 0, 2), 310, Particle::c_Unflavored, Particle::c_Composite, 0);
@@ -4855,7 +4941,7 @@ namespace {
       Ks.addExtraInfo("prodVertSzx", 0.0);
       Ks.addExtraInfo("prodVertSzy", 0.0);
       Ks.addExtraInfo("prodVertSzz", 0.01);
-      Particle* newKs = particles.appendNew(Ks);
+      const Particle* newKs = particles.appendNew(Ks);
       newKs->addRelationTo(newMCKs);
 
 
@@ -4877,7 +4963,7 @@ namespace {
       Dp.addExtraInfo("prodVertSzx", 0.0);
       Dp.addExtraInfo("prodVertSzy", 0.0);
       Dp.addExtraInfo("prodVertSzz", 0.1575);
-      Particle* newDp = particles.appendNew(Dp);
+      const Particle* newDp = particles.appendNew(Dp);
       newDp->addRelationTo(newMCDp);
 
     }
@@ -5001,7 +5087,7 @@ namespace {
 
     const Manager::Var* var = Manager::Instance().getVariable("mcFlightTimeOfDaughter(1)");
     ASSERT_NE(var, nullptr);
-    auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
+    const auto* Ks = newDp->getDaughter(1)->getRelatedTo<MCParticle>();
     //    double p = Ks->getMomentum().Mag();
     //    EXPECT_FLOAT_EQ(std::get<double>(var->function(newDp)), 5.0 / Const::speedOfLight * Ks->getMass() / p);
 
@@ -5111,7 +5197,7 @@ namespace {
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);
-      MCParticle* newMCKs = mcParticles.appendNew(mcKs);
+      const MCParticle* newMCKs = mcParticles.appendNew(mcKs);
 
       Particle Ks(PxPyPzEVector(1.164, 1.55200, 0, 2), 310);
       Ks.setVertex(XYZVector(4.0, 5.0, 0.0));
@@ -5127,7 +5213,7 @@ namespace {
       Ks.addExtraInfo("prodVertSzx", 0.7);
       Ks.addExtraInfo("prodVertSzy", 0.8);
       Ks.addExtraInfo("prodVertSzz", 0.9);
-      Particle* newKs = particles.appendNew(Ks);
+      const Particle* newKs = particles.appendNew(Ks);
       newKs->addRelationTo(newMCKs);
     }
 

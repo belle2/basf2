@@ -10,7 +10,6 @@
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -39,9 +38,9 @@ PerigeeCircle::PerigeeCircle()
   invalidate();
 }
 
-PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact)
+PerigeeCircle::PerigeeCircle(double curvature, const ROOT::Math::XYVector& phi0Vec, double impact)
   : m_curvature(curvature)
-  , m_phi0(phi0Vec.phi())
+  , m_phi0(phi0Vec.Phi())
   , m_phi0Vec(phi0Vec)
   , m_impact(impact)
 {
@@ -50,7 +49,7 @@ PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double i
 PerigeeCircle::PerigeeCircle(double curvature, double phi0, double impact)
   : m_curvature(curvature)
   , m_phi0(phi0)
-  , m_phi0Vec(Vector2D::Phi(phi0))
+  , m_phi0Vec(VectorUtil::Phi(phi0))
   , m_impact(impact)
 {
 }
@@ -62,7 +61,7 @@ PerigeeCircle::PerigeeCircle(const PerigeeParameters& perigeeParameters)
 {
 }
 
-PerigeeCircle::PerigeeCircle(double curvature, double phi0, const Vector2D& phi0Vec, double impact)
+PerigeeCircle::PerigeeCircle(double curvature, double phi0, const ROOT::Math::XYVector& phi0Vec, double impact)
   : m_curvature(curvature)
   , m_phi0(phi0)
   , m_phi0Vec(phi0Vec)
@@ -93,7 +92,7 @@ PerigeeCircle PerigeeCircle::fromN(double n0, double n1, double n2, double n3)
   return circle;
 }
 
-PerigeeCircle PerigeeCircle::fromN(double n0, const Vector2D& n12, double n3)
+PerigeeCircle PerigeeCircle::fromN(double n0, const ROOT::Math::XYVector& n12, double n3)
 {
   PerigeeCircle circle;
   circle.setN(n0, n12, n3);
@@ -101,28 +100,28 @@ PerigeeCircle PerigeeCircle::fromN(double n0, const Vector2D& n12, double n3)
 }
 
 PerigeeCircle
-PerigeeCircle::fromCenterAndRadius(const Vector2D& center, double absRadius, ERotation orientation)
+PerigeeCircle::fromCenterAndRadius(const ROOT::Math::XYVector& center, double absRadius, ERotation orientation)
 {
   PerigeeCircle circle;
   circle.setCenterAndRadius(center, absRadius, orientation);
   return circle;
 }
 
-Vector2D PerigeeCircle::atArcLength(double arcLength) const
+ROOT::Math::XYVector PerigeeCircle::atArcLength(double arcLength) const
 {
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
 
   double atX = arcLength * sinc(chi);
   double atY = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
-  return Vector2D::compose(phi0Vec(), atX, atY);
+  return VectorUtil::compose(phi0Vec(), atX, atY);
 }
 
 void PerigeeCircle::reverse()
 {
   m_curvature = -m_curvature;
   m_phi0 = AngleUtil::reversed(m_phi0);
-  m_phi0Vec.reverse();
+  m_phi0Vec = -m_phi0Vec;
   m_impact = -m_impact;
 }
 
@@ -147,7 +146,7 @@ PerigeeCircle PerigeeCircle::conformalTransformed() const
   // Properly fixing the orientation to the opposite by the minus signs
   double newCurvature = -impact() * denominator;
   double newPhi0 = AngleUtil::reversed(phi0());
-  Vector2D newPhi0Vec = -phi0Vec();
+  ROOT::Math::XYVector newPhi0Vec = -phi0Vec();
   double newImpact = -curvature() / denominator;
   return PerigeeCircle(newCurvature, newPhi0, newPhi0Vec, newImpact);
 }
@@ -156,49 +155,49 @@ void PerigeeCircle::invalidate()
 {
   m_curvature = 0.0;
   m_phi0 = NAN;
-  m_phi0Vec = Vector2D(0.0, 0.0);
+  m_phi0Vec = ROOT::Math::XYVector(0.0, 0.0);
   m_impact = 0;
 }
 
 bool PerigeeCircle::isInvalid() const
 {
   return (not std::isfinite(phi0()) or not std::isfinite(curvature()) or
-          not std::isfinite(impact()) or phi0Vec().isNull());
+          not std::isfinite(impact()) or VectorUtil::isNull(phi0Vec()));
 }
 
-void PerigeeCircle::passiveMoveBy(const Vector2D& by)
+void PerigeeCircle::passiveMoveBy(const ROOT::Math::XYVector& by)
 {
   double arcLength = arcLengthTo(by);
   m_impact = distance(by);
   m_phi0 = m_phi0 + curvature() * arcLength;
   AngleUtil::normalise(m_phi0);
-  m_phi0Vec = Vector2D::Phi(m_phi0);
+  m_phi0Vec = VectorUtil::Phi(m_phi0);
 }
 
-PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
+PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const ROOT::Math::XYVector& by) const
 {
   PerigeeJacobian jacobian = PerigeeUtil::identity();
   passiveMoveByJacobian(by, jacobian);
   return jacobian;
 }
 
-void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const
+void PerigeeCircle::passiveMoveByJacobian(const ROOT::Math::XYVector& by, PerigeeJacobian& jacobian) const
 {
-  Vector2D deltaVec = by - perigee();
-  double delta = deltaVec.norm();
-  double deltaParallel = phi0Vec().dot(deltaVec);
-  // double deltaOrthogonal = phi0Vec().cross(deltaVec);
-  // double zeta = deltaVec.normSquared();
+  ROOT::Math::XYVector deltaVec = by - perigee();
+  double delta = deltaVec.R();
+  double deltaParallel = phi0Vec().Dot(deltaVec);
+  // double deltaOrthogonal = VectorUtil::Cross(phi0Vec(), deltaVec);
+  // double zeta = deltaVec.Mag2();
 
-  Vector2D UVec = gradient(by);
-  double U = UVec.norm();
-  double USquared = UVec.normSquared();
-  double UOrthogonal = phi0Vec().cross(UVec);
-  // double UParallel = phi0Vec().dot(UVec);
+  ROOT::Math::XYVector UVec = gradient(by);
+  double U = UVec.R();
+  double USquared = UVec.Mag2();
+  double UOrthogonal = VectorUtil::Cross(phi0Vec(), UVec);
+  // double UParallel = phi0Vec().Dot(UVec);
 
-  // Vector2D CB = gradient(by).orthogonal();
+  // ROOT::Math::XYVector CB = VectorUtil::Orthogonal(gradient(by));
   // double U = sqrt(1 + curvature() * A);
-  // double xi = 1.0 / CB.normSquared();
+  // double xi = 1.0 / CB.Mag2();
   // double nu = 1 - curvature() * deltaOrthogonal;
   // double mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
   // double mu = 1.0 / U / 2.0;
@@ -210,9 +209,9 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   // double lambda = halfA / ((1 + U) * (1 + U) * U);
   double dr = distance(by);
 
-  // Vector2D uVec = gradient(Vector2D(0.0, 0.0));
-  // double u = uVec.norm();
-  double u = 1 + curvature() * impact(); //= n12().cylindricalR()
+  // ROOT::Math::XYVector uVec = gradient(ROOT::Math::XYVector(0.0, 0.0));
+  // double u = uVec.R();
+  double u = 1 + curvature() * impact(); //= n12().R()
 
   using namespace NPerigeeParameterIndices;
   jacobian(c_Curv, c_Curv) = 1;
@@ -228,23 +227,23 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   jacobian(c_I, c_I) = -UOrthogonal / U;
 }
 
-double PerigeeCircle::arcLengthTo(const Vector2D& point) const
+double PerigeeCircle::arcLengthTo(const ROOT::Math::XYVector& point) const
 {
-  Vector2D closestToPoint = closest(point);
-  double secantLength = perigee().distance(closestToPoint);
-  double deltaParallel = phi0Vec().dot(point);
+  ROOT::Math::XYVector closestToPoint = closest(point);
+  double secantLength = VectorUtil::Distance(perigee(), closestToPoint);
+  double deltaParallel = phi0Vec().Dot(point);
   return copysign(arcLengthAtSecantLength(secantLength), deltaParallel);
 }
 
-double PerigeeCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
+double PerigeeCircle::arcLengthBetween(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
 {
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
   if (not NForwardBackward::isValid(lengthSign)) return NAN;
   // Handling the rare case that from and to correspond to opposing points on the circle
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
-  Vector2D closestAtFrom = closest(from);
-  Vector2D closestAtTo = closest(to);
-  double secantLength = closestAtFrom.distance(closestAtTo);
+  ROOT::Math::XYVector closestAtFrom = closest(from);
+  ROOT::Math::XYVector closestAtTo = closest(to);
+  double secantLength = VectorUtil::Distance(closestAtFrom, closestAtTo);
   return static_cast<double>(lengthSign) * arcLengthAtSecantLength(secantLength);
 }
 
@@ -272,27 +271,27 @@ double PerigeeCircle::arcLengthAtSecantLength(double secantLength) const
   return secantLength * arcLengthFactor;
 }
 
-std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double cylindricalR) const
+std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> PerigeeCircle::atCylindricalR(const double cylindricalR) const
 {
   const double u = (1 + curvature() * impact());
   const double orthogonal = ((square(impact()) + square(cylindricalR)) * curvature() / 2.0 + impact()) / u;
   const double parallel = sqrt(square(cylindricalR) - square(orthogonal));
-  Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
-  Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(), parallel, orthogonal);
-  std::pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
+  ROOT::Math::XYVector atCylindricalR1 = VectorUtil::compose(phi0Vec(), -parallel, orthogonal);
+  ROOT::Math::XYVector atCylindricalR2 = VectorUtil::compose(phi0Vec(), parallel, orthogonal);
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> result(atCylindricalR1, atCylindricalR2);
   return result;
 }
 
-Vector2D PerigeeCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
-                                                const double cylindricalR) const
+ROOT::Math::XYVector PerigeeCircle::atCylindricalRForwardOf(const ROOT::Math::XYVector& startPoint,
+                                                            const double cylindricalR) const
 {
-  std::pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> candidatePoints = atCylindricalR(cylindricalR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 }
 
-Vector2D PerigeeCircle::chooseNextForwardOf(const Vector2D& start,
-                                            const Vector2D& end1,
-                                            const Vector2D& end2) const
+ROOT::Math::XYVector PerigeeCircle::chooseNextForwardOf(const ROOT::Math::XYVector& start,
+                                                        const ROOT::Math::XYVector& end1,
+                                                        const ROOT::Math::XYVector& end2) const
 {
   double arcLength1 = arcLengthBetween(start, end1);
   double arcLength2 = arcLengthBetween(start, end2);
@@ -303,11 +302,11 @@ Vector2D PerigeeCircle::chooseNextForwardOf(const Vector2D& start,
   } else if (fmin(arcLength1, arcLength2) == arcLength2) {
     return end2;
   } else {
-    return Vector2D(NAN, NAN);
+    return ROOT::Math::XYVector(NAN, NAN);
   }
 }
 
-Vector2D PerigeeCircle::closest(const Vector2D& point) const
+ROOT::Math::XYVector PerigeeCircle::closest(const ROOT::Math::XYVector& point) const
 {
   return point - normal(point) * distance(point);
 }
@@ -319,31 +318,35 @@ double PerigeeCircle::distance(double fastDistance) const
   return A / (1.0 + U);
 }
 
-double PerigeeCircle::fastDistance(const Vector2D& point) const
+double PerigeeCircle::fastDistance(const ROOT::Math::XYVector& point) const
 {
-  Vector2D delta = point - perigee();
-  double deltaOrthogonal = phi0Vec().cross(delta);
-  return -deltaOrthogonal + curvature() * delta.normSquared() / 2;
+  ROOT::Math::XYVector delta = point - perigee();
+  double deltaOrthogonal = VectorUtil::Cross(phi0Vec(), delta);
+  return -deltaOrthogonal + curvature() * delta.Mag2() / 2;
 }
 
-void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
+void PerigeeCircle::setCenterAndRadius(const ROOT::Math::XYVector& center,
                                        double absRadius,
                                        ERotation orientation)
 {
   m_curvature = static_cast<double>(orientation) / std::fabs(absRadius);
-  m_phi0Vec = center.orthogonal(NRotation::reversed(orientation));
-  m_phi0Vec.normalize();
-  m_phi0 = m_phi0Vec.phi();
-  m_impact = (center.norm() - std::fabs(absRadius)) * static_cast<double>(orientation);
+  m_phi0Vec = VectorUtil::Orthogonal(center, NRotation::reversed(orientation));
+  if (m_phi0Vec.R() != 0.0) {
+    m_phi0Vec *= (1. / m_phi0Vec.R());
+  }
+  m_phi0 = m_phi0Vec.Phi();
+  m_impact = (center.R() - std::fabs(absRadius)) * static_cast<double>(orientation);
 }
 
-void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
+void PerigeeCircle::setN(double n0, const ROOT::Math::XYVector& n12, double n3)
 {
-  double normalization = sqrt(n12.normSquared() - 4 * n0 * n3);
+  double normalization = sqrt(n12.Mag2() - 4 * n0 * n3);
   m_curvature = 2 * n3 / normalization;
-  m_phi0Vec = n12.orthogonal();
-  m_phi0Vec.normalize();
-  m_phi0 = m_phi0Vec.phi();
+  m_phi0Vec = VectorUtil::Orthogonal(n12);
+  if (m_phi0Vec.R() != 0.0) {
+    m_phi0Vec *= (1. / m_phi0Vec.R());
+  }
+  m_phi0 = m_phi0Vec.Phi();
   m_impact = distance(n0 / normalization); // Uses the new curvature
 }
 

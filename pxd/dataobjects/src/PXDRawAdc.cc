@@ -24,8 +24,8 @@ using namespace Belle2;
 PXDRawAdc::PXDRawAdc(VxdID sensorID, void* data, int len):
   m_adcs(), m_sensorID(sensorID)
 {
-  unsigned char* d = (unsigned char*)data;
-  m_dhp_header = ((boost::endian::big_uint16_t*)data)[2];
+  unsigned char* d = reinterpret_cast<unsigned char*>(data);
+  m_dhp_header = (reinterpret_cast<boost::endian::big_uint16_t*>(data))[2];
   d += 8; // Skip DHH and DHP header, data is 64kb large (+ 8 bytes)
   len -= 8;
   if (len < 0) {

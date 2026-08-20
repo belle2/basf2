@@ -10,9 +10,10 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -24,8 +25,8 @@ void StereoHitTrackAdder::add(CDCTrack& track, const CDCRLWireHit& hit, Weight w
   const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
-  Vector3D recoPos3D = hit.reconstruct3D(trajectory2D);
-  double arcLength2D = trajectory2D.calcArcLength2D(recoPos3D.xy());
+  ROOT::Math::XYZVector recoPos3D = hit.reconstruct3D(trajectory2D);
+  double arcLength2D = trajectory2D.calcArcLength2D(VectorUtil::getXYVector(recoPos3D));
   if (isCurler and arcLength2D < 0) {
     arcLength2D += 2 * TMath::Pi() * radius;
   }

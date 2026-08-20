@@ -124,7 +124,7 @@ namespace Belle2 {
     private:
 
       /** Merge two cluster and update the list of cached clusters */
-      ClusterCandidate* mergeCluster(ClusterCandidate* cls1, ClusterCandidate* cls2);
+      static ClusterCandidate* mergeCluster(ClusterCandidate* cls1, ClusterCandidate* cls2);
 
       /** Switch the internal rows.
        * We always keep current and last row. This method switches these rows

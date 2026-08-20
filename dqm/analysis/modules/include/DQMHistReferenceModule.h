@@ -32,11 +32,6 @@ namespace Belle2 {
     DQMHistReferenceModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistReferenceModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;

@@ -64,7 +64,7 @@ void CDCCrudeT0CollectorModule::finish()
   describeProcess("CDCCrudeT0Collector::finish()");
 }
 
-void CDCCrudeT0CollectorModule::describeProcess(string functionName)
+void CDCCrudeT0CollectorModule::describeProcess(const string& functionName)
 {
   B2DEBUG(100, "Running " + functionName + " function from a Process of type " + ProcHandler::getProcessName()
           + "\nParallel Processing Used = " + to_string(ProcHandler::parallelProcessingUsed())

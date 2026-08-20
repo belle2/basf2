@@ -12,12 +12,11 @@
 
 using namespace Belle2;
 
-HistDelta::HistDelta(EDeltaType t, int p, unsigned int a)
+HistDelta::HistDelta(EDeltaType t, int p, unsigned int a) : m_lastHist{nullptr}
 {
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
-  m_lastHist = nullptr; // implied
   m_lastValue = 0; // implied
 }
 

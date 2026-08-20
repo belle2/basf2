@@ -39,7 +39,7 @@ namespace Belle2 {
     /** constructor */
     SVDClusterEvaluationModule();
     /** destructor */
-    virtual ~SVDClusterEvaluationModule() {};
+    virtual ~SVDClusterEvaluationModule() override {};
 
     virtual void initialize() override; /**< check StoreArrays & create rootfile */
     virtual void beginRun() override; /**< create histograms */
@@ -197,9 +197,9 @@ namespace Belle2 {
     void create_SVDHistograms_clsCoor(); /**< create cluster coordinates plots */
     void create_SVDHistograms_clsResid(); /**< create slucter resid plots */
 
-    double getOneSigma(TH1F* h); /**<returns one sigma using quantiles */
+    static double getOneSigma(TH1F* h); /**<returns one sigma using quantiles */
 
-    bool isRelatedToTrack(SVDIntercept* inter); /**< is the intercept related to a track */
+    bool isRelatedToTrack(const SVDIntercept* inter); /**< is the intercept related to a track */
 
   };
 }

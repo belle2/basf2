@@ -66,11 +66,6 @@ void EclPainterCommon::initHisto()
                     getMinX(), getMaxX());
 }
 
-void EclPainterCommon::getInformation(int px, int py, MultilineWidget* panel)
-{
-  EclPainter::getInformation(px, py, panel);
-}
-
 void EclPainterCommon::Draw()
 {
   EclData* data = getData();

@@ -21,7 +21,7 @@ namespace TreeFitter {
     RecoParticle(Belle2::Particle* bc, const ParticleBase* mother);
 
     /** destructor */
-    virtual ~RecoParticle() {};
+    virtual ~RecoParticle() override = default;
 
     /** init particle without mother */
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
@@ -40,9 +40,6 @@ namespace TreeFitter {
 
     /** get momentum index */
     virtual int momIndex() const override { return index(); }
-
-    /** has an energy in the statevector? */
-    virtual bool hasEnergy() const override { return false; }
 
     /** abstract projection */
     virtual ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const = 0;

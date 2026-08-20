@@ -27,13 +27,6 @@ namespace Belle2::SVD {
     * compute the cluster charge, charge error and SNR with SumSample
      */
     void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDSumSamplesCharge() {};
-
-
   };
 
 }

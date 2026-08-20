@@ -63,7 +63,7 @@ namespace Belle2 {
     TH1D* m_DelayMs = nullptr;        /**< Delay between trigger and end of processing in ms*/
     TH1D* m_DelayLog = nullptr;        /**< Delay between trigger and end of processing log scale */
 
-    void BinLogX(TH1* h); /**< helper function to replace X axis by a log scaled axis */
+    static void BinLogX(TH1* h); /**< helper function to replace X axis by a log scaled axis */
   };
 
 }

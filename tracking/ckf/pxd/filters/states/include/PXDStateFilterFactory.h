@@ -24,7 +24,7 @@ namespace Belle2 {
     explicit PXDStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
-    ~PXDStateFilterFactory();
+    ~PXDStateFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

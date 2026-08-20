@@ -63,7 +63,7 @@ TempDirCreator::~TempDirCreator()
   remove_all(m_tmpdir);
 }
 
-std::string TempDirCreator::getTempDir() const
+const std::string& TempDirCreator::getTempDir() const
 {
   return m_tmpdir;
 }

@@ -24,7 +24,7 @@ namespace Belle2 {
     explicit PXDPairFilterFactory(const std::string& defaultFilterName = "sensor");
 
     /// Default destructor
-    ~PXDPairFilterFactory();
+    ~PXDPairFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

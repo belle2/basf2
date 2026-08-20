@@ -28,7 +28,7 @@ namespace Belle2 {
       explicit ClusterFilterFactory(const std::string& defaultFilterName = "mva_bkg");
 
       /// Default destructor
-      ~ClusterFilterFactory();
+      ~ClusterFilterFactory() override;
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

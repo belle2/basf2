@@ -33,20 +33,21 @@ namespace Belle2 {
 
     // Public functions
   public:
+    enum {kOffline, kOnline, kGroupIDs};  /**< enum for the different histograms */
 
     /**
      * Constructor.
      */
-    DQMHistAnalysisSVDModule(bool panelTop = false, bool online = false);
+    explicit DQMHistAnalysisSVDModule(bool panelTop = false, bool online = false, bool groupIDs = false);
 
     /**
      * Destructor.
      */
-    ~ DQMHistAnalysisSVDModule();
+    ~ DQMHistAnalysisSVDModule() override;
 
-    void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg = true, bool online = false); /**< set status of Canvas */
-    TString getHistoNameFromCanvas(TString cName, TString view = "",
-                                   TString cPrefix = "c_", TString hPrefix = ""); /**< get histogram name from Canvas name*/
+    void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg = true, int histoType = kOffline); /**< set status of Canvas */
+    static  TString getHistoNameFromCanvas(TString cName, TString view = "",
+                                           TString cPrefix = "c_", TString hPrefix = ""); /**< get histogram name from Canvas name*/
 
   protected:
     TPaveText* m_legProblem = nullptr;  /**< plot legend, problem */
@@ -59,7 +60,12 @@ namespace Belle2 {
     TPaveText* m_legOnlineWarning = nullptr; /**< onlineOccupancy plot legend, warning */
     TPaveText* m_legOnlineNormal = nullptr;  /**< onlineOccupancy plot legend, normal */
 
-    std::pair<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+    TPaveText* m_legGroupIDsProblem = nullptr; /**< Group IDs Occupancy plot legend, problem */
+    TPaveText* m_legGroupIDsWarning = nullptr; /**< Group IDs Occupancy plot legend, warning */
+    TPaveText* m_legGroupIDsNormal = nullptr;  /**< Group IDs Occupancy plot legend, normal */
+
+    static std::pair<std::vector<TText*>, std::vector<TText*>>
+                                                            textModuleNumbers(); /**< create vectors of TText to write on the canvas */
     void drawText(); /**< draw text on the RPhi view */
 
     std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
@@ -87,7 +93,7 @@ namespace Belle2 {
     };
 
     void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status, bool isU,
-                        bool online = false); /**< update canvases */
+                        int histoType = kOffline); /**< update canvases */
     void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool isU); /**< update error canvases */
 
   };

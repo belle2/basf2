@@ -35,7 +35,7 @@ namespace Belle2 {
       static void update(ModuleParamList* moduleParamList,
                          const std::map<std::string, boost::variant<T...> >& valuesByName)
       {
-        for (auto& nameAndValue : valuesByName) {
+        for (const auto& nameAndValue : valuesByName) {
           const std::string& name = nameAndValue.first;
           const boost::variant<T...>& value = nameAndValue.second;
           AssignParameterVisitor visitor(moduleParamList, name);
@@ -52,10 +52,10 @@ namespace Belle2 {
 
     private:
       /// Parameter list which contains the parameter to be set
-      ModuleParamList* m_moduleParamList;
+      ModuleParamList* m_moduleParamList  = nullptr;
 
       /// Name of the parameter to be set.
-      std::string m_paramName;
+      std::string m_paramName = "";
     };
 
   }

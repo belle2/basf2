@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisSVDClustersOnTrackModule();
+    ~DQMHistAnalysisSVDClustersOnTrackModule() override;
 
     /**
      * Initializer.
@@ -72,6 +72,7 @@ namespace Belle2 {
 
     double m_statThreshold; /**< minimal number of events to compare histograms */
     double m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
+    double m_refMode; /**< reference mode of the signal time peak  */
 
     int getCanvasStatus(double mode); /**< get canvas status */
 

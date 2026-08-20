@@ -32,7 +32,13 @@ namespace Belle2 {
     BFieldComponentBeamline();
 
     /** The BFieldComponentBeamline destructor. */
-    virtual ~BFieldComponentBeamline();
+    virtual ~BFieldComponentBeamline() override;
+
+    /** Singleton: copying is not allowed. */
+    BFieldComponentBeamline(const BFieldComponentBeamline&) = delete;
+
+    /** Singleton: assignment is not allowed. */
+    BFieldComponentBeamline& operator=(const BFieldComponentBeamline&) = delete;
 
     /**
      * Initializes the magnetic field component.
@@ -47,13 +53,6 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
     virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
-
-    /**
-     * Terminates the magnetic field component.
-     * This method closes the magnetic field map file.
-     */
-    virtual void terminate() override;
-
     /**
      * Check presence of beamline field at the specific space point in
      * the detector coordinate frame

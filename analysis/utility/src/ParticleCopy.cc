@@ -41,7 +41,7 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
   for (unsigned iOld = 0; iOld < nDaughters; iOld++) {
     const Particle* originalDaughter = original->getDaughter(iOld);
 
-    Particle* daughterCopy = copyParticle(originalDaughter);
+    const Particle* daughterCopy = copyParticle(originalDaughter);
 
     // remove original daughter
     copy->removeDaughter(originalDaughter, updateType);
@@ -67,7 +67,7 @@ void ParticleCopy::copyDaughters(Particle* mother)
   for (unsigned iOld_neverUsed = 0; iOld_neverUsed < nDaughters; iOld_neverUsed++) {
     // always accessing the first daughter of mother that is being updated
     const Particle* originalDaughter = mother->getDaughter(0);
-    Particle* daughterCopy = copyParticle(originalDaughter);
+    const Particle* daughterCopy = copyParticle(originalDaughter);
 
     // remove original daughter from the beginning of the daughters' vector
     mother->removeDaughter(originalDaughter, updateType);

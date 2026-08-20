@@ -23,6 +23,7 @@ import process_wiregain as pw
 import process_cosgain as pc
 import process_onedcell as oned
 import process_rungain as rg
+import re
 
 from prompt import ValidationSettings
 
@@ -31,7 +32,34 @@ settings = ValidationSettings(name="CDC dedx",
                               download_files=[],
                               expert_config={
                                 "GT": "data_prompt_rel09",
+                                "payload_boundaries": []
                                   })
+
+
+def get_latest_calibration_dir(base_dir, cal_name):
+
+    latest_idx = -1
+    latest_dir = None
+
+    for idir in os.listdir(base_dir):
+
+        match = re.fullmatch(rf"{re.escape(cal_name)}(\d+)", idir)
+
+        if not match:
+            continue
+
+        idx = int(match.group(1))
+
+        if idx > latest_idx:
+            latest_idx = idx
+            latest_dir = idir
+
+    if latest_dir is None:
+        basf2.B2FATAL(f"No calibration directory found for {cal_name}")
+
+    basf2.B2INFO(f"Using latest calibration directory: {latest_dir}")
+
+    return os.path.join(base_dir, latest_dir)
 
 
 def save_to_pdf(pdf, fig):
@@ -374,39 +402,38 @@ def mom_validation(path, suffix):
 
 def oneDcell_validation(path, suffix):
 
-    val_path_il = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_IL_{suffix}.txt")
-    val_path_ol = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_OL_{suffix}.txt")
+    val_path_sl0 = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_SL0_{suffix}.txt")
+    val_path_sl1 = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_SL1_{suffix}.txt")
+    val_path_sl2_8 = os.path.join(path, "plots", "oneD", f"dedx_vs_1D_SL2-8_{suffix}.txt")
 
-    df_il = read_txt(val_path_il, ["enta", "mean"])
-    df_ol = read_txt(val_path_ol, ["enta", "mean"])
+    df_sl0 = read_txt(val_path_sl0, ["enta", "mean"])
+    df_sl1 = read_txt(val_path_sl1, ["enta", "mean"])
+    df_sl2_8 = read_txt(val_path_sl2_8, ["enta", "mean"])
 
-    if df_il is None or df_ol is None:
+    if df_sl0 is None or df_sl1 is None or df_sl2_8 is None:
         return
 
     pdf_path = make_pdf_path("dedx_vs_enta", suffix)
 
     with PdfPages(pdf_path) as pdf:
-        fig, ax = plt.subplots(2, 2, figsize=(20, 12))
+        fig, ax = plt.subplots(3, 2, figsize=(16, 18))
 
-        pc.hist(x_min=-1.5, x_max=1.5, y_min=0.9, y_max=1.07, xlabel=r"entaRS", ylabel="dE/dx mean", space=0.3, ax=ax[0, 0])
-        ax[0, 0].plot(df_il['enta'], df_il['mean'], '-', markersize=10, rasterized=True, label='IL')
-        ax[0, 0].legend(fontsize=17)
-        ax[0, 0].set_title('dE/dx Mean vs entaRS (IL)', fontsize=14)
+        datasets = [
+            (df_sl0, "SL0", 0.9, 1.07),
+            (df_sl1, "SL1", 0.9, 1.07),
+            (df_sl2_8, "SL2-8", 0.9, 1.07),
+        ]
 
-        pc.hist(x_min=-1.5, x_max=1.5, y_min=0.9, y_max=1.05, xlabel=r"entaRS", ylabel="dE/dx mean", space=0.3, ax=ax[0, 1])
-        ax[0, 1].plot(df_ol['enta'], df_ol['mean'], '-', markersize=10, rasterized=True, label='OL')
-        ax[0, 1].legend(fontsize=17)
-        ax[0, 1].set_title('dE/dx Mean vs entaRS (OL)', fontsize=14)
+        for i, (df, label, y_min, y_max) in enumerate(datasets):
+            pc.hist(x_min=-1.5, x_max=1.5, y_min=y_min, y_max=y_max,  xlabel=r"entaRS", ylabel="dE/dx mean", space=0.3, ax=ax[i, 0])
+            ax[i, 0].plot(df["enta"], df["mean"], "-", markersize=10, rasterized=True, label=label)
+            ax[i, 0].legend(fontsize=17)
+            ax[i, 0].set_title(f"dE/dx Mean vs entaRS ({label})", fontsize=14)
 
-        pc.hist(x_min=-0.2, x_max=0.2, y_min=0.9, y_max=1.07, xlabel=r"entaRS", ylabel="dE/dx mean", space=0.02, ax=ax[1, 0])
-        ax[1, 0].plot(df_il['enta'], df_il['mean'], '-', markersize=10, rasterized=True, label='IL')
-        ax[1, 0].legend(fontsize=17)
-        ax[1, 0].set_title('dE/dx Mean vs entaRS (IL) zoom', fontsize=14)
-
-        pc.hist(x_min=-0.2, x_max=0.2, y_min=0.9, y_max=1.05, xlabel=r"entaRS", ylabel="dE/dx mean", space=0.02, ax=ax[1, 1])
-        ax[1, 1].plot(df_ol['enta'], df_ol['mean'], '-', markersize=10, rasterized=True, label='OL')
-        ax[1, 1].legend(fontsize=17)
-        ax[1, 1].set_title('dE/dx Mean vs entaRS (OL) zoom', fontsize=14)
+            pc.hist(x_min=-0.2, x_max=0.2, y_min=y_min, y_max=y_max, xlabel=r"entaRS", ylabel="dE/dx mean", space=0.03, ax=ax[i, 1])
+            ax[i, 1].plot(df["enta"], df["mean"], "-", markersize=10, rasterized=True, label=label)
+            ax[i, 1].legend(fontsize=17)
+            ax[i, 1].set_title(f"dE/dx Mean vs entaRS ({label}) zoom", fontsize=14)
 
         fig.suptitle(f"dE/dx vs entaRS {suffix}", fontsize=20)
         save_to_pdf(pdf, fig)
@@ -417,7 +444,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
     Makes validation plots
     :job_path: path to cdcdedx calibration output
     :input_data_path: path to the input files
-    :requested_iov: required argument but not used
+    :requested_iov: required argument
     :expert_config: required argument
     '''
     os.makedirs('plots/validation', exist_ok=True)
@@ -428,21 +455,22 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
 
     basf2.B2INFO("Starting validation...")
 
-    basf2.B2INFO("Processing run gain payloads...")
-    gtpath = os.path.join(job_path, 'rungain2', 'outputdb')
-    rg.getRunGain(gtpath, GT)
+    payloads = [
+        ("rungain",  "run gain",  rg.getRunGain),
+        ("coscorr",  "coscorr",   pc.process_cosgain),
+        ("wiregain", "wire gain", pw.process_wiregain),
+        ("onedcell", "1D gain",   oned.process_onedgain),
+    ]
 
-    basf2.B2INFO("Processing coscorr payloads...")
-    ccpath = os.path.join(job_path, 'coscorr1', 'outputdb')
-    pc.process_cosgain(ccpath, GT)
+    for dirname, label, function in payloads:
 
-    basf2.B2INFO("Processing wire gain payloads...")
-    wgpath = os.path.join(job_path, 'wiregain0', 'outputdb')
-    exp_run_dict = pw.process_wiregain(wgpath, GT)
+        basf2.B2INFO(f"Processing {label} payloads...")
 
-    basf2.B2INFO("Processing 1D gain payloads...")
-    onedpath = os.path.join(job_path, 'onedcell0', 'outputdb')
-    oned.process_onedgain(onedpath, GT)
+        caldir = get_latest_calibration_dir(job_path, dirname)
+
+        dbpath = os.path.join(caldir, "outputdb")
+
+        function(dbpath, GT)
 
     basf2.B2INFO("Generating validation plots...")
     val_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output')
@@ -456,17 +484,26 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config, **kw
         ("1D validation plots", oneDcell_validation),
     ]
 
-    for exp, run_list in exp_run_dict.items():
-        for run in run_list:
-            suffix = f"e{exp}_r{run}"
-            for msg, func in validators:
-                basf2.B2INFO(f"Processing {msg} for {suffix}...")
-                func(val_path, suffix)
+    if isinstance(requested_iov, str):
+        requested_iov = json.loads(requested_iov)
 
-            source_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output', 'plots')
-            shutil.copy(source_path+f"/costh/dedxpeaks_vs_cos_{suffix}.pdf", 'plots/validation/')
+    from caf.utils import ExpRun, IoV
+    requested_iov = IoV(*requested_iov)
 
-            shutil.copy(source_path+f"/mom/dedxpeaks_vs_mom_{suffix}.pdf", 'plots/validation/')
+    payload_boundaries = [ExpRun(requested_iov.exp_low, requested_iov.run_low)]
+    payload_boundaries.extend([ExpRun(*boundary) for boundary in expert_config["payload_boundaries"]])
+    basf2.B2INFO(f"Expert set payload boundaries are: {expert_config['payload_boundaries']}")
+
+    for exp_run in payload_boundaries:
+        suffix = f"e{exp_run.exp}_r{exp_run.run}"
+        for msg, func in validators:
+            basf2.B2INFO(f"Processing {msg} for {suffix}...")
+            func(val_path, suffix)
+
+        source_path = os.path.join(job_path, 'validation0', '0', 'algorithm_output', 'plots')
+        shutil.copy(source_path+f"/costh/dedxpeaks_vs_cos_{suffix}.pdf", 'plots/validation/')
+
+        shutil.copy(source_path+f"/mom/dedxpeaks_vs_mom_{suffix}.pdf", 'plots/validation/')
 
 
 if __name__ == "__main__":

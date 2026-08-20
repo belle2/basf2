@@ -159,7 +159,7 @@ namespace Belle2 {
        *
        *  @param[out] outputStream       The output stream to which the result is written.
        */
-      void writeSVGHeader(std::ostream& outputStream);
+      static void writeSVGHeader(std::ostream& outputStream);
 
       /// Writes a preamble of definitions that define an arrow cap which can be referenced by lines
       void writeSVGDefs(std::ostream& outputStream);

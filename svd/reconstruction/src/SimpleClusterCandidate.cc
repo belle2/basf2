@@ -71,7 +71,7 @@ namespace Belle2 {
       , m_isUside(isUside)
     {m_strips.clear();};
 
-    bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip)
+    bool SimpleClusterCandidate::add(VxdID vxdID, bool isUside, const struct stripInCluster& aStrip)
     {
 
       bool added = false;
@@ -122,7 +122,7 @@ namespace Belle2 {
 
       double weightSum = 0;
       double noise = 0;
-      for (auto aStrip : m_strips) {
+      for (const auto& aStrip : m_strips) {
         double stripPos = m_isUside ? info.getUCellPosition(aStrip.cellID) : info.getVCellPosition(aStrip.cellID);
         m_position += stripPos * aStrip.charge;
         m_charge += aStrip.charge;
@@ -290,14 +290,14 @@ namespace Belle2 {
       return rawtime;
 
     }
-    float SimpleClusterCandidate::get3SampleCoGTimeError() const
+    float SimpleClusterCandidate::get3SampleCoGTimeError()
     {
 
       //no obvious way to compute the error yet
       return 6;
     }
 
-    float SimpleClusterCandidate::get3SampleELSTimeError() const
+    float SimpleClusterCandidate::get3SampleELSTimeError()
     {
 
       //no obvious way to compute the error yet
@@ -322,7 +322,7 @@ namespace Belle2 {
       //FIXME: the name of the StoreArray of RecoDigits and ShaperDigits
       // must be taken from the SimpleClusterizer.
       const StoreArray<SVDRecoDigit> m_storeRecoDigits(m_storeRecoDigitsName.c_str());
-      for (auto istrip : m_strips) {
+      for (const auto& istrip : m_strips) {
         const SVDShaperDigit* shaperdigit = m_storeRecoDigits[istrip.recoDigitIndex]->getRelatedTo<SVDShaperDigit>
                                             (m_storeShaperDigitsName.c_str());
         if (!shaperdigit) B2ERROR("No shaperdigit for strip!?");

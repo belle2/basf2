@@ -45,12 +45,12 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      UnionRecording(std::unique_ptr<AFilterFactory> filterFactory,
-                     const std::string& defaultRootFileName = "records.root",
-                     const std::string& defaultTreeName = "records");
+      explicit UnionRecording(std::unique_ptr<AFilterFactory> filterFactory,
+                              const std::string& defaultRootFileName = "records.root",
+                              const std::string& defaultTreeName = "records");
 
       /// Default destructor
-      ~UnionRecording();
+      ~UnionRecording() override;
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -91,11 +91,11 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
-                           const std::string& defaultTreeName = "records");
+      explicit UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
+                                    const std::string& defaultTreeName = "records");
 
       /// Default destructor
-      ~UnionRecordingFilter();
+      ~UnionRecordingFilter() override;
     };
   }
 }

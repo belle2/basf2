@@ -45,11 +45,6 @@ namespace Belle2 {
     DQMHistOutputToEPICSModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistOutputToEPICSModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

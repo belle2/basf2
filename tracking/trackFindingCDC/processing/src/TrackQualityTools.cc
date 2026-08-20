@@ -38,7 +38,7 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
   const double radius = trajectory2D.getLocalCircle()->absRadius();
-  const Vector2D& apogee = trajectory2D.getGlobalCircle().apogee();
+  const ROOT::Math::XYVector& apogee = trajectory2D.getGlobalCircle().apogee();
   double arcLength2DOfApogee = trajectory2D.calcArcLength2D(apogee);
   if (arcLength2DOfApogee < 0) {
     arcLength2DOfApogee += 2 * TMath::Pi() * radius;
@@ -68,7 +68,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
 
   // We reset the trajectory here to start (later) at the newStartPosition of the first hit
-  const Vector3D startPosition(0, 0, 0);
+  const ROOT::Math::XYZVector startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
   trajectory3D.setFlightTime(0);
 
@@ -92,7 +92,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   double arcLength2DPeriod = trajectory2D.getArcLength2DPeriod();
   for (CDCRecoHit3D& recoHit : track) {
-    Vector2D recoPos2D = recoHit.getRLWireHit().reconstruct3D(trajectory2D).xy();
+    ROOT::Math::XYVector recoPos2D = VectorUtil::getXYVector(recoHit.getRLWireHit().reconstruct3D(trajectory2D));
     double arcLength2D = trajectory2D.calcArcLength2D(recoPos2D);
 
     if (arcLength2D < 0) {
@@ -107,7 +107,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   track.sortByArcLength2D();
 
   // Set the position to the first hit and let the hits start at arc length of 0
-  Vector3D frontPosition = track.front().getRLWireHit().reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector frontPosition = track.front().getRLWireHit().reconstruct3D(trajectory2D);
   double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
   for (CDCRecoHit3D& recoHit : track) {
@@ -115,7 +115,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   }
 
   // Set the back trajectory to start at the last hit position (and shift if necessary)
-  Vector3D backPosition = track.back().getRLWireHit().reconstruct3D(trajectory2D);
+  ROOT::Math::XYZVector backPosition = track.back().getRLWireHit().reconstruct3D(trajectory2D);
   double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
   if (backArcLength2D < 0) {
     trajectory3D.shiftPeriod(1);
@@ -134,7 +134,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCyli
     return;
   }
 
-  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
+  const ROOT::Math::XYVector& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
 
   double arcLength2DOfExitWithFactor = trajectory2D.calcArcLength2D(outerExitWithFactor);
   if (arcLength2DOfExitWithFactor < 0) {
@@ -163,7 +163,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCyli
 void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
 {
   ILayer lastLayer = -1;
-  Vector2D lastWirePosition;
+  ROOT::Math::XYVector lastWirePosition;
 
   std::vector<std::vector<const CDCRecoHit3D*>> trackletList;
   trackletList.reserve(3);
@@ -177,10 +177,10 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
     }
 
     const ILayer currentLayer = recoHit.getWire().getICLayer();
-    const Vector2D& currentPosition = recoHit.getRecoPos2D();
+    const ROOT::Math::XYVector& currentPosition = recoHit.getRecoPos2D();
     if (lastLayer != -1) {
       const ILayer delta = currentLayer - lastLayer;
-      const double distance = (currentPosition - lastWirePosition).norm();
+      const double distance = (currentPosition - lastWirePosition).R();
       if (abs(delta) > 4 or distance > 50) {
         trackletList.emplace_back();
         currentTracklet = &(trackletList.back());
@@ -292,7 +292,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
       continue;
     }
 
-    const double currentAngle = recoHit.getRecoPos2D().phi();
+    const double currentAngle = recoHit.getRecoPos2D().Phi();
     if (not std::isnan(lastAngle)) {
       const double delta = currentAngle - lastAngle;
       const double normalizedDelta =

@@ -74,7 +74,7 @@ namespace Belle2 {
       inline BaseHardConstraint();
 
       /// Virtual destructor
-      virtual ~BaseHardConstraint();
+      virtual ~BaseHardConstraint() override;
 
       /// Adds first order derivatives to global covariance matrix M
       virtual void add1stDerivativesToMatrix(double* M,       ///< Global covariance matrix, dimension at least idim x idim

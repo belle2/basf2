@@ -65,7 +65,7 @@ AddDescriptionToRootFile(TString filename, TString description, bool delete_tree
 
   // add the time stamp to all entries
   time_t rawtime;
-  struct tm * timeinfo;
+  const struct tm * timeinfo;
   char buffer [80];
 
   time (&rawtime);

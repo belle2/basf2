@@ -210,7 +210,13 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~GeoEKLMCreator();
+      ~GeoEKLMCreator() override;
+
+      /** Copying is not allowed: the class manages raw pointers. */
+      GeoEKLMCreator(const GeoEKLMCreator&) = delete;
+
+      /** Copying is not allowed: the class manages raw pointers. */
+      GeoEKLMCreator& operator=(const GeoEKLMCreator&) = delete;
 
       /**
        * Creation of the detector geometry from Gearbox (XML).
@@ -360,7 +366,7 @@ namespace Belle2 {
        * @param[in] x2             Second point x coordinate.
        * @param[in] y2             Second point y coordinate.
        */
-      G4SubtractionSolid* cutSolidCorner(
+      static G4SubtractionSolid* cutSolidCorner(
         const char* name, G4VSolid* solid, G4Box* subtractionBox,
         const HepGeom::Transform3D& transf, bool largerAngles,
         double x1, double y1, double x2, double y2);
@@ -376,7 +382,7 @@ namespace Belle2 {
        * @param[in] y              Initial point y coordinate.
        * @param[in] ang            Angle.
        */
-      G4SubtractionSolid* cutSolidCorner(
+      static G4SubtractionSolid* cutSolidCorner(
         const char* name, G4VSolid* solid, G4Box* subtractionBox,
         const HepGeom::Transform3D& transf, bool largerAngles,
         double x, double y, double ang);
@@ -401,8 +407,8 @@ namespace Belle2 {
        * @param[in] nSolids Number of solids.
        * @param[in] name    First part of solid names.
        */
-      G4VSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-                            int nSolids, const std::string& name);
+      static G4VSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
+                                   int nSolids, const std::string& name);
 
       /**
        * Create plastic sheet logical volume.

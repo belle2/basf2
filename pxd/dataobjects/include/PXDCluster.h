@@ -191,7 +191,7 @@ namespace Belle2 {
      * @return cluster shape of the cluster.
      * FIXME REMOVE THIS member
      */
-    short getShape() const { return 0; }
+    static short getShape() { return 0; }
 
     /** Set cluster kind.
      */

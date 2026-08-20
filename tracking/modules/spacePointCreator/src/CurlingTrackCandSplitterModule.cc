@@ -257,7 +257,7 @@ void CurlingTrackCandSplitterModule::event()
         B2DEBUG(21, "This SpacePointTrackCand shows no curling behaviour and will be added to collection: " << m_PARAMcurlingOutFirstName);
         spacePointTC->setTrackStubIndex(0); // set TrackStubIndex to 0 (indicates, that this TrackCandidate shows no curling behaviour)
         // add this spacePoint to the StoreArray with the first outgoing parts since the whole TC is outgoing
-        SpacePointTrackCand* newSPTC = m_curlingFirstOuts.appendNew(*spacePointTC);
+        const SpacePointTrackCand* newSPTC = m_curlingFirstOuts.appendNew(*spacePointTC);
         newSPTC->addRelationTo(spacePointTC);
         m_NoCurlingTCsCtr++;
       } else {
@@ -275,21 +275,21 @@ void CurlingTrackCandSplitterModule::event()
         for (SpacePointTrackCand trackStub : trackStubs) {
           m_createdTrackStubsCtr++;
           if (m_saveCompleteCurler) {
-            SpacePointTrackCand* newSPTC = m_curlingCompletes.appendNew(trackStub);
+            const SpacePointTrackCand* newSPTC = m_curlingCompletes.appendNew(trackStub);
             newSPTC->addRelationTo(spacePointTC);
             B2DEBUG(21, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
           }
           if (!trackStub.isOutgoing()) {
-            SpacePointTrackCand* newSPTC = m_curlingAllIns.appendNew(trackStub);
+            const SpacePointTrackCand* newSPTC = m_curlingAllIns.appendNew(trackStub);
             newSPTC->addRelationTo(spacePointTC);
             B2DEBUG(21, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
           } else { // if not ingoing differentiate between first part and all of the rest
             if (trackStub.getTrackStubIndex() > 1) {
-              SpacePointTrackCand* newSPTC = m_curlingRestOuts.appendNew(trackStub);
+              const SpacePointTrackCand* newSPTC = m_curlingRestOuts.appendNew(trackStub);
               newSPTC->addRelationTo(spacePointTC);
               B2DEBUG(21, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
             } else {
-              SpacePointTrackCand* newSPTC = m_curlingFirstOuts.appendNew(trackStub);
+              const SpacePointTrackCand* newSPTC = m_curlingFirstOuts.appendNew(trackStub);
               newSPTC->addRelationTo(spacePointTC);
               B2DEBUG(21, "Added SpacePointTrackCand " << newSPTC->getArrayIndex() << " to StoreArray " << newSPTC->getArrayName());
             }

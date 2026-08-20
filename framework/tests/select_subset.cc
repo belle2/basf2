@@ -149,9 +149,9 @@ namespace {
       const FromTargetElementsToWeight&
       getAllRelations(const  string& toOtherSetName) const
       {
-        static FromTargetElementsToWeight nothing;
         auto toRelations = getSetOfToRelations(toOtherSetName);
         if (toRelations == m_allRelations.end()) {
+          static FromTargetElementsToWeight nothing;
           return nothing;
         };
         return toRelations->second;
@@ -200,7 +200,7 @@ namespace {
       }
 
       // accessors
-      [[nodiscard]] const string getName() const
+      [[nodiscard]] const string& getName() const
       {
         return m_name;
       }
@@ -508,14 +508,14 @@ namespace {
       }
 
 
-      double
+      static double
       getWeight()
       {
         static double counter(0.0);
         return counter += 1.;
       };
 
-      unsigned int
+      static unsigned int
       flat_random(unsigned int max)
       {
         /* This algorithm is mentioned in the ISO C standard, here extended for 32 bits.
@@ -543,7 +543,7 @@ namespace {
 
       }
 
-      void
+      static void
       appendNewElement(NamedSet& namedSet)
       {
         StoreArray< StoredElement >&   set = namedSet.storedArray();

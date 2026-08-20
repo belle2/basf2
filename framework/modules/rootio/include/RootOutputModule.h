@@ -41,7 +41,13 @@ namespace Belle2 {
      *
      *  Deletion of objects, that were created in the Constructor.
      */
-    virtual ~RootOutputModule();
+    virtual ~RootOutputModule() override;
+
+    /** Copying is not allowed: the module owns raw pointers. */
+    RootOutputModule(const RootOutputModule&) = delete;
+
+    /** Copying is not allowed: the module owns raw pointers. */
+    RootOutputModule& operator=(const RootOutputModule&) = delete;
 
     /** Setting up of various stuff.
      *

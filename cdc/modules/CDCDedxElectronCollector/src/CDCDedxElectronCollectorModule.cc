@@ -80,15 +80,14 @@ void CDCDedxElectronCollectorModule::prepare()
   hestats->GetXaxis()->SetBinLabel(5, "unclean");
   hestats->GetXaxis()->SetBinLabel(6, "selected");
 
-  auto htstats = new TH1I("htstats", "track Stats", 7, -0.5, 6.5);
+  auto htstats = new TH1I("htstats", "track Stats", 6, -0.5, 5.5);
   htstats->SetFillColor(kYellow);
   htstats->GetXaxis()->SetBinLabel(1, "alltrk");
   htstats->GetXaxis()->SetBinLabel(2, "vtx");
   htstats->GetXaxis()->SetBinLabel(3, "inCDC");
   htstats->GetXaxis()->SetBinLabel(4, "whits");
   htstats->GetXaxis()->SetBinLabel(5, "weop");
-  htstats->GetXaxis()->SetBinLabel(6, "radee");
-  htstats->GetXaxis()->SetBinLabel(7, "selected");
+  htstats->GetXaxis()->SetBinLabel(6, "selected");
 
   if (m_isInjTime) {
     ttree->Branch<double>("injtime", &m_injTime);
@@ -143,7 +142,8 @@ void CDCDedxElectronCollectorModule::collect()
     //release05: bhabha_all is grand skim = bhabha+bhabhaecl+radee
     const std::map<std::string, int>& fresults = m_trgResult->getResults();
     if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() and
-        fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end()) {
+        (fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()
+         || fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end())) {
       B2WARNING("Can't find required bhabha/radee trigger identifiers");
       hestats->Fill(2);
       return;
@@ -152,8 +152,22 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") ==
                           SoftwareTriggerCutResult::c_accept);
 
-    const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") ==
-                             SoftwareTriggerCutResult::c_accept);
+    bool eRadBhabha = false;
+
+    const std::string radee =
+      "software_trigger_cut&skim&accept_radee";
+
+    const std::string bhabhaCDC =
+      "software_trigger_cut&skim&accept_bhabha_cdc";
+
+    if (fresults.find(bhabhaCDC) != fresults.end()) {
+      // If bhabha_cdc exists, use only bhabha_cdc
+      eRadBhabha = (m_trgResult->getResult(bhabhaCDC) == SoftwareTriggerCutResult::c_accept);
+    } else if (fresults.find(radee) != fresults.end()) {
+      // Otherwise use radee
+      eRadBhabha = (m_trgResult->getResult(radee) == SoftwareTriggerCutResult::c_accept);
+    }
+
 
     if (!m_isBhabha && !m_isRadee) {
       B2WARNING("requested not-supported event type: going back");
@@ -257,24 +271,6 @@ void CDCDedxElectronCollectorModule::collect()
       htstats->Fill(4);
     }
 
-    //if dealing with radee here (do a safe side cleanup)
-    if (m_isRadee) {
-      if (nTracks != 2)continue; //exactly 2 tracks
-      bool goodradee = false;
-      //checking if dedx of other track is restricted
-      //will not do too much as radee is clean enough
-      for (int jdedx = 0; jdedx < nTracks; jdedx++) {
-        CDCDedxTrack* dedxOtherTrack = m_dedxTracks[std::abs(jdedx - 1)];
-        if (!dedxOtherTrack)continue;
-        if (std::abs(dedxOtherTrack->getDedxNoSat() - 1.0) > 0.25)continue; //loose for uncalibrated
-        goodradee = true;
-        break;
-      }
-      if (!goodradee)continue;
-      htstats->Fill(5);
-    }
-
-
     // Make sure to remove all the data in vectors from the previous track
     if (m_isWire)m_wire.clear();
     if (m_isLayer)m_layer.clear();
@@ -309,7 +305,7 @@ void CDCDedxElectronCollectorModule::collect()
       if (m_islDedx)m_ldedx.push_back(dedxTrack->getLayerDedx(i));
     }
     // Track and/or hit information filled as per config
-    htstats->Fill(6);
+    htstats->Fill(5);
     hmeans->Fill(m_dedx);
     tree->Fill();
   }

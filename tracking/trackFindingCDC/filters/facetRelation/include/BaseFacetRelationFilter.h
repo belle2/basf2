@@ -28,7 +28,7 @@ namespace Belle2 {
       BaseFacetRelationFilter();
 
       /// Default destructor
-      ~BaseFacetRelationFilter();
+      ~BaseFacetRelationFilter() override;
 
       /**
        *  Returns the selection of facets covering the range of possible neighboring

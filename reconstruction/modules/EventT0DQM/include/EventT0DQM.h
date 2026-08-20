@@ -33,7 +33,7 @@ namespace Belle2 {
     EventT0DQMModule();
 
     /** Destructor */
-    virtual ~EventT0DQMModule();
+    virtual ~EventT0DQMModule() override;
 
     /** Defination of histograms */
     virtual void defineHisto() override;

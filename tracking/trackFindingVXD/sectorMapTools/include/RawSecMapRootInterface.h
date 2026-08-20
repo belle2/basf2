@@ -116,7 +116,7 @@ namespace Belle2 {
       m_tree2Hit->get().Branch("innerSecID", &(m_data2Hit.secIDs.inner));
 
       B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: adding " << filterNames.size() << " filters as branches to ttree ");
-      for (auto& name : filterNames) {
+      for (const auto& name : filterNames) {
         double* valuePtr = m_data2Hit.getValuePtr(name);
         if (valuePtr != nullptr) {
           B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: adding now branch with name " << name);
@@ -158,7 +158,7 @@ namespace Belle2 {
       m_tree3Hit->get().Branch("innerSecID", &(m_data3Hit.secIDs.inner));
 
       B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: adding " << filterNames.size() << " filters as branches to ttree ");
-      for (auto& name : filterNames) {
+      for (const auto& name : filterNames) {
         double* valuePtr = m_data3Hit.getValuePtr(name);
         if (valuePtr != nullptr) {
           B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: adding now branch with name " << name);

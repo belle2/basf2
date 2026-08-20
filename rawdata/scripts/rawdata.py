@@ -154,6 +154,8 @@ def add_unpackers(path, components=None, writeKLMDigitRaws=False, addTOPRelation
         # unpacker for neurotrigger
         add_neuro_2d_unpackers(path)
 
+    path.add_module('StatisticsSummary').set_name('Sum_Unpackers')
+
 
 def add_raw_output(path, filename='raw.root', additionalBranches=None):
     """

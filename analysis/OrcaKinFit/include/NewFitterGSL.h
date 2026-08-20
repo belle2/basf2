@@ -49,7 +49,7 @@ namespace Belle2 {
       /// Constructor
       NewFitterGSL();
       /// Virtual destructor
-      virtual ~NewFitterGSL();
+      virtual ~NewFitterGSL() override;
 
       /// The fit method, returns  the fit probability
       virtual double fit() override;
@@ -243,7 +243,7 @@ namespace Belle2 {
 
       int invertM();
 
-      int calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, gsl_vector* vecx);
+      int calcCovMatrix(gsl_matrix* MatW, gsl_permutation* permW, const gsl_vector* vecx);
 
       enum {NPARMAX = 50, NCONMAX = 10, NUNMMAX = 10};
 

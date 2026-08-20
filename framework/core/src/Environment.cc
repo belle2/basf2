@@ -31,7 +31,7 @@ Environment& Environment::Instance()
   return instance;
 }
 
-const list<string>& Environment::getModuleSearchPaths() const
+const list<string>& Environment::getModuleSearchPaths()
 {
   return ModuleManager::Instance().getModuleSearchPaths();
 }
@@ -55,6 +55,7 @@ bool Environment::isMC() const
 {
   StoreObjPtr<FileMetaData> fileMetaData("", DataStore::c_Persistent);
   if (fileMetaData) return fileMetaData->isMC();
+  else if (m_mcEvents == 0) return false;
   return true;
 }
 

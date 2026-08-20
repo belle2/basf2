@@ -8,7 +8,6 @@
 #pragma once
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
@@ -25,6 +24,8 @@
 
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 #include <framework/core/ModuleParamList.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   /// A stack of pre-, helix-extrapolation- , Kalman-extrapolation- and Kalman-update-filters.
@@ -51,6 +52,12 @@ namespace Belle2 {
       m_extrapolationFilter.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "extrapolation"));
       m_finalSelection.exposeParameters(moduleParamList, TrackingUtilities::prefixed(prefix, "final"));
     }
+
+    /** Set maximal hit candidates for state filtering
+     *
+     *  @param maximalHitCandidates Maximum number of hit candidates to test
+     */
+    void setMaximalHitCandidates(size_t maximalHitCandidates) { m_maximalHitCandidates = maximalHitCandidates; }
 
     /// Apply the findlet and do the state selection
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override
@@ -127,7 +134,7 @@ namespace Belle2 {
     TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_finalSelection;
 
     /// Helper function to reconstruct the arc length and the hit distance of a state according to the trajectory
-    void reconstruct(CDCCKFState& state, const TrackingUtilities::CDCTrajectory3D& trajectory, const double lastArcLength) const
+    static void reconstruct(CDCCKFState& state, const TrackingUtilities::CDCTrajectory3D& trajectory, const double lastArcLength)
     {
       // TODO: actually we do not need to do any trajectory creation here. We could save some computing time!
       const TrackingUtilities::CDCTrajectory2D& trajectory2D = trajectory.getTrajectory2D();
@@ -135,22 +142,24 @@ namespace Belle2 {
 
       const TrackingUtilities::CDCWireHit* wireHit = state.getWireHit();
 
-      TrackingUtilities::Vector2D recoPos2D;
+      ROOT::Math::XYVector recoPos2D;
       if (wireHit->isAxial()) {
         recoPos2D = wireHit->reconstruct2D(trajectory2D);
       } else {
         const CDC::CDCWire& wire = wireHit->getWire();
-        const TrackingUtilities::Vector2D& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
+        const ROOT::Math::XYVector& posOnXYPlane = wireHit->reconstruct2D(trajectory2D);
 
         const double arcLength = trajectory2D.calcArcLength2D(posOnXYPlane);
         const double z = trajectorySZ.mapSToZ(arcLength);
 
-        const TrackingUtilities::Vector2D& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
+        const ROOT::Math::XYVector& wirePos2DAtZ = wire.getWirePos2DAtZ(z);
 
-        const TrackingUtilities::Vector2D& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
+        const ROOT::Math::XYVector& recoPosOnTrajectory = trajectory2D.getClosest(wirePos2DAtZ);
         const double driftLength = wireHit->getRefDriftLength();
-        TrackingUtilities::Vector2D disp2D = recoPosOnTrajectory - wirePos2DAtZ;
-        disp2D.normalizeTo(driftLength);
+        ROOT::Math::XYVector disp2D = recoPosOnTrajectory - wirePos2DAtZ;
+        if (disp2D.R() != 0.0) {
+          disp2D *= (driftLength / disp2D.R());
+        }
         recoPos2D = wirePos2DAtZ + disp2D;
       }
 

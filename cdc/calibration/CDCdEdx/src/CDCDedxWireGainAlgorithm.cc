@@ -108,7 +108,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   vector<TH1D*> hdedxhit(c_nwireCDC);
 
   B2INFO("Creating CDCGeometryPar object");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   vector<double> layermean(c_maxNSenseLayers);
 
@@ -311,7 +311,7 @@ void CDCDedxWireGainAlgorithm::plotLayerDist(array<TH1D*, 2> hdedxL)
     hdedxL[il]->SetTitle(Form("%s, trunc(%0.02f - %0.02f);dedxhit;entries", hdedxL[il]->GetTitle(), lowedge, upedge));
     hdedxL[il]->Draw("histo");
 
-    TH1D* hdedxLC = (TH1D*)hdedxL[il]->Clone(Form("%s_c", hdedxL[il]->GetName()));
+    TH1D* hdedxLC = static_cast<TH1D*>(hdedxL[il]->Clone(Form("%s_c", hdedxL[il]->GetName())));
     hdedxLC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxLC->SetFillColor(kAzure + 1);
     hdedxLC->Draw("same histo");
@@ -349,7 +349,7 @@ void CDCDedxWireGainAlgorithm::plotWireDist(const vector<TH1D*>& hist, const vec
     ctmp.cd(iw % 16 + 1);
     hist[iw]->DrawCopy();
 
-    TH1D* hdedxhitC = (TH1D*)hist[iw]->Clone(Form("%sC", hist[iw]->GetName()));
+    TH1D* hdedxhitC = static_cast<TH1D*>(hist[iw]->Clone(Form("%sC", hist[iw]->GetName())));
     hdedxhitC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxhitC->SetFillColor(kAzure + 1);
     hdedxhitC->DrawCopy("same histo");
@@ -385,7 +385,7 @@ void CDCDedxWireGainAlgorithm::plotWireGain(const vector<double>& vdedx_means, c
         && i == 0) hconstpw[i]->SetTitle(Form("merged wiregain rel-const  (%s), avg = %0.03f; wire numbers;<dedxhit>", m_suffix.data(),
                                                 layeravg));
 
-    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%s", m_suffix.data()), "", 400, -0.5, 2.5);
+    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%d_%s", i, m_suffix.data()), "", 400, -0.5, 2.5);
     hconstpwvar[i]->SetTitle(Form("wiregain const (%s); wire gains; nentries", m_suffix.data()));
     if (m_isMerge
         && i == 0) hconstpwvar[i]->SetTitle(Form("merged wiregain rel-const (%s), avg = %0.03f; wire gains; nentries", m_suffix.data(),
@@ -456,7 +456,7 @@ void CDCDedxWireGainAlgorithm::plotLayerGain(const vector<double>& layermean, do
 void CDCDedxWireGainAlgorithm::plotWGPerLayer(const vector<double>& vdedx_means, const vector<double>& layermean, double layeravg)
 {
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   TCanvas clconst("clconst", "", 800, 500);
   clconst.Divide(2, 2);

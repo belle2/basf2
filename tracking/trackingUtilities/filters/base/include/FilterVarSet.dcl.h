@@ -54,7 +54,7 @@ namespace Belle2 {
       using Object = typename Filter::Object;
 
       /// Construct the varset making an instance of the template filter.
-      FilterVarSet(const std::string& filterName = "");
+      explicit FilterVarSet(const std::string& filterName = "");
 
       /// Construct the varset.
       FilterVarSet(const std::string& filterName, std::unique_ptr<Filter> ptrFilter);

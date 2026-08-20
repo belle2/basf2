@@ -194,7 +194,7 @@ namespace Belle2 {
        *  Helper function to prepare the stats.
        *  Clears all temporary cell flags and sets the cell state to minus infinity.
        */
-      void prepareCellFlags(const std::vector<ACellHolder*>& cellHolders) const
+      static void prepareCellFlags(const std::vector<ACellHolder*>& cellHolders)
       {
         for (ACellHolder* cellHolder : cellHolders) {
           AutomatonCell& cell = cellHolder->getAutomatonCell();

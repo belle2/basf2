@@ -13,7 +13,7 @@
 import os
 import sys
 import math
-from ROOT import TFile
+from ROOT import TFile, Belle2
 from pdg import add_particle
 from basf2 import create_path, register_module, process, print_params, find_file
 from modularAnalysis import fillParticleListsFromMC, printVariableValues, variablesToNtuple
@@ -72,6 +72,10 @@ with TemporaryDirectory() as tmp:
     # process the basf2 path
     os.chdir(tmp)
     process(testpath)
+
+    env = Belle2.Environment.Instance()
+    assert env.getNumberOfMCEvents() == 1, f'Expected 1 MC event, got {env.getNumberOfMCEvents()}'
+    assert env.isMC(), 'Expected isMC() to return True'
 
     # open output and check the momenta are what is expected
     fi = TFile('test.root')

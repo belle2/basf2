@@ -617,7 +617,7 @@ namespace Belle2 {
         // the list individually
         for (unsigned i = 0; i < list->getListSize(); ++i)
         {
-          Particle* iparticle = list->getParticle(i);
+          const Particle* iparticle = list->getParticle(i);
           if (particle->getMdstSource() == iparticle->getMdstSource())
             return 1;
         }
@@ -684,14 +684,14 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
               convertString<int>(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
 
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
@@ -747,19 +747,21 @@ namespace Belle2 {
           try
           {
             generation_flag = convertString<int>(listNames.back());
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
 
           if (particle->getMCParticle() == nullptr)
           {
             return false;
           }
 
-          for (auto& iListName : listNames)
+          for (const auto& iListName : listNames)
           {
             try {
+              // only used to test whether the name is a number
+              // cppcheck-suppress ignoredReturnValue
               std::stod(iListName);
               continue;
-            } catch (std::exception& e) {}
+            } catch (const std::exception& e) {}
             // Creating recursive lambda
             auto list_comparison  = [](auto&& self, const Particle * m, const Particle * p, int flag)-> bool {
               bool result = false;
@@ -1167,7 +1169,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1214,7 +1216,7 @@ namespace Belle2 {
           ROOT::Math::PxPyPzEVector pMiss = frame.getMomentum(missingTotalMomentumLab); // transform from lab to reference frame
 
           ROOT::Math::PxPyPzEVector pSum(0, 0, 0, 0);
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart) pSum += frame.getMomentum(dauPart);
@@ -1244,7 +1246,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
 
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1312,7 +1314,7 @@ namespace Belle2 {
           // Parses the generalized indexes and fetches the 4-momenta of the particles of interest
           if (particle->getParticleSource() == Particle::EParticleSourceObject::c_MCParticle) // Check if MCParticle
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const MCParticle* mcPart = particle->getMCParticle();
               if (mcPart == nullptr)
                 return Const::doubleNaN;
@@ -1324,7 +1326,7 @@ namespace Belle2 {
             }
           } else
           {
-            for (auto& generalizedIndex : arguments) {
+            for (const auto& generalizedIndex : arguments) {
               const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
               if (dauPart == nullptr)
                 return Const::doubleNaN;
@@ -1405,7 +1407,7 @@ namespace Belle2 {
           const auto& frame = ReferenceFrame::GetCurrent();
           ROOT::Math::PxPyPzEVector pSum;
 
-          for (auto& generalizedIndex : arguments)
+          for (const auto& generalizedIndex : arguments)
           {
             const Particle* dauPart = particle->getParticleFromGeneralizedIndexString(generalizedIndex);
             if (dauPart)
@@ -1587,7 +1589,7 @@ namespace Belle2 {
     {
       if (arguments.size() > 0) {
         std::vector<const Variable::Manager::Var*> variables;
-        for (auto& argument : arguments)
+        for (const auto& argument : arguments)
           variables.push_back(Manager::Instance().getVariable(argument));
 
         auto func = [variables, arguments](const Particle * particle) -> double {
@@ -1678,7 +1680,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1725,7 +1727,7 @@ namespace Belle2 {
           B2FATAL("One or both of the used variables doesn't exist!");
 
         auto func = [var1, var2](const Particle * particle) -> double {
-          double val1, val2;
+          double val1 = 0.0, val2 = 0.0;
           auto var_result1 = var1->function(particle);
           auto var_result2 = var2->function(particle);
           if (std::holds_alternative<double>(var_result1))
@@ -1853,6 +1855,22 @@ namespace Belle2 {
         return func;
       } else {
         B2FATAL("Wrong number of arguments for meta function atan");
+      }
+    }
+
+    Manager::FunctionPtr atan2(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        const Variable::Manager::Var* varY = Manager::Instance().getVariable(arguments[0]);
+        const Variable::Manager::Var* varX = Manager::Instance().getVariable(arguments[1]);
+        auto func = [varY, varX](const Particle * particle) -> double {
+          double y = std::get<double>(varY->function(particle));
+          double x = std::get<double>(varX->function(particle));
+          return std::atan2(y, x);
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function atan2");
       }
     }
 
@@ -2107,7 +2125,7 @@ namespace Belle2 {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
 
         auto func = [var, indexString](const Particle * particle) -> double {
-          // First get the partcile index. If not int, evaluate the variable
+          // First get the particle index. If not int, evaluate the variable
           int particleNumber = 0;
           try
           {
@@ -2120,12 +2138,12 @@ namespace Belle2 {
           }
 
           StoreArray<MCParticle> mcParticles("MCParticles");
-          if (particleNumber >= mcParticles.getEntries())
+          if (particleNumber < 0 or particleNumber >= mcParticles.getEntries())
           {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcParticle = mcParticles[particleNumber];
+          const MCParticle* mcParticle = mcParticles[particleNumber];
           Particle part = Particle(mcParticle);
           auto var_result = var->function(&part);
           if (std::holds_alternative<double>(var_result))
@@ -2157,7 +2175,7 @@ namespace Belle2 {
             return Const::doubleNaN;
           }
 
-          MCParticle* mcUpsilon4S = mcParticles[0];
+          const MCParticle* mcUpsilon4S = mcParticles[0];
           if (mcUpsilon4S->isInitial()) mcUpsilon4S = mcParticles[2];
           if (mcUpsilon4S->getPDG() != 300553)
           {
@@ -2472,7 +2490,6 @@ namespace Belle2 {
           std::sort(weightsAndIndices.begin(), weightsAndIndices.end(),
                     ValueIndexPairSorting::higherPair<decltype(weightsAndIndices)::value_type>);
 
-          // cppcheck-suppress containerOutOfBounds
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
           StoreArray<Particle> tempParticles("tempParticles");
@@ -2689,7 +2706,7 @@ namespace Belle2 {
             for (int i = 0; i < nParticles; i++) {
               bool overlaps = false;
               Particle* part = listOfParticles->getParticle(i);
-              for (auto poolPart : particlePool) {
+              for (const auto* poolPart : particlePool) {
                 if (part->overlapsWith(poolPart)) {
                   overlaps = true;
                   break;
@@ -3411,7 +3428,7 @@ namespace Belle2 {
         } else {
           try {
             pdg_code = convertString<int>(arg);
-          } catch (std::exception& e) {}
+          } catch (const std::exception& e) {}
         }
 
         if (pdg_code == -1) {
@@ -3458,6 +3475,85 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function varForFirstMCAncestorOfType (expected 2: type and variable of interest)");
       }
+    }
+
+    Manager::FunctionPtr varForNthDaughterOfType(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 4 || arguments.size() < 3) {
+        B2FATAL("Number of arguments for varForNthDaughterOfType must be 3 or 4");
+      }
+      // Get abs pdg id
+      std::string argPtype = arguments[0];
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(argPtype.c_str());
+      int absPdg = -1;
+      if (part != nullptr) {
+        absPdg = std::abs(part->PdgCode());
+      } else {
+        try {
+          absPdg = std::abs(convertString<int>(argPtype));
+        } catch (const std::exception&) { }
+      }
+      if (absPdg == -1 || pdgDatabase->GetParticle(absPdg) == nullptr) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argPtype << "' is neither a valid particle name nor a PDG code");
+      }
+      // Get particle index
+      std::string argIndex = arguments[1];
+      int index = 0;
+      try {
+        index = convertString<int>(argIndex);
+      } catch (const std::exception&) { }
+      if (index <= 0) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argIndex << "' is not a valid positive integer");
+      }
+      // Get variable
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+      // Get depth
+      int depth = 1;
+      if (arguments.size() == 4) {
+        std::string argDepth = arguments[3];
+        try {
+          depth = convertString<int>(argDepth);
+        } catch (const std::exception&) {
+          depth = -1;
+        }
+        if (depth <= 0) {
+          B2FATAL("varForNthDaughterOfType: argument '" << argDepth << "' is not a valid positive integer");
+        }
+      }
+
+      auto func = [absPdg, index, var, depth](const Particle * particle) -> double {
+        int nFound = 0;
+        std::vector<Particle*> currentLevel = particle->getDaughters();
+        std::vector<Particle*> nextLevel;
+        for (int d = 0; d < depth; d++)
+        {
+          if (currentLevel.size() == 0) return Const::doubleNaN;
+          for (unsigned i = 0; i < currentLevel.size(); i++) {
+            Particle* p = currentLevel[i];
+            if (std::abs(p->getPDGCode()) == absPdg) {
+              nFound++;
+              if (nFound == index) {
+                auto result = var->function(p);
+                if (std::holds_alternative<double>(result)) {
+                  return std::get<double>(result);
+                } else if (std::holds_alternative<int>(result)) {
+                  return std::get<int>(result);
+                } else if (std::holds_alternative<bool>(result)) {
+                  return std::get<bool>(result);
+                } else return Const::doubleNaN;
+              }
+            }
+            std::vector<Particle*> newParticles = p->getDaughters();
+            nextLevel.insert(nextLevel.end(), newParticles.begin(), newParticles.end());
+          }
+          currentLevel.clear();
+          std::swap(currentLevel, nextLevel);
+        }
+        return Const::doubleNaN;
+      };
+
+      return func;
     }
 
     Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments)
@@ -3885,6 +3981,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("acos(variable)", acos, "Returns arccosine value of the given variable. The unit of the acos() is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("tan(variable)", tan, "Returns tangent value of the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("atan(variable)", atan, "Returns arctangent value of the given variable. The unit of the atan() is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("atan2(variableY, variableX)", atan2, "Returns the atan2 value (arctangent of y/x). The result is in ``rad``, and the correct quadrant is determined by the signs of the two arguments. Both arguments must not be zero at the same time.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
@@ -4035,6 +4132,11 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable, maxDepth = 1)",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter (``n`` starting at 1) of the given type.
+Particle type can be given as pdg code or by particle name (particles and antiparticles are treated the same, so e.g. ``211``, ``-211``, ``pi+`` and ``pi-`` will all match all charged pions). 
+Maximal depth controls how many generations of daughters are searched (``maxDepth=1`` only direct daughters, ``maxDepth=2`` also granddaughters, ...).
+As an example, when reconstructing ``B0:my_list -> [K_S0:pipi -> pi+:all pi-:all] [pi0:gg -> gamma:all gamma:all]`` then ``varForNthDaughterOfType(pi+, 1, E, 2)`` will return the energy of the first charged pion found searching all daughters and then granddaughters of the given particle, so in this case the pi+, and ``varForNthDaughterOfType(22, 2, E, 2)`` will return the energy of the second daughter of the pi0. (Note that the kinematic distributions of the two pi0 daughters are not the same, unless the ``gamma:all`` list was shuffled beforehand!)
+If no nth daughter of the given type can be found at given maximal depth, returns NaN.)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",

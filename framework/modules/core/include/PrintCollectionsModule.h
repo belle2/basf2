@@ -25,7 +25,7 @@ namespace Belle2 {
     PrintCollectionsModule();
 
     /** Destructor of the module. */
-    virtual ~PrintCollectionsModule();
+    virtual ~PrintCollectionsModule() override;
 
     /** initialization. */
     virtual void initialize() override;
@@ -39,7 +39,7 @@ namespace Belle2 {
     /** Prints information for each collection in the DataStore using the specified durability.
      * @param durability The durability type of which the DataStore content should be printed.
      */
-    void printCollections(DataStore::EDurability durability);
+    static void printCollections(DataStore::EDurability durability);
 
 
   private:

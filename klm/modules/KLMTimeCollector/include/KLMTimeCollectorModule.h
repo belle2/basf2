@@ -47,7 +47,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~KLMTimeCollectorModule();
+    virtual ~KLMTimeCollectorModule() override;
 
     /**
      * Initializes the module.

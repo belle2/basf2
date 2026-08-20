@@ -90,7 +90,7 @@ namespace Belle2 {
     };
 
     /** get the enum representation of an integer */
-    conversionStatus getFailEnum(int intToConvert)
+    static conversionStatus getFailEnum(int intToConvert)
     {
       switch (intToConvert) {
         case 1: return c_singleClusterSP;
@@ -333,8 +333,8 @@ namespace Belle2 {
      * get the position of the appropriate SpacePoint inside the RelationVector
      * NOTE: returns negative index if no SpacePoint fitting the criteria can be found!
      */
-    int getAppropriateSpacePointIndex(const std::vector<std::pair<bool, bool> >& existAndValidSPs,
-                                      const std::vector<std::pair<int, int> >& clusterPositions);
+    static int getAppropriateSpacePointIndex(const std::vector<std::pair<bool, bool> >& existAndValidSPs,
+                                             const std::vector<std::pair<int, int> >& clusterPositions);
 
     /**
      * get the indices of the Clusters related to the SpacePoint. size of returned vector is <= 2!
@@ -346,7 +346,7 @@ namespace Belle2 {
     /**
      * get the NDF of a SpacePoint
      */
-    int getNDF(Belle2::SpacePoint* spacePoint);
+    static int getNDF(Belle2::SpacePoint* spacePoint);
 
     /**
      * check if all hits have been used (i.e. if all flags in the vector of flaggedPairs is set to true)

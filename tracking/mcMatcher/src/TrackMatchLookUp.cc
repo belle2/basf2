@@ -133,7 +133,7 @@ const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack
     Const::ChargedStable chargedStable) const
 {
   B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
-  Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();
+  const Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();
   if (b2track) {
     // Query the Belle2::Track for the selected fit hypothesis
     return b2track->getTrackFitResult(chargedStable);

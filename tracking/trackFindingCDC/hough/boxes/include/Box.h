@@ -36,7 +36,7 @@ namespace Belle2 {
     class Box<> {
     public:
       /// Nothing to do on set bounds.
-      void setBounds()
+      static void setBounds()
       {
       }
 

@@ -10,20 +10,22 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackingUtilities;
 
 namespace {
   /// Helper function to extract the numbered pt-range out of a momentum vector
-  unsigned int getPTRange(const TrackingUtilities::Vector3D& momentum)
+  unsigned int getPTRange(const ROOT::Math::XYZVector& momentum)
   {
-    const double pT = momentum.xy().norm();
+    const double pT = momentum.Rho();
     if (pT > 0.4) {
       return 0;
     } else if (pT > 0.2) {
@@ -57,12 +59,12 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  Vector3D position = Vector3D(firstMeasurement.getPos());
-  Vector3D momentum = Vector3D(firstMeasurement.getMom());
+  const ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
 
-  const Vector3D hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
+  const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
 
-  const bool sameHemisphere = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+  const bool sameHemisphere = fabs(position.Phi() - hitPosition.Phi()) < TMath::PiOver2();
   if (not sameHemisphere) {
     return NAN;
   }
@@ -80,12 +82,12 @@ Weight SimpleSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed(), m_cachedBField);
 
     const double arcLength = trajectory.calcArcLength2D(hitPosition);
-    const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+    const ROOT::Math::XYVector& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
     const double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
-    const Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-    const Vector3D differenceHelix = trackPositionAtHit - hitPosition;
+    const ROOT::Math::XYZVector trackPositionAtHit(trackPositionAtHit2D.X(), trackPositionAtHit2D.Y(), trackPositionAtHitZ);
+    const ROOT::Math::XYZVector differenceHelix = trackPositionAtHit - hitPosition;
 
-    valueToCheck = differenceHelix.norm();
+    valueToCheck = differenceHelix.R();
     maximumValues = &m_param_maximumHelixDistance;
   } else {
     // Filter 2 + 3

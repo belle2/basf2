@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param name Name of bin (Module, layer, ..)
      * @return If error condition was met
      */
-    bool check_error_level(int bin, std::string name);
+    bool check_error_level(int bin, const std::string& name);
 
     /**
      * Check bin/name for warn condition
@@ -77,7 +77,7 @@ namespace Belle2 {
      * @param name Name of bin (Module, layer, ..)
      * @return If warn condition was met
      */
-    bool check_warn_level(int bin, std::string name);
+    bool check_warn_level(int bin, const std::string& name);
 
     /**
      * Set module labels for TGraphAsymmErrors
@@ -148,7 +148,7 @@ namespace Belle2 {
     //! error level for alarm per module
     std::map<std::string, double> m_errorlevelmod;
     //! Number of bins in efficiency plot, all modules plus layer and summary
-    int m_nrxbins;
+    int m_nrxbins = 0;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

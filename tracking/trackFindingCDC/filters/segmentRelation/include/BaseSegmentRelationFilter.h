@@ -36,7 +36,7 @@ namespace Belle2 {
       BaseSegmentRelationFilter();
 
       /// Default destructor
-      virtual ~BaseSegmentRelationFilter();
+      virtual ~BaseSegmentRelationFilter() override;
 
       /// Returns all equivalent segment in the range.
       std::vector<const TrackingUtilities::CDCSegment2D*> getPossibleTos(

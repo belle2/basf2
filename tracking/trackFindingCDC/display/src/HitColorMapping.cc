@@ -110,7 +110,7 @@ std::string RLColorMap::info()
 
 std::string PosFlagColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
+  const CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   int posFlag = simHit->getPosFlag();
   if (posFlag == 0) {
     return ("green"); // right
@@ -128,7 +128,7 @@ std::string PosFlagColorMap::info()
 
 std::string BackgroundTagColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCSimHit* cdcSimHit = hit.getRelated<CDCSimHit>("CDCSimHits");
+  const CDCSimHit* cdcSimHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   short backgroundtag = cdcSimHit->getBackgroundTag();
   switch (backgroundtag) {
     case BackgroundMetaData::BG_TAG::bg_none: return "orange";
@@ -200,7 +200,7 @@ std::string MCSegmentIdColorMap::map(int index __attribute__((unused)), const CD
 
 std::string TOFColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
+  const CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   double timeOfFlight = simHit->getFlightTime();
   return timeOfFlightToColor(timeOfFlight);
 }
@@ -254,7 +254,7 @@ std::string MCParticleColorMap::info()
 
 std::string MCParticleColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
+  const MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
   if (mcParticle != nullptr) {
     int mcParticleId = mcParticle->getArrayIndex();
     if (m_usedColors.count(mcParticleId) == 1) {
@@ -272,7 +272,7 @@ std::string MCParticleColorMap::map(int index __attribute__((unused)), const CDC
 
 std::string MCPDGCodeColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
+  const MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
   int pdgCode = mcParticle != nullptr ? mcParticle->getPDG() : -999;
 
   auto itFound = c_colorByPDGCode.find(pdgCode);
@@ -306,7 +306,7 @@ std::string MCPDGCodeColorMap::info()
 
 std::string MCPrimaryColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
+  const MCParticle* mcParticle = hit.getRelated<MCParticle>("MCParticles");
   if (mcParticle != nullptr) {
     unsigned short int primaryFlag = 1;
     bool isPrimary = mcParticle->hasStatus(primaryFlag);
@@ -334,7 +334,7 @@ std::string MCPrimaryColorMap::info()
 
 std::string SimHitPDGCodeColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
+  const CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   int pdgCode = simHit != nullptr ? simHit->getPDGCode() : -999;
   auto itFound = c_colorByPDGCode.find(pdgCode);
   if (itFound != c_colorByPDGCode.end()) {
@@ -367,7 +367,7 @@ std::string SimHitPDGCodeColorMap::info()
 
 std::string SimHitIsBkgColorMap::map(int index __attribute__((unused)), const CDCHit& hit)
 {
-  CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
+  const CDCSimHit* simHit = hit.getRelated<CDCSimHit>("CDCSimHits");
   bool bkgTag = simHit->getBackgroundTag();
   if (bkgTag) {
     return "gray";

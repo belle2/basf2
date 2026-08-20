@@ -32,8 +32,7 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       VertexFitKFit(void);
       /** Destruct the object. */
-      ~VertexFitKFit(void);
-
+      ~VertexFitKFit(void) override;
 
     public:
       /** Set an initial vertex point for the vertex-vertex constraint fit.
@@ -83,7 +82,6 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepSymMatrix          getVertexError(void) const;
-      double                      getCHIsq(void) const override;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
        */

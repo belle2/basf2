@@ -10,8 +10,12 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRecoHit2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
+
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -35,23 +39,23 @@ bool HitGapAxialSegmentPairVarSet::extract(const CDCAxialSegmentPair* ptrAxialSe
   const CDCRecoHit2D& toFirstHit = toSegment.front();
   const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const Vector2D fromLastHitPos = fromLastHit.getRecoPos2D();
-  const Vector2D fromFirstHitPos = fromFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromLastHitPos = fromLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromFirstHitPos = fromFirstHit.getRecoPos2D();
 
-  const Vector2D toFirstHitPos = toFirstHit.getRecoPos2D();
-  const Vector2D toLastHitPos = toLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector toFirstHitPos = toFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector toLastHitPos = toLastHit.getRecoPos2D();
 
-  const Vector2D hitPosGap = toFirstHitPos - fromLastHitPos;
-  const Vector2D longHitPosGap = toLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector hitPosGap = toFirstHitPos - fromLastHitPos;
+  const ROOT::Math::XYVector longHitPosGap = toLastHitPos - fromFirstHitPos;
 
-  const double hitDistance = hitPosGap.norm();
-  const double longHitDistance = longHitPosGap.norm();
+  const double hitDistance = hitPosGap.R();
+  const double longHitDistance = longHitPosGap.R();
 
-  const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
-  const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
+  const ROOT::Math::XYVector fromLastHitMom = fromLastHit.getFlightDirection2D();
+  const ROOT::Math::XYVector toFirstHitMom = toFirstHit.getFlightDirection2D();
 
-  finitevar<named("delta_hit_pos_phi")>() = fromLastHitPos.angleWith(toFirstHitPos);
-  finitevar<named("delta_hit_mom_phi")>() = fromLastHitMom.angleWith(toFirstHitMom);
+  finitevar<named("delta_hit_pos_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitPos, toFirstHitPos);
+  finitevar<named("delta_hit_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromLastHitMom, toFirstHitMom);
 
   double fromLastHitAlpha = fromLastHit.getAlpha();
   double toFirstHitAlpha = toFirstHit.getAlpha();
@@ -62,21 +66,21 @@ bool HitGapAxialSegmentPairVarSet::extract(const CDCAxialSegmentPair* ptrAxialSe
 
   finitevar<named("delta_hit_distance")>() = longHitDistance - hitDistance;
 
-  finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
-  finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  finitevar<named("hit_forward")>() = hitPosGap.dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("from_hit_forward")>() = hitPosGap.Dot(fromLastHitMom);
+  finitevar<named("to_hit_forward")>() = hitPosGap.Dot(toFirstHitMom);
+  finitevar<named("hit_forward")>() = hitPosGap.Dot(VectorUtil::average(fromLastHitMom, toFirstHitMom));
 
-  const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
-  const Vector2D toStretch = toLastHitPos - toFirstHitPos;
+  const ROOT::Math::XYVector fromStretch = fromLastHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector toStretch = toLastHitPos - toFirstHitPos;
 
-  const double fromLength = fromStretch.norm();
-  const double toLength = toStretch.norm();
+  const double fromLength = fromStretch.R();
+  const double toLength = toStretch.R();
 
-  const Vector2D firstPosGap = toFirstHitPos - fromFirstHitPos;
-  const Vector2D lastPosGap = toLastHitPos - fromLastHitPos;
+  const ROOT::Math::XYVector firstPosGap = toFirstHitPos - fromFirstHitPos;
+  const ROOT::Math::XYVector lastPosGap = toLastHitPos - fromLastHitPos;
 
-  const double firstOffset = firstPosGap.norm();
-  const double lastOffset = lastPosGap.norm();
+  const double firstOffset = firstPosGap.R();
+  const double lastOffset = lastPosGap.R();
 
   finitevar<named("hit_ptolemy")>() =
     firstOffset * lastOffset - longHitDistance * hitDistance - fromLength * toLength;

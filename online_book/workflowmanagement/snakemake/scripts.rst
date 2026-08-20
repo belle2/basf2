@@ -8,7 +8,7 @@ Separate Scripts for the Snakemake Workflow
 
     **Length**: 15-30 min
 
-For completeness, we here provide the separate analysis scripts called by the snakemake workflow. Existing scripts can be implemented with the :code:`script:` directive in the *snakefile* with minimal adaptations. The input and output file paths, as well as the parameters for the corresponding rule can be retrieved in the scripts with :code:`snakemake.input`, :code:`snakemake.output` and :code:`snakemake.params`.
+For completeness, we provide here the separate analysis scripts called by the snakemake workflow. Existing scripts can be implemented with the :code:`script:` directive in the *snakefile* with minimal adaptations. The input and output file paths, as well as the parameters for the corresponding rule can be retrieved in the scripts with :code:`snakemake.input`, :code:`snakemake.output` and :code:`snakemake.params`.
 
 .. literalinclude:: offlineanalysis.py
    :language: python

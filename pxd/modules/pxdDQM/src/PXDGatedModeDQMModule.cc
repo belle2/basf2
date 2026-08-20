@@ -157,6 +157,8 @@ void PXDGatedModeDQMModule::beginRun()
 void PXDGatedModeDQMModule::event()
 {
   // And check if the stored data is valid
+  // the second isValid() is EventLevelTriggerTimeInfo's, not StoreObjPtr's
+  // cppcheck-suppress knownConditionTrueFalse
   if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // check time overflow, too long ago
     if (m_EventLevelTriggerTimeInfo->hasInjection()) {

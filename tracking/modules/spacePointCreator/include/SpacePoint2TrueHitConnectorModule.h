@@ -385,11 +385,11 @@ namespace Belle2 {
     void positionAnalysis(Belle2::SpacePoint* spacePoint, const MapType& trueHitMap, const int& index, e_detTypes detType);
 
     /** get the local position of a SpacePoint */
-    std::pair<double, double> getLocalPos(Belle2::SpacePoint* spacePoint);
+    static std::pair<double, double> getLocalPos(Belle2::SpacePoint* spacePoint);
 
     /** get the local (.first) and global (.second) position of a TrueHit (passed by index) */
     template<typename TrueHitType>
-    std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> getTrueHitPositions(TrueHitType* trueHit);
+    static std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> getTrueHitPositions(TrueHitType* trueHit);
 
     /** initialize the root file that is used for output */
     void initializeRootFile();
@@ -414,7 +414,7 @@ namespace Belle2 {
      * + if a TrueHit is only related to the U-Cluster -> relation weight = 11 (this is what happens with if a PXD is passed!)
      * + if a TrueHit is only related to the V-Cluster -> relation weight = 21
      */
-    double calculateRelationWeight(const TrueHitInfo& trueHitInfo, Belle2::SpacePoint* spacePoint);
+    static double calculateRelationWeight(const TrueHitInfo& trueHitInfo, Belle2::SpacePoint* spacePoint);
 
   }; // end module
 

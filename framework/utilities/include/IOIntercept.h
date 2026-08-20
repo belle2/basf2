@@ -75,9 +75,9 @@ namespace Belle2 {
       /** This class is basically empty so the constructor does nothing */
       KeepStream(std::ostream&, FILE*) {}
       /** doing nothing always succeeds */
-      bool start() const { return true; }
+      static bool start() { return true; }
       /** doing nothing always succeeds */
-      bool finish() const { return true; }
+      static bool finish() { return true; }
     };
 
     /** Simple class to just discard anything written to stream by redirecting it to /dev/null */
@@ -105,8 +105,10 @@ namespace Belle2 {
       /** Get the output, only set after finish() */
       const std::string& getOutput() const { return m_outputStr; }
       /** Start intercepting the output */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
       bool start();
       /** Restore the stream and get the output from the pipe */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
       bool finish();
     private:
       /** file descriptor of the read end of the pipe */
@@ -252,6 +254,7 @@ namespace Belle2 {
       /** Set the indent for each line of the output, default is the supplied name + `": "` */
       void setIndent(const std::string& indent) { m_indent = indent; }
       /** Finish the capture and emit the message if output has appeard on stdout or stderr */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
       bool finish();
     private:
       /** Name of the output producing tool/library */

@@ -62,8 +62,8 @@ void CDCBadWireCollectorModule::collect()
   // Used in wire efficiency building
   std::vector<unsigned short> wiresInCDCTrack;
 
-  for (CDCTrack& cdcTrack : *m_CDCTracks) {
-    for (CDCRecoHit3D& cdcHit : cdcTrack) {
+  for (const CDCTrack& cdcTrack : *m_CDCTracks) {
+    for (const CDCRecoHit3D& cdcHit : cdcTrack) {
       unsigned short eWireID = cdcHit.getWire().getEWire();
       wiresInCDCTrack.push_back(eWireID);
     }
@@ -91,7 +91,7 @@ void CDCBadWireCollectorModule::collect()
     if (pt < m_minimumPt) continue;
 
     // Request tracks coming from IP
-    if (d0 > 2 || z0 > 5) continue;
+    if (d0 > 2 || fabs(z0) > 5) continue;
 
     const Helix helixFit = fitresult->getHelix();
     buildEfficiencies(wiresInCDCTrack, helixFit);
@@ -100,7 +100,7 @@ void CDCBadWireCollectorModule::collect()
 
 void CDCBadWireCollectorModule::finish() {}
 const CDCWire& CDCBadWireCollectorModule::getIntersectingWire(const ROOT::Math::XYZVector& xyz, const CDCWireLayer& layer,
-    const Helix& helixFit) const
+    const Helix& helixFit)
 {
   ROOT::Math::XYZVector crosspoint;
   if (layer.isAxial())

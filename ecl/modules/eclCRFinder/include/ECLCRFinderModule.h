@@ -37,7 +37,7 @@ namespace Belle2 {
     ECLCRFinderModule();
 
     /** Destructor. */
-    virtual ~ECLCRFinderModule();
+    virtual ~ECLCRFinderModule() override;
 
     /** Initialize. */
     virtual void initialize() override;
@@ -110,13 +110,13 @@ namespace Belle2 {
     std::vector<bool> m_visited; /**< Vector to keep track in BFS */
 
     /** Convert vector of cell ids to 0/1 vectors from 1-8737. */
-    std::vector<int> oneHotVector(std::vector<int>& A, const int n);
+    static std::vector<int> oneHotVector(const std::vector<int>& A, const int n);
 
     /** Convert vector of vectors to one long vector. */
-    std::vector<int> flattenVector(std::vector<std::vector<int>>& A);
+    static std::vector<int> flattenVector(const std::vector<std::vector<int>>& A);
 
     /** Find all lists of cell-ids that share at least one cell using Breadth First Search (BFS) graph traversal algorithm. */
-    std::vector<std::set<int>> mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A);
+    std::vector<std::set<int>> mergeVectorsUsingBFSTraversal(const std::vector<std::vector<int>>& A);
 
     /** Get all connected regions. */
     std::vector<std::vector<int>> getConnectedRegions(const std::vector<int>& A, const std::vector<int>& B, const int maptype);

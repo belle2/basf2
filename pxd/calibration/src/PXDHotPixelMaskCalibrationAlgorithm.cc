@@ -135,7 +135,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
   }
 
   // We should have enough hits in the PXD before we decide a single sensor is dead
-  unsigned long long int minPXDHits =  minHits * nPXDSensors * c_nUCells * c_nVCells;
+  unsigned long long int minPXDHits = static_cast<unsigned long long int>(minHits) * nPXDSensors * c_nUCells * c_nVCells;
   if (nPXDHits < minPXDHits) {
     if (not forceContinueMasking) {
       B2INFO("Not enough data: Only " << nPXDHits << " raw hits were collected!");
@@ -319,7 +319,6 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       int pixID = bin - 1;
       int uCell = pixID / c_nVCells;
       int vCell = pixID % c_nVCells;
-      int drainID = uCell * 4 + vCell % 4;
 
       // First, we mask single pixels exceeding hit threshold
       float nhits = collector_pxdhitmap->GetBinContent(bin);
@@ -335,6 +334,7 @@ CalibrationAlgorithm::EResult PXDHotPixelMaskCalibrationAlgorithm::calibrate()
       // Then we accumulate hits along u and v direction for unmasked
       // pixels
       if (not masked) {
+        int drainID = uCell * 4 + vCell % 4;
         ++unmaskedCellsAlongDrain[drainID];
         unmaskedHitsAlongDrain[drainID] += nhits;
         ++unmaskedCellsAlongRow[vCell];

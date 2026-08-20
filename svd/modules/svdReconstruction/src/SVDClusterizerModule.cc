@@ -69,6 +69,8 @@ SVDClusterizerModule::SVDClusterizerModule() : Module(),
            m_returnRawClusterTime);
   addParam("shiftSVDClusterTime", m_shiftSVDClusterTime,
            "if True, applies SVDCluster time shift based on cluster-size.", m_shiftSVDClusterTime);
+  addParam("absoluteShiftSVDClusterTime", m_absoluteShiftSVDClusterTime,
+           "if True, applies an absolute SVDCluster time shift, based on the layer/side", m_absoluteShiftSVDClusterTime);
   addParam("SeedSN", m_cutSeed,
            "minimum SNR for strips to be considered as cluster seed. Overwritten by the dbobject, unless you set useDB = False.", m_cutSeed);
   addParam("ClusterSN", m_cutCluster,
@@ -415,7 +417,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (m_isMC) {
       // if no truehit associated to the cluster there is nothing to fudge
       int clsIndex = m_storeClusters.getEntries() - 1;
-      SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
+      const SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
       if (trueHit) {
         alterClusterPosition(trueHit);
         alterClusterTime();
@@ -507,7 +509,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
   return position;
 }
 
-void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
+void SVDClusterizerModule::alterClusterPosition(const SVDTrueHit* trueHit)
 {
   // alter the position of the last cluster in the array
   int clsIndex = m_storeClusters.getEntries() - 1;
@@ -516,7 +518,6 @@ void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
   float clsPosition = m_storeClusters[clsIndex]->getPosition();
   VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
   bool isU = m_storeClusters[clsIndex]->isUCluster();
-  int layerNum = sensorID.getLayerNumber();
 
   // get the track's incident angle
   double trkAngle = 0.;
@@ -532,6 +533,9 @@ void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
   float fudgeFactor = (float) gRandom->Gaus(0., sigma);
   m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
 
+  // only used in the B2DEBUG below, which expands to a conditional block
+  // cppcheck-suppress variableScope
+  int layerNum = sensorID.getLayerNumber();
   B2DEBUG(20, "Layer number: " << layerNum << ", is U side: " << isU << ", track angle: " << trkAngle << ", sigma: " << sigma <<
           ", cluster position: " << clsPosition << ", fudge factor: " << fudgeFactor);
 }
@@ -575,9 +579,10 @@ void SVDClusterizerModule::shiftSVDClusterTime()
                                                           m_storeClusters[clsIndex]->isUCluster(),
                                                           m_storeClusters[clsIndex]->getSize());
   //absolute shift
-  clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
-                                                m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
-                                                m_storeClusters[clsIndex]->isUCluster());
+  if (m_absoluteShiftSVDClusterTime)
+    clsTime -= m_svdAbsTimeShift->getAbsTimeShift(algo,
+                                                  m_storeClusters[clsIndex]->getSensorID().getLayerNumber(),
+                                                  m_storeClusters[clsIndex]->isUCluster());
 
   m_storeClusters[clsIndex]->setClsTime(clsTime);
 

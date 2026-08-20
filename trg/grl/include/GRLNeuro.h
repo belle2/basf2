@@ -47,10 +47,12 @@ namespace Belle2 {
       std::vector<std::vector<float>> nHidden;
       /** train result as output */
       int targetresult = 10;
+      /** Number of output nodes */
+      std::vector<unsigned> nOutput;
+      /** Threshold of output nodes */
+      std::vector<std::vector<float>> nn_thres;
       /** If true, multiply nHidden with number of input nodes. */
       bool multiplyHidden = false;
-      /** Output scale for all networks. */
-      std::vector<std::vector<float>> outputScale = {{ -1., 1.}};
 
 
       /** Number of CDC sectors. */

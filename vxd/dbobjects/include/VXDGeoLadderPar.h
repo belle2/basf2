@@ -25,9 +25,9 @@ namespace Belle2 {
   class VXDGeoLadderPar: public TObject {
   public:
     /** Constructor */
-    VXDGeoLadderPar(int layerID = 0, double shift = 0, double radius = 0,
-                    double slantedAngle = 0, double slantedRadius = 0,
-                    double glueSize = -1, const std::string& glueMaterial = ""):
+    explicit VXDGeoLadderPar(int layerID = 0, double shift = 0, double radius = 0,
+                             double slantedAngle = 0, double slantedRadius = 0,
+                             double glueSize = -1, const std::string& glueMaterial = ""):
       m_layerID(layerID), m_shift(shift), m_radius(radius),
       m_slantedAngle(slantedAngle), m_slantedRadius(slantedRadius),
       m_glueSize(glueSize), m_glueMaterial(glueMaterial) {}

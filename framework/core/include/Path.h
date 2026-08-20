@@ -43,7 +43,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~Path();
+    ~Path() override;
 
     /**
      * Adds a module to the path.

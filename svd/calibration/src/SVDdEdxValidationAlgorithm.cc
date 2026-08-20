@@ -45,7 +45,7 @@ using namespace RooFit;
 using namespace Belle2;
 
 SVDdEdxValidationAlgorithm::SVDdEdxValidationAlgorithm() : CalibrationAlgorithm("SVDdEdxValidationCollector"),
-  m_isMakePlots(true), m_fullValidation(true)
+  m_fullValidation(true), m_isMakePlots(true)
 {
   setDescription("SVD dE/dx validation algorithm");
 }

@@ -74,7 +74,7 @@ namespace Belle2::Conditions {
   private:
     /** Look for a payload in the local directory location, set the filename
      * member of the metadata instance and return true on success */
-    bool getLocalFile(const PayloadLocation& loc, PayloadMetadata& meta) const;
+    static bool getLocalFile(const PayloadLocation& loc, PayloadMetadata& meta);
     /** Look for a payload on a remote server and download if possible, set the
      * filename member of the metadata instance and return true on success */
     bool getRemoteFile(const PayloadLocation& loc, PayloadMetadata& meta);
@@ -84,7 +84,7 @@ namespace Belle2::Conditions {
      * message */
     bool getTemporaryFile(const std::string& url, PayloadMetadata& meta, bool silentOnMissing);
     /** Return the filename of a payload to look for given a directory structure and some metadata */
-    std::string getFilename(EDirectoryLayout structure, const PayloadMetadata& payload) const;
+    static std::string getFilename(EDirectoryLayout structure, const PayloadMetadata& payload);
     /** List of configured lookup locations: The first one will always be the
      * cache directory and the last one will always be fallback url included in
      * the payload metadata */

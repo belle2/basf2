@@ -57,7 +57,7 @@ namespace Belle2 {
     };
 
     /** Free structures on destruction */
-    ~Gearbox();
+    ~Gearbox() override;
 
     /** Return reference to the Gearbox instance */
     static Gearbox& getInstance();
@@ -131,6 +131,7 @@ namespace Belle2 {
      * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     std::string getString(const std::string& path, const std::string& defaultValue) const
     {
       return gearbox::Interface::getString(path, defaultValue);
@@ -170,7 +171,7 @@ namespace Belle2 {
      *
      * @param component Name of the DetectorComponent (e.g. IR, PXD)
      */
-    GearDir getDetectorComponent(const std::string& component);
+    static GearDir getDetectorComponent(const std::string& component);
 
     /**
      * Register a new input handler

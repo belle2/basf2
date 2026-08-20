@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * The destructor of the GeoMagneticField class.
      */
-    virtual ~GeoMagneticField();
+    virtual ~GeoMagneticField() override;
 
     /**
      * Creates the global ROOT objects and prepares everything for other creators.
@@ -57,7 +57,7 @@ namespace Belle2 {
     virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override;
 
     /** Create a Database configuration from Gearbox parameters */
-    MagneticField createConfiguration(const GearDir& content);
+    static MagneticField createConfiguration(const GearDir& content);
 
   protected:
 
@@ -103,9 +103,9 @@ namespace Belle2 {
     void read3dBField(const GearDir& component);
 
     /** Add a constant field component to a magnetic field configuration for the DB */
-    void addConstantBField(const GearDir& component, MagneticField& fieldmap);
+    static void addConstantBField(const GearDir& component, MagneticField& fieldmap);
     /** Add a 3D field component to a magnetic field configuration for the DB */
-    void add3dBField(const GearDir& component, MagneticField& fielmap);
+    static void add3dBField(const GearDir& component, MagneticField& fielmap);
   private:
 
   };

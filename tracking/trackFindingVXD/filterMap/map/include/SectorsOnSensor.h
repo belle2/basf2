@@ -58,7 +58,6 @@ namespace Belle2 {
       index = 0;
       for (auto Usup : normalizedUsup)
         m_normalizedUsup.insert({Usup, index++});
-      // cppcheck-suppress unreadVariable
       m_normalizedUsup.insert({FLT_MAX, index++});
 
       m_fullSecIDs = fullSecIDs;

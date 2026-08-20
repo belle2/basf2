@@ -85,7 +85,7 @@ namespace Belle2 {
                                                  const int corners);
 
       /** return the chord length between cells */
-      double getDistance(const double alpha, const double R);
+      static double getDistance(const double alpha, const double R);
 
     };
 

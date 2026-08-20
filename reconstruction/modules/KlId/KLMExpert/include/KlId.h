@@ -75,7 +75,7 @@ namespace Belle2::KlongId {
   }
 
   /** return the mc hirachy of the klong 0:not a klong 1:final particle, 2: klong is mother etc */
-  int mcParticleIsKlong(Belle2::MCParticle* part)
+  int mcParticleIsKlong(const Belle2::MCParticle* part)
   {
     unsigned int hirachy_counter = 0;
     if (mcParticleIsBeamBKG(part)) {
@@ -100,7 +100,7 @@ namespace Belle2::KlongId {
   bool isKLMClusterSignal(const Belle2::KLMCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
-    Belle2::MCParticle* part        = mcParticleWeightPair.first;
+    const Belle2::MCParticle* part  = mcParticleWeightPair.first;
     if (!part) {return false; }
     float mcWeight = mcParticleWeightPair.second;
     if (mcParticleIsKlong(part) && (mcWeight > mcWeigthCut)) {
@@ -114,7 +114,7 @@ namespace Belle2::KlongId {
   bool isECLClusterSignal(const Belle2::ECLCluster& cluster, float mcWeigthCut = 0.66)
   {
     const auto mcParticleWeightPair = cluster.getRelatedToWithWeight<Belle2::MCParticle>();
-    Belle2::MCParticle* part        = mcParticleWeightPair.first;
+    const Belle2::MCParticle* part  = mcParticleWeightPair.first;
     if (!part) {return false; }
     float mcWeight = mcParticleWeightPair.second;
     if (mcParticleIsKlong(part) && (mcWeight > mcWeigthCut)) {
@@ -125,7 +125,7 @@ namespace Belle2::KlongId {
   }
 
   /** return if mc particle has a certain pdg in the decay chain*/
-  int isMCParticlePDG(Belle2::MCParticle* part, int pdg)
+  int isMCParticlePDG(const Belle2::MCParticle* part, int pdg)
   {
     bool stop = false;
     while (!stop) {
@@ -148,7 +148,7 @@ namespace Belle2::KlongId {
    *  hadronic or gammas which is whats relevant
    *  for klid investigations.
    * */
-  int getPrimaryPDG(Belle2::MCParticle* part)
+  int getPrimaryPDG(const Belle2::MCParticle* part)
   {
 
     if (mcParticleIsBeamBKG(part)) {
@@ -211,7 +211,7 @@ namespace Belle2::KlongId {
     if (eclClusters.getEntries() > 0) {
       int index = 0;
       int indexOfClosestCluster = -1;
-      for (Belle2::ECLCluster& eclcluster : eclClusters) {
+      for (const Belle2::ECLCluster& eclcluster : eclClusters) {
 
         if (eclcluster.hasHypothesis(eclhypothesis)) {
 
@@ -304,7 +304,7 @@ namespace Belle2::KlongId {
             poca = trackPos;
           }
         }
-      } catch (genfit::Exception& e) {
+      } catch (const genfit::Exception& e) {
       }// try
     }// for gftrack
 
@@ -312,7 +312,6 @@ namespace Belle2::KlongId {
       return std::make_tuple(nullptr, oldDistance, std::unique_ptr<const ROOT::Math::XYZVector>(nullptr));
     } else {
       // actually this is fine because of the datastore
-      // cppcheck-suppress returnDanglingLifetime
       return std::make_tuple(closestTrack, oldDistance, std::unique_ptr<const ROOT::Math::XYZVector>(new ROOT::Math::XYZVector(poca)));
     }
   }

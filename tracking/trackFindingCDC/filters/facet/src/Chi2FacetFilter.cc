@@ -25,7 +25,6 @@ using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 Chi2FacetFilter::Chi2FacetFilter()
-// : m_param_chi2CutByISuperLayer{35.0, 130.0, 73.0, 76.0, 76.0, 84.0, 76.0, 100.0, 110.0} // efficiency 0.99 is a bit to loose
   : m_param_chi2CutByISuperLayer{35.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0, 75.0}
 {
 }
@@ -77,9 +76,11 @@ void Chi2FacetFilter::initialize()
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
   constexpr const int nSteps = 1;
-  const double chi2 = FacetFitter::fit(facet, nSteps);
-
   ISuperLayer iSL = facet.getISuperLayer();
+  // Pass the chi2 cut as third argument so the fit line is built and stored on the
+  // facet only when it passes, sparing the line construction for facets that fail.
+  const double chi2 = FacetFitter::fit(facet, nSteps, m_chi2CutByISuperLayer[iSL]);
+
   if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {
     return NAN;
   } else {

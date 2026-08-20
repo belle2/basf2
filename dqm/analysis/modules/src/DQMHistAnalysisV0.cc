@@ -89,7 +89,7 @@ void DQMHistAnalysisV0Module::event()
   gStyle->SetOptStat(0);
   gStyle->SetPalette(kViridis, 0, 0.7);
   for (int i = 0; i < 32; i++) {
-    TH2* h = (TH2*) findHist(Form("V0Objects/xvsy[%i]", i));
+    auto h = dynamic_cast<TH2*>(findHist(Form("V0Objects/xvsy[%i]", i)));
     m_c_xvsy[i]->cd();
     if (h) h->Draw("COLZ");
 
@@ -108,7 +108,7 @@ void DQMHistAnalysisV0Module::event()
     m_c_xvsy[i]->Update();
   }
 
-  TH2* hxz = (TH2*) findHist("V0Objects/xvsz");
+  auto hxz = dynamic_cast<TH2*>(findHist("V0Objects/xvsz"));
   m_c_xvsz->cd();
 
   // create a new pad for every event? -> mem leak!

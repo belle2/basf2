@@ -35,7 +35,7 @@ void TimeWalkCalibrationAlgorithm::createHisto()
 {
   B2INFO("Creating and filling histograms");
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   double halfCSize[56];
   for (int i = 0; i < 56; ++i) {
@@ -139,7 +139,7 @@ CalibrationAlgorithm::EResult TimeWalkCalibrationAlgorithm::calibrate()
     m_h2[ib]->FitSlicesY(0, 1, -1, 10);
     TString name = m_h2[ib]->GetName();
     TString hm_name = name + "_1";
-    m_h1[ib] = (TH1D*)gDirectory->Get(hm_name);
+    m_h1[ib] = static_cast<TH1D*>(gDirectory->Get(hm_name));
     if (!m_h1[ib]) {m_flag[ib] = 0; continue;}
     m_h1[ib]->SetDirectory(0);
     if (m_h1[ib]->GetEntries() < 5) {
@@ -303,7 +303,7 @@ void TimeWalkCalibrationAlgorithm::prepare()
 void TimeWalkCalibrationAlgorithm::updateT0()
 {
   B2INFO("Add constant term into T0 database");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
   double T0;
   for (int ilay = 0; ilay < 56; ++ilay) {

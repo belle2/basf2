@@ -85,6 +85,9 @@ namespace Belle2 {
      *
      * @return The initial random number generator seed.
      */
+    // exposed to Python as get_random_seed(): boost::python cannot wrap a function
+    // returning a reference without an explicit return_value_policy
+    // cppcheck-suppress returnByReference
     static std::string getSeed() {return s_initialSeed;};
 
     //--------------------------------------------------

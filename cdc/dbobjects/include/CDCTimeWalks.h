@@ -84,7 +84,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, std::vector<float>> getTimeWalkParams() const
+    const std::map<unsigned short, std::vector<float>>& getTimeWalkParams() const
     {
       return m_tws;
     }

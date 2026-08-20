@@ -51,7 +51,7 @@ namespace Belle2 {
       std::vector<TrackingUtilities::ParameterVariantMap> getDefaultFineRelaxationSchedule() const;
 
       /// Get a series of parameters to be set for each pass over the rough hough space
-      std::vector<TrackingUtilities::ParameterVariantMap> getDefaultRoughRelaxationSchedule() const;
+      static std::vector<TrackingUtilities::ParameterVariantMap> getDefaultRoughRelaxationSchedule();
 
     private:
       /// Maximal curvature acceptance of the CDC

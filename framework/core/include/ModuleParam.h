@@ -54,7 +54,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~ModuleParam();
+    virtual ~ModuleParam() override;
 
     /**
      * Sets the value of a parameter.

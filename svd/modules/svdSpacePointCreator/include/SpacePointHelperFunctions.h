@@ -20,6 +20,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/MathHelpers.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -160,9 +161,9 @@ namespace Belle2 {
 
           if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
             bool isContinue = true;
-            for (auto& uitem : uTimeGroupId) {
+            for (const auto& uitem : uTimeGroupId) {
               if (uitem < 0 || uitem >= numberOfSignalGroups) continue;
-              for (auto& vitem : vTimeGroupId) {
+              for (const auto& vitem : vTimeGroupId) {
                 if (vitem < 0 || vitem >= numberOfSignalGroups) continue;
                 if ((uitem == vitem) || formSingleSignalGroup) { isContinue = false; break; }
               }
@@ -248,7 +249,7 @@ namespace Belle2 {
    */
 
 
-  inline void calculatePairingProb(TFile* pdfFile, std::vector<const SVDCluster*>& clusters, double& prob, double& error,
+  inline void calculatePairingProb(TFile* pdfFile, const std::vector<const SVDCluster*>& clusters, double& prob, double& error,
                                    bool useLegacyNaming)
   {
 
@@ -307,11 +308,11 @@ namespace Belle2 {
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
-    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError, 2) +
-                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError, 2) +
-                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError, 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError(), 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError(), 2));
+    error = prob * sqrt(square(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError) +
+                        square(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError) +
+                        square(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError) +
+                        square(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError()) +
+                        square(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError()));
   }
 
   /** finds all possible combinations of U and V Clusters for SVDClusters.
@@ -341,7 +342,7 @@ namespace Belle2 {
     }
 
 
-    for (auto& aSensor : activatedSensors)
+    for (const auto& aSensor : activatedSensors)
       findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo, numberOfSignalGroups,
                                formSingleSignalGroup,
                                noiseCal, svdSpacePointSelectionFunction, useSVDSpacePointSNRFractionSelector);

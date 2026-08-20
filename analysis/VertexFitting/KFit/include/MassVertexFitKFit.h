@@ -32,8 +32,7 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       MassVertexFitKFit(void);
       /** Destruct the object. */
-      ~MassVertexFitKFit(void);
-
+      ~MassVertexFitKFit(void) override;
 
     public:
       /** Set an initial vertex point for the mass-vertex constraint fit.
@@ -61,8 +60,6 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       unfixMass(void);
-      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m) override;
-      enum KFitError::ECode       setZeroCorrelation(void) override;
 
 
       /** Get a vertex position.

@@ -91,10 +91,6 @@ void KLMClusterEfficiencyModule::initialize()
   gStyle->SetOptStat(0);
 }
 
-void KLMClusterEfficiencyModule::beginRun()
-{
-}
-
 void KLMClusterEfficiencyModule::event()
 {
   static int nevent = 0;
@@ -305,10 +301,6 @@ void KLMClusterEfficiencyModule::event()
       }
     }
   }
-}
-
-void KLMClusterEfficiencyModule::endRun()
-{
 }
 
 void KLMClusterEfficiencyModule::terminate()

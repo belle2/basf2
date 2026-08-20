@@ -185,6 +185,7 @@ GRLNeuroModule::beginRun()
       m_parameters.nMLP           = m_db_trggrlconfig->get_ecltaunn_nMLP();
       m_parameters.multiplyHidden = m_db_trggrlconfig->get_ecltaunn_multiplyHidden();
       m_parameters.nHidden        = m_db_trggrlconfig->get_ecltaunn_nHidden();
+      m_parameters.nOutput        = m_db_trggrlconfig->get_ecltaunn_nOutput();
       m_parameters.n_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_n_cdc_sector();
       m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();

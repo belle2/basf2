@@ -19,12 +19,12 @@
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitPair.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -61,14 +61,14 @@ CDCObservations2D::fill(double x, double y, double signedRadius, double weight)
 }
 
 std::size_t
-CDCObservations2D::fill(const Vector2D& pos2D, double signedRadius, double weight)
+CDCObservations2D::fill(const ROOT::Math::XYVector& pos2D, double signedRadius, double weight)
 {
   return fill(pos2D.x(), pos2D.y(), signedRadius, weight);
 }
 
 std::size_t CDCObservations2D::append(const CDCWireHit& wireHit, ERightLeft rlInfo)
 {
-  const Vector2D& wireRefPos2D = wireHit.getRefPos2D();
+  const ROOT::Math::XYVector& wireRefPos2D = wireHit.getRefPos2D();
 
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
@@ -113,7 +113,7 @@ std::size_t CDCObservations2D::append(const CDCRLWireHit& rlWireHit)
   const double driftLength = rlWireHit.getRefDriftLength();
   const double driftLengthVariance = rlWireHit.getRefDriftLengthVariance();
 
-  const Vector2D& wireRefPos2D = rlWireHit.getRefPos2D();
+  const ROOT::Math::XYVector& wireRefPos2D = rlWireHit.getRefPos2D();
 
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RLDriftCircle and isValid(rlInfo)) {
@@ -166,14 +166,14 @@ std::size_t CDCObservations2D::append(const CDCFacet& facet)
 
 std::size_t CDCObservations2D::append(const CDCRecoHit2D& recoHit2D)
 {
-  Vector2D fitPos2D;
+  ROOT::Math::XYVector fitPos2D;
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RecoPos) {
     fitPos2D = recoHit2D.getRecoPos2D();
     signedDriftLength = 0;
 
     // Fall back to the rl circle in case position is not setup
-    if (fitPos2D.hasNAN()) {
+    if (VectorUtil::hasNAN(fitPos2D)) {
       fitPos2D = recoHit2D.getWire().getRefPos2D();
       signedDriftLength = recoHit2D.getSignedRefDriftLength();
     }
@@ -207,7 +207,7 @@ std::size_t CDCObservations2D::append(const CDCRecoHit2D& recoHit2D)
 
 std::size_t CDCObservations2D::append(const CDCRecoHit3D& recoHit3D)
 {
-  Vector2D fitPos2D = recoHit3D.getRecoPos2D();
+  ROOT::Math::XYVector fitPos2D = recoHit3D.getRecoPos2D();
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RecoPos) {
     fitPos2D = recoHit3D.getRecoPos2D();
@@ -289,7 +289,7 @@ std::size_t CDCObservations2D::appendRange(const std::vector<const CDCWire*>& wi
   for (const CDCWire* ptrWire : wires) {
     if (not ptrWire) continue;
     const CDCWire& wire = *ptrWire;
-    const Vector2D& wirePos = wire.getRefPos2D();
+    const ROOT::Math::XYVector& wirePos = wire.getRefPos2D();
     const double driftLength = 0.0;
     const double weight = 1.0;
     nAppendedHits += fill(wirePos, driftLength, weight);
@@ -327,34 +327,34 @@ std::size_t CDCObservations2D::getNObservationsWithDriftRadius() const
   return result;
 }
 
-Vector2D CDCObservations2D::getCentralPoint() const
+ROOT::Math::XYVector CDCObservations2D::getCentralPoint() const
 {
   std::size_t n = size();
-  if (n == 0) return Vector2D(NAN, NAN);
+  if (n == 0) return ROOT::Math::XYVector(NAN, NAN);
   std::size_t i = n / 2;
 
   if (isEven(n)) {
     // For even number of observations use the middle one with the bigger distance from IP
-    Vector2D center1(getX(i), getY(i));
-    Vector2D center2(getX(i - 1), getY(i - 1));
-    return center1.normSquared() > center2.normSquared() ? center1 : center2;
+    ROOT::Math::XYVector center1(getX(i), getY(i));
+    ROOT::Math::XYVector center2(getX(i - 1), getY(i - 1));
+    return center1.Mag2() > center2.Mag2() ? center1 : center2;
   } else {
-    Vector2D center1(getX(i), getY(i));
+    ROOT::Math::XYVector center1(getX(i), getY(i));
     return center1;
   }
 }
 
-void CDCObservations2D::passiveMoveBy(const Vector2D& origin)
+void CDCObservations2D::passiveMoveBy(const ROOT::Math::XYVector& origin)
 {
   Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getEigenObservationMatrix(this);
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
 
-Vector2D CDCObservations2D::centralize()
+ROOT::Math::XYVector CDCObservations2D::centralize()
 {
   // Pick an observation at the center
-  Vector2D centralPoint = getCentralPoint();
+  ROOT::Math::XYVector centralPoint = getCentralPoint();
   passiveMoveBy(centralPoint);
   return centralPoint;
 }

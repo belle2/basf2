@@ -341,8 +341,25 @@ namespace Belle2 {
     void removeSpacePoint(int indexInTrackCand);
 
     /** Overloading the less operator to compare SPTCs based on their quality index. This is used in
-     *  in SPTCSelectorXBestPerFamily for instance. */
-    bool operator <(const SpacePointTrackCand& rhs) const { return m_qualityIndicator < rhs.m_qualityIndicator; }
+     *  in SPTCSelectorXBestPerFamily for instance. A deterministic tie-breaker is applied when the
+     *  quality indicators are equal. */
+    bool operator <(const SpacePointTrackCand& rhs) const
+    {
+      if (m_qualityIndicator != rhs.m_qualityIndicator) {
+        return m_qualityIndicator < rhs.m_qualityIndicator;
+      }
+      if (m_trackSpacePoints.size() != rhs.m_trackSpacePoints.size()) {
+        return m_trackSpacePoints.size() < rhs.m_trackSpacePoints.size();
+      }
+      for (size_t iHit = 0; iHit < m_trackSpacePoints.size(); ++iHit) {
+        const int lhsIndex = m_trackSpacePoints[iHit]->getArrayIndex();
+        const int rhsIndex = rhs.m_trackSpacePoints[iHit]->getArrayIndex();
+        if (lhsIndex != rhsIndex) {
+          return lhsIndex < rhsIndex;
+        }
+      }
+      return false;
+    }
 
   protected:
     /**

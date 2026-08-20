@@ -20,6 +20,7 @@ using namespace Belle2;
 void setgrlconfig()
 {
 
+  //number of network. now it is 1, tauNN only. Maximum 10.
   const int N_config = 1;
 
   const int run[N_config][4] = { //itnitial exp, initial run, end exp, end run
@@ -365,6 +366,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_nMLP(ecltaunn_nMLP[i]);
       db_grlconfig->set_ecltaunn_multiplyHidden(ecltaunn_multiplyHidden[i]);
       db_grlconfig->set_ecltaunn_nHidden(ecltaunn_nHidden[i]);
+      db_grlconfig->set_ecltaunn_nOutput(ecltaunn_nOutput[i]);
       db_grlconfig->set_ecltaunn_n_cdc_sector(ecltaunn_n_cdc_sector[i]);
       db_grlconfig->set_ecltaunn_n_ecl_sector(ecltaunn_n_ecl_sector[i]);
       db_grlconfig->set_ecltaunn_i_cdc_sector(ecltaunn_i_cdc_sector[i]);
@@ -410,6 +412,7 @@ void setgrlconfig()
       db_grlconfig->set_ecltaunn_nMLP(ecltaunn_nMLP[i]);
       db_grlconfig->set_ecltaunn_multiplyHidden(ecltaunn_multiplyHidden[i]);
       db_grlconfig->set_ecltaunn_nHidden(ecltaunn_nHidden[i]);
+      db_grlconfig->set_ecltaunn_nOutput(ecltaunn_nOutput[i]);
       db_grlconfig->set_ecltaunn_n_cdc_sector(ecltaunn_n_cdc_sector[i]);
       db_grlconfig->set_ecltaunn_n_ecl_sector(ecltaunn_n_ecl_sector[i]);
       db_grlconfig->set_ecltaunn_i_cdc_sector(ecltaunn_i_cdc_sector[i]);

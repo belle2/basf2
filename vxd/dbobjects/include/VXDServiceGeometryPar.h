@@ -21,8 +21,8 @@ namespace Belle2 {
   public:
 
     /**Constructor */
-    VXDBoxTypesPar(const std::string& name = "", const std::string& material = "", int identifier = 0,
-                   double width = 0, double length = 0, double height = 0) :
+    explicit VXDBoxTypesPar(const std::string& name = "", const std::string& material = "", int identifier = 0,
+                            double width = 0, double length = 0, double height = 0) :
       m_name(name), m_material(material), m_identifier(identifier), m_width(width), m_length(length), m_height(height)
     {}
     //! Get width in mm
@@ -32,9 +32,9 @@ namespace Belle2 {
     //! Get height in mm
     double getHeight(void) const { return m_height; }
     //! Get material
-    std::string getMaterial(void) const { return m_material; }
+    const std::string& getMaterial(void) const { return m_material; }
     //! Get name
-    std::string getName(void) const { return m_name; }
+    const std::string& getName(void) const { return m_name; }
     //! Get identifier
     int getIdentifier(void) const { return m_identifier; }
 
@@ -86,8 +86,8 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    VXDBoxPositionsPar(const std::string& name = "", double minZ = 0, double maxZ = 0, double minR = 0, double maxR = 0,
-                       int divisions = 0) :
+    explicit VXDBoxPositionsPar(const std::string& name = "", double minZ = 0, double maxZ = 0, double minR = 0, double maxR = 0,
+                                int divisions = 0) :
       m_name(name), m_minZ(minZ), m_maxZ(maxZ), m_minR(minR), m_maxR(maxR), m_divisions(divisions)
     {}
     //! Get minZ in mm

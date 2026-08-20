@@ -26,7 +26,7 @@ namespace Belle2 {
     LayerPXDRelationFilter();
 
     /// Default destructor
-    ~LayerPXDRelationFilter();
+    ~LayerPXDRelationFilter() override;
 
     /// Return all states the given state is possible related to.
     std::vector<CKFToPXDState*> getPossibleTos(CKFToPXDState* from,

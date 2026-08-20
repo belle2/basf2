@@ -20,9 +20,9 @@
 #include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
 #include <framework/database/DBObjPtr.h>
 #include <vector>
-#include "TList.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TList.h>
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -36,7 +36,7 @@ namespace Belle2 {
     /** Copy constructor (disabled) */
     SVDDQMExpressRecoModule(const SVDDQMExpressRecoModule&) = delete;
     /* Destructor */
-    virtual ~SVDDQMExpressRecoModule();
+    virtual ~SVDDQMExpressRecoModule() override;
     /** Operator = (disabled) */
     SVDDQMExpressRecoModule& operator=(const SVDDQMExpressRecoModule&) = delete;
 

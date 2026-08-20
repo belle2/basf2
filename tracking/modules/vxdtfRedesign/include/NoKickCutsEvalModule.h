@@ -71,7 +71,7 @@ namespace Belle2 {
     *  input: (momentum, width of momentum bin)
     *  output: (value of the function)
     */
-    double cutFunction(int p, double pwidth);
+    static double cutFunction(int p, double pwidth);
 
     /** alternative cut function (not used, wider cuts) */
     // double cutFunction(int p, double pwid)

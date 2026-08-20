@@ -22,10 +22,7 @@ namespace Belle2 {
     PrescaleModule();
 
     /** Destructor of the module. */
-    virtual ~PrescaleModule() {};
-
-    /** No Initialization necessary */
-    virtual void initialize() override {};
+    virtual ~PrescaleModule() override {};
 
     /** Sets the return value by running a RNG vs. the prescale value */
     virtual void event() override;

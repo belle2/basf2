@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <gtest/gtest.h>
 
@@ -20,7 +21,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian_identit
   for (double curvature : { -1.0, 0.0, 1.0}) {
     PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
 
-    PerigeeJacobian moveByZeroJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
+    PerigeeJacobian moveByZeroJacobian = circle.passiveMoveByJacobian(ROOT::Math::XYVector(0.0, 0.0));
     EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
     EXPECT_NEAR(0.0, moveByZeroJacobian(0, 1), 10e-7);
     EXPECT_NEAR(0.0, moveByZeroJacobian(0, 2), 10e-7);
@@ -39,7 +40,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtr
 {
   for (double curvature : { -1.0, 0.0, 1.0}) {
     PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
-    Vector2D by(0.1, 1.0);
+    ROOT::Math::XYVector by(0.1, 1.0);
 
     PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(by);
 
@@ -83,7 +84,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
   PerigeeCircle circle(1.0, -M_PI / 2, 0);
 
-  PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(-1.0, 0.0));
+  PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(ROOT::Math::XYVector(-1.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 1), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 2), 10e-7);
@@ -96,7 +97,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   EXPECT_NEAR(0.0, moveByOneJacobian(2, 1), 10e-7);
   EXPECT_NEAR(1.0, moveByOneJacobian(2, 2), 10e-7);
 
-  PerigeeJacobian moveByTwoYJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, -2.0));
+  PerigeeJacobian moveByTwoYJacobian = circle.passiveMoveByJacobian(ROOT::Math::XYVector(0.0, -2.0));
 
   // Hand calculated intermediate quantities;
   double deltaParallel = 2;
@@ -140,7 +141,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0.0, PerigeeCovariance(perigeeVariance));
 
   {
-    PerigeeCovariance noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
+    PerigeeCovariance noMoveVariance = circle.passiveMovedCovarianceBy(ROOT::Math::XYVector(0.0, 0.0));
 
     EXPECT_NEAR(1.0, noMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 1), 10e-7);
@@ -156,7 +157,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   }
 
   {
-    PerigeeCovariance noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
+    PerigeeCovariance noChangeMoveVariance = circle.passiveMovedCovarianceBy(ROOT::Math::XYVector(-1.0, 0.0));
 
     EXPECT_NEAR(1.0, noChangeMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 1), 10e-7);
@@ -172,7 +173,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   }
 
   {
-    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
+    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(ROOT::Math::XYVector(2.0, 0.0));
 
     EXPECT_NEAR(1.0, transformedVariance(0, 0), 10e-7);
 
@@ -192,7 +193,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     // Should be same as before
-    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
+    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(ROOT::Math::XYVector(2.5, 0.0));
 
     EXPECT_NEAR(1, transformedVariance(0, 0), 10e-7);
 
@@ -232,11 +233,11 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMove)
   // circle.perigeeCovariance().Print();
 
   // Test if the move commutes
-  circle.passiveMoveBy(Vector2D(0.0, -1.0));
+  circle.passiveMoveBy(ROOT::Math::XYVector(0.0, -1.0));
 
   // circle.perigeeCovariance().Print();
 
-  circle.passiveMoveBy(Vector2D(0.0, 1.0));
+  circle.passiveMoveBy(ROOT::Math::XYVector(0.0, 1.0));
 
   // circle.perigeeCovariance().Print();
 

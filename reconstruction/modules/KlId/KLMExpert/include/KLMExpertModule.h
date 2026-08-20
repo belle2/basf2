@@ -37,7 +37,7 @@ namespace Belle2 {
     KLMExpertModule();
 
     /** Destructor */
-    virtual ~KLMExpertModule();
+    virtual ~KLMExpertModule() override;
 
     /** init */
     virtual void initialize() override;

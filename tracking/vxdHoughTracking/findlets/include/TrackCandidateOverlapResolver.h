@@ -9,11 +9,13 @@
 
 #include <tracking/trackingUtilities/findlets/base/Findlet.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
   class SVDCluster;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
@@ -27,13 +29,16 @@ namespace Belle2 {
       TrackCandidateOverlapResolver();
 
       /// Default destructor
-      ~TrackCandidateOverlapResolver();
+      ~TrackCandidateOverlapResolver() override;
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Create the store arrays
       void initialize() override;
+
+      /// Check dbobject validity
+      void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining
       void apply(std::vector<SpacePointTrackCand>& spacePointTrackCandsToResolve) override;
@@ -49,6 +54,12 @@ namespace Belle2 {
 
       /// Minimum of activityState of candidate required to be accepted by the algorithm.
       double m_minActivityState = 0.7;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
+
+      /// parameters prefix (finalOverlapResolver, refinerOverlapResolver)
+      std::string m_prefix = "";
     };
 
   }

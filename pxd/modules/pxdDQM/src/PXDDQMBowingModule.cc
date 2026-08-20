@@ -17,7 +17,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <vxd/geometry/GeoCache.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 
 using namespace Belle2;
@@ -59,7 +59,7 @@ void PXDDQMBowingModule::initialize()
 
   /// get the bowing amplitude from the alignment
   DBObjPtr<VXDAlignment> alignment;
-  VXD::GeoCache& geometry(VXD::GeoCache::getInstance());
+  const VXD::GeoCache& geometry(VXD::GeoCache::getInstance());
   const std::vector<VxdID>& sensors = geometry.getListOfSensors();
   for (const VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geometry.getSensorInfo(aVxdID);
@@ -133,7 +133,7 @@ void PXDDQMBowingModule::event()
       const PXDRecoHit* hit = dynamic_cast<PXDRecoHit*>(track.getPoint(i)->getRawMeasurement(0));
       if (!hit) continue;
 
-      const auto fitterInfo = track.getPoint(i)->getFitterInfo();
+      const auto* fitterInfo = track.getPoint(i)->getFitterInfo();
       if (fitterInfo) {
         const auto& vxdid = VxdID(hit->getPlaneId());
         if (vxdid.getSensorNumber() != 1) continue;
@@ -176,7 +176,7 @@ void PXDDQMBowingModule::defineHisto()
   }
   const VXD::GeoCache& vxdGeometry(VXD::GeoCache::getInstance());
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
-  for (VxdID& avxdid : sensors) {
+  for (const VxdID& avxdid : sensors) {
     const VXD::SensorInfoBase& info = vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD
         || avxdid.getSensorNumber() != 1) continue;  /** we are only interested in forward PXD sensor */

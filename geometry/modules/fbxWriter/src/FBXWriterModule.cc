@@ -9,19 +9,19 @@
 #include <geometry/modules/fbxWriter/FBXWriterModule.h>
 #include <geometry/GeometryManager.h>
 
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4LogicalVolume.hh"
-#include "G4VSolid.hh"
-#include "G4DisplacedSolid.hh"
-#include "G4Material.hh"
-#include "G4VisAttributes.hh"
-#include "G4ThreeVector.hh"
-#include "G4RotationMatrix.hh"
-#include "G4Transform3D.hh"
-#include "G4VPVParameterisation.hh"
+#include <G4PhysicalVolumeStore.hh>
+#include <G4LogicalVolumeStore.hh>
+#include <G4SolidStore.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4LogicalVolume.hh>
+#include <G4VSolid.hh>
+#include <G4DisplacedSolid.hh>
+#include <G4Material.hh>
+#include <G4VisAttributes.hh>
+#include <G4ThreeVector.hh>
+#include <G4RotationMatrix.hh>
+#include <G4Transform3D.hh>
+#include <G4VPVParameterisation.hh>
 #include <G4Tubs.hh>
 #include <G4Polyhedron.hh>
 
@@ -265,7 +265,7 @@ void FBXWriterModule::writeMaterialNode(int lvIndex, const std::string& matName)
   } else {
     visible = false;
   }
-  if (logVol->GetSensitiveDetector() != nullptr) visible = "";
+  if (logVol->GetSensitiveDetector() != nullptr) visible = true;
   (*m_Visible)[lvIndex] = visible;
   m_File << "\t; Color for LogVol " << logVol->GetName() << std::endl <<
          "\tMaterial: " << matID << ", \"Material::" << matName << R"(", "" {)" << std::endl <<
@@ -370,16 +370,16 @@ void FBXWriterModule::addModels(G4VPhysicalVolume* physVol, int replica)
           break;
         case kRho:
           if (solid->GetEntityType() == "G4Tubs") {
-            double originalRMin = ((G4Tubs*)solid)->GetInnerRadius();
-            double originalRMax = ((G4Tubs*)solid)->GetOuterRadius();
-            ((G4Tubs*)solid)->SetInnerRadius(offset + width * replica);
-            ((G4Tubs*)solid)->SetOuterRadius(offset + width * (replica + 1));
+            double originalRMin = (static_cast<G4Tubs*>(solid))->GetInnerRadius();
+            double originalRMax = (static_cast<G4Tubs*>(solid))->GetOuterRadius();
+            (static_cast<G4Tubs*>(solid))->SetInnerRadius(offset + width * replica);
+            (static_cast<G4Tubs*>(solid))->SetOuterRadius(offset + width * (replica + 1));
             std::string solidName = (*m_SolidName)[solidIndex];
             solidName.append("_R");
             solidName.append(std::to_string(replica));
             writeGeometryNode(solid, solidName, (*m_SolidID)[solidIndex] + 0x00010000 * replica);
-            ((G4Tubs*)solid)->SetInnerRadius(originalRMin);
-            ((G4Tubs*)solid)->SetOuterRadius(originalRMax);
+            (static_cast<G4Tubs*>(solid))->SetInnerRadius(originalRMin);
+            (static_cast<G4Tubs*>(solid))->SetOuterRadius(originalRMax);
           } else if (replica == 0) {
             B2WARNING("Built-in volumes replicated along radius for " << solid->GetEntityType() <<
                       " (solid " << solid->GetName() << ") are not visualisable.");
@@ -1019,7 +1019,7 @@ HepPolyhedron* FBXWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   HepPolyhedron* polyhedronB = nullptr;
   G4VSolid* solidB2 = solidB;
   if (solidB->GetEntityType() == "G4DisplacedSolid") {
-    solidB2 = ((G4DisplacedSolid*)solidB)->GetConstituentMovedSolid();
+    solidB2 = (static_cast<G4DisplacedSolid*>(solidB))->GetConstituentMovedSolid();
   }
   if ((solidB2->GetEntityType() == "G4IntersectionSolid") ||
       (solidB2->GetEntityType() == "G4UnionSolid") ||
@@ -1028,8 +1028,8 @@ HepPolyhedron* FBXWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
     polyhedronB = getBooleanSolidPolyhedron(solidB2);
     if (solidB != solidB2) { // was solidB a G4DisplacedSolid?
       polyhedronB->Transform(G4Transform3D(
-                               ((G4DisplacedSolid*)solidB)->GetObjectRotation(),
-                               ((G4DisplacedSolid*)solidB)->GetObjectTranslation()));
+                               (static_cast<G4DisplacedSolid*>(solidB))->GetObjectRotation(),
+                               (static_cast<G4DisplacedSolid*>(solidB))->GetObjectTranslation()));
     }
   } else {
     polyhedronB = new HepPolyhedron(*(solidB->GetPolyhedron()));

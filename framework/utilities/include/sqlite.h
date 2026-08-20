@@ -248,7 +248,7 @@ namespace sqlite {
     /** Iterator to the beginning */
     iterator begin() { return iterator(this); }
     /** Iterator to the end */
-    iterator end() const { return iterator(); }
+    static iterator end() { return iterator(); }
 
     /** Create a statement for an existing database object */
     ObjectStatement(sqlite3* db, const std::string& query, bool persistent)

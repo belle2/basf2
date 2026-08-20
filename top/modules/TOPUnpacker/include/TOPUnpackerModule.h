@@ -22,6 +22,7 @@
 #include <top/dataobjects/TOPProductionEventDebug.h>
 #include <top/dataobjects/TOPProductionHitDebug.h>
 #include <top/dataobjects/TOPInjectionVeto.h>
+#include <top/dataobjects/TOPUnpackerErrors.h>
 #include <string>
 
 namespace Belle2 {
@@ -223,6 +224,14 @@ namespace Belle2 {
     static std::string getFrontEndName(RawTOP& raw, int finesse);
 
     /**
+     * Returns front-end number; this should be the same as the boardstack number within the TOP counted from 0.
+     * @param raw raw data
+     * @param finesse finesse number
+     * @return front-end number
+     */
+    static unsigned getFrontEndNumber(RawTOP& raw, int finesse);
+
+    /**
      * Error messages suppression logic
      * @return true to print the error message, false to suppress it
      */
@@ -296,6 +305,7 @@ namespace Belle2 {
     StoreArray<TOPProductionHitDebug> m_productionHitDebugs;   /**< collection of hit debug data */
     StoreArray<TOPTemplateFitResult> m_templateFitResults;   /**< collection of template fit results */
     StoreObjPtr<TOPInjectionVeto> m_injectionVeto; /**< injection veto flag */
+    StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
 
     // other
 
@@ -306,6 +316,7 @@ namespace Belle2 {
     unsigned m_numErrors = 0; /**< number of error messages per event */
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry param */
     std::map<int, int> m_channelStatistics; /**<counts how many different channels have been parsed in a given SCROD packet */
+    unsigned m_BS = 0; /**< temporary boardstack number within the TOP detector */
 
   };
 

@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMMuonIDDNNExpertModule();
+    ~KLMMuonIDDNNExpertModule() override;
 
     /**
      * Initializer.
@@ -62,11 +62,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.
@@ -122,25 +117,25 @@ namespace Belle2 {
     static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
 
     /** BKLM phi-measuring strip width (cm) by layer. */
-    std::array < float, m_maxBKLMLayers > m_BarrelPhiStripWidth;
+    std::array < float, m_maxBKLMLayers > m_BarrelPhiStripWidth{};
 
     /** BKLM Z-measuring strip width (cm) by layer. */
-    std::array < float, m_maxBKLMLayers > m_BarrelZStripWidth;
+    std::array < float, m_maxBKLMLayers > m_BarrelZStripWidth{};
 
     /** EKLM scintillator strip width (cm). */
-    float m_EndcapScintWidth;
+    float m_EndcapScintWidth = 0.;
 
     /** Container of hit widths of one track. Hit pattern variable. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_width;
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_width{};
 
     /** Container of hit steplength of one track. Hit pattern variable. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_steplength;
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_steplength{};
 
     /** Container of hit chi2 of one track. Hit pattern variable. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_chi2;
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_chi2{};
 
     /** Container of extrapolation situation at each KLM layer of one track. Hit pattern variable. */
-    std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext;
+    std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext{};
 
   };
 }

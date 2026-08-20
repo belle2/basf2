@@ -48,7 +48,7 @@ namespace Belle2 {
      *
      * TODO
      */
-    void persist(TTree* /*t*/, const std::string& /*branchname*/, const std::string& /*variablename*/)
+    static void persist(TTree* /*t*/, const std::string& /*branchname*/, const std::string& /*variablename*/)
     {
       // TODO
     }

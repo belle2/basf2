@@ -49,7 +49,6 @@ namespace Belle2 {
        *  Cppcheck may warn to pass the spans by reference here,
        *  however this would come at performance penalty.
        */
-      // cppcheck-suppress passedByValue
       QuadTreeNode(XSpan xSpan, YSpan ySpan, int level, This* parent)
         : m_xBinBounds {
         xSpan[0],

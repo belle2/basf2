@@ -28,7 +28,7 @@ namespace TreeFitter {
     virtual ErrCode initMotherlessParticle(FitParams& fitparams) override;
 
     /** destructor */
-    virtual ~RecoResonance() {};
+    virtual ~RecoResonance() override = default;
 
     /** dimension of the vector */
     virtual int dim() const override
@@ -65,6 +65,7 @@ namespace TreeFitter {
 
   private:
     /** has mass constraint */
+    // cppcheck-suppress duplInheritedMember ; deliberately shadows the Composite member
     bool m_massconstraint;
 
 

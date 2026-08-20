@@ -36,10 +36,6 @@ DQMHistComparitorModule::DQMHistComparitorModule()
   B2DEBUG(1, "DQMHistComparitor: Constructor done.");
 }
 
-DQMHistComparitorModule::~DQMHistComparitorModule()
-{
-}
-
 void DQMHistComparitorModule::initialize()
 {
   gStyle->SetOptStat(0);
@@ -91,14 +87,14 @@ void DQMHistComparitorModule::event()
     TH1* histo = nullptr;
     B2DEBUG(20, "== Search for " << it->histName << " with ref " << it->refName << "==");
     if (it->deltaflag) histo = getDelta(it->histName); // default: last delta
-    if (!histo) histo = findHist(it->histName, true); // only if changed
+    if (!histo) histo = findHist(it->histName, "", true); // only if changed
     if (!histo) {
       // B2DEBUG(20, "NOT Found " << it->histName);
       // Dont compare if missing or not updated ...
       continue;
     }
     // if compare normalized ... need configuration
-    auto refhist = findRefHist(it->refName, ERefScaling::c_RefScaleEntries, histo);
+    auto refhist = findRefHist(it->refName, "", ERefScaling::c_RefScaleEntries, histo);
     if (!refhist) {
       B2DEBUG(20, "NOT Found " << it->refName);
       // Dont compare if any of hists is missing ...

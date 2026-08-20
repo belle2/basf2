@@ -32,7 +32,7 @@ namespace Belle2 {
       explicit NotFilter(std::unique_ptr<AFilter> filter);
 
       /// Default destructor.
-      ~NotFilter();
+      ~NotFilter() override;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

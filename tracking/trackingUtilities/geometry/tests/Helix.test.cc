@@ -8,6 +8,9 @@
 
 #include <tracking/trackingUtilities/geometry/Helix.h>
 
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+
 #include <gtest/gtest.h>
 
 
@@ -21,14 +24,14 @@ TEST(TrackingUtilitiesTest, geometry_Helix_closest)
   // different representations.
   // The point of closest approach should always lie at the position of the original origin / its
   // transformed counterpart.
-  std::vector<Vector3D> bys = {Vector3D(0.0, 0.0, 0.0),
-                               Vector3D(0.0, 0.0, 5.0),
-                               Vector3D(0.0, 3.0, 0.0),
-                               Vector3D(3.0, 0.0, 0.0),
-                               Vector3D(-1.0, -2.0, 3.0)
-                              };
+  std::vector<ROOT::Math::XYZVector> bys = {ROOT::Math::XYZVector(0.0, 0.0, 0.0),
+                                            ROOT::Math::XYZVector(0.0, 0.0, 5.0),
+                                            ROOT::Math::XYZVector(0.0, 3.0, 0.0),
+                                            ROOT::Math::XYZVector(3.0, 0.0, 0.0),
+                                            ROOT::Math::XYZVector(-1.0, -2.0, 3.0)
+                                           };
 
-  for (const Vector3D& by : bys) {
+  for (const ROOT::Math::XYZVector& by : bys) {
     double curvature = +1.0 / 2.0;
     double phi0 = -M_PI / 2.0;
     double impact = +1.0;
@@ -36,15 +39,15 @@ TEST(TrackingUtilitiesTest, geometry_Helix_closest)
     double z0 = 0.0;
 
     Helix helix(curvature, phi0, impact, tanLambda, z0);
-    Vector3D point(0.0, 0.0, 0.0);
+    ROOT::Math::XYZVector point(0.0, 0.0, 0.0);
 
-    Vector3D expectedClosest = helix.perigee();
+    ROOT::Math::XYZVector expectedClosest = helix.perigee();
 
     helix.passiveMoveBy(by);
-    expectedClosest.passiveMoveBy(by);
-    point.passiveMoveBy(by);
+    expectedClosest -= by;
+    point -= by;
     {
-      Vector3D realClosest = helix.closest(point, true);
+      ROOT::Math::XYZVector realClosest = helix.closest(point, true);
       EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
       EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
       EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
@@ -52,7 +55,7 @@ TEST(TrackingUtilitiesTest, geometry_Helix_closest)
 
     helix.shiftPeriod(2);
     {
-      Vector3D realClosest = helix.closest(point, false);
+      ROOT::Math::XYZVector realClosest = helix.closest(point, false);
       EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
       EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
       EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
@@ -97,16 +100,16 @@ TEST(TrackingUtilitiesTest, geometry_Helix_arcLength2DToXY)
 
   Helix helix(curvature, phi0, impact, tanLambda, z0);
 
-  Vector2D origin(0.0, 0.0);
+  ROOT::Math::XYVector origin(0.0, 0.0);
   double closestArcLength2D = helix.arcLength2DToXY(origin);
   EXPECT_NEAR(0, closestArcLength2D, 10e-7);
 
-  double widestArcLength2D = helix.arcLength2DToXY(Vector2D(5.0, 0.0));
+  double widestArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(5.0, 0.0));
   EXPECT_NEAR(M_PI, widestArcLength2D, 10e-7);
 
-  double halfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, 5.0));
+  double halfArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(2.0, 5.0));
   EXPECT_NEAR(M_PI / 2, halfArcLength2D, 10e-7);
 
-  double otherHalfArcLength2D = helix.arcLength2DToXY(Vector2D(2.0, -5.0));
+  double otherHalfArcLength2D = helix.arcLength2DToXY(ROOT::Math::XYVector(2.0, -5.0));
   EXPECT_NEAR(-M_PI / 2, otherHalfArcLength2D, 10e-7);
 }

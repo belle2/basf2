@@ -28,14 +28,14 @@ namespace Belle2 {
     /** Set the hitFilterName
      * @param hitFilterName name of the hitFilter
      */
-    void setHitFilterName(const std::string hitFilterName)
+    void setHitFilterName(const std::string& hitFilterName)
     {
       m_hitFilterName = hitFilterName;
     }
     /** Set the seedFilterName
      * @param seedFilterName name of the seedFilter
      */
-    void setSeedFilterName(const std::string seedFilterName)
+    void setSeedFilterName(const std::string& seedFilterName)
     {
       m_seedFilterName = seedFilterName;
     }
@@ -115,7 +115,7 @@ namespace Belle2 {
     /** Set the PXDInterceptsName
      * @param PXDInterceptsName intercept parameter
      */
-    void setPXDInterceptsName(const std::string PXDInterceptsName)
+    void setPXDInterceptsName(const std::string& PXDInterceptsName)
     {
       m_paramPXDInterceptsName = PXDInterceptsName;
     }

@@ -49,6 +49,7 @@ namespace {
   std::vector<TF1*> FitFunctions;
   const double numberofADCPoints = 31.0;
 
+  // cppcheck-suppress constParameterCallback ; fit callbacks must keep the signature required by ROOT
   double fitf(double* x, double* par)
   {
 

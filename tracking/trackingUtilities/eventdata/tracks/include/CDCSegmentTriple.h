@@ -29,7 +29,7 @@ namespace Belle2 {
     public:
 
       /// Default constructor for ROOT compatibility
-      CDCSegmentTriple();
+      CDCSegmentTriple() = default;
 
       /// Constructor taking two axial segments leaving the middle stereo segment set to null pointer.
       CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
@@ -170,13 +170,13 @@ namespace Belle2 {
 
     private:
       /// Reference to the axial segment in the start of the triple.
-      const CDCAxialSegment2D* m_startSegment;
+      const CDCAxialSegment2D* m_startSegment{nullptr};
 
       /// Reference to the stereo segment in the middle of the triple.
-      const CDCStereoSegment2D* m_middleSegment;
+      const CDCStereoSegment2D* m_middleSegment{nullptr};
 
       /// Reference to the axial segment in the start of the triple.
-      const CDCAxialSegment2D* m_endSegment;
+      const CDCAxialSegment2D* m_endSegment{nullptr};
 
       /// Memory of the linear trajectory in the sz direction associated with the triple.
       mutable CDCTrajectory3D m_trajectory3D;

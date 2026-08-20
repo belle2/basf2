@@ -202,7 +202,7 @@ void TrackCombiner::apply(const std::vector<CDCTrack>& inputTracks,
 
     // Push segments to the common pool
     const CDCSegment3D* lastSegment = nullptr;
-    for (std::pair<InTracks, CDCSegment3D>& segmentInTrack : segmentsInTrack) {
+    for (const std::pair<InTracks, CDCSegment3D>& segmentInTrack : segmentsInTrack) {
       const InTracks& inTracks = segmentInTrack.first;
       const CDCSegment3D& segment = segmentInTrack.second;
       segment->setCellWeight(segment.size());

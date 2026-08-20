@@ -31,9 +31,6 @@ namespace Belle2 {
     /** Initialize */
     void initialize() override;
 
-    /** Actual digitization of all hits in the CDC. */
-    void event() override;
-
   private:
 
     CDC::CDCSimControlPar& m_scp;  /*!< Reference to CDCSim... */

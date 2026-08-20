@@ -83,13 +83,13 @@ void Utility::extract(const std::string& filename, const std::string& directory)
 {
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   auto weightfile = Weightfile::load(filename);
   weightfile.setRemoveTemporaryDirectories(false);
   setenv("TMPDIR", directory.c_str(), 1);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
-  auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+  auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
   expertLocal->load(weightfile);
 
 }
@@ -98,12 +98,12 @@ std::string Utility::info(const std::string& filename)
 {
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   auto weightfile = Weightfile::load(filename);
   GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  auto specific_options = supported_interfaces[general_options.m_method]->getOptions();
+  auto specific_options = supported_interfaces.at(general_options.m_method)->getOptions();
   specific_options->load(weightfile.getXMLTree());
 
   boost::property_tree::ptree temp_tree;
@@ -144,9 +144,9 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
   TTree tree("variables", "variables");
 
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
-  for (auto& filename : filenames) {
+  for (const auto& filename : filenames) {
 
     Belle2::EventMetaData emd(event, run, experiment);
     auto weightfile = Weightfile::load(filename, emd);
@@ -159,7 +159,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
     // otherwise this would apply to the expert as well.
     general_options.m_max_events = 0;
 
-    auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+    auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
     expertLocal->load(weightfile);
 
     bool isMulticlass = general_options.m_nClasses > 2;
@@ -184,7 +184,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         result = r;
         branches[0]->Fill();
       }
@@ -200,7 +200,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double, std::milli> application_time = stop - start;
       B2INFO("Elapsed application time in ms " << application_time.count() << " for " << general_options.m_identifier);
-      for (auto& r : results) {
+      for (const auto& r : results) {
         for (unsigned int iClass = 0; iClass < general_options.m_nClasses; ++iClass) {
           result = r[iClass];
           branches[iClass]->Fill();
@@ -216,7 +216,7 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
       float target = 0;
       auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
       auto targets = data.getTargets();
-      for (auto& t : targets) {
+      for (const auto& t : targets) {
         target = t;
         target_branch->Fill();
       }
@@ -291,16 +291,16 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_dataset(GeneralOptions gen
     }
   }
   AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
   if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
-    auto teacherLocal = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
+    auto teacherLocal = supported_interfaces.at(general_options.m_method)->getTeacher(general_options, specific_options);
     std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     auto weightfile = teacherLocal->train(data);
     std::chrono::high_resolution_clock::time_point stop = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> training_time = stop - start;
     B2INFO("Elapsed training time in ms " << training_time.count() << " for " << general_options.m_identifier);
     Weightfile::save(weightfile, general_options.m_identifier);
-    auto expertLocal = supported_interfaces[general_options.m_method]->getExpert();
+    auto expertLocal = supported_interfaces.at(general_options.m_method)->getExpert();
     expertLocal->load(weightfile);
     return expertLocal;
   } else {
@@ -407,7 +407,6 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_splot(const GeneralOptions
   mc_general_options.m_identifier = general_options.m_identifier + "_pdf.xml";
   mc_general_options.m_method = "PDF";
   PDFOptions pdf_options;
-  // cppcheck-suppress unreadVariable
   auto pdf_expert = teacher_dataset(mc_general_options, pdf_options, mc_dataset);
 
   GeneralOptions combination_general_options = general_options;
@@ -443,7 +442,6 @@ std::unique_ptr<Belle2::MVA::Expert> Utility::teacher_reweighting(const GeneralO
 
   GeneralOptions boost_general_options = general_options;
   boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
-  // cppcheck-suppress unreadVariable
   auto boost_expert = teacher_dataset(boost_general_options, specific_options, boost_dataset);
 
   GeneralOptions reweighter_general_options = general_options;

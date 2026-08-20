@@ -114,11 +114,12 @@ namespace Belle2 {
     @param treeNames : list of names of the trees contained in the root file to be initialized
     */
     void initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames);
-    void getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables); /**< collect the values for root output */
+    static void getValuesForRoot(Belle2::MCParticle* mcParticle,
+                                 RootVariables& rootVariables); /**< collect the values for root output */
 
     /** get all MCPartileIDs of tracks */
     template<typename TrackCandType>
-    std::vector<int> getMCParticleIDs(Belle2::StoreArray<TrackCandType> trackCands);
+    static std::vector<int> getMCParticleIDs(Belle2::StoreArray<TrackCandType> trackCands);
 
 //     /** get all referee statuses from all SpacePointTrackCand */
 //     std::vector<unsigned short int> getRefereeStatuses(Belle2::StoreArray<Belle2::SpacePointTrackCand> trackCands);
@@ -127,7 +128,7 @@ namespace Belle2 {
      * The values that cannot be found in these vectors but are in the reference are collected for each vector.
      * @returns the original allIDs interlaced with the vectors of mcPartIds that were in the reference but not in the vector
      */
-    std::vector<std::vector<int> > getDiffIds(const std::vector<std::vector<int> >& allIDs);
+    static std::vector<std::vector<int> > getDiffIds(const std::vector<std::vector<int> >& allIDs);
 
     StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
     StoreArray<genfit::TrackCand> m_GenfitTrackCands; /**< Genfit::TrackCands StoreArray */

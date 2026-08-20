@@ -31,7 +31,7 @@ namespace Belle2 {
     PruneDataStoreModule();
 
     /** Virtual Constructor to prevent memory leaks */
-    virtual ~PruneDataStoreModule() = default;
+    virtual ~PruneDataStoreModule() override = default;
 
     /** Prepare regex checks */
     void initialize() override;
@@ -44,7 +44,7 @@ namespace Belle2 {
     /** Compile a regex expression and catch the exception if the regex
      * string is not valid.
      */
-    std::regex compileAndCatch(std::string& regexString) const;
+    static std::regex compileAndCatch(std::string& regexString);
 
     /** Storing the option of branches to keep */
     std::vector<std::string> m_matchEntries;

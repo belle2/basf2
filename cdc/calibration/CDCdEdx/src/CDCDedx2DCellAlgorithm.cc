@@ -283,9 +283,9 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
       for (int idoca = 1; idoca <= fnDocaBinL; idoca++) {
 
         if (iIOLayer == 0)
-          htemp = (TH1D*)hILdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea, idoca));
+          htemp = static_cast<TH1D*>(hILdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea, idoca)));
         else if (iIOLayer == 1)
-          htemp = (TH1D*)hOLdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea, idoca));
+          htemp = static_cast<TH1D*>(hOLdEdxhitInEntaDocaBin[ieaprime - 1][idoca - 1]->Clone(Form("hL%d_Ea%d_Doca%d", iIOLayer, iea, idoca)));
         else continue;
 
         double truncMean  = 1.0;

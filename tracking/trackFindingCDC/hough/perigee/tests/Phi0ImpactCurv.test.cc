@@ -76,13 +76,13 @@ namespace {
 
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
@@ -167,13 +167,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 
@@ -187,7 +187,6 @@ namespace {
     timeItResult.printSummary();
   }
 
-  // cppcheck-suppress syntaxError
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_phi0_impact_curv_prepared_event_segments)
   {
     std::string svgFileName = "phi0_impact_curv_on_prepared_event_segments.svg";
@@ -237,13 +236,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Impact " << houghBox.getLowerBound<ContinuousImpact>());
 

@@ -41,7 +41,7 @@ namespace Belle2 {
      * Get ParticleWeightingLookUpTable with binned energy resolution
      * @return ParticleWeightingLookUpTable of the energy resolution in energy, theta, and phi bins
      */
-    ParticleWeightingLookUpTable getFullEnergyResolution() const { return m_resolutionBinningTable; }
+    const ParticleWeightingLookUpTable& getFullEnergyResolution() const { return m_resolutionBinningTable; }
 
     /*!
      * Add energy bin [vector of three pairs] and energy resolution [vector of three values]

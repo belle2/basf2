@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-void ModuleStatistics::csv_header(std::ostream& output) const
+void ModuleStatistics::csv_header(std::ostream& output)
 {
   output << "name";
   for (auto resource : {"time", "memory"}) {

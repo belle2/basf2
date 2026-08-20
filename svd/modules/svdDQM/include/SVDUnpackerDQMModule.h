@@ -36,7 +36,7 @@ namespace Belle2 {
     SVDUnpackerDQMModule();
 
     /* Destructor */
-    virtual ~SVDUnpackerDQMModule();
+    virtual ~SVDUnpackerDQMModule() override;
 
     /** Module function initialize */
     void initialize() override final;

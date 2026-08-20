@@ -13,7 +13,7 @@ using namespace Belle2;
 
 GenDTag::GenDTag() = default;
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2)
 {
   int ndau = gp.size();
   if (ndau == 2) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2);}
@@ -24,7 +24,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2)
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3)
 {
   int ndau = gp.size();
   if (ndau == 3) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3);}
@@ -35,7 +35,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4)
 {
   int ndau = gp.size();
   if (ndau == 4) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4);}
@@ -46,7 +46,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5)
 {
   int ndau = gp.size();
   if (ndau == 5) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5);}
@@ -57,7 +57,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6)
 {
   int ndau = gp.size();
   if (ndau == 6) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6);}
@@ -68,7 +68,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
 {
   int ndau = gp.size();
   if (ndau == 7) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7);}
@@ -79,7 +79,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da
   else return false;
 }
 
-bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
+bool GenDTag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
 {
   int ndau = gp.size();
   if (ndau == 8) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7, da8);}
@@ -92,7 +92,7 @@ bool GenDTag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da
 
 //All the tag number for various decay mode is defined here
 
-int GenDTag::Mode_Dst_plus(std::vector<int> genpart)
+int GenDTag::Mode_Dst_plus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, 421, 211)) {
     return +1 * (100000 * m_nPhotos + 1001);
@@ -107,7 +107,7 @@ int GenDTag::Mode_Dst_plus(std::vector<int> genpart)
 }// Rest of the D*+ decays
 
 
-int GenDTag::Mode_Dst_minus(std::vector<int> genpart)
+int GenDTag::Mode_Dst_minus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, -421, -211)) {
     return -1 * (100000 * m_nPhotos + 1001);
@@ -122,7 +122,7 @@ int GenDTag::Mode_Dst_minus(std::vector<int> genpart)
 }// Rest of the D*- decays
 
 
-int GenDTag::Mode_Ds_plus(std::vector<int> genpart)
+int GenDTag::Mode_Ds_plus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, 333, -11, 12)) {
     return +1 * (100000 * m_nPhotos + 1001);
@@ -380,7 +380,7 @@ int GenDTag::Mode_Ds_plus(std::vector<int> genpart)
 }// Rest of the D_s+ decays
 
 
-int GenDTag::Mode_Ds_minus(std::vector<int> genpart)
+int GenDTag::Mode_Ds_minus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, 333, 11, -12)) {
     return -1 * (100000 * m_nPhotos + 1001);
@@ -638,7 +638,7 @@ int GenDTag::Mode_Ds_minus(std::vector<int> genpart)
 }// Rest of the D_s- decays
 
 
-int GenDTag::Mode_D_plus(std::vector<int> genpart)
+int GenDTag::Mode_D_plus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, -313, -11, 12)) {
     return +1 * (100000 * m_nPhotos + 1001);
@@ -956,7 +956,7 @@ int GenDTag::Mode_D_plus(std::vector<int> genpart)
 }// Rest of the D+ decays
 
 
-int GenDTag::Mode_D_minus(std::vector<int> genpart)
+int GenDTag::Mode_D_minus(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, 313, 11, -12)) {
     return -1 * (100000 * m_nPhotos + 1001);
@@ -1274,7 +1274,7 @@ int GenDTag::Mode_D_minus(std::vector<int> genpart)
 }// Rest of the D- decays
 
 
-int GenDTag::Mode_D0(std::vector<int> genpart)
+int GenDTag::Mode_D0(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, -323, -11, 12)) {
     return +1 * (100000 * m_nPhotos + 1001);
@@ -1688,7 +1688,7 @@ int GenDTag::Mode_D0(std::vector<int> genpart)
 }// Rest of the D0 decays
 
 
-int GenDTag::Mode_anti_D0(std::vector<int> genpart)
+int GenDTag::Mode_anti_D0(const std::vector<int>& genpart)
 {
   if (GenDTag::PcheckDecay(genpart, 323, 11, -12)) {
     return -1 * (100000 * m_nPhotos + 1001);

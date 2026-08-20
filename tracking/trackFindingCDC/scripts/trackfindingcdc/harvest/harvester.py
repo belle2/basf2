@@ -43,7 +43,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
         for reco_hit3D in list(track_cand.items()):
             underlaying_cdc_hit = reco_hit3D.getWireHit().getHit()
             hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit3D.getRecoPos3D()
-            sum_of_difference_norms_axial += hit_difference.xy().norm()
+            sum_of_difference_norms_axial += hit_difference.xy().R()
             num_norms_axial += 1
 
             if reco_hit3D.getStereoType() != 0:  # AXIAL

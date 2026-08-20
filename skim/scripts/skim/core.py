@@ -530,7 +530,8 @@ class CombinedSkim(BaseSkim):
             mc=None,
             analysisGlobaltag=None,
             pidGlobaltag=None,
-            roundToMdstPrecision=False
+            roundToMdstPrecision=False,
+            feiPrefix=None
     ):
         """Initialise the CombinedSkim class.
 
@@ -550,6 +551,8 @@ class CombinedSkim(BaseSkim):
             analysisGlobaltag (str): Analysis globaltag.
             pidGlobaltag (str): PID globaltag.
             roundToMdstPrecision (bool): If True, add MdstRounder module before skim
+            feiPrefix (str, optional): Prefix label for the FEI training. If set,
+                propagated to any FEI skims included in this combined skim.
         """
 
         if NoisyModules is None:
@@ -591,6 +594,12 @@ class CombinedSkim(BaseSkim):
         if pidGlobaltag is not None:
             for skim in self:
                 skim.pidGlobaltag = pidGlobaltag
+
+        self.feiPrefix = feiPrefix
+        if feiPrefix is not None:
+            for skim in self:
+                if hasattr(skim, "FEIPrefix"):
+                    skim.FEIPrefix = feiPrefix
 
         self.roundToMdstPrecision = roundToMdstPrecision
         self._mdstOutput = mdstOutput

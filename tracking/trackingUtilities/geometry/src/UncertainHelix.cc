@@ -32,12 +32,12 @@ UncertainHelix UncertainHelix::average(const UncertainHelix& fromHelix,
   HelixParameters avgPar;
   HelixCovariance avgCov;
 
-  double chi2 = HelixUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
+  double loc_chi2 = HelixUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
 
   // Calculating 5 parameters from 10 input parameters. 5 NDF remaining.
-  size_t ndf = 5;
+  size_t loc_ndf = 5;
 
-  return UncertainHelix(avgPar, avgCov, chi2, ndf);
+  return UncertainHelix(avgPar, avgCov, loc_chi2, loc_ndf);
 }
 
 UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigeeCircle,

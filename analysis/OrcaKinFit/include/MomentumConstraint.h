@@ -36,13 +36,13 @@ namespace Belle2 {
      */
     class MomentumConstraint : public ParticleConstraint {
     public:
-      MomentumConstraint(double efact_ = 0,     ///< Factor for energy sum
-                         double pxfact_ = 0,   ///< Factor for px sum
-                         double pyfact_ = 0,   ///< Factor for py sum
-                         double pzfact_ = 0,   ///< Factor for pz sum
-                         double value_ = 0     ///< Target value of sum
-                        );
-      virtual ~MomentumConstraint();
+      explicit MomentumConstraint(double efact_ = 0,     ///< Factor for energy sum
+                                  double pxfact_ = 0,   ///< Factor for px sum
+                                  double pyfact_ = 0,   ///< Factor for py sum
+                                  double pzfact_ = 0,   ///< Factor for pz sum
+                                  double value_ = 0     ///< Target value of sum
+                                 );
+      virtual ~MomentumConstraint() override;
       virtual double getValue() const override;
       /// Get first order derivatives.
       /// Call this with a predefined array "der" with the necessary number of entries!

@@ -30,19 +30,10 @@ namespace Belle2 {
     SVDShaperDigitsFromTracksModule();
 
     /** if required */
-    virtual ~SVDShaperDigitsFromTracksModule();
-
-    /** initializes the module */
-    virtual void beginRun() override;
+    virtual ~SVDShaperDigitsFromTracksModule() override;
 
     /** processes the event */
     virtual void event() override;
-
-    /** end the run */
-    virtual void endRun() override;
-
-    /** terminates the module */
-    virtual void terminate() override;
 
     /** init the module */
     virtual void initialize() override;

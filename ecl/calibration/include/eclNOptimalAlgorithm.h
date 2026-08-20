@@ -30,7 +30,7 @@ namespace Belle2 {
       eclNOptimalAlgorithm();
 
       /**..Destructor */
-      virtual ~eclNOptimalAlgorithm() {}
+      virtual ~eclNOptimalAlgorithm() override {}
 
 
     protected:

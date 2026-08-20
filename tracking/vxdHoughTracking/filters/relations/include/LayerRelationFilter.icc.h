@@ -56,8 +56,8 @@ namespace Belle2 {
       std::vector<VXDHoughState*> possibleNextHits;
       possibleNextHits.reserve(hits.size());
 
-      const VXDHoughState::DataCache& currentVXDHoughState = currentHit->getDataCache();
-      const unsigned int currentLayer = currentVXDHoughState.layer;
+      const VXDHoughState::DataCache& currentStateCache = currentHit->getDataCache();
+      const unsigned int currentLayer = currentStateCache.layer;
       const unsigned int nextPossibleLayer = std::max(static_cast<int>(currentLayer) - 1 - m_hitJumping, 0);
 
       for (VXDHoughState* nextHit : hits) {
@@ -65,15 +65,15 @@ namespace Belle2 {
           continue;
         }
 
-        const VXDHoughState::DataCache& nextVXDHoughState = nextHit->getDataCache();
-        const unsigned int nextLayer = nextVXDHoughState.layer;
+        const VXDHoughState::DataCache& nextStateCache = nextHit->getDataCache();
+        const unsigned int nextLayer = nextStateCache.layer;
 
         if (std::max(currentLayer, nextPossibleLayer) >= nextLayer and nextLayer >= std::min(currentLayer, nextPossibleLayer)) {
 
           if (currentLayer == nextLayer) {
             // next layer is an overlap one, so lets return all hits from the same layer, that are on a
             // ladder which is below the last added hit.
-            const unsigned int fromLadderNumber = currentVXDHoughState.ladder;
+            const unsigned int fromLadderNumber = currentHit->getHit()->getVxdID().getLadderNumber();
             const unsigned int maximumLadderNumber = m_maximalLadderCache.at(currentLayer);
 
             // the reason for this strange formula is the numbering scheme in the VXD.
@@ -85,7 +85,7 @@ namespace Belle2 {
             const unsigned int overlappingLadder =
               ((fromLadderNumber + maximumLadderNumber - 1) + direction) % maximumLadderNumber + 1;
 
-            if (nextVXDHoughState.ladder != overlappingLadder) {
+            if (nextHit->getHit()->getVxdID().getLadderNumber() != overlappingLadder) {
               continue;
             }
 
@@ -98,11 +98,11 @@ namespace Belle2 {
             //               ----|----                    ----|----                    ----|----
             //  This is fine:         X        This not:                X   This not:          X
             //                      ----|----                    ----|----                    ----|----
-            if (currentVXDHoughState.localNormalizedu > 0.2) {
+            if (currentStateCache.localNormalizedu > 0.2) {
               continue;
             }
 
-            if (nextVXDHoughState.localNormalizedu <= 0.8) {
+            if (nextStateCache.localNormalizedu <= 0.8) {
               continue;
             }
           }

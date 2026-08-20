@@ -766,8 +766,8 @@ void EffPlotsModule::event()
     //                          TRACKS                                  //
     //------------------------------------------------------------------//
 
-    Track* Track_dau0ToMCParticle = m_MCDaughter0->getRelated<Track>();
-    Track* Track_dau1ToMCParticle = m_MCDaughter1->getRelated<Track>();
+    const Track* Track_dau0ToMCParticle = m_MCDaughter0->getRelated<Track>();
+    const Track* Track_dau1ToMCParticle = m_MCDaughter1->getRelated<Track>();
 
     if (Track_dau0ToMCParticle) {
       m_h1_track_dau0_d0->Fill(mcParticleInfo_dau0.getD0());

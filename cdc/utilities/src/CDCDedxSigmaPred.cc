@@ -24,7 +24,7 @@ void CDCDedxSigmaPred::setParameters()
   for (int i = 0; i < 10; ++i) m_cospars[i] = sigmapar[i + 7];
 }
 
-void CDCDedxSigmaPred::setParameters(std::string infile)
+void CDCDedxSigmaPred::setParameters(const std::string& infile)
 {
 
   B2INFO("\n\tWidgetParameterization: Using parameters from file --> " << infile);
@@ -57,7 +57,7 @@ void CDCDedxSigmaPred::setParameters(std::string infile)
   fin.close();
 }
 
-void CDCDedxSigmaPred::printParameters(std::string outfile)
+void CDCDedxSigmaPred::printParameters(const std::string& outfile)
 {
 
   B2INFO("\n\tCDCDedxSigmaPred: Printing parameters to file --> " << outfile.c_str());

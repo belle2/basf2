@@ -23,7 +23,7 @@ namespace Belle2 {
     /** Constructor */
     TrackingExpressRecoDQMModule();
     /** Destructor */
-    ~TrackingExpressRecoDQMModule() { }
+    ~TrackingExpressRecoDQMModule() override { }
 
     /** Module functions */
     void initialize() override;

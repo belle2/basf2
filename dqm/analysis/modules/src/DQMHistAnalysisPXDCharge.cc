@@ -42,10 +42,6 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
-DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
-{
-}
-
 void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");
@@ -55,7 +51,7 @@ void DQMHistAnalysisPXDChargeModule::initialize()
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -209,7 +205,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 
   setEpicsPV("Status", status);
 
-  for (auto& it : m_excluded) {
+  for (const auto& it : m_excluded) {
     static std::map <int, TLatex*> ltmap;
     auto tt = ltmap[it];
     if (!tt) {

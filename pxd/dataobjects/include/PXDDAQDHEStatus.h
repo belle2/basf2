@@ -66,7 +66,7 @@ namespace Belle2 {
     /** Return Error bit mask
      * @return bit mask
      */
-    PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
+    const PXDErrorFlags& getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
      * @param mask Bit Mask to set
@@ -76,7 +76,7 @@ namespace Belle2 {
     /** Return Critical Error bit mask
      * @return bit mask
      */
-    PXDErrorFlags getCritErrorMask(void) const { return m_critErrorMask; }
+    const PXDErrorFlags& getCritErrorMask(void) const { return m_critErrorMask; }
 
     /** Calculate the usability decision
      * If any of the critical bits is set in the error mask
@@ -125,7 +125,7 @@ namespace Belle2 {
     /** Add DHP information
      * @param daqdhp DHP Status Object
      */
-    void addDHP(PXDDAQDHPStatus& daqdhp) { m_pxdDHP.push_back(daqdhp);};
+    void addDHP(const PXDDAQDHPStatus& daqdhp) { m_pxdDHP.push_back(daqdhp);};
 
     /** New DHP information
      * @param params constructor parameter
@@ -154,7 +154,7 @@ namespace Belle2 {
     /** Add Common Mode information
      * @param daqcm DHP Common Mode object
      */
-    auto addCM(PXDDAQDHPComMode& daqcm) { return m_commode.push_back(daqcm);};
+    auto addCM(const PXDDAQDHPComMode& daqcm) { return m_commode.push_back(daqcm);};
 
     /** iterator-based iteration for Common Mode */
     std::vector<PXDDAQDHPComMode>::iterator cm_begin()  { return m_commode.begin(); };

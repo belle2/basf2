@@ -289,7 +289,7 @@ namespace Belle2 {
       /// calculates calculates the sign of the curvature of 3-hit-tracklet given as arguments.
       /// A positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
       /// 0 means that it is exactly straight or that two hits are identical.
-      int getCurvatureSign(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
+      static int getCurvatureSign(const B2Vector3D& oHit, const B2Vector3D& cHit, const B2Vector3D& iHit)
       {
         using boost::math::sign;
         B2Vector3D ba(oHit.X() - cHit.X(), oHit.Y() - cHit.Y(), 0.0);

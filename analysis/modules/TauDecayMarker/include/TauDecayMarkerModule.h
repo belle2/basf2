@@ -73,7 +73,7 @@ namespace Belle2 {
     /** Count the number of daughers of the generated tau */
     int getNumDaughterOfTau(int s = 0, int id = 0, int sign = 0);
     /** Get the prong of the generated tau decay */
-    int getProngOfDecay(const MCParticle& mc);
+    static int getProngOfDecay(const MCParticle& mc);
 
   protected:
     /** If true, prints ID and prong of each tau lepton in the event.*/

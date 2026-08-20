@@ -250,7 +250,10 @@ class ValidationMetadataSetter(basf2.Module):
             validation_metadata_update(self._tfile, name, *metadata)
         if self._description:
             file_description_set(self._tfile, self._description)
-        self._tfile.Close()
+        # Sync the memory contents to the physical file
+        self._tfile.Write()
+        # And reset the pointer, so that RootFileCreationManager can close
+        self._tfile = None
 
 
 def create_validation_histograms(

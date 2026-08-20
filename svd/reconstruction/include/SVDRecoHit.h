@@ -67,7 +67,7 @@ namespace Belle2 {
     explicit SVDRecoHit(const SVDCluster* hit, const genfit::TrackCandHit* trackCandHit = nullptr);
 
     /** Destructor. */
-    virtual ~SVDRecoHit() {}
+    virtual ~SVDRecoHit() override {}
 
     /** Creating a deep copy of this hit.
      * Overrides the method inherited from GFRecoHit.
@@ -124,7 +124,8 @@ namespace Belle2 {
     void setDetectorPlane();
 
     /** Apply planar deformation of sensors */
-    TVectorD applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters, const genfit::StateOnPlane& state) const;
+    TVectorD applyPlanarDeformation(TVectorD rawHit, const std::vector<double>& planarParameters,
+                                    const genfit::StateOnPlane& state) const;
 
     ClassDefOverride(SVDRecoHit, 8)
   };

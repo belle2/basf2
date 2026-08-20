@@ -25,9 +25,9 @@ namespace Belle2 {
   class SelectSubsetBase {
   public:
     /** Get list of arrays we inherit relations from. */
-    std::vector<std::string> getInheritFromArrays() const { return m_inheritFromArrays; }
+    const std::vector<std::string>& getInheritFromArrays() const { return m_inheritFromArrays; }
     /** Get list of arrays we inherit relations to. */
-    std::vector<std::string> getInheritToArrays() const { return m_inheritToArrays; }
+    const std::vector<std::string>& getInheritToArrays() const { return m_inheritToArrays; }
     /** Do we inherit relations from original set to itself? */
     bool getInheritToSelf() const { return m_inheritToSelf; }
 
@@ -193,8 +193,14 @@ namespace Belle2 {
     /** Constructor */
     SelectSubset(): SelectSubsetBase() {};
 
+    /** no copy constructor */
+    SelectSubset(const SelectSubset&) = delete;
+
+    /** no assignment operator */
+    SelectSubset& operator=(const SelectSubset&) = delete;
+
     /** Destructor */
-    ~SelectSubset()
+    ~SelectSubset() override
     {
       delete m_set;
       delete m_subset;
@@ -298,7 +304,7 @@ namespace Belle2 {
     {
       auto arrays = DataStore::Instance().getListOfRelatedArrays(*m_set);
 
-      for (std::string arrayName : arrays) {
+      for (const std::string& arrayName : arrays) {
         StoreArray<TObject> array(arrayName, m_set->getDurability());
         if (array == *m_subset)
           continue; // from registerSubset(), ignore
@@ -330,9 +336,9 @@ namespace Belle2 {
     void copyRelationsToSelf();
 
     /** Empty method to stop the recursion of the variadic template.  */
-    void inheritRelationsFrom() { }
+    static void inheritRelationsFrom() { }
     /** Empty method to stop the recursion of the variadic template.  */
-    void inheritRelationsTo() { }
+    static void inheritRelationsTo() { }
 
     /** The array we use as input. */
     StoreArray<StoredClass>* m_set = nullptr;

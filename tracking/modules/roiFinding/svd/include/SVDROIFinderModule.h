@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    ~SVDROIFinderModule();
+    ~SVDROIFinderModule() override;
 
     /**
      *Initializes the Module. Parameter handling.

@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     Geant4MaterialInterface();
-    ~Geant4MaterialInterface();
+    ~Geant4MaterialInterface() override;
 
     /** @brief Initialize the navigator at given position and with given
         direction.  Returns true if the volume changed.

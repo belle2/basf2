@@ -184,13 +184,13 @@ namespace Belle2 {
      * @return pair of global position and momentum for a given TrueHit. .first is position, .second is momentum
      */
     template<class TrueHit>
-    std::pair<const B2Vector3D, const B2Vector3D >
+    static std::pair<const B2Vector3D, const B2Vector3D >
     getGlobalPositionAndMomentum(TrueHit* aTrueHit);
 
     /**
      * Split a culring track candidate into (up to NTracklets) tracklets
      */
-    const std::vector<Belle2::SpacePointTrackCand>
+    static const std::vector<Belle2::SpacePointTrackCand>
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
@@ -274,11 +274,11 @@ namespace Belle2 {
     std::array<std::vector<double>, c_nPlanes> m_rootMisMatchMomZ;
 
     /** get U&V for a SpacePoint (via its relation to Clusters) (SpacePoint can only return normalized U&V coordinates). Returning a TaggedUVPos makes it possible to properly analyze SpacePoints with only one Cluster */
-    TaggedUVPos getUV(const SpacePoint* spacePoint);
+    static TaggedUVPos getUV(const SpacePoint* spacePoint);
 
     /** Get The Values that are later written to a ROOT file */
     template <class TrueHit>
-    void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
+    static void getValuesForRoot(const SpacePoint* spacePoint, const TrueHit* trueHit, RootVariables& rootVariables);
 
     void writeToRoot(const RootVariables& rootVariables); /**< Write previously collected values to ROOT file */
   };

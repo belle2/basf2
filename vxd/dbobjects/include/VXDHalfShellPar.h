@@ -24,9 +24,9 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDHalfShellPar(std::string const& name = "", double shellAngle = 0) : m_name(name), m_shellAngle(shellAngle) {}
+    explicit VXDHalfShellPar(std::string const& name = "", double shellAngle = 0) : m_name(name), m_shellAngle(shellAngle) {}
     /** get shell name */
-    std::string getName() const { return m_name; }
+    const std::string& getName() const { return m_name; }
     /** get shellAngle */
     double getShellAngle() const { return m_shellAngle; }
     /** add ladder */

@@ -22,8 +22,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisTrackingAbortModule();
-    /**Destructor */
-    ~DQMHistAnalysisTrackingAbortModule() {};
 
     /** Module function initialize */
     void initialize() override final;
@@ -56,7 +54,7 @@ namespace Belle2 {
     TH1F* m_hAbort_BF = nullptr; /**< totla abort (inside + outside) active veto region BEFORE FILTER*/
 
     /** scale hAverage and send bin contents to Mirabelle */
-    void scaleAndSendToMirabelle(TH1F* hAverage, const int nEvents, const TString& tag);
+    void scaleAndSendToMirabelle(TH1* hAverage, const int nEvents, const TString& tag);
   };
 } // end namespace Belle2
 

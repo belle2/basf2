@@ -77,8 +77,6 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
-    bool m_fullValidation;   /**< decide between full or basic validation mode. full validation also produces global PID performance plots.  */
-    bool m_isMakePlots;                                                           /**< produce plots for monitoring of the fit quality */
     /**
      * a generic function to produce efficiency plots
      */
@@ -101,6 +99,7 @@ namespace Belle2 {
     double m_MomHighROC = 7.;    /**< upper edge of the momentum interval considered for the ROC curve */
     unsigned int m_NumEffBins = 30;    /**< number of bins for the efficiency/fake rate plot */
     double m_MomHighEff = 2.5;    /**< upper edge of the momentum interval for the efficiency/fake rate plot */
-
+    bool m_fullValidation;   /**< decide between full or basic validation mode. full validation also produces global PID performance plots.  */
+    bool m_isMakePlots;      /**< produce plots for monitoring of the fit quality */
   };
 } // namespace Belle2

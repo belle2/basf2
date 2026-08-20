@@ -28,7 +28,7 @@ namespace TreeFitter {
                     ) ;
 
     /** destructor */
-    virtual ~InternalParticle() {};
+    virtual ~InternalParticle() override = default;
 
     /** init covariance */
     virtual ErrCode initCovariance(FitParams&) const override;

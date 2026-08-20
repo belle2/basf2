@@ -57,7 +57,7 @@ namespace Belle2 {
     * usemode of the FlavorTagger
     * @return mode "Teacher" or "Expert"
     */
-    std::string getUseModeFlavorTagger() const { return m_useModeFlavorTagger; }
+    const std::string& getUseModeFlavorTagger() const { return m_useModeFlavorTagger; }
 
     /** method used for the FlavorTagger and corresponding FlavorTaggerInfoMap
     * @param method "TMVA" or "FANN".

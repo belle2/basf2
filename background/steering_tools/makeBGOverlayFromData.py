@@ -9,9 +9,7 @@
 import sys
 
 import basf2
-from background import get_trigger_types_for_bgo, SelectTRGTypes
-from rawdata import add_unpackers
-from gdltrigger import filter_trigger_abort_gaps
+from background import add_bgo_modules
 
 # --------------------------------------------------------------------------------------
 # Make data sample for BG overlay from experimental raw data
@@ -32,60 +30,12 @@ basf2.conditions.prepend_globaltag(globalTag)
 
 # Create paths
 main = basf2.Path()
-emptypath = basf2.Path()
 
-# Input: raw data
+# Input
 main.add_module('RootInput')
 
-# Gearbox
-main.add_module('Gearbox')
-
-# Geometry
-main.add_module('Geometry')
-
-# Unpack TRGSummary
-main.add_module('TRGGDLUnpacker')
-main.add_module('TRGGDLSummary')
-
-# Show progress of processing
-main.add_module('Progress')
-
-# Select specific triggered events
-trg_types = get_trigger_types_for_bgo()
-selector = main.add_module(
-    SelectTRGTypes(trg_types=trg_types)
-)
-selector.if_false(emptypath)
-
-# Filter away the events falling in the trigger abort gaps
-filter_trigger_abort_gaps(main)
-
-# Unpack detector data
-add_unpackers(
-    main,
-    components=['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM']
-)
-
-# Convert ECLDsps to ECLWaveforms
-compress = main.add_module(
-    'ECLCompressBGOverlay',
-    CompressionAlgorithm=3
-)
-compress.if_false(emptypath)
-
-# Shift the time of KLMDigits
-main.add_module('KLMDigitTimeShifter')
-
-# ECL trigger unpacker and BGOverlay dataobject
-main.add_module('TRGECLUnpacker')
-main.add_module('TRGECLBGTCHit')
-
-# Output: digitized hits only
-main.add_module(
-    'RootOutput',
-    branchNames=['EventLevelTriggerTimeInfo', 'PXDDigits', 'SVDShaperDigits', 'CDCHits', 'TOPDigits',
-                 'ARICHDigits', 'ECLWaveforms', 'KLMDigits', 'TRGECLBGTCHits', 'TRGSummary', 'TOPInjectionVeto']
-)
+# Add all the modules
+add_bgo_modules(main)
 
 # Process events
-basf2.process(main)
+basf2.process(main, calculateStatistics=True)

@@ -58,6 +58,7 @@ namespace Belle2 {
 
         shaperdspshift_t() {} /**< default constructor */
         shaperdspshift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);} /**< constructor from a ShaperDSP class */
+        // cppcheck-suppress duplInheritedMember ; each level initialises its own fields
         void init(double, const ShaperDSP_t&) __attribute__((noinline)); /**< initialise */
         shaperdspshift_t& operator +=(const shaperdspshift_t&); /**< increment operator */
         shaperdspshift_t operator +(const shaperdspshift_t&) const; /**< addition operator */
@@ -167,7 +168,7 @@ namespace Belle2 {
       /** wrapper of the function */
       double operator()(double) const;
       /** TF1 ROOT interface */
-      double operator()(double*, double*);
+      double operator()(const double*, double*);
       /** set grid step for function calculation */
       void settimestride(double);
       /** set timeoffset */

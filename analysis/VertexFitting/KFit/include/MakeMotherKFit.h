@@ -107,7 +107,7 @@ namespace Belle2 {
       /** Get a track object of the mother particle.
        * @return track object of the mother particle
        */
-      const KFitTrack             getMother(void) const;
+      const KFitTrack&  getMother(void) const;
       /** Get a Lorentz vector of the mother particle.
        * @return Lorentz vector of the mother particle
        */

@@ -33,6 +33,7 @@
 #include <Eigen/Dense>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <framework/utilities/MathHelpers.h>
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
@@ -92,7 +93,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       evt.mu0.p = *p0;
       evt.mu1.p = *p1;
 
-      evt.m = sqrt(pow(hypot(evt.mu0.p.Mag(), mMu) + hypot(evt.mu1.p.Mag(), mMu), 2)   - (evt.mu0.p + evt.mu1.p).Mag2());
+      evt.m = sqrt(square(hypot(evt.mu0.p.Mag(), mMu) + hypot(evt.mu1.p.Mag(), mMu))   - (evt.mu0.p + evt.mu1.p).Mag2());
 
       evt.nBootStrap = 1;
       evt.isSig = true;
@@ -101,7 +102,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     }
 
     //sort by time
-    sort(events.begin(), events.end(), [](Event e1, Event e2) {return e1.t < e2.t;});
+    sort(events.begin(), events.end(), [](const Event & e1, const Event & e2) {return e1.t < e2.t;});
 
 
     return events;
@@ -203,10 +204,10 @@ namespace Belle2::InvariantMassMuMuCalib {
     x -= a;
 
     double A = 1. / sqrt(2) * (-x / sK + sK / tau);
-    double B = -x / tau + 1. / 2 * pow(sK / tau, 2);
+    double B = -x / tau + 1. / 2 * square(sK / tau);
     double res = 0;
     if (B > 700 || A > 20) { // safety term to deal with 0 * inf limit
-      res = 1. / (2 * tau) * 1. / sqrt(M_PI) * exp(-A * A + B) * (1 / A - 1 / 2. / pow(A, 3) + 3. / 4 / pow(A, 5));
+      res = 1. / (2 * tau) * 1. / sqrt(M_PI) * exp(-A * A + B) * (1 / A - 1 / 2. / cube(A) + 3. / 4 / pow5(A));
     } else {
       res = 1. / (2 * tau) * TMath::Erfc(A) * exp(B);
     }
@@ -225,8 +226,8 @@ namespace Belle2::InvariantMassMuMuCalib {
     double xR = bR * sigma + mean;
 
     double iGaus  = sqrt(2 * M_PI) * sigma * convGausGaus(sigmaK, sigma, xL, xR, mean, x);
-    double iRight = exp(-1. / 2 * pow(bR, 2)) * tauR * convExpGaus(sigmaK, tauR, xR, x);
-    double iLeft  = exp(-1. / 2 * pow(bL, 2)) * tauL * convExpGaus(sigmaK, tauL, -xL, -x);
+    double iRight = exp(-1. / 2 * (bR * bR)) * tauR * convExpGaus(sigmaK, tauR, xR, x);
+    double iLeft  = exp(-1. / 2 * (bL * bL)) * tauL * convExpGaus(sigmaK, tauL, -xL, -x);
 
     return (iGaus + iLeft + iRight);
   }
@@ -246,7 +247,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     double fA     = par[9]; // fraction of the added Gaussian
 
     //added Gaussian
-    double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * pow((x - mean) / sigmaA, 2));
+    double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * square((x - mean) / sigmaA));
     return (1 - fA) * gausExpConv(mean, sigma, bMean, bDelta, tauL, tauR, sigmaK, x) + fA * G;
   }
 
@@ -283,7 +284,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       double t = eCMS - i * step;
 
       double y = x - t;
-      double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * pow((y - mean) / sigmaA, 2));
+      double G = 1. / (sqrt(2 * M_PI) * sigmaA) * exp(-1. / 2 * square((y - mean) / sigmaA));
       double Core = (1 - fA) * gausExpConv(mean, sigma, bMean, bDelta, tauL, tauR, sigmaK, y) + fA * G;
 
       double C = (i == 0 || i == N - 1) ? 0.5 : 1;
@@ -338,8 +339,6 @@ namespace Belle2::InvariantMassMuMuCalib {
     double sigma = par[2];  // sigma of Gaus
     double bMean = par[3];  // mean of the transition points between Gaus and exp
     double bDelta = par[4]; // diff/2 of the transition points between Gaus and exp
-    double tauL = par[5];   // decay par of the left exp
-    double tauR = par[6];   // decay par of the right exp
 
     double bL = bMean - bDelta;
     double bR = bMean + bDelta;
@@ -347,13 +346,15 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double r = (x - mean) / sigma;
     if (bL <= r && r <= bR) {
-      return exp(-1. / 2 * pow(r, 2));
+      return exp(-1. / 2 * (r * r));
     } else if (r < bL) {
-      double bp = exp(-1. / 2 * pow(bL, 2));
+      double tauL = par[5];   // decay par of the left exp
+      double bp = exp(-1. / 2 * (bL * bL));
       double xb = mean + bL * sigma;
       return exp((x - xb) / tauL) * bp;
     } else {
-      double bp = exp(-1. / 2 * pow(bR, 2));
+      double tauR = par[6];   // decay par of the right exp
+      double bp = exp(-1. / 2 * (bR * bR));
       double xb = mean + bR * sigma;
       return exp(-(x - xb) / tauR) * bp;
     }
@@ -446,6 +447,8 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
   /** the function which is used to fit M(mu,mu) spectrum */
+  // The signature is imposed by its use as a callback, 'par' cannot be passed by const reference.
+  // cppcheck-suppress passedByValueCallback
   double mainFunction(double xx, Pars par)
   {
     InvariantMassMuMuIntegrator fun;
@@ -491,7 +494,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
 /// plots the result of the fit to the Mmumu, i.e. data and the fitted curve, the base function
-  static void plotMuMuFitBase(TH1D* hData, TGraph* gr, TH1D* hPull, Pars pars, Eigen::MatrixXd mat, int time)
+  static void plotMuMuFitBase(TH1D* hData, TGraph* gr, TH1D* hPull, const Pars& pars, Eigen::MatrixXd mat, int time)
   {
     bool isBatch = gROOT->IsBatch();
     gROOT->SetBatch(kTRUE);
@@ -559,7 +562,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double chi2 = 0;
     for (int j = 1; j <= hPull->GetNbinsX(); ++j)
-      chi2 += pow(hPull->GetBinContent(j), 2);
+      chi2 += square(hPull->GetBinContent(j));
     int ndf = hPull->GetNbinsX() - nPars - 1;
 
 
@@ -707,8 +710,6 @@ namespace Belle2::InvariantMassMuMuCalib {
       it returns (eCMS, eCMSstatUnc, 0) */
   std::pair<Pars, MatrixXd> getInvMassPars(const std::vector<Event>& evts, Pars pars, double mMin, double mMax, int bootStrap = 0)
   {
-    bool is4S = evts[0].is4S;
-
     std::vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
 
 
@@ -755,6 +756,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     };
 
     if (pars.empty()) {
+      bool is4S = evts[0].is4S;
       pars = is4S ? pars0_4S : pars0_Off;
     }
 
@@ -782,7 +784,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
   // Returns tuple with the invariant mass parameters (cmsEnergy in GeV)
-  std::tuple<std::vector<VectorXd>, std::vector<MatrixXd>, MatrixXd>  runMuMuInvariantMassAnalysis(std::vector<Event> evts,
+  std::tuple<std::vector<VectorXd>, std::vector<MatrixXd>, MatrixXd>  runMuMuInvariantMassAnalysis(const std::vector<Event>& evts,
       const std::vector<double>& splitPoints)
   {
     int n = splitPoints.size() + 1;
@@ -805,7 +807,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       invMassVecSpred.resize(1, 1);  //1x1 matrix for spread of the 1D Gauss
 
       std::vector<Event> evtsNow;
-      for (auto ev :  evts) {
+      for (const auto& ev :  evts) {
         double tMin = (iDiv != 0)   ? splitPoints[iDiv - 1] : -1e40;
         double tMax = (iDiv != n - 1) ? splitPoints[iDiv]   :  1e40;
         if (tMin <= ev.t && ev.t < tMax)
@@ -899,7 +901,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       double sum2 = 0;
       for (auto v : vals)
-        sum2 += pow(v - meanMass, 2);
+        sum2 += square(v - meanMass);
       double errBootStrap = vals.size() > 1 ? sqrt(sum2 / (vals.size() - 1)) : 0;
 
       mumuTextOut << n << " " << iDiv << " " << std::setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " " <<

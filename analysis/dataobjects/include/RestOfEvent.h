@@ -67,7 +67,7 @@ namespace Belle2 {
        * @param name name of mask
        * @param origin origin of mask, for debug
        */
-      Mask(const std::string& name = c_defaultMaskName, const std::string& origin = "unknown"): m_name(name),
+      explicit Mask(const std::string& name = c_defaultMaskName, const std::string& origin = "unknown"): m_name(name),
         m_origin(origin)
       {
         B2DEBUG(10, "Mask " << name << " is being initialized by " << origin);
@@ -76,7 +76,7 @@ namespace Belle2 {
       /**
        * Get mask name
        */
-      std::string getName() const
+      const std::string& getName() const
       {
         return m_name;
       }
@@ -105,14 +105,14 @@ namespace Belle2 {
       /**
        *  Get selected particles associated to the mask
        */
-      std::set<int> getParticles() const
+      const std::set<int>& getParticles() const
       {
         return m_maskedParticleIndices;
       }
       /**
        *  Get selected particles associated to the V0 of mask
        */
-      std::set<int> getV0s() const
+      const std::set<int>& getV0s() const
       {
         return m_maskedV0Indices;
       }

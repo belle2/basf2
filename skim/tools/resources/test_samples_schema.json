@@ -25,7 +25,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "pattern": "^MC\\d+"
+                "pattern": "^MC[a-zA-Z]*\\d+"
               },
               {
                 "type": "integer"

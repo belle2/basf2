@@ -38,11 +38,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDTrackChargeModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDTrackChargeModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

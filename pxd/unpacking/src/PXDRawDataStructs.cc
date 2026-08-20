@@ -31,23 +31,25 @@ namespace Belle2 {
 
     void dhc_frame_header_word0::print(void) const
     {
+      // only used in the B2DEBUG below, which expands to a conditional block
+      // cppcheck-suppress variableScope
       const char* dhc_type_name[16] = {
-        (const char*)"DHP_RAW",
-        (const char*)"FCE_RAW",
-        (const char*)"GHOST  ",
-        (const char*)"H_START",
-        (const char*)"H_END  ",
-        (const char*)"DHP_ZSD",
-        (const char*)"COMMODE",
-        (const char*)"undef  ",
-        (const char*)"undef  ",
-        (const char*)"ONS_FCE",
-        (const char*)"undef  ",
-        (const char*)"C_START",
-        (const char*)"C_END  ",
-        (const char*)"ONS_DHP",
-        (const char*)"ONS_TRG",
-        (const char*)"ONS_ROI"
+        "DHP_RAW",
+        "FCE_RAW",
+        "GHOST  ",
+        "H_START",
+        "H_END  ",
+        "DHP_ZSD",
+        "COMMODE",
+        "undef  ",
+        "undef  ",
+        "ONS_FCE",
+        "undef  ",
+        "C_START",
+        "C_END  ",
+        "ONS_DHP",
+        "ONS_TRG",
+        "ONS_ROI"
       };
       B2DEBUG(99, "DHC FRAME TYP $" << std::hex << getFrameType() << " -> " << dhc_type_name[getFrameType()] << " (ERR " << getErrorFlag()
               << ") data " << data);
@@ -128,7 +130,7 @@ namespace Belle2 {
       }
     };
 
-    void dhc_onsen_roi_frame::check_error(PXDErrorFlags& errorMask, int length, bool ignore_inv_size_flag) const
+    void dhc_onsen_roi_frame::check_error(PXDErrorFlags& errorMask, int length, bool ignore_inv_size_flag)
     {
       // 4 byte header, ROIS (n*8), 4 byte copy of inner CRC, 4 byte outer CRC
       if (length < getMinSize()) {
@@ -218,7 +220,7 @@ namespace Belle2 {
 
     void dhc_frames::check_padding(PXDErrorFlags& errorMask)
     {
-      unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
+      unsigned int crc = *reinterpret_cast<const ubig32_t*>(((reinterpret_cast<const unsigned char*>(data)) + length - 4));
       if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
         /// TODO many false positives, we should remove that check after we KNOW that it has been fixed in DHH Firmware
         B2INFO("Suspicious Padding $" << std::hex << crc);
@@ -240,15 +242,15 @@ namespace Belle2 {
       c = bocrc.checksum();
 
       ubig32_t crc32;
-      crc32 = *(ubig32_t*)(((unsigned char*)data) + length - 4);
+      crc32 = *reinterpret_cast<const ubig32_t*>(((reinterpret_cast<const unsigned char*>(data)) + length - 4));
 
       if (c != crc32) {
         if (!ignore_crc_flag) {
           B2WARNING("DHC Data Frame CRC FAIL");
           B2DEBUG(1, "DHC Data Frame CRC FAIL: " << std::hex << c << "!=" << crc32 << " data "
-                  << * (unsigned int*)(((unsigned char*)data) + length - 8) << " "
-                  << * (unsigned int*)(((unsigned char*)data) + length - 6) << " "
-                  << * (unsigned int*)(((unsigned char*)data) + length - 4) << " len $" << length);
+                  << *reinterpret_cast<const unsigned int*>((reinterpret_cast<const unsigned char*>(data)) + length - 8) << " "
+                  << *reinterpret_cast<const unsigned int*>((reinterpret_cast<const unsigned char*>(data)) + length - 6) << " "
+                  << *reinterpret_cast<const unsigned int*>((reinterpret_cast<const unsigned char*>(data)) + length - 4) << " len $" << length);
         }
         errorMask[c_nrDHE_CRC] = true;
       }

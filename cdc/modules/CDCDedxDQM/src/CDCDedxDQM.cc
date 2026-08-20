@@ -18,6 +18,8 @@
 #include <TDirectory.h>
 #include <TMath.h>
 
+#include <cmath>
+
 using namespace Belle2;
 
 REG_MODULE(CDCDedxDQM);
@@ -197,7 +199,7 @@ void CDCDedxDQMModule::event()
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         double TrkEoverP = eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons) / pTrk;
         if (TrkEoverP > 0) {
-          if (abs(TrkEoverP - 1.0) > 0.25)continue;
+          if (std::abs(TrkEoverP - 1.0) > 0.25)continue;
         }
       }
 
@@ -225,6 +227,7 @@ void CDCDedxDQMModule::event()
     if (mmode != "basic") {
       for (int ihit = 0; ihit < dedxTrack->size(); ++ihit) {
         int iwire = dedxTrack->getWire(ihit);
+        // cppcheck-suppress variableScope ; kept next to the related declarations for readability
         double iadc = dedxTrack->getADCCount(ihit);
         if (m_adc[iwire].size() < 50)m_adc[iwire].push_back(iadc); //just contiung dead
       }
@@ -271,7 +274,7 @@ void CDCDedxDQMModule::plotWireMap()
 {
 
   B2INFO("Creating CDCGeometryPar object");
-  Belle2::CDC::CDCGeometryPar& cdcgeo = Belle2::CDC::CDCGeometryPar::Instance();
+  const Belle2::CDC::CDCGeometryPar& cdcgeo = Belle2::CDC::CDCGeometryPar::Instance();
 
   int jwire = -1;
   int nbadwires = 0;

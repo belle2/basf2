@@ -42,7 +42,7 @@ namespace Belle2 {
     ECLSplitterN1Module();
 
     /** Destructor. */
-    ~ECLSplitterN1Module();
+    ~ECLSplitterN1Module() override;
 
     /** Initialize. */
     virtual void initialize() override;
@@ -52,9 +52,6 @@ namespace Belle2 {
 
     /** Event. */
     virtual void event() override;
-
-    /** End run. */
-    virtual void endRun() override;
 
     /** Terminate. */
     virtual void terminate() override;
@@ -152,13 +149,13 @@ namespace Belle2 {
     void splitConnectedRegion(ECLConnectedRegion& aCR);
 
     /** Get number of neighbours based on first energy estimation and background level per event. */
-    int getNeighbourMap(const double energy, const double background);
+    static int getNeighbourMap(const double energy, const double background);
 
     /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
     std::vector<int> getOptimalNumberOfDigits(const int cellid, const double energy);
 
     /** Get energy sum for weighted entries. */
-    double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
+    static double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);
 
     /** Estimate energy using 3x3 around central crystal. */
     double estimateEnergy(const int centerid);

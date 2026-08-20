@@ -141,15 +141,16 @@ double CDCDedxInjectionTime::getCorrection(const std::string& svar, unsigned int
     }
   }
 
-  double thisdedx = getSafely(iv, thisbin);
-  double nextdedx = getSafely(iv, nextbin);
-
-  double thistime = 0.5 * (getSafely(ring * 3, thisbin) + getSafely(ring * 3, thisbin + 1));
-  double nexttime = 0.5 * (getSafely(ring * 3, nextbin) + getSafely(ring * 3, nextbin + 1));
-
   double newdedx = getSafely(iv, it);
-  if (thisbin != nextbin)
+  if (thisbin != nextbin) {
+    double thisdedx = getSafely(iv, thisbin);
+    double nextdedx = getSafely(iv, nextbin);
+
+    double thistime = 0.5 * (getSafely(ring * 3, thisbin) + getSafely(ring * 3, thisbin + 1));
+    double nexttime = 0.5 * (getSafely(ring * 3, nextbin) + getSafely(ring * 3, nextbin + 1));
+
     newdedx = thisdedx + ((nextdedx - thisdedx) / (nexttime - thistime)) * (time - thistime);
+  }
 
   return newdedx;
 }

@@ -96,7 +96,6 @@ namespace {
     B2INFO("nSZ " << nSZ);
     nSZ /= std::copysign(nSZ.norm(), -nSZ(1)); // Making n2 negative to normalize to forward along s
     Eigen::Matrix<double, 3, 1> nWSZ;
-    // cppcheck-suppress constStatement
     nWSZ << -meansSZ.transpose() * nSZ, nSZ;
     B2INFO("nWSZ " << nWSZ);
 
@@ -123,7 +122,7 @@ namespace {
   }
 }
 
-CDCTrajectorySZ CDCSZFitter::fitWithStereoHits(const CDCTrack& track) const
+CDCTrajectorySZ CDCSZFitter::fitWithStereoHits(const CDCTrack& track)
 {
   const bool onlyStereo = true;
   CDCSZObservations observationsSZ(EFitVariance::c_Proper, onlyStereo);
@@ -138,7 +137,7 @@ CDCTrajectorySZ CDCSZFitter::fitWithStereoHits(const CDCTrack& track) const
 }
 
 CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment2D& stereoSegment,
-                                 const CDCTrajectory2D& axialTrajectory2D) const
+                                 const CDCTrajectory2D& axialTrajectory2D)
 {
   B2ASSERT("Expected stereo segment", not stereoSegment.isAxial());
 
@@ -147,21 +146,21 @@ CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment2D& stereoSegment,
   return trajectorySZ;
 }
 
-CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment3D& segment3D) const
+CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment3D& segment3D)
 {
   CDCSZObservations observationsSZ;
   observationsSZ.appendRange(segment3D);
   return fit(std::move(observationsSZ));
 }
 
-CDCTrajectorySZ CDCSZFitter::fit(CDCSZObservations observationsSZ) const
+CDCTrajectorySZ CDCSZFitter::fit(CDCSZObservations observationsSZ)
 {
   CDCTrajectorySZ trajectorySZ;
   update(trajectorySZ, observationsSZ);
   return trajectorySZ;
 }
 
-void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
+void CDCSZFitter::update(const CDCSegmentPair& segmentPair)
 {
   const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
   const CDCSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
@@ -180,7 +179,7 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   segmentPair.setTrajectory3D(trajectory3D);
 }
 
-CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D) const
+CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D)
 {
   CDCSZObservations szObservations;
   for (size_t i = 0; i < observations2D.size(); ++i) {
@@ -193,7 +192,7 @@ CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D) const
 
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          const CDCSegment2D& stereoSegment,
-                         const CDCTrajectory2D& axialTrajectory2D) const
+                         const CDCTrajectory2D& axialTrajectory2D)
 {
   B2ASSERT("Expected stereo segment", not stereoSegment.isAxial());
 
@@ -207,7 +206,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
   update(trajectorySZ, observationsSZ);
 }
 
-void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ) const
+void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ)
 {
   trajectorySZ.clear();
   if (observationsSZ.size() < 3) {

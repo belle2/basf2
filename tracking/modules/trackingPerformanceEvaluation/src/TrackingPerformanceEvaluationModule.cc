@@ -829,7 +829,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
 
     const std::vector< genfit::TrackPoint* >& tp_vector = RecoTracks_fromTrack[tc]->getHitPointsWithMeasurement();
     for (int i = 0; i < (int) tp_vector.size(); i++) {
-      genfit::TrackPoint* tp = tp_vector[i];
+      const genfit::TrackPoint* tp = tp_vector[i];
 
       int nMea = tp->getNumRawMeasurements();
       for (int mea = 0; mea < nMea; mea++) {
@@ -838,7 +838,7 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
         double weight = 0;
 
         std::vector<double> weights;
-        genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
+        const genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
         if (kalmanInfo)
           weights = kalmanInfo->getWeights();
         else //no kalman fitter info, fill the weights vector with 0 (VXD), or 0,0 (CDC)
@@ -847,10 +847,10 @@ void TrackingPerformanceEvaluationModule::fillHitsUsedInTrackFitHistograms(const
         double detId(-999);
         ROOT::Math::XYZVector globalHit(-999, -999, -999);
 
-        PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
-        SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
-        SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
-        CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
+        const PXDRecoHit* pxdHit =  dynamic_cast<PXDRecoHit*>(absMeas);
+        const SVDRecoHit2D* svdHit2D =  dynamic_cast<SVDRecoHit2D*>(absMeas);
+        const SVDRecoHit* svdHit =  dynamic_cast<SVDRecoHit*>(absMeas);
+        const CDCRecoHit* cdcHit =  dynamic_cast<CDCRecoHit*>(absMeas);
 
         if (pxdHit) {
           hasPXDhit = true;

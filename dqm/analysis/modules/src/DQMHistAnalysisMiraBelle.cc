@@ -32,10 +32,6 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   addParam("m_reference_mumu", m_reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
-DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
-{
-}
-
 void DQMHistAnalysisMiraBelleModule::initialize()
 {
   gROOT->cd();
@@ -43,6 +39,7 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
   mon_dst = getMonitoringObject("dst");
+  mon_tautau = getMonitoringObject("tautau");
   //bhabha,hadrons
   mon_bhabha = getMonitoringObject("bhabha");
   mon_hadron = getMonitoringObject("hadronb2");
@@ -85,7 +82,7 @@ void DQMHistAnalysisMiraBelleModule::event()
   B2DEBUG(20, "DQMHistAnalysisOutputMiraBelle: event called.");
 }
 
-void DQMHistAnalysisMiraBelleModule::endRun()
+void DQMHistAnalysisMiraBelleModule::ExtractMumu(void)
 {
   // ========== mumutight
   // get existing histograms produced by DQM modules
@@ -300,7 +297,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double pval_less05 = 0.0;
   for (int i = 95; i < 100; i++) pval_more95 += hist_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) pval_less05 += hist_Pval->GetBinContent(i + 1);
-  if (ntot != 0) {
+  if (neve_mumu != 0) {
     goodmu_frac = hist_muid->GetBinContent(20) / neve_mumu;
     pval_frac_0 = pval_less05 / neve_mumu;
     pval_frac_1 = pval_more95 / neve_mumu;
@@ -374,7 +371,10 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
   mon_mumu->setVariable("Nmumu_ECLMuonPair", Nmumu_ECLMuonPair);
   mon_mumu->setVariable("Nmumu_ECLMuonPairSelectmumu", Nmumu_ECLMuonPairSelectmumu);
+}
 
+void DQMHistAnalysisMiraBelleModule::ExtractD0Star(void)
+{
   // ========== D*
   // get existing histograms produced by DQM modules
   auto* hist_D0_InvM = findHist("PhysicsObjectsMiraBelleDst/hist_D0_InvM");
@@ -812,9 +812,65 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_ARICH_kaon", mean_D0_K_PID_ARICH_kaon);
   mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
+}
 
+void DQMHistAnalysisMiraBelleModule::ExtractTaupair(void)
+{
+  //--- L1 efficiency with taupair
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("ECL_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1ECL1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("ECL_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDC_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDC1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDC_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x1"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDCKLM_1_1_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+  if (auto* ptr = findHist("PhysicsObjectsMiraBelleTau/hist_L1CDCKLM1x3"); ptr != nullptr) {
+    for (int bin = 1; bin <= ptr->GetXaxis()->GetNbins(); bin++) {
+      if (!std::string(ptr->GetXaxis()->GetBinLabel(bin)).empty()) {
+        std::string label = std::string("CDCKLM_1_3_") + ptr->GetXaxis()->GetBinLabel(bin);
+        mon_tautau->setVariable(label, ptr->GetBinContent(bin));
+      }
+    }
+  }
+}
+
+void DQMHistAnalysisMiraBelleModule::ExtractBhabha(void)
+{
   //bhabha,hadrons
-  // ========== bhabha_all
+  // ========== bhabha_trk_ecl
   // get existing histograms produced by DQM modules
   auto* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
   auto* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");
@@ -961,7 +1017,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double bh_mean_z0 = histbh_Z0->GetMean();
   double bh_mean_pval = histbh_Pval->GetMean();
   double bh_mean_ndf = histbh_ndf->GetMean();
-  double bh_dif_ndf_ncdc = mean_ndf - mean_ncdc;
+  double bh_dif_ndf_ncdc = bh_mean_ndf - bh_mean_ncdc;
   double bh_mean_dd0 = histbh_dD0->GetMean();
   double bh_mean_dz0 = histbh_dZ0->GetMean();
   double bh_mean_dpt = histbh_dPtcms->GetMean();
@@ -971,10 +1027,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double bh_sigma68_dd0 = getSigma68(histbh_dD0);
   double bh_sigma68_dz0 = getSigma68(histbh_dZ0);
   double bh_sigma68_dpt = getSigma68(histbh_dPtcms);
-  int bh_ntot = histbh_nECLClusters->GetEntries();
-  double bh_neve_bhabha = bh_ntot;
-  int bh_ntot_sign = histbh_nsvd->GetEntries();
-  double bh_neve_bhabha_sign = bh_ntot_sign;
+  double bh_neve_bhabha = histbh_nECLClusters->GetEntries();
+  double bh_neve_bhabha_sign = histbh_nsvd->GetEntries();
   double bh_goode_frac = -1.;
   double bh_pval_frac_0 = -1.;
   double bh_pval_frac_1 = -1.;
@@ -1039,59 +1093,76 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_bhabha->setVariable("bh_nocdc_frac", bh_nocdc_frac);
   mon_bhabha->setVariable("bh_notop_frac", bh_notop_frac);
   mon_bhabha->setVariable("bh_noarich_frac", bh_noarich_frac);
+}
+
+void DQMHistAnalysisMiraBelleModule::ExtractHadron(void)
+{
+  hadron_main->Clear();
+  hadron_main->Divide(2, 2);
   // ========== hadronb2 + tight
   // get existing histograms produced by DQM modules
-  auto* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleHadron/hist_nECLClusters");
-  auto* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_visibleEnergyCMSnorm");
-  auto* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm");
-  auto* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2");
+
+  if (auto* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleHadron/hist_nECLClusters"); histhad_nECLClusters != nullptr) {
+    hadron_main->cd(1);
+    histhad_nECLClusters->Draw();
+  } else {
+    B2WARNING("Can not find the histhad_nECLClusters histogram!");
+  }
+  if (auto* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_visibleEnergyCMSnorm");
+      histhad_visibleEnergyCMSnorm != nullptr) {
+    hadron_main->cd(2);
+    histhad_visibleEnergyCMSnorm->Draw();
+  } else {
+    B2WARNING("Can not find the histhad_visibleEnergyCMSnorm histogram!");
+  }
+
+  if (auto* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm"); histhad_EsumCMSnorm != nullptr) {
+    hadron_main->cd(3);
+    histhad_EsumCMSnorm->Draw();
+  } else {
+    B2WARNING("Can not find the histhad_EsumCMSnorm histogram!");
+  }
+  if (auto* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2"); histhad_R2 != nullptr) {
+    hadron_main->cd(4);
+    histhad_R2->Draw();
+  } else {
+    B2WARNING("Can not find the histhad_R2 histogram!");
+  }
+
   auto* histhad_physicsresultsH = findHist("PhysicsObjectsMiraBelleHadron/hist_physicsresultsH");
-
-  if (histhad_nECLClusters == nullptr) {
-    B2ERROR("Can not find the histhad_nECLClusters histogram!");
-    return;
-  }
-  if (histhad_visibleEnergyCMSnorm == nullptr) {
-    B2ERROR("Can not find the histhad_visibleEnergyCMSnorm histogram!");
-    return;
-  }
-  if (histhad_EsumCMSnorm == nullptr) {
-    B2ERROR("Can not find the histhad_EsumCMSnorm histogram!");
-    return;
-  }
-  if (histhad_R2 == nullptr) {
-    B2ERROR("Can not find the histhad_R2 histogram!");
-    return;
-  }
   if (histhad_physicsresultsH == nullptr) {
-    B2ERROR("Can not find the histhad_physicsresultsH histogram!");
+    B2WARNING("Can not find the histhad_physicsresultsH histogram!");
+    return;
+  }
+  auto* histbh_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
+  if (histbh_nECLClusters == nullptr) {
+    B2WARNING("Can not find the PhysicsObjectsMiraBelleBhabha/hist_nECLClusters histogram!");
     return;
   }
 
-  // Make TCanvases
-  // --- hadron_Main
-  hadron_main->Divide(2, 2);
-  hadron_main->cd(1);  histhad_nECLClusters->Draw();
-  hadron_main->cd(2);  histhad_visibleEnergyCMSnorm->Draw();
-  hadron_main->cd(3);  histhad_EsumCMSnorm->Draw();
-  hadron_main->cd(4);  histhad_R2->Draw();
+
   // calculate the values of monitoring variables
   double had_ntot = histhad_physicsresultsH->GetBinContent(3);
-  double ratio_hadron_bhabha = 0.;
-  //pull
-  double ratio_pull_hadBhabha = -10.;
-  double error_ratio = -10.;
-  if (bh_ntot != 0) {
-    ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
-    //pull
-    error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
-    ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
-  }
-  // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);
-  mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
-  mon_hadron->setVariable("error_ratio", error_ratio);
-  mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
+  double bh_neve_bhabha = histbh_nECLClusters->GetEntries(); // copy from bhabha
+  if (had_ntot != 0 and bh_neve_bhabha != 0) {
+    double ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
+    //pull
+    double error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
+    double ratio_pull_hadBhabha = (ratio_hadron_bhabha - m_reference_hadb) / error_ratio;
+    mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
+    mon_hadron->setVariable("error_ratio", error_ratio);
+    mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
+  }
+}
+
+void DQMHistAnalysisMiraBelleModule::endRun()
+{
+  ExtractMumu();
+  ExtractD0Star();
+  ExtractTaupair();
+  ExtractBhabha();
+  ExtractHadron();
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");
 }

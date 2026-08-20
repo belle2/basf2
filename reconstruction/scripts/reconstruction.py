@@ -22,7 +22,6 @@ from pxd import add_pxd_reconstruction
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS, DEFAULT_HLT_COMPONENTS
 
 from tracking import (
-    add_mc_tracking_reconstruction,
     add_prefilter_tracking_reconstruction,
     add_postfilter_tracking_reconstruction,
     add_cr_tracking_reconstruction,
@@ -30,6 +29,7 @@ from tracking import (
 )
 
 from softwaretrigger.path_utils import (
+    add_prefilter_module,
     add_filter_software_trigger,
     add_skim_software_trigger
 )
@@ -77,13 +77,14 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        with_cdc_cellular_automaton=False,
                        use_second_cdc_hits=False, svd_standalone_mode="VXDTF2",
                        add_muid_hits=False, reconstruct_cdst=None,
-                       event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
+                       use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
                        create_intercepts_for_pxd_ckf=False,
                        append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                       switch_off_slow_modules_for_online=False):
+                       switch_off_slow_modules_for_online=False,
+                       use_cat_finder=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -144,6 +145,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # Set the run for beam data
@@ -162,6 +165,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         append_full_grid_cdc_eventt0 = False
         legacy_ecl_charged_pid = True
 
+    # HLT pre-filter
+    add_prefilter_module(path, event_abort=default_event_abort)
+
     # pre-filter reconstruction
     add_prefilter_reconstruction(path,
                                  components=components,
@@ -173,12 +179,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  svd_standalone_mode=svd_standalone_mode,
                                  add_muid_hits=add_muid_hits,
                                  reconstruct_cdst=reconstruct_cdst,
-                                 event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
                                  create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
-                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online)
+                                 switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
+                                 use_cat_finder=use_cat_finder)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
@@ -189,6 +195,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
     add_postfilter_reconstruction(path,
                                   components=components,
                                   pruneTracks=pruneTracks,
+                                  trackFitHypotheses=trackFitHypotheses,
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
                                   legacy_ecl_charged_pid=legacy_ecl_charged_pid,
@@ -209,12 +216,12 @@ def add_prefilter_reconstruction(path,
                                  svd_standalone_mode="VXDTF2",
                                  add_muid_hits=False,
                                  reconstruct_cdst=None,
-                                 event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
                                  create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
-                                 switch_off_slow_modules_for_online=False):
+                                 switch_off_slow_modules_for_online=False,
+                                 use_cat_finder=False):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -239,9 +246,6 @@ def add_prefilter_reconstruction(path,
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
         full (old) format. This parameter is needed when reconstructing cdsts, otherwise the
         required PXD objects won't be added.
-    :param event_abort: A function to abort event processing at the given point. Should take three arguments: a module,
-        the condition and the error_flag to be set if these events are kept. If run on HLT this will not abort the event
-        but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
@@ -256,6 +260,8 @@ def add_prefilter_reconstruction(path,
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
+    :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
+        instead of the default one.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -267,11 +273,6 @@ def add_prefilter_reconstruction(path,
 
     # Check components.
     check_components(components)
-
-    # Do not even attempt at reconstructing events w/ abnormally large occupancy.
-    doom = path.add_module("EventsOfDoomBuster")
-    event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
-    path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
     # Add modules that have to be run BEFORE track reconstruction
     add_prefilter_pretracking_reconstruction(path, components=components)
@@ -289,7 +290,8 @@ def add_prefilter_reconstruction(path,
         pxd_filtering_offline=pxd_filtering_offline,
         create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
-        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
+        use_cat_finder=use_cat_finder)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -312,6 +314,7 @@ def add_prefilter_reconstruction(path,
 def add_postfilter_reconstruction(path,
                                   components=None,
                                   pruneTracks=False,
+                                  trackFitHypotheses=None,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
                                   legacy_ecl_charged_pid=False,
@@ -322,6 +325,8 @@ def add_postfilter_reconstruction(path,
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
+    :param trackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the fitted hypotheses are pion, kaon and proton, i.e. [211, 321, 2212].
     :param addClusterExpertModules: Add the cluster expert modules in the KLM and ECL. Turn this off to
         reduce execution time.
     :param reconstruct_cdst: None for mdst, 'rawFormat' to reconstruct cdsts in rawFormat, 'fullFormat' for the
@@ -349,6 +354,7 @@ def add_postfilter_reconstruction(path,
         path,
         components=components,
         pruneTracks=False,
+        trackFitHypotheses=trackFitHypotheses,
         flip_recoTrack=flip_recoTrack,
         kink_finding=kink_finding
     )
@@ -467,44 +473,6 @@ def add_cosmics_reconstruction(
                                             add_muid_hits=add_muid_hits,
                                             cosmics=True,
                                             legacy_ecl_charged_pid=legacy_ecl_charged_pid)
-
-
-def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExpertModules=True,
-                          use_second_cdc_hits=False, add_muid_hits=False, legacy_ecl_charged_pid=False):
-    """
-    This function adds the standard reconstruction modules with MC tracking
-    to a path.
-
-    @param components list of geometry components to include reconstruction for, or None for all components.
-    @param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
-    :param add_muid_hits: Add the found KLM hits to the RecoTrack. Make sure to refit the track afterwards.
-    :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
-    """
-
-    # Set the run for beam data
-    basf2.declare_beam()
-
-    # Add modules that have to be run before track reconstruction
-    add_prefilter_pretracking_reconstruction(path,
-                                             components=components)
-
-    # tracking
-    add_mc_tracking_reconstruction(path,
-                                   components=components,
-                                   pruneTracks=False,
-                                   use_second_cdc_hits=use_second_cdc_hits)
-
-    # Statistics summary
-    path.add_module('StatisticsSummary').set_name('Sum_MC_Tracking')
-
-    # add further reconstruction modules
-    add_posttracking_reconstruction(path,
-                                    components=components,
-                                    pruneTracks=pruneTracks,
-                                    add_muid_hits=add_muid_hits,
-                                    addClusterExpertModules=addClusterExpertModules,
-                                    legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 
 def add_prefilter_pretracking_reconstruction(path, components=None):

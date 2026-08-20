@@ -74,7 +74,7 @@ namespace Belle2 {
 
       int result = 0;
       auto primaryDaughters = particle->getDaughters();
-      for (auto* daughter : primaryDaughters) {
+      for (const auto* daughter : primaryDaughters) {
         if (daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite or
             daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0) {
           if (absPDGCode != 0) {

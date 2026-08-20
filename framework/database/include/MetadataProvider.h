@@ -119,7 +119,7 @@ namespace Belle2::Conditions {
      */
     bool getPayloads(int exp, int run, std::vector<PayloadMetadata>& info);
     /** Get the valid tag states when checking globaltag status */
-    std::set<std::string> getUsableTagStates() { return m_usableTagStates; }
+    const std::set<std::string>& getUsableTagStates() { return m_usableTagStates; }
     /** Set the valid tag states for this provider when checking globaltag
      * status. Should be called before setTags() if necessary.
      *
@@ -164,7 +164,7 @@ namespace Belle2::Conditions {
      *
      * @param provider the actual metadata provider used for the job
      */
-    void printInfoMessage(const std::string& provider);
+    static void printInfoMessage(const std::string& provider);
 
     /** List of globaltags to consider */
     std::vector<std::string> m_tags;

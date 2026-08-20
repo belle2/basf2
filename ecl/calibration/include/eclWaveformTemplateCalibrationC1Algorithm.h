@@ -22,13 +22,13 @@ namespace Belle2 {
       eclWaveformTemplateCalibrationC1Algorithm();
 
       /**..Destructor */
-      virtual ~eclWaveformTemplateCalibrationC1Algorithm() {}
+      virtual ~eclWaveformTemplateCalibrationC1Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_fractionLimitGeneral*/
       void setfractionLimitGeneral(float fractionLimitGeneral) {m_fractionLimitGeneral = fractionLimitGeneral;}

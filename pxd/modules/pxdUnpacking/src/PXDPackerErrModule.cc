@@ -282,7 +282,7 @@ void PXDPackerErrModule::initialize()
     /// read in the mapping for ONSEN->DHC->DHE->DHP
     /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
     /// DHE->DHP is only defined by port number/active mask ... not implemented yet.
-    for (auto& it : m_dhe_to_dhc) {
+    for (const auto& it : m_dhe_to_dhc) {
       bool flag;
       int dhc_id;
       B2DEBUG(27, "PXD Packer Err --> DHC/DHE");
@@ -291,7 +291,7 @@ void PXDPackerErrModule::initialize()
         /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
         B2WARNING("PXD Packer Err --> DHC/DHE maps 1 dhc to 5 dhe (1+5 values), but I found " << it.size());
       }
-      for (auto& it2 : it) {
+      for (const auto& it2 : it) {
         if (flag) {
           int v;
           v = it2;
@@ -314,10 +314,10 @@ void PXDPackerErrModule::initialize()
     }
     B2DEBUG(27, "PXD Packer Err --> DHC/DHE done");
 
-    for (auto& it : m_dhc_mapto_dhe) {
+    for (const auto& it : m_dhc_mapto_dhe) {
       int port = 0;
       B2DEBUG(27, "PXD Packer Err --> DHC " << it.first);
-      for (auto& it2 : it.second) {
+      for (const auto& it2 : it.second) {
         B2DEBUG(27, "PXD Packer Err --> .. connects to DHE " << it2 << " port " << port);
         port++;
       }
@@ -393,11 +393,11 @@ void PXDPackerErrModule::pack_event(void)
 
   // loop for each DHC in system
   // get active DHCs from a database?
-  for (auto& it : m_dhc_mapto_dhe) {
+  for (const auto& it : m_dhc_mapto_dhe) {
     int port = 1, port_inx = 0;
     int act_port = 0;
 
-    for (auto& it2 : it.second) {
+    for (const auto& it2 : it.second) {
       if (it2 >= 0) act_port += port;
       port += port;
       dhe_ids[port_inx] = it2;
@@ -526,7 +526,7 @@ void PXDPackerErrModule::start_frame(void)
   m_current_frame.clear();
 }
 
-void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids, bool send_all, bool send_roi)
+void PXDPackerErrModule::pack_dhc(int dhc_id, int dhe_active, const int* dhe_ids, bool send_all, bool send_roi)
 {
   B2DEBUG(27, "PXD Packer Err --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
@@ -937,12 +937,16 @@ void PXDPackerErrModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped)
           error_done = true;
         }
         if (rowstart) {
+          // the '| 0' documents where the common mode bits belong
+          // cppcheck-suppress badBitmaskCheck
           last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
           append_int16(last_rowstart);
           rowstart = false;
         }
-        int colout = col;
-        if (!isErrorIn(52)) append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
+        if (!isErrorIn(52)) {
+          int colout = col;
+          append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | charge);
+        }
         empty = false;
       }
     }

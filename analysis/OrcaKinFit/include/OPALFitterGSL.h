@@ -84,7 +84,7 @@ namespace Belle2 {
     class OPALFitterGSL : public BaseFitter {
     public:
       OPALFitterGSL();
-      virtual ~OPALFitterGSL();
+      virtual ~OPALFitterGSL() override;
       virtual double fit() override;
 
       /// Return error code

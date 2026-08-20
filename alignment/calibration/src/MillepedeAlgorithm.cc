@@ -292,6 +292,7 @@ void MillepedeAlgorithm::prepareMilleBinary()
   // Create new mille binary
   auto milleBinary = new gbl::MilleBinary(milleFileName);
 
+  /*
   // Containers for GBL data
   double aValue(0.);
   double aErr(0.);
@@ -299,24 +300,28 @@ void MillepedeAlgorithm::prepareMilleBinary()
   std::vector<double>* derLocal;
   std::vector<int>* labGlobal;
   std::vector<double>* derGlobal;
+  */
 
   // Read vectors of GblData from tree branch
   std::vector<gbl::GblData>* currentGblData = new std::vector<gbl::GblData>();
   gblDataTree->SetBranchAddress("GblData", &currentGblData);
 
   B2INFO("Writing Millepede binary files...");
+  B2ERROR("Broken with GBL V02");
   for (unsigned int iRecord = 0; iRecord < gblDataTree->GetEntries(); ++iRecord) {
     gblDataTree->GetEntry(iRecord);
 
     if (!currentGblData)
       continue;
 
+    /*
     for (gbl::GblData& theData : *currentGblData) {
       theData.getAllData(aValue, aErr, indLocal, derLocal, labGlobal,
                          derGlobal);
       milleBinary->addData(aValue, aErr, *indLocal, *derLocal, *labGlobal,
                            *derGlobal);
     }
+    */
     milleBinary->writeRecord();
   }
   // Closes the file

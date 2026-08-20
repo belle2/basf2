@@ -33,7 +33,7 @@ namespace Belle2 {
       if (index > 0) m_path = addIndex(m_path, index);
     }
     /** Create a GearDir with an absolute path and optionally appending an index */
-    GearDir(const std::string& path = "", int index = 0)
+    explicit GearDir(const std::string& path = "", int index = 0)
     {
       m_path = path;
       if (index > 0) m_path = addIndex(path, index);
@@ -75,6 +75,7 @@ namespace Belle2 {
      * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     std::string getString(const std::string& path, const std::string& defaultValue) const
     {
       return gearbox::Interface::getString(path, defaultValue);

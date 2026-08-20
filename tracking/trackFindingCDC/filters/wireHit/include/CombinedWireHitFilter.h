@@ -28,7 +28,7 @@ namespace Belle2 {
       CombinedWireHitFilter();
 
       /// Default destructor.
-      virtual ~CombinedWireHitFilter() = default;
+      virtual ~CombinedWireHitFilter() override = default;
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

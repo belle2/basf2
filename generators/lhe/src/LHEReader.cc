@@ -87,6 +87,36 @@ bool LHEReader::skipEvents(int n)
   return true;
 }
 
+int LHEReader::countEvents(const std::string& filename)
+{
+  std::ifstream input(filename.c_str());
+  if (!input) throw(LHECouldNotOpenFileError() << filename);
+
+  int count = 0;
+  int lineNr = 0;
+  std::string line;
+
+  auto countEvent = [&]() {
+    count++;
+    while (std::getline(input, line)) {
+      lineNr++;
+      boost::trim(line);
+      if (line == "</event>" || line.empty()) break;
+    }
+  };
+
+  while (std::getline(input, line)) {
+    lineNr++;
+    boost::trim(line);
+    if (line == "<event>") {
+      countEvent();
+    }
+  }
+
+  B2INFO("Counted " << count << " events in " << filename << ".");
+  return count;
+}
+
 //===================================================================
 //                  Protected methods
 //===================================================================

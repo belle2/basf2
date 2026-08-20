@@ -58,7 +58,7 @@ namespace Belle2 { // make separate sub-namespace for this?
     for (size_t iTH = 0; iTH < trueHits.size(); ++iTH) {
       B2DEBUG(29, "Trying to get MCParticles from TrueHit " << trueHits[iTH]->getArrayIndex() <<
               " from Array " << trueHits[iTH]->getArrayName());
-      Belle2::MCParticle* mcPart = trueHits[iTH]->template getRelatedFrom<Belle2::MCParticle>("ALL");
+      const Belle2::MCParticle* mcPart = trueHits[iTH]->template getRelatedFrom<Belle2::MCParticle>("ALL");
 
       int mcPartId = -1; // default value for MCPartId (not found)
       if (mcPart != nullptr) {

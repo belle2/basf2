@@ -32,7 +32,7 @@ namespace Belle2 {
       }
 
       //! The destructor of the GeoCDCCreatorReducedCDCNoSL0SL1 class.
-      ~GeoCDCCreatorReducedCDCNoSL0SL1() {};
+      ~GeoCDCCreatorReducedCDCNoSL0SL1() override {};
 
     private:
       /**

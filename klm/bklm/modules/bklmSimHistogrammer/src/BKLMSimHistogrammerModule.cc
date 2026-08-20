@@ -157,7 +157,6 @@ void BKLMSimHistogrammerModule::event()
   for (int i = 0; i < hits2D.getEntries(); i++) {
     if (hits2D[i]->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
-    int scaledTag = -1;
     ROOT::Math::XYZVector gHitPos = hits2D[i]->getPosition();
     RelationVector<BKLMHit1d> related1DHits = hits2D[i]->getRelationsTo<BKLMHit1d>();
     for (const auto& hit1d : related1DHits) {
@@ -165,8 +164,7 @@ void BKLMSimHistogrammerModule::event()
       for (const auto& bklmDigit : bklmDigits) {
         RelationVector<KLMSimHit> relatedSimHits = bklmDigit.getRelationsWith<KLMSimHit>();
         for (const auto& simHit : relatedSimHits) {
-          auto bgTag = simHit.getBackgroundTag();
-          scaledTag = bgTag;
+          int scaledTag = simHit.getBackgroundTag();
           //other has numeric value of 99
           if (scaledTag > 20)
             scaledTag = 20;
@@ -187,7 +185,7 @@ void BKLMSimHistogrammerModule::event()
   if (nSimHit == 0)
     return;
   for (int i = 0; i < n2DHits; i++) {
-    KLMHit2d* hit2D = hits2D[i];
+    const KLMHit2d* hit2D = hits2D[i];
     ROOT::Math::XYZVector gHitPos = hit2D->getPosition();
     if (hit2D->inRPC()) {
       m_hSimHitPhiRPC->Fill(gHitPos.Phi(), m_weight);
@@ -207,10 +205,6 @@ void BKLMSimHistogrammerModule::event()
       std::cout << "got " << bklmMCParticlesTo.size() << " as relation to " << std::endl;
     }
   }
-}
-
-void BKLMSimHistogrammerModule::endRun()
-{
 }
 
 void BKLMSimHistogrammerModule::terminate()

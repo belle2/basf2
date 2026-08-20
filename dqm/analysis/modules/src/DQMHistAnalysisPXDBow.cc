@@ -29,7 +29,7 @@ DQMHistAnalysisPXDBowModule::DQMHistAnalysisPXDBowModule()
 
   /// Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where the histogram is placed",
-           std::string("PXDBow/"));
+           std::string("PXDBow"));
   addParam("moduleName", m_moduleName,
            "Layer_ladder_sensor numbers of the module which residual histogram will be plotted on the DQM, if empty all histogram are plotted",
            std::string(""));
@@ -58,7 +58,7 @@ void DQMHistAnalysisPXDBowModule::initialize()
   /// collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
   int validModule = 0;
-  for (VxdID& aVxdID : sensors) {
+  for (const VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD || aVxdID.getSensorNumber() != 1) continue;/// only forward PXD modules
     m_PXDModules.push_back(aVxdID);
@@ -89,7 +89,7 @@ void DQMHistAnalysisPXDBowModule::initialize()
   }
   if (m_moduleName == "") {
     B2INFO("Plotting the histogram for all forward sensors");
-    for (VxdID& aPXDModule : m_PXDModules) {/// list of canvases
+    for (const VxdID& aPXDModule : m_PXDModules) {/// list of canvases
       auto buff = (std::string)aPXDModule;
       replace(buff.begin(), buff.end(), '.', '_');
       m_cResV[buff] = new TCanvas((m_histogramDirectoryName + std::string("c_resV_") + buff).c_str());
@@ -120,12 +120,12 @@ void DQMHistAnalysisPXDBowModule::beginRun()
 
 void DQMHistAnalysisPXDBowModule::event()
 {
-  for (VxdID& aPXDModule : m_PXDModules) {
+  for (const VxdID& aPXDModule : m_PXDModules) {
     auto buff = (std::string)aPXDModule;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
-    TH1* hV = getDelta(m_histogramDirectoryName + "resV_" + buff, 0, true);
-    TH1* hS = getDelta(m_histogramDirectoryName + "sagitta_" + buff, true);
+    TH1* hV = getDelta(m_histogramDirectoryName, "resV_" + buff, 0, true);
+    TH1* hS = getDelta(m_histogramDirectoryName, "sagitta_" + buff, true);
     if (hS != NULL && hV != NULL) {
       bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos sagitta" << buff << " and resV_" << buff << " found");
@@ -157,7 +157,7 @@ void DQMHistAnalysisPXDBowModule::event()
 
 void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff)
 {
-  TH1* h = findHist(m_histogramDirectoryName + "resV_" + buff, true);
+  TH1* h = findHist(m_histogramDirectoryName, "resV_" + buff, true);
   if (h != NULL) {
     m_hResV[buff].Clear();
     h->Copy(m_hResV[buff]);

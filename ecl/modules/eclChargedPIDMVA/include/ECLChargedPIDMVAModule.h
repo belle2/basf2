@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~ECLChargedPIDMVAModule();
+    virtual ~ECLChargedPIDMVAModule() override;
 
     /**
      * Use this to initialize resources or memory your module needs.
@@ -89,14 +89,14 @@ namespace Belle2 {
      * @param offset offset applied during the log transformation to prevent transforming 0.
      * @param max maximum possible return value of the MVA method.
      */
-    float logTransformation(const float value, const float offset, const float max) const;
+    static float logTransformation(const float value, const float offset, const float max);
 
     /**
      * gaussian transformation.
      * @param value to be gauss transformed.
      * @param cdf histogram containing a cdf of the distribution from which value is taken.
      */
-    float gaussTransformation(const float value, const TH1F* cdf) const;
+    static float gaussTransformation(const float value, const TH1F* cdf);
 
     /**
      * decorrelation transformation.
@@ -104,7 +104,7 @@ namespace Belle2 {
      @ param scores list of scores to be transformed.
      @ param decorrelationMatrix 1D flattened list of a square matrix.
      */
-    std::vector<float> decorrTransformation(const std::vector<float> scores, const std::vector<float>* decorrelationMatrix) const;
+    static std::vector<float> decorrTransformation(const std::vector<float>& scores, const std::vector<float>* decorrelationMatrix);
 
 
   private:

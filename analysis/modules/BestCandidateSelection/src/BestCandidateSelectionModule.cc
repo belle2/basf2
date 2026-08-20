@@ -25,7 +25,6 @@ REG_MODULE(BestCandidateSelection);
 BestCandidateSelectionModule::BestCandidateSelectionModule():
   m_variable(nullptr)
 {
-  //the "undefined order" bit is not strictly true in the current implementation, but details (with anti-particle lists) are tricky
   setDescription(R"DOC(Sort particles by the value of a given ``variable``
 in the input list and optionally remove particles after the nth position.
 
@@ -39,13 +38,12 @@ starting at 1 (best). The name of this extra-info field defaults to
 ``${variable}_rank`` but can be chosen freely using the ``outputVariable``
 parameter.
 
-The ranking also takes antiparticles into account, so there will only be one
-B+- candidate with ``rank=1``. The remaining list is sorted from best to worst
-candidate (each charge, e.g. B+/B-, separately). The sorting is guaranteed
-to be stable between particle and anti particle list: particles with the same
-value for ``variable`` will keep their relative order. That is, a particle "A"
-which was before another particle "B" in the same list and has the same value
-for ``variable`` will also stay before "B" after sorting.
+All particles in the input list are ranked together in a single ordering,
+regardless of particle type (e.g. B+ and B-, or B0 and B0bar). The sorting is
+guaranteed to be stable: particles with the same value for ``variable`` will
+keep their relative order. That is, a particle "A" which was before another
+particle "B" in the same list and has the same value for ``variable`` will
+also stay before "B" after sorting.
 
 If ``allowMultiRank=False`` (the default) candidates with same value of
 ``variable`` will have different ranks. If ``allowMultiRank=True`` they will

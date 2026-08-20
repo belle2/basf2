@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDDataFormatCheckModule();
 
-    virtual ~SVDDataFormatCheckModule();
+    virtual ~SVDDataFormatCheckModule() override;
 
     /** Initialize the SVDDataFormatCheck.*/
     virtual void initialize() override;
@@ -46,9 +46,6 @@ namespace Belle2 {
 
     /** This method is called if the current run ends. */
     virtual void endRun() override;
-
-    /** This method is called at the end of the event processing.   */
-    virtual void terminate() override;
 
 
   private:

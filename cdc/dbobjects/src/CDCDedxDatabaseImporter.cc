@@ -29,7 +29,7 @@
 // NAMESPACES
 using namespace Belle2;
 
-CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(std::string inputFileName, const std::string& name)
+CDCDedxDatabaseImporter::CDCDedxDatabaseImporter(const std::string& inputFileName, const std::string& name)
 {
   m_inputFileNames.push_back(inputFileName);
   m_name = name;
@@ -59,12 +59,12 @@ void CDCDedxDatabaseImporter::importHadronCorrection()
 
     TIter next(f->GetListOfKeys());
     TKey* key;
-    while ((key = (TKey*) next())) {
+    while ((key = static_cast<TKey*>(next()))) {
 
       std::string histconstants = key->GetName();
 
       if (histconstants.compare("CDCDedxHadronCor") == 0) {
-        parhist = (TH1F*)f->Get(histconstants.c_str());
+        parhist = static_cast<TH1F*>(f->Get(histconstants.c_str()));
         B2INFO("Key name matches: " << histconstants);
       }
 
@@ -106,12 +106,12 @@ void CDCDedxDatabaseImporter::importMeanParameters()
 
     TIter next(f->GetListOfKeys());
     TKey* key;
-    while ((key = (TKey*) next())) {
+    while ((key = static_cast<TKey*>(next()))) {
 
       std::string histconstants = key->GetName();
 
       if (histconstants.compare("CDCDedxMeanPars") == 0) {
-        parhist = (TH1F*)f->Get(histconstants.c_str());
+        parhist = static_cast<TH1F*>(f->Get(histconstants.c_str()));
         B2INFO("Key name matches: " << histconstants);
       }
 
@@ -153,12 +153,12 @@ void CDCDedxDatabaseImporter::importSigmaParameters()
 
     TIter next(f->GetListOfKeys());
     TKey* key;
-    while ((key = (TKey*) next())) {
+    while ((key = static_cast<TKey*>(next()))) {
 
       std::string histconstants = key->GetName();
 
       if (histconstants.compare("CDCDedxSigmaPars") == 0) {
-        parhist = (TH1F*)f->Get(histconstants.c_str());
+        parhist = static_cast<TH1F*>(f->Get(histconstants.c_str()));
         B2INFO("Key name matches: " << histconstants);
       }
 

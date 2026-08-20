@@ -50,7 +50,7 @@ namespace Belle2 {
 
       std::map<std::string, enum fann_activationfunc_enum> activationFunctions;
       unsigned int i = 0;
-      for (auto& name : FANN_ACTIVATIONFUNC_NAMES) {
+      for (const auto& name : FANN_ACTIVATIONFUNC_NAMES) {
         activationFunctions[name] = fann_activationfunc_enum(i);
         i++;
       }
@@ -66,7 +66,7 @@ namespace Belle2 {
 #else
       std::map<std::string, enum fann_train_enum> trainingMethods;
       i = 0;
-      for (auto& name : FANN_TRAIN_NAMES) {
+      for (const auto& name : FANN_TRAIN_NAMES) {
         trainingMethods[name] = fann_train_enum(i);
         i++;
       }
@@ -74,7 +74,7 @@ namespace Belle2 {
 
       std::map<std::string, enum fann_errorfunc_enum> errorFunctions;
       i = 0;
-      for (auto& name : FANN_ERRORFUNC_NAMES) {
+      for (const auto& name : FANN_ERRORFUNC_NAMES) {
         errorFunctions[name] = fann_errorfunc_enum(i);
         i++;
       }

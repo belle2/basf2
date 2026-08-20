@@ -21,6 +21,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <TMatrixDSym.h>
+#include <optional>
 
 #include <genfit/FitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
@@ -39,7 +40,14 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
 
   const auto& trackReps = recoTrack.getRepresentations();
   B2DEBUG(27, trackReps.size() << " track representations available.");
-  Track newTrack(recoTrack.getQualityIndicator());
+  std::optional<Track> ownedTrack;
+  Track* relatedTrack = recoTrack.getRelatedFrom<Track>();
+  bool newTrackCreated = false;
+  if (!relatedTrack) {
+    ownedTrack.emplace(recoTrack.getQualityIndicator());
+    relatedTrack = &*ownedTrack;
+    newTrackCreated = true;
+  }
 
   bool repAlreadySet = false;
   unsigned int repIDPlusOne = 0;
@@ -57,6 +65,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     if (not recoTrack.wasFitSuccessful(trackRep)) {
       B2DEBUG(27, "The fit with the given track representation (" << std::abs(trackRep->getPDG()) <<
               ") was not successful. Skipping ...");
+      continue;
+    }
+
+    // Skip hypotheses already stored by a previous TrackBuilder call (e.g. from a prior TrackCreator module).
+    if (not newTrackCreated && relatedTrack->getTrackFitResult(particleType)) {
       continue;
     }
 
@@ -118,19 +131,21 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack,
     const uint64_t hitPatternCDCInitializer = getHitPatternCDCInitializer(recoTrack, trackRep);
     const uint32_t hitPatternVXDInitializer = getHitPatternVXDInitializer(recoTrack, trackRep);
 
-    const auto newTrackFitResult = trackFitResults.appendNew(
-                                     ROOT::Math::XYZVector(poca), ROOT::Math::XYZVector(dirInPoca), cov, charge, particleType, pValue, Bz,
-                                     hitPatternCDCInitializer, hitPatternVXDInitializer, nDF
-                                   );
+    const auto* newTrackFitResult = trackFitResults.appendNew(
+                                      ROOT::Math::XYZVector(poca), ROOT::Math::XYZVector(dirInPoca), cov, charge, particleType, pValue, Bz,
+                                      hitPatternCDCInitializer, hitPatternVXDInitializer, nDF
+                                    );
 
     const int newTrackFitResultArrayIndex = newTrackFitResult->getArrayIndex();
-    newTrack.setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
+    relatedTrack->setTrackFitResultIndex(particleType, newTrackFitResultArrayIndex);
   }
 
-  B2DEBUG(27, "Number of fitted hypothesis = " << newTrack.getNumberOfFittedHypotheses());
-  if (newTrack.getNumberOfFittedHypotheses() > 0) {
-    Track* addedTrack = tracks.appendNew(newTrack);
-    addedTrack->addRelationTo(&recoTrack);
+  B2DEBUG(27, "Number of fitted hypothesis = " << relatedTrack->getNumberOfFittedHypotheses());
+  if (relatedTrack->getNumberOfFittedHypotheses() > 0) {
+    if (newTrackCreated) {
+      const Track* addedTrack = tracks.appendNew(*relatedTrack);
+      addedTrack->addRelationTo(&recoTrack);
+    }
     return true;
   } else {
     B2DEBUG(28, "No valid fit for any given hypothesis. No Track is added to the Tracks StoreArray.");
@@ -148,15 +163,15 @@ uint32_t TrackBuilder::getHitPatternVXDInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) {  // Loop on TrackPoint
 
-    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+    const genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) {  //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
 
-      PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
-      SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
-      SVDRecoHit2D* svdHit2D = dynamic_cast<SVDRecoHit2D*>(absMeas);
+      const PXDRecoHit* pxdHit = dynamic_cast<PXDRecoHit*>(absMeas);
+      const SVDRecoHit* svdHit = dynamic_cast<SVDRecoHit*>(absMeas);
+      const SVDRecoHit2D* svdHit2D = dynamic_cast<SVDRecoHit2D*>(absMeas);
 
       if (!pxdHit && !svdHit2D && !svdHit)
         continue; // consider only VXD hits
@@ -219,12 +234,12 @@ uint64_t TrackBuilder::getHitPatternCDCInitializer(const RecoTrack& recoTrack, c
 
   for (const auto& trackPoint : hitPointsWithMeasurements) { // Loop on TrackPoint
 
-    genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
+    const genfit::KalmanFitterInfo* kalmanInfo = trackPoint->getKalmanFitterInfo(representation);
 
     for (size_t measurementId = 0; measurementId < trackPoint->getNumRawMeasurements(); measurementId++) { //Loop on raw measurement
 
       genfit::AbsMeasurement* absMeas = trackPoint->getRawMeasurement(measurementId);
-      CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
+      const CDCRecoHit* cdcHit = dynamic_cast<CDCRecoHit*>(absMeas);
 
       if (!cdcHit)
         continue; // consider only CDC hits

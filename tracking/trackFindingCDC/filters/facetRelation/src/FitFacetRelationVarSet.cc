@@ -17,9 +17,13 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/LineParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <framework/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/Angle.h>
+
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -41,32 +45,32 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
   LineCovariance toCov   = toFitLine.lineCovariance();
   LineParameters toPar   = toFitLine.lineParameters();
 
-  Vector2D fromTangential = fromFacet->getStartToEndLine().tangential();
-  Vector2D toTangential   = toFacet->getStartToEndLine().tangential();
+  ROOT::Math::XYVector fromTangential = fromFacet->getStartToEndLine().tangential();
+  ROOT::Math::XYVector toTangential   = toFacet->getStartToEndLine().tangential();
 
-  Vector2D tangential = Vector2D::average(fromTangential, toTangential);
+  ROOT::Math::XYVector tangential = VectorUtil::average(fromTangential, toTangential);
 
-  double fromMiddleCos = fromFacet->getStartToMiddleLine().tangential().cosWith(toTangential);
-  double toMiddleCos = fromTangential.cosWith(toFacet->getMiddleToEndLine().tangential());
+  double fromMiddleCos = VectorUtil::CosPhi(fromFacet->getStartToMiddleLine().tangential(), toTangential);
+  double toMiddleCos = VectorUtil::CosPhi(fromTangential, toFacet->getMiddleToEndLine().tangential());
 
-  var<named("cos_delta")>() = fromTangential.cosWith(toTangential);
+  var<named("cos_delta")>() = VectorUtil::CosPhi(fromTangential, toTangential);
 
   var<named("from_middle_cos_delta")>() = fromMiddleCos;
   var<named("to_middle_cos_delta")>() = toMiddleCos;
 
-  Vector2D frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
-  Vector2D backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
+  ROOT::Math::XYVector frontWirePos2D = fromFacet->getStartWireHit().getRefPos2D();
+  ROOT::Math::XYVector backWirePos2D  = toFacet->getEndWireHit().getRefPos2D();
   {
     int nSteps = 0;
     UncertainParameterLine2D fitLine = FacetFitter::fit(*fromFacet, *toFacet, nSteps);
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
-    double alpha = fitLine->support().angleWith(fitLine->tangential());
+    double alpha = ROOT::Math::VectorUtil::DeltaPhi(fitLine->support(), fitLine->tangential());
     var<named("alpha_0")>() = alpha;
     var<named("chi2_0")>() = fitLine.chi2();
     var<named("chi2_0_per_s")>() = fitLine.chi2() / s;
     var<named("erf_0")>() = std::erf(fitLine.chi2() / 800);
-    var<named("fit_0_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_0_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_0_phi0")>() = fitLine->tangential().Phi();
+    var<named("fit_0_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   {
@@ -75,8 +79,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2_1")>() = fitLine.chi2();
     var<named("chi2_1_per_s")>() = fitLine.chi2() / s;
-    var<named("fit_1_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_1_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_1_phi0")>() = fitLine->tangential().Phi();
+    var<named("fit_1_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   {
@@ -84,8 +88,8 @@ bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRel
     double s = fitLine->lengthOnCurve(frontWirePos2D, backWirePos2D);
     var<named("chi2")>() = fitLine.chi2();
     var<named("chi2_per_s")>() = fitLine.chi2() / s;
-    var<named("fit_phi0")>() = fitLine->tangential().phi();
-    var<named("fit_cos_delta")>() = fitLine->tangential().cosWith(tangential);
+    var<named("fit_phi0")>() = fitLine->tangential().Phi();
+    var<named("fit_cos_delta")>() = VectorUtil::CosPhi(fitLine->tangential(), tangential);
   }
 
   // Combination fit

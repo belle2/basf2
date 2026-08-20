@@ -38,7 +38,7 @@ namespace Belle2 {
       Filter();
 
       /// Make destructor of interface class virtual
-      virtual ~Filter();
+      virtual ~Filter() override;
 
       /// Indicates if the filter requires Monte Carlo information.
       virtual bool needsTruthInformation();

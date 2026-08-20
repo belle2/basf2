@@ -13,7 +13,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include "TH1F.h"
+#include <TH1F.h>
 
 namespace Belle2 {
   class RecoTrack;
@@ -30,9 +30,6 @@ namespace Belle2 {
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
     PXDDQMBowingModule();
-
-    /// Virtual destructor (base class)
-    virtual ~PXDDQMBowingModule() {}
 
     /** initializes the needed store arrays and histograms*/
     void initialize() override final;

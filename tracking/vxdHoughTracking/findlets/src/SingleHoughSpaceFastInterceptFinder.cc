@@ -62,34 +62,34 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
 {
   Super::initialize();
 
-  const uint maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
+  const ushort maxRecursionLevelFromSectors = ceil(log2(std::max(m_nAngleSectors, m_nVerticalSectors))) - 1;
   m_maxRecursionLevel = std::max(maxRecursionLevelFromSectors, m_maxRecursionLevel);
-  if (m_maxRecursionLevel > 14) {
-    B2ERROR("The maximum number of recursions (maximumRecursionLevel) must not be larger than 14, but it is " <<
-            m_maxRecursionLevel <<
-            ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.");
-  }
-  m_unitX = (m_maximumX - m_minimumX) / (double)m_nAngleSectors;
-  for (uint i = 0; i < m_nAngleSectors; i++) {
-    double x = m_minimumX + m_unitX * (double)i;
-    double xc = x + 0.5 * m_unitX;
+  B2ASSERT("The maximum number of recursions (maximumRecursionLevel) must not be larger than " << c_maxAllowedRecusionLevel <<
+           ", but it is " << m_maxRecursionLevel <<
+           ", please choose a smaller value for maximumRecursionLevel, and / or for nAngleSectors and / or nVerticalSectors.",
+           m_maxRecursionLevel <= c_maxAllowedRecusionLevel);
+  B2ASSERT("The maximum number of angleSectors must not be larger than " << c_maxHSSectorNumber <<
+           ", but it is " << m_nAngleSectors << ", please choose a smaller value for nAngleSectors.",
+           m_nAngleSectors <= c_maxHSSectorNumber);
+  B2ASSERT("The maximum number of verticalSectors must not be larger than " << c_maxHSSectorNumber <<
+           ", but it is " << m_nVerticalSectors << ", please choose a smaller value for nAngleSectors.",
+           m_nVerticalSectors <= c_maxHSSectorNumber);
 
-    m_HSXLUT[i] = x;
+  m_unitX = (m_maximumX - m_minimumX) / (float)m_nAngleSectors;
+  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
+
+  for (ushort i = 0; i < m_nAngleSectors; i++) {
+    float x = m_minimumX + m_unitX * (float)i;
+    float xc = x + 0.5 * m_unitX;
+
     m_HSSinValuesLUT[i] = sin(x);
     m_HSCosValuesLUT[i] = cos(x);
     m_HSCenterSinValuesLUT[i] = sin(xc);
     m_HSCenterCosValuesLUT[i] = cos(xc);
-    m_HSXCenterLUT[i] = xc;
   }
-  m_HSXLUT[m_nAngleSectors] = m_maximumX;
   m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
   m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
-  m_unitY = 2. * m_verticalHoughSpaceSize / m_nVerticalSectors;
-  for (uint i = 0; i <= m_nVerticalSectors; i++) {
-    m_HSYLUT[i] = m_verticalHoughSpaceSize - m_unitY * i;
-    m_HSYCenterLUT[i] = m_verticalHoughSpaceSize - m_unitY * i - 0.5 * m_unitY;
-  }
   B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
@@ -99,7 +99,8 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
                                                 std::vector<std::vector<VXDHoughState*>>& rawTrackCandidates)
 {
   m_trackCandidates.clear();
-  m_activeSectors.clear();
+  m_activeSectorsMap.clear();
+  m_activeSectorsIndices.clear();
 
   const std::vector<VXDHoughState*> currentEventHitList = TrackingUtilities::as_pointers<VXDHoughState>(hits);
 
@@ -115,7 +116,7 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
       return
         (a->getDataCache().layer > b->getDataCache().layer) or
         (a->getDataCache().layer == b->getDataCache().layer
-         and a->getHit()->getPosition().Perp() > b->getHit()->getPosition().Perp());
+         and a->getHit()->getPosition().Perp2() > b->getHit()->getPosition().Perp2());
     });
 
     rawTrackCandidates.emplace_back(trackCand);
@@ -126,9 +127,8 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
 }
 
 
-void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits, uint xmin, uint xmax,
-    uint ymin,
-    uint ymax, uint currentRecursion)
+void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits,
+    const ushort xmin, const ushort xmax, const ushort ymin, const ushort ymax, const ushort currentRecursion)
 {
   std::vector<VXDHoughState*> containedHits;
   containedHits.reserve(hits.size());
@@ -137,37 +137,39 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
   if (currentRecursion == m_maxRecursionLevel + 1) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
-  const uint centerx = xmin + (uint)((xmax - xmin) / 2);
-  const uint centery = ymin + (uint)((ymax - ymin) / 2);
-  const uint xIndexCache[3] = {xmin, centerx, xmax};
-  const uint yIndexCache[3] = {ymin, centery, ymax};
+  const ushort centerx = xmin + (ushort)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
+  const ushort centery = ymin + (ushort)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
+  const ushort xIndexCache[3] = {xmin, centerx, xmax};
+  const ushort yIndexCache[3] = {ymin, centery, ymax};
 
   for (int i = 0; i < 2 ; ++i) {
-    const uint left  = xIndexCache[i];
-    const uint right = xIndexCache[i + 1];
-    const uint localIndexX = left;
+    const ushort left  = xIndexCache[i];
+    const ushort right = xIndexCache[i + 1];
+    const ushort localIndexX = left;
 
     if (left == right) continue;
 
-    const double& sinLeft     = m_HSSinValuesLUT[left];
-    const double& cosLeft     = m_HSCosValuesLUT[left];
-    const double& sinRight    = m_HSSinValuesLUT[right];
-    const double& cosRight    = m_HSCosValuesLUT[right];
+    const float& sinLeft     = m_HSSinValuesLUT[left];
+    const float& cosLeft     = m_HSCosValuesLUT[left];
+    const float& sinRight    = m_HSSinValuesLUT[right];
+    const float& cosRight    = m_HSCosValuesLUT[right];
 
     // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
-    // is quite large and the logic would become rather complex
-    const double sinCenter   = m_HSCenterSinValuesLUT[(left + right) / 2];
-    const double cosCenter   = m_HSCenterCosValuesLUT[(left + right) / 2];
+    // is quite large and the logic would become rather complex, so this is just an approximation which is good enough
+    const float sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
+    const float cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
 
     for (int j = 0; j < 2; ++j) {
-      const uint lowerIndex = yIndexCache[j];
-      const uint upperIndex = yIndexCache[j + 1];
+      const ushort lowerIndex = yIndexCache[j];
+      const ushort upperIndex = yIndexCache[j + 1];
 
       if (lowerIndex == upperIndex) continue;
 
-      const uint localIndexY = lowerIndex;
-      const double& localUpperCoordinate = m_HSYLUT[lowerIndex];
-      const double& localLowerCoordinate = m_HSYLUT[upperIndex];
+      const ushort localIndexY = lowerIndex;
+      // Sector counting for y starts at positive values, i.e. the topmost sector has index 0,
+      // and the bottommost sector has the highest index
+      const float localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
+      const float localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
 
       // reset layerHits and containedHits
       layerHits = 0;
@@ -175,20 +177,20 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       for (VXDHoughState* hit : hits) {
 
         const VXDHoughState::DataCache& hitData = hit->getDataCache();
-        const double& m = hitData.xConformal;
-        const double& a = hitData.yConformal;
+        const float& m = hitData.xConformal;
+        const float& a = hitData.yConformal;
 
-        const double derivativeyLeft   = m * -sinLeft   + a * cosLeft;
-        const double derivativeyRight  = m * -sinRight  + a * cosRight;
-        const double derivativeyCenter = m * -sinCenter + a * cosCenter;
+        const float derivativeyLeft   = m * -sinLeft   + a * cosLeft;
+        const float derivativeyRight  = m * -sinRight  + a * cosRight;
+        const float derivativeyCenter = m * -sinCenter + a * cosCenter;
 
         // Only interested in the rising arm of the sinosoidal curves.
         // Thus if derivative on both sides of the cell is negative, ignore and continue.
         if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
 
-        const double yLeft   = m * cosLeft   + a * sinLeft;
-        const double yRight  = m * cosRight  + a * sinRight;
-        const double yCenter = m * cosCenter + a * sinCenter;
+        const float yLeft   = m * cosLeft   + a * sinLeft;
+        const float yRight  = m * cosRight  + a * sinRight;
+        const float yCenter = m * cosCenter + a * sinCenter;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
         if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
@@ -204,7 +206,15 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
         if (currentRecursion < m_maxRecursionLevel) {
           fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
-          m_activeSectors.insert({std::make_pair(localIndexX, localIndexY), std::make_pair(-layerFilter(layerHits), containedHits) });
+          // As usual in creating a 2D-array as 1D, calculate the global index as
+          // xIndex + yIndex * ySize
+          // A bit more complicated here though, since the y-axis is inverted on the fly.
+          // Instead of starting the coordinate system in the top-left corner, it has to start in the bottom-left corner
+          // for creating HS clusters from bottom to top and from left to right, so this becomes
+          // xIndex + ySize * (ySize - yIndex)   (eq. 0)
+          const uint globalIndex = localIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - localIndexY);
+          m_activeSectorsMap.insert({globalIndex, containedHits});
+          m_activeSectorsIndices.push_back(globalIndex);
         }
       }
     }
@@ -216,28 +226,39 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
 {
   m_clusterCount = 1;
 
-  for (auto& currentCell : m_activeSectors) {
+  // Sort vector to create HS clusters from bottom left to top right
+  std::sort(m_activeSectorsIndices.begin(), m_activeSectorsIndices.end());
 
-    // cell content meanings:
-    // -3, -4  : active sector, not yet visited
-    // 0       : non-active sector (will never be visited, only checked)
-    // 1,2,3...: index of the clusters
-    if (currentCell.second.first > -1) continue;
+  for (const uint& currentGlobalSectorIndex : m_activeSectorsIndices) {
 
-    m_clusterInitialPosition = std::make_pair(currentCell.first.first, currentCell.first.second);
-    m_clusterSize = 1;
-    currentCell.second.first = m_clusterCount;
-
-    m_currentTrackCandidate.clear();
-    for (VXDHoughState* hit : currentCell.second.second) {
-      m_currentTrackCandidate.emplace_back(hit);
+    const auto currentCellHits = m_activeSectorsMap.find(currentGlobalSectorIndex);
+    if (currentCellHits == m_activeSectorsMap.end()) {
+      continue;
     }
 
+    // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+    // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+    // (currentGlobalSectorIndex & c_xIndexBitMask)
+    // equals % c_maxHSSectorNumber, i.e.
+    // currentGlobalSectorIndex % c_maxHSSectorNumber.
+    // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+    // >> c_maxAllowedRecusionLevel
+    // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
+    m_clusterInitialPosition = std::make_pair((currentGlobalSectorIndex & c_xIndexBitMask),
+                                              c_maxHSSectorNumber - (currentGlobalSectorIndex >> c_maxAllowedRecusionLevel));
+    m_clusterSize = 1;
+
+    m_currentTrackCandidate.clear();
+    for (VXDHoughState* hit : currentCellHits->second) {
+      m_currentTrackCandidate.emplace_back(hit);
+    }
+    // this sector now has been used and the hits have been processed, so it can be removed from the map
+    m_activeSectorsMap.erase(currentGlobalSectorIndex);
+
     // Check for HS sectors connected to each other which could form a cluster
-    DepthFirstSearch(currentCell.first.first, currentCell.first.second);
+    DepthFirstSearch(currentGlobalSectorIndex);
     // if cluster valid (i.e. not too small and not too big): finalize!
     if (m_clusterSize >= m_MinimumHSClusterSize and m_clusterSize <= m_MaximumHSClusterSize) {
-
       m_trackCandidates.emplace_back(m_currentTrackCandidate);
       m_currentTrackCandidate.clear();
     }
@@ -245,40 +266,64 @@ void SingleHoughSpaceFastInterceptFinder::FindHoughSpaceCluster()
   }
 }
 
-void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(uint lastIndexX, uint lastIndexY)
+void SingleHoughSpaceFastInterceptFinder::DepthFirstSearch(const uint lastGlobalSectorIndex)
 {
   if (m_clusterSize >= m_MaximumHSClusterSize) return;
 
-  for (uint currentIndexY = lastIndexY; currentIndexY >= lastIndexY - 1; currentIndexY--) {
-    if (abs((int)m_clusterInitialPosition.second - (int)currentIndexY) >= m_MaximumHSClusterSizeY or
-        m_clusterSize >= m_MaximumHSClusterSize or currentIndexY > m_nVerticalSectors) return;
-    for (uint currentIndexX = lastIndexX; currentIndexX <= lastIndexX + 1; currentIndexX++) {
-      if (abs((int)m_clusterInitialPosition.first - (int)currentIndexX) >= m_MaximumHSClusterSizeX or
-          m_clusterSize >= m_MaximumHSClusterSize or currentIndexX > m_nAngleSectors) return;
+  // Get local (x, y) indices out of the globalSectorIndex by reverting (eq. 0)
+  // Bitwise and with c_xIndexBitMask (which is (c_maxHSSectorNumber - 1))
+  // (currentGlobalSectorIndex & c_xIndexBitMask)
+  // equals % c_maxHSSectorNumber, i.e.
+  // currentGlobalSectorIndex % c_maxHSSectorNumber.
+  // Bitshifting right by c_maxAllowedRecusionLevel, i.e.
+  // >> c_maxAllowedRecusionLevel
+  // equals a division by 2^c_maxAllowedRecusionLevel but is much faster.
+  const ushort lastLocalIndexX = (lastGlobalSectorIndex & c_xIndexBitMask);
+  const ushort lastLocalIndexY = c_maxHSSectorNumber - (lastGlobalSectorIndex >> c_maxAllowedRecusionLevel);
 
-      // The cell (currentIndexX, currentIndexY) is the current one has already been checked, so continue
-      if (lastIndexX == currentIndexX && lastIndexY == currentIndexY) continue;
+  // For the iterative / recursive search, just check the direct neighbours in x and y direction
+  for (ushort currentLocalIndexY = lastLocalIndexY; currentLocalIndexY >= lastLocalIndexY - 1; currentLocalIndexY--) {
+    if (std::abs(static_cast<short>(m_clusterInitialPosition.second) - static_cast<short>(currentLocalIndexY)) >=
+        m_MaximumHSClusterSizeY
+        or m_clusterSize >= m_MaximumHSClusterSize or currentLocalIndexY > m_nVerticalSectors) {
+      return;
+    }
+
+    for (ushort currentLocalIndexX = lastLocalIndexX; currentLocalIndexX <= lastLocalIndexX + 1; currentLocalIndexX++) {
+      if (std::abs(static_cast<short>(m_clusterInitialPosition.first) - static_cast<short>(currentLocalIndexX)) >= m_MaximumHSClusterSizeX
+          or m_clusterSize >= m_MaximumHSClusterSize or currentLocalIndexX > m_nAngleSectors) {
+        return;
+      }
+
+      // Calculate the global index for this sector by applying (eq. 0)
+      const uint currentGlobalSectorIndex = currentLocalIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - currentLocalIndexY);
+      // If currentGlobalSectorIndex == lastGlobalSectorIndex, the sector in check is the "parent" we came from
+      // and thus has already been checked, so continue
+      if (currentGlobalSectorIndex == lastGlobalSectorIndex) {
+        continue;
+      }
 
       // first check bounds to avoid out-of-bound array access
       // as they are uints, they are always >= 0, and in case of an overflow they would be too large
-      if (currentIndexX < m_nAngleSectors and currentIndexY < m_nVerticalSectors) {
+      if (currentLocalIndexX < m_nAngleSectors and currentLocalIndexY < m_nVerticalSectors) {
 
-        auto activeSector = m_activeSectors.find({currentIndexX, currentIndexY});
+        const auto activeSectorHits = m_activeSectorsMap.find(currentGlobalSectorIndex);
         // Only continue searching if the current cluster is smaller than the maximum cluster size
-        if (activeSector != m_activeSectors.end() and activeSector->second.first < 0 /*and m_clusterSize < m_MaximumHSClusterSize*/) {
-          activeSector->second.first = m_clusterCount;
+        if (activeSectorHits != m_activeSectorsMap.end()) {
           m_clusterSize++;
 
-          // No need to check whether currentIndex exists as a key in m_activeSectors as they were created at the same time
-          // so it's certain the key exists.
-          for (VXDHoughState* hit : activeSector->second.second) {
+          // No need to check whether currentGlobalSectorIndex exists as a key in m_activeSectorsMap as they were
+          // created at the same time so it's certain the key exists.
+          for (VXDHoughState* hit : activeSectorHits->second) {
             if (not TrackingUtilities::is_in(hit, m_currentTrackCandidate)) {
               m_currentTrackCandidate.emplace_back(hit);
             }
           }
+          // this sector now has been used and the hits have been processed, so it can be removed from the map
+          m_activeSectorsMap.erase(currentGlobalSectorIndex);
 
           // search in the next Hough Space cells...
-          DepthFirstSearch(currentIndexX, currentIndexY);
+          DepthFirstSearch(currentGlobalSectorIndex);
         }
       }
     }

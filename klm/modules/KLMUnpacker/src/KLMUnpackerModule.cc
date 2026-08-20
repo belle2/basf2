@@ -299,7 +299,7 @@ void KLMUnpackerModule::unpackKLMDigit(
   }
 }
 
-void KLMUnpackerModule::convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb) const
+void KLMUnpackerModule::convertPCIe40ToCOPPER(int channel, unsigned int* copper, int* hslb)
 {
   if (channel >= 0 && channel < 16) {
     int id = channel / 4;
@@ -394,10 +394,3 @@ void KLMUnpackerModule::event()
   }
 }
 
-void KLMUnpackerModule::endRun()
-{
-}
-
-void KLMUnpackerModule::terminate()
-{
-}

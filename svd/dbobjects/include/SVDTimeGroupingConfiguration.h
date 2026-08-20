@@ -10,8 +10,8 @@
 
 #include <framework/logging/Logger.h>
 
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 
 #include <vector>
 
@@ -73,8 +73,8 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    SVDTimeGroupingConfiguration(const TString& uniqueID = "",
-                                 const std::vector<TString>& description = {})
+    explicit SVDTimeGroupingConfiguration(const TString& uniqueID = "",
+                                          const std::vector<TString>& description = {})
       : m_uniqueID(uniqueID), m_description(description)
     {
 

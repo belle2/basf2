@@ -34,7 +34,7 @@ void ExtraInfoRemoverModule::initialize()
 void ExtraInfoRemoverModule::event()
 {
 
-  for (auto& iList :  m_strParticleLists) {
+  for (const auto& iList :  m_strParticleLists) {
 
     StoreObjPtr<ParticleList> particleList(iList);
     if (!particleList.isValid()) {

@@ -10,6 +10,8 @@
 #include <cdc/topology/ISuperLayer.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
+#include <Math/Vector2D.h>
+
 #include <array>
 #include <vector>
 
@@ -19,7 +21,6 @@ namespace Belle2 {
     class CDCTrack;
     class CDCTrajectory2D;
     class CDCWireHit;
-    class Vector2D;
     class CDCRecoHit3D;
   }
   namespace TrackFindingCDC {
@@ -82,13 +83,13 @@ namespace Belle2 {
        *  @retval ESign::c_Invalid given center has a nan value
        */
       static TrackingUtilities::ESign getMajorArmSign(const TrackingUtilities::CDCTrack& track,
-                                                      const TrackingUtilities::Vector2D& center);
+                                                      const ROOT::Math::XYVector& center);
 
       /**
        *  Calculate the sum of right and left votes for the hits relative to the center.
        *  Positive indicates a majority of right by that amount. Negative indicates a left majority.
        */
-      static int getArmSignVote(const TrackingUtilities::CDCTrack& track, const TrackingUtilities::Vector2D& center);
+      static int getArmSignVote(const TrackingUtilities::CDCTrack& track, const ROOT::Math::XYVector& center);
 
 
       /// Searches for a break in the super layer chain and remove all hits that come after that
@@ -103,7 +104,7 @@ namespace Belle2 {
        *  @retval ESign::c_Zero    rare boarderline case
        *  @retval ESign::c_Invalid given hit has a nan value
        */
-      static TrackingUtilities::ESign getArmSign(const TrackingUtilities::CDCRecoHit3D& hit, const TrackingUtilities::Vector2D& center);
+      static TrackingUtilities::ESign getArmSign(const TrackingUtilities::CDCRecoHit3D& hit, const ROOT::Math::XYVector& center);
 
     public:
       /// Check an (improper) p-values of the tracks. If they are below the given value, delete the track from the list.

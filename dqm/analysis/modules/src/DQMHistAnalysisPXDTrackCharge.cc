@@ -20,7 +20,7 @@
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
 #include <RooFitResult.h>
-#include "RooMsgService.h"
+#include <RooMsgService.h>
 
 using namespace std;
 using namespace Belle2;
@@ -50,10 +50,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
-DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
-{
-}
-
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
@@ -71,7 +67,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
 
   // collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -101,7 +97,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -218,7 +214,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         href2->Draw("same,hist");
       }
 
-      for (auto& it : m_excluded) {
+      for (const auto& it : m_excluded) {
         static std::map <int, TLatex*> ltmap;
         auto tt = ltmap[it];
         if (!tt) {
@@ -264,7 +260,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       if (hh1->GetEntries() > 50) {
 
-        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+        auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, dynamic_cast<const TH1*>(hh1));
         auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
         /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
@@ -300,7 +296,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         canvas->cd();
 
         // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        auto h = static_cast<TH1*>(hist2->Clone()); // Annoying ... Maybe an memory leak? TODO
         // would it work to scale it each time again?
         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
 
@@ -324,7 +320,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   // now loop per module over asics pairs (1.5.1)
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
 //     TCanvas* canvas = m_cChargeMod[m_PXDModules[i]];
-    VxdID& aVxdID = m_PXDModules[i];
+    const VxdID& aVxdID = m_PXDModules[i];
 
     if (m_hChargeModASIC2d[aVxdID]) m_hChargeModASIC2d[aVxdID]->Reset();
     if (m_cChargeModASIC2d[aVxdID]) m_cChargeModASIC2d[aVxdID]->Clear();
@@ -343,7 +339,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         if (hh1) {
           double mpv = 0.0;
           if (hh1->GetEntries() > 50) {
-            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, (const TH1*) hh1);
+            auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, static_cast<const TH1*>(hh1));
             auto plot = m_x->frame(RooFit::Title(hh1->GetTitle()));
             /*auto r =*/ model->fitTo(*hdata, RooFit::Range("signal"));
 
@@ -390,7 +386,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
 
-  for (auto& it : m_excluded) {
+  for (const auto& it : m_excluded) {
     static std::map <int, TLatex*> ltmap;
     auto tt = ltmap[it];
     if (!tt) {
@@ -409,7 +405,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
   double data = 0;
   double diff = 0;
-  if (m_gCharge && any_enought_flag) {
+  if (any_enought_flag) {
 //     double currentMin, currentMax;
     m_gCharge->Fit(m_fMean, "R");
     double mean = m_gCharge->GetMean(2);

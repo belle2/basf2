@@ -216,7 +216,7 @@ namespace Belle2 {
       /// Total number of values in the matrix
       static constexpr size_t size()
       {
-        return M * N;
+        return static_cast<size_t>(M) * static_cast<size_t>(N);
       }
 
       /// Total number of rows in the matrix
@@ -258,7 +258,7 @@ namespace Belle2 {
 
     private:
       /// Memory of the flat value content.
-      std::array<T, M* N> m_values;
+      std::array<T, M* N> m_values{};
     };
   }
 }

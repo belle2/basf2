@@ -34,7 +34,7 @@ namespace Belle2 {
     cdcDQM7Module();
 
     //! Destructor
-    virtual ~cdcDQM7Module();
+    virtual ~cdcDQM7Module() override;
 
     //! Module functions
     void initialize() override;
@@ -43,9 +43,7 @@ namespace Belle2 {
     //! action per each event
     void event() override;
     //! action at run end
-    void endRun() override;
     //! termination action
-    void terminate() override;
 
     //! function to define histograms
     void defineHisto() override;

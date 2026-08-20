@@ -76,7 +76,6 @@ namespace Belle2 {
       /// Sort the recoHits according to their perpS information
       void sortByArcLength2D()
       {
-        // cppcheck-suppress constParameter
         std::stable_sort(this->begin(), this->end(), [](const T & recoHit, const T & otherRecoHit) {
           return recoHit.getArcLength2D() < otherRecoHit.getArcLength2D();
         });
@@ -98,8 +97,11 @@ namespace Belle2 {
       /// Memory for the two dimensional trajectory fitted to this segment
       mutable CDCTrajectory2D m_trajectory2D;
 
-      /// Boolean flag to indicate that this segment has a valid alias version
-      double m_aliasScore;
+      /// Flag to indicate that this segment has a valid alias version
+      // Stefano S: this was not initialized, I was not sure if to use 0 was safe
+      // then I set the default value to NaN to solve a warning.
+      // Not clear to me why the variable is "double" and not boolean
+      double m_aliasScore = std::numeric_limits<double>::quiet_NaN();
 
     };
 

@@ -6,20 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "EvtGenBase/EvtPatches.hh"
-#include <stdlib.h>
-#include <assert.h>
-#include "EvtGenBase/EvtParticle.hh"
-#include "EvtGenBase/EvtGenKine.hh"
-#include "EvtGenBase/EvtPDL.hh"
-#include "EvtGenBase/EvtReport.hh"
+#include <EvtGenBase/EvtParticle.hh>
+#include <EvtGenBase/EvtPDL.hh>
 #include <string>
 
-#include "generators/evtgen/EvtGenModelRegister.h"
-#include "generators/evtgen/models/EvtHNLHQET3.h"
-#include "generators/evtgen/models/EvtHQET3FF.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h"
-#include "generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h"
+#include <framework/logging/Logger.h>
+#include <generators/evtgen/EvtGenModelRegister.h>
+#include <generators/evtgen/models/EvtHNLHQET3.h>
+#include <generators/evtgen/models/EvtHQET3FF.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h>
+#include <generators/evtgen/models/EvtHNLSemiLeptonicVectorAmp.h>
 
 B2_EVTGEN_REGISTER_MODEL(EvtHNLHQET3);
 
@@ -116,7 +112,7 @@ void EvtHNLHQET3::init()
       hqetffmodel = new EvtHQET3FF(getArg(0), getArg(1), getArg(2));
       calcamp = new EvtHNLSemiLeptonicScalarAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLHQET3 model for scalar meson daughters needs 2 arguments. Sorry." << endl;
+      B2ERROR("HNLHQET3 model for scalar meson daughters needs 2 arguments. Sorry.");
       ::abort();
     }
   } else if (d1type == EvtSpinType::VECTOR) {
@@ -124,11 +120,11 @@ void EvtHNLHQET3::init()
       hqetffmodel = new EvtHQET3FF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4));
       calcamp = new EvtHNLSemiLeptonicVectorAmp;
     } else  {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLHQET3 model for vector meson daughtersneeds 4 arguments. Sorry." << endl;
+      B2ERROR("HNLHQET3 model for vector meson daughtersneeds 4 arguments. Sorry.");
       ::abort();
     }
   } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLHQET3 model handles only scalar and vector meson daughters. Sorry." << endl;
+    B2ERROR("HNLHQET3 model handles only scalar and vector meson daughters. Sorry.");
     ::abort();
   }
 

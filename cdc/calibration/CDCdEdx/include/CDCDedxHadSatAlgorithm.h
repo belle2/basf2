@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxHadSatAlgorithm() {}
+    virtual ~CDCDedxHadSatAlgorithm() override {}
 
     /**
     * function to enable monitoring plots
@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
     * function to prepare sample for bgcurve hadron saturation and monitoring plots
     */
-    void prepareSample(std::vector< std::string >& particles, const std::string& filename, const std::string& sfx, bool correct);
+    void prepareSample(const std::vector< std::string >& particles, const std::string& filename, const std::string& sfx, bool correct);
 
   protected:
 

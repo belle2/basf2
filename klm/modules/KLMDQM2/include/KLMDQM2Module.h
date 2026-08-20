@@ -87,7 +87,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    ~KLMDQM2Module();
+    ~KLMDQM2Module() override;
 
     /**
      * Definition of the histograms.
@@ -104,12 +104,6 @@ namespace Belle2 {
 
     /** Selection for mumu_tight_skim, then DQM plot filling  */
     virtual void event() override;
-
-    /** Called if the current run ends */
-    virtual void endRun() override;
-
-    /** Called at the end of the event processing */
-    virtual void terminate() override;
 
 
 

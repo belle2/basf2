@@ -102,7 +102,7 @@ void DAQMonitorModule::event()
 
   // PXD
   int pxdSize{0};
-  for (RawPXD& pxdRaw : m_pxdRaw)
+  for (const RawPXD& pxdRaw : m_pxdRaw)
     pxdSize += (pxdRaw.size()) * sizeof(unsigned int);
   h_pxdSize->Fill(static_cast<float>(pxdSize) / 1000.);
 

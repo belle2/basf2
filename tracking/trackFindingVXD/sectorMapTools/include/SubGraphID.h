@@ -23,7 +23,7 @@ namespace Belle2 {
 
 
     /** checks if two given ids are the same sector (while ignoring the sublayerID). */
-    bool areTheSameSector(unsigned a, unsigned b) const
+    static bool areTheSameSector(unsigned a, unsigned b)
     {
       FullSecID idA(a);
       FullSecID idB(b);
@@ -182,7 +182,7 @@ namespace Belle2 {
     {
       std::vector<FullSecID> ids;
 
-      for (auto& id : m_idChain) {
+      for (const auto& id : m_idChain) {
         ids.push_back(FullSecID(id));
       }
       return ids;

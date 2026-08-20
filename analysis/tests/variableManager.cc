@@ -22,7 +22,7 @@ namespace {
   double dummyVarWithParameters(const Particle*, const std::vector<double>& parameters)
   {
     double result = 0;
-    for (auto& x : parameters)
+    for (const auto& x : parameters)
       result += x;
     return result;
   }

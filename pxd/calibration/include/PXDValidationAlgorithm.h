@@ -43,7 +43,7 @@ namespace Belle2 {
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 
     /// getter for current boundaries
-    std::vector<Calibration::ExpRun> getBoundaries() const {return m_requestedBoundaries;}
+    const std::vector<Calibration::ExpRun>& getBoundaries() const {return m_requestedBoundaries;}
 
   protected:
 

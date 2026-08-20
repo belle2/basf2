@@ -44,10 +44,10 @@ namespace Belle2 {
        *  Constructor taking the variable set the filter should work on and the default name of the
        *  variable to be used.
        */
-      ChoosableFromVarSet(std::unique_ptr<AVarSet> varSet, std::string varName = "");
+      explicit ChoosableFromVarSet(std::unique_ptr<AVarSet> varSet, const std::string& varName = "");
 
       /// Default destructor
-      ~ChoosableFromVarSet();
+      ~ChoosableFromVarSet() override;
 
       /// Add the parameters of this filter to the given parameter list
       void exposeParameters(ModuleParamList* parameterList, const std::string& prefix) override;
@@ -81,10 +81,10 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      ChoosableFromVarSetFilter(const std::string& varName = "");
+      explicit ChoosableFromVarSetFilter(const std::string& varName = "");
 
       /// Default destructor
-      ~ChoosableFromVarSetFilter();
+      ~ChoosableFromVarSetFilter() override;
     };
   }
 }

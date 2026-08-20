@@ -26,13 +26,13 @@ namespace Belle2 {
       eclWaveformTemplateCalibrationC3Algorithm();
 
       /**..Destructor */
-      virtual ~eclWaveformTemplateCalibrationC3Algorithm() {}
+      virtual ~eclWaveformTemplateCalibrationC3Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
@@ -48,8 +48,8 @@ namespace Belle2 {
     private:
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC3Algorithm.root"; /**< file name for histogram output */
-      int m_firstCellID;  /**< first cell id to fit */
-      int m_lastCellID;  /**< last cell id to fit */
+      int m_firstCellID = 0;  /**< first cell id to fit */
+      int m_lastCellID = 0;  /**< last cell id to fit */
 
       DBObjPtr<ECLDigitWaveformParameters> m_WaveformParameters;  /**< Waveform parameters. */
     };

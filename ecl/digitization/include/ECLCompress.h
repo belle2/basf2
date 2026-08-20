@@ -94,9 +94,9 @@ namespace Belle2 {
        */
       void uncompress(BitStream& in, int* adc) override;
     protected:
-      const double m_scale; /**< Scale factor for quantization. */
-      const double m_c0; /**< Average waveform amplitude */
-      const width_t* m_widths; /**< Bit widths for the DCT coefficients for prefix encoding. */
+      const double m_scale = 0.0; /**< Scale factor for quantization. */
+      const double m_c0 = 0.0; /**< Average waveform amplitude */
+      const width_t* m_widths = nullptr; /**< Bit widths for the DCT coefficients for prefix encoding. */
     };
 
     /** The compression algorithm selector function

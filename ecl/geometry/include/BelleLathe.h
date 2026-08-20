@@ -8,10 +8,10 @@
 
 #pragma once
 
-#include "G4Types.hh"
+#include <G4Types.hh>
 
-#include "G4CSGSolid.hh"
-#include "G4Polyhedron.hh"
+#include <G4CSGSolid.hh>
+#include <G4Polyhedron.hh>
 #include <vector>
 
 namespace Belle2 {
@@ -172,24 +172,24 @@ namespace Belle2 {
       mutable std::vector<double> farea; /**< vector of area values */
       mutable std::vector<triangle_t> ftlist; /**< vector of triangle structs */
 
-      double fphi; /**< starting angle */
-      double fdphi; /**< finishing angle */
-      double fs0; /**< fs0 */
-      double fc0; /**< fc0 */
-      double fs1; /**< fs1 */
-      double fc1; /**< fc1 */
-      double fn0x; /**< fn0x */
-      double fn0y; /**< fn0y */
-      double fn1x; /**< fn1x */
-      double fn1y; /**< fn1y */
-      double frmin; /**< minimal r value */
-      double frmax; /**< maximal r value */
-      double fzmin; /**< minimal z value */
-      double fzmax; /**< maximal z value */
+      double fphi = 0.0; /**< starting angle */
+      double fdphi = 0.0; /**< finishing angle */
+      double fs0 = 0.0; /**< fs0 */
+      double fc0 = 0.0; /**< fc0 */
+      double fs1 = 0.0; /**< fs1 */
+      double fc1 = 0.0; /**< fc1 */
+      double fn0x = 0.0; /**< fn0x */
+      double fn0y = 0.0; /**< fn0y */
+      double fn1x = 0.0; /**< fn1x */
+      double fn1y = 0.0; /**< fn1y */
+      double frmin = 0.0; /**< minimal r value */
+      double frmax = 0.0; /**< maximal r value */
+      double fzmin = 0.0; /**< minimal z value */
+      double fzmax = 0.0; /**< maximal z value */
       bool fgtpi; /**< greater than pi? */
       bool ftwopi; /**< bound within +- 2pi? */
 
-      G4VSolid* fshape; /**< shape */
+      G4VSolid* fshape = nullptr; /**< shape */
       mutable std::vector<G4ThreeVector> fsurf; /**< vector of surfaces */
     };
 

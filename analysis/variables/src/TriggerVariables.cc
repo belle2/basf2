@@ -122,12 +122,11 @@ namespace Belle2 {
     double L1PSNMBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit = std::lround(arguments[0]);
-
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
           return Const::doubleNaN;
         try {
+          int testBit = std::lround(arguments[0]);
           return trg->testPsnm(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.
@@ -164,12 +163,11 @@ namespace Belle2 {
     double L1FTDLBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit = std::lround(arguments[0]);
-
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
           return Const::doubleNaN;
         try {
+          int testBit = std::lround(arguments[0]);
           return trg->testFtdl(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.
@@ -206,12 +204,11 @@ namespace Belle2 {
     double L1InputBit(const Particle*, const std::vector<double>& arguments)
     {
       if (arguments.size() == 1) {
-        int testBit = std::lround(arguments[0]);
-
         StoreObjPtr<TRGSummary> trg;
         if (!trg)
           return Const::doubleNaN;
         try {
+          int testBit = std::lround(arguments[0]);
           return trg->testInput(testBit);
         } catch (const std::exception&) {
           // Something went wrong, return NaN.

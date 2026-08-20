@@ -15,6 +15,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 #include <TH2F.h>
 #include <TFitResult.h>
 #include <TF1.h>
@@ -122,7 +123,7 @@ void WireEfficiencyAlgorithm::buildEfficiencies()
 
     if (layerID < m_efficiencyList->GetEntries()) {
       TEfficiency* efficiencyInLayer =
-        (TEfficiency*)m_efficiencyList->At(layerID);
+        static_cast<TEfficiency*>(m_efficiencyList->At(layerID));
 
       efficiencyInLayer->Fill(isFound, z, wireID);
     }
@@ -142,9 +143,9 @@ void WireEfficiencyAlgorithm::detectBadWires()
     unsigned short layerNo = wireLayer.getICLayer();
 
     // need to use casting here because GetPassedHistogram assumes it returns TH1
-    auto efficiencyInLayer = (TEfficiency*)m_efficiencyList->At(layerNo);
-    auto passed = (TH2F*)efficiencyInLayer->GetPassedHistogram();
-    auto total = (TH2F*)efficiencyInLayer->GetTotalHistogram();
+    auto efficiencyInLayer = static_cast<TEfficiency*>(m_efficiencyList->At(layerNo));
+    auto passed = const_cast<TH2F*>(static_cast<const TH2F*>(efficiencyInLayer->GetPassedHistogram()));
+    auto total = const_cast<TH2F*>(static_cast<const TH2F*>(efficiencyInLayer->GetTotalHistogram()));
 
     // Ignoring layers that have no hits at all
     if (!total->GetEntries()) continue;
@@ -197,9 +198,13 @@ void WireEfficiencyAlgorithm::detectBadWires()
         if (wireID < 0 || wireID >= maxWires) {
           B2ERROR("Invalid wireID: " << wireID << " for LayerID: " << layerNo
                   << ". Max wires: " << maxWires);
-          continue; // remove invalid wireID
+          delete singleWirePassed;
+          delete singleWireTotal;
+          continue;
         }
         m_badWireList->setWire(layerNo, round(wireID), 0);
+        delete singleWirePassed;
+        delete singleWireTotal;
         continue;
       }
       // constructs efficiency of one wire
@@ -221,7 +226,21 @@ void WireEfficiencyAlgorithm::detectBadWires()
         double wireID = passed->GetYaxis()->GetBinCenter(i);
         m_badWireList->setWire(layerNo, round(wireID), singleWireEfficiencyFromFit);
       }
+
+      delete singleWireEfficiency;
+      delete graphSingleWireEfficiency;
+      delete singleWirePassed;
+      delete singleWireTotal;
     }
+
+    delete constantFunction;
+    delete passedProjectedX;
+    delete totalProjectedX;
+    delete efficiencyProjectedX;
+    delete passedProjectedY;
+    delete totalProjectedY;
+    delete efficiencyProjectedY;
+    delete graphEfficiencyProjected;
   }
 }
 
@@ -242,11 +261,11 @@ double WireEfficiencyAlgorithm::chiTest(TGraphAsymmErrors* graph1, TGraphAsymmEr
     for (int index2 = 0; index2 < numOfEntries2; ++index2) {
       if (std::abs(graph1->GetX()[index1] - graph2->GetX()[index2]) < 1e-6) {
         // this is broken up just for readability
-        double chiNumerator = std::pow(graph1->GetY()[index1] - graph2->GetY()[index2], 2);
+        double chiNumerator = square(graph1->GetY()[index1] - graph2->GetY()[index2]);
         double err1 = 0.5 * (graph1->GetErrorYhigh(index1) + graph1->GetErrorYlow(index1));
         double err2 = 0.5 * (graph2->GetErrorYhigh(index2) + graph2->GetErrorYlow(index2));
         double chiDenominator = err1 * err1 + err2 * err2;
-        //double chiDenominator = std::pow(graph1->GetErrorYhigh(index1), 2) + std::pow(graph1->GetErrorYlow(index1), 2);
+        //double chiDenominator = square(graph1->GetErrorYhigh(index1)) + square(graph1->GetErrorYlow(index1));
         chi += chiNumerator / chiDenominator;
         ndof++;
         continue;

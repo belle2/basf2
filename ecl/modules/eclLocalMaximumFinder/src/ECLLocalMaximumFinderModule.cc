@@ -207,7 +207,7 @@ void ECLLocalMaximumFinderModule::event()
         // Check neighbours: Must be a local energy maximum.
         bool isLocMax = 1;
         int neighbourCount = 0;
-        for (auto& neighbourId : m_neighbourMap->getNeighbours(aECLCalDigit.getCellId())) {
+        for (const auto& neighbourId : m_neighbourMap->getNeighbours(aECLCalDigit.getCellId())) {
           if (neighbourId == aECLCalDigit.getCellId()) continue; // Skip the center cell to avoid possible floating point issues.
 
           const int pos = m_StoreArrPosition[neighbourId]; // Get position in the store array for this digit.

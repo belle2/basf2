@@ -20,10 +20,10 @@ namespace Belle2 {
 
     TrackTimeEstimatorModule();
     /** Verify that required objects are registered */
-    void initialize();
+    void initialize() override;
 
     /** Loop over all Tracks, get related recoTrack, get SVDHitlist, compute average time, set trackTime */
-    void event();
+    void event() override;
 
 
   private:

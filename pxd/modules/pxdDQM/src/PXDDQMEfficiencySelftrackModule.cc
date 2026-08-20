@@ -140,7 +140,7 @@ void PXDDQMEfficiencySelftrackModule::event()
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (VxdID& aVxdID : sensors) {
+    for (const VxdID& aVxdID : sensors) {
       VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
       if (info.getType() != VXD::SensorInfoBase::PXD) continue;
       //Search for intersections of the track with all PXD layers
@@ -300,7 +300,7 @@ void PXDDQMEfficiencySelftrackModule::defineHisto()
   }
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-  for (VxdID& avxdid : sensors) {
+  for (const VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors

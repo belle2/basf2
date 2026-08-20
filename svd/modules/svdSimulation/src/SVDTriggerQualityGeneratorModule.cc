@@ -44,10 +44,6 @@ void SVDTriggerQualityGeneratorModule::initialize()
 }
 
 
-void SVDTriggerQualityGeneratorModule::beginRun()
-{
-}
-
 void SVDTriggerQualityGeneratorModule::event()
 {
   m_triggerQRG.create();
@@ -57,10 +53,3 @@ void SVDTriggerQualityGeneratorModule::event()
     m_triggerQRG->setTimQuality(TRGSummary::TTYQ_FINE);
 }
 
-void SVDTriggerQualityGeneratorModule::endRun()
-{
-}
-
-void SVDTriggerQualityGeneratorModule::terminate()
-{
-}

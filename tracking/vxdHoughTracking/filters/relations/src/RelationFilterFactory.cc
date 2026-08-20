@@ -51,12 +51,10 @@ RelationFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackingUtilities::AllFilter<BaseRelationFilter>>();
   }
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackingUtilities::NoneFilter<BaseRelationFilter>>();
   }
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "angleAndTime") {
     return std::make_unique<AngleAndTimeRelationFilter>();
   }

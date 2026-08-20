@@ -767,7 +767,6 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
-  // cppcheck-suppress copyCtorAndEqOperator
   class Filter <Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
     /// Char suffix to be used in the filter name for ROOT to indicate the filter A of the combination A OR B.
     const char* c_orSuffixA = "_or_A";

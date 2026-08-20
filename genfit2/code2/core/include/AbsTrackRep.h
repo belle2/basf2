@@ -125,12 +125,10 @@ class AbsTrackRep : public TObject {
       TVector3& poca_onwire,
       bool stopAtBoundary = false,
       bool calcJacobianNoise = false) const {
-    TVector3 wireDir(point2 - point1);
-    wireDir = wireDir.Unit();
+    const TVector3 wireDir((point2 - point1).Unit());
     double retval = this->extrapolateToLine(state, point1, wireDir, stopAtBoundary, calcJacobianNoise);
     poca = this->getPos(state);
-    dirInPoca = this->getMom(state);
-    dirInPoca = dirInPoca.Unit();
+    dirInPoca = this->getMom(state).Unit();
 
     poca_onwire = point1 + wireDir*((poca - point1)*wireDir);
     
@@ -281,11 +279,14 @@ class AbsTrackRep : public TObject {
   virtual double getCharge(const StateOnPlane& state) const = 0;
   //! Get charge over momentum.
   virtual double getQop(const StateOnPlane& state) const = 0;
-  //! Get tha particle mass in GeV/c^2
+  //! Get the particle mass in GeV/c^2
   double getMass(const StateOnPlane& state) const;
 
   //! Get propagation direction. (-1, 0, 1) -> (backward, auto, forward).
   char getPropDir() const {return propDir_;}
+
+  //! Get the jacobian and noise matrix of the last extrapolation.
+  virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise) const = 0;
 
   //! Get the jacobian and noise matrix of the last extrapolation.
   virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const = 0;

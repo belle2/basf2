@@ -32,7 +32,7 @@ namespace Belle2 {
       void setPixelThresholds();
 
       /** Set pixel threshold from masked pixels from DB. */
-      void setPixelThresholds(PXDMaskedPixelPar maskedPixels);
+      void setPixelThresholds(const PXDMaskedPixelPar& maskedPixels);
 
       /** Set masked pixels from DB. */
       void setMaskedPixels();

@@ -86,7 +86,7 @@ namespace Belle2::Conditions {
         // and remove comments from the line
         size_t commentChar = line.find('#');
         if (commentChar != std::string::npos) {
-          line = line.substr(0, commentChar);
+          line.resize(commentChar);
         }
         // trim whitespace on each side
         boost::algorithm::trim(line);

@@ -55,6 +55,9 @@ ma.matchMCTruth(list_name='gamma:bremsinput', path=my_path)
 
 # correction of Bremsstrahlung
 # A new lepton is generated, with the old electron and, if found, a gamma as daughters.
+# Note: the photon selection and the module parameters used here are kept simple on purpose.
+# For the current recommendation on the photon selection and the module parameters, use the
+# b2help-recommendation tool (or https://belle2.pages.desy.de/performance/recommendations/).
 ma.correctBrems(outputList='e+:corrected',
                 inputList='e+:uncorrected',
                 gammaList='gamma:bremsinput',

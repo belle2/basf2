@@ -41,7 +41,7 @@ namespace Belle2 {
     class TextTracer: public BaseTracer {
     public:
       explicit TextTracer(std::ostream& os_);
-      virtual ~TextTracer();
+      virtual ~TextTracer() override;
 
       /// Called at the start of a new fit (during initialization)
       virtual void initialize(BaseFitter& fitter) override;

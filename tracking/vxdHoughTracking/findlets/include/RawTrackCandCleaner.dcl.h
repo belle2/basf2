@@ -13,11 +13,13 @@
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateResultRefiner.h>
 #include <tracking/vxdHoughTracking/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ChooseablePathFilter.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   class ModuleParamList;
   class SpacePointTrackCand;
   class VxdID;
+  class SVDHoughParameters;
 
   namespace vxdHoughTracking {
 
@@ -42,6 +44,9 @@ namespace Belle2 {
 
       /// Create the store arrays
       void initialize() override;
+
+      /// Check dbobject validity
+      void beginRun() override;
 
       /// Reject bad SpacePointTrackCands and bad hits inside the remaining
       void apply(std::vector<std::vector<AHit*>>& rawTrackCandidates, std::vector<SpacePointTrackCand>& trackCandidates) override;
@@ -71,6 +76,9 @@ namespace Belle2 {
 
       /// maximum number of relations that can be created per track candidate
       uint m_maxRelations = 100;
+
+      /// DB object containing the SVDHough parameters
+      DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
     };
 
   }

@@ -173,7 +173,7 @@ void CDCUnpackerModule::event()
           if (nWords[k] != 0)
             B2FATAL("The data is not removed for the bad channel (" << j << "," << k << ") with error flag in ff55 trailer! ");
         }
-        data32tab[k] = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, k);
+        data32tab[k] = static_cast<int*>(m_rawCDCs[i]->GetDetectorBuffer(j, k));
       }
 
       //
@@ -181,7 +181,7 @@ void CDCUnpackerModule::event()
       //
 
       for (int iFiness = 0; iFiness < MaxNumOfCh; ++iFiness) {
-        int* ibuf = data32tab[iFiness];
+        const int* ibuf = data32tab[iFiness];
         const int nWord = nWords[iFiness];
         B2DEBUG(99, LogVar("nWords (from " + readoutName + " header)", nWord));
 
@@ -268,7 +268,7 @@ void CDCUnpackerModule::event()
           std::vector<unsigned short> fadcs;
           std::vector<unsigned short> tdcs;
 
-          if (m_buffer.size() < fadcTdcChannels + 2 * fadcTdcChannels * nSamples) continue; // otherwise crash below
+          if (m_buffer.size() < static_cast<size_t>(fadcTdcChannels + 2 * fadcTdcChannels * nSamples)) continue; // otherwise crash below
 
           for (int iCh = 0; iCh < fadcTdcChannels; ++iCh) {
             const int offset = fadcTdcChannels;
@@ -614,7 +614,7 @@ void CDCUnpackerModule::setADCPedestal()
 
 }
 
-void CDCUnpackerModule::printBuffer(int* buf, int nwords)
+void CDCUnpackerModule::printBuffer(const int* buf, int nwords)
 {
 
   for (int j = 0; j < nwords; ++j) {

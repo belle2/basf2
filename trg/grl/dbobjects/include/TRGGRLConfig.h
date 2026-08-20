@@ -41,6 +41,10 @@ namespace Belle2 {
     {
       return m_ecltaunn_nHidden;
     }
+    std::vector<unsigned> get_ecltaunn_nOutput() const
+    {
+      return m_ecltaunn_nOutput;
+    }
     unsigned get_ecltaunn_n_cdc_sector() const
     {
       return m_ecltaunn_n_cdc_sector;
@@ -199,6 +203,10 @@ namespace Belle2 {
     void set_ecltaunn_nHidden(std::vector<std::vector<float>> i)
     {
       m_ecltaunn_nHidden = i;
+    };
+    void set_ecltaunn_nOutput(std::vector<unsigned> i)
+    {
+      m_ecltaunn_nOutput = i;
     };
     void set_ecltaunn_n_cdc_sector(unsigned i)
     {
@@ -364,6 +372,9 @@ namespace Belle2 {
      */
     std::vector<std::vector<float>> m_ecltaunn_nHidden;
 
+    /** Number of output node */
+    std::vector<unsigned> m_ecltaunn_nOutput;
+
     /** Number of CDC sectors. */
     unsigned m_ecltaunn_n_cdc_sector;
     std::vector<float> m_ecltaunn_i_cdc_sector;
@@ -408,7 +419,7 @@ namespace Belle2 {
     std::vector<std::vector<int>> m_ecltaunn_I_input_layer;
 
 
-    ClassDef(TRGGRLConfig, 6);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(TRGGRLConfig, 8);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

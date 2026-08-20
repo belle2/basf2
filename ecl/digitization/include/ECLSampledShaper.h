@@ -22,6 +22,10 @@ namespace Belle2 {
         : m_sampledShape(s), m_timeScale(ts) {}
       /** destructor */
       ~ECLSampledShaper() { delete m_sampledShape;}
+      /** copy constructor (disabled) */
+      ECLSampledShaper(const ECLSampledShaper&) = delete;
+      /** operator = (disabled) */
+      ECLSampledShaper& operator=(const ECLSampledShaper&) = delete;
       /** fill the sampled shape array */
       void fillarray(int N, double* a)
       {

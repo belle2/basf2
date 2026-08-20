@@ -94,7 +94,7 @@ namespace Belle2 {
     /**
     * Clear all static global lists
     */
-    void clearlist(void);
+    static void clearlist(void);
 
 
   private:
@@ -236,14 +236,6 @@ namespace Belle2 {
     static TCanvas* findCanvas(TString cname);
 
     /**
-     * Get histogram from list (no other search).
-     * @param histname The name of the histogram (incl dir).
-     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
-     * @return The found histogram, or nullptr if not found.
-     */
-    static TH1* findHist(const std::string& histname, bool onlyIfUpdated = false);
-
-    /**
      * Find histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
@@ -251,16 +243,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findHist(const std::string& dirname,
-                         const std::string& histname, bool onlyIfUpdated = false);
-
-    /**
-     * Get referencehistogram from list (no other search).
-     * @param histname The name of the histogram (incl dir).
-     * @param scaling enum what scaling to use
-     * @param hist histogram to scale to
-     * @return The found histogram, or nullptr if not found.
-     */
-    static TH1* findRefHist(const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
+                         const std::string& histname = "", bool onlyIfUpdated = false);
 
     /**
      * Find reference histogram.
@@ -271,7 +254,7 @@ namespace Belle2 {
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findRefHist(const std::string& dirname,
-                            const std::string& histname, ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
+                            const std::string& histname = "", ERefScaling scaling = ERefScaling::c_RefScaleNone, const TH1* hist = nullptr);
 
     /** Using the original and reference, create scaled version
      * @param scaling scaling algorithm
@@ -365,22 +348,13 @@ namespace Belle2 {
 
     /**
      * Get Delta histogram.
-     * @param fullname directory+name of histogram
-     * @param n index of delta histogram, 0 is most recent one
-     * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
-     * @return delta histogram or nullptr
-     */
-    TH1* getDelta(const std::string& fullname, int n = 0, bool onlyIfUpdated = true);
-
-    /**
-     * Get Delta histogram.
      * @param dirname directory
      * @param histname name of histogram
      * @param n index of delta histogram, 0 is most recent one
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname, int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(const std::string& dirname, const std::string& histname = "", int n = 0, bool onlyIfUpdated = true);
 
     /**
      * Add Delta histogram parameters.
@@ -483,7 +457,7 @@ namespace Belle2 {
      * @param index index of PV
      * @param value string to write
      */
-    void setEpicsStringPV(int index, std::string value);
+    void setEpicsStringPV(int index, const std::string& value);
 
     /**
      * Read value from a EPICS PV
@@ -574,7 +548,7 @@ namespace Belle2 {
      * Setter for EPICS usage
      * @param flag set in use
      */
-    void setUseEpics(bool flag) {m_useEpics = flag;};
+    static void setUseEpics(bool flag) {m_useEpics = flag;};
 
     /**
      * Setter EPICS flag in read only mode
@@ -637,7 +611,7 @@ namespace Belle2 {
     /**
      * Check the status of all PVs and report if disconnected or not found
      */
-    void checkPVStatus(void);
+    static void checkPVStatus(void);
 
     /**
      * check the status of a PVs and report if disconnected or not found
@@ -660,7 +634,7 @@ namespace Belle2 {
      * @param message message to print out
      * @param id the chid of the affected PV
      */
-    void CheckEpicsError(int state, const std::string& message, chid id);
+    static void CheckEpicsError(int state, const std::string& message, chid id);
 
 
     // Public functions
@@ -668,7 +642,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DQMHistAnalysisModule();
-    virtual ~DQMHistAnalysisModule() {};
+    virtual ~DQMHistAnalysisModule() override = default;
 
     /**
      * Helper function for string token split

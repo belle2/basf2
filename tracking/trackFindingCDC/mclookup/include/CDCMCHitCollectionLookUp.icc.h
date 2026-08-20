@@ -18,6 +18,7 @@
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <Math/Vector3D.h>
 #include <TDatabasePDG.h>
 
 namespace Belle2 {
@@ -32,7 +33,7 @@ namespace Belle2 {
     template <class ACDCHitCollection>
     std::map<ITrackType, size_t>
     CDCMCHitCollectionLookUp<ACDCHitCollection>::getHitCountByMCTrackId(
-      const ACDCHitCollection& hits) const
+      const ACDCHitCollection& hits)
     {
       const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
@@ -367,8 +368,8 @@ namespace Belle2 {
 
       const CDCSimHit& primarySimHit = *ptrPrimarySimHit;
 
-      TrackingUtilities::Vector3D mom3D{primarySimHit.getMomentum()};
-      TrackingUtilities::Vector3D pos3D{primarySimHit.getPosTrack()};
+      ROOT::Math::XYZVector mom3D{primarySimHit.getMomentum()};
+      ROOT::Math::XYZVector pos3D{primarySimHit.getPosTrack()};
       double time{primarySimHit.getFlightTime()};
 
       int pdgCode = primarySimHit.getPDGCode();

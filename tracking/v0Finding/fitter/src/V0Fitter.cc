@@ -182,7 +182,7 @@ TrackFitResult* V0Fitter::buildTrackFitResult(const genfit::Track& track, const 
   return v0TrackFitResult;
 }
 
-std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const
+std::pair<Const::ParticleType, Const::ParticleType> V0Fitter::getTrackHypotheses(const Const::ParticleType& v0Hypothesis)
 {
   if (v0Hypothesis == Const::Kshort) {
     return std::make_pair(Const::pion, Const::pion);
@@ -352,7 +352,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
   genfit::Track gfTrackPlus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackPlus);
   const int pdgTrackPlus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getParticleType().getPDGCode();
-  genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
+  const genfit::AbsTrackRep* plusRepresentation = recoTrackPlus->getTrackRepresentationForPDG(pdgTrackPlus);
   if ((plusRepresentation == nullptr) or (not recoTrackPlus->wasFitSuccessful(plusRepresentation))) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue safely anyway.");
     return false;
@@ -361,7 +361,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
   genfit::Track gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
   const int pdgTrackMinus = trackMinus->getTrackFitResultWithClosestMass(trackHypotheses.second)->getParticleType().getPDGCode();
-  genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
+  const genfit::AbsTrackRep* minusRepresentation = recoTrackMinus->getTrackRepresentationForPDG(pdgTrackMinus);
   if ((minusRepresentation == nullptr) or (not recoTrackMinus->wasFitSuccessful(minusRepresentation))) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue safely anyway.");
     return false;
@@ -459,21 +459,21 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
                                                       sharedInnermostCluster);
 
     B2DEBUG(20, "Creating new V0.");
-    auto v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
-                              std::make_pair(trackMinus, tfrMinusVtx),
-                              posVert.X(), posVert.Y(), posVert.Z());
+    const auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, tfrPlusVtx),
+                                     std::make_pair(trackMinus, tfrMinusVtx),
+                                     posVert.X(), posVert.Y(), posVert.Z());
 
     if (m_validation) {
       B2DEBUG(24, "Create StoreArray and Output for validation.");
-      auto validationV0 = m_validationV0s.appendNew(
-                            std::make_pair(trackPlus, tfrPlusVtx),
-                            std::make_pair(trackMinus, tfrMinusVtx),
-                            ROOT::Math::XYZVector(vert.getPos()),
-                            vert.getCov(),
-                            (lv0 + lv1).P(),
-                            (lv0 + lv1).M(),
-                            vert.getChi2()
-                          );
+      const auto* validationV0 = m_validationV0s.appendNew(
+                                   std::make_pair(trackPlus, tfrPlusVtx),
+                                   std::make_pair(trackMinus, tfrMinusVtx),
+                                   ROOT::Math::XYZVector(vert.getPos()),
+                                   vert.getCov(),
+                                   (lv0 + lv1).P(),
+                                   (lv0 + lv1).M(),
+                                   vert.getChi2()
+                                 );
       v0->addRelationTo(validationV0);
     }
   }

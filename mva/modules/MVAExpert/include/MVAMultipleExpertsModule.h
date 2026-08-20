@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
      * Set the extra info field.
      */
-    void setExtraInfoField(Particle*, std::string, float, unsigned int);
+    void setExtraInfoField(Particle*, const std::string&, float, unsigned int);
 
     /**
      * Set the event extra info field.

@@ -132,7 +132,7 @@ def configure_externals(conf):
 
     try:
         if os.environ.get('BELLE2_EXTERNALS_USE_CONDA') == '1':
-            impdir = os.environ['BELLE2_CONDA_EXTERNALS_TOPDIR']
+            impdir = os.environ['BELLE2_EXTERNALS_TOPDIR']
         else:
             impdir = conf.env['EXTDIR']
         sys.path[:0] = [os.environ['BELLE2_TOOLS'], impdir]

@@ -419,7 +419,7 @@ namespace Belle2 {
     std::vector<std::vector<int>> m_ecltaunn_I_input_layer;
 
 
-    ClassDef(TRGGRLConfig, 8);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(TRGGRLConfig, 9);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

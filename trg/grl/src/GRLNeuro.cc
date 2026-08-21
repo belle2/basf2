@@ -252,14 +252,27 @@ GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
 
-  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP);
-
   // ------------------------------------------------------------------
   // Basic parameter validation (fatal in initialize)
   // ------------------------------------------------------------------
 
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
+  }
+
+  if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
+    B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
+  }
+
+  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
+  if (nTarget < 1) {
+    B2FATAL("No outputs! Turn on targetresult.");
+  }
+
+  for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
+    if (p.outputScale[iScale].size() != 2 * nTarget) {
+      B2FATAL("outputScale should be exactly " << 2 * nTarget << " values");
+    }
   }
 
   // ------------------------------------------------------------------
@@ -278,7 +291,7 @@ GRLNeuro::initialize(const Parameters& p)
   check_size(p.i_cdc_sector, "i_cdc_sector");
   check_size(p.i_ecl_sector, "i_ecl_sector");
   check_size(p.nHidden, "nHidden");
-  check_size(p.nn_thres, "nn_thres");
+  check_size(p.outputScale, "outputScale");
 
   // bias
   check_size(p.total_bit_bias, "total_bit_bias");
@@ -350,9 +363,13 @@ GRLNeuro::initialize(const Parameters& p)
         nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
       }
     }
-    nNodes.push_back(static_cast<float>(pick(p.nOutput)));
 
-    GRLMLP grlmlp_temp(nNodes);
+    nNodes.push_back(nTarget);
+    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
+
+    const vector<float>& outputScale = pick(p.outputScale);
+
+    GRLMLP grlmlp_temp(nNodes, targetVars, outputScale);
 
     // bias
     grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
@@ -395,9 +412,6 @@ GRLNeuro::initialize(const Parameters& p)
     // input layer quantization parameters
     grlmlp_temp.set_W_input_layer(pick(p.W_input_layer));
     grlmlp_temp.set_I_input_layer(pick(p.I_input_layer));
-
-    //threshold
-    grlmlp_temp.set_nn_thres(pick(p.nn_thres));
 
     m_MLPs.push_back(std::move(grlmlp_temp));
   }
@@ -442,14 +456,8 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<vector<int>> W_input_layer = expert.get_W_input_layer();
   vector<vector<int>> I_input_layer = expert.get_I_input_layer();
 
-  // Use actual input instead of hardcoded values
+  // Use actual input
   vector<float> layerinput = input;
-
-  // DEBUG: Use random inputs for testing (fixed seed for reproducibility)
-  std::srand(100);
-  for (size_t i = 0; i < layerinput.size(); ++i) {
-    layerinput[i] = static_cast<float>(std::rand()) / RAND_MAX * 8192.0f - 4096.0f;  // random in [-4096, 4095]
-  }
 
   // Input layer quantization: firmware uses TWO steps:
   // Step 1: float -> input_layer_t (ap_fixed<13,13>) with AP_RND, AP_SAT_SYM
@@ -475,9 +483,6 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   //hidden layer and output layer
   vector<float> layeroutput = {};
   unsigned num_layers = expert.get_number_of_layers();
-
-  //output layer
-  vector<float> final_fixed = {};
 
   unsigned num_total_neurons = 0;
   unsigned iw = 0;

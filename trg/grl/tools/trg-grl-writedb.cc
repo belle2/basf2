@@ -45,6 +45,10 @@ void setgrlconfig()
   // firmware: 24 -> 64 -> 64 -> 64 -> 64 -> 64 -> 10 (input + 5 hidden + output)
   std::vector<float> eclaunn_nHidden_0 = {64, 64, 64, 64, 64};
   ecltaunn_nHidden[0].push_back(eclaunn_nHidden_0);
+  // Number of output nodes
+  std::vector<unsigned> ecltaunn_nOutput[N_config] = {
+    {10}
+  };
   unsigned ecltaunn_n_cdc_sector[N_config] = {
     0
   };
@@ -60,20 +64,20 @@ void setgrlconfig()
   // firmware: 6 dense layer weight files, merged in order
   // w3.txt(24*64=1536) + w6.txt(64*64=4096) + w9.txt(64*64=4096) + w12.txt(64*64=4096) + w15.txt(64*64=4096) + w18.txt(64*10=640) = 18560
   const char* weight_files[] = {
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w3.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w6.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w9.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w12.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w15.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/w18.txt"
+    "trg/grl/tools/weights/w3.txt",
+    "trg/grl/tools/weights/w6.txt",
+    "trg/grl/tools/weights/w9.txt",
+    "trg/grl/tools/weights/w12.txt",
+    "trg/grl/tools/weights/w15.txt",
+    "trg/grl/tools/weights/w18.txt"
   };
   const char* bias_files[] = {
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b3.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b6.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b9.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b12.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b15.txt",
-    "/home/belle2/liuzd/group/zhaoxinyue/hls4ml_Latency/firmware/weights/b18.txt"
+    "trg/grl/tools/weights/b3.txt",
+    "trg/grl/tools/weights/b6.txt",
+    "trg/grl/tools/weights/b9.txt",
+    "trg/grl/tools/weights/b12.txt",
+    "trg/grl/tools/weights/b15.txt",
+    "trg/grl/tools/weights/b18.txt"
   };
 
   // Load and merge all weight files

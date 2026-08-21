@@ -24,7 +24,7 @@ namespace Belle2 {
     GRLMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    GRLMLP(std::vector<unsigned short>& nodes);
+    GRLMLP(std::vector<unsigned short>& nodes, unsigned short targets, const std::vector<float>& outputscale);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~GRLMLP() { }
@@ -165,9 +165,14 @@ namespace Belle2 {
     /** Indicator whether the weights are just default values or have
      *  been set by some trainer (set to true when setWeights() is first called). */
     bool m_trained;
+    /** output variables: 1: z, 2: theta, 3: (z, theta) */
+    unsigned short m_target_vars;
+    /** Output[i] of the MLP is scaled from [-1, 1]
+     *  to [outputScale[2i], outputScale[2i+1]]. */
+    std::vector<float> m_output_scale;
 
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 6);
+    ClassDef(GRLMLP, 8);
   };
 }
 #endif

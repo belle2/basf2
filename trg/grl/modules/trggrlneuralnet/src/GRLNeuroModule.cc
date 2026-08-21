@@ -84,7 +84,6 @@ GRLNeuroModule::GRLNeuroModule() : Module()
            "to [outputScale[2*i], outputScale[2*i+1]]. "
            "(units: z[cm] / theta[degree])",
   {{ -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1.}});
-
   addParam("csvThetaPhiFile", m_csvThetaPhiFile,
            "CSV file for theta/phi correction per tcid.",
   {FileSystem::findFile("/data/trg/grl/tcid_correct_theta_phi.csv", true)});

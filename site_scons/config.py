@@ -131,11 +131,7 @@ def configure_externals(conf):
     """configure the external packages"""
 
     try:
-        if os.environ.get('BELLE2_EXTERNALS_USE_CONDA') == '1':
-            impdir = os.environ['BELLE2_CONDA_EXTERNALS_TOPDIR']
-        else:
-            impdir = conf.env['EXTDIR']
-        sys.path[:0] = [os.environ['BELLE2_TOOLS'], impdir]
+        sys.path[:0] = [os.environ['BELLE2_TOOLS'], os.environ['BELLE2_EXTERNALS_TOPDIR']]
         from externals import config_externals
         return config_externals(conf)
     except Exception as e:

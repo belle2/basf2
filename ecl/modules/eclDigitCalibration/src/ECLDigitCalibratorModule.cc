@@ -142,6 +142,8 @@ void ECLDigitCalibratorModule::initialize()
   } else {
     m_pol2Max = 0.;
   }
+
+  m_isMC = Environment::Instance().isMC();
 }
 
 // begin run
@@ -252,10 +254,9 @@ void ECLDigitCalibratorModule::event()
 
       // For data, apply a correction to the time as a function of the signal amplitude.  Correction determined from a fit.
       // No correction for MC
-      bool m_IsMCFlag = Environment::Instance().isMC();
-      B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag);
+      B2DEBUG(35, "cellid = " << cellid << ", m_isMC = " << m_isMC);
 
-      if (!m_IsMCFlag) {
+      if (!m_isMC) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
                                  m_timeInverseSlope;
         B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude*

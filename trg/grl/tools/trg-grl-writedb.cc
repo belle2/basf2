@@ -64,20 +64,20 @@ void setgrlconfig()
   // firmware: 6 dense layer weight files, merged in order
   // w3.txt(24*64=1536) + w6.txt(64*64=4096) + w9.txt(64*64=4096) + w12.txt(64*64=4096) + w15.txt(64*64=4096) + w18.txt(64*10=640) = 18560
   const char* weight_files[] = {
-    "trg/grl/tools/weights/w3.txt",
-    "trg/grl/tools/weights/w6.txt",
-    "trg/grl/tools/weights/w9.txt",
-    "trg/grl/tools/weights/w12.txt",
-    "trg/grl/tools/weights/w15.txt",
-    "trg/grl/tools/weights/w18.txt"
+    "./weights/w3.txt",
+    "./weights/w6.txt",
+    "./weights/w9.txt",
+    "./weights/w12.txt",
+    "./weights/w15.txt",
+    "./weights/w18.txt"
   };
   const char* bias_files[] = {
-    "trg/grl/tools/weights/b3.txt",
-    "trg/grl/tools/weights/b6.txt",
-    "trg/grl/tools/weights/b9.txt",
-    "trg/grl/tools/weights/b12.txt",
-    "trg/grl/tools/weights/b15.txt",
-    "trg/grl/tools/weights/b18.txt"
+    "./weights/b3.txt",
+    "./weights/b6.txt",
+    "./weights/b9.txt",
+    "./weights/b12.txt",
+    "./weights/b15.txt",
+    "./weights/b18.txt"
   };
 
   // Load and merge all weight files

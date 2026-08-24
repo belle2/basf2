@@ -470,9 +470,9 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
     layerinput[i] = sim_ap_fixed(layerinput[i], 13, 13, true, 3, 2, 0);  // signed, quant_mode=3 (floor), overflow_mode=2 (AP_WRAP)
   }
 
-  // Use W_input_layer[0] and I_input_layer[0] for the first MLP (broadcast if size==1)
-  const auto& w_layer = (W_input_layer.size() == 1) ? W_input_layer[0] : W_input_layer[0];
-  const auto& i_layer = (I_input_layer.size() == 1) ? I_input_layer[0] : I_input_layer[0];
+  // // Use W_input_layer[0] and I_input_layer[0] for the first MLP (broadcast if size==1)
+  const auto& w_layer = W_input_layer[0];
+  const auto& i_layer = I_input_layer[0];
 
   // Step 2: dense_0_iq quantization with per-input W, I
   for (size_t i = 0; i < layerinput.size(); ++i) {

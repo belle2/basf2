@@ -556,6 +556,14 @@ void CDCDedxCosineAlgorithm::plotFitResults(const std::vector<std::vector<double
 void CDCDedxCosineAlgorithm::plotConstants()
 {
 
+  const std::string pdfName =
+    Form("cdcdedx_coscorr_fconsts_%s.pdf", m_suffix.data());
+
+  const std::string rootName =
+    Form("cdcdedx_coscorr_fconsts_%s.root", m_suffix.data());
+
+  TFile rootFile(rootName.c_str(), "RECREATE");
+
   for (int il = 0; il < m_kNGroups; il++) {
 
     unsigned int nbins = m_DBCosineCor->getSize(getRepresentativeLayer(il));
@@ -618,8 +626,19 @@ void CDCDedxCosineAlgorithm::plotConstants()
     line->SetLineStyle(2);
     line->Draw();
 
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.pdf", m_label[il].data(), m_suffix.data()));
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.root", m_label[il].data(), m_suffix.data()));
+    c.Update();
+
+    if (il == 0) {
+      c.Print((pdfName + "(").c_str());
+    } else if (il == m_kNGroups - 1) {
+      c.Print((pdfName + ")").c_str());
+    } else {
+      c.Print(pdfName.c_str());
+    }
+
+    // Save this canvas in the ROOT file
+    rootFile.cd();
+    c.Write();
 
     // cleanup
     delete hnew;

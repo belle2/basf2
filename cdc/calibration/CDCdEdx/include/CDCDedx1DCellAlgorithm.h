@@ -217,7 +217,7 @@ namespace Belle2 {
     /**
     * function to draw symm/Var layer constant
     */
-    void plotRelConst(std::vector<double>tempconst, std::vector<double>layerconst, int il);
+    void plotRelConst(std::vector<std::vector<double>>& tempconst);
 
     /**
     * function to draw the old/new final constants

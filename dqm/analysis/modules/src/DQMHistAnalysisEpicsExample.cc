@@ -38,10 +38,8 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: initialized.");
 
-  TString a;
-  a = m_histoname;
-  m_c1 = new TCanvas(m_histogramDirectoryName + "_c_" + a);
-  m_f1 = new TF1(m_histogramDirectoryName + "_f_" + a, TString(m_function), -30, 300);
+  m_c1 = new TCanvas(TString(m_histogramDirectoryName + "_c_" + m_histogramName));
+  m_f1 = new TF1(TString(m_histogramDirectoryName + "_f_" + m_histogramName), TString(m_function), -30, 300);
   m_f1->SetParameter(0, 1000);
   m_f1->SetParameter(1, 0);
   m_f1->SetParameter(2, 10);
@@ -76,7 +74,7 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
     for (auto i = 0; i < m_parameters; i++) {
       std::string aa;
       aa = m_f1->GetParName(i);
-      if (aa == "") aa = string("par") + string(TString::Itoa(i, 10).Data());
+      if (aa == "") aa = std::string("par") + std::string(TString::Itoa(i, 10).Data());
       mypv.push_back(aa);
       registerEpicsPV(m_pvPrefix + aa, aa);
       // Read LO and HI limits from EPICS if needed, like
@@ -94,14 +92,14 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: beginRun called.");
   m_c1->Clear();
 
-  if (auto hh1 = findHist(m_histoname); hh1 != nullptr) {
+  if (auto hh1 = findHist(m_histogramDirectoryName, m_histogramName); hh1 != nullptr) {
     m_c1->cd();
     hh1->Draw();
     m_line->Draw();
     m_line_lo->Draw();
     m_line_hi->Draw();
   } else {
-    B2DEBUG(20, "Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histogramName << " not found");
   }
 }
 
@@ -109,7 +107,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
 {
   bool flag = false;
 
-  if (auto hh1 = findHist(m_histoname); hh1 != nullptr) {
+  if (auto hh1 = findHist(m_histogramDirectoryName, m_histogramName); hh1 != nullptr) {
     m_c1->cd();// necessary!
     hh1->Fit(m_f1, "");
     double y1 = hh1->GetMaximum();
@@ -133,7 +131,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     m_c1->Update();
     UpdateCanvas(m_c1->GetName());
   } else {
-    B2DEBUG(20, "Histo " << m_histoname << " not found");
+    B2DEBUG(20, "Histo " << m_histogramDirectoryName << "/" << m_histogramName << " not found");
   }
 
   if (m_parameters > 0) {

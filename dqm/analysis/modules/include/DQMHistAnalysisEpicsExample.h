@@ -60,7 +60,7 @@ namespace Belle2 {
     /** The name of the directory the histogram is in */
     std::string m_histogramDirectoryName;
     /** The name of the histogram. */
-    std::string m_histoname;
+    std::string m_histogramName;
     /** The definition of the fit function. */
     std::string m_function;
     /** The number of fit function parameters for EPICS. */

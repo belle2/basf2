@@ -210,7 +210,7 @@ void DQMHistAnalysisPXDFitsModule::event()
         }
         {
           std::string name = "hrawPxdHitsCommonMode" + s2;
-          if (auto           hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
+          if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 10);

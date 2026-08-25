@@ -99,7 +99,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   }
 
   // get most recent delta
-  auto hd2 = getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
+  auto hd2 = getDelta(m_histogramDirectoryName, m_histogramName, false, 0);// even if no update
   if (hd2) {
     m_cTest->cd(4);
     auto a = dynamic_cast<TH1*>(hd2->DrawClone("hist"));
@@ -107,7 +107,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   }
 
   // get most recent delta
-  auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName, 0, true);// only if updated
+  auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName, true, 0);// only if updated
   if (hd1) {
     m_cTest->cd(5);
     auto a = dynamic_cast<TH1*>(hd1->DrawClone("hist"));
@@ -135,7 +135,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   // it would be nicer to plot oldest first, left as exercise for reader
   m_cTest->cd(6);
   for (int i = 0; i < 99; i++) {
-    auto h = getDelta(fullname, "", i, false);
+    auto h = getDelta(fullname, "", false, i);
     if (h == nullptr) break;
     if (i == 0) {
       h->Draw("hist");

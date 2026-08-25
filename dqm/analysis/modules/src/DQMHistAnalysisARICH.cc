@@ -228,7 +228,7 @@ void DQMHistAnalysisARICHModule::event()
   }
   setEpicsPV("deadHAPDs", ndeadHapd);
 
-  auto h_theta =  getDelta("ARICH", "theta", 0, false); // change this to false
+  auto h_theta =  getDelta("ARICH", "theta", false, 0); // change this to false
   auto c_theta = findCanvas("ARICH/c_theta");
   auto* h_thetaInt = findHist("ARICH/theta");
   if (h_theta != NULL && c_theta != NULL && h_thetaInt != NULL) {
@@ -251,7 +251,7 @@ void DQMHistAnalysisARICHModule::event()
     return;
   }
 
-  auto h_bitsPerChannel =  getDelta("ARICH", "bitsPerChannel", 0, true);
+  auto h_bitsPerChannel =  getDelta("ARICH", "bitsPerChannel", true, 0);
   if (h_bitsPerChannel == NULL) return;
   TH1F* apdHits = new TH1F("apdHits", "nSigHits/nevt for all apds", 1680, -0.5, 1679.5);
   double avg = 0.;

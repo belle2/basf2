@@ -414,7 +414,7 @@ namespace Belle2 {
      * + if a TrueHit is only related to the U-Cluster -> relation weight = 11 (this is what happens with if a PXD is passed!)
      * + if a TrueHit is only related to the V-Cluster -> relation weight = 21
      */
-    static double calculateRelationWeight(const TrueHitInfo& trueHitInfo, Belle2::SpacePoint* spacePoint);
+    static double calculateRelationWeight(const TrueHitInfo& trueHitInfo, const Belle2::SpacePoint* spacePoint);
 
   }; // end module
 

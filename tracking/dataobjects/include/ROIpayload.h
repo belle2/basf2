@@ -9,7 +9,7 @@
 #pragma once
 
 #include <tracking/dataobjects/ROIrawID.h>
-#include "TObject.h"
+#include <TObject.h>
 #include <stdint.h>
 #include <boost/endian/arithmetic.hpp>
 

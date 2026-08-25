@@ -82,7 +82,9 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
   if (cwInWireNeighbor) m_wireNeighbors.push_back(cwInWireNeighbor);
   if (ccwInWireNeighbor) m_wireNeighbors.push_back(ccwInWireNeighbor);
 
+  // cppcheck-suppress knownConditionTrueFalse ; defensive null check on the wire neighbour lookup
   if (cwWireNeighbor) m_wireNeighbors.push_back(cwWireNeighbor);
+  // cppcheck-suppress knownConditionTrueFalse ; defensive null check on the wire neighbour lookup
   if (ccwWireNeighbor) m_wireNeighbors.push_back(ccwWireNeighbor);
 
   if (cwOutWireNeighbor) m_wireNeighbors.push_back(cwOutWireNeighbor);

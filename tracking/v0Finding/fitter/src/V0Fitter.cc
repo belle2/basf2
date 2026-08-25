@@ -101,6 +101,7 @@ void V0Fitter::initializeCuts(double beamPipeRadius,
 }
 
 
+// cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
 bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;
@@ -480,7 +481,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   return true;
 }
 
-RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack)
+RecoTrack* V0Fitter::copyRecoTrack(const RecoTrack* origRecoTrack)
 {
   RecoTrack* newRecoTrack = origRecoTrack->copyToStoreArray(m_copiedRecoTracks);
   newRecoTrack->addHitsFromRecoTrack(origRecoTrack);
@@ -488,7 +489,7 @@ RecoTrack* V0Fitter::copyRecoTrack(RecoTrack* origRecoTrack)
   return newRecoTrack;
 }
 
-RecoTrack* V0Fitter::copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG)
+RecoTrack* V0Fitter::copyRecoTrackAndFit(const RecoTrack* origRecoTrack, const int trackPDG)
 {
   /// original track information
   Const::ChargedStable particleUsedForFitting(std::abs(trackPDG));

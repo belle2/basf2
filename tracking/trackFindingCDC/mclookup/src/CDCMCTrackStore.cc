@@ -152,6 +152,7 @@ void CDCMCTrackStore::fillMCSegments()
 
     // Merge small run to an adjacent run
     for (auto itSuperLayerRun : smallSuperLayerRuns) {
+      // cppcheck-suppress containerOutOfBounds ; adjacent_groupby never yields an empty group
       ISuperLayer iSL = itSuperLayerRun->front()->getISuperLayer();
 
       // Look in both directions to adopt the hits in this small runs

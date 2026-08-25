@@ -15,8 +15,8 @@
 #include <gtest/gtest.h>
 
 //root stuff
-#include "TFile.h"
-#include "TKey.h"
+#include <TFile.h>
+#include <TKey.h>
 
 using namespace std;
 
@@ -229,7 +229,7 @@ namespace Belle2 {
 
       TIter next(f2.GetListOfKeys());
       TKey* key;
-      while ((key = (TKey*)next())) {
+      while ((key = dynamic_cast<TKey*>(next()))) {
 
         try {
           retrievedCluster = static_cast<PXDCluster*>(key->ReadObj());
@@ -327,7 +327,7 @@ namespace Belle2 {
 
       TIter next(f4.GetListOfKeys());
       TKey* key;
-      while ((key = (TKey*)next())) {
+      while ((key = dynamic_cast<TKey*>(next()))) {
 
         try {
           retrievedSpacePoint = static_cast<SpacePoint*>(key->ReadObj());

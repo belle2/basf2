@@ -17,12 +17,12 @@
 #include <stdlib.h>
 #include <fstream>
 #include <string>
-#include "TH1.h"
-#include "TH3.h"
-#include "TF1.h"
-#include "TH2.h"
-#include "TF2.h"
-#include "TString.h"
+#include <TH1.h>
+#include <TH3.h>
+#include <TF1.h>
+#include <TH2.h>
+#include <TF2.h>
+#include <TString.h>
 #include <algorithm>
 
 using namespace Belle2;
@@ -258,8 +258,8 @@ void NoKickCutsEvalModule::endRun()
                                             "CUTS_m_" + m_namePar.at(par) + Form("_layer%d_%d", lay1, lay2), c_nbinp, c_pmin, c_pmax, c_nbint, c_tmin, c_tmax));
         for (int theta = 1; theta <= c_nbint; theta++) {
           for (int p = 1; p <= c_nbinp; p++) {
-            cut_M_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
-            cut_m_histo_lay1.at(lay2)->SetBinContent(p, theta, cut_m.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
+            cut_M_histo_lay1.back()->SetBinContent(p, theta, cut_M.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
+            cut_m_histo_lay1.back()->SetBinContent(p, theta, cut_m.at(par).at(lay1).at(lay2).at(theta - 1).at(p - 1));
           }
         }
       }
@@ -451,10 +451,9 @@ void NoKickCutsEvalModule::endRun()
 
 }
 
-void NoKickCutsEvalModule::terminate() {}
 
 
-double NoKickCutsEvalModule::deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EParameters par, bool is0)
+double NoKickCutsEvalModule::deltaParEval(const hitXP& hit1, const hitXP& hit2, NoKickCuts::EParameters par, bool is0)
 {
   double out = c_over;
   int layer1 = hit1.m_sensorLayer;

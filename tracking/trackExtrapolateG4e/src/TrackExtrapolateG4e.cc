@@ -1035,6 +1035,7 @@ ExtState TrackExtrapolateG4e::getStartPoint(const Track& b2track, int pdgCode, G
       double centerPhi = extState.directionAtIP.phi() - M_PI_2;
       double centerX = firstPosition.X() + radius * std::cos(centerPhi);
       double centerY = firstPosition.Y() + radius * std::sin(centerPhi);
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
       double pocaPhi = atan2(charge * centerY, charge * centerX) + M_PI;
       double ipPerp = extState.directionAtIP.perp();
       if (ipPerp > 0.0) {

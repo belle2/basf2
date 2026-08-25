@@ -124,7 +124,7 @@ namespace Belle2 {
      * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
-      StoreArray<RecoTrack>& recoTracks,
+      const StoreArray<RecoTrack>& recoTracks,
       std::string const& pxdHitsStoreArrayName = "",
       std::string const& svdHitsStoreArrayName = "",
       std::string const& cdcHitsStoreArrayName = "",

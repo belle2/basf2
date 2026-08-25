@@ -224,7 +224,9 @@ namespace {
 namespace {
   /// Fill the observation and weight matrices for the fit of a single facet
   ROOT::Math::XYVector fillFacetObservations(const CDCFacet& facet,
+                                             // cppcheck-suppress constParameterReference ; xyl and w are output matrices filled below
                                              Matrix<double, 3, 3>& xyl,
+                                             // cppcheck-suppress constParameterReference ; xyl and w are output matrices filled below
                                              Matrix<double, 3, 1>& w)
   {
     const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
@@ -288,7 +290,9 @@ namespace {
   /// Fill the observation and weight matrices for the fit of a facet pair
   ROOT::Math::XYVector fillFacetPairObservations(const CDCFacet& fromFacet,
                                                  const CDCFacet& toFacet,
+                                                 // cppcheck-suppress constParameterReference ; xyl and w are output matrices filled below
                                                  Matrix<double, 6, 3>& xyl,
+                                                 // cppcheck-suppress constParameterReference ; xyl and w are output matrices filled below
                                                  Matrix<double, 6, 1>& w)
   {
     const ROOT::Math::XYVector support = VectorUtil::average(fromFacet.getMiddleWireHit().getRefPos2D(),

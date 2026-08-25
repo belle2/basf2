@@ -51,7 +51,7 @@ namespace Belle2 {
      * in the input data
      * @param normalise if set to true the covariance matrix of the transformed data will be identity, else it will only be diagonal
      */
-    void calculateDecorrMatrix(std::array<std::vector<double>, Ndims> inputData, bool normalise = true);
+    void calculateDecorrMatrix(const std::array<std::vector<double>, Ndims>& inputData, bool normalise = true);
 
 
     /** calculate the matrix that can be used to decorrelate the data that yield the passed covariance matrix. */
@@ -91,7 +91,7 @@ namespace Belle2 {
   // ======================================== IMPLEMENTATION ========================================
 
   template<size_t Ndims>
-  void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(std::array<std::vector<double>, Ndims> inputData, bool normalise)
+  void DecorrelationMatrix<Ndims>::calculateDecorrMatrix(const std::array<std::vector<double>, Ndims>& inputData, bool normalise)
   {
     calculateDecorrMatrix(calculateCovMatrix(inputData), normalise);
   }

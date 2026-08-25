@@ -26,14 +26,14 @@ void TrackSelector::exposeParameters(ModuleParamList* moduleParamList, const std
 
 void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
 {
-  const auto trackHasEnoughPtAndHits = [this](RecoTrack * rt) {
+  const auto trackHasEnoughPtAndHits = [this](const RecoTrack * rt) {
     return (rt->getNumberOfCDCHits() < m_param_minNumberCDCHits) or
            (rt->getMomentumSeed().Rho() < m_param_minimumTrackPt);
   };
   TrackingUtilities::erase_remove_if(tracks, trackHasEnoughPtAndHits);
 
   // this lambda will sort in reverse order, meaning the tracks with the most CDC hits first
-  const auto greaterHits = [](RecoTrack * lhs, RecoTrack * rhs) {
+  const auto greaterHits = [](const RecoTrack * lhs, const RecoTrack * rhs) {
     return lhs->getNumberOfCDCHits() > rhs->getNumberOfCDCHits();
   };
   // sort by the amount of CDC hits

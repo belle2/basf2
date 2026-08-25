@@ -74,7 +74,9 @@ Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
   if (startToMiddleFBInfo != middleToEndFBInfo) return NAN;
 
 
+  // cppcheck-suppress knownConditionTrueFalse ; defensive check kept deliberately
   if ((startToMiddleFBInfo == EForwardBackward::c_Forward and middleToEndFBInfo == EForwardBackward::c_Forward) or
+      // cppcheck-suppress knownConditionTrueFalse ; defensive check kept deliberately
       (getAllowReverse() and startToMiddleFBInfo == EForwardBackward::c_Backward and middleToEndFBInfo == EForwardBackward::c_Backward)) {
 
     // Do fits

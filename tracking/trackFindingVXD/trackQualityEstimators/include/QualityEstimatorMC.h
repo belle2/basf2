@@ -28,8 +28,8 @@ namespace Belle2 {
      * @param mva_target : Boolean whether to perform quality estimation for MVA QE training.
      *                     This overwrites the strictQualityIndicator option!
      */
-    QualityEstimatorMC(const std::string& mcRecoTracksStoreArrayName = "MCRecoTracks",
-                       bool strictQualityIndicator = true, bool mva_target = false):
+    explicit QualityEstimatorMC(const std::string& mcRecoTracksStoreArrayName = "MCRecoTracks",
+                                bool strictQualityIndicator = true, bool mva_target = false):
       QualityEstimatorBase(), m_strictQualityIndicator(strictQualityIndicator), m_mva_target(mva_target),
       m_mcRecoTracksStoreArrayName(mcRecoTracksStoreArrayName)
     {

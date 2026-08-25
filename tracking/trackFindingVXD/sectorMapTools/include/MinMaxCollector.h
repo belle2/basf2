@@ -159,7 +159,7 @@ namespace Belle2 {
 
 
     /** constructor. quantileCut determines the fraction of the sample to be stored (0-1). warmUpThreshold pays some overhead for sample sizes to get more accuracy (for bigger sample sizes the overhead and the advantage of warmUp vanish (since then the results converge to the real ones anyway). */
-    MinMaxCollector(DataType quantileCut = 0.025, unsigned warmUpThreshold = 10) :
+    explicit MinMaxCollector(DataType quantileCut = 0.025, unsigned warmUpThreshold = 10) :
       m_sampleSize(0),
       m_quantileCut(quantileCut),
       m_warmUpThreshold(warmUpThreshold)

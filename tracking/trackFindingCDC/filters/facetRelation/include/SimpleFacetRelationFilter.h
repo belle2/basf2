@@ -44,7 +44,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the used direction of flight deviation.
-      double m_param_deviationCosCut;
+      double m_param_deviationCosCut {};
     };
   }
 }

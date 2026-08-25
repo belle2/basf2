@@ -149,6 +149,7 @@ void BaseRecoFitterModule::event()
         B2DEBUG(28, "       Chi2 of the fit: " << kfs->getChi2());
         B2DEBUG(28, "       NDF of the fit: " << kfs->getBackwardNdf());
         //Calculate probability
+        // cppcheck-suppress variableScope ; declaration kept at this scope for readability
         double pValue = recoTrack.getTrackFitStatus(trackRep)->getPVal();
         B2DEBUG(28, "       pValue of the fit: " << pValue);
         const genfit::MeasuredStateOnPlane& mSoP = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);

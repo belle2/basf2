@@ -51,9 +51,6 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
   CDCWireHit* from,
   const std::vector<CDCWireHit*>& wireHits) const
 {
-  assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
-         "Expected wire hits to be sorted");
-
   const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
   std::vector<const CDCWire*> m_wireNeighbors;
   m_wireNeighbors.reserve(nWireNeighbors);

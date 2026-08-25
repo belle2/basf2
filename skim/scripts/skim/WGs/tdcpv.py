@@ -309,8 +309,6 @@ class TDCPV_klong(BaseSkim):
             and daughter(1, abs(clusterTiming)) < 200 \
             and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
             and 0.1 < InvM < 0.2 \
-            and -1.5 < daughterDiffOf(0,1,phi) < 1.5 \
-            and daughterAngle(0,1) < 1.4 \
         "
         stdK("all", path=path)
         stdPi("all", path=path)

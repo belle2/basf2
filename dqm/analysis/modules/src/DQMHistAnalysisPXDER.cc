@@ -16,7 +16,6 @@
 
 #include <TROOT.h>
 
-using namespace std;
 using boost::format;
 using namespace Belle2;
 

@@ -106,8 +106,7 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
   m_cTrackedClusters = new TCanvas((m_histogramDirectoryName + "/c_TrackedClusters").data());
   m_hTrackedClusters = new TH1F("hPXDTrackedClusters", "PXD Tracked Clusters/Event;Module", 40, 0, 40);
   m_hTrackedClusters->Draw();
-  auto ax = m_hTrackedClusters->GetXaxis();
-  if (ax) {
+  if (auto ax = m_hTrackedClusters->GetXaxis(); ax != nullptr) {
     ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
     for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
       TString ModuleName = (std::string)m_PXDModules[i];
@@ -174,8 +173,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   if (m_cTrackedClusters and m_hTrackedClusters) { // tracked clusters
     // we already have a plot, but we need to rearrange the X labels in a new plot and scale to events
     std::string name = "Tracked_Clusters"; // new name
-    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
-    if (hh2) {// update only if histogram is updated
+    // update only if histogram is updated
+    if (auto hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true); hh2 != nullptr) {
       m_cTrackedClusters->Clear();
       m_cTrackedClusters->cd();
       m_hTrackedClusters->Reset();
@@ -206,9 +205,9 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->Draw("hist");
 
       // get ref histogram
-      auto href2 = findRefHist(name); // no scaling!
+      // no scaling! TODO this is a special reference plot, in which directory is it?
       // TODO: we would expect that it changes with luminosity and maybe beam condition, but not clear how to factor this out. simple scaling seems not the right way.
-      if (href2) {
+      if (auto href2 = findRefHist(name); href2 != nullptr) {
         href2->SetLineStyle(3);// 2 or 3
         href2->SetLineColor(kBlue);
         href2->Draw("same,hist");
@@ -252,8 +251,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
     std::replace(name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = findHist(m_histogramDirectoryName, name, true);
-    if (hh1) {// update only if histo was updated
+    if (auto hh1 = findHist(m_histogramDirectoryName, name, true); hh1 != nullptr) { // update only if histo was updated
       canvas->cd();
       canvas->Clear();
       UpdateCanvas(canvas);
@@ -286,9 +284,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
-      // get ref histogram
-      auto hist2 = findRefHist(name);// no scaling
-      if (hist2) {
+      // get ref histogram, no scaling
+      if (auto hist2 = findRefHist(m_histogramDirectoryName, name); hist2 != nullptr) {
         B2DEBUG(20, "Draw Normalized " << hist2->GetName());
         hist2->SetLineStyle(3);// 2 or 3
         hist2->SetLineColor(kBlack);

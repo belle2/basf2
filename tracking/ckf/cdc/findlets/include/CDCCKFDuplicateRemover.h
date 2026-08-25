@@ -88,7 +88,7 @@ namespace Belle2 {
         bool increaseIter = true;
         while (iter2 < goodResults.end()) {
           // find tracks from same seed
-          if (iter->front().getSeed()->getRelated<ECLShower>() == iter2->front().getSeed()->getRelated<ECLShower>()) {
+          if (iter2->front().getSeed()->getRelated<ECLShower>() == iter2->front().getSeed()->getRelated<ECLShower>()) {
             // let filter decide which one to keep
             bool selectFirst = m_filter_duplicateTrack(std::pair(&*iter, &*iter2)) > 0;
             if (selectFirst) {

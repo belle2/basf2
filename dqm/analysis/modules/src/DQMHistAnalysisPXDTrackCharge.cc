@@ -254,7 +254,6 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     if (auto hh1 = findHist(m_histogramDirectoryName, name, true); hh1 != nullptr) { // update only if histo was updated
       canvas->cd();
       canvas->Clear();
-      UpdateCanvas(canvas);
 
       if (hh1->GetEntries() > 50) {
 
@@ -285,20 +284,12 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       }
 
       // get ref histogram, no scaling
-      if (auto hist2 = findRefHist(m_histogramDirectoryName, name); hist2 != nullptr) {
+      if (auto hist2 = findRefHist(m_histogramDirectoryName, name, ERefScaling::c_RefScaleEntries, hh1); hist2 != nullptr) {
         B2DEBUG(20, "Draw Normalized " << hist2->GetName());
         hist2->SetLineStyle(3);// 2 or 3
         hist2->SetLineColor(kBlack);
-
-        canvas->cd();
-
-        // if draw normalized
-        auto h = static_cast<TH1*>(hist2->Clone()); // Annoying ... Maybe an memory leak? TODO
-        // would it work to scale it each time again?
-        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
-
-        h->SetStats(kFALSE);
-        h->Draw("same,hist");
+        hist2->SetStats(kFALSE);
+        hist2->Draw("same,hist");
       }
 
       // add coloring, cuts? based on fit, compare with ref?
@@ -332,8 +323,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
           m_cChargeModASIC[aVxdID][s - 1][d - 1]->cd();
         }
 
-        TH1* hh1 = findHist(m_histogramDirectoryName, name);
-        if (hh1) {
+        if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
           double mpv = 0.0;
           if (hh1->GetEntries() > 50) {
             auto hdata = new RooDataHist(hh1->GetName(), hh1->GetTitle(), *m_x, static_cast<const TH1*>(hh1));

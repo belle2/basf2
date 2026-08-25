@@ -7,10 +7,7 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisEpicsExample.h>
-#include <TROOT.h>
-#include <TClass.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -29,10 +26,11 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
   setDescription("Example module for EPICS");
 
   //Parameter definition
-  addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));
+  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("test"));
+  addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
   addParam("Function", m_function, "Fit function definition", std::string("gaus"));
-  addParam("Parameters", m_parameters, "Fit function parameters for EPICS", 3);
-  addParam("PVName", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:hist:"));
+  addParam("Parameters", m_parameters, "Number of fit function parameters for EPICS", 3);
+  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:TEST:"));
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: Constructor done.");
 }
 
@@ -42,9 +40,8 @@ void DQMHistAnalysisEpicsExampleModule::initialize()
 
   TString a;
   a = m_histoname;
-  a.ReplaceAll("/", "_");
-  m_c1 = new TCanvas("c_" + a);
-  m_f1 = new TF1("f_" + a, TString(m_function), -30, 300);
+  m_c1 = new TCanvas(m_histogramDirectoryName + "_c_" + a);
+  m_f1 = new TF1(m_histogramDirectoryName + "_f_" + a, TString(m_function), -30, 300);
   m_f1->SetParameter(0, 1000);
   m_f1->SetParameter(1, 0);
   m_f1->SetParameter(2, 10);
@@ -97,42 +94,7 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisEpicsExample: beginRun called.");
   m_c1->Clear();
 
-  TH1* hh1;
-  hh1 = findHist(m_histoname);
-
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    TDirectory* d = gROOT;
-    TString myl = m_histoname;
-    TString tok;
-    Ssiz_t from = 0;
-    while (myl.Tokenize(tok, from, "/")) {
-      TString dummy;
-      Ssiz_t f;
-      f = from;
-      if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-        auto e = d->GetDirectory(tok);
-        if (e) {
-          B2DEBUG(20, "Cd Dir " << tok);
-          d = e;
-        }
-        d->cd();
-      } else {
-        break;
-      }
-    }
-    TObject* obj = d->FindObject(tok);
-    if (obj != NULL) {
-      if (obj->IsA()->InheritsFrom("TH1")) {
-        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
-        hh1 = dynamic_cast<TH1*>(obj);
-      }
-    } else {
-      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
-    }
-  }
-
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist(m_histoname); hh1 != nullptr) {
     m_c1->cd();
     hh1->Draw();
     m_line->Draw();
@@ -145,43 +107,9 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
 
 void DQMHistAnalysisEpicsExampleModule::event()
 {
-  TH1* hh1;
   bool flag = false;
 
-  hh1 = findHist(m_histoname);
-  if (hh1 == NULL) {
-    B2DEBUG(20, "Histo " << m_histoname << " not in memfile");
-    TDirectory* d = gROOT;
-    TString myl = m_histoname;
-    TString tok;
-    Ssiz_t from = 0;
-    while (myl.Tokenize(tok, from, "/")) {
-      TString dummy;
-      Ssiz_t f;
-      f = from;
-      if (myl.Tokenize(dummy, f, "/")) { // check if its the last one
-        auto e = d->GetDirectory(tok);
-        if (e) {
-          B2DEBUG(20, "Cd Dir " << tok);
-          d = e;
-        }
-        d->cd();
-      } else {
-        break;
-      }
-    }
-    TObject* obj = d->FindObject(tok);
-    if (obj != NULL) {
-      if (obj->IsA()->InheritsFrom("TH1")) {
-        B2DEBUG(20, "Histo " << m_histoname << " found in mem");
-        hh1 = dynamic_cast<TH1*>(obj);
-        flag = true;
-      }
-    } else {
-      B2DEBUG(20, "Histo " << m_histoname << " NOT found in mem");
-    }
-  }
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist(m_histoname); hh1 != nullptr) {
     m_c1->cd();// necessary!
     hh1->Fit(m_f1, "");
     double y1 = hh1->GetMaximum();
@@ -203,6 +131,7 @@ void DQMHistAnalysisEpicsExampleModule::event()
     }
     m_c1->Modified();
     m_c1->Update();
+    UpdateCanvas(m_c1->GetName());
   } else {
     B2DEBUG(20, "Histo " << m_histoname << " not found");
   }

@@ -141,8 +141,7 @@ void DQMHistAutoCanvasModule::event()
 
       // not so nice as we actually touch the histogram by iterator
       // we could use findHist function, but then we do another lookup within iteration
-      auto hist = it.second.getHist();
-      if (hist) {
+      if (auto hist = it.second.getHist(); hist != nullptr) {
         if (hist->GetDimension() == 1) {
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);

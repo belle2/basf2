@@ -285,7 +285,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (m_IsPhysicsRun == true) {
 
     //update comL1-GDLL1
-    auto hist_comL1_GDLL1 = getDelta("TRGGDL", "hGDL_gdlL1TocomL1_all", true); // only if updated
+    auto hist_comL1_GDLL1 = getDelta("TRGGDL", "hGDL_gdlL1TocomL1_all"); // only if updated
     if (hist_comL1_GDLL1) {
       double comL1_GDLL1_mean = 0.0;
       hist_comL1_GDLL1->Draw();
@@ -295,7 +295,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
     //update ECLTRG timing
-    auto hist =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG", true); // only if updated
+    auto hist =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_ECLTRG"); // only if updated
     if (hist) {
       double ECLTRG_timing_mean = 0.0;
       hist->Draw();
@@ -306,7 +306,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
 
     //update CDCTRG timing
-    auto histCDCTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG", true); // only if updated
+    auto histCDCTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_CDCTRG"); // only if updated
     if (histCDCTRG) {
       double CDCTRG_timing_mean = 0.0;
       histCDCTRG->Draw();
@@ -316,7 +316,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
     //update TOPTRG timing
-    auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", true); // only if updated
+    auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG"); // only if updated
     if (histTOPTRG) {
       double TOPTRG_timing_mean = 0.0;
       histTOPTRG->Draw();
@@ -326,7 +326,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update ECLTRG peak
-    auto hist_ECLTRG_peak =  getDelta("TRGGRL", "h_ECLL1", true); // only if updated
+    auto hist_ECLTRG_peak =  getDelta("TRGGRL", "h_ECLL1"); // only if updated
     if (hist_ECLTRG_peak) {
 //    TH1F* hist_ECLTRG_clone = (TH1F*)hist_ECLTRG_peak->Clone();//Clone the histogram.
       double ECLTRG_peak = 0.0;
@@ -349,7 +349,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update ECLTRG deadch
-    auto hist_ECLTRG_deadch =  getDelta("TRG", "h_TCId", true); // only if updated
+    auto hist_ECLTRG_deadch =  getDelta("TRG", "h_TCId"); // only if updated
     if (hist_ECLTRG_deadch) {
       hist_ECLTRG_deadch->Draw();
       int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
@@ -370,7 +370,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update TOPTRG deadch
-    auto hist_TOPTRG_deadch =  getDelta("TRGGRL", "h_slot_TOP", true); // only if updated
+    auto hist_TOPTRG_deadch =  getDelta("TRGGRL", "h_slot_TOP"); // only if updated
     if (hist_TOPTRG_deadch) {
       hist_TOPTRG_deadch->Draw();
       int numberOfBins = hist_TOPTRG_deadch->GetNbinsX();
@@ -385,7 +385,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //  m_canvas_CDCTRG_2D_peak->Clear();
 //  m_canvas_CDCTRG_2D_peak->cd(0);
 // update CDCTRG 2D peak
-    auto hist_CDCTRG_2D_peak =  getDelta("TRGGRL", "h_CDCL1", true); // only if updated
+    auto hist_CDCTRG_2D_peak =  getDelta("TRGGRL", "h_CDCL1"); // only if updated
     if (hist_CDCTRG_2D_peak) {
       double CDCTRG_2D_peak = 0.0;
       hist_CDCTRG_2D_peak->Draw();
@@ -397,7 +397,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update CDCTRG NN peak
-    auto hist_NN_peak =  getDelta("TRGGRL", "h_CDCNNL1", true); // only if updated
+    auto hist_NN_peak =  getDelta("TRGGRL", "h_CDCNNL1"); // only if updated
     if (hist_NN_peak) {
       double NN_peak = 0.0;
       hist_NN_peak->Draw();
@@ -409,7 +409,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update CDCTRG TSF
-    auto hist_CDCTRG_TSF_peak =  getDelta("TRGGRL", "h_TSFL1", true); // only if updated
+    auto hist_CDCTRG_TSF_peak =  getDelta("TRGGRL", "h_TSFL1"); // only if updated
     if (hist_CDCTRG_TSF_peak) {
       double CDCTRG_TSF_peak = 0.0;
       hist_CDCTRG_TSF_peak->Draw();
@@ -421,7 +421,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update CDCTRG deadch
-    auto hist_CDCTRG_deadch =  getDelta("TRGCDCTNN", "NeuroHWInTSID", true); // only if updated
+    auto hist_CDCTRG_deadch =  getDelta("TRGCDCTNN", "NeuroHWInTSID"); // only if updated
     if (hist_CDCTRG_deadch) {
       hist_CDCTRG_deadch->Draw();
       int numberOfBins = hist_CDCTRG_deadch->GetNbinsX();
@@ -436,7 +436,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update KLMTRG
-    auto hist_KLMTRG_peak =  getDelta("TRGGRL", "h_KLML1", true); // only if updated
+    auto hist_KLMTRG_peak =  getDelta("TRGGRL", "h_KLML1"); // only if updated
     if (hist_KLMTRG_peak) {
       double KLMTRG_peak = 0.0;
       hist_KLMTRG_peak->Draw();
@@ -448,7 +448,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update TOPTRG
-    auto hist_TOPTRG_peak =  getDelta("TRGGRL", "h_TOPL1", true); // only if updated
+    auto hist_TOPTRG_peak =  getDelta("TRGGRL", "h_TOPL1"); // only if updated
     if (hist_TOPTRG_peak) {
       double TOPTRG_peak = 0.0;
       hist_TOPTRG_peak->Draw();
@@ -460,7 +460,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update ecltiming_cdctiming
-    auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcToecl_all", true); // only if updated
+    auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcToecl_all"); // only if updated
     if (hist_ecltiming_cdctiming) {
       double ecltiming_cdctiming = 0.0;
       hist_ecltiming_cdctiming->Draw();
@@ -471,7 +471,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update toptiming_ecltiming
-    auto hist_toptiming_ecltiming =  getDelta("TRGGDL", "hGDL_ns_topToecl_all", true); // only if updated
+    auto hist_toptiming_ecltiming =  getDelta("TRGGDL", "hGDL_ns_topToecl_all"); // only if updated
     if (hist_toptiming_ecltiming) {
       double toptiming_ecltiming = 0.0;
       hist_toptiming_ecltiming->Draw();
@@ -482,7 +482,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update toptiming_cdctiming
-    auto hist_toptiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_topTocdc_all", true); // only if updated
+    auto hist_toptiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_topTocdc_all"); // only if updated
     if (hist_toptiming_cdctiming) {
       double toptiming_cdctiming = 0.0;
       hist_toptiming_cdctiming->Draw();
@@ -493,7 +493,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update gdll1_ecltiming
-    auto hist_gdll1_ecltiming =  getDelta("TRGGDL", "hGDL_eclTogdlL1_all", true); // only if updated
+    auto hist_gdll1_ecltiming =  getDelta("TRGGDL", "hGDL_eclTogdlL1_all"); // only if updated
     if (hist_gdll1_ecltiming) {
       double gdll1_ecltiming = 0.0;
       hist_gdll1_ecltiming->Draw();
@@ -504,7 +504,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update gdll1_cdctiming
-    auto hist_gdll1_cdctiming =  getDelta("TRGGDL", "hGDL_cdcTogdlL1_all", true); // only if updated
+    auto hist_gdll1_cdctiming =  getDelta("TRGGDL", "hGDL_cdcTogdlL1_all"); // only if updated
     if (hist_gdll1_cdctiming) {
       double gdll1_cdctiming = 0.0;
       hist_gdll1_cdctiming->Draw();
@@ -515,7 +515,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update gdll1_toptiming
-    auto hist_gdll1_toptiming =  getDelta("TRGGDL", "hGDL_topTogdlL1_all", true); // only if updated
+    auto hist_gdll1_toptiming =  getDelta("TRGGDL", "hGDL_topTogdlL1_all"); // only if updated
     if (hist_gdll1_toptiming) {
       double gdll1_toptiming = 0.0;
       hist_gdll1_toptiming->Draw();
@@ -526,7 +526,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update barrel_klm_latency
-    auto hist_barrel_klm_latency =  getDelta("TRGGDL", "hGDL_itd_klm_hit_rise_all", true); // only if updated
+    auto hist_barrel_klm_latency =  getDelta("TRGGDL", "hGDL_itd_klm_hit_rise_all"); // only if updated
     if (hist_barrel_klm_latency) {
       double barrel_klm_latency = 0.0;
       hist_barrel_klm_latency->Draw();
@@ -537,7 +537,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     }
 
 // update endcap_klm_latency
-    auto hist_endcap_klm_latency =  getDelta("TRGGDL", "hGDL_itd_eklm_hit_rise_all", true); // only if updated
+    auto hist_endcap_klm_latency =  getDelta("TRGGDL", "hGDL_itd_eklm_hit_rise_all"); // only if updated
     if (hist_endcap_klm_latency) {
       double endcap_klm_latency = 0.0;
       hist_endcap_klm_latency->Draw();
@@ -551,7 +551,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     if (m_IsPhysicsRun_ratio == true) {
 
       //Ratios
-      auto hist_software_trigger =  getDelta("softwaretrigger", "skim", true); // only if updated
+      auto hist_software_trigger =  getDelta("softwaretrigger", "skim"); // only if updated
 
       if (hist_software_trigger) {
         hist_software_trigger->Draw();
@@ -698,14 +698,14 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
     }
 
-    auto hist_nTSFHits_total = getDelta("TRGGRL", "h_wirecnt_sum", true);
+    auto hist_nTSFHits_total = getDelta("TRGGRL", "h_wirecnt_sum");
     if (hist_nTSFHits_total) {
       double mean = hist_nTSFHits_total->GetMean();
       B2DEBUG(1, "CDCTRG_meanTSFHits_total:" << mean);
       setEpicsPV("CDCTRG_meanTSFHits_total", mean);
     }
 
-    auto hist_nTSFHits_clean = getDelta("TRGGRL", "h_wirecnt_sum_clean", true);
+    auto hist_nTSFHits_clean = getDelta("TRGGRL", "h_wirecnt_sum_clean");
     if (hist_nTSFHits_clean) {
       double mean = hist_nTSFHits_clean->GetMean();
       B2DEBUG(1, "CDCTRG_meanTSFHits_clean:" << mean);
@@ -716,28 +716,28 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("CDCTRG_tailTSFHits_clean", tail);
     }
 
-    auto hist_nTSFHits_injHER = getDelta("TRGGRL", "h_wirecnt_sum_injHER", true);
+    auto hist_nTSFHits_injHER = getDelta("TRGGRL", "h_wirecnt_sum_injHER");
     if (hist_nTSFHits_injHER) {
       double mean = hist_nTSFHits_injHER->GetMean();
       B2DEBUG(1, "CDCTRG_meanTSFHits_injHER:" << mean);
       setEpicsPV("CDCTRG_meanTSFHits_injHER", mean);
     }
 
-    auto hist_nTSFHits_injLER = getDelta("TRGGRL", "h_wirecnt_sum_injLER", true);
+    auto hist_nTSFHits_injLER = getDelta("TRGGRL", "h_wirecnt_sum_injLER");
     if (hist_nTSFHits_injLER) {
       double mean = hist_nTSFHits_injLER->GetMean();
       B2DEBUG(1, "CDCTRG_meanTSFHits_injLER:" << mean);
       setEpicsPV("CDCTRG_meanTSFHits_injLER", mean);
     }
 
-    auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event_clkgrp", true);
+    auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event_clkgrp");
     if (hist_nTC_total) {
       double mean = hist_nTC_total->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_total:" << mean);
       setEpicsPV("ECLTRG_meanTC_total", mean);
     }
 
-    auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean_clkgrp", true);
+    auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean_clkgrp");
     if (hist_nTC_clean) {
       double mean = hist_nTC_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_clean:" << mean);
@@ -748,28 +748,28 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("ECLTRG_tailTC_clean", tail);
     }
 
-    auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER_clkgrp", true);
+    auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER_clkgrp");
     if (hist_nTC_injHER) {
       double mean = hist_nTC_injHER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_injHER:" << mean);
       setEpicsPV("ECLTRG_meanTC_injHER", mean);
     }
 
-    auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER_clkgrp", true);
+    auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER_clkgrp");
     if (hist_nTC_injLER) {
       double mean = hist_nTC_injLER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_injLER:" << mean);
       setEpicsPV("ECLTRG_meanTC_injLER", mean);
     }
 
-    auto hist_nTC_FWD_total = getDelta("TRG", "h_n_TChit_FWD_event_clkgrp", true);
+    auto hist_nTC_FWD_total = getDelta("TRG", "h_n_TChit_FWD_event_clkgrp");
     if (hist_nTC_FWD_total) {
       double mean = hist_nTC_FWD_total->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_FWD_total:" << mean);
       setEpicsPV("ECLTRG_meanTC_FWD_total", mean);
     }
 
-    auto hist_nTC_FWD_clean = getDelta("TRG", "h_n_TChit_FWD_clean_clkgrp", true);
+    auto hist_nTC_FWD_clean = getDelta("TRG", "h_n_TChit_FWD_clean_clkgrp");
     if (hist_nTC_FWD_clean) {
       double mean = hist_nTC_FWD_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_FWD_clean:" << mean);
@@ -780,28 +780,28 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("ECLTRG_tailTC_FWD_clean", tail);
     }
 
-    auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp", true);
+    auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp");
     if (hist_nTC_FWD_injHER) {
       double mean = hist_nTC_FWD_injHER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_FWD_injHER:" << mean);
       setEpicsPV("ECLTRG_meanTC_FWD_injHER", mean);
     }
 
-    auto hist_nTC_FWD_injLER = getDelta("TRG", "h_n_TChit_FWD_injLER_clkgrp", true);
+    auto hist_nTC_FWD_injLER = getDelta("TRG", "h_n_TChit_FWD_injLER_clkgrp");
     if (hist_nTC_FWD_injLER) {
       double mean = hist_nTC_FWD_injLER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_FWD_injLER:" << mean);
       setEpicsPV("ECLTRG_meanTC_FWD_injLER", mean);
     }
 
-    auto hist_nTC_BRL_total = getDelta("TRG", "h_n_TChit_BRL_event_clkgrp", true);
+    auto hist_nTC_BRL_total = getDelta("TRG", "h_n_TChit_BRL_event_clkgrp");
     if (hist_nTC_BRL_total) {
       double mean = hist_nTC_BRL_total->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BRL_total:" << mean);
       setEpicsPV("ECLTRG_meanTC_BRL_total", mean);
     }
 
-    auto hist_nTC_BRL_clean = getDelta("TRG", "h_n_TChit_BRL_clean_clkgrp", true);
+    auto hist_nTC_BRL_clean = getDelta("TRG", "h_n_TChit_BRL_clean_clkgrp");
     if (hist_nTC_BRL_clean) {
       double mean = hist_nTC_BRL_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BRL_clean:" << mean);
@@ -812,28 +812,28 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("ECLTRG_tailTC_BRL_clean", tail);
     }
 
-    auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp", true);
+    auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp");
     if (hist_nTC_BRL_injHER) {
       double mean = hist_nTC_BRL_injHER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BRL_injHER:" << mean);
       setEpicsPV("ECLTRG_meanTC_BRL_injHER", mean);
     }
 
-    auto hist_nTC_BRL_injLER = getDelta("TRG", "h_n_TChit_BRL_injLER_clkgrp", true);
+    auto hist_nTC_BRL_injLER = getDelta("TRG", "h_n_TChit_BRL_injLER_clkgrp");
     if (hist_nTC_BRL_injLER) {
       double mean = hist_nTC_BRL_injLER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BRL_injLER:" << mean);
       setEpicsPV("ECLTRG_meanTC_BRL_injLER", mean);
     }
 
-    auto hist_nTC_BWD_total = getDelta("TRG", "h_n_TChit_BWD_event_clkgrp", true);
+    auto hist_nTC_BWD_total = getDelta("TRG", "h_n_TChit_BWD_event_clkgrp");
     if (hist_nTC_BWD_total) {
       double mean = hist_nTC_BWD_total->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BWD_total:" << mean);
       setEpicsPV("ECLTRG_meanTC_BWD_total", mean);
     }
 
-    auto hist_nTC_BWD_clean = getDelta("TRG", "h_n_TChit_BWD_clean_clkgrp", true);
+    auto hist_nTC_BWD_clean = getDelta("TRG", "h_n_TChit_BWD_clean_clkgrp");
     if (hist_nTC_BWD_clean) {
       double mean = hist_nTC_BWD_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BWD_clean:" << mean);
@@ -844,14 +844,14 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("ECLTRG_tailTC_BWD_clean", tail);
     }
 
-    auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp", true);
+    auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp");
     if (hist_nTC_BWD_injHER) {
       double mean = hist_nTC_BWD_injHER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BWD_injHER:" << mean);
       setEpicsPV("ECLTRG_meanTC_BWD_injHER", mean);
     }
 
-    auto hist_nTC_BWD_injLER = getDelta("TRG", "h_n_TChit_BWD_injLER_clkgrp", true);
+    auto hist_nTC_BWD_injLER = getDelta("TRG", "h_n_TChit_BWD_injLER_clkgrp");
     if (hist_nTC_BWD_injLER) {
       double mean = hist_nTC_BWD_injLER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BWD_injLER:" << mean);

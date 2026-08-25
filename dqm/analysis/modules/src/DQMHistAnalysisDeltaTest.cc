@@ -107,7 +107,7 @@ void DQMHistAnalysisDeltaTestModule::event()
   }
 
   // get most recent delta
-  auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName, true); // only if updated
+  auto hd1 = getDelta(m_histogramDirectoryName, m_histogramName); // only if updated
   if (hd1) {
     m_cTest->cd(5);
     auto a = dynamic_cast<TH1*>(hd1->DrawClone("hist"));

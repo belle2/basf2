@@ -249,7 +249,7 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
 void DQMHistAnalysisCDCEpicsModule::event()
 {
   //1. get adc median vs layer numbers
-  auto m_delta_ladc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_ladc, true));
+  auto m_delta_ladc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_ladc));
   if (m_delta_ladc) {
     m_histmd_ladc->Reset();
     for (unsigned il = 0; il < kNumLayers; ++il) {
@@ -283,7 +283,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //2. get adc medians vs board ID
-  auto m_delta_adc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_badc, true)); //true=only if updated
+  auto m_delta_adc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_badc)); //true=only if updated
   if (m_delta_adc) {
     m_hist_adc->Reset();
     int cadcgood = 0;
@@ -321,7 +321,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //3. get tdc medians vs board ID
-  auto m_delta_tdc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_btdc, true));
+  auto m_delta_tdc = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_btdc));
   if (m_delta_tdc) {
     m_hist_tdc->Reset();
     int ctdcgood = 0;
@@ -358,7 +358,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get phi plots for various options
-  auto m_delta_skimphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_idxphi, true)); //true=only if updated
+  auto m_delta_skimphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_idxphi)); //true=only if updated
   if (m_delta_skimphi) {
     TString sip[2] = {"OffIP", "IP"};
     TString sname[4] = {"all", "bhabha", "hadron", "mumutrk"};
@@ -441,7 +441,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get tracking efficiency
-  auto m_delta_effphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_effphi, true)); //true=only if updated
+  auto m_delta_effphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_effphi)); //true=only if updated
   if (m_delta_effphi) {
     m_canv_effphi->Clear();
     double eff = -1;
@@ -469,7 +469,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   //get cdc hits vs phi
-  auto m_delta_hitphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_hitsphi, true)); //true=only if updated
+  auto m_delta_hitphi = static_cast<TH2F*>(getDelta(m_name_dir, m_hname_hitsphi)); //true=only if updated
   if (m_delta_hitphi) {
     m_canv_hitsphi->Clear();
     m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
@@ -485,7 +485,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   double fracWiresWithLowAttachProb = 0;
   double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
-  auto m_delta_efflay = static_cast<TH2F*>(getDelta(m_name_dir, m_histoTrackingWireEff, true)); //true=only if updated
+  auto m_delta_efflay = static_cast<TH2F*>(getDelta(m_name_dir, m_histoTrackingWireEff)); //true=only if updated
   if (m_delta_efflay) {
     for (int ij = 0; ij < 4; ij++) m_canv_attach_eff[ij]->Clear();
     m_hist_wire_attach_eff_1d->Reset();

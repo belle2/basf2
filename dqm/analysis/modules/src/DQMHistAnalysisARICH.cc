@@ -251,7 +251,7 @@ void DQMHistAnalysisARICHModule::event()
     return;
   }
 
-  auto h_bitsPerChannel =  getDelta("ARICH", "bitsPerChannel", true);
+  auto h_bitsPerChannel =  getDelta("ARICH", "bitsPerChannel");
   if (h_bitsPerChannel == NULL) return;
   TH1F* apdHits = new TH1F("apdHits", "nSigHits/nevt for all apds", 1680, -0.5, 1679.5);
   double avg = 0.;

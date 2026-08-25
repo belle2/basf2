@@ -124,8 +124,8 @@ void DQMHistAnalysisPXDBowModule::event()
     auto buff = (std::string)aPXDModule;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
-    TH1* hV = getDelta(m_histogramDirectoryName, "resV_" + buff, true);
-    TH1* hS = getDelta(m_histogramDirectoryName, "sagitta_" + buff, true);
+    TH1* hV = getDelta(m_histogramDirectoryName, "resV_" + buff);
+    TH1* hS = getDelta(m_histogramDirectoryName, "sagitta_" + buff);
     if (hS != NULL && hV != NULL) {
       bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos sagitta" << buff << " and resV_" << buff << " found");

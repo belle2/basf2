@@ -105,8 +105,6 @@ void DQMHistAnalysisEpicsExampleModule::beginRun()
 
 void DQMHistAnalysisEpicsExampleModule::event()
 {
-  bool flag = false;
-
   if (auto hh1 = findHist(m_histogramDirectoryName, m_histogramName); hh1 != nullptr) {
     m_c1->cd();// necessary!
     hh1->Fit(m_f1, "");
@@ -121,12 +119,9 @@ void DQMHistAnalysisEpicsExampleModule::event()
     double x = m_f1->GetParameter(1);
     m_line->SetX1(x);
     m_line->SetX2(x);
-    if (!flag) {
-      // dont add another line...
-      m_line->Draw();
-      m_line_lo->Draw();
-      m_line_hi->Draw();
-    }
+    m_line->Draw();
+    m_line_lo->Draw();
+    m_line_hi->Draw();
     m_c1->Modified();
     m_c1->Update();
     UpdateCanvas(m_c1->GetName());

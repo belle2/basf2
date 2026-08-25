@@ -143,7 +143,7 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
 
   // the following cases do not make sense, unless you want to achieve something special.
   // get most recent delta even if not updated
-  // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName, false, 0);// even if no update
+  // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName,false);// even if no update
   // get basic histogram (run integrated up) even if not updated
   // auto hist = findHist(m_histogramDirectoryName, m_histogramName, false);// even if no update
 

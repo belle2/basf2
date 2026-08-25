@@ -680,8 +680,8 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
 
     /* Delta component */
     // Use the latest available deltas, not only "updated in the same event".
-    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", false, 0);
-    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", false, 0);
+    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", false);
+    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", false);
 
     UpdateCanvas(canvas->GetName(), (feHist != nullptr));
     if (deltaNumer != nullptr && deltaDenom != nullptr) {

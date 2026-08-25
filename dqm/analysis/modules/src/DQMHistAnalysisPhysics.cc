@@ -194,7 +194,7 @@ void DQMHistAnalysisPhysicsModule::event()
     }
 
     // for pv #new hadronb2_tight/#bhabha_trk_ecl
-    auto hist_hadronb2_tight_over_bhabha_trk_ecl =  getDelta("PhysicsObjects", "physicsresults", true, 0);// only if updated
+    auto hist_hadronb2_tight_over_bhabha_trk_ecl =  getDelta("PhysicsObjects", "physicsresults", true); // only if updated
     if (hist_hadronb2_tight_over_bhabha_trk_ecl) {
       if (hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(6) != 0) {
         double hadronb2_tight_over_bhabha_trk_ecl = hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(4) /

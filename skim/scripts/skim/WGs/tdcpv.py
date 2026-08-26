@@ -127,7 +127,6 @@ class TDCPV_qqs(BaseSkim):
         "
         stdK("all", path=path)
         stdPi("all", path=path)
-        # stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
         ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
         loadStdSkimHighEffTracks('pi', path=path)
@@ -161,8 +160,6 @@ class TDCPV_qqs(BaseSkim):
     def additional_setup(self, path):
         ma.fillParticleList('gamma:E15_TDCPV_qqs', '1.4<E<4', path=path)
         ma.fillParticleList('gamma:ECMS16_TDCPV_qqs', 'useCMSFrame(E)>1.6', path=path)
-        # ma.cutAndCopyList('gamma:E15_TDCPV_qqs', 'gamma:all', '1.4<E<4', path=path)
-        # ma.cutAndCopyList('gamma:ECMS16_TDCPV_qqs', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
@@ -334,7 +331,6 @@ class TDCPV_klong(BaseSkim):
         "
         stdK("all", path=path)
         stdPi("all", path=path)
-        # stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
         ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
         loadStdSkimHighEffTracks('pi', path=path)
@@ -371,8 +367,6 @@ class TDCPV_klong(BaseSkim):
     def additional_setup(self, path):
         ma.fillParticleList('gamma:E15_TDCPV_klong', '1.4<E<4', path=path)
         ma.fillParticleList('gamma:ECMS16_TDCPV_klong', 'useCMSFrame(E)>1.6', path=path)
-        # ma.cutAndCopyList('gamma:E15_TDCPV_klong', 'gamma:all', '1.4<E<4', path=path)
-        # ma.cutAndCopyList('gamma:ECMS16_TDCPV_klong', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
         # loose KL
         ma.cutAndCopyList(
@@ -543,7 +537,6 @@ class TDCPV_ccs(BaseSkim):
         stdK("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        # stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
         ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
 

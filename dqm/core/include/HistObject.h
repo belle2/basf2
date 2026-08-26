@@ -12,7 +12,7 @@
 namespace Belle2 {
 
   /**
-   * Class to keep track of delta histograms
+   * Class to keep track of histograms
    */
   class HistObject {
   public:
@@ -30,7 +30,7 @@ namespace Belle2 {
     ~HistObject(void);
 
     /** Check if update of histogram is necessary
-     * @param hist pointer to histogram
+     * @param histogram pointer to histogram
      * @return histogram was updated flag (return m_updated)
      */
     bool update(TH1* hist);
@@ -39,13 +39,13 @@ namespace Belle2 {
      */
     void resetBeforeEvent(void);
 
-    /** Check if hist was updated
+    /** Check if histogram was updated
      * @return it was updated
      */
     bool isUpdated(void) { return m_updated;};
 
-    /** Get hist pointer
-    * @return hist ptr
+    /** Get histogram pointer
+    * @return histogram ptr
     */
     TH1* getHist(void) { return m_hist.get();};
 

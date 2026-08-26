@@ -13,6 +13,8 @@ namespace Belle2 {
 
   /**
    * Class to keep track of reference histograms with the original
+   * histograms copy (run type dependent, loaded on run start) and
+   * possible scaled copies
    */
   class RefHistObject {
   public:
@@ -57,35 +59,37 @@ namespace Belle2 {
       return *this;
     }
 
-#if 0 // Unused
-    /** Get ref hist pointer
-    * @return ref hist ptr
+#if 0 // Unused, keep in case we need an explicit public accessor (e.g. testing). Code should use getReference below.
+    /** Get reference histogram pointer
+    * @return reference histogram pointer
     */
     TH1* getRefHist(void) { return m_refHist.get();};
 
-    /** Get scaled ref hist pointer
-    * @return scaled ref hist ptr
+    /** Get scaled reference histogram pointer
+    * @return scaled reference histogram pointer
     */
     TH1* getRefCopy(void) { return m_refCopy.get();};
 #endif
 
-    /** set ref hist pointer
-    * @param refHist reference TH1 pointer
+    /** set reference histogram pointer, takes ownership
+    * @param refHist reference histogram pointer
     */
     void setRefHist(TH1* refHist)
     {
       m_refHist.reset(refHist);  // Assumes ownership of refHist
     }
 
-    /** set scaled ref hist pointer
-    * @param refCopy scaled reference TH1 pointer
+    /** set scaled reference histogram pointer, takes ownership
+    * @param refCopy scaled reference histogram pointer
     */
     void setRefCopy(TH1* refCopy)
     {
       m_refCopy.reset(refCopy);  // Assumes ownership of refCopy
     }
 
-    /** Get reference pointer for copy
+    /** Get reference histogram pointer
+    * the pointer is to a freshly made copy, which can be modified by the caller (scaled)
+    * without changing the original stored reference histogram. Ownership stays in this class.
     * @return reference histogram pointer
     */
     TH1* getReference(void);

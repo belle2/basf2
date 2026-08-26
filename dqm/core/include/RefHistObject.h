@@ -18,8 +18,8 @@ namespace Belle2 {
    */
   class RefHistObject {
   public:
-    std::string m_orghist_name; /**< online histogram name */
-    std::string m_refhist_name; /**< reference histogram name */
+    std::string m_orghist_name; /**< online histogram name TODO this is not used */
+    std::string m_refhist_name; /**< reference histogram name TODO this is not used */
     std::unique_ptr <TH1> m_refHist;/**< Pointer to reference histogram */
     std::unique_ptr <TH1> m_refCopy;/**< Pointer to scaled reference histogram */
 
@@ -95,7 +95,7 @@ namespace Belle2 {
     TH1* getReference(void);
 
   private:
-    /** Make a reference copy
+    /** Make a copy of the underlying reference histogram which can be used for scaling.
     */
     void makeReferenceCopy(void);
   };

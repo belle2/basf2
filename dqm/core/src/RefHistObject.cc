@@ -19,7 +19,8 @@ void RefHistObject::makeReferenceCopy(void)
     m_refCopy->Reset();
     m_refCopy->Add(orgref);
   } else {
-    // is orgref is nullptr, just make a copy
+    // is orgref is nullptr (not existing yet), make a copy of the original histogram
+    // but, as we want to have scaling, we may need to change the type to the next larger float.
     if (orgref && (orgref->InheritsFrom("TH1C") or orgref->InheritsFrom("TH1S"))) {
       m_refCopy = std::make_unique<TH1F>();  // we want it a float for better scaling
       orgref->Copy(*m_refCopy.get());

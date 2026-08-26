@@ -63,10 +63,6 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Reset histogram and update flag, not the entries
-     */
-    void resetBeforeEvent(void);
-
     /** Get canvas pointer
     * @return canvas ptr
     */

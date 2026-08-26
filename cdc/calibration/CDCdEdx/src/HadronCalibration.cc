@@ -7,17 +7,18 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/HadronCalibration.h>
-
+#include <Math/MinimizerOptions.h>
 
 using namespace Belle2;
 
 HadronCalibration::HadronCalibration() {}
 
 
-void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                                   const std::string& suffix)
+void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, const std::string& filename,
+                                   const std::string& paramfile,
+                                   const std::string& suffix, const bool makeIterationSummary)
 {
-
+  ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit");
   // read in a file that contains fit results for bg bins
   double bgmin1 = 0.25, bgmax1 = 5.1; //using until 0 --> 4.5
   double bgmin2 = 3.9, bgmax2 = 15.0; //using till 4.5 --> 10
@@ -101,8 +102,8 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin1, bgmax1, 8, "WidgetCurve");
 
-  fdedx1->SetParameter(0, 1);
-  fdedx1Copy->SetParameter(0, 1);
+  fdedx1->FixParameter(0, 1);
+  fdedx1Copy->FixParameter(0, 1);
   for (int i = 1; i < 8; ++i) {
     fdedx1->SetParameter(i, gpar.getCurvePars(i - 1));
     fdedx1Copy->SetParameter(i, gpar.getCurvePars(i - 1));
@@ -119,8 +120,8 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin2, bgmax2, 5, "WidgetCurve");
 
-  fdedx2->SetParameter(0, 2);
-  fdedx2Copy->SetParameter(0, 2);
+  fdedx2->FixParameter(0, 2);
+  fdedx2Copy->FixParameter(0, 2);
   for (int i = 1; i < 5; ++i) {
     fdedx2->SetParameter(i, gpar.getCurvePars(6 + i));
     fdedx2Copy->SetParameter(i, gpar.getCurvePars(6 + i));
@@ -137,8 +138,9 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin3, bgmax3, 5, "WidgetCurve");
 
-  fdedx3->SetParameter(0, 3);
-  fdedx3Copy->SetParameter(0, 3);
+  fdedx3->FixParameter(0, 3);
+  fdedx3Copy->FixParameter(0, 3);
+
   for (int i = 1; i < 5; ++i) {
     fdedx3->SetParameter(i, gpar.getCurvePars(10 + i));
     fdedx3Copy->SetParameter(i, gpar.getCurvePars(10 + i));
@@ -209,105 +211,105 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
   } else B2INFO("\t--> HadronCalibration: WARNING: PART-3 FIT FAILED...");
 
   // //Plot without fitting (old fits + data points)
+  if (makeIterationSummary) {
+    TLine bgline1(4.5, 0.50, 4.5, 1.20);
+    bgline1.SetLineStyle(kDashed);
+    bgline1.SetLineColor(kGray);
+    TLine bgline2(10.0, 0.50, 10.0, 1.20);
+    bgline2.SetLineStyle(kDashed);
+    bgline2.SetLineColor(kGray);
+    TLine dedxline1(0.75, 1.0, 1000, 1.0);
+    dedxline1.SetLineStyle(kDashed);
+    dedxline1.SetLineColor(kGray);
 
-  TLine bgline1(4.5, 0.50, 4.5, 1.20);
-  bgline1.SetLineStyle(kDashed);
-  bgline1.SetLineColor(kGray);
-  TLine bgline2(10.0, 0.50, 10.0, 1.20);
-  bgline2.SetLineStyle(kDashed);
-  bgline2.SetLineColor(kGray);
-  TLine dedxline1(0.75, 1.0, 1000, 1.0);
-  dedxline1.SetLineStyle(kDashed);
-  dedxline1.SetLineColor(kGray);
+    setFitterStyle(fdedx1, 2, 1);
+    setFitterStyle(fdedx2, 5, 1);
+    setFitterStyle(fdedx3, 8, 1);
 
-  setFitterStyle(fdedx1, 2, 1);
-  setFitterStyle(fdedx2, 5, 1);
-  setFitterStyle(fdedx3, 8, 1);
+    setFitterStyle(fdedx1Copy, 13, 6);
+    setFitterStyle(fdedx2Copy, 4, 6);
+    setFitterStyle(fdedx3Copy, 1, 6);
 
-  setFitterStyle(fdedx1Copy, 13, 6);
-  setFitterStyle(fdedx2Copy, 4, 6);
-  setFitterStyle(fdedx3Copy, 1, 6);
+    TCanvas bgcurvecan(Form("bgcurvecan_%s", suffix.data()), "bg curve and fitting", 1400, 800);
+    bgcurvecan.Divide(3, 2);
+    for (int i = 0; i < 6; i++) {
+      TMultiGraph* grcopy = static_cast<TMultiGraph*>(grcopy1->Clone(Form("datapoints_%s_%d", suffix.data(), i)));
 
-  TCanvas bgcurvecan(Form("bgcurvecan_%s", suffix.data()), "bg curve and fitting", 1400, 800);
-  bgcurvecan.Divide(3, 2);
-  for (int i = 0; i < 6; i++) {
-    TMultiGraph* grcopy = (TMultiGraph*)grcopy1->Clone(Form("datapoints_%s_%d", suffix.data(), i));
+      bgcurvecan.cd(i + 1);
+      gPad->cd();
+      if (i == 0 || i == 3) gPad->SetLogy();
+      gPad->SetLogx();
+      grcopy->GetListOfGraphs()->SetDrawOption("AXIS");
+      grcopy->Draw("A*");
+      gPad->Modified(); gPad->Update();
 
-    bgcurvecan.cd(i + 1);
-    gPad->cd();
-    if (i == 0 || i == 3) gPad->SetLogy();
+      if (i == 0 || i == 3) {
+        grcopy->GetXaxis()->SetLimits(0.10, 14500);
+        grcopy->SetMinimum(0.50);
+        grcopy->SetMaximum(50.0);
+      } else if (i == 1 || i == 4) {
+        grcopy->GetXaxis()->SetLimits(0.75, 100);
+        grcopy->SetMinimum(0.020);
+        grcopy->SetMaximum(3.0);
+      } else if (i == 2 || i == 5) {
+        grcopy->GetXaxis()->SetLimits(0.75, 50);
+        grcopy->SetMinimum(0.50);
+        grcopy->SetMaximum(1.20);
+      }
+      gPad->Modified(); gPad->Update();
+      TPaveText* ptold = new TPaveText(.35, .40, .75, .50, "blNDC");
+      ptold->SetBorderSize(0);
+      ptold->SetFillStyle(0);
+      if (i < 3) {
+        fdedx1Copy->Draw("same");
+        fdedx2Copy->Draw("same");
+        fdedx3Copy->Draw("same");
+        ptold->AddText("Old parameters");
+      } else {
+        fdedx1->Draw("same");
+        fdedx2->Draw("same");
+        fdedx3->Draw("same");
+        ptold->AddText("New parameters");
+
+      }
+
+      bgline1.Draw("same");
+      bgline2.Draw("same");
+      dedxline1.Draw("same");
+
+      if (i == 0) {
+        tleg.AddEntry(fdedx1Copy, "Pub-Fit: 1", "f1");
+        tleg.AddEntry(fdedx2Copy, "Pub-Fit: 2", "f1");
+        tleg.AddEntry(fdedx3Copy, "Pub-Fit: 3", "f1");
+        tleg.Draw("same");
+      }
+      if (i == 0 || i == 3) ptold->Draw("same");
+    }
+
+    bgcurvecan.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_vsfits_%s.pdf", suffix.data()));
+
+    TCanvas bgcurveraw(Form("bgcurveraw_%s", suffix.data()), "bg curvs", 600, 600);
+    gPad->SetLogy();
     gPad->SetLogx();
-    grcopy->GetListOfGraphs()->SetDrawOption("AXIS");
-    grcopy->Draw("A*");
+    grcopy1->GetListOfGraphs()->SetDrawOption("AXIS");
+    grcopy1->Draw("A*");
     gPad->Modified(); gPad->Update();
+    tlegPart.Draw("same");
+    fdedx1->Draw("same");
+    fdedx2->Draw("same");
+    fdedx3->Draw("same");
+    bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_raw_%s.root", suffix.data()));
+    bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_raw_%s.pdf", suffix.data()));
 
-    if (i == 0 || i == 3) {
-      grcopy->GetXaxis()->SetLimits(0.10, 14500);
-      grcopy->SetMinimum(0.50);
-      grcopy->SetMaximum(50.0);
-    } else if (i == 1 || i == 4) {
-      grcopy->GetXaxis()->SetLimits(0.75, 100);
-      grcopy->SetMinimum(0.020);
-      grcopy->SetMaximum(3.0);
-    } else if (i == 2 || i == 5) {
-      grcopy->GetXaxis()->SetLimits(0.75, 50);
-      grcopy->SetMinimum(0.50);
-      grcopy->SetMaximum(1.20);
-    }
+    bgcurveraw.cd();
+    gPad->SetLogy();
+    gPad->SetLogx();
+    gr_dedxvsp->GetListOfGraphs()->SetDrawOption("AXIS");
+    gr_dedxvsp->Draw("A*");
     gPad->Modified(); gPad->Update();
-    TPaveText* ptold = new TPaveText(.35, .40, .75, .50, "blNDC");
-    ptold->SetBorderSize(0);
-    ptold->SetFillStyle(0);
-    if (i < 3) {
-      fdedx1Copy->Draw("same");
-      fdedx2Copy->Draw("same");
-      fdedx3Copy->Draw("same");
-      ptold->AddText("Old parameters");
-    } else {
-      fdedx1->Draw("same");
-      fdedx2->Draw("same");
-      fdedx3->Draw("same");
-      ptold->AddText("New parameters");
-
-    }
-
-    bgline1.Draw("same");
-    bgline2.Draw("same");
-    dedxline1.Draw("same");
-
-    if (i == 0) {
-      tleg.AddEntry(fdedx1Copy, "Pub-Fit: 1", "f1");
-      tleg.AddEntry(fdedx2Copy, "Pub-Fit: 2", "f1");
-      tleg.AddEntry(fdedx3Copy, "Pub-Fit: 3", "f1");
-      tleg.Draw("same");
-    }
-    if (i == 0 || i == 3) ptold->Draw("same");
+    tlegPart.Draw("same");
+    bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/dedx_vs_mom_raw_%s.pdf", suffix.data()));
   }
-
-  bgcurvecan.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_vsfits_%s.pdf", suffix.data()));
-
-  TCanvas bgcurveraw(Form("bgcurveraw_%s", suffix.data()), "bg curvs", 600, 600);
-  gPad->SetLogy();
-  gPad->SetLogx();
-  grcopy1->GetListOfGraphs()->SetDrawOption("AXIS");
-  grcopy1->Draw("A*");
-  gPad->Modified(); gPad->Update();
-  tlegPart.Draw("same");
-  fdedx1->Draw("same");
-  fdedx2->Draw("same");
-  fdedx3->Draw("same");
-  bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_raw_%s.root", suffix.data()));
-  bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/bgcurve_raw_%s.pdf", suffix.data()));
-
-  bgcurveraw.cd();
-  gPad->SetLogy();
-  gPad->SetLogx();
-  gr_dedxvsp->GetListOfGraphs()->SetDrawOption("AXIS");
-  gr_dedxvsp->Draw("A*");
-  gPad->Modified(); gPad->Update();
-  tlegPart.Draw("same");
-  bgcurveraw.SaveAs(Form("plots/HadronCal/BGfits/dedx_vs_mom_raw_%s.pdf", suffix.data()));
-
 
   double func1a = fdedx1->Eval(4.5);
   double func2a = fdedx2->Eval(4.5);
@@ -324,79 +326,80 @@ void HadronCalibration::fitBGCurve(std::vector< std::string > particles, const s
   // --------------------------------------------------
   // GET RESIDUALS AND CHIS
   // --------------------------------------------------
-  TMultiGraph* fit_bgratio = new TMultiGraph(Form("fit_bgratio_%s", suffix.data()), ";#beta#gamma;ratio");
-  TGraph part_bgfit_ratio[npart];
+  if (makeIterationSummary) {
+    TMultiGraph* fit_bgratio = new TMultiGraph(Form("fit_bgratio_%s", suffix.data()), ";#beta#gamma;ratio");
+    TGraph part_bgfit_ratio[npart];
 
-  TMultiGraph* fit_residual = new TMultiGraph(Form("fit_residual_%s", suffix.data()), ";#beta#gamma;residual");
-  TGraph part_bgfit_residual[npart];
+    TMultiGraph* fit_residual = new TMultiGraph(Form("fit_residual_%s", suffix.data()), ";#beta#gamma;residual");
+    TGraph part_bgfit_residual[npart];
 
-  double A = 4.5, B = 10;
-  int respoint = 1;
-  double rmin = 1.0, rmax = 1.0;
+    double A = 4.5, B = 10;
+    int respoint = 1;
+    double rmin = 1.0, rmax = 1.0;
 
-  for (int i = 0; i < npart; ++i) {
+    for (int i = 0; i < npart; ++i) {
 
-    for (int j = 0; j < part_dedxvsbg[i].GetN(); ++j) {
+      for (int j = 0; j < part_dedxvsbg[i].GetN(); ++j) {
 
-      double x, y, fit;
-      part_dedxvsbg[i].GetPoint(j, x, y);
+        double x, y, fit;
+        part_dedxvsbg[i].GetPoint(j, x, y);
 
-      if (y == 0) continue;
+        if (y == 0) continue;
 
-      if (x < A)
-        fit = fdedx1->Eval(x);
-      else if (x < B)
-        fit = fdedx2->Eval(x);
-      else
-        fit = fdedx3->Eval(x);
+        if (x < A)
+          fit = fdedx1->Eval(x);
+        else if (x < B)
+          fit = fdedx2->Eval(x);
+        else
+          fit = fdedx3->Eval(x);
 
-      // the curve is just 1 for electrons...
-      if (npart == 4) fit = 1.0;
-      if (x < 2000) {
-        part_bgfit_ratio[i].SetPoint(respoint++, x, fit / y);
-        part_bgfit_residual[i].SetPoint(respoint++, x, fit - y);
+        // the curve is just 1 for electrons...
+        if (npart == 4) fit = 1.0;
+        if (x < 2000) {
+          part_bgfit_ratio[i].SetPoint(respoint++, x, fit / y);
+          part_bgfit_residual[i].SetPoint(respoint++, x, fit - y);
+        }
+
+        if (fit / y < rmin) rmin = fit / y;
+        else if (fit / y > rmax) rmax = fit / y;
+
       }
 
-      if (fit / y < rmin) rmin = fit / y;
-      else if (fit / y > rmax) rmax = fit / y;
+      part_bgfit_ratio[i].SetMarkerSize(0.50);
+      part_bgfit_ratio[i].SetMarkerStyle(4);
+      part_bgfit_ratio[i].SetMarkerColor(i + 1);
+      if (i == 4) part_bgfit_ratio[i].SetMarkerColor(i + 2);
+      if (i <= 3)fit_bgratio->Add(&part_bgfit_ratio[i]);
 
+      part_bgfit_residual[i].SetMarkerSize(0.50);
+      part_bgfit_residual[i].SetMarkerStyle(4);
+      part_bgfit_residual[i].SetMarkerColor(i + 1);
+      if (i == 4)part_bgfit_residual[i].SetMarkerColor(i + 2);
+      if (i <= 3)fit_residual->Add(&part_bgfit_residual[i]);
     }
 
-    part_bgfit_ratio[i].SetMarkerSize(0.50);
-    part_bgfit_ratio[i].SetMarkerStyle(4);
-    part_bgfit_ratio[i].SetMarkerColor(i + 1);
-    if (i == 4) part_bgfit_ratio[i].SetMarkerColor(i + 2);
-    if (i <= 3)fit_bgratio->Add(&part_bgfit_ratio[i]);
+    fit_bgratio->SetMinimum(rmin * 0.97);
+    fit_bgratio->SetMaximum(rmax * 1.03);
 
-    part_bgfit_residual[i].SetMarkerSize(0.50);
-    part_bgfit_residual[i].SetMarkerStyle(4);
-    part_bgfit_residual[i].SetMarkerColor(i + 1);
-    if (i == 4)part_bgfit_residual[i].SetMarkerColor(i + 2);
-    if (i <= 3)fit_residual->Add(&part_bgfit_residual[i]);
+    TCanvas* bgfitratiocan = new TCanvas(Form("bgfitratiocan_%s", suffix.data()), "dE/dx fit residual", 450, 350);
+    bgfitratiocan->cd()->SetLogx();
+    bgfitratiocan->cd()->SetGridy();
+    fit_bgratio->Draw("AP");
+    tlegPart.Draw("same");
+    bgfitratiocan->SaveAs(Form("plots/HadronCal/BGfits/bgfit_ratios_%s.pdf", suffix.data()));
+    delete bgfitratiocan;
+
+    fit_residual->SetMinimum(-0.12);
+    fit_residual->SetMaximum(+0.12);
+
+    TCanvas* bgrescan = new TCanvas(Form("bgrescan_%s", suffix.data()), "dE/dx fit residual", 450, 350);
+    bgrescan->cd()->SetLogx();
+    bgrescan->cd()->SetGridy();
+    fit_residual->Draw("AP");
+    tlegPart.Draw("same");
+    bgrescan->SaveAs(Form("plots/HadronCal/BGfits/bgfit_residual_%s.pdf", suffix.data()));
+    delete bgrescan;
   }
-
-  fit_bgratio->SetMinimum(rmin * 0.97);
-  fit_bgratio->SetMaximum(rmax * 1.03);
-
-  TCanvas* bgfitratiocan = new TCanvas(Form("bgfitratiocan_%s", suffix.data()), "dE/dx fit residual", 450, 350);
-  bgfitratiocan->cd()->SetLogx();
-  bgfitratiocan->cd()->SetGridy();
-  fit_bgratio->Draw("AP");
-  tlegPart.Draw("same");
-  bgfitratiocan->SaveAs(Form("plots/HadronCal/BGfits/bgfit_ratios_%s.pdf", suffix.data()));
-  delete bgfitratiocan;
-
-  fit_residual->SetMinimum(-0.12);
-  fit_residual->SetMaximum(+0.12);
-
-  TCanvas* bgrescan = new TCanvas(Form("bgrescan_%s", suffix.data()), "dE/dx fit residual", 450, 350);
-  bgrescan->cd()->SetLogx();
-  bgrescan->cd()->SetGridy();
-  fit_residual->Draw("AP");
-  tlegPart.Draw("same");
-  bgrescan->SaveAs(Form("plots/HadronCal/BGfits/bgfit_residual_%s.pdf", suffix.data()));
-  delete bgrescan;
-
   // write out the (possibly) updated parameters to file
   gpar.printParameters("parameters.bgcurve.fit"); //Creating new file with new parameters
 
@@ -537,7 +540,7 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, con
 
 void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename,
                                        const std::string& paramfile,
-                                       const std::string& suffix)
+                                       const std::string& suffix, const bool makeIterationSummary)
 {
 
   // read in a file that contains fit results for bg bins
@@ -608,20 +611,21 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
     if (status == 0) break;
     status = gr_resovsdedx->Fit("sigvsdedx", "", "", 0.50, 7.0);
   }
-  gr_resovsdedx->SetTitle(Form("%s (slope = %0.03f, const = %0.03f)", gr_resovsdedx->GetTitle(), sigvsdedx->GetParameter(1),
-                               sigvsdedx->GetParameter(0)));
-  gPad->Modified(); gPad->Update();
-  sigcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsionz_%s.pdf", suffix.data()));
+  if (makeIterationSummary) {
+    gr_resovsdedx->SetTitle(Form("%s (slope = %0.03f, const = %0.03f)", gr_resovsdedx->GetTitle(), sigvsdedx->GetParameter(1),
+                                 sigvsdedx->GetParameter(0)));
+    gPad->Modified(); gPad->Update();
+    sigcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsionz_%s.pdf", suffix.data()));
 
-  gr_resovsdedx->GetXaxis()->SetLimits(0.2, 2.00);
-  gr_resovsdedx->GetHistogram()->SetMaximum(0.50);
-  gr_resovsdedx->GetHistogram()->SetMinimum(0.00);
-  gr_resovsdedx->Draw("APE");
-  sigvsdedxCopy->Draw("same");
-  tlegPart.Draw("same");
-  sigcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsionz_zoomed_%s.pdf", suffix.data()));
-  gStyle->SetOptStat(11);
-
+    gr_resovsdedx->GetXaxis()->SetLimits(0.2, 2.00);
+    gr_resovsdedx->GetHistogram()->SetMaximum(0.50);
+    gr_resovsdedx->GetHistogram()->SetMinimum(0.00);
+    gr_resovsdedx->Draw("APE");
+    sigvsdedxCopy->Draw("same");
+    tlegPart.Draw("same");
+    sigcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsionz_zoomed_%s.pdf", suffix.data()));
+    gStyle->SetOptStat(11);
+  }
   // if the fit was successful, save the updated parameters
   if (status == 0) {
     B2INFO("\tHadronCalibration: SigmavsdEdx FITs Ok. updating parameters");
@@ -641,7 +645,7 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
 
 void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename,
                                        const std::string& paramsigma,
-                                       const std::string& suffix)
+                                       const std::string& suffix, const bool makeIterationSummary)
 {
 
   const double lowernhit = 7, uppernhit = 39;
@@ -656,7 +660,7 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
     return gs->sigmaCurve(x, parVec);  // Call the member function
   }, lowernhit, uppernhit, 6, "CDCDedxWidgetSigma");
 
-  fsigma->SetParameter(0, 2);
+  fsigma->FixParameter(0, 2);
   for (int i = 1; i < 6; ++i) fsigma->SetParameter(i, sgpar.getNHitPars(i - 1));
 
   TF1* fsigmacopy = (TF1*)fsigma->Clone("fsigmacopy");
@@ -739,13 +743,14 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
 
     tleg.Draw("same");
 
-    sigvsnhitcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsnhits_%s_%s.pdf", suffix.data(), particle.data()));
+    if (makeIterationSummary) sigvsnhitcan.SaveAs(Form("plots/HadronCal/Resofits/sigma_vsnhits_%s_%s.pdf", suffix.data(),
+                                                         particle.data()));
   }
 }
 
 void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename,
                                       const std::string& paramsigma,
-                                      const std::string& suffix)
+                                      const std::string& suffix, const bool makeIterationSummary)
 {
   double lowercos = -0.84, uppercos = 0.96;
 
@@ -836,7 +841,7 @@ void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, cons
     }
 
     tleg.Draw("same");
-    sigvscos.SaveAs(Form("plots/HadronCal/Resofits/sigma_vscos_%s_%s.pdf", suffix.data(), particle.data()));
+    if (makeIterationSummary) sigvscos.SaveAs(Form("plots/HadronCal/Resofits/sigma_vscos_%s_%s.pdf", suffix.data(), particle.data()));
   }
 
 }

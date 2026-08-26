@@ -56,26 +56,26 @@ namespace Belle2 {
     /**
     * fit the beta-gamma curve
     */
-    void fitBGCurve(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                    const std::string& suffx);
+    void fitBGCurve(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                    const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. ionzation
     */
-    void fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                        const std::string& suffix);
+    void fitSigmavsIonz(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                        const std::string& suffix, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. nhit
     */
-    void fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename, const std::string& paramsigma,
-                        const std::string& suffx);
+    static void fitSigmaVsNHit(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramsigma,
+                               const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. cos(theta)
     */
-    void fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                       const std::string& suffx);
+    static void fitSigmaVsCos(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                              const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * plots mean and width after fitting

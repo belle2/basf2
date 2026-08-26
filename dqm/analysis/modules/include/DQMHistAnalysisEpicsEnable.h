@@ -15,7 +15,8 @@
 namespace Belle2 {
 
   /**
-   * Example module of how to use MonitoringObject in DQMHistAnalysis module
+   * DQM core framework module for enabling EPICS usage in analysis modules
+   * This module must run before the first analysis module using EPICS.
    */
   class DQMHistAnalysisEpicsEnableModule final : public DQMHistAnalysisModule {
 

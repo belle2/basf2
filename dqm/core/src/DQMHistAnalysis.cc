@@ -89,7 +89,6 @@ void DQMHistAnalysisModule::addRefHist(const std::string& dirname, TH1* hist)
   hist->SetDirectory(0);
   n.setRefHist(hist); // transfer ownership!
   n.setRefCopy(nullptr);
-  n.setCanvas(nullptr);
 }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,

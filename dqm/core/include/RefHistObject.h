@@ -8,7 +8,6 @@
 #pragma once
 
 #include <TH1.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
 
@@ -19,7 +18,6 @@ namespace Belle2 {
   public:
     std::string m_orghist_name; /**< online histogram name */
     std::string m_refhist_name; /**< reference histogram name */
-    std::unique_ptr <TCanvas> m_canvas; /**< canvas where we draw the histogram*/
     std::unique_ptr <TH1> m_refHist;/**< Pointer to reference histogram */
     std::unique_ptr <TH1> m_refCopy;/**< Pointer to scaled reference histogram */
 
@@ -27,19 +25,17 @@ namespace Belle2 {
 
     /** Constructor
      */
-    RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr) {};
+    RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_refHist(nullptr), m_refCopy(nullptr) {};
 
     /** Move constructor
     */
     RefHistObject(RefHistObject&& other) noexcept
       : m_orghist_name(std::move(other.m_orghist_name)),
         m_refhist_name(std::move(other.m_refhist_name)),
-        m_canvas(std::move(other.m_canvas)),
         m_refHist(std::move(other.m_refHist)),
         m_refCopy(std::move(other.m_refCopy))
     {
       // Reset the moved-from object
-      other.m_canvas = nullptr;
       other.m_refHist = nullptr;
       other.m_refCopy = nullptr;
     }
@@ -51,22 +47,15 @@ namespace Belle2 {
       if (this != &other) {
         m_orghist_name = std::move(other.m_orghist_name);
         m_refhist_name = std::move(other.m_refhist_name);
-        m_canvas = std::move(other.m_canvas);
         m_refHist = std::move(other.m_refHist);
         m_refCopy = std::move(other.m_refCopy);
 
         // Reset the moved-from object
-        other.m_canvas = nullptr;
         other.m_refHist = nullptr;
         other.m_refCopy = nullptr;
       }
       return *this;
     }
-
-    /** Get canvas pointer
-    * @return canvas ptr
-    */
-    TCanvas* getCanvas(void) { return m_canvas.get();};
 
 #if 0 // Unused
     /** Get ref hist pointer
@@ -79,14 +68,6 @@ namespace Belle2 {
     */
     TH1* getRefCopy(void) { return m_refCopy.get();};
 #endif
-
-    /** Set canvas pointer
-    * @param canvas input TCanvas pointer
-    */
-    void setCanvas(TCanvas* canvas)
-    {
-      m_canvas.reset(canvas);  // Assumes ownership of canvas
-    }
 
     /** set ref hist pointer
     * @param refHist reference TH1 pointer

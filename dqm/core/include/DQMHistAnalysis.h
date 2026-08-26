@@ -218,13 +218,13 @@ namespace Belle2 {
 
     /**
      * Set the Run Type.
-     * @par t Run type string.
+     * @param t Run type string.
      */
     static void setRunType(const std::string& t) {s_runType = t;};
 
     /**
      * Set the number of processed events. (Attention, asynch histogram updates!)
-     * @par e Processed events.
+     * @param e Processed events.
      */
     static void setEventProcessed(int e) {s_eventProcessed = e;};
 

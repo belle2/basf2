@@ -8,6 +8,8 @@
 
 #include <framework/modules/core/PruneDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreEntry.h>
+#include <framework/logging/LogSystem.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
@@ -55,6 +57,10 @@ void PruneDataStoreModule::initialize()
   for (auto& kEntry : m_keepEntriesImplicit) {
     m_compiled_regex_implicit.push_back(compileAndCatch(kEntry));
   }
+  // the cached prune decisions of a previous run are not valid any more
+  m_entriesToPrune.clear();
+  m_entriesToKeep.clear();
+  m_cacheValid = false;
 }
 
 std::regex PruneDataStoreModule::compileAndCatch(std::string& regexString)
@@ -68,9 +74,10 @@ std::regex PruneDataStoreModule::compileAndCatch(std::string& regexString)
   }
 }
 
-void PruneDataStoreModule::event()
+void PruneDataStoreModule::updateCache(DataStore::StoreEntryMap& storemap)
 {
-  auto& storemap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+  m_entriesToPrune.clear();
+  m_entriesToKeep.clear();
 
   // iterate through all StoreEntries and check the Regex expression for each entry
   for (auto& datastore_item : storemap) {
@@ -93,17 +100,41 @@ void PruneDataStoreModule::event()
     }
 
     if (toKeep) {
-      B2DEBUG(100,
-              "StoreArray entry " << datastore_key << " will be not pruned from the datastore");
+      m_entriesToKeep.push_back(&datastore_key);
     } else {
-      B2DEBUG(100,
-              "StoreArray entry " << datastore_key << " will be pruned from the datastore");
-    }
-
-    if (!toKeep) {
-      // recreate to clear its content
-      datastore_item.second.invalidate();
+      m_entriesToPrune.push_back(&datastore_item.second);
     }
   }
 
+  m_cacheValid = true;
+}
+
+void PruneDataStoreModule::event()
+{
+  auto& storemap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+
+  // Matching the regular expressions against every DataStore key is expensive,
+  // while the set of DataStore entries is frozen once the initialize() methods
+  // of all modules have been called: everything which registers an entry
+  // (DataStore::registerEntry, DataStore::copyEntriesTo) is only reached from
+  // there. So the regular expressions are evaluated on the first event only.
+  if (not m_cacheValid) {
+    updateCache(storemap);
+  }
+
+  if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 100, PACKAGENAME())) {
+    for (auto const* datastore_key : m_entriesToKeep) {
+      B2DEBUG(100,
+              "StoreArray entry " << *datastore_key << " will be not pruned from the datastore");
+    }
+    for (auto const* entry : m_entriesToPrune) {
+      B2DEBUG(100,
+              "StoreArray entry " << entry->name << " will be pruned from the datastore");
+    }
+  }
+
+  for (auto* entry : m_entriesToPrune) {
+    // recreate to clear its content
+    entry->invalidate();
+  }
 }

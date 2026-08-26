@@ -109,16 +109,36 @@ class TDCPV_qqs(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        clusterQualityCut = " \
+            abs(clusterTiming) < 200 \
+            and abs(formula(clusterTiming/clusterErrorTiming)) < 2 \
+            and clusterNHits > 1.5 \
+            and thetaInCDCAcceptance \
+            and E > 0.05 \
+        "
+        pi0QualityCut = " \
+            daughter(0, abs(clusterTiming)) < 200 \
+            and daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and daughter(1, abs(clusterTiming)) < 200 \
+            and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and 0.1 < InvM < 0.2 \
+            and -1.5 < daughterDiffOf(0,1,phi) < 1.5 \
+            and daughterAngle(0,1) < 1.4 \
+        "
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        # stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
+        ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
+        ma.applyCuts('pi0:skim', pi0QualityCut, path=path)
         loadStdSkimHighEffPi0(path=path)
+        ma.applyCuts('pi0:SkimHighEff', pi0QualityCut, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        ma.applyCuts('pi0:eff40_May2020', pi0QualityCut, path=path)
         loadStdAllRho0(path=path)
 
         loadStdSkimHighEffPhi(path=path)
@@ -503,20 +523,40 @@ class TDCPV_ccs(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        clusterQualityCut = " \
+            abs(clusterTiming) < 200 \
+            and abs(formula(clusterTiming/clusterErrorTiming)) < 2 \
+            and clusterNHits > 1.5 \
+            and thetaInCDCAcceptance \
+            and E > 0.05 \
+        "
+        pi0QualityCut = " \
+            daughter(0, abs(clusterTiming)) < 200 \
+            and daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and daughter(1, abs(clusterTiming)) < 200 \
+            and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and 0.1 < InvM < 0.2 \
+            and -1.5 < daughterDiffOf(0,1,phi) < 1.5 \
+            and daughterAngle(0,1) < 1.4 \
+        "
         stdE("all", path=path)
         stdK("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
+        # stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
+        ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
 
         loadStdSkimPi0(path=path)
+        ma.applyCuts('pi0:skim', pi0QualityCut, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        ma.applyCuts('pi0:eff40_May2020', pi0QualityCut, path=path)
         stdPi0s("eff60_May2020", path=path)
+        ma.applyCuts('pi0:eff60_May2020', pi0QualityCut, path=path)
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffEta(path=path)
 

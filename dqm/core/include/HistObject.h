@@ -12,7 +12,9 @@
 namespace Belle2 {
 
   /**
-   * Class to keep track of histograms
+   * Class to keep track of histograms.
+   * The class owns the histogram and keeps track if the histogram has
+   * changed between analysis events by checking the number of entries.
    */
   class HistObject {
   public:

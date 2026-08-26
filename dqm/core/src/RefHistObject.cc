@@ -40,6 +40,8 @@ void RefHistObject::makeReferenceCopy(void)
 
 TH1* RefHistObject::getReference(void)
 {
+  // make a new copy
   makeReferenceCopy();
+  // now the caller can modify (e.g. scale) the copy without interference
   return m_refCopy.get();
 }

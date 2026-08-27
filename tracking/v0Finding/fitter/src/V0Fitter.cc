@@ -105,11 +105,18 @@ namespace {
 
   TMatrixDSym extractCov6x6(const CLHEP::HepSymMatrix& cov7)
   {
-    // copy upper-left 6x6 block
+    // ordering of the cov7 returned by KFit:
+    // (px,py,pz,E,x,y,z)
+    // ordering expected by GFRaveTrackParameters:
+    // (x,y,z,px,py,pz)
+    // so we need to drop E and reindex: cov6 0,1,2 (x,y,z)    <- KFit 4,5,6
+    //                                   cov6 3,4,5 (px,py,pz) <- KFit 0,1,2
+    constexpr int toCov7[6] = {4, 5, 6, 0, 1, 2};
+
     TMatrixDSym cov6(6);
     for (int i = 0; i < 6; ++i) {
       for (int j = 0; j < 6; ++j) {
-        cov6(i, j) = cov7[i][j];
+        cov6(i, j) = cov7[toCov7[i]][toCov7[j]];
       }
     }
     return cov6;

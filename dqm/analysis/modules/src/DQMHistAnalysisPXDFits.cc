@@ -14,12 +14,10 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
 #include <TROOT.h>
 
-#include <boost/format.hpp>
+#include <format>
 
 using namespace std;
 using namespace Belle2;
-
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -103,7 +101,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     auto layer = (((id >> 5) & 0x1) + 1);
     auto ladder = ((id >> 1) & 0xF);
     auto sensor = ((id & 0x1) + 1);
-    string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
+    string s2 = format("_{}.{}.{}", layer, ladder, sensor);
 
     m_hSignalAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
     m_hCommonAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
@@ -192,16 +190,10 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        //TH1* hh1 = NULL;
-        string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
+        string s2 = format("_{}.{}.{}_{}_{}", layer, ladder, sensor, j, k);
 
         std::string name = "hrawPxdHitsCharge" + s2;
-        TH1* hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
-
-        if (hh1 != NULL) {
+        if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fLandau->SetParameter(0, 1000);
 //           m_fLandau->SetParameter(1, 0);
@@ -216,12 +208,8 @@ void DQMHistAnalysisPXDFitsModule::event()
         }
 
         name = "hrawPxdHitsCommonMode" + s2;
-        hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
 
-        if (hh1 != NULL) {
+        if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 10);
@@ -236,12 +224,8 @@ void DQMHistAnalysisPXDFitsModule::event()
         }
 
         name = "hrawPxdCount" + s2;
-        hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
 
-        if (hh1 != NULL) {
+        if (auto  hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 100);

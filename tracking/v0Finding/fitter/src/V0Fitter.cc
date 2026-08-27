@@ -192,6 +192,9 @@ bool V0Fitter::fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus
                              genfit::GFRaveVertex& vertex)
 {
   analysis::VertexFitKFit vertexFit;
+  // KFit defaults to KFitConst::kDefaultMagneticField:
+  // use instead the same magnetic field used elsewhere in the V0Fitter
+  vertexFit.setMagneticField(BFieldManager::getFieldInTesla({0, 0, 0}).Z());
 
   EvtGenDatabasePDG* pdgDB = EvtGenDatabasePDG::Instance();
 

@@ -12,12 +12,11 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <boost/format.hpp>
+#include <format.hpp>
 
 #include <TROOT.h>
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -74,55 +73,55 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iSensor = 0;
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
-    string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    string sensorDescr = std::format("{0}_{1}_{2}", iLayer, iLadder, iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame
     //----------------------------------------------------------------
-    m_fired.emplace_back(str(format("DQMER_PXD_%1%_Fired") % sensorDescr));
+    m_fired.emplace_back(std::format("DQMER_PXD_{0}_Fired", sensorDescr));
     m_ref_fired.emplace_back(m_fired.back());
     //----------------------------------------------------------------
     // Number of clusters per frame
     //----------------------------------------------------------------
-    m_clusters.emplace_back(str(format("DQMER_PXD_%1%_Clusters") % sensorDescr));
+    m_clusters.emplace_back(std::format("DQMER_PXD_{0}_Clusters", sensorDescr));
     m_ref_clusters.emplace_back(m_clusters.back());
     //----------------------------------------------------------------
     // Start row distribution
     //----------------------------------------------------------------
-    m_startRow.emplace_back(str(format("DQMER_PXD_%1%_StartRow") % sensorDescr));
+    m_startRow.emplace_back(std::format("DQMER_PXD_{0}_StartRow", sensorDescr));
     m_ref_startRow.emplace_back(m_startRow.back());
     //----------------------------------------------------------------
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
-    m_chargStartRow.emplace_back(str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr));
+    m_chargStartRow.emplace_back(std::format("DQMER_PXD_{0}_AverageSeedByStartRow", sensorDescr));
     m_ref_chargStartRow.emplace_back(m_chargStartRow.back());
 
 
-    m_startRowCount.emplace_back(str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr));
+    m_startRowCount.emplace_back(std::format("DQMER_PXD_{0}_SeedCountsByStartRow", sensorDescr));
     m_ref_startRowCount.emplace_back(m_startRowCount.back());
     //----------------------------------------------------------------
     // Cluster Charge
     //----------------------------------------------------------------
-    m_clusterCharge.emplace_back(str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr));
+    m_clusterCharge.emplace_back(std::format("DQMER_PXD_{0}_ClusterCharge", sensorDescr));
     m_ref_clusterCharge.emplace_back(m_clusterCharge.back());
     //----------------------------------------------------------------
     // Pixel Signal
     //----------------------------------------------------------------
-    m_pixelSignal.emplace_back(str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr));
+    m_pixelSignal.emplace_back(std::format("DQMER_PXD_{0}_PixelSignal", sensorDescr));
     m_ref_pixelSignal.emplace_back(m_pixelSignal.back());
     //----------------------------------------------------------------
     // Cluster Size in U
     //----------------------------------------------------------------
-    m_clusterSizeU.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr));
+    m_clusterSizeU.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeU", sensorDescr));
     m_ref_clusterSizeU.emplace_back(m_clusterSizeU.back());
     //----------------------------------------------------------------
     // Cluster Size in V
     //----------------------------------------------------------------
-    m_clusterSizeV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr));
+    m_clusterSizeV.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeV", sensorDescr));
     m_ref_clusterSizeV.emplace_back(m_clusterSizeV.back());
     //----------------------------------------------------------------
     // Cluster Size in U+V
     //----------------------------------------------------------------
-    m_clusterSizeUV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr));
+    m_clusterSizeUV.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeUV", sensorDescr));
     m_ref_clusterSizeUV.emplace_back(m_clusterSizeUV.back());
   }
 //   m_fHitMapCountsFlag = NULL;

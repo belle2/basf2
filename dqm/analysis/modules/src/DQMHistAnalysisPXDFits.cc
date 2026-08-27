@@ -171,8 +171,6 @@ void DQMHistAnalysisPXDFitsModule::beginRun()
 
 void DQMHistAnalysisPXDFitsModule::event()
 {
-//  bool flag = false;
-
   m_hSignalAll->Reset(); // dont sum up!!!
   m_hCommonAll->Reset(); // dont sum up!!!
   m_hCountsAll->Reset(); // dont sum up!!!
@@ -194,7 +192,6 @@ void DQMHistAnalysisPXDFitsModule::event()
 
         std::string name = "hrawPxdHitsCharge" + s2;
         if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fLandau->SetParameter(0, 1000);
 //           m_fLandau->SetParameter(1, 0);
 //           m_fLandau->SetParameter(2, 10);
@@ -210,7 +207,6 @@ void DQMHistAnalysisPXDFitsModule::event()
         name = "hrawPxdHitsCommonMode" + s2;
 
         if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 10);
 //           m_fGaus->SetParameter(2, 10);
@@ -226,7 +222,6 @@ void DQMHistAnalysisPXDFitsModule::event()
         name = "hrawPxdCount" + s2;
 
         if (auto  hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 100);
 //           m_fGaus->SetParameter(2, 10);
@@ -298,15 +293,3 @@ void DQMHistAnalysisPXDFitsModule::event()
     m_cOccupancyAll->Update();
   }
 }
-
-void DQMHistAnalysisPXDFitsModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDFits : endRun called");
-}
-
-
-void DQMHistAnalysisPXDFitsModule::terminate()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDFits: terminate called");
-}
-

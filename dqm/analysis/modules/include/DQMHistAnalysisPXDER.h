@@ -12,7 +12,7 @@
 #include <TFile.h>
 
 namespace Belle2 {
-  /*! PXD DQM AnalysisModule */
+  /*! PXD DQM Analysis Module for ERECO plots */
 
   class DQMHistAnalysisPXDERModule final : public DQMHistAnalysisModule {
 

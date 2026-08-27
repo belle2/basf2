@@ -174,15 +174,15 @@ void DQMHistAnalysisPXDERModule::initialize()
                                 c_nPXDSensors, 0, c_nPXDSensors);
   m_fPixelSignalFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fPixelSignalFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUFlag = new TH1I("DQMER_PXD_ClasterSizeUFlag", "DQM ER PXD Cluster Size U Flag",
+  m_fClusterSizeUFlag = new TH1I("DQMER_PXD_ClusterSizeUFlag", "DQM ER PXD Cluster Size U Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeVFlag = new TH1I("DQMER_PXD_ClasterSizeVFlag", "DQM ER PXD Cluster Size V Flag",
+  m_fClusterSizeVFlag = new TH1I("DQMER_PXD_ClusterSizeVFlag", "DQM ER PXD Cluster Size V Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUVFlag = new TH1I("DQMER_PXD_ClasterSizeUVFlag", "DQM ER PXD Cluster Size UV Flag",
+  m_fClusterSizeUVFlag = new TH1I("DQMER_PXD_ClusterSizeUVFlag", "DQM ER PXD Cluster Size UV Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUVFlag->GetYaxis()->SetTitle("flag");

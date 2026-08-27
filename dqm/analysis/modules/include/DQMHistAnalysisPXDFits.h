@@ -18,7 +18,7 @@
 #include <TF1.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM analysis for PXD, histogram fits */
 
   class DQMHistAnalysisPXDFitsModule final : public DQMHistAnalysisModule {
 

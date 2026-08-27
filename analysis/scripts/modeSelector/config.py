@@ -15,6 +15,8 @@ used by the ModeSelector module. Both inference and training must use these
 definitions to ensure consistency.
 """
 
+import hashlib
+
 # Number of FEI decay modes per B type (dmID range)
 N_BP_MODES = 36  # B+/B- decay modes (dmID 0-35)
 N_B0_MODES = 32  # B0/anti-B0 decay modes (dmID 0-31)
@@ -132,6 +134,71 @@ EVENT_FEATURES = [
     'harmonicMomentThrust1',
     'harmonicMomentThrust2',
 ]
+
+# Default conditions database payload names.
+#
+# The names deliberately carry no training or campaign version. A different training
+# is selected by prepending the performance globaltag that serves it, not by asking
+# for a different payload name. The '_perf' suffix marks the payloads as coming from
+# a performance globaltag rather than from the analysis globaltag.
+DEFAULT_CAT_PAYLOAD = 'modeSelector_cat_model_perf'
+DEFAULT_MAIN_PAYLOAD = 'modeSelector_main_model_perf'
+
+# Prefix used for the raw-feature entries in the MVA weightfile variable list. The
+# weightfile records which raw feature indices a model was trained on, so the payload
+# carries its own feature selection instead of relying on HAS_INPUTS below.
+FEATURE_VAR_PREFIX = 'msfeat_'
+
+# Names of the four extra main-network inputs appended after the selected features:
+# the three category network outputs (B0, B+, continuum) and the charged-category flag.
+MAIN_EXTRA_VARS = ['mscat_b0', 'mscat_bp', 'mscat_cont', 'mscharged_cat']
+
+# Version of the contract between this software and a payload. Bump it whenever the
+# release changes anything that affects what a payload receives or how its outputs are
+# interpreted, for example:
+#   - the raw feature array (layout, transforms, event-level scalars)
+#   - the input_id encoding
+#   - which candidate represents an input_id slot (the deduplication rule)
+#   - the preselection the candidates went through
+#   - how the network outputs are turned into scores (BplusScore, the fallback, ranking)
+# It is NOT a software version: unrelated changes elsewhere in the release must not bump
+# it. feature_schema_hash() below catches the declarative part of the contract on its own,
+# so this constant is what covers the behavioural part, which cannot be hashed.
+MODEL_CONTRACT_VERSION = 1
+
+
+def feature_schema_hash():
+    """Return a short hash over the declarative part of the payload contract.
+
+    Covers what fixes the meaning of a raw feature index and can be read off the
+    definitions in this file: the sector sizes (which set the input_id encoding), the
+    feature block names together with the basf2 variable each one reads, the event-level
+    feature names in order, and the names of the extra main-network inputs.
+
+    Deliberately not covered: the transforms (hashing a lambda means hashing bytecode,
+    which is not stable across Python versions), the preselection cuts (checked at
+    runtime instead) and the accepted experiment ids (extended routinely when a new
+    campaign arrives). Those are behavioural, and MODEL_CONTRACT_VERSION covers them.
+
+    The contract version is deliberately NOT part of this hash, so that the version and
+    the layout can be compared independently and an older payload stays identifiable.
+    """
+    parts = [str(N_BP_MODES), str(N_B0_MODES)]
+    parts += [name + '=' + variable for name, variable, _transform in FEATURE_BLOCKS]
+    parts += list(EVENT_FEATURES)
+    parts += list(MAIN_EXTRA_VARS)
+    return hashlib.sha1(';'.join(parts).encode('utf-8')).hexdigest()[:12]
+
+
+# Layout hash that each contract version is expected to produce. Checked at inference
+# start: if the layout changed but MODEL_CONTRACT_VERSION was not bumped, the mismatch
+# is caught here rather than silently shipping a payload that claims the wrong version.
+# Add a line when bumping the version; keep the old entries so historical payloads stay
+# identifiable.
+KNOWN_CONTRACT_SCHEMAS = {
+    1: 'b59b6c7fc0a1',
+}
+
 
 # MC truth variables to evaluate on best candidates (for training labels)
 TRAINING_MC_VARS = [

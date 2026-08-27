@@ -158,8 +158,8 @@ basf2 applyModeSelector.py -- [options]
 | `--output` | `modeSelector_output` | Output file prefix |
 | `--cat-model` | unset | Category ONNX model. Omit to use payloads |
 | `--main-model` | unset | Main ONNX model. Omit to use payloads |
-| `--cat-payload-name` | `modeSelector_cat_model_v3` | Conditions DB payload name for the category model |
-| `--main-payload-name` | `modeSelector_main_model_v3` | Conditions DB payload name for the main model |
+| `--cat-payload-name` | `modeSelector_cat_model_perf` | Conditions DB payload name for the category model |
+| `--main-payload-name` | `modeSelector_main_model_perf` | Conditions DB payload name for the main model |
 | `--globaltag` | unset | Additional globaltag holding the payloads, prepended to the analysis globaltag |
 | `--data` | off | Run on data: keep a fixed 10% `eventRandom` sample and drop MC-only output columns |
 
@@ -223,8 +223,14 @@ MC-only output columns are skipped, and `eventRandom < 0.1` is applied instead.
 
 Omit `--cat-model` and `--main-model` to load models from the conditions database. Pass local MVA ONNX weightfile paths to override.
 
+The payload names carry no training version: which training is used is decided by
+the performance globaltag that is prepended, not by `--cat-payload-name` /
+`--main-payload-name`. Those stay at their defaults in normal use, and the module
+emits a `B2WARNING` if they are changed. See "conditions database payloads" in
+`analysis/scripts/modeSelector/README.md`.
+
 The script prepends `getAnalysisGlobaltag()`, which does not contain the
-ModeSelector payloads yet, so the globaltag they were uploaded to has to be
+ModeSelector payloads, so the performance globaltag serving them has to be
 given explicitly:
 
 ```bash

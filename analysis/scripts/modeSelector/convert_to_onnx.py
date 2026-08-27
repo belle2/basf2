@@ -60,6 +60,7 @@ def convert_network_to_onnx(pt_path, onnx_path):
     )
     print(f"Exported {pt_path} -> {onnx_path} (input={input_size}, labels={num_labels})")
     _validate_onnx_export(model_with_softmax, onnx_path, input_size)
+    return input_size, num_labels, checkpoint.get('has_inputs')
 
 
 def _validate_onnx_export(model_with_softmax, onnx_path, input_size):
@@ -95,20 +96,46 @@ def _validate_onnx_export(model_with_softmax, onnx_path, input_size):
     print(f"ONNX validation passed for {onnx_path}")
 
 
-def package_as_mva_weightfile(onnx_path, root_path, n_features, n_classes):
-    """Wrap an ONNX file in a basf2 MVA weightfile, aved as .root file.
+def build_variable_names(has_inputs, input_size, is_main):
+    """Build the weightfile variable list describing this model's inputs.
 
-    The variable names are placeholders; ModeSelectorModule fills the feature
-    vector manually rather than via the VariableManager.
+    The names are not resolved through the VariableManager. ModeSelectorModule fills
+    the feature vector manually. They are used to record which raw feature indices the
+    model was trained on, so the payload carries its own feature selection and a
+    retraining can change it without a software release.
+    """
+    if not has_inputs:
+        raise RuntimeError(
+            'Checkpoint does not store has_inputs, cannot record the feature selection '
+            'in the weightfile. Retrain or export with a checkpoint written by train.py.'
+        )
+    names = [config.FEATURE_VAR_PREFIX + str(i) for i in has_inputs]
+    if is_main:
+        names += list(config.MAIN_EXTRA_VARS)
+    if len(names) != input_size:
+        raise RuntimeError(
+            'Feature selection does not match the model: built ' + str(len(names))
+            + ' variable names but the network takes ' + str(input_size) + ' inputs.'
+        )
+    return names
+
+
+def package_as_mva_weightfile(onnx_path, root_path, variables, n_classes, identifier):
+    """Wrap an ONNX file in a basf2 MVA weightfile, saved as .root file.
+
+    The variable list records the raw feature indices the model was trained on and the
+    identifier records the feature schema it expects, both read back at inference time.
     """
     from basf2_mva_util import create_onnx_mva_weightfile
     wf = create_onnx_mva_weightfile(
         onnx_path,
-        variables=[f"f{i}" for i in range(n_features)],
+        variables=variables,
         nClasses=n_classes,
+        identifier=identifier,
     )
     wf.save(root_path)
-    print(f"Packaged {onnx_path} -> {root_path} ({n_features} features, {n_classes} classes)")
+    print(f"Packaged {onnx_path} -> {root_path} ({len(variables)} features, {n_classes} classes)")
+    print(f"  identifier: {identifier}")
 
 
 def add_onnx_payloads(cat_model, main_model, cat_payload_name, main_payload_name, iov):
@@ -142,10 +169,13 @@ def main():
                         help='Directory for output ONNX files')
     parser.add_argument('--add-payloads', action='store_true',
                         help='Copy the exported ONNX files into localdb/database.txt')
-    parser.add_argument('--cat-payload-name', default='modeSelector_cat_model_v3',
+    parser.add_argument('--cat-payload-name', default=config.DEFAULT_CAT_PAYLOAD,
                         help='Payload name for the category model')
-    parser.add_argument('--main-payload-name', default='modeSelector_main_model_v3',
+    parser.add_argument('--main-payload-name', default=config.DEFAULT_MAIN_PAYLOAD,
                         help='Payload name for the main model')
+    parser.add_argument('--training-id', default='unspecified',
+                        help='Name identifying this training, recorded in the weightfile and '
+                             'logged at inference time (for example the training campaign or date)')
     parser.add_argument('--first-exp', type=int, default=0,
                         help='First experiment of the interval of validity')
     parser.add_argument('--first-run', type=int, default=0,
@@ -158,29 +188,62 @@ def main():
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    cat_n_features = len(config.HAS_INPUTS)
-    cat_n_classes = 3
-    main_n_features = len(config.HAS_INPUTS) + 4
-    main_n_classes = config.N_INPUT_IDS + 3
+    schema = config.feature_schema_hash()
+    identifier = (f'schema={schema};contractVersion={config.MODEL_CONTRACT_VERSION};'
+                  f'training={args.training_id}')
+    print(f"Contract version {config.MODEL_CONTRACT_VERSION}, feature layout {schema}")
 
     model_specs = [
-        ('net_category.pt', 'modeSelector_cat.onnx', 'modeSelector_cat.root',
-         cat_n_features, cat_n_classes),
-        ('net_main.pt', 'modeSelector_main.onnx', 'modeSelector_main.root',
-         main_n_features, main_n_classes),
+        ('net_category.pt', 'modeSelector_cat.onnx', 'modeSelector_cat.root', False),
+        ('net_main.pt', 'modeSelector_main.onnx', 'modeSelector_main.root', True),
     ]
 
+    # Belle2.Database.addPayload() appends to an existing local database rather than
+    # replacing it, which would leave two iovs per payload name covering the same range.
+    # Checked before the conversion so the run fails immediately rather than at the end.
+    localdb = os.path.join('localdb', 'database.txt')
+    if args.add_payloads and os.path.exists(localdb):
+        raise RuntimeError(
+            os.path.abspath(localdb) + ' already exists. Adding payloads would append to it '
+            'instead of replacing it, leaving stale entries with overlapping iovs. Move or '
+            'delete the localdb directory and run again.'
+        )
+
+    missing = [pt_name for pt_name, _onnx, _root, _is_main in model_specs
+               if not os.path.exists(os.path.join(args.input_dir, pt_name))]
+    if len(missing) == len(model_specs):
+        raise RuntimeError(
+            'No checkpoints found in --input-dir ' + args.input_dir + ' (looked for '
+            + ', '.join(missing) + '). Point --input-dir at the directory holding the '
+            'trained .pt files.'
+        )
+
     exported_root = {}
-    for pt_name, onnx_name, root_name, n_features, n_classes in model_specs:
+    selections = {}
+    for pt_name, onnx_name, root_name, is_main in model_specs:
         pt_path = os.path.join(args.input_dir, pt_name)
         onnx_path = os.path.join(args.output_dir, onnx_name)
         root_path = os.path.join(args.output_dir, root_name)
         if os.path.exists(pt_path):
-            convert_network_to_onnx(pt_path, onnx_path)
-            package_as_mva_weightfile(onnx_path, root_path, n_features, n_classes)
+            input_size, num_labels, has_inputs = convert_network_to_onnx(pt_path, onnx_path)
+            variables = build_variable_names(has_inputs, input_size, is_main)
+            package_as_mva_weightfile(onnx_path, root_path, variables, num_labels, identifier)
             exported_root[root_name] = root_path
+            selections[pt_name] = list(has_inputs)
         else:
             print(f"Warning: {pt_path} not found")
+
+    # Both networks read the same raw features, so a disagreement means the two
+    # checkpoints come from different trainings and must not be paired in one payload set.
+    if len(selections) == 2 and selections['net_category.pt'] != selections['net_main.pt']:
+        raise RuntimeError(
+            'net_category.pt and net_main.pt were trained on different feature selections. '
+            'Re-export from a matching pair of checkpoints.'
+        )
+
+    if selections and sorted(selections.values())[0] != list(config.HAS_INPUTS):
+        print('Note: the exported feature selection differs from config.HAS_INPUTS. The payload '
+              'carries its own selection, so this is only a problem for training.')
 
     if args.add_payloads:
         missing_files = [

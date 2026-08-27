@@ -77,6 +77,12 @@ Key contents:
 | `NUM_CAT_LABELS` | 3 | Category network output size |
 | `DELTA_M_CUT` | (-0.05, 0.05) | D* delta mass difference window |
 | `DELTA_P_THRESH` | 0.15 | Threshold for `mostcommonBTagDeltaP` in good-tag fallback truth |
+| `DEFAULT_CAT_PAYLOAD` | `modeSelector_cat_model_perf` | Default DB payload name for the category model |
+| `DEFAULT_MAIN_PAYLOAD` | `modeSelector_main_model_perf` | Default DB payload name for the main model |
+| `MODEL_CONTRACT_VERSION` | 1 | Bumped by hand for behavioural changes the layout hash cannot see |
+| `KNOWN_CONTRACT_SCHEMAS` | {1: hash} | Layout hash each contract version must produce |
+| `FEATURE_VAR_PREFIX` | `msfeat_` | Prefix for the raw-feature entries in the weightfile variable list |
+| `MAIN_EXTRA_VARS` | 4 names | The main network's extra inputs (3 category outputs + charged flag) |
 
 Main network output size is `N_INPUT_IDS + 3 = 139` (fixed; derived from `N_INPUT_IDS`).
 `NUM_MAIN_LABELS` in `config.py` is informational and not used for the runtime main-network output size.
@@ -141,8 +147,41 @@ which input_ids the training sample actually populates, so it has to be
 regenerated whenever the training dataset changes: `train.py` recomputes it from
 the data, and on mismatch it warns, writes `has_inputs_recomputed.txt` and
 proceeds with the recomputed list for that run. Paste that file's contents into
-`config.py` afterwards, otherwise inference selects a different set of columns
-than the network was trained on.
+`config.py` afterwards so the next training starts from the right selection.
+
+At inference time `HAS_INPUTS` is only a fallback. Each model records its own
+feature selection in its weightfile (see `convert_to_onnx.py` below), so a
+retraining can change the selection without a software release, and a stale
+`config.HAS_INPUTS` cannot silently mis-select columns for a payload.
+
+**`MODEL_CONTRACT_VERSION`** - The version of the agreement between this release
+and a payload. Bump it whenever the release changes anything affecting what a
+payload receives or how its outputs are interpreted: the feature array, the
+input_id encoding, which candidate represents an input_id slot, the preselection,
+or how the outputs become scores. It is not a software version, so unrelated
+changes elsewhere must not bump it.
+
+**`feature_schema_hash()`** - Short hash over the *declarative* part of that
+contract, the part readable straight off the definitions in `config.py`: the
+sector sizes (which fix the input_id encoding), the block names paired with the
+basf2 variable each reads, the event feature names in order, and the names of the
+extra main-network inputs. Written into the weightfile at export and compared when
+a payload loads.
+
+The two are complementary and deliberately independent. The hash catches
+declarative drift automatically. Everything behavioural is invisible to it -- the
+transforms (hashing a lambda means hashing bytecode, which is not stable across
+Python versions), the deduplication rule, the preselection cuts, the output
+interpretation -- and that is what the contract version covers. The version is
+**not** part of the hash, so the two can be compared separately and an older
+payload stays identifiable rather than just being "different".
+
+`KNOWN_CONTRACT_SCHEMAS` records the layout hash each version must produce, and is
+checked at the start of a job. It catches the easy mistake of changing the layout
+without bumping the version. Add a line when bumping; keep the old entries.
+
+The accepted experiment ids are deliberately outside both, since extending them is
+a routine update when a new campaign arrives.
 
 **`FEI_CALIB_*`** - Per-decay-mode FEI calibration weights for two sigProb
 working points (0.001, 0.01).
@@ -154,6 +193,52 @@ The calibration corresponds to [release 8, run1 + run2](https://gitlab.desy.de/b
 
 When `cat_model_path` and `main_model_path` are omitted, models are loaded from
 the conditions database via payloads.
+
+**Payload naming.** The payload names carry no training or campaign version:
+`modeSelector_cat_model_perf` and `modeSelector_main_model_perf`
+(`config.DEFAULT_CAT_PAYLOAD` / `config.DEFAULT_MAIN_PAYLOAD`). A different
+training is selected by prepending the performance globaltag that serves it, not
+by asking for a different payload name. The `_perf` suffix marks the payloads as
+coming from a performance globaltag rather than from the analysis globaltag.
+
+This follows the conditions database convention that campaign-dependent payloads
+belong in campaign-dependent globaltags, rather than being distinguished by a tag
+in the payload name.
+
+Because the name no longer identifies the training, two safeguards are built into
+the payload itself:
+
+- the weightfile records the **feature selection** its model was trained on, so
+  the payload does not depend on `config.HAS_INPUTS` being in sync
+- the weightfile records the **feature schema hash**, which is compared against
+  the running software when the payload is loaded; a mismatch is fatal
+
+A third check compares the model's output class count (`m_nClasses`) against what
+the module interprets: 3 for the category network, `N_INPUT_IDS + 3` for the main
+network. The outputs are read positionally, so a model with a different number of
+classes would be misread rather than rejected; a mismatch is fatal.
+
+All of these are written by `convert_to_onnx.py` and logged at the start of a job
+together with the training id:
+
+```
+[INFO] ModeSelector: category model training 'mc16rd_v3' (contract v1, feature layout b59b6c7fc0a1)
+[INFO] ModeSelector: Using 976 selected features from the weightfile
+```
+
+**Forward compatibility.** A payload from an older contract version currently
+aborts with a message naming both versions. That branch in `_check_contract()` is
+where a future release would instead dispatch to an older feature builder and keep
+reading payloads already in the database. Payloads are immutable, so the version
+field has to be present before it is needed; a payload written without one is
+treated as version 1.
+
+This only ever buys *backwards* compatibility. No release can be taught to read a
+payload built against a later contract, so analyses should pin to a performance
+globaltag matching their release.
+
+Weightfiles exported before this (with placeholder variable names) still load:
+the module warns and falls back to `config.HAS_INPUTS`, and skips the schema check.
 
 To create a local payload database use:
 
@@ -329,8 +414,8 @@ modeSelector.modeSelector(
 |-----------|---------|-------------|
 | `bp_list` | required | B+ meson list name |
 | `b0_list` | required | B0 meson list name |
-| `payload_cat_model` | `'modeSelector_cat_model_v3'` | DB payload name for category model |
-| `payload_main_model` | `'modeSelector_main_model_v3'` | DB payload name for main model |
+| `payload_cat_model` | `config.DEFAULT_CAT_PAYLOAD` | DB payload name for category model |
+| `payload_main_model` | `config.DEFAULT_MAIN_PAYLOAD` | DB payload name for main model |
 | `output_variable` | `'BplusScore'` | EventExtraInfo name for the main signed score |
 | `cat_model_path` | `None` | Path to basf2 MVA weightfile for the category model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
 | `main_model_path` | `None` | Path to basf2 MVA weightfile for the main model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
@@ -649,8 +734,17 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   `modeSelector_main.root` to `--output-dir`. The `.root` files are the basf2 MVA
   weightfiles passed via `cat_model_path` / `main_model_path`.
 - Packages each `.onnx` into a basf2 MVA weightfile using
-  `basf2_mva_util.create_onnx_mva_weightfile()`. `ModeSelectorModule` fills
-  the feature vector manually; the weightfile contains only dummy variable names.
+  `basf2_mva_util.create_onnx_mva_weightfile()`. `ModeSelectorModule` fills the
+  feature vector manually, so the variable names are not resolved through the
+  VariableManager and are used to carry metadata instead: each selected raw
+  feature index is stored as `msfeat_<index>` (taken from the checkpoint's own
+  `has_inputs`, not from `config.HAS_INPUTS`), followed for the main network by
+  the four names in `config.MAIN_EXTRA_VARS`.
+- Stores `schema=<hash>;contractVersion=<n>;training=<id>` as the weightfile
+  identifier, where the hash comes from `config.feature_schema_hash()`, the version
+  from `config.MODEL_CONTRACT_VERSION` and the id from `--training-id`.
+- Refuses to export if the two checkpoints were trained on different feature
+  selections, since that means they come from different trainings.
 - With `--add-payloads`, creates `localdb/database.txt` with the payload names specified.
 - Wraps the network with `nn.Softmax` before export (ONNX model outputs probabilities).
 - Input size and output classes are derived automatically from the checkpoint.
@@ -663,7 +757,11 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   are meant for float64 and reject roughly 8% of runs at random.
 - `--cat-payload-name` / `--main-payload-name` set the payload names written
   into `localdb/database.txt`. These must match the `payload_cat_model` /
-  `payload_main_model` arguments passed to `modeSelector.modeSelector()`, currently defaults to `'modeSelector_cat_model_v3'` and `'modeSelector_main_model_v3'`.
+  `payload_main_model` arguments passed to `modeSelector.modeSelector()`, which
+  default to `config.DEFAULT_CAT_PAYLOAD` and `config.DEFAULT_MAIN_PAYLOAD`.
+- `--training-id` names the training; it is stored in the weightfile and logged
+  at inference time. Defaults to `unspecified`, so set it for anything that gets
+  uploaded.
 - `--first-exp`, `--first-run`, `--final-exp`, `--final-run` control the
   interval of validity for local payload entries.
 

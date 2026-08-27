@@ -44,8 +44,8 @@ __all__ = [
 def modeSelector(
     bp_list,
     b0_list,
-    payload_cat_model='modeSelector_cat_model_v3',
-    payload_main_model='modeSelector_main_model_v3',
+    payload_cat_model=config.DEFAULT_CAT_PAYLOAD,
+    payload_main_model=config.DEFAULT_MAIN_PAYLOAD,
     output_variable='BplusScore',
     cat_model_path=None,
     main_model_path=None,

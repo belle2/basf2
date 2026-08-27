@@ -51,8 +51,8 @@ class ModeSelectorModule(b2.Module):
     def __init__(
         self,
         particle_lists,
-        payload_cat_model='modeSelector_cat_model_v3',
-        payload_main_model='modeSelector_main_model_v3',
+        payload_cat_model=config.DEFAULT_CAT_PAYLOAD,
+        payload_main_model=config.DEFAULT_MAIN_PAYLOAD,
         output_variable='BplusScore',
         cat_model_path=None,
         main_model_path=None,
@@ -131,6 +131,117 @@ class ModeSelectorModule(b2.Module):
             )
         return Belle2.MVA.Weightfile.loadFromFile(path)
 
+    def _feature_selection_from_weightfile(self, variables, label):
+        """Recover the raw feature indices a model was trained on from its weightfile.
+
+        Returns None for legacy weightfiles that only carry placeholder variable names,
+        in which case the caller falls back to config.HAS_INPUTS.
+        """
+        prefix = config.FEATURE_VAR_PREFIX
+        indices = []
+        for name in variables:
+            name = str(name)
+            if not name.startswith(prefix):
+                continue
+            try:
+                indices.append(int(name[len(prefix):]))
+            except ValueError:
+                b2.B2FATAL(
+                    "ModeSelector: " + label + " model weightfile has a malformed feature "
+                    "name '" + name + "'. Re-export the model with convert_to_onnx.py."
+                )
+        return indices if indices else None
+
+    def _check_contract_is_self_consistent(self):
+        """Check the declared contract version still matches the layout in config.py.
+
+        Guards against the easy mistake of changing the feature layout without bumping
+        MODEL_CONTRACT_VERSION, which would ship payloads claiming a version they do not
+        match. This is a developer error in the release, not a problem with the payload.
+        """
+        expected = config.KNOWN_CONTRACT_SCHEMAS.get(config.MODEL_CONTRACT_VERSION)
+        actual = config.feature_schema_hash()
+        if expected is None:
+            b2.B2FATAL(
+                "ModeSelector: config.KNOWN_CONTRACT_SCHEMAS has no entry for contract version "
+                + str(config.MODEL_CONTRACT_VERSION) + ". Add the layout hash for it."
+            )
+        if expected != actual:
+            b2.B2FATAL(
+                "ModeSelector: the feature layout produces '" + actual + "' but contract version "
+                + str(config.MODEL_CONTRACT_VERSION) + " is recorded as '" + expected + "'. The "
+                "layout was changed without bumping MODEL_CONTRACT_VERSION, or without updating "
+                "config.KNOWN_CONTRACT_SCHEMAS."
+            )
+
+    def _check_contract(self, identifier, label):
+        """Check that this release matches the contract the payload was built against.
+
+        Two independent things are compared. The contract version says which release
+        behaviour the payload expects, covering the parts that cannot be hashed (the
+        transforms, the deduplication rule, how the outputs are interpreted). The layout
+        hash covers the declarative part, so it catches a changed feature array within
+        one contract version. Either mismatch would otherwise run without error and give
+        wrong results, so both are fatal.
+
+        The version branch is where a future release would dispatch to an older feature
+        builder instead of aborting, to stay compatible with payloads already in the
+        conditions database.
+        """
+        fields = {}
+        for part in str(identifier).split(';'):
+            if '=' in part:
+                key, value = part.split('=', 1)
+                fields[key.strip()] = value.strip()
+
+        stored = fields.get('schema')
+        if stored is None:
+            b2.B2WARNING(
+                "ModeSelector: " + label + " model weightfile carries no contract information, "
+                "so it cannot be checked against this release. Re-export it with convert_to_onnx.py."
+            )
+            return
+
+        # Written since the contract was introduced; anything older is version 1.
+        version = fields.get('contractVersion', '1')
+        current = str(config.MODEL_CONTRACT_VERSION)
+        if version != current:
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model was built against contract version "
+                + version + " but this release implements version " + current + ". The way "
+                "payloads are fed or their outputs interpreted has changed, so the model "
+                "cannot be used. Use a globaltag whose payloads match this release."
+            )
+
+        expected = config.feature_schema_hash()
+        if stored != expected:
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model was built against feature layout '"
+                + stored + "' but this software produces '" + expected + "'. The raw feature "
+                "layout has changed, so the model cannot be used. Use a globaltag whose "
+                "payloads match this release, or retrain."
+            )
+
+        b2.B2INFO(
+            "ModeSelector: " + label + " model training '" + fields.get('training', 'unspecified')
+            + "' (contract v" + version + ", feature layout " + stored + ")"
+        )
+
+    def _check_output_classes(self, options, expected, label):
+        """Check the model's output size against what the module's interpretation assumes.
+
+        The outputs are read positionally -- for the main network the class index is the
+        input_id and the last three entries are the background classes -- so a model with a
+        different number of outputs would be misread rather than rejected.
+        """
+        n_classes = int(options.m_nClasses)
+        if n_classes != expected:
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model produces " + str(n_classes) + " output "
+                "classes but this software interprets " + str(expected) + ". The payload does "
+                "not match this release."
+            )
+
     def initialize(self):
         """Called at the beginning of processing."""
         # Build feature index mapping (needed for both inference and training)
@@ -174,8 +285,22 @@ class ModeSelectorModule(b2.Module):
 
         import basf2_mva
 
-        self.has_inputs = list(config.HAS_INPUTS)
-        b2.B2INFO(f"ModeSelector: Using config.HAS_INPUTS ({len(self.has_inputs)} features kept)")
+        # A non-default payload name is the wrong way to pick a training: the names are
+        # deliberately version-free so that the globaltag decides which models are served.
+        # Only warn for names that are actually used, i.e. not overridden by a local file.
+        overridden = []
+        if not self.cat_model_path and self.payload_cat_model != config.DEFAULT_CAT_PAYLOAD:
+            overridden.append(self.payload_cat_model + " (default " + config.DEFAULT_CAT_PAYLOAD + ")")
+        if not self.main_model_path and self.payload_main_model != config.DEFAULT_MAIN_PAYLOAD:
+            overridden.append(self.payload_main_model + " (default " + config.DEFAULT_MAIN_PAYLOAD + ")")
+        if overridden:
+            b2.B2WARNING(
+                "ModeSelector: non-default payload name(s) requested: " + ", ".join(overridden)
+                + ". The payload names carry no training version on purpose. Normally they are"
+                " left at their defaults and the training is selected by prepending the"
+                " performance globaltag that serves it. Override the names only if a globaltag"
+                " really stores the models under different names."
+            )
 
         # Load models through the basf2 MVA Expert framework.
         # Single-threaded ONNX execution is enforced by the framework in mva/methods/src/ONNX.cc.
@@ -226,6 +351,33 @@ class ModeSelectorModule(b2.Module):
         main_opts = basf2_mva.GeneralOptions()
         main_wf.getOptions(main_opts)
 
+        self._check_contract_is_self_consistent()
+        self._check_contract(cat_opts.m_identifier, 'category')
+        self._check_contract(main_opts.m_identifier, 'main')
+        self._check_output_classes(cat_opts, config.NUM_CAT_LABELS, 'category')
+        self._check_output_classes(main_opts, config.N_INPUT_IDS + 3, 'main')
+
+        # The payload records which raw feature indices its model was trained on, so a
+        # retraining can change the selection without a software release.
+        cat_selection = self._feature_selection_from_weightfile(cat_opts.m_variables, 'category')
+        main_selection = self._feature_selection_from_weightfile(main_opts.m_variables, 'main')
+        if cat_selection is None or main_selection is None:
+            b2.B2WARNING(
+                "ModeSelector: weightfile does not record its feature selection, falling back "
+                "to config.HAS_INPUTS. This only works if the payload was trained against the "
+                "same selection. Re-export the model with convert_to_onnx.py."
+            )
+            self.has_inputs = list(config.HAS_INPUTS)
+            selection_source = 'config.HAS_INPUTS'
+        elif cat_selection != main_selection:
+            b2.B2FATAL(
+                "ModeSelector: the category and main models were trained on different feature "
+                "selections, so they come from different trainings and must not be combined."
+            )
+        else:
+            self.has_inputs = cat_selection
+            selection_source = 'the weightfile'
+
         # Input sizes derived from the weightfile variable list
         self.cat_input_size = len(cat_opts.m_variables)
         self.main_input_size = len(main_opts.m_variables)
@@ -239,7 +391,7 @@ class ModeSelectorModule(b2.Module):
         b2.B2INFO(f"ModeSelector: Loaded category model (input size: {self.cat_input_size})")
         b2.B2INFO(f"ModeSelector: Loaded main model (input size: {self.main_input_size})")
         if self.has_inputs:
-            b2.B2INFO(f"ModeSelector: Using {len(self.has_inputs)} selected features")
+            b2.B2INFO(f"ModeSelector: Using {len(self.has_inputs)} selected features from {selection_source}")
 
     def _build_feature_indices(self):
         """

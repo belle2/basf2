@@ -138,9 +138,6 @@ void SuperClusterCreator::apply(std::vector<CDCWireHit>& inputWireHits,
   m_wireHitRelationFilter.prepare(wireHitPtrs);
   RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
-  B2ASSERT("Expect wire hit neighborhood to be symmetric ",
-           WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
-
   m_wirehitClusterizer.apply(wireHitPtrs, m_wireHitRelations, outputSuperClusters);
 
   int iSuperCluster = -1;

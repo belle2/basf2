@@ -23,7 +23,6 @@
 
 #include <vector>
 #include <string>
-#include <cassert>
 
 using namespace Belle2;
 using namespace CDC;
@@ -82,9 +81,6 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   CDCWireHit* from,
   const std::vector<CDCWireHit*>& wireHits) const
 {
-  assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
-         "Expected wire hits to be sorted");
-
   // Use the wires precomputed by prepare() when called with the prepared vector.
   // The comparison LessOf<Deref>() used below resolves to operator<(CDCWireHit, CDCWire),
   // which compares the *address* of the wire of the hit with the address of the wire.

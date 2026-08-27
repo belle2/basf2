@@ -8,9 +8,7 @@
 
 #pragma once
 
-//DQM
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
 

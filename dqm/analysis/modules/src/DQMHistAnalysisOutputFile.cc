@@ -14,7 +14,6 @@
 #include <sstream>
 #include <iomanip>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -32,9 +31,10 @@ DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   : DQMHistAnalysisModule()
 {
 
-  setDescription("Module to save histograms from DQMHistAnalysisModules");
-  //Parameter definition
+  setDescription("Module to save canvas/histograms from analysis to a single root file");
+  // This module CAN NOT be run in parallel!
 
+  //Parameter definition
   addParam("OutputFolder", m_folder, "Output file path", std::string(""));
   addParam("FilePrefix", m_prefix,
            "prefix of the output filename {prefix}dqm_canvas_e####r######.root is generated (unless Filename is set)", std::string(""));
@@ -64,15 +64,8 @@ void DQMHistAnalysisOutputFileModule::endRun()
   if (m_savePerRun) save_to_file();
 }
 
-
-void DQMHistAnalysisOutputFileModule::terminate()
-{
-  B2INFO("DQMHistAnalysisOutputFile: terminate called");
-}
-
 void DQMHistAnalysisOutputFileModule::save_to_file()
 {
-
   std::stringstream ss;
   ss << m_folder << "/";
   if (m_filename != "") ss << m_filename;

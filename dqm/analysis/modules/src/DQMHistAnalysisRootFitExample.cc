@@ -29,6 +29,7 @@ REG_MODULE(DQMHistAnalysisRooFitExample);
 DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM histogram analysis example module featuring RooFit");
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
@@ -111,16 +112,5 @@ void DQMHistAnalysisRooFitExampleModule::event()
 
   double fitdata = 0;
   setEpicsPV("fit_value", fitdata);
-}
-
-void DQMHistAnalysisRooFitExampleModule::endRun()
-{
-  B2INFO("DQMHistAnalysisRooFitExample: endRun called");
-}
-
-
-void DQMHistAnalysisRooFitExampleModule::terminate()
-{
-  B2INFO("DQMHistAnalysisRooFitExample: terminate called");
 }
 

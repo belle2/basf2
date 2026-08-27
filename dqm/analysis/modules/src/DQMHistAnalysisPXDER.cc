@@ -38,16 +38,10 @@ DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule
   // Set module properties
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDER"));
-  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
 }
 
 void DQMHistAnalysisPXDERModule::initialize()
 {
-  m_refFile = NULL;
-  if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());// default is read only
-  }
-
   gROOT->cd(); // this seems to be important, or strange things happen
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -314,12 +308,9 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
   float WarningLevel = 6.0;
   float ErrorLevel = 10.0;
 
-  TH1* hist = nullptr, *refhist = nullptr;
-
-  hist = findHist(m_histogramDirectoryName, name_hist);
+  auto hist = findHist(m_histogramDirectoryName, name_hist);
   if (!hist) return -1;
-  // assumes that ref file has no sub dirs
-  refhist = findHistInFile(m_refFile, name_refhist);
+  auto refhist = findRefHist(m_histogramDirectoryName, name_refhist);
   if (!refhist) return -1;
 
   // What happens if they are TH1I, TH1D and not TH1F
@@ -459,7 +450,6 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
 
 void DQMHistAnalysisPXDERModule::terminate()
 {
-  if (m_refFile) delete m_refFile;
   if (m_fFiredFlag) delete m_fFiredFlag;
   if (m_fClustersFlag) delete m_fClustersFlag;
   if (m_fStartRowFlag) delete m_fStartRowFlag;

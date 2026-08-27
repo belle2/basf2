@@ -15,7 +15,8 @@
 namespace Belle2 {
 
   /**
-   * DQM core framework module for enabling EPICS output.
+   * DQM core framework module for flushing EPICS output and check errors
+   * or disconnections and report them with PV name.
    * This module must run after the last analysis module using EPICS
    */
   class DQMHistAnalysisEpicsOutputModule final : public DQMHistAnalysisModule {

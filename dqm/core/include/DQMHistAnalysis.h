@@ -31,7 +31,11 @@
 namespace Belle2 {
 
   /**
-   * The base class for the histogram analysis module.
+   * The base class for all DQM histogram analysis modules.
+   * This class provides all the interfaces, management, and storage for
+   * histograms, delta histograms, reference histograms, and EPICS integration.
+   * Even so the class is a module, it is not supposed to be added
+   * directly into an analysis path.
    */
   class DQMHistAnalysisModule : public Module {
 

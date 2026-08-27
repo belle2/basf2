@@ -17,6 +17,8 @@ namespace Belle2 {
   /**
    * DQM core framework module for enabling EPICS usage in analysis modules
    * This module must run before the first analysis module using EPICS.
+   * Unless it is for testing, the PV prefix must be supplied.
+   * This module requires the EpicsOuput module for flushing and error checks.
    */
   class DQMHistAnalysisEpicsEnableModule final : public DQMHistAnalysisModule {
 

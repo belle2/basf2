@@ -18,7 +18,6 @@
 
 #include <TROOT.h>
 
-//#include <iostream>
 using namespace Belle2;
 using namespace boost::property_tree;
 

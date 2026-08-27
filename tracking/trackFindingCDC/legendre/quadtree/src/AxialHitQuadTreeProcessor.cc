@@ -261,6 +261,140 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   return false;
 }
 
+void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>& nodes,
+                                                   const std::vector<Item*>& items)
+{
+  const size_t nNodes = nodes.size();
+  if (nNodes == 0 or items.empty()) return;
+
+  // Collect the geometry of the nodes and group them by their theta span.
+  // The nodes handed here are either the four children of one node or the nodes of the seed
+  // level, which both cover only a handful of distinct theta spans.
+  m_thetaSpanCaches.clear();
+  m_nodeCaches.resize(nNodes);
+
+  for (size_t iNode = 0; iNode < nNodes; ++iNode) {
+    QuadTree* node = nodes[iNode];
+    NodeCache& nodeCache = m_nodeCaches[iNode];
+    nodeCache.yMin = node->getYMin();
+    nodeCache.yMax = node->getYMax();
+    nodeCache.needsDerivativeCheck = node->getLevel() <= 4 and m_twoSidedPhaseSpace and
+                                     nodeCache.yMin > -c_curlCurv and nodeCache.yMax < c_curlCurv;
+
+    const long xMin = node->getXMin();
+    const long xMax = node->getXMax();
+
+    size_t iThetaSpan = 0;
+    for (; iThetaSpan < m_thetaSpanCaches.size(); ++iThetaSpan) {
+      if (m_thetaSpanCaches[iThetaSpan].xMin == xMin and m_thetaSpanCaches[iThetaSpan].xMax == xMax) break;
+    }
+    if (iThetaSpan == m_thetaSpanCaches.size()) {
+      ThetaSpanCache thetaSpanCache;
+      thetaSpanCache.xMin = xMin;
+      thetaSpanCache.xMax = xMax;
+      thetaSpanCache.thetaVecMin = &m_cosSinLookupTable->at(xMin);
+      thetaSpanCache.thetaVecMax = &m_cosSinLookupTable->at(xMax);
+      m_thetaSpanCaches.push_back(thetaSpanCache);
+    }
+    nodeCache.iThetaSpan = iThetaSpan;
+  }
+
+  const size_t nThetaSpans = m_thetaSpanCaches.size();
+
+  for (Item* item : items) {
+    if (item->isUsed()) continue;
+
+    const CDCWireHit* wireHit = item->getPointer();
+
+    // Quantities that only depend on the hit
+    const double l = wireHit->getRefDriftLength();
+    const ROOT::Math::XYVector pos2D = wireHit->getRefPos2D() - m_localOrigin;
+    const double r2 = pos2D.Mag2() - l * l;
+
+    // Quantities that only depend on the hit and the theta span of a node
+    for (size_t iThetaSpan = 0; iThetaSpan < nThetaSpans; ++iThetaSpan) {
+      ThetaSpanCache& thetaSpanCache = m_thetaSpanCaches[iThetaSpan];
+      const ROOT::Math::XYVector& thetaVecMin = *thetaSpanCache.thetaVecMin;
+      const ROOT::Math::XYVector& thetaVecMax = *thetaSpanCache.thetaVecMax;
+
+      const float rHitMin = thetaVecMin.Dot(pos2D);
+      const float rHitMax = thetaVecMax.Dot(pos2D);
+
+      thetaSpanCache.rHitMinRight = rHitMin - l;
+      thetaSpanCache.rHitMaxRight = rHitMax - l;
+      thetaSpanCache.rHitMinLeft = rHitMin + l;
+      thetaSpanCache.rHitMaxLeft = rHitMax + l;
+
+      const float rHitMinExtr = VectorUtil::Cross(thetaVecMin, pos2D);
+      const float rHitMaxExtr = VectorUtil::Cross(thetaVecMax, pos2D);
+      thetaSpanCache.rHitMinExtr = rHitMinExtr;
+      thetaSpanCache.rHitMaxExtr = rHitMaxExtr;
+
+      // Same decision as checkDerivative()
+      thetaSpanCache.derivativeOk = ((rHitMinExtr > 0) and (rHitMaxExtr * rHitMinExtr >= 0)) or
+                                    (rHitMaxExtr * rHitMinExtr < 0);
+
+      thetaSpanCache.hasExtremum = rHitMinExtr * rHitMaxExtr < 0.;
+      if (thetaSpanCache.hasExtremum) {
+        thetaSpanCache.extremumIsBetween = VectorUtil::isBetween(pos2D, thetaVecMin, thetaVecMax);
+      }
+    }
+
+    // Sinograms at the extremum - only needed if some theta span contains the extremum
+    bool extremumComputed = false;
+    float rRight = 0;
+    float rLeft = 0;
+
+    for (size_t iNode = 0; iNode < nNodes; ++iNode) {
+      const NodeCache& nodeCache = m_nodeCaches[iNode];
+      const ThetaSpanCache& thetaSpanCache = m_thetaSpanCaches[nodeCache.iThetaSpan];
+
+      // Check whether the hit lies in the forward direction
+      if (nodeCache.needsDerivativeCheck and not thetaSpanCache.derivativeOk) continue;
+
+      // get top and bottom borders of the node
+      const float rMin = nodeCache.yMin * r2 / 2;
+      const float rMax = nodeCache.yMax * r2 / 2;
+
+      // Compare distance signs from the sinograms to the node
+      // Check right
+      if (not sameSign(rMin - thetaSpanCache.rHitMinRight,
+                       rMin - thetaSpanCache.rHitMaxRight,
+                       rMax - thetaSpanCache.rHitMinRight,
+                       rMax - thetaSpanCache.rHitMaxRight)) {
+        nodes[iNode]->insertItem(item);
+        continue;
+      }
+
+      // Check left
+      if (not sameSign(rMin - thetaSpanCache.rHitMinLeft,
+                       rMin - thetaSpanCache.rHitMaxLeft,
+                       rMax - thetaSpanCache.rHitMinLeft,
+                       rMax - thetaSpanCache.rHitMaxLeft)) {
+        nodes[iNode]->insertItem(item);
+        continue;
+      }
+
+      // Check the extremum
+      if (not thetaSpanCache.hasExtremum) continue;
+      if (not thetaSpanCache.extremumIsBetween) continue;
+
+      if (not extremumComputed) {
+        const double r = pos2D.R();
+        rRight = r - l;
+        rLeft = r + l;
+        extremumComputed = true;
+      }
+
+      const bool crossesRight = (rMin - rRight) * (rMax - rRight) < 0;
+      const bool crossesLeft = (rMin - rLeft) * (rMax - rLeft) < 0;
+      if (crossesRight or crossesLeft) {
+        nodes[iNode]->insertItem(item);
+      }
+    }
+  }
+}
+
 bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit* wireHit) const
 {
   const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;

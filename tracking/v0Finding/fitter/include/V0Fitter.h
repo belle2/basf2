@@ -13,10 +13,12 @@
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/v0Finding/fitter/V0VertexFitter.h>
 #include <genfit/Track.h>
 
 #include <Math/Vector3D.h>
 
+#include <memory>
 #include <utility>
 
 namespace genfit {
@@ -52,6 +54,10 @@ namespace Belle2 {
                         std::tuple<double, double> invMassRangeLambda,
                         std::tuple<double, double> invMassRangePhoton);
 
+    /// Set the vertex fitter to be used, replacing the default one.
+    /// The instances are created by the V0VertexFitterFactory.
+    void setVertexFitter(std::unique_ptr<V0VertexFitter> vertexFitter);
+
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
     ///   0: store V0 at the first vertex fit, regardless of inner hits
@@ -86,7 +92,7 @@ namespace Belle2 {
                                  RecoTrack* recoTrackPlus, RecoTrack* recoTrackMinus,
                                  const Const::ParticleType& v0Hypothesis,
                                  unsigned int& hasInnerHitStatus, ROOT::Math::XYZVector& vertexPos,
-                                 const bool forceStore, const bool useKFit = true);
+                                 const bool forceStore);
 
     /** Create a copy of RecoTrack. Track fit should be executed in removeInnerHits function.
      * @param origRecoTrack original RecoTrack
@@ -122,18 +128,6 @@ namespace Belle2 {
      */
     int checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus);
 
-    /** Fit the V0 vertex.
-     *
-     * @param trackPlus
-     * @param trackMinus
-     * @param vertex Result of the fit is returned via reference.
-     * @return
-     */
-    static bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
-
-    bool fitKFitVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, const int pdgTrackPlus, const int pdgTrackMinus,
-                       genfit::GFRaveVertex& vertex);
-
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const ROOT::Math::XYZVector& vertexPosition);
@@ -167,6 +161,7 @@ namespace Belle2 {
     int    m_v0FitterMode;  ///< 0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
     bool   m_forcestore;///< true only if the V0Fitter mode is 1
     bool   m_useOnlyOneSVDHitPair;///< false only if the V0Fitter mode is 3
+    std::unique_ptr<V0VertexFitter> m_vertexFitter; ///< Vertex fitter used to fit the V0 vertex.
   };
 
 }

@@ -110,6 +110,7 @@ void V0FinderModule::initialize()
     m_newV0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
                                   m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
     m_newV0Fitter->setFitterMode(m_v0FitterMode);
+    m_newV0Fitter->setVertexFitter(V0VertexFitterFactory::create(m_vertexFitterName));
   } else {
     m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                             m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,

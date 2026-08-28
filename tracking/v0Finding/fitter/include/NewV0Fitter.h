@@ -14,9 +14,12 @@
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/v0Finding/fitter/V0VertexFitter.h>
 #include <genfit/Track.h>
 #include <genfit/GFRaveVertex.h>
 #include <map>
+#include <memory>
+#include <utility>
 
 namespace Belle2 {
 
@@ -97,6 +100,13 @@ namespace Belle2 {
     void setFitterMode(int fitterMode) {m_fitterMode = fitterMode;}
 
     /**
+     * Setter for the vertex fitter, replacing the default one.
+     * The instances are created by the V0VertexFitterFactory.
+     * @param vertexFitter vertex fitter to be used
+     */
+    void setVertexFitter(std::unique_ptr<V0VertexFitter> vertexFitter) {m_vertexFitter = std::move(vertexFitter);}
+
+    /**
      * Fit V0 with given hypothesis and store results if fit is successful.
      * @param trackPlus positively charged track
      * @param trackMinus negatively charged track
@@ -168,15 +178,6 @@ namespace Belle2 {
     static bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
 
     /**
-     * Genfit Rave vertex fit called by vertexFit method.
-     * @param trackPlus positively charged genfit track
-     * @param trackMinus negatively charged genfit track
-     * @param vertex fitted vertex [out]
-     * @return true on success
-     */
-    static bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
-
-    /**
      * Extrapolation of both tracks to the vertex. On success the return value indicates if tracks have inner hits
      * (see EInnerHitBits).
      * @param statePlus measured state of positively charged track from which the extrapolation is performed [in/out]
@@ -235,6 +236,7 @@ namespace Belle2 {
     double m_vertexChi2Cut = 0;   /**< Chi2 cut */
     std::map<int, std::pair<double, double> > m_invMassCuts; /**< invariant mass cuts, key = abs(PDG) */
 
+    std::unique_ptr<V0VertexFitter> m_vertexFitter; /**< vertex fitter used to fit the V0 vertex */
     int m_fitterMode = 1;  /**< fitter mode */
     bool m_validation = false; /**< validation flag */
 

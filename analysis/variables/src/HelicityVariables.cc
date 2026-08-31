@@ -408,7 +408,7 @@ For example, for the decay :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \l
 is :math:`B^0` and the selected indices are (0, 0), the variable will return the angle between the momentum of the :math:`\mu^+` and the
 direction opposite to the momentum of the :math:`B^0`, with both momenta in the rest frame of the :math:`J/\psi`.
 
-.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/reviews/contents_sports.html>`_.
+.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/web/viewer.html?file=../reviews/rpp2026-rev-b-decays-polarization.pdf>`_.
 
 )DOC");
     REGISTER_VARIABLE("cosAcoplanarityAngle(i, j)", cosAcoplanarityAngle, R"DOC(
@@ -420,13 +420,13 @@ one daughter (in the frame of the mother) and the momentum of one of its grandda
 For example, for the decay  :math:`B^0 \to \left(J/\psi \to \mu^+ \mu^-\right) \left(K^{*0} \to K^+ \pi^-\right)`, if the provided particle
 is :math:`B^0` and the selected indices are (0, 0), the variable will return the acoplanarity using the :math:`\mu^+` and :math:`K^+` granddaughters.
 
-.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/reviews/contents_sports.html>`_.
+.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/web/viewer.html?file=../reviews/rpp2026-rev-b-decays-polarization.pdf>`_.
 
 )DOC");
     REGISTER_VARIABLE("cosHelicityAnglePrimary", cosHelicityAnglePrimary, R"DOC(
 Returns the cosine of the helicity angle (see ``cosHelicityAngle``) assuming the CM system as the mother rest frame.
 
-.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/reviews/contents_sports.html>`_.
+.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/web/viewer.html?file=../reviews/rpp2026-rev-b-decays-polarization.pdf>`_.
 
 )DOC");
     REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter, R"DOC(
@@ -438,14 +438,14 @@ and the selected index is 0, the variable will return the helicity angle of the 
 helicity angle of the :math:`K^+` (defined via the rest frame of the :math:`K^{*0}`). In rare cases, if one wanted the helicity angle of the second granddaughter,
 indices (1, 1) would return the helicity angle of the :math:`\pi^-`.
 
-.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/reviews/contents_sports.html>`_.
+.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/web/viewer.html?file=../reviews/rpp2026-rev-b-decays-polarization.pdf>`_.
 
 )DOC");
     REGISTER_VARIABLE("acoplanarityAngle", acoplanarityAngle, R"DOC(
 Returns the acoplanarity angle, as described in the definition for ``cosAcoplanarityAngle``, assuming a two body decay of the particle and
 its daughters. 
 
-.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/reviews/contents_sports.html>`_.
+.. seealso:: The polarisation of :math:`B` decays is reviewed in this `PDG review <https://pdg.lbl.gov/2026/web/viewer.html?file=../reviews/rpp2026-rev-b-decays-polarization.pdf>`_.
 
 )DOC", "rad");
     REGISTER_VARIABLE("cosHelicityAngleForQuasiTwoBodyDecay(i, j)", cosHelicityAngleForQuasiTwoBodyDecay, R"DOC(

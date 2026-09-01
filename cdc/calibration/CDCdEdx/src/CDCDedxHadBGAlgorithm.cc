@@ -67,35 +67,40 @@ CalibrationAlgorithm::EResult CDCDedxHadBGAlgorithm::calibrate()
 
   for (int iter = 0; iter < m_iter; ++iter) {
 
+    const bool isFirstIteration = (iter == 0);
+    const bool isFinalIteration = (iter == m_iter - 1);
+
+    const bool makeIterationSummary = m_ismakePlots && (isFirstIteration || isFinalIteration);
+
     std::string sfx = Form("%s_iter%d", m_suffix.data(), iter);
     filename = Form("widget_corrected_NewHSpars_1D_%s.root", sfx.data());
 
     // prepare sample to perform bg curve fittting and draw the monitoring plots
-    prepareSample(particles, filename, sfx);
+    prepareSample(particles, filename, sfx, false);
 
     // create the HadronCalibration object and fit the prepared samples
-    hadcal.plotBGMonitoring(particles, filename, sfx);
+    // if(makeIterationSummary) hadcal.plotBGMonitoring(particles, filename, sfx);
 
     //bg fit
-    hadcal.fitBGCurve(particles, filename, m_bgcurve, sfx);
+    hadcal.fitBGCurve(particles, filename, m_bgcurve, sfx, makeIterationSummary);
     m_bgcurve = "parameters.bgcurve.fit";
 
     //dedx reso vs ionz fit
-    hadcal.fitSigmavsIonz(particles, filename, m_bgsigma, sfx);
+    hadcal.fitSigmavsIonz(particles, filename, m_bgsigma, sfx, makeIterationSummary);
     m_bgsigma = "parameters.ionz.fit";
 
     //dedx reso vs nHits fit
-    SigmaFits(particles, sfx, "nhit");
+    SigmaFits(particles, sfx, "nhit", makeIterationSummary);
     m_bgsigma = "parameters.sigmanhit.fit";
 
     //dedx reso vs costh fit
-    SigmaFits(particles, sfx, "costh");
+    SigmaFits(particles, sfx, "costh", makeIterationSummary);
     m_bgsigma = "parameters.sigmacos.fit";
 
   }
 
   filename = Form("widget_corrected_NewHSpars_1D_%s_final.root", m_suffix.data());
-  prepareSample(particles, filename, Form("%s_final", m_suffix.data()));
+  prepareSample(particles, filename, Form("%s_final", m_suffix.data()), true);
   hadcal.plotBGMonitoring(particles, filename, Form("%s_final", m_suffix.data()));
 
   B2INFO("Saving calibration for: " << m_suffix << "");
@@ -165,7 +170,7 @@ void CDCDedxHadBGAlgorithm::createPayload()
 }
 
 void CDCDedxHadBGAlgorithm::prepareSample(const std::vector< std::string >& particles, const std::string& filename,
-                                          const std::string& sfx)
+                                          const std::string& sfx, const bool makeIterationSummary)
 {
 
   TFile* outfile = new TFile(filename.data(), "RECREATE");
@@ -178,13 +183,14 @@ void CDCDedxHadBGAlgorithm::prepareSample(const std::vector< std::string >& part
     HadronBgPrep prep(m_bgpar[p][0], m_bgpar[p][1], m_bgpar[p][2], 8, -1.0, 1.0, m_injpar[p][0], m_injpar[p][1],
                       m_injpar[p][2], m_nhitBins, m_nhitMin, m_nhitMax, m_cut);
 
-    prep.prepareSample(tree, outfile, sfx, m_bgcurve, m_bgsigma, p, m_ismakePlots);
+    prep.prepareSample(tree, outfile, sfx, m_bgcurve, m_bgsigma, p, makeIterationSummary);
   }
   outfile->Close();
 
 }
 
-void CDCDedxHadBGAlgorithm::SigmaFits(const std::vector< std::string >& particles, const std::string& sfx, const std::string& svar)
+void CDCDedxHadBGAlgorithm::SigmaFits(const std::vector< std::string >& particles, const std::string& sfx, const std::string& svar,
+                                      const bool makeIterationSummary)
 {
   // only the muon samples are used for the sigma fits
   HadronCalibration hadcal;
@@ -369,14 +375,14 @@ void CDCDedxHadBGAlgorithm::SigmaFits(const std::vector< std::string >& particle
 
     tTree->Write();
 
-    prep.plotDist(hdedx_var, Form("fits_chi_%s_%s_%s", svar.data(), sfx.data(), particle.data()), nbins);
+    if (makeIterationSummary) prep.plotDist(hdedx_var, Form("fits_chi_%s_%s_%s", svar.data(), sfx.data(), particle.data()), nbins);
 
     prep.deleteHistos(hdedx_var);
   }
   outfile->Close();
 
-  if (svar == "costh") hadcal.fitSigmaVsCos(particles, filename, m_bgsigma, sfx);
-  else hadcal.fitSigmaVsNHit(particles, filename, m_bgsigma, sfx);
+  if (svar == "costh") hadcal.fitSigmaVsCos(particles, filename, m_bgsigma, sfx, makeIterationSummary);
+  else hadcal.fitSigmaVsNHit(particles, filename, m_bgsigma, sfx, makeIterationSummary);
 
 }
 

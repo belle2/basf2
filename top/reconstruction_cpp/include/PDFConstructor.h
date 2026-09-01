@@ -707,11 +707,14 @@ namespace Belle2 {
       double m_bkgPhotons = 0; /**< expected number of uniform background photons */
       double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 
-      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles */
+      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles for dE != 0 */
+      InverseRaytracer::CerenkovAngle m_cerenkovAngle0; /**< sine and cosine of Cerenkov angle at dE = 0 */
       double m_dFic = 0; /**< temporary storage for dFic used in last call to deltaXD */
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< number of calls to setSignalPDF<T> */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< number of calls to expandSignalPDF */
+      /** number of calls to setSignalPDF<T>, indexed with SignalPDF::EPeakType */
+      int m_ncallsSetPDF[3] = {0, 0, 0};
+      /** number of calls to expandSignalPDF, indexed with SignalPDF::EPeakType */
+      int m_ncallsExpandPDF[3] = {0, 0, 0};
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
@@ -765,13 +768,14 @@ namespace Belle2 {
 
     inline double PDFConstructor::getCosCerenkovAngle(double E) const
     {
-      double refind = TOPGeometryPar::Instance()->getPhaseIndex(E);
+      double refind = TOPGeometryPar::getPhaseIndex(E);
       return std::min(1 / m_beta / refind, 1.0);
     }
 
     inline const InverseRaytracer::CerenkovAngle& PDFConstructor::cerenkovAngle(double dE)
     {
-      auto& cer = m_cerenkovAngles[dE];
+      // dE = 0 is by far the most frequent argument, so it is kept out of the map
+      auto& cer = (dE == 0) ? m_cerenkovAngle0 : m_cerenkovAngles[dE];
       if (cer.cosThc == 0 and cer.sinThc == 0) {
         double meanE = m_yScanner->getMeanEnergy();
         double cosThc = getCosCerenkovAngle(meanE + dE);

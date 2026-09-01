@@ -15,6 +15,7 @@
 #include <top/dbobjects/TOPCalModuleAlignment.h>
 #include <top/dbobjects/TOPCalTOFCorrection.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
+#include <top/dbobjects/TOPNominalTTS.h>
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <vector>
@@ -309,10 +310,14 @@ namespace Belle2 {
 
       std::vector<SelectedHit> m_selectedHits; /**< selected photon hits from TOPDigits belonging to this slot ID */
       double m_bkgRate = 0; /**< estimated background hit rate */
+      const TOPNominalTTS* m_tts = nullptr; /**< PMT independent TTS, used by isScanRequired */
       std::unordered_multimap<unsigned, const SelectedHit*> m_columnHits; /**< selected hits mapped to pixel columns */
 
-      /** assumed emission points in module local frame */
+      /** assumed emission points in module local frame, for dL != 0 */
       mutable std::map<double, TOPTrack::AssumedEmission> m_emissionPoints;
+
+      /** assumed emission point in module local frame, at dL = 0 */
+      mutable TOPTrack::AssumedEmission m_emissionPoint0;
 
     };
 

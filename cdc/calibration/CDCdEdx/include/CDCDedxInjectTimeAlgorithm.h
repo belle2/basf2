@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxInjectTimeAlgorithm() {}
+    virtual ~CDCDedxInjectTimeAlgorithm() override {}
 
     /**
     * function to decide merged vs relative calibration
@@ -101,7 +101,7 @@ namespace Belle2 {
     /**
     * function to define histograms for dedx and time dist. (in time bins)
     */
-    void defineHisto(std::array<std::vector<TH1D*>, numdedx::nrings>& htemp,  std::string var);
+    void defineHisto(std::array<std::vector<TH1D*>, 2>& htemp, const std::string& var);
 
     /**
     * function to define injection time bins histograms (monitoring only)
@@ -116,14 +116,14 @@ namespace Belle2 {
     /**
     * function to correct dedx mean/reso and return corrected vector map
     */
-    void correctBinBias(std::map<int, std::vector<double>>& varcorr, std::map<int, std::vector<double>>& var,
-                        std::map<int, std::vector<double>>& time, TH1D*& htimes);
+    void correctBinBias(std::map<int, std::vector<double>>& varcorr, const std::map<int, std::vector<double>>& var,
+                        const std::map<int, std::vector<double>>& time, TH1D*& htimes);
 
     /**
     * function to store payloads after full calibration
     */
-    void createPayload(std::array<double, numdedx::nrings>& scale, std::map<int, std::vector<double>>& vmeans,
-                       std::map<int, std::vector<double>>& varscal, std::string svar);
+    void createPayload(std::array<double, numdedx::nrings>& scale, const std::map<int, std::vector<double>>& vmeans,
+                       std::map<int, std::vector<double>>& varscal, const std::string& svar);
 
     /**
     * function to get mean and reso of histogram
@@ -139,13 +139,13 @@ namespace Belle2 {
     /**
     * function to draw dedx, chi and time dist.
     */
-    void plotBinLevelDist(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar, std::string var);
+    void plotBinLevelDist(std::array<std::vector<TH1D*>, 2>& hvar, const std::string& var);
 
     /**
     * function to relative constant from dedx fit mean and chi fit reso
     */
     void plotRelConstants(std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos,
-                          std::map<int, std::vector<double>>& corr, std::string svar);
+                          std::map<int, std::vector<double>>& corr, const std::string& svar);
 
     /**
     * function to draw time stats
@@ -166,7 +166,7 @@ namespace Belle2 {
     /**
     * function to set histogram cosmetics
     */
-    void setHistStyle(TH1D*& htemp, const int ic, const int is, const double min, const double max)
+    static void setHistStyle(TH1D*& htemp, const int ic, const int is, const double min, const double max)
     {
       htemp->SetStats(0);
       htemp->LabelsDeflate();
@@ -193,7 +193,7 @@ namespace Belle2 {
     /**
     * function to delete histograms for dedx and time dist. (in time bins)
     */
-    void deleteHisto(std::array<std::vector<TH1D*>, numdedx::nrings>& htemp)
+    void deleteHisto(const std::array<std::vector<TH1D*>, numdedx::nrings>& htemp)
     {
       for (unsigned int ir = 0; ir < c_rings; ir++) {
         for (unsigned int it = 0; it < m_tbins; it++) {
@@ -205,7 +205,7 @@ namespace Belle2 {
     /**
     * function to define injection time bins histograms (monitoring only)
     */
-    void deleteTimeHisto(std::array<std::array<TH1D*, 3>, numdedx::nrings>& htemp)
+    static void deleteTimeHisto(const std::array<std::array<TH1D*, 3>, numdedx::nrings>& htemp)
     {
       const int tzoom = 3;
       for (unsigned int ir = 0; ir < c_rings; ir++) {
@@ -218,7 +218,7 @@ namespace Belle2 {
     /**
     * function to get the correction factor of mean
     */
-    double getCorrection(unsigned int ring, unsigned int time, std::map<int, std::vector<double>>&  vmeans);
+    double getCorrection(unsigned int ring, unsigned int time, const std::map<int, std::vector<double> >& vmeans);
 
 
   protected:
@@ -236,8 +236,8 @@ namespace Belle2 {
     std::vector<double> m_vtedges; /**< external time vector*/
     std::vector<double> m_vtlocaledges; /**< internal time vector*/
 
-    double* m_tedges; /**< internal time array (copy of vtlocaledges) */
-    unsigned int m_tbins;  /**< internal time bins */
+    double* m_tedges = nullptr; /**< internal time array (copy of vtlocaledges) */
+    unsigned int m_tbins = 0;  /**< internal time bins */
     double m_sigmaR; /**< fit dedx dist in sigma range */
 
     int m_dedxBins; /**< bins for dedx histogram */

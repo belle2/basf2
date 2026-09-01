@@ -81,7 +81,7 @@ int TagVertex::getFitType() const
   return m_FitType;
 }
 
-std::string TagVertex::getConstraintType() const
+const std::string& TagVertex::getConstraintType() const
 {
   return m_constraintType;
 }

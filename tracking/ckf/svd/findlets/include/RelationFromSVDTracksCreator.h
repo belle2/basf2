@@ -39,7 +39,7 @@ namespace Belle2 {
     void initialize() final;
 
     /// Default destructor
-    ~RelationFromSVDTracksCreator();
+    ~RelationFromSVDTracksCreator() override;
 
     /// Expose the parameters of the subfindlet
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;

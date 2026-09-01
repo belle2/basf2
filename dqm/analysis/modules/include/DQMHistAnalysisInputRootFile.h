@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Read histogram from key and add to list vector
      */
-    void addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key);
+    void addToHistList(std::vector<TH1*>& inputHistList, const std::string& dirname, TKey* key);
 
     /**
      * Pattern match for histogram name
@@ -61,7 +61,7 @@ namespace Belle2 {
      * @param text    Histogram name to be matched
      * @return true, if the pattern matches the text
      */
-    bool hnamePatternMatch(std::string pattern, std::string text);
+    static bool hnamePatternMatch(std::string pattern, const std::string& text);
 
     // Data members
     /** The list of names of the input root file. */

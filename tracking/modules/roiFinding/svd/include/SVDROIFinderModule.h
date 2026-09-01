@@ -38,7 +38,7 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    ~SVDROIFinderModule();
+    ~SVDROIFinderModule() override;
 
     /**
      *Initializes the Module. Parameter handling.
@@ -60,10 +60,6 @@ namespace Belle2 {
      */
     void endRun() override;
 
-    /**
-     * Termination action.
-     */
-    void terminate() override;
 
   protected:
     ROIToUnitTranslator<SVDIntercept>* m_theStripTranslator = nullptr; /**< the strip translator object*/

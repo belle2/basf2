@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/Environment.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/logging/Logger.h>
 
@@ -46,7 +47,9 @@ The module modifies the input particleLists by scaling track momenta as given by
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("scale", m_scale, "scale factor to be applied to 3-momentum", nan(""));
-  addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
+  addParam("payloadName", m_payloadName,
+           "Base name of the table used for reweighing. The suffix '_data' or '_MC' is appended automatically "
+           "depending on whether the module runs on data or MC.", std::string(""));
   addParam("scalingFactorName", m_scalingFactorName, "Label for the scale factor in the look up table", std::string(""));
   addParam("smearingFactorName", m_smearingFactorName, "Label for the smearing factor in the look up table", std::string(""));
 }
@@ -60,6 +63,11 @@ void TrackingMomentumScaleFactorsModule::initialize()
   } else if (!m_scalingFactorName.empty() && !m_smearingFactorName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scalingFactorName and smearingFactorName. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
+    // For the momentum scaling, let basf2 choose the appropriate (data or MC) payload.
+    // For the smearing no suffix is added.
+    if (!m_scalingFactorName.empty()) {
+      m_payloadName += Environment::Instance().isMC() ? "_MC" : "_data";
+    }
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
   }
 }

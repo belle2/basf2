@@ -124,7 +124,7 @@ namespace Belle2 {
       if (mcpart == nullptr)
         return Const::doubleNaN;
 
-      int m_PDG, m_sign = 0;
+      int m_PDG = 0, m_sign = 0;
 
       if (args.empty())
         B2FATAL("Wrong number of arguments for variable hasAncestor!");

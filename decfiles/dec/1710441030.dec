@@ -1,0 +1,24 @@
+# EventType: 1710441030
+# Descriptor: [vpho-> gamma [Y3S->pipi [Y1S ->mumu]]]
+# NickName: vpho_gamma_Y3S_pipi_Y1S_mumu
+# Cuts: None
+# Documentation: vpho decay processes to Upsilon(3)
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Federico Testa
+# Email: fe.testa@unito.it
+# Date: 2026-07-31
+
+
+Decay  vpho
+1.0   Upsilon(3S) gamma        PHSP;
+Enddecay
+
+Decay  Upsilon(3S)
+1.0 Upsilon pi+     pi-                             YMSTOYNSPIPICLEOBOOST -2.523 1.189; #[Reconstructed PDG2014]
+Enddecay
+
+Decay  Upsilon
+1.0    mu+ mu-  VLL;
+Enddecay
+End

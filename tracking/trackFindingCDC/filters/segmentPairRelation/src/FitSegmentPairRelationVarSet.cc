@@ -9,6 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -23,7 +25,7 @@ bool FitSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair>*
   CDCTrajectory3D fromFit = fromSegmentPair->getTrajectory3D();
   CDCTrajectory3D toFit   = toSegmentPair->getTrajectory3D();
 
-  Vector3D commonOrigin = fromFit.getSupport();
+  const ROOT::Math::XYZVector& commonOrigin = fromFit.getSupport();
 
   fromFit.setLocalOrigin(commonOrigin);
   toFit.setLocalOrigin(commonOrigin);

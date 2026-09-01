@@ -33,10 +33,6 @@ DQMHistAnalysisSVDDoseModule::DQMHistAnalysisSVDDoseModule()
            std::string("Occ:Pois:State"));
 }
 
-DQMHistAnalysisSVDDoseModule::~DQMHistAnalysisSVDDoseModule()
-{
-}
-
 void DQMHistAnalysisSVDDoseModule::initialize()
 {
   B2DEBUG(18, "DQMHistAnalysisSVDDose: initialize");
@@ -106,9 +102,9 @@ void DQMHistAnalysisSVDDoseModule::initialize()
   }
 
   m_legend = new TPaveText(0.53, 0.73, 0.68, 0.88, "brNDC");
-  m_legend->AddText("LER inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kRed);
-  m_legend->AddText("HER inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kAzure);
-  m_legend->AddText("No inj."); ((TText*)m_legend->GetListOfLines()->Last())->SetTextColor(kBlack);
+  m_legend->AddText("LER inj."); static_cast<TText*>(m_legend->GetListOfLines()->Last())->SetTextColor(kRed);
+  m_legend->AddText("HER inj.");  static_cast<TText*>(m_legend->GetListOfLines()->Last())->SetTextColor(kAzure);
+  m_legend->AddText("No inj.");  static_cast<TText*>(m_legend->GetListOfLines()->Last())->SetTextColor(kBlack);
 
 #ifdef _BELLE2_EPICS
   if (getUseEpics()) {

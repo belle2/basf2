@@ -67,7 +67,7 @@ void T0CalibrationAlgorithm::createHisto()
 
   double halfCSize[56];
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   for (int i = 0; i < 56; ++i) {
     double R = cdcgeo.senseWireR(i);
@@ -146,7 +146,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
   createHisto();
   TH1F* hm_All = new TH1F("hm_All", "mean of #DeltaT distribution for all channels", 500, -10, 10);
   TH1F* hs_All = new TH1F("hs_All", "#sigma of #DeltaT distribution for all channels", 100, 0, 10);
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
 
   TF1* g1 = new TF1("g1", "gaus", -100, 100);
   g1->SetParLimits(1, -20, 20);
@@ -299,7 +299,7 @@ CalibrationAlgorithm::EResult T0CalibrationAlgorithm::calibrate()
 
 int T0CalibrationAlgorithm::write()
 {
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   CDCTimeZeros* tz = new CDCTimeZeros();
 
   TH1F* hT0B[300];

@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
       B2ERROR("Couldn't open file " << fileName);
       return 1;
     }
-    TTree* tree = (TTree*) file->Get("persistent");
+    TTree* tree = static_cast<TTree*>(file->Get("persistent"));
     if (!tree) {
       B2ERROR("No tree persistent found in " << fileName);
       return 1;

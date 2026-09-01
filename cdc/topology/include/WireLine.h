@@ -174,17 +174,17 @@ namespace Belle2 {
 
       /// Gives the azimuth angle of the forward position relative to the reference position
       double forwardPhiToRef() const
-      { return VectorUtil::Angle(forward2D(), refPos2D()); }
+      { return ROOT::Math::VectorUtil::DeltaPhi(forward2D(), refPos2D()); }
 
       /// Gives the azimuth angle of the backward position relative to the reference position
       double backwardPhiToRef() const
-      { return VectorUtil::Angle(backward2D(), refPos2D()); }
+      { return ROOT::Math::VectorUtil::DeltaPhi(backward2D(), refPos2D()); }
 
       /// Gives the azimuth angle difference from backward to forward position
       /* backwardToForwardAngle means how far the backward position has to be rotated in the xy projection
          in the mathematical positive sense that it seems to be coaligned with the forward position. */
       double backwardToForwardAngle() const
-      { return VectorUtil::Angle(backward2D(), forward2D()); }
+      { return ROOT::Math::VectorUtil::DeltaPhi(backward2D(), forward2D()); }
 
       /// Returns the nominal tan lambda of the line. Also know as dz / ds.
       double tanLambda() const

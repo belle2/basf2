@@ -12,6 +12,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/Environment.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/logging/Logger.h>
 
@@ -46,7 +47,9 @@ The module modifies the input particleLists by subtracting the correction value 
   addParam("particleLists", m_ParticleLists, "input particle lists");
   addParam("correction", m_correction, "correction value to be subtracted from the particle energy",
            nan(""));                                        // Nan
-  addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
+  addParam("payloadName", m_payloadName,
+           "Base name of the table used for reweighing. The suffix '_data' or '_MC' is appended automatically "
+           "depending on whether the module runs on data or MC.", std::string(""));
   addParam("correctionName", m_correctionName, "Label for the correction in the look up table", std::string(""));
 }
 
@@ -57,6 +60,8 @@ void TrackingEnergyLossCorrectionModule::initialize()
   } else if (std::isnan(m_correction) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
+    // Let basf2 choose the appropriate (data or MC) payload
+    m_payloadName += Environment::Instance().isMC() ? "_MC" : "_data";
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
   }
 }

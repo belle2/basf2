@@ -67,6 +67,17 @@ void BridgingWireHitRelationFilter::initialize()
   }
 }
 
+void BridgingWireHitRelationFilter::prepare(const std::vector<CDCWireHit*>& wireHits)
+{
+  m_preparedWires.clear();
+  m_preparedWires.reserve(wireHits.size());
+  for (const CDCWireHit* wireHit : wireHits) {
+    m_preparedWires.push_back(&wireHit->getWire());
+  }
+  m_preparedWireHitsData = wireHits.data();
+  m_preparedWireHitsSize = wireHits.size();
+}
+
 std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   CDCWireHit* from,
   const std::vector<CDCWireHit*>& wireHits) const
@@ -74,8 +85,29 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
          "Expected wire hits to be sorted");
 
-  std::vector<std::pair<const CDCWire*, int>> wireNeighbors;
-  wireNeighbors.reserve(8);
+  // Use the wires precomputed by prepare() when called with the prepared vector.
+  // The wire hits are sorted by the address of their wire such that a search in the
+  // contiguous wire array gives the same ranges without dereferencing the wire hits.
+  const bool prepared =
+    wireHits.data() == m_preparedWireHitsData and wireHits.size() == m_preparedWireHitsSize;
+
+  auto findWireHitRange = [&](const CDCWire * neighborWire) -> ConstVectorRange<CDCWireHit*> {
+    if (prepared)
+    {
+      const auto itRange = std::equal_range(m_preparedWires.begin(), m_preparedWires.end(), neighborWire);
+      return {
+        wireHits.begin() + (itRange.first - m_preparedWires.begin()),
+        wireHits.begin() + (itRange.second - m_preparedWires.begin())};
+    }
+    return ConstVectorRange<CDCWireHit*>{
+      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())
+    };
+  };
+
+  // Stack buffer for the wire neighbors - at most 6 primary
+  // respectively 12 secondary neighbors can be collected
+  std::array<std::pair<const CDCWire*, int>, 12> wireNeighbors;
+  int nWireNeighbors = 0;
 
   std::vector<CDCWireHit*> wireHitNeighbors;
   wireHitNeighbors.reserve(12);
@@ -89,17 +121,18 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   // Analyse primary neighborhood - sorted such that the wire hits relations are most likely sorted.
   for (short oClockDirection : {5, 7, 3, 9, 1, 11}) {
     MayBePtr<const CDCWire> neighborWire = wireTopology.getPrimaryNeighbor(oClockDirection, wire);
-    if (neighborWire) wireNeighbors.emplace_back(neighborWire, oClockDirection);
+    if (neighborWire) wireNeighbors[nWireNeighbors++] = {neighborWire, oClockDirection};
   }
 
-  std::sort(std::begin(wireNeighbors), std::end(wireNeighbors));
+  std::sort(wireNeighbors.begin(), wireNeighbors.begin() + nWireNeighbors);
 
-  for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
+  for (std::pair<const CDCWire*, int> wireAndOClockDirection :
+       asRange(wireNeighbors.begin(), wireNeighbors.begin() + nWireNeighbors)) {
     const CDCWire* neighborWire = wireAndOClockDirection.first;
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int oClockDirection = wireAndOClockDirection.second;
 
-    ConstVectorRange<CDCWireHit*> wireHitRange{
-      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
+    ConstVectorRange<CDCWireHit*> wireHitRange = findWireHitRange(neighborWire);
     if (wireHitRange.empty()) {
       int ccwOClockDirection = oClockDirection - 1;
       int cwOClockDirection = oClockDirection == 11 ? 0 : oClockDirection + 1;
@@ -111,7 +144,7 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
   }
 
   size_t nPrimaryWireHitNeighbors = wireHitNeighbors.size();
-  wireNeighbors.clear();
+  nWireNeighbors = 0;
 
   // Analyse secondary neighborhood
   for (short oClockDirection : m_consideredSecondaryNeighbors) {
@@ -120,15 +153,15 @@ std::vector<CDCWireHit*> BridgingWireHitRelationFilter::getPossibleTos(
     if (missingPrimaryNeighbor[oClockDirection] <
         m_missingPrimaryNeighborThresholds[oClockDirection])
       continue;
-    wireNeighbors.emplace_back(neighborWire, oClockDirection);
+    wireNeighbors[nWireNeighbors++] = {neighborWire, oClockDirection};
   }
 
-  std::sort(std::begin(wireNeighbors), std::end(wireNeighbors));
+  std::sort(wireNeighbors.begin(), wireNeighbors.begin() + nWireNeighbors);
 
-  for (std::pair<const CDCWire*, int> wireAndOClockDirection : wireNeighbors) {
+  for (std::pair<const CDCWire*, int> wireAndOClockDirection :
+       asRange(wireNeighbors.begin(), wireNeighbors.begin() + nWireNeighbors)) {
     const CDCWire* neighborWire = wireAndOClockDirection.first;
-    ConstVectorRange<CDCWireHit*> wireHitRange{
-      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
+    ConstVectorRange<CDCWireHit*> wireHitRange = findWireHitRange(neighborWire);
     wireHitNeighbors.insert(wireHitNeighbors.end(), wireHitRange.begin(), wireHitRange.end());
   }
 

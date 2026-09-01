@@ -16,6 +16,8 @@
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -124,7 +126,7 @@ void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
         if (rlInfo != recoHit2D.getRLInfo()) ++nRLChanges;
         recoHit2D.setRLInfo(rlInfo);
         const TrackingUtilities::CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
-        Vector2D recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
+        ROOT::Math::XYVector recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
         recoHit2D.setRecoPos2D(recoPos2D);
       }
       if (nRLChanges > 0) B2DEBUG(25, "RL changes " << nRLChanges);

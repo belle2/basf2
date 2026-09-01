@@ -42,10 +42,6 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
-DQMHistAnalysisPXDChargeModule::~DQMHistAnalysisPXDChargeModule()
-{
-}
-
 void DQMHistAnalysisPXDChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: initialized.");

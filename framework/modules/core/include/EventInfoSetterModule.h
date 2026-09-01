@@ -35,7 +35,7 @@ namespace Belle2 {
     EventInfoSetterModule();
 
     /** Destructor. */
-    virtual ~EventInfoSetterModule();
+    virtual ~EventInfoSetterModule() override;
 
     /** Initializes the Module.
      *

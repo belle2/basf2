@@ -58,12 +58,10 @@ PXDPairFilterFactory::create(const std::string& filterName) const
     return std::make_unique<TrackingUtilities::AllFilter<BasePXDPairFilter>>();
   }
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "none") {
     return std::make_unique<TrackingUtilities::NoneFilter<BasePXDPairFilter>>();
   }
 
-  // cppcheck-suppress knownConditionTrueFalse
   if (filterName == "sensor") {
     return std::make_unique<SensorPXDPairFilter>();
   }

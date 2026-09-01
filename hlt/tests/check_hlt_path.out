@@ -363,15 +363,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf
@@ -3321,15 +3321,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf

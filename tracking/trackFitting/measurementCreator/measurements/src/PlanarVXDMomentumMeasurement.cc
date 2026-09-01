@@ -12,13 +12,13 @@
 using namespace Belle2;
 
 template<>
-int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const
+int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId()
 {
   return Belle2::Const::PXD;
 }
 
 template<>
-int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const
+int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId()
 {
   return Belle2::Const::SVD;
 }

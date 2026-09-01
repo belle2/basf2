@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #pragma once
+#include <framework/utilities/MathHelpers.h>
 #include <Math/Boost.h>
 #include <Math/AxisAngle.h>
 #include <Math/LorentzRotation.h>
@@ -48,7 +49,7 @@ namespace Belle2 {
       // The current pHER orientation (unit 3D vector)
       double tanAngleXZ = tan(cmsAngleXZ);
       double tanAngleYZ = tan(cmsAngleYZ);
-      double Norm   = 1 / sqrt(1 + pow(tanAngleXZ, 2) + pow(tanAngleYZ, 2));
+      double Norm   = 1 / sqrt(1 + square(tanAngleXZ) + square(tanAngleYZ));
       ROOT::Math::XYZVector electronCMS(Norm * tanAngleXZ, Norm * tanAngleYZ, Norm);
 
       // Axis to rotate current pHER direction to the target one

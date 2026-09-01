@@ -22,7 +22,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;
@@ -100,7 +100,7 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   if (m_listOfSensorsToMonitor.size() != 0)
     m_addSensorPlots = true;
 
-  for (auto sensor : m_listOfSensorsToMonitor) {
+  for (const auto& sensor : m_listOfSensorsToMonitor) {
     B2DEBUG(20, "ClusTrk: additional sensors to be monitored " << sensor);
   }
 
@@ -439,14 +439,14 @@ void SVDDQMClustersOnTrackModule::beginRun()
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
-      ((TH1F*)obj)->Reset();
+      (static_cast<TH1F*>(obj))->Reset();
 
       TString tmp = (TString)obj->GetTitle();
       Int_t pos = tmp.Last('~');
       if (pos == -1) pos = tmp.Length() + 2;
 
       TString title = tmp(0, pos - 2);
-      ((TH1F*)obj)->SetTitle(title + runID);
+      (static_cast<TH1F*>(obj))->SetTitle(title + runID);
     }
 }
 
@@ -505,10 +505,10 @@ void SVDDQMClustersOnTrackModule::event()
     for (const SVDCluster& svdCluster : recoTrack->getRelationsWith<SVDCluster>(m_svdClustersName)) {
 
       int iLayer = svdCluster.getSensorID().getLayerNumber();
-      int iLadder = svdCluster.getSensorID().getLadderNumber();
       int iSensor = svdCluster.getSensorID().getSensorNumber();
 
       if (m_addSensorPlots) {
+        int iLadder = svdCluster.getSensorID().getLadderNumber();
         string sensorId = str(format("%1%.%2%.%3%") % iLayer % iLadder % iSensor);
 
         auto it = find(m_listOfSensorsToMonitor.begin(), m_listOfSensorsToMonitor.end(), sensorId);
@@ -570,7 +570,7 @@ void SVDDQMClustersOnTrackModule::event()
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
+          const SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
           if (m_stripMaxBinUAll != nullptr and shaper != nullptr) m_stripMaxBinUAll->Fill(shaper->getMaxTimeBin());
         }
 
@@ -605,7 +605,7 @@ void SVDDQMClustersOnTrackModule::event()
 
         for (const SVDRecoDigit& recoDigit : svdCluster.getRelationsTo<SVDRecoDigit>(m_svdRecoDigitsName)) {
 
-          SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
+          const SVDShaperDigit* shaper = recoDigit.getRelatedTo<SVDShaperDigit>(m_svdShaperDigitsName);
           if (m_stripMaxBinVAll != nullptr and shaper != nullptr) m_stripMaxBinVAll->Fill(shaper->getMaxTimeBin());
         }
 

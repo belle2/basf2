@@ -1,0 +1,10 @@
+Changes in the skim package in light-2607-k
+--------------------------------------------
+
+FEI skims
++++++++++
+
+* ``FEIPrefix`` is now mandatory. The class-level default has been removed.
+  Provide it via the ``feiPrefix`` constructor argument, the ``FEIPrefix``
+  instance attribute, or the ``feiPrefix`` parameter of `CombinedSkim`.
+  A ``B2FATAL`` is raised if the FEI is run without setting the prefix.

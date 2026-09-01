@@ -39,7 +39,7 @@ namespace Belle2 {
       /**
        * Destructor of the module.
        */
-      virtual ~CDCUnpackerModule();
+      virtual ~CDCUnpackerModule() override;
 
       /**
        * Initializes the Module.
@@ -158,13 +158,13 @@ namespace Belle2 {
        *  @param buf pointer to the buffer in RawCDC (RawCOPPER).
        *  @param nwords number of words to be printed out.
        */
-      void printBuffer(int* buf, int nwords);
+      static void printBuffer(const int* buf, int nwords);
 
       /**
        * Check if the hit wire is valid or not.
        * @param wireId hit wire.
        */
-      bool isValidBoardChannel(WireID wireId)
+      static bool isValidBoardChannel(WireID wireId)
       {
         if (wireId.getEWire() == 65535) {
           return false;
@@ -177,43 +177,43 @@ namespace Belle2 {
       /**
        * Data type of CDC data block.
        */
-      int m_dataType;
+      int m_dataType = 0;
 
       /**
        * Format version.
        */
-      int m_version;
+      int m_version = 0;
 
       /**
        * Front end board ID.
        */
-      int m_boardId;
+      int m_boardId = 0;
 
       /**
        * Trigger time.
        */
-      int m_triggerTime;
+      int m_triggerTime = 0;
 
       /**
        * Data length of the CDC data block (in bytes).
        */
-      int m_dataLength;
+      int m_dataLength = 0;
 
       /**
        * Trigger number.
        */
-      int m_triggerNumber;
+      int m_triggerNumber = 0;
 
       /**
        * Enable/Disable to store CDCRawHit.
        */
-      bool m_enableStoreCDCRawHit;
+      bool m_enableStoreCDCRawHit = false;
 
       /**
        * Enable/Disable to print out the data to the terminal.
        */
 
-      bool m_enablePrintOut;
+      bool m_enablePrintOut = false;
 
 
       /**
@@ -266,49 +266,49 @@ namespace Belle2 {
       /**
        * FADC threshold.
        */
-      int m_fadcThreshold;
+      int m_fadcThreshold = 0;
 
       /**
        * TDC offset (nsec).
        */
-      int m_tdcOffset;
+      int m_tdcOffset = 0;
 
       /**
        * TDC auxiliary offset (nsec).
        */
-      int m_tdcAuxOffset;
+      int m_tdcAuxOffset = 0;
       /**
        * Board ID for the trigger.
        */
-      int m_boardIDTrig;
+      int m_boardIDTrig = 0;
 
       /**
        * Channel for the trigger.
        */
-      int m_channelTrig;
+      int m_channelTrig = 0;
 
       /**
        * Enable/Disable to subtract the trigger timing
        * from TDCs.
        */
-      bool m_subtractTrigTiming;
+      bool m_subtractTrigTiming = false;
 
       /**
        * Enable/Disable to read the channel map
        * from the database.
        */
-      bool m_enableDatabase;
+      bool m_enableDatabase = false;
 
       /**
        * Enable/Disable to 2nd hit output.
        *
        */
-      bool m_enable2ndHit;
+      bool m_enable2ndHit = false;
 
       /**
        * Channel map retrieved from DB.
        */
-      DBArray<CDCChannelMap>* m_channelMapFromDB;
+      DBArray<CDCChannelMap>* m_channelMapFromDB = nullptr;
       // DBArray<CDCChannelMap> m_channelMapFromDB;
 
       /**
@@ -344,22 +344,22 @@ namespace Belle2 {
       /**
        * True if data length error has been already reported.
        */
-      bool m_dataLengthError;
+      bool m_dataLengthError = false;
 
       /**
        * True if data size error between CDCFE and COPPER has been already reported.
        */
-      bool m_dataSizeError;
+      bool m_dataSizeError = false;
 
       /**
        * True if add relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms."
        */
-      bool m_relationRawHits;
+      bool m_relationRawHits = false;
 
       /**
        * Recover boardID error if true, skip information otherwise
        */
-      bool m_recoverBoardIdError;
+      bool m_recoverBoardIdError = false;
 
     };//end class declaration
 

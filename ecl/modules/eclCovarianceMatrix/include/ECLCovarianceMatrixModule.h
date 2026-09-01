@@ -26,7 +26,7 @@ namespace Belle2 {
     ECLCovarianceMatrixModule();
 
     /** Destructor. */
-    ~ECLCovarianceMatrixModule();
+    ~ECLCovarianceMatrixModule() override;
 
     /** Initialize. */
     virtual void initialize() override;

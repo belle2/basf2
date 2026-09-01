@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Module destructor.
      */
-    virtual ~eclBhabhaTimeCalibrationValidationCollectorModule() ;
+    virtual ~eclBhabhaTimeCalibrationValidationCollectorModule()  override;
 
     /** Replacement for defineHisto() in CalibrationCollector modules */
     void inDefineHisto() override;

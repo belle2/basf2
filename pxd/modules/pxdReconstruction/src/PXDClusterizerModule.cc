@@ -328,7 +328,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
   vector<pair<unsigned int, float> > digit_weights;
 
 
-  for (ClusterCandidate& cls : *m_cache) {
+  for (const ClusterCandidate& cls : *m_cache) {
     //Check for noise cuts
     if (!(cls.size() > 0 && m_noiseMap(cls.getCharge(), m_cutCluster) && m_noiseMap(cls.getSeed(), m_cutSeed))) continue;
 
@@ -464,7 +464,7 @@ void PXDClusterizerModule::calculatePositionError(const ClusterCandidate& cls, C
   }
 }
 
-void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
+void PXDClusterizerModule::assignPositionErrorFromDB(ClusterProjection& primary, const PXDClusterPositionErrorPar& errorPar,
                                                      VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
                                                      bool isAtUEdge, bool isAtVEdge, bool isAdjacentDead)
 {

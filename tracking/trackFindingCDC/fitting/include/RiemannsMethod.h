@@ -68,10 +68,10 @@ namespace Belle2 {
 
     private:
       /// Memory for the flag indicating that lines should be fitted.
-      bool m_lineConstrained;
+      bool m_lineConstrained {};
 
       /// Memory for the flag indicating that curves through the origin shall be fitter.
-      bool m_originConstrained;
+      bool m_originConstrained {};
     };
   }
 }

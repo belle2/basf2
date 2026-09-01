@@ -104,7 +104,7 @@ namespace Belle2 {
       double Start, End;
       std::tie(Start, End) = Splitter::getStartEnd(r);
 
-      Eigen::Vector3d ipNow;
+      Eigen::Vector3d ipNow = Eigen::Vector3d::Zero();
       Eigen::MatrixXd ipeNow;
       Eigen::MatrixXd sizeMatNow;
 
@@ -182,7 +182,7 @@ namespace Belle2 {
   inline double encodeNumber(double val, unsigned num)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
-    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+    static const long long fEnc   = 4294967296; // pow(2, 32), 32 binary digits  for encoded number
 
     int e; //exponent of the number
     double mantisa = std::frexp(val, &e);
@@ -204,7 +204,7 @@ namespace Belle2 {
   inline unsigned decodeNumber(double val)
   {
     double factor = pow(FLT_RADIX, DBL_MANT_DIG);
-    static const long long fEnc   = pow(2, 32); //32 binary digits  for encoded number
+    static const long long fEnc   = 4294967296; // pow(2, 32), 32 binary digits  for encoded number
 
     int e;
     double mantisa = std::frexp(val, &e);
@@ -218,7 +218,8 @@ namespace Belle2 {
 
   /** Store payloads to files */
   template<typename Evt>
-  inline void storePayloads(const std::vector<Evt>& evts, const std::vector<CalibrationData>&  calVecConst, std::string objName,
+  inline void storePayloads(const std::vector<Evt>& evts, const std::vector<CalibrationData>&  calVecConst,
+                            const std::string& objName,
                             std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
     auto calVec = calVecConst;
@@ -283,7 +284,7 @@ namespace Belle2 {
 
 
   /** Store payloads to files, where calib data have no intra-run dependence */
-  inline void storePayloadsNoIntraRun(const std::vector<CalibrationData>&  calVecConst, std::string objName,
+  inline void storePayloadsNoIntraRun(const std::vector<CalibrationData>&  calVecConst, const std::string& objName,
                                       std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
     auto calVec = calVecConst;
@@ -453,7 +454,7 @@ namespace Belle2 {
 
     //Loop over all calibration intervals
     std::vector<CalibrationData> calVec;
-    for (auto s : splits) {
+    for (const auto& s : splits) {
       CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the interval s
       calVec.push_back(calD);
     }

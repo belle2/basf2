@@ -19,7 +19,7 @@ namespace Belle2 {
     /** Constructor */
     GeometryModule();
     /** Destructor */
-    ~GeometryModule() {};
+    ~GeometryModule() override {}
     /** Create geometry */
     void initialize() override;
     /** Clean up the geometry */

@@ -46,10 +46,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
   for (int i = 0; i < 56; i++) m_hHits[i] = nullptr;
 }
 
-DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
-{
-}
-
 void DQMHistAnalysisCDCMonObjModule::initialize()
 {
 
@@ -164,18 +160,18 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1* h)
 {
-  TH1D* hist = (TH1D*)h->Clone();
+  auto hist = static_cast<TH1*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float m = hist->GetMean();
   delete hist;
   return m;
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
+float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1* h)
 {
-  TH1D* hist = (TH1D*)h->Clone();
+  auto hist = static_cast<TH1*>(h->Clone());
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only ADC=0 entries
   double quantiles[1] = {0.0}; // One element to store median
@@ -203,9 +199,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
 {
   B2DEBUG(20, "end run");
 
-  m_hADC = (TH2F*)findHist(m_name_dir + "/" + m_hname_badc);
-  m_hTDC = (TH2F*)findHist(m_name_dir + "/" + m_hname_btdc);
-  m_hHit = (TH2F*)findHist(m_name_dir + "/" + m_hname_hits);
+  m_hADC = dynamic_cast<TH2F*>(findHist(m_name_dir, m_hname_badc));
+  m_hTDC = dynamic_cast<TH2F*>(findHist(m_name_dir, m_hname_btdc));
+  m_hHit = dynamic_cast<TH2F*>(findHist(m_name_dir, m_hname_hits));
 
   if (m_hADC == nullptr) {
     m_monObj->setVariable("comment", "No ADC histograms of CDC in file");
@@ -271,13 +267,13 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   std::vector<float> tdcSlopes = {};
   for (int i = 0; i < 300; ++i) {
     m_hTDCs[i] = m_hTDC->ProjectionY(Form("hTDC%d", i), i + 1, i + 1);
-    m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
-    if (m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0 || m_hTDCs[i] == nullptr) {
+    if (m_hTDCs[i] == nullptr || m_hTDCs[i]->Integral(0, m_hTDCs[i]->GetNbinsX()) == 0) {
       nDeadTDC += 1;
       tdcEdges.push_back(0);
       tdcSlopes.push_back(0);
     } else {
       double init_p0 = m_hTDCs[i]->GetBinContent(700 + 60);
+      m_hTDCs[i]->SetTitle(Form("hTDC%d", i));
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
@@ -313,10 +309,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
     if (i < 8) tdcwindow = 416;
     else tdcwindow = 768;
     m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
-    m_hHits[i]->SetTitle(Form("hHit%d", i));
-    if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
+    if (m_hHits[i] != nullptr && m_hHits[i]->GetEntries() > 0) {
       int nhitSumL = 0;
       int nBins = m_nSenseWires[i];
+      m_hHits[i]->SetTitle(Form("hHit%d", i));
       for (int j = 0; j < nBins; ++j) {
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }

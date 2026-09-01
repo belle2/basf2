@@ -22,13 +22,13 @@ namespace Belle2 {
       eclAutocovarianceCalibrationC1Algorithm();
 
       /**..Destructor */
-      virtual ~eclAutocovarianceCalibrationC1Algorithm() {}
+      virtual ~eclAutocovarianceCalibrationC1Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_lowestEnergyFraction */
       void setLowestEnergyFraction(float lowestEnergyFraction) {m_lowestEnergyFraction = lowestEnergyFraction;}

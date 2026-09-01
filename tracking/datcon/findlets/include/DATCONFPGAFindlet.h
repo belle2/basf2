@@ -37,7 +37,7 @@ namespace Belle2 {
     DATCONFPGAFindlet();
 
     /// Default destructor
-    ~DATCONFPGAFindlet();
+    ~DATCONFPGAFindlet() override;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

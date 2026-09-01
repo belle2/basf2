@@ -66,7 +66,7 @@ namespace Belle2 {
       void Mapping(int cid);
 
       /** Get Cell Id */
-      int GetCellID(int ThetaId, int PhiId);
+      static int GetCellID(int ThetaId, int PhiId);
       /** Get Cell Id */
       int GetCellID() {return mPar_cellID;};
       /** Get Theta Id */

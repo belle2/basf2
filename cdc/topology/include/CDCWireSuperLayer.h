@@ -61,7 +61,7 @@ namespace Belle2 {
 
     public:
       /// Initializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
-      void initialize();
+      static void initialize();
 
       /**
        *  @name Superlayer index
@@ -85,7 +85,6 @@ namespace Belle2 {
       /// Gives the layer by its layer id within the superlayer
       const CDCWireLayer& getWireLayer(ILayer iLayer) const
       {
-        // cppcheck-suppress returnTempReference
         return at(iLayer);
       }
       /**@}*/

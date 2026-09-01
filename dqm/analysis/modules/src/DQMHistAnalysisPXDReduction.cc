@@ -45,10 +45,6 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
-DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
-{
-}
-
 void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");

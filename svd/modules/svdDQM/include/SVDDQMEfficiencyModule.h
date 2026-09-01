@@ -26,7 +26,7 @@
 
 #include <framework/database/DBObjPtr.h>
 
-#include "TH2D.h"
+#include <TH2D.h>
 
 namespace Belle2 {
 
@@ -60,7 +60,8 @@ namespace Belle2 {
     void defineHisto() override final;
 
 
-    bool isGoodIntercept(SVDIntercept* inter); /**< returns true if the track related to the intercept passes the selection cuts */
+    bool isGoodIntercept(const SVDIntercept*
+                         inter); /**< returns true if the track related to the intercept passes the selection cuts */
 
     VXD::GeoCache& m_geoCache; /**< BelleII Geometry*/
 

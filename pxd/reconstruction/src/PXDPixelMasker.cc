@@ -88,7 +88,7 @@ bool Belle2::PXD::PXDPixelMasker::pixelDead(Belle2::VxdID id, unsigned int uid, 
   return false;
 }
 
-void Belle2::PXD::PXDPixelMasker::setPixelThresholds(PXDMaskedPixelPar maskedPixels)
+void Belle2::PXD::PXDPixelMasker::setPixelThresholds(const PXDMaskedPixelPar& maskedPixels)
 {
   auto maskedPixelMap = maskedPixels.getMaskedPixelMap();
   for (auto maskedSingles = maskedPixelMap.begin(); maskedSingles != maskedPixelMap.end(); maskedSingles++) {

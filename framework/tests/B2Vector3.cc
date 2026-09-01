@@ -61,6 +61,10 @@ namespace {
       TVector3 tvec2 = bvec;
       EXPECT_EQ(tvec2, tvec);
 
+      EXPECT_EQ(bvec.at(0), tvec(0)) << bvec.PrintString();
+      EXPECT_EQ(bvec.at(1), tvec(1)) << bvec.PrintString();
+      EXPECT_EQ(bvec.at(2), tvec(2)) << bvec.PrintString();
+
       EXPECT_DOUBLE_EQ(bvec.CosTheta(), tvec.CosTheta()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Mag(), tvec.Mag()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Mag2(), tvec.Mag2()) << bvec.PrintString();

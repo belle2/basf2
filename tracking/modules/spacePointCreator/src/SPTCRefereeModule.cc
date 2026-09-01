@@ -335,7 +335,7 @@ void SPTCRefereeModule::terminate()
 }
 
 // ====================================================================== CHECK SAME SENSORS ======================================
-const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
+const std::vector<int> SPTCRefereeModule::checkSameSensor(const Belle2::SpacePointTrackCand* trackCand)
 {
   B2DEBUG(20, "Checking SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
           " for consecutive SpacePoints on the same sensor");
@@ -364,7 +364,7 @@ const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrac
 }
 
 // ========================================================================= CHECK MIN DISTANCE ===================================
-const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance)
+const std::vector<int> SPTCRefereeModule::checkMinDistance(const Belle2::SpacePointTrackCand* trackCand, double minDistance)
 {
   B2DEBUG(20, "Checking the distances between consecutive SpacePoints for SpacePointTrackCand " << trackCand->getArrayIndex() <<
           " from Array " << trackCand->getArrayIndex());
@@ -597,13 +597,10 @@ bool SPTCRefereeModule::getDirOfFlightTrueHit(const Belle2::SpacePoint* spacePoi
   if (trueHit == nullptr) {B2FATAL("Found no TrueHit to SpacePoint " << spacePoint->getArrayIndex() << " from Array " << spacePoint->getArrayName()); }
 
   // get SensorId - needed for transforming local to global coordinates
-  // cppcheck-suppress nullPointerRedundantCheck
   VxdID vxdID = trueHit->getSensorID();
 
   const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F position = sensorInfoBase.pointToGlobal(B2Vector3F(trueHit->getU(), trueHit->getV(), 0), true); // global position
-  // cppcheck-suppress nullPointerRedundantCheck
   B2Vector3F momentum = sensorInfoBase.vectorToGlobal(trueHit->getMomentum(), true); // global momentum
 
   B2DEBUG(20, "Getting the direction of flight for SpacePoint " << spacePoint->getArrayIndex() << ", related to TrueHit " <<
@@ -663,7 +660,7 @@ bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F mom
 void SPTCRefereeModule::copyToNewStoreArray(const Belle2::SpacePointTrackCand* trackCand,
                                             Belle2::StoreArray<Belle2::SpacePointTrackCand> newStoreArray)
 {
-  SpacePointTrackCand* newTC = newStoreArray.appendNew(*trackCand);
+  const SpacePointTrackCand* newTC = newStoreArray.appendNew(*trackCand);
   newTC->addRelationTo(trackCand);
   B2DEBUG(20, "Added new SPTC to StoreArray " << newStoreArray.getName() << " and registered relation to SPTC " <<
           trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName());
@@ -674,7 +671,7 @@ void SPTCRefereeModule::addToStoreArray(const Belle2::SpacePointTrackCand& track
                                         Belle2::StoreArray<Belle2::SpacePointTrackCand> storeArray,
                                         const Belle2::SpacePointTrackCand* origTrackCand)
 {
-  SpacePointTrackCand* newTC = storeArray.appendNew(trackCand);
+  const SpacePointTrackCand* newTC = storeArray.appendNew(trackCand);
   newTC->addRelationTo(origTrackCand);
   B2DEBUG(20, "Added new SPTC to StoreArray " << storeArray.getName() << " and registered relation to SPTC " <<
           origTrackCand->getArrayIndex() << " from Array " << origTrackCand->getArrayName());

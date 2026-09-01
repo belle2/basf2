@@ -30,7 +30,7 @@ namespace Belle2 {
       RecoTrackStorer();
 
       /// Default destructor
-      ~RecoTrackStorer();
+      ~RecoTrackStorer() override;
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

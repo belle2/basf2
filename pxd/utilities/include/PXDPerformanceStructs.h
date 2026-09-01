@@ -197,7 +197,7 @@ namespace Belle2 {
 
       //RelationVector<PXDIntercept> pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>();
       auto pxdIntercepts = recoTrack.getRelationsTo<PXDIntercept>(pxdInterceptsName);
-      for (auto& pxdIntercept : pxdIntercepts) {
+      for (const auto& pxdIntercept : pxdIntercepts) {
         TTrackCluster temp;
         // Only push a TrackCluster when setValues succeeds
         if (temp.setValues(pxdIntercept, recoTracksName, pxdTrackClustersName))

@@ -61,8 +61,8 @@ namespace Belle2 {
      * @param priorsTable the 2D std::vector<float> containing the prior probabilities
      * @param errorsTable the 2D std::vector<float> containing the errors on prior probabilities
      */
-    void setPriors(const Const::ChargedStable& particle, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges,
-                   std::vector<float> priorsTable, std::vector<float> errorsTable)
+    void setPriors(const Const::ChargedStable& particle, const std::vector<float>& xAxisEdges, const std::vector<float>& yAxisEdges,
+                   const std::vector<float>& priorsTable, const std::vector<float>& errorsTable)
     {
       auto index = particle.getIndex();
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
@@ -100,7 +100,7 @@ namespace Belle2 {
      * @param xAxisEdges the vector of edges of the X axis
      * @param yAxisEdges the vector of edges of the Y axis
      */
-    void setPriorsAxes(const Const::ChargedStable& particle, std::vector<float> xAxisEdges, std::vector<float> yAxisEdges)
+    void setPriorsAxes(const Const::ChargedStable& particle, const std::vector<float>& xAxisEdges, const std::vector<float>& yAxisEdges)
     {
       auto index = particle.getIndex();
       m_priors[index].setBinEdges(xAxisEdges, yAxisEdges);
@@ -115,7 +115,7 @@ namespace Belle2 {
      * @param particle the charged stable type of the prior's species
      * @param priorsTable a 2D vector containing the prior probabilities
      */
-    void setPriorsTable(const Const::ChargedStable& particle, std::vector<float> priorsTable)
+    void setPriorsTable(const Const::ChargedStable& particle, const std::vector<float>& priorsTable)
     {
       auto index = particle.getIndex();
       m_priors[index].setPriorsTable(priorsTable);
@@ -129,7 +129,7 @@ namespace Belle2 {
      * @param particle the charged stable type of the prior's species
      * @param errorsTable a 2D vector containing the prior probabilities
      */
-    void setErrorsTable(const Const::ChargedStable& particle, std::vector<float> errorsTable)
+    void setErrorsTable(const Const::ChargedStable& particle, const std::vector<float>& errorsTable)
     {
       auto index = particle.getIndex();
       m_priors[index].setErrorsTable(errorsTable);
@@ -143,7 +143,7 @@ namespace Belle2 {
      * @param xAxisLabel the label of the X axis
      * @param yAxisLabel the label of the Y axis
      */
-    void setAxisLabels(const Const::ChargedStable& particle, std::string xAxisLabel, std::string yAxisLabel)
+    void setAxisLabels(const Const::ChargedStable& particle, const std::string& xAxisLabel, const std::string& yAxisLabel)
     {
       auto index = particle.getIndex();
       m_priors[index].setAxisLabels(xAxisLabel, yAxisLabel);

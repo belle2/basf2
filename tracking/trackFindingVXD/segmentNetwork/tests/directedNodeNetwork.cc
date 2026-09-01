@@ -93,7 +93,7 @@ namespace DirectedNodeNetworkTests {
         const PXDCluster* pxdCluster = m_pxdClusterData.appendNew(providePXDCluster(float(i) / float(nHits), float(i) / float(nHits),
                                                                   aVxdID));
 
-        SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        const SpacePoint* newSP = m_spacePointData.appendNew(pxdCluster, &aSensorInfo);
         B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
@@ -162,7 +162,7 @@ namespace DirectedNodeNetworkTests {
     // here some tool-definitions first:
 
     /** small lambda function for checking existence of a given node in a given vector */
-    auto nodeWasFound = [&](std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes, DirectedNode<int, VoidMetaInfo>* node) -> bool {
+    auto nodeWasFound = [&](const std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes, DirectedNode<int, VoidMetaInfo>* node) -> bool {
       for (DirectedNode<int, VoidMetaInfo>* otherNode : nodes)
       {
         if (node->getEntry() == otherNode->getEntry()) { return true; }
@@ -171,7 +171,7 @@ namespace DirectedNodeNetworkTests {
     };
 
     /** small lambda function for printing all the nodes for debugging */
-    auto printNodeEntries = [&](std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes) -> std::string {
+    auto printNodeEntries = [&](const std::vector<DirectedNode<int, VoidMetaInfo>*>& nodes) -> std::string {
       std::string output = "Nodes got the following entries: ";
       for (DirectedNode<int, VoidMetaInfo>* node : nodes)
       {
@@ -299,8 +299,8 @@ namespace DirectedNodeNetworkTests {
         B2INFO("innerEnds after indices " << index - 1 << "/" << index << " are: " << printNodeEntries(innerEnds));
 
         // get all nodes of outer node, expected: 1 inner and no outerNodes:
-        auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
-        auto& outerNodes = intNetwork.getNode(intArray3.at(index))->getOuterNodes();
+        const auto& innerNodes = intNetwork.getNode(intArray3.at(index - 1))->getInnerNodes();
+        const auto& outerNodes = intNetwork.getNode(intArray3.at(index))->getOuterNodes();
         EXPECT_EQ(1, innerNodes.size());
         EXPECT_EQ(1, outerNodes.size());
       }
@@ -342,7 +342,6 @@ namespace DirectedNodeNetworkTests {
       int& newOuterInt = onTheFlyCreatedInts.back();
       int& existingInt = intArray.at(1); // neither an outer nor an inner end before.
       std::vector<DirectedNode<int, VoidMetaInfo>*> oldOuterEnds = intNetwork.getOuterEnds();
-      std::vector<DirectedNode<int, VoidMetaInfo>*> oldInnerEnds = intNetwork.getInnerEnds();
 
       EXPECT_EQ(3, oldOuterEnds.size());
       EXPECT_TRUE(nullptr == intNetwork.getNode(newOuterInt));

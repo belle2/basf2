@@ -244,10 +244,9 @@ void KLMTimeCollectorModule::collect()
       B2DEBUG(20, "Collect :: Assign elementNum based on copyId for extHits." << LogVar("Sub from elementNumber",
               tSub) << LogVar("bklmCover", bklmCover) << LogVar("eklmCover", eklmCover));
 
-      bool crossed = false; // should be only once ?
-      KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
+      const KLMMuidLikelihood* muidLikelihood = track->getRelatedTo<KLMMuidLikelihood>();
       if (bklmCover) {
-        crossed = muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1);
+        const bool crossed = muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1);
         if (crossed) {
           if (tLay > 2) {
             unsigned int tModule = m_elementNum->moduleNumber(tSub, tFor, tSec, tLay);
@@ -261,7 +260,7 @@ void KLMTimeCollectorModule::collect()
         }
       }
       if (eklmCover) {
-        crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1);
+        const bool crossed = muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1);
         if (crossed) {
           unsigned int tChannel = m_elementNum->channelNumber(tSub, tFor, tSec, tLay, tPla, tStr);
           if (m_channelStatus->getChannelStatus(tChannel) != KLMChannelStatus::c_Normal)
@@ -298,7 +297,7 @@ void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klm
     if (!digits[0]->isGood() || !digits[1]->isGood())
       continue;
 
-    for (KLMDigit& digitHit : digits) {
+    for (const KLMDigit& digitHit : digits) {
       m_Event.channelId = digitHit.getUniqueChannelID();
       m_Event.inRPC = 0;
       if (m_channelStatus->getChannelStatus(m_Event.channelId) != KLMChannelStatus::c_Normal)
@@ -307,8 +306,8 @@ void KLMTimeCollectorModule::collectScintEnd(const RelationVector<KLMHit2d>& klm
       std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(m_Event.channelId, m_vExtHits);
       if (pair_extHits.first == nullptr || pair_extHits.second == nullptr)
         continue;
-      ExtHit& entryHit = *(pair_extHits.first);
-      ExtHit& exitHit = *(pair_extHits.second);
+      const ExtHit& entryHit = *(pair_extHits.first);
+      const ExtHit& exitHit = *(pair_extHits.second);
 
       m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
 
@@ -375,8 +374,8 @@ void KLMTimeCollectorModule::collectScint(RelationVector<KLMHit2d>& klmHit2ds)
         std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(channelId_digit, m_vExtHits);
         if (pair_extHits.first == nullptr || pair_extHits.second == nullptr)
           continue;
-        ExtHit& entryHit = *(pair_extHits.first);
-        ExtHit& exitHit = *(pair_extHits.second);
+        const ExtHit& entryHit = *(pair_extHits.first);
+        const ExtHit& exitHit = *(pair_extHits.second);
 
         m_Event.inRPC = digitHit.inRPC();
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
@@ -447,8 +446,8 @@ void KLMTimeCollectorModule::collectRPC(RelationVector<KLMHit2d>& klmHit2ds)
         std::pair<ExtHit*, ExtHit*> pair_extHits = matchExt(tModule, m_vExtHits_RPC);
         if (pair_extHits.first == nullptr || pair_extHits.second == nullptr)
           continue;
-        ExtHit& entryHit = *(pair_extHits.first);
-        ExtHit& exitHit = *(pair_extHits.second);
+        const ExtHit& entryHit = *(pair_extHits.first);
+        const ExtHit& exitHit = *(pair_extHits.second);
 
         m_Event.flyTime = 0.5 * (entryHit.getTOF() + exitHit.getTOF());
         ROOT::Math::XYZVector positionGlobal_extHit = 0.5 * (entryHit.getPosition() + exitHit.getPosition());

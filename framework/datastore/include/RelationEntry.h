@@ -23,7 +23,7 @@ namespace Belle2 {
      *  @param obj  The object that is pointed to by the relation.
      *  @param w    The weight of the relation.
      */
-    RelationEntry(TObject* obj = nullptr, float w = 1.0): object(obj), weight(w) {}
+    explicit RelationEntry(TObject* obj = nullptr, float w = 1.0): object(obj), weight(w) {}
 
     TObject* object;  /**< Pointer to the object. */
     float   weight;  /**< Weight of the relation. */

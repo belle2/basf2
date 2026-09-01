@@ -22,6 +22,8 @@
 #include <framework/core/ModuleParamList.h>
 #include <tracking/trackingUtilities/numerics/Angle.h>
 
+#include <Math/Vector3D.h>
+
 
 namespace Belle2 {
 
@@ -123,7 +125,7 @@ namespace Belle2 {
           if (hitPtr->getAutomatonCell().hasBackgroundFlag() || hitPtr->getAutomatonCell().hasTakenFlag()) {
             m_wireHitCache.push_back(CDCCKFWireHitCache{99999, 0.});
           } else {
-            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().phi()});
+            m_wireHitCache.push_back(CDCCKFWireHitCache{hitPtr->getWire().getICLayer(), hitPtr->getRefPos2D().Phi()});
           }
         }
       }
@@ -141,23 +143,23 @@ namespace Belle2 {
           const float maxForwardZ = wires.back().getForwardZ();     // 157.615
           const float maxBackwardZ = wires.back().getBackwardZ();   // -72.0916
 
-          const TrackingUtilities::Vector3D seedPos(lastState.getSeed()->getPositionSeed());
+          const ROOT::Math::XYZVector seedPos(lastState.getSeed()->getPositionSeed());
           const float seedPosZ = seedPos.z();
 
           if (seedPosZ < maxForwardZ && seedPosZ > maxBackwardZ) {
             lastICLayer = 56;
           } else {
             // do straight extrapolation of seed momentum to CDC outer walls
-            TrackingUtilities::Vector3D seedMomZOne(lastState.getSeed()->getMomentumSeed());
+            ROOT::Math::XYZVector seedMomZOne(lastState.getSeed()->getMomentumSeed());
             seedMomZOne = seedMomZOne / seedMomZOne.z();
             // const float maxZ = seedPosZ > 0 ? maxForwardZ : maxBackwardZ;
-            // const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMom / seedMom.norm() * (seedPosZ - maxZ);
+            // const ROOT::Math::XYZVector extrapolatedPos = seedPos - seedMom / seedMom.R() * (seedPosZ - maxZ);
 
             // find closest iCLayer
             float minDist = 99999;
             for (const auto& wire : wires) {
               const float maxZ = seedPosZ > 0 ? wire.getForwardZ() : wire.getBackwardZ();
-              const TrackingUtilities::Vector3D extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
+              const ROOT::Math::XYZVector extrapolatedPos = seedPos - seedMomZOne * (seedPosZ - maxZ);
 
               const auto distance = wire.getDistance(extrapolatedPos);
               if (distance < minDist) {
@@ -169,7 +171,7 @@ namespace Belle2 {
           }
         }
       } else {
-        lastPhi = lastState.getWireHit()->getRefPos2D().phi();
+        lastPhi = lastState.getWireHit()->getRefPos2D().Phi();
         lastICLayer = lastState.getWireHit()->getWire().getICLayer();
       }
 

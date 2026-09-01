@@ -116,14 +116,14 @@ namespace Belle2 {
        * @return GeoMaterial instance describing the material and suitable for
        * serialization
        */
-      GeoMaterial createMaterialConfig(const gearbox::Interface& parameters);
+      static GeoMaterial createMaterialConfig(const gearbox::Interface& parameters);
 
       /** Create Optical Surface Configuration from XML description
        * @param parameters GearDir pointing to the Optical Surface description
        * @return GeoOpticalSurface instance describing the material and
        * suitable for serialization
        */
-      GeoOpticalSurface createOpticalSurfaceConfig(const gearbox::Interface& parameters);
+      static GeoOpticalSurface createOpticalSurfaceConfig(const gearbox::Interface& parameters);
 
       /** Clear all existing materials */
       void clear();
@@ -140,7 +140,7 @@ namespace Belle2 {
         m_densityScale.reset();
       }
       /** get the set of material names which will **not** be scaled in any way */
-      std::set<std::string> getDensityScaleIgnoredMaterials() const { return m_ignoreScaling; }
+      const std::set<std::string>& getDensityScaleIgnoredMaterials() const { return m_ignoreScaling; }
       /** set the set of material names which will **not** be scaled in any way */
       void setDensityScaleIgnoredMaterials(const std::set<std::string>& ignored) { m_ignoreScaling = ignored; }
     protected:

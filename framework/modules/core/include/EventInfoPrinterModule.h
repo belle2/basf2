@@ -30,7 +30,7 @@ namespace Belle2 {
     EventInfoPrinterModule();
 
     /** Destructor of the module. */
-    virtual ~EventInfoPrinterModule();
+    virtual ~EventInfoPrinterModule() override;
 
     /** initialization. */
     virtual void initialize() override;

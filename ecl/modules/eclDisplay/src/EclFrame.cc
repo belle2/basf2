@@ -524,7 +524,7 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
     // Root entry (detector) has been selected.
     changeType(PAINTER_COLLECTOR);
   } else {
-    TGListTreeItem* grandparent = parent->GetParent();
+    const TGListTreeItem* grandparent = parent->GetParent();
     if (!grandparent) {
       // Crate entry had been selected.
       changeType(PAINTER_SHAPER, false);
@@ -537,7 +537,7 @@ void EclFrame::changeRange(TGListTreeItem* entry, int)
       long shaper = (long)entry->GetUserData();
       long crate  = (long)parent->GetUserData();
       shaper = 12 * crate + shaper;
-      ((EclPainter1D*)m_ecl_painter)->setShaper(crate + 1, shaper + 1);
+      (static_cast<EclPainter1D*>(m_ecl_painter))->setShaper(crate + 1, shaper + 1);
       doDraw();
     }
   }

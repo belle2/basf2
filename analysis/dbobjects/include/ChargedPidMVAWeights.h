@@ -450,7 +450,7 @@ namespace Belle2 {
     /**
      * Get the name of the polar angle variable.
      */
-    std::string getThetaVarName() const
+    const std::string& getThetaVarName() const
     {
       return m_thetaVarName;
     }

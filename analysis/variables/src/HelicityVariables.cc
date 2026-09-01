@@ -40,7 +40,7 @@ namespace Belle2 {
         // Only for pi0 -> gamma gamma, gamma -> e+ e-
         bool isOneConversion = false;
         if (part->getPDGCode() == Const::pi0.getPDGCode()) {
-          for (const auto& idaughter : daughters) {
+          for (const auto* idaughter : daughters) {
             // both daughter must be gamma
             if (idaughter -> getPDGCode() != Const::photon.getPDGCode()) {
               isOneConversion = false;
@@ -63,7 +63,7 @@ namespace Belle2 {
 
           //only for pi0 decay where one gamma converts
           PxPyPzEVector pGamma;
-          for (const auto& idaughter : daughters) {
+          for (const auto* idaughter : daughters) {
             if (idaughter -> getNDaughters() == 2) continue;
             else pGamma = frame.getMomentum(idaughter);
           }
@@ -118,7 +118,7 @@ namespace Belle2 {
 
         PxPyPzEVector pGamma;
 
-        for (const auto& idaughter : daughters) {
+        for (const auto* idaughter : daughters) {
           if (std::abs(idaughter -> getPDGCode()) == Const::photon.getPDGCode()) {
             pGamma = frame.getMomentum(idaughter);
             break;

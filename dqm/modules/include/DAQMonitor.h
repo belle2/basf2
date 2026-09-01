@@ -39,9 +39,6 @@ namespace Belle2 {
     /** Constructor. */
     DAQMonitorModule();
 
-    /** Destructor. */
-    ~DAQMonitorModule() = default;
-
     /** Initialize. */
     void initialize() override final;
 

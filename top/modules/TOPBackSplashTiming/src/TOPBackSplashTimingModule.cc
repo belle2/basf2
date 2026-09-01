@@ -202,7 +202,7 @@ void TOPBackSplashTimingModule::makePlot(double cosTheta, double clusterE, int m
   // Parameters
   double xpeak1 = 0;
   for (int i = 0; i < res->floatParsFinal().getSize(); ++i) {
-    RooRealVar* p = (RooRealVar*)res->floatParsFinal().at(i);
+    RooRealVar* p = static_cast<RooRealVar*>(res->floatParsFinal().at(i));
     box->AddText(Form("%s = %.3f ± %.3f",
                       p->GetName(),
                       p->getVal(),
@@ -235,7 +235,7 @@ void TOPBackSplashTimingModule::makePlot(double cosTheta, double clusterE, int m
 }
 
 TOPBackSplashFitResult* TOPBackSplashTimingModule::fitTimingDigits(int moduleID,
-    std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta, int nTracksPerSlot)
+    const std::vector<const TOPDigit*>& digitsPerSlot, double clusterE, double clusterCosTheta, int nTracksPerSlot)
 {
 
   // Intercept RooFit messages
@@ -342,6 +342,7 @@ void TOPBackSplashTimingModule::initialize()
   B2INFO("TOPBackSplashTimingModule initialized");
   m_eclClusters.isRequired();
   m_digits.isRequired();
+  m_recBunch.isOptional();
   m_tracks.isRequired();
   m_fitresult.registerInDataStore();
   m_fitresult.registerRelationTo(m_eclClusters);
@@ -350,6 +351,15 @@ void TOPBackSplashTimingModule::initialize()
 
 void TOPBackSplashTimingModule::event()
 {
+
+  // check bunch reconstruction status and do the backsplash timing reconstruction:
+  // - if object exists and bunch is found (collision data w/ bunch finder in the path)
+  // - if object doesn't exist (cosmic data and other cases w/o bunch finder in the path)
+
+  if (m_recBunch.isValid()) {
+    if (not m_recBunch->isReconstructed()) return;
+  }
+
   // Step 1: See which tracks can be matched to slots, ignore these slots
   // Even if only neutral clusters are being considered, the same slot
   // might be adjacent to an additional charged cluster, which will make be bkg

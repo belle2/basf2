@@ -221,7 +221,7 @@ void eclCosmicECollectorModule::prepare()
   /** Bulk of the ECL uses the neighbour code to find pairs of nearest neighbours. Excludes first and last ThetaID.  */
 
   /** Roughly four nearest neighbours, plus crystal itself. cellID starts from 1 in ECLNeighbours */
-  ECLNeighbours* myNeighbours4 = new ECLNeighbours("F", 0.95);
+  const ECLNeighbours* myNeighbours4 = new ECLNeighbours("F", 0.95);
 
   for (int crysID = firstCrystal[1]; crysID < firstCrystal[68]; crysID++) {
     std::vector<short int> neighbours = myNeighbours4->getNeighbours(crysID + 1);
@@ -231,7 +231,7 @@ void eclCosmicECollectorModule::prepare()
     int nB = -1;
     std::vector<short int> nextThetaNeighbours;
     std::vector<short int> previousThetaNeighbours;
-    for (auto& ID1 : neighbours) {
+    for (const auto& ID1 : neighbours) {
       int temp0 = ID1 - 1;
       if (temp0 != crysID && ThetaIDCrys[temp0] == ThetaIDCrys[crysID] && nA == -1) {
         nA = temp0;
@@ -255,8 +255,8 @@ void eclCosmicECollectorModule::prepare()
     }
 
     /** Now create pairs consisting of one next thetaID and one previous thetaID */
-    for (auto& IDn : nextThetaNeighbours) {
-      for (auto& IDp : previousThetaNeighbours) {
+    for (const auto& IDn : nextThetaNeighbours) {
+      for (const auto& IDp : previousThetaNeighbours) {
         CenterCrys.push_back(crysID);
         NeighbourA.push_back(IDn);
         NeighbourB.push_back(IDp);

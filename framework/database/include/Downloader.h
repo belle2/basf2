@@ -78,11 +78,11 @@ namespace Belle2::Conditions {
      * @param checksum expected hash digest of the data
      * @return true if digest matches, false otherwise
      */
-    bool verifyChecksum(std::istream& input, const std::string& checksum) { return calculateChecksum(input) == checksum; }
+    static bool verifyChecksum(std::istream& input, const std::string& checksum) { return calculateChecksum(input) == checksum; }
     /** Escape a string to make it safe to be used in web requests */
     std::string escapeString(const std::string& text);
     /** Join two strings and make sure that there is exactly one '/' between them */
-    std::string joinWithSlash(const std::string& base, const std::string& second);
+    static std::string joinWithSlash(const std::string& base, const std::string& second);
 
   private:
 

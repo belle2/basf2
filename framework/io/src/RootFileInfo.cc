@@ -11,6 +11,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/DataStore.h>
 
+#include <sstream>
 #include <TTree.h>
 #include <TFile.h>
 #include <TKey.h>
@@ -78,7 +79,7 @@ namespace Belle2::RootIOUtilities {
     return *cache;
   }
 
-  const std::set<std::string> RootFileInfo::getNtupleBranchNames(std::string treeName)
+  const std::set<std::string> RootFileInfo::getNtupleBranchNames(const std::string& treeName)
   {
     std::set<std::string> branches;
     auto* tree = dynamic_cast<TTree*>(m_file->Get(treeName.c_str()));

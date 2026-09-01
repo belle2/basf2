@@ -974,6 +974,7 @@ namespace Belle2 {
      *
      *  \warning TClonesArray is dangerously easy to misuse, please avoid.
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally caches the base class result
     TClonesArray* getArrayPointer() const
     {
       if (!m_arrayPointer)

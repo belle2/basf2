@@ -26,12 +26,15 @@ void ROIpayload::init(int length)
 {
   m_index = 0;
   m_length = length;
-  if (length == 0)
+  if (length == 0) {
     m_rootdata = nullptr;
-  else
+    m_data32 = nullptr;
+    m_data64 = nullptr;
+  } else {
     m_rootdata = new int[length];
-  m_data32 = (uint32_t*)m_rootdata;
-  m_data64 = (ROIrawID::baseType*)(m_data32 + HEADER_SIZE_WITH_LENGTH);
+    m_data32 = reinterpret_cast<uint32_t*>(m_rootdata);
+    m_data64 = reinterpret_cast<ROIrawID::baseType*>(m_data32 + HEADER_SIZE_WITH_LENGTH);
+  }
 }
 
 void ROIpayload::setPayloadLength(int length)
@@ -81,7 +84,7 @@ void ROIpayload::setRunSubrunExpNumber(int run, int subrun, int exp)
 //void ROIpayload::addROIraw(ROIrawID roiraw)
 void ROIpayload::addROIraw(unsigned long int roiraw)
 {
-  if ((int*)(m_data64 + m_index) >= m_rootdata + m_length) {
+  if (reinterpret_cast<int*>(m_data64 + m_index) >= m_rootdata + m_length) {
     B2ERROR("Adding too many ROIs to the ROIpayload." << std::endl <<
             "Something really fishy is going on");
     return;
@@ -95,14 +98,14 @@ void ROIpayload::setCRC()
   //  assert((int*)(m_data64 + m_index) ==  m_rootdata + m_length - 1);
 
   // TODO Pointer comparison is bad
-  if ((int*)(m_data32 + m_index * 2 + HEADER_SIZE_WITH_LENGTH) >= m_rootdata + m_length) {
+  if (reinterpret_cast<int*>(m_data32 + m_index * 2 + HEADER_SIZE_WITH_LENGTH) >= m_rootdata + m_length) {
     B2ERROR("No space left on the ROI payload to write the CRC." << std::endl);
     return;
   }
 
   crc_optimal<32, 0x04C11DB7, 0, 0, false, false> dhh_crc_32;
 
-  dhh_crc_32.process_bytes((void*)(m_rootdata + OFFSET_HEADER),
+  dhh_crc_32.process_bytes(m_rootdata + OFFSET_HEADER,
                            HEADER_SIZE_WO_LENGTH * sizeof(uint32_t) + m_index * sizeof(uint64_t));
 
   m_data32[OFFSET_ROIS + m_index * 2] = htonl(dhh_crc_32.checksum()) ;

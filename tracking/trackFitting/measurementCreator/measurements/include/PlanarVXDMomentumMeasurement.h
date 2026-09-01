@@ -105,7 +105,8 @@ namespace Belle2 {
     const RecoTrack* m_recoTrack = nullptr;
 
     /// Return the detector ID.
-    int getDetId() const
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
+    static int getDetId()
     {
       return -1;
     }
@@ -136,7 +137,7 @@ namespace Belle2 {
     short trackCharge = m_recoTrack->getChargeSeed();
 
     // Copy the information from the mc particle (if there is one)
-    MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
+    const MCParticle* relatedMCParticle = m_hit->template getRelated<MCParticle>("MCParticles");
 
     ROOT::Math::XYZVector mcMomentum;
     ROOT::Math::XYZVector mcPosition;
@@ -196,10 +197,10 @@ namespace Belle2 {
 
   /** Specialisation for PXD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId() const;
+  int PlanarVXDMomentumMeasurement<PXDCluster>::getDetId();
 
   /** Specialisation for SVD clusters. */
   template<>
-  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId() const;
+  int PlanarVXDMomentumMeasurement<SVDCluster>::getDetId();
 
 }

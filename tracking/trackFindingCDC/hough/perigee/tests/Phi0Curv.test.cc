@@ -78,13 +78,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Tags of the hits");
 
@@ -170,13 +170,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
+    for (const std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
       const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
-      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << houghBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << houghBox.getLowerBound<DiscreteCurv>());
 
       for (const CDCSegment2D* segment2D : segments) {
@@ -271,7 +271,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
       const std::vector<CDCRLWireHit >& taggedHits = candidate.second;
 
@@ -382,7 +382,7 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const CDCTrajectory2D& trajectory2D = candidate.first;
       const std::vector<CDCRLWireHit >& taggedHits = candidate.second;
 
@@ -418,7 +418,6 @@ namespace {
     timeItResult.printSummary();
   }
 
-  // cppcheck-suppress syntaxError
   TEST_F(TrackFindingCDCTestWithSimpleSimulation, hough_perigee_phi0_curv_prepared_event_hits)
   {
     std::string svgFileName = "phi0_curv_on_prepared_event_hits.svg";
@@ -465,13 +464,13 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
+    for (const std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> >& candidate : candidates) {
       const Phi0CurvBox& phi0CurvBox = candidate.first;
       const std::vector<CDCRLWireHit>& taggedHits = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << phi0CurvBox.getLowerBound<DiscretePhi0>()->phi());
+      B2DEBUG(100, "Phi0 " << phi0CurvBox.getLowerBound<DiscretePhi0>()->Phi());
       B2DEBUG(100, "Curv " << phi0CurvBox.getLowerBound<DiscreteCurv>());
       B2DEBUG(100, "Tags of the hits");
 

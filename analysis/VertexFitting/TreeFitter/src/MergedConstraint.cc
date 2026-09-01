@@ -19,7 +19,7 @@ namespace TreeFitter {
   ErrCode MergedConstraint::project(const FitParams& fitpar, Projection& p) const
   {
     ErrCode status ;
-    for (auto element : m_list) {
+    for (const auto* element : m_list) {
       status |= element->project(fitpar, p) ;
       p.incrementOffset(element->dim()) ;
     }

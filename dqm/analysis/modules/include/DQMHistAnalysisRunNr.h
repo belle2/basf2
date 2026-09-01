@@ -30,11 +30,6 @@ namespace Belle2 {
     DQMHistAnalysisRunNrModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisRunNrModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

@@ -27,7 +27,7 @@ namespace Belle2::Conditions {
     HSFCentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
 
     /** default destructor */
-    virtual ~HSFCentralMetadataProvider() = default;
+    virtual ~HSFCentralMetadataProvider() override = default;
 
     /** Check the status of a given globaltag
      * @returns the status of the globaltag (like "OPEN", "INVALID", "PUBLISHED").

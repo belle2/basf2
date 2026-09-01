@@ -25,8 +25,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisEventT0EfficiencyModule();
-    /** Destructor */
-    ~DQMHistAnalysisEventT0EfficiencyModule();
 
     /** create TCanvas and MonitoringObject */
     void initialize() override final;

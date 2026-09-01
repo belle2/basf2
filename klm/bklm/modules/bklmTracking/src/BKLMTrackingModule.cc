@@ -17,6 +17,7 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 using namespace Belle2;
 using namespace Belle2::bklm;
@@ -253,7 +254,7 @@ void BKLMTrackingModule::runTracking(int mode, int iSection, int iSector, int iL
           if (m_MatchToRecoTrack) {
             if (findClosestRecoTrack(m_track, closestTrack)) {
               m_track->addRelationTo(closestTrack);
-              for (KLMHit2d* hit2d : m_hits) {
+              for (const KLMHit2d* hit2d : m_hits) {
                 unsigned int sortingParameter = closestTrack->getNumberOfTotalHits();
                 closestTrack->addBKLMHit(hit2d, sortingParameter, RecoHitInformation::OriginTrackFinder::c_LocalTrackFinder);
               }
@@ -325,7 +326,7 @@ void BKLMTrackingModule::terminate()
 
 }
 
-bool BKLMTrackingModule::sameSector(KLMHit2d* hit1, KLMHit2d* hit2)
+bool BKLMTrackingModule::sameSector(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
   if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector())
     return true;
@@ -396,7 +397,7 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
       closestTrack = &track;
       }
       */
-    } catch (genfit::Exception& e) {
+    } catch (const genfit::Exception& e) {
     }// try
   }
 
@@ -549,28 +550,28 @@ void BKLMTrackingModule::generateEffi(int iSection, int iSector, int iLayer)
 
 }
 
-bool BKLMTrackingModule::sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2)
+bool BKLMTrackingModule::sortByLayer(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
 
   return hit1->getLayer() < hit2->getLayer();
 
 }
 
-bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit)
+bool BKLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, const KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1)
     return true;
   else return false;
 }
 
-bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, KLMHit2d* hit)
+bool BKLMTrackingModule::isSectorUnderStudy(int section, int iSector, const KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1)
     return true;
   else return false;
 }
 
-double BKLMTrackingModule::distanceToHit(BKLMTrack* track, KLMHit2d* hit,
+double BKLMTrackingModule::distanceToHit(BKLMTrack* track, const KLMHit2d* hit,
                                          double& error,
                                          double& sigma)
 {
@@ -604,8 +605,7 @@ double BKLMTrackingModule::distanceToHit(BKLMTrack* track, KLMHit2d* hit,
   double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
   //error from tracking is ignored here
-  error = sqrt(pow(hit_localPhiErr, 2) +
-               pow(hit_localZErr, 2));
+  error = sqrt(square(hit_localPhiErr) + square(hit_localZErr));
 
   if (error != 0.0) {
     sigma = distance / error;

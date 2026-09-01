@@ -94,7 +94,7 @@ namespace Belle2::BoostVectorCalib {
     }
 
     //sort by time
-    sort(events.begin(), events.end(), [](Event e1, Event e2) {return e1.t < e2.t;});
+    sort(events.begin(), events.end(), [](const Event & e1, const Event & e2) {return e1.t < e2.t;});
 
 
     return events;
@@ -131,7 +131,7 @@ namespace Belle2::BoostVectorCalib {
 
 
   /** Rapidities of particles with momenta vecs wrt the input boost vector (tanAngleX, tanAnlgeY) (in mili-units) */
-  std::vector<double> getRapidities(std::vector<B2Vector3D> vecs, std::vector<double> boostDir)
+  std::vector<double> getRapidities(const std::vector<B2Vector3D>& vecs, const std::vector<double>& boostDir)
   {
     B2Vector3D boost(boostDir[0], boostDir[1], 1);
     boost = boost.Unit();
@@ -144,8 +144,8 @@ namespace Belle2::BoostVectorCalib {
     double pMu0 = vecs[0].Mag();
     double pMu1 = vecs[1].Mag();
 
-    double C0 = 1. / sqrt(pow(mL / pMu0, 2) + 1);
-    double C1 = 1. / sqrt(pow(mL / pMu1, 2) + 1);
+    double C0 = 1. / sqrt((mL / pMu0) * (mL / pMu0) + 1);
+    double C1 = 1. / sqrt((mL / pMu1) * (mL / pMu1) + 1);
 
     double y0 = atanh(cos(th0) * C0);
     double y1 = atanh(cos(th1) * C1);

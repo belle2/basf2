@@ -31,7 +31,7 @@ namespace Belle2 {
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
     /** Destructor */
-    ~DQMHistAnalysisSVDOnMiraBelleModule();
+    ~DQMHistAnalysisSVDOnMiraBelleModule() override;
     /** Module function initialize */
     void initialize() override final;
     /** Module function beginRun */
@@ -78,7 +78,7 @@ namespace Belle2 {
      * @param nEvents number of events
      * @return vector with values for U and V sides
      */
-    std::pair<float, float> avgOccupancyUV(TH1F* hU, TH1F* hV, int nEvents, int layer = -1, int ladder = -1, int sensor = -1) const;
+    std::pair<float, float> avgOccupancyUV(auto hU, auto hV, int nEvents, int layer = -1, int ladder = -1, int sensor = -1) const;
 
     /**
      * Calculate avg offline occupancy for specified layer for time group id = 0
@@ -95,7 +95,7 @@ namespace Belle2 {
      * @param ladder ladder index
      * @param sensor sensor index     * @return vector with values for U and V sides
      */
-    std::pair<float, float> avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int layer = -1, int ladder = -1,
+    std::pair<float, float> avgEfficiencyUV(auto hMCU, auto hMCV, auto hFTU, auto hFTV, int layer = -1, int ladder = -1,
                                             int sensor = -1) const;
 
     /**
@@ -103,14 +103,14 @@ namespace Belle2 {
     * @param h pointer to histogram
     * @return x value for max Y bin
     */
-    float xForMaxY(TH1F* h) const;
+    static float xForMaxY(auto h) ;
 
     /**
     * Calculate full width at half maximum of histogram
     * @param h pointer to histogram
     * @return x value for fwhm
     */
-    float histFWHM(TH1F* h) const;
+    static float histFWHM(auto h) ;
 
     /**
      * Add variable to object monitoring
@@ -120,7 +120,7 @@ namespace Belle2 {
     void addVariable(std::string name, std::pair<float, float>& varUV);
 
     /** find the Y bin given the layer and sensor number */
-    Int_t findBinY(Int_t layer, Int_t sensor) const
+    static Int_t findBinY(Int_t layer, Int_t sensor)
     {
       // should take the method from SVDSummaryPlot (->put as static)
       if (layer == 3)
@@ -136,7 +136,7 @@ namespace Belle2 {
     }
 
     /** get number of ladders per layer*/
-    Int_t getNumberOfLadders(Int_t layer) const
+    static Int_t getNumberOfLadders(Int_t layer)
     {
       if (layer == 3)
         return 7;
@@ -151,7 +151,7 @@ namespace Belle2 {
     }
 
     /** get number of sensors per layer*/
-    Int_t getNumberOfSensors(Int_t layer) const
+    static Int_t getNumberOfSensors(Int_t layer)
     {
       if (layer == 3)
         return 2;

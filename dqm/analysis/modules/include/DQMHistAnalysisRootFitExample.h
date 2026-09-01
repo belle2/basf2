@@ -35,11 +35,6 @@ namespace Belle2 {
     DQMHistAnalysisRooFitExampleModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisRooFitExampleModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

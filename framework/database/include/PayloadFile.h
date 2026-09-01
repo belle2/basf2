@@ -28,7 +28,7 @@ namespace Belle2 {
      * Get the name of the downloaded payload file.
      * @return    Local file name.
      */
-    std::string getFileName() const {return m_fileName;};
+    const std::string& getFileName() const {return m_fileName;};
 
     /**
      * Read the content of the payload (text) file.
@@ -57,6 +57,7 @@ namespace Belle2 {
       addCallback([this](const std::string&) {m_payloadFile = PayloadFile(isValid() ? m_entry->getFilename() : "");});
     }
     /** isValid is always true if we have a filename */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     inline bool isValid() const {return (m_entry) && (m_entry->getFilename() != "");}
     inline const PayloadFile& operator *()  const {return m_payloadFile; }  /**< Imitate pointer functionality. */
     inline const PayloadFile* operator ->() const {return &m_payloadFile; }   /**< Imitate pointer functionality. */

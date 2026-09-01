@@ -51,9 +51,17 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // wire gains
+  int nZeroWG = 0;
+
   for (unsigned int i = 0; i < c_nSenseWires; ++i) {
-    if (m_DBWireGains->getWireGain(i) == 0)
-      B2WARNING("Wire gain is zero for this wire: " << i);
+    if (m_DBWireGains->getWireGain(i) == 0) {
+      ++nZeroWG;
+      B2DEBUG(20, "Wire gain is zero for wire: " << i);
+    }
+  }
+
+  if (nZeroWG > 0) {
+    B2WARNING("Found " << nZeroWG << " wires with zero gain");
   }
 
   // cosine correction (store the bin edges for extrapolation)
@@ -120,7 +128,6 @@ void CDCDedxCorrectionModule::event()
 
     if (costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
     if (costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
-
 
     double injtime = dedxTrack.getInjectionTime();
     double injring = dedxTrack.getInjectionRing();

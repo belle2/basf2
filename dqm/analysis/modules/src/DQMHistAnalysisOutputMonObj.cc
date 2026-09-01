@@ -46,9 +46,6 @@ DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: Constructor done.");
 }
 
-
-DQMHistAnalysisOutputMonObjModule::~DQMHistAnalysisOutputMonObjModule() { }
-
 void DQMHistAnalysisOutputMonObjModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisOutputMonObj: initialized.");

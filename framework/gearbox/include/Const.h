@@ -320,6 +320,7 @@ namespace Belle2 {
        * Addition of another set to this one.
        * @param set  The other set of detector IDs.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
       RestrictedDetectorSet& operator += (const DetectorSet& set) {DetectorSet::operator +=(set); checkSet(); return *this;}
 
       /**
@@ -558,7 +559,7 @@ namespace Belle2 {
       }
 
       /** Returns an invalid particle to check if iteration should be stopped. */
-      ParticleType end() const
+      static ParticleType end()
       {
         return invalidParticle;
       }
@@ -566,7 +567,7 @@ namespace Belle2 {
       /** Returns particle in set with given PDG code, or invalidParticle if not found. */
       const ParticleType& find(int pdg) const
       {
-        for (ParticleType pdgIter : *this) {
+        for (const ParticleType& pdgIter : *this) {
           if (pdgIter.getPDGCode() == pdg)
             return m_particles[pdgIter.getIndex()];
         }

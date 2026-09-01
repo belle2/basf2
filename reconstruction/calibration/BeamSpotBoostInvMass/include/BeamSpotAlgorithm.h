@@ -21,7 +21,7 @@ namespace Belle2 {
     BeamSpotAlgorithm();
 
     /// Destructor
-    virtual ~BeamSpotAlgorithm() {}
+    virtual ~BeamSpotAlgorithm() override {}
 
     /// Set outer loss function (for calibration intervals)
     void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }

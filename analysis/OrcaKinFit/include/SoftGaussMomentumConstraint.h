@@ -46,13 +46,13 @@ namespace Belle2 {
     public:
 
       /// Constructor
-      SoftGaussMomentumConstraint(double sigma_ = 0,      ///< The sigma value
-                                  double efact_  = 0,    ///< Factor for energy sum
-                                  double pxfact_ = 0,    ///< Factor for px sum
-                                  double pyfact_ = 0,    ///< Factor for py sum
-                                  double pzfact_ = 0,    ///< Factor for pz sum
-                                  double value_ = 0  ///< Target value of sum
-                                 );
+      explicit SoftGaussMomentumConstraint(double sigma_ = 0,      ///< The sigma value
+                                           double efact_  = 0,    ///< Factor for energy sum
+                                           double pxfact_ = 0,    ///< Factor for px sum
+                                           double pyfact_ = 0,    ///< Factor for py sum
+                                           double pzfact_ = 0,    ///< Factor for pz sum
+                                           double value_ = 0  ///< Target value of sum
+                                          );
       /// Virtual destructor
       virtual ~SoftGaussMomentumConstraint() override;
 

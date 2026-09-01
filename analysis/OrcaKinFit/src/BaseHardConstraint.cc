@@ -227,7 +227,8 @@ namespace Belle2 {
 
     double BaseHardConstraint::dirDer(double* p, double* w, int idim, double mu)
     {
-      double* pw, *pp;
+      double* pw;
+      const double* pp;
       for (pw = w; pw < w + idim; * (pw++) = 0);
       addToGlobalChi2DerVector(w, idim, mu);
       double result = 0;

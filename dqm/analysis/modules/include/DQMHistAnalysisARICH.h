@@ -35,11 +35,6 @@ namespace Belle2 {
     DQMHistAnalysisARICHModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisARICHModule();
-
-    /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */

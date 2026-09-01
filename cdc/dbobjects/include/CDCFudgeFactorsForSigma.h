@@ -64,7 +64,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, std::vector<float>> getFactors() const
+    const std::map<unsigned short, std::vector<float>>& getFactors() const
     {
       return m_ffs;
     }

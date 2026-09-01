@@ -28,10 +28,6 @@ SteppingAction::SteppingAction()
 {
   //Default value for the maximum number of steps
   m_maxNumberSteps = 100000;
-  if (false) {
-    G4Step* aStep;
-    UserSteppingAction(aStep);
-  }
   m_writeSimSteps = Environment::Instance().getWriteSimSteps();
 }
 
@@ -60,7 +56,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   //------------------------------
   // Check for absorbers
   //------------------------------
-  for (auto& rAbsorber : m_absorbers) {
+  for (const auto& rAbsorber : m_absorbers) {
     const G4ThreeVector stepPrePos = step->GetPreStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
     const G4ThreeVector stepPostPos = step->GetPostStepPoint()->GetPosition() / CLHEP::mm * Unit::mm;
     if (stepPrePos.perp() < (rAbsorber * Unit::cm) && stepPostPos.perp() > (rAbsorber * Unit::cm)) {
@@ -118,7 +114,7 @@ void SteppingAction::writeVREventStep(const G4Step* step, const G4Track* track)
 {
   // There must be an open output file (opened in simulation's EventAction)
   RunManager& runManager = RunManager::Instance();
-  const EventAction* eventAction = (const Belle2::Simulation::EventAction*)runManager.GetUserEventAction();
+  const EventAction* eventAction = static_cast<const Belle2::Simulation::EventAction*>(runManager.GetUserEventAction());
   if (eventAction == nullptr)
     return;
   std::ofstream* output = eventAction->getVREventStream();

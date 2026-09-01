@@ -32,7 +32,7 @@ namespace Belle2 {
     SVDShaperDigitConverter();
 
     /// default destructor
-    virtual ~SVDShaperDigitConverter() = default;
+    virtual ~SVDShaperDigitConverter() override = default;
 
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

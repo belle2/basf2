@@ -12,7 +12,7 @@
 /*   Question send to cdc@belle2.org                                    */
 /*                                                                      */
 /************************************************************************/
-#include "TROOT.h"
+#include <TROOT.h>
 void loadStyle();
 void fit(TH1D* h1);
 
@@ -196,12 +196,12 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   TH1D*  hdPPt_sim;
   if (compare) {
     TFile ff(result4Compare);
-    hdPtPt_sim = (TH1D*)ff.Get("hdPtPt_2;1");
-    hdPPt_sim = (TH1D*)ff.Get("hdPPt_2;1");
-    hdD0Pt_sim = (TH1D*)ff.Get("hdD0Pt_2;1");
-    hdZ0Pt_sim = (TH1D*)ff.Get("hdZ0Pt_2;1");
-    hdPhi0Pt_sim = (TH1D*)ff.Get("hdPhi0Pt_2;1");
-    hdtanLPt_sim = (TH1D*)ff.Get("hdtanLPt_2;1");
+    hdPtPt_sim = static_cast<TH1D*>(ff.Get("hdPtPt_2;1"));
+    hdPPt_sim = static_cast<TH1D*>(ff.Get("hdPPt_2;1"));
+    hdD0Pt_sim = static_cast<TH1D*>(ff.Get("hdD0Pt_2;1"));
+    hdZ0Pt_sim = static_cast<TH1D*>(ff.Get("hdZ0Pt_2;1"));
+    hdPhi0Pt_sim = static_cast<TH1D*>(ff.Get("hdPhi0Pt_2;1"));
+    hdtanLPt_sim = static_cast<TH1D*>(ff.Get("hdtanLPt_2;1"));
     hdPtPt_sim->SetDirectory(0);
     hdPtPt_sim->SetLineColor(color4Compare);
     hdPtPt_sim->SetMarkerColor(color4Compare);
@@ -300,6 +300,7 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
     double Pm = (Mom1->Mag() + Mom2->Mag()) * 0.5;
 
     double sigmaPt = dPt / Ptm;
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double sigmaP = dP / Pm;
 
     //    if(n>300000) continue;
@@ -444,20 +445,20 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   TCanvas* c3 = new TCanvas("c3", "", 1200, 800);
   c3->Divide(3, 2);
 
-  TPad* pad1 = (TPad*)c3->GetPrimitive("c3_1");
+  TPad* pad1 = static_cast<TPad*>(c3->GetPrimitive("c3_1"));
   //  pad1->cd();pad1->SetGrid();
-  TPad* pad2 = (TPad*)c3->GetPrimitive("c3_2");
+  TPad* pad2 = static_cast<TPad*>(c3->GetPrimitive("c3_2"));
   pad2->SetGrid();
 
-  TPad* pad5 = (TPad*)c3->GetPrimitive("c3_5");
+  TPad* pad5 = static_cast<TPad*>(c3->GetPrimitive("c3_5"));
   pad5->SetGrid();
 
   c3->cd(1);
   hdD0TanL->GetXaxis()->SetNdivisions(8, 9);
   hdD0TanL->Draw("colz");
   hdD0TanL->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdD0TanL = (TH1D*)gDirectory->Get("hdD0TanL_1");
-  TH1D* s_hdD0TanL = (TH1D*)gDirectory->Get("hdD0TanL_2");
+  TH1D* m_hdD0TanL = static_cast<TH1D*>(gDirectory->Get("hdD0TanL_1"));
+  TH1D* s_hdD0TanL = static_cast<TH1D*>(gDirectory->Get("hdD0TanL_2"));
   if (m_hdD0TanL && m_hdD0TanL->GetEntries() > 10) {
     c3->cd(2);
     m_hdD0TanL->SetMinimum(max_d0m * -1);
@@ -479,8 +480,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
 
   c3->cd(4); hdZ0TanL->Draw("colz");
   hdZ0TanL->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdZ0TanL = (TH1D*)gDirectory->Get("hdZ0TanL_1");
-  TH1D* s_hdZ0TanL = (TH1D*)gDirectory->Get("hdZ0TanL_2");
+  TH1D* m_hdZ0TanL = static_cast<TH1D*>(gDirectory->Get("hdZ0TanL_1"));
+  TH1D* s_hdZ0TanL = static_cast<TH1D*>(gDirectory->Get("hdZ0TanL_2"));
   if (m_hdZ0TanL  && m_hdZ0TanL->GetEntries() > 10) {
     m_hdZ0TanL->SetMinimum(-1 * max_z0m);
     m_hdZ0TanL->SetMaximum(max_z0m);
@@ -504,8 +505,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   c3->Clear("D");
   c3->cd(1); hdD0Phi0->Draw("colz");
   hdD0Phi0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdD0Phi0 = (TH1D*)gDirectory->Get("hdD0Phi0_1");
-  TH1D* s_hdD0Phi0 = (TH1D*)gDirectory->Get("hdD0Phi0_2");
+  TH1D* m_hdD0Phi0 = static_cast<TH1D*>(gDirectory->Get("hdD0Phi0_1"));
+  TH1D* s_hdD0Phi0 = static_cast<TH1D*>(gDirectory->Get("hdD0Phi0_2"));
   if (m_hdD0Phi0) {
     m_hdD0Phi0->SetMinimum(-1 * max_d0m);
     m_hdD0Phi0->SetMaximum(max_d0m);
@@ -518,8 +519,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
   c3->cd(4); hdZ0Phi0->Draw("colz");
   hdZ0Phi0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdZ0Phi0 = (TH1D*)gDirectory->Get("hdZ0Phi0_1");
-  TH1D* s_hdZ0Phi0 = (TH1D*)gDirectory->Get("hdZ0Phi0_2");
+  TH1D* m_hdZ0Phi0 = static_cast<TH1D*>(gDirectory->Get("hdZ0Phi0_1"));
+  TH1D* s_hdZ0Phi0 = static_cast<TH1D*>(gDirectory->Get("hdZ0Phi0_2"));
   if (m_hdZ0Phi0) {
     m_hdZ0Phi0->SetMinimum(-1 * max_z0m);
     m_hdZ0Phi0->SetMaximum(max_z0m);
@@ -536,8 +537,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   c3->Clear("D");
   c3->cd(1); hdD0D0->Draw("colz");
   hdD0D0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdD0D0 = (TH1D*)gDirectory->Get("hdD0D0_1");
-  TH1D* s_hdD0D0 = (TH1D*)gDirectory->Get("hdD0D0_2");
+  TH1D* m_hdD0D0 = static_cast<TH1D*>(gDirectory->Get("hdD0D0_1"));
+  TH1D* s_hdD0D0 = static_cast<TH1D*>(gDirectory->Get("hdD0D0_2"));
   if (m_hdD0D0) {
     m_hdD0D0->SetMinimum(-1 * max_d0m);
     m_hdD0D0->SetMaximum(max_d0m);
@@ -550,8 +551,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
   c3->cd(4); hdZ0D0->Draw("colz");
   hdZ0D0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdZ0D0 = (TH1D*)gDirectory->Get("hdZ0D0_1");
-  TH1D* s_hdZ0D0 = (TH1D*)gDirectory->Get("hdZ0D0_2");
+  TH1D* m_hdZ0D0 = static_cast<TH1D*>(gDirectory->Get("hdZ0D0_1"));
+  TH1D* s_hdZ0D0 = static_cast<TH1D*>(gDirectory->Get("hdZ0D0_2"));
   if (s_hdZ0D0) {
     m_hdZ0D0->SetMinimum(-1 * max_z0m);
     m_hdZ0D0->SetMaximum(max_z0m);
@@ -567,8 +568,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   c3->Clear("D");
   c3->cd(1); hdD0Z0->Draw("colz");
   hdD0Z0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdD0Z0 = (TH1D*)gDirectory->Get("hdD0Z0_1");
-  TH1D* s_hdD0Z0 = (TH1D*)gDirectory->Get("hdD0Z0_2");
+  TH1D* m_hdD0Z0 = static_cast<TH1D*>(gDirectory->Get("hdD0Z0_1"));
+  TH1D* s_hdD0Z0 = static_cast<TH1D*>(gDirectory->Get("hdD0Z0_2"));
   if (m_hdD0Z0) {
     c3->cd(2);
     m_hdD0Z0->SetMinimum(-1 * max_d0m);    m_hdD0Z0->SetMaximum(max_d0m);
@@ -581,8 +582,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
 
   c3->cd(4); hdZ0Z0->Draw("colz");
   hdZ0Z0->FitSlicesY(0, 0, -1, 20);
-  TH1D* m_hdZ0Z0 = (TH1D*)gDirectory->Get("hdZ0Z0_1");
-  TH1D* s_hdZ0Z0 = (TH1D*)gDirectory->Get("hdZ0Z0_2");
+  TH1D* m_hdZ0Z0 = static_cast<TH1D*>(gDirectory->Get("hdZ0Z0_1"));
+  TH1D* s_hdZ0Z0 = static_cast<TH1D*>(gDirectory->Get("hdZ0Z0_2"));
   if (m_hdZ0Z0) {
     c3->cd(5);
     m_hdZ0Z0->SetMinimum(-1 * max_z0m);    m_hdZ0Z0->SetMaximum(max_z0m);
@@ -608,14 +609,14 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   f1->SetParameters(0.2, 0.2);
   f1->SetLineColor(kBlack);
   f1->SetLineWidth(1);
-  TF1* f2 = (TF1*)f1->Clone("f2");
+  TF1* f2 = static_cast<TF1*>(f1->Clone("f2"));
   c3->Clear("D");
   c3->cd(1);
   hdPtPt->GetXaxis()->SetNdivisions(8, 9);
   hdPtPt->Draw("colz");
   hdPtPt->FitSlicesY(0, 0, -1, 0);
-  TH1D* hdPtPt_m = (TH1D*)gDirectory->Get("hdPtPt_1");
-  TH1D* hdPtPt_s = (TH1D*)gDirectory->Get("hdPtPt_2");
+  TH1D* hdPtPt_m = static_cast<TH1D*>(gDirectory->Get("hdPtPt_1"));
+  TH1D* hdPtPt_s = static_cast<TH1D*>(gDirectory->Get("hdPtPt_2"));
   //  TH1D* hdPtPt_s = (TH1D*)SliceFit::doSliceFitY(hdPtPt,10)->Clone("hdPtPt_2");
   //  hdPtPt_s->SetDirectory(0);
 
@@ -664,8 +665,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   hdPPt->GetXaxis()->SetNdivisions(8, 9);
   hdPPt->Draw("colz");
   hdPPt->FitSlicesY(0, 0, -1, 20);
-  TH1D* hdPPt_m = (TH1D*)gDirectory->Get("hdPPt_1");
-  TH1D* hdPPt_s = (TH1D*)gDirectory->Get("hdPPt_2");
+  TH1D* hdPPt_m = static_cast<TH1D*>(gDirectory->Get("hdPPt_1"));
+  TH1D* hdPPt_s = static_cast<TH1D*>(gDirectory->Get("hdPPt_2"));
   if (hdPPt_m && hdPPt_m->GetEntries() > 3) {
     c3->cd(5);
     hdPPt_s->SetTitle("P resolution;Pt (Gev/c)     ;P resolution  (%)  ");
@@ -696,8 +697,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   c3->Clear("D");
   ///Pt dependence
   hdD0Pt->FitSlicesY(0, 0, -1, 5);
-  TH1D* hdD0Pt_m = (TH1D*)gDirectory->Get("hdD0Pt_1");
-  TH1D* hdD0Pt_s = (TH1D*)gDirectory->Get("hdD0Pt_2");
+  TH1D* hdD0Pt_m = static_cast<TH1D*>(gDirectory->Get("hdD0Pt_1"));
+  TH1D* hdD0Pt_s = static_cast<TH1D*>(gDirectory->Get("hdD0Pt_2"));
   if (hdD0Pt_s) {
     hdD0Pt_s->SetTitle("d_{0} resolution;Pt (Gev/c)   ;d_{0} resolution (cm)");
     hdD0Pt_m->SetTitle("#Deltad_{0} vs. Pt ; Pt (GeV/c)   ;#Deltad_{0}  (cm)  ");
@@ -714,8 +715,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
 
   hdZ0Pt->FitSlicesY(0, 0, -1, 5);
-  TH1D* hdZ0Pt_m = (TH1D*)gDirectory->Get("hdZ0Pt_1");
-  TH1D* hdZ0Pt_s = (TH1D*)gDirectory->Get("hdZ0Pt_2");
+  TH1D* hdZ0Pt_m = static_cast<TH1D*>(gDirectory->Get("hdZ0Pt_1"));
+  TH1D* hdZ0Pt_s = static_cast<TH1D*>(gDirectory->Get("hdZ0Pt_2"));
   if (hdZ0Pt_s) {
     hdZ0Pt_s->SetTitle("z_{0} resolution;Pt (GeV/c)   ;z_{0} resolution (cm)   ");
     hdZ0Pt_m->SetTitle(" #Deltaz_{0} vs. Pt ;Pt (GeV/c)   ;#Deltaz_{0} (cm) ");
@@ -734,8 +735,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
 
   c3->Clear("D");
   hdPhi0Pt->FitSlicesY(0, 0, -1, 5);
-  TH1D* hdPhi0Pt_m = (TH1D*)gDirectory->Get("hdPhi0Pt_1");
-  TH1D* hdPhi0Pt_s = (TH1D*)gDirectory->Get("hdPhi0Pt_2");
+  TH1D* hdPhi0Pt_m = static_cast<TH1D*>(gDirectory->Get("hdPhi0Pt_1"));
+  TH1D* hdPhi0Pt_s = static_cast<TH1D*>(gDirectory->Get("hdPhi0Pt_2"));
   if (hdPhi0Pt_s) {
     hdPhi0Pt_s->SetTitle("#varphi_{0} resolution  ;Pt (GeV/c)  ;#varphi_{0} resolution (deg)  ");
     hdPhi0Pt_m->SetTitle("#Delta#varphi_{0}  vs. Pt ; Pt (GeV/c)  ; #Delta#varphi_{0}  (deg)  ");
@@ -752,8 +753,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
 
   hdtanLPt->FitSlicesY(0, 0, -1, 5);
-  TH1D* hdtanLPt_m = (TH1D*)gDirectory->Get("hdtanLPt_1");
-  TH1D* hdtanLPt_s = (TH1D*)gDirectory->Get("hdtanLPt_2");
+  TH1D* hdtanLPt_m = static_cast<TH1D*>(gDirectory->Get("hdtanLPt_1"));
+  TH1D* hdtanLPt_s = static_cast<TH1D*>(gDirectory->Get("hdtanLPt_2"));
   if (hdtanLPt_s) {
     hdtanLPt_s->SetTitle(" tan#lambda resolution ;Pt (GeV/c)  ; tan#lambda resolution     ");
     hdtanLPt_m->SetTitle(" #Deltatan#lambda  vs. Pt ;Pt (GeV/c)  ; #Deltatan#lambda  ");
@@ -773,14 +774,14 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   delete c3;
   c3 = new TCanvas("c3", "", 900, 800); c3->Divide(2, 2);
   //  pad1 = (TPad*)c3->GetPrimitive("c3_1");
-  TPad* pad3 = (TPad*)c3->GetPrimitive("c3_3");
+  TPad* pad3 = static_cast<TPad*>(c3->GetPrimitive("c3_3"));
 
   hdPtPt_neg->FitSlicesY(0, 0, -1, 20);
-  TH1D* hdPtPt_neg_m = (TH1D*)gDirectory->Get("hdPtPt_neg_1");
-  TH1D* hdPtPt_neg_s = (TH1D*)gDirectory->Get("hdPtPt_neg_2");
+  TH1D* hdPtPt_neg_m = static_cast<TH1D*>(gDirectory->Get("hdPtPt_neg_1"));
+  TH1D* hdPtPt_neg_s = static_cast<TH1D*>(gDirectory->Get("hdPtPt_neg_2"));
   hdPtPt_pos->FitSlicesY(0, 0, -1, 20);
-  TH1D* hdPtPt_pos_m = (TH1D*)gDirectory->Get("hdPtPt_pos_1");
-  TH1D* hdPtPt_pos_s = (TH1D*)gDirectory->Get("hdPtPt_pos_2");
+  TH1D* hdPtPt_pos_m = static_cast<TH1D*>(gDirectory->Get("hdPtPt_pos_1"));
+  TH1D* hdPtPt_pos_s = static_cast<TH1D*>(gDirectory->Get("hdPtPt_pos_2"));
 
   TF1* fpos = new TF1("fpos", "sqrt([0]*[0]*x*x+[1]*[1])", 0, 10);
   fpos->SetParameters(0.2, 0.2);
@@ -868,8 +869,8 @@ void compare2Tracks(bool loose_selection = false, bool compare = true)
   }
 
   hdPtTanl->FitSlicesY(0, 0, -1, 15);
-  TH1D* hdPtTanl_m = (TH1D*)gDirectory->Get("hdPtTanl_1");
-  TH1D* hdPtTanl_s = (TH1D*)gDirectory->Get("hdPtTanl_2");
+  TH1D* hdPtTanl_m = static_cast<TH1D*>(gDirectory->Get("hdPtTanl_1"));
+  TH1D* hdPtTanl_s = static_cast<TH1D*>(gDirectory->Get("hdPtTanl_2"));
   if (hdPtTanl_m && hdPtTanl_s) {
     hdPtTanl_m->SetMinimum(-0.01);    hdPtTanl_m->SetMaximum(0.01);
     hdPtTanl_m->SetTitle("#DeltaPt vs. tan#lambda ; tan#lambda; #DeltaPt/Pt ");

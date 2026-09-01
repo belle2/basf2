@@ -18,7 +18,7 @@ namespace Belle2 {
     *
     * WARNING does not check if innerNode is in List of OuterNodes!
     */
-    bool areCompatible(NodeType* outerNode, NodeType* innerNode)
+    static bool areCompatible(NodeType* outerNode, NodeType* innerNode)
     {
 //    return true;
       return (outerNode->getMetaInfo().getState() == (innerNode->getMetaInfo().getState() + 1));

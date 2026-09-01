@@ -94,13 +94,13 @@ namespace Belle2 {
     /** Check if the next character is a operator */
     EOperator checkForOperator(char next);
     /** Bool to check whether there were consecutive operators or variables */
-    bool m_lastTokenWasOperator;
+    bool m_lastTokenWasOperator = false;
     /** Buffer for the formula */
     std::istringstream m_buffer;
     /** collect characters into a variable name */
-    std::string m_currentVariableName;
+    std::string m_currentVariableName = "";
     /** State of the current variable name being a valid float literal */
-    ENumberStatus m_currentVariableNameNumberStatus;
+    ENumberStatus m_currentVariableNameNumberStatus = ENumberStatus::c_Empty;
     /** Stack of operators for the Shunting-yard algorithm */
     std::stack<EOperator> m_operatorStack;
   };
@@ -165,9 +165,7 @@ namespace Belle2 {
     {
       assertOperatorUsable(m_outputStack.size());
       // so far all a binary operators
-      // cppcheck-suppress unreadVariable; used in lambda below
       OutputToken op2 = m_outputStack.top(); m_outputStack.pop();
-      // cppcheck-suppress unreadVariable; used in lambda below
       OutputToken op1 = m_outputStack.top(); m_outputStack.pop();
       // and apply ...
       m_outputStack.push(std::visit(Utils::VisitOverload {

@@ -47,7 +47,7 @@ namespace Belle2 {
       , m_isUside(isUside)
     {m_strips.clear();};
 
-    bool RawCluster::add(VxdID vxdID, bool isUside, struct StripInRawCluster& aStrip)
+    bool RawCluster::add(VxdID vxdID, bool isUside, const struct StripInRawCluster& aStrip)
     {
 
       bool added = false;
@@ -115,7 +115,7 @@ namespace Belle2 {
 
       SVDPulseShapeCalibrations pulseShapeCal;
 
-      for (auto istrip : m_strips) {
+      for (const auto& istrip : m_strips) {
         const SVDShaperDigit* shaperdigit = m_storeShaperDigits[istrip.shaperDigitIndex];
         if (!shaperdigit) B2ERROR("No SVDShaperDigit for this strip! Are you sure you set the correct SVDShaperDigit StoreArray name?");
         Belle2::SVDShaperDigit::APVFloatSamples APVsamples = shaperdigit->getSamples();

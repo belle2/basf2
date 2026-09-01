@@ -44,7 +44,7 @@ using namespace Calibration;
 //
 //  3. Loop over each energy and group to find the optimal number of crystals
 //    - start by checking the current value of nOptimal, then check smaller and larger
-//      values of number of summed crystals. For value, find:
+//      values of number of summed crystals. For each value, find:
 //      - peak contained energy divided by generated energy by fitting the histogram
 //        range that includes 50% of events;
 //      - corresponding bias = sum of ECLCalDigits minus mc true energy;
@@ -70,37 +70,50 @@ std::vector<int> eclNOptimalFitRange(TH1D* h, const double& fraction)
 {
   const double target = fraction * h->GetEntries();
   const int nBins = h->GetNbinsX();
+  int iLo = 1;
+  int iHi = nBins;
+  double currentSum = h->Integral(iLo, iHi);
 
-  //..Start at the histogram maximum
-  int iLo = h->GetMaximumBin();
-  int iHi = iLo;
-  double sum = h->Integral(iLo, iHi);
+  //..Give up if the histogram integral is less than the target
+  std::vector<int> iBins;
+  if (currentSum < target) {
+    iBins.push_back(iLo);
+    iBins.push_back(iHi);
+  }
 
-  //..Add one bin at a time
-  while (sum < target and (iLo > 1 or iHi < nBins)) {
-    double nextLo = 0.;
-    if (iLo > 1) {nextLo = h->GetBinContent(iLo - 1);}
-    double nextHi = 0.;
-    if (iHi < nBins) {nextHi = h->GetBinContent(iHi + 1);}
-    if (nextLo > nextHi) {
-      sum += nextLo;
-      iLo--;
-    } else {
-      sum += nextHi;
-      iHi++;
+  //..Vector of cumulative contents, i.e. inVector[n] = sum of 0...n
+  std::vector<double> intVector;
+  intVector.push_back(h->GetBinContent(1));
+  for (int iL = 2; iL <= nBins; iL++) {
+    double nextIntegral = intVector[iL - 2] + h->GetBinContent(iL);
+    intVector.push_back(nextIntegral);
+  }
+
+  //..Now search all possible ranges
+  double maxIntegral = currentSum;
+  for (int iL = 2; iL <= nBins; iL++) {
+    for (int iH = iL; iH <= nBins; iH++) {
+
+      // sum[iL, iH] = sum[1, iH] - sum[1,iL-1] = intVector[iH-1] - intVector[iL-2]
+      double integral = intVector[iH - 1] - intVector[iL - 2];
+      if ((integral > target and (iH - iL) < (iHi - iLo)) or
+          (integral > target and (iH - iL) == (iHi - iLo) and integral > maxIntegral)
+         ) {
+        iLo = iL;
+        iHi = iH;
+        maxIntegral = integral;
+      }
     }
   }
 
-  std::vector<int> iBins;
   iBins.push_back(iLo);
   iBins.push_back(iHi);
   return iBins;
-
 }
 
 //-----------------------------------------------------------------------------------
 //..Resolution is the minimum range that contains 68.3% of entries
-double eclNOptimalResolution(TH1D* h, int& iLo75, int& iHi75)
+double eclNOptimalResolution(TH1D* h, const int& iLo75, const int& iHi75)
 {
 
   //..Search among the bin range that contains 75% of events for the smallest
@@ -148,7 +161,7 @@ double eclNOptimalResolution(TH1D* h, int& iLo75, int& iHi75)
   double fracBinToExcludeLo = fracEntriesToExcludeLo;
 
   //..Use the slope from the fit extrapolated to this point unless it is 0
-  TF1* func = (TF1*)h->GetFunction("eclNOptimalNovo");
+  TF1* func = static_cast<TF1*>(h->GetFunction("eclNOptimalNovo"));
   double f0 = func->Eval(xLow);
   double f1 = func->Eval(xLow + dx);
   if (abs(f1 - f0) > 1.) {
@@ -249,6 +262,12 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   //..Couple of diagnostic histograms
   auto entriesPerThetaIdEnergy = getObjectPtr<TH2F>("entriesPerThetaIdEnergy");
   auto mcEnergyDiff = getObjectPtr<TH2F>("mcEnergyDiff");
+  auto eMCOverEGenerated = getObjectPtr<TH1D>("eMCOverEGenerated");
+  auto clusterTime = getObjectPtr<TH1D>("clusterTime");
+  auto angularDiff = getObjectPtr<TH1D>("angularDiff");
+  auto nOutOfTimeCrystals = getObjectPtr<TH1D>("nOutOfTimeCrystals");
+  auto timeSinceInjection = getObjectPtr<TH1D>("timeSinceInjection");
+
 
   //..Write these to disk.
   TFile* histFile = new TFile("eclNOptimalAlgorithm.root", "recreate");
@@ -256,6 +275,12 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   groupNumberOfEachCellID->Write();
   entriesPerThetaIdEnergy->Write();
   mcEnergyDiff->Write();
+  eMCOverEGenerated->Write();
+  clusterTime->Write();
+  angularDiff->Write();
+  nOutOfTimeCrystals->Write();
+  timeSinceInjection->Write();
+
 
   //-----------------------------------------------------------------------------------
   //..Parameters from the inputParameters histogram
@@ -477,7 +502,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       int nCrysSumToFit = initialnCrysSumToFit;
       while (nCrysSumToFit > 0) {
 
-        TH1D* hEnergy = (TH1D*)eSum->ProjectionY("hEnergy", nCrysSumToFit, nCrysSumToFit);
+        TH1D* hEnergy = static_cast<TH1D*>(eSum->ProjectionY("hEnergy", nCrysSumToFit, nCrysSumToFit));
         TString newName = name + "_" + std::to_string(nCrysSumToFit);
         hEnergy->SetName(newName);
 
@@ -548,7 +573,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
         double bias = 0.;
         double biasSigma = 0.;
         if (nCrysSumToFit < nCrysBins) {
-          TH1D* hBias = (TH1D*)biasSum->ProjectionY("hBias", nCrysSumToFit, nCrysSumToFit);
+          TH1D* hBias = static_cast<TH1D*>(biasSum->ProjectionY("hBias", nCrysSumToFit, nCrysSumToFit));
           fitFraction = 0.683;
           std::vector<int> jBins = eclNOptimalFitRange(hBias, fitFraction);
           const double lowEdge = hBias->GetBinLowEdge(jBins[0]);
@@ -629,7 +654,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       //..Store everything in diagnostic histograms
 
       //..Extract the function from the nOptimal histogram
-      TF1* funcOpt = (TF1*)eSumOpt->GetFunction("eclNOptimalNovo");
+      TF1* funcOpt = static_cast<TF1*>(eSumOpt->GetFunction("eclNOptimalNovo"));
 
       nOptimalPerGroup->SetBinContent(ig + 1, ie + 1, nOpt);
 
@@ -739,7 +764,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
           //..Find the bias
           std::string biasName = "biasSum_" + std::to_string(ig) + "_" + std::to_string(ieAdj);
           auto biasSum = getObjectPtr<TH2F>(biasName);
-          TH1D* hBias = (TH1D*)biasSum->ProjectionY("hBias", nOpt, nOpt);
+          TH1D* hBias = static_cast<TH1D*>(biasSum->ProjectionY("hBias", nOpt, nOpt));
 
           //..Bias is the mid-point of the range containing 68.3% of events
           double fitFraction = 0.683;
@@ -752,7 +777,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
           //..Get the eSum distribution to be fit
           std::string name = "eSum_" + std::to_string(ig) + "_" + std::to_string(ieAdj);
           auto eSum = getObjectPtr<TH2F>(name);
-          TH1D* hEnergy = (TH1D*)eSum->ProjectionY("hEnergy", nOpt, nOpt);
+          TH1D* hEnergy = static_cast<TH1D*>(eSum->ProjectionY("hEnergy", nOpt, nOpt));
           TString newName = name + "_" + std::to_string(nOpt);
           hEnergy->SetName(newName);
 

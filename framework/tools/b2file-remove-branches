@@ -67,18 +67,21 @@ if __name__ == "__main__":
     # Ok, here we go
     basf2.B2INFO(f"Copying {args.input} to {args.output} and removing the branches {', '.join(disabled_branches)}")
     outfile.cd()
-    # clone persistent
-    persistent.CloneTree()
-    # disable ALL branches in the file
-    events.SetBranchStatus('*', 0)
-    # and re-enable all branches not excluded
-    for branch in events.GetListOfBranches():
-        branch = branch.GetName()
-        if branch not in disabled_branches:
-            basf2.B2INFO(f"keeping branch {branch}")
-            events.SetBranchStatus(branch + '*', 1)
+    # clone persistent (without making a variable, persistent tree is not copied. Why?)
+    basf2.B2INFO("Cloning persistent tree")
+    _ = persistent.CloneTree()
+
+    events.SetBranchStatus('*', 1)
+    for branch_to_remove in disabled_branches:
+        basf2.B2INFO(f"removing branch {branch_to_remove}")
+        events.SetBranchStatus(branch_to_remove, 0)
+        events.SetBranchStatus(branch_to_remove + '.*', 0)
+        events.SetBranchStatus(branch_to_remove + '*', 0)
+
     # And then clone the tree
+    basf2.B2INFO("Cloning events tree")
     events.CloneTree()
     outfile.Write()
     outfile.Close()
+    infile.Close()
     basf2.B2INFO("done")

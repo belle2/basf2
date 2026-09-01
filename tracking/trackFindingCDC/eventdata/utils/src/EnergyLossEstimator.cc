@@ -17,10 +17,10 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-#include "G4ThreeVector.hh"
-#include "G4Navigator.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4Material.hh"
+#include <G4ThreeVector.hh>
+#include <G4Navigator.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4Material.hh>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

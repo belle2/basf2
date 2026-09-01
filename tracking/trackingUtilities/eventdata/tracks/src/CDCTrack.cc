@@ -22,7 +22,6 @@
 
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -140,15 +139,18 @@ CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   const CDCRecoHit2D& startRecoHit2D = segment.front();
   const CDCRecoHit2D& endRecoHit2D = segment.back();
 
-  Vector3D startPos3D(startRecoHit2D.getRecoPos2D(), 0.0);
-  Vector3D endPos3D(endRecoHit2D.getRecoPos2D(), 0.0);
+  const auto& tmpStart = startRecoHit2D.getRecoPos2D();
+  const auto& tmpEnd = endRecoHit2D.getRecoPos2D();
+  ROOT::Math::XYZVector startPos3D(tmpStart.X(), tmpStart.Y(), 0.0);
+  ROOT::Math::XYZVector endPos3D(tmpEnd.X(), tmpEnd.Y(), 0.0);
 
   m_startTrajectory3D.setLocalOrigin(startPos3D);
   m_endTrajectory3D.setLocalOrigin(endPos3D);
 
   for (const CDCRecoHit2D& recoHit2D : segment) {
     const CDCRLWireHit& rlWireHit = recoHit2D.getRLWireHit();
-    Vector3D recoPos3D(recoHit2D.getRecoPos2D(), 0.0);
+    const auto& tmp = recoHit2D.getRecoPos2D();
+    ROOT::Math::XYZVector recoPos3D(tmp.X(), tmp.Y(), 0.0);
     double perpS = m_startTrajectory3D.calcArcLength2D(recoPos3D);
     push_back(CDCRecoHit3D(rlWireHit, recoPos3D, perpS));
   }

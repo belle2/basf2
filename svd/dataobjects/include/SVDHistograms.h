@@ -53,9 +53,9 @@ namespace Belle2 {
     {
       H* returnValue = m_defaultHistogram;
       try {
-        auto& layer = m_histograms.at(vxdID.getLayerNumber());
-        auto& ladder = layer.at(vxdID.getLadderNumber());
-        auto& sensor = ladder.at(vxdID.getSensorNumber());
+        const auto& layer = m_histograms.at(vxdID.getLayerNumber());
+        const auto& ladder = layer.at(vxdID.getLadderNumber());
+        const auto& sensor = ladder.at(vxdID.getSensorNumber());
         returnValue = sensor.at(view);
       } catch (...) {
         B2WARNING("Unexpected VxdID /view. VxdID: " << (std::string)(vxdID)
@@ -172,8 +172,10 @@ namespace Belle2 {
           m_histograms[layerNumber][ladderNumber][sensorNumber].resize(2);
 
           for (int view = VIndex ; view < UIndex + 1; view++) {
+            // the last branch is only reached for layerNumber != 3, where both views occur
             H h = layerNumber == 3 && view == UIndex ? templateU3 :
                   layerNumber == 3 && view == VIndex ? templateV3 :
+                  // cppcheck-suppress knownConditionTrueFalse
                   view == UIndex ? templateU456 : templateV456 ;
             customize(h, sensor, view);
             m_histograms[layerNumber][ladderNumber][sensorNumber][view] = new H(h);

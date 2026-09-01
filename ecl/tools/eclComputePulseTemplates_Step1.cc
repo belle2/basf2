@@ -17,6 +17,7 @@
  See eclComputePulseTemplates_Step0.cc for README instructions.
  */
 //
+// cppcheck-suppress constParameter ; main() keeps its standard signature
 int main(int argc, char* argv[])
 {
   //
@@ -32,7 +33,7 @@ int main(int argc, char* argv[])
   //
   double PhotonWaveformPar[11];
   TFile* PhotonParFile = new TFile(OutputDirectory + "PhotonWaveformParameters.root");
-  TTree* chain = (TTree*) PhotonParFile->Get("ParTree");
+  TTree* chain = static_cast<TTree*>(PhotonParFile->Get("ParTree"));
   chain->SetBranchAddress("PhotonPar", &PhotonWaveformPar);
   //
   TFile* f = new TFile(OutputDirectory + Form("PhotonShapes_Low%d_High%d.root", LowIDLimit, HighIDLimit), "RECREATE");

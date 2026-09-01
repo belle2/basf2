@@ -18,7 +18,7 @@ namespace Belle2::Conditions {
     /** Create using a base rest url to find the server endpoints */
     CentralMetadataProvider(std::string baseUrl, const std::set<std::string>& usableTagStates);
     /** default destructor */
-    virtual ~CentralMetadataProvider() = default;
+    virtual ~CentralMetadataProvider() override = default;
     /** Check the status of a given globaltag \
      * @returns the status of the globaltag (like "OPEN", "INVALID", "PUBLISHED").
      *          Returns empty string on any errors or if the tag doesn't exist.

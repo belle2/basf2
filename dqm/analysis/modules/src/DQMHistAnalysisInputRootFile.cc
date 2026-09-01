@@ -76,7 +76,7 @@ void DQMHistAnalysisInputRootFileModule::initialize()
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
-bool DQMHistAnalysisInputRootFileModule::hnamePatternMatch(std::string pattern, std::string text)
+bool DQMHistAnalysisInputRootFileModule::hnamePatternMatch(std::string pattern, const std::string& text)
 {
   boost::replace_all(pattern, "\\", "\\\\");
   boost::replace_all(pattern, "^", "\\^");
@@ -106,9 +106,9 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
   clearRefList();
 }
 
-void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
+void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& inputHistList, const std::string& dirname, TKey* key)
 {
-  TH1* h = (TH1*)key->ReadObj();
+  TH1* h = dynamic_cast<TH1*>(key->ReadObj());
   if (h == nullptr) return; // would be strange, but better check
   std::string hname = h->GetName();
 
@@ -127,7 +127,7 @@ void DQMHistAnalysisInputRootFileModule::addToHistList(std::vector<TH1*>& inputH
   if (m_histograms.size() == 0) {// workaround for run info???
     hpass = true;
   } else {
-    for (auto& hpattern : m_histograms) {
+    for (const auto& hpattern : m_histograms) {
       if (hnamePatternMatch(hpattern, h->GetName())) {
         hpass = true;
         break;
@@ -201,7 +201,7 @@ void DQMHistAnalysisInputRootFileModule::event()
   unsigned long long int ts = 0;
   m_file->cd();
   TIter next(m_file->GetListOfKeys());
-  while (auto key = (TKey*)next()) {
+  while (auto key = dynamic_cast<TKey*>(next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (ts == 0) ts = key->GetDatime().Convert();
     if (cl->InheritsFrom("TDirectory")) {
@@ -211,7 +211,7 @@ void DQMHistAnalysisInputRootFileModule::event()
       d->cd();
       TIter nextd(d->GetListOfKeys());
 
-      while (auto dkey = (TKey*)nextd()) {
+      while (auto dkey = dynamic_cast<TKey*>(nextd())) {
         if (gROOT->GetClass(dkey->GetClassName())->InheritsFrom("TH1")) {
           addToHistList(inputHistList, dirname, dkey);
         }
@@ -228,18 +228,18 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   if (m_h_expno) {
     m_h_expno->SetTitle(std::to_string(expno).c_str());
-    inputHistList.push_back((TH1*)(m_h_expno->Clone()));
+    inputHistList.push_back(dynamic_cast<TH1*>(m_h_expno->Clone()));
   }
   if (m_h_runno) {
     m_h_runno->SetTitle(std::to_string(runno).c_str());
-    inputHistList.push_back((TH1*)(m_h_runno->Clone()));
+    inputHistList.push_back(dynamic_cast<TH1*>(m_h_runno->Clone()));
   }
   if (m_h_rtype) {
     m_h_rtype->SetTitle(rtype.c_str());
-    inputHistList.push_back((TH1*)(m_h_rtype->Clone()));
+    inputHistList.push_back(dynamic_cast<TH1*>(m_h_rtype->Clone()));
   }
   if (m_fillNEvent > 0) {
-    inputHistList.push_back((TH1*)(m_h_fillNEvent->Clone()));
+    inputHistList.push_back(dynamic_cast<TH1*>(m_h_fillNEvent->Clone()));
   }
   // check for no-override
   for (auto& h : inputHistList) {

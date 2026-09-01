@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
 #include <cdc/topology/ILayer.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -46,8 +48,8 @@ namespace Belle2 {
                                                float dydz = 0,
                                                TrackingUtilities::ILayer iCLayer = -1) const
       {
-        const TrackingUtilities::Vector2D& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
-        const TrackingUtilities::Vector2D& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
+        const ROOT::Math::XYVector& lowerPhi0Vec(houghBox.template getLowerBound<APhi0>());
+        const ROOT::Math::XYVector& upperPhi0Vec(houghBox.template getUpperBound<APhi0>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerX = x * lowerPhi0Vec.x() + y * lowerPhi0Vec.y();

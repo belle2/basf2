@@ -24,7 +24,7 @@ namespace Belle2 {
     explicit SVDResultFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
-    ~SVDResultFilterFactory();
+    ~SVDResultFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

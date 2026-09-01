@@ -84,7 +84,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
         // Fix to outwards flying
         const CDCRecoHit3D& firstHit = track.front();
         const CDCRecoHit3D& lastHit = track.back();
-        if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
+        if (lastHit.getRecoPos2D().R() < firstHit.getRecoPos2D().R()) {
           outputTracks.push_back(track.reversed());
         } else {
           outputTracks.push_back(track);
@@ -101,7 +101,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
     for (const CDCTrack& track : inputTracks) {
       const CDCRecoHit3D& firstHit = track.front();
       const CDCRecoHit3D& lastHit = track.back();
-      if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
+      if (lastHit.getRecoPos2D().R() < firstHit.getRecoPos2D().R()) {
         outputTracks.push_back(track.reversed());
       } else {
         outputTracks.push_back(track);

@@ -6,13 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "TEveManager.h"
-#include "TEveGeoNode.h"
+#include <TEveManager.h>
+#include <TEveGeoNode.h>
 
-#include "TGeoManager.h"
-#include "TGeoNode.h"
-#include "TGeoVolume.h"
-#include "TGeoMedium.h"
+#include <TGeoManager.h>
+#include <TGeoNode.h>
+#include <TGeoVolume.h>
+#include <TGeoMedium.h>
 
 void EveGeo()
 {

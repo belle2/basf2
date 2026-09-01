@@ -149,7 +149,7 @@ namespace Belle2 {
       if (deadBranches.empty()) { B2DEBUG(20, "pruneGraph: no rare branches found - stopping pruning process."); return 0; }
 
       // kill selected ones:
-      for (auto* graph : deadBranches) {
+      for (const auto* graph : deadBranches) {
         nKilled += graph->getFound();
         m_subgraphs.erase(graph->getID());
       }
@@ -169,8 +169,8 @@ namespace Belle2 {
 
       TH1D* h_nfound = new TH1D("h", "# times that subgraphs were found n_found times", xmax, 0, xmax);
 
-      for (auto& subGraphEntry : m_subgraphs) {
-        SubGraph<FilterType>& graph = subGraphEntry.second;
+      for (const auto& subGraphEntry : m_subgraphs) {
+        const SubGraph<FilterType>& graph = subGraphEntry.second;
         h_nfound->Fill(graph.getFound());
       }
 
@@ -215,7 +215,7 @@ namespace Belle2 {
         }
       }
 
-      for (auto& graph : deadBranches) {
+      for (const auto* graph : deadBranches) {
         m_subgraphs.erase(graph->getID());
         killed ++;
       }
@@ -228,8 +228,8 @@ namespace Belle2 {
     {
       std::ofstream out;
       out.open("output_nfound.txt");
-      for (auto& subGraphEntry : m_subgraphs) {
-        SubGraph<FilterType>& graph = subGraphEntry.second;
+      for (const auto& subGraphEntry : m_subgraphs) {
+        const SubGraph<FilterType>& graph = subGraphEntry.second;
         out << graph.print() << std::endl;
       }
       out.close();

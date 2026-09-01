@@ -63,6 +63,7 @@ namespace Belle2 {
       explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
         , m_sectorLevelSkip(sectorLevelSkip)
+          // cppcheck-suppress nullPointer ; false positive on the variadic pack expansion
         , m_overlaps((divisions * 0)...)
       {
       }
@@ -176,13 +177,19 @@ namespace Belle2 {
       /// Terminates the processing by striping all hit information from the tree
       void fell()
       {
-        m_houghTree->fell();
+        HoughTree* const tree = this->m_houghTree.get();
+        if (tree != nullptr) {
+          tree->fell();
+        }
       }
 
       /// Release all memory that the tree acquired during the runs.
       void raze()
       {
-        m_houghTree->raze();
+        HoughTree* const tree = this->m_houghTree.get();
+        if (tree != nullptr) {
+          tree->raze();
+        }
       }
 
     public:

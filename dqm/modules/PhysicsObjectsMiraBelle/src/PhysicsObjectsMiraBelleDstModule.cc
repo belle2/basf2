@@ -297,12 +297,3 @@ void PhysicsObjectsMiraBelleDstModule::event()
 //   PIDLikelihood* I_like_coffee = part->getPIDLikelihood();
 //   pid[0][0] = I_like_coffee->getProbability();
 // }
-
-void PhysicsObjectsMiraBelleDstModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleDstModule::terminate()
-{
-}
-

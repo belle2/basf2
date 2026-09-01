@@ -81,6 +81,12 @@ namespace Belle2 {
     KLMEventT0EstimatorModule();
     ~KLMEventT0EstimatorModule() override;
 
+    /** Copying is not allowed: the module manages raw pointers. */
+    KLMEventT0EstimatorModule(const KLMEventT0EstimatorModule&) = delete;
+
+    /** Copying is not allowed: the module manages raw pointers. */
+    KLMEventT0EstimatorModule& operator=(const KLMEventT0EstimatorModule&) = delete;
+
     /** Definition of histograms (called once by HistoManager). */
     void defineHisto() override;
 
@@ -92,12 +98,6 @@ namespace Belle2 {
 
     /** Per-event algorithm: collect hits, compute residuals, fill outputs. */
     void event() override;
-
-    /** Called when the current run ends. */
-    void endRun() override;
-
-    /** Called at the end of processing. */
-    void terminate() override;
 
   private:
     /* Local helpers. */

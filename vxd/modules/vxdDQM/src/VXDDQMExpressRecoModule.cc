@@ -27,7 +27,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;
@@ -111,9 +111,9 @@ void VXDDQMExpressRecoModule::defineHisto()
   int nVXDLayers = gTools->getNumberOfLayers();
 
   // Create basic histograms:
-  m_correlationsSP = (TH2F**) new TH2F*[nVXDLayers * nVXDLayers];
-  m_correlationsSP1DPhi = (TH1F**) new TH1F*[nVXDLayers * nVXDLayers];
-  m_correlationsSP1DTheta = (TH1F**) new TH1F*[nVXDLayers * nVXDLayers];
+  m_correlationsSP = new TH2F*[nVXDLayers * nVXDLayers];
+  m_correlationsSP1DPhi = new TH1F*[nVXDLayers * nVXDLayers];
+  m_correlationsSP1DTheta = new TH1F*[nVXDLayers * nVXDLayers];
 
 
   for (int i = 0; i < nVXDLayers; i++) {

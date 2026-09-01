@@ -15,9 +15,6 @@
 #include <cdc/topology/EStereoKind.h>
 #include <cdc/topology/ISuperLayer.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
-
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 
 #include <cdc/dataobjects/CDCSimHit.h>
@@ -107,10 +104,11 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
                                       const CDCSimHit& simhit)
 {
   // find out if the wire is right or left of the track ( view in flight direction )
-  Vector3D trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
-  Vector3D directionOfFlight{simhit.getMomentum()};
+  ROOT::Math::XYZVector trackPosToWire{simhit.getPosWire() - simhit.getPosTrack()};
+  ROOT::Math::XYZVector directionOfFlight{simhit.getMomentum()};
 
-  ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
+  ERightLeft rlInfo = VectorUtil::isRightOrLeftOf(VectorUtil::getXYVector(trackPosToWire),
+                                                  VectorUtil::getXYVector(directionOfFlight));
 
   CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength(), CDCWireHit::c_simpleDriftLengthVariance);
 
@@ -157,22 +155,24 @@ double CDCRLWireHit::getRefCylindricalR() const
   return getWire().getRefCylindricalR();
 }
 
-Vector2D CDCRLWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
+ROOT::Math::XYVector CDCRLWireHit::reconstruct2D(const CDCTrajectory2D& trajectory2D) const
 {
-  const Vector2D& refPos2D = getRefPos2D();
-  Vector2D recoPos2D = trajectory2D.getClosest(refPos2D);
+  const ROOT::Math::XYVector& refPos2D = getRefPos2D();
+  ROOT::Math::XYVector recoPos2D = trajectory2D.getClosest(refPos2D);
 
-  const Vector2D& wirePos2D = getWire().getRefPos2D();
+  const ROOT::Math::XYVector& wirePos2D = getWire().getRefPos2D();
   const double driftLength = getRefDriftLength();
 
-  Vector2D disp2D = recoPos2D - wirePos2D;
+  ROOT::Math::XYVector disp2D = recoPos2D - wirePos2D;
 
   // Fix the displacement to lie on the drift circle.
-  disp2D.normalizeTo(driftLength);
+  if (disp2D.R() != 0.0) {
+    disp2D *= (driftLength / disp2D.R());
+  }
   return wirePos2D + disp2D;
 }
 
-Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z) const
+ROOT::Math::XYZVector CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const double z) const
 {
   const EStereoKind stereoType = getStereoKind();
   const ERightLeft rlInfo = getRLInfo();
@@ -183,10 +183,10 @@ Vector3D CDCRLWireHit::reconstruct3D(const CDCTrajectory2D& trajectory2D, const 
     return trajectory2D.reconstruct3D(wireLine, signedDriftLength, z);
 
   } else { /*if (stereoType == EStereoKind::c_Axial)*/
-    const Vector2D recoPos2D = reconstruct2D(trajectory2D);
+    const ROOT::Math::XYVector recoPos2D = reconstruct2D(trajectory2D);
     // for axial wire we can not determine the z coordinate by looking at the xy projection only
     // we set it the basic assumption.
-    return Vector3D(recoPos2D, z);
+    return ROOT::Math::XYZVector(recoPos2D.X(), recoPos2D.Y(), z);
   }
 }
 

@@ -27,6 +27,7 @@
 #include <TH1F.h>
 #include <TH1D.h>
 #include <TH2F.h>
+#include <TH2D.h>
 #include <TProfile.h>
 #include <TProfile2D.h>
 
@@ -85,7 +86,7 @@ namespace Belle2 {
     double m_momentumCut; /**< momentum cut */
 
     // histograms
-    TH1D* m_BoolEvtMonitor = 0; /**< Event desynchronization monitoring */
+    TH2D* m_BoolEvtMonitor = 0; /**< Event desynchronization monitoring */
     TH2F* m_window_vs_slot = 0; /**< Histogram window w.r.t reference vs. slot number */
     TH1F* m_eventT0 = 0; /**< reconstructed event T0 */
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */

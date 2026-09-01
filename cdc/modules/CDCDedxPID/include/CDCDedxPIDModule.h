@@ -67,7 +67,7 @@ namespace Belle2 {
     CDCDedxPIDModule();
 
     /** Destructor */
-    virtual ~CDCDedxPIDModule();
+    virtual ~CDCDedxPIDModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;
@@ -93,13 +93,13 @@ namespace Belle2 {
     StoreArray<MCParticle> m_mcparticles; /**< Optional array of input MCParticles */
 
     /** parameterized beta-gamma curve for predicted means */
-    double meanCurve(double* x, double* par, int version) const;
+    static double meanCurve(double* x, const double* par, int version);
 
     /** calculate the predicted mean using the parameterized resolution */
     double getMean(double bg) const;
 
     /** parameterized resolution for predictions */
-    double sigmaCurve(double* x, const double* par, int version) const;
+    static double sigmaCurve(double* x, const double* par, int version);
 
     /** calculate the predicted resolution using the parameterized resolution */
     double getSigma(double dedx, double nhit, double cos, double timereso) const;

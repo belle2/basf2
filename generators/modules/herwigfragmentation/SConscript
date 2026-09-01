@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = ['generators_evtgen', 'mdst_dataobjects', 'framework', 'EvtGenExternal', 'EvtGen',
+               'HepMC'
+               ]
+
+Return('env')

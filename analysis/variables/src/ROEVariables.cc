@@ -2066,7 +2066,9 @@ namespace Belle2 {
     // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
-                      "Returns number of all remaining KLM clusters in the related RestOfEvent object.");
+                      "Returns number of all remaining KLM clusters in the related RestOfEvent object. "
+                      "This variable takes no ROE mask and always uses the default mask; use ``nROE_NeutralHadrons(maskName)``, "
+                      "which counts the same candidates, if you need a specific mask.");
 
     REGISTER_METAVARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
                           "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
@@ -2075,11 +2077,15 @@ namespace Belle2 {
                           "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
-                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
+                          "Only ECL-cluster-based ROE particles with the photon (N1) hypothesis are counted, which makes this a subset of "
+                          "``nROE_NeutralECLClusters``: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
-                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. ",
+                          "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
+                          "Note that only KLM-cluster-based candidates are counted, so this is the mask-aware equivalent of ``nROE_KLMClusters``; "
+                          "neutral hadron candidates built from ECL clusters are counted by ``nROE_NeutralECLClusters`` instead.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
@@ -2123,11 +2129,16 @@ namespace Belle2 {
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
-                          "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria. "
+                          "This counts the neutral (unmatched) clusters plus the clusters matched to charged ROE particles, so it is the "
+                          "widest of the three ECL counters: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
-                          "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria.",
+                          "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria. "
+                          "This counts every ECL-cluster-based ROE particle regardless of hypothesis, and is therefore the ECL counterpart of "
+                          "``nROE_NeutralHadrons``. It differs from ``nROE_Photons``, which counts only the subset with the photon (N1) "
+                          "hypothesis, and from ``nROE_ECLClusters``, which additionally counts clusters matched to charged ROE particles.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_Composites(maskName)", nROE_Composites,

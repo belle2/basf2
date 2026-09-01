@@ -27,8 +27,8 @@ namespace Belle2 {
   class ProcessStatisticsPython {
   public:
     /** Construct a new object to show statistics for a given call type. Possibly also restricting the list of modules to be shown */
-    ProcessStatisticsPython(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                            const std::vector<ModuleStatistics>& modules = {}): m_type{type}, m_modules{modules} {}
+    explicit ProcessStatisticsPython(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
+                                     const std::vector<ModuleStatistics>& modules = {}): m_type{type}, m_modules{modules} {}
     /** Default copy constructor. */
     ProcessStatisticsPython(const ProcessStatisticsPython&) = default;
     /** Default assignment operator. */
@@ -37,7 +37,7 @@ namespace Belle2 {
     ~ProcessStatisticsPython() = default;
 
     /** Get wrapped ProcessStatistics object. */
-    ProcessStatistics* getWrapped();
+    static ProcessStatistics* getWrapped();
 
     /**
      * Return string with statistics for all selected modules.

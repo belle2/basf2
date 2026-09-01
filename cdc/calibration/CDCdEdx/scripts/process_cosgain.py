@@ -136,7 +136,7 @@ def process_cosgain(ccpath, gt):
                     axes[igroup, 0].legend()
 
                     # Right column: ratio
-                    hist(0.7, 1.8,
+                    hist(0.8, 1.2,
                          xlabel=r"$\cos\theta$",
                          ylabel="Gain Ratio (new/prev)",
                          ax=axes[igroup, 1])

@@ -86,7 +86,7 @@ void RandomGenerator::setState(int barrier)
   hash.update(buffer.size(), buffer.data());
   //Extract 1024bit hash from the hash structure and write it into the
   //internal state
-  hash.getHash(sizeof(m_state), (unsigned char*) m_state);
+  hash.getHash(sizeof(m_state), reinterpret_cast<unsigned char*>(m_state));
 
   //Only prepare debugoutput if we actually want to show it. This is almost
   //equivalent to B2DEBUG(200, ...); but we need to loop over states for
@@ -120,12 +120,12 @@ void RandomGenerator::setState(int barrier)
 void RandomGenerator::RndmArray(Int_t n, unsigned char* array)
 {
   //First we fill the array using 64bit blocks
-  RndmArray(n / sizeof(ULong64_t), (ULong64_t*)array);
+  RndmArray(n / sizeof(ULong64_t), reinterpret_cast<ULong64_t*>(array));
   const Int_t remainder = n % sizeof(ULong64_t);
   //If the size is not divisible by 8 we fill the remainder from one additional
   //random value
   if (remainder) {
     const ULong64_t r = random64();
-    std::copy_n((unsigned char*)&r, remainder, array + (n - remainder - 1));
+    std::copy_n(reinterpret_cast<const unsigned char*>(&r), remainder, array + (n - remainder - 1));
   }
 }

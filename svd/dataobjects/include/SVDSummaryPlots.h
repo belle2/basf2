@@ -197,12 +197,12 @@ namespace Belle2 {
       TString name = histogram->GetName();
       TString title = histogram->GetTitle();
 
-      double xLow = -210.;
-      double xHigh = 210.;
-      double yLow = -210.;
-      double yHigh = 210.;
-
       if (m_polyHistos[view] == NULL) {
+        double xLow = -210.;
+        double xHigh = 210.;
+        double yLow = -210.;
+        double yHigh = 210.;
+
         m_polyHistos[view] = new TH2Poly(name + "_poly", title, xLow, xHigh, yLow, yHigh);
         generateHistogramBins(m_polyHistos[view]);
         m_polyHistos[view]->GetXaxis()->SetTitle("x");
@@ -341,11 +341,6 @@ namespace Belle2 {
             double xbin[4] = {xr0, xr1, xr2, xr3};
             double ybin[4] = {yr0, yr1, yr2, yr3};
             histogram->AddBin(4, xbin, ybin);
-            // resetting bin coordinates
-            for (int k = 0; k < 4; k++) {
-              xbin[k] = 0.;
-              ybin[k] = 0.;
-            }
           }
         }
       }

@@ -20,7 +20,7 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCBFieldUtil.h>
 
 #include <tracking/trackingUtilities/numerics/TMatrixConversion.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
@@ -29,6 +29,7 @@
 
 #include <framework/datastore/StoreArray.h>
 
+#include <Math/Vector3D.h>
 #include <TMatrixDSymfwd.h>
 #include <TMatrixTSym.h>
 #include <cmath>
@@ -44,7 +45,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>
   ISuperLayer closestLayer = track.getStartISuperLayer();
   if (ISuperLayerUtil::isAxial(closestLayer)) closestLayer = ISuperLayerUtil::getNextOutwards(closestLayer);
 
-  for (const CDCRecoHit3D hit : track) {
+  for (const CDCRecoHit3D& hit : track) {
     if (hit.isAxial()) continue;
     firstHits.push_back(hit);
     if ((hit.getISuperLayer() != closestLayer) and (firstHits.size() > 3)) break;
@@ -53,15 +54,15 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>
   const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
   const CDCTrajectorySZ& szTrajectory = szFitter.fitWithStereoHits(firstHits);
 
-  Vector3D position(track.getStartTrajectory3D().getSupport().x(),
-                    track.getStartTrajectory3D().getSupport().y(),
-                    szTrajectory.getZ0());
+  ROOT::Math::XYZVector position(track.getStartTrajectory3D().getSupport().x(),
+                                 track.getStartTrajectory3D().getSupport().y(),
+                                 szTrajectory.getZ0());
 
-  Vector3D momentum(track.getStartTrajectory3D().getFlightDirection3DAtSupport());
+  ROOT::Math::XYZVector momentum(track.getStartTrajectory3D().getFlightDirection3DAtSupport());
   const double z0 = szTrajectory.getZ0();
   const double lambda = std::atan(szTrajectory.getTanLambda());
-  momentum.scale(std::cos(lambda));
-  momentum.setZ(std::sin(lambda));
+  momentum *= (std::cos(lambda));
+  momentum.SetZ(std::sin(lambda));
   momentum *= momentumSeedMagnitude;
 
   ESign charge;
@@ -96,7 +97,7 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrack& track, StoreArray<RecoTrack>
 RecoTrack*
 RecoTrackUtil::storeInto(const CDCTrajectory3D& traj3D, StoreArray<RecoTrack>& recoTracks)
 {
-  Vector3D position = traj3D.getSupport();
+  ROOT::Math::XYZVector position = traj3D.getSupport();
   return storeInto(traj3D, CDCBFieldUtil::getBFieldZ(position), recoTracks);
 }
 
@@ -105,13 +106,13 @@ RecoTrack* RecoTrackUtil::storeInto(const CDCTrajectory3D& traj3D,
                                     StoreArray<RecoTrack>& recoTracks)
 {
   // Set the start parameters
-  Vector3D position = traj3D.getSupport();
-  Vector3D momentum =
+  ROOT::Math::XYZVector position = traj3D.getSupport();
+  ROOT::Math::XYZVector momentum =
     bZ == 0 ? traj3D.getFlightDirection3DAtSupport() : traj3D.getMom3DAtSupport(bZ);
   ESign charge = traj3D.getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
-  if (not ESignUtil::isValid(charge) or momentum.hasNAN() or position.hasNAN()) {
+  if (not ESignUtil::isValid(charge) or VectorUtil::hasNAN(momentum) or VectorUtil::hasNAN(position)) {
     return nullptr;
   }
 

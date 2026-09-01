@@ -152,11 +152,3 @@ void KLMPackerModule::formatData(int flag, int lane, int plane, int strip, int c
   bword4 |= (charge & 0xFFF);
 }
 
-void KLMPackerModule::endRun()
-{
-}
-
-void KLMPackerModule::terminate()
-{
-}
-

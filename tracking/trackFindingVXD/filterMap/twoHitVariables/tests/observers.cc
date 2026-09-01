@@ -130,7 +130,7 @@ namespace VXDTFObserversTest {
         const PXDCluster* pxdCluster = pxdClusterData.appendNew(providePXDCluster(0., 0., aVxdID));
         pxdCluster->addRelationTo(aParticle);
 
-        SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
+        const SpacePoint* newSP = spacePointData.appendNew(pxdCluster, &aSensorInfo);
         B2DEBUG(10, " setup: new spacePoint got arrayIndex: " << newSP->getArrayIndex() << " and VxdID " << newSP->getVxdID());
         newSP->addRelationTo(pxdCluster);
       }
@@ -155,7 +155,7 @@ namespace VXDTFObserversTest {
 
         std::vector<const SVDCluster*> clusterVector = {clusterU, clusterV};
 
-        SpacePoint* newSP = spacePointData.appendNew(clusterVector, &aSensorInfo);
+        const SpacePoint* newSP = spacePointData.appendNew(clusterVector, &aSensorInfo);
         newSP->addRelationTo(clusterU);
         newSP->addRelationTo(clusterV);
       }
@@ -770,7 +770,7 @@ namespace VXDTFObserversTest {
 
       RelationVector<PXDCluster> pxDClusters = aSP.getRelationsTo<PXDCluster>();
       for (PXDCluster& aCluster : pxDClusters) {
-        MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
+        const MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
         if (aParticle == nullptr) { nullptrTrap = 1; }
         EXPECT_EQ(0, nullptrTrap);
 
@@ -787,7 +787,7 @@ namespace VXDTFObserversTest {
 
       RelationVector<SVDCluster> svDClusters = aSP.getRelationsTo<SVDCluster>();
       for (SVDCluster& aCluster : svDClusters) {
-        MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
+        const MCParticle* aParticle = aCluster.getRelatedTo<MCParticle>();
         if (aParticle == nullptr) { nullptrTrap = 2; }
         EXPECT_EQ(0, nullptrTrap);
 

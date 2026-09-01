@@ -214,7 +214,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         mc_vertex2D = TFCDC.Vector2D(t_vertex.XYvector())
         mc_mom2D = TFCDC.Vector2D(t_mom.XYvector())
         mc_trajectory2D = TFCDC.CDCTrajectory2D(mc_vertex2D, 0, mc_mom2D, charge)
-        mc_pt = mc_mom2D.norm()
+        mc_pt = mc_mom2D.R()
 
         first_hit = self.mc_track_lookup.getFirstHit(track)
         first_sim_hit = first_hit.getRelated("CDCSimHits")
@@ -235,13 +235,13 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         first_sim_pos3D = TFCDC.Vector3D(first_sim_hit.getPosTrack())
         first_sim_mom3D = TFCDC.Vector3D(first_sim_hit.getMomentum())
         first_sim_tof = first_sim_hit.getFlightTime()
-        first_sim_energy = np.sqrt(first_sim_mom3D.norm() ** 2 + mass ** 2)
-        first_sim_pt = first_sim_mom3D.cylindricalR()
+        first_sim_energy = np.sqrt(first_sim_mom3D.R() ** 2 + mass ** 2)
+        first_sim_pt = first_sim_mom3D.Rho()
         first_sim_pz = first_sim_mom3D.z()
 
         first_sim_mom2D = first_sim_mom3D.xy()
 
-        # first_sim_mom2D.normalizeTo(last_sim_mom3D.cylindricalR())
+        # first_sim_mom2D.normalizeTo(last_sim_mom3D.Rho())
         first_sim_trajectory2D = TFCDC.CDCTrajectory2D(first_sim_pos3D.xy(), first_sim_tof, first_sim_mom2D, charge)
 
         # mc_trajectory3D = mc_track_lookup.getTrajectory3D(track)
@@ -253,8 +253,8 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
                 continue
 
             sim_mom3D = TFCDC.Vector3D(sim_hit.getMomentum())
-            sim_energy = np.sqrt(sim_mom3D.norm() ** 2 + mass ** 2)
-            sim_pt = sim_mom3D.cylindricalR()
+            sim_energy = np.sqrt(sim_mom3D.R() ** 2 + mass ** 2)
+            sim_pt = sim_mom3D.Rho()
             sim_pz = sim_mom3D.z()
 
             mc_eloss_truth = mc_energy - sim_energy
@@ -265,7 +265,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
 
             layer_cid = reco_hit3D.getWire().getICLayer()
             bz = self.bfield.getBFieldZ(sim_pos3D)
-            r = sim_pos3D.cylindricalR()
+            r = sim_pos3D.Rho()
 
             # recoPos3D = reco_hit3D.getRecoPos3D()
             # recoPos3D = TFCDC.Vector3D(sim_hit.getPosTrack())
@@ -315,11 +315,11 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
             # dx = self.eloss_estimator.getMomentumLossFactor(mc_pt, pdg_code, mc_s2D)
             # deloss_radius2D = recoPos2D - center2D;
             # deloss_radius2D.scale (1.0 /  dx)
-            # loss_disp2D_estimate2 = (deloss_radius2D - radius2D).norm()
+            # loss_disp2D_estimate2 = (deloss_radius2D - radius2D).R()
 
-            # loss_disp2D_estimate3 = radius2D.norm() * (1.0 /dx - 1.0)
-            # loss_disp2D_estimate3 = radius2D.norm() * ((1.0 - dx) /dx)
-            # loss_disp2D_estimate3 = radius2D.norm() * (eLoss / (mc_pt - eLoss))
+            # loss_disp2D_estimate3 = radius2D.R() * (1.0 /dx - 1.0)
+            # loss_disp2D_estimate3 = radius2D.R() * ((1.0 - dx) /dx)
+            # loss_disp2D_estimate3 = radius2D.R() * (eLoss / (mc_pt - eLoss))
 
             if abs(mc_residual2D) > 6:
                 continue

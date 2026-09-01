@@ -77,9 +77,8 @@ Weight Chi2FacetRelationFilter::operator()(const CDCFacet& fromFacet, const CDCF
 {
   if (fromFacet.getStartWireHit().isOnWire(toFacet.getEndWire())) return NAN;
 
-  constexpr const int nSteps = 0;
-  const UncertainParameterLine2D fitLine = FacetFitter::fit(fromFacet, toFacet, nSteps);
-  const double chi2 = fitLine.chi2();
+  // Same value as FacetFitter::fit(fromFacet, toFacet, 0).chi2() without constructing the line
+  const double chi2 = FacetFitter::fitChi2(fromFacet, toFacet);
 
   ISuperLayer iSL = fromFacet.getISuperLayer();
   if (chi2 > m_chi2CutByISuperLayer[iSL] or std::isnan(chi2)) {

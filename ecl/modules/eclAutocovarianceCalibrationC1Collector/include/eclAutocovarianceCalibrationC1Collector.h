@@ -46,7 +46,7 @@ namespace Belle2 {
 
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
 
-    TH2F* PPVsCrysID; /**< histogram of peak-to-peak amplitude vs crystalID (cellID-1) */
+    TH2F* PPVsCrysID = nullptr; /**< histogram of peak-to-peak amplitude vs crystalID (cellID-1) */
 
     const int MaxPeaktoPeakValue = 2000;  /**< histogram limit for peak-to-peak amplitude */
 

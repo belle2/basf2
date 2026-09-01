@@ -217,7 +217,7 @@ void EventShapeCalculatorModule::event()
 
 
 
-int EventShapeCalculatorModule::parseParticleLists(vector<string> particleListNames)
+int EventShapeCalculatorModule::parseParticleLists(const std::vector<std::string>& particleListNames)
 {
   PCmsLabTransform T;
   m_p4List.clear();

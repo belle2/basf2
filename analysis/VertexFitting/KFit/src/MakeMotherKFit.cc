@@ -160,7 +160,7 @@ MakeMotherKFit::getErrorCode() const {
   return m_ErrorCode;
 }
 
-const KFitTrack
+const KFitTrack&
 MakeMotherKFit::getMother() const
 {
   return m_Mother;

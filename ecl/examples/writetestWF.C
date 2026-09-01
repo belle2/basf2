@@ -47,7 +47,7 @@ void writetestWF()
   if ( ! readerr ) {
 
     for ( int n=0; n< 300; n++ ) {
-      vector<int>& v = grmap[n];
+      const vector<int>& v = grmap[n];
       /*
       vector<int>::const_iterator i;
       for ( i= v.begin(); i != v.end(); ++i )
@@ -89,7 +89,7 @@ void writetestWF()
     t3.Branch("cellId",cellId3,"cellId[ncellId]/I");
 
     for ( int n=1; n<300; n++) {
-      vector<int>& v = grmap[n];
+      const vector<int>& v = grmap[n];
       if ( v.size() == 0 ) continue;
       ncellId1 = ncellId2 = v.size();
       for ( size_t i = 0; i< v.size(); ++i)

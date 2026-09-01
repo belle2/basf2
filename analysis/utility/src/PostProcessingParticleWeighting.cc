@@ -22,7 +22,7 @@ PostProcessingParticleWeighting::~PostProcessingParticleWeighting()
 }
 
 void PostProcessingParticleWeighting::setValue(
-  std::string variableName, double value)
+  const std::string& variableName, double value)
 {
   m_Values[variableName] = value;
 }

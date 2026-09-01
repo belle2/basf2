@@ -52,7 +52,7 @@ namespace Belle2 {
     ECLShowerShapeModule();
 
     /** Destructor. */
-    ~ECLShowerShapeModule();
+    ~ECLShowerShapeModule() override;
 
     /** Initialize. */
     virtual void initialize() override;
@@ -62,12 +62,6 @@ namespace Belle2 {
 
     /** Event. */
     virtual void event() override;
-
-    /** End run. */
-    virtual void endRun() override;
-
-    /** Terminate. */
-    virtual void terminate() override;
 
   private:
 
@@ -139,7 +133,7 @@ namespace Belle2 {
     void setShowerShapeVariables(ECLShower* eclShower, const bool calculateZernikeMVA) const;
 
     /** Shower shape variable: Lateral energy. */
-    double computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits, const double avgCrystalDimension) const;
+    static double computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits, const double avgCrystalDimension);
 
     /** Compute the absolute value of the complex Zernike moment Znm.
         The moments are computed in a plane perpendicular to the direction of the shower.
@@ -162,7 +156,7 @@ namespace Belle2 {
     /** Compute the second moment in the plane perpendicular to the direction of the shower.
         The plane's origin is at the intersection of the shower direction with the plane.
         The origin is at a distance from the interaction point equal to the shower distance from the interaction point. */
-    double computeSecondMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy) const;
+    static double computeSecondMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy);
 
     /** Compute projections of the ECLCalDigits to the perpendicular plane */
     std::vector<ProjectedECLDigit> projectECLDigits(const ECLShower& shower) const;
@@ -170,7 +164,7 @@ namespace Belle2 {
     /** The radial part of the Zernike polynomial
      * n,m - Zernike polynomial rank
      * rho - radial distance             */
-    double Rnm(const int n, const int m, const double rho) const;
+    static double Rnm(const int n, const int m, const double rho);
 
     /** Return the complex value of the Zernike polynomial of rank n,m.
     Znm(rho,alpha) = Rnm(rho) * exp(i*m*alpha)

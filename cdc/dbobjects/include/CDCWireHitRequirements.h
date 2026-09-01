@@ -166,7 +166,7 @@ namespace Belle2 {
     }
 
     /// Get map of maximum allowed ADC given TOT (first super layer of CDC). An upper value of -1 stands for unbounded.
-    const std::map<short, short> getMaxADCGivenTOTFirstSuperLayer() const
+    const std::map<short, short>& getMaxADCGivenTOTFirstSuperLayer() const
     {
       return m_MaxADCGivenTOTFirstSuperLayer;
     }
@@ -193,7 +193,7 @@ namespace Belle2 {
     }
 
     /// Get map of maximum allowed ADC given TOT (outer super layers of CDC). An upper value of -1 stands for unbounded.
-    const std::map<short, short> getMaxADCGivenTOTOuterSuperLayers() const
+    const std::map<short, short>& getMaxADCGivenTOTOuterSuperLayers() const
     {
       return m_MaxADCGivenTOTOuterSuperLayers;
     }
@@ -223,13 +223,13 @@ namespace Belle2 {
     void dump() const
     {
       std::string MaxADCGivenTOTFirstSuperLayer = "";
-      for (auto& v : getMaxADCGivenTOTFirstSuperLayer()) {
+      for (const auto& v : getMaxADCGivenTOTFirstSuperLayer()) {
         MaxADCGivenTOTFirstSuperLayer += "If TOT == " + std::to_string(v.first) +
                                          ", then ADC <= " + std::to_string(v.second) + "\n";
       }
 
       std::string MaxADCGivenTOTOuterSuperLayers = "";
-      for (auto& v : getMaxADCGivenTOTOuterSuperLayers()) {
+      for (const auto& v : getMaxADCGivenTOTOuterSuperLayers()) {
         MaxADCGivenTOTOuterSuperLayers += "If TOT == " + std::to_string(v.first) +
                                           ", then ADC <= " + std::to_string(v.second) + "\n";
       }

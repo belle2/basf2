@@ -9,6 +9,7 @@
 #include <pxd/modules/pxdPerformanceCollector/PXDPerformanceCollectorModule.h>
 
 #include <framework/datastore/RelationArray.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
@@ -142,7 +143,7 @@ void PXDPerformanceCollectorModule::prepare() // Do your initialise() stuff here
   //-------------------------------------------------------------------------------------
   // PXDTrackClusterCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
   //-------------------------------------------------------------------------------------
-  auto hPXDTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackClusterCounter");
+  auto hPXDTrackClusterCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDTrackClusterCounter"));
   hPXDTrackClusterCounter->SetTitle("Number of track clusters");
   hPXDTrackClusterCounter->GetYaxis()->SetTitle("Number of track clusters");
   registerObject<TH1I>("PXDTrackClusterCounter", hPXDTrackClusterCounter);
@@ -150,7 +151,7 @@ void PXDPerformanceCollectorModule::prepare() // Do your initialise() stuff here
   //-------------------------------------------------------------------------------------
   // PXDTrackPointCounter: Count the number of PXDClustersFrom tracks (the same track selection as for track points)
   //-------------------------------------------------------------------------------------
-  auto hPXDTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackPointCounter");
+  auto hPXDTrackPointCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDTrackPointCounter"));
   hPXDTrackPointCounter->SetTitle("Number of track points");
   hPXDTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
   registerObject<TH1I>("PXDTrackPointCounter", hPXDTrackPointCounter);
@@ -295,12 +296,12 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
   auto lambda0 = atan(track.tanLambda);
   if (fabs(lambda0) > m_maxAbsLambda)
     m_selectedRes = false;
-  auto sinTheta0 = 1. / sqrt(1. + pow(track.tanLambda, 2));
+  auto sinTheta0 = 1. / sqrt(1. + square(track.tanLambda));
   auto pBetaSinTheta3o2 = track.pt * 1.0 * sqrt(sinTheta0);
   if (pBetaSinTheta3o2 < m_minPBetaSinTheta3o2)
     m_selectedRes = false;
 
-  for (auto& trackCluster : track.trackClusters) {
+  for (const auto& trackCluster : track.trackClusters) {
     bool selectedCluster = true;
     auto cluster = trackCluster.cluster;
     auto intersection = trackCluster.intersection;
@@ -331,9 +332,6 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       auto uID = Info.getUCellID(cluster.posU);
       auto vID = Info.getVCellID(cluster.posV);
       auto iSensor = gTools->getPXDSensorIndex(sensorID);
-      auto layerNumber = sensorID.getLayerNumber();
-      auto ladderNumber = sensorID.getLadderNumber();
-      auto sensorNumber = sensorID.getSensorNumber();
       auto uBin = PXD::PXDGainCalibrator::getInstance().getBinU(sensorID, uID, vID, m_nBinsU);
       auto vBin = PXD::PXDGainCalibrator::getInstance().getBinV(sensorID, vID, m_nBinsV);
       // Calculate bin ID based on iSensor, uBin, vBin and number of bins in u/v
@@ -344,6 +342,9 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
 
       // Fill variables into tree
       if (m_fillChargeTree) {
+        auto sensorNumber = sensorID.getSensorNumber();
+        auto ladderNumber = sensorID.getLadderNumber();
+        auto layerNumber = sensorID.getLayerNumber();
         string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
         getObjectPtr<TTree>(treename)->Fill();
       }

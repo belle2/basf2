@@ -380,7 +380,7 @@ void Module::setDisplacedGeo(const HepGeom::Transform3D& moduleDisplacedGeo)
   m_DisplacedGeoRotationInverse = getRotationFromTransform3D(m_DisplacedGeoInverse);
 }
 
-const CLHEP::Hep3Vector Module::getTranslationFromTransform3D(const HepGeom::Transform3D& trans) const
+const CLHEP::Hep3Vector Module::getTranslationFromTransform3D(const HepGeom::Transform3D& trans)
 {
   HepGeom::Scale3D scale;
   HepGeom::Rotate3D rotation;
@@ -390,7 +390,7 @@ const CLHEP::Hep3Vector Module::getTranslationFromTransform3D(const HepGeom::Tra
   return t;
 }
 
-const CLHEP::HepRotation Module::getRotationFromTransform3D(const HepGeom::Transform3D& trans) const
+const CLHEP::HepRotation Module::getRotationFromTransform3D(const HepGeom::Transform3D& trans)
 {
   HepGeom::Scale3D scale;
   HepGeom::Rotate3D rotation;

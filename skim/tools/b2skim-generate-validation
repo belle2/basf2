@@ -99,6 +99,14 @@ def get_argument_parser():
              "to the skim constructor."
     )
 
+    parser.add_argument(
+        "--fei-prefix",
+        required=False,
+        default=None,
+        help="FEI prefix to use in generated validation scripts for FEI skims. "
+             "Must be provided if any of the specified skims is an FEI skim."
+    )
+
     return parser
 
 
@@ -116,7 +124,7 @@ def check_has_validation_method(skim):
         raise ValueError(f"No validation_histograms method defined for {skim}.")
 
 
-def get_output_validation_files(skim, analysisGlobaltag):
+def get_output_validation_files(skim, analysisGlobaltag, feiPrefix=None):
     """
     Create a dummy path using the ``validation_histograms`` method of the passed skim
     and search through that path to find the output ROOT file names.
@@ -129,6 +137,8 @@ def get_output_validation_files(skim, analysisGlobaltag):
         path = b2.Path()
         SkimFunction = Registry.get_skim_function(skim)
         SkimObject = SkimFunction(validation=True, udstOutput=False, analysisGlobaltag=analysisGlobaltag)
+        if feiPrefix is not None:
+            SkimObject.FEIPrefix = feiPrefix
         SkimObject.build_lists(path)
         SkimObject.validation_histograms(path)
 
@@ -201,6 +211,8 @@ def main():
     if args.add_analysis_globaltag:
         analysisGlobaltag = ma.getAnalysisGlobaltag()
 
+    fei_prefix = args.fei_prefix
+
     skims = args.skims or Registry.names
     for skim in skims:
         try:
@@ -210,12 +222,20 @@ def main():
                 cprint(e, "red")
             continue
 
+        SkimFunction = Registry.get_skim_function(skim)
+        if hasattr(SkimFunction, "FEIPrefix") and fei_prefix is None:
+            raise ValueError(
+                f"Skim {skim} is an FEI skim, but no ``--fei-prefix`` was provided. "
+                "Please pass ``--fei-prefix`` with the desired FEI training prefix."
+            )
+
         CodeString = template.render(
             skim=skim,
             module=Registry.get_skim_module(skim),
             contact=get_contact(skim),
-            output=get_output_validation_files(skim, analysisGlobaltag),
-            add_analysis_globaltag=args.add_analysis_globaltag
+            output=get_output_validation_files(skim, analysisGlobaltag, feiPrefix=fei_prefix),
+            add_analysis_globaltag=args.add_analysis_globaltag,
+            fei_prefix=fei_prefix or ""
         )
 
         output(CodeString, directory=directory, skim=skim)

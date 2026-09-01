@@ -372,7 +372,7 @@ void ECLGeometryPar::InitCrystal(int cid)
   else
     sincos<16>(ss16, nreplica, s, c);
 
-  G4Transform3D* T;
+  const G4Transform3D* T;
   if (ECLElementNumbers::isForward(cid + 1)) {
     T = m_ECLForwardGlobalT;
   } else if (ECLElementNumbers::isBarrel(cid + 1)) {
@@ -501,6 +501,7 @@ double ECLGeometryPar::time2sensor(int cid, const G4ThreeVector& hit_pos)
   return dt;
 }
 
+// cppcheck-suppress uninitMemberVar ; m_nbrs is a reference bound in the init list
 EclNbr::EclNbr() :
   m_nbrs(*new std::vector< Identifier >)
 {

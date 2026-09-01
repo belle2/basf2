@@ -225,13 +225,13 @@ namespace Belle2 {
       }
 
       if (mode == "time") {
-        double lifetime = mcparticle->getLifetime();
         double mass = mcparticle->getMass();
         double time = Const::doubleNaN;
         if (mass == 0)
           B2WARNING("you are asking for the proper time of a massless particle which is not allowed, returning -99.");
         else {
           double energy = mcparticle->getEnergy();
+          double lifetime = mcparticle->getLifetime();
           time = lifetime / energy * mass;
         }
 
@@ -668,8 +668,6 @@ namespace Belle2 {
 
       const Particle* daughterReco = particle->getDaughter(daughterNumber);
       //get the MC DAUGHTER
-      const MCParticle* daughter = daughterReco->getMCParticle();
-
       double flightDistanceMC;
       if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters()) {
         // Compute value between mother and granddaughter
@@ -677,6 +675,7 @@ namespace Belle2 {
         flightDistanceMC = getMCFlightInfoBtw(gdaughter, "distance");
       } else {
         // Compute value between mother and daughter
+        const MCParticle* daughter = daughterReco->getMCParticle();
         flightDistanceMC = getMCFlightInfoBtw(daughter, "distance");
       }
       return flightDistanceMC;
@@ -707,14 +706,13 @@ namespace Belle2 {
 
       const Particle* daughterReco = particle->getDaughter(daughterNumber);
       //get the MC DAUGHTER
-      const MCParticle* daughter = daughterReco->getMCParticle();
-
       double flightTimeMC;
       if (grandDaughterNumber > -1 && grandDaughterNumber < (int)daughterReco->getNDaughters()) {
         // Compute value between mother and granddaughter
         const MCParticle* gdaughter = daughterReco->getDaughter(grandDaughterNumber)->getMCParticle();
         flightTimeMC = getMCFlightInfoBtw(gdaughter, "time");
       } else  {
+        const MCParticle* daughter = daughterReco->getMCParticle();
         flightTimeMC = getMCFlightInfoBtw(daughter, "time");
       }
       return flightTimeMC;

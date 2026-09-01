@@ -10,14 +10,14 @@
 
 #include <string>
 
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/SymMatrix.h"
+#include <CLHEP/Matrix/Vector.h>
+#include <CLHEP/Matrix/SymMatrix.h>
 #ifndef CLHEP_THREEVECTOR_H
-#include "CLHEP/Vector/ThreeVector.h"
+#include <CLHEP/Vector/ThreeVector.h>
 #endif
-#include "CLHEP/Vector/LorentzVector.h"
+#include <CLHEP/Vector/LorentzVector.h>
 #ifndef CLHEP_POINT3D_H
-#include "CLHEP/Geometry/Point3D.h"
+#include <CLHEP/Geometry/Point3D.h>
 #endif
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -281,13 +281,13 @@ namespace Belle2 {
     private:
 
       //! True: matrix valid, False: matrix not valid.
-      bool m_matrixValid;
+      bool m_matrixValid = false;
       //! True: helix valid, False: helix not valid.
-      bool m_helixValid;
+      bool m_helixValid = false;
       //! Magnetic field, assuming uniform Bz in the unit of  kG.
-      double m_bField;
+      double m_bField = 15.0;
       //! 10000.0/(speed of light)/B.
-      double m_alpha;
+      double m_alpha = 222.376063;
       //! Pivot
       HepPoint3D m_pivot;
       //! Helix parameter.
@@ -308,7 +308,7 @@ namespace Belle2 {
       //! Cache of the r
       double m_r;
       //! Cache of the helix parameter.
-      double m_ac[5];
+      double m_ac[5] = {0.0, 0.0, 0.0, 0.0, 0.0};
 
       //! String "Invalid Helix".
       static const std::string invalidhelix;

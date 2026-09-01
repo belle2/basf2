@@ -22,7 +22,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;
@@ -599,7 +599,6 @@ void SVDDQMExpressRecoModule::defineHisto()
     int iLadder = id.getLadderNumber();
     int iSensor = id.getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
-    SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
     if (m_additionalPlots) {
@@ -953,8 +952,8 @@ void SVDDQMExpressRecoModule::beginRun()
       if (pos == -1) pos = tmp.Length() + 2;
 
       TString title = tmp(0, pos - 2);
-      ((TH1F*)obj)->SetTitle(title + runID);
-      ((TH1F*)obj)->Reset();
+      (static_cast<TH1F*>(obj))->SetTitle(title + runID);
+      (static_cast<TH1F*>(obj))->Reset();
     }
 }
 
@@ -1000,7 +999,6 @@ void SVDDQMExpressRecoModule::event()
     int iSensor = digitIn.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getSVDSensorIndex(sensorID);
-    SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     if (digitIn.isUStrip()) {
 
       //fill strip count first
@@ -1100,7 +1098,6 @@ void SVDDQMExpressRecoModule::event()
       int iSensor = digitIn.getSensorID().getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
       int index = gTools->getSVDSensorIndex(sensorID);
-      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       if (digitIn.isUStrip()) {
         if (m_onlineZSstripCountU[index] != nullptr) m_onlineZSstripCountU[index]->Fill(digitIn.getCellID());
         if (m_3Samples) {

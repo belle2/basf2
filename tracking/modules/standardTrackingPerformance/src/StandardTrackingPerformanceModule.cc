@@ -145,7 +145,7 @@ void StandardTrackingPerformanceModule::event()
         m_trackProperties.nSVDhits = 0;
         m_trackProperties.nCDChits = 0;
         m_trackProperties.nWeights = 0;
-        for (genfit::TrackPoint* tp : recoTrack->getHitPointsWithMeasurement()) {
+        for (const genfit::TrackPoint* tp : recoTrack->getHitPointsWithMeasurement()) {
           for (genfit::AbsMeasurement* m : tp->getRawMeasurements()) {
             if (dynamic_cast<PXDRecoHit*>(m))
               ++m_trackProperties.nPXDhits;
@@ -159,7 +159,7 @@ void StandardTrackingPerformanceModule::event()
               B2ERROR("Unknown AbsMeasurement in track.");
 
             std::vector<double> weights;
-            genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
+            const genfit::KalmanFitterInfo* kalmanInfo = tp->getKalmanFitterInfo();
             if (kalmanInfo)
               weights = kalmanInfo->getWeights();
 
@@ -312,7 +312,7 @@ void StandardTrackingPerformanceModule::addChargedStable(const MCParticle& mcPar
   // loop over daughters and add the charged stable particles recursively to the vector
   std::vector<MCParticle*> daughters = mcParticle.getDaughters();
   if (daughters.size() != 0) {
-    for (auto daughterMcParticle : daughters) {
+    for (const auto* daughterMcParticle : daughters) {
       addChargedStable(*daughterMcParticle);
     }
   }

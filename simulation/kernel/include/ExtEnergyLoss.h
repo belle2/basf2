@@ -29,7 +29,7 @@ namespace Belle2 {
     public:
 
       //! constructor
-      ExtEnergyLoss(const G4String& processName = "ExtEnergyLoss", G4ProcessType aType = fElectromagnetic);
+      explicit ExtEnergyLoss(const G4String& processName = "ExtEnergyLoss", G4ProcessType aType = fElectromagnetic);
 
       //! destructor
       virtual ~ExtEnergyLoss();

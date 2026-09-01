@@ -60,8 +60,8 @@ namespace Belle2 {
     StoreObjPtr<RandomGenerator> m_randomgenerator;
 
     /// Begin Run counter
-    int m_beginRun;
+    int m_beginRun = 0;
     /// End Run counter
-    int m_endRun;
+    int m_endRun = 0;
   };
 }

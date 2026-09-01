@@ -239,7 +239,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~UnaryBooleanNode() {}
+    ~UnaryBooleanNode() override {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -320,7 +320,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~BinaryBooleanNode() {}
+    ~BinaryBooleanNode() override {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -401,7 +401,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~UnaryRelationalNode() {}
+    ~UnaryRelationalNode() override {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -489,7 +489,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~BinaryRelationalNode() {}
+    ~BinaryRelationalNode() override {}
 
   private:
     friend class NodeFactory; // friend declaration so that NodeFactory can call the private constructor
@@ -609,7 +609,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~TernaryRelationalNode() {}
+    ~TernaryRelationalNode() override {}
 
   private:
     friend class NodeFactory;
@@ -694,7 +694,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~UnaryExpressionNode() {}
+    ~UnaryExpressionNode() override {}
 
   private:
     friend class NodeFactory;
@@ -855,7 +855,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~BinaryExpressionNode() {}
+    ~BinaryExpressionNode() override {}
 
   private:
     friend class NodeFactory;
@@ -926,7 +926,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~DataNode() {}
+    ~DataNode() override {}
 
   };
 
@@ -988,7 +988,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~IdentifierNode() {}
+    ~IdentifierNode() override {}
 
   private:
     friend class NodeFactory;
@@ -1051,6 +1051,9 @@ namespace Belle2 {
       // Initialize Variable
       AVariableManager& manager = AVariableManager::Instance();
       m_var = manager.getVariable(m_name, m_arguments);
+      // AVariableManager is a template parameter and the real variable managers do
+      // return nullptr for unknown variables, so this check is required
+      // cppcheck-suppress knownConditionTrueFalse
       if (m_var == nullptr) {
         auto fullname = m_name + "(" + boost::algorithm::join(m_arguments, ", ") + ")";
 
@@ -1061,7 +1064,7 @@ namespace Belle2 {
     /**
      * Destructor
     **/
-    ~FunctionNode() {}
+    ~FunctionNode() override {}
 
   private:
     friend class NodeFactory;

@@ -8,26 +8,26 @@
 
 #include <simulation/physicslist/AntiBaryonPhysics.h>
 
-#include "G4ProcessManager.hh"
-#include "G4HadronInelasticProcess.hh"
-#include "G4HadronElasticProcess.hh"
+#include <G4ProcessManager.hh>
+#include <G4HadronInelasticProcess.hh>
+#include <G4HadronElasticProcess.hh>
 
-#include "G4TheoFSGenerator.hh"
-#include "G4FTFModel.hh"
-#include "G4ExcitedStringDecay.hh"
-#include "G4LundStringFragmentation.hh"
-#include "G4GeneratorPrecompoundInterface.hh"
-#include "G4HadronElastic.hh"
-#include "G4AntiNuclElastic.hh"
-#include "G4HadronicAbsorptionFritiof.hh"
+#include <G4TheoFSGenerator.hh>
+#include <G4FTFModel.hh>
+#include <G4ExcitedStringDecay.hh>
+#include <G4LundStringFragmentation.hh>
+#include <G4GeneratorPrecompoundInterface.hh>
+#include <G4HadronElastic.hh>
+#include <G4AntiNuclElastic.hh>
+#include <G4HadronicAbsorptionFritiof.hh>
 
-#include "G4ChipsAntiBaryonElasticXS.hh"
-#include "G4ChipsAntiBaryonInelasticXS.hh"
-#include "G4ComponentAntiNuclNuclearXS.hh"
-#include "G4CrossSectionInelastic.hh"
-#include "G4CrossSectionElastic.hh"
+#include <G4ChipsAntiBaryonElasticXS.hh>
+#include <G4ChipsAntiBaryonInelasticXS.hh>
+#include <G4ComponentAntiNuclNuclearXS.hh>
+#include <G4CrossSectionInelastic.hh>
+#include <G4CrossSectionElastic.hh>
 
-#include "G4SystemOfUnits.hh"
+#include <G4SystemOfUnits.hh>
 
 using namespace Belle2;
 using namespace Simulation;

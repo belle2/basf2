@@ -17,6 +17,8 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -48,8 +50,8 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
     const CDCRecoHit2D& firstHit = middleSegment.front();
     const CDCRecoHit2D& lastHit = middleSegment.back();
 
-    Vector3D firstRecoPos = firstHit.reconstruct3D(startFit);
-    Vector3D lastRecoPos = lastHit.reconstruct3D(endFit);
+    ROOT::Math::XYZVector firstRecoPos = firstHit.reconstruct3D(startFit);
+    ROOT::Math::XYZVector lastRecoPos = lastHit.reconstruct3D(endFit);
 
     const CDCWire& firstWire = firstHit.getWire();
     const CDCWire& lastWire = lastHit.getWire();

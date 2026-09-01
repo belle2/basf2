@@ -75,19 +75,6 @@ MassVertexFitKFit::unfixMass() {
   return m_ErrorCode = KFitError::kNoError;
 }
 
-
-enum KFitError::ECode
-MassVertexFitKFit::setCorrelation(const HepMatrix& m) {
-  return KFitBase::setCorrelation(m);
-}
-
-
-enum KFitError::ECode
-MassVertexFitKFit::setZeroCorrelation() {
-  return KFitBase::setZeroCorrelation();
-}
-
-
 const HepPoint3D
 MassVertexFitKFit::getVertex(const int flag) const
 {
@@ -233,7 +220,7 @@ MassVertexFitKFit::prepareInputMatrix() {
   m_property = HepMatrix(m_TrackCount, 3, 0);
   m_V_al_0   = HepSymMatrix(KFitConst::kNumber7 * m_TrackCount, 0);
 
-  for (auto& track : m_Tracks)
+  for (const auto& track : m_Tracks)
   {
     // momentum x,y,z and position x,y,z
     m_al_0[index * KFitConst::kNumber7 + 0][0] = track.getMomentum(KFitConst::kBeforeFit).x();
@@ -305,7 +292,7 @@ MassVertexFitKFit::prepareCorrelation() {
 
   int row = 0, col = 0;
 
-  for (auto& hm : m_BeforeCorrelation)
+  for (const auto& hm : m_BeforeCorrelation)
   {
     // counter
     row++;

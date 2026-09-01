@@ -70,8 +70,6 @@ namespace Belle2 {
      *  @param fileName   Name of ROOT file to which should be written.
      *  @param treeName       Name of the TTree in the ROOT file.
      */
-    // cppcheck does not recognize that m_tfile is initialized by calling the other constructor
-    // cppcheck-suppress uninitMemberVar
     SimpleVariableRecorder(std::vector<TrackingUtilities::Named<float*>>& namedVariables, const std::string& fileName,
                            const std::string& treeName) :
       SimpleVariableRecorder([ & namedVariables](TTree & tree)

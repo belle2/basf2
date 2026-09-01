@@ -15,6 +15,7 @@
 
 /* Basf2 headers. */
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Matrix/DiagMatrix.h>
@@ -152,7 +153,7 @@ double BKLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
 }
 
 //! Distance from track to a hit in the plane of the module
-double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
+double BKLMTrackFitter::distanceToHit(const KLMHit2d* hit,
                                       double& error,
                                       double& sigma)
 {
@@ -217,8 +218,8 @@ double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
 
   error = sqrt(errors[ MY ][ MY ] +
                errors[ MZ ][ MZ ] +
-               pow(hit_localPhiErr, 2) +
-               pow(hit_localZErr, 2));
+               square(hit_localPhiErr) +
+               square(hit_localZErr));
 
   if (error != 0.0) {
     sigma = distance / error;
@@ -230,7 +231,7 @@ double BKLMTrackFitter::distanceToHit(KLMHit2d* hit,
 }
 
 //! Distance from track to a hit calculated in the global system
-double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
+double BKLMTrackFitter::globalDistanceToHit(const KLMHit2d* hit,
                                             double& error,
                                             double& sigma)
 {
@@ -291,13 +292,13 @@ double BKLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   double cosphi = globalOrigin[0] / globalOrigin.mag();
 
   HepMatrix globalHitErr(3, 3, 0);
-  globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
+  globalHitErr[0][0] = square(hit_localPhiErr * sinphi); //x
   globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
   globalHitErr[0][2] = 0;
-  globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
+  globalHitErr[1][1] = square(hit_localPhiErr * cosphi);;
   globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
   globalHitErr[1][2] = 0;
-  globalHitErr[2][2] = pow(hit_localZErr, 2);
+  globalHitErr[2][2] = square(hit_localZErr);
   globalHitErr[2][0] = 0;
   globalHitErr[2][1] = 0;
 
@@ -366,7 +367,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
   const Belle2::bklm::Module* refMod = m_GeoPar->findModule(section, sector, 1);
 
   int n = 0;
-  for (KLMHit2d* hit : hitList) {
+  for (const KLMHit2d* hit : hitList) {
 
     if (hit->getSection() != section || hit->getSector() != sector) {
       continue;
@@ -477,7 +478,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
 }
 
 //! do fit in global system, handle tracks that go through multi-sectors
-double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
+double BKLMTrackFitter::fit1dTrack(const std::list< KLMHit2d* >& hitList,
                                    HepVector&  eta,
                                    HepSymMatrix&  error,
                                    int depDir,    int indDir)
@@ -510,7 +511,7 @@ double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
   const Belle2::bklm::Module* corMod;
 
   int n = 0;
-  for (KLMHit2d* hit : hitList) {
+  for (const KLMHit2d* hit : hitList) {
 
     // m_GeoPar = GeometryPar::instance();
     //const Belle2::bklm::Module* refMod = m_GeoPar->findModule(hit->getSection(), hit->getSector(), 1);
@@ -542,13 +543,13 @@ double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
     double sinphi = globalOrigin[1] / globalOrigin.mag();
     double cosphi = globalOrigin[0] / globalOrigin.mag();
 
-    globalHitErr[0][0] = pow(hit_localPhiErr * sinphi, 2); //x
+    globalHitErr[0][0] = square(hit_localPhiErr * sinphi); //x
     globalHitErr[0][1] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
     globalHitErr[0][2] = 0;
-    globalHitErr[1][1] = pow(hit_localPhiErr * cosphi, 2);;
+    globalHitErr[1][1] = square(hit_localPhiErr * cosphi);;
     globalHitErr[1][0] = (hit_localPhiErr * sinphi) * (hit_localPhiErr * cosphi);
     globalHitErr[1][2] = 0;
-    globalHitErr[2][2] = pow(hit_localZErr, 2);;
+    globalHitErr[2][2] = square(hit_localZErr);;
     globalHitErr[2][0] = 0;
     globalHitErr[2][1] = 0;
 

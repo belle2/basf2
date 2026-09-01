@@ -244,7 +244,7 @@ namespace Belle2 {
 
     /*! Set list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD usability for charged PID.
      */
-    void setListOfCrystalEnergyRankAndQuality(std::vector<std::pair<unsigned int, bool>>
+    void setListOfCrystalEnergyRankAndQuality(const std::vector<std::pair<unsigned int, bool>>&
                                               listOfCrystalEnergyRankAndQuality) {m_listOfCrystalEnergyRankAndQuality = listOfCrystalEnergyRankAndQuality;}
 
     /*! Get if matched with a Track
@@ -440,7 +440,7 @@ namespace Belle2 {
     /*! Get list of indexes of related ECLCalDigit objects sorted by calibrated energy with flag for PSD usability for charged PID.
      *  @return m_listOfCrystalEnergyRankAndQuality
      */
-    std::vector<std::pair<unsigned int, bool>> getListOfCrystalEnergyRankAndQuality() {return m_listOfCrystalEnergyRankAndQuality; }
+    const std::vector<std::pair<unsigned int, bool>>& getListOfCrystalEnergyRankAndQuality() {return m_listOfCrystalEnergyRankAndQuality; }
 
 
 

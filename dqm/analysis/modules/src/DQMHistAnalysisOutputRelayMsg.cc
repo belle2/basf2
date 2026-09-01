@@ -41,9 +41,6 @@ DQMHistAnalysisOutputRelayMsgModule::DQMHistAnalysisOutputRelayMsgModule()
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: Constructor done.");
 }
 
-
-DQMHistAnalysisOutputRelayMsgModule::~DQMHistAnalysisOutputRelayMsgModule() { }
-
 void DQMHistAnalysisOutputRelayMsgModule::initialize()
 {
   if (m_sock != nullptr) delete m_sock;

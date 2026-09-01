@@ -50,7 +50,7 @@ void RecoTracksCopierModule::event()
     newRecoTrack->addHitsFromRecoTrack(&recoTrack);
     newRecoTrack->addRelationTo(&recoTrack);
 
-    for (Track& track : recoTrack.getRelationsWith<Track>()) {
+    for (const Track& track : recoTrack.getRelationsWith<Track>()) {
       track.addRelationTo(newRecoTrack);
     }
   }

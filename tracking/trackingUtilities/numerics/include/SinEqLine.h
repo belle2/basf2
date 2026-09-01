@@ -10,9 +10,10 @@
 #include <tracking/trackingUtilities/numerics/Modulo.h>
 
 #include <tracking/trackingUtilities/geometry/Line2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/EIncDec.h>
+
+#include <Math/Vector2D.h>
 
 #include <cmath>
 
@@ -81,29 +82,29 @@ namespace Belle2 {
 
     private:
       /// Shrinking method of the newton algorithm return the next candidate root.
-      double newtonX(const Vector2D& pos) const;
+      double newtonX(const ROOT::Math::XYVector& pos) const;
 
       /// Fall back shrinking method to the secant algorithm
-      static double secantX(const Vector2D& lower, const Vector2D& upper);
+      static double secantX(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper);
 
       /// Simple fall back shrinking method using trivial division of the interval.
-      static double middleX(const Vector2D& lower, const Vector2D& upper);
+      static double middleX(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper);
 
       /// Replaces the lower or upper bound inplace if the next candidate position is valid and within the interval. Returns true on success.
-      static bool updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next);
+      static bool updateBounds(ROOT::Math::XYVector& lower, ROOT::Math::XYVector& upper, const ROOT::Math::XYVector& next);
 
       /// Check is next position is within the interval given by lower and upper.
-      static bool isBetween(const Vector2D& lower, const Vector2D& next, const Vector2D& upper)
+      static bool isBetween(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& next, const ROOT::Math::XYVector& upper)
       { return lower.x() < next.x() and next.x() < upper.x(); }
 
       /// Check if the interval has shrunk close enough to the solution.
-      static bool isConverged(const Vector2D& lower, const Vector2D& upper)
+      static bool isConverged(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
       {
         return fabs(lower.y()) < 10e-7 or fabs(upper.y()) < 10e-7;
       }
 
       /// Returns the better solution x from the bounds of the interval.
-      static double getConvergedBound(const Vector2D& lower, const Vector2D& upper)
+      static double getConvergedBound(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
       {
         if (not std::isfinite(lower.y()) or not std::isfinite(upper.y())) {
           return NAN;
@@ -122,11 +123,11 @@ namespace Belle2 {
 
     public:
       /// Checks if the function changes sign in the interval
-      static bool changesSign(const Vector2D& lower, const Vector2D& upper)
+      static bool changesSign(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
       { return (lower.y() > 0 and upper.y() < 0) or (lower.y() < 0 and upper.y() > 0); }
 
       /// Determines if the function is increasing or decreasing in the interval.
-      static EIncDec getEIncDec(const Vector2D& lower, const Vector2D& upper)
+      static EIncDec getEIncDec(const ROOT::Math::XYVector& lower, const ROOT::Math::XYVector& upper)
       {
         if (lower.y() < upper.y()) {
           return EIncDec::c_Increasing;

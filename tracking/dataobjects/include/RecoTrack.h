@@ -124,7 +124,7 @@ namespace Belle2 {
      * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
      */
     static void registerRequiredRelations(
-      StoreArray<RecoTrack>& recoTracks,
+      const StoreArray<RecoTrack>& recoTracks,
       std::string const& pxdHitsStoreArrayName = "",
       std::string const& svdHitsStoreArrayName = "",
       std::string const& cdcHitsStoreArrayName = "",
@@ -311,9 +311,7 @@ namespace Belle2 {
       (m_storeArrayNameOfRecoHitInformation);
 
       for (RecoHitInformation& recoHitInformation : relatedHitInformationToHit) {
-        // cppcheck-suppress useStlAlgorithm
         if (recoHitInformation.getRelatedFrom<RecoTrack>(this->getArrayName()) == this) {
-          // cppcheck-suppress returnDanglingLifetime
           return &recoHitInformation;
         }
       }
@@ -1046,7 +1044,6 @@ namespace Belle2 {
         // cppcheck-suppress useStlAlgorithm
         hitList.push_back(&hit);
       }
-      // cppcheck-suppress returnDanglingLifetime
       return hitList;
     }
 

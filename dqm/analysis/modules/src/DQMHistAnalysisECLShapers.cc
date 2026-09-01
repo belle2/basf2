@@ -32,9 +32,6 @@ DQMHistAnalysisECLShapersModule::DQMHistAnalysisECLShapersModule()
            std::string("ECL:"));
 }
 
-
-DQMHistAnalysisECLShapersModule::~DQMHistAnalysisECLShapersModule() { }
-
 void DQMHistAnalysisECLShapersModule::initialize()
 {
   for (int i = 0; i < c_collector_count; i++) {

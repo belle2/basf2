@@ -157,7 +157,7 @@ namespace Belle2 {
       /** Check if the flag is one of KFitConst::kBeforeFit or KFitConst::kAfterFit.  If check fails, abort the program.
        * @param flag
        */
-      inline void checkFlag(const int flag) const
+      inline static void checkFlag(const int flag)
       {
         if (flag != KFitConst::kBeforeFit && flag != KFitConst::kAfterFit) B2FATAL("checkFlag");
       }
@@ -166,7 +166,7 @@ namespace Belle2 {
        * @param m matrix to be tested
        * @param dim size of the matrix
        */
-      inline void checkMatrixDimension(const CLHEP::HepSymMatrix& m, const int dim) const
+      inline static void checkMatrixDimension(const CLHEP::HepSymMatrix& m, const int dim)
       {
         if (m.num_row() != dim) B2FATAL("checkMatrixDimension");
       }

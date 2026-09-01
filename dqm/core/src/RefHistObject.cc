@@ -28,7 +28,7 @@ void RefHistObject::makeReferenceCopy(void)
       orgref->Copy(*m_refCopy.get());
     } else {
       // keep TProfile, TH1F or TH1D
-      m_refCopy = std::unique_ptr<TH1> ((TH1*)orgref->Clone());
+      m_refCopy = std::unique_ptr<TH1> (static_cast<TH1*>(orgref->Clone()));
     }
     m_refCopy->SetLineStyle(2);
     m_refCopy->SetLineColor(3);

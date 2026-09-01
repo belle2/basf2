@@ -84,6 +84,8 @@ void TheKillerModule::event()
       {
         // this is an intentional nullptr dereference so lets hide it from clang analyzer
         volatile int* foo {nullptr};
+        // the dereference of a null pointer is the whole point of this method
+        // cppcheck-suppress nullPointer
         *foo = 5;
       }
 #endif
@@ -94,8 +96,10 @@ void TheKillerModule::event()
 #if defined(__GNUC__) && defined(__x86_64__)
         __asm__("pushf\norl $0x40000,(%rsp)\npopf");
 #endif
-        auto* cptr = (char*) malloc(sizeof(int) + 1);
-        auto* iptr = (int*)(cptr + 1);
+        auto* cptr = static_cast<char*>(malloc(sizeof(int) + 1));
+        // the misaligned access is the whole point of this method
+        // cppcheck-suppress nullPointerArithmeticOutOfMemory
+        auto* iptr = reinterpret_cast<int*>(cptr + 1);
         *iptr = 42;
         free(cptr);
       }

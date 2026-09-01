@@ -158,7 +158,7 @@ void RecoTrackStorer::apply(std::vector<SpacePointTrackCand>& finishedResults,
     // Transfer quality indicator from SPTC to RecoTrack
     newRecoTrack->setQualityIndicator(qi);
 
-    SpacePointTrackCand* newSPTC = m_storeSpacePointTrackCands.appendNew(thisSPTC);
+    const SpacePointTrackCand* newSPTC = m_storeSpacePointTrackCands.appendNew(thisSPTC);
     // Add relation to SpacePointTrackCandidate
     newRecoTrack->addRelationTo(newSPTC);
 

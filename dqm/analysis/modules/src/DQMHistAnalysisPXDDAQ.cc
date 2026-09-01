@@ -39,10 +39,6 @@ DQMHistAnalysisPXDDAQModule::DQMHistAnalysisPXDDAQModule()
 
 }
 
-DQMHistAnalysisPXDDAQModule::~DQMHistAnalysisPXDDAQModule()
-{
-}
-
 void DQMHistAnalysisPXDDAQModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDDAQ: initialized.");

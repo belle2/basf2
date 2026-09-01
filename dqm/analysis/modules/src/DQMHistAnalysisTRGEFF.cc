@@ -42,11 +42,6 @@ DQMHistAnalysisTRGEFFModule::DQMHistAnalysisTRGEFFModule()
   addParam("alert", m_enableAlert, "Enable color alert", true);
 }
 
-DQMHistAnalysisTRGEFFModule::~DQMHistAnalysisTRGEFFModule()
-{
-
-}
-
 void DQMHistAnalysisTRGEFFModule::initialize()
 {
   gROOT->cd();

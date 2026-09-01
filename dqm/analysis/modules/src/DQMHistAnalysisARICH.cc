@@ -42,10 +42,6 @@ DQMHistAnalysisARICHModule::DQMHistAnalysisARICHModule()
 
 }
 
-DQMHistAnalysisARICHModule::~DQMHistAnalysisARICHModule()
-{
-}
-
 void DQMHistAnalysisARICHModule::initialize()
 {
   gROOT->cd();

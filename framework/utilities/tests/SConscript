@@ -1,0 +1,6 @@
+Import('env')
+
+env['SUBLIB'] = True
+env['LIBS'] = ['framework', 'gtest']
+
+Return('env')

@@ -16,7 +16,7 @@ using namespace ROOT::Math;
 ClusterUtils::ClusterUtils() = default;
 
 // -----------------------------------------------------------------------------
-const PxPyPzEVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
+PxPyPzEVector ClusterUtils::GetCluster4MomentumFromCluster(const ECLCluster* cluster, ECLCluster::EHypothesisBit hypo)
 {
   // Use the geometry origin (0,0,0) and *not* the IP position
   return Get4MomentumFromCluster(cluster, XYZVector(0.0, 0.0, 0.0), hypo);

@@ -55,7 +55,7 @@ namespace Belle2 {
   public:
 
     /** Configurable-specific function to obtain value */
-    const std::string getTupleStyle()
+    const std::string& getTupleStyle()
     {
       //B2INFO("Returning style '"<<m_tupleStyle<<"'");
       return m_tupleStyle;

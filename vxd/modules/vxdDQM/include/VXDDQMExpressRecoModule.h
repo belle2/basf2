@@ -9,8 +9,8 @@
 #pragma once
 
 #include <framework/core/HistoModule.h>
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -22,7 +22,7 @@ namespace Belle2 {
     /** Constructor */
     VXDDQMExpressRecoModule();
     /* Destructor */
-    virtual ~VXDDQMExpressRecoModule();
+    virtual ~VXDDQMExpressRecoModule() override;
 
     /** Initialize */
     void initialize() override final;

@@ -28,7 +28,7 @@ namespace Belle2 {
     };
 
     SubEventModule();
-    ~SubEventModule();
+    ~SubEventModule() override;
 
     /** used by Path::forEach() to actually set parameters. */
     void initSubEvent(const std::string& objectName, const std::string& loopOver, std::shared_ptr<Path> path);

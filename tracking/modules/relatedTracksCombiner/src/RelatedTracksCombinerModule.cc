@@ -52,8 +52,8 @@ void RelatedTracksCombinerModule::event()
 
     B2ASSERT("Can not handle more than 2 relations!", relatedVXDRecoTracks.size() <= 2);
 
-    RecoTrack* vxdTrackBefore = nullptr;
-    RecoTrack* vxdTrackAfter = nullptr;
+    const RecoTrack* vxdTrackBefore = nullptr;
+    const RecoTrack* vxdTrackAfter = nullptr;
 
     for (unsigned int index = 0; index < relatedVXDRecoTracks.size(); ++index) {
       const double weight = relatedVXDRecoTracks.weight(index);

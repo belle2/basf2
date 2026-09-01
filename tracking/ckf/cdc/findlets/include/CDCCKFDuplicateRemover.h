@@ -57,8 +57,8 @@ namespace Belle2 {
       std::vector<CDCCKFResult> goodResults;
 
       // Additional filter (typically check if charge of reconstructed track is equal to charge of seed)
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
       TrackingUtilities::Weight weight;
-      std::unordered_map<double, CDCCKFResult> resultToWeightList;
       for (const auto& result : results) {
         weight = m_filter_badTracks(result);
         if (not std::isnan(weight)) {
@@ -82,6 +82,7 @@ namespace Belle2 {
 
       // If both charge assumptions lead to a good track, only pick one to avoid duplicate tracks
       auto iter = goodResults.begin();
+      // cppcheck-suppress invalidContainer ; every erase() result is assigned back to the iterator
       while (iter < goodResults.end()) {
         auto iter2 = iter + 1;
         bool increaseIter = true;

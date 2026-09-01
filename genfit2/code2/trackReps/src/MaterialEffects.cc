@@ -250,7 +250,7 @@ void MaterialEffects::stepper(const RKTrackRep* rep,
   }
 
   if (relMomLoss > maxRelMomLoss) {
-    limits.setLimit(stp_momLoss, 0);
+    limits.setLimit(EStepLimitType::stp_momLoss, 0);
     return;
   }
 
@@ -295,7 +295,7 @@ void MaterialEffects::stepper(const RKTrackRep* rep,
   }
 
   double maxStepMomLoss = fabs((maxRelMomLoss - fabs(relMomLoss)) / relMomLossPer_cm); // >= 0
-  limits.setLimit(stp_momLoss, maxStepMomLoss);
+  limits.setLimit(EStepLimitType::stp_momLoss, maxStepMomLoss);
 
   if (debugLvl_ > 0) {
     debugOut << "     momLoss exceeded after a step of " <<  maxStepMomLoss
@@ -356,7 +356,7 @@ void MaterialEffects::stepper(const RKTrackRep* rep,
       break;
   }
 
-  limits.setLimit(stp_boundary, stepSize_);
+  limits.setLimit(EStepLimitType::stp_boundary, stepSize_);
 
 
   relMomLoss += relMomLossPer_cm * limits.getLowestLimitVal();
@@ -586,7 +586,7 @@ void MaterialEffects::noiseCoulomb(M7x7& noise,
   noiseAfter[2 * 7 + 0] = -sigma2 * step2 / 3.0 * a[0]*a[2];
   noiseAfter[3 * 7 + 0] =  sigma2 * step * 0.5 * (1 - a[0]*a[0]);
   noiseAfter[4 * 7 + 0] = -sigma2 * step * 0.5 * a[0]*a[1];
-  noiseAfter[5 * 7 + 0] = -sigma2 * step * 0.5 * a[0]*a[1];
+  noiseAfter[5 * 7 + 0] = -sigma2 * step * 0.5 * a[0]*a[2];
   noiseAfter[0 * 7 + 1] = noiseAfter[1 * 7 + 0];
   noiseAfter[1 * 7 + 1] =  sigma2 * step2 / 3.0 * (1 - a[1]*a[1]);
   noiseAfter[2 * 7 + 1] = -sigma2 * step2 / 3.0 * a[1]*a[2];

@@ -26,10 +26,6 @@ DQMHistAnalysisDAQMonObjModule::DQMHistAnalysisDAQMonObjModule()
   B2DEBUG(20, "DQMHistAnalysisDAQMonObj: Constructor done.");
 }
 
-DQMHistAnalysisDAQMonObjModule::~DQMHistAnalysisDAQMonObjModule()
-{
-}
-
 void DQMHistAnalysisDAQMonObjModule::initialize()
 {
   m_monObj = getMonitoringObject("daq");

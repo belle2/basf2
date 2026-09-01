@@ -16,6 +16,8 @@
 #include <tracking/trackingUtilities/numerics/ESign.h>
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
+#include <Math/Vector2D.h>
+
 #include <numeric>
 
 namespace Belle2 {
@@ -151,9 +153,9 @@ namespace Belle2 {
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
       bool contains(const HoughBox& houghBox, const CDC::CDCWire& wire, double signedDriftLength)
       {
-        const TrackingUtilities::Vector2D& pos2D = wire.getRefPos2D();
-        //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);
-        const TrackingUtilities::Vector2D& movePerZ = wire.getMovePerZ();
+        const ROOT::Math::XYVector& pos2D = wire.getRefPos2D();
+        //const ROOT::Math::XYVector& pos2D = wire.getWirePos2DAtZ(0);
+        const ROOT::Math::XYVector& movePerZ = wire.getMovePerZ();
         CDC::ILayer iCLayer(wire.getICLayer());
         //B2INFO("movePerZ = " << movePerZ);
         const TrackingUtilities::ESign distSign = this->getDistanceSign(houghBox,

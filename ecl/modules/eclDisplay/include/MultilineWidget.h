@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Create multiline widget with parent window p.
      */
-    MultilineWidget(const TGWindow* p = 0, const char* title = 0, int line_count = 0);
+    explicit MultilineWidget(const TGWindow* p = 0, const char* title = 0, int line_count = 0);
     virtual ~MultilineWidget();
 
     /**

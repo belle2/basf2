@@ -110,15 +110,15 @@
       payloadIov=[0, 0, -1, -1]
       useDB=True
   17. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   18. RegisterEventLevelTrackingInfo
       EventLevelTrackingInfoName=EventLevelTrackingInfo

@@ -456,7 +456,7 @@ void PXDROIFinderAnalysisModule::event()
     m_pTmc = (aMcParticle->getMomentum()).Rho();
 
     //SVDhits
-    RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
+    // RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
 
     /*    Int_t nMCPartSVDhits = 0;
     Int_t nSVDhitLadder[4] = {0};
@@ -516,7 +516,7 @@ void PXDROIFinderAnalysisModule::event()
         v2 = m_Vidmc;
       }
 
-      VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+      const VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
       const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_vxdIDmc);
 
       m_coorUmc = aSensorInfo.getUCellPosition(m_Uidmc);   //pxdDigits_MCParticle[iPXDDigit]->getUCellPosition();

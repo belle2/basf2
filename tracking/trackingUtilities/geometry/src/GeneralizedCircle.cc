@@ -9,7 +9,6 @@
 
 #include <tracking/trackingUtilities/geometry/Circle2D.h>
 #include <tracking/trackingUtilities/geometry/Line2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
@@ -34,7 +33,7 @@ GeneralizedCircle::GeneralizedCircle(const double n0,
   normalize();
 }
 
-GeneralizedCircle::GeneralizedCircle(const double n0, const Vector2D& n12, const double n3)
+GeneralizedCircle::GeneralizedCircle(const double n0, const ROOT::Math::XYVector& n12, const double n3)
   : m_n3(n3)
   , m_n12(n12)
   , m_n0(n0)
@@ -53,11 +52,11 @@ GeneralizedCircle::GeneralizedCircle(const Line2D& n012)
 GeneralizedCircle::GeneralizedCircle(const Circle2D& circle)
   : m_n3(1.0 / 2.0 / circle.radius())
   , m_n12(-circle.center().x() * (m_n3 * 2.0), -circle.center().y() * (m_n3 * 2.0))
-  , m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
+  , m_n0((circle.center().Mag2() - circle.radiusSquared()) * m_n3)
 {
 }
 
-GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
+GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const ROOT::Math::XYVector& center,
                                                          const double absRadius,
                                                          const ERotation orientation)
 {
@@ -67,7 +66,7 @@ GeneralizedCircle GeneralizedCircle::fromCenterAndRadius(const Vector2D& center,
 }
 
 GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvature,
-                                                           const Vector2D& tangential,
+                                                           const ROOT::Math::XYVector& tangential,
                                                            const double impact)
 {
   GeneralizedCircle generalizedCircle;
@@ -84,12 +83,12 @@ GeneralizedCircle GeneralizedCircle::fromPerigeeParameters(const double curvatur
   return generalizedCircle;
 }
 
-void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
+void GeneralizedCircle::setCenterAndRadius(const ROOT::Math::XYVector& center,
                                            const double absRadius,
                                            const ERotation orientation)
 {
   double curvature = static_cast<double>(orientation) / fabs(absRadius);
-  setN0((center.normSquared() - absRadius * absRadius) * curvature / 2.0);
+  setN0((center.Mag2() - absRadius * absRadius) * curvature / 2.0);
   setN1(-center.x() * curvature);
   setN2(-center.y() * curvature);
   setN3(curvature / 2.0);
@@ -97,16 +96,16 @@ void GeneralizedCircle::setCenterAndRadius(const Vector2D& center,
 }
 
 void GeneralizedCircle::setPerigeeParameters(const double curvature,
-                                             const Vector2D& tangential,
+                                             const ROOT::Math::XYVector& tangential,
                                              const double impact)
 {
   double loc_n0 = impact * (impact * curvature / 2.0 + 1.0);
-  Vector2D loc_n12 = -tangential.orthogonal() * (1 + curvature * impact);
+  ROOT::Math::XYVector loc_n12 = -VectorUtil::Orthogonal(tangential) * (1 + curvature * impact);
   double loc_n3 = curvature / 2.0;
   setN(loc_n0, loc_n12, loc_n3);
 }
 
-Vector2D GeneralizedCircle::closest(const Vector2D& point) const
+ROOT::Math::XYVector GeneralizedCircle::closest(const ROOT::Math::XYVector& point) const
 {
   if (fastDistance(point) == 0) return point;
 
@@ -117,15 +116,15 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   //                       point.cylindricalRSquared() * m_n3 == 0
   // solved with a Lagrangian multiplicator for the constraint
 
-  Vector2D gradientAtPoint = gradient(point);
-  Vector2D coordinateSystem = gradientAtPoint.unit();
+  ROOT::Math::XYVector gradientAtPoint = gradient(point);
+  ROOT::Math::XYVector coordinateSystem = VectorUtil::unit(gradientAtPoint);
 
   // component of closest approach orthogonal to coordinateSystem
-  double closestOrthogonal = n12().cross(point) / gradientAtPoint.norm();
+  double closestOrthogonal = VectorUtil::Cross(n12(), point) / gradientAtPoint.R();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
-  double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
-  double nParallel = n12().unnormalizedParallelComp(coordinateSystem);
+  double nOrthogonal = VectorUtil::unnormalizedOrthogonalComp(n12(), coordinateSystem);
+  double nParallel = VectorUtil::unnormalizedParallelComp(n12(), coordinateSystem);
 
   double closestParallel = 0.0;
   if (isLine()) {
@@ -139,7 +138,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     const std::pair<double, double> closestParallel12 = solveQuadraticABC(a, b, c);
 
     // take the solution with smaller distance to point
-    const double pointParallel = point.unnormalizedParallelComp(coordinateSystem);
+    const double pointParallel = VectorUtil::unnormalizedParallelComp(point, coordinateSystem);
 
     const double criterion1 =
       closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
@@ -148,26 +147,26 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 
     closestParallel = criterion1 < criterion2 ? closestParallel12.first : closestParallel12.second;
   }
-  return Vector2D::compose(coordinateSystem, closestParallel, closestOrthogonal);
+  return VectorUtil::compose(coordinateSystem, closestParallel, closestOrthogonal);
 }
 
-Vector2D GeneralizedCircle::perigee() const
+ROOT::Math::XYVector GeneralizedCircle::perigee() const
 {
-  Vector2D result(n12());
-  result.setCylindricalR(-impact());
+  ROOT::Math::XYVector result(n12());
+  result *= (-impact() / result.R());
   return result;
 }
 
-Vector2D GeneralizedCircle::apogee() const
+ROOT::Math::XYVector GeneralizedCircle::apogee() const
 {
-  Vector2D result(n12());
-  result.setCylindricalR(-impact() - 2 * radius());
+  ROOT::Math::XYVector result(n12());
+  result *= ((-impact() - 2 * radius()) / result.R());
   return result;
 }
 
-Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
-                                                const Vector2D& end1,
-                                                const Vector2D& end2) const
+ROOT::Math::XYVector GeneralizedCircle::chooseNextForwardOf(const ROOT::Math::XYVector& start,
+                                                            const ROOT::Math::XYVector& end1,
+                                                            const ROOT::Math::XYVector& end2) const
 {
   double lengthOnCurve1 = arcLengthBetween(start, end1);
   double lengthOnCurve2 = arcLengthBetween(start, end2);
@@ -190,16 +189,16 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
       // unless the generalized circle is a line
       // in this case their is no forward intersection with the same cylindrical radius
       if (isLine()) {
-        return Vector2D(NAN, NAN);
+        return ROOT::Math::XYVector(NAN, NAN);
       } else {
         return lengthOnCurve1 < lengthOnCurve2 ? end1 : end2;
       }
     }
   }
-  return Vector2D(NAN, NAN); // just avoid a compiler warning
+  return ROOT::Math::XYVector(NAN, NAN); // just avoid a compiler warning
 }
 
-std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cylindricalR) const
+std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> GeneralizedCircle::atCylindricalR(const double cylindricalR) const
 {
   // extraploted to r
   // solve
@@ -208,33 +207,33 @@ std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cyl
   // search for x and y
 
   // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
-  const Vector2D nUnit = n12().unit();
+  const ROOT::Math::XYVector nUnit = VectorUtil::unit(n12());
 
   // parallel component
-  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().R();
 
   // orthogonal component
   const double sameCylindricalROrthogonal = sqrt(square(cylindricalR) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
-  Vector2D sameCylindricalR1 =
-    Vector2D::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
+  ROOT::Math::XYVector sameCylindricalR1 =
+    VectorUtil::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
 
-  Vector2D sameCylindricalR2 =
-    Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
+  ROOT::Math::XYVector sameCylindricalR2 =
+    VectorUtil::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
-  std::pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> result(sameCylindricalR1, sameCylindricalR2);
   return result;
 }
 
-Vector2D GeneralizedCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
-                                                    const double cylindricalR) const
+ROOT::Math::XYVector GeneralizedCircle::atCylindricalRForwardOf(const ROOT::Math::XYVector& startPoint,
+    const double cylindricalR) const
 {
-  std::pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> candidatePoints = atCylindricalR(cylindricalR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 }
 
-double GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
+double GeneralizedCircle::arcLengthBetween(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
 {
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
   if (not NForwardBackward::isValid(lengthSign)) return NAN;
@@ -242,16 +241,16 @@ double GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D&
   // Handling the rare case that from and to correspond to opposing points on the circle
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
 
-  Vector2D closestAtFrom = closest(from);
-  Vector2D closestAtTo = closest(to);
-  double directDistance = closestAtFrom.distance(closestAtTo);
+  ROOT::Math::XYVector closestAtFrom = closest(from);
+  ROOT::Math::XYVector closestAtTo = closest(to);
+  double directDistance = VectorUtil::Distance(closestAtFrom, closestAtTo);
 
   return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }
 
-double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
+double GeneralizedCircle::arcLengthTo(const ROOT::Math::XYVector& to) const
 {
-  const Vector2D from = perigee();
+  const ROOT::Math::XYVector from = perigee();
 
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
   if (not NForwardBackward::isValid(lengthSign)) return NAN;
@@ -259,9 +258,9 @@ double GeneralizedCircle::arcLengthTo(const Vector2D& to) const
   // Handling the rare case that from and to correspond to opposing points on the circle
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
 
-  const Vector2D& closestAtFrom = from;
-  Vector2D closestAtTo = closest(to);
-  double directDistance = closestAtFrom.distance(closestAtTo);
+  const ROOT::Math::XYVector& closestAtFrom = from;
+  ROOT::Math::XYVector closestAtTo = closest(to);
+  double directDistance = VectorUtil::Distance(closestAtFrom, closestAtTo);
 
   return static_cast<double>(lengthSign) * arcLengthFactor(directDistance) * directDistance;
 }
@@ -286,7 +285,7 @@ double GeneralizedCircle::arcLengthFactor(const double directDistance, const dou
   return asinc(x);
 }
 
-double GeneralizedCircle::distance(const Vector2D& point) const
+double GeneralizedCircle::distance(const ROOT::Math::XYVector& point) const
 {
   const double fastD = fastDistance(point);
   return distance(fastD);
@@ -311,26 +310,29 @@ double GeneralizedCircle::distance(const double fastDistance) const
   }
 }
 
-std::pair<Vector2D, Vector2D>
+std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector>
 GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) const
 {
   const double m0 = generalizedCircle.n0();
-  const Vector2D& m12 = generalizedCircle.n12();
+  const ROOT::Math::XYVector& m12 = generalizedCircle.n12();
   const double m3 = generalizedCircle.n3();
 
   const double loc_n0 = this->n0();
-  const Vector2D& loc_n12 = this->n12();
+  const ROOT::Math::XYVector& loc_n12 = this->n12();
   const double loc_n3 = this->n3();
 
-  Vector2D unitC = loc_n12 * m3 - m12 * loc_n3;
-  double absC = unitC.normalize();
+  ROOT::Math::XYVector unitC = loc_n12 * m3 - m12 * loc_n3;
+  double absC = unitC.R();
+  if (absC != 0.0) {
+    unitC *= (1. / absC);
+  }
 
   double xParallel = (m0 * loc_n3 - m3 * loc_n0) / absC;
 
   // Use symmetric solution and use all input parameters
-  Vector2D mn12 = loc_n12 + m12;
-  double mn12Parallel = unitC.unnormalizedParallelComp(mn12);
-  double mn12Orthogonal = unitC.unnormalizedOrthogonalComp(mn12);
+  ROOT::Math::XYVector mn12 = loc_n12 + m12;
+  double mn12Parallel = VectorUtil::unnormalizedParallelComp(unitC, mn12);
+  double mn12Orthogonal = VectorUtil::unnormalizedOrthogonalComp(unitC, mn12);
 
   double a = m3 + loc_n3;
   double b = mn12Orthogonal;
@@ -338,18 +340,18 @@ GeneralizedCircle::intersections(const GeneralizedCircle& generalizedCircle) con
 
   std::pair<double, double> xOrthogonal = solveQuadraticABC(a, b, c);
 
-  return std::make_pair(Vector2D::compose(unitC, xParallel, xOrthogonal.first),
-                        Vector2D::compose(unitC, xParallel, xOrthogonal.second));
+  return std::make_pair(VectorUtil::compose(unitC, xParallel, xOrthogonal.first),
+                        VectorUtil::compose(unitC, xParallel, xOrthogonal.second));
 }
 
-Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
+ROOT::Math::XYVector GeneralizedCircle::atArcLength(const double arcLength) const
 {
   double chi = arcLength * curvature();
   double chiHalf = chi / 2.0;
 
   double atX = arcLength * sinc(chiHalf) * sin(chiHalf) + impact();
   double atY = -arcLength * sinc(chi);
-  return Vector2D::compose(-n12().unit(), atX, atY);
+  return VectorUtil::compose(-VectorUtil::unit(n12()), atX, atY);
 }
 
 std::ostream& TrackingUtilities::operator<<(std::ostream& output, const GeneralizedCircle& circle)

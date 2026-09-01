@@ -163,7 +163,7 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "occupancyLimits", "occLimits");
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
-  registerEpicsPV(m_pvPrefix + "occupancyGoupIDsLimits", "occGroupIDsLimits");
+  registerEpicsPV(m_pvPrefix + "occupancyGroupIDsLimits", "occGroupIDsLimits");
 }
 
 void DQMHistAnalysisSVDOccupancyModule::beginRun()
@@ -324,7 +324,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: event called.");
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  TH1* hnEvnts = findHist("SVDExpReco", "SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;

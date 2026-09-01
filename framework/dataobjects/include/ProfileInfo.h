@@ -22,7 +22,7 @@ namespace Belle2 {
      *
      *  Initializes meta data of event with Nulls.
      */
-    ProfileInfo(unsigned long virtualMemory = 0, unsigned long rssMemory = 0, double timeInSec = 0)
+    explicit ProfileInfo(unsigned long virtualMemory = 0, unsigned long rssMemory = 0, double timeInSec = 0)
       : m_virtualMemory(virtualMemory), m_rssMemory(rssMemory), m_timeInSec(timeInSec) {}
 
     /** Obtain the current profile values.

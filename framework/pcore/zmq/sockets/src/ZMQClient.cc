@@ -22,6 +22,10 @@ void ZMQClient::terminate(bool sendGoodbye)
     publish(std::move(multicastMessage));
   }
 
+  // The sockets and the context are deliberately released and not destructed:
+  // running the ZMQ destructors in a forked process would also tear down the
+  // file descriptors still used by the parent process.
+  // cppcheck-suppress-begin ignoredReturnValue
   if (m_socket) {
     m_socket->close();
     m_socket.release();
@@ -38,14 +42,18 @@ void ZMQClient::terminate(bool sendGoodbye)
     m_context->close();
     m_context.release();
   }
+  // cppcheck-suppress-end ignoredReturnValue
 }
 
 void ZMQClient::reset()
 {
+  // Deliberately give up ownership without destructing: see the comment in terminate().
+  // cppcheck-suppress-begin ignoredReturnValue
   m_context.release();
   m_subSocket.release();
   m_pubSocket.release();
   m_socket.release();
+  // cppcheck-suppress-end ignoredReturnValue
 }
 
 

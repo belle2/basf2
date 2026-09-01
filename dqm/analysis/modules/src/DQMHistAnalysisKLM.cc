@@ -47,7 +47,9 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
-           "Minimal number for delta histogram updates", 30000.);
+           "Minimal number of entries for delta histogram updates", 30000.);
+  addParam("MinEvents", m_minEvents,
+           "Minimal number of processed events for delta histogram updates", 30000.);
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
@@ -80,10 +82,12 @@ void DQMHistAnalysisKLMModule::initialize()
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_bklm", HistDelta::c_Entries, m_minEntries, 1);
   addDeltaPar(m_histogramDirectoryName, "time_scintillator_eklm", HistDelta::c_Entries, m_minEntries, 1);
 
-  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_0", HistDelta::c_Entries, m_minEntries, 1);
-  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_1", HistDelta::c_Entries, m_minEntries, 1);
+  // The FE ratio via pair: in c_Entries one fills far more slowly than other,
+  // leaving the pair out of sync and now use c_Events to update over the same event window.
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_0", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_bklm_scintillator_layers_1", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_0", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "feStatus_eklm_plane_1", HistDelta::c_Events, m_minEvents, 1);
 
   //register EPICS PVs
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
@@ -234,7 +238,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
 
@@ -460,7 +464,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       deltaDrawer(delta, histogram, canvas);
     }
     //reference check
-    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
     if (ref) {ref->Draw("hist,same");}
   }
 }
@@ -518,7 +522,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   histogram->Draw();
 
   // Overlay reference histogram if available
-  TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref) {
     ref->Draw("hist,same");
   }
@@ -643,11 +647,6 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
   /* Obtain plots necessary for FE Ratio plots */
   auto* numerator = findHist(m_histogramDirectoryName + "/" + histName + "_0");
   auto* denominator = findHist(m_histogramDirectoryName + "/" + histName + "_1");
-  /* Check if fe histograms exist*/
-  if (numerator == nullptr || denominator == nullptr) {
-    B2INFO("processFEHistogram: Histograms needed for FE Ratio computation are not found");
-    return;
-  }
 
   feHist->Reset();
   std::unique_ptr<TH1> feClone(static_cast<TH1*>(feHist->Clone())); // Clone feHist
@@ -667,7 +666,7 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
     feHist->Draw();
 
     // Reference check
-    TH1* ref = findRefHist(feHist->GetName(), ERefScaling::c_RefScaleNone);
+    TH1* ref = findRefHist(feHist->GetName(), "", ERefScaling::c_RefScaleNone);
     if (ref) {
       ref->Draw("hist,same");
       B2INFO("processFEHistogram: Found and drew reference histogram.");
@@ -703,9 +702,10 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
 
       canvas->Modified();
       canvas->Update();
-    } else {
-      B2WARNING("processFEHistogram: Delta numerator or denominator not found.");
     }
+    // If the deltas are not available yet (e.g. before the first MinEvents window
+    // has closed), silently skip drawing the delta overlay, consistent with the
+    // other histogram handlers (e.g. processTimeHistogram).
   } else {
     B2WARNING("processFEHistogram: Skipped histogram processing due to missing numerator/denominator.");
   }

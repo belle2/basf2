@@ -121,8 +121,8 @@ namespace Belle2 {
       double xmi = 0, xma = 0;
       bool ok = rangeOfX(prism.zD, xmi, xma);
       if (not ok) return;
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x and over pixel columns
 
@@ -150,8 +150,8 @@ namespace Belle2 {
       double xmi = 0, xma = 0;
       bool ok = rangeOfX(mirror.zb, xmi, xma);
       if (not ok) return;
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x before mirror
 
@@ -190,8 +190,8 @@ namespace Belle2 {
       double xmi = xDs.front();
       double xma = xDs.back();
 
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x after mirror and over pixel columns
 

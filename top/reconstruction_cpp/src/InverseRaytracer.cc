@@ -152,7 +152,7 @@ namespace Belle2 {
           continue;
         }
         sol.len = len;
-        int Nym = lround((emiPoint.Y() + len * sol.ky) / B);
+        int Nym = func::lround((emiPoint.Y() + len * sol.ky) / B);
 
         double kx = func::unfold(sol.kx, Nxm);
         double ky = func::unfold(sol.ky, Nym);
@@ -224,7 +224,7 @@ namespace Belle2 {
           continue;
         }
         sol.len = len;
-        int Nym = lround((emiPoint.Y() + len * sol.ky) / B);
+        int Nym = func::lround((emiPoint.Y() + len * sol.ky) / B);
 
         double kx = func::unfold(sol.kx, Nxm);
         double ky = func::unfold(sol.ky, Nym);

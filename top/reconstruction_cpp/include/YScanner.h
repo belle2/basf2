@@ -531,7 +531,7 @@ namespace Belle2 {
 
     inline double YScanner::Table::getXmax() const {return x0 + step * (entries.size() - 1);}
 
-    inline int YScanner::Table::getIndex(double x) const {return lround((x - x0) / step);}
+    inline int YScanner::Table::getIndex(double x) const {return func::lround((x - x0) / step);}
 
     inline double YScanner::Table::getY(int i) const
     {

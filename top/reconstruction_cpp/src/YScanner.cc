@@ -193,7 +193,7 @@ namespace Belle2 {
       }
 
       double step = m_energyDistribution.step;
-      int ng = lround(3 * sigma / step);
+      int ng = func::lround(3 * sigma / step);
       auto& quasyEnergyDistribution = m_quasyEnergyDistributions[ng];
 
       if (quasyEnergyDistribution.entries.empty()) {
@@ -254,8 +254,8 @@ namespace Belle2 {
         y2 += D.dyB_de * (minE - m_meanE);
       }
       double B = m_bars.front().B;
-      int j1  = lround(y1 / B);
-      int j2  = lround(y2 / B) + 1;
+      int j1  = func::lround(y1 / B);
+      int j2  = func::lround(y2 / B) + 1;
 
       if (doScan and j2 - j1 <= s_maxReflections) {
         scan(col, yB, dydz, D, j1, j2);
@@ -290,7 +290,7 @@ namespace Belle2 {
         for (unsigned k = 0; k < 2; k++) {
           std::sort(projections[k].begin(), projections[k].end());
           for (auto& projection : projections[k]) {
-            int iDy = lround(projection.Dy * 1000);
+            int iDy = func::lround(projection.Dy * 1000);
             auto& mask = masks[iDy];
             if (not mask) {
               double Dy = projection.Dy;

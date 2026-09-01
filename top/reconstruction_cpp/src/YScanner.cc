@@ -16,6 +16,7 @@ namespace Belle2 {
   namespace TOP {
 
     int YScanner::s_maxReflections = 16;
+    unsigned YScanner::s_maxTabulatedPower = 1024;
 
     YScanner::Derivatives::Derivatives(const InverseRaytracer::Solution& sol,
                                        const InverseRaytracer::Solution& sol_dx,
@@ -105,6 +106,20 @@ namespace Belle2 {
       m_meanE0 = se / s;
       m_rmsE0 = sqrt(see / s - m_meanE0 * m_meanE0);
       m_cosTotal = sqrt(1 - 1 / pow(topgp->getPhaseIndex(m_meanE0), 2));
+    }
+
+
+    double YScanner::tabulateSurfaceReflectivity(unsigned n) const
+    {
+      double reflectivity = m_bars.front().reflectivity;
+
+      // an unreasonably large number of reflections must not blow up the table
+      if (n > s_maxTabulatedPower) return pow(reflectivity, n);
+
+      while (m_surfaceReflectivities.size() <= n) {
+        m_surfaceReflectivities.push_back(pow(reflectivity, m_surfaceReflectivities.size()));
+      }
+      return m_surfaceReflectivities[n];
     }
 
 

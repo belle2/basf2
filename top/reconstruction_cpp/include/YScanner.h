@@ -368,6 +368,19 @@ namespace Belle2 {
       double getSigmaAlpha() const {return m_sigmaAlpha;}
 
       /**
+       * Returns the reflectivity of the bar surface raised to the given power.
+       * The reflectivity is a constant of the module, therefore the powers are tabulated on
+       * first use and kept for the whole job (they do not depend on the track or the hypothesis).
+       * @param n power, i.e. the number of reflections
+       * @return reflectivity to the power of n
+       */
+      double getSurfaceReflectivity(unsigned n) const
+      {
+        if (n < m_surfaceReflectivities.size()) return m_surfaceReflectivities[n];
+        return tabulateSurfaceReflectivity(n);
+      }
+
+      /**
        * Returns photon energy distribution
        * @return photon energy distribution
        */
@@ -451,6 +464,14 @@ namespace Belle2 {
       }
 
       /**
+       * Extends the table of surface reflectivity powers up to n and returns the value.
+       * Called by getSurfaceReflectivity only when the table is not long enough.
+       * @param n power, i.e. the number of reflections
+       * @return reflectivity to the power of n
+       */
+      double tabulateSurfaceReflectivity(unsigned n) const;
+
+      /**
        * Performs expansion w/ the scan over reflections.
        * @param col pixel column number (0-based)
        * @param yB unfolded coordinate y of photon at prism entrance (= Bar exit) plane
@@ -482,12 +503,15 @@ namespace Belle2 {
        */
       PixelEfficiencies& pixelEfficiencies() {return m_pixelEfficiencies;}
 
-      // variables set in constructor (slot dependent)
+      // variables set in constructor or, for m_surfaceReflectivities, filled lazily on first use
+      // (slot dependent, therefore not reset by clear())
       PixelPositions m_pixelPositions; /**< positions and sizes of pixels */
       PixelMasks m_pixelMasks; /**< pixel masks */
       PixelEfficiencies m_pixelEfficiencies; /**< pixel relative efficiencies */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
       std::vector<WindowProjection> m_windowProjections; /**< pixel projection constants of unfolded prism exit windows */
+      mutable std::vector<double>
+      m_surfaceReflectivities; /**< bar surface reflectivity to the power of the index; filled on demand, never cleared */
       double m_prismZR = 0; /**< z of the prism-bar joint (copy of m_prism.zR) */
       double m_halfBarThickness = 0; /**< half thickness of the bar at prism entrance */
       double m_meanE0 = 0; /**< mean photon energy for beta = 1 */
@@ -514,6 +538,7 @@ namespace Belle2 {
       mutable bool m_scanDone = false;  /**< true if scan performed, false if reflections just merged */
 
       static int s_maxReflections; /**< maximal number of reflections to perform scan */
+      static unsigned s_maxTabulatedPower; /**< maximal power of the surface reflectivity that is tabulated */
 
       friend class TOPRecoManager;
 

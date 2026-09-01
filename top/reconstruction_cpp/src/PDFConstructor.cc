@@ -482,8 +482,10 @@ namespace Belle2 {
                                              SignalPDF::EPeakType type) const
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
-      double surf = m_yScanner->getBars().front().reflectivity;
-      double p = exp(-propLen / bulk) * pow(surf, std::abs(nx) + std::abs(ny));
+      // the surface reflectivity is a constant of the module, so its powers are tabulated
+      // once per module by the YScanner instead of being re-computed for every photon
+      double surf = m_yScanner->getSurfaceReflectivity(std::abs(nx) + std::abs(ny));
+      double p = exp(-propLen / bulk) * surf;
       if (type == SignalPDF::c_Reflected) p *= std::min(m_yScanner->getMirror().reflectivity, 1.0);
       return p;
     }

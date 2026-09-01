@@ -37,9 +37,9 @@ namespace Belle2 {
       m_zM = yScanner->getBars().back().zR;
       double meanE = yScanner->getMeanEnergyBeta1();
       double sigE = yScanner->getRMSEnergyBeta1();
-      m_phaseIndex = TOPGeometryPar::Instance()->getPhaseIndex(meanE);
-      m_groupIndex = TOPGeometryPar::Instance()->getGroupIndex(meanE);
-      double dng_de = TOPGeometryPar::Instance()->getGroupIndexDerivative(meanE);
+      m_phaseIndex = TOPGeometryPar::getPhaseIndex(meanE);
+      m_groupIndex = TOPGeometryPar::getGroupIndex(meanE);
+      double dng_de = TOPGeometryPar::getGroupIndexDerivative(meanE);
       m_dispersion = dng_de / m_groupIndex * sigE;
 
       const int N = 1000;

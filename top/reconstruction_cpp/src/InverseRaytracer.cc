@@ -293,19 +293,6 @@ namespace Belle2 {
     }
 
 
-    double InverseRaytracer::getDeltaXE(double x, double xe, double ze, double xd, double zd)
-    {
-      double z = sqrt(1 - x * x);
-      double kx = (x - xd);
-      double kz = (z - zd);
-      double s = 2 * (kx * x + kz * z);
-      kx -= s * x;
-      kz -= s * z;
-
-      return x + (ze - z) * kx / kz - xe;
-    }
-
-
     bool InverseRaytracer::findReflectionPoint(double xE, double zE, double xD, double zD,
                                                double xmMin, double xmMax,
                                                double& xM, double& zM, double& dxdz) const

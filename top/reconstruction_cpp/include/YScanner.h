@@ -186,6 +186,19 @@ namespace Belle2 {
 
 
       /**
+       * Geometry-only quantities needed to project a pixel to a given unfolded prism exit window.
+       * They only depend on the prism, therefore they are calculated once in the constructor.
+       */
+      struct WindowProjection {
+        double sy = 0; /**< window surface direction in y */
+        double sz = 0; /**< window surface direction in z */
+        double y0 = 0; /**< y of the window origin, displaced to the prism entrance plane */
+        double z0 = 0; /**< z of the window origin, displaced to the prism entrance plane */
+        bool evenReflection = false; /**< true if the window has the same orientation as the true one */
+      };
+
+
+      /**
        * Single PDF peak data
        */
       struct Result {
@@ -411,7 +424,31 @@ namespace Belle2 {
        * @param dydz Photon slope at prism entrance; dydz is used for even projections and -dydz is used for odd projections.
        * @param proj Projections of a pixel to prism entrance (results)
        */
-      void projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const;
+      void projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const
+      {
+        const auto& win = m_windowProjections[k];
+        double halfSize = win.evenReflection ? size / 2 : -size / 2;
+        const double ypix[2] =  {yc - halfSize, yc + halfSize}; // pixel edges in y
+        double yproj[2][2] = {{0}}; // pixel projections to prism entrance window (second index corresponds to pixel edges)
+
+        #pragma omp simd
+        for (int i = 0; i < 2; ++i) {
+          /* Formerly YScanner::prismEntranceY. */
+          double z = ypix[i] * win.sz + win.z0;
+          double y = ypix[i] * win.sy + win.y0;
+          double dy = dydz * (m_prismZR - z);
+          yproj[0][i] = y + dy; // even reflections
+          yproj[1][i] = y - dy; // odd reflections
+        }
+
+        double Bh = m_halfBarThickness;
+        for (int i = 0; i < 2; ++i) {
+          yproj[i][0] = std::max(yproj[i][0], -Bh);
+          yproj[i][1] = std::min(yproj[i][1], Bh);
+          proj[i].yc = (yproj[i][0] + yproj[i][1]) / 2;
+          proj[i].Dy = yproj[i][1] - yproj[i][0];
+        }
+      }
 
       /**
        * Performs expansion w/ the scan over reflections.
@@ -450,6 +487,9 @@ namespace Belle2 {
       PixelMasks m_pixelMasks; /**< pixel masks */
       PixelEfficiencies m_pixelEfficiencies; /**< pixel relative efficiencies */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
+      std::vector<WindowProjection> m_windowProjections; /**< pixel projection constants of unfolded prism exit windows */
+      double m_prismZR = 0; /**< z of the prism-bar joint (copy of m_prism.zR) */
+      double m_halfBarThickness = 0; /**< half thickness of the bar at prism entrance */
       double m_meanE0 = 0; /**< mean photon energy for beta = 1 */
       double m_rmsE0 = 0; /**< r.m.s of photon energy for beta = 1 */
       double m_cosTotal = 0; /**< cosine of total reflection angle */

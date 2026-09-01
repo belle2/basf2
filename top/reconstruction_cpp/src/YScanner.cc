@@ -50,6 +50,22 @@ namespace Belle2 {
         return;
       }
 
+      // set the pixel projection constants of the unfolded prism exit windows
+
+      m_prismZR = m_prism.zR;
+      m_halfBarThickness = m_bars.front().B / 2;
+      double dz = std::abs(m_prism.zD - m_prism.zFlat);
+      for (size_t k = 0; k < m_prism.unfoldedWindows.size(); k++) {
+        const auto& win = m_prism.unfoldedWindows[k];
+        WindowProjection projection;
+        projection.sy = win.sy;
+        projection.sz = win.sz;
+        projection.y0 = win.y0 + win.ny * dz;
+        projection.z0 = win.z0 + win.nz * dz;
+        projection.evenReflection = ((static_cast<int>(k) - m_prism.k0) % 2 == 0);
+        m_windowProjections.push_back(projection);
+      }
+
       // set the table of nominal photon detection efficiencies (incl. wavelength filter)
 
       const auto* topgp = TOPGeometryPar::Instance();
@@ -205,14 +221,19 @@ namespace Belle2 {
 
         quasyEnergyDistribution.set(m_energyDistribution.getX(-ng), step);
         int N = m_energyDistribution.entries.size();
+        const auto* entries = m_energyDistribution.entries.data();
+        const double* gausTable = gaus.data();
         double sum = 0;
         for (int k = -ng; k < N + ng; k++) {
+          // outside of this range getY(k - i) is zero, so those terms contribute nothing
+          const int iMin = std::max(-ng, k - N + 1);
+          const int iMax = std::min(ng, k);
           double s = 0;
           double se = 0;
           double see = 0;
-          for (int i = -ng; i <= ng; i++) {
-            double p = gaus[std::abs(i)] * m_energyDistribution.getY(k - i);
-            double e = m_energyDistribution.getX(k - i);
+          for (int i = iMin; i <= iMax; i++) {
+            double p = gausTable[std::abs(i)] * entries[k - i].y;
+            double e = entries[k - i].x; // equals m_energyDistribution.getX(k - i)
             s += p;
             se += p * e;
             see += p * e * e;
@@ -270,8 +291,12 @@ namespace Belle2 {
     void YScanner::scan(unsigned col, double yB, double dydz, const Derivatives& D, int j1, int j2) const
     {
 
+      const size_t numWindows = m_windowProjections.size();
+      const unsigned numRows = m_pixelPositions.getNumPixelRows();
+      const double barB = m_bars.front().B;
+
       std::map<int, EnergyMask*> masks;
-      for (unsigned row = 0; row < m_pixelPositions.getNumPixelRows(); row++) {
+      for (unsigned row = 0; row < numRows; row++) {
 
         int pixelID = m_pixelPositions.pixelID(row, col);
         if (not m_pixelMasks.isActive(pixelID)) continue;
@@ -279,7 +304,7 @@ namespace Belle2 {
         const auto& pixel = m_pixelPositions.get(pixelID);
         std::vector<PixelProjection> projections[2];
         PixelProjection proj[2];
-        for (size_t k = 0; k < m_prism.unfoldedWindows.size(); k++) {
+        for (size_t k = 0; k < numWindows; k++) {
           projectPixel(pixel.yc, pixel.Dy, k, dydz, proj);
           if (proj[0].Dy > 0) projections[0].push_back(proj[0]);
           proj[1].yc = -proj[1].yc;
@@ -305,7 +330,7 @@ namespace Belle2 {
         double wid_old = 1000;
         m_results.push_back(Result(pixelID));
         for (int j = j1; j < j2; j++) {
-          double ybar = j * m_bars.front().B - yB;
+          double ybar = j * barB - yB;
           for (const auto& projection : projections[std::abs(j) % 2]) {
             double Ecp = (ybar + projection.yc) / D.dyB_de + m_meanE;
             double wid = projection.mask->getFullWidth();
@@ -335,7 +360,11 @@ namespace Belle2 {
       int Neven = func::getNumOfEven(j1, j2);
       int Nodd = j2 - j1 - Neven;
 
-      for (unsigned row = 0; row < m_pixelPositions.getNumPixelRows(); row++) {
+      const size_t numWindows = m_windowProjections.size();
+      const unsigned numRows = m_pixelPositions.getNumPixelRows();
+      const double barB = m_bars.front().B;
+
+      for (unsigned row = 0; row < numRows; row++) {
 
         int pixelID = m_pixelPositions.pixelID(row, col);
         if (not m_pixelMasks.isActive(pixelID)) continue;
@@ -344,7 +373,7 @@ namespace Belle2 {
         double Dy0 = 0;
         double Dy1 = 0;
         PixelProjection proj[2];
-        for (size_t k = 0; k < m_prism.unfoldedWindows.size(); k++) {
+        for (size_t k = 0; k < numWindows; k++) {
           projectPixel(pixel.yc, pixel.Dy, k, dydz, proj);
           if (proj[0].Dy > 0) Dy0 += proj[0].Dy;
           if (proj[1].Dy > 0) Dy1 += proj[1].Dy;
@@ -353,7 +382,7 @@ namespace Belle2 {
 
         double Dy = (Dy0 * Neven + Dy1 * Nodd) / (Neven + Nodd);
         Result result(pixelID);
-        result.sum = Dy / m_bars.front().B;
+        result.sum = Dy / barB;
         result.e0 = m_meanE;
         result.sigsq = m_rmsE * m_rmsE;
         m_results.push_back(result);
@@ -401,36 +430,6 @@ namespace Belle2 {
       }
     }
 
-
-    void YScanner::projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const
-    {
-      double halfSize = (k - m_prism.k0) % 2 == 0 ? size / 2 : -size / 2;
-      const double ypix[2] =  {yc - halfSize, yc + halfSize}; // pixel edges in y
-      double yproj[2][2] = {{0}}; // pixel projections to prism entrance window (second index corresponds to pixel edges)
-
-      const auto& win = m_prism.unfoldedWindows[k];
-      double dz = std::abs(m_prism.zD - m_prism.zFlat);
-      double projectedY = win.y0 + win.ny * dz;
-      double projectedZ = win.z0 + win.nz * dz;
-
-      #pragma omp simd
-      for (int i = 0; i < 2; ++i) {
-        /* Formerly YScanner::prismEntranceY. */
-        double z = ypix[i] * win.sz + projectedZ;
-        double y = ypix[i] * win.sy + projectedY;
-        double dy = dydz * (m_prism.zR - z);
-        yproj[0][i] = y + dy; // even reflections
-        yproj[1][i] = y - dy; // odd reflections
-      }
-
-      double Bh = m_bars.front().B / 2;
-      for (int i = 0; i < 2; ++i) {
-        yproj[i][0] = std::max(yproj[i][0], -Bh);
-        yproj[i][1] = std::min(yproj[i][1], Bh);
-        proj[i].yc = (yproj[i][0] + yproj[i][1]) / 2;
-        proj[i].Dy = yproj[i][1] - yproj[i][0];
-      }
-    }
 
   } //TOP
 } //Belle2

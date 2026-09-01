@@ -1,0 +1,24 @@
+# EventType: 1220018001
+# Descriptor: B+ -> K+ pi0 eta
+# NickName: Bu_Kpi0eta
+# Documentation:   
+# Tested: YES
+# PhysicsWG: BHADRONIC
+# Responsible: Sebastiano Raiz
+# Email: sebastiano.raiz@desy.de
+# Cuts: None
+# Date: 20260901
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.000 K+ pi0 eta PHSP;
+Enddecay
+
+CDecay B-sig
+
+End
+

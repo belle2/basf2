@@ -223,9 +223,19 @@ namespace Belle2 {
        */
       double getExpectedSignalPhotons(double minTime, double maxTime) const
       {
+        // the time window usually contains either all the PDF peaks or none of them,
+        // and then the sum over the pixels is known in advance
         double ps = 0;
-        for (const auto& signalPDF : m_signalPDFs) {
-          ps += signalPDF.getIntegral(minTime, maxTime);
+        if (not m_hasPeaks) {
+          ; // no peaks at all: the sum stays zero
+        } else if (minTime <= m_minPeakT0 and maxTime >= m_maxPeakT0) {
+          ps = m_sumOfPeaks;
+        } else if (maxTime < m_minPeakT0 or minTime > m_maxPeakT0) {
+          ; // no peak is inside the window: the sum stays zero
+        } else {
+          for (const auto& signalPDF : m_signalPDFs) {
+            ps += signalPDF.getIntegral(minTime, maxTime);
+          }
         }
         return ps * m_signalPhotons;
       }
@@ -690,6 +700,10 @@ namespace Belle2 {
 
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
+      bool m_hasPeaks = false;  /**< true if at least one pixel has a PDF peak */
+      double m_sumOfPeaks = 0;  /**< sum over the pixels of the normalized number of photons in all peaks */
+      double m_minPeakT0 = 0;   /**< position of the earliest PDF peak of all pixels [ns] */
+      double m_maxPeakT0 = 0;   /**< position of the latest PDF peak of all pixels [ns] */
       double m_bkgPhotons = 0; /**< expected number of uniform background photons */
       double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 

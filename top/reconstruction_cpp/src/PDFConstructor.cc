@@ -70,6 +70,21 @@ namespace Belle2 {
         setSignalPDF();
       }
 
+      // the sum and the time span of the PDF peaks, used to shortcut getExpectedSignalPhotons
+
+      for (const auto& signalPDF : m_signalPDFs) {
+        m_sumOfPeaks += signalPDF.getSum(); // equals getIntegral over a window containing all the peaks
+        if (signalPDF.getPDFPeaks().empty()) continue;
+        if (m_hasPeaks) {
+          m_minPeakT0 = std::min(m_minPeakT0, signalPDF.getMinT0());
+          m_maxPeakT0 = std::max(m_maxPeakT0, signalPDF.getMaxT0());
+        } else {
+          m_minPeakT0 = signalPDF.getMinT0();
+          m_maxPeakT0 = signalPDF.getMaxT0();
+          m_hasPeaks = true;
+        }
+      }
+
       m_deltaRayPDF.prepare(track, hypothesis);
       m_deltaPhotons = m_deltaRayPDF.getNumPhotons();
 

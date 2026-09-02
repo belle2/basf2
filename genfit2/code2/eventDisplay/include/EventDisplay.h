@@ -20,8 +20,7 @@
 * @{
 */
 
-#ifndef genfit_EventDisplay_h
-#define genfit_EventDisplay_h
+#pragma once
 
 #include "Track.h"
 #include "AbsKalmanFitter.h"
@@ -249,6 +248,3 @@ class EventDisplay : public TNamed {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_EventDisplay_h
-

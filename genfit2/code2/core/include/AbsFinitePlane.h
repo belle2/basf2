@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef genfit_AbsFinitePlane_h
-#define genfit_AbsFinitePlane_h
+#pragma once
 
 #include <Rtypes.h> // for Option_t
 
@@ -68,5 +67,3 @@ class AbsFinitePlane {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsFinitePlane_h

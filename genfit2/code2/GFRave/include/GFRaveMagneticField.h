@@ -25,8 +25,7 @@
  * @{
  */
 
-#ifndef GFRAVEMAGNETICFIELD_H
-#define GFRAVEMAGNETICFIELD_H
+#pragma once
 
 #include <rave/MagneticField.h>
 
@@ -51,5 +50,3 @@ class GFRaveMagneticField : public rave::MagneticField {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVEMAGNETICFIELD_H

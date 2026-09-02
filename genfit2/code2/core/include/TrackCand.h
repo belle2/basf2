@@ -19,8 +19,7 @@
 /** @addtogroup genfit
  * @{ */
 
-#ifndef genfit_TrackCand_h
-#define genfit_TrackCand_h
+#pragma once
 
 #include "TrackCandHit.h"
 
@@ -245,5 +244,3 @@ class TrackCand : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TrackCand_h

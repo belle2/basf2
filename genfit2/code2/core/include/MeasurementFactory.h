@@ -21,9 +21,7 @@
  * @{
  */
 
-
-#ifndef genfit_MeasurementFactory_h
-#define genfit_MeasurementFactory_h
+#pragma once
 
 #include "MeasurementProducer.h"
 #include "TrackCand.h"
@@ -150,5 +148,3 @@ typename std::vector<measurement_T*> MeasurementFactory<measurement_T>::createMa
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_MeasurementFactory_h

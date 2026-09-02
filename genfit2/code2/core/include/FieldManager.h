@@ -20,9 +20,7 @@
  * @{
  */
 
-
-#ifndef genfit_FieldManager_h
-#define genfit_FieldManager_h
+#pragma once
 
 #include "AbsBField.h"
 #include "IO.h"
@@ -145,5 +143,3 @@ class FieldManager {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_FieldManager_h

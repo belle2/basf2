@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef GFRAVETRACKPARAMETERS_H
-#define GFRAVETRACKPARAMETERS_H
+#pragma once
 
 #include "Track.h"
 #include "AbsTrackRep.h"
@@ -90,5 +89,3 @@ class GFRaveTrackParameters : public TObject
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVETRACKPARAMETERS_H

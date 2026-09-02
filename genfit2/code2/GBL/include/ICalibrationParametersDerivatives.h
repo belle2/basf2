@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_ICalibrationParametersDerivatives_h
-#define genfit_ICalibrationParametersDerivatives_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "StateOnPlane.h"
@@ -154,5 +153,3 @@ class ICalibrationParametersDerivatives {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ICalibrationParametersDerivatives_h

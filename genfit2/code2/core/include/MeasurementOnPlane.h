@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_MeasurementOnPlane_h
-#define genfit_MeasurementOnPlane_h
+#pragma once
 
 #include "MeasuredStateOnPlane.h"
 #include "AbsHMatrix.h"
@@ -103,5 +102,3 @@ class MeasurementOnPlane : public MeasuredStateOnPlane {
 
 } /* End of namespace   */
 /** @} */
-
-#endif //  _MeasurementOnPlane_h

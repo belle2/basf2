@@ -1,5 +1,5 @@
-/* Copyright 2008-2010, Technische Universitaet Muenchen,
-   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch
+/* Copyright 2008-2026, Technische Universitaet Muenchen, DESY
+   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Christian Wessel
 
    This file is part of GENFIT.
 
@@ -22,6 +22,7 @@
 
 #include "WireMeasurement.h"
 #include "IO.h"
+#include "MathHelpers.h"
 
 #include <cmath>
 #include <algorithm>
@@ -106,7 +107,7 @@ std::vector<MeasurementOnPlane*> WireMeasurement::constructMeasurementsOnPlane(c
     mopR->setWeight(1);
   }
   else {
-    double val = 0.5 * pow(std::max(0., 1 - mR/maxDistance_), 2.);
+    double val = 0.5 * square(std::max(0., 1 - mR/maxDistance_));
     mopL->setWeight(val);
     mopR->setWeight(val);
   }

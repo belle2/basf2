@@ -26,9 +26,7 @@
  * @{
  */
 
-
-#ifndef GFRAVECONVERTERS_H
-#define GFRAVECONVERTERS_H
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "DetPlane.h"
@@ -95,6 +93,3 @@ namespace genfit {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVECONVERTERS_H
-

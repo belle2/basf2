@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_AbsFitterInfo_h
-#define genfit_AbsFitterInfo_h
+#pragma once
 
 #include "MeasurementOnPlane.h"
 #include "FitStatus.h"
@@ -112,5 +111,3 @@ inline AbsFitterInfo* new_clone( const AbsFitterInfo & a)
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsFitterInfo_h

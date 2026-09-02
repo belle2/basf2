@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_RKTrackRep_h
-#define genfit_RKTrackRep_h
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "StateOnPlane.h"
@@ -319,5 +318,3 @@ class RKTrackRep : public AbsTrackRep {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_RKTrackRep_h

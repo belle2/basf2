@@ -28,8 +28,7 @@
  * @{
  */
 
-#ifndef genfit_DetPlane_h
-#define genfit_DetPlane_h
+#pragma once
 
 #include "AbsFinitePlane.h"
 
@@ -194,5 +193,3 @@ class DetPlane : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_DetPlane_h

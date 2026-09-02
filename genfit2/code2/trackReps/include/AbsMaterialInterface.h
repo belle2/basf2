@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_AbsMaterialInterface_h
-#define genfit_AbsMaterialInterface_h
+#pragma once
 
 #include "RKTrackRep.h"
 #include "Material.h"
@@ -76,5 +75,3 @@ class AbsMaterialInterface : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsMaterialInterface_h

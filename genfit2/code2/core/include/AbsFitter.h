@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsFitter_h
-#define genfit_AbsFitter_h
+#pragma once
 
 
 namespace genfit {
@@ -58,5 +57,3 @@ class AbsFitter {
 
 }  /* End of namespace genfit */
 /** @} */
-
-#endif //genfit_AbsFitter_h

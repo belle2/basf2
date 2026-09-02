@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_DAF_h
-#define genfit_DAF_h
+#pragma once
 
 #include "AbsKalmanFitter.h"
 
@@ -180,5 +179,3 @@ class DAF : public AbsKalmanFitter {
 
 }  /* End of namespace genfit */
 /** @} */
-
-#endif //genfit_DAF_h

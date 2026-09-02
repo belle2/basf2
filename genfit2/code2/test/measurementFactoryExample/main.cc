@@ -20,6 +20,7 @@
 #include <EventDisplay.h>
 
 #include <HelixTrackModel.h>
+#include <MathHelpers.h>
 #include <MeasurementCreator.h>
 
 #include <TDatabasePDG.h>
@@ -136,7 +137,7 @@ int main() {
     for (int i = 0; i < 3; ++i)
       covSeed(i,i) = resolution*resolution;
     for (int i = 3; i < 6; ++i)
-      covSeed(i,i) = pow(resolution / nMeasurements / sqrt(3), 2);
+      covSeed(i,i) = genfit::square(resolution / nMeasurements / sqrt(3));
 
 
     // set start values and pdg to cand

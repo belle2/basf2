@@ -22,7 +22,6 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <genfit/Track.h>
-#include <genfit/TrackPoint.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>

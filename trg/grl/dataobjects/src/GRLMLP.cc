@@ -33,9 +33,9 @@ GRLMLP::n_weights_cal() const
 {
   unsigned n_weights = 0;
   if (get_number_of_layers() > 1) {
-    n_weights = m_n_nodes[0] * m_n_nodes[1];
+    n_weights = m_n_nodes.at(0) * m_n_nodes.at(1);
     for (unsigned il = 1; il < get_number_of_layers() - 1; ++il) {
-      n_weights += m_n_nodes[il] * m_n_nodes[il + 1];
+      n_weights += m_n_nodes.at(il) * m_n_nodes.at(il + 1);
     }
   }
   return n_weights;
@@ -47,7 +47,7 @@ GRLMLP::n_bias_cal() const
   unsigned nbias = 0;
   if (get_number_of_layers() > 1) {
     for (unsigned il = 1; il < get_number_of_layers(); ++il) {
-      nbias += m_n_nodes[il] ;
+      nbias += m_n_nodes.at(il) ;
     }
   }
   return nbias;

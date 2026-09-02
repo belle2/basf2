@@ -34,7 +34,7 @@ namespace Belle2 {
     /** get number of layers */
     unsigned get_number_of_layers() const { return m_n_nodes.size(); }
     /** get number of nodes in a layer */
-    unsigned get_number_of_nodes_layer(unsigned i_layer) const { return m_n_nodes[i_layer]; }
+    unsigned get_number_of_nodes_layer(unsigned i_layer) const { return m_n_nodes.at(i_layer); }
     /** get number of weights from length of weights vector */
     unsigned get_number_of_weights() const { return m_weights.size(); }
     /** calculate number of weights from number of nodes */
@@ -172,7 +172,7 @@ namespace Belle2 {
     std::vector<float> m_output_scale;
 
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 8);
+    ClassDef(GRLMLP, 7);
   };
 }
 #endif

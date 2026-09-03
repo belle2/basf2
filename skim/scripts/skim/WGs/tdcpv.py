@@ -208,14 +208,14 @@ class TDCPV_qqs(BaseSkim):
             'phi:SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
             'eta\':SkimHighEff_TDCPV_qqs K_S0:pi0pi0_TDCPV_qqs',
             'phi:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
-            'eta:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
+            'eta:SkimHighEff_TDCPV_qqs K_S0:merged gamma:E15_TDCPV_qqs',
             'rho0:SkimHighEff gamma:E15_TDCPV_qqs',
             'omega:SkimHighEff gamma:E15_TDCPV_qqs',
             'phi:SkimHighEff gamma:E15_TDCPV_qqs'
         ]
 
         bu_qqs_Channels = [
-            'eta\':SkimHighEff K+:SkimHighEff',
+            'eta\':SkimHighEff_TDCPV_qqs K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K*+:kshort_pip_TDCPV_qqs',
             'phi:SkimHighEff K*+:kp_piz_TDCPV_qqs',
@@ -267,7 +267,8 @@ class TDCPV_qqs(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import ValidationMetadataSetter
 
-        ma.reconstructDecay("B0:etap_TDCPV_qqs -> eta':SkimHighEff K_S0:merged", '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+        ma.reconstructDecay("B0:etap_TDCPV_qqs -> eta':SkimHighEff_TDCPV_qqs K_S0:merged",
+                            '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
         ma.reconstructDecay("K_10:all_TDCPV_qqs -> K_S0:merged pi+:all pi-:all ", "", path=path)
         ma.reconstructDecay("B0:Kspipig_TDCPV_qqs -> K_10:all_TDCPV_qqs gamma:E15_TDCPV_qqs",

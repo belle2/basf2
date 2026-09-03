@@ -373,6 +373,13 @@ void TRGGDLDQMModule::initialize()
   for (int i = 0; i < 320; i++) {
     strcpy(outbitname[i], m_dbftdl->getoutbitname(i));
   }
+
+  // The bit names are constant for the whole run. All 320 entries are indexed and
+  // the first occurrence of a name wins.
+  for (int i = 0; i < 320; i++) {
+    m_inbitIndex.emplace(inbitname[i], i);
+    m_outbitIndex.emplace(outbitname[i], i);
+  }
   n_leafs  = m_unpacker->getnLeafs();
   n_leafsExtra = m_unpacker->getnLeafsExtra();
   n_clocks = m_unpacker->getnClks();
@@ -630,6 +637,21 @@ void TRGGDLDQMModule::event()
 
   } // clk
 
+
+  // Collapse the per-clock bit vectors into "did this bit fire in any clock cycle",
+  // so that isFired_quick() is a single lookup
+  m_firedPsnm.assign(n_outbit, 0);
+  m_firedFtdl.assign(n_outbit, 0);
+  m_firedInput.assign(n_inbit, 0);
+  for (unsigned clk = 0; clk < n_clocks; clk++) {
+    for (unsigned b = 0; b < n_outbit; b++) {
+      if (h_p_vec[clk * n_outbit + b] > 0) m_firedPsnm[b] = 1;
+      if (h_f_vec[clk * n_outbit + b] > 0) m_firedFtdl[b] = 1;
+    }
+    for (unsigned b = 0; b < n_inbit; b++) {
+      if (h_i_vec[clk * n_inbit + b] > 0) m_firedInput[b] = 1;
+    }
+  }
 
   // fill rising and falling edges
   fillRiseFallTimings();
@@ -914,24 +936,13 @@ void TRGGDLDQMModule::genVcd(void)
 bool
 TRGGDLDQMModule::isFired_quick(const std::string& bitname, const bool& isPsnm = 0)
 {
-  int bn = getoutbitnum(bitname.c_str());
-  for (unsigned clk = 0; clk < n_clocks; clk++) {
-    if (bn > -1) {
-      if (isPsnm) {
-        if (h_p_vec[clk * n_outbit + bn] > 0)
-          return true;
-      } else {
-        if (h_f_vec[clk * n_outbit + bn] > 0)
-          return true;
-      }
-    }
+  const auto itOut = m_outbitIndex.find(bitname);
+  if (itOut != m_outbitIndex.end() && itOut->second < (int)n_outbit) {
+    if (isPsnm ? m_firedPsnm[itOut->second] : m_firedFtdl[itOut->second]) return true;
   }
-  bn = getinbitnum(bitname.c_str());
-  for (unsigned clk = 0; clk < n_clocks; clk++) {
-    if (bn > -1) {
-      if (h_i_vec[clk * n_inbit + bn] > 0)
-        return true;
-    }
+  const auto itIn = m_inbitIndex.find(bitname);
+  if (itIn != m_inbitIndex.end() && itIn->second < (int)n_inbit) {
+    if (m_firedInput[itIn->second]) return true;
   }
   return false;
 }

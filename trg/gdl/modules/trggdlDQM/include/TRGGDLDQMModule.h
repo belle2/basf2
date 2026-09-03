@@ -17,6 +17,8 @@
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <TH2I.h>
 #include <TH1I.h>
@@ -146,6 +148,17 @@ namespace Belle2 {
     bool isFired_quick(const std::string& bitname, const bool& isPsnm);
     int getinbitnum(const char* c) const;
     int getoutbitnum(const char* c) const;
+
+    /** bit name -> input bit number, built once in initialize() */
+    std::unordered_map<std::string, int> m_inbitIndex;
+    /** bit name -> output bit number, built once in initialize() */
+    std::unordered_map<std::string, int> m_outbitIndex;
+    /** per-event cache: psnm output bit fired in at least one clock cycle */
+    std::vector<char> m_firedPsnm;
+    /** per-event cache: ftdl output bit fired in at least one clock cycle */
+    std::vector<char> m_firedFtdl;
+    /** per-event cache: input bit fired in at least one clock cycle */
+    std::vector<char> m_firedInput;
     unsigned n_clocks = 0;
     unsigned evtno = 0;
     unsigned _exp = 0;

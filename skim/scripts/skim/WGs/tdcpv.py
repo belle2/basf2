@@ -27,7 +27,8 @@ from stdKlongs import stdKlongs
 
 __authors__ = [
     "Chiara La Licata <chiara.lalicata@ts.infn.it>",
-    "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>"
+    "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>",
+    "nbrenny <nbrenny@iastate.edu>"
 ]
 
 __liaison__ = "Noah BRENNY <nbrenny@iastate.edu>"
@@ -74,8 +75,6 @@ class TDCPV_qqs(BaseSkim):
     **Particle lists used**:
 
     * ``phi:SkimHighEff``
-    * ``eta':SkimHighEff``
-    * ``eta:SkimHighEff``
     * ``pi0:eff40_May2020``
     * ``pi0:skim``
     * ``pi0:SkimHighEff``
@@ -94,7 +93,20 @@ class TDCPV_qqs(BaseSkim):
     **Cuts used**:
 
     * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
-    * 5.2 < Mbc < 5.29
+    * photon quality:
+        * abs(clusterTiming) < 200
+        * abs(formula(clusterTiming/clusterErrorTiming)) < 2
+        * clusterNHits > 1.5
+        * thetaInCDCAcceptance
+        * E > 0.05
+    * pi0 quality:
+        * daughter(0, abs(clusterTiming)) < 200
+        * daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * daughter(1, abs(clusterTiming)) < 200
+        * daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * 0.1 < InvM < 0.17
+        * -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4 for pi0s not in eta -> 3pi mode
+    * Mbc > 5.2
     * abs(deltaE) < 0.5
     * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1
     * E_ECL_TDCPV < 9
@@ -142,6 +154,7 @@ class TDCPV_qqs(BaseSkim):
 
         loadStdAllRho0(path=path)
         loadStdSkimHighEffPhi(path=path)
+        # loadStdSkimHighEffEta with appropriately cut pi0 list (for dmID=2)
         ma.reconstructDecay('eta:SkimHighEff1_TDCPV_qqs -> gamma:tight gamma:tight', '0.4 < M < 0.6', dmID=1, path=path)
         ma.reconstructDecay(
                 'eta:SkimHighEff2_TDCPV_qqs -> pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_qqs pi-:SkimHighEff pi+:SkimHighEff',
@@ -149,7 +162,7 @@ class TDCPV_qqs(BaseSkim):
                 dmID=2,
                 path=path)
         ma.copyLists('eta:SkimHighEff_TDCPV_qqs', ['eta:SkimHighEff1_TDCPV_qqs', 'eta:SkimHighEff2_TDCPV_qqs'], path=path)
-        # loadStdSkimHighEffEta(path=path)
+        # loadStdSkimHighEffEtaPrime with appropriately cut pi0 list (for dmID=2)
         ma.reconstructDecay(
             'eta\':SkimHighEff1_TDCPV_qqs -> pi+:SkimHighEff pi-:SkimHighEff gamma:tight',
             '0.8 < M < 1.1',
@@ -160,7 +173,6 @@ class TDCPV_qqs(BaseSkim):
             dmID=2,
             path=path)
         ma.copyLists('eta\':SkimHighEff_TDCPV_qqs', ['eta\':SkimHighEff1_TDCPV_qqs', 'eta\':SkimHighEff2_TDCPV_qqs'], path=path)
-        # loadStdSkimHighEffEtaPrime(path=path)
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffRho0(path=path)
         loadStdSkimHighEffOmega(path=path)
@@ -304,8 +316,6 @@ class TDCPV_klong(BaseSkim):
     **Particle lists used**:
 
     * ``phi:SkimHighEff``
-    * ``eta:SkimHighEff1``
-    * ``eta:SkimHighEff2``
     * ``rho0:SkimHighEff``
     * ``K_L0:allklm``
     * ``K_L0:allecl``
@@ -313,6 +323,19 @@ class TDCPV_klong(BaseSkim):
     **Cuts used**:
 
     * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
+    * photon quality:
+        * abs(clusterTiming) < 200
+        * abs(formula(clusterTiming/clusterErrorTiming)) < 2
+        * clusterNHits > 1.5
+        * thetaInCDCAcceptance
+        * E > 0.05
+    * pi0 quality:
+        * daughter(0, abs(clusterTiming)) < 200
+        * daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * daughter(1, abs(clusterTiming)) < 200
+        * daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * 0.1 < InvM < 0.17
+        * -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4 for pi0s not in eta -> 3pi mode
     * clusterE>0.150 for loose ECL KL
     * klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for loose KLM KL
     * clusterPulseShapeDiscriminationMVA<0.15 and clusterE>0.25 for tight ECL KL

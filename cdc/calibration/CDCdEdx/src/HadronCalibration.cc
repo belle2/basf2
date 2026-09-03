@@ -28,7 +28,7 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
   TFile* infile = new TFile(filename.data());
 
   CDCDedxMeanPred gpar;
-  gpar.setParameters(paramfile.data());
+  gpar.setParameters(paramfile);
   CDCDedxWidgetCurve* gc = new CDCDedxWidgetCurve();
 
   // multigraphs to hold the curve and residual results
@@ -55,7 +55,7 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
 
     if (!infile->GetListOfKeys()->Contains(particle.data())) continue;
 
-    TTree* hadron = (TTree*) infile->Get(particle.data());
+    TTree* hadron = static_cast<TTree*>(infile->Get(particle.data()));
     B2INFO("HadronCalibration: reading " << particle.data() << " in file " << filename.data());
 
     double dedx, dedxerr, bg;      // dE/dx without electron saturation correction
@@ -89,14 +89,16 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
 
   }
 
-  TMultiGraph* grcopy1 = (TMultiGraph*)gr_dedxvsbg->Clone(Form("datapoints_%s", suffix.data()));
+  TMultiGraph* grcopy1 = static_cast<TMultiGraph*>(gr_dedxvsbg->Clone(Form("datapoints_%s", suffix.data())));
 
   //Region 1
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx1 = new TF1("fdedx1", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 8);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin1, bgmax1, 8, "WidgetCurve");
 
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx1Copy = new TF1("fdedx1Copy", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 8);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
@@ -110,11 +112,13 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
   }
 
   //Region 2
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx2 = new TF1("fdedx2", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin2, bgmax2, 5, "WidgetCurve");
 
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx2Copy = new TF1("fdedx2Copy", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
@@ -128,11 +132,13 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
   }
 
   //Region 3
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx3 = new TF1("fdedx3", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
   }, bgmin3, bgmax3, 5, "WidgetCurve");
 
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fdedx3Copy = new TF1("fdedx3Copy", [gc](double * x, double * par) {
     std::vector<double> parVec(par, par + 5);  // Create a vector from the parameters
     return gc->meanCurve(x, parVec);  // Call the member function
@@ -416,7 +422,7 @@ void HadronCalibration::fitBGCurve(const std::vector< std::string >& particles, 
   infile->Close();
 }
 
-void HadronCalibration::plotBGMonitoring(std::vector< std::string > particles, const std::string& filename,
+void HadronCalibration::plotBGMonitoring(const std::vector< std::string >& particles, const std::string& filename,
                                          const std::string& suffix)
 {
   //1. chi-mean vs bg
@@ -455,7 +461,8 @@ void HadronCalibration::plotBGMonitoring(std::vector< std::string > particles, c
   }
 }
 
-void HadronCalibration::plotMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& sname,
+void HadronCalibration::plotMonitoring(const std::vector< std::string >& particles, const std::string& filename,
+                                       const std::string& sname,
                                        const std::string& title,
                                        const std::string& sxvar, const std::string& syvar)
 {
@@ -481,8 +488,8 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, con
 
     if (!infile->GetListOfKeys()->Contains(particle.data())) continue;
     TTree* hadron;
-    if (sxvar == "bg"  || sxvar == "mom") hadron = (TTree*)infile->Get(particle.data());
-    else hadron = (TTree*)infile->Get(Form("%s_%s", particle.data(), sxvar.data()));
+    if (sxvar == "bg"  || sxvar == "mom") hadron = static_cast<TTree*>(infile->Get(particle.data()));
+    else hadron = static_cast<TTree*>(infile->Get(Form("%s_%s", particle.data(), sxvar.data())));
 
     B2INFO("HadronCalibration: reading " << particle.data() << " in file " << filename.data());
 
@@ -538,7 +545,7 @@ void HadronCalibration::plotMonitoring(std::vector< std::string > particles, con
   delete gr_var;
 }
 
-void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename,
+void HadronCalibration::fitSigmavsIonz(const std::vector< std::string >& particles, const std::string& filename,
                                        const std::string& paramfile,
                                        const std::string& suffix, const bool makeIterationSummary)
 {
@@ -547,7 +554,7 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
   const int npart = int(particles.size());
 
   CDCDedxSigmaPred gpar;
-  gpar.setParameters(paramfile.data());
+  gpar.setParameters(paramfile);
 
   TFile* infile = new TFile(filename.data());
   std::vector<TGraphErrors> part_resovsdedx(npart);
@@ -566,7 +573,7 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
     if (particle == "electron") continue;
 
     if (!infile->GetListOfKeys()->Contains(particle.data())) continue;
-    TTree* hadron = (TTree*)infile->Get(particle.data());
+    TTree* hadron = static_cast<TTree*>(infile->Get(particle.data()));
     B2INFO("\tHadronCalibration: reading " << particle << " in file " << filename.data());
 
     double dedx, ionzres;
@@ -597,7 +604,7 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
   sigvsdedx->SetParameter(0, gpar.getDedxPars(0));
   sigvsdedx->SetParameter(1, gpar.getDedxPars(1));
 
-  TF1* sigvsdedxCopy = (TF1*)sigvsdedx->Clone("sigvsdedxcopy");
+  TF1* sigvsdedxCopy = static_cast<TF1*>(sigvsdedx->Clone("sigvsdedxcopy"));
   setFitterStyle(sigvsdedxCopy, 13, 6);
 
   TCanvas sigcan("sigcan", " Reso(ionz) vs dE/dx", 820, 750);
@@ -643,7 +650,7 @@ void HadronCalibration::fitSigmavsIonz(std::vector< std::string > particles, con
   delete sigvsdedx;
 }
 
-void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename,
+void HadronCalibration::fitSigmaVsNHit(const std::vector< std::string >& particles, const std::string& filename,
                                        const std::string& paramsigma,
                                        const std::string& suffix, const bool makeIterationSummary)
 {
@@ -651,10 +658,11 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
   const double lowernhit = 7, uppernhit = 39;
 
   CDCDedxSigmaPred sgpar;
-  sgpar.setParameters(paramsigma.data());
+  sgpar.setParameters(paramsigma);
 
   CDCDedxWidgetSigma* gs = new CDCDedxWidgetSigma();
 
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* fsigma = new TF1("fsigma", [gs](double * x, double * par) {
     std::vector<double> parVec(par, par + 6);  // Create a vector from the parameters
     return gs->sigmaCurve(x, parVec);  // Call the member function
@@ -663,7 +671,7 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
   fsigma->FixParameter(0, 2);
   for (int i = 1; i < 6; ++i) fsigma->SetParameter(i, sgpar.getNHitPars(i - 1));
 
-  TF1* fsigmacopy = (TF1*)fsigma->Clone("fsigmacopy");
+  TF1* fsigmacopy = static_cast<TF1*>(fsigma->Clone("fsigmacopy"));
   setFitterStyle(fsigmacopy, 13, 6);
 
   TFile* infile = new TFile(filename.data());
@@ -674,7 +682,7 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
     TGraphErrors gr_dedxvsbg;
 
     if (!infile->GetListOfKeys()->Contains(Form("%s_nhit", particle.data()))) continue;
-    TTree* hadron = (TTree*)infile->Get(Form("%s_nhit", particle.data()));
+    TTree* hadron = static_cast<TTree*>(infile->Get(Form("%s_nhit", particle.data())));
     B2INFO("\tHadronCalibration: reading " << particle << " in file " << filename.data());
 
     double avg, sigma, sigmaerr;
@@ -748,17 +756,18 @@ void HadronCalibration::fitSigmaVsNHit(std::vector< std::string > particles, con
   }
 }
 
-void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename,
+void HadronCalibration::fitSigmaVsCos(const std::vector< std::string >& particles, const std::string& filename,
                                       const std::string& paramsigma,
                                       const std::string& suffix, const bool makeIterationSummary)
 {
   double lowercos = -0.84, uppercos = 0.96;
 
   CDCDedxSigmaPred gpar;
-  gpar.setParameters(paramsigma.data());
+  gpar.setParameters(paramsigma);
 
   CDCDedxWidgetSigma* gs = new CDCDedxWidgetSigma();
 
+  // cppcheck-suppress constParameterPointer ; ROOT fixes this signature
   TF1* total = new TF1("total", [gs](double * x, double * par) {
     std::vector<double> parVec(par, par + 11);  // Create a vector from the parameters
     return gs->sigmaCurve(x, parVec);  // Call the member function
@@ -768,7 +777,7 @@ void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, cons
   total->FixParameter(0, 3);
   total->FixParameter(2, 0.0);
 
-  TF1* fsigmacopy = (TF1*)total->Clone("fsigmacopy");
+  TF1* fsigmacopy = static_cast<TF1*>(total->Clone("fsigmacopy"));
   setFitterStyle(fsigmacopy, 13, 6);
 
   TFile* infile = new TFile(filename.data());
@@ -779,7 +788,7 @@ void HadronCalibration::fitSigmaVsCos(std::vector< std::string > particles, cons
     TGraphErrors gr_dedx;
 
     if (!infile->GetListOfKeys()->Contains(Form("%s_costh", particle.data()))) continue;
-    TTree* hadron = (TTree*)infile->Get(Form("%s_costh", particle.data()));
+    TTree* hadron = static_cast<TTree*>(infile->Get(Form("%s_costh", particle.data())));
     B2INFO("\tHadronCalibration: reading " << particle << " in file " << filename.data());
 
     double avg, sigma, sigmaerr;

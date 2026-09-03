@@ -276,6 +276,8 @@ void TRGGDLDQMModule::beginRun()
         array_psn_extra_fast[iskim][i][ibin] = 0;
       }
     }
+    m_fastPos[iskim] = 0;
+    for (int ibin = 0; ibin < n_output_extra; ibin++) m_fastSum[iskim][ibin] = 0;
   }
 
   oldDir->cd();
@@ -400,6 +402,8 @@ void TRGGDLDQMModule::initialize()
         array_psn_extra_fast[iskim][i][ibin] = 0;
       }
     }
+    m_fastPos[iskim] = 0;
+    for (int ibin = 0; ibin < n_output_extra; ibin++) m_fastSum[iskim][ibin] = 0;
   }
 
 }
@@ -1773,443 +1777,442 @@ TRGGDLDQMModule::fillOutputExtra(void)
 
   for (unsigned ifill = 0; ifill < skim.size(); ifill++) {
 
-    for (int i = nsample_fast - 1; i > 0; i--) {
-      for (int ibin = 0; ibin < n_output_extra; ibin++) {
-        array_psn_extra_fast[skim[ifill]][i][ibin] = array_psn_extra_fast[skim[ifill]][i - 1][ibin];
-      }
-    }
+    // array_psn_extra_fast holds the last nsample_fast events as a ring buffer: advance the
+    // index, drop the slot being reused from the running sum, and publish the histogram
+    // straight from that sum
+    const int fastSkim = skim[ifill];
+    m_fastPos[fastSkim] = (m_fastPos[fastSkim] + 1) % nsample_fast;
+    const int fastPos = m_fastPos[fastSkim];
     for (int ibin = 0; ibin < n_output_extra; ibin++) {
-      array_psn_extra_fast[skim[ifill]][0][ibin] = 0;
+      m_fastSum[fastSkim][ibin] -= array_psn_extra_fast[fastSkim][fastPos][ibin];
+      array_psn_extra_fast[fastSkim][fastPos][ibin] = 0;
     }
 
     if (1) {
       h_psn_extra[skim[ifill]]->Fill(0.5);
-      array_psn_extra_fast[skim[ifill]][0][0] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][0] = 1;
     }
     if (fff_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(1.5);
-      array_psn_extra_fast[skim[ifill]][0][1] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][1] = 1;
     }
     if (ffo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(2.5);
-      array_psn_extra_fast[skim[ifill]][0][2] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][2] = 1;
     }
     if (ffb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(3.5);
-      array_psn_extra_fast[skim[ifill]][0][3] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][3] = 1;
     }
     if (fff_fired) {
       h_psn_extra[skim[ifill]]->Fill(4.5);
-      array_psn_extra_fast[skim[ifill]][0][4] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][4] = 1;
     }
     if (ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(5.5);
-      array_psn_extra_fast[skim[ifill]][0][5] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][5] = 1;
     }
     if (CDC_fired) {
       h_psn_extra[skim[ifill]]->Fill(6.5);
-      array_psn_extra_fast[skim[ifill]][0][6] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][6] = 1;
     }
     if ((CDC_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(7.5);
-      array_psn_extra_fast[skim[ifill]][0][7] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][7] = 1;
     }
     if (bha2D_fired) {
       h_psn_extra[skim[ifill]]->Fill(8.5);
-      array_psn_extra_fast[skim[ifill]][0][8] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][8] = 1;
     }
     if (bha3D_fired) {
       h_psn_extra[skim[ifill]]->Fill(9.5);
-      array_psn_extra_fast[skim[ifill]][0][9] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][9] = 1;
     }
     if (ff_fired) {
       h_psn_extra[skim[ifill]]->Fill(10.5);
-      array_psn_extra_fast[skim[ifill]][0][10] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][10] = 1;
     }
     if (ff_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(11.5);
-      array_psn_extra_fast[skim[ifill]][0][11] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][11] = 1;
     }
     if (f_fired) {
       h_psn_extra[skim[ifill]]->Fill(12.5);
-      array_psn_extra_fast[skim[ifill]][0][12] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][12] = 1;
     }
     if (f_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(13.5);
-      array_psn_extra_fast[skim[ifill]][0][13] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][13] = 1;
     }
     if (LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(14.5);
-      array_psn_extra_fast[skim[ifill]][0][14] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][14] = 1;
     }
     if (fff_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(15.5);
-      array_psn_extra_fast[skim[ifill]][0][15] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][15] = 1;
     }
     if (ffo_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(16.5);
-      array_psn_extra_fast[skim[ifill]][0][16] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][16] = 1;
     }
     if (ffb_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(17.5);
-      array_psn_extra_fast[skim[ifill]][0][17] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][17] = 1;
     }
     if (ffy_fired) {
       h_psn_extra[skim[ifill]]->Fill(18.5);
-      array_psn_extra_fast[skim[ifill]][0][18] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][18] = 1;
     }
     if (ffy_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(19.5);
-      array_psn_extra_fast[skim[ifill]][0][19] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][19] = 1;
     }
     if (fyo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(20.5);
-      array_psn_extra_fast[skim[ifill]][0][20] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][20] = 1;
     }
     if (fyb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(21.5);
-      array_psn_extra_fast[skim[ifill]][0][21] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][21] = 1;
     }
     if ((ffy_fired || fyo_fired || fyb_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(22.5);
-      array_psn_extra_fast[skim[ifill]][0][22] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][22] = 1;
     }
     if (ffy_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(23.5);
-      array_psn_extra_fast[skim[ifill]][0][23] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][23] = 1;
     }
     if (fyo_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(24.5);
-      array_psn_extra_fast[skim[ifill]][0][24] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][24] = 1;
     }
     if (fyb_fired && (LML_fired)) {
       h_psn_extra[skim[ifill]]->Fill(25.5);
-      array_psn_extra_fast[skim[ifill]][0][25] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][25] = 1;
     }
     if (c4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(26.5);
-      array_psn_extra_fast[skim[ifill]][0][26] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][26] = 1;
     }
     if (hie_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(27.5);
-      array_psn_extra_fast[skim[ifill]][0][27] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][27] = 1;
     }
     if (lml0_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(28.5);
-      array_psn_extra_fast[skim[ifill]][0][28] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][28] = 1;
     }
     if (lml1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(29.5);
-      array_psn_extra_fast[skim[ifill]][0][29] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][29] = 1;
     }
     if (lml2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(30.5);
-      array_psn_extra_fast[skim[ifill]][0][30] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][30] = 1;
     }
     if (lml3_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(31.5);
-      array_psn_extra_fast[skim[ifill]][0][31] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][31] = 1;
     }
     if (lml4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(32.5);
-      array_psn_extra_fast[skim[ifill]][0][32] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][32] = 1;
     }
     if (lml5_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(33.5);
-      array_psn_extra_fast[skim[ifill]][0][33] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][33] = 1;
     }
     if (lml6_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(34.5);
-      array_psn_extra_fast[skim[ifill]][0][34] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][34] = 1;
     }
     if (lml7_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(35.5);
-      array_psn_extra_fast[skim[ifill]][0][35] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][35] = 1;
     }
     if (lml8_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(36.5);
-      array_psn_extra_fast[skim[ifill]][0][36] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][36] = 1;
     }
     if (lml9_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(37.5);
-      array_psn_extra_fast[skim[ifill]][0][37] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][37] = 1;
     }
     if (lml10_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(38.5);
-      array_psn_extra_fast[skim[ifill]][0][38] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][38] = 1;
     }
     if (lml12_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(39.5);
-      array_psn_extra_fast[skim[ifill]][0][39] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][39] = 1;
     }
     if (lml13_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(40.5);
-      array_psn_extra_fast[skim[ifill]][0][40] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][40] = 1;
     }
     if (eclmumu_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(41.5);
-      array_psn_extra_fast[skim[ifill]][0][41] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][41] = 1;
     }
     if (mu_b2b_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(42.5);
-      array_psn_extra_fast[skim[ifill]][0][42] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][42] = 1;
     }
     if (mu_eb2b_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(43.5);
-      array_psn_extra_fast[skim[ifill]][0][43] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][43] = 1;
     }
     if (cdcklm1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(44.5);
-      array_psn_extra_fast[skim[ifill]][0][44] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][44] = 1;
     }
     if (cdcklm2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(45.5);
-      array_psn_extra_fast[skim[ifill]][0][45] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][45] = 1;
     }
     if (klm_hit_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(46.5);
-      array_psn_extra_fast[skim[ifill]][0][46] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][46] = 1;
     }
     if (eklm_hit_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(47.5);
-      array_psn_extra_fast[skim[ifill]][0][47] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][47] = 1;
     }
     if (mu_b2b_fired  && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(48.5);
-      array_psn_extra_fast[skim[ifill]][0][48] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][48] = 1;
     }
     if (mu_eb2b_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(49.5);
-      array_psn_extra_fast[skim[ifill]][0][49] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][49] = 1;
     }
     if (cdcklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(50.5);
-      array_psn_extra_fast[skim[ifill]][0][50] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][50] = 1;
     }
     if (cdcklm2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(51.5);
-      array_psn_extra_fast[skim[ifill]][0][51] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][51] = 1;
     }
     if (klm_hit_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(52.5);
-      array_psn_extra_fast[skim[ifill]][0][52] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][52] = 1;
     }
     if (eklm_hit_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(53.5);
-      array_psn_extra_fast[skim[ifill]][0][53] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][53] = 1;
     }
     if (cdcecl1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(54.5);
-      array_psn_extra_fast[skim[ifill]][0][54] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][54] = 1;
     }
     if (cdcecl2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(55.5);
-      array_psn_extra_fast[skim[ifill]][0][55] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][55] = 1;
     }
     if (cdcecl3_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(56.5);
-      array_psn_extra_fast[skim[ifill]][0][56] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][56] = 1;
     }
     if (cdcecl4_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(57.5);
-      array_psn_extra_fast[skim[ifill]][0][57] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][57] = 1;
     }
     if (cdcecl1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(58.5);
-      array_psn_extra_fast[skim[ifill]][0][58] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][58] = 1;
     }
     if (cdcecl2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(59.5);
-      array_psn_extra_fast[skim[ifill]][0][59] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][59] = 1;
     }
     if (cdcecl3_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(60.5);
-      array_psn_extra_fast[skim[ifill]][0][60] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][60] = 1;
     }
     if (cdcecl4_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(61.5);
-      array_psn_extra_fast[skim[ifill]][0][61] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][61] = 1;
     }
     if (fso_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(62.5);
-      array_psn_extra_fast[skim[ifill]][0][62] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][62] = 1;
     }
     if (fsb_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(63.5);
-      array_psn_extra_fast[skim[ifill]][0][63] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][63] = 1;
     }
     if (syo_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(64.5);
-      array_psn_extra_fast[skim[ifill]][0][64] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][64] = 1;
     }
     if (syb_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(65.5);
-      array_psn_extra_fast[skim[ifill]][0][65] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][65] = 1;
     }
     if (x_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(66.5);
-      array_psn_extra_fast[skim[ifill]][0][66] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][66] = 1;
     }
     if (fioiecl1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(67.5);
-      array_psn_extra_fast[skim[ifill]][0][67] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][67] = 1;
     }
     if (ecleklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(68.5);
-      array_psn_extra_fast[skim[ifill]][0][68] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][68] = 1;
     }
     if (seklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(69.5);
-      array_psn_extra_fast[skim[ifill]][0][69] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][69] = 1;
     }
     if (seklm2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(70.5);
-      array_psn_extra_fast[skim[ifill]][0][70] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][70] = 1;
     }
     if (ieklm_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(71.5);
-      array_psn_extra_fast[skim[ifill]][0][71] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][71] = 1;
     }
     if (iecl_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(72.5);
-      array_psn_extra_fast[skim[ifill]][0][72] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][72] = 1;
     }
     if (ecleklm1_fired && CDC_fired) {
       h_psn_extra[skim[ifill]]->Fill(73.5);
-      array_psn_extra_fast[skim[ifill]][0][73] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][73] = 1;
     }
     if (syo_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(74.5);
-      array_psn_extra_fast[skim[ifill]][0][74] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][74] = 1;
     }
     if (yioiecl1_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(75.5);
-      array_psn_extra_fast[skim[ifill]][0][75] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][75] = 1;
     }
     if (stt_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(76.5);
-      array_psn_extra_fast[skim[ifill]][0][76] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][76] = 1;
     }
     if (ffz_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(77.5);
-      array_psn_extra_fast[skim[ifill]][0][77] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][77] = 1;
     }
     if (fzo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(78.5);
-      array_psn_extra_fast[skim[ifill]][0][78] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][78] = 1;
     }
     if (fzb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(79.5);
-      array_psn_extra_fast[skim[ifill]][0][79] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][79] = 1;
     }
     if (ffy_fired && ffz_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(80.5);
-      array_psn_extra_fast[skim[ifill]][0][80] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][80] = 1;
     }
     if (fyo_fired && fzo_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(81.5);
-      array_psn_extra_fast[skim[ifill]][0][81] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][81] = 1;
     }
     if (fyb_fired && fzb_fired && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(82.5);
-      array_psn_extra_fast[skim[ifill]][0][82] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][82] = 1;
     }
     if ((ffy_fired || ffz_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(83.5);
-      array_psn_extra_fast[skim[ifill]][0][83] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][83] = 1;
     }
     if ((fyo_fired || fzo_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(84.5);
-      array_psn_extra_fast[skim[ifill]][0][84] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][84] = 1;
     }
     if ((fyb_fired || fzb_fired) && (ECL_fired)) {
       h_psn_extra[skim[ifill]]->Fill(85.5);
-      array_psn_extra_fast[skim[ifill]][0][85] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][85] = 1;
     }
     if (ffy_fired && ffz_fired) {
       h_psn_extra[skim[ifill]]->Fill(86.5);
-      array_psn_extra_fast[skim[ifill]][0][86] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][86] = 1;
     }
     if (fyo_fired && fzo_fired) {
       h_psn_extra[skim[ifill]]->Fill(87.5);
-      array_psn_extra_fast[skim[ifill]][0][87] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][87] = 1;
     }
     if (fyb_fired && fzb_fired) {
       h_psn_extra[skim[ifill]]->Fill(88.5);
-      array_psn_extra_fast[skim[ifill]][0][88] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][88] = 1;
     }
     if (ffy_fired || ffz_fired) {
       h_psn_extra[skim[ifill]]->Fill(89.5);
-      array_psn_extra_fast[skim[ifill]][0][89] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][89] = 1;
     }
     if (fyo_fired || fzo_fired) {
       h_psn_extra[skim[ifill]]->Fill(90.5);
-      array_psn_extra_fast[skim[ifill]][0][90] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][90] = 1;
     }
     if (fyb_fired || fzb_fired) {
       h_psn_extra[skim[ifill]]->Fill(91.5);
-      array_psn_extra_fast[skim[ifill]][0][91] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][91] = 1;
     }
     if (ffo_fired) {
       h_psn_extra[skim[ifill]]->Fill(92.5);
-      array_psn_extra_fast[skim[ifill]][0][92] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][92] = 1;
     }
     if (ffb_fired) {
       h_psn_extra[skim[ifill]]->Fill(93.5);
-      array_psn_extra_fast[skim[ifill]][0][93] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][93] = 1;
     }
     if (aaa_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(94.5);
-      array_psn_extra_fast[skim[ifill]][0][94] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][94] = 1;
     }
     if (aay_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(95.5);
-      array_psn_extra_fast[skim[ifill]][0][95] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][95] = 1;
     }
     if (ycdcklm1_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(96.5);
-      array_psn_extra_fast[skim[ifill]][0][96] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][96] = 1;
     }
     if (ycdcklm2_fired && (CDC_fired)) {
       h_psn_extra[skim[ifill]]->Fill(97.5);
-      array_psn_extra_fast[skim[ifill]][0][97] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][97] = 1;
     }
     if (ycdcklm1_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(98.5);
-      array_psn_extra_fast[skim[ifill]][0][98] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][98] = 1;
     }
     if (ycdcklm2_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(99.5);
-      array_psn_extra_fast[skim[ifill]][0][99] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][99] = 1;
     }
     if (sttecl_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(100.5);
-      array_psn_extra_fast[skim[ifill]][0][100] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][100] = 1;
     }
     if (syoecl_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(101.5);
-      array_psn_extra_fast[skim[ifill]][0][101] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][101] = 1;
     }
     if (sybecl_fired && LML_fired) {
       h_psn_extra[skim[ifill]]->Fill(102.5);
-      array_psn_extra_fast[skim[ifill]][0][102] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][102] = 1;
     }
     if (syoecl_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(103.5);
-      array_psn_extra_fast[skim[ifill]][0][103] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][103] = 1;
     }
     if (sybecl_fired && ECL_fired) {
       h_psn_extra[skim[ifill]]->Fill(104.5);
-      array_psn_extra_fast[skim[ifill]][0][104] = 1;
+      array_psn_extra_fast[fastSkim][fastPos][104] = 1;
     }
 
 
     for (int ibin = 0; ibin < n_output_extra; ibin++) {
-      int sum_psn_extra_fast = 0;
-      for (int i = 0; i < nsample_fast; i++) {
-        sum_psn_extra_fast += array_psn_extra_fast[skim[ifill]][i][ibin];
-      }
-      h_psn_extra_fast[skim[ifill]]->SetBinContent(ibin + 1, sum_psn_extra_fast);
+      m_fastSum[fastSkim][ibin] += array_psn_extra_fast[fastSkim][fastPos][ibin];
+      h_psn_extra_fast[fastSkim]->SetBinContent(ibin + 1, m_fastSum[fastSkim][ibin]);
     }
   }
 

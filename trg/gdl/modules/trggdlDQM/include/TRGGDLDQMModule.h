@@ -173,6 +173,8 @@ namespace Belle2 {
     static const char* output_pure_extra[n_output_pure_extra];
     static const int nsample_fast = 500; //!< number of sample for fast efficiency monitor
     int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //!< array to store past nsample events
+    int m_fastPos[nskim_gdldqm] = {0}; //!< ring-buffer index of the newest slot of array_psn_extra_fast
+    int m_fastSum[nskim_gdldqm][n_output_extra] = {{0}}; //!< running sum of array_psn_extra_fast over the whole ring
 
     //! condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;

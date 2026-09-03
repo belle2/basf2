@@ -280,6 +280,25 @@ void TRGGDLDQMModule::beginRun()
     for (int ibin = 0; ibin < n_output_extra; ibin++) m_fastSum[iskim][ibin] = 0;
   }
 
+  // The rise/fall axis titles and ranges only depend on n_clocks. These histograms
+  // exist only for skim 0, which defineHisto() creates only when it is in the
+  // configured skim range.
+  if (start_skim_gdldqm == 0) {
+    const char* clkTitle = (n_clocks == 32) ? "clk32ns" : "clk8ns";
+    for (unsigned i = 0; i < n_inbit; i++) {
+      for (TH1I* h : {h_itd_rise[i][0], h_itd_fall[i][0]}) {
+        h->GetXaxis()->SetTitle(clkTitle);
+        if (n_clocks == 32) h->GetXaxis()->SetRange(1, 32);
+      }
+    }
+    for (unsigned i = 0; i < n_outbit; i++) {
+      for (TH1I* h : {h_ftd_rise[i][0], h_psn_rise[i][0], h_ftd_fall[i][0], h_psn_fall[i][0]}) {
+        h->GetXaxis()->SetTitle(clkTitle);
+        if (n_clocks == 32) h->GetXaxis()->SetRange(1, 32);
+      }
+    }
+  }
+
   oldDir->cd();
 }
 
@@ -1012,15 +1031,6 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
     if (skim[ifill] != 0)continue;
 
     for (unsigned i = 0; i < n_inbit; i++) {
-      if (n_clocks == 32) {
-        h_itd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_itd_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_itd_rise[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-        h_itd_fall[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-      } else {
-        h_itd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-        h_itd_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-      }
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {
@@ -1041,21 +1051,6 @@ TRGGDLDQMModule::fillRiseFallTimings(void)
       }
     }
     for (unsigned i = 0; i < n_outbit; i++) {
-      if (n_clocks == 32) {
-        h_ftd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_psn_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_ftd_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_psn_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk32ns");
-        h_ftd_rise[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-        h_psn_rise[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-        h_ftd_fall[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-        h_psn_fall[i][skim[ifill]]->GetXaxis()->SetRange(1, 32);
-      } else {
-        h_ftd_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-        h_psn_rise[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-        h_ftd_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-        h_psn_fall[i][skim[ifill]]->GetXaxis()->SetTitle("clk8ns");
-      }
       bool rising_done = false;
       bool falling_done = false;
       for (unsigned clk = 0; clk < n_clocks; clk++) {

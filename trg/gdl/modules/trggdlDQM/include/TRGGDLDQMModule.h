@@ -18,6 +18,7 @@
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <TH2I.h>
@@ -175,6 +176,10 @@ namespace Belle2 {
     int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //!< array to store past nsample events
     int m_fastPos[nskim_gdldqm] = {0}; //!< ring-buffer index of the newest slot of array_psn_extra_fast
     int m_fastSum[nskim_gdldqm][n_output_extra] = {{0}}; //!< running sum of array_psn_extra_fast over the whole ring
+    bool m_leavesResolved = false; //!< whether the leaf positions below are valid for the current run
+    int m_evtLeaf = -1; //!< position of the "evt" leaf in m_unpackername, -1 if absent
+    int m_clkLeaf = 0; //!< position of the "clk" leaf in m_unpackername
+    std::vector<std::pair<int, int>> m_leafMap; //!< (position in m_unpacker, leaf number) for every mapped leaf
 
     //! condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;

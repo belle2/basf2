@@ -16,6 +16,8 @@
 // Description : A trigger module for TRG GDL
 //---------------------------------------------------------------
 #include <trg/gdl/modules/trggdlDQM/TRGGDLDQMModule.h>
+
+#include <algorithm>
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
 #include <framework/datastore/StoreObjPtr.h>
@@ -280,6 +282,11 @@ void TRGGDLDQMModule::beginRun()
     for (int ibin = 0; ibin < n_output_extra; ibin++) m_fastSum[iskim][ibin] = 0;
   }
 
+  m_leavesResolved = false;
+  m_evtLeaf = -1;
+  m_clkLeaf = 0;
+  m_leafMap.clear();
+
   // The rise/fall axis titles and ranges only depend on n_clocks. These histograms
   // exist only for skim 0, which defineHisto() creates only when it is in the
   // configured skim range.
@@ -538,45 +545,36 @@ void TRGGDLDQMModule::event()
 
 
   //prepare entAry address
-  int clk_map = 0;
-  for (int i = 0; i < 320; i++) {
-    if (strcmp(entAry[0]->m_unpackername[i], "evt") == 0) evtno = entAry[0]->m_unpacker[i];
-    if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) clk_map = i;
+  // the leaf names and the leaf mapping are fixed for the whole run
+  if (!m_leavesResolved) {
+    for (int i = 0; i < 320; i++) {
+      if (strcmp(entAry[0]->m_unpackername[i], "evt") == 0) m_evtLeaf = i;
+      if (strcmp(entAry[0]->m_unpackername[i], "clk") == 0) m_clkLeaf = i;
+      if (LeafBitMap[i] != -1) m_leafMap.emplace_back(i, LeafBitMap[i]);
+    }
+    m_leavesResolved = true;
   }
+  const int clk_map = m_clkLeaf;
+  if (m_evtLeaf >= 0) evtno = entAry[0]->m_unpacker[m_evtLeaf];
 
   const double clkTo2ns = 1. / .508877;
   const double clkTo1ns = 0.5 / .508877;
 
   dirDQM->cd();
 
-  for (unsigned i = 0; i < n_clocks; i++) {
-    for (int j = 0; j < n_leafs + n_leafsExtra; j++) {
-      h_0_vec[i * (n_leafs + n_leafsExtra) + j] = 0;
-    }
-    for (unsigned j = 0; j < n_outbit; j++) {
-      h_p_vec[i * n_outbit + j] = 0;
-    }
-    for (unsigned j = 0; j < n_outbit; j++) {
-      h_f_vec[i * n_outbit + j] = 0;
-    }
-    for (unsigned j = 0; j < n_inbit; j++) {
-      h_i_vec[i * n_inbit + j] = 0;
-    }
-  }
+  std::fill(h_0_vec.begin(), h_0_vec.end(), 0);
+  std::fill(h_p_vec.begin(), h_p_vec.end(), 0);
+  std::fill(h_f_vec.begin(), h_f_vec.end(), 0);
+  std::fill(h_i_vec.begin(), h_i_vec.end(), 0);
 
   oldDir->cd();
 
   // fill "bit vs clk" for the event
+  const int nLeafTot = n_leafs + n_leafsExtra;
   for (int ii = 0; ii < entAry.getEntries(); ii++) {
-    std::vector<int*> Bits(n_leafs + n_leafsExtra);
-    //set pointer
-    for (int i = 0; i < 320; i++) {
-      if (LeafBitMap[i] != -1) {
-        Bits[LeafBitMap[i]] = &(entAry[ii]->m_unpacker[i]);
-      }
-    }
-    for (int leaf = 0; leaf < n_leafs + n_leafsExtra; leaf++) {
-      h_0_vec[(entAry[ii]->m_unpacker[clk_map]) * (n_leafs + n_leafsExtra) + leaf] = *Bits[leaf];
+    const int clkRow = entAry[ii]->m_unpacker[clk_map] * nLeafTot;
+    for (const auto& leaf : m_leafMap) {
+      h_0_vec[clkRow + leaf.second] = entAry[ii]->m_unpacker[leaf.first];
     }
   }
   int coml1rvc      = h_0_vec[0 * (n_leafs + n_leafsExtra) + _e_coml1rvc];

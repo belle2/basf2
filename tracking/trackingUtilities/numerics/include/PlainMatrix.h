@@ -125,6 +125,7 @@ namespace Belle2 {
       {
         for (int i = 0; i < rhs.rows(); ++i) {
           out << rhs(i, 0) << ", ";
+          // cppcheck-suppress knownConditionTrueFalse ; the condition depends on the template arguments of the instantiation
           for (int j = 1; j < rhs.cols(); ++j) {
             out << rhs(i, j);
           }

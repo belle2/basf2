@@ -112,10 +112,10 @@ bool KinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, gen
 }
 
 /// Build TrackFitResult of Kink Track.
-TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
+TrackFitResult* KinkFitter::buildTrackFitResult(const RecoTrack* recoTrack,
                                                 const genfit::MeasuredStateOnPlane& msop,
                                                 const double Bz,
-                                                const Const::ParticleType trackHypothesis)
+                                                const Const::ParticleType& trackHypothesis)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
   const uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
@@ -133,7 +133,7 @@ TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
 
 /// Find hit position closest to the vertex.
 int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
-                                               ROOT::Math::XYZVector& vertexPos,
+                                               const ROOT::Math::XYZVector& vertexPos,
                                                int direction)
 {
 
@@ -190,7 +190,7 @@ int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
 }
 
 /// Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
-RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
+RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(const RecoTrack* motherRecoTrack, const RecoTrack* daughterRecoTrack,
                                                        const bool motherFlag, const int delta)
 {
 
@@ -468,8 +468,8 @@ bool KinkFitter::isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, 
 /// combine daughter and mother tracks and fit the result to check for clones
 unsigned int KinkFitter::combineTracksAndFit(const Track* trackMother, const Track* trackDaughter)
 {
-  RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
-  RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
+  const RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
+  const RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
 
   // create a combined track by reassigning all daughter track hits to mother track
   RecoTrack* recoTrackCombinedRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
@@ -996,8 +996,8 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     ROOT::Math::XYZVector vertexPosTmp(vertexPos);
     RecoTrack* recoTrackMotherRefit = nullptr;
     RecoTrack* recoTrackDaughterRefit = nullptr;
-    RecoTrack* recoTrackMotherBuffer = recoTrackMother;
-    RecoTrack* recoTrackDaughterBuffer = recoTrackDaughter;
+    const RecoTrack* recoTrackMotherBuffer = recoTrackMother;
+    const RecoTrack* recoTrackDaughterBuffer = recoTrackDaughter;
 
     // The number of tries is limited to 3
     while (reassignHitStatus != 0 && countReassignTries < 3) {
@@ -1277,7 +1277,7 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 /// Fit kink vertex using RecoTracks as inputs.
 /// Calculates distance at the fitted vertex.
 /// Checks if the reassignment of the hits is required.
-bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
+bool KinkFitter::vertexFitWithRecoTracks(const RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                          unsigned int& reassignHitStatus,
                                          ROOT::Math::XYZVector& vertexPos, double& distance,
                                          ROOT::Math::XYZVector vertexPosSeed)
@@ -1409,7 +1409,8 @@ bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
 }
 
 /// Prepare the error matrix for the kFit
-void KinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+void KinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, const TMatrixDSym& covMatrix6,
+                                  // cppcheck-suppress constParameterReference ; errMatrix7 is the output matrix filled below
                                   TMatrixDSym& errMatrix7)
 {
 

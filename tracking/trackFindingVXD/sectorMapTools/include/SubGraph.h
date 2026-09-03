@@ -55,6 +55,7 @@ namespace Belle2 {
     }
 
     /// destructor
+    // cppcheck-suppress[noCopyConstructor,noOperatorEq] ; instances are stored by value in an unordered_map, so they must stay copyable
     ~SubGraph() { if (m_rawDataCollected != nullptr) delete m_rawDataCollected; }
 
     /** add filter, if not added yet, checks value and replaces old ones if new one is better. returns true if minMax was updated. */

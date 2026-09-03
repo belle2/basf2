@@ -68,13 +68,13 @@ namespace Belle2 {
 
     private:
       /// Lower bound of the binning range
-      double m_lowerBound;
+      double m_lowerBound {};
 
       /// Upper bound of the binning range
-      double m_upperBound;
+      double m_upperBound {};
 
       /// Number of accessible bins
-      long m_nBins;
+      long m_nBins {};
 
       /// Overlap of the leaves in curve counted in number of discrete values.
       int m_nOverlap = 1;

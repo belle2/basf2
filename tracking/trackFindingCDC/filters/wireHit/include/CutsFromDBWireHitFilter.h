@@ -57,7 +57,7 @@ namespace Belle2 {
       std::unique_ptr<DBObjPtr<CDCWireHitRequirements> > m_CDCWireHitRequirementsFromDB;
 
       /// Boolean asserting if DBObjPtr is valid for the current run.
-      bool m_DBPtrIsValidForCurrentRun;
+      bool m_DBPtrIsValidForCurrentRun {};
     };
   }
 }

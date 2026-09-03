@@ -346,7 +346,7 @@ namespace Belle2 {
     /**
      * get the NDF of a SpacePoint
      */
-    static int getNDF(Belle2::SpacePoint* spacePoint);
+    static int getNDF(const Belle2::SpacePoint* spacePoint);
 
     /**
      * check if all hits have been used (i.e. if all flags in the vector of flaggedPairs is set to true)

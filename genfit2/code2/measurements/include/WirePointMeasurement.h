@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_WirePointMeasurement_h
-#define genfit_WirePointMeasurement_h
+#pragma once
 
 #include "WireMeasurement.h"
 
@@ -73,5 +72,3 @@ class WirePointMeasurement : public WireMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_WirePointMeasurement_h

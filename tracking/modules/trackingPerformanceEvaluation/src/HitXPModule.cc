@@ -149,7 +149,6 @@ void HitXPModule::initialize()
 
 }
 
-void HitXPModule::beginRun() {}
 
 void HitXPModule::event()
 {
@@ -168,7 +167,7 @@ void HitXPModule::event()
         hitXPDerivate entry(hit, *cluster, particle, sensorInfo);
         int NClusterU = 0;
         int NClusterV = 0;
-        for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
+        for (const SVDCluster& Ncluster : hit.getRelationsFrom<SVDCluster>()) {
           if (Ncluster.isUCluster()) NClusterU++;
           else NClusterV++;
         }
@@ -382,4 +381,3 @@ void HitXPModule::endRun()
   m_outputFileExt->Close();
 }
 
-void HitXPModule::terminate() {}

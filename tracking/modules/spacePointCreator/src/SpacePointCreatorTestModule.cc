@@ -51,7 +51,7 @@ void SpacePointCreatorTestModule::initialize()
   m_svdClusters.isOptional(m_svdClustersName);
 
 
-  for (auto aName : m_containerSpacePointsName) {
+  for (const auto& aName : m_containerSpacePointsName) {
     m_allSpacePointStoreArrays.push_back({/* aName,*/ StoreArray<SpacePoint>(aName) });
   }
 
@@ -150,6 +150,7 @@ void SpacePointCreatorTestModule::event()
     for (unsigned i = 0; i < hitOutput.size(); i++) {
       track.insertMeasurement(hitOutput[i].second);
       const genfit::TrackPoint* point = track.getPointWithMeasurement(i);
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
       const genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
       B2DEBUG(20, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n");
       point->Print();

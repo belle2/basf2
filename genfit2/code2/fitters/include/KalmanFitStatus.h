@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_KalmanFitStatus_h
-#define genfit_KalmanFitStatus_h
+#pragma once
 
 #include "FitStatus.h"
 
@@ -88,5 +87,3 @@ class KalmanFitStatus : public FitStatus {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_KalmanFitStatus_h

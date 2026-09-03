@@ -257,7 +257,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     // Only use some MCParticles if request - mostly for debug
     if (not m_param_useMCParticleIds.empty()) {
       const MCParticle* mcParticle = hit.getRelated<MCParticle>();
-      int mcParticleId = mcParticle->getArrayIndex();
+      // hits without a related MCParticle can never be in the requested id list and are skipped below
+      int mcParticleId = mcParticle ? mcParticle->getArrayIndex() : -1;
       if (mcParticle) {
         nHitsByMCParticleId[mcParticleId]++;
       }
@@ -304,7 +305,8 @@ void WireHitCreator::apply(std::vector<CDCWireHit>& outputWireHits)
     // Only use some MCParticles if request - mostly for debug
     if (not m_param_useMCParticleIds.empty()) {
       const MCParticle* mcParticle = hit.getRelated<MCParticle>();
-      int mcParticleId = mcParticle->getArrayIndex();
+      // hits without a related MCParticle can never be in the requested id list and are skipped below
+      int mcParticleId = mcParticle ? mcParticle->getArrayIndex() : -1;
       if (mcParticle) {
         nHitsByMCParticleId[mcParticleId]++;
       }

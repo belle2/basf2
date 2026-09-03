@@ -70,7 +70,7 @@ void PhaseSpaceAnalysisModule::initialize()
     }
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       std::string output;
-      for (std::string id : m_PARAMrootFileName) {
+      for (const std::string& id : m_PARAMrootFileName) {
         output += "'" + id + "' ";
       }
       B2FATAL("PhaseSpaceAnalysis::initialize() : rootFileName is set wrong: entries are: " << output);
@@ -92,7 +92,7 @@ void PhaseSpaceAnalysisModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
   std::string arrayNames;
-  for (std::string name : m_PARAMcontainerNames) {
+  for (const std::string& name : m_PARAMcontainerNames) {
     arrayNames += " " + name;
   }
   B2DEBUG(25, "PhaseSpaceAnalysis::event(). Processing event " << eventCounter << " for StoreArray names :" << arrayNames);
@@ -128,7 +128,7 @@ void PhaseSpaceAnalysisModule::event()
         m_skippedTCsCtr++;
         continue;
       }
-      MCParticle* mcParticle = m_MCParticles[id];
+      const MCParticle* mcParticle = m_MCParticles[id];
       if (mcParticle == nullptr) { // safety measure
         m_noMcPartCtr++;
         continue;
@@ -169,7 +169,8 @@ void PhaseSpaceAnalysisModule::terminate()
 }
 
 // ================================== initialize root ===============================
-void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames)
+void PhaseSpaceAnalysisModule::initializeRootFile(const std::string& fileName, const std::string& writeOption,
+                                                  std::vector<std::string> treeNames)
 {
   B2DEBUG(25, "initializing root file. fileName: " << fileName << ", writeOption: " << writeOption);
   m_rootFilePtr = new TFile(fileName.c_str(), writeOption.c_str());
@@ -198,7 +199,7 @@ void PhaseSpaceAnalysisModule::initializeRootFile(std::string fileName, std::str
 }
 
 // =============================== collect values for root ====================================
-void PhaseSpaceAnalysisModule::getValuesForRoot(Belle2::MCParticle* mcParticle, RootVariables& rootVariables)
+void PhaseSpaceAnalysisModule::getValuesForRoot(const Belle2::MCParticle* mcParticle, RootVariables& rootVariables)
 {
   B2DEBUG(25, "Collecting values for MCParticle " << mcParticle->getArrayIndex());
   // collect all the momentum

@@ -31,13 +31,16 @@ namespace Belle2 {
       void beginRun(); /**< Called once before a new run begins */
       std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
       double predict(); /**< Get the MVA prediction */
-      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /**< Get predictions for several inputs */
+      std::vector<float> predict(const float* /* test_data */, int /* nFeature */,
+                                 int /* nRows */); /**< Get predictions for several inputs */
       std::vector<std::string> getVariableNames();  /**< Get selected variable names */
     private:
       /// References to the all named values from the source variable set.
+      // cppcheck-suppress unusedStructMember ; part of the pimpl state, kept for symmetry with the selected set
       std::vector<Named<Float_t*> > m_allNamedVariables;
 
       /// References to the *selected* named values from the source variable set.
+      // cppcheck-suppress unusedStructMember ; part of the pimpl state
       std::vector<Named<Float_t*> > m_selectedNamedVariables;
 
       /// Database pointer to the Database representation of the weightfile
@@ -50,9 +53,11 @@ namespace Belle2 {
       std::unique_ptr<MVA::Dataset> m_dataset;
 
       /// General options
+      // cppcheck-suppress unusedStructMember ; part of the pimpl state
       MVA::GeneralOptions m_generalOptions;
 
       /// DB identifier of the expert or file name
+      // cppcheck-suppress unusedStructMember ; part of the pimpl state
       std::string m_identifier;
     };
   }
@@ -92,6 +97,7 @@ void MVAExpert::Impl::initialize()
 void MVAExpert::Impl::beginRun()
 {
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
+  // cppcheck-suppress knownConditionTrueFalse ; defensive check on the weightfile representation
   if (weightfile) {
     if ((weightfile->getElement<std::string>("method") == "FastBDT" and
          (weightfile->getElement<int>("FastBDT_version") == 1 or
@@ -162,7 +168,8 @@ double MVAExpert::Impl::predict()
   return m_expert->apply(*m_dataset)[0];
 }
 
-std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int nRows)   /** Get predictions for several inputs */
+std::vector<float> MVAExpert::Impl::predict(const float* test_data, int nFeature,
+                                            int nRows)   /** Get predictions for several inputs */
 {
   std::vector<std::vector<float>> spectators;
   std::vector<std::vector <float> > data;

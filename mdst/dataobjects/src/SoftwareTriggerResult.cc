@@ -8,6 +8,7 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <sstream>
 #include <TROOT.h>
 #include <TColor.h>
 

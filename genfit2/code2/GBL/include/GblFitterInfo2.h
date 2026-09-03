@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_GblFitterInfo2_h
-#define genfit_GblFitterInfo2_h
+#pragma once
 
 #include "AbsFitterInfo.h"
 #include "MeasuredStateOnPlane.h"
@@ -323,5 +322,3 @@ namespace genfit {
   
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_GblFitterInfo2_h

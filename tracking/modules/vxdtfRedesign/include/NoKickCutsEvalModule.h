@@ -45,8 +45,6 @@ namespace Belle2 {
     /** This method is called if the current run ends. */
     void endRun() override;
 
-    /** This method is called at the end of the event processing. */
-    void terminate() override;
 
     /** enum for the track-parameters */
     // enum EParameters {
@@ -63,7 +61,7 @@ namespace Belle2 {
     * input: (first hit, second hit, track parameter, first hit is IP?)
     * output: Delta(par)
     */
-    double deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EParameters par, bool is0 = false);
+    double deltaParEval(const hitXP& hit1, const hitXP& hit2, NoKickCuts::EParameters par, bool is0 = false);
 
 
     /** This is the function that select the percentage that has to be cut away from

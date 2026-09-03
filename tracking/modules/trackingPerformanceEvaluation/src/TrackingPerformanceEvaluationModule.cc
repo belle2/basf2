@@ -171,9 +171,10 @@ void TrackingPerformanceEvaluationModule::initialize()
                                            2000, 0, 15, "r_{t} (cm)",
                                            m_histoList_firstHit);
 
-  m_h2_z0errcotThetaerr_xy = (TH2F*)duplicateHistogram("h2z0errcotThetaerrXY", "#sigma_{z0}/#sigma_{cot#theta} projected on x,y",
-                                                       m_h2_d0errphi0err_xy,
-                                                       m_histoList_firstHit);
+  m_h2_z0errcotThetaerr_xy = dynamic_cast<TH2F*>(duplicateHistogram("h2z0errcotThetaerrXY",
+                                                 "#sigma_{z0}/#sigma_{cot#theta} projected on x,y",
+                                                 m_h2_d0errphi0err_xy,
+                                                 m_histoList_firstHit));
 
   m_h2_OmegaerrOmegaVSpt = createHistogram2D("h2OmegaerrOmegaVSpt", "#sigma_{#omega}/#omega VS p_{t}",
                                              100, 0, 3, "p_{t} (GeV/c)",
@@ -186,31 +187,37 @@ void TrackingPerformanceEvaluationModule::initialize()
                                      100, 0, 0.1, "#sigma_{z0} (cm)",
                                      m_histoList_firstHit);
 
-  m_h2_z0errVSpt_wtpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wTruePXD", "#sigma_{z0} VS p_{t}, with True PXD hits", m_h2_z0errVSpt,
-                                                   m_histoList_firstHit);
-  m_h2_z0errVSpt_wfpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wFalsePXD", "#sigma_{z0} VS p_{t}, with False PXD hits",
-                                                   m_h2_z0errVSpt,
-                                                   m_histoList_firstHit);
-  m_h2_z0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits", m_h2_z0errVSpt,
-                                                  m_histoList_firstHit);
+  m_h2_z0errVSpt_wtpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2z0errVSpt_wTruePXD", "#sigma_{z0} VS p_{t}, with True PXD hits",
+                                             m_h2_z0errVSpt,
+                                             m_histoList_firstHit));
+  m_h2_z0errVSpt_wfpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2z0errVSpt_wFalsePXD", "#sigma_{z0} VS p_{t}, with False PXD hits",
+                                             m_h2_z0errVSpt,
+                                             m_histoList_firstHit));
+  m_h2_z0errVSpt_wpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2z0errVSpt_wPXD", "#sigma_{z0} VS p_{t}, with PXD hits",
+                                            m_h2_z0errVSpt,
+                                            m_histoList_firstHit));
 
-  m_h2_z0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits", m_h2_z0errVSpt,
-                                                   m_histoList_firstHit);
+  m_h2_z0errVSpt_wopxd = dynamic_cast<TH2F*>(duplicateHistogram("h2z0errVSpt_woPXD", "#sigma_{z0} VS p_{t}, no PXD hits",
+                                             m_h2_z0errVSpt,
+                                             m_histoList_firstHit));
 
   m_h2_d0errVSpt = createHistogram2D("h2d0errVSpt", "#sigma_{d0} VS p_{t}",
                                      100, 0, 3, "p_{t} (GeV/c)",
                                      100, 0, 0.1, "#sigma_{d0} (cm)",
                                      m_histoList_firstHit);
-  m_h2_d0errVSpt_wtpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wTruePXD", "#sigma_{d0} VS p_{t}, with True PXD hits", m_h2_d0errVSpt,
-                                                   m_histoList_firstHit);
-  m_h2_d0errVSpt_wfpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wFalsePXD", "#sigma_{d0} VS p_{t}, with False PXD hits",
-                                                   m_h2_d0errVSpt,
-                                                   m_histoList_firstHit);
-  m_h2_d0errVSpt_wpxd = (TH2F*)duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits", m_h2_d0errVSpt,
-                                                  m_histoList_firstHit);
+  m_h2_d0errVSpt_wtpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2d0errVSpt_wTruePXD", "#sigma_{d0} VS p_{t}, with True PXD hits",
+                                             m_h2_d0errVSpt,
+                                             m_histoList_firstHit));
+  m_h2_d0errVSpt_wfpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2d0errVSpt_wFalsePXD", "#sigma_{d0} VS p_{t}, with False PXD hits",
+                                             m_h2_d0errVSpt,
+                                             m_histoList_firstHit));
+  m_h2_d0errVSpt_wpxd = dynamic_cast<TH2F*>(duplicateHistogram("h2d0errVSpt_wPXD", "#sigma_{d0} VS p_{t}, with PXD hits",
+                                            m_h2_d0errVSpt,
+                                            m_histoList_firstHit));
 
-  m_h2_d0errVSpt_wopxd = (TH2F*)duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits", m_h2_d0errVSpt,
-                                                   m_histoList_firstHit);
+  m_h2_d0errVSpt_wopxd = dynamic_cast<TH2F*>(duplicateHistogram("h2d0errVSpt_woPXD", "#sigma_{d0} VS p_{t}, no PXD hits",
+                                             m_h2_d0errVSpt,
+                                             m_histoList_firstHit));
   m_h2_d0errMSVSpt = createHistogram2D("h2d0errMSVSpt", "#sigma_{d0} * #betapsin^{3/2}#theta VS p_{t}",
                                        50, 0, 2.5, "p_{t} (GeV/c)",
                                        500, 0, 1, "cm",
@@ -225,15 +232,16 @@ void TrackingPerformanceEvaluationModule::initialize()
   m_h1_nHitDetID = createHistogram1D("h1nHitDetID", "detector ID per hit", 4, -0.5, 3.5, "0=PXD, 1=SVD2D, 2=SVD,3=CDC", m_histoList);
   m_h1_nCDChitsPR = createHistogram1D("h1nCDCHitsPR", "number of CDC hits from PR per Layer", 56, -0.5, 55.5, "CDC Layer",
                                       m_histoList);
-  m_h1_nCDChitsWeighted = (TH1F*)duplicateHistogram("h1nCDCHitsWeighted", "CDC hits used in the fit per Layer, weighted",
-                                                    m_h1_nCDChitsPR, m_histoList);
-  m_h1_nCDChitsUsed = (TH1F*)duplicateHistogram("h1nCDCHitsUsed",
-                                                "approximated number of CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList);
+  m_h1_nCDChitsWeighted = dynamic_cast<TH1F*>(duplicateHistogram("h1nCDCHitsWeighted", "CDC hits used in the fit per Layer, weighted",
+                                              m_h1_nCDChitsPR, m_histoList));
+  m_h1_nCDChitsUsed = dynamic_cast<TH1F*>(duplicateHistogram("h1nCDCHitsUsed",
+                                                             "approximated number of CDC hits used in the fit per Layer, weighted", m_h1_nCDChitsPR, m_histoList));
   m_h1_nVXDhitsPR = createHistogram1D("h1nVXDHitsPR", "number of VXD hits from PR per Layer", 6, 0.5, 6.5, "VXD Layer", m_histoList);
-  m_h1_nVXDhitsWeighted = (TH1F*)duplicateHistogram("h1nVXDHitsWeighted", "number of VXD hits used in the fit per Layer, weighted",
-                                                    m_h1_nVXDhitsPR, m_histoList);
-  m_h1_nVXDhitsUsed = (TH1F*)duplicateHistogram("h1nVXDHitsUsed",
-                                                "approximate number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList);
+  m_h1_nVXDhitsWeighted = dynamic_cast<TH1F*>(duplicateHistogram("h1nVXDHitsWeighted",
+                                              "number of VXD hits used in the fit per Layer, weighted",
+                                              m_h1_nVXDhitsPR, m_histoList));
+  m_h1_nVXDhitsUsed = dynamic_cast<TH1F*>(duplicateHistogram("h1nVXDHitsUsed",
+                                                             "approximate number of VXD hits used in the fit per Layer, weighted", m_h1_nVXDhitsPR, m_histoList));
   m_h2_VXDhitsPR_xy = createHistogram2D("h2hitsPRXY", "Pattern Recognition hits, transverse plane",
                                         2000, -15, 15, "x (cm)",
                                         2000, -15, 15, "y (cm)",
@@ -260,81 +268,81 @@ void TrackingPerformanceEvaluationModule::initialize()
                                       10, bins_theta, "#theta",
                                       14, bins_phi, "#phi" /*, m_histoList*/);
 
-  m_h3_TracksPerMCParticle = (TH3F*)duplicateHistogram("h3TracksPerMCParticle",
-                                                       "entry per Track connected to a MCParticle",
-                                                       m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCParticle = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCParticle",
+                                                 "entry per Track connected to a MCParticle",
+                                                 m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TrackswPXDHitsPerMCParticle = (TH3F*)duplicateHistogram("h3TrackswPXDHitsPerMCParticle",
-                                     "entry per Track with PXD hits connected to a MCParticle",
-                                     m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TrackswPXDHitsPerMCParticle = dynamic_cast<TH3F*>(duplicateHistogram("h3TrackswPXDHitsPerMCParticle",
+                                                         "entry per Track with PXD hits connected to a MCParticle",
+                                                         m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_RecoTrackswPXDHitsPerMCParticle = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticle",
-                                         "entry per RecoTrack with PXD hits connected to a MCParticle",
-                                         m_h3_MCParticle /*, m_histoList*/);
+  m_h3_RecoTrackswPXDHitsPerMCParticle = dynamic_cast<TH3F*>(duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticle",
+                                                             "entry per RecoTrack with PXD hits connected to a MCParticle",
+                                                             m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits = (TH3F*)duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticlewPXDHits",
+  m_h3_RecoTrackswPXDHitsPerMCParticlewPXDHits = dynamic_cast<TH3F*>(duplicateHistogram("h3RecoTrackswPXDHitsPerMCParticlewPXDHits",
                                                  "entry per RecoTrack with PXD hits connected to a MCParticle with PXD hits",
-                                                 m_h3_MCParticle /*, m_histoList*/);
+                                                 m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCParticleswPXDHits = (TH3F*)duplicateHistogram("h3MCParticleswPXDHitsPerMCParticle",
-                                                       "entry per MCParticle with PXD hits",
-                                                       m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCParticleswPXDHits = dynamic_cast<TH3F*>(duplicateHistogram("h3MCParticleswPXDHitsPerMCParticle",
+                                                 "entry per MCParticle with PXD hits",
+                                                 m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCRecoTrack = (TH3F*)duplicateHistogram("h3MCRecoTrack",
-                                               "entry per MCRecoTrack connected to the MCParticle",
-                                               m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCRecoTrack = dynamic_cast<TH3F*>(duplicateHistogram("h3MCRecoTrack",
+                                                            "entry per MCRecoTrack connected to the MCParticle",
+                                                            m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TracksPerMCRecoTrack = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack",
-                                                        "entry per Track connected to an MCRecoTrack",
-                                                        m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCRecoTrack = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCRecoTrack",
+                                                  "entry per Track connected to an MCRecoTrack",
+                                                  m_h3_MCParticle /*, m_histoList*/));
   //plus
-  m_h3_MCParticle_plus = (TH3F*)duplicateHistogram("h3MCParticle_plus", "entry per positive MCParticle",
-                                                   m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCParticle_plus = dynamic_cast<TH3F*>(duplicateHistogram("h3MCParticle_plus", "entry per positive MCParticle",
+                                             m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TracksPerMCParticle_plus = (TH3F*)duplicateHistogram("h3TracksPerMCParticle_plus",
-                                                            "entry per Track connected to a positive MCParticle",
-                                                            m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCParticle_plus = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCParticle_plus",
+                                                      "entry per Track connected to a positive MCParticle",
+                                                      m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCRecoTrack_plus = (TH3F*)duplicateHistogram("h3MCRecoTrack_plus",
-                                                    "entry per MCRecoTrack connected to the positive MCParticle",
-                                                    m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCRecoTrack_plus = dynamic_cast<TH3F*>(duplicateHistogram("h3MCRecoTrack_plus",
+                                              "entry per MCRecoTrack connected to the positive MCParticle",
+                                              m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TracksPerMCRecoTrack_plus = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack_plus",
-                                                             "entry per Track connected to a positive MCRecoTrack",
-                                                             m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCRecoTrack_plus = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCRecoTrack_plus",
+                                                       "entry per Track connected to a positive MCRecoTrack",
+                                                       m_h3_MCParticle /*, m_histoList*/));
 
 
   //minus
-  m_h3_MCParticle_minus = (TH3F*)duplicateHistogram("h3MCParticlee_minus", "entry per negative MCParticle",
-                                                    m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCParticle_minus = dynamic_cast<TH3F*>(duplicateHistogram("h3MCParticlee_minus", "entry per negative MCParticle",
+                                              m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TracksPerMCParticle_minus = (TH3F*)duplicateHistogram("h3TracksPerMCParticle_minus",
-                                                             "entry per Track connected to a negative MCParticle",
-                                                             m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCParticle_minus = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCParticle_minus",
+                                                       "entry per Track connected to a negative MCParticle",
+                                                       m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCRecoTrack_minus = (TH3F*)duplicateHistogram("h3MCRecoTrack_minus",
-                                                     "entry per MCRecoTrack connected to the negative MCParticle",
-                                                     m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCRecoTrack_minus = dynamic_cast<TH3F*>(duplicateHistogram("h3MCRecoTrack_minus",
+                                               "entry per MCRecoTrack connected to the negative MCParticle",
+                                               m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_TracksPerMCRecoTrack_minus = (TH3F*)duplicateHistogram("h3TracksPerMCRecoTrack_minus",
-                                                              "entry per Track connected to a negative MCRecoTrack",
-                                                              m_h3_MCParticle /*, m_histoList*/);
+  m_h3_TracksPerMCRecoTrack_minus = dynamic_cast<TH3F*>(duplicateHistogram("h3TracksPerMCRecoTrack_minus",
+                                                        "entry per Track connected to a negative MCRecoTrack",
+                                                        m_h3_MCParticle /*, m_histoList*/));
 
   //histograms to produce efficiency plots
   m_h1_HitsRecoTrackPerMCRecoTrack = createHistogram1D("h1hitsTCperMCRT", "RecoTrack per MCRecoTrack Hit in VXD layers", 6, 0.5, 6.5,
                                                        "# VXD layer" /*, m_histoList*/);
 
-  m_h1_HitsMCRecoTrack = (TH1F*) duplicateHistogram("h1hitsMCRT", " MCRecoTrack Hit in VXD layers",
-                                                    m_h1_HitsRecoTrackPerMCRecoTrack /*,  m_histoList*/);
+  m_h1_HitsMCRecoTrack = dynamic_cast<TH1F*>(duplicateHistogram("h1hitsMCRT", " MCRecoTrack Hit in VXD layers",
+                                             m_h1_HitsRecoTrackPerMCRecoTrack /*,  m_histoList*/));
 
 
   //histograms to produce purity plots
-  m_h3_Tracks = (TH3F*)duplicateHistogram("h3Tracks", "entry per Track",
-                                          m_h3_MCParticle /*, m_histoList*/);
+  m_h3_Tracks = dynamic_cast<TH3F*>(duplicateHistogram("h3Tracks", "entry per Track",
+                                                       m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCParticlesPerTrack = (TH3F*)duplicateHistogram("h3MCParticlesPerTrack",
-                                                       "entry per MCParticle connected to a Track",
-                                                       m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCParticlesPerTrack = dynamic_cast<TH3F*>(duplicateHistogram("h3MCParticlesPerTrack",
+                                                 "entry per MCParticle connected to a Track",
+                                                 m_h3_MCParticle /*, m_histoList*/));
 }
 
 void TrackingPerformanceEvaluationModule::beginRun()
@@ -353,6 +361,7 @@ void TrackingPerformanceEvaluationModule::event()
     if (! isTraceable(mcParticle))
       continue;
 
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int pdgCode = mcParticle.getPDG();
     B2DEBUG(29, "MCParticle has PDG code " << pdgCode);
 
@@ -525,7 +534,6 @@ void TrackingPerformanceEvaluationModule::event()
 
   for (const RecoTrack& mcRecoTrack : m_MCRecoTracks) {
 
-    bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
     RelationVector<RecoTrack> RecoTracks_fromMCRecoTrack = DataStore::getRelationsWithObj<RecoTrack>(&mcRecoTrack);
@@ -543,11 +551,6 @@ void TrackingPerformanceEvaluationModule::event()
                                                             (MCParticles_fromMCRecoTrack[mcp]);
 
       B2DEBUG(29, "~~~~~ " << RecoTracks_fromMCParticle.size() << " RecoTracks related to this MCParticle");
-      for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
-        if (!hasRecoTrack) {
-          hasRecoTrack = true;
-        }
-
     }
 
   }

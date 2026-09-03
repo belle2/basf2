@@ -265,110 +265,131 @@ void EffPlotsModule::initialize()
   //------------------------------------------------------------------//
 
   //track dau0
-  m_h1_track_dau0_d0 = (TH1F*)duplicateHistogram("h1trackdau0D0", "d0 dau_{0}", m_h1_MC_dau0_d0, m_histoList_Tracks);
-  m_h1_track_dau0_z0 = (TH1F*)duplicateHistogram("h1trackdau0Z0", "z0 dau_{0}", m_h1_MC_dau0_z0, m_histoList_Tracks);
-  m_h1_track_dau0_RMother = (TH1F*)duplicateHistogram("h1trackdau0RMother", "dau_{0}, R mother", m_h1_MC_dau0_RMother,
-                                                      m_histoList_Tracks);
-  m_h3_track_dau0 = (TH3F*)duplicateHistogram("h3trackdau0", "entry per track dau_{0}", m_h3_MC_dau0, m_histoList_Tracks);
-  m_h1_track_dau0_pt = (TH1F*)duplicateHistogram("h1trackdau0Pt", "p_{T} dau_{0}", m_h1_MC_dau0_pt, m_histoList_Tracks);
-  m_h1_track_dau0_pz = (TH1F*)duplicateHistogram("h1trackdau0Pz", "p_{z} dau_{0}", m_h1_MC_dau0_pz, m_histoList_Tracks);
-  m_h1_track_dau0_p = (TH1F*)duplicateHistogram("h1trackdau0P", "p dau_{0}", m_h1_MC_dau0_p, m_histoList_Tracks);
-  m_h1_track_dau0_theta = (TH1F*)duplicateHistogram("h1trackdau0Theta", "#theta dau_{0}", m_h1_MC_dau0_theta, m_histoList_Tracks);
-  m_h1_track_dau0_costheta = (TH1F*)duplicateHistogram("h1trackdau0CosTheta", "cos#theta dau_{0}", m_h1_MC_dau0_costheta,
-                                                       m_histoList_Tracks);
-  m_h1_track_dau0_Mother_cosAngle = (TH1F*)duplicateHistogram("h1trackdau0MothercosAngle", "#alpha_{mother,dau_{0}}",
-                                                              m_h1_MC_dau0_Mother_cosAngle, m_histoList_Tracks);
-  m_h1_track_dau0_phi = (TH1F*)duplicateHistogram("h1trackdau0Phi", "#phi dau_{0}", m_h1_MC_dau0_phi, m_histoList_Tracks);
-  m_h1_track_dau0_phi_BW = (TH1F*)duplicateHistogram("h1trackdau0PhiBW", "#phi dau_{0}", m_h1_MC_dau0_phi_BW, m_histoList_Tracks);
-  m_h1_track_dau0_phi_barrel = (TH1F*)duplicateHistogram("h1trackdau0Phibarrel", "#phi dau_{0}", m_h1_MC_dau0_phi_barrel,
-                                                         m_histoList_Tracks);
-  m_h1_track_dau0_phi_FW = (TH1F*)duplicateHistogram("h1trackdau0PhiFW", "#phi dau_{0}", m_h1_MC_dau0_phi_FW, m_histoList_Tracks);
+  m_h1_track_dau0_d0 = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0D0", "d0 dau_{0}", m_h1_MC_dau0_d0, m_histoList_Tracks));
+  m_h1_track_dau0_z0 = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Z0", "z0 dau_{0}", m_h1_MC_dau0_z0, m_histoList_Tracks));
+  m_h1_track_dau0_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0RMother", "dau_{0}, R mother", m_h1_MC_dau0_RMother,
+                                                m_histoList_Tracks));
+  m_h3_track_dau0 = dynamic_cast<TH3F*>(duplicateHistogram("h3trackdau0", "entry per track dau_{0}", m_h3_MC_dau0,
+                                                           m_histoList_Tracks));
+  m_h1_track_dau0_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Pt", "p_{T} dau_{0}", m_h1_MC_dau0_pt, m_histoList_Tracks));
+  m_h1_track_dau0_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Pz", "p_{z} dau_{0}", m_h1_MC_dau0_pz, m_histoList_Tracks));
+  m_h1_track_dau0_p = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0P", "p dau_{0}", m_h1_MC_dau0_p, m_histoList_Tracks));
+  m_h1_track_dau0_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Theta", "#theta dau_{0}", m_h1_MC_dau0_theta,
+                                              m_histoList_Tracks));
+  m_h1_track_dau0_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0CosTheta", "cos#theta dau_{0}", m_h1_MC_dau0_costheta,
+                                                 m_histoList_Tracks));
+  m_h1_track_dau0_Mother_cosAngle = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0MothercosAngle", "#alpha_{mother,dau_{0}}",
+                                                        m_h1_MC_dau0_Mother_cosAngle, m_histoList_Tracks));
+  m_h1_track_dau0_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Phi", "#phi dau_{0}", m_h1_MC_dau0_phi,
+                                            m_histoList_Tracks));
+  m_h1_track_dau0_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiBW", "#phi dau_{0}", m_h1_MC_dau0_phi_BW,
+                                               m_histoList_Tracks));
+  m_h1_track_dau0_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0Phibarrel", "#phi dau_{0}", m_h1_MC_dau0_phi_barrel,
+                                                   m_histoList_Tracks));
+  m_h1_track_dau0_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiFW", "#phi dau_{0}", m_h1_MC_dau0_phi_FW,
+                                               m_histoList_Tracks));
 
-  m_h1_track_dau0_phiMother_total = (TH1F*)duplicateHistogram("h1trackdau0PhiMothertotal", "dau_{0}, #phi_{mother}",
-                                                              m_h1_MC_dau0_phiMother_total, m_histoList_Tracks);
-  m_h1_track_dau0_phiMother_BW = (TH1F*)duplicateHistogram("h1trackdau0PhiMotherBW", "dau_{0}, #phi_{mother}, BW",
-                                                           m_h1_MC_dau0_phiMother_BW, m_histoList_Tracks);
-  m_h1_track_dau0_phiMother_barrel = (TH1F*)duplicateHistogram("h1trackdau0PhiMotherbarrel", "dau_{0}, #phi_{mother}, barrel",
-                                     m_h1_MC_dau0_phiMother_barrel, m_histoList_Tracks);
-  m_h1_track_dau0_phiMother_FW = (TH1F*)duplicateHistogram("h1trackdau0PhiMotherFW", "dau_{0}, #phi_{mother}, FW",
-                                                           m_h1_MC_dau0_phiMother_FW, m_histoList_Tracks);
+  m_h1_track_dau0_phiMother_total = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiMothertotal", "dau_{0}, #phi_{mother}",
+                                                        m_h1_MC_dau0_phiMother_total, m_histoList_Tracks));
+  m_h1_track_dau0_phiMother_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiMotherBW", "dau_{0}, #phi_{mother}, BW",
+                                                     m_h1_MC_dau0_phiMother_BW, m_histoList_Tracks));
+  m_h1_track_dau0_phiMother_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiMotherbarrel",
+                                                         "dau_{0}, #phi_{mother}, barrel",
+                                                         m_h1_MC_dau0_phiMother_barrel, m_histoList_Tracks));
+  m_h1_track_dau0_phiMother_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PhiMotherFW", "dau_{0}, #phi_{mother}, FW",
+                                                     m_h1_MC_dau0_phiMother_FW, m_histoList_Tracks));
 
-  m_h1_track_dau0_thetaMother = (TH1F*)duplicateHistogram("h1trackdau0ThetaMother", "#theta_{mother} dau_{0}",
-                                                          m_h1_MC_dau0_thetaMother, m_histoList_Tracks);
-  m_h1_track_dau0_ptMother = (TH1F*)duplicateHistogram("h1trackdau0PtMother", "p_{T,mother} dau_{0}", m_h1_MC_dau0_ptMother,
-                                                       m_histoList_Tracks);
+  m_h1_track_dau0_thetaMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0ThetaMother", "#theta_{mother} dau_{0}",
+                                                    m_h1_MC_dau0_thetaMother, m_histoList_Tracks));
+  m_h1_track_dau0_ptMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau0PtMother", "p_{T,mother} dau_{0}",
+                                                 m_h1_MC_dau0_ptMother,
+                                                 m_histoList_Tracks));
 
-  m_h2_track_dau0_2D = (TH2F*)duplicateHistogram("h2trackdau02D", "p_{T} VS #theta, dau_{0}", m_h2_MC_dau0_2D, m_histoList_Tracks);
-  m_h2_track_dau0_2D_BP = (TH2F*)duplicateHistogram("h2trackdau02dBP", "p_{T} VS #theta, dau_{0} BP", m_h2_MC_dau0_2D_BP,
-                                                    m_histoList_Tracks);
-  m_h2_track_dau0_2DMother = (TH2F*)duplicateHistogram("h2trackdau02DMother", "p_{T,mother} VS #theta_{mother}, dau_{0}",
-                                                       m_h2_MC_dau0_2DMother, m_histoList_Tracks);
+  m_h2_track_dau0_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau02D", "p_{T} VS #theta, dau_{0}", m_h2_MC_dau0_2D,
+                                                              m_histoList_Tracks));
+  m_h2_track_dau0_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau02dBP", "p_{T} VS #theta, dau_{0} BP", m_h2_MC_dau0_2D_BP,
+                                              m_histoList_Tracks));
+  m_h2_track_dau0_2DMother = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau02DMother", "p_{T,mother} VS #theta_{mother}, dau_{0}",
+                                                 m_h2_MC_dau0_2DMother, m_histoList_Tracks));
 
-  m_h2_track_dau0_pVScostheta = (TH2F*)duplicateHistogram("h2trackdau0pVScostheta", "p VS cos(#theta), dau_{0}",
-                                                          m_h2_MC_dau0_pVScostheta, m_histoList_Tracks);
+  m_h2_track_dau0_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau0pVScostheta", "p VS cos(#theta), dau_{0}",
+                                                    m_h2_MC_dau0_pVScostheta, m_histoList_Tracks));
 
 
   //track dau1
-  m_h1_track_dau1_d0 = (TH1F*)duplicateHistogram("h1trackdau1D0", "d0 dau_{1}", m_h1_MC_dau1_d0, m_histoList_Tracks);
-  m_h1_track_dau1_z0 = (TH1F*)duplicateHistogram("h1trackdau1Z0", "z0 dau_{1}", m_h1_MC_dau1_z0, m_histoList_Tracks);
-  m_h1_track_dau1_RMother = (TH1F*)duplicateHistogram("h1trackdau1RMother", "p, R mother", m_h1_MC_dau1_RMother, m_histoList_Tracks);
-  m_h3_track_dau1 = (TH3F*)duplicateHistogram("h3trackdau1", "entry per track dau_{1}", m_h3_MC_dau1, m_histoList_Tracks);
-  m_h1_track_dau1_pt = (TH1F*)duplicateHistogram("h1trackdau1Pt", "p_{T} dau_{1}", m_h1_MC_dau1_pt, m_histoList_Tracks);
-  m_h1_track_dau1_pz = (TH1F*)duplicateHistogram("h1trackdau1Pz", "p_{z} dau_{1}", m_h1_MC_dau1_pz, m_histoList_Tracks);
-  m_h1_track_dau1_p = (TH1F*)duplicateHistogram("h1trackdau1P", "p dau_{1}", m_h1_MC_dau1_p, m_histoList_Tracks);
-  m_h1_track_dau1_theta = (TH1F*)duplicateHistogram("h1trackdau1Theta", "#theta dau_{1}", m_h1_MC_dau1_theta, m_histoList_Tracks);
-  m_h1_track_dau1_costheta = (TH1F*)duplicateHistogram("h1trackdau1CosTheta", "cos#theta dau_{1}", m_h1_MC_dau1_costheta,
-                                                       m_histoList_Tracks);
-  m_h1_track_dau1_Mother_cosAngle = (TH1F*)duplicateHistogram("h1trackdau1MothercosAngle", "#alpha_{mother,p}",
-                                                              m_h1_MC_dau1_Mother_cosAngle, m_histoList_Tracks);
-  m_h1_track_dau1_phi = (TH1F*)duplicateHistogram("h1trackdau1Phi", "#phi dau_{1}", m_h1_MC_dau1_phi, m_histoList_Tracks);
-  m_h1_track_dau1_phi_BW = (TH1F*)duplicateHistogram("h1trackdau1PhiBW", "#phi dau_{1}", m_h1_MC_dau1_phi_BW, m_histoList_Tracks);
-  m_h1_track_dau1_phi_barrel = (TH1F*)duplicateHistogram("h1trackdau1Phibarrel", "#phi dau_{1}", m_h1_MC_dau1_phi_barrel,
-                                                         m_histoList_Tracks);
-  m_h1_track_dau1_phi_FW = (TH1F*)duplicateHistogram("h1trackdau1PhiFW", "#phi dau_{1}", m_h1_MC_dau1_phi_FW, m_histoList_Tracks);
+  m_h1_track_dau1_d0 = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1D0", "d0 dau_{1}", m_h1_MC_dau1_d0, m_histoList_Tracks));
+  m_h1_track_dau1_z0 = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Z0", "z0 dau_{1}", m_h1_MC_dau1_z0, m_histoList_Tracks));
+  m_h1_track_dau1_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1RMother", "p, R mother", m_h1_MC_dau1_RMother,
+                                                m_histoList_Tracks));
+  m_h3_track_dau1 = dynamic_cast<TH3F*>(duplicateHistogram("h3trackdau1", "entry per track dau_{1}", m_h3_MC_dau1,
+                                                           m_histoList_Tracks));
+  m_h1_track_dau1_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Pt", "p_{T} dau_{1}", m_h1_MC_dau1_pt, m_histoList_Tracks));
+  m_h1_track_dau1_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Pz", "p_{z} dau_{1}", m_h1_MC_dau1_pz, m_histoList_Tracks));
+  m_h1_track_dau1_p = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1P", "p dau_{1}", m_h1_MC_dau1_p, m_histoList_Tracks));
+  m_h1_track_dau1_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Theta", "#theta dau_{1}", m_h1_MC_dau1_theta,
+                                              m_histoList_Tracks));
+  m_h1_track_dau1_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1CosTheta", "cos#theta dau_{1}", m_h1_MC_dau1_costheta,
+                                                 m_histoList_Tracks));
+  m_h1_track_dau1_Mother_cosAngle = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1MothercosAngle", "#alpha_{mother,p}",
+                                                        m_h1_MC_dau1_Mother_cosAngle, m_histoList_Tracks));
+  m_h1_track_dau1_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Phi", "#phi dau_{1}", m_h1_MC_dau1_phi,
+                                            m_histoList_Tracks));
+  m_h1_track_dau1_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiBW", "#phi dau_{1}", m_h1_MC_dau1_phi_BW,
+                                               m_histoList_Tracks));
+  m_h1_track_dau1_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1Phibarrel", "#phi dau_{1}", m_h1_MC_dau1_phi_barrel,
+                                                   m_histoList_Tracks));
+  m_h1_track_dau1_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiFW", "#phi dau_{1}", m_h1_MC_dau1_phi_FW,
+                                               m_histoList_Tracks));
 
-  m_h1_track_dau1_phiMother_total = (TH1F*)duplicateHistogram("h1trackdau1PhiMothertotal", "dau_{1}, #phi_{mother}",
-                                                              m_h1_MC_dau1_phiMother_total, m_histoList_Tracks);
-  m_h1_track_dau1_phiMother_BW = (TH1F*)duplicateHistogram("h1trackdau1PhiMotherBW", "dau_{1}, #phi_{mother}, BW",
-                                                           m_h1_MC_dau1_phiMother_BW, m_histoList_Tracks);
-  m_h1_track_dau1_phiMother_barrel = (TH1F*)duplicateHistogram("h1trackdau1PhiMotherbarrel", "dau_{1}, #phi_{mother}, barrel",
-                                     m_h1_MC_dau1_phiMother_barrel, m_histoList_Tracks);
-  m_h1_track_dau1_phiMother_FW = (TH1F*)duplicateHistogram("h1trackdau1PhiMotherFW", "dau_{1}, #phi_{mother}, FW",
-                                                           m_h1_MC_dau1_phiMother_FW, m_histoList_Tracks);
+  m_h1_track_dau1_phiMother_total = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiMothertotal", "dau_{1}, #phi_{mother}",
+                                                        m_h1_MC_dau1_phiMother_total, m_histoList_Tracks));
+  m_h1_track_dau1_phiMother_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiMotherBW", "dau_{1}, #phi_{mother}, BW",
+                                                     m_h1_MC_dau1_phiMother_BW, m_histoList_Tracks));
+  m_h1_track_dau1_phiMother_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiMotherbarrel",
+                                                         "dau_{1}, #phi_{mother}, barrel",
+                                                         m_h1_MC_dau1_phiMother_barrel, m_histoList_Tracks));
+  m_h1_track_dau1_phiMother_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PhiMotherFW", "dau_{1}, #phi_{mother}, FW",
+                                                     m_h1_MC_dau1_phiMother_FW, m_histoList_Tracks));
 
-  m_h1_track_dau1_thetaMother = (TH1F*)duplicateHistogram("h1trackdau1ThetaMother", "#theta_{mother} dau_{1}",
-                                                          m_h1_MC_dau1_thetaMother, m_histoList_Tracks);
-  m_h1_track_dau1_ptMother = (TH1F*)duplicateHistogram("h1trackdau1PtMother", "p_{T,mother} dau_{1}", m_h1_MC_dau1_ptMother,
-                                                       m_histoList_Tracks);
+  m_h1_track_dau1_thetaMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1ThetaMother", "#theta_{mother} dau_{1}",
+                                                    m_h1_MC_dau1_thetaMother, m_histoList_Tracks));
+  m_h1_track_dau1_ptMother = dynamic_cast<TH1F*>(duplicateHistogram("h1trackdau1PtMother", "p_{T,mother} dau_{1}",
+                                                 m_h1_MC_dau1_ptMother,
+                                                 m_histoList_Tracks));
 
-  m_h2_track_dau1_2D = (TH2F*)duplicateHistogram("h2trackdau12D", "p_{T} VS #theta, dau_{1}", m_h2_MC_dau1_2D, m_histoList_Tracks);
-  m_h2_track_dau1_2D_BP = (TH2F*)duplicateHistogram("h2trackdau12dBP", "p_{T} VS #theta, p BDAU_{1}", m_h2_MC_dau1_2D_BP,
-                                                    m_histoList_Tracks);
-  m_h2_track_dau1_2DMother = (TH2F*)duplicateHistogram("h2trackdau12DMother", "p_{T,mother} VS #theta_{mother}, dau_{1}",
-                                                       m_h2_MC_dau1_2DMother, m_histoList_Tracks);
+  m_h2_track_dau1_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau12D", "p_{T} VS #theta, dau_{1}", m_h2_MC_dau1_2D,
+                                                              m_histoList_Tracks));
+  m_h2_track_dau1_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau12dBP", "p_{T} VS #theta, p BDAU_{1}", m_h2_MC_dau1_2D_BP,
+                                              m_histoList_Tracks));
+  m_h2_track_dau1_2DMother = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau12DMother", "p_{T,mother} VS #theta_{mother}, dau_{1}",
+                                                 m_h2_MC_dau1_2DMother, m_histoList_Tracks));
 
-  m_h2_track_dau1_pVScostheta = (TH2F*)duplicateHistogram("h2trackdau1pVScostheta", "p VS cos(#theta), dau_{1}",
-                                                          m_h2_MC_dau1_pVScostheta, m_histoList_Tracks);
+  m_h2_track_dau1_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2trackdau1pVScostheta", "p VS cos(#theta), dau_{1}",
+                                                    m_h2_MC_dau1_pVScostheta, m_histoList_Tracks));
 
   //V0
-  m_h1_V0_RMother = (TH1F*)duplicateHistogram("h1V0RMother", "mother, R mother", m_h1_MC_Mother_RMother, m_histoList_Tracks);
-  m_h3_V0 = (TH3F*)duplicateHistogram("h3V0", "entry per V0", m_h3_MC_Mother, m_histoList_Tracks);
-  m_h1_V0_pt = (TH1F*)duplicateHistogram("h1V0Pt", "p_{T} mother", m_h1_MC_Mother_pt, m_histoList_Tracks);
-  m_h1_V0_pz = (TH1F*)duplicateHistogram("h1V0Pz", "p_{z} mother", m_h1_MC_Mother_pz, m_histoList_Tracks);
-  m_h1_V0_p = (TH1F*)duplicateHistogram("h1V0P", "p mother", m_h1_MC_Mother_p, m_histoList_Tracks);
-  m_h1_V0_theta = (TH1F*)duplicateHistogram("h1V0Theta", "#theta mother", m_h1_MC_Mother_theta, m_histoList_Tracks);
-  m_h1_V0_costheta = (TH1F*)duplicateHistogram("h1V0CosTheta", "cos#theta mother", m_h1_MC_Mother_costheta, m_histoList_Tracks);
-  m_h1_V0_phi = (TH1F*)duplicateHistogram("h1V0Phi", "#phi mother", m_h1_MC_Mother_phi, m_histoList_Tracks);
-  m_h1_V0_phi_BW = (TH1F*)duplicateHistogram("h1V0PhiBW", "#phi mother", m_h1_MC_Mother_phi_BW, m_histoList_Tracks);
-  m_h1_V0_phi_barrel = (TH1F*)duplicateHistogram("h1V0Phibarrel", "#phi mother", m_h1_MC_Mother_phi_barrel, m_histoList_Tracks);
-  m_h1_V0_phi_FW = (TH1F*)duplicateHistogram("h1V0PhiFW", "#phi mother", m_h1_MC_Mother_phi_FW, m_histoList_Tracks);
+  m_h1_V0_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1V0RMother", "mother, R mother", m_h1_MC_Mother_RMother,
+                                                           m_histoList_Tracks));
+  m_h3_V0 = dynamic_cast<TH3F*>(duplicateHistogram("h3V0", "entry per V0", m_h3_MC_Mother, m_histoList_Tracks));
+  m_h1_V0_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1V0Pt", "p_{T} mother", m_h1_MC_Mother_pt, m_histoList_Tracks));
+  m_h1_V0_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1V0Pz", "p_{z} mother", m_h1_MC_Mother_pz, m_histoList_Tracks));
+  m_h1_V0_p = dynamic_cast<TH1F*>(duplicateHistogram("h1V0P", "p mother", m_h1_MC_Mother_p, m_histoList_Tracks));
+  m_h1_V0_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1V0Theta", "#theta mother", m_h1_MC_Mother_theta, m_histoList_Tracks));
+  m_h1_V0_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1V0CosTheta", "cos#theta mother", m_h1_MC_Mother_costheta,
+                                                            m_histoList_Tracks));
+  m_h1_V0_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1V0Phi", "#phi mother", m_h1_MC_Mother_phi, m_histoList_Tracks));
+  m_h1_V0_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1V0PhiBW", "#phi mother", m_h1_MC_Mother_phi_BW, m_histoList_Tracks));
+  m_h1_V0_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1V0Phibarrel", "#phi mother", m_h1_MC_Mother_phi_barrel,
+                                                              m_histoList_Tracks));
+  m_h1_V0_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1V0PhiFW", "#phi mother", m_h1_MC_Mother_phi_FW, m_histoList_Tracks));
 
-  m_h2_V0_Mother_2D = (TH2F*)duplicateHistogram("h2V0Mother2D", "p_{T} VS #theta, mother", m_h2_MC_Mother_2D, m_histoList_Tracks);
-  m_h2_V0_Mother_2D_BP = (TH2F*)duplicateHistogram("h2V0Mother2dBP", "p_{T} VS #theta, mother BP", m_h2_MC_Mother_2D_BP,
-                                                   m_histoList_Tracks);
+  m_h2_V0_Mother_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2V0Mother2D", "p_{T} VS #theta, mother", m_h2_MC_Mother_2D,
+                                                             m_histoList_Tracks));
+  m_h2_V0_Mother_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2V0Mother2dBP", "p_{T} VS #theta, mother BP", m_h2_MC_Mother_2D_BP,
+                                             m_histoList_Tracks));
 
-  m_h2_V0_Mother_pVScostheta = (TH2F*)duplicateHistogram("h2V0MotherpVScostheta", "p VS cos(#theta), mother",
-                                                         m_h2_MC_Mother_pVScostheta, m_histoList_Tracks);
+  m_h2_V0_Mother_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2V0MotherpVScostheta", "p VS cos(#theta), mother",
+                                                   m_h2_MC_Mother_pVScostheta, m_histoList_Tracks));
 
 
   //------------------------------------------------------------------//
@@ -376,131 +397,170 @@ void EffPlotsModule::initialize()
   //------------------------------------------------------------------//
 
   //RecoTrack dau0
-  m_h1_RecoTrack_dau0_d0 = (TH1F*)duplicateHistogram("h1RecoTrackdau0D0", "d0 dau_{0}", m_h1_MC_dau0_d0, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_z0 = (TH1F*)duplicateHistogram("h1RecoTrackdau0Z0", "z0 dau_{0}", m_h1_MC_dau0_z0, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_RMother = (TH1F*)duplicateHistogram("h1RecoTrackdau0RMother", "dau_{0}, R mother", m_h1_MC_dau0_RMother,
-                                                          m_histoList_RecoTracks);
-  m_h3_RecoTrack_dau0 = (TH3F*)duplicateHistogram("h3RecoTrackdau0", "entry per RecoTrack dau_{0}", m_h3_MC_dau0,
-                                                  m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_pt = (TH1F*)duplicateHistogram("h1RecoTrackdau0Pt", "p_{T} dau_{0}", m_h1_MC_dau0_pt, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_pz = (TH1F*)duplicateHistogram("h1RecoTrackdau0Pz", "p_{z} dau_{0}", m_h1_MC_dau0_pz, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_p = (TH1F*)duplicateHistogram("h1RecoTrackdau0P", "p dau_{0}", m_h1_MC_dau0_p, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_theta = (TH1F*)duplicateHistogram("h1RecoTrackdau0Theta", "#theta dau_{0}", m_h1_MC_dau0_theta,
-                                                        m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_costheta = (TH1F*)duplicateHistogram("h1RecoTrackdau0CosTheta", "cos#theta dau_{0}", m_h1_MC_dau0_costheta,
-                                                           m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_Mother_cosAngle = (TH1F*)duplicateHistogram("h1RecoTrackdau0MothercosAngle", "#alpha_{mother,dau_{0}}",
-                                        m_h1_MC_dau0_Mother_cosAngle, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phi = (TH1F*)duplicateHistogram("h1RecoTrackdau0Phi", "#phi dau_{0}", m_h1_MC_dau0_phi, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phi_BW = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiBW", "#phi dau_{0}", m_h1_MC_dau0_phi_BW,
-                                                         m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phi_barrel = (TH1F*)duplicateHistogram("h1RecoTrackdau0Phibarrel", "#phi dau_{0}", m_h1_MC_dau0_phi_barrel,
-                                                             m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phi_FW = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiFW", "#phi dau_{0}", m_h1_MC_dau0_phi_FW,
-                                                         m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau0_d0 = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0D0", "d0 dau_{0}", m_h1_MC_dau0_d0,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_z0 = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Z0", "z0 dau_{0}", m_h1_MC_dau0_z0,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0RMother", "dau_{0}, R mother",
+                                                    m_h1_MC_dau0_RMother,
+                                                    m_histoList_RecoTracks));
+  m_h3_RecoTrack_dau0 = dynamic_cast<TH3F*>(duplicateHistogram("h3RecoTrackdau0", "entry per RecoTrack dau_{0}", m_h3_MC_dau0,
+                                            m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Pt", "p_{T} dau_{0}", m_h1_MC_dau0_pt,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Pz", "p_{z} dau_{0}", m_h1_MC_dau0_pz,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_p = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0P", "p dau_{0}", m_h1_MC_dau0_p,
+                                              m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Theta", "#theta dau_{0}", m_h1_MC_dau0_theta,
+                                                  m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0CosTheta", "cos#theta dau_{0}",
+                                                     m_h1_MC_dau0_costheta,
+                                                     m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_Mother_cosAngle = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0MothercosAngle",
+                                                            "#alpha_{mother,dau_{0}}",
+                                                            m_h1_MC_dau0_Mother_cosAngle, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Phi", "#phi dau_{0}", m_h1_MC_dau0_phi,
+                                                m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiBW", "#phi dau_{0}", m_h1_MC_dau0_phi_BW,
+                                                   m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0Phibarrel", "#phi dau_{0}",
+                                                       m_h1_MC_dau0_phi_barrel,
+                                                       m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiFW", "#phi dau_{0}", m_h1_MC_dau0_phi_FW,
+                                                   m_histoList_RecoTracks));
 
-  m_h1_RecoTrack_dau0_phiMother_total = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiMothertotal", "dau_{0}, #phi_{mother}",
-                                        m_h1_MC_Mother_phi, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phiMother_BW = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiMotherBW", "dau_{0}, #phi_{mother}, BW",
-                                     m_h1_MC_dau0_phiMother_BW, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phiMother_barrel = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiMotherbarrel", "dau_{0}, #phi_{mother}, barrel",
-                                         m_h1_MC_dau0_phiMother_barrel, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_phiMother_FW = (TH1F*)duplicateHistogram("h1RecoTrackdau0PhiMotherFW", "dau_{0}, #phi_{mother}, FW",
-                                     m_h1_MC_dau0_phiMother_FW, m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau0_phiMother_total = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiMothertotal",
+                                                            "dau_{0}, #phi_{mother}",
+                                                            m_h1_MC_Mother_phi, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phiMother_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiMotherBW",
+                                                         "dau_{0}, #phi_{mother}, BW",
+                                                         m_h1_MC_dau0_phiMother_BW, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phiMother_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiMotherbarrel",
+                                                             "dau_{0}, #phi_{mother}, barrel",
+                                                             m_h1_MC_dau0_phiMother_barrel, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_phiMother_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PhiMotherFW",
+                                                         "dau_{0}, #phi_{mother}, FW",
+                                                         m_h1_MC_dau0_phiMother_FW, m_histoList_RecoTracks));
 
-  m_h1_RecoTrack_dau0_thetaMother = (TH1F*)duplicateHistogram("h1RecoTrackdau0ThetaMother", "#theta_{mother} dau_{0}",
-                                                              m_h1_MC_dau0_theta, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau0_ptMother = (TH1F*)duplicateHistogram("h1RecoTrackdau0PtMother", "p_{T,mother} dau_{0}", m_h1_MC_dau0_pt,
-                                                           m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau0_thetaMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0ThetaMother", "#theta_{mother} dau_{0}",
+                                                        m_h1_MC_dau0_theta, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau0_ptMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau0PtMother", "p_{T,mother} dau_{0}",
+                                                     m_h1_MC_dau0_pt,
+                                                     m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_dau0_2D = (TH2F*)duplicateHistogram("h2RecoTrackdau02D", "p_{T} VS #theta, dau_{0}", m_h2_MC_dau0_2D,
-                                                     m_histoList_RecoTracks);
-  m_h2_RecoTrack_dau0_2D_BP = (TH2F*)duplicateHistogram("h2RecoTrackdau02dBP", "p_{T} VS #theta, dau_{0} BP", m_h2_MC_dau0_2D_BP,
-                                                        m_histoList_RecoTracks);
-  m_h2_RecoTrack_dau0_2DMother = (TH2F*)duplicateHistogram("h2RecoTrackdau02DMother", "p_{T,mother} VS #theta_{mother}, dau_{0}",
-                                                           m_h2_MC_dau0_2DMother, m_histoList_RecoTracks);
+  m_h2_RecoTrack_dau0_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau02D", "p_{T} VS #theta, dau_{0}", m_h2_MC_dau0_2D,
+                                               m_histoList_RecoTracks));
+  m_h2_RecoTrack_dau0_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau02dBP", "p_{T} VS #theta, dau_{0} BP",
+                                                  m_h2_MC_dau0_2D_BP,
+                                                  m_histoList_RecoTracks));
+  m_h2_RecoTrack_dau0_2DMother = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau02DMother",
+                                                     "p_{T,mother} VS #theta_{mother}, dau_{0}",
+                                                     m_h2_MC_dau0_2DMother, m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_dau0_pVScostheta = (TH2F*)duplicateHistogram("h2RecoTrackdau0pVscostheta", "p VS cos(#theta), dau_{0}",
-                                                              m_h2_MC_dau0_pVScostheta, m_histoList_RecoTracks);
+  m_h2_RecoTrack_dau0_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau0pVscostheta", "p VS cos(#theta), dau_{0}",
+                                                        m_h2_MC_dau0_pVScostheta, m_histoList_RecoTracks));
 
   //RecoTrack dau1
-  m_h1_RecoTrack_dau1_d0 = (TH1F*)duplicateHistogram("h1RecoTrackdau1D0", "d0 dau_{1}", m_h1_MC_dau1_d0, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_z0 = (TH1F*)duplicateHistogram("h1RecoTrackdau1Z0", "z0 dau_{1}", m_h1_MC_dau1_z0, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_RMother = (TH1F*)duplicateHistogram("h1RecoTrackdau1RMother", "dau_{1}, R mother", m_h1_MC_dau1_RMother,
-                                                          m_histoList_RecoTracks);
-  m_h3_RecoTrack_dau1 = (TH3F*)duplicateHistogram("h3RecoTrackdau1", "entry per RecoTrack dau_{1}", m_h3_MC_dau1,
-                                                  m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_pt = (TH1F*)duplicateHistogram("h1RecoTrackdau1Pt", "p_{T} dau_{1}", m_h1_MC_dau1_pt, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_pz = (TH1F*)duplicateHistogram("h1RecoTrackdau1Pz", "p_{z} dau_{1}", m_h1_MC_dau1_pz, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_p = (TH1F*)duplicateHistogram("h1RecoTrackdau1P", "p dau_{1}", m_h1_MC_dau1_p, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_theta = (TH1F*)duplicateHistogram("h1RecoTrackdau1Theta", "#theta dau_{1}", m_h1_MC_dau1_theta,
-                                                        m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_costheta = (TH1F*)duplicateHistogram("h1RecoTrackdau1CosTheta", "cos#theta dau_{1}", m_h1_MC_dau1_costheta,
-                                                           m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_Mother_cosAngle = (TH1F*)duplicateHistogram("h1RecoTrackdau1MothercosAngle", "#alpha_{mother,p}",
-                                        m_h1_MC_dau1_Mother_cosAngle, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phi = (TH1F*)duplicateHistogram("h1RecoTrackdau1Phi", "#phi dau_{1}", m_h1_MC_dau1_phi, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phi_BW = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiBW", "#phi dau_{1}", m_h1_MC_dau1_phi_BW,
-                                                         m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phi_barrel = (TH1F*)duplicateHistogram("h1RecoTrackdau1Phibarrel", "#phi dau_{1}", m_h1_MC_dau1_phi_barrel,
-                                                             m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phi_FW = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiFW", "#phi dau_{1}", m_h1_MC_dau1_phi_FW,
-                                                         m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau1_d0 = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1D0", "d0 dau_{1}", m_h1_MC_dau1_d0,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_z0 = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Z0", "z0 dau_{1}", m_h1_MC_dau1_z0,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1RMother", "dau_{1}, R mother",
+                                                    m_h1_MC_dau1_RMother,
+                                                    m_histoList_RecoTracks));
+  m_h3_RecoTrack_dau1 = dynamic_cast<TH3F*>(duplicateHistogram("h3RecoTrackdau1", "entry per RecoTrack dau_{1}", m_h3_MC_dau1,
+                                            m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Pt", "p_{T} dau_{1}", m_h1_MC_dau1_pt,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Pz", "p_{z} dau_{1}", m_h1_MC_dau1_pz,
+                                               m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_p = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1P", "p dau_{1}", m_h1_MC_dau1_p,
+                                              m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Theta", "#theta dau_{1}", m_h1_MC_dau1_theta,
+                                                  m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1CosTheta", "cos#theta dau_{1}",
+                                                     m_h1_MC_dau1_costheta,
+                                                     m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_Mother_cosAngle = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1MothercosAngle", "#alpha_{mother,p}",
+                                                            m_h1_MC_dau1_Mother_cosAngle, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Phi", "#phi dau_{1}", m_h1_MC_dau1_phi,
+                                                m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiBW", "#phi dau_{1}", m_h1_MC_dau1_phi_BW,
+                                                   m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1Phibarrel", "#phi dau_{1}",
+                                                       m_h1_MC_dau1_phi_barrel,
+                                                       m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiFW", "#phi dau_{1}", m_h1_MC_dau1_phi_FW,
+                                                   m_histoList_RecoTracks));
 
-  m_h1_RecoTrack_dau1_phiMother_total = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiMothertotal", "dau_{1}, #phi_{mother}",
-                                        m_h1_MC_dau1_phiMother_total, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phiMother_BW = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiMotherBW", "dau_{1}, #phi_{mother}, BW",
-                                     m_h1_MC_dau1_phiMother_BW, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phiMother_barrel = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiMotherbarrel", "dau_{1}, #phi_{mother}, barrel",
-                                         m_h1_MC_dau1_phiMother_barrel, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_phiMother_FW = (TH1F*)duplicateHistogram("h1RecoTrackdau1PhiMotherFW", "dau_{1}, #phi_{mother}, FW",
-                                     m_h1_MC_dau1_phiMother_FW, m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau1_phiMother_total = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiMothertotal",
+                                                            "dau_{1}, #phi_{mother}",
+                                                            m_h1_MC_dau1_phiMother_total, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phiMother_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiMotherBW",
+                                                         "dau_{1}, #phi_{mother}, BW",
+                                                         m_h1_MC_dau1_phiMother_BW, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phiMother_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiMotherbarrel",
+                                                             "dau_{1}, #phi_{mother}, barrel",
+                                                             m_h1_MC_dau1_phiMother_barrel, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_phiMother_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PhiMotherFW",
+                                                         "dau_{1}, #phi_{mother}, FW",
+                                                         m_h1_MC_dau1_phiMother_FW, m_histoList_RecoTracks));
 
-  m_h1_RecoTrack_dau1_thetaMother = (TH1F*)duplicateHistogram("h1RecoTrackdau1ThetaMother", "#theta_{mother} dau_{1}",
-                                                              m_h1_MC_dau1_theta, m_histoList_RecoTracks);
-  m_h1_RecoTrack_dau1_ptMother = (TH1F*)duplicateHistogram("h1RecoTrackdau1PtMother", "p_{T,mother} dau_{1}", m_h1_MC_dau1_pt,
-                                                           m_histoList_RecoTracks);
+  m_h1_RecoTrack_dau1_thetaMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1ThetaMother", "#theta_{mother} dau_{1}",
+                                                        m_h1_MC_dau1_theta, m_histoList_RecoTracks));
+  m_h1_RecoTrack_dau1_ptMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrackdau1PtMother", "p_{T,mother} dau_{1}",
+                                                     m_h1_MC_dau1_pt,
+                                                     m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_dau1_2D = (TH2F*)duplicateHistogram("h2RecoTrackdau12D", "p_{T} VS #theta, dau_{1}", m_h2_MC_dau1_2D,
-                                                     m_histoList_RecoTracks);
-  m_h2_RecoTrack_dau1_2D_BP = (TH2F*)duplicateHistogram("h2RecoTrackdau12dBP", "p_{T} VS #theta, p BP", m_h2_MC_dau1_2D_BP,
-                                                        m_histoList_RecoTracks);
-  m_h2_RecoTrack_dau1_2DMother = (TH2F*)duplicateHistogram("h2RecoTrackdau12DMother", "p_{T,mother} VS #theta_{mother}, dau_{1}",
-                                                           m_h2_MC_dau1_2DMother, m_histoList_RecoTracks);
+  m_h2_RecoTrack_dau1_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau12D", "p_{T} VS #theta, dau_{1}", m_h2_MC_dau1_2D,
+                                               m_histoList_RecoTracks));
+  m_h2_RecoTrack_dau1_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau12dBP", "p_{T} VS #theta, p BP",
+                                                  m_h2_MC_dau1_2D_BP,
+                                                  m_histoList_RecoTracks));
+  m_h2_RecoTrack_dau1_2DMother = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau12DMother",
+                                                     "p_{T,mother} VS #theta_{mother}, dau_{1}",
+                                                     m_h2_MC_dau1_2DMother, m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_dau1_pVScostheta = (TH2F*)duplicateHistogram("h2RecoTrackdau1pVscostheta", "p VS cos(#theta), dau_{1}",
-                                                              m_h2_MC_dau1_pVScostheta, m_histoList_RecoTracks);
+  m_h2_RecoTrack_dau1_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackdau1pVscostheta", "p VS cos(#theta), dau_{1}",
+                                                        m_h2_MC_dau1_pVScostheta, m_histoList_RecoTracks));
 
   //RecoTrack Mother
-  m_h1_RecoTrack_Mother_RMother = (TH1F*)duplicateHistogram("h1RecoTrack_MotherRMother", "mother, R mother", m_h1_MC_Mother_RMother,
-                                                            m_histoList_RecoTracks);
-  m_h3_RecoTrack_Mother = (TH3F*)duplicateHistogram("h3RecoTrack_Mother", "entry per RecoTrack_Mother", m_h3_MC_Mother,
-                                                    m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_pt = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPt", "p_{T} mother", m_h1_MC_dau0_pt,
-                                                       m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_pz = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPz", "p_{z} mother", m_h1_MC_dau0_pz,
-                                                       m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_p = (TH1F*)duplicateHistogram("h1RecoTrack_MotherP", "p mother", m_h1_MC_dau0_p, m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_theta = (TH1F*)duplicateHistogram("h1RecoTrack_MotherTheta", "#theta mother", m_h1_MC_dau0_theta,
-                                                          m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_costheta = (TH1F*)duplicateHistogram("h1RecoTrack_MotherCosTheta", "cos#theta mother", m_h1_MC_dau0_costheta,
-                                                             m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_phi = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPhi", "#phi mother", m_h1_MC_dau0_phi,
-                                                        m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_phi_BW = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPhiBW", "#phi mother", m_h1_MC_dau0_phi_BW,
-                                                           m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_phi_barrel = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPhibarrel", "#phi mother", m_h1_MC_dau0_phi_barrel,
-                                     m_histoList_RecoTracks);
-  m_h1_RecoTrack_Mother_phi_FW = (TH1F*)duplicateHistogram("h1RecoTrack_MotherPhiFW", "#phi mother", m_h1_MC_dau0_phi_FW,
-                                                           m_histoList_RecoTracks);
+  m_h1_RecoTrack_Mother_RMother = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherRMother", "mother, R mother",
+                                                      m_h1_MC_Mother_RMother,
+                                                      m_histoList_RecoTracks));
+  m_h3_RecoTrack_Mother = dynamic_cast<TH3F*>(duplicateHistogram("h3RecoTrack_Mother", "entry per RecoTrack_Mother", m_h3_MC_Mother,
+                                              m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_pt = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPt", "p_{T} mother", m_h1_MC_dau0_pt,
+                                                 m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_pz = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPz", "p_{z} mother", m_h1_MC_dau0_pz,
+                                                 m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_p = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherP", "p mother", m_h1_MC_dau0_p,
+                                                m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_theta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherTheta", "#theta mother", m_h1_MC_dau0_theta,
+                                                    m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_costheta = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherCosTheta", "cos#theta mother",
+                                                       m_h1_MC_dau0_costheta,
+                                                       m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_phi = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPhi", "#phi mother", m_h1_MC_dau0_phi,
+                                                  m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_phi_BW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPhiBW", "#phi mother", m_h1_MC_dau0_phi_BW,
+                                                     m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_phi_barrel = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPhibarrel", "#phi mother",
+                                                         m_h1_MC_dau0_phi_barrel,
+                                                         m_histoList_RecoTracks));
+  m_h1_RecoTrack_Mother_phi_FW = dynamic_cast<TH1F*>(duplicateHistogram("h1RecoTrack_MotherPhiFW", "#phi mother", m_h1_MC_dau0_phi_FW,
+                                                     m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_Mother_2D = (TH2F*)duplicateHistogram("h2RecoTrack_Mother2D", "p_{T} VS #theta, mother", m_h2_MC_Mother_2D,
-                                                       m_histoList_RecoTracks);
-  m_h2_RecoTrack_Mother_2D_BP = (TH2F*)duplicateHistogram("h2RecoTrack_Mother2dBP", "p_{T} VS #theta, mother BP",
-                                                          m_h2_MC_Mother_2D_BP, m_histoList_RecoTracks);
+  m_h2_RecoTrack_Mother_2D = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrack_Mother2D", "p_{T} VS #theta, mother",
+                                                 m_h2_MC_Mother_2D,
+                                                 m_histoList_RecoTracks));
+  m_h2_RecoTrack_Mother_2D_BP = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrack_Mother2dBP", "p_{T} VS #theta, mother BP",
+                                                    m_h2_MC_Mother_2D_BP, m_histoList_RecoTracks));
 
-  m_h2_RecoTrack_Mother_pVScostheta = (TH2F*)duplicateHistogram("h2RecoTrackMotherpVscostheta", "p VS cos(#theta), mother",
-                                      m_h2_MC_Mother_pVScostheta, m_histoList_RecoTracks);
+  m_h2_RecoTrack_Mother_pVScostheta = dynamic_cast<TH2F*>(duplicateHistogram("h2RecoTrackMotherpVscostheta",
+                                                          "p VS cos(#theta), mother",
+                                                          m_h2_MC_Mother_pVScostheta, m_histoList_RecoTracks));
 
 }
 
@@ -851,6 +911,7 @@ void EffPlotsModule::event()
     if (nMatchedDau != 2)
       continue;
 
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int pdgCode = mcParticle.getPDG();
     B2DEBUG(29, "MCParticle has PDG code " << pdgCode);
 

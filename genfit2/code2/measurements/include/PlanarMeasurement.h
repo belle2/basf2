@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_PlanarMeasurement_h
-#define genfit_PlanarMeasurement_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsHMatrix.h"
@@ -82,5 +81,3 @@ class PlanarMeasurement : public AbsMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_PlanarMeasurement_h

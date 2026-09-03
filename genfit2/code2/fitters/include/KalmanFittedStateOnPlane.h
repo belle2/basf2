@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_KalmanFittedStateOnPlane_h
-#define genfit_KalmanFittedStateOnPlane_h
+#pragma once
 
 #include "MeasuredStateOnPlane.h"
 
@@ -106,5 +105,3 @@ inline void KalmanFittedStateOnPlane::swap(KalmanFittedStateOnPlane& other) {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_KalmanFittedStateOnPlane_h

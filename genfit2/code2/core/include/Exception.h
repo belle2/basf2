@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_Exception_h
-#define genfit_Exception_h
+#pragma once
 
 #include <exception>
 #include <string>
@@ -100,5 +99,3 @@ class Exception : public std::exception {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_Exception_h

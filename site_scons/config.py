@@ -98,8 +98,8 @@ def configure_system(conf):
     # sqlite3
     conf.env['HAS_SQLITE'] = False
     conf.env['SQLITE_LIBS'] = []
-    if conf.CheckLibWithHeader('sqlite3', 'sqlite3.h', 'C',
-                               'sqlite3_open_v2(":memory:",0,SQLITE_OPEN_READONLY,0);'
+    if conf.CheckLibWithHeader('sqlite3', 'sqlite3.h', language='C',
+                               call='sqlite3_open_v2(":memory:",0,SQLITE_OPEN_READONLY,0);'
                                ):
         conf.env['HAS_SQLITE'] = True
         conf.env.Append(CPPDEFINES='-DHAS_SQLITE')
@@ -131,8 +131,11 @@ def configure_externals(conf):
     """configure the external packages"""
 
     try:
-        extdir = conf.env['EXTDIR']
-        sys.path[:0] = [os.environ['BELLE2_TOOLS'], extdir]
+        if os.environ.get('BELLE2_EXTERNALS_USE_CONDA') == '1':
+            impdir = os.environ['BELLE2_EXTERNALS_TOPDIR']
+        else:
+            impdir = conf.env['EXTDIR']
+        sys.path[:0] = [os.environ['BELLE2_TOOLS'], impdir]
         from externals import config_externals
         return config_externals(conf)
     except Exception as e:

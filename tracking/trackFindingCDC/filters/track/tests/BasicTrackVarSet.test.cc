@@ -138,8 +138,8 @@ TEST_F(TrackingUtilitiesTestWithTopology, basicTrackVarSet_test_two_hit_track)
 
   for (size_t i = 0; i < drift_lengths.size(); i++) {
     cdcHits.emplace_back(128, adc_counts.at(i), wireIDs.at(i)); // store in vector to avoid nullptrs
-    cdcWireHits.emplace_back(&cdcHits.at(i), drift_lengths.at(i));
-    CDCRLWireHit aRLWireHit(&cdcWireHits.at(i), ERightLeft::c_Unknown);
+    cdcWireHits.emplace_back(&cdcHits.back(), drift_lengths.at(i));
+    CDCRLWireHit aRLWireHit(&cdcWireHits.back(), ERightLeft::c_Unknown);
     const auto& tmp = aRLWireHit.getRefPos2D();
     ROOT::Math::XYZVector aRecoPos(tmp.X(), tmp.Y(), 0.0);
     cdcRecoHits.emplace_back(aRLWireHit, aRecoPos, arc_length_2Ds.at(i));

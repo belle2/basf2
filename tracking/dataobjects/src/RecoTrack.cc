@@ -51,7 +51,7 @@ RecoTrack::RecoTrack(const ROOT::Math::XYZVector& seedPosition, const ROOT::Math
 }
 
 void RecoTrack::registerRequiredRelations(
-  StoreArray<RecoTrack>& recoTracks,
+  const StoreArray<RecoTrack>& recoTracks,
   std::string const& pxdHitsStoreArrayName,
   std::string const& svdHitsStoreArrayName,
   std::string const& cdcHitsStoreArrayName,
@@ -267,6 +267,7 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, unsigned int 
     if (not optionalMinimalWeight) {
       return true;
     }
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     double minimalWeight = *optionalMinimalWeight;
     const genfit::TrackPoint* trackPoint = recoTrack->getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {

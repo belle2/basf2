@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_MaterialEffects_h
-#define genfit_MaterialEffects_h
+#pragma once
 
 #include "RKTools.h"
 #include "AbsMaterialInterface.h"
@@ -208,5 +207,3 @@ public:
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_MaterialEffects_h

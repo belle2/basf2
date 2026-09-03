@@ -47,7 +47,7 @@ void TCConvertersTestModule::initialize()
 
   // check if all StoreArrays are present
   StoreArray<SpacePointTrackCand> SPTCs(m_SPTCName); SPTCs.isRequired(m_SPTCName);
-  for (std::string aName : m_genfitTCNames) {
+  for (const std::string& aName : m_genfitTCNames) {
     StoreArray<genfit::TrackCand> TCs(aName);
     TCs.isRequired(aName);
   }

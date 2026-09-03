@@ -113,8 +113,8 @@ namespace Belle2 {
     @param writeOption root option for opening the file 'UPDATE' or 'RECREATE'
     @param treeNames : list of names of the trees contained in the root file to be initialized
     */
-    void initializeRootFile(std::string fileName, std::string writeOption, std::vector<std::string> treeNames);
-    static void getValuesForRoot(Belle2::MCParticle* mcParticle,
+    void initializeRootFile(const std::string& fileName, const std::string& writeOption, std::vector<std::string> treeNames);
+    static void getValuesForRoot(const Belle2::MCParticle* mcParticle,
                                  RootVariables& rootVariables); /**< collect the values for root output */
 
     /** get all MCPartileIDs of tracks */

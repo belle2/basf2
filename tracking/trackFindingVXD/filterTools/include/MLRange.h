@@ -41,7 +41,7 @@ namespace Belle2 {
      * @param hits is the three hit combination (for the moment, maybe this will get templated in the future) that gets
      * passed down from the MLHandover selection variable.
      */
-    inline bool contains(std::array<double, Ndims> hits) const { return !(m_classifier->analyze(hits) < m_cut); }
+    inline bool contains(const std::array<double, Ndims>& hits) const { return !(m_classifier->analyze(hits) < m_cut); }
 
     /**
      * For Storing this range

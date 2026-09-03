@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_TGeoMaterialInterface_h
-#define genfit_TGeoMaterialInterface_h
+#pragma once
 
 #include "AbsMaterialInterface.h"
 
@@ -65,5 +64,3 @@ class TGeoMaterialInterface : public AbsMaterialInterface {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TGeoMaterialInterface_h

@@ -43,6 +43,7 @@ namespace Belle2 {
 
     private:
       /// Reference to the open TFile.
+      // cppcheck-suppress unusedStructMember ; owns the output file for the lifetime of the recorder
       TFile* m_tFile;
 
       /// Reference to the TTree.

@@ -262,7 +262,7 @@ namespace Belle2 {
      * @param delimiter delimiter to be put in between the individual strings, defaults to white space (1 character)
      * NOTE: mainly for easier readability of debug output!
      */
-    std::string getRefereeStatusString(std::string delimiter = " ") const;
+    std::string getRefereeStatusString(const std::string& delimiter = " ") const;
 
     /**
      * return family identifier

@@ -56,8 +56,8 @@ namespace Belle2 {
     Segment(FullSecID::BaseType outerSector, FullSecID::BaseType innerSector, HitType* outerNode, HitType* innerNode):
       m_outerHit(outerNode),
       m_innerHit(innerNode),
-      m_identifier(static_cast<std::int64_t>(outerNode->getID()) << 32 | static_cast<std::int64_t>
-                   (innerNode->getID())), // Use int TrackNode IDs to construct int Segment ID
+      m_identifier(static_cast<std::int64_t>(static_cast<std::uint32_t>(outerNode->getID())) << 32 | static_cast<std::int64_t>
+                   (static_cast<std::uint32_t>(innerNode->getID()))), // Use int TrackNode IDs to construct int Segment ID
       m_outerSector(outerSector),
       m_innerSector(innerSector)
     {}

@@ -68,7 +68,7 @@ ROISenderModule::event()
 {
 
   int length = m_roiPayload->getPacketLengthByte();
-  const char* data = (const char*) m_roiPayload->getRootdata();
+  const char* data = reinterpret_cast<const char*>(m_roiPayload->getRootdata());
 
   mqd_t ret;
 
@@ -167,8 +167,8 @@ ROISenderModule::closeMessageQueue(const char* log_string)
 
 
 /// Not sure if we ever need to unlink the queue, but lets keep the code for reference
-void
-ROISenderModule::unlinkMessageQueue(const char* log_string)
+// cppcheck-suppress unusedPrivateFunction ; kept for debugging, its call sites are commented out
+void ROISenderModule::unlinkMessageQueue(const char* log_string)
 {
   mqd_t ret;
   ret = mq_unlink(m_messageQueueNameCstring);

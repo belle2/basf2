@@ -35,9 +35,9 @@ namespace Belle2 {
      * @param recoTracksName RecoTrack StoreArray name.
      * @param copiedRecoTracksName RecoTrack StoreArray name (used for track refitting).
      */
-    KinkFitter(const std::string& trackFitResultsName = "", const std::string& kinksName = "",
-               const std::string& recoTracksName = "",
-               const std::string& copiedRecoTracksName = "RecoTracksKinkTmp");
+    explicit KinkFitter(const std::string& trackFitResultsName = "", const std::string& kinksName = "",
+                        const std::string& recoTracksName = "",
+                        const std::string& copiedRecoTracksName = "RecoTracksKinkTmp");
 
     /**
      * Initialize the cuts which will be applied during the fit and store process.
@@ -129,7 +129,7 @@ namespace Belle2 {
      * for mother track, returns positive index of the hit, closest to the vertex, counting from the end of the track
      */
     static int findHitPositionForReassignment(const RecoTrack* recoTrack,
-                                              ROOT::Math::XYZVector& vertexPos,
+                                              const ROOT::Math::XYZVector& vertexPos,
                                               int direction);
 
     /**
@@ -141,7 +141,7 @@ namespace Belle2 {
      * positive if mother hits are reassigned to daughter, negative if vice-versa
      * @return a pointer to created RecoTrack
      */
-    RecoTrack* copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
+    RecoTrack* copyRecoTrackAndReassignCDCHits(const RecoTrack* motherRecoTrack, const RecoTrack* daughterRecoTrack,
                                                const bool motherFlag, const int delta);
 
     /**
@@ -208,7 +208,7 @@ namespace Belle2 {
      * false if one of the tracks is not fitted (should not happen), kFit finishes with error,
      * chi^2 of the fit is too large, or extrapolation of one of the tracks to decay vertex fails
      */
-    bool vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
+    bool vertexFitWithRecoTracks(const RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                  unsigned int& reassignHitStatus,
                                  ROOT::Math::XYZVector& vertexPos, double& distance,
                                  ROOT::Math::XYZVector vertexPosSeed = ROOT::Math::XYZVector(0, 0, 0));
@@ -234,8 +234,8 @@ namespace Belle2 {
      * @param trackHypothesis track hypothesis
      * @return pointer to created TrackFitResult of the Kink Track
      */
-    TrackFitResult* buildTrackFitResult(RecoTrack* recoTrack, const genfit::MeasuredStateOnPlane& msop,
-                                        const double Bz, const Const::ParticleType trackHypothesis);
+    TrackFitResult* buildTrackFitResult(const RecoTrack* recoTrack, const genfit::MeasuredStateOnPlane& msop,
+                                        const double Bz, const Const::ParticleType& trackHypothesis);
 
     /**
      * Prepare the error matrix for the kFit.
@@ -243,7 +243,7 @@ namespace Belle2 {
      * @param covMatrix6 covariance matrix of the track state to be used in kFit
      * @param errMatrix7 error matrix of the track state to be prepared and used in kFit
      */
-    static void errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+    static void errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, const TMatrixDSym& covMatrix6,
                                  TMatrixDSym& errMatrix7);
 
 
@@ -258,9 +258,9 @@ namespace Belle2 {
     StoreArray <Kink> m_kinks;  ///< Kink (output).
 
     // cut variables
-    double m_vertexDistanceCut;  ///< cut on the distance at the found vertex.
-    double m_vertexChi2Cut;  ///< Chi2 cut.
-    double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks used in prefilter.
+    double m_vertexDistanceCut {};  ///< cut on the distance at the found vertex.
+    double m_vertexChi2Cut {};  ///< Chi2 cut.
+    double m_precutDistance {};  ///< Preselection cut on distance between ending points of two tracks used in prefilter.
     ///< here it is needed in isRefitImproveFilter6 function
 
     // fitter working mode variables
@@ -269,17 +269,17 @@ namespace Belle2 {
     ///< 2nd bit: flip tracks with close end points (1 is On, 0 is Off)
     ///< 3rd bit: fit both tracks as one (1 is On, 0 is Off)
     ///< 4th bit: combined track candidate splitting (1 is On, 0 is Off)
-    bool m_kinkFitterModeHitsReassignment; ///< fitter mode 1st bit
-    bool m_kinkFitterModeFlipAndRefit; ///< fitter mode 2nd bit
-    bool m_kinkFitterModeCombineAndFit; ///< fitter mode 3rd bit
-    bool m_kinkFitterModeSplitTrack; ///< fitter mode 4th bit
+    bool m_kinkFitterModeHitsReassignment {}; ///< fitter mode 1st bit
+    bool m_kinkFitterModeFlipAndRefit {}; ///< fitter mode 2nd bit
+    bool m_kinkFitterModeCombineAndFit {}; ///< fitter mode 3rd bit
+    bool m_kinkFitterModeSplitTrack {}; ///< fitter mode 4th bit
 
     // helper variables
     StoreArray <RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks
     genfit::MeasuredStateOnPlane m_stMotherBuffer; ///< buffer for the MeasuredStateOnPlane of mother obtained in the vertex fit
     genfit::MeasuredStateOnPlane m_stDaughterBuffer; ///< buffer for the MeasuredStateOnPlane of daughter obtained in the vertex fit
-    RecoTrack* m_motherKinkRecoTrackCache; ///< cache for the RecoTrack of mother used to find the best vertex
-    RecoTrack* m_daughterKinkRecoTrackCache; ///< cache for the RecoTrack of daughter used to find the best vertex
+    RecoTrack* m_motherKinkRecoTrackCache {}; ///< cache for the RecoTrack of mother used to find the best vertex
+    RecoTrack* m_daughterKinkRecoTrackCache {}; ///< cache for the RecoTrack of daughter used to find the best vertex
   };
 
 }

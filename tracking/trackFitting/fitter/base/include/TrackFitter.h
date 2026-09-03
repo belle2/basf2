@@ -187,7 +187,7 @@ namespace Belle2 {
     * Use the user settings of the fitter to fit the reco tracks.
     * The parameters are passed as DAFParameters object.
     */
-    void resetFitterToUserSettings(DAFParameters* DAFParams);
+    void resetFitterToUserSettings(const DAFParameters* DAFParams);
 
     /**
      * Use the settings of the fitter to fit the reco tracks for cosmics data.

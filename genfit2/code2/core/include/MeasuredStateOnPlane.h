@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_MeasuredStateOnPlane_h
-#define genfit_MeasuredStateOnPlane_h
+#pragma once
 
 #include "StateOnPlane.h"
 #include "AbsTrackRep.h"
@@ -139,5 +138,3 @@ inline MeasuredStateOnPlane& MeasuredStateOnPlane::operator=(MeasuredStateOnPlan
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_MeasuredStateOnPlane_h

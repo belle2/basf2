@@ -53,7 +53,7 @@ SectorMapComparer::setLeafAddresses(TTree* t, std::unordered_map<std::string, do
 {
   const TObjArray* leafList = t->GetListOfLeaves();
   for (TObject* o : *leafList) {
-    TLeaf* l = (TLeaf*)o;
+    auto* l = dynamic_cast<TLeaf*>(o);
     std::string name = l->GetName();
     // cannot use TClass pointer here as it is TLeaf and not TLeafD or TLeafI, ClassName is virtual (gives the name of the derived)
     TString classname = l->ClassName();
@@ -137,7 +137,7 @@ SectorMapComparer::compareTrees(TTree* t_first, TTree* t_second, bool unmatchedE
   // Creating histograms, using the list of leaves  for indexing the histograms
   const TObjArray* leafList = t_first->GetListOfLeaves();
   for (TObject* o : *leafList) {
-    TLeaf* l_first = (TLeaf*)o;
+    auto* l_first = dynamic_cast<TLeaf*>(o);
     // no histograms for the sector ids
     TString leafName = l_first->GetName();
     if (leafName.Contains("FullSecID")) continue;
@@ -237,7 +237,7 @@ SectorMapComparer::showSetups(TString secmapFileName)
     return;
   }
 
-  TTree* t = (TTree*)f->Get(m_setupsTreeName.c_str());
+  auto* t = dynamic_cast<TTree*>(f->Get(m_setupsTreeName.c_str()));
   if (t == nullptr) {
     B2WARNING("tree not found! tree name: " << m_setupsTreeName);
     return;
@@ -272,7 +272,7 @@ SectorMapComparer::findTrees(TDirectory* aDir, std::vector<std::string>&  listOf
     TObject* o = aDir->Get(akey->GetName());
 
 
-    if (o->InheritsFrom(TDirectory::Class())) findTrees((TDirectory*)o, listOfTrees);
+    if (o->InheritsFrom(TDirectory::Class())) findTrees(dynamic_cast<TDirectory*>(o), listOfTrees);
     if (o->InheritsFrom(TTree::Class())) {
       listOfTrees.emplace_back(std::string(aDir->GetPath()) + std::string("/") + std::string(o->GetName()));
     }
@@ -343,7 +343,7 @@ SectorMapComparer::compareMaps(TString setupName, bool unmatchedEntries)
   TFile* f_first = TFile::Open(m_SMFileName_first.c_str());
   TFile* f_second = TFile::Open(m_SMFileName_second.c_str());
 
-  if (!f_first->IsOpen() || !f_first->IsOpen()) {
+  if (f_first == nullptr || f_second == nullptr || !f_first->IsOpen() || !f_second->IsOpen()) {
     B2ERROR("ERROR: one of the files not open");
 
     if (f_first) f_first->Close();
@@ -370,8 +370,8 @@ SectorMapComparer::compareMaps(TString setupName, bool unmatchedEntries)
 
 
 
-    TTree* t_first = (TTree*)f_first->Get(tname_first.c_str());
-    TTree* t_second = (TTree*)f_second->Get(tname_second.c_str());
+    auto* t_first = dynamic_cast<TTree*>(f_first->Get(tname_first.c_str()));
+    auto* t_second = dynamic_cast<TTree*>(f_second->Get(tname_second.c_str()));
 
     // filter out the sector id and test for consistency
     if (TString(tname_first).Contains("CompactSecIDs")) {

@@ -24,7 +24,8 @@ namespace Belle2 {
     typedef unsigned int uInt;
 
     /** Standard constructor. */
-    ExporterHitInfo(B2Vector3D globalHitPosition, B2Vector3D covValues, int layerID, uShort vID, uInt sID, double angleOfSensor,
+    ExporterHitInfo(const B2Vector3D& globalHitPosition, const B2Vector3D& covValues, int layerID, uShort vID, uInt sID,
+                    double angleOfSensor,
                     int hitID,
                     int hitType, int classification = -1, int particleID = -1, int pdg = -1):
       m_hitPos(globalHitPosition),

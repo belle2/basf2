@@ -251,6 +251,7 @@ bool NewV0Fitter::setCardinalRep(genfit::Track& gfTrack, int pdgCode)
 }
 
 
+// cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
 bool NewV0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;

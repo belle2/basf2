@@ -189,6 +189,7 @@ namespace Belle2 {
         return TrackingUtilities::EForwardBackward::c_Forward;
       } else if (firstInTrackId > lastInTrackId) {
         return TrackingUtilities::EForwardBackward::c_Backward;
+        // cppcheck-suppress knownConditionTrueFalse ; defensive check kept deliberately
       } else if (firstInTrackId == lastInTrackId) {
         return TrackingUtilities::EForwardBackward::c_Unknown;
       }

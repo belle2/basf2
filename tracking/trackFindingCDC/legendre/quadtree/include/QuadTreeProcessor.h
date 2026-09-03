@@ -178,7 +178,7 @@ namespace Belle2 {
       void fill(const CandidateReceiver& candidateReceiver, int nHitsThreshold, float yLimit)
       {
         std::vector<QuadTree*> quadTrees = m_seededTrees;
-        std::sort(quadTrees.begin(), quadTrees.end(), [](QuadTree * quadTree1, QuadTree * quadTree2) {
+        std::sort(quadTrees.begin(), quadTrees.end(), [](const QuadTree * quadTree1, const QuadTree * quadTree2) {
           return quadTree1->getNItems() > quadTree2->getNItems();
         });
 

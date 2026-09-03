@@ -148,12 +148,12 @@ namespace Belle2 {
      * @returns empty vector if it is not the case and the indices of the SpacePoints that are on a sensor if
      * there are SpacePoints on the same sensors
      */
-    static const std::vector<int> checkSameSensor(Belle2::SpacePointTrackCand* trackCand);
+    static const std::vector<int> checkSameSensor(const Belle2::SpacePointTrackCand* trackCand);
 
     /** Check if two subsequent SpacePoints are separated by at least the provided minDistance.
      * @returns empty vector if all SpacePoints are far enough apart, indices of SpacePoints that are not elsewise
      */
-    static const std::vector<int> checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance);
+    static const std::vector<int> checkMinDistance(const Belle2::SpacePointTrackCand* trackCand, double minDistance);
 
     /** Check if the SpacePointTrackCand shows curling behavior.
      * @returns empty vector if it is not the case and the indices where the SpacePointTrackCand can be split into

@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_FitStatus_h
-#define genfit_FitStatus_h
+#pragma once
 
 #include <Rtypes.h>
 #include <Math/ProbFuncMathCore.h>
@@ -168,5 +167,3 @@ class FitStatus {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_FitStatus_h

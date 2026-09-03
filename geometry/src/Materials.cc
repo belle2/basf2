@@ -385,11 +385,11 @@ namespace Belle2 {
       m_PropTables.clear();
       // and last but not least: get rid of all materials
       B2DEBUG(50, "Cleaning G4Materials");
-      G4MaterialTable& materials = *G4Material::GetMaterialTable();
+      auto& materials = const_cast<G4MaterialTable&>(*G4Material::GetMaterialTable());
       for (G4Material* mat : materials) delete mat;
       materials.clear();
       B2DEBUG(50, "Cleaning G4Elements");
-      G4ElementTable& elements = *G4Element::GetElementTable();
+      auto& elements = const_cast<G4ElementTable&>(*G4Element::GetElementTable());
       for (G4Element* elm : elements) delete elm;
       elements.clear();
       B2DEBUG(50, "Cleaning G4Isotopes");

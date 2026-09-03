@@ -25,7 +25,7 @@ namespace Belle2 {
     NoKickCuts() {}
 
     /** constructor with name of the CutFile, used in cuts application */
-    explicit NoKickCuts(std::string m_fileName)
+    explicit NoKickCuts(const std::string& m_fileName)
     {
       if (m_fileName.size() != 0) FillCuts(m_fileName); //else cuts not applied
     }
@@ -75,7 +75,7 @@ namespace Belle2 {
     *  cutfile.
     *input: (name of the cutFile)
     */
-    void FillCuts(std::string m_fileName);
+    void FillCuts(const std::string& m_fileName);
 
   private:
     std::vector<std::vector <std::vector<std::vector <double>>>> m_cutNorm; /**< matrix of fit-parameter of cut, norm */

@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef genfit_MeasurementOnPlaneCreator_h
-#define genfit_MeasurementOnPlaneCreator_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "HelixTrackModel.h"
@@ -128,5 +127,3 @@ class MeasurementCreator : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_MeasurementOnPlaneCreator_h

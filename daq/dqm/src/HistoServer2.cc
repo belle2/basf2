@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+#include <TText.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -25,6 +27,18 @@ HistoServer2::HistoServer2(int port, const string& filename)
 
 HistoServer2::~HistoServer2()
 {
+  if (m_root_socket) {
+    m_root_socket->Close();
+    delete m_root_socket;
+    m_root_socket = nullptr;
+  }
+
+  if (m_root_server_sock) {
+    m_root_server_sock->Close();
+    delete m_root_server_sock;
+    m_root_server_sock = nullptr;
+  }
+
   delete m_sock;
 }
 
@@ -35,6 +49,15 @@ int HistoServer2::init()
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   m_hman = new HistoManager2(m_filename);
+
+  // ROOT socket
+  int rootPort = m_port + 1;
+  m_root_server_sock = new TServerSocket(rootPort, kTRUE);
+  if (!m_root_server_sock->IsValid()) {
+    return -1;
+  }
+  m_root_server_sock->SetOption(kNoBlock, 1);
+
   return 0;
 
 }
@@ -53,6 +76,18 @@ int HistoServer2::server()
   write_state();
   while (m_force_exit == 0) {
     fflush(stdout);
+    {
+      vector<TObject*> objlist;
+      vector<string> strlist;
+      int root_fd = -1;
+      if (recv_root_message(objlist, strlist, root_fd)) {
+        printf("HistoServer2: ROOT received nobjs=%zu\n", objlist.size());
+        handle_objects(objlist, strlist, root_fd, updated);
+      }
+      // Objects were cloned in recvRootMessage().
+      for (auto* obj : objlist)
+        delete obj;
+    }
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
@@ -91,6 +126,7 @@ int HistoServer2::server()
           vector<string> strlist;
           msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
+          handle_objects(objlist, strlist, fd, updated);
           //    string subdir = "ROOT";
           string subdir = "";
           now = time(0);
@@ -188,5 +224,213 @@ void HistoServer2::write_state(void)
       fprintf(fh, "%s,%d,%s,%s,%s\n", it.first.c_str(), con, mbstr, mbstr2, mbstr3);
     }
     fclose(fh);
+  }
+}
+
+bool HistoServer2::recv_root_message(
+  vector<TObject*>& objlist,
+  vector<string>& strlist,
+  int& fd)
+{
+  fd = -1;
+
+  // No ROOT client connected yet.
+  // Try to accept one.
+
+  if (!m_root_socket) {
+
+    TSocket* sock = m_root_server_sock->Accept();
+
+    if (!sock || sock == reinterpret_cast<TSocket*>(-1)) {
+      return false;
+    }
+
+    if (!sock->IsValid()) {
+      delete sock;
+      return false;
+    }
+
+    m_root_socket = sock;
+
+    printf("HistoServer2: ROOT client connected fd=%d\n",
+           m_root_socket->GetDescriptor());
+  }
+
+  // Check whether data is available.
+
+  int ready = m_root_socket->Select(TSocket::kRead, 0);
+
+  if (ready == 0) {
+    return false;
+  }
+
+  if (ready < 0) {
+
+    printf("HistoServer2: ROOT socket select error fd=%d\n",
+           m_root_socket->GetDescriptor());
+
+    m_root_socket->Close();
+    delete m_root_socket;
+    m_root_socket = nullptr;
+
+    return false;
+  }
+
+  // Receive TMessage.
+
+  TMessage* msg = nullptr;
+
+  int recvSize = m_root_socket->Recv(msg);
+
+  if (recvSize <= 0) {
+
+    printf("HistoServer2: ROOT client disconnected fd=%d\n",
+           m_root_socket->GetDescriptor());
+
+    delete msg;
+
+    m_root_socket->Close();
+    delete m_root_socket;
+    m_root_socket = nullptr;
+
+    return false;
+  }
+
+  fd = m_root_socket->GetDescriptor();
+
+  if (!msg) {
+    return false;
+  }
+
+  if (msg->What() != kMESS_OBJECT) {
+
+    printf("HistoServer2: unexpected ROOT message type %d\n",
+           msg->What());
+
+    delete msg;
+    return false;
+  }
+
+  TObject* received = msg->ReadObject(msg->GetClass());
+
+  TList* list = dynamic_cast<TList*>(received);
+
+  if (!list) {
+
+    if (received) {
+      printf("HistoServer2: expected TList, got %s\n",
+             received->ClassName());
+    }
+
+    delete received;
+    delete msg;
+
+    return false;
+  }
+
+  // Convert TList into the same form as decode_msg():
+  //
+  //   vector<TObject*>
+  //   vector<string>
+
+  TIter next(list);
+  TObject* obj = nullptr;
+
+  while ((obj = next())) {
+
+    TObject* copy = obj->Clone();
+
+    if (!copy) continue;
+
+    if (auto* hist = dynamic_cast<TH1*>(copy)) {
+
+      hist->SetDirectory(nullptr);
+
+      objlist.push_back(hist);
+      strlist.push_back(hist->GetName());
+
+    } else if (auto* text = dynamic_cast<TText*>(copy)) {
+
+      objlist.push_back(text);
+      strlist.push_back(text->GetTitle());
+
+    } else {
+
+      objlist.push_back(copy);
+      strlist.push_back(copy->GetName());
+    }
+  }
+
+  delete list;
+  delete msg;
+
+  return !objlist.empty();
+}
+
+void HistoServer2::handle_objects(
+  vector<TObject*>& objlist,
+  vector<string>& strlist,
+  int fd,
+  bool& updated)
+{
+  string subdir = "";
+
+  int nobjs = objlist.size();
+
+  for (int i = 0; i < nobjs; i++) {
+    string objname = strlist.at(i);
+
+    if (objname == "DQMRC:CLEAR") {
+      m_hman->clear();
+      m_hman->merge();
+      updated = false;
+      m_last_merge_time = time(0);
+      continue;
+    }
+
+    if (objname == "DQMRC:MERGE") {
+      m_hman->merge();
+      updated = false;
+      m_last_merge_time = time(0);
+      continue;
+    }
+
+    auto lpos = objname.find("DQMRC:SAVE:");
+
+    if (lpos != string::npos) {
+      auto filename = objname.substr(11);
+      m_hman->filedump(filename);
+      continue;
+    }
+
+    lpos = objname.find("SUBDIR:");
+
+    if (lpos != string::npos) {
+      subdir = objname.substr(7);
+      if (subdir == "EXIT")
+        subdir = "";
+      continue;
+    }
+
+    if (objname == "COMMAND:EXIT") {
+      subdir = "";
+      continue;
+    }
+
+    TH1* histo = dynamic_cast<TH1*>(objlist.at(i));
+
+    if (!histo) {
+      printf("HistoServer2: invalid object '%s', class=%s\n",
+             objname.c_str(), objlist.at(i)->ClassName());
+      continue;
+    }
+
+    m_hman->update(subdir, objname, fd, histo);
+
+    // Ownership transferred to HistoManager2.
+
+    objlist[i] = nullptr;
+
+    updated = true;
   }
 }

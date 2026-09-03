@@ -16,6 +16,11 @@
 #include <map>
 #include <vector>
 
+// ROOT socket
+#include <TServerSocket.h>
+#include <TSocket.h>
+#include <TObject.h>
+
 namespace Belle2 {
 
   class HistoServer2 {
@@ -37,6 +42,17 @@ namespace Belle2 {
     EvtSocketManager* m_man;
     int m_port;
     int m_force_exit;
+
+    /** ROOT TSocket receiver */
+    TServerSocket* m_root_server_sock = nullptr;
+    TSocket* m_root_socket = nullptr;
+    bool recv_root_message(std::vector<TObject*>& objlist,
+                           std::vector<std::string>& strlist,
+                           int& fd);
+    void handle_objects(std::vector<TObject*>& objlist,
+                        std::vector<std::string>& strlist,
+                        int fd,
+                        bool& updated);
 
     /** Write connection state to a file */
     void write_state(void);

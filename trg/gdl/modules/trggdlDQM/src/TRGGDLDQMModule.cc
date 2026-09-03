@@ -532,11 +532,12 @@ void TRGGDLDQMModule::event()
   for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
     if (iskim == 0) skim.push_back(iskim);
   }
-  if (result_soft.isValid()) {
-    const std::map<std::string, int>& skim_map = result_soft->getResults();
-    for (int iskim = start_skim_gdldqm; iskim < end_skim_gdldqm; iskim++) {
-      if (iskim == 0);
-      else if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
+  // getResults() returns the map by value, so only call it when there is a skim
+  // other than 0 to look up
+  if (end_skim_gdldqm > 1 && result_soft.isValid()) {
+    const std::map<std::string, int> skim_map = result_soft->getResults();
+    for (int iskim = std::max(start_skim_gdldqm, 1); iskim < end_skim_gdldqm; iskim++) {
+      if (skim_map.find(skim_menu[iskim]) != skim_map.end()) {
         const bool accepted = (result_soft->getResult(skim_menu[iskim]) == SoftwareTriggerCutResult::c_accept);
         if (accepted) skim.push_back(iskim);
       }

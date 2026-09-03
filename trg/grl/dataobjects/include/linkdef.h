@@ -12,7 +12,7 @@
 #pragma link C++ class Belle2::TRGGRLInfo+; // checksum=0x296ce6b6, version=9
 #pragma link C++ class Belle2::TRGGRLInnerTrack+; // checksum=0xfd2849ce, version=1
 #pragma link C++ class Belle2::TRGGRLUnpackerStore+; // checksum=0x674011c8, version=5
-#pragma link C++ class Belle2::GRLMLP+; // checksum=0xce42dd18, version=6
+#pragma link C++ class Belle2::GRLMLP+; // checksum=0xd1ef4b42, version=7
 #pragma link C++ class Belle2::GRLMLPData+; // checksum=0x1bae3955, version=1
 
 #endif

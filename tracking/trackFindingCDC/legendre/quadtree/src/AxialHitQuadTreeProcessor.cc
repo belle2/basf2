@@ -201,9 +201,9 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
     if (not checkDerivative(node, wireHit)) return false;
   }
 
-  const double& l = wireHit->getRefDriftLength();
+  const double& driftLength = wireHit->getRefDriftLength();
   const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
-  double r2 = pos2D.Mag2() - l * l;
+  double r2 = pos2D.Mag2() - driftLength * driftLength;
 
   using Quadlet = std::array<std::array<float, 2>, 2>;
   Quadlet distRight{};
@@ -223,14 +223,14 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   float rHitMin = thetaVecMin.Dot(pos2D);
   float rHitMax = thetaVecMax.Dot(pos2D);
 
-  // compute sinograms at the left and right borders of the node
-  float rHitMinRight = rHitMin - l;
-  float rHitMaxRight = rHitMax - l;
+  // compute Legendre curves at the left and right borders of the node
+  float rHitMinRight = rHitMin - driftLength;
+  float rHitMaxRight = rHitMax - driftLength;
 
-  float rHitMinLeft = rHitMin + l;
-  float rHitMaxLeft = rHitMax + l;
+  float rHitMinLeft = rHitMin + driftLength;
+  float rHitMaxLeft = rHitMax + driftLength;
 
-  // Compute distance from the sinograms to bottom and top borders of the node
+  // Compute distance from the Legendre curves to bottom and top borders of the node
   distRight[0][0] = rMin - rHitMinRight;
   distRight[0][1] = rMin - rHitMaxRight;
   distRight[1][0] = rMax - rHitMinRight;
@@ -241,7 +241,7 @@ bool AxialHitQuadTreeProcessor::isInNode(QuadTree* node, const CDCWireHit* wireH
   distLeft[1][0] = rMax - rHitMinLeft;
   distLeft[1][1] = rMax - rHitMaxLeft;
 
-  // Compare distance signs from sinograms to the node
+  // Compare distance signs from Legendre curves to the node
   // Check right
   if (not sameSign(distRight[0][0], distRight[0][1], distRight[1][0], distRight[1][1])) {
     return true;
@@ -307,9 +307,9 @@ void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>&
     const CDCWireHit* wireHit = item->getPointer();
 
     // Quantities that only depend on the hit
-    const double l = wireHit->getRefDriftLength();
+    const double driftLength = wireHit->getRefDriftLength();
     const ROOT::Math::XYVector pos2D = wireHit->getRefPos2D() - m_localOrigin;
-    const double r2 = pos2D.Mag2() - l * l;
+    const double r2 = pos2D.Mag2() - driftLength * driftLength;
 
     // Quantities that only depend on the hit and the theta span of a node
     for (size_t iThetaSpan = 0; iThetaSpan < nThetaSpans; ++iThetaSpan) {
@@ -320,10 +320,10 @@ void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>&
       const float rHitMin = thetaVecMin.Dot(pos2D);
       const float rHitMax = thetaVecMax.Dot(pos2D);
 
-      thetaSpanCache.rHitMinRight = rHitMin - l;
-      thetaSpanCache.rHitMaxRight = rHitMax - l;
-      thetaSpanCache.rHitMinLeft = rHitMin + l;
-      thetaSpanCache.rHitMaxLeft = rHitMax + l;
+      thetaSpanCache.rHitMinRight = rHitMin - driftLength;
+      thetaSpanCache.rHitMaxRight = rHitMax - driftLength;
+      thetaSpanCache.rHitMinLeft = rHitMin + driftLength;
+      thetaSpanCache.rHitMaxLeft = rHitMax + driftLength;
 
       const float rHitMinExtr = VectorUtil::Cross(thetaVecMin, pos2D);
       const float rHitMaxExtr = VectorUtil::Cross(thetaVecMax, pos2D);
@@ -340,7 +340,7 @@ void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>&
       }
     }
 
-    // Sinograms at the extremum - only needed if some theta span contains the extremum
+    // Legendre curves at the extremum - only needed if some theta span contains the extremum
     bool extremumComputed = false;
     float rRight = 0;
     float rLeft = 0;
@@ -356,7 +356,7 @@ void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>&
       const float rMin = nodeCache.yMin * r2 / 2;
       const float rMax = nodeCache.yMax * r2 / 2;
 
-      // Compare distance signs from the sinograms to the node
+      // Compare distance signs from the Legendre curves to the node
       // Check right
       if (not sameSign(rMin - thetaSpanCache.rHitMinRight,
                        rMin - thetaSpanCache.rHitMaxRight,
@@ -381,8 +381,8 @@ void AxialHitQuadTreeProcessor::insertItemsInNodes(const std::vector<QuadTree*>&
 
       if (not extremumComputed) {
         const double r = pos2D.R();
-        rRight = r - l;
-        rLeft = r + l;
+        rRight = r - driftLength;
+        rLeft = r + driftLength;
         extremumComputed = true;
       }
 
@@ -416,9 +416,9 @@ bool AxialHitQuadTreeProcessor::checkDerivative(QuadTree* node, const CDCWireHit
 
 bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* wireHit) const
 {
-  const double& l = wireHit->getRefDriftLength();
+  const double& driftLength = wireHit->getRefDriftLength();
   const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
-  double r2 = pos2D.Mag2() - l * l;
+  double r2 = pos2D.Mag2() - driftLength * driftLength;
 
   // get left and right borders of the node
   long thetaMin = node->getXMin();
@@ -429,10 +429,10 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
 
   if (not VectorUtil::isBetween(pos2D, thetaVecMin, thetaVecMax)) return false;
 
-  // compute sinograms at the position
+  // compute Legendre curves at the position
   double r = pos2D.R();
-  float rRight = r - l;
-  float rLeft = r + l;
+  float rRight = r - driftLength;
+  float rLeft = r + driftLength;
 
   // get top and bottom borders of the node
   float rMin = node->getYMin() * r2 / 2;
@@ -459,11 +459,11 @@ void AxialHitQuadTreeProcessor::drawHits(const std::vector<const CDCWireHit*>& h
   dummyGraph->GetYaxis()->SetRangeUser(-0.02, 0.15);
 
   for (const CDCWireHit* wireHit : hits) {
-    const double& l = wireHit->getRefDriftLength();
+    const double& driftLength = wireHit->getRefDriftLength();
     const ROOT::Math::XYVector& pos2D = wireHit->getRefPos2D() - m_localOrigin;
     double x = pos2D.x();
     double y = pos2D.y();
-    double r2 = pos2D.Mag2() - l * l;
+    double r2 = pos2D.Mag2() - driftLength * driftLength;
 
     TF1* concaveHitLegendre = new TF1("concaveHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) + 2*([2]/[3])", -M_PI, M_PI);
     TF1* convexHitLegendre = new TF1("convexHitLegendre", "2*([0]/[3])*cos(x) + 2*([1]/[3])*sin(x) - 2*([2]/[3])", -M_PI, M_PI);
@@ -472,8 +472,8 @@ void AxialHitQuadTreeProcessor::drawHits(const std::vector<const CDCWireHit*>& h
     concaveHitLegendre->SetLineColor(color);
     convexHitLegendre->SetLineColor(color);
 
-    concaveHitLegendre->SetParameters(x, y, l, r2);
-    convexHitLegendre->SetParameters(x, y, l, r2);
+    concaveHitLegendre->SetParameters(x, y, driftLength, r2);
+    convexHitLegendre->SetParameters(x, y, driftLength, r2);
     concaveHitLegendre->Draw("CSAME");
     convexHitLegendre->Draw("CSAME");
   }

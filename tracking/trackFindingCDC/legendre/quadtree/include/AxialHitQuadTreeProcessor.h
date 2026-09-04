@@ -74,7 +74,7 @@ namespace Belle2 {
        * Check whether hit belongs to the quadtree node:
        * @param node quadtree node
        * @param wireHit hit being checked
-       * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
+       * @return returns true if Legendre curve of the hit crosses (geometrically) borders of the node
        */
       bool isInNode(QuadTree* node, const TrackingUtilities::CDCWireHit* wireHit) const final;
 
@@ -93,7 +93,7 @@ namespace Belle2 {
 
     protected: // Implementation details
       /**
-       * Check derivative of the sinogram.
+       * Check derivative of the Legendre curve.
        * @param node QuadTree node
        * @param wireHit pointer to the hit to check
        * @return returns true in cases:
@@ -136,28 +136,28 @@ namespace Belle2 {
         /// Unit vector (cos, sin) at the upper theta bound
         const ROOT::Math::XYVector* thetaVecMax = nullptr;
 
-        /// Sinogram of the right passage hypothesis at the lower theta bound
+        /// Legendre curve of the right passage hypothesis at the lower theta bound
         float rHitMinRight = 0;
 
-        /// Sinogram of the right passage hypothesis at the upper theta bound
+        /// Legendre curve of the right passage hypothesis at the upper theta bound
         float rHitMaxRight = 0;
 
-        /// Sinogram of the left passage hypothesis at the lower theta bound
+        /// Legendre curve of the left passage hypothesis at the lower theta bound
         float rHitMinLeft = 0;
 
-        /// Sinogram of the left passage hypothesis at the upper theta bound
+        /// Legendre curve of the left passage hypothesis at the upper theta bound
         float rHitMaxLeft = 0;
 
-        /// Derivative of the sinogram at the lower theta bound
+        /// Derivative of the Legendre curve at the lower theta bound
         float rHitMinExtr = 0;
 
-        /// Derivative of the sinogram at the upper theta bound
+        /// Derivative of the Legendre curve at the upper theta bound
         float rHitMaxExtr = 0;
 
         /// Result of the derivative check for this theta span
         bool derivativeOk = false;
 
-        /// Indicator that the extremum of the sinogram lies within this theta span
+        /// Indicator that the extremum of the Legendre curve lies within this theta span
         bool hasExtremum = false;
 
         /// Indicator that the extremum is a candidate for the containment check

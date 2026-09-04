@@ -104,12 +104,14 @@ namespace Belle2 {
     /**
     * function to do the sigma vs nhit or cos fits and store parameters
     */
-    void SigmaFits(std::vector< std::string > particles, const std::string& sfx, const std::string& svar);
+    void SigmaFits(const std::vector<std::string >& particles, const std::string& sfx, const std::string& svar,
+                   const bool makeIterationSummary);
 
     /**
     * function to prepare sample for bgcurve fitting, sigma vs ionzation fitting and monitoring plots
     */
-    void prepareSample(std::vector< std::string > particles, const std::string& filename, const std::string& sfx);
+    void prepareSample(const std::vector<std::string >& particles, const std::string& filename, const std::string& sfx,
+                       const bool makeIterationSummary);
 
   protected:
 

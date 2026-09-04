@@ -115,3 +115,16 @@ Belle2FileCatalog.xml
 # ############### #
 *.o
 *.os
+
+# Local overlap-check output and large binary geometry data #
+# ########################################################## #
+/overlaps*.log
+/check_geometry_default.log
+geometry/data/MagneticField3dBeamline*.dat.gz
+geometry/data/ApertHER_postLS2.dat
+geometry/data/ApertLER_postLS2.dat
+geometry/data/MagneticField3dQuadBeamline_postLS2.xml
+geometry/data/QuadFieldMapHER_postLS2.dat
+geometry/data/QuadFieldMapLER_postLS2.dat
+geometry/examples/check_geometry_default.py
+geometry/examples/create_geometry_payloads_with_FarBeamLine.py

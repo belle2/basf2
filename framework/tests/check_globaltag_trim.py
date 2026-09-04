@@ -16,7 +16,7 @@ This test checks if the trim is correctly applied.
 import basf2 as b2
 
 
-tag = b2.conditions.default_globaltags[0]
+tag = b2.conditions.default_globaltags[-1]
 tags = [f'  {tag}', f'{tag} ', f' {tag}  ']
 b2.conditions.override_globaltags(tags)
 

@@ -98,7 +98,7 @@
 
 <Sensor type="layer1o">
   <Material>Si</Material>
-  <width unit="mm">19.412</width>
+  <width unit="mm">20.932</width>
   <length unit="mm">30.218</length>
   <height unit="mm">0.75</height>
   <!-- definition of the active area of the module which is a part of the
@@ -108,7 +108,7 @@
     <u unit="mm">3.5</u>
     <v unit="mm">0.3</v>
     <w>top</w>
-    <width unit="mm">15.33</width>
+    <width unit="mm">16.851</width>
     <length unit="mm">29.604</length>
     <height unit="mm">0.03</height>
     <!-- define the number of pixels in rphi direction -->
@@ -194,7 +194,7 @@
 
 <Sensor type="layer1i">
   <Material>Si</Material>
-  <width unit="mm">19.412</width>
+  <width unit="mm">20.932</width>
   <length unit="mm">30.218</length>
   <height unit="mm">0.285</height>
   <!-- definition of the active area of the module which is a part of the
@@ -204,7 +204,7 @@
     <u unit="mm">0.0</u>
     <v unit="mm">0.3</v>
     <w>top</w>
-    <width unit="mm">15.33</width>
+    <width unit="mm">16.851</width>
     <length unit="mm">29.604</length>
     <height unit="mm">0.03</height>
     <!-- define the number of pixels in rphi direction -->
@@ -291,7 +291,7 @@
   <Component name="ThinningLayer14">
     <Material>ColdAir</Material>
     <Color>#5599BB</Color>
-    <width  unit="mm">15.33</width>
+    <width  unit="mm">16.851</width>
     <length unit="mm">118.416</length>
     <height unit="mm">0.36</height>
     <angle  unit="deg">0</angle>
@@ -300,7 +300,7 @@
   <Component name="ThinningLayer14i">
     <Material>ColdAir</Material>
     <Color>#5599BB</Color>
-    <width  unit="mm">15.33</width>
+    <width  unit="mm">16.851</width>
     <length unit="mm">118.416</length>
     <height unit="mm">0.36</height>
     <angle  unit="deg">0</angle>
@@ -309,7 +309,7 @@
   <Component name="ThinningLayer12">
     <Material>ColdAir</Material>
     <Color>#5599BB</Color>
-    <width  unit="mm">15.33</width>
+    <width  unit="mm">16.851</width>
     <length unit="mm">59.208</length>
     <height unit="mm">0.36</height>
     <angle  unit="deg">0</angle>

@@ -22,13 +22,13 @@ X0Si = 0.0937
 X = 0.008
 Xi = 0.003
 sensorL = 30.218
-sensorW = 19.412
+sensorW = 20.932
 sensorH = 0.750  # str(X0Si*X*1e3)
 sensorHi = 0.285  # str(X0Si*Xi*1e3)
 offsetV = 0.3
 
 activeL = 29.604
-activeW = 15.330
+activeW = 16.851
 activeH = 0.030
 
 pixelsU = 464

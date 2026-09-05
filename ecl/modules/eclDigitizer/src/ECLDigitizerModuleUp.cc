@@ -64,7 +64,7 @@ ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC(
   addParam("NoElectronicNoise", m_noElectronicNoise,
            "Flag to disable electronic noise when generating waveforms (default: false)", false);
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: false)", false);
-  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 2)", 2);
+  addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 2)", 2u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
   addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: false)",
            false);

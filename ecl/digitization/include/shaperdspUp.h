@@ -94,70 +94,101 @@ namespace Belle2 {
        * is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
       //static constexpr double _filterdt = 0.2;
 
-      // Normalization coefficients
+      /** normalization coefficient of Fm for the main scintillation decay component */
       double _an = realNaNUp;
+      /** normalization coefficient of Fi for the main scintillation decay component */
       double _ai = realNaNUp;
-      // Normalization coefficients for slow scintillation decay time
+      /** normalization coefficient of Fm for the second scintillation decay component */
       double _an1 = realNaNUp;
+      /** normalization coefficient of Fi for the second scintillation decay component */
       double _ai1 = realNaNUp;
 
+      /** phase of the first Bessel term in Fm for the main scintillation decay component */
       double _phi0 = realNaNUp;
+      /** phase of the second Bessel term in Fm for the main scintillation decay component */
       double _phi1 = realNaNUp;
+      /** phase of the first Bessel term in Fi for the main scintillation decay component */
       double _phi0i = realNaNUp;
+      /** phase of the second Bessel term in Fi for the main scintillation decay component */
       double _phi1i = realNaNUp;
 
+      /** phase of the first Bessel term in Fm for the second scintillation decay component */
       double _phi01 = realNaNUp;
+      /** phase of the second Bessel term in Fm for the second scintillation decay component */
       double _phi11 = realNaNUp;
+      /** phase of the first Bessel term in Fi for the second scintillation decay component */
       double _phi0i1 = realNaNUp;
+      /** phase of the second Bessel term in Fi for the second scintillation decay component */
       double _phi1i1 = realNaNUp;
 
-      /** linear coefficient before sin of the first Bessel stage    */
+      /** coefficient of the first Bessel sine term in Fm */
       double _cs0 = realNaNUp;
-      /** linear coefficient before cos of the first Bessel stage    */
+      /** coefficient of the first Bessel cosine term in Fi */
       double _cc0 = realNaNUp;
-      /** linear coefficient before sin of the second Bessel stage    */
+      /** coefficient of the second Bessel sine term in Fm */
       double _cs1 = realNaNUp;
-      /** linear coefficient before cos of the second Bessel stage    */
+      /** coefficient of the second Bessel cosine term in Fi */
       double _cc1 = realNaNUp;
-      /** linear coefficient before first part of tail section    */
-      double _cems = realNaNUp;
-      /** linear coefficient before second part of tail section    */
-      double _cemd = realNaNUp;
-      double _ceis = realNaNUp;
-      double _ceid = realNaNUp;
-      double _ceii = realNaNUp;
-      double _cs01 = realNaNUp;
-      double _cs11 = realNaNUp;
-      double _cc01 = realNaNUp;
-      double _cc11 = realNaNUp;
-      double _cems1 = realNaNUp;
-      double _cemd1 = realNaNUp;
-      double _ceis1 = realNaNUp;
-      double _ceii1 = realNaNUp;
-      double _ceid1 = realNaNUp;
-      /**  circular frequency of the first Bessel stage  */
-      double  _w0 = realNaNUp;
-      /**  circular frequency of the second Bessel stage  */
-      double  _w1 = realNaNUp;
-      /** inverse scintillation decay time */
-      double _ds = realNaNUp;
-      /** inverse slow scintillation decay time */
-      double _ds1 = realNaNUp;
-      /** inverse time of the differential stage */
-      double _dd = realNaNUp;
-      /** coefficient for first exponent factor  */
-      double _d0 = realNaNUp;
-      /** coefficient for second exponent factor  */
-      double  _d1 = realNaNUp;
-      /** inverse integration exponent factor */
-      double  _di = realNaNUp;
 
-      /** time offset  */
+      /** coefficient of the scintillation-decay exponential term in Fm */
+      double _cems = realNaNUp;
+      /** coefficient of the differentiation-time exponential term in Fm */
+      double _cemd = realNaNUp;
+      /** coefficient of the scintillation-decay exponential term in Fi */
+      double _ceis = realNaNUp;
+      /** coefficient of the differentiation-time exponential term in Fi */
+      double _ceid = realNaNUp;
+      /** coefficient of the integration-time exponential term in Fi */
+      double _ceii = realNaNUp;
+
+      /** coefficient of the first Bessel sine term in Fm for the second scintillation decay component */
+      double _cs01 = realNaNUp;
+      /** coefficient of the second Bessel sine term in Fm for the second scintillation decay component */
+      double _cs11 = realNaNUp;
+      /** coefficient of the first Bessel cosine term in Fi for the second scintillation decay component */
+      double _cc01 = realNaNUp;
+      /** coefficient of the second Bessel cosine term in Fi for the second scintillation decay component */
+      double _cc11 = realNaNUp;
+
+      /** coefficient of the scintillation-decay exponential term in Fm for the second decay component */
+      double _cems1 = realNaNUp;
+      /** coefficient of the differentiation-time exponential term in Fm for the second decay component */
+      double _cemd1 = realNaNUp;
+      /** coefficient of the scintillation-decay exponential term in Fi for the second decay component */
+      double _ceis1 = realNaNUp;
+      /** coefficient of the integration-time exponential term in Fi for the second decay component */
+      double _ceii1 = realNaNUp;
+      /** coefficient of the differentiation-time exponential term in Fi for the second decay component */
+      double _ceid1 = realNaNUp;
+
+      /** circular frequency of the first Bessel stage */
+      double _w0 = realNaNUp;
+      /** circular frequency of the second Bessel stage */
+      double _w1 = realNaNUp;
+      /** inverse main scintillation decay time */
+      double _ds = realNaNUp;
+      /** inverse second scintillation decay time */
+      double _ds1 = realNaNUp;
+      /** inverse differentiation time */
+      double _dd = realNaNUp;
+      /** inverse decay time of the first Bessel stage */
+      double _d0 = realNaNUp;
+      /** inverse decay time of the second Bessel stage */
+      double _d1 = realNaNUp;
+      /** inverse integration time */
+      double _di = realNaNUp;
+
+      /** time offset */
       double _toff = realNaNUp;
+      /** fraction of the inversion cascade */
       double _fi = realNaNUp;
+      /** fraction of the second scintillation decay component */
       double _alpha = realNaNUp;
+      /** delay applied to the subtraction term */
       double _tshift = realNaNUp;
+      /** fraction of the delayed subtraction term */
       double _eta = realNaNUp;
+      /** normalization coefficient corresponding to the maximum of the response function */
       double _anorm = realNaNUp;
 
       /** time step of the grid for response function calculation   */

@@ -209,6 +209,7 @@
       backgroundTimingCut=110.0
       fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
       simulatePure=False
+      simulateUpgrade=False
   37. ECLEventT0
       T0bin=1.0
       ethresh=0.06
@@ -3180,6 +3181,7 @@
       backgroundTimingCut=110.0
       fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
       simulatePure=False
+      simulateUpgrade=False
   37. ECLEventT0
       T0bin=1.0
       ethresh=0.06

@@ -187,6 +187,7 @@
       DspDataTest=False
       DspWithExtraMCInfoThreshold=0.02
       HadronPulseShapes=True
+      NoElectronicNoise=False
       StoreDspWithExtraMCInfo=False
       TriggerTime=False
       WaveformMaker=False

@@ -252,14 +252,14 @@ def add_simulation(
                 useWaveformParameters=False,
                 WaveformThresholdOverride=-1,
                 DiodeDeposition=True,
-                StoreDspWithExtraMCInfo=True,
+                StoreDspWithExtraMCInfo=False,
                 HadronPulseShapes=False,
                 NoElectronicNoise=not ECLElectronicNoise,
             )
         else:
             ecl_digitizer = b2.register_module(
                 'ECLDigitizer',
-                StoreDspWithExtraMCInfo=True,
+                StoreDspWithExtraMCInfo=False,
                 NoElectronicNoise=not ECLElectronicNoise,
             )
         if bkgfiles is not None:

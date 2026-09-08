@@ -27,7 +27,7 @@ namespace Belle2 {
     /** Add shape likelihood*/
     void addShapeLikelyhood(int shape_index, float likelyhood) {m_shape_likelyhoods[shape_index] = likelyhood;}
 
-    /** Return shape likelyhood map  */
+    /** Return shape likelihood map  */
     const std::map<int, float>& getShapeLikelyhoodMap() const { return m_shape_likelyhoods; }
 
     /**Returns position offset if available, otherwise returns nullptr */
@@ -51,7 +51,7 @@ namespace Belle2 {
     /** Add eta percentile to shape for position correction*/
     void addEtaPercentile(int shape_index, float percentile) {m_percentiles[shape_index].push_back(percentile);}
 
-    /** Add eta likelyhood to shape for position correction*/
+    /** Add eta likelihood to shape for position correction*/
     void addEtaLikelyhood(int shape_index, float likelyhood) {m_likelyhoods[shape_index].push_back(likelyhood);}
 
     /** Add offset to shape for position correction */
@@ -71,7 +71,7 @@ namespace Belle2 {
     /** Return percentiles map for position correction */
     const std::map<int, std::vector<float>>& getPercentilesMap() const { return m_percentiles; }
 
-    /** Return likelyhood map for position correction */
+    /** Return likelihood map for position correction */
     const std::map<int, std::vector<float>>& getLikelyhoodMap() const { return m_likelyhoods; }
 
     /** Return offset map for position correction */

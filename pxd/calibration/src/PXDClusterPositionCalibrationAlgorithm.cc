@@ -321,7 +321,7 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
     double likelyhood = counter / nEntries;
 
     if (counter >=  minClusterForShapeLikelyhood) {
-      //B2INFO("Adding shape " << name << " with index " << tmpIndex << " and shape likelihood " << 100*likelihood << "% and count " << counter);
+      //B2INFO("Adding shape " << name << " with index " << tmpIndex << " and shape likelihood " << 100*likelyhood << "% and count " << counter);
       shapeIndexer->addShape(name, tmpIndex);
       shapeClassifier->addShapeLikelyhood(tmpIndex, likelyhood);
 

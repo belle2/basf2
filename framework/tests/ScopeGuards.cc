@@ -29,13 +29,13 @@ namespace {
   {
     int old{5};
     {
-      auto guard = Belle2::ScopeGuard::guardValue(old); // cppcheck-suppress unreadVariable
+      auto guard = Belle2::ScopeGuard::guardValue(old);
       ASSERT_EQ(old, 5);
       old = 17;
     }
     ASSERT_EQ(old, 5);
     {
-      auto guard = Belle2::ScopeGuard::guardValue(old, 17); // cppcheck-suppress unreadVariable
+      auto guard = Belle2::ScopeGuard::guardValue(old, 17);
       ASSERT_EQ(old, 17);
     }
     ASSERT_EQ(old, 5);
@@ -78,13 +78,13 @@ namespace {
     int old{5};
     IntSetterGetterFunctor functor(old);
     {
-      auto guard = Belle2::ScopeGuard::guardFunctor(functor); // cppcheck-suppress unreadVariable
+      auto guard = Belle2::ScopeGuard::guardFunctor(functor);
       ASSERT_EQ(old, 5);
       old = 17;
     }
     ASSERT_EQ(old, 5);
     {
-      auto guard = Belle2::ScopeGuard::guardFunctor(functor, 17); // cppcheck-suppress unreadVariable
+      auto guard = Belle2::ScopeGuard::guardFunctor(functor, 17);
       ASSERT_EQ(old, 17);
     }
     ASSERT_EQ(old, 5);
@@ -95,7 +95,6 @@ namespace {
     }
     ASSERT_EQ(old, 17);
     {
-      // cppcheck-suppress unreadVariable
       auto guard = Belle2::ScopeGuard::guardFunctor(Belle2::Utils::VisitOverload{
         [&old](int v) { old = v; },
         [&old]() { return old; }
@@ -112,12 +111,11 @@ namespace {
   {
     std::string value{"before"};
     {
-      auto guard = Belle2::ScopeGuard::guardValue(value, "after"); // cppcheck-suppress unreadVariable
+      auto guard = Belle2::ScopeGuard::guardValue(value, "after");
       ASSERT_EQ(value, "after");
     }
     ASSERT_EQ(value, "before");
     {
-      // cppcheck-suppress unreadVariable
       auto guard = Belle2::ScopeGuard::guardFunctor(Belle2::Utils::VisitOverload{
         [&value](const std::string & v) { value = v; },
         [&value]() { return value; }
@@ -133,10 +131,9 @@ namespace {
     std::stringstream buf;
     buf << "a:" << std::setprecision(4) << 1.2;
     {
-      auto guard1 = Belle2::ScopeGuard::guardStreamState(buf); // cppcheck-suppress unreadVariable
+      auto guard1 = Belle2::ScopeGuard::guardStreamState(buf);
       buf << ":b:" << std::fixed << std::setprecision(4) << 2.3;
       {
-        // cppcheck-suppress unreadVariable
         auto guard3 = Belle2::ScopeGuard::guardStreamState(buf);
         buf << ":c:" << std::setprecision(5) << std::setw(10) << std::setfill('-') << 3.4;
       }
@@ -152,9 +149,9 @@ namespace {
   {
     std::string start{std::filesystem::current_path().c_str()};
     std::string tmpdir(std::filesystem::temp_directory_path().c_str());
-    std::string root("/");
     {
-      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory( // cppcheck-suppress unreadVariable
+      std::string root("/");
+      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory(
                       std::filesystem::temp_directory_path().c_str());
       ASSERT_EQ(tmpdir, std::filesystem::current_path().c_str());
       {
@@ -173,10 +170,10 @@ namespace {
   {
     const bool start = gROOT->IsBatch();
     {
-      auto guard1 = Belle2::ScopeGuard::guardBatchMode(); // cppcheck-suppress unreadVariable
+      auto guard1 = Belle2::ScopeGuard::guardBatchMode();
       ASSERT_EQ(true, gROOT->IsBatch());
       {
-        auto guard2 = Belle2::ScopeGuard::guardBatchMode(false); // cppcheck-suppress unreadVariable
+        auto guard2 = Belle2::ScopeGuard::guardBatchMode(false);
         ASSERT_EQ(false, gROOT->IsBatch());
       }
       ASSERT_EQ(true, gROOT->IsBatch());

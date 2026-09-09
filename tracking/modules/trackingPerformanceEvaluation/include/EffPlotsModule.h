@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EffPlotsModule();
+    ~EffPlotsModule() override;
 
     /**
      * Initializer.
@@ -69,13 +69,13 @@ namespace Belle2 {
   private:
 
     /// determine if the MCParticle is a K-short
-    bool isK_Short(const MCParticle& the_mcParticle);
+    static bool isK_Short(const MCParticle& the_mcParticle);
 
     /// determine if the MCParticle is a Lambda0
-    bool isLambda0(const MCParticle& the_mcParticle);
+    static bool isLambda0(const MCParticle& the_mcParticle);
 
     /// get the number of matched daughters of the MCParticle
-    int nMatchedDaughters(const MCParticle& the_mcParticle);
+    static int nMatchedDaughters(const MCParticle& the_mcParticle);
 
     /** user-defined parameters */
     std::string m_MCParticlesName; /**< name of the MCParticles dataobjects collection */

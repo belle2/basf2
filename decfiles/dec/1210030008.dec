@@ -1,0 +1,22 @@
+# EventType: 1210030008
+# Descriptor: [B+ -> K+ pi- pi+ gamma]
+# NickName: Bp_to_Kp_pip_pim_gamma
+# Documentation: Amplitude Analysis Study; Rare b-›s gamma process
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Mattéo MAUSHART
+# Email: matteo.m.belle2@gmail.com
+# Cuts: None 
+# Date: 25062026
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1       pi+ pi- K+ gamma        PHSP;
+Enddecay
+CDecay B-sig
+
+End

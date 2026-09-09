@@ -26,7 +26,7 @@ namespace Belle2 {
      *  Sorts the "tracks" according to quality, loops from the top and kills
      *  overlapping tracks of all tracks, that are still active.
      */
-    void performSelection(std::vector <OverlapResolverNodeInfo>& overlapResolverNodeInfo)
+    static void performSelection(std::vector <OverlapResolverNodeInfo>& overlapResolverNodeInfo)
     {
       //sort the vector according to the QI supplied.
       std::sort(overlapResolverNodeInfo.begin(), overlapResolverNodeInfo.end(),

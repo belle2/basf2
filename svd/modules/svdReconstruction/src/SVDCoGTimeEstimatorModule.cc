@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdReconstruction/SVDCoGTimeEstimatorModule.h>
+#include <framework/utilities/MathHelpers.h>
 #include <TMath.h>
 
 using namespace Belle2;
@@ -95,10 +96,6 @@ void SVDCoGTimeEstimatorModule::initialize()
   B2DEBUG(25, " -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
 
 }
-void SVDCoGTimeEstimatorModule::beginRun()
-{
-}
-
 
 void SVDCoGTimeEstimatorModule::event()
 {
@@ -134,7 +131,6 @@ void SVDCoGTimeEstimatorModule::event()
   createRelationLookup(relShaperDigitTrueHit, m_trueRelation, nDigits);
 
   //start loop on SVDSHaperDigits
-  Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
   m_NumberOfAPVSamples = m_storeSVDEvtInfo->getNSamples();
 
@@ -144,6 +140,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
+    Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
     samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
@@ -225,14 +222,6 @@ void SVDCoGTimeEstimatorModule::event()
 }
 
 
-void SVDCoGTimeEstimatorModule::endRun()
-{
-}
-
-
-void SVDCoGTimeEstimatorModule::terminate()
-{
-}
 
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)
@@ -281,7 +270,7 @@ float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTimeError(Belle2::SVDS
 
   for (int k = 0; k < m_NumberOfAPVSamples; k ++) {
     Atot  += samples[k];
-    tmpResSq += TMath::Power(k * m_DeltaT - m_weightedMeanTime, 2);
+    tmpResSq += square(k * m_DeltaT - m_weightedMeanTime);
   }
 
   return m_amplitudeError / Atot * TMath::Sqrt(tmpResSq);

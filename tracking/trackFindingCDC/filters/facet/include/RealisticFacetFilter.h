@@ -46,7 +46,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the pull cu
-      double m_param_phiPullCut;
+      double m_param_phiPullCut {};
     };
   }
 }

@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr = nullptr);
+    explicit SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr = nullptr);
     /** Constructor including map initialization */
     SVDStripNoiseMap(SVDOnlineToOfflineMap* onl2offl_map_ptr,
                      const std::string& noisefilename);

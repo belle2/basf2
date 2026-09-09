@@ -19,7 +19,7 @@ void RootParameterTracker::collectData4DoubleAlgorithms(std::string tcTypeName, 
   if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
-  for (auto& entry : *foundTCTypeData) {
+  for (const auto& entry : *foundTCTypeData) {
     // increase readability:
     auto* anAlgorithm = entry.second.first;
     auto* dataVector = entry.second.second;
@@ -62,7 +62,7 @@ void RootParameterTracker::collectData4IntAlgorithms(std::string tcTypeName, con
   if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
-  for (auto& entry : *foundTCTypeData) {
+  for (const auto& entry : *foundTCTypeData) {
     // increase readability:
     auto* anAlgorithm = entry.second.first;
     auto* dataVector = entry.second.second;
@@ -106,7 +106,7 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
   if (foundTCTypeData == nullptr) { return; }
 
   // looping over algorithms:
-  for (auto& entry : *foundTCTypeData) {
+  for (const auto& entry : *foundTCTypeData) {
     // increase readability:
     auto* anAlgorithm = entry.second.first;
     auto* dataVector = entry.second.second; // std::vector< vector < double>>

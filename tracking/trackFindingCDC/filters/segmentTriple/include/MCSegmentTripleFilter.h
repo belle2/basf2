@@ -44,7 +44,7 @@ namespace Belle2 {
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.
-      void setTrajectoryOf(const TrackingUtilities::CDCSegmentTriple& segmentTriple) const;
+      static void setTrajectoryOf(const TrackingUtilities::CDCSegmentTriple& segmentTriple);
 
     public:
       /// Setter for the allow reverse parameter

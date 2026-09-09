@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_RKTrackRep_h
-#define genfit_RKTrackRep_h
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "StateOnPlane.h"
@@ -155,6 +154,8 @@ class RKTrackRep : public AbsTrackRep {
   virtual double getQop(const StateOnPlane& state) const override {return state.getState()(0);}
   double getSpu(const StateOnPlane& state) const;
   double getTime(const StateOnPlane& state) const override;
+
+  virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise) const override;
 
   virtual void getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const override;
 
@@ -317,5 +318,3 @@ class RKTrackRep : public AbsTrackRep {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_RKTrackRep_h

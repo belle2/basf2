@@ -31,7 +31,7 @@ genfit::AbsMeasurement* BaseMeasurementCreatorFromHit<HitType, detector>::create
 template <class HitType, Const::EDetector detector>
 genfit::TrackPoint* BaseMeasurementCreatorFromHit<HitType, detector>::createTrackPointWithRecoHitInformation(
   genfit::AbsMeasurement* coordinateMeasurement,
-  RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation) const
+  RecoTrack& recoTrack, const RecoHitInformation& recoHitInformation)
 {
   genfit::TrackPoint* coordinateTrackPoint = new genfit::TrackPoint(coordinateMeasurement,
       &RecoTrackGenfitAccess::getGenfitTrack(recoTrack));

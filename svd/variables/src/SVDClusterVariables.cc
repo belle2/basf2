@@ -57,7 +57,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     return svdCluster ? svdCluster->getCharge() : Const::doubleNaN;
   }
 
@@ -72,7 +72,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     return svdCluster ? svdCluster->getSNR() : Const::doubleNaN;
   }
 
@@ -87,7 +87,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     return svdCluster ? svdCluster->getSize() : -1;
   }
 
@@ -101,7 +101,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     return svdCluster ? svdCluster->getClsTime() : Const::doubleNaN;
   }
 
@@ -253,7 +253,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     if (!svdCluster) {
       return -1;
     }
@@ -271,7 +271,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     if (!svdCluster) {
       return -1;
     }
@@ -289,7 +289,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     if (!svdCluster) {
       return -1;
     }
@@ -307,7 +307,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     return svdCluster ? svdCluster->isUCluster() : false;
   }
 
@@ -321,7 +321,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     if (!svdCluster) {
       return Const::doubleNaN;
     }
@@ -402,7 +402,7 @@ namespace Belle2::Variable {
     }
     const auto clusterIndex = static_cast<unsigned int>(indices[0]);
 
-    SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
+    const SVDCluster* svdCluster = getSVDCluster(particle, clusterIndex);
     if (!svdCluster) {
       return Const::doubleNaN;
     }

@@ -25,7 +25,7 @@ void CDCDedxMeanPred::setParameters()
 }
 
 
-void CDCDedxMeanPred::setParameters(std::string infile)
+void CDCDedxMeanPred::setParameters(const std::string& infile)
 {
 
   B2INFO("\n\tWidgetParameterization: Using parameters from file --> " << infile);
@@ -46,7 +46,7 @@ void CDCDedxMeanPred::setParameters(std::string infile)
   fin.close();
 }
 
-void CDCDedxMeanPred::printParameters(std::string outfile)
+void CDCDedxMeanPred::printParameters(const std::string& outfile)
 {
 
   B2INFO("\tCDCDedxMeanPred: Printing parameters to file --> " << outfile.c_str());

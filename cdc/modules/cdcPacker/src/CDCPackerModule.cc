@@ -141,7 +141,7 @@ void CDCPackerModule::event()
       const int boardId = m_fee_board[sly][ily][iwire];
       const int channel = m_fee_ch[sly][ily][iwire];
       auto fi = std::find_if(chData.begin(), chData.end(),
-      [&](CDCChannelData & ch) {
+      [&](const CDCChannelData & ch) {
         return (ch.getBoard() == boardId && ch.getChannel() == channel);
       });
       if (fi != chData.end()) {
@@ -194,11 +194,13 @@ void CDCPackerModule::event()
       const short dataLength = nwords[j] * 4 - packet_header_words * 4;
       const int trigNum = m_event;
 
+      // cppcheck-suppress badBitmaskCheck ; the packet layout is spelled out in full
       *(buf[j] + 0) = (type << 24) | (ver << 16) | fee_id;
+      // cppcheck-suppress badBitmaskCheck ; the packet layout is spelled out in full
       *(buf[j] + 1) = ((trigTime << 16) | dataLength);
       *(buf[j] + 2) = trigNum;
 
-      short* sbuf = (short*)(buf[j] + 3);
+      short* sbuf = reinterpret_cast<short*>(buf[j] + 3);
 
       bool halfOffset = false;
       short reservedValue = 0xcccc;

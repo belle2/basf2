@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Fork and initialize worker processes. */
     void startWorkerProcesses();
     /** There is no real output process, but marks current process as output. */
-    void startOutputProcess();
+    static void startOutputProcess();
 
     /** Wait until all forked processes handled by this ProcHandler terminate.
      *
@@ -57,7 +57,7 @@ namespace Belle2 {
     static int numEventProcesses();
 
     /** Return list of PIDs managed by this ProcHandler instance. */
-    std::set<int> processList() const;
+    const std::set<int>& processList() const;
     /** Return list of all PIDs (from all ProcHandler instances). */
     static std::set<int> globalProcessList();
 

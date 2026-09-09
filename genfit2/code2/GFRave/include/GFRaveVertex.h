@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef GFRAVEVERTEX_H
-#define GFRAVEVERTEX_H
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "Track.h"
@@ -98,5 +97,3 @@ class GFRaveVertex : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVEVERTEX_H

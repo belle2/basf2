@@ -79,10 +79,10 @@ namespace Belle2 {
 
   private:
     /// This now is the real "update" step, where we update the X_k and the C_k.
-    double kalmanStep(TrackState& x_k, TrackCovariance& C_k,
-                      const MeasurementState& m_k,
-                      const MeasurementCovariance& V_k,
-                      const HMatrix& H_k) const
+    static double kalmanStep(TrackState& x_k, TrackCovariance& C_k,
+                             const MeasurementState& m_k,
+                             const MeasurementCovariance& V_k,
+                             const HMatrix& H_k)
     {
       const Eigen::Matrix<double, 5, Dimension>& K_k = C_k * H_k.transpose() * (V_k + H_k * C_k * H_k.transpose()).inverse();
       C_k -= K_k * H_k * C_k;

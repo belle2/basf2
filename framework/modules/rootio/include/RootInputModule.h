@@ -42,7 +42,7 @@ namespace Belle2 {
     RootInputModule();
 
     /** Destructor. */
-    virtual ~RootInputModule();
+    virtual ~RootInputModule() override;
 
     /** Initialize the Module */
     virtual void initialize() override;
@@ -103,7 +103,7 @@ namespace Belle2 {
     void addEventListForIndexFile(const std::string& parentLfn);
 
     /** Correct isMC flag for raw data recorded before experiment 8 run 2364. */
-    void realDataWorkaround(FileMetaData& metaData);
+    static void realDataWorkaround(FileMetaData& metaData);
 
     //first the steerable variables:
     /** File to read from. Cannot be used together with m_inputFileNames. */

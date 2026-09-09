@@ -28,7 +28,7 @@ namespace Belle2 {
     int Mode_anti_Bs0(const std::vector<int>& genDAU); /**< returns Bs0bar mode identifier */
 
   private:
-    int m_nPhotos; /**< number of photons */
+    int m_nPhotos = 0; /**< number of photons */
     /** check decay with two daughters */
     bool PcheckDecay(const std::vector<int>& gp, int da1, int da2);
     /** check decay with three daughters */

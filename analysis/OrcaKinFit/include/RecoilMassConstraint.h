@@ -20,7 +20,8 @@ namespace Belle2 {
     public:
 
       /// Constructor
-      RecoilMassConstraint(double recoilmass = 0., double beampx = 0., double beampy = 0., double beampz = 0, double beampe = 0.);
+      explicit RecoilMassConstraint(double recoilmass = 0., double beampx = 0., double beampy = 0., double beampz = 0,
+                                    double beampe = 0.);
 
       /// Virtual destructor
       virtual ~RecoilMassConstraint() override;

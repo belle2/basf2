@@ -26,6 +26,9 @@ void ZMQParent::terminate()
 
 void ZMQParent::reset()
 {
+  // Deliberately give up ownership without destructing: running the ZMQ destructor
+  // in a forked process would tear down file descriptors owned by the parent.
+  // cppcheck-suppress ignoredReturnValue
   m_context.release();
 }
 
@@ -56,7 +59,6 @@ void ZMQParent::initialize()
 unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int timeout)
 {
   B2ASSERT("Only allow to poll on maximal 8 sockets at the same time!", socketList.size() <= 8);
-  std::bitset<8> return_bitmask;
   std::vector<zmq::pollitem_t> items(socketList.size());
 
   for (unsigned int i = 0; i < socketList.size(); i++) {
@@ -67,6 +69,7 @@ unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int 
 
   try {
     zmq::poll(items.data(), socketList.size(), timeout);
+    std::bitset<8> return_bitmask;
 
     for (unsigned int i = 0; i < socketList.size(); i++) {
       return_bitmask[i] = static_cast<bool>(items[i].revents & ZMQ_POLLIN);

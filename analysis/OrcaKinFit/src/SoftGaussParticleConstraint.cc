@@ -226,7 +226,7 @@ namespace Belle2 {
       for (int i = 0; i < idim; ++i) {
         if (double vi = v[i]) {
           int ioffs = i * idim;
-          for (double* pvj = v; pvj < v + idim; ++pvj) {
+          for (const double* pvj = v; pvj < v + idim; ++pvj) {
             M[ioffs++] += vi * (*pvj);
           }
         }

@@ -19,6 +19,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 
 /* C++ standard libraries*/
@@ -377,7 +378,7 @@ void KLMTrackingModule::terminate()
 
 }
 
-bool KLMTrackingModule::sameSector(KLMHit2d* hit1, KLMHit2d* hit2)
+bool KLMTrackingModule::sameSector(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
   if (hit1->getSection() == hit2->getSection() && hit1->getSector() == hit2->getSector())
     return true;
@@ -452,7 +453,7 @@ bool KLMTrackingModule::findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& close
         }
         */
         B2DEBUG(30, "KLMTracking::findClosestRecoTrack, step one done");
-      } catch (genfit::Exception& e) {
+      } catch (const genfit::Exception& e) {
       }// try
     }
   }
@@ -615,6 +616,8 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
           float hitY = hits2D[he]->getPositionY();
           float hitZ = hits2D[he]->getPositionZ();
           float deltaX = hitX - global[0]; float deltaY = hitY - global[1];  float deltaZ = hitZ - global[2];
+          // only used in the B2DEBUG below, which expands to a conditional block
+          // cppcheck-suppress variableScope
           float dist = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
           B2DEBUG(10, "dist w/ hit = " << dist << ", dist func = " << distance << ", error = " << error);
           if (distance < m_maxDistance && sigma < m_maxSigma) {
@@ -641,28 +644,28 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
 }
 
 
-bool KLMTrackingModule::sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2)
+bool KLMTrackingModule::sortByLayer(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
 
   return hit1->getLayer() < hit2->getLayer();
 
 }
 
-bool KLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit)
+bool KLMTrackingModule::isLayerUnderStudy(int section, int iSector, int iLayer, const KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1 &&  hit->getLayer() == iLayer + 1)
     return true;
   else return false;
 }
 
-bool KLMTrackingModule::isSectorUnderStudy(int section, int iSector, KLMHit2d* hit)
+bool KLMTrackingModule::isSectorUnderStudy(int section, int iSector, const KLMHit2d* hit)
 {
   if (hit->getSection() == section && hit->getSector() == iSector + 1)
     return true;
   else return false;
 }
 
-double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
+double KLMTrackingModule::distanceToHit(KLMTrack* track, const KLMHit2d* hit,
                                         double& error,
                                         double& sigma)
 {
@@ -701,6 +704,8 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     double dy2 = y2 - hit->getPositionY();
     double dz2 = z2 - hit->getPositionZ();
 
+    // only used in the B2DEBUG below, which expands to a conditional block
+    // cppcheck-suppress variableScope
     double dist2 = sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2);
 
 
@@ -709,8 +714,7 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
     //error from tracking is ignored here
-    error = sqrt(pow(hit_localPhiErr, 2) +
-                 pow(hit_localZErr, 2));
+    error = sqrt(square(hit_localPhiErr) + square(hit_localZErr));
     B2DEBUG(11, "Dist = " << distance << ", error = " << error);
     B2DEBUG(11, "Dist2 = " << dist2 << ", error = " << error);
   } //end of BKLM section
@@ -741,8 +745,7 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
 
 
     //error from tracking is ignored here
-    error = sqrt(pow(hit_xErr, 2) +
-                 pow(hit_yErr, 2));
+    error = sqrt(square(hit_xErr) + square(hit_yErr));
   } //end of EKLM section
   else {
     B2WARNING("KLMTracking::distanceToHit Received KLMHit2d that's not from E/B-KLM. Setting distance to -1");

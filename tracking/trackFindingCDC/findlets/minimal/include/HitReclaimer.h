@@ -37,7 +37,7 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Execute over wireHits
-      void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits);
+      void apply(const std::vector<TrackingUtilities::CDCWireHit>& wireHits) final;
     };
   }
 }

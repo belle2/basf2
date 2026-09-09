@@ -161,6 +161,3 @@ ROOT::Math::XYZVector BFieldComponentKlm1::calculate(const ROOT::Math::XYZVector
 }
 
 
-void BFieldComponentKlm1::terminate()
-{
-}

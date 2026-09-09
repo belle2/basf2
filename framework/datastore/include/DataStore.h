@@ -545,15 +545,15 @@ namespace Belle2 {
     /** Destructor. */
     ~DataStore();
 
-    /** Check whether the given entry and the requested class match.
+    /** Check whether the given entry and the requested class match;
+     *  if not, a B2FATAL is raised.
      *
      *  Name and durability are not checked.
      *
      *  @param entry      The existing DataStore entry.
      *  @param accessor   Encapsulates name, durability, and type
-     *  @return           True if both types match.
      */
-    static bool checkType(const StoreEntry& entry, const StoreAccessorBase& accessor);
+    static void checkType(const StoreEntry& entry, const StoreAccessorBase& accessor);
 
     /** Returns a vector with the names of store arrays matching the given name and class. Note that the returned reference is only valid until the next call.
      *

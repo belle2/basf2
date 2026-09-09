@@ -134,7 +134,15 @@ void TRGGRLUnpackerModule::fillTreeTRGGRLUnpacker(int* buf, int evt)
           int bitWidOfTheLeaf = BitMap[leaf][1];
           int bitMinOfTheLeaf = bitMaxOfTheLeaf - bitWidOfTheLeaf;
           if (bitMinOfTheLeaf <= bitPosition && bitPosition <= bitMaxOfTheLeaf) {
-            SetStoreLeaf(rawstore, leaf, GetStoreLeaf(rawstore, leaf) | (1 << (bitPosition - bitMinOfTheLeaf)));
+            const int bitOffset = bitPosition - bitMinOfTheLeaf;
+            if (leaf == e_ml_tau_nn_input) {
+              const int inputID = bitOffset / 12;
+              const int inputBit = bitOffset % 12;
+              rawstore->set_ml_tau_nn_input(inputID,
+                                            rawstore->get_ml_tau_nn_input(inputID) | static_cast<int>(1u << inputBit));
+            } else {
+              SetStoreLeaf(rawstore, leaf, GetStoreLeaf(rawstore, leaf) | static_cast<int>(1u << bitOffset));
+            }
           }
         }
       }

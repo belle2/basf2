@@ -1,0 +1,29 @@
+# EventType: 1213050009
+# Descriptor: Y(4S) -> B+ B-
+#                     [B+ -> D+ [-> K-  pi+  pi+] p+ anti-p-] 
+#                     [B- -> anything]
+# NickName: Bu_Dpp_DtoKpipi
+# Tested: Yes
+# Responsible: Xiaodong Shi, Siyu Wang
+# Email: shixd@ihep.ac.cn, wangsy25@lnnu.edu.cn
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2026/07/28
+
+
+Decay Upsilon(4S)
+0.50000 B- B+sig  VSS;
+0.50000 B+ B-sig  VSS;
+Enddecay
+
+Decay B+sig
+1.0  D+sig p+ anti-p- PHSP;
+Enddecay
+CDecay B-sig
+
+Decay D+sig
+1.0  K-  pi+  pi+  D_DALITZ;
+Enddecay
+CDecay D-sig
+
+End

@@ -126,7 +126,7 @@ namespace Belle2 {
 
     public:
       /// Converts a time given in nanoseconds to a time string of the from "%fs".
-      std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
+      static std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
       {
         return std::to_string(nanoseconds) + "s";
       }

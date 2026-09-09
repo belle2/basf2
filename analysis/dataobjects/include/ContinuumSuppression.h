@@ -199,7 +199,7 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 0
      */
-    std::vector<float> getKsfwFS0() const
+    const std::vector<float>& getKsfwFS0() const
     {
       return m_ksfwFS0;
     }
@@ -209,7 +209,7 @@ namespace Belle2 {
      *
      * @return vector of KSFW moments, Et, and mm2 for final state = 1
      */
-    std::vector<float> getKsfwFS1() const
+    const std::vector<float>& getKsfwFS1() const
     {
       return m_ksfwFS1;
     }
@@ -219,7 +219,7 @@ namespace Belle2 {
      *
      * @return vector of Cleo Cones constructed of all final state particles
      */
-    std::vector<float> getCleoConesALL() const
+    const std::vector<float>& getCleoConesALL() const
     {
       return m_cleoConesALL;
     }
@@ -229,7 +229,7 @@ namespace Belle2 {
      *
      * @return vector of Cleo Cones constructed of only ROE particles
      */
-    std::vector<float> getCleoConesROE() const
+    const std::vector<float>& getCleoConesROE() const
     {
       return m_cleoConesROE;
     }

@@ -140,7 +140,7 @@ namespace Belle2 {
     *
     * calling it more than once will result in a B2FATAL-message.
     */
-    void initialize(std::string fileName, std::string fileTreatment)
+    void initialize(const std::string& fileName, const std::string& fileTreatment)
     {
       if (fileTreatment != std::string("RECREATE") and fileTreatment != std::string("UPDATE")) {
         B2FATAL("RootParameterTracker::initialize(), specified fileTreatment is " << fileTreatment <<
@@ -254,22 +254,22 @@ namespace Belle2 {
       }
       m_file->Close();
 
-      for (auto& algoData2tcType : m_algoDataDouble) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataDouble) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }
       }
 
-      for (auto& algoData2tcType : m_algoDataInt) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataInt) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }
       }
 
-      for (auto& algoData2tcType : m_algoDataVecDouble) {
-        for (auto& algoPack : algoData2tcType.second) {
+      for (const auto& algoData2tcType : m_algoDataVecDouble) {
+        for (const auto& algoPack : algoData2tcType.second) {
           delete algoPack.second.first; // algorithm
           delete algoPack.second.second; // vector(data) to algorithm
         }

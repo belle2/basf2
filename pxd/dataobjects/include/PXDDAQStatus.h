@@ -88,7 +88,7 @@ namespace Belle2 {
      * This is the OR of error masks of all sub-objects (DHC, DHE)
      * @return bit mask
      */
-    PXDErrorFlags getErrorMask(void) const { return m_errorMask; }
+    const PXDErrorFlags& getErrorMask(void) const { return m_errorMask; }
 
     /** Set Critical Error bit mask
      * @param mask Bit Mask to set
@@ -98,7 +98,7 @@ namespace Belle2 {
     /** Return Critical Error bit mask
      * @return bit mask
      */
-    PXDErrorFlags getCritErrorMask(void) const { return m_critErrorMask; }
+    const PXDErrorFlags& getCritErrorMask(void) const { return m_critErrorMask; }
 
     /** Calculate the usability decision
      * If any of the critical bits is set in the error mask, or the sensor was gated,
@@ -110,7 +110,7 @@ namespace Belle2 {
     /** Add Data packet information including its DHC/DHE tree
      * @param daqpktstat Packet Status Object
      */
-    void addPacket(PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
+    void addPacket(const PXDDAQPacketStatus& daqpktstat) {m_pxdPacket.push_back(daqpktstat);};
 
     /** Add new Packet information
      * @param params constructor parameter

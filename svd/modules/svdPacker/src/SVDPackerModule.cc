@@ -245,10 +245,10 @@ void SVDPackerModule::event()
       addData32(data32);
 
       // alias for table element (DataInfo object)
-      vector<DataInfo>& apv_data_vec = fadc_apv_matrix[iFADC][iAPV];
+      const vector<DataInfo>& apv_data_vec = fadc_apv_matrix[iFADC][iAPV];
 
       if (apv_data_vec.size() > 0) { // if any data for given FADC/APV
-        for (std::vector<DataInfo>::iterator apv_data = apv_data_vec.begin(); apv_data != apv_data_vec.end(); ++apv_data) {
+        for (std::vector<DataInfo>::const_iterator apv_data = apv_data_vec.begin(); apv_data != apv_data_vec.end(); ++apv_data) {
 
           // here go DATA words
 
@@ -356,14 +356,6 @@ void SVDPackerModule::event()
 #endif
 
 
-void SVDPackerModule::terminate()
-{
-}
-
-
-void SVDPackerModule::endRun()
-{
-}
 
 
 

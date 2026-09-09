@@ -74,8 +74,8 @@ namespace Belle2 {
   private:
 
     // central values
-    double m_angleXZ; ///< the XZ angle of the HER beam in the CM system obtained by pure boost
-    double m_angleYZ; ///< the YZ angle of the HER beam in the CM system obtained by pure boost
+    double m_angleXZ = 0; ///< the XZ angle of the HER beam in the CM system obtained by pure boost
+    double m_angleYZ = 0; ///< the YZ angle of the HER beam in the CM system obtained by pure boost
 
     // uncertainty of central values
     TMatrixDSym m_centerCovariance{2}; ///< Covariance matrix describing uncertainties of m_angleXZ and m_angleYZ
@@ -84,9 +84,9 @@ namespace Belle2 {
     TMatrixDSym m_spreadCovariance{2}; ///< Covariance matrix describing "natural" spread of m_angleXZ and m_angleYZ
 
     // uncertainties of spread of the values
-    double m_spreadXZunc;    ///< Uncertainty of the eigenvalue of m_spreadCovariance corresponding to eigenvector closer to x-axis
-    double m_spreadYZunc;    ///< Uncertainty of the eigenvalue of m_spreadCovariance corresponding to eigenvector closer to y-axis
-    double m_spreadPhiUnc;   ///< Uncertainty of the angle of the eigenvector of m_spreadCovariance
+    double m_spreadXZunc = 0;    ///< Uncertainty of the eigenvalue of m_spreadCovariance corresponding to eigenvector closer to x-axis
+    double m_spreadYZunc = 0;    ///< Uncertainty of the eigenvalue of m_spreadCovariance corresponding to eigenvector closer to y-axis
+    double m_spreadPhiUnc = 0;   ///< Uncertainty of the angle of the eigenvector of m_spreadCovariance
 
     ClassDef(CollisionAxisCMS, 1);  /**<  direction of collision axis in CMS and its spread **/
   };

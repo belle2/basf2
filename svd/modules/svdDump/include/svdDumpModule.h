@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
     //! Constructor and Destructor
     svdDumpModule();
-    virtual ~svdDumpModule() {};
+    virtual ~svdDumpModule() override {};
 
     //! module functions
     virtual void initialize() override; /**< requires RawSVDs and create output file*/

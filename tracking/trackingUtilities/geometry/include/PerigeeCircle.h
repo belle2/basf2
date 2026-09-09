@@ -12,12 +12,14 @@
 
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
 
 #include <tracking/trackingUtilities/numerics/EForwardBackward.h>
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
 #include <tracking/trackingUtilities/numerics/ERotation.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
+
+#include <Math/Vector2D.h>
 
 #include <utility>
 #include <cmath>
@@ -37,7 +39,7 @@ namespace Belle2 {
 
       /// Constructor from the perigee parameters. The direction of travel at the perigee is given
       /// as vector.
-      PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact);
+      PerigeeCircle(double curvature, const ROOT::Math::XYVector& phi0Vec, double impact);
 
       /// Constructor from the perigee parameters. The direction of travel at the perigee is given
       /// as azimuth angle
@@ -48,7 +50,7 @@ namespace Belle2 {
 
     private:
       /// Constructor taking all stored parameters for internal use.
-      PerigeeCircle(double curvature, double phi0, const Vector2D& phi0Vec, double impact);
+      PerigeeCircle(double curvature, double phi0, const ROOT::Math::XYVector& phi0Vec, double impact);
 
     public:
       /// Constructor from a two dimensional line
@@ -64,7 +66,7 @@ namespace Belle2 {
       static PerigeeCircle fromN(double n0, double n1, double n2, double n3 = 0);
 
       /// Constructor with the four parameters of the generalized circle
-      static PerigeeCircle fromN(double n0, const Vector2D& n12, double n3 = 0);
+      static PerigeeCircle fromN(double n0, const ROOT::Math::XYVector& n12, double n3 = 0);
 
       /**
        *  Constructor from center, radius and a optional orientation.
@@ -75,7 +77,7 @@ namespace Belle2 {
        *  If no orientation is given, it defaults to mathematical positive counterclockwise.
        */
       static PerigeeCircle
-      fromCenterAndRadius(const Vector2D& center,
+      fromCenterAndRadius(const ROOT::Math::XYVector& center,
                           double absRadius,
                           ERotation orientation = ERotation::c_CounterClockwise);
 
@@ -119,21 +121,21 @@ namespace Belle2 {
       PerigeeCircle conformalTransformed() const;
 
       /// Moves the coordinates system by the given vector. Updates perigee parameters in place
-      void passiveMoveBy(const Vector2D& by);
+      void passiveMoveBy(const ROOT::Math::XYVector& by);
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      PerigeeJacobian passiveMoveByJacobian(const Vector2D& by) const;
+      PerigeeJacobian passiveMoveByJacobian(const ROOT::Math::XYVector& by) const;
 
       /// Puts the Jacobi matrix for a move of the coordinate system by the given vector in the
       /// given matrix as an output argument
-      void passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const;
+      void passiveMoveByJacobian(const ROOT::Math::XYVector& by, PerigeeJacobian& jacobian) const;
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from
       /// the perigee)
-      Vector2D atArcLength(double arcLength) const;
+      ROOT::Math::XYVector atArcLength(double arcLength) const;
 
       /// Calculates the arc length between the perigee and the given point.
-      double arcLengthTo(const Vector2D& point) const;
+      double arcLengthTo(const ROOT::Math::XYVector& point) const;
 
       /**
        *  Calculates the arc length between two points of closest approach on the circle.
@@ -144,7 +146,7 @@ namespace Belle2 {
        *  before we take the length on the curve.
        *  For the line case the length is the distance component parallel to the line.
        */
-      double arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
+      double arcLengthBetween(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const;
 
       /**
        *  Calculates the two dimensional arc length till the cylindrical radius is reached
@@ -155,7 +157,7 @@ namespace Belle2 {
       double arcLengthToCylindricalR(double cylindricalR) const;
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
-      std::pair<Vector2D, Vector2D> atCylindricalR(double cylindricalR) const;
+      std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> atCylindricalR(double cylindricalR) const;
 
       /**
        *  Approach on the circle with the given cylindrical radius
@@ -165,23 +167,23 @@ namespace Belle2 {
        *  which is closest following the circle in the direction of positive forward orientation
        *  This is particularly useful to extraplotate into a certain layer.
        *  In case no intersection with this cylindrical radius exists
-       *  the function returns Vector2D(NAN,NAN)
+       *  the function returns ROOT::Math::XYVector(NAN,NAN)
        *  @param startPoint Start point from which to follow in the circle in the forward direction
        *  @param cylindricalR Cylindrical radius of interest
        *  @return Close point in forward direction with same cylindrical radius on the circle.
        */
-      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint, double cylindricalR) const;
+      ROOT::Math::XYVector atCylindricalRForwardOf(const ROOT::Math::XYVector& startPoint, double cylindricalR) const;
 
       /// Indicates whether to given point lies in the forward direction from the perigee
-      EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
+      EForwardBackward isForwardOrBackwardOf(const ROOT::Math::XYVector& from, const ROOT::Math::XYVector& to) const
       {
-        return tangential(from).isForwardOrBackwardOf(to - from);
+        return VectorUtil::isForwardOrBackwardOf(tangential(from), (to - from));
       }
 
       /// Indicates whether to given point lies in the forward direction from the perigee
-      EForwardBackward isForwardOrBackward(const Vector2D& to) const
+      EForwardBackward isForwardOrBackward(const ROOT::Math::XYVector& to) const
       {
-        return tangential().isForwardOrBackwardOf(to);
+        return VectorUtil::isForwardOrBackwardOf(tangential(), to);
       }
 
       /**
@@ -189,21 +191,21 @@ namespace Belle2 {
        *  if one strictly follows the forward direction of the circle.
        *
        *  If the generalized circle is truly a line none of the points might lie
-       *  in the forward direction and Vector2D(NAN,NAN) is returned.
+       *  in the forward direction and ROOT::Math::XYVector(NAN,NAN) is returned.
        *  @param start Point to start the traversal
        *  @param end1 One possible end point
        *  @param end2 Other possible end point
        *  @return end1 or end2 depending, which lies closer to start in the forward direction or
-       *          Vector2D(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction
+       *          ROOT::Math::XYVector(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction
        *          (line case only)
        */
-      Vector2D
-      chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
+      ROOT::Math::XYVector
+      chooseNextForwardOf(const ROOT::Math::XYVector& start, const ROOT::Math::XYVector& end1, const ROOT::Math::XYVector& end2) const;
       /// Calculates the point of closest approach on the circle to the given point.
-      Vector2D closest(const Vector2D& point) const;
+      ROOT::Math::XYVector closest(const ROOT::Math::XYVector& point) const;
 
       /// Getter for the proper signed distance of the point to the circle
-      double distance(const Vector2D& point) const
+      double distance(const ROOT::Math::XYVector& point) const
       {
         return distance(fastDistance(point));
       }
@@ -219,7 +221,7 @@ namespace Belle2 {
        *  The sign of the fast distance indicates if the point is to the right or to the left of the
        *  circle.
        */
-      double fastDistance(const Vector2D& point) const;
+      double fastDistance(const ROOT::Math::XYVector& point) const;
 
       /// Getter for the linearised distance to the origin
       double fastImpact() const
@@ -237,7 +239,7 @@ namespace Belle2 {
       }
 
       /// Indicates if the point is on the right or left side of the circle.
-      ERightLeft isRightOrLeft(const Vector2D& point) const
+      ERightLeft isRightOrLeft(const ROOT::Math::XYVector& point) const
       {
         return static_cast<ERightLeft>(sign(fastDistance(point)));
       }
@@ -261,45 +263,45 @@ namespace Belle2 {
       }
 
       /// Gradient of the distance field, hence indicates the direction of increasing distance.
-      Vector2D gradient(const Vector2D& point) const
+      ROOT::Math::XYVector gradient(const ROOT::Math::XYVector& point) const
       {
-        return (point - perigee()) * curvature() - phi0Vec().orthogonal();
+        return (point - perigee()) * curvature() - VectorUtil::Orthogonal(phi0Vec());
       }
 
       /// Unit normal vector from the circle to the given point.
-      Vector2D normal(const Vector2D& point) const
+      ROOT::Math::XYVector normal(const ROOT::Math::XYVector& point) const
       {
-        return gradient(point).unit();
+        return VectorUtil::unit(gradient(point));
       }
 
       /// Tangential vector to the circle near the given position.
-      Vector2D tangential(const Vector2D& point) const
+      ROOT::Math::XYVector tangential(const ROOT::Math::XYVector& point) const
       {
-        return normal(point).orthogonal();
+        return VectorUtil::Orthogonal(normal(point));
       }
 
       /// Getter for the tangtial vector at the perigee
-      const Vector2D& tangential() const
+      const ROOT::Math::XYVector& tangential() const
       {
         return phi0Vec();
       }
 
       /// Getter for the perigee point
-      Vector2D perigee() const
+      ROOT::Math::XYVector perigee() const
       {
-        return phi0Vec().orthogonal() * impact();
+        return VectorUtil::Orthogonal(phi0Vec()) * impact();
       }
 
       /// Getter for the center of the circle. If it was a line both components will be infinity.
-      Vector2D center() const
+      ROOT::Math::XYVector center() const
       {
-        return phi0Vec().orthogonal() * (impact() + radius());
+        return VectorUtil::Orthogonal(phi0Vec()) * (impact() + radius());
       }
 
       /// Getter for the apogee of the circle. If it was a line both components will be infinity.
-      Vector2D apogee() const
+      ROOT::Math::XYVector apogee() const
       {
-        return phi0Vec().orthogonal() * (impact() + 2 * radius());
+        return VectorUtil::Orthogonal(phi0Vec()) * (impact() + 2 * radius());
       }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
@@ -339,7 +341,7 @@ namespace Belle2 {
       }
 
       /// Setter for the circle center and radius
-      void setCenterAndRadius(const Vector2D& center,
+      void setCenterAndRadius(const ROOT::Math::XYVector& center,
                               double absRadius,
                               ERotation orientation = ERotation::c_CounterClockwise);
 
@@ -350,9 +352,9 @@ namespace Belle2 {
       }
 
       /// Getter for the generalised circle parameters n1 and n2
-      Vector2D n12() const
+      ROOT::Math::XYVector n12() const
       {
-        return -phi0Vec().orthogonal() * (1 + curvature() * impact());
+        return -VectorUtil::Orthogonal(phi0Vec()) * (1 + curvature() * impact());
       }
 
       /// Getter for the generalised circle parameters n1
@@ -378,11 +380,11 @@ namespace Belle2 {
       /// Setter for four generalised circle parameters.
       void setN(double n0, double n1, double n2, double n3 = 0.0)
       {
-        setN(n0, Vector2D(n1, n2), n3);
+        setN(n0, ROOT::Math::XYVector(n1, n2), n3);
       }
 
       /// Setter for four generalised circle parameters.
-      void setN(double n0, const Vector2D& n12, double n3 = 0.0);
+      void setN(double n0, const ROOT::Math::XYVector& n12, double n3 = 0.0);
 
       /// Setter for generalised circle parameters from a normal line.
       void setN(const Line2D& n012)
@@ -421,7 +423,7 @@ namespace Belle2 {
       }
 
       /// Getter for the unit vector of the direction of flight at the perigee
-      const Vector2D& phi0Vec() const
+      const ROOT::Math::XYVector& phi0Vec() const
       {
         return m_phi0Vec;
       }
@@ -453,14 +455,14 @@ namespace Belle2 {
       void setPhi0(double phi0)
       {
         m_phi0 = phi0;
-        m_phi0Vec = Vector2D::Phi(phi0);
+        m_phi0Vec = VectorUtil::Phi(phi0);
       }
 
       /// Sets the unit direction of flight at the perigee
-      void setPhi0(const Vector2D& phi0Vec)
+      void setPhi0(const ROOT::Math::XYVector& phi0Vec)
       {
-        m_phi0 = phi0Vec.phi();
-        m_phi0Vec = phi0Vec.unit();
+        m_phi0 = phi0Vec.Phi();
+        m_phi0Vec = VectorUtil::unit(phi0Vec);
       }
 
       /// Sets the impact parameter of the circle.
@@ -470,11 +472,11 @@ namespace Belle2 {
       }
 
       /// Setter for the perigee parameters
-      void setPerigeeParameters(double curvature, const Vector2D& phi0Vec, double impact)
+      void setPerigeeParameters(double curvature, const ROOT::Math::XYVector& phi0Vec, double impact)
       {
         m_impact = impact;
-        m_phi0 = phi0Vec.phi();
-        m_phi0Vec = phi0Vec.unit();
+        m_phi0 = phi0Vec.Phi();
+        m_phi0Vec = VectorUtil::unit(phi0Vec);
         m_curvature = curvature;
       }
 
@@ -483,7 +485,7 @@ namespace Belle2 {
       {
         m_impact = impact;
         m_phi0 = phi0;
-        m_phi0Vec = Vector2D::Phi(phi0);
+        m_phi0Vec = VectorUtil::Phi(phi0);
         m_curvature = curvature;
       }
 
@@ -502,7 +504,7 @@ namespace Belle2 {
       double m_phi0 = NAN;
 
       /// Cached unit direction of flight at the perigee
-      Vector2D m_phi0Vec{0.0, 0.0};
+      ROOT::Math::XYVector m_phi0Vec;
 
       /// Memory for the signed impact parameter
       double m_impact = 0.0;

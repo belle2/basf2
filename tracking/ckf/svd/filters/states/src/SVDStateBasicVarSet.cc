@@ -11,10 +11,12 @@
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectorySZ.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/RecoTrack.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 using namespace Belle2;
 using namespace TrackingUtilities;
@@ -38,38 +40,38 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
     firstMeasurement = previousStates.back()->getMeasuredStateOnPlane();
   }
 
-  Vector3D position = Vector3D(firstMeasurement.getPos());
-  Vector3D momentum = Vector3D(firstMeasurement.getMom());
+  const ROOT::Math::XYZVector position = ROOT::Math::XYZVector(firstMeasurement.getPos());
+  const ROOT::Math::XYZVector momentum = ROOT::Math::XYZVector(firstMeasurement.getMom());
 
   const CDCTrajectory3D trajectory(position, 0, momentum, cdcTrack->getChargeSeed());
 
-  const Vector3D& hitPosition = static_cast<Vector3D>(spacePoint->getPosition());
+  const ROOT::Math::XYZVector& hitPosition = spacePoint->getPosition();
 
   const double arcLength = trajectory.calcArcLength2D(hitPosition);
-  const Vector2D& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
+  const ROOT::Math::XYVector& trackPositionAtHit2D = trajectory.getTrajectory2D().getPos2DAtArcLength2D(arcLength);
   double trackPositionAtHitZ = trajectory.getTrajectorySZ().mapSToZ(arcLength);
 
-  Vector3D trackPositionAtHit(trackPositionAtHit2D, trackPositionAtHitZ);
-  Vector3D distance = trackPositionAtHit - hitPosition;
+  ROOT::Math::XYZVector trackPositionAtHit(trackPositionAtHit2D.X(), trackPositionAtHit2D.Y(), trackPositionAtHitZ);
+  ROOT::Math::XYZVector distance = trackPositionAtHit - hitPosition;
 
-  var<named("distance")>() = static_cast<Float_t>(distance.norm());
-  var<named("xy_distance")>() = static_cast<Float_t>(distance.xy().norm());
+  var<named("distance")>() = static_cast<Float_t>(distance.R());
+  var<named("xy_distance")>() = static_cast<Float_t>(distance.Rho());
   var<named("z_distance")>() = static_cast<Float_t>(distance.z());
 
-  Vector3D mSoP_distance = position - hitPosition;
+  ROOT::Math::XYZVector mSoP_distance = position - hitPosition;
 
-  var<named("mSoP_distance")>() = static_cast<Float_t>(mSoP_distance.norm());
-  var<named("mSoP_xy_distance")>() = static_cast<Float_t>(mSoP_distance.xy().norm());
+  var<named("mSoP_distance")>() = static_cast<Float_t>(mSoP_distance.R());
+  var<named("mSoP_xy_distance")>() = static_cast<Float_t>(mSoP_distance.Rho());
   var<named("mSoP_z_distance")>() = static_cast<Float_t>(mSoP_distance.z());
 
-  var<named("same_hemisphere")>() = fabs(position.phi() - hitPosition.phi()) < TMath::PiOver2();
+  var<named("same_hemisphere")>() = fabs(position.Phi() - hitPosition.Phi()) < TMath::PiOver2();
 
   var<named("arcLengthOfHitPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(hitPosition));
-  var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(Vector3D(0, 0, 0)));
+  var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(ROOT::Math::XYZVector(0, 0, 0)));
 
-  var<named("pt")>() = static_cast<Float_t>(momentum.xy().norm());
+  var<named("pt")>() = static_cast<Float_t>(momentum.Rho());
   var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
-  var<named("phi")>() = static_cast<Float_t>(momentum.phi());
+  var<named("phi")>() = static_cast<Float_t>(momentum.Phi());
 
   const VxdID& sensorInfo = spacePoint->getVxdID();
   var<named("layer")>() = sensorInfo.getLayerNumber();

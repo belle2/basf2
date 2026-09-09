@@ -47,7 +47,7 @@ namespace Belle2 {
     * @param p pointer to particle
     * @return true for successfully adding the covariance matrix
     */
-    bool add_matrix(Particle* p);
+    static bool add_matrix(Particle* p);
   };
 } // Belle2 namespace
 

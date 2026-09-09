@@ -56,10 +56,6 @@ namespace Belle2 {
     DQMHistComparitorModule();
 
   private:
-    /**
-     * Destructor.
-     */
-    ~DQMHistComparitorModule();
 
     /**
      * Initializer.

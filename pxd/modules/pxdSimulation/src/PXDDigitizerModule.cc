@@ -403,7 +403,7 @@ void PXDDigitizerModule::processHit()
     double lastFraction {0};
     double lastElectrons {0};
 
-    for (auto& segment : segments) {
+    for (const auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
       const double f = (segment.first + lastFraction) * 0.5;
@@ -536,13 +536,13 @@ void PXDDigitizerModule::saveDigits()
                                 m_relDigitTrueHitName);
 
 
-  for (Sensors::value_type& sensor : m_sensors) {
+  for (const Sensors::value_type& sensor : m_sensors) {
     auto sensorID = sensor.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
     m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
-    for (Sensor::value_type& digitAndValue : sensor.second) {
+    for (const Sensor::value_type& digitAndValue : sensor.second) {
       const Digit& d = digitAndValue.first;
       const DigitValue& v = digitAndValue.second;
 

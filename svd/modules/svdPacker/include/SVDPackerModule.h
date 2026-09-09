@@ -40,19 +40,17 @@ namespace Belle2 {
       SVDPackerModule();
 
       /**default destructor*/
-      virtual ~SVDPackerModule();
+      virtual ~SVDPackerModule() override;
 
       virtual void initialize() override; /**<initialize*/
       virtual void beginRun() override; /**<begin run*/
       virtual void event() override; /**<event*/
-      virtual void endRun() override; /**<end run*/
-      virtual void terminate() override; /**<terminate*/
 
 
       std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
       std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
       std::string m_svdEventInfoName; /**< SVDEventInfo name */
-      bool m_simulate3sampleData; /**<if true, simulate 3-sample data taking*/
+      bool m_simulate3sampleData = false; /**<if true, simulate 3-sample data taking*/
       bool m_binPrintout;  /**< if true, print data created by the Packer */
 
     private:
@@ -61,10 +59,10 @@ namespace Belle2 {
       typedef std::unordered_map<unsigned short, unsigned short> FADCmap;
 
       /**how many FADCs we have */
-      unsigned short nFADCboards;
+      unsigned short nFADCboards = 0;
 
       /** pointer to APVforFADCmap filled by mapping procedure */
-      std::unordered_multimap<unsigned char, unsigned char>* APVmap;
+      std::unordered_multimap<unsigned char, unsigned char>* APVmap = 0;
 
       int n_basf2evt; /**<event number*/
       int m_nodeid; /**< Node ID*/
@@ -93,7 +91,7 @@ namespace Belle2 {
       struct DataInfo {
         short data[6]; /**< 6 samples*/
         unsigned short channel; /**< APV channel number*/
-      } dataInfo; /**< data info*/
+      } dataInfo{}; /**< data info*/
 
       // The following assumes i386 byte order: MSB comes last!
 
@@ -170,7 +168,7 @@ namespace Belle2 {
 
 
       union {
-        uint32_t data32; /**< Output 32-bit data word */
+        uint32_t data32 = 0; /**< Output 32-bit data word */
         FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
         MainHeader m_MainHeader; /**< Implementation of FADC Header */
         APVHeader m_APVHeader; /**< Implementation of APV Header */

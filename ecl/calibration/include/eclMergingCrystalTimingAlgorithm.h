@@ -38,13 +38,13 @@ namespace Belle2 {
       eclMergingCrystalTimingAlgorithm();
 
       /**..Destructor */
-      ~eclMergingCrystalTimingAlgorithm() {}
+      ~eclMergingCrystalTimingAlgorithm() override {}
 
 
       /*** Parameters ***/
 
       /**< Read the previous crystal payload values for comparison */
-      bool readPrevCrysPayload;
+      bool readPrevCrysPayload = false;
 
     protected:
 

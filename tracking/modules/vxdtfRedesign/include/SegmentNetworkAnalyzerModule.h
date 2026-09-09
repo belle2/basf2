@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /** get the number of connections between the nodes of a network */
     template<typename EntryType, typename MetaInfoType>
-    size_t getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const;
+    static size_t getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network);
 
   };
 }

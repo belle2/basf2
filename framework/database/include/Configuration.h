@@ -231,11 +231,17 @@ namespace Belle2::Conditions {
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
     /** Get the default server URL for the remote metadata provider */
+    // exposed to Python as a property: boost::python cannot wrap a function
+    // returning a reference without an explicit return_value_policy
+    // cppcheck-suppress returnByReference
     std::string getDefaultRemoteMetadataProviderServer() { return m_defaultLegacyRemoteMetadataProviderServer; }
     /** Get the default server URL for the HSF central metadata provider */
+    // exposed to Python as a property: boost::python cannot wrap a function
+    // returning a reference without an explicit return_value_policy
+    // cppcheck-suppress returnByReference
     std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
     /** Get the default local path for the local metadata provider */
-    std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+    const std::string& getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
 
     ///@}
 
@@ -277,14 +283,14 @@ namespace Belle2::Conditions {
     /** Set the file where to save newly created payload information */
     void setNewPayloadLocation(const std::string& filename) { ensureEditable(); m_newPayloadFile = filename; }
     /** Get the filename where to save newly created payload information */
-    std::string getNewPayloadLocation() const { return m_newPayloadFile; }
+    const std::string& getNewPayloadLocation() const { return m_newPayloadFile; }
 
     /** Set the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
     void setDownloadCacheDirectory(const std::string& directory) { ensureEditable(); m_downloadCacheDirectory = directory; }
     /** Get the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
-    std::string getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
+    const std::string& getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
 
     /** Set the timeout we try to lock a file in the download cache directory for downloading */
     void setDownloadLockTimeout(size_t timeout) { ensureEditable(); m_downloadLockTimeout = timeout; }

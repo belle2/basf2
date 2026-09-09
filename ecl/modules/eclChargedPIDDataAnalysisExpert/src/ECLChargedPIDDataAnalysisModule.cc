@@ -203,10 +203,6 @@ void ECLChargedPIDDataAnalysisModule::initialize()
   B2INFO("[ECLChargedPIDDataAnalysis Module]: Initialization of ECLChargedPIDDataAnalysis Module completed.");
 }
 
-void ECLChargedPIDDataAnalysisModule::beginRun()
-{
-}
-
 void ECLChargedPIDDataAnalysisModule::event()
 {
 
@@ -415,10 +411,6 @@ void ECLChargedPIDDataAnalysisModule::event()
   n1_tree->Fill();
   n2_tree->Fill();
 
-}
-
-void ECLChargedPIDDataAnalysisModule::endRun()
-{
 }
 
 void ECLChargedPIDDataAnalysisModule::terminate()

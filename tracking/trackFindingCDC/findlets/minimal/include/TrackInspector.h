@@ -38,7 +38,7 @@ namespace Belle2 {
       void apply(std::vector<TrackingUtilities::CDCTrack>& tracks) final;
 
       /// Remove tracks with no stereo hits
-      void removeIncompleteTracks(std::vector<TrackingUtilities::CDCTrack>& tracks);
+      static void removeIncompleteTracks(std::vector<TrackingUtilities::CDCTrack>& tracks);
 
     private:
       /// Flag to draw the CDCTrack (true) or not (false)

@@ -78,12 +78,12 @@ namespace Belle2 {
       }
 
       AbstractInterface::initSupportedInterfaces();
-      auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+      const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
       if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
         B2ERROR("Couldn't find method named " + general_options.m_method);
         throw std::runtime_error("Couldn't find method named " + general_options.m_method);
       }
-      auto expert = supported_interfaces[general_options.m_method]->getExpert();
+      auto expert = supported_interfaces.at(general_options.m_method)->getExpert();
       expert->load(expert_weightfile);
 
       auto prediction = expert->apply(training_data);
@@ -158,12 +158,12 @@ namespace Belle2 {
       sub_weightfile.getOptions(m_expert_options);
 
       AbstractInterface::initSupportedInterfaces();
-      auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+      const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
       if (supported_interfaces.find(m_expert_options.m_method) == supported_interfaces.end()) {
         B2ERROR("Couldn't find method named " + m_expert_options.m_method);
         throw std::runtime_error("Couldn't find method named " + m_expert_options.m_method);
       }
-      m_expert = supported_interfaces[m_expert_options.m_method]->getExpert();
+      m_expert = supported_interfaces.at(m_expert_options.m_method)->getExpert();
       m_expert->load(sub_weightfile);
 
       m_norm = weightfile.getElement<float>("Reweighter_norm");

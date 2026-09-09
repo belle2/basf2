@@ -266,7 +266,7 @@ void ECLCRFinderModule::terminate()
 
 }
 
-std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>& A)
+std::vector<int> ECLCRFinderModule::flattenVector(const std::vector<std::vector<int>>& A)
 {
   std::vector<int> C;
   for (const auto& B : A) {
@@ -277,7 +277,7 @@ std::vector<int> ECLCRFinderModule::flattenVector(std::vector<std::vector<int>>&
   return C;
 }
 
-std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int n)
+std::vector<int> ECLCRFinderModule::oneHotVector(const std::vector<int>& A, const int n)
 {
   std::vector<int> C(n, 0);
   for (int x : A) {
@@ -288,7 +288,7 @@ std::vector<int> ECLCRFinderModule::oneHotVector(std::vector<int>& A, const int 
   return C;
 }
 
-std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(std::vector<std::vector<int>>& A)
+std::vector<std::set<int>> ECLCRFinderModule::mergeVectorsUsingBFSTraversal(const std::vector<std::vector<int>>& A)
 {
   std::vector<std::set<int>> output;
 

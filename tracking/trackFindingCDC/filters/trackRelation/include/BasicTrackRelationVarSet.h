@@ -38,6 +38,7 @@ namespace Belle2 {
       static const size_t nVars = TrackingUtilities::size(basicTrackRelationVarNames);
 
       /// Getter for the name at the given index
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which is the empty default of VarNames
       static constexpr char const* getName(int iName)
       {
         return basicTrackRelationVarNames[iName];

@@ -82,11 +82,11 @@ void ECLExpertModule::beginRun()
 void ECLExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
+  m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
 
   std::vector<float> dummy;
@@ -102,10 +102,10 @@ void ECLExpertModule::event()
   const ECLCluster::EHypothesisBit eclHypothesis = ECLCluster::EHypothesisBit::c_neutralHadron;
 
   //overwritten at the end of the cluster loop
-  KlId* klid = nullptr;
+  const KlId* klid = nullptr;
 
   // loop thru clusters in event and classify
-  for (ECLCluster& cluster : m_eclClusters) {
+  for (const ECLCluster& cluster : m_eclClusters) {
 
     if (!cluster.hasHypothesis(eclHypothesis)) {continue;}
 

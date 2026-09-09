@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMPackerModule();
+    ~KLMPackerModule() override;
 
     /**
      * Initializer.
@@ -57,16 +57,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 
@@ -84,8 +74,8 @@ namespace Belle2 {
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(int flag, int lane, int plane, int strip, int charge, uint16_t ctime, uint16_t tdc,
-                    uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
+    static void formatData(int flag, int lane, int plane, int strip, int charge, uint16_t ctime, uint16_t tdc,
+                           uint16_t& bword1, uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
     /* Common objects. */
 

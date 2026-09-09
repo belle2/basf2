@@ -107,6 +107,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
         ++it0; ++it1;
       }
     }
+    // cppcheck-suppress containerOutOfBounds ; contour should be valid here
     const zr_t& s0 = *it0, &s1 = contour[0]; // cppcheck-suppress invalidContainer ; contour should be valid here
     if (abs(s0.z - s1.z) < kCarTolerance && abs(s0.r - s1.r) < kCarTolerance) contour.erase(it0);
   } while (0);
@@ -665,16 +666,17 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
       const cachezr_t& seg = fcache[i];
       // r0 -- cone radius at z0, c -- cone axis
       // cone equation is (r0 + tg * ((r-c0)*c))^2 = (r-c0)^2 - ((r-c0)*c)^2
-      double r0 = seg.r, z0 = seg.z, tg = seg.ta, tg2 = tg * tg;
+      double r0 = seg.r, z0 = seg.z, tg = seg.ta;
       double rtg = r0 * tg;
 
       G4ThreeVector o(op.x(), op.y(), op.z() - z0);
 
       double ko = k * o, uo = u * o, ck = k.z(), cu = u.z(), co = o.z();
       double k2 = 1, u2 = 1, o2 = o * o;
-      double ck2 = ck * ck, cu2 = cu * cu, co2 = co * co;
+      double ck2 = ck * ck, cu2 = cu * cu;
       double dr2 = r0 * r0 - o2;
       if (seg.dz != 0.0) {
+        double tg2 = tg * tg, co2 = co * co;
         double q0 = 1 + tg2;
         double q1 = co * q0 + rtg;
 
@@ -795,7 +797,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
     }
 
     vector<G4ThreeVector> vside = PhiCrossN(planes);
-    for (G4ThreeVector& p : vside) {
+    for (const G4ThreeVector& p : vside) {
       //      cout<<p<<endl;
       double tt = n0t * p;
       if (pmax < tt) { pmax = tt; smax = p;}
@@ -837,7 +839,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
     planes[1] = { -n, limits[1]* n};
     vector<G4ThreeVector> vside = PhiCrossN(planes);
 
-    for (G4ThreeVector& p : vside) {
+    for (const G4ThreeVector& p : vside) {
       //      double t = n0t*(p-limits[0]);
       double tt = n0t * p;
       //      cout<<tt<<" "<<p<<" "<<endl;
@@ -1463,11 +1465,11 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 }
 
 // Calculate distance to surface of shape from inside
-G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& n,
-                                   const G4bool calcNorm, G4bool* IsValid, G4ThreeVector* _n) const
+G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& v,
+                                   const G4bool calcNorm, G4bool* validNorm, G4ThreeVector* n) const
 {
-  //  return fshape->DistanceToOut(p, n, calcNorm, IsValid, _n);
-  auto getnormal = [this, &p, &n](int i, double t)->G4ThreeVector{
+  //  return fshape->DistanceToOut(p, v, calcNorm, validNorm, n);
+  auto getnormal = [this, &p, &v](int i, double t)->G4ThreeVector{
     const int imax = fcache.size();
     G4ThreeVector o;
     if (i < 0)
@@ -1478,8 +1480,8 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
       if (s.dz == 0.0) {
         o.setZ(copysign(1, s.dr));
       } else {
-        double x = p.x() + n.x() * t;
-        double y = p.y() + n.y() * t;
+        double x = p.x() + v.x() * t;
+        double y = p.y() + v.y() * t;
         double sth = s.dr * s.is, cth = -s.dz * s.is;
         double ir = cth / sqrt(x * x + y * y);
         o.set(x * ir, y * ir, sth);
@@ -1494,27 +1496,27 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     return o;
   };
 
-  double nn = dotxy(n, n), np = dotxy(n, p), pp = dotxy(p, p);
-  auto hitside = [this, &p, &n, nn, np, pp](double t, const cachezr_t& s) -> bool {
-    double z = p.z() + n.z() * t;
+  double nn = dotxy(v, v), np = dotxy(v, p), pp = dotxy(p, p);
+  auto hitside = [this, &p, &v, nn, np, pp](double t, const cachezr_t& s) -> bool {
+    double z = p.z() + v.z() * t;
     //    cout<<t<<" "<<x<<" "<<y<<" "<<z<<endl;
-    double dot = n.z() * s.dr * sqrt(pp + ((np + np) + nn * t) * t) - s.dz * (np + nn * t);
+    double dot = v.z() * s.dr * sqrt(pp + ((np + np) + nn * t) * t) - s.dz * (np + nn * t);
     bool k = s.zmin < z && z <= s.zmax && dot > 0;
     if (k && !ftwopi)
     {
-      double x = p.x() + n.x() * t;
-      double y = p.y() + n.y() * t;
+      double x = p.x() + v.x() * t;
+      double y = p.y() + v.y() * t;
 
       k = k && insector(x, y);
     }
     return k;
   };
 
-  auto hitzside = [this, &p, &n](double t, const cachezr_t& s) -> bool {
-    double x = p.x() + n.x() * t;
-    double y = p.y() + n.y() * t;
+  auto hitzside = [this, &p, &v](double t, const cachezr_t& s) -> bool {
+    double x = p.x() + v.x() * t;
+    double y = p.y() + v.y() * t;
     double r2 = x * x + y * y;
-    bool k = s.dr * n.z() > 0 && s.r2min <= r2 && r2 < s.r2max;
+    bool k = s.dr * v.z() > 0 && s.r2min <= r2 && r2 < s.r2max;
     if (k && !ftwopi)
     {
       k = k && insector(x, y);
@@ -1522,26 +1524,26 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     return k;
   };
 
-  auto hitphi0side = [this, &p, &n](double t) -> bool {
-    double x = p.x() + n.x() * t;
-    double y = p.y() + n.y() * t;
+  auto hitphi0side = [this, &p, &v](double t) -> bool {
+    double x = p.x() + v.x() * t;
+    double y = p.y() + v.y() * t;
     double r = x * fc0 + y * fs0;
     if (r >= frmin)
     {
-      double z = p.z() + n.z() * t;
+      double z = p.z() + v.z() * t;
       zr_t zr = {z, r};
       return wn_poly(zr) == 2;
     }
     return false;
   };
 
-  auto hitphi1side = [this, &p, &n](double t) -> bool {
-    double x = p.x() + n.x() * t;
-    double y = p.y() + n.y() * t;
+  auto hitphi1side = [this, &p, &v](double t) -> bool {
+    double x = p.x() + v.x() * t;
+    double y = p.y() + v.y() * t;
     double r = x * fc1 + y * fs1;
     if (r >= frmin)
     {
-      double z = p.z() + n.z() * t;
+      double z = p.z() + v.z() * t;
       zr_t zr = {z, r};
       return wn_poly(zr) == 2;
     }
@@ -1555,7 +1557,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
   int iseg = -1, isurface = -1;
 
   const double delta = 0.5 * kCarTolerance;
-  double inz = 1 / n.z();
+  double inz = 1 / v.z();
   double pz = p.z(), pr = sqrt(pp);
 
   for (int i = 0; i < imax; i++) {
@@ -1584,7 +1586,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
         double R = taz + s.r;
         R2 = R * R;
 
-        double nzta = n.z() * s.ta;
+        double nzta = v.z() * s.ta;
         A = nzta * nzta - nn;
         B = np - nzta * R;
       }
@@ -1614,7 +1616,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
 
   if (!ftwopi) {
     do { // side at phi0
-      double vn = fn0x * n.x() + fn0y * n.y();
+      double vn = fn0x * v.x() + fn0y * v.y();
       if (vn > 0) {
         double d = fn0x * p.x() + fn0y * p.y();
         double t = -d / vn;
@@ -1631,7 +1633,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     } while (0);
 
     do { // side at phi0+dphi
-      double vn = fn1x * n.x() + fn1y * n.y();
+      double vn = fn1x * v.x() + fn1y * v.y();
       if (vn > 0) {
         double d = fn1x * p.x() + fn1y * p.y();
         double t = -d / vn;
@@ -1656,17 +1658,17 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
 
   if (calcNorm) {
     if (tmin >= 0 && tmin < kInfinity) {
-      *_n = getnormal(iseg, tmin);
-      *IsValid = convex(iseg);
+      *n = getnormal(iseg, tmin);
+      *validNorm = convex(iseg);
     } else {
       if (Inside(p) == kSurface) {
         if (isurface >= 0) {
-          *_n = getnormal(isurface, tmin);
-          *IsValid = convex(isurface);
+          *n = getnormal(isurface, tmin);
+          *validNorm = convex(isurface);
           tmin = 0;
         }
       } else {
-        *IsValid = false;
+        *validNorm = false;
       }
     }
   }
@@ -1677,20 +1679,20 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     // if ((p - p0).mag() > 1e-2)continue;
     bool isvalid;
     G4ThreeVector norm;
-    double dd = fshape->DistanceToOut(p, n, calcNorm, &isvalid, &norm);
-    if (abs(tmin - dd) > 1e-10 || (calcNorm && *IsValid != isvalid)) {
+    double dd = fshape->DistanceToOut(p, v, calcNorm, &isvalid, &norm);
+    if (abs(tmin - dd) > 1e-10 || (calcNorm && *validNorm != isvalid)) {
       int oldprec = cout.precision(16);
-      cout << GetName() << " DistanceToOut(p,v) p,n =" << curl_t(p) << curl_t(n) << " calcNorm=" << calcNorm
+      cout << GetName() << " DistanceToOut(p,v) p,v =" << curl_t(p) << curl_t(v) << " calcNorm=" << calcNorm
            << " myInside=" << Inside(p) << " tmin=" << tmin << " dd=" << dd << " d=" << tmin - dd << " iseg=" << iseg << " isurf=" << isurface
            << " ";
-      if (calcNorm) cout << "myIsValid = " << *IsValid << " tIsValid=" << isvalid << " myn=" << (*_n) << " tn=" << (norm);
+      if (calcNorm) cout << "myIsValid = " << *validNorm << " tIsValid=" << isvalid << " myn=" << (*n) << " tn=" << (norm);
       cout << endl;
       cout.precision(oldprec);
       //      _exit(0);
     }
   } while (0);
 #endif
-  MATCHOUT("BelleLathe::DistanceToOut(p,n) " << p << " " << n << " res= " << tmin);
+  MATCHOUT("BelleLathe::DistanceToOut(p,v) " << p << " " << v << " res= " << tmin);
   return tmin;
 }
 
@@ -1850,7 +1852,7 @@ void BelleLathe::DescribeYourselfTo(G4VGraphicsScene& scene) const
 void BelleLathe::BoundingLimits(G4ThreeVector& pMin, G4ThreeVector& pMax) const
 {
   std::vector<vector_t> points;
-  vector_t point;
+  vector_t point{};
 
   // Placeholder vectors
   const double inf = std::numeric_limits<double>::infinity();

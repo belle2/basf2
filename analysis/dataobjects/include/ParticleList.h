@@ -227,7 +227,7 @@ namespace Belle2 {
     /**
      * Returns Particle store array name to which particle list refers
      */
-    std::string getParticleCollectionName() const {return m_particleStore;}
+    const std::string& getParticleCollectionName() const {return m_particleStore;}
 
     /**
      * Returns PDG code
@@ -265,7 +265,7 @@ namespace Belle2 {
     /**
      * Returns the name the anti-particle ParticleList.
      */
-    std::string getAntiParticleListName() const
+    const std::string& getAntiParticleListName() const
     {
       return m_antiListName;
     }
@@ -273,7 +273,7 @@ namespace Belle2 {
     /**
      * Returns the name this ParticleList.
      */
-    std::string getParticleListName() const
+    const std::string& getParticleListName() const
     {
       return m_thisListName;
     }

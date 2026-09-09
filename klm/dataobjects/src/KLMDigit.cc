@@ -88,7 +88,7 @@ unsigned int KLMDigit::getUniqueChannelID() const
 
 DigitBase::EAppendStatus KLMDigit::addBGDigit(const DigitBase* bg)
 {
-  const KLMDigit* bgDigit = (KLMDigit*)bg;
+  const KLMDigit* bgDigit = static_cast<const KLMDigit*>(bg);
   if (!bgDigit->isGood())
     return DigitBase::c_DontAppend;
   if (!this->isGood())

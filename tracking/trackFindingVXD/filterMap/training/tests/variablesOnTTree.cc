@@ -18,6 +18,7 @@
 namespace Belle2 {
 
   /// Quick definition of a selection variable implementing the difference of 2 doubles
+  // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
   SELECTION_VARIABLE(Difference, 2, double,
                      static double value(const double& t1,
                                          const double& t2)
@@ -26,6 +27,7 @@ namespace Belle2 {
                     );
 
   /// Quick definition of a selection variable implementing the sum of 2 doubles
+  // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
   SELECTION_VARIABLE(Sum, 2, double,
                      static double value(const double& t1,
                                          const double& t2)

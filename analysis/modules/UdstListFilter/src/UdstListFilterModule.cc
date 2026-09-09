@@ -60,7 +60,7 @@ void keepObject(const Particle* p, std::map < Particle::EParticleSourceObject, s
 //                 Implementation
 //-----------------------------------------------------------------
 
-UdstListFilterModule::UdstListFilterModule() : Module()
+UdstListFilterModule::UdstListFilterModule() : Module(), m_selectedV0s(nullptr)
 {
   setDescription("Filter udst file content based on a particle list. As a result of the module, all object which are (not) associated with the list are removed. The module is used for signal embedding.");
   setPropertyFlags(c_ParallelProcessingCertified);

@@ -82,7 +82,6 @@ namespace Belle2 {
        * @return vertex error matrix
        */
       const CLHEP::HepSymMatrix          getVertexError(void) const;
-      double                      getCHIsq(void) const override;
       /** Get a chi-square of the fit excluding IP-constraint part.
        * @return chi-square of the fit excluding IP-constraint part.
        */

@@ -13,8 +13,6 @@
 # determination. All exclusive decays have the PHSP distributuion.
 # Do not use it for one-dimensional analyses without proper reweighting.
 
-Alias pi0sig pi0
-
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
 0.5 B-sig B+ VSS;
@@ -28,10 +26,6 @@ CDecay B-sig
 
 Decay J/psisig
 1.0 mu+ mu- PHOTOS PHSP;
-Enddecay
-
-Decay pi0sig
-1.0 gamma gamma PHSP;
 Enddecay
 
 End

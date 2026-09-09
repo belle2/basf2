@@ -88,8 +88,8 @@ namespace Belle2 {
       const IntervalOfValidity& getRequestedIov() const {return m_iov;}
       /// Get constants (in TObjects) for database update from last calibration
       std::list<Database::DBImportQuery>& getPayloads() {return m_payloads;}
-      /// Get constants (in TObjects) for database update from last calibration
-      const std::list<Database::DBImportQuery>& getPayloadValues() const {return m_payloads;}
+      /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
+      std::list<Database::DBImportQuery> getPayloadValues() const {return m_payloads;}
       /// Get a previously created object in m_mapCalibData if one exists, otherwise return shared_ptr(nullptr)
       std::shared_ptr<TNamed> getCalibObj(const std::string& name, const RunRange& runRange) const
       {
@@ -199,8 +199,8 @@ namespace Belle2 {
     /// Get constants (in TObjects) for database update from last execution
     std::list<Database::DBImportQuery>& getPayloads() {return m_data.getPayloads();}
 
-    /// Get constants (in TObjects) for database update from last execution
-    const std::list<Database::DBImportQuery>& getPayloadValues() const {return m_data.getPayloadValues();}
+    /// Get constants (in TObjects) for database update from last execution but passed by VALUE
+    std::list<Database::DBImportQuery> getPayloadValues() const {return m_data.getPayloadValues();}
 
     /// Submit constants from last calibration into database
     bool commit();

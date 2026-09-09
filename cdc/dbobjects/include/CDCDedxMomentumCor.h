@@ -60,14 +60,14 @@ namespace Belle2 {
 
     /** Get the momentum correction
      */
-    std::vector<double> getMomCor() const {return m_momcor; };
+    const std::vector<double>& getMomCor() const {return m_momcor; };
 
     /** Return dE/dx mean value for given bin
      * @param bin for const from bin number
      */
     double getMean(unsigned int bin) const
     {
-      if (bin > m_momcor.size()) return 1.0;
+      if (bin >= m_momcor.size()) return 1.0;
       else return m_momcor[bin];
     }
 

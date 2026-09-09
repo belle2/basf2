@@ -150,7 +150,7 @@ namespace Belle2 {
 
       addedSectors = 0;
       try {
-        for (auto secIDrow : sectorIds)
+        for (const auto& secIDrow : sectorIds)
           for (auto secID : secIDrow) {
             auto compactID = m_compactSecIDsMap.getCompactID(secID);
 
@@ -229,7 +229,7 @@ namespace Belle2 {
     {
       // TODO: sanity checks
       static twoHitFilter_t just_in_case;
-      const auto staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
+      const auto* staticSector = m_staticSectors[ m_compactSecIDsMap[ outer ] ];
       // catch case when sector is not part of the sectorMap:
       if (staticSector == nullptr)
         return just_in_case;
@@ -290,9 +290,11 @@ namespace Belle2 {
 
       if (! m_testConfig.Write("config"))
         return false;
+      // cppcheck-suppress knownConditionTrueFalse ; the persist/retrieve helpers currently always succeed, the check guards future implementations
       if (! persistSectors())
         return false;
 
+      // cppcheck-suppress knownConditionTrueFalse ; the persist/retrieve helpers currently always succeed, the check guards future implementations
       if (! persistFilters())
         return false;
 
@@ -310,6 +312,7 @@ namespace Belle2 {
       if (! m_testConfig.Read("config"))
         return false;
 
+      // cppcheck-suppress knownConditionTrueFalse ; the persist/retrieve helpers currently always succeed, the check guards future implementations
       if (! retrieveSectors(dirName))
         return false;
 
@@ -429,7 +432,7 @@ namespace Belle2 {
       TString treeName = *dirName;
       treeName.Append("/");
       treeName.Append(c_CompactSecIDstreeName);
-      TTree* tree = (TTree*) gFile->Get(treeName);
+      TTree* tree = dynamic_cast<TTree*>(gFile->Get(treeName));
       UInt_t layer, ladder, sensor;
       if (tree->SetBranchAddress("layer", & layer) < 0) B2FATAL("VXDTFFilters: invalid branch address");
       if (tree->SetBranchAddress("ladder", & ladder) < 0) B2FATAL("VXDTFFilters: invalid branch address");
@@ -482,7 +485,7 @@ namespace Belle2 {
       sp3tree->Branch("centerFullSecID", & centerFullSecID3sp);
       sp3tree->Branch("innerFullSecID", & innerFullSecID3sp);
 
-      for (auto staticSector : m_staticSectors) {
+      for (const auto* staticSector : m_staticSectors) {
         if (staticSector == nullptr)
           // Why there is an empty sector per layer?
           continue;
@@ -518,7 +521,7 @@ namespace Belle2 {
     {
       TString sp2treeName = *dirName;
       sp2treeName.Append("/SegmentFilters");
-      TTree* sp2tree = (TTree*) gFile->Get(sp2treeName);
+      TTree* sp2tree = dynamic_cast<TTree*>(gFile->Get(sp2treeName));
       if (!sp2tree)
         return false;
 
@@ -551,7 +554,7 @@ namespace Belle2 {
 
       TString sp3treeName = *dirName;
       sp3treeName.Append("/TripletsFilters");
-      TTree* sp3tree = (TTree*) gFile->Get(sp3treeName);
+      TTree* sp3tree = dynamic_cast<TTree*>(gFile->Get(sp3treeName));
       if (! sp3tree)
         return false;
       threeHitFilter_t threeHitFilter;
@@ -600,7 +603,7 @@ namespace Belle2 {
     {
       std::vector< std::vector< FullSecID >> fullSecIDs;
 
-      for (auto col : fullSecIDsBaseType) {
+      for (const auto& col : fullSecIDsBaseType) {
         std::vector< FullSecID > tmp_col;
         for (auto id : col)
           tmp_col.push_back(FullSecID(id));

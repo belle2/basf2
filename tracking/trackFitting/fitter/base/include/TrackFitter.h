@@ -144,14 +144,14 @@ namespace Belle2 {
     static constexpr unsigned int s_defaultMaxFailedHits = 5;
 
     /// Create a new fitter instance.
-    TrackFitter(const DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default,
-                const std::string& storeArrayNameOfPXDHits = "",
-                const std::string& storeArrayNameOfSVDHits = "",
-                const std::string& storeArrayNameOfCDCHits = "",
-                const std::string& storeArrayNameOfBKLMHits = "",
-                const std::string& storeArrayNameOfEKLMHits = "",
-                const bool initializeCDCTranslators = true,
-                bool fromTrackCreator = false):
+    explicit TrackFitter(const DAFConfiguration::ETrackFitType trackFitType = DAFConfiguration::c_Default,
+                         const std::string& storeArrayNameOfPXDHits = "",
+                         const std::string& storeArrayNameOfSVDHits = "",
+                         const std::string& storeArrayNameOfCDCHits = "",
+                         const std::string& storeArrayNameOfBKLMHits = "",
+                         const std::string& storeArrayNameOfEKLMHits = "",
+                         const bool initializeCDCTranslators = true,
+                         bool fromTrackCreator = false):
       m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits,
                          storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators, fromTrackCreator)
     {
@@ -187,7 +187,7 @@ namespace Belle2 {
     * Use the user settings of the fitter to fit the reco tracks.
     * The parameters are passed as DAFParameters object.
     */
-    void resetFitterToUserSettings(DAFParameters* DAFParams);
+    void resetFitterToUserSettings(const DAFParameters* DAFParams);
 
     /**
      * Use the settings of the fitter to fit the reco tracks for cosmics data.

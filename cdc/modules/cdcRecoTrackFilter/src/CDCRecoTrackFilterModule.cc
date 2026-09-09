@@ -33,10 +33,6 @@ void CDCRecoTrackFilterModule::initialize()
   m_RecoTracks.isRequired(m_recoTrackArrayName);
 }
 
-void CDCRecoTrackFilterModule::beginRun()
-{
-}
-
 void CDCRecoTrackFilterModule::event()
 {
   // Loop over Recotracks
@@ -62,11 +58,4 @@ void CDCRecoTrackFilterModule::event()
     }//end of track
   }//end RecoTrack array
 }//End Event
-void CDCRecoTrackFilterModule::endRun()
-{
-}
-
-void CDCRecoTrackFilterModule::terminate()
-{
-}
 

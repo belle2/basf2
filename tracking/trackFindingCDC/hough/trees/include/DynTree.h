@@ -287,7 +287,7 @@ namespace Belle2 {
           // Initialize new elements with dummy property.
           result->resize(subProperties.size(), Node(subProperties.back()));
           size_t iSubNode = 0;
-          for (auto& properties : subProperties) {
+          for (const auto& properties : subProperties) {
             TrackingUtilities::clearIfApplicable(result->at(iSubNode));
             result->at(iSubNode) = properties;
             ++iSubNode;

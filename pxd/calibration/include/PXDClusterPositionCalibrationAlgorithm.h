@@ -49,12 +49,13 @@ namespace Belle2 {
                                PXDClusterShapeIndexPar* shapeIndexer);
 
     /// Returns a mirrored version of shape classifier
-    PXDClusterShapeClassifierPar mirrorShapeClassifier(PXDClusterShapeClassifierPar* shapeClassifier,
-                                                       PXDClusterShapeIndexPar* shapeIndexer, int clusterKind);
+    PXDClusterShapeClassifierPar mirrorShapeClassifier(const PXDClusterShapeClassifierPar* shapeClassifier,
+                                                       const PXDClusterShapeIndexPar* shapeIndexer, int clusterKind);
 
     /// Returns a shape classifier using global shape indices instead of local ones
-    PXDClusterShapeClassifierPar localToGlobal(PXDClusterShapeClassifierPar* localShapeClassifier,
-                                               PXDClusterShapeIndexPar* localShapeIndexer, PXDClusterShapeIndexPar* globalShapeIndexer);
+    static PXDClusterShapeClassifierPar localToGlobal(const PXDClusterShapeClassifierPar* localShapeClassifier,
+                                                      const PXDClusterShapeIndexPar* localShapeIndexer,
+                                                      const PXDClusterShapeIndexPar* globalShapeIndexer);
 
     /** Branches for tree */
     /** Name of cluster shape */

@@ -22,15 +22,8 @@ namespace Belle2 {
     public:
       /** Constructor.  */
       VXDMisalignmentModule();
-
-      /** Initialize the module and check the parameters */
-      virtual void initialize() override {}
       /** Initialize the list of existing VXD Sensors */
       virtual void beginRun() override;
-      /** Digitize one event */
-      virtual void event() override {}
-      /** Terminate the module */
-      virtual void terminate() override {}
 
     protected:
       /** Name of the xml filename with misalignment data */

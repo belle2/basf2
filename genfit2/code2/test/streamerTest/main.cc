@@ -17,6 +17,7 @@
 #include <EventDisplay.h>
 
 #include <HelixTrackModel.h>
+#include <MathHelpers.h>
 #include <MeasurementCreator.h>
 
 #include <TDatabasePDG.h>
@@ -157,7 +158,7 @@ int main() {
     for (int i = 0; i < 3; ++i)
       covM(i,i) = resolution*resolution;
     for (int i = 3; i < 6; ++i)
-      covM(i,i) = pow(resolution / nMeasurements / sqrt(3), 2);
+      covM(i,i) = genfit::square(resolution / nMeasurements / sqrt(3));
 
 
     // trackrep
@@ -176,9 +177,9 @@ int main() {
 
 
     // create random measurement types
-    std::vector<genfit::eMeasurementType> measurementTypes;
+    std::vector<genfit::EMeasurementType> measurementTypes;
     for (unsigned int i = 0; i < nMeasurements; ++i)
-      measurementTypes.push_back(genfit::eMeasurementType(gRandom->Uniform(8)));
+      measurementTypes.push_back(genfit::EMeasurementType(gRandom->Uniform(8)));
 
 
     // create smeared measurements and add to track
@@ -302,7 +303,7 @@ int main() {
   std::cout << nEvents - fail << " stored tracks are identical to fitted tracks, as far as tested." << std::endl;
   std::cout << fail << " tracks were not identical to fitted tracks, as far as tested." << std::endl;
   delete fitTrack;
-  std::cout << "deleteing didn't segfault" << std::endl;
+  std::cout << "deleting didn't segfault" << std::endl;
 
   return 0;
 }

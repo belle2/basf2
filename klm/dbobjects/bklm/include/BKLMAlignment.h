@@ -80,7 +80,7 @@ namespace Belle2 {
     /**
      * Get a list of stored global parameters.
      */
-    std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams();
+    static std::vector<std::pair<unsigned short, unsigned short>> listGlobalParams();
 
   private:
 

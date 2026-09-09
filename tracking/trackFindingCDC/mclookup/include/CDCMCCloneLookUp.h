@@ -56,13 +56,13 @@ namespace Belle2 {
 
       /// Helper function which returns a map of MCTrackIDs to vectors of CDTrack pointers.
       /// Need that to find clone candidates: tracks with same MCTrackID
-      std::map<const ITrackType, std::vector<TrackingUtilities::CDCTrack*>> getMatchedCDCTracksByMCID(
+      static std::map<const ITrackType, std::vector<TrackingUtilities::CDCTrack*>> getMatchedCDCTracksByMCID(
             std::vector<TrackingUtilities::CDCTrack>& cdcTracks);
 
       /// Helper function which takes a vector of pointers to CDCTracks which are matched to the
       /// same MC particle.
       /// Returns track ptr which is assumed to be not a clone.
-      TrackingUtilities::CDCTrack* findBestMatchedTrack(std::vector<TrackingUtilities::CDCTrack*> matchedTrackPtrs);
+      static TrackingUtilities::CDCTrack* findBestMatchedTrack(std::vector<TrackingUtilities::CDCTrack*> matchedTrackPtrs);
 
       /// Map of track pointers to isClone indicator from MCTruth-based assumption
       std::map<const TrackingUtilities::CDCTrack*, bool> m_cdcTrackIsCloneMap;

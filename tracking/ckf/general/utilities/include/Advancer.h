@@ -42,7 +42,7 @@ namespace Belle2 {
     void setMaterialEffectsToParameterValue() const;
 
     /// Call this to reset the material effects back to their default value (turned on).
-    void resetMaterialEffects() const;
+    static void resetMaterialEffects();
 
     /// Convert the string parameter to a valid forward backward information
     void initialize() final;

@@ -35,7 +35,7 @@ namespace Belle2 {
      *  @param Tmin   Minimal reached temperature in the annealing scheme.
      *  @param cmax   Maximum change of weights between iterations, so we accept the network as converged.
      */
-    HopfieldNetwork(float omega = 0.5, float T = 3.1, float Tmin = 0.1, float cmax = 0.01):
+    explicit HopfieldNetwork(float omega = 0.5, float T = 3.1, float Tmin = 0.1, float cmax = 0.01):
       m_omega(omega), m_T(T), m_Tmin(Tmin), m_cmax(cmax)
     {}
 

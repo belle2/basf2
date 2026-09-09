@@ -82,13 +82,13 @@ void CDCDedxValidationModule::event()
 
     CDCDedxTrack* dedxTrack = m_cdcDedxTracks[idedx];
     if (!dedxTrack) {
-      ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(0.0);
+      (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(0.0);
       continue;
     }
 
     const Track* track = dedxTrack->getRelatedFrom<Track>();
     if (!track) {
-      ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(1.0);
+      (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(1.0);
       continue;
     }
 
@@ -99,13 +99,13 @@ void CDCDedxValidationModule::event()
       mTrack = track->getTrackFitResultWithClosestMass(Const::pion);
     }
     if (!mTrack) {
-      ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(2.0);
+      (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(2.0);
       continue;
     }
 
     bool IsTrkSelected = IsSelectedTrack(mTrack);
     if (!IsTrkSelected) {
-      ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(3.0);
+      (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(3.0);
       continue;
     }
 
@@ -116,21 +116,21 @@ void CDCDedxValidationModule::event()
       fTrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (mTrack->getMomentum().R());
       if (fCollType == "bhabha" || fCollType == "radbhabha") {
         if (std::abs(fTrkEoverP - 1.0) >= 0.2)continue;
-        ((TH1D*)fBasic->FindObject(Form("hEOverP_AR")))->Fill(double(fTrkEoverP));
+        (static_cast<TH1D*>(fBasic->FindObject(Form("hEOverP_AR"))))->Fill(double(fTrkEoverP));
       }
     } else {
-      ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(4.0);
+      (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(4.0);
       continue;
 
     }
 
-    ((TH1D*)fBasic->FindObject("hTrkPerEvtStats"))->Fill(5.0);
+    (static_cast<TH1D*>(fBasic->FindObject("hTrkPerEvtStats")))->Fill(5.0);
     FillHistograms(dedxTrack, mTrack);
   }
 }
 
 //----------------------------------------------------------------------------------------------------
-void CDCDedxValidationModule::FillHistograms(CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack)
+void CDCDedxValidationModule::FillHistograms(const CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack)
 {
 
   fcRunGain = dedxTrack->getRunGain();
@@ -148,19 +148,19 @@ void CDCDedxValidationModule::FillHistograms(CDCDedxTrack* dedxTrack, const Trac
   if (fCollType == "radbhabha" or fCollType == "bhabha") {
 
     if (TrkCharge > 0) {
-      ((TH1D*)fBasic->FindObject(Form("hP_Positron_AR")))->Fill(TrkMom);
-      ((TH1D*)fBasic->FindObject(Form("hdEdx_Positron_AR")))->Fill(TrkdEdxnosat);
-      ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", iMomBin)))->Fill(TrkdEdxnosat);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hP_Positron_AR"))))->Fill(TrkMom);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hdEdx_Positron_AR"))))->Fill(TrkdEdxnosat);
+      (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", iMomBin))))->Fill(TrkdEdxnosat);
     } else if (TrkCharge < 0) {
-      ((TH1D*)fBasic->FindObject(Form("hP_Electron_AR")))->Fill(TrkMom);
-      ((TH1D*)fBasic->FindObject(Form("hdEdx_Electron_AR")))->Fill(TrkdEdxnosat);
-      ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", iMomBin)))->Fill(TrkdEdxnosat);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hP_Electron_AR"))))->Fill(TrkMom);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hdEdx_Electron_AR"))))->Fill(TrkdEdxnosat);
+      (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", iMomBin))))->Fill(TrkdEdxnosat);
     }
 
-    ((TH1D*)fBasic->FindObject(Form("hdEdx_AR")))->Fill(double(TrkdEdxnosat));
-    ((TH2D*)fBasic->FindObject(Form("hdEdxvsPhi_AR")))->Fill(double(mTrack->getPhi()), double(TrkdEdxnosat));
-    ((TH2D*)fBasic->FindObject(Form("hPvsdEdx_AR")))->Fill(TrkMom * TrkCharge, double(TrkdEdxnosat));
-    ((TH2D*)fBasic->FindObject(Form("hPvsCosth_AR")))->Fill(TrkMom * TrkCharge, double(TrkCosTheta));
+    (static_cast<TH1D*>(fBasic->FindObject(Form("hdEdx_AR"))))->Fill(double(TrkdEdxnosat));
+    (static_cast<TH2D*>(fBasic->FindObject(Form("hdEdxvsPhi_AR"))))->Fill(double(mTrack->getPhi()), double(TrkdEdxnosat));
+    (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsdEdx_AR"))))->Fill(TrkMom * TrkCharge, double(TrkdEdxnosat));
+    (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsCosth_AR"))))->Fill(TrkMom * TrkCharge, double(TrkCosTheta));
 
     hdEdx_PR[fiRun]->Fill(double(TrkdEdxnosat));
 
@@ -168,35 +168,38 @@ void CDCDedxValidationModule::FillHistograms(CDCDedxTrack* dedxTrack, const Trac
 
     // double ChiE = dedxTrack->getChi(0);
     // double ChiMu = dedxTrack->getChi(1);
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double ChiPi = dedxTrack->getChi(2);
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double ChiK = dedxTrack->getChi(3);
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double ChiP = dedxTrack->getChi(4);
     // double ChiD = dedxTrack->getChi(5);
 
-    ((TH2D*)fBasic->FindObject(Form("hPvsdEdx_hadAR")))->Fill(TrkMom, TrkdEdx);
+    (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsdEdx_hadAR"))))->Fill(TrkMom, TrkdEdx);
 
     if ((TrkMom < 0.40) && (fTrkEoverP < 0.4) && (TrkdEdx < (0.6 + 0.10 / (TrkMom * TrkMom)))
         && (TrkdEdx > (0.4 + 0.012 / (TrkMom * TrkMom)))) {
-      ((TH1D*)fBasic->FindObject(Form("hPionChiallP")))->Fill(ChiPi);
-      if (TrkMom < 0.300)((TH1D*)fBasic->FindObject(Form("hPionChiLowP")))->Fill(ChiPi);
-      else ((TH1D*)fBasic->FindObject(Form("hPionChiHighP")))->Fill(ChiPi);
-      ((TH2D*)fBasic->FindObject(Form("hPvsdEdxPion_hadAR")))->Fill(TrkMom, TrkdEdx);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hPionChiallP"))))->Fill(ChiPi);
+      if (TrkMom < 0.300)(static_cast<TH1D*>(fBasic->FindObject(Form("hPionChiLowP"))))->Fill(ChiPi);
+      else (static_cast<TH1D*>(fBasic->FindObject(Form("hPionChiHighP"))))->Fill(ChiPi);
+      (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsdEdxPion_hadAR"))))->Fill(TrkMom, TrkdEdx);
     }
 
     if ((TrkMom < 0.40) && (TrkdEdx > 1.35) && (TrkdEdx < (0.6 + 0.40 / (TrkMom * TrkMom)))
         && (TrkdEdx > (0.6 + 0.10 / (TrkMom * TrkMom)))) {
-      ((TH1D*)fBasic->FindObject(Form("hKaonChiallP")))->Fill(ChiK);
-      if (TrkMom < 0.350)((TH1D*)fBasic->FindObject(Form("hKaonChiLowP")))->Fill(ChiK);
-      else ((TH1D*)fBasic->FindObject(Form("hKaonChiHighP")))->Fill(ChiK);
-      ((TH2D*)fBasic->FindObject(Form("hPvsdEdxKaon_hadAR")))->Fill(TrkMom, TrkdEdx);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hKaonChiallP"))))->Fill(ChiK);
+      if (TrkMom < 0.350)(static_cast<TH1D*>(fBasic->FindObject(Form("hKaonChiLowP"))))->Fill(ChiK);
+      else (static_cast<TH1D*>(fBasic->FindObject(Form("hKaonChiHighP"))))->Fill(ChiK);
+      (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsdEdxKaon_hadAR"))))->Fill(TrkMom, TrkdEdx);
     }
 
     if ((TrkMom < 0.80) && (TrkdEdx > 1.35) && (TrkdEdx < (0.6 + 1.20 / (TrkMom * TrkMom)))
         && (TrkdEdx > (0.6 + 0.40 / (TrkMom * TrkMom)))) {
-      ((TH1D*)fBasic->FindObject(Form("hProtonChiallP")))->Fill(ChiP);
-      if (TrkMom < 0.600)((TH1D*)fBasic->FindObject(Form("hProtonChiLowP")))->Fill(ChiP);
-      else ((TH1D*)fBasic->FindObject(Form("hProtonChiHighP")))->Fill(ChiP);
-      ((TH2D*)fBasic->FindObject(Form("hPvsdEdxProton_hadAR")))->Fill(TrkMom, TrkdEdx);
+      (static_cast<TH1D*>(fBasic->FindObject(Form("hProtonChiallP"))))->Fill(ChiP);
+      if (TrkMom < 0.600)(static_cast<TH1D*>(fBasic->FindObject(Form("hProtonChiLowP"))))->Fill(ChiP);
+      else (static_cast<TH1D*>(fBasic->FindObject(Form("hProtonChiHighP"))))->Fill(ChiP);
+      (static_cast<TH2D*>(fBasic->FindObject(Form("hPvsdEdxProton_hadAR"))))->Fill(TrkMom, TrkdEdx);
     }
   }
 
@@ -385,7 +388,7 @@ void CDCDedxValidationModule::ExtractHistograms(TString level = "exit")
       Int_t fitStatus = -1;
       fitStatus = hdEdx_PR[fiRun]->Fit("gaus", "Q"); //Q = No printing
       if (fitStatus == 0) {
-        TF1* fit = (TF1*)hdEdx_PR[fiRun]->GetFunction("gaus");
+        TF1* fit = static_cast<TF1*>(hdEdx_PR[fiRun]->GetFunction("gaus"));
         mean = fit->GetParameter(1);
         meanError = fit->GetParError(1);
         sigma = fit->GetParameter(2);
@@ -401,14 +404,16 @@ void CDCDedxValidationModule::ExtractHistograms(TString level = "exit")
     TotSigma.push_back(sigma);
     TotSigmaE.push_back(sigmaError);
 
-    if (fiRun % 10 == 0)((TH1D*)fBasic->FindObject("hRunGainPR"))->GetXaxis()->SetBinLabel(fiRun + 1, Form("%d", TotRunN.at(fiRun)));
-    ((TH1D*)fBasic->FindObject("hRunGainPR"))->SetBinContent(fiRun + 1, fcRunGain);
-    ((TH1D*)fBasic->FindObject("hRunGainPR"))->SetBinError(fiRun + 1, 0.001 * fcRunGain); // no meaning but histogramming only
+    if (fiRun % 10 == 0)(static_cast<TH1D*>(fBasic->FindObject("hRunGainPR")))->GetXaxis()->SetBinLabel(fiRun + 1, Form("%d",
+          TotRunN.at(fiRun)));
+    (static_cast<TH1D*>(fBasic->FindObject("hRunGainPR")))->SetBinContent(fiRun + 1, fcRunGain);
+    (static_cast<TH1D*>(fBasic->FindObject("hRunGainPR")))->SetBinError(fiRun + 1,
+        0.001 * fcRunGain); // no meaning but histogramming only
 
   } else if (level == "AR") {
 
     const Int_t allNRun = TotMean.size();
-    ((TH1D*)fBasic->FindObject("hRunGainPR"))->GetXaxis()->SetRange(1, allNRun);
+    (static_cast<TH1D*>(fBasic->FindObject("hRunGainPR")))->GetXaxis()->SetRange(1, allNRun);
 
     TH1D* hFitdEdxMeanPR = new TH1D("hFitdEdxMeanPR", "dE/dx(nohad-sat) #mu via fit vs. Runs", allNRun, 0, allNRun);
     hFitdEdxMeanPR->GetYaxis()->SetRangeUser(0.90, 1.10);
@@ -442,10 +447,10 @@ void CDCDedxValidationModule::ExtractHistograms(TString level = "exit")
     fBasic->Add(hFitdEdxMeanPR);
     fBasic->Add(hFitdEdxSigmaPR);
 
-    TH1D* hdEdxFit_allRun = (TH1D*)(fBasic->FindObject(Form("hdEdx_AR"))->Clone("hdEdxFit_allRun"));
+    TH1D* hdEdxFit_allRun = static_cast<TH1D*>((fBasic->FindObject(Form("hdEdx_AR"))->Clone("hdEdxFit_allRun")));
     if (hdEdxFit_allRun->GetEntries() > 100) {
       hdEdxFit_allRun->Fit("gaus", "Q");
-      TF1* hGfit = (TF1*)hdEdxFit_allRun->GetFunction("gaus");
+      TF1* hGfit = static_cast<TF1*>(hdEdxFit_allRun->GetFunction("gaus"));
       Double_t meanGFit = hGfit->GetParameter(1);
       Double_t sigmaGFit = hGfit->GetParameter(2);
       hdEdxFit_allRun->GetXaxis()->SetRangeUser(meanGFit - 7 * sigmaGFit, meanGFit + 7 * sigmaGFit);
@@ -463,27 +468,27 @@ void CDCDedxValidationModule::ExtractHistograms(TString level = "exit")
     hdEdxSigmaVsMomentum->GetYaxis()->SetTitle("dEdx Sigma");
 
     for (int ip = 0; ip < 32; ip++) {
-      Int_t nTrack = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->GetEntries();
-      ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->SetFillColor(kYellow);
+      Int_t nTrack = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->GetEntries();
+      (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->SetFillColor(kYellow);
       Double_t iPMean  = 1.0, iPSigma = 0.0;
       if (nTrack > 100) {
-        ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->Fit("gaus", "0");
-        iPMean  = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->GetFunction("gaus")->GetParameter(1);
-        iPSigma = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->GetFunction("gaus")->GetParameter(2);
+        (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->Fit("gaus", "0");
+        iPMean  = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->GetFunction("gaus")->GetParameter(1);
+        iPSigma = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->GetFunction("gaus")->GetParameter(2);
       }
       hdEdxMeanVsMomentum->SetBinContent(32 + ip + 1, iPMean);
       hdEdxSigmaVsMomentum->SetBinContent(32 + ip + 1, iPSigma);
     }
 
     for (int ip = 0; ip < 32; ip++) {
-      Int_t nTrack = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip)))->GetEntries();
-      ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip)))->SetFillColor(kYellow);
+      Int_t nTrack = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Posi_Pbin_AR%d", ip))))->GetEntries();
+      (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip))))->SetFillColor(kYellow);
       Double_t iPMean  = 1.0, iPSigma = 0.0;
 
       if (nTrack > 100) {
-        ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip)))->Fit("gaus", "0");
-        iPMean  = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip)))->GetFunction("gaus")->GetParameter(1);
-        iPSigma = ((TH1D*)fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip)))->GetFunction("gaus")->GetParameter(2);
+        (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip))))->Fit("gaus", "0");
+        iPMean  = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip))))->GetFunction("gaus")->GetParameter(1);
+        iPSigma = (static_cast<TH1D*>(fPRdEdxinP->FindObject(Form("hdEdx_Elec_Pbin_AR%d", ip))))->GetFunction("gaus")->GetParameter(2);
       }
       hdEdxMeanVsMomentum->SetBinContent(32 - ip, iPMean);
       hdEdxSigmaVsMomentum->SetBinContent(32 - ip, iPSigma);

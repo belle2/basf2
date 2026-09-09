@@ -92,13 +92,13 @@ int PXDReadRawONSENModule::read_data(char* data, size_t len)
 
 int PXDReadRawONSENModule::readOneEvent()
 {
-  char* data = (char*)m_buffer;
+  char* data = reinterpret_cast<char*>(m_buffer);
   int len = MAXEVTSIZE * sizeof(int);
 
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  ubig32_t* pxdheader = (ubig32_t*) data;
-  ubig32_t* pxdheadertable = (ubig32_t*) &data[headerlen];
+  ubig32_t* pxdheader = reinterpret_cast<ubig32_t*>(data);
+  const ubig32_t* pxdheadertable = reinterpret_cast<ubig32_t*>(&data[headerlen]);
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(data, headerlen);
   if (br <= 0) return br;
@@ -112,7 +112,7 @@ int PXDReadRawONSENModule::readOneEvent()
     exit(0);
   }
   tablelen = 4 * framenr;
-  br = read_data((char*)&data[headerlen], tablelen);
+  br = read_data(reinterpret_cast<char*>(&data[headerlen]), tablelen);
   if (br <= 0) return br;
   for (int i = 0; i < framenr; i++) {
     datalen += (pxdheadertable[i] + 3) & 0xFFFFFFFC;
@@ -197,7 +197,7 @@ bool PXDReadRawONSENModule::getTrigNr(RawPXD& px)
     return false;
   }
 
-  Frames_in_event = ((ubig32_t*)data.data())[1];
+  Frames_in_event = (reinterpret_cast<ubig32_t*>(data.data()))[1];
   if (Frames_in_event < 1 || Frames_in_event > 250) {
     B2ERROR("Number of Frames invalid: Will not unpack anything. Header corrupted! Frames in event: " << Frames_in_event);
     return false;
@@ -213,7 +213,7 @@ bool PXDReadRawONSENModule::getTrigNr(RawPXD& px)
   int ll = 0; // Offset in dataptr in bytes
   for (int j = 0; j < Frames_in_event; j++) {
     int lo;/// len of frame in bytes
-    lo = ((ubig32_t*)tableptr)[j];
+    lo = (reinterpret_cast<ubig32_t*>(tableptr))[j];
     if (lo <= 0) {
       B2ERROR("size of frame invalid: " << j << "size " << lo << " at byte offset in dataptr " << ll);
       return false;
@@ -227,7 +227,7 @@ bool PXDReadRawONSENModule::getTrigNr(RawPXD& px)
       B2ERROR("SKIP Frame with Data with not MOD 4 length " << " ( $" << hex << lo << " ) ");
       ll += (lo + 3) & 0xFFFFFFFC; /// round up to next 32 bit boundary
     } else {
-      if (unpack_dhc_frame(ll + (char*)dataptr)) return true;
+      if (unpack_dhc_frame(ll + reinterpret_cast<char*>(dataptr))) return true;
       ll += lo; /// no rounding needed
     }
   }
@@ -236,10 +236,10 @@ bool PXDReadRawONSENModule::getTrigNr(RawPXD& px)
 
 bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
 {
-  switch (((*(ubig16_t*)data) & 0x7800) >> 11) {
+  switch (((*reinterpret_cast<ubig16_t*>(data)) & 0x7800) >> 11) {
     case EDHCFrameHeaderDataType::c_ONSEN_TRG: {
-      unsigned int trignr = ((ubig32_t*)data)[2];
-      unsigned int tag = ((ubig32_t*)data)[3];
+      unsigned int trignr = (reinterpret_cast<ubig32_t*>(data))[2];
+      unsigned int tag = (reinterpret_cast<ubig32_t*>(data))[3];
 
       B2INFO("Set event and exp/run from ONSEN: $" << hex << trignr << ", $" << hex << tag);
       m_eventMetaDataPtr->setEvent(trignr);
@@ -250,9 +250,9 @@ bool PXDReadRawONSENModule::unpack_dhc_frame(void* data)
       break;
     }
     case EDHCFrameHeaderDataType::c_DHC_START: {
-      unsigned int time_tag_lo_and_type = ((ubig16_t*)data)[3];
-      unsigned int time_tag_mid = ((ubig16_t*)data)[4];
-      unsigned int time_tag_hi = ((ubig16_t*)data)[5];
+      unsigned int time_tag_lo_and_type = (reinterpret_cast<ubig16_t*>(data))[3];
+      unsigned int time_tag_mid = (reinterpret_cast<ubig16_t*>(data))[4];
+      unsigned int time_tag_hi = (reinterpret_cast<ubig16_t*>(data))[5];
       B2INFO("Set time tag from DHC: $" << hex << time_tag_mid << ", $" << hex << time_tag_lo_and_type);
       uint32_t tt = ((time_tag_mid & 0x7FFF) << 12) | (time_tag_lo_and_type >> 4);
       // we cannot recover full time tag from DHH header, but we do as much as possible to

@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_AbsMaterialInterface_h
-#define genfit_AbsMaterialInterface_h
+#pragma once
 
 #include "RKTrackRep.h"
 #include "Material.h"
@@ -49,7 +48,7 @@ class AbsMaterialInterface : public TObject {
                          double dirX, double dirY, double dirZ) = 0;
 
   /***
-   * Get the material paramaters in the current material.
+   * Get the material parameters in the current material.
    * @return
    */
   virtual Material getMaterialParameters() = 0;
@@ -76,5 +75,3 @@ class AbsMaterialInterface : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsMaterialInterface_h

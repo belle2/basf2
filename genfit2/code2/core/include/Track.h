@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_Track_h
-#define genfit_Track_h
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "FitStatus.h"
@@ -224,9 +223,9 @@ class Track : public TObject {
    */
   bool sort();
 
-  //! Try to set the fitted state as seed. Return if it was successfull.
+  //! Try to set the fitted state as seed. Return if it was successful.
   //! Adapt the sign of all TrackReps' pdg to the actual fitted charge.
-  bool udpateSeed(int id = 0, AbsTrackRep* rep = nullptr, bool biased = true);
+  bool updateSeed(int id = 0, AbsTrackRep* rep = nullptr, bool biased = true);
 
   //! Flip the ordering of the TrackPoints
   void reverseTrackPoints();
@@ -273,7 +272,7 @@ class Track : public TObject {
    * The idea is hat you can get a TrackCand for storing the hit IDs after a track has been fitted.
    * His could have been reordered, added or removed, so that the original TackCand no longer
    * represents the Track correctly.
-   * You might want to call determineCardinalRep() and/or udpateSeed() before.
+   * You might want to call determineCardinalRep() and/or updateSeed() before.
    */
   TrackCand* constructTrackCand() const;
 
@@ -329,5 +328,3 @@ class Track : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_Track_h

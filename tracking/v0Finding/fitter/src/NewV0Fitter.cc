@@ -144,17 +144,17 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
   const auto* fitMinus = saveTrackFitResult(m_trkMinus, sharedCluster);
   if (not fitMinus) return false;
 
-  auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, fitPlus),
-                             std::make_pair(trackMinus, fitMinus),
-                             m_fittedVertex.getPos().X(), m_fittedVertex.getPos().Y(), m_fittedVertex.getPos().Z());
+  const auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, fitPlus),
+                                   std::make_pair(trackMinus, fitMinus),
+                                   m_fittedVertex.getPos().X(), m_fittedVertex.getPos().Y(), m_fittedVertex.getPos().Z());
 
   if (m_validation) {
-    auto* validationV0 = m_validationV0s.appendNew(std::make_pair(trackPlus, fitPlus),
-                                                   std::make_pair(trackMinus, fitMinus),
-                                                   ROOT::Math::XYZVector(m_fittedVertex.getPos()),
-                                                   m_fittedVertex.getCov(),
-                                                   m_momentum, m_invMass,
-                                                   m_fittedVertex.getChi2());
+    const auto* validationV0 = m_validationV0s.appendNew(std::make_pair(trackPlus, fitPlus),
+                                                         std::make_pair(trackMinus, fitMinus),
+                                                         ROOT::Math::XYZVector(m_fittedVertex.getPos()),
+                                                         m_fittedVertex.getCov(),
+                                                         m_momentum, m_invMass,
+                                                         m_fittedVertex.getChi2());
     v0->addRelationTo(validationV0);
   }
 
@@ -251,6 +251,7 @@ bool NewV0Fitter::setCardinalRep(genfit::Track& gfTrack, int pdgCode)
 }
 
 
+// cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
 bool NewV0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
 {
   VertexVector vertexVector;
@@ -312,7 +313,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   std::vector<bool> useInFit;
   const auto& recoHitInformations = origRecoTrack->getRecoHitInformations(true); // true to get sorted hits info
   useInFit.reserve(recoHitInformations.size());
-  for (const auto& hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
+  for (const auto* hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
 
   // get track representation for a given particle
   const auto* rep = getTrackRepresentation(origRecoTrack, abs(ptype.getPDGCode()));
@@ -322,7 +323,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   int removedHits = 0;
   unsigned firstHit = 0;
   for (unsigned i = 0; i < recoHitInformations.size(); i++) {
-    const auto& hitInfo = recoHitInformations[i];
+    const auto* hitInfo = recoHitInformations[i];
     if (not hitInfo->useInFit()) continue;
     try {
       auto state = origRecoTrack->getMeasuredStateOnPlaneFromRecoHit(hitInfo, rep); // a copy of
@@ -353,7 +354,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
     std::vector<unsigned> svdIndex;
     for (unsigned i = 0; i < useInFit.size(); i++) {
       if (not useInFit[i]) continue;
-      const auto& hitInfo = recoHitInformations[i];
+      const auto* hitInfo = recoHitInformations[i];
       if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) svdIndex.push_back(i);
       else break;
     }

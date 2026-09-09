@@ -47,8 +47,9 @@ void RaveSetup::initialize(int verbosity, double magneticField)
   getRawInstance()->m_initialized = true;
 }
 
-RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(nullptr)/*, m_GFRaveVertexFactory(NULL)*/,
-  m_raveKinematicTreeFactory(nullptr), m_initialized(false)
+// cppcheck-suppress uninitMemberVar
+RaveSetup::RaveSetup(): m_useBeamSpot(false), m_raveVertexFactory(nullptr), m_raveKinematicTreeFactory(nullptr),
+  m_initialized(false)
 {
 }
 
@@ -88,6 +89,9 @@ void RaveSetup::unsetBeamSpot()
 
 void RaveSetup::Print()
 {
+  // getRawInstance() returns a function-local static, so it can never be null;
+  // the else branch below is therefore unreachable
+  // cppcheck-suppress knownConditionTrueFalse
   if (getRawInstance() not_eq nullptr) {
     if (getRawInstance()->m_useBeamSpot == false) {
       B2INFO("use beam spot is false");

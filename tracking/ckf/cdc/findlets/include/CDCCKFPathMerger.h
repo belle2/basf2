@@ -42,7 +42,7 @@ namespace Belle2 {
 
   private:
     /// helper function, returns has of the last 3 wire hits on the path
-    size_t lastThreeHitHash(const CDCCKFPath& path)
+    static size_t lastThreeHitHash(const CDCCKFPath& path)
     {
       size_t seed = 0;
       unsigned int counter = 0;

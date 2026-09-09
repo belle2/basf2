@@ -25,25 +25,25 @@ namespace Belle2 {
       eclBhabhaTAlgorithm();
 
       /**..Destructor */
-      ~eclBhabhaTAlgorithm() {}
+      ~eclBhabhaTAlgorithm() override {}
 
       /*** Parameters ***/
 
-      int cellIDLo;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      int cellIDHi;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
-      double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
+      int cellIDLo = 0;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      int cellIDHi = 0;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      double meanCleanRebinFactor = 0.0;  /**< Rebinning factor for mean calculation */
+      double meanCleanCutMinFactor = 0.0;  /**< After rebinning, create a mask for bins that have values
                                           less than meanCleanCutMinFactor times the maximum bin value.
                                           Expand mask and apply to non-rebinned histogram. */
-      int crateIDLo;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-      int crateIDHi;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
-      bool savePrevCrysPayload; /**< Save the previous crystal payload values for comparison */
-      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
-      bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
+      int crateIDLo = 0;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
+      int crateIDHi = 0;    /**< Fit crates with crateID0 in the inclusive range [crateIDLo,crateIDHi] */
+      bool savePrevCrysPayload = false; /**< Save the previous crystal payload values for comparison */
+      bool readPrevCrysPayload = false; /**< Read the previous crystal payload values for comparison */
+      bool debugOutput = false; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclBhabhaTAlgorithm.root by default */
       std::string debugFilenameBase;
       std::string collectorName;  /**< Name of the collector */
-      int refCrysPerCrate[52] ;  /**< List of crystals, one per crate, used as reference
+      int refCrysPerCrate[52]  = {};  /**< List of crystals, one per crate, used as reference
                                         time for crystal time calibration */
     protected:
 

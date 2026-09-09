@@ -9,7 +9,7 @@
 
 #include <framework/utilities/TestHelpers.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   namespace TrackingUtilities {
@@ -37,11 +37,13 @@ namespace Belle2 {
        *  Implementation of hook method to setup the environment for all tests in this test case
        *  Unpacks the wire topology from the CDCGeometryPar.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
       static void SetUpTestCase();
 
       /**
        *  Implementation of hook method to clean up the environment for all tests in this test case.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
       static void TearDownTestCase();
 
     };
@@ -54,9 +56,9 @@ namespace Belle2 {
   namespace TestHelpers {
     /** Predicate checking that all three components of Vector3D are close by a maximal error of tolerance. */
     template<>
-    bool allNear<TrackingUtilities::Vector3D>(const TrackingUtilities::Vector3D& expected,
-                                              const TrackingUtilities::Vector3D& actual,
-                                              double tolerance);
+    bool allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                        const ROOT::Math::XYZVector& actual,
+                                        double tolerance);
   }
 
 }

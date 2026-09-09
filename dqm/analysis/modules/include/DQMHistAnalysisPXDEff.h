@@ -148,7 +148,7 @@ namespace Belle2 {
     //! error level for alarm per module
     std::map<std::string, double> m_errorlevelmod;
     //! Number of bins in efficiency plot, all modules plus layer and summary
-    int m_nrxbins;
+    int m_nrxbins = 0;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

@@ -95,10 +95,6 @@ void SVDShaperDigitsFromTracksModule::initialize()
 }
 
 
-void SVDShaperDigitsFromTracksModule::beginRun()
-{
-}
-
 
 void SVDShaperDigitsFromTracksModule::event()
 {
@@ -116,14 +112,6 @@ void SVDShaperDigitsFromTracksModule::event()
       return !isRelatedToTrackRel5(theSVDShaperDigit);
     return !isRelatedToTrack(theSVDShaperDigit);
   });
-}
-
-void SVDShaperDigitsFromTracksModule::endRun()
-{
-}
-
-void SVDShaperDigitsFromTracksModule::terminate()
-{
 }
 
 bool SVDShaperDigitsFromTracksModule::isRelatedToTrack(const SVDShaperDigit* shaperdigit)

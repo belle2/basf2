@@ -24,7 +24,7 @@ namespace Belle2 {
       /** Constructor takes waveform decay time as parameter.
        * @param tau waveform decay time
        */
-      DefaultWave(double tau = s_default_tau) : m_tau(tau) {}
+      explicit DefaultWave(double tau = s_default_tau) : m_tau(tau) {}
 
       static double s_default_tau;  /**< Default waveform decay time */
 
@@ -201,10 +201,9 @@ namespace Belle2 {
       /** Calculate fitted data. */
       void calculateFittedData();
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
-      // cppcheck-suppress unusedPrivateFunction
-      double integral12(double lower, double upper, std::function<double(double)> f);
+      static double integral12(double lower, double upper, std::function<double(double)> f);
       /** High-order Gauss-Legendre quadrature for likelihood integrals */
-      double integral20(double lower, double upper, std::function<double(double)> f);
+      static double integral20(double lower, double upper, std::function<double(double)> f);
       bool m_hasFit;    /**< Are fit results available? */
       double m_dt;  /**< Time interval between samples */
       strip_data_type m_data;   /**< Vector of sextets of APV samples */

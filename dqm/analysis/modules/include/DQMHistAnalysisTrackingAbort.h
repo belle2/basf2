@@ -22,8 +22,6 @@ namespace Belle2 {
 
     /** Constructor */
     DQMHistAnalysisTrackingAbortModule();
-    /**Destructor */
-    ~DQMHistAnalysisTrackingAbortModule() {};
 
     /** Module function initialize */
     void initialize() override final;

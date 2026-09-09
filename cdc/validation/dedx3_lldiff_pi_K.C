@@ -59,7 +59,7 @@ TH1D *GetLLDiffPlot(TFile *file, TTree *tree, TString det="temp", Int_t ipart=0)
   file->cd();
   tree->Project(TString::Format("%s", hname.Data()), TString::Format("%s", proj.Data()), TString::Format("%s", cut.Data()));
   
-  TH1D* hist = (TH1D*)file->Get(TString::Format("%s", name.Data()));
+  TH1D* hist = static_cast<TH1D*>(file->Get(TString::Format("%s", name.Data())));
   if(hist)std::cout << "creating histogram for: " << hist->GetName() << std::endl;
   
   hist->SetTitle(TString::Format("LL(pi) - LL(K) for true %s w/ CC (in %s);LL_{#pi}-LL_{K} diff (%s);entries", pname.Data(), det.Data(), (idet==0)?"VXD":"CDC") );
@@ -85,7 +85,7 @@ void plot(const TString &input_filename)
     exit(1);
   }
 
-  TTree *tree = (TTree*)f->Get("tree");
+  TTree *tree = static_cast<TTree*>(f->Get("tree"));
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
@@ -112,8 +112,8 @@ void plot(const TString &input_filename)
   for ( auto pdg : {211,321}) {
     count++;
     //prepare CDC/SVD plots
-    hSVD[count] = (TH1D*)GetLLDiffPlot(f,tree,"SVD",pdg); //0 for all
-    hCDC[count] = (TH1D*)GetLLDiffPlot(f,tree,"CDC",pdg); //0 for all
+    hSVD[count] = static_cast<TH1D*>(GetLLDiffPlot(f,tree,"SVD",pdg)); //0 for all
+    hCDC[count] = static_cast<TH1D*>(GetLLDiffPlot(f,tree,"CDC",pdg)); //0 for all
     //add SVD plots
     hSVD[count]->SetMarkerColor(kRed);
     hCDC[count]->SetMarkerColor(kBlue);

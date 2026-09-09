@@ -74,7 +74,7 @@ namespace {
     EXPECT_TRUE(*v2 == v);
 
     //something more complex
-    RelationContainer* relCont = createObject();
+    const RelationContainer* relCont = createObject();
 
     std::string relStr = Stream::serializeAndEncode(relCont);
     obj = Stream::deserializeEncodedRawData(relStr);
@@ -86,7 +86,7 @@ namespace {
     // assumes multiple of four and then performs an invalid read of a char
     // which it casts to unsigned int.
     std::string truncated = vStr.substr(0, 12);
-    TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
+    const TObject* broken_obj = Stream::deserializeEncodedRawData(truncated);
     EXPECT_TRUE(broken_obj == nullptr);
   }
 

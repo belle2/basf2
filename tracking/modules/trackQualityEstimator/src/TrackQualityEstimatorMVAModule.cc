@@ -124,8 +124,8 @@ void TrackQualityEstimatorMVAModule::event()
     // The reconstructed track contains at most one CDC part.
     // Try to match the hit list to find the right CDC track.
     // If no matching CDC tracks are found, then cdcRecoTrackPtr will still be nullptr.
-    RecoTrack* cdcRecoTrackPtr = nullptr;
-    for (RecoTrack* foundCDCTrack : allCDCTracks) {
+    const RecoTrack* cdcRecoTrackPtr = nullptr;
+    for (const RecoTrack* foundCDCTrack : allCDCTracks) {
       const auto& foundCDCTrackHitList = foundCDCTrack->getCDCHitList();
       if (foundCDCTrackHitList.size() == cdcHitList.size() and
           std::equal(foundCDCTrackHitList.begin(), foundCDCTrackHitList.end(), cdcHitList.begin())) {

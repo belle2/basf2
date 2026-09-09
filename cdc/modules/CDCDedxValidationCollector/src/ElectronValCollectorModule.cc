@@ -131,7 +131,9 @@ void ElectronValCollectorModule::collect()
 
   // Check for the required trigger identifiers
   if (fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end() &&
-      fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end()) {
+      (fresults.find("software_trigger_cut&skim&accept_radee") == fresults.end()
+       || fresults.find("software_trigger_cut&skim&accept_bhabha_cdc") == fresults.end())) {
+
     B2WARNING("Can't find required bhabha/radee trigger identifiers");
     hestats->Fill(2); // Fill bin 3 to indicate missing trigger identifiers
     return;
@@ -139,15 +141,30 @@ void ElectronValCollectorModule::collect()
 
   // Defining event trigger conditions
   const bool eBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha") == SoftwareTriggerCutResult::c_accept);
-  const bool eRadBhabha = (m_trgResult->getResult("software_trigger_cut&skim&accept_bhabha_cdc") ==
-                           SoftwareTriggerCutResult::c_accept);
+
+  bool eRadBhabha = false;
+
+  const std::string radee =
+    "software_trigger_cut&skim&accept_radee";
+
+  const std::string bhabhaCDC =
+    "software_trigger_cut&skim&accept_bhabha_cdc";
+
+  if (fresults.find(bhabhaCDC) != fresults.end()) {
+    // If bhabha_cdc exists, use only bhabha_cdc
+    eRadBhabha = (m_trgResult->getResult(bhabhaCDC) == SoftwareTriggerCutResult::c_accept);
+  } else if (fresults.find(radee) != fresults.end()) {
+    // Otherwise use radee
+    eRadBhabha = (m_trgResult->getResult(radee) == SoftwareTriggerCutResult::c_accept);
+  }
+
 
   // Handling different event types
   if (eBhabha) {
-    B2INFO("Bhabha events");
+    // B2INFO("Bhabha events");
     hestats->Fill(3);  // Bin 4 (index 3)
   } else if (eRadBhabha) {
-    B2INFO("Radiative Bhabha events");
+    // B2INFO("Radiative Bhabha events");
     hestats->Fill(4);  // Bin 5 (index 4)
   } else {
     B2WARNING("Requested event not found: going back");

@@ -121,7 +121,7 @@ namespace {
     EXPECT_NEAR(probabilities[1][2], 0.0132, 0.0001);
   }
 
-  Weightfile getONNXWeightfile(std::string modelFilenameONNX, std::string outputName = "")
+  Weightfile getONNXWeightfile(const std::string& modelFilenameONNX, const std::string& outputName = "")
   {
     Weightfile weightfile;
     GeneralOptions general_options;

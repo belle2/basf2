@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/DataStore.h>
 #include <string>
 #include <vector>
 #include <regex>
@@ -31,7 +32,7 @@ namespace Belle2 {
     PruneDataStoreModule();
 
     /** Virtual Constructor to prevent memory leaks */
-    virtual ~PruneDataStoreModule() = default;
+    virtual ~PruneDataStoreModule() override = default;
 
     /** Prepare regex checks */
     void initialize() override;
@@ -44,7 +45,7 @@ namespace Belle2 {
     /** Compile a regex expression and catch the exception if the regex
      * string is not valid.
      */
-    std::regex compileAndCatch(std::string& regexString) const;
+    static std::regex compileAndCatch(std::string& regexString);
 
     /** Storing the option of branches to keep */
     std::vector<std::string> m_matchEntries;
@@ -67,6 +68,23 @@ namespace Belle2 {
 
     /** Caching the regex expression for the keep check */
     std::vector < std::regex > m_compiled_regex_implicit;
+
+    /** Evaluate the regular expressions for all entries of the given DataStore
+     * map and fill the m_entriesToPrune / m_entriesToKeep caches.
+     */
+    void updateCache(DataStore::StoreEntryMap& storemap);
+
+    /** DataStore entries which have to be pruned. Matching the regular
+     * expressions is expensive and the set of DataStore entries does not
+     * change during event processing, so the decision is cached here.
+     */
+    std::vector<DataStore::StoreEntry*> m_entriesToPrune;
+
+    /** Names of the DataStore entries which are kept, only used for debug output. */
+    std::vector<const std::string*> m_entriesToKeep;
+
+    /** Whether the caches above have already been filled for this run. */
+    bool m_cacheValid{false};
 
   };
 } // end namespace Belle2

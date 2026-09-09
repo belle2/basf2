@@ -36,7 +36,7 @@ namespace Belle2 {
 
     //! find associated hits and do fit.
     bool filter(const std::list<KLMHit2d* >& seed,
-                std::list<KLMHit2d* >& hits,
+                const std::list<KLMHit2d* >& hits,
                 std::list<KLMHit2d* >& track);
 
     //!  set the fitting mode, local system or global system

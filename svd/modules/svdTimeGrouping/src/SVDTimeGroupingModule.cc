@@ -403,8 +403,7 @@ void SVDTimeGroupingModule::sortSignalGroups(std::vector<GroupInfo>& groupInfoVe
       if (keyGroupIntegral <= 0) break;
       double keyGroupCenter = std::get<1>(keyGroup);
       bool isKeyGroupSignal = true;
-      if (keyGroupIntegral > 0 &&
-          (keyGroupCenter < m_usedPars.expectedSignalTime[0] || keyGroupCenter > m_usedPars.expectedSignalTime[2]))
+      if (keyGroupCenter < m_usedPars.expectedSignalTime[0] || keyGroupCenter > m_usedPars.expectedSignalTime[2])
         isKeyGroupSignal = false;
       if (!isKeyGroupSignal) break; // skip the backgrounds
 

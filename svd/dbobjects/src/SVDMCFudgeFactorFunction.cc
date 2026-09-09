@@ -12,12 +12,9 @@ using namespace Belle2;
 std::vector <SVDMCFudgeFactorFunction::fudgeFactorFunction> SVDMCFudgeFactorFunction::m_implementations;
 
 
-SVDMCFudgeFactorFunction::SVDMCFudgeFactorFunction(const SVDMCFudgeFactorFunction& a) : TObject(a)
+SVDMCFudgeFactorFunction::SVDMCFudgeFactorFunction(const SVDMCFudgeFactorFunction& a) :
+  TObject(a), m_chebyCoeffs(a.m_chebyCoeffs), m_x(a.m_x), m_y(a.m_y)
 {
-  m_chebyCoeffs = a.m_chebyCoeffs;
-
-  m_x = a.m_x;
-  m_y = a.m_y;
 
   m_current = a.m_current;
 

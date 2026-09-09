@@ -159,7 +159,7 @@ namespace Belle2 {
        *
        *  @param[out] outputStream       The output stream to which the result is written.
        */
-      void writeSVGHeader(std::ostream& outputStream);
+      static void writeSVGHeader(std::ostream& outputStream);
 
       /// Writes a preamble of definitions that define an arrow cap which can be referenced by lines
       void writeSVGDefs(std::ostream& outputStream);
@@ -235,7 +235,7 @@ namespace Belle2 {
       std::ostringstream m_svgContentStream;
 
       /// Memory for the number of spaces that shall be prepended to each line.
-      int m_nIndentationSpaces;
+      int m_nIndentationSpaces {};
 
       /// Memory for additional attributes to the top-level svg element.
       AttributeMap m_svgAttributes;

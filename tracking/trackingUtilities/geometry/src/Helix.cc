@@ -13,7 +13,9 @@
 #include <tracking/trackingUtilities/geometry/SZLine.h>
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
 
 #include <boost/math/tools/minima.hpp>
 
@@ -26,10 +28,10 @@
 using namespace Belle2;
 using namespace TrackingUtilities;
 
-double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
+double Helix::arcLength2DToClosest(const ROOT::Math::XYZVector& point, bool firstPeriod) const
 {
   // The point may happen to lie in the center of the helix.
-  double loc_d0 = circleXY().distance(point.xy());
+  double loc_d0 = circleXY().distance(VectorUtil::getXYVector(point));
   double denominator = 1 + curvatureXY() * loc_d0;
   if (denominator == 0) {
     // When this happens we can optimise the z distance for the closest point
@@ -42,7 +44,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   }
 
   // First approximation optimising the xy distance.
-  double arcLength2D = circleXY().arcLengthTo(point.xy());
+  double arcLength2D = circleXY().arcLengthTo(VectorUtil::getXYVector(point));
   // In case the helix is a flat circle with no extend into z this is the actual solution
   if (tanLambda() == 0) {
     return arcLength2D;
@@ -61,8 +63,8 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   using boost::math::tools::brent_find_minima;
 
   auto distance3D = [this, &point](const double & s) -> double {
-    Vector3D pos = atArcLength2D(s);
-    return pos.distance(point);
+    ROOT::Math::XYZVector pos = atArcLength2D(s);
+    return VectorUtil::Distance(pos, point);
   };
 
   double searchWidth = std::fmin(perimeterXY(), 2 * deltaZ / tanLambda());
@@ -71,7 +73,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   double upperS = arcLength2D + searchWidth;
 
   int bits = std::numeric_limits<double>::digits;
-  boost::uintmax_t nMaxIter = 100;
+  size_t nMaxIter = 100;
 
   std::pair<double, double> sBounds = brent_find_minima(distance3D, lowerS, upperS, bits, nMaxIter);
 
@@ -87,16 +89,16 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   }
 }
 
-HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
+HelixJacobian Helix::passiveMoveByJacobian(const ROOT::Math::XYZVector& by) const
 {
   // Fills the upper left 3x3 corner.
-  PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(by.xy());
+  PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(VectorUtil::getXYVector(by));
   SZJacobian szJacobian = SZUtil::identity();
   HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
   double tanL = tanLambda();
-  double sArc = circleXY().arcLengthTo(by.xy());
+  double sArc = circleXY().arcLengthTo(VectorUtil::getXYVector(by));
 
   using namespace NHelixParameterIndices;
   jacobian(c_Z0, c_Curv) = tanL * (jacobian(c_Phi0, c_Curv) - sArc) / curv;

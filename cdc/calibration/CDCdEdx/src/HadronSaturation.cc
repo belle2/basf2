@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/HadronSaturation.h>
+#include <framework/utilities/MathHelpers.h>
 using namespace Belle2;
 
 static HadronSaturation* HC_obj;
@@ -60,7 +61,7 @@ void HadronSaturation::fillSample(TString infilename)
 
   for (int i = 0; i < int(types.size()); ++i) {
 
-    TTree* satTree = (TTree*)satFile->Get(types[i]);
+    TTree* satTree = static_cast<TTree*>(satFile->Get(types[i]));
     double satbg, satcosth, satdedx, satdedxerr;
     satTree->SetBranchAddress("bg", &satbg);
     satTree->SetBranchAddress("costh", &satcosth);
@@ -156,7 +157,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta,
       continue;
     }
 
-    chisq += pow((dedxcor - vdedxavg[j]) / m_dedxerror[i], 2);
+    chisq += square((dedxcor - vdedxavg[j]) / m_dedxerror[i]);
     B2INFO("\t " << i << ") " << dedxcor << "/" << vdedxavg[j] << ", error was "
            << m_dedxerror[i] << " De = " << hadsat.I2D(m_costheta[i], 1.0, alpha, gamma, delta, power, ratio) <<
            ": Final " << chisq);
@@ -166,6 +167,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta,
 }
 
 void
+// cppcheck-suppress constParameterCallback ; ROOT fixes this signature
 HadronSaturation::minuitFunction(int&, double*, double& result, double* par, int)
 {
   result = HC_obj->myFunction(par[0], par[1], par[2], par[3], par[4]);

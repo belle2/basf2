@@ -361,7 +361,7 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
   double trackLen(0);
 
   bool newRefState(false); // has the current Point a new reference state?
-  bool prevNewRefState(false); // has the last successfull point a new reference state?
+  bool prevNewRefState(false); // has the last successful point a new reference state?
 
   unsigned int nPoints = tr->getNumPoints();
 
@@ -568,7 +568,7 @@ bool KalmanFitterRefTrack::prepareTrack(Track* tr, const AbsTrackRep* rep, bool 
       }
 
       if (plane.get() == nullptr) {
-        Exception exc("KalmanFitterRefTrack::prepareTrack ==> construced plane is nullptr!",__LINE__,__FILE__);
+        Exception exc("KalmanFitterRefTrack::prepareTrack ==> constructed plane is nullptr!",__LINE__,__FILE__);
         exc.setFatal();
         throw exc;
       }
@@ -944,7 +944,7 @@ KalmanFitterRefTrack::processTrackPoint(KalmanFitterInfo* fi, const KalmanFitter
     p_ += fi->getReferenceState()->getDeltaState(direction);
 
     C_ = prevFi->getUpdate(direction)->getCov();
-    C_.Similarity(F);
+    tools::similarity(F, C_);
     C_ += N;
     fi->setPrediction(new MeasuredStateOnPlane(p_, C_, fi->getReferenceState()->getPlane(), fi->getReferenceState()->getRep(), fi->getReferenceState()->getAuxInfo()), direction);
     if (debugLvl_ > 1) {
@@ -1039,7 +1039,7 @@ KalmanFitterRefTrack::processTrackPoint(KalmanFitterInfo* fi, const KalmanFitter
       debugOut << "\033[0m";
     }
 
-    covSumInv_.Similarity(CHt); // with (C H^T)^T = H C^T = H C  (C is symmetric)
+    tools::similarity(CHt, covSumInv_); // with (C H^T)^T = H C^T = H C  (C is symmetric)
     C_ -= covSumInv_; // updated Cov
 
     if (debugLvl_ > 1) {
@@ -1084,7 +1084,7 @@ KalmanFitterRefTrack::processTrackPoint(KalmanFitterInfo* fi, const KalmanFitter
           debugOut << " Rinv ";
           Rinv_.Print();
         }
-        chi2inc += Rinv_.Similarity(res_);
+        chi2inc += tools::similarity(res_, Rinv_);
       }
     }
 
@@ -1293,7 +1293,7 @@ KalmanFitterRefTrack::processTrackPointSqrt(KalmanFitterInfo* fi, const KalmanFi
           debugOut << " Rinv ";
           Rinv_.Print();
         }
-        chi2inc += Rinv_.Similarity(res_);
+        chi2inc += tools::similarity(res_, Rinv_);
       }
     }
 

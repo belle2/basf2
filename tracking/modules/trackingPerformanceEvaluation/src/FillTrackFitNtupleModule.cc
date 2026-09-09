@@ -78,7 +78,7 @@ void FillTrackFitNtupleModule::event()
 
   for (Track& track : tracks) {
 
-    RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
+    const RecoTrack* recoTrack = track.getRelationsTo<RecoTrack>()[0];
     if (recoTrack == nullptr) {
       // if no recoTrack is associated to Track, we skip the track
       B2WARNING(" the RecoTrack associated to Track is nullptr!");

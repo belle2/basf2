@@ -32,7 +32,7 @@ namespace Belle2 {
   public:
     SetMergeable() : m_wrapped() {  }
 
-    virtual ~SetMergeable() { }
+    virtual ~SetMergeable() override { }
     /** Constructor, forwards all arguments to T constructor. */
     template<class ...Args> explicit SetMergeable(Args&& ... params) : m_wrapped(std::forward<Args>(params)...) { }
 

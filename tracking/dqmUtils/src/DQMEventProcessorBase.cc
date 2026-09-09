@@ -139,7 +139,7 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   auto trackpoint = m_recoTrack->getCreatedTrackPoint(recoHitInfo);
   if (!trackpoint)
     return;
-  auto fitterInfo = trackpoint->getFitterInfo();
+  const auto* fitterInfo = trackpoint->getFitterInfo();
   if (!fitterInfo)
     return;
 

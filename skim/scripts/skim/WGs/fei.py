@@ -100,8 +100,10 @@ class BaseFEISkim(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, Full Event Interpretation"
 
-    FEIPrefix = "FEIv1_2025_MC16ri_aldebaran_200"
-    """Prefix label for the FEI training used in the FEI skims."""
+    FEIPrefix = None
+    """Prefix label for the FEI training used in the FEI skims. This must be set
+    before the skim is run (either by passing ``feiPrefix`` to the constructor, by
+    setting it as an instance attribute, or by passing it to `CombinedSkim`)."""
 
     FEIChannelArgs = {}
     """Dict of ``str -> bool`` pairs to be passed to `fei.get_default_channels`. When
@@ -114,6 +116,19 @@ class BaseFEISkim(BaseSkim):
 
     ApplyHLTHadronCut = True
     produce_on_tau_samples = True  # Note retention is very close to zero on taupair
+
+    def __init__(self, *, feiPrefix=None, **kwargs):
+        """Initialise the BaseFEISkim class.
+
+        Parameters:
+            feiPrefix (str, optional): Prefix label for the FEI training.
+                If not provided, the caller must set ``FEIPrefix`` as an instance
+                attribute before the skim is run.
+            **kwargs: Forwarded to `BaseSkim.__init__`.
+        """
+        super().__init__(**kwargs)
+        if feiPrefix is not None:
+            self.FEIPrefix = feiPrefix
 
     @staticmethod
     @lru_cache()
@@ -186,6 +201,10 @@ class BaseFEISkim(BaseSkim):
         # Run FEI
         if analysisGlobaltag is None:
             b2.B2FATAL("The analysis globaltag is not set in the FEI skim.")
+        if FEIPrefix is None:
+            b2.B2FATAL("The FEI prefix is not set in the FEI skim. "
+                       "Provide a ``feiPrefix`` argument to the skim constructor, "
+                       "or set the ``FEIPrefix`` instance attribute.")
         b2.conditions.prepend_globaltag(analysisGlobaltag)
         particles = fei.get_default_channels(**FEIChannelArgs)
         configuration = fei.config.FeiConfiguration(

@@ -127,7 +127,7 @@ namespace Belle2 {
      * @return Vector with all parameters that haven't been
      * included in basic ECL DSP file format
      */
-    std::vector<short int> getExtraData() const { return m_extraData; }
+    const std::vector<short int>& getExtraData() const { return m_extraData; }
 
     /**
      * Array with tabulated signal waveform.

@@ -105,9 +105,9 @@ void ECLLocalRunCalibUnit::writeToDB(
   const bool& changePrev,
   const bool& addref)
 {
-  int exp = iov.getExperimentLow();
   ECLCrystalLocalRunCalib data(isNegAmpl());
   if (m_unitData.size() > 0) {
+    int exp = iov.getExperimentLow();
     int nevents = 0;
     for (const auto& cellAcc : m_unitData) {
       nevents = cellAcc.getNOfEvents();

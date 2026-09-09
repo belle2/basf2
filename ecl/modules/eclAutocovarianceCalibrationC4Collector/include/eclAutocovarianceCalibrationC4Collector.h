@@ -57,7 +57,7 @@ namespace Belle2 {
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
     DBObjPtr<ECLAutoCovariance> m_ECLAutocovarianceCalibrationC3Autocovariances; /**< Autocovariances obtained from C3 stage */
 
-    TH2F* Chi2VsCrysID; /**< Store fit chi2 vs. crystal ID for validation */
+    TH2F* Chi2VsCrysID = nullptr; /**< Store fit chi2 vs. crystal ID for validation */
 
     std::vector<TMatrixDSym> m_NoiseMatrix; /**< Stores noise matrix derived from  the input Autocovariances */
 

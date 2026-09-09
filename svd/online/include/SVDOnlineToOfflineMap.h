@@ -227,7 +227,7 @@ namespace Belle2 {
      * @param info Const reference to ChipInfo object.
      * @return The corresponding strip number, -1 if nonsensical input
      */
-    short getStripNumber(unsigned char channel, const SensorInfo& info) const
+    static short getStripNumber(unsigned char channel, const SensorInfo& info)
     { return (info.m_channel0 + ((unsigned short)channel) * (info.m_parallel ? 1 : -1)); }
 
 

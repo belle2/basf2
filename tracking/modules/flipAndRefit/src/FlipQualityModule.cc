@@ -78,7 +78,7 @@ void FlipQualityModule::event()
       // for the 2nd MVA
       // first check if the flipped track was created or not.
       // then call the corresponding class and set the 2nd Qi using set2ndFlipQualityIndicator()
-      RecoTrack* RecoTrackflipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
+      const RecoTrack* RecoTrackflipped = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
       if (RecoTrackflipped) {
         m_recoTrackExtractor2nd->extractVariables(recoTrack);
         float probability = m_mvaExpert->predict();

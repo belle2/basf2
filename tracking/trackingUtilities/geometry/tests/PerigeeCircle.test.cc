@@ -8,7 +8,10 @@
 
 #include <tracking/trackingUtilities/geometry/PerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/GeneralizedCircle.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <gtest/gtest.h>
 
@@ -56,7 +59,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_inheritance)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isLine)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
   EXPECT_FALSE(circle.isLine());
@@ -72,7 +75,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isLine)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isCircle)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
   EXPECT_TRUE(circle.isCircle());
@@ -88,7 +91,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_isCircle)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_orientation)
 {
   double curvature = 1;
-  Vector2D phi0 = Vector2D::Phi(1);
+  ROOT::Math::XYVector phi0 = VectorUtil::Phi(1);
   double impact = 1;
 
   PerigeeCircle circle(curvature, phi0, impact);
@@ -132,7 +135,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_maximalCylindricalR)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
   PerigeeCircle circle;
-  Vector2D center(0.5, 0.0);
+  ROOT::Math::XYVector center(0.5, 0.0);
   double radius = 1.5;
   circle.setCenterAndRadius(center, radius, ERotation::c_CounterClockwise);
 
@@ -164,14 +167,14 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(phi0, circle.phi0(), 10e-7);
   EXPECT_NEAR(impact, circle.impact(), 10e-7);
 
-  EXPECT_NEAR(0, circle.distance(Vector2D(1.0, 0.0)), 10e-7);
-  EXPECT_NEAR(0, circle.distance(Vector2D(0.0, 1.0)), 10e-7);
-  EXPECT_NEAR(impact, circle.distance(Vector2D(0.0, 0.0)), 10e-7);
+  EXPECT_NEAR(0, circle.distance(ROOT::Math::XYVector(1.0, 0.0)), 10e-7);
+  EXPECT_NEAR(0, circle.distance(ROOT::Math::XYVector(0.0, 1.0)), 10e-7);
+  EXPECT_NEAR(impact, circle.distance(ROOT::Math::XYVector(0.0, 0.0)), 10e-7);
 
-  EXPECT_NEAR(0.5, circle.distance(Vector2D(1.0, 0.5)), 10e-7);
+  EXPECT_NEAR(0.5, circle.distance(ROOT::Math::XYVector(1.0, 0.5)), 10e-7);
 
-  EXPECT_NEAR(-0.5, circle.distance(Vector2D(1.0, 2.5)), 10e-7);
-  EXPECT_NEAR(-0.5, circle.distance(Vector2D(2.5, 1.0)), 10e-7);
+  EXPECT_NEAR(-0.5, circle.distance(ROOT::Math::XYVector(1.0, 2.5)), 10e-7);
+  EXPECT_NEAR(-0.5, circle.distance(ROOT::Math::XYVector(2.5, 1.0)), 10e-7);
 }
 
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_invalidate)
@@ -203,11 +206,11 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_invalidate)
 
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveBy)
 {
-  Vector2D center(4.0, 2.0);
+  ROOT::Math::XYVector center(4.0, 2.0);
   double radius = 5.0;
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
-  circle.passiveMoveBy(Vector2D(4.0, 0.0));
+  circle.passiveMoveBy(ROOT::Math::XYVector(4.0, 0.0));
 
   EXPECT_NEAR(5.0, circle.radius(), 10e-7);
   EXPECT_NEAR(0.0, circle.perigee().x(), 10e-7);
@@ -216,13 +219,13 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_passiveMoveBy)
 
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_conformalTranform)
 {
-  Vector2D center(1.0, 0.0);
+  ROOT::Math::XYVector center(1.0, 0.0);
   double radius = 1.0;
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
   // Get two points on the circle to check for the orientation to be correct
-  Vector2D firstPos = circle.atArcLength(1);
-  Vector2D secondPos = circle.atArcLength(2);
+  ROOT::Math::XYVector firstPos = circle.atArcLength(1);
+  ROOT::Math::XYVector secondPos = circle.atArcLength(2);
 
   EXPECT_NEAR(1.0, circle.curvature(), 10e-7);
   EXPECT_NEAR(-M_PI / 2.0, circle.phi0(), 10e-7);
@@ -231,8 +234,9 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_conformalTranform)
   EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
 
   circle.conformalTransform();
-  firstPos.conformalTransform();
-  secondPos.conformalTransform();
+  const auto conformalTransform = [](ROOT::Math::XYVector & a) { return a *= (1. / a.Mag2()); };
+  conformalTransform(firstPos);
+  conformalTransform(secondPos);
 
   EXPECT_NEAR(0.0, circle.curvature(), 10e-7);
   EXPECT_NEAR(M_PI / 2.0, circle.phi0(), 10e-7);
@@ -254,18 +258,18 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_conformalTranform)
 
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_closest)
 {
-  PerigeeCircle circle(1.0, Vector2D(0.0, -1.0), 1.0);
-  Vector2D up(2.0, 2.0);
-  Vector2D far(5.0, 0.0);
+  PerigeeCircle circle(1.0, ROOT::Math::XYVector(0.0, -1.0), 1.0);
+  ROOT::Math::XYVector up(2.0, 2.0);
+  ROOT::Math::XYVector far(5.0, 0.0);
 
-  EXPECT_EQ(Vector2D(2.0, 1.0), circle.closest(up));
-  EXPECT_EQ(Vector2D(3.0, 0.0), circle.closest(far));
+  EXPECT_EQ(ROOT::Math::XYVector(2.0, 1.0), circle.closest(up));
+  EXPECT_EQ(ROOT::Math::XYVector(3.0, 0.0), circle.closest(far));
 
   // This tests for point which is on the circle
   double smallAngle = M_PI / 100;
-  Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  Vector2D closestOfNear = circle.closest(near);
+  ROOT::Math::XYVector closestOfNear = circle.closest(near);
   EXPECT_NEAR(near.x(), closestOfNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
 }
@@ -273,26 +277,26 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_closest)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atArcLength)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
 
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
   double smallAngle = M_PI / 100;
-  Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
+  ROOT::Math::XYVector near(2.0 - cos(smallAngle), sin(smallAngle));
 
   double nearArcLength =
     -smallAngle * radius; // Minus because of default counterclockwise orientation
 
-  Vector2D atNear = circle.atArcLength(nearArcLength);
+  ROOT::Math::XYVector atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
-  Vector2D down(2.0, -1.0);
+  ROOT::Math::XYVector down(2.0, -1.0);
   double downArcLength =
     +M_PI / 2.0 * radius; // Plus because of default counterclockwise orientation
 
-  Vector2D atDown = circle.atArcLength(downArcLength);
+  ROOT::Math::XYVector atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
@@ -301,7 +305,7 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atArcLength)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
 
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
   {
@@ -343,10 +347,10 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atCylindricalR)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
-  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> solutions = circle.atCylindricalR(sqrt(5.0));
 
   EXPECT_NEAR(2, solutions.first.x(), 10e-7);
   EXPECT_NEAR(1, solutions.first.y(), 10e-7);
@@ -358,10 +362,10 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atCylindricalR)
 TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_atCylindricalR_opposite_orientation)
 {
   double radius = 1;
-  Vector2D center = Vector2D(2.0, 0.0);
+  ROOT::Math::XYVector center = ROOT::Math::XYVector(2.0, 0.0);
   PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius, ERotation::c_Clockwise);
 
-  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+  std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> solutions = circle.atCylindricalR(sqrt(5.0));
 
   EXPECT_NEAR(2, solutions.first.x(), 10e-7);
   EXPECT_NEAR(-1, solutions.first.y(), 10e-7);
@@ -378,18 +382,18 @@ TEST(TrackingUtilitiesTest, geometry_PerigeeCircle_OriginCircleFromPointDirectio
 
   // Checks if the normal parameters n follow the same sign convention
   const PerigeeCircle perigeeCircle(expectedCurvature, expectedPhi0, impact);
-  const Vector2D& expectedPhi0Vec = perigeeCircle.phi0Vec();
+  const ROOT::Math::XYVector& expectedPhi0Vec = perigeeCircle.phi0Vec();
 
   double randomArcLength = 2.0;
-  Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);
-  Vector2D phiVec = perigeeCircle.tangential(pos2D);
+  ROOT::Math::XYVector pos2D = perigeeCircle.atArcLength(randomArcLength);
+  ROOT::Math::XYVector phiVec = perigeeCircle.tangential(pos2D);
 
-  double curvature = 2 * pos2D.cross(phiVec) / pos2D.normSquared();
-  Vector2D phi0Vec = phiVec.flippedOver(pos2D);
+  double curvature = 2 * VectorUtil::Cross(pos2D, phiVec) / pos2D.Mag2();
+  ROOT::Math::XYVector phi0Vec = VectorUtil::flippedOver(phiVec, pos2D);
 
   EXPECT_NEAR(expectedCurvature, curvature, 10e-7);
   EXPECT_NEAR(expectedPhi0Vec.x(), phi0Vec.x(), 10e-7);
   EXPECT_NEAR(expectedPhi0Vec.y(), phi0Vec.y(), 10e-7);
-  EXPECT_NEAR(expectedPhi0, phi0Vec.phi(), 10e-7);
-  EXPECT_NEAR(1, phi0Vec.norm(), 10e-7);
+  EXPECT_NEAR(expectedPhi0, phi0Vec.Phi(), 10e-7);
+  EXPECT_NEAR(1, phi0Vec.R(), 10e-7);
 }

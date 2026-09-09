@@ -8,6 +8,7 @@
 
 #include <generators/evtgen/models/EvtHNLSemiLeptonicScalarAmp.h>
 
+#include <framework/logging/Logger.h>
 #include <EvtGenBase/EvtAmp.hh>
 #include <EvtGenBase/EvtDiracSpinor.hh>
 #include <EvtGenBase/EvtId.hh>
@@ -45,47 +46,29 @@ void EvtHNLSemiLeptonicScalarAmp::CalcAmp(EvtParticle* parent, EvtAmp& amp,
   mdiffoverq2 = parentmass * parentmass - mesonmass * mesonmass;
   mdiffoverq2 = mdiffoverq2 / q2;
 
-  EvtVector4C l11, l12, l21, l22;
-
   EvtId l_num = parent->getDaug(1)->getId();
   EvtVector4C tds;
+  tds = EvtVector4C(
+          fpf * (p4b + p4meson - (mdiffoverq2 * (p4b - p4meson))) +
+          +f0f * mdiffoverq2 * (p4b - p4meson));
 
-  if (l_num == EM || l_num == MUM || l_num == TAUM) {
-    tds = EvtVector4C(
-            fpf * (p4b + p4meson - (mdiffoverq2 * (p4b - p4meson))) +
-            +f0f * mdiffoverq2 * (p4b - p4meson));
+  for (int i{0}; i < 2; ++i) {
+    for (int j{0}; j < 2; ++j) {
+      const EvtVector4C current{
+        EvtLeptonVACurrent(parent->getDaug(2)->spParent(j),
+                           parent->getDaug(1)->spParent(i))};
 
-    l11 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(0));
-    l12 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(0),
-                             parent->getDaug(2)->spParent(1));
-    l21 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(0));
-    l22 = EvtLeptonVACurrent(parent->getDaug(1)->spParent(1),
-                             parent->getDaug(2)->spParent(1));
-  } else {
-    if (l_num == EP || l_num == MUP || l_num == TAUP) {
-      tds = EvtVector4C(
-              fpf * (p4b + p4meson - (mdiffoverq2 * (p4b - p4meson))) +
-              +f0f * mdiffoverq2 * (p4b - p4meson));
+      if (l_num == EM || l_num == MUM || l_num == TAUM) {
 
-      l11 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(0));
-      l12 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(0),
-                               parent->getDaug(1)->spParent(1));
-      l21 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(0));
-      l22 = EvtLeptonVACurrent(parent->getDaug(2)->spParent(1),
-                               parent->getDaug(1)->spParent(1));
-    } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen")
-          << "Wrong lepton number\n";
+        amp.vertex(i, j, current.conj() * tds);
+
+      } else if (l_num == EP || l_num == MUP || l_num == TAUP) {
+
+        amp.vertex(i, j, current * tds);
+
+      } else {
+        B2ERROR("HNLSemileptonicScalarAmp: Wrong lepton number");
+      }
     }
   }
-
-  amp.vertex(0, 0, l11 * tds);
-  amp.vertex(0, 1, l12 * tds);
-  amp.vertex(1, 0, l21 * tds);
-  amp.vertex(1, 1, l22 * tds);
-
 }

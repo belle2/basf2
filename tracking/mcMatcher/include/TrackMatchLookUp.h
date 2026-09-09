@@ -380,7 +380,7 @@ namespace Belle2 {
      */
     const TrackFitResult*
     getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
-                             Const::ChargedStable chargedStable = Const::pion) const;
+                             const Const::ChargedStable& chargedStable = Const::pion) const;
 
     /*!
      * Looks for a related Monte Carlo track for the given pattern recognition track and

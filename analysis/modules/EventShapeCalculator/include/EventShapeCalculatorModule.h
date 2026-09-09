@@ -56,7 +56,7 @@ namespace Belle2 {
      * Turns the ParticleLists provided as inputs into std::vector of PxPyPzEVector,
      * after boosting them into the CMS frame.
      */
-    int parseParticleLists(std::vector<std::string>);
+    int parseParticleLists(const std::vector<std::string>& particleListNames);
 
 
   private:

@@ -226,6 +226,7 @@ namespace Belle2 {
      *         generators, where the first particle has index 1. In the array
      *         the first particle has index 0.
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class version
     int getArrayIndex() const { fixParticleList(); return m_index - 1;  }
 
     /**
@@ -548,7 +549,7 @@ namespace Belle2 {
     unsigned short int m_status = 0;      /**< status code */
 
     bool m_validVertex = false;         /**< indication whether vertex and time information is useful or just default */
-    static const double c_epsilon;  /**< limit of precision for two doubles to be the same. */
+    static constexpr double c_epsilon = 10e-7;  /**< limit of precision for two doubles to be the same. */
 
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
@@ -562,11 +563,11 @@ namespace Belle2 {
   {
     bool virtuality = hasStatus(c_IsVirtual);
     if (!virtuality) {
-      double E2 = m_energy * m_energy;
-      double m2 = m_mass * m_mass;
-      double p2 = m_momentum_x * m_momentum_x;
-      p2 += m_momentum_y * m_momentum_y;
-      p2 += m_momentum_z * m_momentum_z;
+      double E2 = static_cast<double>(m_energy) * m_energy;
+      double m2 = static_cast<double>(m_mass) * m_mass;
+      double p2 = static_cast<double>(m_momentum_x) * m_momentum_x;
+      p2 += static_cast<double>(m_momentum_y) * m_momentum_y;
+      p2 += static_cast<double>(m_momentum_z) * m_momentum_z;
 
       virtuality = (fabs(E2 - (p2 + m2)) > c_epsilon * E2);
     }

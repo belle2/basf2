@@ -99,7 +99,7 @@ namespace Belle2 {
       std::string map(int index, const CDCHit& hit) override;
 
       /// Translates the given floating point time of flight to a color.
-      std::string timeOfFlightToColor(const double timeOfFlight);
+      static std::string timeOfFlightToColor(const double timeOfFlight);
     };
 
     /// CDCHit to color map indicating the reassignment to a different MCParticle.
@@ -125,7 +125,7 @@ namespace Belle2 {
       std::vector<std::string> m_colors;
 
       /// Index of the color to be used next.
-      int m_iColor;
+      int m_iColor {};
 
       /**
        *  Mapping of the already used colors by the MCParticle::getArrayId to map later CDCHits to

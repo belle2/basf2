@@ -36,7 +36,7 @@ namespace Belle2 {
     ECLDQMOutOfTimeDigitsModule();
 
     /** Destructor. */
-    virtual ~ECLDQMOutOfTimeDigitsModule();
+    virtual ~ECLDQMOutOfTimeDigitsModule() override;
 
     /** Initialize the module. */
     virtual void initialize() override;

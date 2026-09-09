@@ -47,7 +47,7 @@ namespace Belle2 {
   private:
 
     //! Create unique and legal name for each solid
-    void assignName(std::vector<std::string>*, unsigned int, const G4String&, int);
+    static void assignName(std::vector<std::string>*, unsigned int, const G4String&, int);
 
     //! Emit VRML for each solid
     void describeSolid(G4VSolid*, const std::string&, bool);
@@ -71,7 +71,7 @@ namespace Belle2 {
     void writePhysicalVolume(const G4VPhysicalVolume*, const std::string&, const std::string&, bool);
 
     //! Create polyhedron for a boolean solid (recursive)
-    HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
+    static HepPolyhedron* getBooleanSolidPolyhedron(G4VSolid*);
 
     //! Once-only flag to write VRML only on the first event
     bool m_First{true};

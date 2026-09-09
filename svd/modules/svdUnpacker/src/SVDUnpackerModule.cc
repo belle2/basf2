@@ -42,6 +42,8 @@ REG_MODULE(SVDUnpacker);
 
 std::string Belle2::SVD::SVDUnpackerModule::m_xmlFileName = std::string("SVDChannelMapping.xml");
 
+// seenHeadersAndTrailers is a bit-field set explicitly at the start of each event
+// cppcheck-suppress uninitMemberVar
 SVDUnpackerModule::SVDUnpackerModule() : Module(),
   m_mapping(m_xmlFileName),
   m_shutUpFTBError(0),
@@ -193,7 +195,7 @@ void SVDUnpackerModule::event()
       std::vector<uint32_t*>      data32tab(maxNumOfCh); //vector of pointers
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
         nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
-        data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
+        data32tab[k] = reinterpret_cast<uint32_t*>(m_rawSVD[i]->GetDetectorBuffer(j, k)); // points at the beginning of the 1st buffer
       }
 
       unsigned short ftbError = 0;
@@ -713,16 +715,16 @@ void SVDUnpackerModule::endRun()
 
 
 // additional printing function
-void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uint32_t* data32_max, int nWords)
+void SVDUnpackerModule::printB2Debug(const uint32_t* data32, const uint32_t* data32_min, const uint32_t* data32_max, int nWords)
 {
 
-  uint32_t* min = std::max((data32 - nWords), data32_min);
-  uint32_t* max = std::min((data32 + nWords), data32_max);
+  const uint32_t* min = std::max((data32 - nWords), data32_min);
+  const uint32_t* max = std::min((data32 + nWords), data32_max);
 
   size_t counter{0};
   std::stringstream os;
   os << std::hex << std::setfill('0');
-  for (uint32_t* ptr = min; ptr <= max; ++ptr) {
+  for (const uint32_t* ptr = min; ptr <= max; ++ptr) {
     os << std::setw(8) << *ptr;
     if (++counter % 10 == 0) os << std::endl;
     else os << " ";

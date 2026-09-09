@@ -108,20 +108,21 @@ void MCTrackCandClassifierModule::initialize()
                                       10, bins_lambda, "#lambda",
                                       14, bins_phi, "#phi" /*, m_histoList*/);
 
-  m_h3_idealMCTrackCand = (TH3F*)duplicateHistogram("h3idealMCTrackCand",
-                                                    "entry per idealMCTrackCand",
-                                                    m_h3_MCParticle /*, m_histoList*/);
+  m_h3_idealMCTrackCand = dynamic_cast<TH3F*>(duplicateHistogram("h3idealMCTrackCand",
+                                              "entry per idealMCTrackCand",
+                                              m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_MCTrackCand = (TH3F*)duplicateHistogram("h3MCTrackCand",
-                                               "entry per MCTrackCand",
-                                               m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCTrackCand = dynamic_cast<TH3F*>(duplicateHistogram("h3MCTrackCand",
+                                                            "entry per MCTrackCand",
+                                                            m_h3_MCParticle /*, m_histoList*/));
 
 
   m_h1_thetaMS_SVD = new TH1F("h1thetaMS_SVD", "Multiple Scattering Angle (SVD)", 500, 0, 500);
   m_histoList->Add(m_h1_thetaMS_SVD);
   m_h1_thetaMS_SVD->GetXaxis()->SetTitle("#theta_{MS} (mrad)");
 
-  m_h1_thetaMS_PXD = (TH1F*) duplicateHistogram("h1thetaMS_PXD", "Multiple Scattering Angle (PXD)", m_h1_thetaMS_SVD, m_histoList);
+  m_h1_thetaMS_PXD = dynamic_cast<TH1F*>(duplicateHistogram("h1thetaMS_PXD", "Multiple Scattering Angle (PXD)", m_h1_thetaMS_SVD,
+                                                            m_histoList));
 
   m_h1_dR = new TH1F("h1dR", "dR, annulus half width", 1000, 0, 5);
   m_histoList->Add(m_h1_dR);
@@ -155,8 +156,8 @@ void MCTrackCandClassifierModule::initialize()
   m_histoList->Add(m_h1_lapTime);
   m_h1_lapTime->GetXaxis()->SetTitle("time (ns)");
 
-  m_h1_timeDifference = (TH1F*)duplicateHistogram("h1TimeDiff", "Hit Time Difference",
-                                                  m_h1_lapTime, m_histoList);
+  m_h1_timeDifference = dynamic_cast<TH1F*>(duplicateHistogram("h1TimeDiff", "Hit Time Difference",
+                                            m_h1_lapTime, m_histoList));
   m_h1_diffOVERlap = new TH1F("h1HitDiffOVERlap", "Hit Time Difference over Lap Time",
                               100, 0, 1.5);
   m_histoList->Add(m_h1_diffOVERlap);
@@ -186,8 +187,9 @@ void MCTrackCandClassifierModule::initialize()
   m_histoList->Add(m_h1_firstRejectedOVERMCHit);
   m_h1_firstRejectedOVERMCHit->GetXaxis()->SetTitle("# idealMCTrackCands hits / # MCTrackCands hits");
 
-  m_h1_MCTrackCandNhits = (TH1F*)duplicateHistogram("h1MCTrackCandNhits", "number of MCTrackCands hits", m_h1_firstRejectedHit,
-                                                    m_histoList);
+  m_h1_MCTrackCandNhits = dynamic_cast<TH1F*>(duplicateHistogram("h1MCTrackCandNhits", "number of MCTrackCands hits",
+                                              m_h1_firstRejectedHit,
+                                              m_histoList));
 }
 
 
@@ -286,7 +288,7 @@ void MCTrackCandClassifierModule::event()
             continue;
           }
 
-          PXDTrueHit* aPXDTrueHit = PXDTrueHit_fromPXDCluster[0];
+          const PXDTrueHit* aPXDTrueHit = PXDTrueHit_fromPXDCluster[0];
           thetaMS = compute_thetaMS(mcParticleInfo, aPXDTrueHit);
           m_h1_thetaMS_PXD->Fill(thetaMS / 2 * 1000); //PXD
 
@@ -310,7 +312,7 @@ void MCTrackCandClassifierModule::event()
             continue;
           }
 
-          SVDTrueHit* aSVDTrueHit = SVDTrueHit_fromSVDCluster[0];
+          const SVDTrueHit* aSVDTrueHit = SVDTrueHit_fromSVDCluster[0];
 
           thetaMS = compute_thetaMS(mcParticleInfo, aSVDTrueHit);
           m_h1_thetaMS_SVD->Fill(thetaMS * 1000); //SVD
@@ -818,7 +820,7 @@ float MCTrackCandClassifierModule::compute_dR(double thetaMS, double hitDistance
 };
 
 
-float MCTrackCandClassifierModule::compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit)
+float MCTrackCandClassifierModule::compute_thetaMS(MCParticleInfo& mcParticleInfo, const VXDTrueHit* aTrueHit)
 {
   //  double thetaMS = 0.0136 * 14 * sqrt(0.008); //SVD, PXD is half of it
   double thetaMS = 0.0136 * 14;  //SVD, PXD is half of it

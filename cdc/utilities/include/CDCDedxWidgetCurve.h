@@ -35,7 +35,7 @@ namespace Belle2 {
     * calculate the predicted mean value as a function of beta-gamma (bg)
     * this is done with a different function depending on the value of bg
     */
-    double meanCurve(double* x, const std::vector<double>& par) const
+    static double meanCurve(const double* x, const std::vector<double>& par)
     {
       double f = 0;
 

@@ -70,7 +70,7 @@ namespace Belle2 {
        * @param nBinsU number of gain bins along u side
        * @return uBin correction bin along u side of sensor
        */
-      unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const;
+      static unsigned short getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU);
 
       /** Get gain correction bin along v side
        * @param id unique ID of the sensor
@@ -78,7 +78,7 @@ namespace Belle2 {
        * @param nBinsV number of gain bins along v side
        * @return vBin correction bin along v side of sensor
        */
-      unsigned short getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const;
+      static unsigned short getBinV(VxdID id, unsigned int vid, unsigned short nBinsV);
 
       /** Get global ID for gain correction on a sensor
        * @param id unique ID of the sensor

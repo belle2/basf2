@@ -1,5 +1,5 @@
-/* Copyright 2008-2013, Technische Universitaet Muenchen, Ludwig-Maximilians-Universität München
-   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Tobias Schlüter
+/* Copyright 2008-2026, Technische Universitaet Muenchen, Ludwig-Maximilians-Universität München, DESY
+   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Tobias Schlüter & Christian Wessel
 
    This file is part of GENFIT.
 
@@ -19,6 +19,8 @@
 
 #include "RKTrackRep.h"
 #include "IO.h"
+#include "MathHelpers.h"
+#include "Tools.h"
 
 #include <Exception.h>
 #include <FieldManager.h>
@@ -26,6 +28,7 @@
 #include <MeasuredStateOnPlane.h>
 #include <MeasurementOnPlane.h>
 
+#include <TMatrixDSymEigen.h>
 #include <TBuffer.h>
 #include <TDecompLU.h>
 #include <TMath.h>
@@ -900,7 +903,7 @@ double RKTrackRep::getMomVar(const MeasuredStateOnPlane& state) const {
   // delta means sigma
   // cov(0,0) is sigma^2
 
-  return state.getCov()(0,0) * pow(getCharge(state), 2)  / pow(state.getState()(0), 4);
+  return state.getCov()(0,0) * square(getCharge(state))  / pow4(state.getState()(0));
 }
 
 
@@ -945,9 +948,19 @@ void RKTrackRep::calcForwardJacobianAndNoise(const M1x7& startState7, const DetP
   // The Jacobians returned from RKutta are transposed.
   TMatrixD jac(TMatrixD::kTransposed, TMatrixD(7, 7, ExtrapSteps_.back().jac7_.begin()));
   TMatrixDSym noise(7, ExtrapSteps_.back().noise7_.begin());
-  for (int i = ExtrapSteps_.size() - 2; i >= 0; --i) {
-    noise += TMatrixDSym(7, ExtrapSteps_[i].noise7_.begin()).Similarity(jac);
-    jac *= TMatrixD(TMatrixD::kTransposed, TMatrixD(7, 7, ExtrapSteps_[i].jac7_.begin()));
+  if (ExtrapSteps_.size() > 1) {
+    // The 7x7 buffers are allocated once and refilled inside the loop.
+    TMatrixDSym stepNoise(7);
+    TMatrixDSym transportedNoise(7);
+    TMatrixD stepJac(7, 7);
+    for (int i = ExtrapSteps_.size() - 2; i >= 0; --i) {
+      stepNoise.SetMatrixArray(ExtrapSteps_[i].noise7_.begin());
+      tools::similarity(jac, stepNoise, transportedNoise);
+      noise += transportedNoise;
+      stepJac.SetMatrixArray(ExtrapSteps_[i].jac7_.begin());
+      stepJac.T();
+      jac *= stepJac;
+    }
   }
 
   // Project into 5x5 space.
@@ -975,6 +988,15 @@ void RKTrackRep::calcForwardJacobianAndNoise(const M1x7& startState7, const DetP
 
 }
 
+void RKTrackRep::getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise) const {
+
+  jacobian.ResizeTo(5,5);
+  jacobian = fJacobian_;
+
+  noise.ResizeTo(5,5);
+  noise = fNoise_;
+
+}
 
 void RKTrackRep::getForwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& noise, TVectorD& deltaState) const {
 
@@ -1032,7 +1054,7 @@ void RKTrackRep::getBackwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& no
 
   noise.ResizeTo(5,5);
   noise = fNoise_;
-  noise.Similarity(jacobian);
+  tools::similarity(jacobian, noise);
 
   // lastStartState_ = jacobian * lastEndState_  + deltaState
   deltaState.ResizeTo(5);
@@ -1175,18 +1197,18 @@ void RKTrackRep::setPosMomErr(MeasuredStateOnPlane& state, const TVector3& pos, 
 
   TMatrixDSym& cov(state.getCov());
 
-  cov(0,0) = pow(getCharge(state), 2) / pow(mom.Mag(), 6) *
+  cov(0,0) = square(getCharge(state)) / cube(mom.Mag2()) *
              (mom.X()*mom.X() * momErr.X()*momErr.X()+
               mom.Y()*mom.Y() * momErr.Y()*momErr.Y()+
               mom.Z()*mom.Z() * momErr.Z()*momErr.Z());
 
-  cov(1,1) = pow((U.X()/pw - W.X()*pu/(pw*pw)),2.) * momErr.X()*momErr.X() +
-             pow((U.Y()/pw - W.Y()*pu/(pw*pw)),2.) * momErr.Y()*momErr.Y() +
-             pow((U.Z()/pw - W.Z()*pu/(pw*pw)),2.) * momErr.Z()*momErr.Z();
+  cov(1,1) = square(U.X()/pw - W.X()*pu/(pw*pw)) * momErr.X()*momErr.X() +
+             square(U.Y()/pw - W.Y()*pu/(pw*pw)) * momErr.Y()*momErr.Y() +
+             square(U.Z()/pw - W.Z()*pu/(pw*pw)) * momErr.Z()*momErr.Z();
 
-  cov(2,2) = pow((V.X()/pw - W.X()*pv/(pw*pw)),2.) * momErr.X()*momErr.X() +
-             pow((V.Y()/pw - W.Y()*pv/(pw*pw)),2.) * momErr.Y()*momErr.Y() +
-             pow((V.Z()/pw - W.Z()*pv/(pw*pw)),2.) * momErr.Z()*momErr.Z();
+  cov(2,2) = square(V.X()/pw - W.X()*pv/(pw*pw)) * momErr.X()*momErr.X() +
+             square(V.Y()/pw - W.Y()*pv/(pw*pw)) * momErr.Y()*momErr.Y() +
+             square(V.Z()/pw - W.Z()*pv/(pw*pw)) * momErr.Z()*momErr.Z();
 
   cov(3,3) = posErr.X()*posErr.X() * U.X()*U.X() +
              posErr.Y()*posErr.Y() * U.Y()*U.Y() +
@@ -1891,7 +1913,7 @@ bool RKTrackRep::RKutta(const M1x4& SU,
     if (onlyOneStep) return(true);
 
     // if stepsize has been limited by material, break the loop and return. No linear extrapolation!
-    if (limits.getLowestLimit().first == stp_momLoss) {
+    if (limits.getLowestLimit().first == EStepLimitType::stp_momLoss) {
       if (debugLvl_ > 0) {
         debugOut<<" momLossExceeded -> return(true); \n";
       }
@@ -1899,7 +1921,7 @@ bool RKTrackRep::RKutta(const M1x4& SU,
     }
 
     // if stepsize has been limited by material boundary, break the loop and return. No linear extrapolation!
-    if (limits.getLowestLimit().first == stp_boundary) {
+    if (limits.getLowestLimit().first == EStepLimitType::stp_boundary) {
       if (debugLvl_ > 0) {
         debugOut<<" at boundary -> return(true); \n";
       }
@@ -1909,20 +1931,20 @@ bool RKTrackRep::RKutta(const M1x4& SU,
 
     // estimate Step for next loop or linear extrapolation
     Sl = S; // last S used
-    limits.removeLimit(stp_fieldCurv);
-    limits.removeLimit(stp_momLoss);
-    limits.removeLimit(stp_boundary);
-    limits.removeLimit(stp_plane);
+    limits.removeLimit(EStepLimitType::stp_fieldCurv);
+    limits.removeLimit(EStepLimitType::stp_momLoss);
+    limits.removeLimit(EStepLimitType::stp_boundary);
+    limits.removeLimit(EStepLimitType::stp_plane);
     S = estimateStep(state7, SU, plane, charge, relMomLoss, limits);
 
-    if (limits.getLowestLimit().first == stp_plane &&
+    if (limits.getLowestLimit().first == EStepLimitType::stp_plane &&
         fabs(S) < MINSTEP) {
       if (debugLvl_ > 0) {
         debugOut<<" (at Plane && fabs(S) < MINSTEP) -> break and do linear extrapolation \n";
       }
       break;
     }
-    if (limits.getLowestLimit().first == stp_momLoss &&
+    if (limits.getLowestLimit().first == EStepLimitType::stp_momLoss &&
         fabs(S) < MINSTEP) {
       if (debugLvl_ > 0) {
         debugOut<<" (momLossExceeded && fabs(S) < MINSTEP) -> return(true), no linear extrapolation; \n";
@@ -1962,7 +1984,7 @@ bool RKTrackRep::RKutta(const M1x4& SU,
   //
   // linear extrapolation to plane
   //
-  if (limits.getLowestLimit().first == stp_plane) {
+  if (limits.getLowestLimit().first == EStepLimitType::stp_plane) {
 
     if (fabs(Sl) > 0.001*MINSTEP){
       if (debugLvl_ > 0) {
@@ -2086,7 +2108,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
       useCache_ = false;
     }
     else {
-      if (RKSteps_.at(cachePos_).limits_.getLowestLimit().first == stp_plane) {
+      if (RKSteps_.at(cachePos_).limits_.getLowestLimit().first == EStepLimitType::stp_plane) {
         // we need to step exactly to the plane, so don't use the cache!
         useCache_ = false;
         RKSteps_.erase(RKSteps_.begin() + cachePos_, RKSteps_.end());
@@ -2103,7 +2125,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
     }
   }
 
-  limits.setLimit(stp_sMax, 25.); // max. step allowed [cm]
+  limits.setLimit(EStepLimitType::stp_sMax, 25.); // max. step allowed [cm]
 
   if (debugLvl_ > 0) {
     debugOut << " RKTrackRep::estimateStep \n";
@@ -2127,7 +2149,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
     if (An<0) SLDist *= -1.;
   }
 
-  limits.setLimit(stp_plane, SLDist);
+  limits.setLimit(EStepLimitType::stp_plane, SLDist);
   limits.setStepSign(SLDist);
 
   if (debugLvl_ > 0) {
@@ -2198,15 +2220,15 @@ double RKTrackRep::estimateStep(const M1x7& state7,
       break;
   }
   if (fabs(fieldCurvLimit) < MINSTEP)
-    limits.setLimit(stp_fieldCurv, MINSTEP);
+    limits.setLimit(EStepLimitType::stp_fieldCurv, MINSTEP);
   else
-    limits.setLimit(stp_fieldCurv, fieldCurvLimit);
+    limits.setLimit(EStepLimitType::stp_fieldCurv, fieldCurvLimit);
 
-  double stepToPlane(limits.getLimitSigned(stp_plane));
+  double stepToPlane(limits.getLimitSigned(EStepLimitType::stp_plane));
   if (fabs(distVsStep.first) < 8.E99) {
     stepToPlane = distVsStep.first + distVsStep.second;
   }
-  limits.setLimit(stp_plane, stepToPlane);
+  limits.setLimit(EStepLimitType::stp_plane, stepToPlane);
 
 
   //
@@ -2221,7 +2243,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
     }
   }
   // see if straight line approximation is ok
-  else if ( limits.getLimit(stp_plane) < 0.2*limits.getLimit(stp_fieldCurv) ){
+  else if ( limits.getLimit(EStepLimitType::stp_plane) < 0.2*limits.getLimit(EStepLimitType::stp_fieldCurv) ){
     if (debugLvl_ > 0) {
       debugOut << "  straight line approximation is fine.\n";
     }
@@ -2234,7 +2256,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
     }
     // if we are near the plane, but not pointing to the active area, make a big step!
     else {
-      limits.removeLimit(stp_plane);
+      limits.removeLimit(EStepLimitType::stp_plane);
       limits.setStepSign(propDir_);
       if (debugLvl_ > 0) {
         debugOut << "  we are near the plane, but not pointing to the active area. make a big step! \n";
@@ -2244,7 +2266,7 @@ double RKTrackRep::estimateStep(const M1x7& state7,
   // propDir_ is set and we are not pointing to an active part of a plane -> propDir_ decides!
   else {
     if (limits.getStepSign() * propDir_ < 0){
-      limits.removeLimit(stp_plane);
+      limits.removeLimit(EStepLimitType::stp_plane);
       limits.setStepSign(propDir_);
       if (debugLvl_ > 0) {
         debugOut << "  invert Step according to propDir_ and make a big step. \n";
@@ -2366,7 +2388,7 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
     // propagation
     bool checkJacProj = false;
     limits_.reset();
-    limits_.setLimit(stp_sMaxArg, maxStep-fabs(coveredDistance));
+    limits_.setLimit(EStepLimitType::stp_sMaxArg, maxStep-fabs(coveredDistance));
 
     M1x7 J_MMT_unprojected_lastRow = {{0, 0, 0, 0, 0, 0, 1}};
 
@@ -2378,8 +2400,8 @@ double RKTrackRep::Extrap(const DetPlane& startPlane,
       throw exc;
     }
 
-    bool atPlane(limits_.getLowestLimit().first == stp_plane);
-    if (limits_.getLowestLimit().first == stp_boundary)
+    bool atPlane(limits_.getLowestLimit().first == EStepLimitType::stp_plane);
+    if (limits_.getLowestLimit().first == EStepLimitType::stp_boundary)
       isAtBoundary = true;
 
 

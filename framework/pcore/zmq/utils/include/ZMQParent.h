@@ -134,6 +134,8 @@ namespace Belle2 {
   }
 
   template<int AZMQType>
+  // it delegates to the non-static two-argument overload below, so it cannot be static
+  // cppcheck-suppress functionStatic
   std::unique_ptr<zmq::socket_t> ZMQParent::createSocket(const std::string& socketAddress)
   {
     // We only check for "*" in the full address for now. This is fine, as neither a valid hostname nor a valid

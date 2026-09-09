@@ -241,12 +241,3 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
   }
   m_h_nECLClusters->Fill(neclClusters);
 }
-
-void PhysicsObjectsMiraBelleBhabhaModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleBhabhaModule::terminate()
-{
-}
-

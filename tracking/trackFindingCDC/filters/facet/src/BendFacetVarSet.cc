@@ -9,6 +9,9 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -54,17 +57,17 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double middleChi2 = middleDistance * (middleDistance - middleOptimalStep) * middleWeight;
   const double endChi2 = endDistance * (endDistance - endOptimalStep) * endWeight;
 
-  const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
-  const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
-  const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
+  const ROOT::Math::XYVector& startToMiddleTangentialVector = startToMiddleLine.tangential();
+  const ROOT::Math::XYVector& startToEndTangentialVector = startToEndLine.tangential();
+  const ROOT::Math::XYVector& middleToEndTangentialVector = middleToEndLine.tangential();
 
-  const double startToMiddleLength = startToMiddleTangentialVector.norm();
-  const double startToEndLength = startToEndTangentialVector.norm();
-  const double middleToEndLength = middleToEndTangentialVector.norm();
+  const double startToMiddleLength = startToMiddleTangentialVector.R();
+  const double startToEndLength = startToEndTangentialVector.R();
+  const double middleToEndLength = middleToEndTangentialVector.R();
 
-  const double startPhi = startToMiddleTangentialVector.angleWith(startToEndTangentialVector);
-  const double middlePhi = startToMiddleTangentialVector.angleWith(middleToEndTangentialVector);
-  const double endPhi = startToEndTangentialVector.angleWith(middleToEndTangentialVector);
+  const double startPhi = ROOT::Math::VectorUtil::DeltaPhi(startToMiddleTangentialVector, startToEndTangentialVector);
+  const double middlePhi = ROOT::Math::VectorUtil::DeltaPhi(startToMiddleTangentialVector, middleToEndTangentialVector);
+  const double endPhi = ROOT::Math::VectorUtil::DeltaPhi(startToEndTangentialVector, middleToEndTangentialVector);
 
   const double startToMiddleSigmaPhi = startDriftLengthSigma / startToMiddleLength;
   const double startToEndSigmaPhi = startDriftLengthSigma / startToEndLength;

@@ -17,8 +17,7 @@
    along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef genfit_mySpacepointMeasurement_h
-#define genfit_mySpacepointMeasurement_h
+#pragma once
 
 #include "SpacepointMeasurement.h"
 #include "TrackCandHit.h"
@@ -61,5 +60,3 @@ class mySpacepointMeasurement : public SpacepointMeasurement {
 /** @} */
 
 } /* End of namespace genfit */
-
-#endif // genfit_mySpacepointMeasurement_h

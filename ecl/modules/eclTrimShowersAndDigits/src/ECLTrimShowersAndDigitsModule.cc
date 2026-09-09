@@ -95,9 +95,6 @@ void ECLTrimShowersAndDigitsModule::event()
 
 //-----------------------------------------------------------------
 //..Terminate
-void ECLTrimShowersAndDigitsModule::terminate()
-{
-}
 
 //-----------------------------------------------------------------
 //..Select the ECLShowers to keep

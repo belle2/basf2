@@ -144,7 +144,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
               double bcx = static_cast<TAxis*>(hEventT0vsCoG->GetXaxis())->GetBinCenter(i);
-              double bcy = ((TAxis*)hEventT0vsCoG->GetYaxis())->GetBinCenter(j);
+              double bcy = (static_cast<TAxis*>(hEventT0vsCoG->GetYaxis()))->GetBinCenter(j);
               if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               } else if (hEventT0vsCoG->GetBinContent(i, j) > 0

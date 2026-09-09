@@ -11,15 +11,15 @@
 #include <simulation/longlivedneutral/G4LongLivedNeutral.h>
 #include <simulation/longlivedneutral/G4LongLivedNeutralDecay.h>
 
-#include "G4PhysicalConstants.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4DynamicParticle.hh"
-#include "G4PrimaryParticle.hh"
-#include "G4DecayProducts.hh"
-#include "G4DecayTable.hh"
-#include "G4VDecayChannel.hh"
-#include "G4PhysicsLogVector.hh"
-#include "G4ParticleChangeForDecay.hh"
+#include <G4PhysicalConstants.hh>
+#include <G4SystemOfUnits.hh>
+#include <G4DynamicParticle.hh>
+#include <G4PrimaryParticle.hh>
+#include <G4DecayProducts.hh>
+#include <G4DecayTable.hh>
+#include <G4VDecayChannel.hh>
+#include <G4PhysicsLogVector.hh>
+#include <G4ParticleChangeForDecay.hh>
 
 
 using namespace Belle2;

@@ -127,7 +127,7 @@ namespace {
     auto splot_weights = MVA::getSPlotWeights(dataset, binning);
 
     double sum = 0;
-    for (auto& s : splot_weights)
+    for (const auto& s : splot_weights)
       sum += s;
     EXPECT_FLOAT_EQ(sum, 20.0);
 

@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Destructor for EclPainter subclass.
      */
-    ~EclPainter2D();
+    ~EclPainter2D() override;
 
   private:
     /**  Display subtypes of this class. */

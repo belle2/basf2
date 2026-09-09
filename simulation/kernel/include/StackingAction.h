@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
 
-      double    m_photonFraction; /**< The fraction of Cerenkov photons which will be kept and propagated. */
+      double    m_photonFraction = 1.0; /**< The fraction of Cerenkov photons which will be kept and propagated. */
 
     };
 

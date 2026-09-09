@@ -46,7 +46,7 @@ namespace Belle2 {
        *
        *  Updates the contained trajectory.
        */
-      void fusePreliminary(const TrackingUtilities::CDCSegmentPair& segmentPair);
+      static void fusePreliminary(const TrackingUtilities::CDCSegmentPair& segmentPair);
 
       /**
        * Combine the trajectories of the two given segments to a full helix trajectory
@@ -59,8 +59,8 @@ namespace Belle2 {
        *
        *  The fit is used as the expansion point for the least square fuse fit with proper covariance.
        */
-      TrackingUtilities::CDCTrajectory3D fusePreliminary(const TrackingUtilities::CDCSegment2D& fromSegment2D,
-                                                         const TrackingUtilities::CDCSegment2D& toSegment2D);
+      static TrackingUtilities::CDCTrajectory3D fusePreliminary(const TrackingUtilities::CDCSegment2D& fromSegment2D,
+                                                                const TrackingUtilities::CDCSegment2D& toSegment2D);
 
       /// Combine the two segments given a preliminary reference trajectory to which a creation is applied
       TrackingUtilities::CDCTrajectory3D reconstructFuseTrajectories(const TrackingUtilities::CDCSegment2D& fromSegment2D,
@@ -72,8 +72,8 @@ namespace Belle2 {
        *  Calculate the ambiguity of the helix parameters relative to the three circle
        *  parameters given the hit content of the segment and their stereo displacement.
        */
-      TrackingUtilities::PerigeeHelixAmbiguity calcAmbiguity(const TrackingUtilities::CDCSegment3D& segment3D,
-                                                             const TrackingUtilities::CDCTrajectory2D& trajectory2D);
+      static TrackingUtilities::PerigeeHelixAmbiguity calcAmbiguity(const TrackingUtilities::CDCSegment3D& segment3D,
+          const TrackingUtilities::CDCTrajectory2D& trajectory2D);
 
 
     private:

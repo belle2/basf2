@@ -36,7 +36,7 @@ namespace Belle2 {
     /**
     * set the parameters from file
     */
-    void setParameters(std::string infile);
+    void setParameters(const std::string& infile);
 
     /**
     * hadron saturation parameterization part 1
@@ -51,20 +51,20 @@ namespace Belle2 {
     /**
     * hadron saturation parameterization part 1
     */
-    double D2I(double cosTheta, double D, double alpha, double gamma, double delta, double power, double ratio) const;
+    static double D2I(double cosTheta, double D, double alpha, double gamma, double delta, double power, double ratio);
 
     /**
     * hadron saturation parameterization part 2
     */
-    double I2D(double cosTheta, double I, double alpha, double gamma, double delta, double power, double ratio) const;
+    static double I2D(double cosTheta, double I, double alpha, double gamma, double delta, double power, double ratio);
 
   private:
 
-    double m_alpha; /**< the alpha parameter for the hadron saturation correction */
-    double m_gamma; /**< the gamma parameter for the hadron saturation correction */
-    double m_delta; /**< the delta parameter for the hadron saturation correction */
-    double m_power; /**< the power parameter for the hadron saturation correction */
-    double m_ratio; /**< the ratio parameter for the hadron saturation correction */
+    double m_alpha = 0.; /**< the alpha parameter for the hadron saturation correction */
+    double m_gamma = 0.; /**< the gamma parameter for the hadron saturation correction */
+    double m_delta = 0.; /**< the delta parameter for the hadron saturation correction */
+    double m_power = 0.; /**< the power parameter for the hadron saturation correction */
+    double m_ratio = 0.; /**< the ratio parameter for the hadron saturation correction */
 
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< db object for dE/dx hadron saturation parameters */
 

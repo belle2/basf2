@@ -56,22 +56,22 @@ namespace Belle2 {
       static PXDClusterPositionEstimator& getInstance();
 
       /** Return the normed charge ratio between head and tail pixels (size>=2) or the charge of the seed (size=1) . */
-      float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
+      static float computeEta(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV);
 
       /** Return the shape index of the pixels */
       int computeShapeIndex(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
                             double thetaV) const;
 
       /** Return the name for the pixel set */
-      const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
-                                     double thetaV) const;
+      static const std::string getShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                                            double thetaV);
 
       /** Return the mirrored name for the pixel set */
-      const std::string getMirroredShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
-                                             double thetaV) const;
+      static const std::string getMirroredShortName(const std::set<Pixel>& pixels, int uStart, int vStart, int vSize, double thetaU,
+                                                    double thetaV);
 
       /** Return a name for the pixel set. */
-      const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart) const;
+      static const std::string getFullName(const std::set<Pixel>& pixels, int uStart, int vStart);
 
       /** Return kind of cluster needed to find cluster position correction. */
       int getClusterkind(const PXDCluster& cluster) const;
@@ -80,21 +80,21 @@ namespace Belle2 {
       int getClusterkind(const std::vector<Belle2::PXD::Pixel>& pixels, const Belle2::VxdID& sensorID) const;
 
       /** Get sector index from angles. Sectors in thetaU and thetaV are numbered ++, -+, --, +-. */
-      int getSectorIndex(double thetaU, double thetaV) const;
+      static int getSectorIndex(double thetaU, double thetaV);
 
     private:
 
       /** Return reference to the head pixel in pixel set. */
-      const Pixel& getHeadPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
+      static const Pixel& getHeadPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV);
 
       /** Return reference to the tail pixel in pixel set. */
-      const Pixel& getTailPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV) const;
+      static const Pixel& getTailPixel(const std::set<Pixel>& pixels, int vStart, int vSize, double thetaU, double thetaV);
 
       /** Return reference to the last pixel in pixel set with given vOffset from vStart. */
-      const Pixel& getLastPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
+      static const Pixel& getLastPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset);
 
       /** Return reference to the first pixel in pixel set with given vOffset from vStart. */
-      const Pixel& getFirstPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset) const;
+      static const Pixel& getFirstPixelWithVOffset(const std::set<Pixel>& pixels, int vStart, int vOffset);
 
       /** Singleton class, hidden constructor */
       PXDClusterPositionEstimator() {};

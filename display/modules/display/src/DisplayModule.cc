@@ -265,7 +265,7 @@ void DisplayModule::event()
 
     // Add 3DNeuro and 3DHough tracks
     const auto trg3DHTrackArrays = StoreArray<CDCTrigger3DHTrack>::getArrayList();
-    for (std::string colName : trg3DHTrackArrays) {
+    for (const std::string& colName : trg3DHTrackArrays) {
       StoreArray<CDCTrigger3DHTrack> trg3DHTracks(colName);
       for (const CDCTrigger3DHTrack& trg3DHTrack : trg3DHTracks) {
         m_visualizer->addCDCTriggerTrack(colName, trg3DHTrack);

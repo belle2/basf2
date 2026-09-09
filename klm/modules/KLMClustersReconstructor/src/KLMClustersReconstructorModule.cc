@@ -81,10 +81,6 @@ void KLMClustersReconstructorModule::initialize()
     B2FATAL("Incorrect ClusterMode argument.");
 }
 
-void KLMClustersReconstructorModule::beginRun()
-{
-}
-
 static bool compareDistance(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
   return hit1->getPosition().R() < hit2->getPosition().R();
@@ -121,7 +117,7 @@ static ROOT::Math::XYZVector referenceDirection(const std::vector<KLMHit2d*>& in
   if (seedByInnermost)
     return unitDirection(hitWithMinR(inliers)->getPosition());
   ROOT::Math::XYZVector sum{0, 0, 0};
-  for (KLMHit2d* h : inliers)
+  for (const KLMHit2d* h : inliers)
     sum = sum + unitDirection(h->getPosition());
   if (sum.R() <= 0)
     return unitDirection(hitWithMinR(inliers)->getPosition());
@@ -135,7 +131,7 @@ static double adaptiveThreshold(const ROOT::Math::XYZVector& ref,
 {
   std::vector<double> residuals;
   residuals.reserve(hits.size());
-  for (KLMHit2d* h : hits)
+  for (const KLMHit2d* h : hits)
     residuals.push_back(ROOT::Math::VectorUtil::Angle(h->getPosition(), ref));
   std::vector<double> sorted = residuals;
   std::sort(sorted.begin(), sorted.end());
@@ -424,13 +420,5 @@ clusterFound:;
 
   delete[] layerHitsBKLM;
   delete[] layerHitsEKLM;
-}
-
-void KLMClustersReconstructorModule::endRun()
-{
-}
-
-void KLMClustersReconstructorModule::terminate()
-{
 }
 

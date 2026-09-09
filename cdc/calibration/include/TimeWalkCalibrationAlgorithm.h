@@ -25,7 +25,7 @@ namespace Belle2 {
       TimeWalkCalibrationAlgorithm();
 
       /// Destructor
-      ~TimeWalkCalibrationAlgorithm() {}
+      ~TimeWalkCalibrationAlgorithm() override {}
 
       /// change flag for debug
       void setDebug(bool debug) {m_debug = debug; }
@@ -76,7 +76,7 @@ namespace Belle2 {
       void updateT0();
 
       /// fit tw histogram
-      void fitToExponentialFunc(TH1D* h1);
+      static void fitToExponentialFunc(TH1D* h1);
 
       /// prepare calibration.
       void prepare();
@@ -89,8 +89,8 @@ namespace Belle2 {
 
     private:
 
-      TH1D* m_h1[300];                               /**< Mean of residual as function of ADC of each board. */
-      TH2D* m_h2[300];                               /**< 2D histogram of residual vs ADC for each board. */
+      TH1D* m_h1[300] = {};                               /**< Mean of residual as function of ADC of each board. */
+      TH2D* m_h2[300] = {};                               /**< 2D histogram of residual vs ADC for each board. */
 
       double m_xmin = 0.07;                          /**< minimum value cut of drift length. */
       double m_minNdf = 20;                          /**< minimum number of degree of freedom required for track. */

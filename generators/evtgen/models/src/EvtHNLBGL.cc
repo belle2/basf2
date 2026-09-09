@@ -10,6 +10,7 @@
 #include <EvtGenBase/EvtPDL.hh>
 #include <string>
 
+#include <framework/logging/Logger.h>
 #include <generators/evtgen/EvtGenModelRegister.h>
 #include <generators/evtgen/models/EvtHNLBGL.h>
 #include <generators/evtgen/models/EvtBGLFF.h>
@@ -111,8 +112,7 @@ void EvtHNLBGL::init()
       bglffmodel = new EvtBGLFF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5), getArg(6), getArg(7));
       calcamp = new EvtHNLSemiLeptonicScalarAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLBGL (N=3) model for scalar meson daughters needs 8 arguments. Sorry." << endl;
-
+      B2ERROR("HNLBGL (N=3) model for scalar meson daughters needs 8 arguments. Sorry.");
       ::abort();
     }
   }  else if (d1type == EvtSpinType::VECTOR) {
@@ -120,11 +120,11 @@ void EvtHNLBGL::init()
       bglffmodel = new EvtBGLFF(getArg(0), getArg(1), getArg(2), getArg(3), getArg(4), getArg(5));
       calcamp = new EvtHNLSemiLeptonicVectorAmp;
     } else {
-      EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLBGL model for vector meson daughters needs 6 arguments. Sorry." << endl;
+      B2ERROR("HNLBGL model for vector meson daughters needs 6 arguments. Sorry.");
       ::abort();
     }
   } else {
-    EvtGenReport(EVTGEN_ERROR, "EvtGen") << "HNLBGL model handles only scalar and vector meson daughters. Sorry." << endl;
+    B2ERROR("HNLBGL model handles only scalar and vector meson daughters. Sorry.");
     ::abort();
   }
 

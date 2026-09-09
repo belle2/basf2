@@ -25,15 +25,9 @@ using namespace std;
 using namespace Belle2;
 using namespace Simulation;
 
-Geant4ePhysics::Geant4ePhysics() :
-// G4VPhysicsConstructor("Geant4ePhysics"),
-  m_StepLengthLimitProcess(NULL), m_MagFieldLimitProcess(NULL),
-  m_ELossProcess(NULL), m_Messenger(NULL)
+// Note: G4VPhysicsConstructor("Geant4ePhysics") is deliberately not invoked here.
+Geant4ePhysics::Geant4ePhysics()
 {
-  if (false) {
-    ConstructParticle();
-    ConstructProcess();
-  }
 }
 
 Geant4ePhysics::~Geant4ePhysics()

@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_FitStatus_h
-#define genfit_FitStatus_h
+#pragma once
 
 #include <Rtypes.h>
 #include <Math/ProbFuncMathCore.h>
@@ -57,7 +56,7 @@ struct PruneFlags {
   void Print(const Option_t* = "") const;
 
 private:
-  enum fields { C = 1 << 0,
+  enum class EFields { C = 1 << 0,
 		F = 1 << 1,
 		L = 1 << 2,
 		W = 1 << 3,
@@ -168,5 +167,3 @@ class FitStatus {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_FitStatus_h

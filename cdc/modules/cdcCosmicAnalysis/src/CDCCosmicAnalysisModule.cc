@@ -227,10 +227,6 @@ void CDCCosmicAnalysisModule::event()
 
 }
 
-void CDCCosmicAnalysisModule::endRun()
-{
-}
-
 void CDCCosmicAnalysisModule::terminate()
 {
   tfile->cd();

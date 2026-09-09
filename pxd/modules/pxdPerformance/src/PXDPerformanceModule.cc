@@ -84,11 +84,4 @@ void PXDPerformanceModule::event()
 
 }
 
-void PXDPerformanceModule::endRun()
-{
-}
 
-
-void PXDPerformanceModule::terminate()
-{
-}

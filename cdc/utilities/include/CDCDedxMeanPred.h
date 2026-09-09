@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
     * set the parameters from file
     */
-    void setParameters(std::string infile);
+    void setParameters(const std::string& infile);
 
     /**
     * set the parameters
@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
     * write the parameters in file
     */
-    void printParameters(std::string infile);
+    void printParameters(const std::string& infile);
 
     /**
     * Return the predicted mean value as a function of beta-gamma (bg)
@@ -60,7 +60,7 @@ namespace Belle2 {
 
   private:
 
-    double m_meanpars[15]; /**< parameters for beta-gamma curve */
+    double m_meanpars[15] = {}; /**< parameters for beta-gamma curve */
 
     const DBObjPtr<CDCDedxMeanPars> m_DBMeanPars; /**< db object for dE/dx mean parameters */
 

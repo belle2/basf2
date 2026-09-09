@@ -11,6 +11,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/DataStore.h>
 
+#include <sstream>
 #include <TTree.h>
 #include <TFile.h>
 #include <TKey.h>

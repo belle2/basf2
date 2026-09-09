@@ -23,7 +23,7 @@ namespace Belle2 {
       /**
        * Constructor
        */
-      ECLTimingUtilities(bool required = true);
+      explicit ECLTimingUtilities(bool required = true);
 
 
       /**

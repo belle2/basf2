@@ -343,16 +343,18 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         validation_plots.extend(missing_tracks_plot)
 
         # Quality Indicator #
-        if self.plotTrackQualityIndicator:
-            track_QI_plot = self.profiles_by_parameters_base(
-                xs=self.pr_track_QI,
-                quantity_name="track quality indicator",
-                make_hist=True,
-                parameter_names=[],
-                profile_parameters={},
-                unit=None)
+        if self.plotTrackQualityIndicator and len(self.pr_track_QI) > 0:
+            pr_track_QI_values = np.array(self.pr_track_QI, dtype=float)
+            if not np.all(np.isnan(pr_track_QI_values)):
+                track_QI_plot = self.profiles_by_parameters_base(
+                    xs=self.pr_track_QI,
+                    quantity_name="track quality indicator",
+                    make_hist=True,
+                    parameter_names=[],
+                    profile_parameters={},
+                    unit=None)
 
-            validation_plots.extend(track_QI_plot)
+                validation_plots.extend(track_QI_plot)
 
         for validation_plot in validation_plots:
             validation_plot.write()

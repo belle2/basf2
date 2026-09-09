@@ -126,7 +126,7 @@ void SVDROIDQMModule::event()
 
   hnInter->Fill(m_Intercepts.getEntries());
 
-  for (auto& it : m_Intercepts)
+  for (const auto& it : m_Intercepts)
     fillSensorInterHistos(&it);
 
 

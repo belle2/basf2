@@ -24,7 +24,7 @@ namespace Belle2 {
 
   private:
     /// Cache for the B field at the IP
-    double m_cachedBField;
+    double m_cachedBField {};
 
     /// Kalman stepper (CKF) for PXD
     PXDKalmanStepper m_kalmanStepper;

@@ -50,7 +50,7 @@ namespace Belle2 {
       GeoBKLMCreator& operator=(GeoBKLMCreator&) = delete;
 
       //! Destructor of the GeoBKLMCreator class
-      ~GeoBKLMCreator();
+      ~GeoBKLMCreator() override;
 
       //! Creates the objects for the BKLM geometry
       //! virtual void create(const GearDir&, G4LogicalVolume&, geometry::GeometryTypes type);
@@ -84,7 +84,7 @@ namespace Belle2 {
     private:
 
       //! Create a parameter object from the Gearbox XML parameters.
-      BKLMGeometryPar createConfiguration(const GearDir& param)
+      static BKLMGeometryPar createConfiguration(const GearDir& param)
       {
         BKLMGeometryPar bklmGeometryPar;
         //bklmGeometryPar.setVersion(0);

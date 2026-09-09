@@ -34,7 +34,7 @@ namespace Belle2 {
     }
 
     /// Getter for the cut identifiers
-    const std::vector<std::string> getCutIdentifiers() const
+    const std::vector<std::string>& getCutIdentifiers() const
     {
       return m_cutIdentifiers;
     }

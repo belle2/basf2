@@ -17,8 +17,7 @@
    along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef genfit_IO_h
-#define genfit_IO_h
+#pragma once
 
 /** @brief Defines for I/O streams used for error and debug printing.
  */
@@ -38,5 +37,3 @@ extern std::ostream errorOut;
 extern std::ostream printOut;
 
 }
-
-#endif

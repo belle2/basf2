@@ -71,8 +71,8 @@ namespace Belle2 {
     const int nLeakReg = 3; /**< 0 = forward, 1 = barrel, 2 = backward */
     const int nCrysMax = 21; /**< max number of crystals used to calculate energy */
 
-    int nCrystalGroups; /**< sort the crystals into this many groups */
-    int iGroupOfCrystal[ECLElementNumbers::c_NCrystals]; /**< group number of each crystal */
+    int nCrystalGroups = 0; /**< sort the crystals into this many groups */
+    int iGroupOfCrystal[ECLElementNumbers::c_NCrystals] = {}; /**< group number of each crystal */
 
     ECL::ECLNeighbours* neighbours{nullptr}; /**< neighbours to crystal */
     std::vector<int> thetaIDofCrysID; /**< thetaID of each crystal */

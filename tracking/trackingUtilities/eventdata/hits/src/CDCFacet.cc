@@ -17,7 +17,6 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/ParameterLine2D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
@@ -51,6 +50,7 @@ void CDCFacet::reverse()
   m_fitLine.reverse();
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
 CDCFacet CDCFacet::reversed() const
 {
   return CDCFacet(getEndRLWireHit().reversed(),
@@ -69,17 +69,17 @@ void CDCFacet::invalidateFitLine()
   m_fitLine.invalidate();
 }
 
-Vector2D CDCFacet::getStartRecoPos2D() const
+ROOT::Math::XYVector CDCFacet::getStartRecoPos2D() const
 {
   return getFitLine()->closest(getStartWire().getRefPos2D());
 }
 
-Vector2D CDCFacet::getMiddleRecoPos2D() const
+ROOT::Math::XYVector CDCFacet::getMiddleRecoPos2D() const
 {
   return getFitLine()->closest(getMiddleWire().getRefPos2D());
 }
 
-Vector2D CDCFacet::getEndRecoPos2D() const
+ROOT::Math::XYVector CDCFacet::getEndRecoPos2D() const
 {
   return getFitLine()->closest(getEndWire().getRefPos2D());
 }

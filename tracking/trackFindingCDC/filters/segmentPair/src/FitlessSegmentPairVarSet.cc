@@ -10,9 +10,15 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
 
+#include <tracking/trackingUtilities/numerics/Angle.h>
+
 #include <cdc/topology/CDCWire.h>
 
-#include <tracking/trackingUtilities/numerics/Angle.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 using namespace Belle2;
 using namespace CDC;
@@ -75,27 +81,27 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCRecoHit2D& toFirstHit = toSegment.front();
   const CDCRecoHit2D& toLastHit = toSegment.back();
 
-  const Vector2D fromHitPos = fromLastHit.getRecoPos2D();
-  const Vector2D toHitPos = toFirstHit.getRecoPos2D();
+  const ROOT::Math::XYVector fromHitPos = fromLastHit.getRecoPos2D();
+  const ROOT::Math::XYVector toHitPos = toFirstHit.getRecoPos2D();
 
   // Fit
-  const Vector2D fromFitPos = fromFit.getClosest(fromHitPos);
-  const Vector2D toFitPos = toFit.getClosest(toHitPos);
-  const Vector2D fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toFitMom = toFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromFitPos = fromFit.getClosest(fromHitPos);
+  const ROOT::Math::XYVector toFitPos = toFit.getClosest(toHitPos);
+  const ROOT::Math::XYVector fromFitMom = fromFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toFitMom = toFit.getFlightDirection2D(toHitPos);
 
-  const Vector2D fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
-  const Vector2D toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
+  const ROOT::Math::XYVector fromOtherFitMom = toFit.getFlightDirection2D(fromHitPos);
+  const ROOT::Math::XYVector toOtherFitMom = fromFit.getFlightDirection2D(toHitPos);
 
-  const double deltaPosPhi = fromFitPos.angleWith(toFitPos);
-  const double deltaMomPhi = fromFitMom.angleWith(toFitMom);
+  const double deltaPosPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitPos, toFitPos);
+  const double deltaMomPhi = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, toFitMom);
   const double deltaAlpha = AngleUtil::normalised(deltaMomPhi - deltaPosPhi);
 
   finitevar<named("delta_pos_phi")>() = deltaPosPhi;
   finitevar<named("delta_mom_phi")>() = deltaMomPhi;
 
-  finitevar<named("from_delta_mom_phi")>() = fromFitMom.angleWith(fromOtherFitMom);
-  finitevar<named("to_delta_mom_phi")>() = toFitMom.angleWith(toOtherFitMom);
+  finitevar<named("from_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(fromFitMom, fromOtherFitMom);
+  finitevar<named("to_delta_mom_phi")>() = ROOT::Math::VectorUtil::DeltaPhi(toFitMom, toOtherFitMom);
   finitevar<named("delta_alpha")>() = deltaAlpha;
 
   // Reconstructed quantities
@@ -110,20 +116,20 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCWire& nearStereoWire = nearStereoHit.getWire();
   const WireLine& nearWireLine = nearStereoWire.getWireLine();
 
-  const Vector3D nearAxialRecoPos = nearAxialHit.reconstruct3D(axialFit);
-  const Vector3D farStereoRecoPos = farStereoHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector nearAxialRecoPos = nearAxialHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector farStereoRecoPos = farStereoHit.reconstruct3D(axialFit);
   const double farZ = farStereoRecoPos.z();
 
-  const Vector3D nearStereoRecoPos = nearStereoHit.reconstruct3D(axialFit);
+  const ROOT::Math::XYZVector nearStereoRecoPos = nearStereoHit.reconstruct3D(axialFit);
   const double nearZ = nearStereoRecoPos.z();
 
   const double stereoArcLength2D =
-    axialFit.calcArcLength2DBetween(nearStereoRecoPos.xy(),
-                                    farStereoRecoPos.xy());
+    axialFit.calcArcLength2DBetween(VectorUtil::getXYVector(nearStereoRecoPos),
+                                    VectorUtil::getXYVector(farStereoRecoPos));
 
   const double arcLength2DGap =
-    axialFit.calcArcLength2DBetween(nearAxialRecoPos.xy(),
-                                    nearStereoRecoPos.xy());
+    axialFit.calcArcLength2DBetween(VectorUtil::getXYVector(nearAxialRecoPos),
+                                    VectorUtil::getXYVector(nearStereoRecoPos));
 
   finitevar<named("reco_arc_length_gap")>() = fabs(arcLength2DGap);
   finitevar<named("stereo_arc_length")>() = fabs(stereoArcLength2D);

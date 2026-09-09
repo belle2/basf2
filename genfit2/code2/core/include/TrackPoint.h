@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_TrackPoint_h
-#define genfit_TrackPoint_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsFitterInfo.h"
@@ -51,7 +50,7 @@ class TrackPoint : public TObject {
   explicit TrackPoint(Track* track);
 
   /**
-   * @brief Contructor taking list of measurements.
+   * @brief Constructor taking list of measurements.
    *
    * AbsMeasurement::setTrackPoint() of each measurement will be called.
    * TrackPoint takes ownership over rawMeasurements.
@@ -59,7 +58,7 @@ class TrackPoint : public TObject {
   TrackPoint(const std::vector< genfit::AbsMeasurement* >& rawMeasurements, Track* track);
 
   /**
-   * @brief Contructor taking one measurement.
+   * @brief Constructor taking one measurement.
    *
    * AbsMeasurement::setTrackPoint() of the measurement will be called.
    * TrackPoint takes ownership over the rawMeasurement.
@@ -154,5 +153,3 @@ class TrackPoint : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TrackPoint_h

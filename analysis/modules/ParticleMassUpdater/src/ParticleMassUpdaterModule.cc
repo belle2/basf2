@@ -28,15 +28,11 @@ ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
   addParam("pdgCode", m_pdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
 }
 
-void ParticleMassUpdaterModule::initialize()
-{
-}
-
 void ParticleMassUpdaterModule::event()
 {
 
 
-  for (auto& iList : m_strParticleLists) {
+  for (const auto& iList : m_strParticleLists) {
 
     StoreObjPtr<ParticleList> particlelist(iList);
     if (!particlelist) {
@@ -50,9 +46,5 @@ void ParticleMassUpdaterModule::event()
       }
     }
   }
-}
-
-void ParticleMassUpdaterModule::terminate()
-{
 }
 

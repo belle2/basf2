@@ -9,7 +9,7 @@
 ##########################################################################
 
 import b2bii
-from basf2 import B2ERROR
+from basf2 import B2ERROR, B2WARNING
 import modularAnalysis as ma
 from stdCharged import stdPi, stdPr
 import vertex
@@ -142,6 +142,11 @@ def goodBelleKshort(path):
     Parameters:
         path (basf2.Path): the path to load the modules
     """
+    B2WARNING(
+        "The standard K_S0 list 'K_S0:legacyGoodKS' is deprecated "
+        "and will be removed at the end of 2026. "
+        "Please update your analysis accordingly."
+    )
     if b2bii.isB2BII():
         ma.cutAndCopyList(
             "K_S0:legacyGoodKS", "K_S0:mdst", "0.3 < M < 0.7", writeOut=True, path=path

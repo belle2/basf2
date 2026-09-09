@@ -1051,6 +1051,9 @@ namespace Belle2 {
       // Initialize Variable
       AVariableManager& manager = AVariableManager::Instance();
       m_var = manager.getVariable(m_name, m_arguments);
+      // AVariableManager is a template parameter and the real variable managers do
+      // return nullptr for unknown variables, so this check is required
+      // cppcheck-suppress knownConditionTrueFalse
       if (m_var == nullptr) {
         auto fullname = m_name + "(" + boost::algorithm::join(m_arguments, ", ") + ")";
 

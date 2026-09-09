@@ -392,7 +392,7 @@ void eclMuMuECollectorModule::collect()
 
       //..Possible cable swap
       if (highNeighourSignal or (noNeighbourSignal and EperCrys[crysID] < m_MaxNeighbourE)) {
-        for (auto& id : highECrys) {
+        for (const auto& id : highECrys) {
           getObjectPtr<TH2F>("hitCrysVsExtrapolatedCrys")->Fill(crysID + 0.0001, id + 0.0001);
         }
       }

@@ -10,6 +10,8 @@
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -44,7 +46,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic)
   double arcLengthToOuterWall =
     straightOffOriginLine.arcLength2DToCylindricalR(outerWallR);
 
-  Vector3D startPoint = straightOffOriginLine.atArcLength2D(-arcLengthToOuterWall);
+  ROOT::Math::XYZVector startPoint = straightOffOriginLine.atArcLength2D(-arcLengthToOuterWall);
   CDCTrajectory3D cosmicTrajectory(straightOffOriginLine);
   cosmicTrajectory.setLocalOrigin(startPoint);
 
@@ -71,8 +73,8 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_secondar
 TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_photon_conversion)
 {
   // Should probably be placed at a vxd ladder
-  Vector3D vertex(1.0, 0.0, 0.0);
-  Vector3D momentum(1.0, 0.0, 0.0);
+  ROOT::Math::XYZVector vertex(1.0, 0.0, 0.0);
+  ROOT::Math::XYZVector momentum(1.0, 0.0, 0.0);
   double time = 0.0;
 
   CDCTrajectory3D electronTrajectory(vertex, time, momentum, -1, 1.5);
@@ -92,7 +94,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_cosmic_w
   double arcLengthToOuterWall =
     straightOffOriginLine.arcLength2DToCylindricalR(outerWallR);
 
-  Vector3D startPoint = straightOffOriginLine.atArcLength2D(-arcLengthToOuterWall);
+  ROOT::Math::XYZVector startPoint = straightOffOriginLine.atArcLength2D(-arcLengthToOuterWall);
   CDCTrajectory3D cosmicTrajectory(straightOffOriginLine);
   cosmicTrajectory.setLocalOrigin(startPoint);
 
@@ -109,7 +111,7 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_prepared_event_rl_flags)
   std::string svgFileName = "rl_flags_prepared_event.svg";
   loadPreparedEvent();
 
-  for (CDCTrack& track : m_mcTracks) {
+  for (const CDCTrack& track : m_mcTracks) {
     for (const CDCRecoHit3D& recoHit3D : track) {
       const CDCRLWireHit& rlWireHit = recoHit3D.getRLWireHit();
       std::string color = "blue";

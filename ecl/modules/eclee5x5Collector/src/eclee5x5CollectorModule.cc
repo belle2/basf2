@@ -375,7 +375,7 @@ void eclee5x5CollectorModule::collect()
     //** Energy in 5x5, and expected energy corrected for crystals that will not be calibrated */
     double reducedExpE = expE;
     double E25 = 0.;
-    for (auto& cellID : neighbours) {
+    for (const auto& cellID : neighbours) {
       E25 += EperCrys[cellID - 1];
       if (ee5x5Calib[cellID - 1] < 0.) {
         reducedExpE -= EperCrys[cellID - 1];
@@ -384,12 +384,12 @@ void eclee5x5CollectorModule::collect()
 
     //** now the vector and matrix used in the calibration */
     double rexpE = reducedExpE / sigmaExp;
-    for (auto& celli : neighbours) {
+    for (const auto& celli : neighbours) {
       if (ee5x5Calib[celli - 1] > 0.) {
         float rEi = EperCrys[celli - 1] / sigmaExp;
         getObjectPtr<TH1F>("RvsCrysID")->Fill(celli - 0.999, rexpE * rEi);
         getObjectPtr<TH1F>("NRvsCrysID")->Fill(celli - 0.999);
-        for (auto& cellj : neighbours) {
+        for (const auto& cellj : neighbours) {
           if (ee5x5Calib[cellj - 1] > 0.) {
             float rEj = EperCrys[cellj - 1] / sigmaExp;
             getObjectPtr<TH2F>("Qmatrix")->Fill(celli - 0.999, cellj - 0.999, rEi * rEj);

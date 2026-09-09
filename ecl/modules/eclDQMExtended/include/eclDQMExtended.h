@@ -53,10 +53,6 @@ namespace Belle2 {
     virtual void beginRun() override;
     /** Event processor. */
     virtual void event() override;
-    /** Call when a run ends. */
-    virtual void endRun() override;
-    /** Terminate. */
-    virtual void terminate() override;
 
     /** Function to define histograms. */
     virtual void defineHisto() override;
@@ -208,16 +204,17 @@ namespace Belle2 {
     /** Convert a CellID number to the global Shaper number. */
     int conversion(int);
     /** Select from vector of DSP coeffs a subvector corresponding to accurate channel number. */
-    const short int* vectorsplit(const std::vector<short int>&, int);
+    static const short int* vectorsplit(const std::vector<short int>&, int);
     /** Read calibration values for thresholds from DBObject. */
-    void callbackCalibration(DBObjPtr<ECLCrystalCalib>&, std::vector<short int>&);
+    static void callbackCalibration(DBObjPtr<ECLCrystalCalib>&, std::vector<short int>&);
     /** Read DSP coeffs and auxiliary constants from DBObject. */
-    void callbackCalibration(const ECLDspData*, std::map<std::string, std::vector<short int>>&, std::map<std::string, short int>&);
+    static void callbackCalibration(const ECLDspData*, std::map<std::string, std::vector<short int>>&,
+                                    std::map<std::string, short int>&);
     /** Get DSP coeffs and auxiliary constants from DB. */
     void initDspfromDB();
     /** Get DSP coeffs and auxiliary constants from Files. */
     void initDspfromFile();
     /** Call for DSP emulator. */
-    void emulator(int, int, std::vector<int>);
+    void emulator(int, int, const std::vector<int>&);
   };
 }; // end Belle2 namespace

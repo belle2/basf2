@@ -59,7 +59,7 @@ void BadBoardADCDetector::exposeParameters(ModuleParamList* moduleParamList,
 
 void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wireHits)
 {
-  CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
+  const CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
   // first loop: average ADC per board
   std::map <int, double> BoardADC;
   std::map <int, double> BoardTOT;
@@ -71,7 +71,7 @@ void BadBoardADCDetector::apply(std::vector<TrackingUtilities::CDCWireHit>& wire
     BoardTOT[board] += (*wireHit.getHit()).getTOT();
   };
   // now compute the averages:
-  for (auto& pair  : BoardADC) {
+  for (const auto& pair  : BoardADC) {
     int board = pair.first;
     BoardADC[board] /= BoardCount[board];
     BoardTOT[board] /= BoardCount[board];

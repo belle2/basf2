@@ -11,7 +11,8 @@
 #include <tracking/trackFindingCDC/hough/axes/ContinuousValue.h>
 
 #include <cdc/topology/ILayer.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -93,7 +94,7 @@ namespace Belle2 {
     class Phi0Tag;
 
     /// Type for discrete phi0 values
-    using DiscretePhi0 = DiscreteValue<TrackingUtilities::Vector2D, Phi0Tag>;
+    using DiscretePhi0 = DiscreteValue<ROOT::Math::XYVector, Phi0Tag>;
 
     // NOTE The following is for quadratic and hyperbolic tracks
     /// Phantom type tag for the discrete p representation

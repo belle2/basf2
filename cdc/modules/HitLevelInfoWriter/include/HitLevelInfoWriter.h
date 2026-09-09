@@ -53,7 +53,7 @@ namespace Belle2 {
     HitLevelInfoWriterModule();
 
     /** Destructor */
-    virtual ~HitLevelInfoWriterModule();
+    virtual ~HitLevelInfoWriterModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;
@@ -66,7 +66,7 @@ namespace Belle2 {
     virtual void terminate() override;
 
     /** Create the output TFiles and TTrees. */
-    void bookOutput(std::string filename);
+    void bookOutput(const std::string& filename);
 
     /**
      * Function to recalculate the dedx with latest constants
@@ -101,12 +101,12 @@ namespace Belle2 {
        * @param truncatedMeanErr  error for truncatedMean
        * @param dedx              input values
        */
-    void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx) const;
+    static void calculateMeans(double* mean, double* truncatedMean, double* truncatedMeanErr, const std::vector<double>& dedx);
 
     /** for all particles, save chi values into 'chi'
     * chi array of chi values to be modified
     **/
-    void saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize], CDCDedxTrack* dedxTrack, double dedx) const;
+    static void saveChiValue(double (&)[6], const Belle2::CDCDedxTrack* dedxTrack, double dedx);
 
   private:
 

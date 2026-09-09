@@ -20,11 +20,11 @@ namespace Belle2 {
 
   private:
     /// Calculate delta phi
-    float deltaPhi(float phi1, float phi2);
+    static float deltaPhi(float phi1, float phi2);
     /// Calculate delta eta from theta
-    float deltaEtaFromTheta(float theta1, float theta2);
+    static float deltaEtaFromTheta(float theta1, float theta2);
     /// Convert theta to eta (pseudorapidity)
-    float convertThetaToEta(float cosTheta);
+    static float convertThetaToEta(float cosTheta);
 
     /// Threshold to apply inverse pT dependent cut [GeV]
     double m_param_PtThresholdTrackToHitCut = 0.5;

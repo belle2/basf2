@@ -51,7 +51,7 @@ namespace Belle2 {
        * @param[in] raw_file Path to dsp??.dat file to be created.
        * @param[in] obj      Object to be written
        */
-      static void writeEclDsp(const char* raw_file, ECLDspData* obj);
+      static void writeEclDsp(const char* raw_file, const ECLDspData* obj);
 
       /**
        * @brief Emulate shape fitting algorithm from ShaperDSP
@@ -68,7 +68,7 @@ namespace Belle2 {
        *              precision, time of low-energy hits will be one of {-4,0,4}
        *              If false, time will be one of {-32, -16, 0}
        */
-      static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig,
+      static ECLShapeFit shapeFitter(int cid, const std::vector<int>& adc, int ttrig,
                                      bool adjusted_timing = true);
 
       /**
@@ -90,7 +90,7 @@ namespace Belle2 {
        *
        * @return struct with fit results
        */
-      static ECLPedestalFit pedestalFit(std::vector<int> adc);
+      static ECLPedestalFit pedestalFit(const std::vector<int>& adc);
 
     private:
       /** Flag indicating whether arrays fg31,fg32 are filled */

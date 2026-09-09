@@ -172,7 +172,7 @@ namespace Belle2 {
       s_mainPurity = purityPack.second;
 
       // reset the wasUsed-flag to catch when filters are not triggered.
-      for (auto& entry : s_wasUsed) {
+      for (const auto& entry : s_wasUsed) {
         *(entry.second) = false;
       }
     }

@@ -56,43 +56,43 @@ namespace Belle2 {
     /**
     * fit the beta-gamma curve
     */
-    void fitBGCurve(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                    const std::string& suffx);
+    void fitBGCurve(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                    const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. ionzation
     */
-    void fitSigmavsIonz(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                        const std::string& suffix);
+    void fitSigmavsIonz(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                        const std::string& suffix, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. nhit
     */
-    void fitSigmaVsNHit(std::vector< std::string > particles, const std::string& filename, const std::string& paramsigma,
-                        const std::string& suffx);
+    static void fitSigmaVsNHit(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramsigma,
+                               const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. cos(theta)
     */
-    void fitSigmaVsCos(std::vector< std::string > particles, const std::string& filename, const std::string& paramfile,
-                       const std::string& suffx);
+    static void fitSigmaVsCos(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
+                              const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * plots mean and width after fitting
     */
-    void plotBGMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& suffix);
+    void plotBGMonitoring(const std::vector<std::string >& particles, const std::string& filename, const std::string& suffix);
 
     /**
     * plots chi and width after fitting - main function
     */
-    void plotMonitoring(std::vector< std::string > particles, const std::string& filename, const std::string& sname,
+    void plotMonitoring(const std::vector< std::string >& particles, const std::string& filename, const std::string& sname,
                         const std::string& title,
                         const std::string& sx, const std::string& sy);
 
     /**
     * function to set graph cosmetics
     */
-    void setGraphStyle(TGraphErrors& gr, const int ic)
+    static void setGraphStyle(TGraphErrors& gr, const int ic)
     {
       gr.SetMarkerColor(ic);
       gr.SetMarkerStyle(4);
@@ -102,7 +102,7 @@ namespace Belle2 {
     /**
     * function to set fitter cosmetics
     */
-    void setFitterStyle(TF1*& fitt, const int ic, const int il)
+    static void setFitterStyle(TF1*& fitt, const int ic, const int il)
     {
       fitt->SetLineColor(ic);
       fitt->SetLineWidth(1);

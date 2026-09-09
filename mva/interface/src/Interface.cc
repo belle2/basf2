@@ -35,7 +35,7 @@ namespace Belle2 {
       s_supported_interfaces.erase(m_name);
     }
 
-    std::string AbstractInterface::getName() const { return m_name; }
+    const std::string& AbstractInterface::getName() const { return m_name; }
 
     std::map<std::string, AbstractInterface*> AbstractInterface::s_supported_interfaces;
 

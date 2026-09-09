@@ -67,7 +67,7 @@ namespace Belle2 {
     void setEntrySequencesOverride(const std::vector<std::string>& sequences) { m_entrySequencesOverride = sequences; }
 
     /** Returns the number sequences (e.g. 23:42,101) defining the entry which are processed for each filename given in inputFilesOverride*/
-    std::vector<std::string> getEntrySequencesOverride() const { return m_entrySequencesOverride; }
+    const std::vector<std::string>& getEntrySequencesOverride() const { return m_entrySequencesOverride; }
 
     /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
@@ -171,7 +171,7 @@ namespace Belle2 {
      *
      * @return  The path to the file where the pickled path is stored.
      */
-    std::string getPicklePath() const { return m_picklePath; }
+    const std::string& getPicklePath() const { return m_picklePath; }
 
     /**
      * Sets the steering file content.
@@ -226,7 +226,7 @@ namespace Belle2 {
     void setProfileModuleName(const std::string& name) { m_profileModuleName = name; }
 
     /** Return the name of the module to be profiled, empty if no profiling was requested */
-    std::string getProfileModuleName() const { return m_profileModuleName; }
+    const std::string& getProfileModuleName() const { return m_profileModuleName; }
 
     /** Override global log level if != LogConfig::c_Default. */
     void setLogLevelOverride(int level) { m_logLevelOverride = level; }

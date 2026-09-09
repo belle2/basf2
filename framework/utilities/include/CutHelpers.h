@@ -16,17 +16,17 @@ namespace Belle2 {
    * Returns position of the matched closing parenthesis if the first character in the given
    * string contains an opening parenthesis. Otherwise return 0.
    */
-  unsigned long int findMatchedParenthesis(std::string str, char open = '[', char close = ']');
+  unsigned long int findMatchedParenthesis(const std::string& str, char open = '[', char close = ']');
 
   /**
    * Split into std::vector on delimiter ignoring delimiters between parenthesis
    */
-  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close);
+  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(const std::string& str, char delimiter, char open, char close);
 
   /**
    * Returns the position of a pattern in a string ignoring everything that is in parenthesis.
    */
-  unsigned long int findIgnoringParenthesis(std::string str, std::string pattern, unsigned int begin = 0);
+  unsigned long int findIgnoringParenthesis(const std::string& str, const std::string& pattern, unsigned int begin = 0);
 
   /**
    * Helper function to test if two floats are almost equal.

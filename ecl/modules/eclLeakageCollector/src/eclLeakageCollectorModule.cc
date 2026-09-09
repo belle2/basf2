@@ -415,7 +415,7 @@ void eclLeakageCollectorModule::collect()
 
   //..Standard timing cut
   const double maxClusterTiming = 200.;
-  if (abs(timing) > maxClusterTiming) {return;}
+  if (std::abs(timing) > maxClusterTiming) {return;}
 
   //..Out of time crystals.
   double OutOfTime = m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();

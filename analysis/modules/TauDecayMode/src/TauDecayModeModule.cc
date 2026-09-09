@@ -445,7 +445,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
             isPiPizGamTauPlusFirst = false;
             isPiPizGam = true;
           }
-        } else if (nTotSisters == 2 && nPiSisters == 1 && nPizSisters == 0 && nOtherSisters == 0) {
+        } else if (nTotSisters >= 2 && nPiSisters == 1 && nPizSisters == 0 && nOtherSisters == 0) {
           int chg = getRecursiveMotherCharge(mother);
           if (chg < 0 && isPiGamTauMinusFirst) {
             isPiGamTauMinusFirst = false;

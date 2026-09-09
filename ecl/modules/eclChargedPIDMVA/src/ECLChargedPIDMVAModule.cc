@@ -65,7 +65,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
   m_binningVariables = manager.getVariables((*m_mvaWeights.get())->getBinningVariables());
 
   MVA::AbstractInterface::initSupportedInterfaces();
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
 
   for (const auto& iterator : * (*m_mvaWeights.get())->getPhasespaceCategories()) {
 
@@ -79,7 +79,7 @@ void ECLChargedPIDMVAModule::initializeMVA()
     weightfile.getOptions(general_options);
 
     // Store an MVA::Expert object.
-    m_experts[iterator.first] = supported_interfaces[general_options.m_method]->getExpert();
+    m_experts[iterator.first] = supported_interfaces.at(general_options.m_method)->getExpert();
     m_experts.at(iterator.first)->load(weightfile);
 
     B2DEBUG(22, "\t\tweightfile  at " << iterator.first << " successfully initialised.");
@@ -238,12 +238,12 @@ void ECLChargedPIDMVAModule::event()
   } // tracks
 }
 
-float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset, const float max) const
+float ECLChargedPIDMVAModule::logTransformation(const float value, const float offset, const float max)
 {
   return std::log((value + offset) / (max + offset - value));
 }
 
-float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf) const
+float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F* cdf)
 {
   int binIndex = cdf->GetXaxis()->FindBin(value);
 
@@ -274,8 +274,8 @@ float ECLChargedPIDMVAModule::gaussTransformation(const float value, const TH1F*
 }
 
 
-std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vector<float> scores,
-    const std::vector<float>* decorrelationMatrix) const
+std::vector<float> ECLChargedPIDMVAModule::decorrTransformation(const std::vector<float>& scores,
+    const std::vector<float>* decorrelationMatrix)
 {
   unsigned int n_scores = scores.size();
   std::vector<float> decor_scores(n_scores, 0.0);

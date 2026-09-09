@@ -38,8 +38,6 @@ DQMHistAnalysisTRGECLModule::DQMHistAnalysisTRGECLModule()
            m_MinEntryForFit);
 }
 
-DQMHistAnalysisTRGECLModule::~DQMHistAnalysisTRGECLModule() { }
-
 void DQMHistAnalysisTRGECLModule::initialize()
 {
 

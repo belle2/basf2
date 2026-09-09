@@ -94,6 +94,9 @@ namespace {
           Database::Instance().storeData("TObjects", &array, iov);
 
           FILE* f = fopen("file.xml", "w");
+#ifndef __clang_analyzer__
+          ASSERT_NE(f, nullptr);
+#endif
           fprintf(f, "Experiment %d\n", experiment);
           fclose(f);
           Database::Instance().addPayload("file.xml", "file.xml", iov);
@@ -624,6 +627,9 @@ namespace {
           Database::Instance().storeData("TObjects", &array, iov);
 
           FILE* f = fopen("file.xml", "w");
+#ifndef __clang_analyzer__
+          ASSERT_NE(f, nullptr);
+#endif
           fprintf(f, "Experiment %d\n", experiment);
           fclose(f);
           Database::Instance().addPayload("file.xml", "file.xml", iov);

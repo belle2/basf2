@@ -33,7 +33,7 @@ namespace Belle2 {
     * calculate the predicted sigma value as a function of beta-gamma (bg)
     * this is done with a different function depending dE/dx, nhit, and cos(theta)
     */
-    double sigmaCurve(double* x, const std::vector<double>& par) const
+    static double sigmaCurve(const double* x, const std::vector<double>& par)
     {
 
       double f = 0;

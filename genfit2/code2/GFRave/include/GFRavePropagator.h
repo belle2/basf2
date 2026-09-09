@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef GFRAVEPROPAGATOR_H
-#define GFRAVEPROPAGATOR_H
+#pragma once
 
 #include "GFRaveVertexFactory.h"
 #include "AbsTrackRep.h"
@@ -76,5 +75,3 @@ class GFRavePropagator : public rave::Propagator
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVEPROPAGATOR_H

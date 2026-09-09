@@ -54,7 +54,7 @@ namespace Belle2::Variable {
 
   VARIABLE_GROUP("BeamBackgroundOverlay");
   REGISTER_VARIABLE("beamBackgroundReuseRate", beamBackgroundReuseRate,
-                    "[Eventbased] Reuse rate of the background overlay events used for producing the file.", "");
+                    "**[Eventbased]** Returns the reuse rate of the background overlay events used for producing the file.", "");
   REGISTER_VARIABLE("beamBackgroundEvents", beamBackgroundEvents,
-                    "[Eventbased] Total number of the background overlay events used for producing the file.", "");
+                    "**[Eventbased]** Returns the total number of the background overlay events used for producing the file.", "");
 }

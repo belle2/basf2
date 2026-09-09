@@ -109,8 +109,8 @@ void HitOrderer::nearestNeighbor(const KDTNode* node, const KDTHit& query, KDTHi
   const double qVal = (dim == 0) ? query.x : query.y;
   const double nVal = (dim == 0) ? node->hit.x : node->hit.y;
 
-  KDTNode* near = (qVal < nVal) ? node->left : node->right;
-  KDTNode* far  = (qVal < nVal) ? node->right : node->left;
+  const KDTNode* near = (qVal < nVal) ? node->left : node->right;
+  const KDTNode* far  = (qVal < nVal) ? node->right : node->left;
 
   // Always descend into the near subtree first (more likely to improve bestDist)
   nearestNeighbor(near, query, best, bestDist);

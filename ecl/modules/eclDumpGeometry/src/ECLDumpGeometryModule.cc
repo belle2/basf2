@@ -37,11 +37,6 @@ ECLDumpGeometryModule::ECLDumpGeometryModule() : Module()
 }
 
 
-void ECLDumpGeometryModule::initialize()
-{
-}
-
-
 void ECLDumpGeometryModule::event()
 {
   if (firstEvent) {

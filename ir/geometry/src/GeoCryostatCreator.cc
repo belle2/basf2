@@ -443,7 +443,7 @@ namespace Belle2 {
       G4UnionSolid* geo_A1spc1_raw = new G4UnionSolid("geo_A1spc1_raw_name", geo_A1spc1xy, A1spc2.geo);
 
       // A1spc1 (HER) excludes B1spc1's raw volume
-      G4VSolid* geo_LER_protect = new G4Tubs("geo_LER_protect", 0.0, 1.1 * unitFactor, 2500.0, 0.0, 2 * M_PI);
+      G4VSolid* geo_LER_protect = new G4Tubs("geo_LER_protect", 0.0, 1.32 * unitFactor, 2500.0, 0.0, 2 * M_PI);
       G4VSolid* geo_A1spc1_clipped = new G4SubtractionSolid("geo_A1spc1_clipped", geo_A1spc1_raw, geo_LER_protect,
                                                             A1spc1.transform.inverse() * B1spc1.transform);
       geo_A1spc1_clipped = clipAgainstBeamPipeShields(geo_A1spc1_clipped, A1spc1.transform,
@@ -615,7 +615,7 @@ namespace Belle2 {
       // comment). D1spc1_raw is also registered as its own named element
       // so E2Ta's Ta sleeve can Subtract(D1spc1_raw) directly instead of
       // going through the (unclipped) E1spc1.
-      G4VSolid* geo_LER_protect_back = new G4Tubs("geo_LER_protect_back", 0.0, 1.1 * unitFactor, 2500.0, 0.0, 2 * M_PI);
+      G4VSolid* geo_LER_protect_back = new G4Tubs("geo_LER_protect_back", 0.0, 1.32 * unitFactor, 2500.0, 0.0, 2 * M_PI);
       G4VSolid* geo_D1spc1_clipped = new G4SubtractionSolid("geo_D1spc1_clipped", geo_D1spc1_raw, geo_LER_protect_back,
                                                             D1spc1.transform.inverse() * E1spc1.transform);
       geo_D1spc1_clipped = clipAgainstBeamPipeShields(geo_D1spc1_clipped, D1spc1.transform,
@@ -870,8 +870,15 @@ namespace Belle2 {
 
         //define geometry
         string motherVolume = m_config.getParameterStr(prep + "MotherVolume");
-        string subtract = m_config.getParameterStr(prep + "Subtract", "");
-        string intersect = m_config.getParameterStr(prep + "Intersect", "");
+        string subtractStr = m_config.getParameterStr(prep + "Subtract", "");
+        std::vector<std::string> subtractNames;
+        if (subtractStr != "") boost::split(subtractNames, subtractStr, boost::is_any_of(" "));
+        string subtract = subtractNames.empty() ? "" : subtractNames[0];
+
+        string intersectStr = m_config.getParameterStr(prep + "Intersect", "");
+        std::vector<std::string> intersectNames;
+        if (intersectStr != "") boost::split(intersectNames, intersectStr, boost::is_any_of(" "));
+        string intersect = intersectNames.empty() ? "" : intersectNames[0];
 
         string geo_polyconexx_name = "geo_" + name + "xx_name";
         string geo_polyconex_name = "geo_" + name + "x_name";
@@ -896,12 +903,23 @@ namespace Belle2 {
         } else
           geo_polycone = new G4Polycone(geo_polycone_name, 0.0, 2 * M_PI, N, &(Z[0]), &(r[0]), &(R[0]));
 
+        for (size_t k = 1; k < subtractNames.size(); ++k) {
+          const string& subtract2 = subtractNames[k];
+          geo_polycone = new G4SubtractionSolid(geo_polycone_name + "_s" + std::to_string(k), geo_polycone,
+                                                elements[subtract2].geo,
+                                                elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[subtract2].transform);
+        }
+        for (size_t k = 1; k < intersectNames.size(); ++k) {
+          const string& intersect2 = intersectNames[k];
+          geo_polycone = new G4IntersectionSolid(geo_polycone_name + "_i" + std::to_string(k), geo_polycone,
+                                                 elements[intersect2].geo,
+                                                 elements[motherVolume].transform.inverse()*polycone.transform.inverse()*elements[intersect2].transform);
+        }
+
         bool clipMother = (m_config.getParameter(prep + "ClipMother", 1.0) != 0.0);
         if (motherVolume != "" && clipMother) {
           G4VSolid* motherGeo = nullptr;
-          if (elements.find(motherVolume + "_raw") != elements.end() && elements[motherVolume + "_raw"].geo != nullptr) {
-            motherGeo = elements[motherVolume + "_raw"].geo;
-          } else if (elements.find(motherVolume) != elements.end() && elements[motherVolume].geo != nullptr) {
+          if (elements.find(motherVolume) != elements.end() && elements[motherVolume].geo != nullptr) {
             motherGeo = elements[motherVolume].geo;
           }
           if (motherGeo != nullptr) {
@@ -1021,15 +1039,15 @@ namespace Belle2 {
 
       // Added 10 Nov 2018
       // Elliptical inner surface around QC1LE
-      G4EllipticalTube* geo_elp_QC1LEx = new G4EllipticalTube("geo_elp_QC1LEx", 10.5, 13.5, (-675 - (-1225)) / 2.); //in mm
+      G4EllipticalTube* geo_elp_QC1LEx = new G4EllipticalTube("geo_elp_QC1LEx", 10.5, 13.5, (-300 - (-1225)) / 2.); //in mm
       G4IntersectionSolid* geo_elp_QC1LE = new G4IntersectionSolid("geo_elp_QC1LE", elements["D2Ta"].geo, geo_elp_QC1LEx,
-          G4Translate3D(0, 0, (-675 - 1225) / 2.));
+          G4Translate3D(0, 0, (-300 - 1225) / 2.));
       G4LogicalVolume* logi_elp_QC1LE = new G4LogicalVolume(geo_elp_QC1LE, Materials::get("Vacuum"), "logi_elp_QC1LE_name");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1LE, "phys_elp_QC1LE_name", elements["D2Ta"].logi, false, 0);
       // Elliptical inner surface around QC1LP
-      G4EllipticalTube* geo_elp_QC1LPx = new G4EllipticalTube("geo_elp_QC1LPx", 8.0, 8.0, (-675 - (-1225)) / 2.); //in mm
+      G4EllipticalTube* geo_elp_QC1LPx = new G4EllipticalTube("geo_elp_QC1LPx", 8.5, 8.5, (-300 - (-1225)) / 2.); //in mm
       G4IntersectionSolid* geo_elp_QC1LP = new G4IntersectionSolid("geo_elp_QC1LP", elements["E2Ta"].geo, geo_elp_QC1LPx,
-          G4Translate3D(0, 0, (-675 - 1225) / 2.));
+          G4Translate3D(0, 0, (-300 - 1225) / 2.));
       G4LogicalVolume* logi_elp_QC1LP = new G4LogicalVolume(geo_elp_QC1LP, Materials::get("Vacuum"), "logi_elp_QC1LP_name");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1LP, "phys_elp_QC1LP_name", elements["E2Ta"].logi, false, 0);
       // Elliptical inner surface around QC1RE
@@ -1039,7 +1057,7 @@ namespace Belle2 {
       G4LogicalVolume* logi_elp_QC1RE = new G4LogicalVolume(geo_elp_QC1RE, Materials::get("Vacuum"), "logi_elp_QC1RE_name");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_elp_QC1RE, "phys_elp_QC1RE_name", elements["A2Ta"].logi, false, 0);
       // Elliptical inner surface around QC1RP
-      G4EllipticalTube* geo_elp_QC1RPx = new G4EllipticalTube("geo_elp_QC1RPx", 8.0, 8.0, (1225 - 300) / 2.); //in mm
+      G4EllipticalTube* geo_elp_QC1RPx = new G4EllipticalTube("geo_elp_QC1RPx", 8.5, 8.5, (1225 - 300) / 2.); //in mm
       G4IntersectionSolid* geo_elp_QC1RP = new G4IntersectionSolid("geo_elp_QC1RP", elements["B2Ta"].geo, geo_elp_QC1RPx,
           G4Translate3D(0, 0, (1225 + 300) / 2.));
       G4LogicalVolume* logi_elp_QC1RP = new G4LogicalVolume(geo_elp_QC1RP, Materials::get("Vacuum"), "logi_elp_QC1RP_name");

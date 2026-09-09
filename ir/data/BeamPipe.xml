@@ -217,17 +217,20 @@
     <VacFWD>
       <!-- Ends where IPBeamPipe_FWD begins; RO0-RO3 changed to match IPChamber_FWD's SAD taper. -->
       <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">8.9</sec>
-      <sec name="Z2" unit="cm">12.65</sec>
-      <sec name="Z3" unit="cm">13.60</sec>
+      <sec name="Z1" unit="cm">8.5</sec>
+      <sec name="Z2" unit="cm">11.5</sec>
+      <sec name="Z3" unit="cm">12.65</sec>
+      <sec name="Z4" unit="cm">13.60</sec>
       <sec name="RI0" unit="cm">0.0</sec>
       <sec name="RI1" unit="cm">0.0</sec>
       <sec name="RI2" unit="cm">0.0</sec>
       <sec name="RI3" unit="cm">0.0</sec>
+      <sec name="RI4" unit="cm">0.0</sec>
       <sec name="RO0" unit="cm">0.569</sec>
-      <sec name="RO1" unit="cm">0.6419</sec>
-      <sec name="RO2" unit="cm">0.6726</sec>
-      <sec name="RO3" unit="cm">0.6804</sec>
+      <sec name="RO1" unit="cm">0.6386</sec>
+      <sec name="RO2" unit="cm">0.6632</sec>
+      <sec name="RO3" unit="cm">0.6726</sec>
+      <sec name="RO4" unit="cm">0.6804</sec>
       <Material>Vacuum</Material>
     </VacFWD>
 
@@ -251,11 +254,14 @@
     <VacBWD>
       <!-- Ends where IPBeamPipe_BWD begins; RO0-RO1 matches IPChamber_FWD/VacFWD's SAD taper. -->
       <sec name="Z0" unit="cm">0.0</sec>
-      <sec name="Z1" unit="cm">-8.9</sec>
+      <sec name="Z1" unit="cm">-8.5</sec>
+      <sec name="Z2" unit="cm">-8.9</sec>
       <sec name="RI0" unit="cm">0.0</sec>
       <sec name="RI1" unit="cm">0.0</sec>
+      <sec name="RI2" unit="cm">0.0</sec>
       <sec name="RO0" unit="cm">0.569</sec>
-      <sec name="RO1" unit="cm">0.6419</sec>
+      <sec name="RO1" unit="cm">0.6386</sec>
+      <sec name="RO2" unit="cm">0.6419</sec>
       <Material>Vacuum</Material>
     </VacBWD>
 

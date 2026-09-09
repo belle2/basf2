@@ -590,7 +590,7 @@ namespace Belle2 {
                                           };
       // Counts: IPChamber_FWD=8, IPBeamPipe_FWD=12, VacFWD=4, BellowsPipe_FWD=6,
       //         AdditionalShield_FWD=12 (was 5), AdditionalShield_BWD=4 (was 2)
-      std::vector<int> newPartsNum = {8, 12, 4, 6, 12, 8, 4, 12, 2, 6, 4, 8};
+      std::vector<int> newPartsNum = {8, 12, 5, 6, 12, 8, 4, 12, 3, 6, 4, 8};
 
       std::vector<std::string> colors = {"#333333", "#333333", "#CCCCCC", "#FFD700", "#555555", "#555555",
                                          "#333333", "#333333", "#CCCCCC", "#FFD700", "#555555", "#555555"

@@ -29,7 +29,7 @@ basf2 produceTrainingInputs.py -- \
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--input` | local MC file | Input ROOT file(s) |
+| `--input` | validation file | Input ROOT file(s); defaults to `udst16_feiHadronic.root` from the validation data |
 | `--output` | `modeSelector_training` | Output prefix for the `.root` file |
 | `--cont-fraction` | `0.25` | Continuum keep fraction relative to the 30% BB base band |
 
@@ -110,8 +110,8 @@ python3 analysis/scripts/modeSelector/train.py \
 
 `--input` is not passed explicitly on the grid job itself: gbasf2 overrides the
 `RootInput` file list with the job's assigned grid input file regardless of what
-`inputMdstList` was given in the script, so the script's hardcoded local
-`--input` default is harmless on the grid. See `online_book/computing/gbasf2.rst`
+`inputMdstList` was given in the script, so the script's `--input` default is
+never used on the grid. See `online_book/computing/gbasf2.rst`
 for the general gbasf2 workflow (dataset discovery, monitoring, downloading).
 
 ---
@@ -154,10 +154,10 @@ basf2 applyModeSelector.py -- [options]
 
 | Argument | Default | Description |
 |----------|---------|-------------|
-| `--input` | local MC file | Input ROOT file(s) |
+| `--input` | validation file | Input ROOT file(s); defaults to `udst16_feiHadronic.root` from the validation data |
 | `--output` | `modeSelector_output` | Output file prefix |
-| `--cat-model` | unset | Category ONNX model. Omit to use payloads |
-| `--main-model` | unset | Main ONNX model. Omit to use payloads |
+| `--cat-model` | unset | Category MVA ONNX weightfile (`.root`, from `convert_to_onnx.py`). Omit to use payloads |
+| `--main-model` | unset | Main MVA ONNX weightfile (`.root`, from `convert_to_onnx.py`). Omit to use payloads |
 | `--cat-payload-name` | `modeSelector_cat_model_perf` | Conditions DB payload name for the category model |
 | `--main-payload-name` | `modeSelector_main_model_perf` | Conditions DB payload name for the main model |
 | `--globaltag` | unset | Additional globaltag holding the payloads, prepended to the analysis globaltag |

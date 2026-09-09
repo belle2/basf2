@@ -43,13 +43,17 @@ from variables import variables as vm
 
 # Parse arguments (basf2 strips its own args, remaining go to script)
 parser = argparse.ArgumentParser()
-parser.add_argument('--input', default='/home/pf/dataframes/MC16rd_skim/udst_000001_prod00051442_task230000001.root', nargs='+',
+parser.add_argument('--input', nargs='+', default=None,
                     help='Input ROOT file(s) with FEI B meson candidates')
 parser.add_argument('--output', default='modeSelector_training',
                     help='Output prefix for training files (default: modeSelector_training)')
 parser.add_argument('--cont-fraction', type=float, default=0.25,
                     help='Continuum keep fraction relative to the 30% BB band (default: 0.25)')
 args = parser.parse_args()
+
+# Resolved after parsing so that --input works without the validation file installed
+if args.input is None:
+    args.input = [b2.find_file('udst16_feiHadronic.root', 'validation')]
 
 # Set up logging
 b2.set_log_level(b2.LogLevel.INFO)

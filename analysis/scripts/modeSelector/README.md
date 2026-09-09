@@ -119,8 +119,10 @@ they duplicate `Bdaughter_chiProb`, and otherwise they are not available for
 veto-reconstructed D* candidates. Block 10 (Mbc, indices 1360-1495) is excluded
 to prevent correlation with the output.
 
-**`EVENT_FEATURES`** - 12 event-level scalars appended after the flat feature matrix
-(indices 1632-1643):
+**`EVENT_FEATURES`** - the 8 event-shape names read from `EventShapeContainer`
+(indices 1632-1639). Together with four scalars the module computes itself
+(`ncandidates`, `max_input_id`, `scnd_max_input_id`, `__experiment__`) these make up
+the 12 event-level values appended after the flat feature matrix (indices 1632-1643):
 
 | Index | Name | Source | Transform |
 |-------|------|--------|-----------|
@@ -149,10 +151,12 @@ the data, and on mismatch it warns, writes `has_inputs_recomputed.txt` and
 proceeds with the recomputed list for that run. Paste that file's contents into
 `config.py` afterwards so the next training starts from the right selection.
 
-At inference time `HAS_INPUTS` is only a fallback. Each model records its own
-feature selection in its weightfile (see `convert_to_onnx.py` below), so a
-retraining can change the selection without a software release, and a stale
-`config.HAS_INPUTS` cannot silently mis-select columns for a payload.
+Payloads carry their own feature selection (see `convert_to_onnx.py` below), so at
+inference this list is only a fallback for pre-convention weightfiles and the
+`skip_nn_evaluation` path, and `train.py` uses the recomputed selection either way.
+A retraining can therefore change the selection without a software release, and a
+stale `config.HAS_INPUTS` cannot silently mis-select columns for a payload. It can
+be dropped once no pre-convention payloads remain.
 
 **`MODEL_CONTRACT_VERSION`** - The version of the agreement between this release
 and a payload. Bump it whenever the release changes anything affecting what a
@@ -345,7 +349,7 @@ addDstarVeto(
 | `Dst0_chiProb` | Same for D\*0 (NaN if `skipTreeFit` and no pre-existing D\*) |
 
 **Key parameters:**
-- `skipTreeFit=True` (default): skip `treeFit` for reconstructed D* candidates —
+- `skipTreeFit=True` (default): skip `treeFit` for reconstructed D* candidates, a
   large speedup at slight accuracy cost. When `True`, `Dst*_chiProb` is not
   written for veto-reconstructed candidates and is manually excluded from `HAS_INPUTS`.
 - `deltaMassDiffCut`: window on reconstructed minus true D* mass difference
@@ -423,6 +427,8 @@ modeSelector.modeSelector(
 | `skip_nn_evaluation` | `False` | Skip NN inference and use placeholder outputs (debug only) |
 | `store_fei_calib_weight` | `False` | Compute and store `modeSelector_feiCalibWeight` (based on best FEI candidate); requires `mostcommonBTagPDG` and `mostcommonBTagDeltaP` for truth matching; MC only |
 | `addDstarVetoReco` | `True` | Add D* veto reconstruction before the NN; pass `False` if already added separately |
+| `debug` | `False` | Print the feature vector and network outputs for the first few events |
+| `debug_max_events` | `10` | How many events `debug` prints |
 
 **Outputs written:**
 
@@ -570,6 +576,12 @@ the event remains in training and uses the fallback label assignment above.
 | `--disco_lambda` | `0.0` | DisCo penalty coefficient (0 to disable) |
 | `--label_smoothing` | `0.0` | Label smoothing for CrossEntropyLoss (0 to disable) |
 | `--use_sparse` | flag | Sparse data loading (lower peak memory, slower) |
+| `--lr` | `5e-4` | Initial learning rate |
+| `--lr_schedule` | `cosine` | `cosine` or `constant` |
+| `--eta_min` | `1e-5` | Final learning rate for the cosine schedule |
+| `--weight_decay` | `2e-4` | AdamW weight decay |
+| `--val_split` | `0.3` | Fraction of events held out for validation |
+| `--seed` | `42` | Random seed |
 | `--batch_size` | `None` | Batch size; defaults to 16384 (category) or 32768 (main) |
 | `--num_workers` | `None` | Worker processes for input loading and the DataLoader; default `min(8, max(1, cpu_count//2))` |
 

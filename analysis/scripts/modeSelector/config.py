@@ -299,8 +299,11 @@ def get_fei_calibration_rest(pdg):
 # exclude Dst0_chiProb (block 7) and Dstp_chiProb (block 8) because with
 # skipTreeFit=True they do not add independent information beyond
 # Bdaughter_chiProb, and exclude Mbc (block 10).
-# train.py recomputes this dynamically and asserts equality -- update here
-# if it changes.
+#
+# This list is NOT used for inference. Every payload records the feature
+# selection its model was trained on, so an outdated list here can not
+# result in wrong columns for a given payload. Currently it is only
+# kept as a crosscheck and for backwards compatibility with older payloads.
 HAS_INPUTS = [
     0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 18,
     19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,

@@ -77,9 +77,11 @@ def modeSelector(
             Used only when main_model_path is None.
         output_variable (str): Name of the ExtraInfo variable for the output score.
             Default: 'BplusScore'
-        cat_model_path (str): Path to the category network ONNX model file.
+        cat_model_path (str): Path to the basf2 MVA weightfile for the category network,
+            as produced by convert_to_onnx.py (a .root file, not a raw .onnx file).
             If None, loads from conditions database.
-        main_model_path (str): Path to the main network ONNX model file.
+        main_model_path (str): Path to the basf2 MVA weightfile for the main network,
+            as produced by convert_to_onnx.py (a .root file, not a raw .onnx file).
             If None, loads from conditions database.
         skip_nn_evaluation (bool): If True, skip loading and evaluating the neural networks
             and fill deterministic placeholder outputs instead. Intended for debugging or
@@ -91,6 +93,10 @@ def modeSelector(
             ``analysis/examples/modeSelector/produceTrainingInputs.py``. Default: False.
         addDstarVetoReco (bool): Whether to add D* veto reconstruction before the NN.
             Default: True
+        debug (bool): If True, print the feature vector and network outputs for the first
+            few events. Intended for comparing against a reference implementation.
+            Default: False
+        debug_max_events (int): Number of events to print when debug is True. Default: 10
         store_fei_calib_weight (bool): If True, compute and store modeSelector_feiCalibWeight
             in EventExtraInfo using the reco path (truth-compatible tag PDG and
             DeltaP < DELTA_P_THRESH). Returns NaN when reco conditions are not met.

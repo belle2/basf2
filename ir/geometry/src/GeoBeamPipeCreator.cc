@@ -63,7 +63,21 @@ namespace Belle2 {
       m_sensitive.clear();
     }
 
-    void GeoBeamPipeCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes)
+    void GeoBeamPipeCreator::createGeometry(G4LogicalVolume& topVolume, GeometryTypes type)
+    {
+      bool isPostLS2 = (m_config.getParameter("IPChamber_FWD.Z0", -999.0) != -999.0) ||
+                       (m_config.getParameter("Lv1SUS.L1", -1.0) > 0.0);
+
+      if (isPostLS2) {
+        B2INFO("GeoBeamPipeCreator: Building Post-LS2 BeamPipe geometry.");
+        createPostLS2Geometry(topVolume, type);
+      } else {
+        B2INFO("GeoBeamPipeCreator: Building legacy (Phase 2 / Phase 3 Run 1 & 2) BeamPipe geometry.");
+        createLegacyGeometry(topVolume, type);
+      }
+    }
+
+    void GeoBeamPipeCreator::createPostLS2Geometry(G4LogicalVolume& topVolume, GeometryTypes)
     {
 
       //########## Index ##########

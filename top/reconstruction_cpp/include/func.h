@@ -28,11 +28,10 @@ namespace Belle2 {
       {
         // 2^52: above it every double is already an integer, and the conversion below could overflow
         if (std::abs(x) < 4503599627370496.0) {
-          long n = static_cast<long>(x); // truncation towards zero
-          double d = x - static_cast<double>(n); // exact, |d| < 1
-          if (d >= 0.5) return n + 1;
-          if (d <= -0.5) return n - 1;
-          return n;
+          x += 0.5;
+          long n = static_cast<long>(std::abs(x)); // truncation towards zero
+          if (x > 0) return n;
+          return -(n + 1);
         }
         return std::lround(x); // also takes care of NaN and infinity
       }

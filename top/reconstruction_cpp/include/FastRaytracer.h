@@ -51,6 +51,7 @@ namespace Belle2 {
 
       /**
        * Propagate photon to photo-detector plane.
+       * The states and the number of reflections are not reliable if propagation fails.
        * @param photon initial photon state
        * @param averaging if true, propagate photon also in upside-down flipped prism
        */
@@ -84,6 +85,7 @@ namespace Belle2 {
 
       /**
        * Returns total propagation length since initial position.
+       * Reliable only if propagation status is true.
        * If averaging is ON the return value equals to arithmetic average of true and flipped prism.
        * @return propagation length
        */
@@ -91,6 +93,7 @@ namespace Belle2 {
 
       /**
        * Returns total propagation length difference between true and flipped prism
+       * Reliable only if propagation status is true.
        * @return propagation length difference (or 0 if averaging is OFF)
        */
       double getPropagationLenDelta() const;

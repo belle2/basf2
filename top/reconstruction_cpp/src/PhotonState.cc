@@ -292,8 +292,8 @@ namespace Belle2 {
       const double ky_in = ky;
       const double kz_in = kz;
 
-      double yD = m_yD;
-      double zD = m_zD;
+      double yD = y;
+      double zD = z;
 
       if (z > zFlat) {
 
@@ -322,10 +322,6 @@ namespace Belle2 {
             double zu = zD - win.z0;
             double yw = yu * win.sy + zu * win.sz;
             if (yw >= yDown and yw <= yUp) {
-              m_y = y;
-              m_yD = yD;
-              m_zD = zD;
-              m_cosy = cosy;
               if (len < 0 or len > s_maxLen) return;
               double kyNew = ky * win.sy + kz * win.sz;
               double kzNew = kz * win.sy - ky * win.sz;
@@ -347,34 +343,17 @@ namespace Belle2 {
         }
 
         if (not found) {
-          m_y = y;
-          m_yD = yD;
-          m_zD = zD;
-          m_cosy = cosy;
           B2DEBUG(20, "TOP::PhotonState::propagate: unfolded prism window not found"
                   << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown) << LogVar("zR", prism.zR)
                   << LogVar("y", y) << LogVar("z", z)
                   << LogVar("ky", ky_in) << LogVar("kz", kz_in));
           return;
         }
-      } else {
-        yD = y;
-        zD = z;
       }
 
       double len = (zDet - z) / kz;
-      if (len < 0 or len > s_maxLen) {
-        m_x = x;
-        m_y = y;
-        m_z = z;
-        m_ky = ky;
-        m_kz = kz;
-        m_propLen = propLen;
-        m_yD = yD;
-        m_zD = zD;
-        m_cosy = cosy;
-        return;
-      }
+      if (len < 0 or len > s_maxLen) return;
+
       func::fold(x + len * kx, prismA, x, kx, m_nx);
       y += len * ky;
       z = zDet;

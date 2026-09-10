@@ -19,7 +19,6 @@
 
 using namespace Belle2;
 
-// cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
 bool RaveV0VertexFitter::fit(genfit::Track& trackPlus, genfit::Track& trackMinus, const int, const int,
                              genfit::GFRaveVertex& vertex)
 {

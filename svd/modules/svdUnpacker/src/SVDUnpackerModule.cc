@@ -211,7 +211,7 @@ void SVDUnpackerModule::event()
       data32tab.resize(maxNumOfCh);
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
         nWords[k] = rawSVD->GetDetectorNwords(j, k);
-        data32tab[k] = (uint32_t*)rawSVD->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
+        data32tab[k] = reinterpret_cast<uint32_t*>(rawSVD->GetDetectorBuffer(j, k)); // points at the beginning of the 1st buffer
       }
 
       unsigned short ftbError = 0;

@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMChannelArrayIndex();
+    ~KLMChannelArrayIndex() override;
 
   };
 

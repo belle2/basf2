@@ -41,10 +41,10 @@
 using namespace std;
 using namespace Belle2;
 
-ECLDatabaseImporter::ECLDatabaseImporter(vector<string> inputFileNames, const std::string& name)
+ECLDatabaseImporter::ECLDatabaseImporter(const vector<string>& inputFileNames, const std::string& name)
 {
   //input file names
-  for (auto& inputFileName : inputFileNames)
+  for (const auto& inputFileName : inputFileNames)
     m_inputFileNames.push_back(inputFileName);
 
   //output file name
@@ -66,14 +66,14 @@ void ECLDatabaseImporter::importDigitEnergyCalibration()
 
     TIter next(f->GetListOfKeys());
     TKey* key;
-    while ((key = (TKey*) next())) {
+    while ((key = static_cast<TKey*>(next()))) {
 
       string histconstants = key->GetName();
 
       if (histconstants.compare("energy") == 0) {
-        energy = (TH1F*)f->Get(histconstants.c_str());
+        energy = static_cast<TH1F*>(f->Get(histconstants.c_str()));
       } else  if (histconstants.compare("amplitude") == 0) {
-        amplitude = (TH1F*)f->Get(histconstants.c_str());
+        amplitude = static_cast<TH1F*>(f->Get(histconstants.c_str()));
       }
 
       else { B2FATAL("Key name does not match any of the following: energy, amplitude!"); }
@@ -114,12 +114,12 @@ void ECLDatabaseImporter::importDigitTimeCalibration()
 
     TIter next(f->GetListOfKeys());
     TKey* key;
-    while ((key = (TKey*) next())) {
+    while ((key = static_cast<TKey*>(next()))) {
 
       string histconstants = key->GetName();
 
       if (histconstants.compare("constantB") == 0) {
-        offset = (TH1F*)f->Get(histconstants.c_str());
+        offset = static_cast<TH1F*>(f->Get(histconstants.c_str()));
       } else { B2FATAL("Key name does not match any of the following: constantC!"); }
     }
 
@@ -408,7 +408,9 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
     dbPtr_theta_en.import(iov);
     dbPtr_phi_en.import(iov);
   }
-  /*else (because currently phase_2 and phase_3 are same payload*/ if (std::abs(bkgFactor - 1.0) < 1e-9) {
+  /*else (because currently phase_2 and phase_3 are same payload*/
+  // cppcheck-suppress duplicateCondition ; both payloads are imported on purpose
+  if (std::abs(bkgFactor - 1.0) < 1e-9) {
 
     DBImportObjPtr<ECLShowerEnergyCorrectionTemporary> dbPtr_theta_geo("ECLLeakageCorrection_thetaGeometry_phase3");
     dbPtr_theta_geo.construct(*theta_geo_graph, thetaMin, thetaMax, energyMin, energyMax);

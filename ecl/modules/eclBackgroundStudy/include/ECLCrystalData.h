@@ -110,7 +110,7 @@ namespace Belle2 {
     /** return cell ID */
     int GetCellID();
     /** return cell ID of crystal with given theta and phi id*/
-    int GetCellID(int tid, int pid);
+    static int GetCellID(int tid, int pid);
 
     /** get phi value of crystal */
     double GetPhi() { return m_PosP; };

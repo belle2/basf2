@@ -28,7 +28,7 @@ namespace Belle2 {
       explicit WireHitFilterFactory(const std::string& defaultFilterName = "all");
 
       /// Default destructor
-      ~WireHitFilterFactory();
+      ~WireHitFilterFactory() override;
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

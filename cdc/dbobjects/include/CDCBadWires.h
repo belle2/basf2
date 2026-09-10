@@ -60,7 +60,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, float> getWires() const
+    const std::map<unsigned short, float>& getWires() const
     {
       return m_wires;
     }

@@ -56,7 +56,7 @@ namespace Belle2 {
     }
 
     /** Return dEdX but not with dX = path length but with dX = thickness of cluster. */
-    double getDEDXWithThickness(const ClusterType& cluster) const
+    static double getDEDXWithThickness(const ClusterType& cluster)
     {
       const double calibratedCharge = getCalibratedCharge(cluster);
       const double pathLength = getThicknessOfCluster(cluster);
@@ -65,7 +65,7 @@ namespace Belle2 {
     }
 
     /** Return the thickness of a cluster. */
-    double getThicknessOfCluster(const ClusterType& cluster) const
+    static double getThicknessOfCluster(const ClusterType& cluster)
     {
       const VxdID&   vxdID = cluster.getSensorID();
       const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
@@ -73,7 +73,7 @@ namespace Belle2 {
     }
 
     /** Return the thickness of a cluster. */
-    double getWidthOfCluster(const ClusterType& cluster) const
+    static double getWidthOfCluster(const ClusterType& cluster)
     {
       const VxdID&   vxdID = cluster.getSensorID();
       const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
@@ -81,7 +81,7 @@ namespace Belle2 {
     }
 
     /** Return the thickness of a cluster. */
-    double getLengthOfCluster(const ClusterType& cluster) const
+    static double getLengthOfCluster(const ClusterType& cluster)
     {
       const VxdID&   vxdID = cluster.getSensorID();
       const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
@@ -108,7 +108,7 @@ namespace Belle2 {
     }
 
     /** Return the layer of the cluster. */
-    VxdID::baseType getLayerOfCluster(const ClusterType& cluster) const
+    static VxdID::baseType getLayerOfCluster(const ClusterType& cluster)
     {
       VxdID vxdID = cluster.getSensorID();
       VxdID::baseType layer = vxdID.getLayerNumber();
@@ -116,7 +116,7 @@ namespace Belle2 {
     }
 
     /** Return the ladder of the cluster. */
-    VxdID::baseType getLadderOfCluster(const ClusterType& cluster) const
+    static VxdID::baseType getLadderOfCluster(const ClusterType& cluster)
     {
       VxdID vxdID = cluster.getSensorID();
       VxdID::baseType ladder = vxdID.getLadderNumber();
@@ -124,7 +124,7 @@ namespace Belle2 {
     }
 
     /** Return the sensor number of the cluster. */
-    VxdID::baseType getSensorNumberOfCluster(const ClusterType& cluster) const
+    static VxdID::baseType getSensorNumberOfCluster(const ClusterType& cluster)
     {
       VxdID vxdID = cluster.getSensorID();
       VxdID::baseType sensorNumber = vxdID.getSensorNumber();
@@ -132,7 +132,7 @@ namespace Belle2 {
     }
 
     /** Return the segment number of the cluster. */
-    VxdID::baseType getSegmentNumberOfCluster(const ClusterType& cluster) const
+    static VxdID::baseType getSegmentNumberOfCluster(const ClusterType& cluster)
     {
       VxdID vxdID = cluster.getSensorID();
       VxdID::baseType segmentNumber = vxdID.getSegmentNumber();
@@ -142,7 +142,7 @@ namespace Belle2 {
     /** Return the charge of the cluster (in ADC count) calibrated with a factor of ~0.6 for pxd hits.
      * This factor can be seen in data (and is calculated from that) and has probably something to do with
      * the different readout of the hit types. */
-    double getCalibratedCharge(const ClusterType& cluster) const
+    static double getCalibratedCharge(const ClusterType& cluster)
     {
       const double charge = cluster.getCharge();
       const double calibration = getCalibration();
@@ -214,7 +214,7 @@ namespace Belle2 {
     const double m_layerPositions[6] = {1.42, 2.18, 3.81, 8.0, 10.51, 13.51};
 
     /** For SVD the calibration is 1, for PXD (see below) it is ~0.6. */
-    double getCalibration() const
+    static double getCalibration()
     {
       return 1;
     }
@@ -222,7 +222,7 @@ namespace Belle2 {
 
   /** We only need a calibration for the PXD Clusters. */
   template<>
-  double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const;
+  double VXDMomentumEstimationTools<PXDCluster>::getCalibration();
 
   /** We have to handle PXD and SVD differently here. */
   template <>

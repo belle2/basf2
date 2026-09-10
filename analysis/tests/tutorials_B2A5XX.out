@@ -125,24 +125,6 @@ TBranch: pErr, 0.004259
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
 TBranch: extraInfo__bobremsCorrected__bc, nan
-TFile: B2A502-WriteOutDecayHash.root
-TTree: variables
-TBranch: __experiment__, 0
-TBranch: __run__, 0
-TBranch: __event__, 660003
-TBranch: __production__, 0
-TBranch: __candidate__, 0
-TBranch: __ncandidates__, 2
-TBranch: __eventType__, 
-TBranch: __weight__, 1
-TBranch: M, 0.7012
-TBranch: p, 1.691
-TBranch: E, 1.831
-TBranch: x, 0
-TBranch: y, 0
-TBranch: z, 0
-TBranch: extraInfo__boDecayHash__bc, -7.3e+05
-TBranch: extraInfo__boDecayHashExtended__bc, 1.313e-33
 TFile: B2A504-TrackingSystematics.root
 TTree: variables
 TBranch: __experiment__, 0

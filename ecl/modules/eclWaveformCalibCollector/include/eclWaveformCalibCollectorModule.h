@@ -63,51 +63,51 @@ namespace Belle2 {
 
     bool m_includeWaveforms; /**< Flag to save ADC information. >*/
 
-    int m_CellID; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    int m_runNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    int m_expNum; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    float m_OnlineE; /**< To read ntuple branch, waveform energy measured online by FPGA > */
-    float m_OfflineE;  /**< To read ntuple branch, waveform energy measure offline with multi-template fit > */
-    float m_OfflineHadE; /**< To read ntuple branch, waveform hadron energy measure offline with multi-template fit > */
-    float m_Baseline; /**< To read ntuple branch, baseline of waveform > */
-    float m_BaselineRMS; /**< To read ntuple branch, RMS squared of waveform baseline > */
-    float m_calibConst; /**< To read ntuple branch, calibration from ADC to GeV > */
-    float m_Chi2; /**< To read ntuple branch, offline fit chi2 > */
-    float m_Chi2Save0; /**< To read ntuple branch, offline fit chi2 for fit type 0 > */
-    float m_Chi2Save1; /**< To read ntuple branch, offline fit chi2 for fit type 1 > */
-    float m_Chi2Save2; /**< To read ntuple branch, offline fit chi2 for fit type 2 > */
-    int m_FitType; /**< To read ntuple branch, offline fit type with best chi2 > */
-    int m_ADC0; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC1; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC2; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC3; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC4; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC5; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC6; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC7; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC8; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC9; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC10; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC11; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC12; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC13; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC14; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC15; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC16; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC17; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC18; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC19; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC20; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC21; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC22; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC23; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC24; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC25; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC26; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC27; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC28; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC29; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC30; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_CellID = 0; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    int m_runNum = 0; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    int m_expNum = 0; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    float m_OnlineE = 0.0; /**< To read ntuple branch, waveform energy measured online by FPGA > */
+    float m_OfflineE = 0.0;  /**< To read ntuple branch, waveform energy measure offline with multi-template fit > */
+    float m_OfflineHadE = 0.0; /**< To read ntuple branch, waveform hadron energy measure offline with multi-template fit > */
+    float m_Baseline = 0.0; /**< To read ntuple branch, baseline of waveform > */
+    float m_BaselineRMS = 0.0; /**< To read ntuple branch, RMS squared of waveform baseline > */
+    float m_calibConst = 0.0; /**< To read ntuple branch, calibration from ADC to GeV > */
+    float m_Chi2 = 0.0; /**< To read ntuple branch, offline fit chi2 > */
+    float m_Chi2Save0 = 0.0; /**< To read ntuple branch, offline fit chi2 for fit type 0 > */
+    float m_Chi2Save1 = 0.0; /**< To read ntuple branch, offline fit chi2 for fit type 1 > */
+    float m_Chi2Save2 = 0.0; /**< To read ntuple branch, offline fit chi2 for fit type 2 > */
+    int m_FitType = 0; /**< To read ntuple branch, offline fit type with best chi2 > */
+    int m_ADC0 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC1 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC2 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC3 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC4 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC5 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC6 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC7 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC8 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC9 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC10 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC11 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC12 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC13 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC14 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC15 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC16 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC17 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC18 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC19 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC20 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC21 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC22 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC23 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC24 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC25 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC26 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC27 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC28 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC29 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC30 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
 
   };
 }

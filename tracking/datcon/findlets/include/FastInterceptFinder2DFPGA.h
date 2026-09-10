@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /// Layer filter, checks if at least hits from 3 layers are in a set of hits
     /// @param layer bool-vector containing information whether there is a hit in a layer
-    inline unsigned short layerFilter(std::vector<bool> layer)
+    static inline unsigned short layerFilter(std::vector<bool> layer)
     {
       uint layercount = std::count(layer.begin(), layer.end(), true);
       return (layercount >= 3 ? layercount : 0);

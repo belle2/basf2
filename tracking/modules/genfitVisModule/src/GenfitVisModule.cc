@@ -83,8 +83,5 @@ void GenfitVisModule::endRun()
   m_display->open();
 }
 
-void GenfitVisModule::terminate()
-{
-}
 
 

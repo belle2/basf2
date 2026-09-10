@@ -52,13 +52,13 @@ namespace Belle2 {
     /** name of the optical surface */
     std::string m_name;
     /** model for the surface */
-    int m_model;
+    int m_model{0};
     /** finish of the surface */
-    int m_finish;
+    int m_finish{0};
     /** type of the surface */
-    int m_type;
+    int m_type{0};
     /** value for the surface condition */
-    double m_value;
+    double m_value{0};
     /** properties of this material */
     std::vector<GeoMaterialProperty> m_properties;
     /** Add ROOT reflection info */

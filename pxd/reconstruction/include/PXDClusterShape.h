@@ -94,7 +94,7 @@ namespace Belle2 {
        * @param sensorID sensor details for PXD sensors
        * @returns cluster shape ID
        */
-      pxdClusterShapeType setClsShape(const ClusterCandidate& cls, VxdID sensorID);
+      static pxdClusterShapeType setClsShape(const ClusterCandidate& cls, VxdID sensorID);
 
     private:
 

@@ -48,14 +48,14 @@ void TrackInspector::apply(std::vector<CDCTrack>& tracks)
   TCanvas canvS("stereoCanvas", "CDC stereo hits in an event", 0, 0, 1440, 1080);
   TMultiGraph* mgA = new TMultiGraph("axialTracks", "CDC axial tracks in the event;X, cm;Y, cm");
   TMultiGraph* mgS = new TMultiGraph("stereoTracks", "CDC stereo tracks in the event;Z, cm;R, cm");
-  for (CDCTrack& track : tracks) {
+  for (const CDCTrack& track : tracks) {
     TGraph* grA = new TGraph();
     TGraph* grS = new TGraph();
     grA->SetLineWidth(2);
     grA->SetLineColor(9);
     grS->SetLineWidth(2);
     grS->SetLineColor(9);
-    for (CDCRecoHit3D& hit : track) {
+    for (const CDCRecoHit3D& hit : track) {
       ROOT::Math::XYZVector pos = hit.getRecoPos3D();
       const double R = std::sqrt(pos.x() * pos.x() + pos.y() * pos.y());
       const double X = pos.x();
@@ -94,7 +94,7 @@ void TrackInspector::removeIncompleteTracks(std::vector<CDCTrack>& tracks)
   for (auto it = tracks.begin(); it != tracks.end();) {
     bool stereoHitsPresent =
       false; //If stereo hit matcher can't find more hits than its threshold, it doesn't add any, but keeps the track
-    for (CDCRecoHit3D& hit : *it) {
+    for (const CDCRecoHit3D& hit : *it) {
       if (not hit.isAxial()) stereoHitsPresent = true;
     }
     if (not stereoHitsPresent) {

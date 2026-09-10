@@ -30,7 +30,7 @@ namespace Belle2 {
     ECLFinalizerModule();
 
     /** Destructor. */
-    ~ECLFinalizerModule();
+    ~ECLFinalizerModule() override;
 
     /** Initialize. */
     virtual void initialize() override;

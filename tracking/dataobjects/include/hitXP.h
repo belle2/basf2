@@ -381,7 +381,7 @@ namespace Belle2 {
     */
     struct timeCompare {
       /// Compare operator for time of two hits.
-      bool operator()(hitXP v, hitXP u) const
+      bool operator()(const hitXP& v, const hitXP& u) const
       {return v.m_time < u.m_time;}
     };
 

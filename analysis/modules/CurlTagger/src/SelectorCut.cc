@@ -11,7 +11,7 @@
 #include <analysis/dataobjects/Particle.h>
 
 //Root includes
-#include "TMath.h"
+#include <TMath.h>
 
 using namespace Belle2;
 using namespace CurlTagger;

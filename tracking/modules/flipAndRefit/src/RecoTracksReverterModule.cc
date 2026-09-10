@@ -58,7 +58,7 @@ void RecoTracksReverterModule::event()
     double mvaFlipCut = (*m_flipCutsFromDB).getFirstCut();
 
     if (recoTrack.getFlipQualityIndicator() < mvaFlipCut) continue;
-    Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
+    const Track* track = recoTrack.getRelatedFrom<Belle2::Track>();
     if (!track) continue;
 
     const auto& measuredStateOnPlane = recoTrack.getMeasuredStateOnPlaneFromLastHit();

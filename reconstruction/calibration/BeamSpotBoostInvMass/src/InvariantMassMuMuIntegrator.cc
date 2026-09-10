@@ -10,6 +10,7 @@
 
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuIntegrator.h>
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <cassert>
 #include <cmath>
@@ -58,7 +59,7 @@ namespace Belle2::InvariantMassMuMuCalib {
   double  InvariantMassMuMuIntegrator::eval(double t)
   {
     double CoreC = gausExpConv(m_mean, m_sigma, m_bMean, m_bDelta, m_tauL, m_tauR, m_sigmaK, m_x + t - m_m0);
-    double CoreE = 1. / (sqrt(2 * M_PI) * m_sigmaE) * exp(-1. / 2 * pow((m_x + t - m_m0 - m_mean) / m_sigmaE, 2));
+    double CoreE = 1. / (sqrt(2 * M_PI) * m_sigmaE) * exp(-1. / 2 * square((m_x + t - m_m0 - m_mean) / m_sigmaE));
     double Core = (1 - m_frac) * CoreC + m_frac * CoreE;
 
     assert(t >= 0);

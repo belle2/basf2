@@ -96,8 +96,8 @@ namespace Belle2 {
 
     public:
       /// Retrieve the wire hit the given CDCHit form the given wire hits
-      const TrackingUtilities::CDCWireHit* getWireHit(const CDCHit* ptrHit,
-                                                      const std::vector<TrackingUtilities::CDCWireHit>& wireHits) const;
+      static const TrackingUtilities::CDCWireHit* getWireHit(const CDCHit* ptrHit,
+                                                             const std::vector<TrackingUtilities::CDCWireHit>& wireHits);
 
       /// Retrieve the wire hit including right left passage information for the given CDCHit form the given wire hits
       TrackingUtilities::CDCRLWireHit getRLWireHit(const CDCHit* ptrHit,
@@ -121,7 +121,7 @@ namespace Belle2 {
 
     private:
       /// Reference to the CDCMCMap to be used in this event
-      const CDCMCMap* m_ptrMCMap;
+      const CDCMCMap* m_ptrMCMap {};
 
       /// Memory for the look up relation of close primary CDCSimHits
       std::map<const CDCHit*, TrackingUtilities::MayBePtr<const CDCSimHit> >  m_primarySimHits;

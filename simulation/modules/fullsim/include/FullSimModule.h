@@ -46,7 +46,7 @@ namespace Belle2 {
     FullSimModule();
 
     /** Destructor of the module. */
-    virtual ~FullSimModule();
+    virtual ~FullSimModule() override;
 
     /**
      * Initialize the Module.
@@ -57,21 +57,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when a new run is started.
-     *
-     * Initializes the Geant4 run manager and sets the run number in Geant4.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Performs the full Geant4 simulation.
      */
     virtual void event() override;
-
-    /**
-     * Called when run has ended.
-     */
-    virtual void endRun() override;
 
     /**
      * Terminates the module.

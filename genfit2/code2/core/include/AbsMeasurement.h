@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsMeasurement_h
-#define genfit_AbsMeasurement_h
+#pragma once
 
 #include "MeasurementOnPlane.h"
 #include "AbsHMatrix.h"
@@ -124,5 +123,3 @@ class AbsMeasurement : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsMeasurement_h

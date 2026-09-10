@@ -282,14 +282,14 @@ namespace Belle2 {
         );
 
         //Add radiation sensor positions
-        for (GearDir& position : radiationDir.getNodes("position")) {
+        for (const GearDir& position : radiationDir.getNodes("position")) {
           VXDGeoRadiationSensorsPositionPar diamonds(position.getLength("z"),
                                                      position.getLength("radius"),
                                                      position.getAngle("theta")
                                                     );
 
           //Loop over all phi positions
-          for (GearDir& sensor : position.getNodes("phi")) {
+          for (const GearDir& sensor : position.getNodes("phi")) {
             //Add sensor with angle and id
             diamonds.addSensor(sensor.getInt("@id"), sensor.getAngle());
           }
@@ -405,12 +405,12 @@ namespace Belle2 {
           paramsComponent.getLength() / Unit::mm,
           paramsComponent.getHeight() / Unit::mm
         );
-        double angle  = paramsComponent.getAngle();
 
 
         if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
           B2DEBUG(100, "One dimension empty, using auto resize for component");
         } else {
+          double angle  = paramsComponent.getAngle();
           G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.getWidth(), c.getWidth2(), c.getLength(), c.getHeight(), angle);
           c.setVolume(new G4LogicalVolume(solid, Materials::get(c.getMaterial()), m_prefix + "." + name));
         }

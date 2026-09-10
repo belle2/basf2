@@ -80,7 +80,7 @@ namespace Belle2 {
       ///  get the time difference of two space points for the u-side measurement
       /// @param outerSpacePoint outer space point used for calculating the time difference in u
       /// @param innerSpacePoint inner space point used for calculating the time difference in u
-      double getDistanceInTimeU(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
+      static double getDistanceInTimeU(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
       {
         return outerSpacePoint.TimeU() - innerSpacePoint.TimeU();
       }
@@ -88,7 +88,7 @@ namespace Belle2 {
       ///  get the time difference of two space points for the v-side measurement
       /// @param outerSpacePoint outer space point used for calculating the time difference in v
       /// @param innerSpacePoint inner space point used for calculating the time difference in v
-      double getDistanceInTimeV(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
+      static double getDistanceInTimeV(const SpacePoint& outerSpacePoint, const SpacePoint& innerSpacePoint)
       {
         return outerSpacePoint.TimeV() - innerSpacePoint.TimeV();
       }

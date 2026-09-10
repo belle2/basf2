@@ -44,6 +44,7 @@ namespace Belle2 {
        * @param[out] intersection Intersection.
        * @return Number of intersections (0 or 1).
        */
+      // cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
       int findIntersection(const Line2D& line,
                            HepGeom::Point3D<double>* intersection) const;
 
@@ -62,6 +63,7 @@ namespace Belle2 {
        * @param[out] intersections Intersections.
        * @return Number of intersections (0, 1 or 2).
        */
+      // cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
       int findIntersection(const Circle2D& circle,
                            HepGeom::Point3D<double> intersections[2]) const;
 
@@ -71,6 +73,7 @@ namespace Belle2 {
        * @param[out] intersections Intersections.
        * @return Number of intersections (0, 1 or 2).
        */
+      // cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
       int findIntersection(const Arc2D& arc,
                            HepGeom::Point3D<double> intersections[2]) const;
 
@@ -78,7 +81,7 @@ namespace Belle2 {
        * Check if t is within the line segment (0 <= t <= 1).
        * @param[in] t Line parameter.
        */
-      bool tWithinRange(double t) const;
+      static bool tWithinRange(double t);
 
     };
 

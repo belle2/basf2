@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsKalmanFitter_h
-#define genfit_AbsKalmanFitter_h
+#pragma once
 
 #include "AbsFitter.h"
 #include "MeasurementOnPlane.h"
@@ -179,5 +178,3 @@ class AbsKalmanFitter : public AbsFitter {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif //genfit_AbsKalmanFitter_h

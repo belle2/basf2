@@ -45,7 +45,7 @@ settings = CalibrationSettings(name="PXD hot/dead pixel calibration",
                                    "max_files_per_run": 20,  # only valid when max_events/run <= 0
                                    },
                                depends_on=[],
-                               produced_payloads=["PXDDeadPixelPar", "PXDMaskedPixelPar"])
+                               produced_payloads=["PXDDeadPixelPar", "PXDMaskedPixelPar", "PXDOccupancyInfoPar"])
 
 
 def get_calibrations(input_data, **kwargs):

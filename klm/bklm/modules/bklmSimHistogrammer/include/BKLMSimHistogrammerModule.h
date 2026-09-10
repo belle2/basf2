@@ -39,7 +39,7 @@ namespace Belle2 {
     BKLMSimHistogrammerModule();
 
     //! Destructor
-    ~BKLMSimHistogrammerModule();
+    ~BKLMSimHistogrammerModule() override;
 
     //! Initialize at start of job
     void initialize() override;
@@ -49,9 +49,6 @@ namespace Belle2 {
 
     //! Digitize one event and write hits, digis, and relations into DataStore
     void event() override;
-
-    //! Do any needed actions at the end of a simulation run
-    void endRun() override;
 
     //! Terminate at the end of job
     void terminate() override;

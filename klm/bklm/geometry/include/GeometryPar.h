@@ -624,7 +624,8 @@ namespace Belle2 {
       //! Angles in radians, length units in centimeters.
       //! three angles are defined as the intrinsic rotations, that is around u (alpha) --> v' (beta) --> w'' (gamma) axis
       //! note this is equivalent with extrinsic rotation with the order w (gamma)--> v(beta) --> u (alpha)
-      HepGeom::Transform3D getTransformFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta, double dGamma);
+      static HepGeom::Transform3D getTransformFromRigidBodyParams(double dU, double dV, double dW, double dAlpha, double dBeta,
+                                                                  double dGamma);
 
       //! Flag for enabling beam background study (=use bkg sensitive-detector function too)
       bool m_DoBeamBackgroundStudy;

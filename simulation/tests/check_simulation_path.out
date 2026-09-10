@@ -645,15 +645,15 @@
             useSVDSpacePointSNRFractionFor3Samples=False
             useSVDSpacePointSNRFractionFor6Samples=False
         13. SetupGenfitExtrapolationForPXDDataReduction
-            MSCModel=Highland
             energyLossBetheBloch=True
             energyLossBrems=True
             ignoreIfPresent=True
+            multipleScatteringModel=Highland
             noEffects=False
             noiseBetheBloch=True
             noiseBrems=True
             noiseCoulomb=True
-            useVXDAlignment=True
+            useBFieldCache=False
             whichGeometry=Geant4
         14. RegisterEventLevelTrackingInfo__ROI
             EventLevelTrackingInfoName=EventLevelTrackingInfo__ROI

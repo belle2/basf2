@@ -76,7 +76,7 @@ namespace Belle2 {
      * Clear content of SSNODE
      * @param n Pointer to the SSNODE
      */
-    void clear_node(SSNODE* n);
+    static void clear_node(SSNODE* n);
 
     // Data members
   private:

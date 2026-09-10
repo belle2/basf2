@@ -716,6 +716,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->getTimeSincePrevTrigger();
       } else {
@@ -734,6 +736,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->getTimeSincePrevTriggerInMicroSeconds();
       } else {
@@ -752,6 +756,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->getBunchNumber();
       } else {
@@ -770,6 +776,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->getTriggeredBunchNumberGlobal();
       } else {
@@ -788,6 +796,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->hasInjection();
       } else {
@@ -806,6 +816,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid and if an injection happened recently
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceLastInjection();
       } else {
@@ -824,6 +836,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid and if an injection happened recently
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
       } else {
@@ -842,6 +856,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid and if an injection happened recently
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceInjectedBunch();
       } else {
@@ -860,6 +876,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid and if an injection happened recently
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->getTimeSinceInjectedBunchInMicroSeconds();
       } else {
@@ -878,6 +896,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid and if an injection happened recently
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid() && TTDInfo->hasInjection()) {
         return TTDInfo->isHER();
       } else {
@@ -896,6 +916,8 @@ namespace Belle2 {
       }
 
       // And check if the stored data is valid
+      // (a different isValid() than StoreObjPtr's, which cppcheck conflates)
+      // cppcheck-suppress knownConditionTrueFalse
       if (TTDInfo->isValid()) {
         return TTDInfo->isRevo2();
       } else {

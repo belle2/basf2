@@ -37,6 +37,11 @@ namespace Belle2 {
     DQMHistAnalysisSVDOccupancyModule();
 
     /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisSVDOccupancyModule() override;
+
+    /**
      * Initializer.
      */
     void initialize() override final;
@@ -64,19 +69,19 @@ namespace Belle2 {
   private:
 
     //! Parameters accesible from basf2 scripts
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
-    bool m_3Samples; /**< if true enable 3 samples histograms analysis */
-    double m_occError; /**<error level of the occupancy */
-    double m_occWarning; /**< warning level of the occupancy */
-    double m_occEmpty; /**<empty level of the occupancy */
+    bool m_printCanvas = false; /**< if true print the pdf of the canvases */
+    bool m_3Samples = false; /**< if true enable 3 samples histograms analysis */
+    double m_occError = 0.; /**<error level of the occupancy */
+    double m_occWarning = 0.; /**< warning level of the occupancy */
+    double m_occEmpty = 0.; /**<empty level of the occupancy */
 
-    double m_groupIDsOccError; /**<error level of the group IDs occupancy */
-    double m_groupIDsOccWarning; /**< warning level of the group IDs occupancy */
-    double m_groupIDsOccEmpty; /**<empty level of the IDs occupancy */
+    double m_groupIDsOccError = 0.; /**<error level of the group IDs occupancy */
+    double m_groupIDsOccWarning = 0.; /**< warning level of the group IDs occupancy */
+    double m_groupIDsOccEmpty = 0.; /**<empty level of the IDs occupancy */
 
-    double m_onlineOccError; /**<error level of the onlineOccupancy */
-    double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
-    double m_onlineOccEmpty; /**<empty level of the occupancy */
+    double m_onlineOccError = 0.; /**<error level of the onlineOccupancy */
+    double m_onlineOccWarning = 0.; /**< warning level of the onlineOccupancy */
+    double m_onlineOccEmpty = 0.; /**<empty level of the occupancy */
 
     // plots and canvases
     SVDSummaryPlots* m_hOccupancy = nullptr;  /**< occupancy histos */

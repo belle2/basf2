@@ -5,12 +5,12 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "TProfile.h"
-#include "TCanvas.h"
-#include "TF1.h"
-#include "TH1D.h"
-#include "Math/ChebyshevPol.h"
-#include "iostream"
+#include <TProfile.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TH1D.h>
+#include <Math/ChebyshevPol.h>
+#include <iostream>
 
 
 namespace Belle2 {
@@ -19,7 +19,7 @@ namespace Belle2 {
     /**
      * helper function to initialize xt function with 5th order polynomial + linear.
      */
-    // cppcheck-suppress constParameter
+    // cppcheck-suppress constParameterCallback
     Double_t pol5pol1(Double_t* x, Double_t* par)
     {
       Double_t xx = x[0];
@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * helper function to initialize xt function with 5th order Chebshev Polynomial + linear.
      */
-    // cppcheck-suppress constParameter
+    // cppcheck-suppress constParameterCallback
     Double_t cheby5pol1(Double_t* x, Double_t* par)
     {
       Double_t xx = x[0];
@@ -69,7 +69,7 @@ namespace Belle2 {
        */
       explicit XTFunction(TProfile* h1)
       {
-        m_h1 = (TProfile*)h1->Clone();
+        m_h1 = static_cast<TProfile*>(h1->Clone());
         m_h1->SetDirectory(0);
         if (m_mode == c_Chebyshev) {
           m_fitFunc = new TF1("xtCheb5", cheby5pol1, 0.0, 700, 8);
@@ -82,7 +82,7 @@ namespace Belle2 {
        */
       XTFunction(TProfile* h1, int mode)
       {
-        m_h1 = (TProfile*)h1->Clone();
+        m_h1 = static_cast<TProfile*>(h1->Clone());
         m_h1->SetDirectory(0);
         m_mode = mode;
         if (m_mode == c_Chebyshev) {
@@ -98,7 +98,7 @@ namespace Belle2 {
        */
       XTFunction(TH1F* h1, int mode)
       {
-        m_h1 = (TProfile*)h1->Clone();
+        m_h1 = static_cast<TProfile*>(h1->Clone());
         m_h1->SetDirectory(0);
         m_mode = mode;
         if (m_mode == c_Chebyshev) {
@@ -123,7 +123,7 @@ namespace Belle2 {
         m_tmin(x.m_tmin),
         m_tmax(x.m_tmax)
       {
-        m_fitFunc = (TF1*) x.m_fitFunc->Clone();
+        m_fitFunc = static_cast<TF1*>(x.m_fitFunc->Clone());
         for (int i = 0; i < 8; ++i) {
           m_XTParam[i] = x.m_XTParam[i];
           m_FittedXTParams[i] = x.m_XTParam[i];
@@ -333,7 +333,7 @@ namespace Belle2 {
       double max_dif2 = 0.05;
       double par[8];
       m_h1->Fit("pol1", "MQ", "", m_tmin, 50);
-      TF1* f1 = (TF1*)m_h1->GetFunction("pol1");
+      TF1* f1 = static_cast<TF1*>(m_h1->GetFunction("pol1"));
       double p0 = f1->GetParameter(0);
       double p1 = f1->GetParameter(1);
       double f10 = f1->Eval(10);

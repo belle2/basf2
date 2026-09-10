@@ -45,7 +45,7 @@ public:
   /**
    * Returns the value stored for this variable.
    */
-  std::string getValue() const
+  const std::string& getValue() const
   {
     return m_value;
   }
@@ -53,7 +53,7 @@ public:
   /**
    * Returns the name stored for this variable.
    */
-  std::string getName() const
+  const std::string& getName() const
   {
     return m_name;
   }
@@ -157,7 +157,7 @@ public:
    * @param text       Initial text.
    * @param variables  Map of variables' names and values.
    * */
-  explicit LogVariableStream(std::string const& text, std::map<std::string, std::string> variables = {})
+  explicit LogVariableStream(std::string const& text, const std::map<std::string, std::string>& variables = {})
   {
     m_stringStream << text;
     for (auto const& kv : variables) {
@@ -169,7 +169,6 @@ public:
    * operator override for ostream modifier functions like std::endl who are directly
    * applied to the underlying string stream.
    */
-  // cppcheck-suppress constParameter ; no, this cannot be const otherwise e.g. std::endl doesn't work
   LogVariableStream& operator<<(__basic_ostream_type & (*__pf)(__basic_ostream_type&))
   {
     // execute provided function on the string stream

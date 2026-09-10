@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Module destructor.
      */
-    virtual ~eclTimeShiftsPlottingCollectorModule();
+    virtual ~eclTimeShiftsPlottingCollectorModule() override;
 
     /** Replacement for defineHisto() in CalibrationCollector modules */
     void inDefineHisto() override;

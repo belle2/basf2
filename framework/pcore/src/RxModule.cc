@@ -45,7 +45,7 @@ void RxModule::readEvent()
 {
   auto* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while (!m_rbuf->isDead()) {
-    int size = m_rbuf->remq((int*)evtbuf);
+    int size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf));
     if (size != 0) {
       B2DEBUG(35, "Rx: got an event from RingBuffer, size=" << size);
 
@@ -78,8 +78,6 @@ void RxModule::initialize()
   readEvent();
 }
 
-void RxModule::beginRun() { }
-
 void RxModule::event()
 {
   m_nrecv++;
@@ -89,8 +87,6 @@ void RxModule::event()
   // Get a record from ringbuf
   readEvent();
 }
-
-void RxModule::endRun() { }
 
 void RxModule::terminate()
 {

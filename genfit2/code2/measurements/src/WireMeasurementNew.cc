@@ -1,6 +1,7 @@
 /* Copyright 2008-2010, Technische Universitaet Muenchen,
              2014, Ludwig-Maximilians-Universität München
-   Authors: Tobias Schlüter
+             2026, DESY
+   Authors: Tobias Schlüter, Christian Wessel
 
    This file is part of GENFIT.
 
@@ -22,6 +23,7 @@
  */
 
 #include "WireMeasurementNew.h"
+#include "MathHelpers.h"
 
 #include <cmath>
 #include <algorithm>
@@ -118,7 +120,7 @@ std::vector<MeasurementOnPlane*> WireMeasurementNew::constructMeasurementsOnPlan
     mopR->setWeight(1);
   }
   else {
-    double val = 0.5 * pow(std::max(0., 1 - mR/maxDistance_), 2.);
+    double val = 0.5 * square(std::max(0., 1 - mR/maxDistance_));
     mopL->setWeight(val);
     mopR->setWeight(val);
   }

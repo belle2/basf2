@@ -31,7 +31,7 @@ namespace Belle2 {
     SVDShaperDigitFilterModule();
 
     /** Destructor. */
-    ~SVDShaperDigitFilterModule();
+    ~SVDShaperDigitFilterModule() override;
 
     /**  register new SVDSShaperDigits store arrays (inside/outside ROIs)*/
     void initialize() override;

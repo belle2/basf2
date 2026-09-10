@@ -69,9 +69,9 @@ namespace Belle2 {
     /** find the closest cluster*/
     int findClosestCluster(const VxdID& vxdid, ROOT::Math::XYZVector intersection);
     /** is it close to the border*/
-    bool isCloseToBorder(int u, int v, int checkDistance);
+    static bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/
-    bool isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
+    static bool isDeadPixelClose(int u, int v, int checkDistance, const VxdID& moduleID);
 
     /// Require tracks going through ROIs
     bool m_requireROIs;

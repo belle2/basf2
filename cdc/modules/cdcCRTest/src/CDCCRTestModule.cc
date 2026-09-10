@@ -23,7 +23,7 @@
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <Math/ProbFuncMathCore.h>
 
 using namespace std;
@@ -230,10 +230,6 @@ void CDCCRTestModule::initialize()
   B2INFO("Trigger Position (" << m_TriggerPos.at(0) << " ," << m_TriggerPos.at(1) << " ," << m_TriggerPos.at(2) << ")");
 }
 
-void CDCCRTestModule::beginRun()
-{
-}
-
 void CDCCRTestModule::event()
 {
   evtT0 = 0.;
@@ -242,7 +238,7 @@ void CDCCRTestModule::event()
   /* CDCHit distribution */
   if (m_MakeHitDist) {
     for (int i = 0; i < m_CDCHits.getEntries(); ++i) {
-      Belle2::CDCHit* hit = m_CDCHits[i];
+      const Belle2::CDCHit* hit = m_CDCHits[i];
       m_hHitDistInCDCHit[getICLayer(hit->getISuperLayer(), hit->getILayer())]->Fill(hit->getIWire());
       m_h2DHitDistInCDCHit->Fill(hit->getIWire(), getICLayer(hit->getISuperLayer(), hit->getILayer()));
     }
@@ -342,14 +338,6 @@ void CDCCRTestModule::event()
   m_hNTracksPerEventFitted->Fill(nfitted);
 }
 
-void CDCCRTestModule::endRun()
-{
-}
-
-void CDCCRTestModule::terminate()
-{
-}
-
 void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 {
   m_trigHitPos = getTriggerHitPosition(track);
@@ -436,7 +424,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
           //    t = getCorrectedDriftTime(wireid, tdc, adc, z, z0);
           if (m_StoreCDCSimHitInfo) {
-            CDCSimHit* simhit = rawCDC->getCDCHit()->getRelated<Belle2::CDCSimHit>();
+            const CDCSimHit* simhit = rawCDC->getCDCHit()->getRelated<Belle2::CDCSimHit>();
             if (simhit) {
               x_sim = simhit->getDriftLength();
               z_sim = simhit->getPosWire().Z();
@@ -648,7 +636,7 @@ void CDCCRTestModule::getResidualOfUnFittedLayer(Belle2::RecoTrack* track)
     m_hAlpha->Fill(alpha);
     m_hTheta->Fill(theta);
     if (m_StoreCDCSimHitInfo) {
-      CDCSimHit* simhit = cdchit->getRelated<Belle2::CDCSimHit>();
+      const CDCSimHit* simhit = cdchit->getRelated<Belle2::CDCSimHit>();
       if (simhit) {
         x_sim = simhit->getDriftLength();
         z_sim = simhit->getPosWire().Z();

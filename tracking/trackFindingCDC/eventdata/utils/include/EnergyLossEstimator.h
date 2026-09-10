@@ -68,13 +68,13 @@ namespace Belle2 {
 
     private:
       /// Electron density in mol / cm^3
-      double m_eDensity;
+      double m_eDensity {};
 
       /// Mean excitation energy in GeV
-      double m_I;
+      double m_I {};
 
       /// B field to be used for the distance translation
-      double m_bZ;
+      double m_bZ {};
     };
   }
 }

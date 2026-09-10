@@ -6,10 +6,6 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//
-// Common setup for everything that uses genfit's extrapolation code.
-//
-
 #include <tracking/modules/genfitUtilities/SetupGenfitExtrapolationModule.h>
 #include <tracking/modules/genfitUtilities/Geant4MaterialInterface.h>
 
@@ -31,8 +27,9 @@ using namespace Belle2;
 REG_MODULE(SetupGenfitExtrapolation)
 
 namespace {
-//! Stream that writes to Belle II logging system at the debug level
-//! given by the template parameter.
+
+  //! Stream that writes to Belle II logging system at the debug level
+  //! given by the template parameter.
   template<size_t T_level>
   class genfitSink : public boost::iostreams::sink {
   public:
@@ -44,20 +41,20 @@ namespace {
     }
   };
 
-//! Sink for debug output.
+  //! Sink for debug output.
   genfitSink<200> debugSink;
-//! Buffer for debug output.
+  //! Buffer for debug output.
   boost::iostreams::stream_buffer<genfitSink<200> > debugStreamBuf(debugSink);
-//! Sink for error output.
+  //! Sink for error output.
   genfitSink<100> errorSink;
-//! Buffer for error output.
+  //! Buffer for error output.
   boost::iostreams::stream_buffer<genfitSink<100> > errorStreamBuf(errorSink);
-//! Sink for output from ...::Print() calls.
+  //! Sink for output from ...::Print() calls.
   genfitSink<150> printSink;
-//! Buffer for output from ...::Print() calls.
+  //! Buffer for output from ...::Print() calls.
   boost::iostreams::stream_buffer<genfitSink<150> > printStreamBuf(printSink);
 
-//! Directs output from genfit into the Belle II logging system.
+  //! Directs output from genfit into the Belle II logging system.
   void setupGenfitStreams()
   {
     genfit::debugOut.rdbuf(&debugStreamBuf);
@@ -67,11 +64,11 @@ namespace {
 }
 
 SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
-  Module(), m_vxdAlignment()
+  Module()
 {
 
   setDescription("Sets up material handling for genfit extrapolation.  Also setups up I/O streams for"
-                 " genfit in order to integrate it into basf2 logging system. Also sets up update of VXDAlignment from DB (temporary).");
+                 " genfit in order to integrate it into basf2 logging system.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("ignoreIfPresent", m_ignoreIfPresent,
@@ -97,10 +94,10 @@ SetupGenfitExtrapolationModule::SetupGenfitExtrapolationModule() :
   addParam("noEffects", m_noEffects,
            "switch off all material effects in Genfit. This overwrites all "
            "individual material effects switches", m_noEffects);
-  addParam("MSCModel", m_mscModel,
+  addParam("multipleScatteringModel", m_mscModel,
            "Multiple scattering model", m_mscModel);
-  addParam("useVXDAlignment", m_useVXDAlignment,
-           "Use VXD alignment from database?", m_useVXDAlignment);
+  addParam("useBFieldCache", m_useBFieldCache, "activate the usage of the magnetic field cache",
+           m_useBFieldCache);
 }
 
 void SetupGenfitExtrapolationModule::initialize()
@@ -117,7 +114,10 @@ void SetupGenfitExtrapolationModule::initialize()
   setupGenfitStreams();
 
   genfit::FieldManager::getInstance()->init(new GFGeant4Field());
-  genfit::FieldManager::getInstance()->useCache();
+  // The usage of the magnetic field cache in Genfit leads to irreproducible results.
+  // A parameter is added here to switch off the usage of the cache until the problem
+  // is fixed upstream.
+  genfit::FieldManager::getInstance()->useCache(m_useBFieldCache);
 
   if (!geometry::GeometryManager::getInstance().getTopVolume()) {
     B2FATAL("No geometry set up so far. Load the geometry module.");

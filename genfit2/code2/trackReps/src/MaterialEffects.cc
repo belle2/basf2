@@ -1,5 +1,5 @@
-/* Copyright 2008-2014, Technische Universitaet Muenchen,
-   Authors: Christian Hoeppner & Sebastian Neubert
+/* Copyright 2008-2026, Technische Universitaet Muenchen, DESY
+   Authors: Christian Hoeppner & Sebastian Neubert & Christian Wessel
 
    This file is part of GENFIT.
 
@@ -20,6 +20,7 @@
 #include "MaterialEffects.h"
 #include "Exception.h"
 #include "IO.h"
+#include "MathHelpers.h"
 
 #include <stdexcept>
 #include <string>
@@ -436,7 +437,7 @@ double MaterialEffects::momentumLoss(double stepSign, double mom, bool linear)
     // Step would stop particle (E_kin <= 0).
     return momLoss = mom;
   }
-  else momLoss = mom - sqrt(pow(E0 - dE, 2) - mass_*mass_); // momLoss; positive for positive stepSign
+  else momLoss = mom - sqrt(square(E0 - dE) - mass_*mass_); // momLoss; positive for positive stepSign
 
   if (debugLvl_ > 0) {
     debugOut << "      MaterialEffects::momentumLoss: mom = " << mom << "; E0 = " << E0
@@ -532,9 +533,9 @@ void MaterialEffects::noiseBetheBloch(M7x7& noise, double mom, double betaSquare
         sigmaalpha =  1.975560
                       + 9.898841e-02 * RLAMAX
                       - 2.828670e-04 * RLAMAX * RLAMAX
-                      + 5.345406e-07 * pow(RLAMAX, 3.)
-                      - 4.942035e-10 * pow(RLAMAX, 4.)
-                      + 1.729807e-13 * pow(RLAMAX, 5.);
+                      + 5.345406e-07 * cube(RLAMAX)
+                      - 4.942035e-10 * pow4(RLAMAX)
+                      + 1.729807e-13 * pow5(RLAMAX);
       } else { sigmaalpha = 1.871887E+01 + 1.296254E-02 * RLAMAX; }
       // alpha=54.6  corresponds to a 0.9996 maximum cut
       if (sigmaalpha > 54.6) sigmaalpha = 54.6;
@@ -550,7 +551,7 @@ void MaterialEffects::noiseBetheBloch(M7x7& noise, double mom, double betaSquare
   sigma2E *= 1.E-18; // eV -> GeV
 
   // update noise matrix, using linear error propagation from E to q/p
-  noise[6 * 7 + 6] += charge_*charge_/betaSquare / pow(mom, 4) * sigma2E;
+  noise[6 * 7 + 6] += charge_*charge_/betaSquare / pow4(mom) * sigma2E;
 }
 
 
@@ -777,7 +778,7 @@ double MaterialEffects::dEdxBrems(double mom) const
       if (X > -8.) {
         if (X >= +9.) ETA = 1.;
         else {
-          double W = A1 * X + A3 * pow(X, 3.) + A5 * pow(X, 5.);
+          double W = A1 * X + A3 * cube(X) + A5 * pow5(X);
           ETA = 0.5 + atan(W) / M_PI;
         }
       }
@@ -816,7 +817,7 @@ void MaterialEffects::noiseBrems(M7x7& noise, double momSquare, double betaSquar
   sigma2E = std::max(sigma2E, 0.0); // must be positive
   
   // update noise matrix, using linear error propagation from E to q/p
-  noise[6 * 7 + 6] += charge_*charge_/betaSquare / pow(momSquare, 2) * sigma2E;
+  noise[6 * 7 + 6] += charge_*charge_/betaSquare / square(momSquare) * sigma2E;
 }
 
 

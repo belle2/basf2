@@ -53,9 +53,9 @@ def getEigenPars(covM):
     eigVals = eigVals[idx]
     eigVecs = eigVecs[:, idx]
 
-    assert(eigVals[0] > 1e-4)
-    assert(eigVals[1] > 1e-4)
-    assert(eigVals[2] > 1e-4)
+    assert (eigVals[0] > 1e-4)
+    assert (eigVals[1] > 1e-4)
+    assert (eigVals[2] > 1e-4)
 
     sxEig = sqrt(eigVals[1])
     syEig = sqrt(eigVals[2])
@@ -102,14 +102,14 @@ def getBSvalues(path):
 
         f = ROOT.TFile.Open(fName)
         bsAll = f.Get("BeamSpot")
-        assert(bsAll.ClassName() == "Belle2::EventDependency")
+        assert (bsAll.ClassName() == "Belle2::EventDependency")
 
         evNums = bsAll.getEventNumbers()
 
         for i in range(len(evNums) + 1):
             bs = bsAll.getObjectByIndex(i)
             ipR = bs.getIPPosition()
-            ip = [ipR(i) * Unit.cm / Unit.um for i in range(3)]  # from cm to um
+            ip = [c * Unit.cm / Unit.um for c in (ipR.X(), ipR.Y(), ipR.Z())]  # from cm to um
             ipeR = bs.getIPPositionCovMatrix()
             ipe = [sqrt(ipeR(i, i)) * Unit.cm / Unit.um for i in range(3)]  # from cm to um
             covR = bs.getSizeCovMatrix()
@@ -269,7 +269,7 @@ def plotPullSpectrum(arr, vName, getterV, getterE):
     q1 = np.quantile(diffs, n1)
     q2 = np.quantile(diffs, n2)
 
-    plt.hist(diffs, bins=np.linspace(-20, 20, 80), label=f'q1={round(q1,1)}, q2={round(q2,1)}')
+    plt.hist(diffs, bins=np.linspace(-20, 20, 80), label=f'q1={round(q1, 1)}, q2={round(q2, 1)}')
     plt.xlabel(vName)
     plt.legend()
 
@@ -294,7 +294,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # Path to the database.txt file and to the payloads.
     dbFile = glob(f'{job_path}/**/database.txt', recursive=True)
     dbFile = [db for db in dbFile if 'algorithm_output' not in db]
-    assert(len(dbFile) == 1)
+    assert (len(dbFile) == 1)
     dbFile = dbFile[0]
     inputDir = dbFile[:dbFile.rfind('/')]
 

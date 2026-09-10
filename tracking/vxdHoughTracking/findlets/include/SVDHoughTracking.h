@@ -36,7 +36,7 @@ namespace Belle2 {
       SVDHoughTracking();
 
       /// Default destructor
-      ~SVDHoughTracking();
+      ~SVDHoughTracking() override;
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

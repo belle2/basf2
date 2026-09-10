@@ -28,7 +28,7 @@ namespace Belle2 {
       BaseSegmentPairRelationFilter();
 
       /// Default destructor
-      ~BaseSegmentPairRelationFilter();
+      ~BaseSegmentPairRelationFilter() override;
 
       /// Returns the segment pairs form the range that continue on the to site of the given segment pair.
       std::vector<const TrackingUtilities::CDCSegmentPair*> getPossibleTos(

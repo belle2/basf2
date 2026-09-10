@@ -44,6 +44,11 @@ namespace Belle2 {
       Results(const Results& results);
 
       /**
+       * Assignment operator.
+       */
+      Results& operator=(const Results& results);
+
+      /**
        * Destructor.
        */
       ~Results();
@@ -187,7 +192,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMChannelStatusAlgorithm();
+    ~KLMChannelStatusAlgorithm() override;
 
     /**
      * Calibration.

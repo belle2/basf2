@@ -40,7 +40,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedxWireGainAlgorithm() {}
+    virtual ~CDCDedxWireGainAlgorithm() override {}
 
     /**
     * function to decide merge vs relative gains
@@ -75,7 +75,7 @@ namespace Belle2 {
     /**
     * function to get mean of truncation from histogram
     */
-    double getTruncationMean(TH1D* hdedxhit, int binlow, int binhigh);
+    static double getTruncationMean(TH1D* hdedxhit, int binlow, int binhigh);
 
     /**
     * function to draw dE/dx for inner/outer layer
@@ -135,7 +135,7 @@ namespace Belle2 {
     double m_truncMax; /**< max trunc range for mean */
 
     std::string m_suffix; /**< suffix string to separate plots */
-    int m_exp;   /**< exp no to set SL boundaries */
+    int m_exp = 0;   /**< exp no to set SL boundaries */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */

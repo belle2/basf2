@@ -51,7 +51,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~KLMDQMModule();
+    ~KLMDQMModule() override;
 
     /**
      * Definition of the histograms.
@@ -72,16 +72,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 
@@ -142,7 +132,7 @@ namespace Belle2 {
     TH1F* m_TimeRPC;
 
     /** Time: revo9DCArrivalTime for RPC. */
-    TH1F* m_TimeRevo9DCArrivalTime;
+    TH1F* m_TimeRevo9DCArrivalTime = nullptr;
 
     /** Time: BKLM scintillators. */
     TH1F* m_TimeScintillatorBKLM;

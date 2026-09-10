@@ -14,7 +14,9 @@ using namespace std;
 using namespace Belle2;
 
 RelationContainer::RelationContainer():
-  m_elements(RelationElement::Class()),
+  // Deliberately small initial capacity (see also the StoreEntry struct):
+  // the array grows on demand, but Clear()/Delete() cost scales with the capacity.
+  m_elements(RelationElement::Class(), 10),
   m_fromName(""), m_fromDurability(-1),
   m_toName(""), m_toDurability(-1), m_modified(true)
 {

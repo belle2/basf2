@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMChannelStatusCollectorModule();
+    ~KLMChannelStatusCollectorModule() override;
 
     /**
      * Initializer.

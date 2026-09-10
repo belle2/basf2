@@ -28,7 +28,7 @@ from top_calibration import calibration_validation
 globalTags = ['data_reprocessing_prompt', 'dp_recon_release6_patch', 'online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/gpfs/group/belle2/dataprod/Data/PromptReco/bucket16_calib/'
-bhabha_skim_dir = 'skim/bhabha_all_calib/cdst/sub00/'
+bhabha_skim_dir = 'skim/bhabha_combined_calib/cdst/sub00/'
 dimuon_skim_dir = 'skim/mumutight_calib/cdst/sub00'
 main_output_dir = 'top_calibration'
 default_sample = 'dimuon'

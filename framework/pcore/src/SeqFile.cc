@@ -22,7 +22,7 @@ using namespace Belle2;
 using namespace std;
 namespace io = boost::iostreams;
 
-SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* streamerinfo, int streamerinfo_size,
+SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, const char* streamerinfo, int streamerinfo_size,
                  bool filenameIsPattern):
   m_filename(filename)
 {
@@ -39,7 +39,7 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, char* s
   m_compressed = m_filename.size() > 3 && m_filename.compare(m_filename.size() - 3, 3, ".gz") == 0;
   // strip .gz suffix to add it at the end automatically and correctly for subsequent files
   if (m_compressed) {
-    m_filename = m_filename.substr(0, m_filename.size() - 3);
+    m_filename.resize(m_filename.size() - 3);
   }
   // check if we want different naming scheme using boost::format
   if (filenameIsPattern) {
@@ -144,7 +144,7 @@ int SeqFile::write(const char* buf)
   if (!out) {
     B2FATAL("SeqFile::write() called on a file opened in read mode");
   }
-  int insize = *((int*)buf); // nbytes in the buffer at the beginning
+  int insize = *reinterpret_cast<const int*>(buf); // nbytes in the buffer at the beginning
   if (insize + m_nb >= c_MaxFileSize && m_filename != "/dev/null") {
     B2INFO("SeqFile: previous file closed (size=" << m_nb << " bytes)");
     m_nfile++;
@@ -207,7 +207,7 @@ int SeqFile::read(char* buf, int size)
     return -1;
   }
   // Normal processing, extract the record size from the first 4 bytes
-  int recsize = *((int*)buf);
+  int recsize = *reinterpret_cast<const int*>(buf);
   if (recsize > size) {
     B2ERROR("SeqFile::read() buffer too small, need at least " << recsize << " bytes");
     return -1;

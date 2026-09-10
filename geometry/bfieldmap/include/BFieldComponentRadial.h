@@ -41,7 +41,7 @@ namespace Belle2 {
     BFieldComponentRadial() = default;
 
     /** The BFieldComponentRadial destructor. */
-    virtual ~BFieldComponentRadial() = default;
+    virtual ~BFieldComponentRadial() override = default;
 
     /**
      * Initializes the magnetic field component.
@@ -56,13 +56,6 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
     virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
-
-    /**
-     * Terminates the magnetic field component.
-     * This method closes the magnetic field map file.
-     */
-    virtual void terminate() override;
-
     /**
      * Sets the filename of the magnetic field map.
      * @param filename The filename of the magnetic field map.

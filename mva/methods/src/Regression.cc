@@ -13,6 +13,8 @@
 using namespace Belle2;
 using namespace MVA;
 
+// cppcheck complains that m_cutValue and m_childDataSet are not initialised, which they obviously are, therefore:
+// cppcheck-suppress uninitMemberVar
 RegressionDataSet::RegressionDataSet(const GeneralOptions& general_options, Dataset* dataset, double cutValue) :
   Dataset(general_options), m_cutValue(cutValue), m_childDataSet(dataset)
 {

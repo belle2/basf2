@@ -1,0 +1,25 @@
+# Herwig 7.2 cluster hadronization tune for Belle II
+# e+e- -> qqbar continuum events
+#
+# This file is injected into the Herwig .in file just before 'run',
+# overriding any template defaults.
+# Format: standard Herwig 'set' commands, one per line.
+#
+# Parameters description reference, table 7.5 in Bellm et al., "The Physics of Herwig 7", arXiv:2512.16645 (2025)
+# Note: Herwig 7.3.0 retuned several defaults; where they differ from the Herwig 7.2.0 values.
+#
+# Herwig 7.2 defaults are in:
+#   share/Herwig/defaults/Hadronization.in  (Herwig 7.2.0 is available in the basf2 externals since version v02-04-00)
+
+##################################################
+# Example:
+# Strange quark suppression; cluster fission and cluster decay
+# Weight for selecting strange quark-antiquark pairs popped from the vacuum.
+#
+# Range: [0, 10]
+# Herwig 7.2 default: 0.291717  (Note Herwig 7.3 default: 0.37)
+# Effect: increase -> higher K/(K+pi) ratio (more K+/-, K0 from fission and decay).
+#         decrease -> lower K/(K+pi) ratio (fewer K; more pi+/-/pi0).
+##################################################
+set /Herwig/Hadronization/HadronSelector:PwtSquark 0.291717
+

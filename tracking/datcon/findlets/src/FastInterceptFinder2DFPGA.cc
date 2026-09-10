@@ -377,7 +377,7 @@ void FastInterceptFinder2DFPGA::gnuplotoutput(const std::vector<std::pair<VxdID,
   hsoutstream << "load '" << m_param_gnuplotHSRectOutputFileName << "'" << std::endl << std::endl;
 
   uint count = 0;
-  for (auto& hit : hits) {
+  for (const auto& hit : hits) {
     const VxdID& id = hit.first;
     int layer = id.getLayerNumber();
     // Multiplication with 1000 is necessary, as in the actual intercept finding step, cos and sin are multiplied by 1000, too.

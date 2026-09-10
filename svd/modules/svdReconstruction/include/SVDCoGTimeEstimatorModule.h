@@ -44,22 +44,13 @@ namespace Belle2 {
     SVDCoGTimeEstimatorModule();
 
     /** default destructor*/
-    virtual ~SVDCoGTimeEstimatorModule();
+    virtual ~SVDCoGTimeEstimatorModule() override;
 
     /** Initialize the SVDCoGTimeEstimator.*/
     virtual void initialize() override;
 
-    /** Called when entering a new run.     */
-    virtual void beginRun() override;
-
     /** This method is the core of the SVDCoGTimeEstimator. */
     virtual void event() override;
-
-    /** This method is called if the current run ends. */
-    virtual void endRun() override;
-
-    /** This method is called at the end of the event processing.   */
-    virtual void terminate() override;
 
 
   private:
@@ -163,7 +154,7 @@ namespace Belle2 {
     /** Function to calculate the amplitude error as the noise of the strip */
     float CalculateAmplitudeError(VxdID ThisSensorID, bool ThisSide, int ThisCellID);
     /** Function to calculate chi2, that is not used here, so just set at 0.01 */
-    float CalculateChi2();
+    static float CalculateChi2();
 
     //calibration objects
     SVDPulseShapeCalibrations m_PulseShapeCal; /**<SVDPulseShaper calibrations db object*/

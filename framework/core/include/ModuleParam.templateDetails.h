@@ -57,7 +57,16 @@ namespace Belle2 {
   template <class T>
   void ModuleParam<T>::setValueFromPythonObject(const boost::python::object& pyObject)
   {
+    // For T = std::string the boost::python::extract inside convertPythonObject
+    // triggers a false-positive -Wmaybe-uninitialized in GCC; silence it here.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     setValue(PyObjConvUtils::convertPythonObject(pyObject, getDefaultValue()));
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
 
   template <class T>

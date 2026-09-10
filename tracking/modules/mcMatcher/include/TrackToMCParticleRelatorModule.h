@@ -25,7 +25,7 @@ namespace Belle2 {
     TrackToMCParticleRelatorModule();
 
     /** Destructor (empty). */
-    ~TrackToMCParticleRelatorModule() {};
+    ~TrackToMCParticleRelatorModule() override {};
 
     /** Use this to initialize StoreArrays and relations. */
     void initialize() override;

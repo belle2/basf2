@@ -64,16 +64,16 @@ namespace Belle2 {
     double EstimateGain(VxdID sensorID, unsigned short uBin, unsigned short vBin);
 
     /// Calculate a median from unsorted signal vector. The input vector gets sorted.
-    double CalculateMedian(std::vector<double>& signals);
+    static double CalculateMedian(std::vector<double>& signals);
 
     /// Calculate a median from 1D histogram
-    double CalculateMedian(TH1D* histo_signals);
+    static double CalculateMedian(TH1D* histo_signals);
 
     /// calculate MPV of unsorted signal vector using a Landau fit
-    double FitLandau(std::vector<double>& signals);
+    static double FitLandau(std::vector<double>& signals);
 
     /// calculate MPV from 1D histogram
-    double FitLandau(TH1D* histo_signals);
+    static double FitLandau(TH1D* histo_signals);
 
     /// Retrieve charge value from pulled in data base payload
     //double GetChargeFromDB(VxdID sensorID, unsigned short uBin, unsigned short vBin, TTree *dbtree);

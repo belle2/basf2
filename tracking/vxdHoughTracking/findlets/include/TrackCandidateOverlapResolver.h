@@ -29,7 +29,7 @@ namespace Belle2 {
       TrackCandidateOverlapResolver();
 
       /// Default destructor
-      ~TrackCandidateOverlapResolver();
+      ~TrackCandidateOverlapResolver() override;
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

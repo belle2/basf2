@@ -59,7 +59,7 @@ namespace Belle2 {
     * @param cellID Strip ID.
     * @param samples std::array of 6 APV raw samples.
     */
-    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, APVFloatSamples samples) :
+    DATCONSVDDigit(VxdID sensorID, bool isU, short cellID, const APVFloatSamples& samples) :
       m_sensorID(sensorID), m_isU(isU), m_cellID(cellID), m_totalCharge(0), m_maxSampleIndex(0)
     {
       std::transform(samples.begin(), samples.end(), m_samples.begin(),
@@ -88,7 +88,7 @@ namespace Belle2 {
     }
 
     /** Get int-array of of 6 APV25 samples. */
-    APVRawSamples getRawSamples() const
+    const APVRawSamples& getRawSamples() const
     {
       return m_samples;
     }
@@ -162,7 +162,7 @@ namespace Belle2 {
     void setCellID(short cellID) { m_cellID = cellID; }
 
     /** Setter for the raw samples array. */
-    void setAPVRawSamples(APVFloatSamples apvInputSamples)
+    void setAPVRawSamples(const APVFloatSamples& apvInputSamples)
     {
       //       m_samples = apvSamples;
       std::transform(apvInputSamples.begin(), apvInputSamples.end(), m_samples.begin(),

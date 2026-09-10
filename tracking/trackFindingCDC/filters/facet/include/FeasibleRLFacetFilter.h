@@ -9,13 +9,15 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
+#include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHitTriple.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+
 #include <string>
 
 namespace Belle2 {
 
   namespace TrackingUtilities {
     class CDCFacet;
-    class CDCRLWireHitTriple;
   }
   namespace TrackFindingCDC {
 
@@ -46,6 +48,17 @@ namespace Belle2 {
       TrackingUtilities::Weight operator()(const TrackingUtilities::CDCFacet& facet) final;
 
     public:
+      /**
+       *  Check if the given shape and right left passage information is a feasible combination.
+       *
+       *  Shape based version to be used when the shape of the hit triple is already known,
+       *  e.g. when scanning the right left passage combinations of the same three hits.
+       */
+      bool isFeasible(const TrackingUtilities::CDCRLWireHitTriple::Shape& shape,
+                      TrackingUtilities::ERightLeft startRLInfo,
+                      TrackingUtilities::ERightLeft middleRLInfo,
+                      TrackingUtilities::ERightLeft endRLInfo) const;
+
       /// Setter for the flag that the borderline cases should be excluded.
       void setHardRLCut(bool hardRLCut)
       {

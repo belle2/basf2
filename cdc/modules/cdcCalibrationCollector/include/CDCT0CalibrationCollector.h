@@ -38,7 +38,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCT0CalibrationCollectorModule();
+      virtual ~CDCT0CalibrationCollectorModule() override;
 
       /**
        * Initializes the Module.
@@ -73,9 +73,9 @@ namespace Belle2 {
       double m_PvalCut = 0;  /**< minimum pt required for track*/
       double m_ndfCut = 15;  /**< minimum pt required for track*/
       double m_xmin = 0.1; /**< Min drift length*/
-      bool m_BField;       /**< fit in case no magnetic field or not, if false, NDF=4 in cal P-value */
-      bool m_EventT0Extraction;                /**< use Event T0 extraction or not. */
-      double halfCSize[56]; /**< Half cell size*/
+      bool m_BField = false;       /**< fit in case no magnetic field or not, if false, NDF=4 in cal P-value */
+      bool m_EventT0Extraction = false;                /**< use Event T0 extraction or not. */
+      double halfCSize[56] = {}; /**< Half cell size*/
     };
   }
 }

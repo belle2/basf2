@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedxBadWireAlgorithm() {}
+    virtual ~CDCDedxBadWireAlgorithm() override {}
 
     /**
     * function to enable plotting
@@ -121,7 +121,7 @@ namespace Belle2 {
     /**
     * function to change text styles
     */
-    void setTextCosmetics(TPaveText* pt, double size)
+    static void setTextCosmetics(TPaveText* pt, double size)
     {
       pt->SetTextAlign(11);
       pt->SetFillStyle(3001);
@@ -133,7 +133,7 @@ namespace Belle2 {
     /**
     * function to change histogram styles
     */
-    void setHistCosmetics(TH2F* hist, Color_t color)
+    static void setHistCosmetics(TH2F* hist, Color_t color)
     {
       hist->SetMarkerStyle(20);
       hist->SetMarkerSize(0.3);
@@ -163,17 +163,17 @@ namespace Belle2 {
     double m_rmsThres; /**< rms Threshold accepted for good wire */
     double m_fracThres; /**< high-frac Threshold accepted for good wire */
 
-    double m_amean_IL; /**< average mean of dedx for inner wires */
-    double m_arms_IL; /**< average rms of dedx for inner wires */
-    double m_amean_OL; /**< average mean of dedx for outer wires */
-    double m_arms_OL; /**< average rms of dedx for outer wires */
+    double m_amean_IL = 0.0; /**< average mean of dedx for inner wires */
+    double m_arms_IL = 0.0; /**< average rms of dedx for inner wires */
+    double m_amean_OL = 0.0; /**< average mean of dedx for outer wires */
+    double m_arms_OL = 0.0; /**< average rms of dedx for outer wires */
 
     std::string m_varName; /**< std::string to set var name (adc or dedx) */
     std::string m_suffix; /**< suffix std::string for naming plots */
 
-    int m_exp;   /**< exp no to set SL boundaries */
+    int m_exp = 0;   /**< exp no to set SL boundaries */
 
-    int m_slWireBoundary; /**< Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40) */
+    int m_slWireBoundary = 0; /**< Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40) */
 
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */

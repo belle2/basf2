@@ -141,7 +141,7 @@ namespace Belle2 {
 /////////////////////////////////////////////////////////////////////////// member functions:
 
     /** constructor, expects to get a vector of names for filters. */
-    explicit FilterValueDataSet(std::vector<std::string> filterNames) :
+    explicit FilterValueDataSet(const std::vector<std::string>& filterNames) :
       expNo(std::numeric_limits<unsigned>::max()),
       runNo(std::numeric_limits<unsigned>::max()),
       evtNo(std::numeric_limits<unsigned>::max()),
@@ -202,7 +202,7 @@ namespace Belle2 {
       if (evtNo == std::numeric_limits<unsigned>::max()) return false;
       if (trackNo == std::numeric_limits<unsigned>::max()) return false;
       if (pdg == std::numeric_limits<int>::max()) return false;
-      for (auto& entry : m_values) {
+      for (const auto& entry : m_values) {
         if (entry.second == std::numeric_limits<double>::max()) return false;
       }
       return secIDs.isValid();

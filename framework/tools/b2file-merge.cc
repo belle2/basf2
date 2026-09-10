@@ -313,7 +313,7 @@ The following restrictions apply:
         B2WARNING("File " << std::quoted(input) << " created with modified software "
                   <<  fileMetaData.getRelease()
                   << ": cannot verify that files are compatible");
-        release = release.substr(0, release.size() - std::string("-modified").size());
+        release.resize(release.size() - std::string("-modified").size());
       }
 
       // so, event tree looks good too. Now we merge the FileMetaData

@@ -365,7 +365,7 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
     } else if (iCrate > 44) {
       if (iShaperPosition > 8) continue;
     }
-    ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
+    const ECLDspData* dspdata = ECLDspUtilities::readEclDsp(x.path().string().c_str(), iShaperPosition - 1);
     callbackCalibration(dspdata, map_container_vec[iShaper],
                         map_container_coef[iShaper]);
     callbackCalibration(m_calibrationThrA0, v_totalthrA0);
@@ -374,7 +374,7 @@ void ECLDQMEXTENDEDModule::initDspfromFile()
   }
 }
 
-void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<int> adc_data)
+void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, const std::vector<int>& adc_data)
 {
   int iShaper = conversion(cellID);
   int iChannelPosition = mapper.getShaperChannel(cellID);
@@ -401,7 +401,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int Ahard = (int)v_totalthrAhard[cellID - 1];
   int Askip = (int)v_totalthrAskip[cellID - 1];
 
-  int* y = adc_data.data();
+  const int* y = adc_data.data();
   int ttrig2 = trigger_time - 2 * (trigger_time / 8);
 
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
@@ -465,7 +465,7 @@ void ECLDQMEXTENDEDModule::event()
     // Skip events for several types of timing sources
     // to reduce CPU time usage on HLT (random trigger, delayed bhahba).
     int timing_type = m_TRGSummary->getTimType();
-    for (auto& skipped_timing_type : m_skipEvents) {
+    for (const auto& skipped_timing_type : m_skipEvents) {
       if (timing_type == skipped_timing_type) return;
     }
   }
@@ -481,7 +481,7 @@ void ECLDQMEXTENDEDModule::event()
     m_TrigTime = ECLTrig::getByCellID(m_CellId)->getTimeTrig();
 
     emulator(m_CellId, m_TrigTime, DspArray);
-    ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
+    const ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit) {
       if (h_missing_ecldigits->GetEntries() == 0) {
@@ -557,14 +557,3 @@ void ECLDQMEXTENDEDModule::event()
     } //aECLDigit
   }  //aECLDsp
 } //event
-
-
-void ECLDQMEXTENDEDModule::endRun()
-{
-}
-
-
-
-void ECLDQMEXTENDEDModule::terminate()
-{
-}

@@ -1363,7 +1363,7 @@ namespace Belle2 {
 
     int NewFitterGSL::calcCovMatrix(gsl_matrix* MatW,
                                     gsl_permutation* permw,
-                                    gsl_vector* vecx)
+                                    const gsl_vector* vecx)
     {
       // Set up equation system M*dadeta + dydeta = 0
       // here, dadeta is d a / d eta, i.e. the derivatives of the fitted
@@ -1727,6 +1727,8 @@ namespace Belle2 {
 
       result = 1;
       int iSVD = solveSystemSVD(vecdxscal, vecyscal, MatMscal, MatW, MatW2, vecw, epsSV);
+      // solveSystemSVD() can also return non-zero; cppcheck only follows one path
+      // cppcheck-suppress knownConditionTrueFalse
       if (iSVD == 0) return result;
 
       return -1;

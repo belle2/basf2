@@ -66,7 +66,7 @@ SensorInfo::getDriftVelocity(const ROOT::Math::XYZVector& E,
   return v;
 }
 
-int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
+int SensorInfo::getPixelKind(const VxdID sensorID, double v)
 {
   const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   int i_pixelKind = Info.getVPitchID(v);
@@ -75,7 +75,7 @@ int SensorInfo::getPixelKind(const VxdID sensorID, double v) const
   return i_pixelKind;
 }
 
-int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID) const
+int SensorInfo::getPixelKindNew(const VxdID& sensorID, int vID)
 {
   const SensorInfo& Info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   double v = Info.getVCellPosition(vID);
@@ -151,10 +151,10 @@ int SensorInfo::getTrappedID(double x, double y) const
 {
   double huCells = 0.5 * m_uCells;
   double ix = floor(x * m_iup + huCells);
-  int jx = ix;
   double x0 = (ix + 0.5 - huCells) * m_up;
 
   if (fabs(x - x0) < m_hxIG) {
+    int jx = ix;
     if ((unsigned)jx >= (unsigned)m_uCells) return -1;
     double ys = y - m_vsplit;
     if (ys >= 0) {

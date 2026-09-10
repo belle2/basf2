@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    virtual ~ECLChargedPIDDataAnalysisValidationModule();
+    virtual ~ECLChargedPIDDataAnalysisValidationModule() override;
 
     /**
      * Initializes the module.
@@ -49,19 +49,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called once before a new run begins.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Called once for each event.
      */
     virtual void event() override;
-
-    /**
-     * Called once when a run ends.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -274,8 +264,9 @@ namespace Belle2 {
     /**
      * Dump PID vars.
      */
-    void dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo, const int sigCharge, const Const::ChargedStable& bkgHypo,
-                     bool mergeSigCharge = false);
+    static void dumpPIDVars(TTree* sampleTree, const Const::ChargedStable& sigHypo, const int sigCharge,
+                            const Const::ChargedStable& bkgHypo,
+                            bool mergeSigCharge = false);
 
     /**
      * Dump PID efficiency / fake rate vs clusterTheta, clusterPhi, p... for a fixed cut on PID as previously initialised.
@@ -306,7 +297,7 @@ namespace Belle2 {
     /**
      * Check if the input pdgId is that of a valid charged stable particle.
      */
-    inline bool isValidChargedPdg(const int pdg) const
+    static bool isValidChargedPdg(const int pdg)
     {
       return (Const::chargedStableSet.find(pdg) != Const::invalidParticle);
     }
@@ -314,7 +305,7 @@ namespace Belle2 {
     /**
      * Draw u/oflow content on top of first/last visible bin.
      */
-    void paintUnderOverflow(TH1F* h);
+    static void paintUnderOverflow(TH1F* h);
 
   };
 }

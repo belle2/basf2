@@ -13,19 +13,6 @@
 namespace Belle2 {
   namespace TOP {
 
-    void FastRaytracer::clear() const
-    {
-      m_photonStates.clear();
-      m_extraStates.clear();
-      m_status = false;
-      m_Nxm = 0;
-      m_Nxb = 0;
-      m_Nxe = 0;
-      m_Nym = 0;
-      m_Nyb = 0;
-      m_Nye = 0;
-    }
-
     void FastRaytracer::propagate(const PhotonState& photon, bool averaging) const
     {
       clear();

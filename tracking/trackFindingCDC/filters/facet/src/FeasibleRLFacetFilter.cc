@@ -47,7 +47,17 @@ Weight FeasibleRLFacetFilter::operator()(const CDCFacet& facet)
 
 bool FeasibleRLFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple) const
 {
-  const CDCRLWireHitTriple::Shape shape = rlWireHitTriple.getShape();
+  return isFeasible(rlWireHitTriple.getShape(),
+                    rlWireHitTriple.getStartRLInfo(),
+                    rlWireHitTriple.getMiddleRLInfo(),
+                    rlWireHitTriple.getEndRLInfo());
+}
+
+bool FeasibleRLFacetFilter::isFeasible(const CDCRLWireHitTriple::Shape& shape,
+                                       const ERightLeft startRLInfo,
+                                       const ERightLeft middleRLInfo,
+                                       const ERightLeft endRLInfo) const
+{
   const short oClockDelta = shape.getOClockDelta();
   const short absOClockDelta = std::abs(oClockDelta);
   const short cellExtend = shape.getCellExtend();
@@ -56,10 +66,6 @@ bool FeasibleRLFacetFilter::isFeasible(const CDCRLWireHitTriple& rlWireHitTriple
     // funny formula, but basically checks the triple to be a progressing forward and not turning back in itself.
     return false;
   }
-
-  const ERightLeft startRLInfo = rlWireHitTriple.getStartRLInfo();
-  const ERightLeft middleRLInfo = rlWireHitTriple.getMiddleRLInfo();
-  const ERightLeft endRLInfo = rlWireHitTriple.getEndRLInfo();
 
   const short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
   const bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;

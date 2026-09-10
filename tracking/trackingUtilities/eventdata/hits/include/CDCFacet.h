@@ -46,6 +46,7 @@ namespace Belle2 {
       void reverse() override;
 
       /// Constructs the reverse triple from this one.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
       CDCFacet reversed() const;
 
       /// Adjusts the contained fit line to touch such that it touches the first and third hit.

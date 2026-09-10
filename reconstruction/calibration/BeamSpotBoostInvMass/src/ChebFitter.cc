@@ -122,33 +122,8 @@ namespace Belle2 {
   }
 
 
-// get data transformed into the grid such that (chebFunVals dot m_dataGrid) == logL
-  std::pair<VectorXd, MatrixXd> ChebFitter::getDataGridWithCov() const
-  {
-    double a = m_nodes[0];
-    double b = m_nodes[m_nodes.size() - 1];
-
-    MatrixXd polSum2 = MatrixXd::Zero(m_nodes.size(), m_nodes.size());
-    VectorXd polSum  = VectorXd::Zero(m_nodes.size());
-    for (double x : m_data) {
-      double xx = (x - a) / (b - a); //normalize between 0 and 1
-      VectorXd pol = getPols(m_nodes.size(), xx);
-      polSum  += pol;
-      polSum2 += pol * pol.transpose();
-    }
-
-
-    //transform to the basis of the cheb nodes
-    MatrixXd coefs = getCoefsCheb(polSum.size()).transpose();
-    VectorXd gridVals = coefs * polSum;
-    MatrixXd gridValsCov = coefs * polSum2 * coefs.transpose();
-
-    return std::make_pair(gridVals, gridValsCov);
-  }
-
-
 //Minimize using ROOT minimizer
-  std::pair<Pars, MatrixXd> ChebFitter::fitData(Pars pars, Limits limits, bool UseCheb)
+  std::pair<Pars, MatrixXd> ChebFitter::fitData(const Pars& pars, Limits limits, bool UseCheb)
   {
     m_useCheb = UseCheb;
 
@@ -216,16 +191,6 @@ namespace Belle2 {
     delete minimum;
 
     return std::make_pair(parsF, covMat);
-  }
-
-
-  double ChebFitter::getFunctionFast(const Pars& pars, double x)
-  {
-    static VectorXd funVals = getLogFunction(pars);
-
-
-    return  exp(-0.5 * interpol(m_nodes, funVals, x));
-
   }
 
 }

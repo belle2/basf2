@@ -132,9 +132,12 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
-    ("13160200", "tdcpv", "TDCPV_ccs"),
-    ("13160300", "tdcpv", "TDCPV_qqs"),
-    ("13160400", "tdcpv", "TDCPV_klong"),
+    # ("13160200", "tdcpv", "TDCPV_ccs_invalid"),  # deprecated
+    ("13160201", "tdcpv", "TDCPV_ccs"),
+    # ("13160300", "tdcpv", "TDCPV_qqs_invalid"),  # deprecated
+    ("13160301", "tdcpv", "TDCPV_qqs"),
+    # ("13160400", "tdcpv", "TDCPV_klong_invalid"),  # deprecated
+    ("13160401", "tdcpv", "TDCPV_klong"),
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),

@@ -12,7 +12,6 @@
 
 #include <tracking/trackingUtilities/utilities/WeightedRelation.h>
 
-#include <cassert>
 #include <cmath>
 #include <vector>
 
@@ -78,8 +77,6 @@ namespace Belle2 {
                                             const std::vector<WeightedRelation<ACellHolder>>& cellHolderRelations,
                                             Weight minStateToFollow = -INFINITY)
       {
-        assert(std::is_sorted(cellHolderRelations.begin(), cellHolderRelations.end()));
-
         Path<ACellHolder> path;
         if (not startCellHolder) return path;
         const AutomatonCell& startCell = startCellHolder->getAutomatonCell();

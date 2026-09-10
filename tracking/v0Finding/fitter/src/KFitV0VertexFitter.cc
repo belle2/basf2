@@ -89,25 +89,6 @@ namespace {
     return cov7;
   }
 
-  TMatrixDSym extractCov6x6(const CLHEP::HepSymMatrix& cov7)
-  {
-    // ordering of the cov7 returned by KFit:
-    // (px,py,pz,E,x,y,z)
-    // ordering expected by GFRaveTrackParameters:
-    // (x,y,z,px,py,pz)
-    // so we need to drop E and reindex: cov6 0,1,2 (x,y,z)    <- KFit 4,5,6
-    //                                   cov6 3,4,5 (px,py,pz) <- KFit 0,1,2
-    constexpr int toCov7[6] = {4, 5, 6, 0, 1, 2};
-
-    TMatrixDSym cov6(6);
-    for (int i = 0; i < 6; ++i) {
-      for (int j = 0; j < 6; ++j) {
-        cov6(i, j) = cov7[toCov7[i]][toCov7[j]];
-      }
-    }
-    return cov6;
-  }
-
   double getMagneticField()
   {
     const double bZ = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
@@ -168,21 +149,36 @@ bool KFitV0VertexFitter::fit(genfit::Track& trackPlus, genfit::Track& trackMinus
 
   const HepGeom::Point3D<double> posVertex = vertexFit.getVertex();
   const CLHEP::HepSymMatrix covVertex = vertexFit.getVertexError();
+  const TVector3 extrapolationTarget(posVertex.x(), posVertex.y(), posVertex.z());
+
   std::vector<genfit::GFRaveTrackParameters*> trackParamsVertex;
-  trackParamsVertex.reserve(vertexFit.getTrackCount());
-  for (int i = 0; i < vertexFit.getTrackCount(); ++i) {
-    const CLHEP::HepLorentzVector mom = vertexFit.getTrackMomentum(i);
-    const HepPoint3D pos = vertexFit.getTrackPosition(i);
+  trackParamsVertex.reserve(2);
+  for (int i = 0; i <= 1; ++i) {
+    const genfit::Track& daughter = i == 0 ? trackPlus : trackMinus;
+    // KFit gives back the daughter parameters at the reference point of the track:
+    // the momentum there points elsewhere than at the vertex. Transport the daughter
+    // to the vertex position with genfit instead.
+    TVector3 pos;
+    TVector3 mom;
+    TMatrixDSym cov6;
+    try {
+      genfit::MeasuredStateOnPlane daughterState = daughter.getFittedState();
+      daughterState.extrapolateToPoint(extrapolationTarget);
+      daughterState.getPosMomCov(pos, mom, cov6);
+    } catch (...) {
+      B2ERROR("Exception while extrapolating a daughter to the fitted vertex.");
+      for (auto* trackParams : trackParamsVertex) delete trackParams;
+      return false;
+    }
     TVectorD state{6};
-    state[0] = pos.x();
-    state[1] = pos.y();
-    state[2] = pos.z();
-    state[3] = mom.x();
-    state[4] = mom.y();
-    state[5] = mom.z();
-    const TMatrixDSym cov6 = extractCov6x6(vertexFit.getTrackError(i));
-    genfit::GFRaveTrackParameters* trackparams = new genfit::GFRaveTrackParameters(nullptr, nullptr, 1, state, cov6, true);
-    trackParamsVertex.push_back(trackparams);
+    state[0] = pos.X();
+    state[1] = pos.Y();
+    state[2] = pos.Z();
+    state[3] = mom.X();
+    state[4] = mom.Y();
+    state[5] = mom.Z();
+    genfit::GFRaveTrackParameters* trackParams = new genfit::GFRaveTrackParameters(nullptr, nullptr, 1, state, cov6, true);
+    trackParamsVertex.push_back(trackParams);
   }
   const double ndfVertex = static_cast<double>(vertexFit.getNDF());
   const double chisqVertex = vertexFit.getCHIsq();

@@ -22,6 +22,10 @@
 
 // Current default globaltag when generating events.
 #define CURRENT_DEFAULT_TAG "prerelease-11-00-00b"
+// Current upgrade default globaltag, prepended before CURRENT_DEFAULT_TAG so it takes precedence.
+// Can be pinned to a different tag, or disabled entirely, by setting the
+// BELLE2_UPGRADE_GLOBALTAG environment variable (empty or "NONE" disables it).
+#define CURRENT_UPGRADE_DEFAULT_TAG "upgrade_2026-09-07"
 
 namespace py = boost::python;
 
@@ -42,6 +46,22 @@ namespace {
     });
     // done, return
     return result;
+  }
+
+  /** Build the fallback string used for the default globaltag list: the
+   * upgrade globaltag (if any) followed by the base default globaltag.
+   *
+   * The upgrade globaltag defaults to CURRENT_UPGRADE_DEFAULT_TAG but can be
+   * pinned to a different tag, or disabled entirely, independently of
+   * BELLE2_CONDB_GLOBALTAG by setting the BELLE2_UPGRADE_GLOBALTAG
+   * environment variable. Setting it to an empty string or "NONE" disables
+   * the upgrade globaltag.
+   */
+  std::string getDefaultTagListFallback()
+  {
+    const std::string upgradeTag = Belle2::EnvironmentVariables::get("BELLE2_UPGRADE_GLOBALTAG", CURRENT_UPGRADE_DEFAULT_TAG);
+    if (upgradeTag.empty() or upgradeTag == "NONE") return CURRENT_DEFAULT_TAG;
+    return upgradeTag + " " CURRENT_DEFAULT_TAG;
   }
 }
 
@@ -124,14 +144,14 @@ namespace Belle2::Conditions {
   {
     // currently the default globaltag can be overwritten by environment variable
     // so keep that
-    return EnvironmentVariables::getOrCreateList("BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
+    return EnvironmentVariables::getOrCreateList("BELLE2_CONDB_GLOBALTAG", getDefaultTagListFallback());
   }
 
   py::tuple Configuration::getDefaultGlobalTagsPy() const
   {
     // same as above but as a python tuple ...
     py::list list;
-    fillFromEnv(list, "BELLE2_CONDB_GLOBALTAG", CURRENT_DEFAULT_TAG);
+    fillFromEnv(list, "BELLE2_CONDB_GLOBALTAG", getDefaultTagListFallback());
     return py::tuple(list);
   }
 

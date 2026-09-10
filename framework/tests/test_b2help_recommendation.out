@@ -145,4 +145,4 @@ Recommendation
 +-------+----+-----------+--------+
 [INFO] Convert the localfile to a payload
 [INFO] Conditions Database: found working metadata provider
-[INFO] Conditions data: configured globaltag is ${default_globaltag}
+[INFO] Conditions data: configured globaltags (highest priority first) are ${default_globaltag}

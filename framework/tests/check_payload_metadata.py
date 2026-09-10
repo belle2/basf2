@@ -42,7 +42,7 @@ class CheckPayloadMetadata(b2.Module):
             assert (os.path.basename(self.beam_parameters.getFilename()).index(self.md5_revision) != -1)
             assert (self.beam_parameters.getIoV() == B2.IntervalOfValidity(0, 1, 2, 3))
         else:
-            assert (self.beam_parameters.getGlobaltag() == b2.conditions.default_globaltags[0])
+            assert (self.beam_parameters.getGlobaltag() in b2.conditions.default_globaltags)
             assert (self.beam_parameters.getRevision() > 0)
             if os.path.isdir('/cvmfs'):
                 assert (self.beam_parameters.getFilename().startswith('/cvmfs'))

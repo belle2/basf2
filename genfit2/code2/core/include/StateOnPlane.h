@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_StateOnPlane_h
-#define genfit_StateOnPlane_h
+#pragma once
 
 #include "SharedPlanePtr.h"
 #include "AbsTrackRep.h"
@@ -191,5 +190,3 @@ inline void StateOnPlane::swap(StateOnPlane& other) {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_StateOnPlane_h

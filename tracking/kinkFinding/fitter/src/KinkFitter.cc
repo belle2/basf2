@@ -112,10 +112,10 @@ bool KinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, gen
 }
 
 /// Build TrackFitResult of Kink Track.
-TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
+TrackFitResult* KinkFitter::buildTrackFitResult(const RecoTrack* recoTrack,
                                                 const genfit::MeasuredStateOnPlane& msop,
                                                 const double Bz,
-                                                const Const::ParticleType trackHypothesis)
+                                                const Const::ParticleType& trackHypothesis)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
   const uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
@@ -133,7 +133,7 @@ TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
 
 /// Find hit position closest to the vertex.
 int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
-                                               ROOT::Math::XYZVector& vertexPos,
+                                               const ROOT::Math::XYZVector& vertexPos,
                                                int direction)
 {
 
@@ -161,7 +161,7 @@ int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
     else
       riHit = static_cast<int>(cdcHits.size()) - 1 - cdcHitIndex;
 
-    auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[riHit]);
+    const auto* recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[riHit]);
     if (!recoHitInfo->useInFit()) continue;
     try {
       const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(
@@ -190,7 +190,7 @@ int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
 }
 
 /// Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
-RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
+RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(const RecoTrack* motherRecoTrack, const RecoTrack* daughterRecoTrack,
                                                        const bool motherFlag, const int delta)
 {
 
@@ -204,7 +204,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
   int sortingParameterOffset = 0;
 
   // pointer to a track to be copied
-  RecoTrack* recoTrackToCopy = nullptr;
+  const RecoTrack* recoTrackToCopy = nullptr;
   if (motherFlag) {
     recoTrackToCopy = motherRecoTrack;
   } else {
@@ -228,21 +228,21 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
 
     // copy PXD hits (we have checked in KinkFinderModule that there are no PXD hits on the other side of the track)
     for (const auto* pxdHit : recoTrackToCopy->getPXDHitList()) {
-      auto recoHitInfo = recoTrackToCopy->getRecoHitInformation(pxdHit);
+      const auto* recoHitInfo = recoTrackToCopy->getRecoHitInformation(pxdHit);
       recoTrack->addPXDHit(pxdHit, recoHitInfo->getSortingParameter(),
                            recoHitInfo->getFoundByTrackFinder());
     }
 
     // copy SVD hits (we have checked in KinkFinderModule that there are no SVD hits on the other side of the track)
     for (const auto* svdHit : recoTrackToCopy->getSVDHitList()) {
-      auto recoHitInfo = recoTrackToCopy->getRecoHitInformation(svdHit);
+      const auto* recoHitInfo = recoTrackToCopy->getRecoHitInformation(svdHit);
       recoTrack->addSVDHit(svdHit, recoHitInfo->getSortingParameter(),
                            recoHitInfo->getFoundByTrackFinder());
     }
 
     // copy CDC hits with respect to reassignment
     for (size_t motherCDCHitIndex = 0; motherCDCHitIndex < motherCDCHit.size() + deltaMother; ++motherCDCHitIndex) {
-      auto recoHitInfo = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHitIndex]);
+      const auto* recoHitInfo = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHitIndex]);
       recoTrack->addCDCHit(motherCDCHit[motherCDCHitIndex],
                            recoHitInfo->getSortingParameter(),
                            recoHitInfo->getRightLeftInformation(),
@@ -251,7 +251,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
     }
     sortingParameterOffset = recoTrack->getNumberOfTotalHits();
     for (size_t daughterCDCHitIndex = 0; daughterCDCHitIndex < static_cast<unsigned int>(deltaDaughter); ++daughterCDCHitIndex) {
-      auto recoHitInfo = daughterRecoTrack->getRecoHitInformation(daughterCDCHit[daughterCDCHitIndex]);
+      const auto* recoHitInfo = daughterRecoTrack->getRecoHitInformation(daughterCDCHit[daughterCDCHitIndex]);
       recoTrack->addCDCHit(daughterCDCHit[daughterCDCHitIndex],
                            recoHitInfo->getSortingParameter() + sortingParameterOffset,
                            recoHitInfo->getRightLeftInformation(),
@@ -271,7 +271,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
                                                    deltaMother])->getSortingParameter();
     // copy CDC hits with respect to reassignment
     for (size_t motherCDCHitIndex = motherCDCHit.size() + deltaMother; motherCDCHitIndex < motherCDCHit.size(); ++motherCDCHitIndex) {
-      auto recoHitInfo = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHitIndex]);
+      const auto* recoHitInfo = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHitIndex]);
       recoTrack->addCDCHit(motherCDCHit[motherCDCHitIndex],
                            recoHitInfo->getSortingParameter() - sortingParameterOffset,
                            recoHitInfo->getRightLeftInformation(),
@@ -280,7 +280,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
     }
     sortingParameterOffset = -deltaMother - deltaDaughter;
     for (size_t daughterCDCHitIndex = deltaDaughter; daughterCDCHitIndex < daughterCDCHit.size(); ++daughterCDCHitIndex) {
-      auto recoHitInfo = daughterRecoTrack->getRecoHitInformation(daughterCDCHit[daughterCDCHitIndex]);
+      const auto* recoHitInfo = daughterRecoTrack->getRecoHitInformation(daughterCDCHit[daughterCDCHitIndex]);
       recoTrack->addCDCHit(daughterCDCHit[daughterCDCHitIndex],
                            recoHitInfo->getSortingParameter() + sortingParameterOffset,
                            recoHitInfo->getRightLeftInformation(),
@@ -290,14 +290,14 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
 
     // copy BKLM hits
     for (const auto* bklmHit : recoTrackToCopy->getBKLMHitList()) {
-      auto recoHitInfo = recoTrackToCopy->getRecoHitInformation(bklmHit);
+      const auto* recoHitInfo = recoTrackToCopy->getRecoHitInformation(bklmHit);
       recoTrack->addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
                             recoHitInfo->getFoundByTrackFinder());
     }
 
     // copy EKLM hits
     for (const auto* eklmHit : recoTrackToCopy->getEKLMHitList()) {
-      auto recoHitInfo = recoTrackToCopy->getRecoHitInformation(eklmHit);
+      const auto* recoHitInfo = recoTrackToCopy->getRecoHitInformation(eklmHit);
       recoTrack->addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
                             recoHitInfo->getFoundByTrackFinder());
     }
@@ -468,8 +468,8 @@ bool KinkFitter::isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, 
 /// combine daughter and mother tracks and fit the result to check for clones
 unsigned int KinkFitter::combineTracksAndFit(const Track* trackMother, const Track* trackDaughter)
 {
-  RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
-  RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
+  const RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
+  const RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
 
   // create a combined track by reassigning all daughter track hits to mother track
   RecoTrack* recoTrackCombinedRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
@@ -550,14 +550,14 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
   if (motherFlag) {
     // copy PXD hits (we have checked in KinkFinderModule that there no PXD hits on the other side of the track)
     for (const auto* pxdHit : splitRecoTrack->getPXDHitList()) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(pxdHit);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(pxdHit);
       recoTrack->addPXDHit(pxdHit, recoHitInfo->getSortingParameter(),
                            recoHitInfo->getFoundByTrackFinder());
     }
 
     // copy SVD hits (we have checked in KinkFinderModule that there no SVD hits on the other side of the track)
     for (const auto* svdHit : splitRecoTrack->getSVDHitList()) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(svdHit);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(svdHit);
       recoTrack->addSVDHit(svdHit, recoHitInfo->getSortingParameter(),
                            recoHitInfo->getFoundByTrackFinder());
     }
@@ -565,7 +565,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
 
     // copy CDC hits with respect to reassignment
     for (size_t splitCDCHitIndex = 0; splitCDCHitIndex < splitCDCHit.size() - delta; ++splitCDCHitIndex) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
       recoTrack->addCDCHit(splitCDCHit[splitCDCHitIndex],
                            recoHitInfo->getSortingParameter(),
                            recoHitInfo->getRightLeftInformation(),
@@ -581,7 +581,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
     int sortingParameterOffset = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHit.size()
                                  - delta])->getSortingParameter();
     for (size_t splitCDCHitIndex = splitCDCHit.size() - delta; splitCDCHitIndex < splitCDCHit.size(); ++splitCDCHitIndex) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
       recoTrack->addCDCHit(splitCDCHit[splitCDCHitIndex],
                            splitCDCHitIndex - sortingParameterOffset,
                            recoHitInfo->getRightLeftInformation(),
@@ -591,14 +591,14 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
 
     // copy BKLM hits
     for (const auto* bklmHit : splitRecoTrack->getBKLMHitList()) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(bklmHit);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(bklmHit);
       recoTrack->addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() - sortingParameterOffset,
                             recoHitInfo->getFoundByTrackFinder());
     }
 
     // copy EKLM hits
     for (const auto* eklmHit : splitRecoTrack->getEKLMHitList()) {
-      auto recoHitInfo = splitRecoTrack->getRecoHitInformation(eklmHit);
+      const auto* recoHitInfo = splitRecoTrack->getRecoHitInformation(eklmHit);
       recoTrack->addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() - sortingParameterOffset,
                             recoHitInfo->getFoundByTrackFinder());
     }
@@ -996,8 +996,8 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     ROOT::Math::XYZVector vertexPosTmp(vertexPos);
     RecoTrack* recoTrackMotherRefit = nullptr;
     RecoTrack* recoTrackDaughterRefit = nullptr;
-    RecoTrack* recoTrackMotherBuffer = recoTrackMother;
-    RecoTrack* recoTrackDaughterBuffer = recoTrackDaughter;
+    const RecoTrack* recoTrackMotherBuffer = recoTrackMother;
+    const RecoTrack* recoTrackDaughterBuffer = recoTrackDaughter;
 
     // The number of tries is limited to 3
     while (reassignHitStatus != 0 && countReassignTries < 3) {
@@ -1277,14 +1277,14 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 /// Fit kink vertex using RecoTracks as inputs.
 /// Calculates distance at the fitted vertex.
 /// Checks if the reassignment of the hits is required.
-bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
+bool KinkFitter::vertexFitWithRecoTracks(const RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                          unsigned int& reassignHitStatus,
                                          ROOT::Math::XYZVector& vertexPos, double& distance,
                                          ROOT::Math::XYZVector vertexPosSeed)
 {
 
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
-  genfit::AbsTrackRep* motherRepresentation = recoTrackMother->getCardinalRepresentation();
+  const genfit::AbsTrackRep* motherRepresentation = recoTrackMother->getCardinalRepresentation();
   if ((motherRepresentation == nullptr) || !(recoTrackMother->wasFitSuccessful(motherRepresentation))) {
     B2ERROR("Cardinal representation is not available for track. Should never happen, but I can continue safely anyway.");
     return false;
@@ -1294,7 +1294,7 @@ bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   const double motherCharge = recoTrackMother->getTrackFitStatus()->getCharge();
 
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
-  genfit::AbsTrackRep* daughterRepresentation = recoTrackDaughter->getCardinalRepresentation();
+  const genfit::AbsTrackRep* daughterRepresentation = recoTrackDaughter->getCardinalRepresentation();
   if ((daughterRepresentation == nullptr) || !(recoTrackDaughter->wasFitSuccessful(daughterRepresentation))) {
     B2ERROR("Cardinal representation is not available for track. Should never happen, but I can continue safely anyway.");
     return false;
@@ -1409,7 +1409,8 @@ bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
 }
 
 /// Prepare the error matrix for the kFit
-void KinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+void KinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, const TMatrixDSym& covMatrix6,
+                                  // cppcheck-suppress constParameterReference ; errMatrix7 is the output matrix filled below
                                   TMatrixDSym& errMatrix7)
 {
 

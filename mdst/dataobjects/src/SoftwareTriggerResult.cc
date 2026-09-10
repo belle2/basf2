@@ -8,6 +8,7 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <boost/algorithm/string/replace.hpp>
 
+#include <sstream>
 #include <TROOT.h>
 #include <TColor.h>
 
@@ -41,7 +42,6 @@ SoftwareTriggerCutResult SoftwareTriggerResult::getNonPrescaledResult(const std:
 std::map<std::string, int> SoftwareTriggerResult::getResults() const
 {
   std::map<std::string, int> result;
-  // cppcheck-suppress unassignedVariable ; cppcheck doesn't understand the assignment in the range-based for loop
   for (const auto& [key, valuePair] : m_results) {
     result[key] = valuePair.first;
   }
@@ -51,7 +51,6 @@ std::map<std::string, int> SoftwareTriggerResult::getResults() const
 std::map<std::string, int> SoftwareTriggerResult::getNonPrescaledResults() const
 {
   std::map<std::string, int> result;
-  // cppcheck-suppress unassignedVariable ; cppcheck doesn't understand the assignment in the range-based for loop
   for (const auto& [key, valuePair] : m_results) {
     result[key] = valuePair.second;
   }

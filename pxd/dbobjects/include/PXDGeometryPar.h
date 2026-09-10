@@ -25,7 +25,7 @@ namespace Belle2 {
     //! Copy constructor
     PXDGeometryPar(PXDGeometryPar& geo) : VXDGeometryPar(geo)
     {
-      for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
+      for (const PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
         m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
       }
       m_endflanges = geo.getEndflanges();
@@ -50,7 +50,7 @@ namespace Belle2 {
     PXDGeometryPar& operator=(PXDGeometryPar& geo)
     {
       VXDGeometryPar::operator=(geo);
-      for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
+      for (const PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
         m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
       }
       m_endflanges = geo.getEndflanges();

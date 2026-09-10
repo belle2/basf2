@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_StepLimits_h
-#define genfit_StepLimits_h
+#pragma once
 
 #include <array>
 #include <cmath>
@@ -115,5 +114,3 @@ class StepLimits {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_StepLimits_h

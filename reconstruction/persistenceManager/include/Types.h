@@ -33,7 +33,7 @@ namespace Belle2::VariablePersistenceManager {
      * @brief Constructs a new Variable.
      * @param variableName The name of the variable.
      */
-    Variable(const std::string& variableName) : name{variableName} {}
+    explicit Variable(const std::string& variableName) : name{variableName} {}
 
     /**
      * @brief Retrieves the name of the variable.

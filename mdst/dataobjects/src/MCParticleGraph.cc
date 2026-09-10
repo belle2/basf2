@@ -129,6 +129,8 @@ public:
   {
     //References to the daughter information of the mother for easier access
     int& d1 = mother.m_firstDaughter;
+    // writes through this reference modify mother.m_lastDaughter, which cppcheck does not track
+    // cppcheck-suppress unreadVariable
     int& d2 = mother.m_lastDaughter;
 
     typename boost::graph_traits<Graph>::out_edge_iterator j, j_end;

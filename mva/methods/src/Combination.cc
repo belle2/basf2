@@ -86,12 +86,12 @@ namespace Belle2 {
         sub_weightfile.getOptions(general_options);
 
         AbstractInterface::initSupportedInterfaces();
-        auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+        const auto& supported_interfaces = AbstractInterface::getSupportedInterfaces();
         if (supported_interfaces.find(general_options.m_method) == supported_interfaces.end()) {
           B2ERROR("Couldn't find method named " + general_options.m_method);
           throw std::runtime_error("Couldn't find method named " + general_options.m_method);
         }
-        auto expert = supported_interfaces[general_options.m_method]->getExpert();
+        auto expert = supported_interfaces.at(general_options.m_method)->getExpert();
         expert->load(sub_weightfile);
         m_experts.emplace_back(std::move(expert));
         m_expert_variables.push_back(general_options.m_variables);

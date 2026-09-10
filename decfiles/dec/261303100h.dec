@@ -1,0 +1,32 @@
+# EventType: 261303100h
+# Descriptor: [ccbar Dstarp2D0Pip D02KstarbarGamma]
+# NickName: DstpToD0Pip_D02KstarbarGamma
+# PhysicsWG: Charm
+# Responsible: Rishav  Kumar Jaiswal
+# Date: 20260806 (YYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias Myanti-D0 anti-D0
+Alias MyK''*0 K''*0
+
+Decay D*-
+1.000 Myanti-D0 pi-        VSS;
+Enddecay
+
+Decay Myanti-D0
+1.000 MyK''*0  gamma       SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+
+Decay MyK''*0
+1.000 K+ pi- VSS;
+Enddecay
+
+End
+

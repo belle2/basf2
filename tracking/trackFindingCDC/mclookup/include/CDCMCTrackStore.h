@@ -103,10 +103,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the MC map of the current event
-      const CDCMCMap* m_ptrMCMap;
+      const CDCMCMap* m_ptrMCMap {};
 
       /// Reference to the CDCSimHit look up for additional information about related primary sim hits
-      const CDCSimHitLookUp* m_ptrSimHitLookUp;
+      const CDCSimHitLookUp* m_ptrSimHitLookUp {};
 
       /// The memory for the tracks made of CDCHits sorted for the time of flight and associated to the Monte Carlo particle id
       std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;

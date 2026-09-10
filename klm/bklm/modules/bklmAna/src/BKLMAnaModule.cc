@@ -150,10 +150,6 @@ void BKLMAnaModule::initialize()
 
 }
 
-void BKLMAnaModule::beginRun()
-{
-}
-
 void BKLMAnaModule::event()
 {
   StoreObjPtr<EventMetaData> eventMetaData("EventMetaData", DataStore::c_Event);
@@ -174,7 +170,7 @@ void BKLMAnaModule::event()
   //all ExtHit in bklm scope in each event, should not be many
   int nExtHit = 0;
   for (int t = 0; t < extHits.getEntries(); t++) {
-    ExtHit* exthit =  extHits[t];
+    const ExtHit* exthit =  extHits[t];
     if (exthit->getDetectorID() != Const::EDetector::BKLM)
       continue;
     m_extx[nExtHit] = exthit->getPosition().X();
@@ -200,10 +196,9 @@ void BKLMAnaModule::event()
     double trktheta = p3.Theta() * TMath::RadToDeg();
     if (trkphi < 0)
       trkphi =  trkphi + 360.0;
-    RelationVector<KLMHit2d> relatedHit2D = track->getRelationsTo<KLMHit2d>();
     RelationVector<ExtHit> relatedExtHit = track->getRelationsTo<ExtHit>();
     for (unsigned int t = 0; t < relatedExtHit.size(); t++) {
-      ExtHit* exthit =  relatedExtHit[t];
+      const ExtHit* exthit =  relatedExtHit[t];
       if (exthit->getDetectorID() != Const::EDetector::BKLM)
         continue;
       int module = exthit->getCopyID();
@@ -211,7 +206,7 @@ void BKLMAnaModule::event()
       int sector = BKLMElementNumbers::getSectorByModule(module);
       int layer = BKLMElementNumbers::getLayerByModule(module);
       bool crossed = false; // should be only once ?
-      KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
+      const KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
       if (!muid)
         continue;
       int extPattern = muid->getExtLayerPattern();
@@ -235,7 +230,7 @@ void BKLMAnaModule::event()
       //for (unsigned int mHit = 0; mHit < relatedHit2D.size(); mHit++) {
       // KLMHit2d* hit = relatedHit2D[mHit];
       for (int mHit = 0; mHit < hits2D.getEntries(); mHit++) {
-        KLMHit2d* hit = hits2D[mHit];
+        const KLMHit2d* hit = hits2D[mHit];
         if (hit->getSubdetector() != KLMElementNumbers::c_BKLM)
           continue;
         //if(!hit->inRPC()) continue;
@@ -266,10 +261,6 @@ void BKLMAnaModule::event()
     }//end of loop ext hit
   }//end of loop tracks
   m_extTree->Fill();
-}
-
-void BKLMAnaModule::endRun()
-{
 }
 
 void BKLMAnaModule::terminate()

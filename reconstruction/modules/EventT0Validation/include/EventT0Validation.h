@@ -31,7 +31,7 @@ namespace Belle2 {
     EventT0ValidationModule();
 
     /** Destructor */
-    virtual ~EventT0ValidationModule();
+    virtual ~EventT0ValidationModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;
@@ -54,7 +54,7 @@ namespace Belle2 {
     std::string m_RootFileName = "EventT0Validation.root";
 
     /// Output ROOT file
-    TFile* m_outputFile;
+    TFile* m_outputFile = nullptr;
 
     /// ECL based EventT0 histograms
     TH1F* m_histECLEventT0{nullptr};
@@ -81,8 +81,8 @@ namespace Belle2 {
     TH1D* m_histAlgorithmSourceCountsActive{nullptr};
 
     /// Set additional plot info: contact, description, shifter
-    void setPlotMetaData(TH1* hist, const std::string& description, const std::string& check,
-                         const std::string& contact, const std::string& shifter = "shifter");
+    static void setPlotMetaData(TH1* hist, const std::string& description, const std::string& check,
+                                const std::string& contact, const std::string& shifter = "shifter");
 
     /// For simplicity, just set the contact once
     std::string m_contact = "christian.wessel@desy.de";

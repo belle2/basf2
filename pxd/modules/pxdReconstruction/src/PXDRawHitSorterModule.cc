@@ -100,7 +100,7 @@ void PXDRawHitSorterModule::event()
 
   unsigned int index(0);
   // And just loop over the sensors and create the digits.
-  for (auto& sensor : sensors) {
+  for (const auto& sensor : sensors) {
     const PXD::Pixel* lastpx(0);
     VxdID sensorID = sensor.first;
     for (const PXD::Pixel& px : sensor.second) {

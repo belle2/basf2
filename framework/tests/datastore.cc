@@ -363,12 +363,14 @@ namespace {
       StoreArray<EventMetaData>::iterator it2(it);
       it2 = it;
 
-      //equality/inequality
+      //equality/inequality (the point of the test is to assert these hold)
+      // cppcheck-suppress-begin knownConditionTrueFalse
       EXPECT_TRUE(it == it2);
       EXPECT_FALSE(it != it2);
 
       //test postfix
       EXPECT_TRUE((it++) == it2);
+      // cppcheck-suppress-end knownConditionTrueFalse
       ++it2;
 
       //test prefix
@@ -421,6 +423,8 @@ namespace {
 
     //range-based for
     i = 0;
+    // this deliberately tests the non-const range-based for; the const case is checked below
+    // cppcheck-suppress constVariableReference
     for (EventMetaData& emd : evtDataNonConst) {
       EXPECT_TRUE(&emd == evtData[i]);
       i++;

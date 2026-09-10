@@ -17,8 +17,8 @@
 #include <TFile.h>
 #include <TGraph.h>
 #include <TH2I.h>
-#include"TMatrixDSym.h"
-#include"TDecompChol.h"
+#include <TMatrixDSym.h>
+#include <TDecompChol.h>
 
 using namespace Belle2;
 using namespace ECL;

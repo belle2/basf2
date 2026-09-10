@@ -27,7 +27,12 @@ namespace Belle2 {
       /// Constructor.
       WireEfficiencyAlgorithm();
       /// Destructor.
-      ~WireEfficiencyAlgorithm() { delete m_efficiencyList; delete m_badWireList; }
+      ~WireEfficiencyAlgorithm() override { delete m_efficiencyList; delete m_badWireList; }
+      /** Copy constructor (disabled). */
+      WireEfficiencyAlgorithm(const WireEfficiencyAlgorithm&) = delete;
+
+      /** Operator = (disabled). */
+      WireEfficiencyAlgorithm& operator=(const WireEfficiencyAlgorithm&) = delete;
       /// Set name for histogram output
       void setHistFileName(const std::string& name) {m_outputFileName = "histWireEff_" + name + ".root";}
       /// Set the average occupancy threshold
@@ -42,7 +47,7 @@ namespace Belle2 {
       /// detects bad wires.
       void detectBadWires();
       /// chitest
-      double chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minVale, double maxValue);
+      static double chiTest(TGraphAsymmErrors* graph1, TGraphAsymmErrors* graph2, double minVale, double maxValue);
     private:
       float m_averageOccupancyThreshold = 4000.0; /**< Threshold for the average layer occupancy to run the calibration */
       TList* m_efficiencyList = new TList(); /**< TList of efficiencies */

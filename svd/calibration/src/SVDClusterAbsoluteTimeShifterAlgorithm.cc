@@ -10,7 +10,7 @@
 #include <svd/dbobjects/SVDAbsoluteClusterTimeShift.h>
 
 #include <TF1.h>
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 #include <TCanvas.h>
 #include <TStyle.h>
@@ -120,8 +120,8 @@ CalibrationAlgorithm::EResult SVDClusterAbsoluteTimeShifterAlgorithm::calibrate(
 
 
         TString binLabel = TString::Format("L%iS%c", layer, (side == 0 ? 'U' : 'V'));
-        TH1F* hist = (TH1F*)h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
-                                                           LayerSensorID, "");
+        TH1D* hist = (h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
+                                                     LayerSensorID, ""));
         hist->SetTitle(Form("Cluster Time in L%dS%c", layer, (side == 0 ? 'U' : 'V')));
         hist->SetDirectory(0);
 
@@ -327,8 +327,10 @@ bool SVDClusterAbsoluteTimeShifterAlgorithm::isBoundaryRequired(const Calibratio
   int layer = 3;
   int side = 0;
   int LayerSensorID = 2 * layer - side;
-  auto timeL3V = (TH1F*)h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
-                                                       LayerSensorID, "");
+  // side is fixed to 0 above; the ternary is kept to document the convention
+  // cppcheck-suppress knownConditionTrueFalse
+  auto timeL3V = h_ClustersOnTrack->ProjectionX(Form("hClsTimeOnTracks_L%dS%c", layer, (side == 0 ? 'U' : 'V')), LayerSensorID,
+                                                LayerSensorID, "");
   if (!timeL3V) {
     if (m_previousTimeMeanL3V)
       meanTimeL3V = m_previousTimeMeanL3V.value();

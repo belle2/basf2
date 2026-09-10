@@ -157,7 +157,7 @@ TCanvas*  DQMHistAnalysisEcmsMonObjModule::plotArgusFit(RooDataHist* dataE, RooA
 
 
 // Fit the EcmsBB histogram with Gaus+Argus function
-unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::fitEcmsBB(TH1D* hB0, TH1D* hBp)
+unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::fitEcmsBB(TH1* hB0, TH1* hBp)
 {
   const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
   const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
@@ -271,8 +271,8 @@ void DQMHistAnalysisEcmsMonObjModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisEcmsMonObj: endRun called.");
 
-  auto* hB0 = (TH1D*)findHist("PhysicsObjectsMiraBelleEcmsBB/hB0");
-  auto* hBp = (TH1D*)findHist("PhysicsObjectsMiraBelleEcmsBB/hBp");
+  auto* hB0 = dynamic_cast<TH1*>(findHist("PhysicsObjectsMiraBelleEcmsBB/hB0"));
+  auto* hBp = dynamic_cast<TH1D*>(findHist("PhysicsObjectsMiraBelleEcmsBB/hBp"));
   if (hB0 == nullptr || hBp == nullptr) return;
 
   auto res = fitEcmsBB(hB0, hBp);

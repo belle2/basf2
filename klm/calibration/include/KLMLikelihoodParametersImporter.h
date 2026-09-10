@@ -30,12 +30,12 @@ namespace Belle2 {
     /**
      * Write KLMLikelihoodParameters into the database.
      */
-    void writeLikelihoodParameters();
+    static void writeLikelihoodParameters();
 
     /**
      * Read KLMLikelihoodParameters from the database.
      */
-    void readLikelihoodParameters();
+    static void readLikelihoodParameters();
 
   };
 

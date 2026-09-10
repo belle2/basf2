@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * Get the whole array
      */
-    std::array<float, c_maxNSenseLayers> getParams() const
+    const std::array<float, c_maxNSenseLayers>& getParams() const
     {
       return m_crs;
     }
@@ -98,7 +98,7 @@ namespace Belle2 {
     }
 
   private:
-    std::array<float, c_maxNSenseLayers> m_crs; /**< cr array */
+    std::array<float, c_maxNSenseLayers> m_crs = {}; /**< cr array */
 
     ClassDef(CDCCorrToThresholds, 2); /**< ClassDef */
     // Version history:

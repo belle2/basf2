@@ -36,10 +36,8 @@ KLMStripEfficiencyAlgorithm::Results::Results(const Results& results)
 
 KLMStripEfficiencyAlgorithm::Results::~Results()
 {
-  if (m_Efficiency != nullptr)
-    delete m_Efficiency;
-  if (m_ExtHitsPlane != nullptr)
-    delete m_ExtHitsPlane;
+  delete[] m_Efficiency;
+  delete[] m_ExtHitsPlane;
 }
 
 KLMStripEfficiencyAlgorithm::KLMStripEfficiencyAlgorithm() :
@@ -84,7 +82,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
   bool notEnoughData = false;
   m_Results.m_AchievedPrecision = 0;
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
-  for (KLMChannelIndex& klmPlane : klmPlanes) {
+  for (const KLMChannelIndex& klmPlane : klmPlanes) {
     KLMPlaneNumber plane = klmPlane.getKLMPlaneNumber();
     KLMPlaneNumber planeIndex = m_PlaneArrayIndex->getIndex(plane);
     int extHits = allExtHitsInPlane->GetBinContent(planeIndex + 1);
@@ -115,7 +113,7 @@ CalibrationAlgorithm::EResult KLMStripEfficiencyAlgorithm::calibrate()
       (!notEnoughData || m_ForcedCalibration)) {
     m_StripEfficiency = new KLMStripEfficiency();
     KLMChannelIndex klmChannels;
-    for (KLMChannelIndex& klmChannel : klmChannels) {
+    for (const KLMChannelIndex& klmChannel : klmChannels) {
       int subdetector = klmChannel.getSubdetector();
       int section = klmChannel.getSection();
       int sector = klmChannel.getSector();

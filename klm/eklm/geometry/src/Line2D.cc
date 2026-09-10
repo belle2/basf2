@@ -46,7 +46,7 @@ findIntersection(const Arc2D& arc,
 {
   int i, n;
   double t[2], angles[2];
-  bool condition[2];
+  bool condition[2] = {false, false};
   n = findIntersection(arc, intersections, t, angles);
   for (i = 0; i < n; i++)
     condition[i] = arc.angleWithinRange(angles[i]);
@@ -130,7 +130,7 @@ findIntersection(const Circle2D& circle,
 }
 
 int EKLM::Line2D::selectIntersections(HepGeom::Point3D<double>* intersections,
-                                      bool* condition, int n) const
+                                      const bool* condition, int n)
 {
   int i, j;
   j = 0;

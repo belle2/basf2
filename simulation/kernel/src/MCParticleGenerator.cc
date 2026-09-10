@@ -65,7 +65,7 @@ void MCParticleGenerator::GeneratePrimaryVertex(G4Event* event)
   // will be called recursively for all daughters
   int nPart = mcParticles.getEntries();
   for (int iPart = 0; iPart < nPart; iPart++) {
-    MCParticle* currParticle = mcParticles[iPart];
+    const MCParticle* currParticle = mcParticles[iPart];
     if (currParticle->getMother() != NULL) continue;
 
     //Add primary particle (+ daughters) and the vertex
@@ -225,7 +225,7 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
 
   //Add all children
   int currMotherIndex = m_mcParticleGraph.size();
-  for (MCParticle* daughter : mcParticle.getDaughters()) {
+  for (const MCParticle* daughter : mcParticle.getDaughters()) {
     addParticle(*daughter, event, g4Mother, currMotherIndex, useTime);
   }
 }

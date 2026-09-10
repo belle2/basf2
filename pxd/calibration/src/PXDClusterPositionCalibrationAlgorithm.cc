@@ -158,8 +158,8 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
 }
 
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(PXDClusterShapeClassifierPar*
-    shapeClassifier, PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(const PXDClusterShapeClassifierPar*
+    shapeClassifier, const PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
 {
   // Create a mirrored shape classifier
   auto mirroredShapeClassifier = PXDClusterShapeClassifierPar();
@@ -198,7 +198,7 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
       auto likelyhood = likelyhoodMap[shapeIndex][etaBin];
       mirroredShapeClassifier.addEtaLikelyhood(mirroredIndex, likelyhood);
       // Mirror the offset: v offset shifts and covariance swaps sign
-      double shift = (m_sizeMap[shapeName] - 1) * m_pitchMap[clusterKind];
+      double shift = (m_sizeMap[shapeName] - 1) * static_cast<double>(m_pitchMap[clusterKind]);
       auto mirroredOffset = PXDClusterOffsetPar(offset.getU(), shift - offset.getV(), offset.getUSigma2(), offset.getVSigma2(),
                                                 -offset.getUVCovariance());
       mirroredShapeClassifier.addEtaOffset(mirroredIndex, mirroredOffset);
@@ -209,8 +209,9 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
   return mirroredShapeClassifier;
 }
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(PXDClusterShapeClassifierPar* shapeClassifier,
-    PXDClusterShapeIndexPar* shapeIndexer, PXDClusterShapeIndexPar* globalShapeIndexer)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(const PXDClusterShapeClassifierPar*
+    shapeClassifier,
+    const PXDClusterShapeIndexPar* shapeIndexer, const PXDClusterShapeIndexPar* globalShapeIndexer)
 {
   // Create a shape classifier using global shape indices
   auto globalShapeClassifier = PXDClusterShapeClassifierPar();

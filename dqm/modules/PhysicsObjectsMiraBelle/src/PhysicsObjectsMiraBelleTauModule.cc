@@ -294,22 +294,8 @@ void PhysicsObjectsMiraBelleTauModule::event()
           }
           bin++;
         }
-
       }
-
     }
-
   }
-
-
-
-}
-
-void PhysicsObjectsMiraBelleTauModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleTauModule::terminate()
-{
 }
 

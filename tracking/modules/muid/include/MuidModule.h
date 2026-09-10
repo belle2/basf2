@@ -39,7 +39,7 @@ namespace Belle2 {
     MuidModule();
 
     //! destructor
-    ~MuidModule();
+    ~MuidModule() override;
 
     //! Initialize for muon identification
     void initialize() override;

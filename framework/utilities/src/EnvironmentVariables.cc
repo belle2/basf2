@@ -17,7 +17,7 @@ namespace Belle2 {
 
   bool EnvironmentVariables::isSet(const std::string& name)
   {
-    char* envValue = std::getenv(name.c_str());
+    const char* envValue = std::getenv(name.c_str());
     return envValue != nullptr;
   }
 
@@ -71,6 +71,15 @@ namespace Belle2 {
     // time since there's a perfectly good implementation available.
     namespace py = boost::python;
     py::object path = py::import("os.path");
+    // boost::python::extract<std::string> triggers a false-positive
+    // -Wmaybe-uninitialized in GCC; silence it around the extraction.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     return py::extract<std::string>(path.attr("expandvars")(text));
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
 }

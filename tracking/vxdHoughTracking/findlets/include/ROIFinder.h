@@ -32,7 +32,7 @@ namespace Belle2 {
       ROIFinder();
 
       /// Default destructor
-      ~ROIFinder();
+      ~ROIFinder() override;
 
       /// Expose the parameters of the sub findlets.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

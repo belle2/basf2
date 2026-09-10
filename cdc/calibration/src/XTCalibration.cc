@@ -217,14 +217,14 @@ bool XTCalibration::calibrate()
           TF1* fpol1;
           if (m_useSliceFit) {
             hist2d[l][lr][al][th]->FitSlicesY(0, 0, -1, 5);
-            hist2d_1[l][lr][al][th] = (TH1D*)gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th));
+            hist2d_1[l][lr][al][th] = static_cast<TH1D*>(gDirectory->Get(Form("h%d_%d_%d_%d_1", l, lr, al, th)));
             if (!hist2d_1[l][lr][al][th]) {
               fitflag[l][lr][al][th] = -1;
               B2WARNING("error, not found results of slices fit");
               continue;
             }
             hist2d_1[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
+            fpol1 = static_cast<TF1*>(hprof[l][lr][al][th]->GetFunction("pol1"));
           } else {
             /*Set Error for low statistic bin*/
             for (int n = 0; n < hprof[l][lr][al][th]->GetNbinsX(); ++n) {
@@ -233,7 +233,7 @@ bool XTCalibration::calibrate()
               }
             }
             hprof[l][lr][al][th]->Fit("pol1", "Q", "", 30, 60);
-            fpol1 = (TF1*)hprof[l][lr][al][th]->GetFunction("pol1");
+            fpol1 = static_cast<TF1*>(hprof[l][lr][al][th]->GetFunction("pol1"));
           }
           if (fpol1) {
             //determine tmin in fitting
@@ -279,11 +279,11 @@ bool XTCalibration::calibrate()
           xt->FitXT(m_xtmode);
           /*get result*/
           fitflag[l][lr][al][th] = xt->getFitStatus();
-          xtf5r[l][lr][al][th] = (TF1*)xt->getXTFunction();
+          xtf5r[l][lr][al][th] = static_cast<TF1*>(xt->getXTFunction());
           if (m_useSliceFit) {
-            hist2d_1[l][lr][al][th] = (TH1D*)xt->getFittedHisto();
+            hist2d_1[l][lr][al][th] = static_cast<TH1D*>(xt->getFittedHisto());
           } else {
-            hprof[l][lr][al][th] = (TProfile*)xt->getFittedHisto();
+            hprof[l][lr][al][th] = static_cast<TProfile*>(xt->getFittedHisto());
           }
           delete xt;
         }
@@ -480,7 +480,7 @@ void XTCalibration::readXTFromText()
   short np = 0;
   unsigned short iCL, iLR;
   //  const unsigned short npx = nXTParams - 1;
-  double xtc[npar]; // cppcheck-suppress constVariable
+  double xtc[npar];
   double theta, alpha, dummy1;
   //  unsigned m_xtParamMode_old;
   ifs >> xtmode_old >> np;

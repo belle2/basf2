@@ -38,7 +38,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the underlying value
-      T m_value;
+      T m_value {};
     };
 
   }

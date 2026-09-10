@@ -309,7 +309,7 @@ bool AxialHitQuadTreeProcessor::checkExtremum(QuadTree* node, const CDCWireHit* 
   return crossesRight or crossesLeft;
 }
 
-void AxialHitQuadTreeProcessor::drawHits(std::vector<const CDCWireHit*> hits, unsigned int color) const
+void AxialHitQuadTreeProcessor::drawHits(const std::vector<const CDCWireHit*>& hits, unsigned int color) const
 {
   static int nevent(0);
 

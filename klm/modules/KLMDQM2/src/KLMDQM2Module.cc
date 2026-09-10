@@ -195,14 +195,6 @@ void KLMDQM2Module::event()
   }
 }
 
-void KLMDQM2Module::endRun()
-{
-}
-
-void KLMDQM2Module::terminate()
-{
-}
-
 bool KLMDQM2Module::triggerFlag()
 {
 

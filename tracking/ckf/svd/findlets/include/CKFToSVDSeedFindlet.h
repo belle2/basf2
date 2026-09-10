@@ -49,7 +49,7 @@ namespace Belle2 {
     CKFToSVDSeedFindlet();
 
     /// Default destructor
-    ~CKFToSVDSeedFindlet();
+    ~CKFToSVDSeedFindlet() override;
 
     /// Expose the parameters (also of the sub findlets).
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;

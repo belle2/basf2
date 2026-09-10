@@ -112,7 +112,7 @@ genfit::AbsMeasurement* SVDRecoHit::clone() const
   return new SVDRecoHit(*this);
 }
 
-TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters,
+TVectorD SVDRecoHit::applyPlanarDeformation(TVectorD rawHit, const std::vector<double>& planarParameters,
                                             const genfit::StateOnPlane& state) const
 {
   // Legendre parametrization of deformation

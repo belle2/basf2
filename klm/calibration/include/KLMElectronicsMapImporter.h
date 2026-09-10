@@ -103,7 +103,7 @@ namespace Belle2 {
      * Get EKLM firmware strip number by software strip number.
      * @param[in] stripSoftware Software strip number.
      */
-    int getEKLMStripFirmwareBySoftware(int stripSoftware) const;
+    static int getEKLMStripFirmwareBySoftware(int stripSoftware);
 
     /**
      * Set channels for EKLM segment.

@@ -34,7 +34,7 @@ void plot(const TString &input_filename)
     exit(1);
   }
   
-  TTree *tree = (TTree*)f->Get("tree");
+  TTree *tree = static_cast<TTree*>(f->Get("tree"));
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
@@ -51,8 +51,8 @@ void plot(const TString &input_filename)
   tree->Project("layer_ID(70,-10,60)", "CDCDedxTracks.m_lLayer", "");
   tree->Project("vxd_layer_ID(70,-10,60)", "VXDDedxTracks.dedxLayer", "");
   
-  TH1* hist = (TH1*)output_file->Get("layer_ID");
-  TH1* vxdhist = (TH1*)output_file->Get("vxd_layer_ID");
+  TH1* hist = static_cast<TH1*>(output_file->Get("layer_ID"));
+  TH1* vxdhist = static_cast<TH1*>(output_file->Get("vxd_layer_ID"));
   hist->Add(vxdhist);
   
   hist->SetTitle("layer ID for each dE/dx measurement;Layer # (-ive VXD, +ive CDC); entries");

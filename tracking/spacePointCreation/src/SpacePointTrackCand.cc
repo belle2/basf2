@@ -204,7 +204,7 @@ void SpacePointTrackCand::print(int debuglevel, const Option_t* option) const
 
 // get referee status as std::string
 // COULDDO: this can possibly be done with switch - case, which is probably faster
-std::string SpacePointTrackCand::getRefereeStatusString(std::string delimiter) const
+std::string SpacePointTrackCand::getRefereeStatusString(const std::string& delimiter) const
 {
   std::string statusString;
   if (getRefereeStatus() == 0) return statusString; // return empty std::string if there is no status

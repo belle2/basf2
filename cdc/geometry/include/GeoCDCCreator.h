@@ -42,7 +42,12 @@ namespace Belle2 {
       GeoCDCCreator();
 
       //! The destructor of the GeoCDCCreator class.
-      ~GeoCDCCreator();
+      ~GeoCDCCreator() override;
+      /** Copy constructor (disabled). */
+      GeoCDCCreator(const GeoCDCCreator&) = delete;
+
+      /** Operator = (disabled). */
+      GeoCDCCreator& operator=(const GeoCDCCreator&) = delete;
 
       //! Creates the ROOT Objects for the CDC geometry.
       /*!
@@ -154,7 +159,7 @@ namespace Belle2 {
       /**
        * Create DB object of CDC geometry from gearbox.
        */
-      CDCGeometry createConfiguration(const GearDir& param)
+      static CDCGeometry createConfiguration(const GearDir& param)
       {
         CDCGeometry cdcGeometry;
         cdcGeometry.read(param);

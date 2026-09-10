@@ -199,8 +199,6 @@ std::size_t CDCObservations2D::append(const CDCRecoHit2D& recoHit2D)
   } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
     // Fall back to the pseudo variance if the rl information is not known
     variance = getPseudoDriftLengthVariance(driftLength, variance);
-  } else if (m_fitVariance == EFitVariance::c_Proper) {
-    variance = recoHit2D.getRefDriftLengthVariance();
   }
   return fill(fitPos2D, signedDriftLength, 1 / variance);
 }
@@ -210,7 +208,6 @@ std::size_t CDCObservations2D::append(const CDCRecoHit3D& recoHit3D)
   ROOT::Math::XYVector fitPos2D = recoHit3D.getRecoPos2D();
   double signedDriftLength = 0;
   if (m_fitPos == EFitPos::c_RecoPos) {
-    fitPos2D = recoHit3D.getRecoPos2D();
     signedDriftLength = 0;
   } else if (m_fitPos == EFitPos::c_RLDriftCircle) {
     fitPos2D = recoHit3D.getRecoWirePos2D();
@@ -233,8 +230,6 @@ std::size_t CDCObservations2D::append(const CDCRecoHit3D& recoHit3D)
   } else if (m_fitVariance == EFitVariance::c_Pseudo or abs(rlInfo) != 1) {
     // Fall back to the pseudo variance if the rl information is not known
     variance = getPseudoDriftLengthVariance(driftLength, variance);
-  } else if (m_fitVariance == EFitVariance::c_Proper) {
-    variance = recoHit3D.getRecoDriftLengthVariance();
   }
   return fill(fitPos2D, signedDriftLength, 1 / variance);
 }

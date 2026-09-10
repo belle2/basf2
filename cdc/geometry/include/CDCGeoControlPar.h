@@ -464,7 +464,7 @@ namespace Belle2 {
       /**
        * Get input file name for wire displacement
        */
-      std::string getDisplacementFile() const
+      const std::string& getDisplacementFile() const
       {
         return m_displacementFile;
       }
@@ -472,7 +472,7 @@ namespace Belle2 {
       /**
        * Get input file name for wire alignment
        */
-      std::string getAlignmentFile() const
+      const std::string& getAlignmentFile() const
       {
         return m_alignmentFile;
       }
@@ -480,7 +480,7 @@ namespace Belle2 {
       /**
        * Get input file name for wire misalignment
        */
-      std::string getMisalignmentFile() const
+      const std::string& getMisalignmentFile() const
       {
         return m_misalignmentFile;
       }
@@ -488,7 +488,7 @@ namespace Belle2 {
       /**
        * Get input file name for xt-relation
        */
-      std::string getXtFile() const
+      const std::string& getXtFile() const
       {
         return m_xtFile;
       }
@@ -496,7 +496,7 @@ namespace Belle2 {
       /**
        * Get input file name for sigma
        */
-      std::string getSigmaFile() const
+      const std::string& getSigmaFile() const
       {
         return m_sigmaFile;
       }
@@ -504,7 +504,7 @@ namespace Belle2 {
       /**
        * Get input file name for fudge factor
        */
-      std::string getFFactorFile() const
+      const std::string& getFFactorFile() const
       {
         return m_fFactorFile;
       }
@@ -512,7 +512,7 @@ namespace Belle2 {
       /**
        * Get input file name for prop-speed
        */
-      std::string getPropSpeedFile() const
+      const std::string& getPropSpeedFile() const
       {
         return m_propSpeedFile;
       }
@@ -520,7 +520,7 @@ namespace Belle2 {
       /**
        * Get input file name for t0
        */
-      std::string getT0File() const
+      const std::string& getT0File() const
       {
         return m_t0File;
       }
@@ -528,7 +528,7 @@ namespace Belle2 {
       /**
        * Get input file name for time-walk
        */
-      std::string getTwFile() const
+      const std::string& getTwFile() const
       {
         return m_twFile;
       }
@@ -536,7 +536,7 @@ namespace Belle2 {
       /**
        * Get input file name for badwire
        */
-      std::string getBwFile() const
+      const std::string& getBwFile() const
       {
         return m_bwFile;
       }
@@ -544,7 +544,7 @@ namespace Belle2 {
       /**
        * Get input file name for channel map
        */
-      std::string getChMapFile() const
+      const std::string& getChMapFile() const
       {
         return m_chMapFile;
       }
@@ -552,7 +552,7 @@ namespace Belle2 {
       /**
        * Get input file name for edeptoadc
        */
-      std::string getEDepToADCFile() const
+      const std::string& getEDepToADCFile() const
       {
         return m_eDepToADCFile;
       }

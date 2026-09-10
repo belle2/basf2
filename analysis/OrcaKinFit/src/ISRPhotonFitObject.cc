@@ -147,7 +147,6 @@ namespace Belle2 {
 #endif
       bool result = ((pp2 - par[2]) * (pp2 - par[2]) > eps2 * cov[2][2]);
       par[2] = pp2;
-      pp[i2] = par[2];
       return result;
     }
 

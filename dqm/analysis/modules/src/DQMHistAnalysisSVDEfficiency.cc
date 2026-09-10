@@ -50,6 +50,11 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
 
+DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule()
+{
+
+}
+
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialize");
@@ -59,7 +64,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   //collect the list of all SVD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     // B2INFO("VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::SVD) continue;
@@ -117,12 +122,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "efficiencyLimits", "effLimits");
 
-  //find nEvents testing if histograms are present
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
-  if (hnEvnts == NULL) {
-    B2INFO("no events, nothing to do here");
-    return;
-  }
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -208,7 +207,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: event called.");
 
   //find nEvents
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents", true);
+  TH1* hnEvnts = findHist("SVDExpReco", "SVDDQM_nEvents", true);
   if (hnEvnts == NULL) {
     B2INFO("no events, nothing to do here");
     return;
@@ -257,11 +256,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   Float_t erreffV = -1;
 
   // Efficiency for the U and V sides
-  TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
-  TH2F* matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
+  auto found_tracksU = findHist("SVDEfficiency/TrackHitsU");
+  auto matched_clusU = findHist("SVDEfficiency/MatchedHitsU");
 
-  TH2F* found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
-  TH2F* matched_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHitsV");
+  auto found_tracksV = findHist("SVDEfficiency/TrackHitsV");
+  auto matched_clusV = findHist("SVDEfficiency/MatchedHitsV");
 
   if (matched_clusU != NULL && found_tracksU != NULL && matched_clusV != NULL && found_tracksV != NULL) {
     B2DEBUG(10, "Before loop on sensors, size :" << m_SVDModules.size());
@@ -346,11 +345,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
 
     // Efficiency for the U and V-side - 3 samples
-    TH2F* found3_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHits3U");
-    TH2F* matched3_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHits3U");
+    auto found3_tracksU = findHist("SVDEfficiency/TrackHits3U");
+    auto matched3_clusU = findHist("SVDEfficiency/MatchedHits3U");
 
-    TH2F* found3_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHits3V");
-    TH2F* matched3_clusV = (TH2F*)findHist("SVDEfficiency/MatchedHits3V");
+    auto found3_tracksV = findHist("SVDEfficiency/TrackHits3V");
+    auto matched3_clusV = findHist("SVDEfficiency/MatchedHits3V");
 
     if (matched3_clusU != NULL && found3_tracksU != NULL && matched3_clusV != NULL && found3_tracksV != NULL) {
       B2DEBUG(10, "Before loop on sensors, size :" << m_SVDModules.size());

@@ -99,14 +99,14 @@ namespace Belle2 {
      * @param mcParticle: tested MCParticle
      * @return: true if MCParticle is a primary, else false is returned
      */
-    bool isPrimaryMcParticle(const MCParticle& mcParticle);
+    static bool isPrimaryMcParticle(const MCParticle& mcParticle);
 
     /**
      * Tests if MCPArticle is a charged stable particle.
      * @param mcParticle: tester MCParticle
      * @return: true if MCParticle is charged stable, else false
      */
-    bool isChargedStable(const MCParticle& mcParticle);
+    static bool isChargedStable(const MCParticle& mcParticle);
 
     /**
      * Find all interesting charged final state particles.
@@ -127,7 +127,7 @@ namespace Belle2 {
      * @param in_daughters: vector is taken and photons returned
      * @return: MCParticle vector with no photons
      */
-    std::vector<MCParticle*> removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters);
+    static std::vector<MCParticle*> removeFinalStateRadiation(const std::vector<MCParticle*>& in_daughters);
 
     /**
      * Tests if mcParticle has the searched decay chain.

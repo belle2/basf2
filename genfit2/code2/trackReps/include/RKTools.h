@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_RKTools_h
-#define genfit_RKTools_h
+#pragma once
 
 #include <stddef.h>
 #include <algorithm>
@@ -101,6 +100,3 @@ RKMatrix<nRows, nCols>::print() {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_RKTools_h
-

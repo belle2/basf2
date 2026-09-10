@@ -35,6 +35,9 @@ namespace Belle2 {
     /** number of l1 trigger words */
     static const unsigned int c_ntrgWords = 10;
 
+    /** combined value of trigger word size and number */
+    static constexpr unsigned int c_trgDataSize = c_trgWordSize * c_ntrgWords;
+
     /** types of trigger timing source defined in b2tt firmware */
     enum ETimingType {
       /** events triggered by ECL timing */

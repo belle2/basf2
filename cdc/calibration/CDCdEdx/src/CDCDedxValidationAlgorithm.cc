@@ -131,13 +131,14 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   ttree->SetBranchAddress("entaRS", &enta);
   ttree->SetBranchAddress("layer", &layer);
 
-  std::vector<double> vtlocaledges;
-  defineTimeBins(vtlocaledges);
-  m_tbins = vtlocaledges.size() - 1;
-  m_tedges = &vtlocaledges[0];
+  defineTimeBins(m_vtlocaledges);
+  m_tbins = m_vtlocaledges.size() - 1;
+  m_tedges = &m_vtlocaledges[0];
 
   std::array<std::array<std::vector<TH1D*>, 2>, 13> hdedx_mom;
-  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor, hdedx_oned;
+  std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor;
+  std::array<std::vector<TH1D*>, 3> hdedx_oned;
+
   TH1D* htimes = new TH1D(Form("htimes_%s", m_suffix.data()), "", m_tbins, m_tedges);
 
   const double momBinWidth = (m_momMax - m_momMin) / m_momBins;
@@ -151,7 +152,7 @@ void CDCDedxValidationAlgorithm::radeeValidation()
                           "cos#theta > 0.6 and cos#theta <= 0.8", "cos#theta > 0.8"
                          };
   std::string stype[2] = {"posi", "elec"};
-  std::string sLayer[2] = {"IL", "OL"};
+  std::string sLayer[3] = {"SL0", "SL1", "SL2-8"};
 
   // Define histograms for momentum bins and charge types
   for (int ic = 0; ic < 13; ic++) {
@@ -166,11 +167,15 @@ void CDCDedxValidationAlgorithm::radeeValidation()
     hdedx_inj[ir].resize(m_tbins);
     hdedx_inj_nocor[ir].resize(m_tbins);
     hdedx_mom_peaks[ir].resize(4);
-    hdedx_oned[ir].resize(m_eaBin);
 
     defineHisto(hdedx_inj[ir], "inj", m_sring[ir].data());
     defineHisto(hdedx_inj_nocor[ir], "inj", Form("nocor_%s", m_sring[ir].data()));
     defineHisto(hdedx_mom_peaks[ir], "mom_peaks", Form("%s", stype[ir].data()));
+
+  }
+
+  for (unsigned int ir = 0; ir < 3; ir++) {
+    hdedx_oned[ir].resize(m_eaBin);
     defineHisto(hdedx_oned[ir], "oned", Form("%s", sLayer[ir].data()));
   }
 
@@ -236,7 +241,8 @@ void CDCDedxValidationAlgorithm::radeeValidation()
       int ibin = std::floor((entaval - m_eaMin) / eaBW);
       if (ibin < 0 || ibin >= m_eaBin) continue;
 
-      int mL = (layer->at(j) < 8) ? 0 : 1;
+      int lay = layer->at(j);
+      int mL = (lay < 8) ? 0 : ((lay < 14) ? 1 : 2);
       hdedx_oned[mL][ibin]->Fill(dedxhit->at(j));
     }
   }
@@ -250,8 +256,9 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   for (int it = 0; it < 2; ++it) {
     printCanvas(hdedx_inj[it], Form("plots/injection/dedx_vs_inj_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
     printCanvas(hdedx_inj_nocor[it], Form("plots/injection/dedx_vs_inj_nocor_%s_%s", m_sring[it].data(), m_suffix.data()), "inj");
-    printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
   }
+  for (int it = 0; it < 3; ++it)
+    printCanvas(hdedx_oned[it], Form("plots/oneD/dedx_vs_1D_%s_%s", sLayer[it].data(), m_suffix.data()), "oned");
 
   printCanvasdEdx(hdedx_mom_peaks, Form("plots/mom/dedxpeaks_vs_mom_%s", m_suffix.data()), "mom");
 
@@ -349,16 +356,17 @@ void CDCDedxValidationAlgorithm::bhabhaValidation()
 }
 
 //------------------------------------
-void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::string var, std::string stype)
+void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, const std::string& var, const std::string& stype)
 {
   int xbins = 0;
   double xmin = 0.0, xmax = 0.0;
   double binWidth = 0.0;
+  int dedxbins = m_dedxBins;
 
   if (var == "mom") {
     xbins = m_momBins; xmin = m_momMin; xmax = m_momMax;
   } else if (var == "oned") {
-    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax; m_dedxBins = 250;
+    xbins = m_eaBin; xmin = m_eaMin; xmax = m_eaMax; dedxbins = 250;
   } else if (var == "costh") {
     xbins = m_cosBins; xmin = m_cosMin; xmax = m_cosMax;
   } else if (var == "inj") {
@@ -368,7 +376,7 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
   }  else if (var == "cos_peaks") {
     xbins = 4; xmin = m_cosMin; xmax = m_cosMax;
   }  else {
-    xbins = c_nSenseWires; m_dedxBins = 250;
+    xbins = c_nSenseWires; dedxbins = 250;
   }
 
   if (var == "costh" || var == "mom" || var == "mom_peaks" || var == "cos_peaks" || var == "oned") {
@@ -389,15 +397,16 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
       title = Form("%s, time(%s)", stype.data(), label.data());
       name = Form("h%s_%s_%s_t%d", var.data(),  m_suffix.data(), stype.data(), ic);
     }
-    htemp[ic] = new TH1D(name.data(), "", m_dedxBins, m_dedxMin, m_dedxMax);
+    htemp[ic] = new TH1D(name.data(), "", dedxbins, m_dedxMin, m_dedxMax);
     htemp[ic]->SetTitle(Form("%s;dedx;entries", title.data()));
   }
 }
 
-void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, std::string namesfx, std::string svar)
+void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, const std::string& namesfx,
+                                                 const std::string& svar)
 {
   int xbins = 4;
-  double xmin, xmax;
+  double xmin = 0., xmax = 0.;
 
   if (svar == "mom") {
     xmin = m_momMin; xmax = 4.0;
@@ -481,7 +490,7 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
   delete ctmp;
 }
 
-void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::string namesfx, std::string svar)
+void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, const std::string& namesfx, const std::string& svar)
 {
   int xbins = 0;
   double xmin = 0.0, xmax = 0.0;
@@ -591,7 +600,7 @@ void CDCDedxValidationAlgorithm::fit(TH1D*& hist, double& mean, double& meanErr,
   }
 }
 
-void CDCDedxValidationAlgorithm::printCanvasRun(std::map<int, TH1D*>& htemp, std::string namesfx)
+void CDCDedxValidationAlgorithm::printCanvasRun(const std::map<int, TH1D*>& htemp, const std::string& namesfx)
 {
   // Set up the TCanvas with 4x4 grid
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
@@ -693,7 +702,7 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   int activelayers = 0;
   double layeravg = 0.0;
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
   CDCDedxWireGainAlgorithm wireg;
 
   DBObjPtr<CDCDedxBadWires> Badwire;
@@ -756,7 +765,7 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   printCanvasWire(hdedxhit, Form("plots/wire/dedx_vs_wire_%s", m_suffix.data()), vdedx_means);
 }
 
-void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, std::string namesfx,
+void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, const std::string& namesfx,
                                                  const std::vector<double>& vdedx_mean)
 {
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
@@ -777,7 +786,7 @@ void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, std::s
     ctmp->cd(ip % 16 + 1);
     gPad->cd();
     temp[ip]->DrawCopy("hist");
-    TH1D* hdedxhitC = (TH1D*)temp[ip]->Clone(Form("%sC", temp[ip]->GetName()));
+    TH1D* hdedxhitC = static_cast<TH1D*>(temp[ip]->Clone(Form("%sC", temp[ip]->GetName())));
     hdedxhitC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxhitC->SetFillColor(kAzure + 1);
     hdedxhitC->DrawCopy("same histo");
@@ -841,14 +850,11 @@ void CDCDedxValidationAlgorithm::plotEventStats()
 
 void CDCDedxValidationAlgorithm::DatabaseIN(int experiment, int run)
 {
-  if (m_EventMetaData.isValid()) {
-    m_EventMetaData->setExperiment(experiment);
-    m_EventMetaData->setRun(run);
-  }
-
   auto& dbConfiguration = Conditions::Configuration::getInstance();
+
   dbConfiguration.overrideGlobalTags();
   dbConfiguration.setGlobalTags({"online"});
+
   if (!m_testingPayloadName.empty() && m_GlobalTagName.empty()) {
     dbConfiguration.prependTestingPayloadLocation(m_testingPayloadName);
   } else if (m_testingPayloadName.empty() && !m_GlobalTagName.empty()) {
@@ -856,12 +862,21 @@ void CDCDedxValidationAlgorithm::DatabaseIN(int experiment, int run)
   } else
     B2FATAL("Setting both testing payload and Global Tag or setting no one of them.");
 
+  StoreObjPtr<EventMetaData> EventMetaData;
+
   /* Mimic a module initialization. */
   DataStore::Instance().setInitializeActive(true);
-  m_EventMetaData.registerInDataStore();
+  EventMetaData.registerInDataStore();
   DataStore::Instance().setInitializeActive(false);
-  if (!m_EventMetaData.isValid())
-    m_EventMetaData.construct(1, run, experiment);
+
+  if (!EventMetaData.isValid())
+    EventMetaData.construct(1, run, experiment);
+
+  else {
+    EventMetaData->setEvent(1);
+    EventMetaData->setExperiment(experiment);
+    EventMetaData->setRun(run);
+  }
 
   /* Database instance and configuration. */
   DBStore& dbStore = DBStore::Instance();
@@ -880,7 +895,7 @@ WireGainData CDCDedxValidationAlgorithm::getwiregain(int experiment, int run)
   DBObjPtr<CDCDedxWireGain> DBWireGains;
   if (!DBWireGains.isValid())  B2FATAL("Wire gain data are not valid.");
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   int jwire = -1;
   for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {

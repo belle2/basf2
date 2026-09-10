@@ -22,7 +22,7 @@ namespace Belle2 {
       eclAutocovarianceCalibrationC3Algorithm();
 
       /**..Destructor */
-      virtual ~eclAutocovarianceCalibrationC3Algorithm() {}
+      virtual ~eclAutocovarianceCalibrationC3Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
@@ -36,7 +36,7 @@ namespace Belle2 {
       }
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
     protected:
 

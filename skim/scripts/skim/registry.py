@@ -146,6 +146,7 @@ _RegisteredSkims = [
     ("14120600", "btocharm", "B0toDpi_Kpipi"),
     ("14120602", "btocharm", "B0toDpi_KpipiLooseDelE"),
     ("14120601", "btocharm", "B0toDpi_Kspi"),   # B0 -> D-(Ks pi-)pi+
+    ("14120603", "btocharm", "B0toDh_Kpipi"),   # B0 -> D-(K+ pi- pi-) h+, h=pi, K
     # B0 -> D*-(anti-D0 pi-)pi+    With anti-D0 -> k+ pi-
     ("14120700", "btocharm", "B0toDstarPi_D0pi_Kpi"),
     # merge  B0 -> D*-(anti-D0 pi-)pi+ with anti-D0 -> k- pi+ pi+ pi-
@@ -199,7 +200,8 @@ _RegisteredSkims = [
     ("17230400", "charm", "XToDp_DpToKsHp"),  # D+ -> Ks h+
     ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
     ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h+ j-
-    ("17230700", "charm", "DstToD0Pi_D0ToGeneric"),  # D* -> D0 -> generic decays
+    # ("17230700", "charm", "DstToD0Pi_D0ToGeneric_invalid"), #D* -> D0 -> generic decays, pre-PromptRel9
+    ("17230701", "charm", "DstToD0Pi_D0ToGeneric"),  # D* -> D0 -> generic decays
     # Charmed baryons
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
@@ -254,7 +256,9 @@ _RegisteredSkims = [
     ("18520100", "dark", "DimuonPlusMissingEnergy"),
     ("18520200", "dark", "ElectronMuonPlusMissingEnergy"),
     ("18520300", "dark", "DielectronPlusMissingEnergy"),
-    ("18520400", "dark", "LFVZpVisible"),
+    ("18520400", "dark", "LFVZpVisible_invalid"),  # pre-PromptRel9
+    ("18520401", "dark", "LFVZpVisible"),  # PromptRel9
+    ("18520600", "dark", "ZpVisible"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),

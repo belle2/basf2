@@ -83,7 +83,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, float> getT0s() const
+    const std::map<unsigned short, float>& getT0s() const
     {
       return m_t0s;
     }

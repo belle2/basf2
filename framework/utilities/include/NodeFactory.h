@@ -195,16 +195,34 @@ namespace Belle2 {
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new DataNode<AVariableManager, bool>(b));
       } else if (node_type == NodeType::IdentifierNode) {
         if (py::len(tuple) != 2) B2FATAL("IdentifierNode nodetuple has to have length 2." << LogVar("actual length", py::len(tuple)));
+        // boost::python::extract<std::string> triggers a false-positive
+        // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         std::string identifier = py::extract<std::string>(tuple[1]);
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
         return std::unique_ptr<const AbstractExpressionNode<AVariableManager>>(new IdentifierNode<AVariableManager>(identifier));
       } else if (node_type == NodeType::FunctionNode) {
         if (py::len(tuple) != 3) B2FATAL("FunctionNode nodetuple has to have length 3." << LogVar("actual length", py::len(tuple)));
 
+        // boost::python::extract<std::string> triggers a false-positive
+        // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         // Extract functionName as second argument of the tuple
         std::string functionName = py::extract<std::string>(tuple[1]);
 
         // Extract argument tuple
         std::string argument = py::extract<std::string>(tuple[2]);
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
         boost::algorithm::trim(argument);
         // Define vector for function arguments
         std::vector<std::string> functionArguments = splitOnDelimiterAndConserveParenthesis(argument, ',', '(', ')');

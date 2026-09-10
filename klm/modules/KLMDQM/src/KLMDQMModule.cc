@@ -90,14 +90,14 @@ KLMDQMModule::KLMDQMModule() :
 KLMDQMModule::~KLMDQMModule()
 {
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
     KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     if (m_ChannelHits[sectorIndex] != nullptr)
       delete[] m_ChannelHits[sectorIndex];
   }
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
-  for (KLMChannelIndex& klmSection : klmIndex) {
+  for (const KLMChannelIndex& klmSection : klmIndex) {
     KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
       KLMSectionNumber section = klmSection.getSection();
@@ -192,7 +192,7 @@ void KLMDQMModule::defineHisto()
     new KLMChannelNumber[nChannelHistograms + 1];
   int i = 0;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     KLMChannelIndex klmChannel(klmSector);
     klmChannel.setIndexLevel(KLMChannelIndex::c_IndexLevelStrip);
     KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
@@ -218,7 +218,7 @@ void KLMDQMModule::defineHisto()
   firstChannelNumbers[nChannelHistograms] = m_ChannelArrayIndex->getNElements();
   i = 0;
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = m_ChannelHitHistogramsBKLM;
@@ -298,7 +298,7 @@ void KLMDQMModule::defineHisto()
                               4000, 0, 20000);
   /* Spatial distribution of EKLM 2d hits per layer. */
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
-  for (KLMChannelIndex& klmSection : klmIndex) {
+  for (const KLMChannelIndex& klmSection : klmIndex) {
     KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
       KLMSectionNumber section = klmSection.getSection();
@@ -376,7 +376,7 @@ void KLMDQMModule::beginRun()
   m_PlaneBKLMZ->Reset();
   /* Channel hits. */
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = m_ChannelHitHistogramsBKLM;
@@ -407,7 +407,7 @@ void KLMDQMModule::beginRun()
   m_TriggersHERInj->Reset();
   /* Spatial 2D hits distributions. */
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
-  for (KLMChannelIndex& klmSection : klmIndex) {
+  for (const KLMChannelIndex& klmSection : klmIndex) {
     KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
       KLMSectionNumber section = klmSection.getSection();
@@ -454,8 +454,8 @@ void KLMDQMModule::event()
       int sector = digit.getSector();
       int layer = digit.getLayer();
       int plane = digit.getPlane();
-      int strip = digit.getStrip();
       if (not digit.isMultiStrip()) {
+        int strip = digit.getStrip();
         KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberEKLM(section, sector);
         KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
         KLMChannelNumber channel = m_ElementNumbers->channelNumberEKLM(section, sector, layer, plane, strip);
@@ -505,13 +505,12 @@ void KLMDQMModule::event()
       int section = digit.getSection();
       int sector = digit.getSector();
       int layer = digit.getLayer();
-      int plane = digit.getPlane();
-      int strip = digit.getStrip();
-
       KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
       KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
 
       if (not digit.isMultiStrip()) {
+        int plane = digit.getPlane();
+        int strip = digit.getStrip();
         KLMChannelNumber channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
         KLMChannelNumber channelIndex = m_ChannelArrayIndex->getIndex(channel);
         for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
@@ -656,10 +655,3 @@ void KLMDQMModule::event()
   }
 }
 
-void KLMDQMModule::endRun()
-{
-}
-
-void KLMDQMModule::terminate()
-{
-}

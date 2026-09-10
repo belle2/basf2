@@ -22,7 +22,7 @@ namespace Belle2 {
       eclEdgeAlgorithm();
 
       /**..Destructor */
-      virtual ~eclEdgeAlgorithm() {}
+      virtual ~eclEdgeAlgorithm() override {}
 
     protected:
 

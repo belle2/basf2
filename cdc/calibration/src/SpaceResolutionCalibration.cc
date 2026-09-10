@@ -15,15 +15,15 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-#include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TCanvas.h"
-#include "TSystem.h"
-#include "TChain.h"
-#include "TROOT.h"
-#include "TError.h"
-#include "TMinuit.h"
+#include <TFile.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TCanvas.h>
+#include <TSystem.h>
+#include <TChain.h>
+#include <TROOT.h>
+#include <TError.h>
+#include <TMinuit.h>
 
 using namespace std;
 using namespace Belle2;
@@ -189,15 +189,15 @@ void SpaceResolutionCalibration::createHisto()
 
           hist_b[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, minEntry);
 
-          TH1F* hm1 = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th));
-          TH1F* hs1 = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th));
+          TH1F* hm1 = static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)));
+          TH1F* hs1 = static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)));
           if (!hm1 || !hs1) {
             m_fitflag[il][lr][al][th] = -1;
             continue;
           }
 
-          hb_m[il][lr][al][th] = (TH1F*)hm1->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al, th));
-          hb_s[il][lr][al][th] = (TH1F*)hs1->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al, th));//sigma
+          hb_m[il][lr][al][th] = static_cast<TH1F*>(hm1->Clone(Form("hb_%d_%d_%d_%d_m", il, lr, al, th)));
+          hb_s[il][lr][al][th] = static_cast<TH1F*>(hs1->Clone(Form("hb_%d_%d_%d_%d_s", il, lr, al, th)));//sigma
 
           hb_m[il][lr][al][th]->SetDirectory(0);
           hb_s[il][lr][al][th]->SetDirectory(0);
@@ -205,23 +205,25 @@ void SpaceResolutionCalibration::createHisto()
 
           //slice other bin with full gaus func
           hist_b[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, m_np, minEntry);
-          hb_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))); //mean
-          hb_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
+          hb_m[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)))); //mean
+          hb_s[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)))); //sigma
           B2DEBUG(199, "entries (2nd): " << hb_s[il][lr][al][th]->GetEntries());
 
           //fit half gaus for first range near sense wire
           hist_u[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, minEntry);
-          hu_m[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m", il, lr, al,
-                                 th));//mean
-          hu_s[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s", il, lr, al,
-                                 th));//sigma
+          hu_m[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m",
+                                                    il, lr, al,
+                                                    th)));//mean
+          hu_s[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s",
+                                                    il, lr, al,
+                                                    th)));//sigma
           hu_m[il][lr][al][th]->SetDirectory(0);
           hu_s[il][lr][al][th]->SetDirectory(0);
 
           //slice other bin with full gaus func
           hist_u[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, m_np, minEntry);
-          hu_m[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))); //mean
-          hu_s[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))); //sigma
+          hu_m[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th)))); //mean
+          hu_s[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th)))); //sigma
           if (!hu_s[il][lr][al][th] || !hb_s[il][lr][al][th]) {
             B2WARNING("slice histo do not found");
             m_fitflag[il][lr][al][th] = -1;
@@ -532,7 +534,7 @@ void SpaceResolutionCalibration::readSigmaFromText()
   double theta, alpha;
 
   ifs >> m_sigmaParamMode_old >> np;
-  double sigma[8]; // cppcheck-suppress constVariable
+  double sigma[8];
   //  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) cout<<"CDCGeometryPar: invalid sigma-parameterization mode read !"<<endl;
   //if (m_sigmaParamMode == 1) cout<<"CDCGeometryPar: sigma-parameterization mode=1 not ready yet"<<endl;
   //  if (np <= 0 || np > nSigmaParams) cout<<"CDCGeometryPar: no. of sigma-params. outside limits !"<<endl;

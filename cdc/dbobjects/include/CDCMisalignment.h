@@ -113,11 +113,11 @@ namespace Belle2 {
     /// Direct getter to Y shift of layer
     double getLayerShiftY(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerY);}
     /// Destructor
-    ~CDCMisalignment() {}
+    ~CDCMisalignment() override {}
 
   private:
 
-    ClassDef(CDCMisalignment, 1); /**< Storage for CDC misalignment constants (mainly now for Millepede) */
+    ClassDefOverride(CDCMisalignment, 1); /**< Storage for CDC misalignment constants (mainly now for Millepede) */
 
   };
 

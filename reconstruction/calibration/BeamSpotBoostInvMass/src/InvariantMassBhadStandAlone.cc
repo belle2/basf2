@@ -124,7 +124,7 @@ namespace Belle2::InvariantMassBhadCalib {
     }
 
     //sort by time
-    sort(events.begin(), events.end(), [](Event e1, Event e2) {return e1.t < e2.t;});
+    sort(events.begin(), events.end(), [](const Event & e1, const Event & e2) {return e1.t < e2.t;});
 
 
     return events;
@@ -226,7 +226,7 @@ namespace Belle2::InvariantMassBhadCalib {
 
 
   std::map<TString, std::pair<double, double>> argusFit(const std::vector<Event>& evts,
-                                                        std::vector<std::pair<double, double>> limits)
+                                                        const std::vector<std::pair<double, double>>& limits)
   {
 
     const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
@@ -251,7 +251,7 @@ namespace Belle2::InvariantMassBhadCalib {
 
     const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
 
-    for (auto event : evts) {
+    for (const auto& event : evts) {
       for (auto cand : event.cand) {
 
         double p = cand.pBcms;
@@ -266,7 +266,7 @@ namespace Belle2::InvariantMassBhadCalib {
           if (abs(mInv - mB) < 0.05)
             if (cand.R2 < 0.3)
               if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
-                double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                double eBC = sqrt(p * p + (mB * mB)); // beam constrained energy
                 if (eBC > 5.37) continue;
 
                 for (unsigned i = 0; i < limits.size(); ++i) {
@@ -378,8 +378,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
 // Analysis itself
   std::map<TString, std::pair<double, double>> argusFitConstrained(const std::vector<Event>& evts,
-                                            std::vector<std::pair<double, double>> limits,
-                                            std::vector<std::pair<double, double>> mumuVals,  std::vector<double> startPars)
+                                            const std::vector<std::pair<double, double>>& limits,
+                                            std::vector<std::pair<double, double>> mumuVals,  const std::vector<double>& startPars)
   {
     // Calculate eCMS/2
     for (auto& el : mumuVals) {
@@ -394,8 +394,9 @@ namespace Belle2::InvariantMassBhadCalib {
 
     double s = 0, sw = 0;
     for (auto p : mumuVals) {
-      s  += p.first / pow(p.second, 2);
-      sw += 1. / pow(p.second, 2);
+      const double invSquared = 1. / (p.second * p.second);
+      s  += p.first * invSquared;
+      sw += invSquared;
     }
     const double mumuMean = s / sw;
     const double shiftInit = meanInit - mumuMean;
@@ -426,7 +427,7 @@ namespace Belle2::InvariantMassBhadCalib {
 
     const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
 
-    for (auto event : evts) {
+    for (const auto& event : evts) {
       for (auto cand : event.cand) {
 
         double p = cand.pBcms;
@@ -441,7 +442,7 @@ namespace Belle2::InvariantMassBhadCalib {
           if (abs(mInv - mB) < 0.05)
             if (cand.R2 < 0.3)
               if ((cand.dmDstar < -10)  || (0.143 < cand.dmDstar && cand.dmDstar < 0.147)) {
-                double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+                double eBC = sqrt(p * p + (mB * mB)); // beam constrained energy
                 if (eBC > 5.37) continue;
 
                 for (unsigned i = 0; i < limits.size(); ++i) {
@@ -627,8 +628,8 @@ namespace Belle2::InvariantMassBhadCalib {
 
 
 
-  std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, std::vector<std::pair<double, double>> limits,
-                                             std::vector<std::pair<double, double>> mumuVals,  const std::vector<double>& startPars)
+  std::vector<std::vector<double>> doBhadFit(const std::vector<Event>& evts, const std::vector<std::pair<double, double>>& limits,
+                                             const std::vector<std::pair<double, double>>& mumuVals,  const std::vector<double>& startPars)
   {
 
     auto r = argusFitConstrained(evts, limits, mumuVals, startPars);

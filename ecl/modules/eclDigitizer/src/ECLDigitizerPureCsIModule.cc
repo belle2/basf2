@@ -97,10 +97,6 @@ void ECLDigitizerPureCsIModule::initialize()
   mapGeometry();
 }
 
-void ECLDigitizerPureCsIModule::beginRun()
-{
-}
-
 void ECLDigitizerPureCsIModule::event()
 {
   /* add trigger resolution defined in a module parameter
@@ -142,7 +138,7 @@ void ECLDigitizerPureCsIModule::event()
       m_adc[j].AddHit(m_testenedep, m_testsig, m_ss[m_tbl[j].iss]);
       //cout << "Adding enedep = " << m_testenedep << " time: " << m_testsig << endl;
     }
-    adccounts_type& a = m_adc[j];
+    const adccounts_type& a = m_adc[j];
     if (! m_calibration && a.total < 0.0001) continue;
 
     //Noise generation
@@ -232,14 +228,6 @@ void ECLDigitizerPureCsIModule::event()
   m_nEvent++;
 }
 
-void ECLDigitizerPureCsIModule::endRun()
-{
-}
-
-void ECLDigitizerPureCsIModule::terminate()
-{
-}
-
 void ECLDigitizerPureCsIModule::readDSPDB()
 {
   string dataFileName, dataFileName2;
@@ -279,7 +267,7 @@ void ECLDigitizerPureCsIModule::readDSPDB()
 
   if (!(m_calibration || m_NoCovMatrix)) {
     TFile rootfile2(dataFileName2.c_str());
-    TTree* tree = (TTree*) rootfile2.Get("EclWF");
+    TTree* tree = static_cast<TTree*>(rootfile2.Get("EclWF"));
     ECLWaveformData* eclWFData = new ECLWaveformData;
     const int maxncellid = 512;
     int ncellId;

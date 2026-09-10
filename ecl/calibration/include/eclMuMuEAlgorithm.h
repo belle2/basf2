@@ -22,19 +22,20 @@ namespace Belle2 {
       eclMuMuEAlgorithm();
 
       /**..Destructor */
-      virtual ~eclMuMuEAlgorithm() {}
+      virtual ~eclMuMuEAlgorithm() override {}
 
       /**..Parameters to control Novosibirsk fit to energy deposited in each crystal by mu+mu- events */
-      int cellIDLo;  /**<  First cellID to be fit */
-      int cellIDHi;  /**<  Last cellID to be fit */
-      int minEntries;  /**<  All crystals to be fit must have at least minEntries events in the fit range */
-      int nToRebin; /**< If fewer entries than this, rebin and fix eta parameter */
-      double tRatioMin;  /**< entries/peak at low edge of fit must be greater than this  */
-      double tRatioMax; /**< entries/peak at high edge of fit must be greater than this */
-      double lowerEdgeThresh; /**< Lower edge is where the fit = lowerEdgeThresh * peak value */
-      bool performFits;  /**<  if false, input histograms are copied to output, but no fits are done. */
-      bool findExpValues;  /**< if true, fits are used to find expected energy deposit for each crystal instead of the calibration constant */
-      int storeConst; /**< controls which values are written to the database.
+      int cellIDLo = 0;  /**<  First cellID to be fit */
+      int cellIDHi = 0;  /**<  Last cellID to be fit */
+      int minEntries = 0;  /**<  All crystals to be fit must have at least minEntries events in the fit range */
+      int nToRebin = 0; /**< If fewer entries than this, rebin and fix eta parameter */
+      double tRatioMin = 0.0;  /**< entries/peak at low edge of fit must be greater than this  */
+      double tRatioMax = 0.0; /**< entries/peak at high edge of fit must be greater than this */
+      double lowerEdgeThresh = 0.0; /**< Lower edge is where the fit = lowerEdgeThresh * peak value */
+      bool performFits = false;  /**<  if false, input histograms are copied to output, but no fits are done. */
+      bool findExpValues =
+        false;  /**< if true, fits are used to find expected energy deposit for each crystal instead of the calibration constant */
+      int storeConst = 0; /**< controls which values are written to the database.
                              0 (default): store value found by successful fits, or -|input value| otherwise;
                              -1 : do not store values
                              1 : store values if every fit for [cellIDLo,cellIDHi] was successful */

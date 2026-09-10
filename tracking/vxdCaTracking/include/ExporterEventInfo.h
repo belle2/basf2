@@ -31,11 +31,11 @@ namespace Belle2 {
 
 
     /** adds Hit to internal storage.  */
-    void addHit(ExporterHitInfo aHit);
+    void addHit(const ExporterHitInfo& aHit);
 
 
     /** adds Tc to internal storage.  */
-    void addTc(ExporterTcInfo aTc);
+    void addTc(const ExporterTcInfo& aTc);
 
 
     /** returns a pointer to internal vector of hits */

@@ -41,7 +41,7 @@ EKLM::GeometryData::Instance(enum DataSource dataSource, const GearDir* gearDir)
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readPositionData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
+static void readPositionData(EKLMGeometry::ElementPosition* epos, const GearDir* gd)
 {
   epos->setX(gd->getLength("X") * CLHEP::cm);
   epos->setY(gd->getLength("Y") * CLHEP::cm);
@@ -53,7 +53,7 @@ static void readPositionData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
  * @param epos Position data.
  * @param gd   XML data directory.
  */
-static void readSizeData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
+static void readSizeData(EKLMGeometry::ElementPosition* epos, const GearDir* gd)
 {
   epos->setInnerR(gd->getLength("InnerR") * CLHEP::cm);
   epos->setOuterR(gd->getLength("OuterR") * CLHEP::cm);
@@ -66,7 +66,7 @@ static void readSizeData(EKLMGeometry::ElementPosition* epos, GearDir* gd)
  * @param gd  XML data directory.
  */
 static void readSectorSupportGeometry(
-  EKLMGeometry::SectorSupportGeometry* ssg, GearDir* gd)
+  EKLMGeometry::SectorSupportGeometry* ssg, const GearDir* gd)
 {
   ssg->setThickness(gd->getLength("Thickness") * CLHEP::cm);
   ssg->setDeltaLY(gd->getLength("DeltaLY") * CLHEP::cm);
@@ -95,10 +95,9 @@ static void readSectorSupportGeometry(
  * @param gd  XML data directory.
  */
 static void readShieldDetailGeometry(
-  EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
+  EKLMGeometry::ShieldDetailGeometry* sdg, const GearDir* gd)
 {
   int i, n;
-  std::string name;
   EKLMGeometry::Point p;
   sdg->setLengthX(gd->getLength("LengthX") * CLHEP::cm);
   sdg->setLengthY(gd->getLength("LengthY") * CLHEP::cm);
@@ -106,7 +105,7 @@ static void readShieldDetailGeometry(
   sdg->setNPoints(n);
   for (i = 0; i < n; i++) {
     GearDir point(*gd);
-    name = "/Point[" + std::to_string(i + 1) + "]";
+    std::string name = "/Point[" + std::to_string(i + 1) + "]";
     point.append(name);
     p.setX(point.getLength("X") * CLHEP::cm);
     p.setY(point.getLength("Y") * CLHEP::cm);
@@ -223,7 +222,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
       m_nStripDifferent++;
     }
   }
-  m_StripLenToAll = (int*)malloc(m_nStripDifferent * sizeof(int));
+  m_StripLenToAll = static_cast<int*>(malloc(m_nStripDifferent * sizeof(int)));
   if (m_StripLenToAll == nullptr)
     B2FATAL(c_MemErr);
   i = 0;
@@ -244,7 +243,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
       mapLengthStrip2.insert(std::pair<double, int>(l, i));
     }
   }
-  m_StripAllToLen = (int*)malloc(m_NStrips * sizeof(int));
+  m_StripAllToLen = static_cast<int*>(malloc(m_NStrips * sizeof(int)));
   if (m_StripAllToLen == nullptr)
     B2FATAL(c_MemErr);
   for (i = 0; i < m_NStrips; i++) {
@@ -258,7 +257,6 @@ void EKLM::GeometryData::fillStripIndexArrays()
 void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
 {
   int i;
-  std::string name;
   GearDir Strips(gd);
   Strips.append("/Strip");
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
@@ -275,7 +273,7 @@ void EKLM::GeometryData::readXMLDataStrips(const GearDir& gd)
   }
   for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
-    name = "/Strip[" + std::to_string(i + 1) + "]";
+    std::string name = "/Strip[" + std::to_string(i + 1) + "]";
     StripContent.append(name);
     m_StripPosition[i].setLength(StripContent.getLength("Length") * CLHEP::cm);
     m_StripPosition[i].setX(StripContent.getLength("X") * CLHEP::cm);

@@ -10,12 +10,12 @@
 
 using namespace Belle2::HistogramFactory;
 
-TH1F* Factory::CreateTH1F(std::string name, std::string title)
+TH1F* Factory::CreateTH1F(const std::string& name, const std::string& title)
 {
   return m_histoModule->Create(name, title, m_nbinsx.Get(), m_xlow.Get(), m_xup.Get(), m_xTitle.Get(), m_yTitle.Get());
 }
 
-TH2F* Factory::CreateTH2F(std::string name, std::string title)
+TH2F* Factory::CreateTH2F(const std::string& name, const std::string& title)
 {
   return m_histoModule->Create(name, title, m_nbinsx.Get(), m_xlow.Get(), m_xup.Get(), m_nbinsy.Get(), m_ylow.Get(), m_yup.Get(),
                                m_xTitle.Get(), m_yTitle.Get(), m_zTitle.Get());

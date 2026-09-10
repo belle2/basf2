@@ -144,11 +144,6 @@ void RootInputModule::initialize()
   //       each file and the global tags to use.  That would be more efficient
   //       but also less safe
 
-  // list of required branches. We keep this empty for now and only fill
-  // it after we checked the first file to make sure all other files have the
-  // same branches available.
-  std::set<std::string> requiredEventBranches;
-  std::set<std::string> requiredPersistentBranches;
   // Event metadata from all files, keep it around for sanity checks and globaltag replay
   std::vector<FileMetaData> fileMetaData;
   // and if so, what is the sum
@@ -156,6 +151,11 @@ void RootInputModule::initialize()
 
   // scope for local variables
   {
+    // list of required branches. We keep this empty for now and only fill
+    // it after we checked the first file to make sure all other files have the
+    // same branches available.
+    std::set<std::string> requiredEventBranches;
+    std::set<std::string> requiredPersistentBranches;
     // temporarily disable some root warnings
     auto rootWarningGuard = ScopeGuard::guardValue(gErrorIgnoreLevel, kWarning + 1);
     // do all files have a consistent number of MC events? that is all positive or all zero
@@ -241,7 +241,7 @@ void RootInputModule::initialize()
     TObjArray* fileElements = m_tree->GetListOfFiles();
     TIter next(fileElements);
     TChainElement* chEl = nullptr;
-    while ((chEl = (TChainElement*)next())) {
+    while ((chEl = static_cast<TChainElement*>(next()))) {
       if (!unique_filenames.insert(chEl->GetTitle()).second) {
         B2WARNING("The input file '" << chEl->GetTitle() << "' was specified more than once");
         // seems we have duplicate files so we process events more than once. Disable forwarding of MC event number
@@ -591,7 +591,7 @@ bool RootInputModule::createParentStoreEntries()
   branch->GetEntry(0);
   int experiment = eventMetaData->getExperiment();
   int run = eventMetaData->getRun();
-  unsigned int event = eventMetaData->getEvent();
+  unsigned int eventNr = eventMetaData->getEvent();
   std::string parentLfn = eventMetaData->getParentLfn();
   branch->SetAddress(address);
 
@@ -629,7 +629,7 @@ bool RootInputModule::createParentStoreEntries()
     // get parent LFN of parent
     EventMetaData* metaData = nullptr;
     tree->SetBranchAddress("EventMetaData", &metaData);
-    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, eventNr, run, experiment);
     tree->GetBranch("EventMetaData")->GetEntry(entry);
     parentLfn = metaData->getParentLfn();
   }
@@ -643,7 +643,7 @@ bool RootInputModule::readParentTrees()
   const StoreObjPtr<EventMetaData> eventMetaData;
   int experiment = eventMetaData->getExperiment();
   int run = eventMetaData->getRun();
-  unsigned int event = eventMetaData->getEvent();
+  unsigned int eventNr = eventMetaData->getEvent();
 
   std::string parentLfn = eventMetaData->getParentLfn();
   for (int level = 0; level < m_parentLevel; level++) {
@@ -674,9 +674,9 @@ bool RootInputModule::readParentTrees()
     }
 
     // get entry number in parent tree
-    long entryNumber = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    long entryNumber = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, eventNr, run, experiment);
     if (entryNumber < 0) {
-      B2ERROR("No event " << experiment << "/" << run << "/" << event << " in parent file " << parentPfn);
+      B2ERROR("No event " << experiment << "/" << run << "/" << eventNr << " in parent file " << parentPfn);
       return false;
     }
 
@@ -723,14 +723,14 @@ void RootInputModule::addEventListForIndexFile(const std::string& parentLfn)
     branch->GetEntry(i);
     int experiment = eventMetaData->getExperiment();
     int run = eventMetaData->getRun();
-    unsigned int event = eventMetaData->getEvent();
+    unsigned int eventNr = eventMetaData->getEvent();
     const std::string& newParentLfn = eventMetaData->getParentLfn();
 
     if (parentLfn != newParentLfn) {
       //parent file changed, stopping for now
       break;
     }
-    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, event, run, experiment);
+    long entry = RootIOUtilities::getEntryNumberWithEvtRunExp(tree, eventNr, run, experiment);
     elist->Enter(entry);
   }
   branch->SetAddress(address);

@@ -89,8 +89,8 @@ void MCMatcherECLClustersModule::event()
 
   const RelationArray& p2sh = m_mcParticleToECLSimHitRelationArray;
   //RelationArray& cd2p = m_eclCalDigitToMCParticleRelationArray;
-  ECLSimHit** simhits = (ECLSimHit**)(m_eclSimHits.getPtr()->GetObjectRef());
-  MCParticle** mcs = (MCParticle**)(m_mcParticles.getPtr()->GetObjectRef());
+  ECLSimHit** simhits = reinterpret_cast<ECLSimHit**>((m_eclSimHits.getPtr()->GetObjectRef()));
+  MCParticle** mcs = reinterpret_cast<MCParticle**>((m_mcParticles.getPtr()->GetObjectRef()));
 
   for (int i = 0, imax = p2sh.getEntries(); i < imax; i++) {
     const RelationElement& re = p2sh[i];
@@ -155,7 +155,7 @@ void MCMatcherECLClustersModule::event()
 
   const RelationArray& p2eh = m_mcParticleToECLHitRelationArray;
   //RelationArray& ed2p = m_eclDigitToMCParticleRelationArray;
-  ECLHit** eclhits = (ECLHit**)(m_eclHits.getPtr()->GetObjectRef());
+  ECLHit** eclhits = reinterpret_cast<ECLHit**>((m_eclHits.getPtr()->GetObjectRef()));
   for (int i = 0, imax = p2eh.getEntries(); i < imax; i++) {
     const RelationElement& re = p2eh[i];
     const std::vector<unsigned int>& eclhitindx = re.getToIndices();
@@ -179,7 +179,7 @@ void MCMatcherECLClustersModule::event()
 
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
     for (unsigned int i = 0; i < mcParticles.size(); ++i) {
-      const auto mcParticle = mcParticles.object(i);
+      const auto* mcParticle = mcParticles.object(i);
       const auto weight = mcParticles.weight(i);
       eclCluster->addRelationTo(mcParticle, weight);
     }

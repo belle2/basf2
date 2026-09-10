@@ -40,16 +40,6 @@ namespace Belle2 {
     void event() override;
 
     /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
-
-    /**
      * Definition of the histograms.
      */
     void defineHisto() override;

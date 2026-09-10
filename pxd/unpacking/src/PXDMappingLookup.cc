@@ -107,7 +107,7 @@ void PXDMappingLookup::map_rc_to_uv_IF_OB(unsigned int& v_cellID, unsigned int& 
 }
 
 void PXDMappingLookup::map_uv_to_rc_IF_OB(unsigned int& v_cellID, unsigned int& u_cellID,
-                                          __attribute__((unused)) unsigned int& dhp_id,
+                                          __attribute__((unused)) unsigned const int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");
@@ -179,7 +179,7 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 }
 
 void PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID,
-                                          __attribute__((unused)) unsigned int& dhp_id,
+                                          __attribute__((unused)) unsigned const int& dhp_id,
                                           const unsigned int dhe_ID)
 {
   B2FATAL("Code to be written");

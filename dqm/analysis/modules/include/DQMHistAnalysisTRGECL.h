@@ -22,6 +22,9 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisTRGECLModule();
+
+  private:
+
     //! initialization
     void initialize() override final;
     //! begin run
@@ -32,8 +35,6 @@ namespace Belle2 {
     void endRun() override final;
     //! delete pointers
     void terminate() override final;
-
-  private:
 
     //! minimum entry in EventT0 histogram to fit
     int m_MinEntryForFit = 200;

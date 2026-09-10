@@ -53,7 +53,7 @@ EvtGenParticlePDG* EvtGenDatabasePDG::AddParticle(const char* name, const char* 
   //  mean free path will be calculated.
   //
 
-  TParticlePDG* old = GetParticle(PDGcode);
+  const TParticlePDG* old = GetParticle(PDGcode);
 
   if (old) {
     B2ERROR("EvtGenDatabasePDG::AddParticle: particle with PDGcode=" << PDGcode << " already defined");

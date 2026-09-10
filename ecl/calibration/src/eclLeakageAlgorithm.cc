@@ -116,7 +116,7 @@ std::vector<double> eclLeakageFitParameters(TH1F* h, const double& target)
 
 /**-------------------------------------------------------------------------------------*/
 //..Novosibirsk; H. Ikeda et al. / NIM A 441 (2000) 401-426
-// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+// cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
 double eclLeakageNovo(Double_t* x, Double_t* par)
 {
 
@@ -379,7 +379,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
-      TH1F* hEnergy = (TH1F*)hELabUncorr[ie][thID];
+      TH1F* hEnergy = static_cast<TH1F*>(hELabUncorr[ie][thID]);
       double peak = -1.;
       double eta = 0.;
       int fitStatus = 2;
@@ -573,7 +573,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       double genE = iEnergiesMeV[ie][thID] / 1000.;
       for (int idir = 0; idir < nDir; idir++) {
         for (int ipos = 0; ipos < nPositions; ipos++) {
-          TH1F* hEnergy = (TH1F*)eFracPosition[ie][thID][idir][ipos];
+          TH1F* hEnergy = static_cast<TH1F*>(eFracPosition[ie][thID][idir][ipos]);
           if (hEnergy->Integral() > minEntries) {nHistToFit++;}
 
           //..Default peak from fit to full thetaID/energy = peakUncorr;
@@ -937,7 +937,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       //..Base the resolution on the number of entries in the corrected plot for all 4 cases.
       double entries = energyResolution[ireg][ie][nResType - 1]->Integral();
       for (int ires = 0; ires < nResType; ires++) {
-        TH1F* hEnergy = (TH1F*)energyResolution[ireg][ie][ires];
+        TH1F* hEnergy = static_cast<TH1F*>(energyResolution[ireg][ie][ires]);
         double peak = -1.;
         double res68 = 99.; // resolution based on 68.3% of the entries
         int nIter = 0; // keep track of attempts to fit this histogram

@@ -28,13 +28,6 @@ namespace Belle2::SVD {
      */
     void computeClusterCharge(Belle2::SVD::RawCluster& rawCluster, double& charge, double& SNR, double& seedCharge) override;
 
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDMaxSampleCharge() {};
-
-
   };
 
 }

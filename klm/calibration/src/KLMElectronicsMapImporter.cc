@@ -172,7 +172,7 @@ void KLMElectronicsMapImporter::loadBKLMElectronicsMap(int version)
   }
 }
 
-int KLMElectronicsMapImporter::getEKLMStripFirmwareBySoftware(int stripSoftware) const
+int KLMElectronicsMapImporter::getEKLMStripFirmwareBySoftware(int stripSoftware)
 {
   int segment, strip;
   /* Segment is 0-based here. */

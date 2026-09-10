@@ -47,7 +47,7 @@ TrackFinderVXDCosmicsStandaloneModule::TrackFinderVXDCosmicsStandaloneModule() :
 
 void TrackFinderVXDCosmicsStandaloneModule::initialize()
 {
-  for (auto& spacePointsName : m_spacePointsNames) {
+  for (const auto& spacePointsName : m_spacePointsNames) {
     m_spacePoints.push_back(StoreArray<SpacePoint>(spacePointsName));
     m_spacePoints.back().isRequired();
   }

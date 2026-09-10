@@ -238,7 +238,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
 
@@ -464,7 +464,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       deltaDrawer(delta, histogram, canvas);
     }
     //reference check
-    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
     if (ref) {ref->Draw("hist,same");}
   }
 }
@@ -522,7 +522,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   histogram->Draw();
 
   // Overlay reference histogram if available
-  TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref) {
     ref->Draw("hist,same");
   }
@@ -666,7 +666,7 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
     feHist->Draw();
 
     // Reference check
-    TH1* ref = findRefHist(feHist->GetName(), ERefScaling::c_RefScaleNone);
+    TH1* ref = findRefHist(feHist->GetName(), "", ERefScaling::c_RefScaleNone);
     if (ref) {
       ref->Draw("hist,same");
       B2INFO("processFEHistogram: Found and drew reference histogram.");

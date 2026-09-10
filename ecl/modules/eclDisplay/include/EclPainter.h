@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
      * Return title of ECL subsystem to use in painter.
      */
-    TString getSubsystemTitle(EclData::EclSubsystem subsys);
+    static TString getSubsystemTitle(EclData::EclSubsystem subsys);
 
     /**
      * Sets the information to be displayed in the provided
@@ -98,7 +98,7 @@ namespace Belle2 {
     /**
      * Make unique name for next root object.
      */
-    void getNewRootObjectName(char* buf, int size);
+    static void getNewRootObjectName(char* buf, int size);
 
   private:
     /**  Counter to make unique names for new root objects. */

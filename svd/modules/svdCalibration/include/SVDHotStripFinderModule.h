@@ -36,7 +36,7 @@ namespace Belle2 {
     SVDHotStripFinderModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~SVDHotStripFinderModule();
+    virtual ~SVDHotStripFinderModule() override;
 
     /** Use this to initialize resources or memory your module needs.
      *

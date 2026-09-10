@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "G4VPhysicsConstructor.hh"
+#include <G4VPhysicsConstructor.hh>
 
 class G4TheoFSGenerator;
 class G4ExcitedStringDecay;
@@ -28,7 +28,7 @@ namespace Belle2 {
     class GammaLeptoNuclearPhysics: public G4VPhysicsConstructor {
     public:
       /** Constructor **/
-      GammaLeptoNuclearPhysics(const G4int verbosityLevel = 0);
+      explicit GammaLeptoNuclearPhysics(const G4int verbosityLevel = 0);
       /** Destructor **/
       ~GammaLeptoNuclearPhysics();
 
@@ -40,19 +40,19 @@ namespace Belle2 {
 
     private:
       /** Final state generator for QCD string models */
-      G4TheoFSGenerator* m_qgsp;
+      G4TheoFSGenerator* m_qgsp = nullptr;
 
       /** Quark Gluon String model */
-      G4QGSModel<G4GammaParticipants>* m_stringModel;
+      G4QGSModel<G4GammaParticipants>* m_stringModel = nullptr;
 
       /** Model to decay strings into hadrons */
-      G4ExcitedStringDecay* m_stringDecay;
+      G4ExcitedStringDecay* m_stringDecay = nullptr;
 
       /** Quark Gluon String fragmentation model */
-      G4QGSMFragmentation* m_fragModel;
+      G4QGSMFragmentation* m_fragModel = nullptr;
 
       /** Precompound model to deexcite post-collision nucleus */
-      G4GeneratorPrecompoundInterface* m_preCompoundModel;
+      G4GeneratorPrecompoundInterface* m_preCompoundModel = nullptr;
 
       /** Switch between GammaNuclearXS and PhotoNuclearXS */
       G4bool m_useGammaNuclearXS;

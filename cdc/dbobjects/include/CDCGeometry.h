@@ -934,15 +934,15 @@ namespace Belle2 {
       /**
        * Get the list of the Rmin coordinates.
        */
-      std::vector<double> getRmin() const { return m_rmin;}
+      const std::vector<double>& getRmin() const { return m_rmin;}
       /**
        * Get the list of the Rmax coordinates.
        */
-      std::vector<double> getRmax() const { return m_rmax;}
+      const std::vector<double>& getRmax() const { return m_rmax;}
       /**
        * Get the list of the z coordinates.
        */
-      std::vector<double> getZ() const { return m_z;}
+      const std::vector<double>& getZ() const { return m_z;}
 
 
     private:
@@ -1163,7 +1163,7 @@ namespace Belle2 {
       /**
        * Get name.
        */
-      std::string getName() const { return m_name;}
+      const std::string& getName() const { return m_name;}
 
       /**
        * Get ID.
@@ -1234,7 +1234,7 @@ namespace Belle2 {
       /**
        * Get name.
        */
-      std::string getName() const { return m_name;}
+      const std::string& getName() const { return m_name;}
 
       /**
        * Get ID.
@@ -1306,7 +1306,7 @@ namespace Belle2 {
       /**
        * Get name.
        */
-      std::string getName() const { return m_name;}
+      const std::string& getName() const { return m_name;}
 
       /**
        * Get ILayer.
@@ -1394,7 +1394,7 @@ namespace Belle2 {
       /**
        * Get the list of endplate layers.
        */
-      std::vector<EndPlateLayer> getEndPlateLayers() const {return m_endPlateLayers;}
+      const std::vector<EndPlateLayer>& getEndPlateLayers() const {return m_endPlateLayers;}
     private:
       int m_id; /**< Layer ID. */
       std::vector<EndPlateLayer> m_endPlateLayers; /**< Endplate layers. */
@@ -1471,12 +1471,12 @@ namespace Belle2 {
     /**
      * Get the mother volume geometry of CDC.
      */
-    MotherVolume getMotherVolume() const { return m_mother;}
+    const MotherVolume& getMotherVolume() const { return m_mother;}
 
     /**
      * Get the list of outer walls.
      */
-    std::vector<OuterWall> getOuterWalls() const { return m_outerWalls;}
+    const std::vector<OuterWall>& getOuterWalls() const { return m_outerWalls;}
 
     /**
      * Get the i-th outer wall.
@@ -1486,7 +1486,7 @@ namespace Belle2 {
     /**
      * Get the list of inner walls.
      */
-    std::vector<InnerWall> getInnerWalls() const { return m_innerWalls;}
+    const std::vector<InnerWall>& getInnerWalls() const { return m_innerWalls;}
 
     /**
      * Get the i-th inner wall.
@@ -1506,7 +1506,7 @@ namespace Belle2 {
     /**
      * Get the list of endplates.
      */
-    std::vector<EndPlate> getEndPlates() const { return m_endplates;}
+    const std::vector<EndPlate>& getEndPlates() const { return m_endplates;}
 
     /**
      * Get the number of frontend layers.
@@ -1516,7 +1516,7 @@ namespace Belle2 {
     /**
      * Get the list of frontend layers.
      */
-    std::vector<Frontend> getFrontends() const {return m_frontends;}
+    const std::vector<Frontend>& getFrontends() const {return m_frontends;}
 
     /**
      * Get i-th sense layer.
@@ -1526,7 +1526,7 @@ namespace Belle2 {
     /**
      * Get the list of sense layers.
      */
-    std::vector<SenseLayer> getSenseLayers() const { return m_senseLayers;}
+    const std::vector<SenseLayer>& getSenseLayers() const { return m_senseLayers;}
 
     /**
      * Get the number of sense layers.
@@ -1556,7 +1556,7 @@ namespace Belle2 {
     /**
      * Get the list of field layers.
      */
-    std::vector<FieldLayer> getFieldLayers() const { return m_fieldLayers;}
+    const std::vector<FieldLayer>& getFieldLayers() const { return m_fieldLayers;}
 
     /**
      * Get the number of field layers.
@@ -1567,42 +1567,42 @@ namespace Belle2 {
     /**
      * Get the list of neutron shields.
      */
-    std::vector<NeutronShield> getNeutronShields() const { return m_neutronShields;}
+    const std::vector<NeutronShield>& getNeutronShields() const { return m_neutronShields;}
 
     /**
      * Get the list of covers.
      */
-    std::vector<Cover> getCovers() const { return m_covers;}
+    const std::vector<Cover>& getCovers() const { return m_covers;}
 
     /**
      * Get the list of covers.
      */
-    std::vector<Cover2> getCover2s() const { return m_cover2s;}
+    const std::vector<Cover2>& getCover2s() const { return m_cover2s;}
 
     /**
      * Get the list of ribs.
      */
-    std::vector<Rib> getRibs() const { return m_ribs;}
+    const std::vector<Rib>& getRibs() const { return m_ribs;}
 
     /**
      * Get the list of rib2s.
      */
-    std::vector<Rib2> getRib2s() const { return m_rib2s;}
+    const std::vector<Rib2>& getRib2s() const { return m_rib2s;}
 
     /**
      * Get the list of rib3s.
      */
-    std::vector<Rib3> getRib3s() const { return m_rib3s;}
+    const std::vector<Rib3>& getRib3s() const { return m_rib3s;}
 
     /**
      * Get the list of rib4s.
      */
-    std::vector<Rib4> getRib4s() const { return m_rib4s;}
+    const std::vector<Rib4>& getRib4s() const { return m_rib4s;}
 
     /**
      * Get the list of rib5s.
      */
-    std::vector<Rib5> getRib5s() const { return m_rib5s;}
+    const std::vector<Rib5>& getRib5s() const { return m_rib5s;}
 
 
     /**

@@ -123,6 +123,7 @@ namespace Belle2 {
       double m_A = 0;  /**< the largest energy full width */
       double m_B = 0;  /**< the middle energy full width */
       double m_C = 0;  /**< the smallset energy full width */
+      bool m_threeSquare = false; /**< true if the three-square convolution must be used (m_C/m_A > 0.001) */
       std::vector<double> m_mask; /**< discrete mask (half of) */
 
       static unsigned s_Nmin; /**< minimal mask size */

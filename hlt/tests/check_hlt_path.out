@@ -1316,6 +1316,7 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
+      vertexFitter=Rave
   143. TrackFinderMCTruthRecoTracks
       AllowFirstCDCSuperLayerOnly=False
       EnergyCut=0.0
@@ -4291,6 +4292,7 @@
             useNewV0Fitter=False
             v0FitterMode=1
             vertexChi2CutOutside=10000.0
+            vertexFitter=Rave
         3. TrackFinderMCTruthRecoTracks
             AllowFirstCDCSuperLayerOnly=False
             EnergyCut=0.0

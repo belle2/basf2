@@ -47,6 +47,17 @@ void WholeWireHitRelationFilter::exposeParameters(ModuleParamList* moduleParamLi
                  m_param_degree);
 }
 
+void WholeWireHitRelationFilter::prepare(const std::vector<CDCWireHit*>& wireHits)
+{
+  m_preparedWires.clear();
+  m_preparedWires.reserve(wireHits.size());
+  for (const CDCWireHit* wireHit : wireHits) {
+    m_preparedWires.push_back(&wireHit->getWire());
+  }
+  m_preparedWireHitsData = wireHits.data();
+  m_preparedWireHitsSize = wireHits.size();
+}
+
 std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
   CDCWireHit* from,
   const std::vector<CDCWireHit*>& wireHits) const
@@ -143,9 +154,28 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
 
   std::sort(std::begin(m_wireNeighbors), std::end(m_wireNeighbors));
 
+  // Use the wires precomputed by prepare() when called with the prepared vector.
+  // The comparison LessOf<Deref>() used below resolves to operator<(CDCWireHit, CDCWire),
+  // which compares the *address* of the wire of the hit with the address of the wire.
+  // Searching the precomputed wire addresses therefore evaluates exactly the same
+  // predicate on exactly the same values, only without dereferencing the wire hits.
+  const bool prepared =
+    wireHits.data() == m_preparedWireHitsData and wireHits.size() == m_preparedWireHitsSize;
+
   for (const CDCWire* neighborWire : m_wireNeighbors) {
-    ConstVectorRange<CDCWireHit*> neighborWireHits{
-      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
+    ConstVectorRange<CDCWireHit*> neighborWireHits = [&]() -> ConstVectorRange<CDCWireHit*> {
+      if (prepared)
+      {
+        const auto itRange =
+        std::equal_range(m_preparedWires.begin(), m_preparedWires.end(), neighborWire);
+        return {
+          wireHits.begin() + (itRange.first - m_preparedWires.begin()),
+          wireHits.begin() + (itRange.second - m_preparedWires.begin())};
+      }
+      return ConstVectorRange<CDCWireHit*>{
+        std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())
+      };
+    }();
 
     m_wireHitNeighbors.insert(m_wireHitNeighbors.end(),
                               neighborWireHits.begin(),

@@ -11,10 +11,14 @@
 
 #include <vector>
 #include <string>
+#include <cstddef>
 
 namespace Belle2 {
   class ModuleParamList;
 
+  namespace CDC {
+    class CDCWire;
+  }
   namespace TrackingUtilities {
     class CDCWireHit;
   }
@@ -40,9 +44,27 @@ namespace Belle2 {
       std::vector<TrackingUtilities::CDCWireHit*> getPossibleTos(TrackingUtilities::CDCWireHit* from,
                                                                  const std::vector<TrackingUtilities::CDCWireHit*>& wireHits) const final;
 
+      /**
+       *  Precompute the wires of the given wire hits to speed up the searches
+       *  in the following getPossibleTos calls made with the very same vector.
+       *
+       *  Optional - getPossibleTos calls with any other vector fall back to
+       *  searching the wire hits directly.
+       */
+      void prepare(const std::vector<TrackingUtilities::CDCWireHit*>& wireHits);
+
     private:
       /// Degree of the neighbor extend
       int m_param_degree = 2;
+
+      /// Memory for the wires of the prepared wire hit vector.
+      std::vector<const CDC::CDCWire*> m_preparedWires;
+
+      /// Data pointer of the prepared wire hit vector used to recognize it in getPossibleTos.
+      TrackingUtilities::CDCWireHit* const* m_preparedWireHitsData = nullptr;
+
+      /// Size of the prepared wire hit vector used to recognize it in getPossibleTos.
+      std::size_t m_preparedWireHitsSize = 0;
     };
   }
 }

@@ -165,7 +165,7 @@ geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
 # add beast detectors
 if sampleType == 'study' and (phase == 31 or phase == 32):
-    geometry.param('additionalComponents', ["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
+    geometry.param('additionalComponents', ["MICROTPC", "CLAWS", "HE3TUBE"])
 main.add_module(geometry)
 
 # Geant simulation

@@ -2,16 +2,7 @@
 <Envelope description="Envelope Volume for VTX">
 	<!-- InnerPoints re-derived 2026-08 to clear the AdditionalShield_FWD/BWD and
 		 BellowsShield_FWD/BWD tungsten shields (ir/data/BeamPipe.xml) by >=1.1mm
-		 radial margin everywhere the two overlap in Z, instead of the previous
-		 profile which overlapped the shields by up to ~2.35cm (z=43.8-52.5cm FWD)
-		 and ~0.35cm elsewhere, including at the AdditionalShield_BWD/BellowsShield_BWD
-		 junction (z=-19.1cm), where the two shield elements meet with different
-		 radii (5.317cm vs 5.817cm) and the larger of the two must be cleared.
-		 The active VTX sensor layers (up to R=13.46cm, |Z|<=35.3cm) stay well
-		 clear of the shields (>0.6cm radial gap in the worst case) and remain
-		 fully inside this envelope after the change.
-		 FIXME: this still gives zero margin for detector misalignment beyond the
-		 ~1mm shield clearance; revisit if alignment studies need more room. -->
+		 radial margin everywhere  -->
 	<OuterPoints>
 		<point><z unit="mm">-400.000</z><x unit="mm">155.000</x></point>
 		<point><z unit="mm"> 525.000</z><x unit="mm">155.000</x></point>

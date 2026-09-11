@@ -203,7 +203,7 @@ geometry.param('useDB', False)
 addComp = ["MagneticField3dQuadBeamline"]
 # add beast detectors
 if sampleType == 'study' and (phase == 31 or phase == 32):
-    addComp.extend(["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
+    addComp.extend(["MICROTPC", "CLAWS", "HE3TUBE"])
 
 geometry.param({"excludedComponents": ["MagneticField"],
                 "additionalComponents": addComp})

@@ -8,7 +8,6 @@
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
 
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -86,6 +85,11 @@ void SVDUnpackerModule::initialize()
   m_storeShaperDigits.registerInDataStore(m_svdShaperDigitListName);
   m_svdShaperDigitListName = m_storeShaperDigits.getName();
 
+  m_diagnostics.reserve(2048);
+  m_digitsWithDiag.reserve(8192);
+  m_digitSortKeys.reserve(8192);
+  m_apvsByPipeline.reserve(2048);
+
 }
 
 void SVDUnpackerModule::beginRun()
@@ -147,12 +151,15 @@ void SVDUnpackerModule::event()
               << "remember to use SVDShaperDigitSorter in your path and \n"
               << "set the silentlyAppend parameter of SVDUnpacker to true.");
 
-  SVDDAQDiagnostic* currentDAQDiagnostic;
-  vector<SVDDAQDiagnostic*> vDiagnostic_ptr;
+  // Diagnostics, digits and pipeline addresses are accumulated in event-local
+  // buffers and moved to the DataStore only once, at the end of the event.
+  m_diagnostics.clear();
+  m_digitsWithDiag.clear();
+  m_digitSortKeys.clear();
+  m_apvsByPipeline.clear();
 
-  map<SVDShaperDigit, SVDDAQDiagnostic*> diagnosticMap;
-  // Store encountered pipeline addresses with APVs in which they were observed
-  map<unsigned short, set<pair<unsigned short, unsigned short> > > apvsByPipeline;
+  // index in m_diagnostics of the diagnostic of the current APV
+  size_t currentDiagIdx = size_t(-1);
 
   if (!m_eventMetaDataPtr.isValid()) {  // give up...
     B2ERROR("Missing valid EventMetaData." << std::endl << "No SVDShaperDigit produced for this event!");
@@ -173,27 +180,36 @@ void SVDUnpackerModule::event()
   bool isSetNAPVsamples = false;
 
   unsigned short nAPVheaders = 999;
-  set<short> seenAPVHeaders = {};
+  uint64_t seenAPVHeaders = 0; // bit mask of the (6-bit) APV numbers seen since the last FADC trailer
 
   unsigned short nEntries_rawSVD = m_rawSVD.getEntries();
   auto eventNo = m_eventMetaDataPtr->getEvent();
 
   short fadc = 255, apv = 63;
 
+  // cache of the online-to-offline sensor lookup, valid for the current (fadc, apv)
+  int cachedChipID = -1;
+  SVDOnlineToOfflineMap::SensorInfo cachedSensorInfo{};
+
+  // scratch buffers hoisted out of the loops to avoid re-allocations
+  std::vector<unsigned short> nWords;
+  std::vector<uint32_t*> data32tab; //vector of pointers
+  vector<uint32_t> crc16vec; // input words for the CRC16 check, already converted with htonl
+
   unsigned short cntFADCboards = 0;
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
 
-    unsigned int numEntries_rawSVD = m_rawSVD[ i ]->GetNumEntries();
+    RawSVD* rawSVD = m_rawSVD[i];
+    unsigned int numEntries_rawSVD = rawSVD->GetNumEntries();
     for (unsigned int j = 0; j < numEntries_rawSVD; j++) {
 
-      const unsigned short maxNumOfCh = m_rawSVD[i]->GetMaxNumOfCh(j);
+      const unsigned short maxNumOfCh = rawSVD->GetMaxNumOfCh(j);
 
-      std::vector<unsigned short> nWords;
-      nWords.reserve(maxNumOfCh);
-      std::vector<uint32_t*>      data32tab(maxNumOfCh); //vector of pointers
+      nWords.resize(maxNumOfCh);
+      data32tab.resize(maxNumOfCh);
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
-        nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
-        data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
+        nWords[k] = rawSVD->GetDetectorNwords(j, k);
+        data32tab[k] = (uint32_t*)rawSVD->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
       }
 
       unsigned short ftbError = 0;
@@ -213,42 +229,45 @@ void SVDUnpackerModule::event()
 
       for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4(COPPER) or 48(PCIe40) buffers
 
-        if (data32tab[buf] == nullptr || nWords.at(buf) == 0) {
-          if (data32tab[buf] != nullptr || nWords.at(buf) != 0) {
+        if (data32tab[buf] == nullptr || nWords[buf] == 0) {
+          if (data32tab[buf] != nullptr || nWords[buf] != 0) {
             B2WARNING("Invalid combination of buffer pointer and nWords:" <<
                       LogVar("COPPER/PCIe40 ID", i) <<
                       LogVar("COPPER/PCIe40 Entry", j) <<
                       LogVar("COPPER/PCIe40 Channel", buf) <<
                       LogVar("data32tab[buf]", data32tab[buf]) <<
-                      LogVar("nWords[buf]", nWords.at(buf)));
+                      LogVar("nWords[buf]", nWords[buf]));
           }
           continue;
         }
-        if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords.at(buf) - 1], nWords.at(buf));
+        if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
 
         cntFADCboards++;
 
         missedHeader = false;
         missedTrailer = false;
 
+        // diagnostics created for this buffer: [bufDiagStart, m_diagnostics.size())
+        const size_t bufDiagStart = m_diagnostics.size();
+
         uint32_t* data32_it = data32tab[buf];
         short strip, sample[6];
-        vector<uint32_t> crc16vec;
+        crc16vec.clear();
 
         //reset value for headers and trailers check
         seenHeadersAndTrailers = 0;
 
-        for (; data32_it != &data32tab[buf][nWords.at(buf)]; data32_it++) {
+        for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header
             crc16vec.clear(); // clear the input container for crc16 calculation
-            crc16vec.push_back(m_data32);
+            crc16vec.push_back(htonl(m_data32));
 
             seenHeadersAndTrailers |= 0x1; // we found FTB header
 
             data32_it++; // go to 2nd part of FTB header
-            crc16vec.push_back(*data32_it);
+            crc16vec.push_back(htonl(*data32_it));
 
             m_data32 = *data32_it; //put the second 32-bit frame to union
 
@@ -291,7 +310,7 @@ void SVDUnpackerModule::event()
             continue;
           } // is FTB Header
 
-          crc16vec.push_back(m_data32);
+          crc16vec.push_back(htonl(m_data32));
 
           if (m_MainHeader.check == 6) { // FADC header
 
@@ -359,7 +378,7 @@ void SVDUnpackerModule::event()
 
             nAPVheaders++;
             apv = m_APVHeader.APVnum;
-            seenAPVHeaders.insert(apv);
+            seenAPVHeaders |= (uint64_t(1) << apv);
 
             cmc1 = m_APVHeader.CMC1;
             cmc2 = m_APVHeader.CMC2;
@@ -373,13 +392,13 @@ void SVDUnpackerModule::event()
                                                  apvErrors));
             }
             // temporary SVDDAQDiagnostic object (no info from trailers and APVmatch code)
-            currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, true,
-                                                                   nAPVmatch,
-                                                                   badHeader, missedHeader, missedTrailer,
-                                                                   fadc, apv);
-            vDiagnostic_ptr.push_back(currentDAQDiagnostic);
+            m_diagnostics.emplace_back(trgNumber, trgType, pipAddr, cmc1, cmc2, apvErrors, ftbError, true,
+                                       nAPVmatch,
+                                       badHeader, missedHeader, missedTrailer,
+                                       fadc, apv);
+            currentDiagIdx = m_diagnostics.size() - 1;
 
-            apvsByPipeline[pipAddr].insert(make_pair(fadc, apv));
+            m_apvsByPipeline.push_back((uint32_t(pipAddr) << 16) | (uint32_t(fadc) << 8) | uint32_t(apv));
 
             // Let's check if the data frame does not come after APV header with piplAddr = 255 (special SEU recovery pseudo-data)
             if (pipAddr == 255) {
@@ -418,7 +437,7 @@ void SVDUnpackerModule::event()
                   B2ERROR("DAQMode value (indicating 3-sample acquisition mode) doesn't correspond to the actual number of samples (6) in the data! The data might be corrupted!");
               }
 
-              crc16vec.push_back(m_data32);
+              crc16vec.push_back(htonl(m_data32));
 
               sample[3] = m_data_B.sample4;
               sample[4] = m_data_B.sample5;
@@ -438,11 +457,24 @@ void SVDUnpackerModule::event()
               }
             }
 
-            // Generating SVDShaperDigit object
-            SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0);
-            if (newShaperDigit) {
-              diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
-              delete newShaperDigit;
+            // Generating SVDShaperDigit object; the sensor lookup is cached
+            // and refreshed only when the (fadc, apv) combination changes
+            const int chipID = (int(fadc) << 8) | int(apv);
+            if (chipID != cachedChipID) {
+              cachedSensorInfo = m_map->getSensorInfo(fadc, apv);
+              cachedChipID = chipID;
+            }
+            if (cachedSensorInfo.m_sensorID) {
+              const short cellID = m_map->getStripNumber(strip, cachedSensorInfo);
+              // key packing (sensorID, side with U first, strip, insertion index):
+              // sorting the keys reproduces the SVDShaperDigit::operator< ordering,
+              // with ties resolved in favour of the first inserted digit
+              m_digitSortKeys.push_back((uint64_t(VxdID::baseType(cachedSensorInfo.m_sensorID)) << 48)
+                                        | (uint64_t(cachedSensorInfo.m_uSide ? 0 : 1) << 47)
+                                        | (uint64_t(uint16_t(cellID) ^ 0x8000) << 31)
+                                        | uint64_t(m_digitsWithDiag.size()));
+              m_digitsWithDiag.emplace_back(SVDShaperDigit(cachedSensorInfo.m_sensorID, cachedSensorInfo.m_uSide, cellID, sample, 0),
+                                            currentDiagIdx);
             } else if (m_badMappingFatal) {
               B2FATAL("Respective FADC/APV combination not found -->> incorrect payload in the database! ");
             } else {
@@ -463,15 +495,15 @@ void SVDUnpackerModule::event()
             unsigned short nAPVs = APVmap->count(fadc);
 
             if (nAPVheaders == 0) {
-              currentDAQDiagnostic = m_storeDAQDiagnostics.appendNew(0, 0, 0, 0, 0, 0, ftbError, true, nAPVmatch, badHeader, 0, 0, fadc, 0);
-              vDiagnostic_ptr.push_back(currentDAQDiagnostic);
+              m_diagnostics.emplace_back(0, 0, 0, 0, 0, 0, ftbError, true, nAPVmatch, badHeader, 0, 0, fadc, 0);
+              currentDiagIdx = m_diagnostics.size() - 1;
             }
 
             if (nAPVs != nAPVheaders) {
               // There is an APV missing, detect which it is.
               for (const auto& fadcApv : *APVmap) {
                 if (fadcApv.first != fadc) continue;
-                if (seenAPVHeaders.find(fadcApv.second) == seenAPVHeaders.end()) {
+                if (!((seenAPVHeaders >> fadcApv.second) & 1)) {
                   // We have a missing APV. Look if it is a known one.
                   auto missingRec = m_missingAPVs.find(make_pair(fadcApv.first, fadcApv.second));
                   if (missingRec != m_missingAPVs.end()) {
@@ -496,7 +528,7 @@ void SVDUnpackerModule::event()
               nAPVmatch = false;
             } // is nAPVs != nAPVheaders
 
-            seenAPVHeaders.clear();
+            seenAPVHeaders = 0;
 
             ftbFlags = m_FADCTrailer.FTBFlags;
             if ((ftbFlags >> 5) != 0) badTrailer = true;
@@ -522,18 +554,14 @@ void SVDUnpackerModule::event()
 
             seenHeadersAndTrailers |= 0x8; // we found FTB trailer
 
-            //check CRC16
+            //check CRC16: the trailer word itself is not part of the checksum,
+            //the words were already converted with htonl when collected
             crc16vec.pop_back();
-            unsigned short iCRC = crc16vec.size();
-            std::vector<uint32_t> crc16input;
-            crc16input.reserve(iCRC);
 
-            for (unsigned short icrc = 0; icrc < iCRC; icrc++)
-              crc16input.push_back(htonl(crc16vec.at(icrc)));
-
-            //verify CRC16
-            boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-            bcrc.process_bytes(crc16input.data(), crc16input.size() * sizeof(uint32_t));
+            //verify CRC16 (table-driven, same parameters and result as
+            //boost::crc_basic<16>(0x8005, 0xffff, 0, false, false))
+            boost::crc_optimal<16, 0x8005, 0xFFFF, 0, false, false> bcrc;
+            bcrc.process_bytes(crc16vec.data(), crc16vec.size() * sizeof(uint32_t));
             unsigned int checkCRC = bcrc.checksum();
 
             if (checkCRC != m_FTBTrailer.crc16) {
@@ -553,18 +581,17 @@ void SVDUnpackerModule::event()
           if (!(seenHeadersAndTrailers & 8)) {B2ERROR("Missing FTB Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
         }
 
-        for (auto p : vDiagnostic_ptr) {
+        for (size_t d = bufDiagStart; d < m_diagnostics.size(); d++) {
           // adding remaining info to Diagnostic object
-          p->setFTBFlags(ftbFlags);
-          p->setApvErrorOR(apvErrorsOR);
-          p->setAPVMatch(nAPVmatch);
-          p->setBadMapping(badMapping);
-          p->setBadTrailer(badTrailer);
-          p->setMissedHeader(missedHeader);
-          p->setMissedTrailer(missedTrailer);
+          SVDDAQDiagnostic& p = m_diagnostics[d];
+          p.setFTBFlags(ftbFlags);
+          p.setApvErrorOR(apvErrorsOR);
+          p.setAPVMatch(nAPVmatch);
+          p.setBadMapping(badMapping);
+          p.setBadTrailer(badTrailer);
+          p.setMissedHeader(missedHeader);
+          p.setMissedTrailer(missedTrailer);
         }
-
-        vDiagnostic_ptr.clear();
 
       } // end iteration on 4(COPPER)/48(PCIe40) data buffers
 
@@ -580,64 +607,83 @@ void SVDUnpackerModule::event()
                                                              cntFADCboards)  << LogVar("# of FADCs", nFADCboards) << LogVar("Event number", eventNo));
 
     // We override all FADCMatch fields in diagnostics and set it to false.
-    for (auto& p : m_storeDAQDiagnostics) {
+    for (auto& p : m_diagnostics) {
       p.setFADCMatch(false);
     }
   }
 
+  // Sort the (pipeline address, FADC, APV) words and drop duplicates: groups of
+  // entries sharing the pipeline address then appear in the same order as in
+  // the former map<pipeline, set<pair<fadc, apv>>>
+  std::sort(m_apvsByPipeline.begin(), m_apvsByPipeline.end());
+  m_apvsByPipeline.erase(std::unique(m_apvsByPipeline.begin(), m_apvsByPipeline.end()), m_apvsByPipeline.end());
 
   // Check if we have special data for SEU recovery mode (pipAddr = 0xFF)
   // If so, let's monitor affected FADC/APV's and the event range with seuRecMap
-  auto itPtr = apvsByPipeline.find(255);
-  if (itPtr != apvsByPipeline.end()) {
-    for (const auto& fadcApv : itPtr->second) {
+  // (the entries with pipAddr = 255 are the tail of the sorted list)
+  auto seuBegin = std::lower_bound(m_apvsByPipeline.begin(), m_apvsByPipeline.end(), uint32_t(255) << 16);
+  for (auto it = seuBegin; it != m_apvsByPipeline.end(); ++it) {
+    const unsigned short fadcNo = (*it >> 8) & 0xff;
+    const unsigned short apvNo = *it & 0xff;
 
-      auto seuRec = m_seuRecMap.find(make_pair(fadcApv.first, fadcApv.second));
-      if (seuRec != m_seuRecMap.end()) {
-        if (seuRec->second.first > eventNo)
-          seuRec->second.first = eventNo;
-        if (seuRec->second.second < eventNo)
-          seuRec->second.second = eventNo;
-      } else {
-        nSEURecoveryCase++;
-        m_seuRecMap.insert(make_pair(
-                             make_pair(fadcApv.first, fadcApv.second),
-                             make_pair(eventNo, eventNo)
-                           ));
-        if (!(nSEURecoveryCase % m_errorRate))
-          B2ERROR("Special Recovery Data (Dummy APV Header) found due to the detection of Single Event Upset (SEU)!!!" << LogVar("APV",
-                  int(fadcApv.second)) << LogVar("FADC", int(fadcApv.first)) << LogVar("Event number", eventNo));
+    auto seuRec = m_seuRecMap.find(make_pair(fadcNo, apvNo));
+    if (seuRec != m_seuRecMap.end()) {
+      if (seuRec->second.first > eventNo)
+        seuRec->second.first = eventNo;
+      if (seuRec->second.second < eventNo)
+        seuRec->second.second = eventNo;
+    } else {
+      nSEURecoveryCase++;
+      m_seuRecMap.insert(make_pair(
+                           make_pair(fadcNo, apvNo),
+                           make_pair(eventNo, eventNo)
+                         ));
+      if (!(nSEURecoveryCase % m_errorRate))
+        B2ERROR("Special Recovery Data (Dummy APV Header) found due to the detection of Single Event Upset (SEU)!!!" << LogVar("APV",
+                int(apvNo)) << LogVar("FADC", int(fadcNo)) << LogVar("Event number", eventNo));
 
-      }
-      for (auto& pp : m_storeDAQDiagnostics) {
-        if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
-          pp.setSEURecoData(true);
-      }
+    }
+    for (auto& pp : m_diagnostics) {
+      if (pp.getFADCNumber() == fadcNo and pp.getAPVNumber() == apvNo)
+        pp.setSEURecoData(true);
     }
   }
 
+  // Detect upset APVs and report/treat.
+  // Find the pipeline address seen by most APVs; ties are resolved in favour
+  // of the lowest address, as max_element did on the former map.
+  unsigned short majorPipeline = 0;
+  size_t majorCount = 0;
+  unsigned short nPipelines = 0;
+  for (size_t b = 0; b < m_apvsByPipeline.size();) {
+    const unsigned short pip = m_apvsByPipeline[b] >> 16;
+    size_t e = b;
+    while (e < m_apvsByPipeline.size() && (m_apvsByPipeline[e] >> 16) == pip) e++;
+    nPipelines++;
+    if (e - b > majorCount) { majorCount = e - b; majorPipeline = pip; }
+    b = e;
+  }
 
-  // Detect upset APVs and report/treat
-  auto majorAPV = max_element(apvsByPipeline.begin(), apvsByPipeline.end(),
-                              [](const decltype(apvsByPipeline)::value_type & p1,
-                                 const decltype(apvsByPipeline)::value_type & p2) -> bool
-  { return p1.second.size() < p2.second.size(); }
-                             );
   // We set emuPipelineAddress fields in diagnostics to this.
-  if (m_emulatePipelineAddress)
-    for (auto& p : m_storeDAQDiagnostics)
-      p.setEmuPipelineAddress(majorAPV->first);
+  if (m_emulatePipelineAddress && majorCount > 0)
+    for (auto& p : m_diagnostics)
+      p.setEmuPipelineAddress(majorPipeline);
 
-  unsigned short apvsByPipelineSize = apvsByPipeline.size();
-  if (majorAPV->first == 255) apvsByPipelineSize = 1;
+  unsigned short apvsByPipelineSize = nPipelines;
+  if (majorCount > 0 && majorPipeline == 255) apvsByPipelineSize = 1;
 
   // And report any upset apvs or update records
   if (apvsByPipelineSize > 1)
-    for (const auto& p : apvsByPipeline) {
-      if (p.first == majorAPV->first or p.first == 255) continue;
-      for (const auto& fadcApv : p.second) {
+    for (size_t b = 0; b < m_apvsByPipeline.size();) {
+      const unsigned short pip = m_apvsByPipeline[b] >> 16;
+      size_t e = b;
+      while (e < m_apvsByPipeline.size() && (m_apvsByPipeline[e] >> 16) == pip) e++;
+      if (pip == majorPipeline or pip == 255) { b = e; continue; }
+      for (size_t k = b; k < e; k++) {
+        const unsigned short fadcNo = (m_apvsByPipeline[k] >> 8) & 0xff;
+        const unsigned short apvNo = m_apvsByPipeline[k] & 0xff;
         // We have an upset APV. Look if it is a known one.
-        auto upsetRec = m_upsetAPVs.find(make_pair(fadcApv.first, fadcApv.second));
+        auto upsetRec = m_upsetAPVs.find(make_pair(fadcNo, apvNo));
         if (upsetRec != m_upsetAPVs.end()) {
           // This is known to be upset, so keep quiet and update event counters
           if (upsetRec->second.first > eventNo)
@@ -648,33 +694,49 @@ void SVDUnpackerModule::event()
           // We haven't seen this one previously.
           nUpsetAPVsErrors++;
           m_upsetAPVs.insert(make_pair(
-                               make_pair(fadcApv.first, fadcApv.second),
+                               make_pair(fadcNo, apvNo),
                                make_pair(eventNo, eventNo)
                              ));
 
-          if (!(nUpsetAPVsErrors % m_errorRate)) B2ERROR("Upset APV detected!!!" << LogVar("APV", int(fadcApv.second)) << LogVar("FADC",
-                                                           int(fadcApv.first)) << LogVar("Event number", eventNo));
+          if (!(nUpsetAPVsErrors % m_errorRate)) B2ERROR("Upset APV detected!!!" << LogVar("APV", int(apvNo)) << LogVar("FADC",
+                                                           int(fadcNo)) << LogVar("Event number", eventNo));
         }
 
-        for (auto& pp : m_storeDAQDiagnostics) {
+        for (auto& pp : m_diagnostics) {
 
-          if (pp.getFADCNumber() == fadcApv.first and pp.getAPVNumber() == fadcApv.second)
+          if (pp.getFADCNumber() == fadcNo and pp.getAPVNumber() == apvNo)
             pp.setUpsetAPV(true);
         }
 
       }
+      b = e;
     }
+
+  // Sort the digit keys and drop duplicated strips keeping the first occurrence:
+  // same ordering and deduplication as the former map<SVDShaperDigit, ...>
+  std::sort(m_digitSortKeys.begin(), m_digitSortKeys.end());
 
   // Here we can delete digits coming from upset APVs. We detect them by comparing
   // actual and emulated pipeline address fields in DAQDiagnostics.
-  for (auto& p : diagnosticMap) {
+  uint64_t lastKeptStrip = ~uint64_t(0); // sentinel that cannot match any key
+  for (const uint64_t key : m_digitSortKeys) {
 
-    if ((m_killUpsetDigits && p.second->getPipelineAddress() != p.second->getEmuPipelineAddress()) || p.second->getFTBError() != 240
-        || p.second->getFTBFlags()     || p.second->getAPVError() || !(p.second->getAPVMatch()) || !(p.second->getFADCMatch())
-        || p.second->getBadHeader()
-        ||  p.second->getBadMapping() || p.second->getUpsetAPV() || p.second->getMissedHeader() || p.second->getMissedTrailer()) continue;
+    if ((key >> 31) == lastKeptStrip) continue; // duplicated strip
+    lastKeptStrip = key >> 31;
+
+    const auto& p = m_digitsWithDiag[key & 0x7fffffff];
+    if (p.second >= m_diagnostics.size()) continue; // data frame without APV header
+    const SVDDAQDiagnostic& d = m_diagnostics[p.second];
+    if ((m_killUpsetDigits && d.getPipelineAddress() != d.getEmuPipelineAddress()) || d.getFTBError() != 240
+        || d.getFTBFlags()     || d.getAPVError() || !(d.getAPVMatch()) || !(d.getFADCMatch())
+        || d.getBadHeader()
+        ||  d.getBadMapping() || d.getUpsetAPV() || d.getMissedHeader() || d.getMissedTrailer()) continue;
     m_storeShaperDigits.appendNew(p.first);
   }
+
+  // Finally move the diagnostics to the DataStore, in one go.
+  for (const auto& d : m_diagnostics)
+    m_storeDAQDiagnostics.appendNew(d);
 
   if (!m_svdEventInfoPtr->getMatchTriggerType()) {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD Trigger Type value for: " << LogVar("Event number", eventNo));}
   if (!m_svdEventInfoPtr->getMatchModeByte())  {if (!(nEventInfoMatchErrors % m_errorRate) or nEventInfoMatchErrors < 200) B2WARNING("Inconsistent SVD ModeByte object for: " << LogVar("Event number", eventNo));}

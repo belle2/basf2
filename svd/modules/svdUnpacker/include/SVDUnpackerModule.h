@@ -27,8 +27,11 @@
 #include <svd/online/SVDOnlineToOfflineMap.h>
 #include <svd/online/SVDStripNoiseMap.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <memory>
 
+#include <cstdint>
+#include <memory>
+#include <utility>
+#include <vector>
 
 namespace Belle2::SVD {
 
@@ -57,14 +60,21 @@ namespace Belle2::SVD {
     virtual void event() override; /**<event*/
     virtual void endRun() override; /**<end run*/
 
-    std::string m_rawSVDListName; /**<RawSVD StoreArray name*/
-    std::string m_svdShaperDigitListName; /**<SVDShaperDigit StoreArray name*/
-    std::string m_svdDAQDiagnosticsListName; /**<SVDDAQDiagnostic StoreArray name*/
-    std::string m_svdEventInfoName; /**< SVDEventInfo name */
+  private:
+
+    /** RawSVD StoreArray name */
+    std::string m_rawSVDListName;
+
+    /** SVDShaperDigit StoreArray name */
+    std::string m_svdShaperDigitListName;
+
+    /** SVDDAQDiagnostic StoreArray name */
+    std::string m_svdDAQDiagnosticsListName;
+
+    /** SVDEventInfo name */
+    std::string m_svdEventInfoName;
 
     int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
-
-  private:
 
     /** how many FADCs we have */
     unsigned short nFADCboards;
@@ -235,6 +245,19 @@ namespace Belle2::SVD {
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_upsetAPVs;
     /** Map to store a list of APVs for special data for SEU recovery */
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_seuRecMap;
+
+    /** Event-local buffer of diagnostics; moved to the StoreArray once per event */
+    std::vector<SVDDAQDiagnostic> m_diagnostics;
+
+    /** Event-local buffer of digits, each with the index of its diagnostic in m_diagnostics */
+    std::vector<std::pair<SVDShaperDigit, std::size_t> > m_digitsWithDiag;
+
+    /** Event-local sort keys of the digits: (sensorID, side, strip, insertion index)
+     *  packed so that sorting them reproduces the SVDShaperDigit ordering */
+    std::vector<uint64_t> m_digitSortKeys;
+
+    /** Event-local list of (pipeline address << 16 | FADC << 8 | APV) words */
+    std::vector<uint32_t> m_apvsByPipeline;
 
     int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in units of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
 

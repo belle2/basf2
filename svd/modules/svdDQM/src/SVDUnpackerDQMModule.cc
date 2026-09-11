@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <string>
+#include <format>
 
 
 using namespace std;
@@ -167,14 +168,14 @@ void SVDUnpackerDQMModule::beginRun()
   m_runNumber = evtMetaData->getRun();
   m_errorFraction = 0;
 
-  TString runID = TString::Format(" ~ Exp %d Run %d", m_expNumber, m_runNumber);
+  std::string runID = std::format(" ~ Exp {:d} Run {:d}", m_expNumber, m_runNumber);
 
   if (m_DQMUnpackerHisto != nullptr) {
     TString tmp = m_DQMUnpackerHisto->GetTitle();
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMUnpackerHisto->SetTitle(title + runID);
+    m_DQMUnpackerHisto->SetTitle(title + runID.c_str());
     m_DQMUnpackerHisto->Reset();
   }
 
@@ -183,7 +184,7 @@ void SVDUnpackerDQMModule::beginRun()
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMErrorEventsHisto->SetTitle(title + runID);
+    m_DQMErrorEventsHisto->SetTitle(title + runID.c_str());
     m_DQMErrorEventsHisto->Reset();
   }
 
@@ -192,7 +193,7 @@ void SVDUnpackerDQMModule::beginRun()
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMSeuRecoveryFADCsEventHisto->SetTitle(title + runID);
+    m_DQMSeuRecoveryFADCsEventHisto->SetTitle(title + runID.c_str());
     m_DQMSeuRecoveryFADCsEventHisto->Reset();
   }
 
@@ -201,7 +202,7 @@ void SVDUnpackerDQMModule::beginRun()
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMnSamplesHisto->SetTitle(title + runID);
+    m_DQMnSamplesHisto->SetTitle(title + runID.c_str());
     m_DQMnSamplesHisto->Reset();
   }
 
@@ -210,7 +211,7 @@ void SVDUnpackerDQMModule::beginRun()
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMnSamplesHisto2->SetTitle(title + runID);
+    m_DQMnSamplesHisto2->SetTitle(title + runID.c_str());
     m_DQMnSamplesHisto2->Reset();
   }
 
@@ -219,7 +220,7 @@ void SVDUnpackerDQMModule::beginRun()
     Int_t pos = tmp.Last('~');
     if (pos == -1) pos = tmp.Length() + 2;
     TString title = tmp(0, pos - 2);
-    m_DQMtrgQuality->SetTitle(title + runID);
+    m_DQMtrgQuality->SetTitle(title + runID.c_str());
     m_DQMtrgQuality->Reset();
   }
 
@@ -286,28 +287,25 @@ void SVDUnpackerDQMModule::event()
 
 
   //filling m_DQMUnpackerHisto
-  unsigned int nDiagnostics = m_svdDAQDiagnostics.getEntries();
-
   unsigned short bin_no = 0;
   gStyle->SetOptStat(0);
 
-  for (unsigned short i = 0; i < nDiagnostics; i++) {
+  for (const auto& d : m_svdDAQDiagnostics) {
 
-    m_ftbFlags = m_svdDAQDiagnostics[i]->getFTBFlags();
-    m_ftbError = m_svdDAQDiagnostics[i]->getFTBError();
-    m_apvError = m_svdDAQDiagnostics[i]->getAPVError();
-    m_apvMatch = m_svdDAQDiagnostics[i]->getAPVMatch();
-    m_fadcMatch = m_svdDAQDiagnostics[i]->getFADCMatch();
-    m_upsetAPV = m_svdDAQDiagnostics[i]->getUpsetAPV();
-    m_badMapping = m_svdDAQDiagnostics[i]->getBadMapping();
-    m_badHeader = m_svdDAQDiagnostics[i]->getBadHeader();
-    m_badTrailer = m_svdDAQDiagnostics[i]->getBadTrailer();
-    m_missedHeader = m_svdDAQDiagnostics[i]->getMissedHeader();
-    m_missedTrailer = m_svdDAQDiagnostics[i]->getMissedTrailer();
-    m_seuRecoData = m_svdDAQDiagnostics[i]->getSEURecoData();
-
-    m_fadcNo = m_svdDAQDiagnostics[i]->getFADCNumber();
-    m_apvNo = m_svdDAQDiagnostics[i]->getAPVNumber();
+    m_ftbFlags = d.getFTBFlags();
+    m_ftbError = d.getFTBError();
+    m_apvError = d.getAPVError();
+    m_apvMatch = d.getAPVMatch();
+    m_fadcMatch = d.getFADCMatch();
+    m_upsetAPV = d.getUpsetAPV();
+    m_badMapping = d.getBadMapping();
+    m_badHeader = d.getBadHeader();
+    m_badTrailer = d.getBadTrailer();
+    m_missedHeader = d.getMissedHeader();
+    m_missedTrailer = d.getMissedTrailer();
+    m_seuRecoData = d.getSEURecoData();
+    m_fadcNo = d.getFADCNumber();
+    m_apvNo = d.getAPVNumber();
 
     // insert FADCnumber into the map (if not already there) and assign the next bin to it.
     if (m_changeFADCaxis) {
@@ -400,9 +398,10 @@ void SVDUnpackerDQMModule::event()
   m_errorFraction = 100 * float(m_nBadEvents) / float(m_nEvents);
 
   if (m_DQMErrorEventsHisto != nullptr) {
-    TString runID = TString::Format(" ~ Exp %d Run %d", m_expNumber, m_runNumber);
-    TString histoErrorTitle = TString::Format("SVD Events with errors %s # Error Fraction: %6.4e %%", runID.Data(), m_errorFraction);
-    m_DQMErrorEventsHisto->SetTitle(histoErrorTitle.Data());
+    std::string runID = std::format(" ~ Exp {:d} Run {:d}", m_expNumber, m_runNumber);
+    std::string histoErrorTitle = std::format("SVD Events with errors {:s} # Error Fraction: {:6.4e} %%", runID.c_str(),
+                                              m_errorFraction);
+    m_DQMErrorEventsHisto->SetTitle(histoErrorTitle.c_str());
     if (!m_badEvent) m_DQMErrorEventsHisto->Fill(0);
     else m_DQMErrorEventsHisto->Fill(1);
     if (m_seuEvent) m_DQMErrorEventsHisto->Fill(2);

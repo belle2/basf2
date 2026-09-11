@@ -64,7 +64,6 @@ namespace Belle2::SVD {
 
     int m_wrongFTBcrc; /**<FTB CRC no-Match counter*/
 
-
   private:
 
     /** how many FADCs we have */
@@ -158,7 +157,6 @@ namespace Belle2::SVD {
       unsigned int controlWord : 16; /**< MSB "ff55" - FADC Trailer ID */
     };
 
-
     union {  // The 4 byte words of the stream can be interpreted as:
       uint32_t m_data32; /**< Input 32-bit data word */
       FTBHeader m_FTBHeader; /**< Implementation of FTB Header */
@@ -238,15 +236,10 @@ namespace Belle2::SVD {
     /** Map to store a list of APVs for special data for SEU recovery */
     std::map<std::pair<unsigned short, unsigned short>, std::pair<std::size_t, std::size_t> > m_seuRecMap;
 
-
-
-
-    int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in usint of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
+    int m_relativeTimeShift; /**< latency difference between the 3- and 6-sample acquired events in units of APV clock / 4, read from SVDGlobalConfigParameters and filled into SVDEventInfo */
 
     DBObjPtr<SVDGlobalConfigParameters> m_svdGlobalConfig;  /**< SVDGlobal Configuration payload*/
 
   };//end class declaration
 
 }
-
-

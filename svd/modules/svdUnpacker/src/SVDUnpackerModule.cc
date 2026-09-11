@@ -8,7 +8,6 @@
 
 #include <svd/modules/svdUnpacker/SVDUnpackerModule.h>
 
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
@@ -173,12 +172,22 @@ void SVDUnpackerModule::event()
   bool isSetNAPVsamples = false;
 
   unsigned short nAPVheaders = 999;
-  set<short> seenAPVHeaders = {};
+  uint64_t seenAPVHeaders = 0; // bitmask over the 6-bit APV numbers
 
   unsigned short nEntries_rawSVD = m_rawSVD.getEntries();
   auto eventNo = m_eventMetaDataPtr->getEvent();
 
   short fadc = 255, apv = 63;
+
+  // cache of the sensor lookup for the current (FADC, APV) pair
+  int cachedChipID = -1;
+  SVDOnlineToOfflineMap::SensorInfo cachedSensorInfo{};
+
+  // scratch buffers reused across all buffers (avoids repeated allocations)
+  std::vector<unsigned short> nWords;
+  std::vector<uint32_t*> data32tab;
+  vector<uint32_t> crc16vec;
+  std::vector<uint32_t> crc16input;
 
   unsigned short cntFADCboards = 0;
   for (unsigned int i = 0; i < nEntries_rawSVD; i++) {
@@ -188,9 +197,9 @@ void SVDUnpackerModule::event()
 
       const unsigned short maxNumOfCh = m_rawSVD[i]->GetMaxNumOfCh(j);
 
-      std::vector<unsigned short> nWords;
+      nWords.clear();
       nWords.reserve(maxNumOfCh);
-      std::vector<uint32_t*>      data32tab(maxNumOfCh); //vector of pointers
+      data32tab.assign(maxNumOfCh, nullptr); //vector of pointers
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
         nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
         data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the beginning of the 1st buffer
@@ -233,7 +242,7 @@ void SVDUnpackerModule::event()
 
         uint32_t* data32_it = data32tab[buf];
         short strip, sample[6];
-        vector<uint32_t> crc16vec;
+        crc16vec.clear();
 
         //reset value for headers and trailers check
         seenHeadersAndTrailers = 0;
@@ -359,7 +368,7 @@ void SVDUnpackerModule::event()
 
             nAPVheaders++;
             apv = m_APVHeader.APVnum;
-            seenAPVHeaders.insert(apv);
+            seenAPVHeaders |= (uint64_t(1) << apv);
 
             cmc1 = m_APVHeader.CMC1;
             cmc2 = m_APVHeader.CMC2;
@@ -439,10 +448,19 @@ void SVDUnpackerModule::event()
             }
 
             // Generating SVDShaperDigit object
-            SVDShaperDigit* newShaperDigit = m_map->NewShaperDigit(fadc, apv, strip, sample, 0.0);
-            if (newShaperDigit) {
-              diagnosticMap.insert(make_pair(*newShaperDigit, currentDAQDiagnostic));
-              delete newShaperDigit;
+            // (equivalent to m_map->NewShaperDigit, but without the per-strip
+            //  heap allocation and with the sensor lookup cached per chip;
+            //  getSensorInfo returns a reference to a reused member, so copy it)
+            const int chipID = (int(fadc) << 8) | int(apv);
+            if (chipID != cachedChipID) {
+              cachedSensorInfo = m_map->getSensorInfo(fadc, apv);
+              cachedChipID = chipID;
+            }
+            if (cachedSensorInfo.m_sensorID) {
+              const short cellID = m_map->getStripNumber(strip, cachedSensorInfo);
+              diagnosticMap.insert(make_pair(SVDShaperDigit(cachedSensorInfo.m_sensorID, cachedSensorInfo.m_uSide,
+                                                            cellID, sample, 0.0),
+                                             currentDAQDiagnostic));
             } else if (m_badMappingFatal) {
               B2FATAL("Respective FADC/APV combination not found -->> incorrect payload in the database! ");
             } else {
@@ -471,7 +489,7 @@ void SVDUnpackerModule::event()
               // There is an APV missing, detect which it is.
               for (const auto& fadcApv : *APVmap) {
                 if (fadcApv.first != fadc) continue;
-                if (seenAPVHeaders.find(fadcApv.second) == seenAPVHeaders.end()) {
+                if (!((seenAPVHeaders >> fadcApv.second) & 1)) {
                   // We have a missing APV. Look if it is a known one.
                   auto missingRec = m_missingAPVs.find(make_pair(fadcApv.first, fadcApv.second));
                   if (missingRec != m_missingAPVs.end()) {
@@ -496,7 +514,7 @@ void SVDUnpackerModule::event()
               nAPVmatch = false;
             } // is nAPVs != nAPVheaders
 
-            seenAPVHeaders.clear();
+            seenAPVHeaders = 0;
 
             ftbFlags = m_FADCTrailer.FTBFlags;
             if ((ftbFlags >> 5) != 0) badTrailer = true;
@@ -525,14 +543,14 @@ void SVDUnpackerModule::event()
             //check CRC16
             crc16vec.pop_back();
             unsigned short iCRC = crc16vec.size();
-            std::vector<uint32_t> crc16input;
+            crc16input.clear();
             crc16input.reserve(iCRC);
 
             for (unsigned short icrc = 0; icrc < iCRC; icrc++)
               crc16input.push_back(htonl(crc16vec.at(icrc)));
 
-            //verify CRC16
-            boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
+            //verify CRC16 (table-driven; checksum-identical to bit-by-bit crc_basic)
+            boost::crc_optimal<16, 0x8005, 0xFFFF, 0, false, false> bcrc;
             bcrc.process_bytes(crc16input.data(), crc16input.size() * sizeof(uint32_t));
             unsigned int checkCRC = bcrc.checksum();
 
@@ -733,3 +751,4 @@ void SVDUnpackerModule::printB2Debug(uint32_t* data32, uint32_t* data32_min, uin
   return;
 
 }
+

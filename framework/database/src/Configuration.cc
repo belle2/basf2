@@ -25,7 +25,7 @@
 // Current upgrade default globaltag, prepended before CURRENT_DEFAULT_TAG so it takes precedence.
 // Can be pinned to a different tag, or disabled entirely, by setting the
 // BELLE2_UPGRADE_GLOBALTAG environment variable (empty or "NONE" disables it).
-#define CURRENT_UPGRADE_DEFAULT_TAG "upgrade_2026-09-07"
+#define CURRENT_UPGRADE_DEFAULT_TAG "upgrade_2026-09-15"
 
 namespace py = boost::python;
 

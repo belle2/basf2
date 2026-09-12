@@ -19,12 +19,9 @@ import math
 import ROOT
 from ROOT import Belle2
 import basf2 as b2
-from vtx import get_upgrade_globaltag
 
 # set some random seed
 b2.set_random_seed(10346)
-
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
 
 class VTXPositionEstimation(b2.Module):
@@ -317,7 +314,7 @@ if __name__ == "__main__":
 
     # Now let's create a path to simulate our events.
     main = b2.create_path()
-    main.add_module("EventInfoSetter", evtNumList=[10000])
+    main.add_module("EventInfoSetter", evtNumList=[10000], expList=[2003])
     main.add_module("Gearbox")
     # We only need the vtx for this
     main.add_module('Geometry', excludedComponents=['PXD', 'SVD', 'CDC', 'ECL', 'ARICH', 'TOP', 'KLM'],

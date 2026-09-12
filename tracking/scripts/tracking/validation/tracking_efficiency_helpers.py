@@ -122,7 +122,10 @@ def run_simulation(path, pt_value, output_filename='', useVTX=False):
     eventinfosetter = b2.register_module('EventInfoSetter')
 
     # generate one event
-    eventinfosetter.param('expList', [0])
+    if useVTX:
+        eventinfosetter.param('expList', [2003])
+    else:
+        eventinfosetter.param('expList', [0])
     eventinfosetter.param('runList', [1])
     eventinfosetter.param('evtNumList', [200])
 
@@ -165,9 +168,7 @@ def run_simulation(path, pt_value, output_filename='', useVTX=False):
         add_simulation(path, get_simulation_components(), background_files)
 
     else:
-        from vtx import get_upgrade_globaltag, get_upgrade_background_files
-        b2.conditions.disable_globaltag_replay()
-        b2.conditions.prepend_globaltag(get_upgrade_globaltag())
+        from vtx import get_upgrade_background_files
         add_simulation(
             path,
             bkgfiles=get_upgrade_background_files(),

@@ -34,7 +34,6 @@
 
 
 import basf2 as b2
-import ROOT as r
 from beamparameters import add_beamparameters
 from simulation import add_simulation
 
@@ -44,22 +43,17 @@ import random
 
 from vtx import add_vtx_reconstruction
 
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
 # ---------------------------------------------------------------------------------------
 
 # Set Random Seed for reproducable simulation. 0 means really random.
 rndseed = 12345
 # assume the first argument is the random seed
-if(len(sys.argv) > 1):
+if (len(sys.argv) > 1):
     rndseed = sys.argv[1]
 
 outputDir = './'
 # assume second argument is the output directory
-if(len(sys.argv) > 2):
+if (len(sys.argv) > 2):
     outputDir = sys.argv[2]
 
 b2.set_random_seed(rndseed)
@@ -73,7 +67,7 @@ main = b2.create_path()
 
 eventinfosetter = b2.register_module('EventInfoSetter')
 # default phase3 geometry:
-exp_number = 0
+exp_number = 2003
 # if environment variable is set then phase2 (aka Beast2) geometry will be taken
 if os.environ.get('USE_BEAST2_GEOMETRY'):
     exp_number = 1002

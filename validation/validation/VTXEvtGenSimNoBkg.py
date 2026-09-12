@@ -18,14 +18,12 @@
 </header>
 """
 
-from vtx import get_upgrade_globaltag
 from basf2 import (
     set_random_seed,
     create_path,
     process,
     statistics,
     register_module,
-    conditions
 )
 from simulation import add_simulation
 from beamparameters import add_beamparameters
@@ -33,9 +31,6 @@ from validation import statistics_plots, event_timing_plot
 
 set_random_seed(12345)
 
-# Need to use default global tag prepended with upgrade GT
-conditions.disable_globaltag_replay()
-conditions.prepend_globaltag(get_upgrade_globaltag())
 
 main = create_path()
 
@@ -43,7 +38,7 @@ main = create_path()
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [0])
+eventinfosetter.param('expList', [2003])
 main.add_module(eventinfosetter)
 
 # beam parameters

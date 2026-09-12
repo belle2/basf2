@@ -20,7 +20,6 @@
 """
 import reconstruction as rec
 from simulation import add_simulation
-from vtx import get_upgrade_globaltag
 from ROOT import Belle2
 import ROOT
 import math
@@ -175,14 +174,12 @@ class ClusterEfficiency(b2.Module):
 # that's not too bad since we only simulate single muons
 main = b2.create_path()
 
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 print(b2.conditions.globaltags)
 
 eventinfosetter = main.add_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [0])
+eventinfosetter.param('expList', [2003])
 
 particlegun = main.add_module("ParticleGun")
 particlegun.param({

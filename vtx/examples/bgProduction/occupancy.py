@@ -27,10 +27,7 @@ import basf2 as b2
 import numpy as np
 
 
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag, get_upgrade_background_files
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
+from vtx import get_upgrade_background_files
 
 
 def getID(VxdId):
@@ -127,7 +124,7 @@ class VTXOccupancy(b2.Module):
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10])
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
 
 # print event numbers
 main.add_module('EventInfoPrinter')

@@ -23,7 +23,6 @@
 #####################################################################
 
 
-from vtx import get_upgrade_globaltag
 from basf2 import register_module
 import basf2 as b2
 import argparse
@@ -48,10 +47,6 @@ secmap_name = arguments.secmap
 # ---------------------------------------------------------------------------------------
 # Settings
 
-# Need to use default global tag prepended with upgrade GT
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
 usePXD = False
 useSVD = False
 useVTX = True
@@ -62,8 +57,8 @@ performFit = False
 generateTimeSeedAfterFit = False
 
 # Logging and Debug Levels
-set_log_level(LogLevel.ERROR)
-log_to_file('logVXDTF2Execution.log', append=False)
+b2.set_log_level(b2.LogLevel.ERROR)
+b2.log_to_file('logVXDTF2Execution.log', append=False)
 
 
 # ---------------------------------------------------------------------------------------

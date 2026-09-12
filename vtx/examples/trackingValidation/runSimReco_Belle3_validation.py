@@ -25,7 +25,6 @@
 import variables.collections
 from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
 import argparse
-import os
 import basf2 as b2
 import simulation as sim
 import reconstruction as rec
@@ -49,14 +48,8 @@ else:
     use_globaltag = True
 
 
-# Need to use default global tag prepended with upgrade GT
-if use_globaltag:
-    from vtx import get_upgrade_globaltag
-    b2.conditions.disable_globaltag_replay()
-    b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
 main = b2.create_path()
-main.add_module('EventInfoSetter')
+main.add_module('EventInfoSetter', expList=[2003])
 
 if args['gen'] == 'bbar':
     main.add_module('EvtGenInput')

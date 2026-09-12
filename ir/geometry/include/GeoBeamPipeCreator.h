@@ -43,6 +43,20 @@ namespace Belle2 {
        */
       void createGeometry(G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+      /**
+       * Create legacy detector geometry (Phase 2, Phase 3 Run 1 & Run 2)
+       * @param topVolume Geant4 logical top volume.
+       * @param type Geometry type.
+       */
+      void createLegacyGeometry(G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+      /**
+       * Create Post-LS2 detector geometry
+       * @param topVolume Geant4 logical top volume.
+       * @param type Geometry type.
+       */
+      void createPostLS2Geometry(G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
 
     public:
 

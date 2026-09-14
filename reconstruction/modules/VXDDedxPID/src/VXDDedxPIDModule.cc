@@ -212,6 +212,9 @@ void VXDDedxPIDModule::event()
     dedxTrack->m_nHits = numDedx;
     // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
     dedxTrack->m_nHitsUsed = numDedx - 2;
+    if (numDedx == 2) {
+      dedxTrack->m_nHitsUsed = 1;
+    }
 
     // calculate log likelihoods
     dedxTrack->clearLogLikelihoods();
@@ -267,6 +270,8 @@ void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, doubl
   }
   if (numDedx - 2 != 0) {
     truncatedMeanTmp /= numDedx - 2;
+  } else {
+    truncatedMeanTmp = sortedDedx[0];
   }
 
   mean = meanTmp;

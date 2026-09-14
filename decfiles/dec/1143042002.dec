@@ -1,11 +1,10 @@
 # EventType: 1143042002
 # Descriptor: [B0 
-                -> D- [-> K+ pi- pi-] pi+ ]
-                -> D*-[-> D0bar[                    pi-] pi+ ]
-                                  -> K+ pi-
-                                  -> K+ pi- pi0
-                                  -> K+ pi- pi+ pi- ] 
-
+#                -> D- [-> K+ pi- pi-] pi+ ]
+#                -> D*-[-> D0bar[                    pi-] pi+ ]
+#                                  -> K+ pi-
+#                                  -> K+ pi- pi0
+#                                  -> K+ pi- pi+ pi- ] 
 # NickName: Bd_Dstmpip_D0barpim_Kppim_Kppimpiz_Kppimpippim
 # Documentation: Decay mode for Lindblad-type decoherence analysis
 # Tested: Yes

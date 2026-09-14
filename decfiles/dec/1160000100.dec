@@ -1,0 +1,27 @@
+# EventType: 1160000100
+# Descriptor: [B0 -> K_S0 nu anti-nu]cc
+# NickName: Bd_KS0nunubar
+# Documentation: Rare b->s nu anti-nu process, decays to only reconstructed final state
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Giulio Dujany
+# Email: giulio.dujany@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260715
+
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+1.00 B0sig anti-B0sig B0 anti-B0         VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K_S0sig nu_e anti-nu_e                   KNUNU;
+Enddecay
+CDecay anti-B0sig
+
+Decay K_S0sig
+1.0    pi- pi+ PHSP;
+Enddecay
+
+End

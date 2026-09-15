@@ -117,47 +117,17 @@ namespace Belle2 {
       /** Index in m_shapeSignalSamples */
       short unsigned int iss;
     };
-
-    /** Lookup table for ECL channels. */
-    std::vector<CrystalLinks> m_tbl;
-
-    /** Fit algorithm parameters shared by group of crystals */
-    std::vector<AlgoParams> m_idn; /**< parameters that needs for waveform fit */
-    std::vector<FitParams> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
-    std::vector<ECLNoiseDataUp> m_noise; /**< parameters for correlated noise simulation */
-    std::vector<SignalSample> m_shapeSignalSamples; /**< tabulated shape line */
-    std::vector<SignalSample> m_hadronShapeSignalSamples; /**< tabulated shape line for hadron shape simulations */
-
-    /** Storage for adc hits from entire calorimeter (8736 crystals) */
-    std::vector<AdcCounts> m_adc;  /**< ACD counts */
-
     /** calibration constants per channel */
     struct Calibration {
       float ascale; /**< amplitude scale */
       float tshift; /**< time shift */
     };
-    /** Storage for calibration constants */
-    std::vector<Calibration> m_calib;
-
-    /** Storage for waveform saving thresholds*/
-    std::vector<double> m_waveformThresholds;
-
-    /** storage for trigger time in each ECL. The crate trigger time
-     *  is an even number from 0 to 142, so here it is stored as
-     *  numbers from 0 to 71 inclusive.
-     */
-    unsigned char m_ttime[ECL::ECL_CRATES] = {};
 
     /** function wrapper for waveform fit */
-    void shapeFitterWrapper(const int j, const int* FitA, const int m_ttrig,
-                            int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const ;
-
-    /** Always load waveform parameters at least once */
-    bool m_loadOnce = true;
-
+    void shapeFitterWrapper(int j, const int* fitA, const int triggerTime,
+                            int& amplitude, int& time, int& quality, int& chi2) const ;
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();
-
     /** read Shaper-DSP data from root file */
     void readDSPDB();
     /** Emulate response of energy deposition in a crystal and attached photodiode and make waveforms*/
@@ -169,7 +139,57 @@ namespace Belle2 {
     /** load waveform fit parameters for the shapeFitter function */
     void getfitparams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, FitParams&);
     /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
-    void makeElectronicNoiseAndPedestal(int j, int* FitA);
+    void makeElectronicNoiseAndPedestal(int j, int* fitA);
+
+    /** Module parameters */
+    std::string m_eclWaveformsName{""};
+
+    double m_waveformThresholdOverride{-1.0};
+    double m_dspWithExtraMCInfoThreshold{0.02};
+    double m_unitscale{1.0};
+
+    unsigned int m_compAlgo{2u};
+    int m_adcThreshold{25};
+
+    bool m_background{false};
+    bool m_calibration{false};
+    bool m_inter{true};
+    bool m_noElectronicNoise{false};
+    bool m_waveformMaker{false};
+    bool m_storeDspWithExtraMCInfo{false};
+    bool m_trigTime{false};
+    bool m_hadronPulseShape{false};
+    bool m_dspDataTest{false};
+    bool m_useWaveformParameters{false};
+    bool m_timeCalib{true};
+
+    /** Lookup table for ECL channels. */
+    std::vector<CrystalLinks> m_tbl;
+
+    /** Always load waveform parameters at least once */
+    bool m_loadOnce = true;
+
+    /** Fit algorithm parameters shared by group of crystals */
+    std::vector<AlgoParams> m_idn; /**< parameters that needs for waveform fit */
+    std::vector<FitParams> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
+    std::vector<ECLNoiseDataUp> m_noise; /**< parameters for correlated noise simulation */
+    std::vector<SignalSample> m_shapeSignalSamples; /**< tabulated shape line */
+    std::vector<SignalSample> m_hadronShapeSignalSamples; /**< tabulated shape line for hadron shape simulations */
+
+    /** Storage for adc hits from entire calorimeter (8736 crystals) */
+    std::vector<AdcCounts> m_adc;  /**< ACD counts */
+
+    /** Storage for calibration constants */
+    std::vector<Calibration> m_calib;
+
+    /** Storage for waveform saving thresholds*/
+    std::vector<double> m_waveformThresholds;
+
+    /** storage for trigger time in each ECL. The crate trigger time
+     *  is an even number from 0 to 142, so here it is stored as
+     *  numbers from 0 to 71 inclusive.
+     */
+    unsigned char m_ttime[ECL::ECL_CRATES] = {};
 
     /** Hadron signal shapes. */
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC{"ECLDigitWaveformParametersForMC"};
@@ -238,26 +258,5 @@ namespace Belle2 {
     /** Channel Mapper */
     ECL::ECLChannelMapper m_eclMapper; /**< channel mapper to utilize trigger information */
 
-    /** Module parameters */
-    std::string m_eclWaveformsName{""};
-
-    double m_waveformThresholdOverride{-1.0};
-    double m_dspWithExtraMCInfoThreshold{0.02};
-    double m_unitscale{1.0};
-
-    unsigned int m_compAlgo{2u};
-    int m_adcThreshold{25};
-
-    bool m_background{false};
-    bool m_calibration{false};
-    bool m_inter{true};
-    bool m_noElectronicNoise{false};
-    bool m_waveformMaker{false};
-    bool m_storeDspWithExtraMCInfo{false};
-    bool m_trigTime{false};
-    bool m_hadronPulseShape{false};
-    bool m_dspDataTest{false};
-    bool m_useWaveformParameters{false};
-    bool m_timeCalib{true};
   };
 }//Belle2

@@ -36,7 +36,16 @@ print("INFO: Display for " + args['vtx'])
 main = b2.create_path()
 
 # list of parts obstructing view of on cvd volume
-other_parts = ['COIL', 'STR', 'ServiceGapsMaterial', 'BeamPipe', 'Cryostat', 'FarBeamLine', 'HeavyMetalShield', 'VXDService']
+other_parts = [
+    'COIL',
+    'STR',
+    'ServiceGapsMaterial',
+    'BeamPipe',
+    'Cryostat',
+    'FarBeamLine',
+    'HeavyMetalShield',
+    'VXDService',
+    'BEAMABORT']
 
 
 main.add_module('EventInfoSetter')

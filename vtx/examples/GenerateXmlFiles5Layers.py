@@ -9,36 +9,26 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# create 6 layers staggered with last obelix design
+# create 5 layers staggered with last obelix design
 # using super modules 1x4, 1x2 sensors
 
-OptL3Mod = True
-
-fileName = ""
-fileNameC = ""
-
-if OptL3Mod:
-    fileName = 'VTX-CMOS5-staggered-L3mod.xml'
-    fileNameC = 'VTX-Components-CMOS5-staggered-L3mod.xml'
-else:
-    fileName = 'VTX-CMOS5-staggered.xml'
-    fileNameC = 'VTX-Components-CMOS5-staggered.xml'
+fileName = "VTX-5layer-2026-July-baseline.xml"
+fileNameC = "VTX-Components-5layer-2026-July-baseline.xml"
 
 f = open('../data/' + fileNameC, 'w')
 
 Material = "Si"
 X0Si = 0.0937
-X = 0.00439
-Xi = 0.001  # 0.002
-sensorL = 30.168
-sensorW = 18.812
-sensorH = 0.400  # str(X0Si*X*1e3)
-sensorHi = 0.095*2  # str(X0Si*Xi*1e3)
-offsetU = 3.5
+X = 0.008
+Xi = 0.003
+sensorL = 30.218
+sensorW = 20.932
+sensorH = 0.750  # str(X0Si*X*1e3)
+sensorHi = 0.285  # str(X0Si*Xi*1e3)
 offsetV = 0.3
 
-activeL = 29.568
-activeW = 15.312
+activeL = 29.604
+activeW = 16.851
 activeH = 0.030
 
 pixelsU = 464
@@ -47,8 +37,8 @@ pixelsV = 896
 BulkDoping = 10.0
 BackVoltage = -30
 TopVoltage = -5.0
-BorderU = 6.0
-BorderV = 4.0
+BorderU = 0.306
+BorderV = 4.007
 ChargeThreshold = 1.25
 NoiseFraction = 0.00000000
 ApplyElectronicEffects = 'true'
@@ -81,14 +71,10 @@ nsensor = 0
 type = ""
 start = 0
 shiftR0 = 0.
-shiftR1 = 1.5
-shiftZ0 = 0
+shiftR1 = 6.5
 gap = 0
 shiftL = 0
 radius = 0
-radius1 = 0
-phi = 0
-phi1 = 0
 
 f.write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n')
 f.write('<Components>\n')
@@ -115,33 +101,27 @@ for layer in range(1, nlayer+1):
 
     if layer == 3:
         type = 'layer1o'
-        nsensor = 12
-        start = -112.186
+        nsensor = 13
+        start = -132.774  # + sensorL/2.
         gap = 0.1
-        shiftL = 8.
-        radius = 69.0 + sensorH/2.
+        shiftL = 0
+        radius = 82.5 + sensorH/2.
 
     if layer == 4:
         type = 'layer1o'
-        nsensor = 15
-        start = -141.874
+        nsensor = 17
+        start = -192.386  # + sensorL/2.
         gap = 0.1
-        shiftL = 12.042
-        radius = 89.0 + sensorH/2.
-        radius1 = radius + shiftR1
-        phi = 5.
-        phi1 = 15.
+        shiftL = 0
+        radius = 108.0 + sensorH/2.
 
     if layer == 5:
         type = 'layer1o'
-        nsensor = 24
-        start = -237.859
+        nsensor = 20
+        start = -238.022  # + sensorL/2.
         gap = 0.1
-        shiftL = 5.818
-        radius = 140.0 + sensorH/2.
-        radius1 = radius + shiftR1
-        phi = 3.75
-        phi1 = 11.25
+        shiftL = 0
+        radius = 133.5 + sensorH/2.
 
     f.write('  <Ladder layer=\"' + str(layer) + '\">\n')
     if (layer == 1):
@@ -181,6 +161,7 @@ length = (sensorL, sensorL)
 height = (sensorH, sensorHi)
 lengthA = (activeL, activeL, activeL)
 pixels = (pixelsV, pixelsV, pixelsV)
+offsetU = [3.5, 0.0]
 
 for i in range(0, 2):
 
@@ -193,7 +174,7 @@ for i in range(0, 2):
     f.write('       whole thing. The position is given relative to the lower left edge of\n')
     f.write('       the module (the point with the most negative local coordinates). -->\n')
     f.write('  <Active>\n')
-    f.write('    <u unit=\"mm\">' + str(offsetU) + '</u>\n')
+    f.write('    <u unit=\"mm\">' + str(offsetU[i]) + '</u>\n')
     f.write('    <v unit=\"mm\">' + str(offsetV) + '</v>\n')
     f.write('    <w>top</w>\n')
     f.write('    <width unit=\"mm\">' + str(activeW) + '</width>\n')
@@ -387,8 +368,7 @@ nlayers = 5
 nLaddersYing = 0
 nLaddersYang = 0
 nLadders = 0
-shiftPhi1 = 0
-shiftPhi2 = 0
+shiftPhi = 0
 
 # Ying
 for layer in range(1, nlayers+1):
@@ -404,19 +384,25 @@ for layer in range(1, nlayers+1):
         shiftPhi = 0
 
     if layer == 3:
-        nLaddersYing = 13
-        nLadders = 25
-        shiftPhi = 11
+        nLaddersYing = 18
+        nLadders = 36
+        shiftPhi = 5
+        shiftZ0 = 0
+        shiftZ1 = -11.109
 
     if layer == 4:
-        nLaddersYing = 17
-        nLadders = 33
-        shiftPhi = 10
+        nLaddersYing = 24
+        nLadders = 48
+        shiftPhi = 3.75
+        shiftZ0 = 0
+        shiftZ1 = -15.125
 
     if layer == 5:
-        nLaddersYing = 26
-        nLadders = 52
-        shiftPhi = 7.5
+        nLaddersYing = 30
+        nLadders = 60
+        shiftPhi = 3.
+        shiftZ0 = 0
+        shiftZ1 = 4.0
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
@@ -427,23 +413,19 @@ for layer in range(1, nlayers+1):
 
         angt = ang[0:6]
 
-        if layer <= 4:
+        if layer <= 2:
             cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
 
-        if layer == 5:
-            shiftRa = shiftR0
-            shiftRb = shiftR1
-            shiftZa = shiftZ0
-            shiftZb = shiftZ0
+        if layer >= 3:
 
             if id % 2 == 0:
                 cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
-                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRa) + '</shiftR>'
-                cmd += '<shiftZ unit=\"mm\">' + str(shiftZa) + '</shiftZ></Ladder>\n'
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftR1) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZ1) + '</shiftZ></Ladder>\n'
             else:
                 cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
-                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRb) + '</shiftR>'
-                cmd += '<shiftZ unit=\"mm\">' + str(shiftZb) + '</shiftZ></Ladder>\n'
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftR0) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZ0) + '</shiftZ></Ladder>\n'
 
         f.write(cmd)
 
@@ -464,60 +446,58 @@ for layer in range(1, nlayers+1):
 
     if layer == 1:
         nLaddersYing = 3
-        nLaddersYang = 6
         nLadders = 6
         shiftPhi = 0
 
     if layer == 2:
         nLaddersYing = 5
-        nLaddersYang = 10
         nLadders = 10
         shiftPhi = 0
 
     if layer == 3:
-        nLaddersYing = 13
-        nLaddersYang = 25
-        nLadders = 25
-        shiftPhi = 11
+        nLaddersYing = 18
+        nLadders = 36
+        shiftPhi = 5
+        shiftZ0 = 0
+        shiftZ1 = -11.109
 
     if layer == 4:
-        nLaddersYing = 17
-        nLaddersYang = 33
-        nLadders = 33
-        shiftPhi = 10
+        nLaddersYing = 24
+        nLadders = 48
+        shiftPhi = 3.75
+        shiftZ0 = 0
+        shiftZ1 = -15.125
 
     if layer == 5:
-        nLaddersYing = 26
-        nLaddersYang = 52
-        nLadders = 52
-        shiftPhi = 7.5
+        nLaddersYing = 30
+        nLadders = 60
+        shiftPhi = 3
+        shiftZ0 = 0
+        shiftZ1 = 4.0
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
 
-    for id in range(nLaddersYing+1, nLaddersYang+1):
+    for id in range(nLaddersYing+1, nLadders+1):
 
         ang = str(dPhi*(id-1) + shiftPhi)
 
         angt = ang[0:6]
 
-        if layer <= 4:
+        if layer <= 2:
             cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + '</phi></Ladder>\n'
 
-        if layer == 5:
-            shiftRa = shiftR0
-            shiftRb = shiftR1
-            shiftZa = shiftZ0
-            shiftZb = shiftZ0
+        if layer >= 3:
 
             if id % 2 == 0:
                 cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
-                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRa) + '</shiftR>'
-                cmd += '<shiftZ unit=\"mm\">' + str(shiftZa) + '</shiftZ></Ladder>\n'
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftR1) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZ1) + '</shiftZ></Ladder>\n'
             else:
                 cmd = '        <Ladder id=\"' + str(id) + '\"' + '><phi unit=\"deg\">' + angt + \
-                                                    '</phi><shiftR unit=\"mm\">' + str(shiftRb) + '</shiftR>'
-                cmd += '<shiftZ unit=\"mm\">' + str(shiftZb) + '</shiftZ></Ladder>\n'
+                                                    '</phi><shiftR unit=\"mm\">' + str(shiftR0) + '</shiftR>'
+                cmd += '<shiftZ unit=\"mm\">' + str(shiftZ0) + '</shiftZ></Ladder>\n'
+
         f.write(cmd)
     f.write('      </Layer>\n')
 

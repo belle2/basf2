@@ -14,8 +14,8 @@
 using namespace std;
 using namespace Belle2::ECL;
 
-const double t_adc_up = Belle2::ECL::EclConfigurationUp::s_clock / 508.876; // ADC clock period in us
-const double time_to_units_up = Belle2::ECL::EclConfigurationUp::m_step / t_adc_up; // Convert time to units of ADC clock
+const double t_adc_up = Belle2::ECL::EclConfigurationUp::c_clock / 508.876; // ADC clock period in us
+const double time_to_units_up = Belle2::ECL::EclConfigurationUp::c_step / t_adc_up; // Convert time to units of ADC clock
 
 // tau_d, tau_0, omega_0, tau_1, omega_1, tau_i, f_i, tau_s, tau_s1, alpha, t_shift, eta, a_norm, toff
 const double ShaperDSPUp_t::_defs[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.966 * time_to_units_up, 6.975 * time_to_units_up, 0.603, 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters

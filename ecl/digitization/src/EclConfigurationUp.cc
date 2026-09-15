@@ -22,107 +22,101 @@
 
 using namespace Belle2;
 using namespace Belle2::ECL;
-using namespace std;
 
 // define the constexpr here to make clang happy. Could be a bug or some strict
 // adherence to the standard. I guess it's just a different interpretation of
 // how to use these values by clang.
 // http://stackoverflow.com/questions/28264279/undefined-reference-when-accessing-static-constexpr-float-member
-constexpr double EclConfigurationUp::s_clock;
-constexpr double EclConfigurationUp::m_step;
-double EclConfigurationUp::m_rf = -1;
-double EclConfigurationUp::m_tick = -1;
+constexpr double EclConfigurationUp::c_clock;
+constexpr double EclConfigurationUp::c_step;
+double EclConfigurationUp::s_rf = -1;
 
 double EclConfigurationUp::getRF()
 {
   /**< Default RF value is 508.876 MHz,
    *   see www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
-  if (m_rf < 0) {
+  if (s_rf < 0) {
     DBObjPtr<Belle2::HardwareClockSettings> clock_info("HardwareClockSettings");
     // Convert RF from GHz to MHz
-    m_rf = clock_info->getAcceleratorRF() * 1e3;
+    s_rf = clock_info->getAcceleratorRF() * 1e3;
   }
-  return m_rf;
+  return s_rf;
 }
 
-double EclConfigurationUp::getTick()
+void EclConfigurationUp::SignalSample::initSample(const double* waveformParameters, double unitScale)
 {
-  return 64. / getRF();
-}
-
-void EclConfigurationUp::signalsample_t::InitSample(const double* MPd, double u)
-{
-  const int N = m_ns * m_nl;
-  vector<double> MP(MPd, MPd + 14);
-  ShaperDSPUp_t dsp(MP, u);
-  dsp.settimestride(m_step / m_ns);
-  dsp.fillarray(0.0, N, m_ft);
+  const int nSignalSamples = c_nSamplesPerAdcClock * c_nSignalAdcClocks;
+  std::vector<double> MP(waveformParameters, waveformParameters + 14);
+  ShaperDSPUp_t dsp(MP, unitScale);
+  dsp.settimestride(c_step / c_nSamplesPerAdcClock);
+  dsp.fillarray(0.0, nSignalSamples, m_signalShape);
 
   double sum = 0;
-  for (int i = 0; i < N; i++) sum += m_ft[i];
-  m_sumscale = m_ns / sum;
+  for (int i = 0; i < nSignalSamples; i++) sum += m_signalShape[i];
+  m_sumScale = c_nSamplesPerAdcClock / sum;
 }
 
 
-void EclConfigurationUp::signalsample_t::InitSample(const float* MP, double u)
+void EclConfigurationUp::SignalSample::initSample(const float* waveformParameters, double unitScale)
 {
   double MPd[14];
-  for (int i = 0; i < 14; i++) MPd[i] = MP[i];
-  InitSample(MPd, u);
+  for (int i = 0; i < 14; i++) MPd[i] = waveformParameters[i];
+  initSample(MPd, unitScale);
 }
 
-void EclConfigurationUp::adccounts_t::AddHit(const double a, const double t0, const EclConfigurationUp::signalsample_t& s)
+void EclConfigurationUp::AdcCounts::addHit(double amplitude, double timeOffset,
+                                           const EclConfigurationUp::SignalSample& signalSample)
 {
-  total += s.Accumulate(a, t0, c);
+  m_total += signalSample.accumulate(amplitude, timeOffset, m_adcCounts);
 }
 
-double EclConfigurationUp::signalsample_t::Accumulate(const double a, const double t0, double* s) const
+double EclConfigurationUp::SignalSample::accumulate(double amplitude, double timeOffset, double* signal) const
 {
   // input parameters
-  // a -- signal amplitude
-  // t -- signal offset
+  // amplitude -- signal amplitude
+  // timeOffset -- signal offset
   // output parameter
-  // s -- output array with added signal
-  const double itick = getRF() / s_clock;  // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
-  const double  tlen = m_nl - 1.0 / m_ns;   // length of the sampled signal in ADC clocks units
-  const double  tmax = m_tmin + m_nsmp - 1; // upper range of the fit region
+  // signal -- output array with added signal
+  const double itick = getRF() / c_clock;  // reciprocal to avoid division in usec^-1 (has to be evaluated at compile time)
+  const double tlen = c_nSignalAdcClocks - 1.0 / c_nSamplesPerAdcClock;   // length of the sampled signal in ADC clocks units
+  const double tmax = c_fitTimeMin + c_nAdcSamples - 1; // upper range of the fit region
 
-  double t = t0 * itick; // rescale time in usec to ADC clocks
+  double t = timeOffset * itick; // rescale time in usec to ADC clocks
   double x0 = t, x1 = t + tlen;
 
   if (x0 > tmax) return 0; // signal starts after the upper range of output array -- do nothing
-  if (x0 < m_tmin) {
-    if (x1 < m_tmin) return 0; // signal ends before lower range of output array -- do nothing
-    x0 = m_tmin; // adjust signal with range of output array
+  if (x0 < c_fitTimeMin) {
+    if (x1 < c_fitTimeMin) return 0; // signal ends before lower range of output array -- do nothing
+    x0 = c_fitTimeMin; // adjust signal with range of output array
   }
 
-  int imax = m_nsmp; // length of sampled signal is long enough so
+  int imax = c_nAdcSamples; // length of sampled signal is long enough so
   // the last touched element is the last element
   // of the output array
   if (x1 < tmax) { // if initial time is too early we need to adjust
     // the last touched element of output array to avoid
-    // out-of-bound situation in m_ft
-    imax = x1 - m_tmin; // imax is always positive so floor can be
+    // out-of-bound situation in m_signalShape
+    imax = x1 - c_fitTimeMin; // imax is always positive so floor can be
     // replace by simple typecast
     imax += 1; // like s.end()
   }
 
-  double imind = ceil(x0 - m_tmin); // store result in double to avoid int->double conversion below
+  double imind = std::ceil(x0 - c_fitTimeMin); // store result in double to avoid int->double conversion below
   // the ceil function today at modern CPUs is surprisingly fast (before it was horribly slow)
   int imin = imind; // starting point to fill output array
-  double w = ((m_tmin - t) + imind) * double(m_ns);
+  double w = ((c_fitTimeMin - t) + imind) * double(c_nSamplesPerAdcClock); // starting point in sampled signal array
   int jmin = w; // starting point in sampled signal array
   w -= jmin;
 
   // use linear interpolation between samples. Since signal samples
   // are aligned with output samples only two weights are need to
   // calculate to fill output array
-  const double w1 = a * w, w0 = a - w1;
+  const double w1 = amplitude * w, w0 = amplitude - w1;
   double sum = 0;
-  for (int i = imin, j = jmin; i < imax; i++, j += m_ns) {
-    double amp = w0 * m_ft[j] + w1 * m_ft[j + 1];
-    s[i] += amp;
+  for (int i = imin, j = jmin; i < imax; i++, j += c_nSamplesPerAdcClock) {
+    double amp = w0 * m_signalShape[j] + w1 * m_signalShape[j + 1];
+    signal[i] += amp;
     sum  += amp;
   }
-  return sum * m_sumscale;
+  return sum * m_sumScale;
 }

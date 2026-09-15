@@ -37,7 +37,7 @@ namespace {
 void ECLBaseCompressUp::compress(BitStream& out, const int* adc)
 {
   int amin = adc[0], amax = adc[0];
-  for (unsigned int i = 0; i < EclConfigurationUp::m_nsmp; i++) {
+  for (unsigned int i = 0; i < EclConfigurationUp::c_nAdcSamples; i++) {
     amax = std::max(amax, adc[i]);
     amin = std::min(amin, adc[i]);
   }
@@ -48,7 +48,7 @@ void ECLBaseCompressUp::compress(BitStream& out, const int* adc)
   w &= 0x1f;
   out.putNBits(w, 5);
 
-  for (unsigned int i = 0; i < EclConfigurationUp::m_nsmp; i++) {
+  for (unsigned int i = 0; i < EclConfigurationUp::c_nAdcSamples; i++) {
     unsigned int d = adc[i] - amin;
     out.putNBits(d, w);
   }
@@ -57,14 +57,14 @@ void ECLBaseCompressUp::compress(BitStream& out, const int* adc)
 void ECLBaseCompressUp::uncompress(BitStream& out, int* adc)
 {
   unsigned int amin = out.getNBits(18), w = out.getNBits(5);
-  for (unsigned int i = 0; i < EclConfigurationUp::m_nsmp; i++)
+  for (unsigned int i = 0; i < EclConfigurationUp::c_nAdcSamples; i++)
     adc[i] = amin + out.getNBits(w);
 }
 
 void ECLDeltaCompressUp::compress(BitStream& out, const int* adc)
 {
   int a0 = adc[0], dmin = 0, dmax = 0;
-  for (int k = 1; k < EclConfigurationUp::m_nsmp; k++) {
+  for (int k = 1; k < EclConfigurationUp::c_nAdcSamples; k++) {
     int d = adc[k] - a0;
     dmin = std::min(dmin, d);
     dmax = std::max(dmax, d);
@@ -79,7 +79,7 @@ void ECLDeltaCompressUp::compress(BitStream& out, const int* adc)
   out.putNBits(a0, 18);
 
   unsigned int base = 1 << (w - 1);
-  for (unsigned int i = 1; i < EclConfigurationUp::m_nsmp; i++) {
+  for (unsigned int i = 1; i < EclConfigurationUp::c_nAdcSamples; i++) {
     unsigned int d = int(adc[i]) - a0 + base;
     out.putNBits(d, w);
     a0 = adc[i];
@@ -91,7 +91,7 @@ void ECLDeltaCompressUp::uncompress(BitStream& out, int* adc)
   unsigned int w = out.getNBits(4);
   adc[0] = out.getNBits(18);
   unsigned int base = 1 << (w - 1);
-  for (unsigned int i = 1; i < EclConfigurationUp::m_nsmp; i++) {
+  for (unsigned int i = 1; i < EclConfigurationUp::c_nAdcSamples; i++) {
     adc[i] = adc[i - 1] + out.getNBits(w) - base;
   }
 }

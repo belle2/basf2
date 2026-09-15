@@ -96,14 +96,13 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    using AlgoParams   = ECL::EclConfigurationUp::algoparams_t;   /**< algorithm parameters */
-    using FitParams    = ECL::EclConfigurationUp::fitparams_t;    /**< fit parameters */
-    using SignalSample = ECL::EclConfigurationUp::signalsample_t; /**< signal sample */
-    using AdcCounts    = ECL::EclConfigurationUp::adccounts_t;    /**< ADC counts */
+    using AlgoParams   = ECL::EclConfigurationUp::AlgoParams;   /**< algorithm parameters */
+    using FitParams    = ECL::EclConfigurationUp::FitParams;    /**< fit parameters */
+    using SignalSample = ECL::EclConfigurationUp::SignalSample; /**< signal sample */
+    using AdcCounts    = ECL::EclConfigurationUp::AdcCounts;    /**< ADC counts */
 
-    using IntArrayGridXAdc = FitParams::int_array_gridxadc_t; /**<  weighting coefficients for time and amplitude calculation */
-    using IntArraySubXAdc =
-      FitParams::int_array_subxadc_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
+    using IntArrayGridXAdc = FitParams::IntArrayGridXAdc; /**<  weighting coefficients for time and amplitude calculation */
+    using IntArraySubXAdc = FitParams::IntArraySubXAdc;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
     using UIntPair = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
     /** Indices in arrays with info on ECL channels */
@@ -124,7 +123,7 @@ namespace Belle2 {
     };
 
     /** function wrapper for waveform fit */
-    void shapeFitterWrapper(int j, const int* fitA, const int triggerTime,
+    void shapeFitterWrapper(int j, const int* fitA, int triggerTime,
                             int& amplitude, int& time, int& quality, int& chi2) const ;
     /** callback hadron signal shapes from database*/
     void callbackHadronSignalShapes();
@@ -137,8 +136,8 @@ namespace Belle2 {
     /** repack waveform fit parameters from ROOT format to plain array of unsigned short for the shapeFitter function */
     void repack(const ECLWFAlgoParamsUp&, AlgoParams&);
     /** load waveform fit parameters for the shapeFitter function */
-    void getfitparams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, FitParams&);
-    /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
+    void getFitParams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, FitParams&);
+    /** Fill the waveform array with electronic noise and pedestal for channel j [0-8735]. */
     void makeElectronicNoiseAndPedestal(int j, int* fitA);
 
     /** Module parameters */
@@ -163,11 +162,11 @@ namespace Belle2 {
     bool m_useWaveformParameters{false};
     bool m_timeCalib{true};
 
+    /** Always load waveform parameters at least once */
+    bool m_loadOnce{true};
+
     /** Lookup table for ECL channels. */
     std::vector<CrystalLinks> m_tbl;
-
-    /** Always load waveform parameters at least once */
-    bool m_loadOnce = true;
 
     /** Fit algorithm parameters shared by group of crystals */
     std::vector<AlgoParams> m_idn; /**< parameters that needs for waveform fit */

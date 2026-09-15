@@ -121,7 +121,7 @@ void ECLDigitizerUpModule::initialize()
   if (m_waveformMaker)
     m_eclWaveforms.registerInDataStore(m_eclWaveformsName);
 
-  m_adc.resize(EclConfigurationUp::m_nch);
+  m_adc.resize(EclConfigurationUp::c_nChannels);
 
   EclConfigurationUp::get().setBackground(m_background);
 }
@@ -129,7 +129,7 @@ void ECLDigitizerUpModule::initialize()
 void ECLDigitizerUpModule::beginRun()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  double ns_per_tick = ec.s_clock / (ec.m_ndt * ec.m_nta *
+  double ns_per_tick = ec.c_clock / (ec.c_nFitPointsPerAdcTick * ec.c_nLowAmplitudeFitTimeShifts *
                                      ec.getRF()) *
                        1e3; // convert to ns
 
@@ -202,7 +202,7 @@ void ECLDigitizerUpModule::shapeFitterWrapper(
   const FitParams& r = m_fitparams[t.ifunc];
 
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  const int nSamples = ec.m_nsmp;
+  const int nSamples = ec.c_nAdcSamples;
 
   ECLShapeFitUp result;
 
@@ -273,7 +273,7 @@ void ECLDigitizerUpModule::shapeSignals()
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
-  const double trgtick = ec.s_clock / ec.getRF() / ec.m_ntrg;   // trigger tick
+  const double trgtick = ec.s_clock / ec.getRF() / ec.c_nTriggerCounts;   // trigger tick
   const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
 
   // clear the storage for the event
@@ -291,19 +291,19 @@ void ECLDigitizerUpModule::shapeSignals()
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * e2GeV;
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * t2us;
 
-    m_adc[j].energyConversion = m_calib[j].ascale * e2GeV * 20000;
-    m_adc[j].flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
-    m_adc[j].timeshift += m_calib[j].tshift * hit.getEnergyDep();
-    m_adc[j].timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
-    m_adc[j].totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
-    m_adc[j].totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
+    m_adc[j].m_energyConversion = m_calib[j].ascale * e2GeV * 20000;
+    m_adc[j].m_flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
+    m_adc[j].m_timeshift += m_calib[j].tshift * hit.getEnergyDep();
+    m_adc[j].m_timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
+    m_adc[j].m_totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
+    m_adc[j].m_totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
 
     if (m_hadronPulseShape) {
       double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * e2GeV;
-      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[0]);//Gamma Component
-      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[1]); //Hadron Component
+      m_adc[j].addHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[0]);//Gamma Component
+      m_adc[j].addHit(hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[1]); //Hadron Component
     } else {
-      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
+      m_adc[j].addHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
     }
   }
 
@@ -316,7 +316,7 @@ void ECLDigitizerUpModule::shapeSignals()
     double timeOffset = tscale * m_ttime[id] - toff;
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * e2GeV;
     double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * t2us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
+    m_adc[j].addHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
   }
 
   // internuclear counter effect -- charged particle crosses diode and produces signal
@@ -335,9 +335,9 @@ void ECLDigitizerUpModule::shapeSignals()
 
       AdcCounts& a = m_adc[j];
       if (m_hadronPulseShape) {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[2]); // diode component
+        a.addHit(hitE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[2]); // diode component
       } else {
-        a.AddHit(hitE, hitTimeAve + timeOffset,
+        a.addHit(hitE, hitTimeAve + timeOffset,
                  m_shapeSignalSamples[m_tbl[j].iss]); // m_shapeSignalSamples[m_tbl[j].iss] is the sampled diode response
       }
     }
@@ -347,11 +347,11 @@ void ECLDigitizerUpModule::shapeSignals()
     // This has been added by Alex Bobrov for calibration
     // of covariance matrix artificially generate 100 MeV in time for each crystal
     double hitE = 0.1, hitTimeAve = 0.0;
-    for (int j = 0; j < ec.m_nch; j++) {
+    for (int j = 0; j < ec.c_nChannels; j++) {
       int cellId = j + 1; // 1 .. 8736
       int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
       double timeOffset = tscale * m_ttime[id] - toff;
-      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
+      m_adc[j].addHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
     }
   }
 }
@@ -359,7 +359,7 @@ void ECLDigitizerUpModule::shapeSignals()
 void ECLDigitizerUpModule::makeElectronicNoiseAndPedestal(int j, int* fitA)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  const int nSamples = ec.m_nsmp;
+  const int nSamples = ec.c_nAdcSamples;
   if (m_noElectronicNoise) {
     for (int i = 0; i < nSamples; i++) fitA[i] = 3000;
     return;
@@ -374,8 +374,8 @@ void ECLDigitizerUpModule::makeElectronicNoiseAndPedestal(int j, int* fitA)
 void ECLDigitizerUpModule::makeWaveforms()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  const int nSamples = ec.m_nsmp;
-  BitStream out(ec.m_nch * nSamples * 18 / 32);
+  const int nSamples = ec.c_nAdcSamples;
+  BitStream out(ec.c_nChannels * nSamples * 18 / 32);
   out.putNBits(m_compAlgo & 0xff, 8);
   ECLCompressUp* comp = selectAlgoUp(m_compAlgo & 0xff);
   if (comp == nullptr)
@@ -383,11 +383,11 @@ void ECLDigitizerUpModule::makeWaveforms()
 
   std::vector<int> fitA(nSamples); // buffer for the waveform fitter
   // loop over entire calorimeter
-  for (int j = 0; j < ec.m_nch; j++) {
+  for (int j = 0; j < ec.c_nChannels; j++) {
     AdcCounts& a = m_adc[j];
     makeElectronicNoiseAndPedestal(j, fitA.data());
     for (int  i = 0; i < nSamples; i++) {
-      int A = 20000 * a.c[i] + fitA[i];
+      int A = 20000 * a.m_adcCounts[i] + fitA[i];
       fitA[i] = max(0, min(A, (1 << 18) - 1));
     }
     comp->compress(out, fitA.data());
@@ -404,14 +404,17 @@ void ECLDigitizerUpModule::makeWaveforms()
 void ECLDigitizerUpModule::event()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  const int nSamples = ec.m_nsmp;
+  const int nSamples = ec.c_nAdcSamples;
 
   // make relation between cellid and eclhits
-  struct ch_t {int cell, id;};
-  vector<ch_t> hitmap;
+  struct HitMapEntry {
+    int cell;
+    int id;
+  };
+  std::vector<HitMapEntry> hitMap;
   for (const auto& hit : m_eclHits) {
     int j = hit.getCellId() - 1; //0~8735
-    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    if (hit.getBackgroundTag() == BackgroundMetaData::bg_none) hitMap.push_back({j, hit.getArrayIndex()});
   }
 
   bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
@@ -436,7 +439,7 @@ void ECLDigitizerUpModule::event()
   }
 
   if (!m_trigTime || !isTrigTime) { // reproduce previous logic -- one trigger time for all crates
-    int deltaT = gRandom->Uniform(0, double(ec.m_ntrg) * 0.5); // trigger decision can come in any time [0..n_trg/2)
+    int deltaT = gRandom->Uniform(0, double(ec.c_nTriggerCounts) * 0.5); // trigger decision can come in any time [0..n_trg/2)
     for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = deltaT;
   }
 
@@ -458,14 +461,14 @@ void ECLDigitizerUpModule::event()
   std::vector<int> fitA(nSamples); // buffer for the waveform fitter
 
   // loop over entire calorimeter
-  for (int j = 0; j < ec.m_nch; j++) {
+  for (int j = 0; j < ec.c_nChannels; j++) {
     AdcCounts& a = m_adc[j];
 
     //normalize the MC true arrival times
-    if (m_adc[j].totalDep > 0) {
-      m_adc[j].flighttime /= m_adc[j].totalDep;
-      m_adc[j].timeshift /= m_adc[j].totalDep;
-      m_adc[j].timetosensor /= m_adc[j].totalDep;
+    if (m_adc[j].m_totalDep > 0) {
+      m_adc[j].m_flighttime /= m_adc[j].m_totalDep;
+      m_adc[j].m_timeshift /= m_adc[j].m_totalDep;
+      m_adc[j].m_timetosensor /= m_adc[j].m_totalDep;
     }
 
     // if background waveform is here there is no need to generate
@@ -474,12 +477,12 @@ void ECLDigitizerUpModule::event()
       comp->uncompress(out, fitA.data());
     } else {
       // Signal amplitude should be above 100 keV
-      if (a.total < 0.0001) continue;
+      if (a.m_total < 0.0001) continue;
       makeElectronicNoiseAndPedestal(j, fitA.data());
     }
 
     for (int i = 0; i < nSamples; i++) {
-      int A = 20000 * a.c[i] + fitA[i];
+      int A = 20000 * a.m_adcCounts[i] + fitA[i];
       fitA[i] = max(0, min(A, (1 << 18) - 1));
     }
 
@@ -505,32 +508,32 @@ void ECLDigitizerUpModule::event()
       }
 
       // only store extra MC info if requested and above threshold
-      if (m_storeDspWithExtraMCInfo && a.totalDep >= m_dspWithExtraMCInfoThreshold) {
+      if (m_storeDspWithExtraMCInfo && a.m_totalDep >= m_dspWithExtraMCInfoThreshold) {
         const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew(nSamples);
         eclDspWithExtraMCInfo->setCellId(cellId);
         eclDspWithExtraMCInfo->setDspA(fitA);
-        eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
-        eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
-        eclDspWithExtraMCInfo->setFlightTime(a.flighttime);
-        eclDspWithExtraMCInfo->setTimeShift(a.timeshift);
-        eclDspWithExtraMCInfo->setTimeToSensor(a.timetosensor);
-        eclDspWithExtraMCInfo->setEnergyConversion(a.energyConversion * 20000);
+        eclDspWithExtraMCInfo->setEnergyDep(a.m_totalDep);
+        eclDspWithExtraMCInfo->setHadronEnergyDep(a.m_totalHadronDep);
+        eclDspWithExtraMCInfo->setFlightTime(a.m_flighttime);
+        eclDspWithExtraMCInfo->setTimeShift(a.m_timeshift);
+        eclDspWithExtraMCInfo->setTimeToSensor(a.m_timetosensor);
+        eclDspWithExtraMCInfo->setEnergyConversion(a.m_energyConversion * 20000);
       }
 
       const auto eclDigit = m_eclDigits.appendNew();
       eclDigit->setCellId(cellId); // cellId in range from 1 to 8736
       eclDigit->setAmp(energyFit); // E (GeV) = energyFit/20000;
-      eclDigit->setTimeFit(tFit);  // t0 (us)= (64 / 508.876) / (m_ndt*32)
+      eclDigit->setTimeFit(tFit);  // t0 (us)= (64 / 508.876) / (nFitPointsPerAdcTick*32)
       eclDigit->setQuality(qualityFit);
       if (qualityFit == 2)
         eclDigit->setChi(chi);
       else eclDigit->setChi(0);
-      for (const auto& hit : hitmap)
+      for (const auto& hit : hitMap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
 
       // set relation to DspWithExtraInfo
-      for (auto& DspWithExtraMCInfo : m_eclDspsWithExtraMCInfo) {
-        if (eclDigit->getCellId() == DspWithExtraMCInfo.getCellId()) DspWithExtraMCInfo.addRelationTo(eclDigit);
+      for (auto& dspWithExtraMCInfo : m_eclDspsWithExtraMCInfo) {
+        if (eclDigit->getCellId() == dspWithExtraMCInfo.getCellId()) dspWithExtraMCInfo.addRelationTo(eclDigit);
       }
     }
   } //store each crystal hit
@@ -563,9 +566,9 @@ void ECLDigitizerUpModule::callbackHadronSignalShapes()
     }
 
     //Initialize templates for hadron shape simulations
-    m_hadronShapeSignalSamples[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
-    m_hadronShapeSignalSamples[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
-    m_hadronShapeSignalSamples[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
+    m_hadronShapeSignalSamples[0].initSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
+    m_hadronShapeSignalSamples[1].initSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
+    m_hadronShapeSignalSamples[2].initSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
 
   }
 
@@ -610,7 +613,7 @@ void ECLDigitizerUpModule::readDSPDB()
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
 
-  m_tbl.resize(ec.m_nch);
+  m_tbl.resize(ec.c_nChannels);
 
   const int maxncellid = 512;
   int ncellId;
@@ -619,7 +622,7 @@ void ECLDigitizerUpModule::readDSPDB()
   tree->SetBranchAddress("ncellId", &ncellId);
   tree->SetBranchAddress("cellId", cellId.data());
 
-  vector<int> eclWaveformDataTable(ec.m_nch);
+  vector<int> eclWaveformDataTable(ec.c_nChannels);
   for (Long64_t j = 0, jmax = tree->GetEntries(); j < jmax; j++) {
     tree->GetEntry(j);
     assert(ncellId <= maxncellid);
@@ -657,7 +660,7 @@ void ECLDigitizerUpModule::readDSPDB()
     assert(ncellId <= maxncellid);
     m_noise.push_back(*noise);
     if (ncellId == 0) {
-      for (int i = 0; i < ec.m_nch; i++)
+      for (int i = 0; i < ec.c_nChannels; i++)
         m_tbl[i].inoise = 0;
       break;
     } else {
@@ -674,7 +677,7 @@ void ECLDigitizerUpModule::readDSPDB()
     repack(eclWFAlgoParams[i], m_idn[i]);
 
   vector<UIntPair> pairIdx;
-  for (int i = 0; i < ec.m_nch; i++) {
+  for (int i = 0; i < ec.c_nChannels; i++) {
     unsigned int   wfIdx = eclWaveformDataTable[i];
     unsigned int algoIdx = m_tbl[i].idn;
     UIntPair p(wfIdx, algoIdx);
@@ -699,7 +702,7 @@ void ECLDigitizerUpModule::readDSPDB()
   for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
     const UIntPair& p = pairIdx[ip];
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
-    getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
+    getFitParams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
   }
   B2DEBUG(150, "ECLDigitizer: " << m_fitparams.size() << " fitting crystals groups were created.");
 
@@ -707,21 +710,19 @@ void ECLDigitizerUpModule::readDSPDB()
   // since all shaper parameters are the same for all crystals
   m_shapeSignalSamples.resize(2);
   float MP[14]; eclWFData->getWaveformParArray(MP);
-  m_shapeSignalSamples[0].InitSample(MP, 1.0);
+  m_shapeSignalSamples[0].initSample(MP, 1.0);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
   // have peak position with parameters from ps.dat roughly in the
   // same place as in current MC
-  // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
-  // m_shapeSignalSamples[0].InitSample(crystal_params, 0.9999272*19.5216);
-  for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
+  for (int i = 0; i < ec.c_nChannels; i++) m_tbl[i].iss = 0;
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
   // parameters from ps.dat roughly in the same place as in current MC
-  const double t_adc_up = ec.s_clock / ec.getRF(); // ADC clock period in us
-  const double time_to_units_up = ec.m_step / t_adc_up; // Convert time to units of ADC clock
+  const double t_adc_up = ec.c_clock / ec.getRF(); // ADC clock period in us
+  const double time_to_units_up = ec.c_step / t_adc_up; // Convert time to units of ADC clock
   double diode_params[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.010 * time_to_units_up, 6.975 * time_to_units_up, 0., 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters
 
-  m_shapeSignalSamples[1].InitSample(diode_params, 1.0);
+  m_shapeSignalSamples[1].initSample(diode_params, 1.0);
 
   B2DEBUG(150, "ECLDigitizer: " << m_shapeSignalSamples.size() << " sampled signal templates were created.");
 
@@ -758,14 +759,14 @@ void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, AlgoParams
   t.id[15] = eclWFAlgo.getcT();
 }
 
-void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, FitParams& p)
+void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, FitParams& p)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
   constexpr int nADC_signal = ECLWaveformDataUp::c_nADCsignal;
-  constexpr int m_ndt = ec.m_ndt;
-  constexpr int m_ntf = ec.m_ntf;
-  constexpr int m_nta = ec.m_nta;
+  constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
+  constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
+  constexpr int nLowAmplitudeFitTimeShifts = ec.c_nLowAmplitudeFitTimeShifts;
 
   double ssd[nADC_signal][nADC_signal];
   eclWFData.getMatrix(ssd);
@@ -779,13 +780,13 @@ void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   int ib = 1 << eclWFAlgo.getkb();
   int ic = 1 << eclWFAlgo.getkc();
 
-  double dbl_f   [m_ntf * m_ndt][nADC_signal];
-  double dbl_f1  [m_ntf * m_ndt][nADC_signal];
-  double dbl_fg31[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg32[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg33[m_ntf * m_ndt][nADC_signal];
-  double dbl_fg41[m_nta][nADC_signal];
-  double dbl_fg43[m_nta][nADC_signal];
+  double dbl_f   [nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
+  double dbl_f1  [nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
+  double dbl_fg31[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
+  double dbl_fg32[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
+  double dbl_fg33[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
+  double dbl_fg41[nLowAmplitudeFitTimeShifts][nADC_signal];
+  double dbl_fg43[nLowAmplitudeFitTimeShifts][nADC_signal];
 
   IntArrayGridXAdc& ref_f    = p.f;
   IntArrayGridXAdc& ref_f1   = p.f1;
@@ -802,12 +803,13 @@ void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   if (m_unitscale > 0) unitscale = m_unitscale;
 
   ShaperDSPUp_t dsp(MP, unitscale);
-  dsp.settimestride(ec.m_step);
-  dsp.setseedoffset(ec.m_step / ec.m_ndt);
-  dsp.settimeseed((ec.m_step * ec.m_tmin) + (ec.m_step / ec.m_ndt));
-  dsp.settimeseed(ec.m_step * (ec.m_tmin - (m_ntf / 2)));
+  dsp.settimestride(ec.c_step);
+  dsp.setseedoffset(ec.c_step / ec.c_nFitPointsPerAdcTick);
+  dsp.settimeseed((ec.c_step * ec.c_fitTimeMin) + (ec.c_step / ec.c_nFitPointsPerAdcTick));
+  dsp.settimeseed(ec.c_step * (ec.c_fitTimeMin - (nFitTimeShifts / 2)));
   vector<dd_t> f(nADC_signal);
-  for (int k = 0; k < m_ntf * m_ndt; k++, dsp.nextseed()) { // calculate fit parameters around 0 +- m_ntf/2 ADC tick
+  for (int k = 0; k < nFitTimeShifts * nFitPointsPerAdcTick;
+       k++, dsp.nextseed()) { // calculate fit parameters around 0 +- nFitTimeShifts/2 ADC tick
     dsp.fillvector(f);
 
     double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
@@ -856,14 +858,14 @@ void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, cons
     }
 
     //first approximation without time correction
-    int center = m_ndt * (m_ntf - 1) / 2;
-    int step   = m_ndt / m_nta;   // 4
+    int center = nFitPointsPerAdcTick * (nFitTimeShifts - 1) / 2;
+    int step   = nFitPointsPerAdcTick / nLowAmplitudeFitTimeShifts;   // 4
 
     int rel = center - k;
 
     if (rel % step == 0) {
-      int jk = (m_nta - 1) + rel / step;
-      if (jk >= 0 && jk < m_nta) {
+      int jk = (nLowAmplitudeFitTimeShifts - 1) + rel / step;
+      if (jk >= 0 && jk < nLowAmplitudeFitTimeShifts) {
 
         double igg1 = 1 / a11;
         // to fixed point
@@ -880,14 +882,14 @@ void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   // Ignore dynamically calculated normalization coefficient if
   // unitscale is set to a static positive value.
   if (m_unitscale > 0) fm = 1.0;
-  for (int k = 0; k < m_ntf * m_ndt; k++) {
+  for (int k = 0; k < nFitTimeShifts * nFitPointsPerAdcTick; k++) {
     for (int j = 0; j < nADC_signal; j++) {
       ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
       ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
       ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
       ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
       ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
-      if (k >= m_nta) continue;
+      if (k >= nLowAmplitudeFitTimeShifts) continue;
       ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
       ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
     }

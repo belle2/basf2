@@ -27,96 +27,94 @@ namespace Belle2 {
       /** set the background flag */
       void setBackground(bool val) { m_background = val; }
 
-      static constexpr int        m_nch =
+      static constexpr int        c_nChannels =
         ECLElementNumbers::c_NCrystals;  /**< total number of electronic channels (crystals) in calorimeter */
-      static constexpr double    m_step = 1. / 9.; /**< time between points in internal units t_{asrto}*m_rf/2./64. */
-      static constexpr double    s_clock = 64.; /**< digitization clock in RF units */
-      static constexpr int       m_ntrg = 256; /**< number of trigger counts per ADC clock tick */
+      static constexpr double    c_step = 1. / 9.; /**< time between points in internal units t_{asrto}*m_rf/2./64. */
+      static constexpr double    c_clock = 64.; /**< digitization clock in RF units */
+      static constexpr int       c_nTriggerCounts = 256; /**< number of trigger counts per ADC clock tick */
 
-      static constexpr int       m_nsmp = 64; /**< number of ADC measurements for signal fitting */
-      static constexpr double    m_tmin = -32; /**< lower range of the signal fitting region in ADC clocks */
+      static constexpr int       c_nAdcSamples = 64; /**< number of ADC measurements for signal fitting */
+      static constexpr double    c_fitTimeMin = -32; /**< lower range of the signal fitting region in ADC clocks */
 
-      static constexpr int       m_nl = 96; /**< length of samples signal in number of ADC clocks */
-      static constexpr int       m_ns = 32; /**< number of samples per ADC clock */
-      static constexpr int       m_ndt = 128; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
-      static constexpr int       m_ntf = 4; /**< number of time shifts for signal fit procedure parameters */
-      static constexpr int       m_nta = 32; /**< number of time shifts for signal fit procedure parameters in low amplitude case */
+      static constexpr int       c_nSignalAdcClocks = 96; /**< length of samples signal in number of ADC clocks */
+      static constexpr int       c_nSamplesPerAdcClock = 32; /**< number of samples per ADC clock */
+      static constexpr int       c_nFitPointsPerAdcTick =
+        128; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
+      static constexpr int       c_nFitTimeShifts = 4; /**< number of time shifts for signal fit procedure parameters */
+      static constexpr int       c_nLowAmplitudeFitTimeShifts =
+        32; /**< number of time shifts for signal fit procedure parameters in low amplitude case */
 
-    private:
-      static double m_rf; /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
-      static double m_tick; /**< == 72/127 digitization clock tick (in microseconds) */
-
-    public:
-      /** See m_rf. This will try to use the value from the database */
+      /** See s_rf. This will try to use the value from the database */
       static double getRF();
-      /** See m_tick */
-      static double getTick();
-
-    private:
-      EclConfigurationUp() {}; /**< constructor */
-      bool m_background{false}; /**< background configuration */
-    public:
 
       /** a struct for a signal sample */
-      struct signalsample_t {
-        /** @param MP        Float array of waveform parameters
-         *  @param unitscale Normalization of template waveform
+      struct SignalSample {
+        /** @param waveformParameters Float array of waveform parameters
+         *  @param unitScale          Normalization of template waveform
          */
-        void InitSample(const float* MP, double unitscale = -1);
-        /** @param MPd       Double array of waveform parameters
-         *  @param unitscale Normalization of template waveform
+        void initSample(const float* waveformParameters, double unitScale = -1);
+        /** @param waveformParameters Double array of waveform parameters
+         *  @param unitScale          Normalization of template waveform
          */
-        void InitSample(const double* MPd, double unitscale = -1);
+        void initSample(const double* waveformParameters, double unitScale = -1);
         /**
-         * @param[in]  a  Signal amplitude
-         * @param[in]  t0 Signal offset
-         * @param[out] s  Output array with added signal
+         * @param[in]  amplitude  Signal amplitude
+         * @param[in]  timeOffset Signal offset
+         * @param[out] signal     Output array with added signal
          *
          * @return Energy deposition in ADC units
          */
-        double Accumulate(const double a, const double t0, double* s) const;
+        double accumulate(double amplitude, double timeOffset, double* signal) const;
 
-        double m_sumscale; /**< energy deposit in fitting window scale factor */
-        double m_ft[m_nl * m_ns]; /**< Simulated signal shape */
+        double m_sumScale; /**< energy deposit in fitting window scale factor */
+        double m_signalShape[c_nSignalAdcClocks * c_nSamplesPerAdcClock]; /**< Simulated signal shape */
       };
 
       /** a struct for the ADC count */
-      struct adccounts_t {
+      struct AdcCounts {
         /** add hit method */
-        void AddHit(const double a, const double t0, const signalsample_t& q);
-        double total; /**< total deposition (sum of m_s array) */
-        double c[m_nsmp]; /**< flash ADC measurements */
-        double totalHadronDep; /**< total true hadron energy deposition*/
-        double totalDep; /**< total true energy deposition*/
-        double energyConversion; /**< energy conversion factor*/
-        double flighttime; /**< simulated time weighted by true deposited energy*/
-        double timeshift; /**< simulated time shift*/
-        double timetosensor; /**< simulated time to sensor*/
+        void addHit(const double a, const double t0, const SignalSample& q);
+        void addHit(double amplitude, double timeOffset,
+                    const SignalSample& signalSample);
+        double m_total; /**< total deposition (sum of m_s array) */
+        double m_adcCounts[c_nAdcSamples]; /**< flash ADC measurements */
+        double m_totalHadronDep; /**< total true hadron energy deposition*/
+        double m_totalDep; /**< total true energy deposition*/
+        double m_energyConversion; /**< energy conversion factor*/
+        double m_flightTime; /**< simulated time weighted by true deposited energy*/
+        double m_timeShift; /**< simulated time shift*/
+        double m_timeToSensor; /**< simulated time to sensor*/
       };
 
-      static const int m_npre = m_nsmp; /**< number of samples in the fitting window */
+      static constexpr int c_nFitSamples = c_nAdcSamples; /**< number of samples in the fitting window */
 
       /** a struct for the fit parameters */
-      struct fitparams_t {
-        typedef int int_array_gridxadc_t[m_ntf * m_ndt][m_npre]; /**< Array for DSP coefs in normal fit */
-        typedef int int_array_subxadc_t[m_nta][m_npre]; /**< Array for DSP coefs in fast fit */
-        int_array_gridxadc_t f; /**< Array with tabulated signal waveform */
-        int_array_gridxadc_t f1; /**< Array with tabulated derivative of signal waveform */
-        int_array_gridxadc_t fg31; /**< Array to estimate signal amplitude */
-        int_array_gridxadc_t fg32; /**< Array to estimate amp * time */
-        int_array_gridxadc_t fg33; /**< Array to estimate pedestal height */
-        int_array_subxadc_t fg41; /**< Alternative for FG31 for low amplitude fits */
-        int_array_subxadc_t fg43; /**< Alternative for FG33 for low amplitude fits */
+      struct FitParams {
+        typedef int IntArrayGridXAdc[c_nFitTimeShifts * c_nFitPointsPerAdcTick][c_nFitSamples]; /**< Array for DSP coefs in normal fit */
+        typedef int IntArraySubXAdc[c_nLowAmplitudeFitTimeShifts][c_nFitSamples]; /**< Array for DSP coefs in fast fit */
+        IntArrayGridXAdc f; /**< Array with tabulated signal waveform */
+        IntArrayGridXAdc f1; /**< Array with tabulated derivative of signal waveform */
+        IntArrayGridXAdc fg31; /**< Array to estimate signal amplitude */
+        IntArrayGridXAdc fg32; /**< Array to estimate amp * time */
+        IntArrayGridXAdc fg33; /**< Array to estimate pedestal height */
+        IntArraySubXAdc fg41; /**< Alternative for FG31 for low amplitude fits */
+        IntArraySubXAdc fg43; /**< Alternative for FG33 for low amplitude fits */
       };
 
       /** a struct for the parameters of the algorithm */
-      struct algoparams_t {
+      struct AlgoParams {
         union {
           short int     id[16]; /**< */
           unsigned char ic[32]; /**< */
         };
       };
 
+    private:
+      EclConfigurationUp() = default; /**< constructor */
+
+      bool m_background{false}; /**< background configuration */
+
+      static double s_rf; /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
     };
   }
 }

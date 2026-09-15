@@ -273,8 +273,8 @@ void ECLDigitizerUpModule::shapeSignals()
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
 
-  const double trgtick = ec.s_clock / ec.getRF() / ec.c_nTriggerCounts;   // trigger tick
-  const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
+  const double trgtick = ec.c_clock / ec.getRF() / ec.c_nTriggerCounts;   // trigger tick
+  const double tscale = 2 * trgtick, toff = ec.c_clock / (2 * ec.getRF());
 
   // clear the storage for the event
   memset(m_adc.data(), 0, m_adc.size()*sizeof(AdcCounts));
@@ -292,9 +292,9 @@ void ECLDigitizerUpModule::shapeSignals()
     double hitTimeAve = (hit.getFlightTime() + m_calib[j].tshift + eclp->time2sensor(j, hit.getPosition())) * t2us;
 
     m_adc[j].m_energyConversion = m_calib[j].ascale * e2GeV * 20000;
-    m_adc[j].m_flighttime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
-    m_adc[j].m_timeshift += m_calib[j].tshift * hit.getEnergyDep();
-    m_adc[j].m_timetosensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
+    m_adc[j].m_flightTime += hit.getFlightTime() * hit.getEnergyDep(); //true time weighted by energy
+    m_adc[j].m_timeShift += m_calib[j].tshift * hit.getEnergyDep();
+    m_adc[j].m_timeToSensor += eclp->time2sensor(j, hit.getPosition()) * hit.getEnergyDep();
     m_adc[j].m_totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
     m_adc[j].m_totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
 
@@ -466,9 +466,9 @@ void ECLDigitizerUpModule::event()
 
     //normalize the MC true arrival times
     if (m_adc[j].m_totalDep > 0) {
-      m_adc[j].m_flighttime /= m_adc[j].m_totalDep;
-      m_adc[j].m_timeshift /= m_adc[j].m_totalDep;
-      m_adc[j].m_timetosensor /= m_adc[j].m_totalDep;
+      m_adc[j].m_flightTime /= m_adc[j].m_totalDep;
+      m_adc[j].m_timeShift /= m_adc[j].m_totalDep;
+      m_adc[j].m_timeToSensor /= m_adc[j].m_totalDep;
     }
 
     // if background waveform is here there is no need to generate
@@ -514,9 +514,9 @@ void ECLDigitizerUpModule::event()
         eclDspWithExtraMCInfo->setDspA(fitA);
         eclDspWithExtraMCInfo->setEnergyDep(a.m_totalDep);
         eclDspWithExtraMCInfo->setHadronEnergyDep(a.m_totalHadronDep);
-        eclDspWithExtraMCInfo->setFlightTime(a.m_flighttime);
-        eclDspWithExtraMCInfo->setTimeShift(a.m_timeshift);
-        eclDspWithExtraMCInfo->setTimeToSensor(a.m_timetosensor);
+        eclDspWithExtraMCInfo->setFlightTime(a.m_flightTime);
+        eclDspWithExtraMCInfo->setTimeShift(a.m_timeShift);
+        eclDspWithExtraMCInfo->setTimeToSensor(a.m_timeToSensor);
         eclDspWithExtraMCInfo->setEnergyConversion(a.m_energyConversion * 20000);
       }
 

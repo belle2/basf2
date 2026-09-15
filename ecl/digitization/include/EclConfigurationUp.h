@@ -73,7 +73,6 @@ namespace Belle2 {
       /** a struct for the ADC count */
       struct AdcCounts {
         /** add hit method */
-        void addHit(const double a, const double t0, const SignalSample& q);
         void addHit(double amplitude, double timeOffset,
                     const SignalSample& signalSample);
         double m_total; /**< total deposition (sum of m_s array) */

@@ -31,7 +31,6 @@ namespace Belle2 {
   class ECLCrystalCalib;
   class ECLDigit;
   class ECLDsp;
-  class ECLDspUp;
   class ECLCalDigit;
   class ECLPureCsIInfo;
 
@@ -71,10 +70,6 @@ namespace Belle2 {
     /** Name of the ECLDsp.*/
     virtual const char* eclDspArrayName() const
     { return "ECLDsps" ; }
-
-    /** Name of the ECLDspUp.*/
-    virtual const char* eclDspUpArrayName() const
-    { return "ECLDspUps" ; }
 
     /** Name of the ECLCalDigit.*/
     virtual const char* eclCalDigitArrayName() const
@@ -128,7 +123,6 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits; /**< storearray ECLDigit */
     StoreArray<ECLCalDigit> m_eclCalDigits; /**< storearray ECLCalDigit */
     StoreArray<ECLDsp> m_eclDsps; /**< storearray ECLDsp */
-    StoreArray<ECLDspUp> m_eclDspUps; /**< storearray ECLDspUp */
     StoreArray<ECLPureCsIInfo> m_eclPureCsIInfo; /**< storearray ECLPureCsIInfo - Special information for pure CsI simulation */
 
     double m_timeInverseSlope; /**< Time calibration inverse slope "a". */

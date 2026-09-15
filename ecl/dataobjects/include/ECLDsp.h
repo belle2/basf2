@@ -29,29 +29,41 @@ namespace Belle2 {
       photonDiodeCrossing = 2  /**< photon + diode template fit */
     };
 
+    /** default number of ADC points for current ECL electronics */
+    static constexpr int c_defaultNADCPoints = 31;
+
     /** default constructor for ROOT */
-    ECLDsp() : m_DspAVector(31, 0) {}
+    ECLDsp() : m_DspAVector(c_defaultNADCPoints, 0) {}
 
-    /** Constructor for data*/
-    ECLDsp(int CellId, int NADCPoints, int* ADCData)
-    {
-      m_CellId     = CellId;
-      m_DspAVector.assign(ADCData, ADCData + NADCPoints);
-    }
+    /** constructor with configurable number of ADC samples */
+    explicit ECLDsp(int nADCPoints) :
+      m_DspAVector(nADCPoints, 0)
+    {}
 
-    /** Constructor for data*/
-    ECLDsp(int CellId, const std::vector<int>& ADCData) :
-      m_DspAVector(ADCData), m_CellId(CellId) {}
+    /** Constructor for data */
+    ECLDsp(int cellId, int nADCPoints, const int* adcData) :
+      m_DspAVector(adcData, adcData + nADCPoints),
+      m_CellId(cellId)
+    {}
+
+    /** Constructor for data */
+    ECLDsp(int cellId, const std::vector<int>& adcData) :
+      m_DspAVector(adcData),
+      m_CellId(cellId)
+    {}
 
     /*! Set Cell ID
      */
     void setCellId(int CellId) { m_CellId = CellId; }
 
-    /*! Set Dsp array
-     */
-    void setDspA(int  DspArray[31])
+    /*! Set Dsp array for the default current-electronics configuration
+    */
+    void setDspA(int dspArray[c_defaultNADCPoints])
     {
-      m_DspAVector.assign(DspArray, DspArray + 31);
+      m_DspAVector.assign(
+        dspArray,
+        dspArray + c_defaultNADCPoints
+      );
     }
 
     /*! Set Dsp array
@@ -111,15 +123,14 @@ namespace Belle2 {
      */
     int getCellId() const { return m_CellId; }
 
-    /*! Get Dsp Array
-     * @param DspArray array which gets filled with DspAVector values
-     */
-    void getDspA(int  DspArray[31]) const
+    /*! Get Dsp array for the default current-electronics configuration
+    * @param dspArray array which gets filled with DspAVector values
+    */
+    void getDspA(int dspArray[c_defaultNADCPoints]) const
     {
-      for (int i = 0; i < 31; i++)
-        DspArray[i] = m_DspAVector[i];
+      for (int i = 0; i < c_defaultNADCPoints; i++)
+        dspArray[i] = m_DspAVector[i];
     }
-
 
     /*! get two comp total amp
      * @return two comp total amp

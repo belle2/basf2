@@ -11,8 +11,8 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDspUp.h>
-#include <ecl/dataobjects/ECLDspWithExtraMCInfoUp.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLTrig.h>
@@ -406,6 +406,7 @@ void ECLDigitizerModuleUp::makeWaveforms()
 void ECLDigitizerModuleUp::event()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
+  const int nSamples = ec.m_nsmp;
 
   // make relation between cellid and eclhits
   struct ch_t {int cell, id;};
@@ -501,16 +502,16 @@ void ECLDigitizerModuleUp::event()
       //note energyFit and m_Awave is in ADC units
       if (energyFit > m_Awave[CellId - 1]) {
         //only save waveforms above ADC threshold
-        const auto eclDsp = m_eclDsps.appendNew();
+        const auto eclDsp = m_eclDsps.appendNew(nSamples);
         eclDsp->setCellId(CellId);
-        eclDsp->setDspA(FitA);
+        eclDsp->setDspA(std::vector<int>(FitA, FitA + nSamples));
       }
 
       // only store extra MC info if requested and above threshold
       if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
-        const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew();
+        const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew(nSamples);
         eclDspWithExtraMCInfo->setCellId(CellId);
-        eclDspWithExtraMCInfo->setDspA(FitA);
+        eclDspWithExtraMCInfo->setDspA(std::vector<int>(FitA, FitA + nSamples));
         eclDspWithExtraMCInfo->setEnergyDep(a.totalDep);
         eclDspWithExtraMCInfo->setHadronEnergyDep(a.totalHadronDep);
         eclDspWithExtraMCInfo->setFlightTime(a.flighttime);

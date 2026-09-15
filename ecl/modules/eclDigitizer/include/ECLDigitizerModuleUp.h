@@ -34,8 +34,8 @@ namespace Belle2 {
   class ECLHit;
   class ECLSimHit;
   class ECLDigit;
-  class ECLDspUp;
-  class ECLDspWithExtraMCInfoUp;
+  class ECLDsp;
+  class ECLDspWithExtraMCInfo;
   class ECLTrig;
   class ECLWaveforms;
 
@@ -225,10 +225,10 @@ namespace Belle2 {
     StoreArray<ECLDigit> m_eclDigits;
 
     /** Generated waveforms. */
-    StoreArray<ECLDspUp> m_eclDsps;
+    StoreArray<ECLDsp> m_eclDsps;
 
     /** Generated waveforms with extra MC information. */
-    StoreArray<ECLDspWithExtraMCInfoUp> m_eclDspsWithExtraMCInfo;
+    StoreArray<ECLDspWithExtraMCInfo> m_eclDspsWithExtraMCInfo;
 
     /** Trigger information. */
     StoreArray<ECLTrig> m_eclTrigs;

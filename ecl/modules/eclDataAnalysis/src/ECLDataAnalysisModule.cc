@@ -13,9 +13,7 @@
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLDspUp.h>
 #include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
-#include <ecl/dataobjects/ECLDspWithExtraMCInfoUp.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
@@ -59,9 +57,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclSimHits(eclSimHitArrayName()),
     m_eclHits(eclHitArrayName()),
     m_eclDsps(eclDspArrayName()),
-    m_eclDspUps(eclDspUpArrayName()),
     m_eclDspWithExtraMCInfos(eclDspWithExtraMCInfoArrayName()),
-    m_eclDspWithExtraMCInfoUps(eclDspWithExtraMCInfoUpArrayName()),
     m_eclDigits(eclDigitArrayName()),
     m_eclCalDigits(eclCalDigitArrayName()),
     m_eclConnectedRegions(eclConnectedRegionArrayName()),
@@ -83,11 +79,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclDspIdx(0),
     m_eclDspCellId(0),
     m_eclDspAVector(0),
-// DpspUp
-    m_eclDspUpMultip(0),
-    m_eclDspUpIdx(0),
-    m_eclDspUpCellId(0),
-    m_eclDspUpAVector(0),
 // DpspWithExtraMCInfo
     m_eclDspWithExtraMCInfoMultip(0),
     m_eclDspWithExtraMCInfoIdx(0),
@@ -98,16 +89,6 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclDspWithExtraMCInfoTimeShift(0),
     m_eclDspWithExtraMCInfoTimeToSensor(0),
     m_eclDspWithExtraMCInfoEnergyConversion(0),
-// DpspWithExtraMCInfoUp
-    m_eclDspWithExtraMCInfoUpMultip(0),
-    m_eclDspWithExtraMCInfoUpIdx(0),
-    m_eclDspWithExtraMCInfoUpCellId(0),
-    m_eclDspWithExtraMCInfoUpAVector(0),
-    m_eclDspWithExtraMCInfoUpEnergyDep(0),
-    m_eclDspWithExtraMCInfoUpFlightTime(0),
-    m_eclDspWithExtraMCInfoUpTimeShift(0),
-    m_eclDspWithExtraMCInfoUpTimeToSensor(0),
-    m_eclDspWithExtraMCInfoUpEnergyConversion(0),
 //Digit
     m_eclDigitMultip(0),
     m_eclDigitIdx(0),
@@ -466,27 +447,19 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
            bool(false));
   addParam("doHits", m_doHits, "set true if you want to save the Hit and SimHit informations'", bool(false));
   addParam("doDsps", m_doDsps, "set true if you want to save the Dsp informations'", bool(false));
-  addParam("doDspUps", m_doDspUps, "set true if you want to save the DspUp informations'", bool(false));
   addParam("doDspWithExtraMCInfos", m_doDspWithExtraMCInfos,
            "set true if you want to save the DspWithExtraMCInfo informations'", bool(false));
-  addParam("doDspWithExtraMCInfoUps", m_doDspWithExtraMCInfoUps,
-           "set true if you want to save the DspWithExtraMCInfoUp informations'", bool(false));
   addParam("doDigits", m_doDigits, "set true if you want to save the Digits and CalDigits informations'", bool(false));
   addParam("doPureCsI", m_doPureCsI, "set true if you want to save the information for upgrade option'", bool(false));
 
   m_eclDspAVector = new std::vector<std::vector<int>>();
-  m_eclDspUpAVector = new std::vector<std::vector<int>>();
   m_eclDspWithExtraMCInfoAVector = new std::vector<std::vector<int>>();
-  m_eclDspWithExtraMCInfoUpAVector = new std::vector<std::vector<int>>();
-
 }
 
 ECLDataAnalysisModule::~ECLDataAnalysisModule()
 {
   delete m_eclDspAVector;
-  delete m_eclDspUpAVector;
   delete m_eclDspWithExtraMCInfoAVector;
-  delete m_eclDspWithExtraMCInfoUpAVector;
 }
 
 
@@ -501,9 +474,7 @@ void ECLDataAnalysisModule::initialize()
   m_eclHits.registerInDataStore(eclHitArrayName());
 
   m_eclDsps.registerInDataStore(eclDspArrayName());
-  m_eclDspUps.registerInDataStore(eclDspUpArrayName());
   m_eclDspWithExtraMCInfos.registerInDataStore(eclDspWithExtraMCInfoArrayName());
-  m_eclDspWithExtraMCInfoUps.registerInDataStore(eclDspWithExtraMCInfoUpArrayName());
   m_eclDigits.registerInDataStore(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
@@ -563,13 +534,6 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclDspAVector",    "std::vector<std::vector<int>>",         &m_eclDspAVector);
   }
 
-  if (m_doDspUps == 1) {
-    m_tree->Branch("eclDspUpMultip",     &m_eclDspUpMultip,         "eclDspUp_Multip/I");
-    m_tree->Branch("eclDspUpIdx",        "std::vector<int>",         &m_eclDspUpIdx);
-    m_tree->Branch("eclDspUpCellId",     "std::vector<int>",         &m_eclDspUpCellId);
-    m_tree->Branch("eclDspUpAVector",    "std::vector<std::vector<int>>",         &m_eclDspUpAVector);
-  }
-
   if (m_doDspWithExtraMCInfos == 1) {
     m_tree->Branch("eclDspWithExtraMCInfoMultip",     &m_eclDspWithExtraMCInfoMultip,         "eclDspWithExtraMCInfo_Multip/I");
     m_tree->Branch("eclDspWithExtraMCInfoIdx",        "std::vector<int>",         &m_eclDspWithExtraMCInfoIdx);
@@ -581,19 +545,6 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclDspWithExtraMCInfoTimeToSensor",    "std::vector<double>",         &m_eclDspWithExtraMCInfoTimeToSensor);
     m_tree->Branch("eclDspWithExtraMCInfoEnergyConversion",    "std::vector<double>",
                    &m_eclDspWithExtraMCInfoEnergyConversion);
-  }
-
-  if (m_doDspWithExtraMCInfoUps == 1) {
-    m_tree->Branch("eclDspWithExtraMCInfoUpMultip",     &m_eclDspWithExtraMCInfoUpMultip,         "eclDspWithExtraMCInfoUp_Multip/I");
-    m_tree->Branch("eclDspWithExtraMCInfoUpIdx",        "std::vector<int>",         &m_eclDspWithExtraMCInfoUpIdx);
-    m_tree->Branch("eclDspWithExtraMCInfoUpCellId",     "std::vector<int>",         &m_eclDspWithExtraMCInfoUpCellId);
-    m_tree->Branch("eclDspWithExtraMCInfoUpAVector",    "std::vector<std::vector<int>>",         &m_eclDspWithExtraMCInfoUpAVector);
-    m_tree->Branch("eclDspWithExtraMCInfoUpEnergyDep",    "std::vector<double>",         &m_eclDspWithExtraMCInfoUpEnergyDep);
-    m_tree->Branch("eclDspWithExtraMCInfoUpFlightTime",    "std::vector<double>",         &m_eclDspWithExtraMCInfoUpFlightTime);
-    m_tree->Branch("eclDspWithExtraMCInfoUpTimeShift",    "std::vector<double>",         &m_eclDspWithExtraMCInfoUpTimeShift);
-    m_tree->Branch("eclDspWithExtraMCInfoUpTimeToSensor",    "std::vector<double>",         &m_eclDspWithExtraMCInfoUpTimeToSensor);
-    m_tree->Branch("eclDspWithExtraMCInfoUpEnergyConversion",    "std::vector<double>",
-                   &m_eclDspWithExtraMCInfoUpEnergyConversion);
   }
 
   if (m_doDigits == 1) {
@@ -980,14 +931,6 @@ void ECLDataAnalysisModule::event()
     m_eclDspAVector->clear();
   }
 
-  if (m_doDspUps == 1) {
-    ///DspUps
-    m_eclDspUpMultip = 0;
-    m_eclDspUpCellId->clear();
-    m_eclDspUpIdx->clear();
-    m_eclDspUpAVector->clear();
-  }
-
   if (m_doDspWithExtraMCInfos == 1) {
     ///DspWithExtraMCInfos
     m_eclDspWithExtraMCInfoMultip = 0;
@@ -999,19 +942,6 @@ void ECLDataAnalysisModule::event()
     m_eclDspWithExtraMCInfoTimeShift->clear();
     m_eclDspWithExtraMCInfoTimeToSensor->clear();
     m_eclDspWithExtraMCInfoEnergyConversion->clear();
-  }
-
-  if (m_doDspWithExtraMCInfoUps == 1) {
-    ///DspWithExtraMCInfoUps
-    m_eclDspWithExtraMCInfoUpMultip = 0;
-    m_eclDspWithExtraMCInfoUpCellId->clear();
-    m_eclDspWithExtraMCInfoUpIdx->clear();
-    m_eclDspWithExtraMCInfoUpAVector->clear();
-    m_eclDspWithExtraMCInfoUpEnergyDep->clear();
-    m_eclDspWithExtraMCInfoUpFlightTime->clear();
-    m_eclDspWithExtraMCInfoUpTimeShift->clear();
-    m_eclDspWithExtraMCInfoUpTimeToSensor->clear();
-    m_eclDspWithExtraMCInfoUpEnergyConversion->clear();
   }
 
   if (m_doDigits == 1) {
@@ -1408,17 +1338,6 @@ void ECLDataAnalysisModule::event()
     }
   }
 
-  if (m_doDspUps == 1) {
-    // DSPUPS
-    m_eclDspUpMultip = m_eclDspUps.getEntries();
-    for (int idsps = 0; idsps < m_eclDspUps.getEntries() ; idsps++) {
-      ECLDspUp* aECLDspUps = m_eclDspUps[idsps];
-      m_eclDspUpIdx->push_back(idsps);
-      m_eclDspUpCellId->push_back(aECLDspUps->getCellId());
-      m_eclDspUpAVector->push_back(aECLDspUps->getDspA());
-    }
-  }
-
   if (m_doDspWithExtraMCInfos == 1) {
     // DSPWITHEXTRAMCINFOS
     m_eclDspWithExtraMCInfoMultip = m_eclDspWithExtraMCInfos.getEntries();
@@ -1432,22 +1351,6 @@ void ECLDataAnalysisModule::event()
       m_eclDspWithExtraMCInfoTimeShift->push_back(aECLDspWithExtraMCInfos->getTimeShift());
       m_eclDspWithExtraMCInfoTimeToSensor->push_back(aECLDspWithExtraMCInfos->getTimeToSensor());
       m_eclDspWithExtraMCInfoEnergyConversion->push_back(aECLDspWithExtraMCInfos->getEnergyConversion());
-    }
-  }
-
-  if (m_doDspWithExtraMCInfoUps == 1) {
-    // DSPWITHEXTRAMCINFOUPS
-    m_eclDspWithExtraMCInfoUpMultip = m_eclDspWithExtraMCInfoUps.getEntries();
-    for (int idsps = 0; idsps < m_eclDspWithExtraMCInfoUps.getEntries() ; idsps++) {
-      ECLDspWithExtraMCInfoUp* aECLDspWithExtraMCInfoUps = m_eclDspWithExtraMCInfoUps[idsps];
-      m_eclDspWithExtraMCInfoUpIdx->push_back(idsps);
-      m_eclDspWithExtraMCInfoUpCellId->push_back(aECLDspWithExtraMCInfoUps->getCellId());
-      m_eclDspWithExtraMCInfoUpAVector->push_back(aECLDspWithExtraMCInfoUps->getDspA());
-      m_eclDspWithExtraMCInfoUpEnergyDep->push_back(aECLDspWithExtraMCInfoUps->getEnergyDep());
-      m_eclDspWithExtraMCInfoUpFlightTime->push_back(aECLDspWithExtraMCInfoUps->getFlightTime());
-      m_eclDspWithExtraMCInfoUpTimeShift->push_back(aECLDspWithExtraMCInfoUps->getTimeShift());
-      m_eclDspWithExtraMCInfoUpTimeToSensor->push_back(aECLDspWithExtraMCInfoUps->getTimeToSensor());
-      m_eclDspWithExtraMCInfoUpEnergyConversion->push_back(aECLDspWithExtraMCInfoUps->getEnergyConversion());
     }
   }
 

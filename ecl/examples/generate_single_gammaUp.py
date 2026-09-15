@@ -264,16 +264,6 @@ main.add_module(output)
 
 ecldataanalysis = register_module('ECLDataAnalysis')
 ecldataanalysis.param('doDigits', 1)
-ecldataanalysis.param(
-    'doDspUps' if not args.NoUpgrade else 'doDsps',
-    1,
-)
-ecldataanalysis.param(
-    'doDspWithExtraMCInfoUps'
-    if not args.NoUpgrade
-    else 'doDspWithExtraMCInfos',
-    1,
-)
 ecldataanalysis.param('writeToRoot', 1)
 ecldataanalysis.param('rootFileName', fname)
 # ecldataanalysis.param('doTracking', 1)

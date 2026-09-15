@@ -169,10 +169,10 @@ def main():
                         help='Directory for output ONNX files')
     parser.add_argument('--add-payloads', action='store_true',
                         help='Copy the exported ONNX files into localdb/database.txt')
-    parser.add_argument('--cat-payload-name', default=config.DEFAULT_CAT_PAYLOAD,
-                        help='Payload name for the category model')
-    parser.add_argument('--main-payload-name', default=config.DEFAULT_MAIN_PAYLOAD,
-                        help='Payload name for the main model')
+    parser.add_argument('--cat-payload-name', default=None,
+                        help='Payload name for the category model (default: derived from the contract version)')
+    parser.add_argument('--main-payload-name', default=None,
+                        help='Payload name for the main model (default: derived from the contract version)')
     parser.add_argument('--training-id', default='unspecified',
                         help='Name identifying this training, recorded in the weightfile and '
                              'logged at inference time (for example the training campaign or date)')
@@ -186,8 +186,6 @@ def main():
                         help='Final run of the interval of validity')
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
-
     schema = config.feature_schema_hash()
     identifier = (f'schema={schema};contractVersion={config.MODEL_CONTRACT_VERSION};'
                   f'training={args.training_id}')
@@ -197,6 +195,27 @@ def main():
         ('net_category.pt', 'modeSelector_cat.onnx', 'modeSelector_cat.root', False),
         ('net_main.pt', 'modeSelector_main.onnx', 'modeSelector_main.root', True),
     ]
+
+    # A payload records the contract version and layout hash of the code that exported it.
+    # If the two disagree, the payload would claim a version it does not match and only be
+    # rejected once someone loads it, so refuse before any payload is produced.
+    error = config.contract_consistency_error()
+    if error:
+        raise RuntimeError('Cannot export: ' + error)
+
+    # The default names encode the contract version of this code, and releases request
+    # exactly that name. Exporting under another name bypasses that link.
+    if args.cat_payload_name is None:
+        args.cat_payload_name = config.DEFAULT_CAT_PAYLOAD
+    if args.main_payload_name is None:
+        args.main_payload_name = config.DEFAULT_MAIN_PAYLOAD
+    if args.add_payloads:
+        for given, default in ((args.cat_payload_name, config.DEFAULT_CAT_PAYLOAD),
+                               (args.main_payload_name, config.DEFAULT_MAIN_PAYLOAD)):
+            if given != default:
+                print('Warning: exporting payload ' + given + ' instead of ' + default + '. Releases '
+                      'implementing contract version ' + str(config.MODEL_CONTRACT_VERSION) + ' request '
+                      + default + ', so they will not load this payload.')
 
     # Belle2.Database.addPayload() appends to an existing local database rather than
     # replacing it, which would leave two iovs per payload name covering the same range.
@@ -217,6 +236,8 @@ def main():
             + ', '.join(missing) + '). Point --input-dir at the directory holding the '
             'trained .pt files.'
         )
+
+    os.makedirs(args.output_dir, exist_ok=True)
 
     exported_root = {}
     selections = {}

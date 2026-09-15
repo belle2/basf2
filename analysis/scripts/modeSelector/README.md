@@ -77,10 +77,12 @@ Key contents:
 | `NUM_CAT_LABELS` | 3 | Category network output size |
 | `DELTA_M_CUT` | (-0.05, 0.05) | D* delta mass difference window |
 | `DELTA_P_THRESH` | 0.15 | Threshold for `mostcommonBTagDeltaP` in good-tag fallback truth |
-| `DEFAULT_CAT_PAYLOAD` | `modeSelector_cat_model_perf` | Default DB payload name for the category model |
-| `DEFAULT_MAIN_PAYLOAD` | `modeSelector_main_model_perf` | Default DB payload name for the main model |
+| `DEFAULT_CAT_PAYLOAD` | `modeSelector_cat_model_perf_c1` | Default DB payload name for the category model, derived from `MODEL_CONTRACT_VERSION` |
+| `DEFAULT_MAIN_PAYLOAD` | `modeSelector_main_model_perf_c1` | Default DB payload name for the main model, derived from `MODEL_CONTRACT_VERSION` |
+| `payload_names(version)` | function | (category, main) payload names for any contract version |
 | `MODEL_CONTRACT_VERSION` | 1 | Bumped by hand for behavioural changes the layout hash cannot see |
 | `KNOWN_CONTRACT_SCHEMAS` | {1: hash} | Layout hash each contract version must produce |
+| `SUPPORTED_CONTRACT_VERSIONS` | {1} | Contract versions the module can run (current plus older ones with a kept code path) |
 | `FEATURE_VAR_PREFIX` | `msfeat_` | Prefix for the raw-feature entries in the weightfile variable list |
 | `MAIN_EXTRA_VARS` | 4 names | The main network's extra inputs (3 category outputs + charged flag) |
 
@@ -158,8 +160,8 @@ A retraining can therefore change the selection without a software release, and 
 stale `config.HAS_INPUTS` cannot silently mis-select columns for a payload. It can
 be dropped once no pre-convention payloads remain.
 
-**`MODEL_CONTRACT_VERSION`** - The version of the agreement between this release
-and a payload. Bump it whenever the release changes anything affecting what a
+**`MODEL_CONTRACT_VERSION`** - The version of the agreement between the ModeSelector
+code and a payload. Bump it whenever the code changes anything affecting what a
 payload receives or how its outputs are interpreted: the feature array, the
 input_id encoding, which candidate represents an input_id slot, the preselection,
 or how the outputs become scores. It is not a software version, so unrelated
@@ -169,8 +171,8 @@ changes elsewhere must not bump it.
 contract, the part readable straight off the definitions in `config.py`: the
 sector sizes (which fix the input_id encoding), the block names paired with the
 basf2 variable each reads, the event feature names in order, and the names of the
-extra main-network inputs. Written into the weightfile at export and compared when
-a payload loads.
+extra main-network inputs. Written into the weightfile at export, and compared at load
+with the hash pinned for the payload's own contract version.
 
 The two are complementary and deliberately independent. The hash catches
 declarative drift automatically. Everything behavioural is invisible to it -- the
@@ -180,9 +182,16 @@ interpretation -- and that is what the contract version covers. The version is
 **not** part of the hash, so the two can be compared separately and an older
 payload stays identifiable rather than just being "different".
 
-`KNOWN_CONTRACT_SCHEMAS` records the layout hash each version must produce, and is
-checked at the start of a job. It catches the easy mistake of changing the layout
-without bumping the version. Add a line when bumping; keep the old entries.
+`KNOWN_CONTRACT_SCHEMAS` records the layout hash each version must produce. If
+the version were always bumped correctly the hash would be redundant; its job is to
+enforce that bump for layout changes, since it is easy to forget. This matters more
+because the module requests payloads by a name derived from the contract version: a
+missed bump would place an incompatible model under a name all code implementing that
+contract requests. The rule lives in
+`config.contract_consistency_error()` and is checked in two places: by
+`convert_to_onnx.py` before exporting, so an inconsistent payload never reaches the
+conditions database, and at the start of a job. Add a line when bumping; keep the
+old entries.
 
 The accepted experiment ids are deliberately outside both, since extending them is
 a routine update when a new campaign arrives.
@@ -198,29 +207,56 @@ The calibration corresponds to [release 8, run1 + run2](https://gitlab.desy.de/b
 When `cat_model_path` and `main_model_path` are omitted, models are loaded from
 the conditions database via payloads.
 
-**Payload naming.** The payload names carry no training or campaign version:
-`modeSelector_cat_model_perf` and `modeSelector_main_model_perf`
-(`config.DEFAULT_CAT_PAYLOAD` / `config.DEFAULT_MAIN_PAYLOAD`). A different
-training is selected by prepending the performance globaltag that serves it, not
-by asking for a different payload name. The `_perf` suffix marks the payloads as
-coming from a performance globaltag rather than from the analysis globaltag.
+In this section, **the module** means the ModeSelector code that consumes the payloads
+and implements one contract version, and a **release** means the light release shipping
+it, which is what users switch.
+
+**Payload naming.** The payload names are derived from the contract version the
+module implements: `modeSelector_cat_model_perf_c1` and
+`modeSelector_main_model_perf_c1` (`config.DEFAULT_CAT_PAYLOAD` /
+`config.DEFAULT_MAIN_PAYLOAD`). They carry no training or campaign version: a new
+training for the same contract is uploaded as a new revision under the same name and
+selected by the performance globaltag. The `_perf` part marks the payloads as coming
+from a performance globaltag rather than from the analysis globaltag.
+
+The contract suffix `_cN` lets a single performance globaltag serve several releases.
+It can hold `_c1` and `_c2` payloads side by side, and the module requests the payloads
+for the contract version it implements, so the module in an older release keeps working
+with a newer performance globaltag, or a newer version of it, as long as that globaltag
+still provides payloads for its contract version.
+It then gets the newest training available for that contract.
 
 This follows the conditions database convention that campaign-dependent payloads
-belong in campaign-dependent globaltags, rather than being distinguished by a tag
-in the payload name.
+belong in campaign-dependent globaltags rather than being distinguished by a tag in
+the payload name. The contract suffix is not such a tag: it identifies which inputs a
+model consumes and how its outputs are read.
+
+When loading from the conditions database, the module also looks for payloads of up
+to ten newer contract versions (`config.payload_names()`). If one exists it emits a
+warning that a newer contract, shipped with a newer release, uses a different model,
+and refers to the ModeSelector
+performance recommendations for what changed and whether switching is worthwhile.
+A missing payload only costs a metadata lookup; the newer file is fetched only if it
+exists. Passing local weightfiles skips this check.
 
 Because the name no longer identifies the training, two safeguards are built into
 the payload itself:
 
 - the weightfile records the **feature selection** its model was trained on, so
   the payload does not depend on `config.HAS_INPUTS` being in sync
-- the weightfile records the **feature schema hash**, which is compared against
-  the running software when the payload is loaded; a mismatch is fatal
+- the weightfile records the **layout hash**, which is compared with the hash pinned
+  for the payload's contract version when it is loaded; a mismatch is fatal
 
 A third check compares the model's output class count (`m_nClasses`) against what
 the module interprets: 3 for the category network, `N_INPUT_IDS + 3` for the main
 network. The outputs are read positionally, so a model with a different number of
 classes would be misread rather than rejected; a mismatch is fatal.
+
+A fourth check compares the training ids of the category and main models. The main
+network takes the category outputs as inputs, so a pair from different trainings would
+run but give wrong results, and it would pass every other check since both share the
+contract version and layout hash. A mismatch is fatal. Weightfiles without contract
+information carry no training id and are not compared.
 
 All of these are written by `convert_to_onnx.py` and logged at the start of a job
 together with the training id:
@@ -230,19 +266,35 @@ together with the training id:
 [INFO] ModeSelector: Using 976 selected features from the weightfile
 ```
 
-**Forward compatibility.** A payload from an older contract version currently
-aborts with a message naming both versions. That branch in `_check_contract()` is
-where a future release would instead dispatch to an older feature builder and keep
-reading payloads already in the database. Payloads are immutable, so the version
-field has to be present before it is needed; a payload written without one is
-treated as version 1.
+**Supported contract versions.** `config.SUPPORTED_CONTRACT_VERSIONS` lists the
+contract versions the module can run. It always contains `MODEL_CONTRACT_VERSION`;
+an older version stays in it only while the module still provides that contract's
+code path, meaning everything that differs between contract versions (feature
+construction, expected output classes, output interpretation) branches on
+`ModeSelectorModule.contract_version`. When the models are loaded:
 
-This only ever buys *backwards* compatibility. No release can be taught to read a
-payload built against a later contract, so analyses should pin to a performance
-globaltag matching their release.
+- a payload for the current contract version runs normally;
+- a payload for an older supported version runs with that contract's behaviour, and
+  the module warns that a newer contract exists, referring to the ModeSelector
+  performance recommendations for what changed and whether switching is worthwhile;
+- a payload for a newer version, or an older one that is no longer supported, is fatal;
+- the category and main models must share one contract version.
+
+The layout hash of a payload is compared with the hash pinned for its own contract
+version in `KNOWN_CONTRACT_SCHEMAS`, which is why old entries must be kept.
+`config.contract_consistency_error()` additionally requires that the current version
+is supported, that no newer version is listed, and that every supported version has a
+pinned hash. At the moment only contract version 1 exists, so there is no older code
+path yet.
+
+An older contract is loaded by naming its payloads explicitly, for example
+`payload_cat_model=config.payload_names(1)[0]`. Any explicitly given payload name emits
+a warning that the default payloads are not used; names superseded by local
+weightfiles are not reported.
 
 Weightfiles exported before this (with placeholder variable names) still load:
-the module warns and falls back to `config.HAS_INPUTS`, and skips the schema check.
+the module warns, treats them as contract version 1 (fatal if that version is no longer
+supported), falls back to `config.HAS_INPUTS`, and skips the layout check.
 
 To create a local payload database use:
 
@@ -418,8 +470,8 @@ modeSelector.modeSelector(
 |-----------|---------|-------------|
 | `bp_list` | required | B+ meson list name |
 | `b0_list` | required | B0 meson list name |
-| `payload_cat_model` | `config.DEFAULT_CAT_PAYLOAD` | DB payload name for category model |
-| `payload_main_model` | `config.DEFAULT_MAIN_PAYLOAD` | DB payload name for main model |
+| `payload_cat_model` | `None` | DB payload name for category model; `None` derives it from the contract version (normal use). An explicit name always warns; it can also select a payload for an older supported contract version |
+| `payload_main_model` | `None` | Same for the main model |
 | `output_variable` | `'BplusScore'` | EventExtraInfo name for the main signed score |
 | `cat_model_path` | `None` | Path to basf2 MVA weightfile for the category model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
 | `main_model_path` | `None` | Path to basf2 MVA weightfile for the main model, as produced by `convert_to_onnx.py` (overrides DB); do not pass a raw `.onnx` file |
@@ -757,6 +809,13 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   from `config.MODEL_CONTRACT_VERSION` and the id from `--training-id`.
 - Refuses to export if the two checkpoints were trained on different feature
   selections, since that means they come from different trainings.
+- Before converting anything, refuses to run if the contract configuration is
+  inconsistent (`config.contract_consistency_error()`: the current version is missing
+  from `SUPPORTED_CONTRACT_VERSIONS`, a newer version is listed, a supported version has
+  no pinned hash, or the layout was changed without bumping the version), or if
+  `--add-payloads` is given and
+  `localdb/database.txt` already exists, since adding payloads appends to it and would
+  leave stale entries with overlapping iovs.
 - With `--add-payloads`, creates `localdb/database.txt` with the payload names specified.
 - Wraps the network with `nn.Softmax` before export (ONNX model outputs probabilities).
 - Input size and output classes are derived automatically from the checkpoint.
@@ -768,9 +827,10 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   139-class main network by a few 1e-6. `np.allclose` defaults (`atol=1e-8`)
   are meant for float64 and reject roughly 8% of runs at random.
 - `--cat-payload-name` / `--main-payload-name` set the payload names written
-  into `localdb/database.txt`. These must match the `payload_cat_model` /
-  `payload_main_model` arguments passed to `modeSelector.modeSelector()`, which
-  default to `config.DEFAULT_CAT_PAYLOAD` and `config.DEFAULT_MAIN_PAYLOAD`.
+  into `localdb/database.txt`. When omitted they are derived from the contract
+  version (`config.DEFAULT_CAT_PAYLOAD` / `config.DEFAULT_MAIN_PAYLOAD`), which are
+  the names the module requests for this contract version. Exporting under any other
+  name prints a warning, since the module will not request it.
 - `--training-id` names the training; it is stored in the weightfile and logged
   at inference time. Defaults to `unspecified`, so set it for anything that gets
   uploaded.

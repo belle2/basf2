@@ -158,8 +158,8 @@ basf2 applyModeSelector.py -- [options]
 | `--output` | `modeSelector_output` | Output file prefix |
 | `--cat-model` | unset | Category MVA ONNX weightfile (`.root`, from `convert_to_onnx.py`). Omit to use payloads |
 | `--main-model` | unset | Main MVA ONNX weightfile (`.root`, from `convert_to_onnx.py`). Omit to use payloads |
-| `--cat-payload-name` | `modeSelector_cat_model_perf` | Conditions DB payload name for the category model |
-| `--main-payload-name` | `modeSelector_main_model_perf` | Conditions DB payload name for the main model |
+| `--cat-payload-name` | derived | Conditions DB payload name for the category model; omit to use the name derived from the contract version |
+| `--main-payload-name` | derived | Conditions DB payload name for the main model; omit to use the name derived from the contract version |
 | `--globaltag` | unset | Additional globaltag holding the payloads, prepended to the analysis globaltag |
 | `--data` | off | Run on data: keep a fixed 10% `eventRandom` sample and drop MC-only output columns |
 
@@ -225,8 +225,9 @@ Omit `--cat-model` and `--main-model` to load models from the conditions databas
 
 The payload names carry no training version: which training is used is decided by
 the performance globaltag that is prepended, not by `--cat-payload-name` /
-`--main-payload-name`. Those stay at their defaults in normal use, and the module
-emits a `B2WARNING` if they are changed. See "conditions database payloads" in
+`--main-payload-name`. Leave them unset in normal use; giving a name always emits a
+`B2WARNING`. Naming the payloads explicitly is also how an older contract version still
+supported by the module is loaded. See "conditions database payloads" in
 `analysis/scripts/modeSelector/README.md`.
 
 The script prepends `getAnalysisGlobaltag()`, which does not contain the

@@ -44,8 +44,8 @@ __all__ = [
 def modeSelector(
     bp_list,
     b0_list,
-    payload_cat_model=config.DEFAULT_CAT_PAYLOAD,
-    payload_main_model=config.DEFAULT_MAIN_PAYLOAD,
+    payload_cat_model=None,
+    payload_main_model=None,
     output_variable='BplusScore',
     cat_model_path=None,
     main_model_path=None,
@@ -72,9 +72,15 @@ def modeSelector(
         bp_list (str): B+ meson particle list name to process. Example: 'B+:feiHadronic'
         b0_list (str): B0 meson particle list name to process. Example: 'B0:feiHadronic'
         payload_cat_model (str): Conditions DB payload name for the category model.
-            Used only when cat_model_path is None.
+            Used only when cat_model_path is None. None (default) uses the name derived
+            from the contract version this release implements, and the training is chosen
+            by the performance globaltag. Passing a name always emits a warning that the
+            default payload is not used. A payload built for an older contract version runs
+            with that contract's behaviour if the version is in
+            config.SUPPORTED_CONTRACT_VERSIONS (with a warning); a newer or unsupported
+            version is fatal.
         payload_main_model (str): Conditions DB payload name for the main model.
-            Used only when main_model_path is None.
+            Used only when main_model_path is None. Same rules as payload_cat_model.
         output_variable (str): Name of the ExtraInfo variable for the output score.
             Default: 'BplusScore'
         cat_model_path (str): Path to the basf2 MVA weightfile for the category network,

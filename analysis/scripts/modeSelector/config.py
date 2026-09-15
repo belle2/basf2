@@ -135,15 +135,6 @@ EVENT_FEATURES = [
     'harmonicMomentThrust2',
 ]
 
-# Default conditions database payload names.
-#
-# The names deliberately carry no training or campaign version. A different training
-# is selected by prepending the performance globaltag that serves it, not by asking
-# for a different payload name. The '_perf' suffix marks the payloads as coming from
-# a performance globaltag rather than from the analysis globaltag.
-DEFAULT_CAT_PAYLOAD = 'modeSelector_cat_model_perf'
-DEFAULT_MAIN_PAYLOAD = 'modeSelector_main_model_perf'
-
 # Prefix used for the raw-feature entries in the MVA weightfile variable list. The
 # weightfile records which raw feature indices a model was trained on, so the payload
 # carries its own feature selection instead of relying on HAS_INPUTS below.
@@ -165,6 +156,25 @@ MAIN_EXTRA_VARS = ['mscat_b0', 'mscat_bp', 'mscat_cont', 'mscharged_cat']
 # it. feature_schema_hash() below catches the declarative part of the contract on its own,
 # so this constant is what covers the behavioural part, which cannot be hashed.
 MODEL_CONTRACT_VERSION = 1
+
+
+def payload_names(contract_version):
+    """Return the (category, main) payload names for a given contract version."""
+    suffix = '_perf_c' + str(contract_version)
+    return 'modeSelector_cat_model' + suffix, 'modeSelector_main_model' + suffix
+
+
+# Default conditions database payload names, derived from the contract version.
+#
+# The names carry no training or campaign version: a different training for the same
+# contract is uploaded as a new revision under the same name and selected by the
+# performance globaltag. The contract suffix is different in kind. It says which inputs
+# the model consumes and how its outputs are read, so a single performance globaltag can
+# hold models for several contract versions side by side, and every release requests the
+# one it implements without any user action. The '_perf' part marks the payloads as coming
+# from a performance globaltag rather than from the analysis globaltag.
+DEFAULT_CAT_PAYLOAD = payload_names(MODEL_CONTRACT_VERSION)[0]
+DEFAULT_MAIN_PAYLOAD = payload_names(MODEL_CONTRACT_VERSION)[1]
 
 
 def feature_schema_hash():
@@ -198,6 +208,47 @@ def feature_schema_hash():
 KNOWN_CONTRACT_SCHEMAS = {
     1: 'b59b6c7fc0a1',
 }
+
+# Contract versions this release can run. It always contains MODEL_CONTRACT_VERSION. An older
+# version stays in this set only as long as the release still provides that contract's code
+# path, i.e. everything that differs between contract versions (feature construction,
+# expected output classes, output interpretation) branches on
+# ModeSelectorModule.contract_version. A payload for an older supported contract then runs with
+# that contract's behaviour; any other version is rejected. Remove a version once its code path
+# is dropped.
+SUPPORTED_CONTRACT_VERSIONS = frozenset((1,))
+
+
+def contract_consistency_error():
+    """Describe why the declared contract version does not match the layout, or return None.
+
+    The layout hash does not replace bumping MODEL_CONTRACT_VERSION, it enforces it: a
+    layout change made without a bump shows up here as a hash that no longer matches the
+    one recorded for the version. Checked when a payload is exported, so an inconsistent
+    payload never reaches the conditions database, and again when a job starts.
+    """
+    if MODEL_CONTRACT_VERSION not in SUPPORTED_CONTRACT_VERSIONS:
+        return ('SUPPORTED_CONTRACT_VERSIONS does not contain the current contract version '
+                + str(MODEL_CONTRACT_VERSION) + '.')
+    newer = sorted(v for v in SUPPORTED_CONTRACT_VERSIONS if v > MODEL_CONTRACT_VERSION)
+    if newer:
+        return ('SUPPORTED_CONTRACT_VERSIONS contains versions newer than the current contract '
+                'version ' + str(MODEL_CONTRACT_VERSION) + ': ' + str(newer) + '.')
+    unpinned = sorted(v for v in SUPPORTED_CONTRACT_VERSIONS if v not in KNOWN_CONTRACT_SCHEMAS)
+    if unpinned:
+        return ('KNOWN_CONTRACT_SCHEMAS has no layout hash for supported contract versions '
+                + str(unpinned) + '.')
+    expected = KNOWN_CONTRACT_SCHEMAS.get(MODEL_CONTRACT_VERSION)
+    actual = feature_schema_hash()
+    if expected is None:
+        return ('KNOWN_CONTRACT_SCHEMAS has no entry for contract version '
+                + str(MODEL_CONTRACT_VERSION) + '. Add the layout hash for it.')
+    if expected != actual:
+        return ("the feature layout produces '" + actual + "' but contract version "
+                + str(MODEL_CONTRACT_VERSION) + " is recorded as '" + expected + "'. The layout "
+                "was changed without bumping MODEL_CONTRACT_VERSION, or without adding its hash "
+                "to KNOWN_CONTRACT_SCHEMAS.")
+    return None
 
 
 # MC truth variables to evaluate on best candidates (for training labels)

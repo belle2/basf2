@@ -42,8 +42,20 @@ class ModeSelectorModule(b2.Module):
         main_model_path (str): Path to the basf2 MVA weightfile for the main network,
             as produced by convert_to_onnx.py. Pass None to load from the conditions
             database via payload_main_model.
+        payload_cat_model (str): Conditions DB payload name for the category model. None
+            (default) uses the name derived from the contract version this release
+            implements, which is the normal case.
+        payload_main_model (str): Same for the main model.
         output_variable (str): Name of ExtraInfo variable for output score
-        store_event_info (bool): Whether to store event-level info
+        training_mode (bool): Expose features and MC truth for training instead of running
+            the networks.
+        skip_nn_evaluation (bool): Fill placeholder outputs instead of running the networks
+            (debugging and timing only).
+        store_fei_calib_weight (bool): Store modeSelector_feiCalibWeight (MC only).
+        debug (bool): Print the feature vector and network outputs for the first events.
+        debug_max_events (int): Number of events printed when debug is True.
+
+    See modeSelector.modeSelector() for the full description of each parameter.
     """
     #: Prefix used for auxiliary ExtraInfo output variables
     AUXILIARY_OUTPUT_PREFIX = 'modeSelector'
@@ -51,8 +63,8 @@ class ModeSelectorModule(b2.Module):
     def __init__(
         self,
         particle_lists,
-        payload_cat_model=config.DEFAULT_CAT_PAYLOAD,
-        payload_main_model=config.DEFAULT_MAIN_PAYLOAD,
+        payload_cat_model=None,
+        payload_main_model=None,
         output_variable='BplusScore',
         cat_model_path=None,
         main_model_path=None,
@@ -72,10 +84,20 @@ class ModeSelectorModule(b2.Module):
         self.main_model_path = main_model_path
         #: Output variable name
         self.output_variable = output_variable
+        # None means: use the name derived from the contract version this release implements
+        #: True if the category payload name was given explicitly instead of derived
+        self.payload_cat_model_given = payload_cat_model is not None
+        #: True if the main payload name was given explicitly instead of derived
+        self.payload_main_model_given = payload_main_model is not None
         #: Payload name for category model
-        self.payload_cat_model = payload_cat_model
+        self.payload_cat_model = payload_cat_model if payload_cat_model is not None else config.DEFAULT_CAT_PAYLOAD
         #: Payload name for main model
-        self.payload_main_model = payload_main_model
+        self.payload_main_model = payload_main_model if payload_main_model is not None else config.DEFAULT_MAIN_PAYLOAD
+        #: Contract version the loaded models were built for. Set in initialize() from the
+        #: weightfiles. Everything that differs between supported contract versions (feature
+        #: construction, expected output classes, output interpretation) branches on this, so a
+        #: model for an older supported contract runs with that contract's behaviour.
+        self.contract_version = config.MODEL_CONTRACT_VERSION
         #: Training mode (save features + MC truth, skip NN inference)
         self.training_mode = training_mode
         #: Skip NN inference and fill deterministic placeholder outputs
@@ -155,38 +177,23 @@ class ModeSelectorModule(b2.Module):
     def _check_contract_is_self_consistent(self):
         """Check the declared contract version still matches the layout in config.py.
 
-        Guards against the easy mistake of changing the feature layout without bumping
-        MODEL_CONTRACT_VERSION, which would ship payloads claiming a version they do not
-        match. This is a developer error in the release, not a problem with the payload.
+        A mismatch is a developer error in the release, not a problem with the payload.
+        The same rule is applied by convert_to_onnx.py before exporting.
         """
-        expected = config.KNOWN_CONTRACT_SCHEMAS.get(config.MODEL_CONTRACT_VERSION)
-        actual = config.feature_schema_hash()
-        if expected is None:
-            b2.B2FATAL(
-                "ModeSelector: config.KNOWN_CONTRACT_SCHEMAS has no entry for contract version "
-                + str(config.MODEL_CONTRACT_VERSION) + ". Add the layout hash for it."
-            )
-        if expected != actual:
-            b2.B2FATAL(
-                "ModeSelector: the feature layout produces '" + actual + "' but contract version "
-                + str(config.MODEL_CONTRACT_VERSION) + " is recorded as '" + expected + "'. The "
-                "layout was changed without bumping MODEL_CONTRACT_VERSION, or without updating "
-                "config.KNOWN_CONTRACT_SCHEMAS."
-            )
+        error = config.contract_consistency_error()
+        if error:
+            b2.B2FATAL("ModeSelector: " + error)
 
     def _check_contract(self, identifier, label):
-        """Check that this release matches the contract the payload was built against.
+        """Check a model's contract information and return its (contract version, training id).
 
-        Two independent things are compared. The contract version says which release
-        behaviour the payload expects, covering the parts that cannot be hashed (the
-        transforms, the deduplication rule, how the outputs are interpreted). The layout
-        hash covers the declarative part, so it catches a changed feature array within
-        one contract version. Either mismatch would otherwise run without error and give
-        wrong results, so both are fatal.
-
-        The version branch is where a future release would dispatch to an older feature
-        builder instead of aborting, to stay compatible with payloads already in the
-        conditions database.
+        The contract version must be one this release supports: the current one, or an older
+        one whose code path the release still provides. A newer version, or an older one that
+        is no longer supported, would run without error and give wrong results, so it is
+        fatal. The layout hash is compared with the hash pinned for the payload's own contract
+        version, since an older contract has its own layout. Weightfiles written before the
+        contract information existed are treated as contract version 1: they are subject to the
+        same support rule, but their layout cannot be checked.
         """
         fields = {}
         for part in str(identifier).split(';'):
@@ -198,34 +205,98 @@ class ModeSelectorModule(b2.Module):
         if stored is None:
             b2.B2WARNING(
                 "ModeSelector: " + label + " model weightfile carries no contract information, "
-                "so it cannot be checked against this release. Re-export it with convert_to_onnx.py."
+                "so it is treated as contract version 1 and cannot be checked against this "
+                "release. Re-export it with convert_to_onnx.py."
             )
-            return
+            # Still subject to the support rule: without it, a release that dropped contract 1
+            # would run such a model with the wrong code path.
+            self._require_supported_contract(1, label)
+            return 1, None
 
-        # Written since the contract was introduced; anything older is version 1.
-        version = fields.get('contractVersion', '1')
-        current = str(config.MODEL_CONTRACT_VERSION)
-        if version != current:
+        try:
+            # Written since the contract was introduced; anything older is version 1.
+            version = int(fields.get('contractVersion', '1'))
+        except ValueError:
             b2.B2FATAL(
-                "ModeSelector: " + label + " model was built against contract version "
-                + version + " but this release implements version " + current + ". The way "
-                "payloads are fed or their outputs interpreted has changed, so the model "
-                "cannot be used. Use a globaltag whose payloads match this release."
+                "ModeSelector: " + label + " model weightfile has a malformed contract version '"
+                + fields.get('contractVersion') + "'. Re-export it with convert_to_onnx.py."
             )
 
-        expected = config.feature_schema_hash()
+        self._require_supported_contract(version, label)
+
+        expected = config.KNOWN_CONTRACT_SCHEMAS[version]
         if stored != expected:
             b2.B2FATAL(
                 "ModeSelector: " + label + " model was built against feature layout '"
-                + stored + "' but this software produces '" + expected + "'. The raw feature "
-                "layout has changed, so the model cannot be used. Use a globaltag whose "
-                "payloads match this release, or retrain."
+                + stored + "' but contract version " + str(version) + " uses '" + expected + "'. "
+                "The payload does not match the contract it claims, so the model cannot be used."
             )
 
         b2.B2INFO(
             "ModeSelector: " + label + " model training '" + fields.get('training', 'unspecified')
-            + "' (contract v" + version + ", feature layout " + stored + ")"
+            + "' (contract v" + str(version) + ", feature layout " + stored + ")"
         )
+        return version, fields.get('training')
+
+    def _require_supported_contract(self, version, label):
+        """Stop unless this release can run models built for the given contract version."""
+        if version in config.SUPPORTED_CONTRACT_VERSIONS:
+            return
+        current = config.MODEL_CONTRACT_VERSION
+        if version > current:
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model was built for contract version " + str(version)
+                + ", newer than contract version " + str(current) + " implemented by this release. "
+                "Use a newer release for this payload."
+            )
+        b2.B2FATAL(
+            "ModeSelector: " + label + " model was built for contract version " + str(version)
+            + ", which this release no longer supports (supported: "
+            + ", ".join(str(v) for v in sorted(config.SUPPORTED_CONTRACT_VERSIONS))
+            + "). Use an older release for this payload."
+        )
+
+    def _select_contract_version(self, cat_version, main_version):
+        """Return the contract version to run with, and warn when it is older than the current one.
+
+        Both networks are evaluated by one code path, so they must share a contract version.
+        """
+        if cat_version != main_version:
+            b2.B2FATAL(
+                "ModeSelector: the category model was built for contract version " + str(cat_version)
+                + " but the main model for contract version " + str(main_version)
+                + ". Both must come from the same contract."
+            )
+        current = config.MODEL_CONTRACT_VERSION
+        if cat_version < current:
+            b2.B2WARNING(
+                "ModeSelector: the models were built for contract version " + str(cat_version)
+                + ", older than contract version " + str(current) + " implemented by this release. "
+                "The module falls back to the behaviour of contract version " + str(cat_version)
+                + ", which this release still supports. See the ModeSelector performance "
+                "recommendations for what changed in contract version " + str(current)
+                + " and whether using its models is worthwhile."
+            )
+        return cat_version
+
+    def _check_same_training(self, cat_training, main_training):
+        """Check that the category and main models come from the same training.
+
+        The main network takes the category network outputs as inputs, so a pair from
+        different trainings runs without error but gives wrong results. Such a pair shares
+        the contract version and layout hash, so only the training id, which
+        convert_to_onnx.py writes identically into both weightfiles, can tell them apart.
+        Weightfiles without contract information carry no training id and are not compared.
+        """
+        if cat_training is None or main_training is None:
+            return
+        if cat_training != main_training:
+            b2.B2FATAL(
+                "ModeSelector: the category model comes from training '" + cat_training
+                + "' but the main model from training '" + main_training + "'. The main network "
+                "takes the category outputs as inputs, so both must come from the same training. "
+                "Check that the two payloads were exported and uploaded together."
+            )
 
     def _check_output_classes(self, options, expected, label):
         """Check the model's output size against what the module's interpretation assumes.
@@ -240,6 +311,34 @@ class ModeSelectorModule(b2.Module):
                 "ModeSelector: " + label + " model produces " + str(n_classes) + " output "
                 "classes but this software interprets " + str(expected) + ". The payload does "
                 "not match this release."
+            )
+
+    def _warn_if_newer_contract_available(self):
+        """Warn when the configured globaltags also serve payloads for a newer contract version.
+
+        Payload names are derived from the contract version, so a single performance
+        globaltag can hold models for several releases at once. Finding a newer one means a
+        newer release would use a different, possibly improved model. Looking up a payload
+        that does not exist only queries the metadata; the file of a newer payload is
+        fetched only if it is actually present.
+        """
+        # Contract versions are bumped rarely, and a globaltag may drop payloads for versions
+        # no supported release uses, so look a few versions ahead instead of stopping at the
+        # first gap.
+        probe_range = 10
+        current = config.MODEL_CONTRACT_VERSION
+        newest = None
+        for version in range(current + 1, current + 1 + probe_range):
+            name = config.payload_names(version)[0]
+            accessor = Belle2.DBAccessorBase(Belle2.DBStoreEntry.c_RawFile, name, False)
+            if accessor.getFilename():
+                newest = (version, name)
+        if newest is not None:
+            b2.B2WARNING(
+                "ModeSelector: the configured globaltags also provide payloads for contract version "
+                + str(newest[0]) + " ('" + newest[1] + "'), which newer releases use. This release "
+                "implements contract version " + str(current) + ". See the ModeSelector performance "
+                "recommendations for what changed and whether moving to a newer release is worthwhile."
             )
 
     def initialize(self):
@@ -288,18 +387,19 @@ class ModeSelectorModule(b2.Module):
         # A non-default payload name is the wrong way to pick a training: the names are
         # deliberately version-free so that the globaltag decides which models are served.
         # Only warn for names that are actually used, i.e. not overridden by a local file.
-        overridden = []
-        if not self.cat_model_path and self.payload_cat_model != config.DEFAULT_CAT_PAYLOAD:
-            overridden.append(self.payload_cat_model + " (default " + config.DEFAULT_CAT_PAYLOAD + ")")
-        if not self.main_model_path and self.payload_main_model != config.DEFAULT_MAIN_PAYLOAD:
-            overridden.append(self.payload_main_model + " (default " + config.DEFAULT_MAIN_PAYLOAD + ")")
-        if overridden:
+        # An explicitly given payload name bypasses the name derived from the contract version.
+        # Local weightfiles take precedence, so names they override are not reported.
+        explicit = []
+        if not self.cat_model_path and self.payload_cat_model_given:
+            explicit.append(self.payload_cat_model + " (default " + config.DEFAULT_CAT_PAYLOAD + ")")
+        if not self.main_model_path and self.payload_main_model_given:
+            explicit.append(self.payload_main_model + " (default " + config.DEFAULT_MAIN_PAYLOAD + ")")
+        if explicit:
             b2.B2WARNING(
-                "ModeSelector: non-default payload name(s) requested: " + ", ".join(overridden)
-                + ". The payload names carry no training version on purpose. Normally they are"
-                " left at their defaults and the training is selected by prepending the"
-                " performance globaltag that serves it. Override the names only if a globaltag"
-                " really stores the models under different names."
+                "ModeSelector: not using the default payloads, explicitly requested: " + ", ".join(explicit)
+                + ". Normally the payload names are left unset, so they are derived from the contract"
+                " version this release implements, and the training is selected by prepending the"
+                " performance globaltag that serves it."
             )
 
         # Load models through the basf2 MVA Expert framework.
@@ -318,8 +418,9 @@ class ModeSelectorModule(b2.Module):
                 b2.B2FATAL(
                     "ModeSelector: category model payload '"
                     + self.payload_cat_model
-                    + "' not found in the conditions database. "
-                    "Make sure the correct global tag is configured."
+                    + "' not found in the conditions database. This release implements "
+                    "contract version " + str(config.MODEL_CONTRACT_VERSION) + ", so the "
+                    "configured performance globaltag must provide payloads for it."
                 )
             cat_wf = Belle2.MVA.Weightfile.loadFromFile(cat_filename)
 
@@ -334,8 +435,9 @@ class ModeSelectorModule(b2.Module):
                 b2.B2FATAL(
                     "ModeSelector: main model payload '"
                     + self.payload_main_model
-                    + "' not found in the conditions database. "
-                    "Make sure the correct global tag is configured."
+                    + "' not found in the conditions database. This release implements "
+                    "contract version " + str(config.MODEL_CONTRACT_VERSION) + ", so the "
+                    "configured performance globaltag must provide payloads for it."
                 )
             main_wf = Belle2.MVA.Weightfile.loadFromFile(main_filename)
 
@@ -352,10 +454,14 @@ class ModeSelectorModule(b2.Module):
         main_wf.getOptions(main_opts)
 
         self._check_contract_is_self_consistent()
-        self._check_contract(cat_opts.m_identifier, 'category')
-        self._check_contract(main_opts.m_identifier, 'main')
+        cat_version, cat_training = self._check_contract(cat_opts.m_identifier, 'category')
+        main_version, main_training = self._check_contract(main_opts.m_identifier, 'main')
+        self._check_same_training(cat_training, main_training)
+        self.contract_version = self._select_contract_version(cat_version, main_version)
         self._check_output_classes(cat_opts, config.NUM_CAT_LABELS, 'category')
         self._check_output_classes(main_opts, config.N_INPUT_IDS + 3, 'main')
+        if not self.cat_model_path:
+            self._warn_if_newer_contract_available()
 
         # The payload records which raw feature indices its model was trained on, so a
         # retraining can change the selection without a software release.

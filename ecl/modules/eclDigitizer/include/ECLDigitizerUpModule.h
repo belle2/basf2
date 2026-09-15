@@ -141,27 +141,42 @@ namespace Belle2 {
     void makeElectronicNoiseAndPedestal(int j, int* fitA);
 
     /** Module parameters */
+
+    /** Name of background waveform storage. */
     std::string m_eclWaveformsName{""};
 
+    /** Override for the waveform-saving threshold in GeV; if negative, use the DB value. */
     double m_waveformThresholdOverride{-1.0};
+    /** Energy threshold above which DSPs with extra MC information are stored. */
     double m_dspWithExtraMCInfoThreshold{0.02};
+    /** Normalization coefficient for the ECL signal shape. */
     double m_unitscale{1.0};
-
+    /** Compression algorithm for background waveforms. */
     unsigned int m_compAlgo{2u};
+    /** ADC threshold for waveform fits. */
     int m_adcThreshold{25};
-
+    /** Background flag. */
     bool m_background{false};
+    /** Calibration flag. */
     bool m_calibration{false};
+    /** Enable the internuclear counter effect. */
     bool m_inter{true};
+    /** Disable electronic noise when generating waveforms. */
     bool m_noElectronicNoise{false};
+    /** Produce only waveform digits. */
     bool m_waveformMaker{false};
+    /** Store DSP objects with additional MC information. */
     bool m_storeDspWithExtraMCInfo{false};
+    /** Use trigger time from beam-background overlay. */
     bool m_trigTime{false};
+    /** Enable hadron pulse shapes. */
     bool m_hadronPulseShape{false};
+    /** DSP data usage flag. */
     bool m_dspDataTest{false};
+    /** Use waveform, algorithm and noise parameters from the Conditions DB. */
     bool m_useWaveformParameters{false};
+    /** Enable electronic calibration for time. */
     bool m_timeCalib{true};
-
     /** Always load waveform parameters at least once */
     bool m_loadOnce{true};
 

@@ -23,7 +23,7 @@ TrackingUtilities::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilt
 
   const double& arcLength = state.getArcLength() - lastState.getArcLength();
   // TODO: magic number
-  if (arcLength <= 0 or arcLength > 20) {
+  if (arcLength <= 0 or arcLength > m_maximalArcLengthDistance) {
     return NAN;
   }
 
@@ -42,4 +42,9 @@ void RoughCDCStateFilter::exposeParameters(ModuleParamList* moduleParamList, con
                                 m_maximalHitDistance,
                                 "Maximal allowed hit distance",
                                 m_maximalHitDistance);
+
+  moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "maximalArcLengthDistance"),
+                                m_maximalArcLengthDistance,
+                                "Maximal allowed arclength distance",
+                                m_maximalArcLengthDistance);
 }

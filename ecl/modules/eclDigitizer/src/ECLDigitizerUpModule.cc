@@ -32,6 +32,7 @@
 #include <TFile.h>
 #include <TRandom.h>
 #include <TTree.h>
+#include <array>
 
 using namespace std;
 using namespace Belle2;
@@ -763,12 +764,15 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
-  constexpr int nADC_signal = ECLWaveformDataUp::c_nADCsignal;
+  constexpr int nAdcSignalSamples = ECLWaveformDataUp::c_nADCsignal;
   constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
   constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
   constexpr int nLowAmplitudeFitTimeShifts = ec.c_nLowAmplitudeFitTimeShifts;
+  constexpr int nFitGridPoints = nFitTimeShifts * nFitPointsPerAdcTick;
 
-  double ssd[nADC_signal][nADC_signal];
+  using FitRow = std::array<double, nAdcSignalSamples>;
+
+  double ssd[nAdcSignalSamples][nAdcSignalSamples];
   eclWFData.getMatrix(ssd);
   vector<double> MP(14);
   eclWFData.getWaveformParArray(MP.data());
@@ -780,13 +784,13 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
   int ib = 1 << eclWFAlgo.getkb();
   int ic = 1 << eclWFAlgo.getkc();
 
-  double dbl_f   [nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
-  double dbl_f1  [nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
-  double dbl_fg31[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
-  double dbl_fg32[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
-  double dbl_fg33[nFitTimeShifts * nFitPointsPerAdcTick][nADC_signal];
-  double dbl_fg41[nLowAmplitudeFitTimeShifts][nADC_signal];
-  double dbl_fg43[nLowAmplitudeFitTimeShifts][nADC_signal];
+  std::vector<FitRow> dblF(nFitGridPoints);
+  std::vector<FitRow> dblF1(nFitGridPoints);
+  std::vector<FitRow> dblFg31(nFitGridPoints);
+  std::vector<FitRow> dblFg32(nFitGridPoints);
+  std::vector<FitRow> dblFg33(nFitGridPoints);
+  std::vector<FitRow> dblFg41(nLowAmplitudeFitTimeShifts);
+  std::vector<FitRow> dblFg43(nLowAmplitudeFitTimeShifts);
 
   IntArrayGridXAdc& ref_f    = p.f;
   IntArrayGridXAdc& ref_f1   = p.f1;
@@ -807,16 +811,16 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
   dsp.setseedoffset(ec.c_step / ec.c_nFitPointsPerAdcTick);
   dsp.settimeseed((ec.c_step * ec.c_fitTimeMin) + (ec.c_step / ec.c_nFitPointsPerAdcTick));
   dsp.settimeseed(ec.c_step * (ec.c_fitTimeMin - (nFitTimeShifts / 2)));
-  vector<dd_t> f(nADC_signal);
+  vector<dd_t> f(nAdcSignalSamples);
   for (int k = 0; k < nFitTimeShifts * nFitPointsPerAdcTick;
        k++, dsp.nextseed()) { // calculate fit parameters around 0 +- nFitTimeShifts/2 ADC tick
     dsp.fillvector(f);
 
     double g0g0 = 0, g0g1 = 0, g1g1 = 0, g0g2 = 0, g1g2 = 0, g2g2 = 0;
-    double sg0[nADC_signal], sg1[nADC_signal], sg2[nADC_signal];
-    for (int j = 0; j < nADC_signal; j++) {
+    double sg0[nAdcSignalSamples], sg1[nAdcSignalSamples], sg2[nAdcSignalSamples];
+    for (int j = 0; j < nAdcSignalSamples; j++) {
       double g0 = 0, g1 = 0, g2 = 0;
-      for (int i = 0; i < nADC_signal; i++) {
+      for (int i = 0; i < nAdcSignalSamples; i++) {
         if (fm < f[i].first) fm = f[i].first;
         g0 += ssd[j][i] * f[i].first;
         g1 += ssd[j][i] * f[i].second;
@@ -843,18 +847,18 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
     double igg2 = 1 / (a11 * g1g1 + g0g1 * a01 + g1g2 * a12);
 
     // to fixed point representation
-    for (int i = 0; i < nADC_signal; i++) {
+    for (int i = 0; i < nAdcSignalSamples; i++) {
 
-      dbl_f   [k][i] = (f[i].first  * iff);
-      dbl_f1  [k][i] = (f[i].second * iff);
+      dblF   [k][i] = (f[i].first  * iff);
+      dblF1  [k][i] = (f[i].second * iff);
 
       double fg31 = (a00 * sg0[i] + a01 * sg1[i] + a02 * sg2[i]) * igg2;
       double fg32 = (a01 * sg0[i] + a11 * sg1[i] + a12 * sg2[i]) * igg2;
       double fg33 = (a02 * sg0[i] + a12 * sg1[i] + a22 * sg2[i]) * igg2;
 
-      dbl_fg31[k][i] = (fg31 * ia);
-      dbl_fg32[k][i] = (fg32 * ib);
-      dbl_fg33[k][i] = (fg33 * ic);
+      dblFg31[k][i] = (fg31 * ia);
+      dblFg32[k][i] = (fg32 * ib);
+      dblFg33[k][i] = (fg33 * ic);
     }
 
     //first approximation without time correction
@@ -869,12 +873,12 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
 
         double igg1 = 1 / a11;
         // to fixed point
-        for (int i = 0; i < nADC_signal; i++) {
+        for (int i = 0; i < nAdcSignalSamples; i++) {
 
           double fg41 = (g2g2 * sg0[i] - g0g2 * sg2[i]) * igg1;
           double fg43 = (g0g0 * sg2[i] - g0g2 * sg0[i]) * igg1;
-          dbl_fg41[jk][i] = (fg41 * ia);
-          dbl_fg43[jk][i] = (fg43 * ic);
+          dblFg41[jk][i] = (fg41 * ia);
+          dblFg43[jk][i] = (fg43 * ic);
         }
       }
     }
@@ -883,15 +887,15 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
   // unitscale is set to a static positive value.
   if (m_unitscale > 0) fm = 1.0;
   for (int k = 0; k < nFitTimeShifts * nFitPointsPerAdcTick; k++) {
-    for (int j = 0; j < nADC_signal; j++) {
-      ref_f   [k][j] = lrint(dbl_f   [k][j] / fm);
-      ref_f1  [k][j] = lrint(dbl_f1  [k][j] / fm);
-      ref_fg31[k][j] = lrint(dbl_fg31[k][j] * fm);
-      ref_fg32[k][j] = lrint(dbl_fg32[k][j] * fm);
-      ref_fg33[k][j] = lrint(dbl_fg33[k][j]);
+    for (int j = 0; j < nAdcSignalSamples; j++) {
+      ref_f   [k][j] = lrint(dblF   [k][j] / fm);
+      ref_f1  [k][j] = lrint(dblF1  [k][j] / fm);
+      ref_fg31[k][j] = lrint(dblFg31[k][j] * fm);
+      ref_fg32[k][j] = lrint(dblFg32[k][j] * fm);
+      ref_fg33[k][j] = lrint(dblFg33[k][j]);
       if (k >= nLowAmplitudeFitTimeShifts) continue;
-      ref_fg41[k][j] = lrint(dbl_fg41[k][j] * fm);
-      ref_fg43[k][j] = lrint(dbl_fg43[k][j]);
+      ref_fg41[k][j] = lrint(dblFg41[k][j] * fm);
+      ref_fg43[k][j] = lrint(dblFg43[k][j]);
     }
   }
 }

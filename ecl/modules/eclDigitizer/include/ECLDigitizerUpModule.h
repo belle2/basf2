@@ -22,6 +22,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 /* C++ headers. */
+#include <string>
+#include <utility>
 #include <vector>
 
 class TTree;
@@ -39,7 +41,7 @@ namespace Belle2 {
   class ECLTrig;
   class ECLWaveforms;
 
-  /** The ECLDigitizer module.
+  /** The upgraded ECL digitizer module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
    * First, we simulate the sampling array by waveform and amplitude of hit, and
@@ -55,11 +57,11 @@ namespace Belle2 {
      ECLDigit   = graph.data('ECLDigit')
      ECLDsp = graph.data('ECLDsp')
 
-     graph.module('ECLDigitizer', [ECLHit], [ECLDigit,ECLDsp])
-     graph.relation(ECLDigitizer, ECLHit)
-     graph.relation(ECLDigitizer, ECLDigit)
-     graph.relation(ECLDigitizer, ECLDsp)
-     graph.relation(ECLDigitizer, ECLDspWithExtraMCInfo)
+     graph.module('ECLDigitizerUp', [ECLHit], [ECLDigit,ECLDsp])
+     graph.relation(ECLDigitizerUp, ECLHit)
+     graph.relation(ECLDigitizerUp, ECLDigit)
+     graph.relation(ECLDigitizerUp, ECLDsp)
+     graph.relation(ECLDigitizerUp, ECLDspWithExtraMCInfo)
      \endcorrelationdiagram
 
    */
@@ -94,51 +96,51 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    using algoparams_t   = ECL::EclConfigurationUp::algoparams_t;   /**< algorithm parameters */
-    using fitparams_t    = ECL::EclConfigurationUp::fitparams_t;    /**< fit parameters */
-    using signalsample_t = ECL::EclConfigurationUp::signalsample_t; /**< signal sample */
-    using adccounts_t    = ECL::EclConfigurationUp::adccounts_t;    /**< ADC counts */
+    using AlgoParams   = ECL::EclConfigurationUp::algoparams_t;   /**< algorithm parameters */
+    using FitParams    = ECL::EclConfigurationUp::fitparams_t;    /**< fit parameters */
+    using SignalSample = ECL::EclConfigurationUp::signalsample_t; /**< signal sample */
+    using AdcCounts    = ECL::EclConfigurationUp::adccounts_t;    /**< ADC counts */
 
-    using int_array_gridxadc_t = fitparams_t::int_array_gridxadc_t; /**<  weighting coefficients for time and amplitude calculation */
-    using int_array_subxadc_t  =
-      fitparams_t::int_array_subxadc_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
-    using uint_pair_t        = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
+    using IntArrayGridXAdc = FitParams::int_array_gridxadc_t; /**<  weighting coefficients for time and amplitude calculation */
+    using IntArraySubXAdc =
+      FitParams::int_array_subxadc_t;  /**<  weighting coefficients amplitude calculation. Time is fixed by trigger */
+    using UIntPair = std::pair<unsigned int, unsigned int>; /**< a pair of unsigned ints */
 
     /** Indices in arrays with info on ECL channels */
-    struct crystallinks_t {
+    struct CrystalLinks {
       /** Index in EclAlgo tree */
       short unsigned int idn;
       /** Index in EclNoise tree */
       short unsigned int inoise;
       /** Index of associated (waveform parameters, fit parameters) pair */
       short unsigned int ifunc;
-      /** Index in m_ss */
+      /** Index in m_shapeSignalSamples */
       short unsigned int iss;
     };
 
     /** Lookup table for ECL channels. */
-    std::vector<crystallinks_t> m_tbl;
+    std::vector<CrystalLinks> m_tbl;
 
     /** Fit algorithm parameters shared by group of crystals */
-    std::vector<algoparams_t> m_idn; /**< parameters that needs for waveform fit */
-    std::vector<fitparams_t> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
+    std::vector<AlgoParams> m_idn; /**< parameters that needs for waveform fit */
+    std::vector<FitParams> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
     std::vector<ECLNoiseDataUp> m_noise; /**< parameters for correlated noise simulation */
-    std::vector<signalsample_t> m_ss; /**< tabulated shape line */
-    std::vector<signalsample_t> m_ss_HadronShapeSimulations; /**< tabulated shape line for hadron shape simulations */
+    std::vector<SignalSample> m_shapeSignalSamples; /**< tabulated shape line */
+    std::vector<SignalSample> m_hadronShapeSignalSamples; /**< tabulated shape line for hadron shape simulations */
 
     /** Storage for adc hits from entire calorimeter (8736 crystals) */
-    std::vector<adccounts_t> m_adc;  /**< ACD counts */
+    std::vector<AdcCounts> m_adc;  /**< ACD counts */
 
     /** calibration constants per channel */
-    struct calibration_t {
+    struct Calibration {
       float ascale; /**< amplitude scale */
       float tshift; /**< time shift */
     };
     /** Storage for calibration constants */
-    std::vector<calibration_t> m_calib;
+    std::vector<Calibration> m_calib;
 
     /** Storage for waveform saving thresholds*/
-    std::vector<double> m_Awave;
+    std::vector<double> m_waveformThresholds;
 
     /** storage for trigger time in each ECL. The crate trigger time
      *  is an even number from 0 to 142, so here it is stored as
@@ -163,47 +165,47 @@ namespace Belle2 {
     /** Produce and compress waveforms for beam background overlay */
     void makeWaveforms();
     /** repack waveform fit parameters from ROOT format to plain array of unsigned short for the shapeFitter function */
-    void repack(const ECLWFAlgoParamsUp&, algoparams_t&);
+    void repack(const ECLWFAlgoParamsUp&, AlgoParams&);
     /** load waveform fit parameters for the shapeFitter function */
-    void getfitparams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, fitparams_t&);
+    void getfitparams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, FitParams&);
     /** fill the waveform array FitA by electronic noise and bias it for channel J [0-8735]*/
     void makeElectronicNoiseAndPedestal(int j, int* FitA);
 
     /** Hadron signal shapes. */
-    DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC;
+    DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC{"ECLDigitWaveformParametersForMC"};
 
     /** CellID-specific signal shapes. */
-    DBObjPtr<TTree> m_waveformParameters;
+    DBObjPtr<TTree> m_waveformParameters{"ECLWFParameters"};
 
     /** Shape fitting algorithm parameters. */
-    DBObjPtr<TTree> m_algoParameters;
+    DBObjPtr<TTree> m_algoParameters{"ECLWFAlgoParams"};
 
     /** Electronics noise covariance matrix. */
-    DBObjPtr<TTree> m_noiseParameters;
+    DBObjPtr<TTree> m_noiseParameters{"ECLWFNoiseParams"};
 
     /** Crystal electronics. */
-    DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
+    DBObjPtr<ECLCrystalCalib> m_crystalElectronics{"ECLCrystalElectronics"};
 
     /** Crystal energy. */
-    DBObjPtr<ECLCrystalCalib> m_CrystalEnergy{"ECLCrystalEnergy"};
+    DBObjPtr<ECLCrystalCalib> m_crystalEnergy{"ECLCrystalEnergy"};
 
     /** Crystal electronics time. */
-    DBObjPtr<ECLCrystalCalib> m_CrystalElectronicsTime{"ECLCrystalElectronicsTime"};
+    DBObjPtr<ECLCrystalCalib> m_crystalElectronicsTime{"ECLCrystalElectronicsTime"};
 
     /** Crystal time offset. */
-    DBObjPtr<ECLCrystalCalib> m_CrystalTimeOffset{"ECLCrystalTimeOffset"};
+    DBObjPtr<ECLCrystalCalib> m_crystalTimeOffset{"ECLCrystalTimeOffset"};
 
     /** Crate time offset. */
-    DBObjPtr<ECLCrystalCalib> m_CrateTimeOffset{"ECLCrateTimeOffset"};
+    DBObjPtr<ECLCrystalCalib> m_crateTimeOffset{"ECLCrateTimeOffset"};
 
     /** MC time offset. */
-    DBObjPtr<ECLCrystalCalib> m_MCTimeOffset{"ECLMCTimeOffset"};
+    DBObjPtr<ECLCrystalCalib> m_mcTimeOffset{"ECLMCTimeOffset"};
 
     /** FPGA waveform. */
-    DBObjPtr<ECLCrystalCalib> m_FPGAWaveform{"ECL_FPGA_StoreWaveform"};
+    DBObjPtr<ECLCrystalCalib> m_fpgaWaveform{"ECL_FPGA_StoreWaveform"};
 
     /** Event metadata. */
-    StoreObjPtr<EventMetaData> m_EventMetaData;
+    StoreObjPtr<EventMetaData> m_eventMetaData;
 
     /* Input arrays. */
 
@@ -237,32 +239,25 @@ namespace Belle2 {
     ECL::ECLChannelMapper m_eclMapper; /**< channel mapper to utilize trigger information */
 
     /** Module parameters */
-    bool m_background;  /**< background flag */
-    bool m_calibration;  /**< calibration flag */
-    bool m_inter; /**< internuclear counter effect */
-    bool m_noElectronicNoise; /**< flag to disable electronic noise when generating waveforms */
-    bool m_waveformMaker; /**< produce only waveform digits */
-    bool m_storeDspWithExtraMCInfo;  /**< DSP with extra info flag */
-    unsigned int m_compAlgo; /**< compression algorithm for background waveforms */
-    int m_ADCThreshold; /**< ADC threshold for wavefom fits*/
-    double m_WaveformThresholdOverride; /**< If gt 0, value will override ECL_FPGA_StoreWaveform and apply value (in GeV) as threshold for all crystals for waveform saving*/
-    double m_DspWithExtraMCInfoThreshold;  /**< Energy threshold above which to store DSPs with extra information */
-    bool m_trigTime; /**< Use trigger time from beam background overlay */
-    std::string m_eclWaveformsName;   /**< name of background waveforms storage*/
-    bool m_HadronPulseShape; /**< hadron pulse shape flag */
+    std::string m_eclWaveformsName{""};
 
-    bool m_dspDataTest; /**< DSP data usage flag */
-    /** If true, use m_waveformParameters, m_algoParameters, m_noiseParameters.
-     *  If false, use the data from ecl/data/ECL-WF.root or ECL-WF-BG.root
-     */
-    bool m_useWaveformParameters;
-    /** Normalization coefficient for ECL signal shape.
-     *  If positive, use same static value for all ECL channels.
-     *  If negative, calculate it dynamically at beginRun().
-     *  (for default shape parameters, the static value is 1.0)
-     */
-    double m_unitscale;
-    /** Flag to disable electronic calibration for time (default: true) */
-    bool m_timeCalib;
+    double m_waveformThresholdOverride{-1.0};
+    double m_dspWithExtraMCInfoThreshold{0.02};
+    double m_unitscale{1.0};
+
+    unsigned int m_compAlgo{2u};
+    int m_adcThreshold{25};
+
+    bool m_background{false};
+    bool m_calibration{false};
+    bool m_inter{true};
+    bool m_noElectronicNoise{false};
+    bool m_waveformMaker{false};
+    bool m_storeDspWithExtraMCInfo{false};
+    bool m_trigTime{false};
+    bool m_hadronPulseShape{false};
+    bool m_dspDataTest{false};
+    bool m_useWaveformParameters{false};
+    bool m_timeCalib{true};
   };
 }//Belle2

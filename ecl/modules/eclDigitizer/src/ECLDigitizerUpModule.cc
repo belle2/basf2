@@ -46,10 +46,7 @@ REG_MODULE(ECLDigitizerUp);
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerUpModule::ECLDigitizerUpModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
-  m_waveformParameters("ECLWFParameters"),
-  m_algoParameters("ECLWFAlgoParams"),
-  m_noiseParameters("ECLWFNoiseParams")
+ECLDigitizerUpModule::ECLDigitizerUpModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -66,14 +63,14 @@ ECLDigitizerUpModule::ECLDigitizerUpModule() : Module(), m_waveformParametersMC(
   addParam("WaveformMaker", m_waveformMaker, "Flag to produce background waveform digits (default: false)", false);
   addParam("CompressionAlgorithm", m_compAlgo, "Waveform compression algorithm (default: 2)", 2u);
   addParam("eclWaveformsName", m_eclWaveformsName, "Name of the output/input collection (digitized waveforms)", string(""));
-  addParam("HadronPulseShapes", m_HadronPulseShape, "Flag to include hadron component in pulse shape construction (default: false)",
+  addParam("HadronPulseShapes", m_hadronPulseShape, "Flag to include hadron component in pulse shape construction (default: false)",
            false);
-  addParam("ADCThreshold", m_ADCThreshold, "ADC threshold for waveform fits (default: 25)", 25);
-  addParam("WaveformThresholdOverride", m_WaveformThresholdOverride,
+  addParam("ADCThreshold", m_adcThreshold, "ADC threshold for waveform fits (default: 25)", 25);
+  addParam("WaveformThresholdOverride", m_waveformThresholdOverride,
            "If gt 0 value is applied to all crystals for waveform saving threshold. If lt 0 dbobject is used. (GeV)", -1.0);
   addParam("StoreDspWithExtraMCInfo", m_storeDspWithExtraMCInfo,
            "Flag to store Dsp with extra MC information in addition to normal Dsp (default: false)", false);
-  addParam("DspWithExtraMCInfoThreshold", m_DspWithExtraMCInfoThreshold,
+  addParam("DspWithExtraMCInfoThreshold", m_dspWithExtraMCInfoThreshold,
            "Threshold above with to store Dsp with extra MC information [GeV]",
            0.02);
   addParam("DspDataTest", m_dspDataTest,
@@ -102,7 +99,7 @@ void ECLDigitizerUpModule::initialize()
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
-  if (m_HadronPulseShape) {
+  if (m_hadronPulseShape) {
     B2DEBUG(20,
             "Hadron pulse shapes for ECL simulations are enabled.  Pulse shape simulations use techniques validated with test beam data documented in: S. Longo and J. M. Roney 2018 JINST 13 P03018");
   } else {
@@ -141,32 +138,32 @@ void ECLDigitizerUpModule::beginRun()
     m_loadOnce = false;
   }
 
-  calibration_t def = {1, 0};
+  Calibration def = {1, 0};
   m_calib.assign(ECLElementNumbers::c_NCrystals, def);
 
-  if (m_CrystalElectronics.isValid()) {
+  if (m_crystalElectronics.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].ascale /= m_CrystalElectronics->getCalibVector()[i];
+      m_calib[i].ascale /= m_crystalElectronics->getCalibVector()[i];
   }
-  if (m_CrystalEnergy.isValid()) {
+  if (m_crystalEnergy.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].ascale /= m_CrystalEnergy->getCalibVector()[i] * 20000.0;
+      m_calib[i].ascale /= m_crystalEnergy->getCalibVector()[i] * 20000.0;
   }
-  if (m_CrystalElectronicsTime.isValid()) {
+  if (m_crystalElectronicsTime.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].tshift += m_CrystalElectronicsTime->getCalibVector()[i] * ns_per_tick;
+      m_calib[i].tshift += m_crystalElectronicsTime->getCalibVector()[i] * ns_per_tick;
   }
-  if (m_CrystalTimeOffset.isValid()) {
+  if (m_crystalTimeOffset.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].tshift += m_CrystalTimeOffset->getCalibVector()[i] * ns_per_tick;
+      m_calib[i].tshift += m_crystalTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
-  if (m_CrateTimeOffset.isValid()) {
+  if (m_crateTimeOffset.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].tshift += m_CrateTimeOffset->getCalibVector()[i] * ns_per_tick;
+      m_calib[i].tshift += m_crateTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
-  if (m_MCTimeOffset.isValid()) {
+  if (m_mcTimeOffset.isValid()) {
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_calib[i].tshift += m_MCTimeOffset->getCalibVector()[i] * ns_per_tick;
+      m_calib[i].tshift += m_mcTimeOffset->getCalibVector()[i] * ns_per_tick;
   }
   if (m_timeCalib) {
     // Set to zero all time calibrations for Upgrade electronics
@@ -174,19 +171,19 @@ void ECLDigitizerUpModule::beginRun()
       m_calib[i].tshift = 0;
   }
 
-  m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
-  if (m_WaveformThresholdOverride < 0) {
-    if (m_FPGAWaveform.isValid()) {
+  m_waveformThresholds.assign(ECLElementNumbers::c_NCrystals, -1);
+  if (m_waveformThresholdOverride < 0) {
+    if (m_fpgaWaveform.isValid()) {
       for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-        m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
+        m_waveformThresholds[i] = m_fpgaWaveform->getCalibVector()[i];
     }
   } else {
-    //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
+    //If m_waveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
     for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
-      m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
+      m_waveformThresholds[i] = m_waveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
   }
 
-  if (m_HadronPulseShape)
+  if (m_hadronPulseShape)
     callbackHadronSignalShapes();
 
   // Initialize channel mapper at run start to account for possible
@@ -200,11 +197,11 @@ void ECLDigitizerUpModule::beginRun()
 void ECLDigitizerUpModule::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
                                               int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
 {
-  const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
-  const fitparams_t& r = m_fitparams[t.ifunc];
+  const CrystalLinks& t = m_tbl[j]; //lookup table [0,8735]
+  const FitParams& r = m_fitparams[t.ifunc];
 
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  constexpr int m_nsmp = ec.m_nsmp;
+  constexpr int nSamples = ec.m_nsmp;
 
   ECLShapeFitUp result;
 
@@ -230,8 +227,8 @@ void ECLDigitizerUpModule::shapeFitterWrapper(const int j, const int* FitA, cons
                     trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k1_chi,
                     k2_chi, chi_thres);
   } else {
-    std::vector<int> adc(m_nsmp);
-    for (int i = 0; i < m_nsmp; i++) adc[i] = FitA[i];
+    std::vector<int> adc(nSamples);
+    for (int i = 0; i < nSamples; i++) adc[i] = FitA[i];
     // NOTE: ttrig_packed is any even number in set {8*Z, 8*Z + 2, 8*Z + 4}
     //       where Z is an integer number in 0..23 range
     // ttrig = ttrig_packed - 2 * (ttrig_packed / 8);
@@ -279,7 +276,7 @@ void ECLDigitizerUpModule::shapeSignals()
   const double tscale = 2 * trgtick, toff = ec.s_clock / (2 * ec.getRF());
 
   // clear the storage for the event
-  memset(m_adc.data(), 0, m_adc.size()*sizeof(adccounts_t));
+  memset(m_adc.data(), 0, m_adc.size()*sizeof(AdcCounts));
 
   const double E2GeV = 1 / Unit::GeV; // convert Geant energy units to GeV
   const double T2us = 1 / Unit::us; // convert Geant time units to microseconds
@@ -300,12 +297,12 @@ void ECLDigitizerUpModule::shapeSignals()
     m_adc[j].totalHadronDep += hit.getHadronEnergyDep(); // true deposited energy hadron component (in GeV)
     m_adc[j].totalDep += hit.getEnergyDep(); //true deposited energy (in GeV)
 
-    if (m_HadronPulseShape == true) {
+    if (m_hadronPulseShape == true) {
       double hitHadronE       = hit.getHadronEnergyDep() * m_calib[j].ascale * E2GeV;
-      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[0]);//Gamma Component
-      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[1]); //Hadron Component
+      m_adc[j].AddHit(hitE - hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[0]);//Gamma Component
+      m_adc[j].AddHit(hitHadronE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[1]); //Hadron Component
     } else {
-      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
     }
   }
 
@@ -318,7 +315,7 @@ void ECLDigitizerUpModule::shapeSignals()
     double timeOffset = tscale * m_ttime[id] - toff;
     double hitE       = hit.getEnergyDep() * m_calib[j].ascale * E2GeV;
     double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
   }
 
   // internuclear counter effect -- charged particle crosses diode and produces signal
@@ -335,13 +332,14 @@ void ECLDigitizerUpModule::shapeSignals()
       double hitE       = hit.getEnergyDep() * m_calib[j].ascale * diodeEdep2crystalEdep;
       double hitTimeAve = (hit.getTimeAve() + m_calib[j].tshift) * T2us;
 
-      adccounts_t& a = m_adc[j];
+      AdcCounts& a = m_adc[j];
       // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
       // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-      if (m_HadronPulseShape) {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss_HadronShapeSimulations[2]); // diode component
+      if (m_hadronPulseShape) {
+        a.AddHit(hitE, hitTimeAve + timeOffset, m_hadronShapeSignalSamples[2]); // diode component
       } else {
-        a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+        a.AddHit(hitE, hitTimeAve + timeOffset,
+                 m_shapeSignalSamples[m_tbl[j].iss]); // m_shapeSignalSamples[m_tbl[j].iss] is the sampled diode response
       }
       //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
     }
@@ -355,7 +353,7 @@ void ECLDigitizerUpModule::shapeSignals()
       int cellId = j + 1; // 1 .. 8736
       int id = m_eclMapper.getCrateID(cellId) - 1; // 0 .. 51
       double timeOffset = tscale * m_ttime[id] - toff;
-      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
+      m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_shapeSignalSamples[m_tbl[j].iss]);
     }
   }
 }
@@ -386,7 +384,7 @@ void ECLDigitizerUpModule::makeWaveforms()
   int FitA[ec.m_nsmp]; // buffer for the waveform fitter
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
+    AdcCounts& a = m_adc[j];
     makeElectronicNoiseAndPedestal(j, FitA);
     for (int  i = 0; i < ec.m_nsmp; i++) {
       int A = 20000 * a.c[i] + FitA[i];
@@ -443,7 +441,7 @@ void ECLDigitizerUpModule::event()
     for (int id = 0; id < ECL::ECL_CRATES; id++) m_ttime[id] = DeltaT;
   }
 
-  int triggerTag0 = m_EventMetaData->getEvent();
+  int triggerTag0 = m_eventMetaData->getEvent();
   for (int id = 0; id < ECL::ECL_CRATES; id++) {
     auto eclTrig = m_eclTrigs.appendNew();
     int triggerPhase0 = 2 * (m_ttime[id] + m_ttime[id] / 3);
@@ -458,11 +456,11 @@ void ECLDigitizerUpModule::event()
   // dump to a disk, read from the disk to test before real data
   if (m_waveformMaker) { makeWaveforms(); return; }
 
-  int FitA[ec.m_nsmp]; // buffer for the waveform fitter
+  int FitA[nSamples]; // buffer for the waveform fitter
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
+    AdcCounts& a = m_adc[j];
 
     //normalize the MC true arrival times
     if (m_adc[j].totalDep > 0) {
@@ -481,7 +479,7 @@ void ECLDigitizerUpModule::event()
       makeElectronicNoiseAndPedestal(j, FitA);
     }
 
-    for (int i = 0; i < ec.m_nsmp; i++) {
+    for (int i = 0; i < nSamples; i++) {
       int A = 20000 * a.c[i] + FitA[i];
       FitA[i] = max(0, min(A, (1 << 18) - 1));
     }
@@ -496,11 +494,11 @@ void ECLDigitizerUpModule::event()
 
     shapeFitterWrapper(j, FitA, ttrig, energyFit, tFit, qualityFit, chi);
 
-    if (energyFit > m_ADCThreshold) {
+    if (energyFit > m_adcThreshold) {
       int CellId = j + 1;
 
-      //note energyFit and m_Awave is in ADC units
-      if (energyFit > m_Awave[CellId - 1]) {
+      //note energyFit and m_waveformThresholds is in ADC units
+      if (energyFit > m_waveformThresholds[CellId - 1]) {
         //only save waveforms above ADC threshold
         const auto eclDsp = m_eclDsps.appendNew(nSamples);
         eclDsp->setCellId(CellId);
@@ -508,7 +506,7 @@ void ECLDigitizerUpModule::event()
       }
 
       // only store extra MC info if requested and above threshold
-      if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_DspWithExtraMCInfoThreshold) {
+      if (m_storeDspWithExtraMCInfo and  a.totalDep >= m_dspWithExtraMCInfoThreshold) {
         const auto eclDspWithExtraMCInfo = m_eclDspsWithExtraMCInfo.appendNew(nSamples);
         eclDspWithExtraMCInfo->setCellId(CellId);
         eclDspWithExtraMCInfo->setDspA(std::vector<int>(FitA, FitA + nSamples));
@@ -553,7 +551,7 @@ void ECLDigitizerUpModule::callbackHadronSignalShapes()
 
   if (m_waveformParametersMC.hasChanged()) {
 
-    m_ss_HadronShapeSimulations.resize(3);
+    m_hadronShapeSignalSamples.resize(3);
 
     //read MC templates from database
     float photonParsPSD[14];
@@ -566,9 +564,9 @@ void ECLDigitizerUpModule::callbackHadronSignalShapes()
     }
 
     //Initialize templates for hadron shape simulations
-    m_ss_HadronShapeSimulations[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
-    m_ss_HadronShapeSimulations[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
-    m_ss_HadronShapeSimulations[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
+    m_hadronShapeSignalSamples[0].InitSample(photonParsPSD, m_waveformParametersMC->getPhotonParameters()[0]);
+    m_hadronShapeSignalSamples[1].InitSample(hadronParsPSD, m_waveformParametersMC->getHadronParameters()[0]);
+    m_hadronShapeSignalSamples[2].InitSample(diodeParsPSD, m_waveformParametersMC->getDiodeParameters()[0]);
 
   }
 
@@ -676,12 +674,12 @@ void ECLDigitizerUpModule::readDSPDB()
   for (int i = 0, imax = eclWFAlgoParams.size(); i < imax; i++)
     repack(eclWFAlgoParams[i], m_idn[i]);
 
-  vector<uint_pair_t> pairIdx;
+  vector<UIntPair> pairIdx;
   for (int i = 0; i < ec.m_nch; i++) {
     unsigned int   wfIdx = eclWaveformDataTable[i];
     unsigned int algoIdx = m_tbl[i].idn;
-    uint_pair_t p(wfIdx, algoIdx);
-    vector<uint_pair_t>::iterator ip = find(pairIdx.begin(), pairIdx.end(), p);
+    UIntPair p(wfIdx, algoIdx);
+    vector<UIntPair>::iterator ip = find(pairIdx.begin(), pairIdx.end(), p);
     if (ip != pairIdx.end()) { // crystal i already have the same parameters as before
       m_tbl[i].ifunc = ip - pairIdx.begin();
     } else {                  // new combination of parameters
@@ -700,7 +698,7 @@ void ECLDigitizerUpModule::readDSPDB()
 
   // fill parameters for each (Waveform x AlgoParams) parameter set
   for (unsigned int ip = 0; ip < pairIdx.size(); ip++) {
-    const uint_pair_t& p = pairIdx[ip];
+    const UIntPair& p = pairIdx[ip];
     tree->GetEntry(p.first); // retrieve data to eclWFData pointer
     getfitparams(*eclWFData, eclWFAlgoParams[p.second], m_fitparams[ip]);
   }
@@ -708,14 +706,14 @@ void ECLDigitizerUpModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(2);
+  m_shapeSignalSamples.resize(2);
   float MP[14]; eclWFData->getWaveformParArray(MP);
-  m_ss[0].InitSample(MP, 1.0);
+  m_shapeSignalSamples[0].InitSample(MP, 1.0);
   // parameters vector from ps.dat file, time offset 0.5 usec added to
   // have peak position with parameters from ps.dat roughly in the
   // same place as in current MC
   // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
-  // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
+  // m_shapeSignalSamples[0].InitSample(crystal_params, 0.9999272*19.5216);
   for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
@@ -724,16 +722,16 @@ void ECLDigitizerUpModule::readDSPDB()
   const double time_to_units_up = ec.m_step / t_adc_up; // Convert time to units of ADC clock
   double diode_params[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.010 * time_to_units_up, 6.975 * time_to_units_up, 0., 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters
 
-  m_ss[1].InitSample(diode_params, 1.0);
+  m_shapeSignalSamples[1].InitSample(diode_params, 1.0);
 
-  B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
+  B2DEBUG(150, "ECLDigitizer: " << m_shapeSignalSamples.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;
 
   if (!m_useWaveformParameters) rootfile->Close();
 }
 
-void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams_t& t)
+void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, AlgoParams& t)
 {
   // filling short int array
   t.id[ 0] = eclWFAlgo.getlAT() + 128;
@@ -761,7 +759,7 @@ void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams
   t.id[15] = eclWFAlgo.getcT();
 }
 
-void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, fitparams_t& p)
+void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, FitParams& p)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
@@ -790,13 +788,13 @@ void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, cons
   double dbl_fg41[m_nta][nADC_signal];
   double dbl_fg43[m_nta][nADC_signal];
 
-  int_array_gridxadc_t& ref_f    = p.f;
-  int_array_gridxadc_t& ref_f1   = p.f1;
-  int_array_gridxadc_t& ref_fg31 = p.fg31;
-  int_array_gridxadc_t& ref_fg32 = p.fg32;
-  int_array_gridxadc_t& ref_fg33 = p.fg33;
-  int_array_subxadc_t&  ref_fg41 = p.fg41;
-  int_array_subxadc_t&  ref_fg43 = p.fg43;
+  IntArrayGridXAdc& ref_f    = p.f;
+  IntArrayGridXAdc& ref_f1   = p.f1;
+  IntArrayGridXAdc& ref_fg31 = p.fg31;
+  IntArrayGridXAdc& ref_fg32 = p.fg32;
+  IntArrayGridXAdc& ref_fg33 = p.fg33;
+  IntArraySubXAdc&  ref_fg41 = p.fg41;
+  IntArraySubXAdc&  ref_fg43 = p.fg43;
 
   // Dynamic normalization coefficient for shape function
   double fm = 0;

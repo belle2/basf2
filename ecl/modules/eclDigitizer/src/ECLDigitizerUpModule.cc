@@ -7,7 +7,7 @@
  **************************************************************************/
 
 /* Own header. */
-#include <ecl/modules/eclDigitizer/ECLDigitizerModuleUp.h>
+#include <ecl/modules/eclDigitizer/ECLDigitizerUpModule.h>
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
@@ -40,13 +40,13 @@ using namespace ECL;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(ECLDigitizerModuleUp);
+REG_MODULE(ECLDigitizerUp);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
+ECLDigitizerUpModule::ECLDigitizerUpModule() : Module(), m_waveformParametersMC("ECLDigitWaveformParametersForMC"),
   m_waveformParameters("ECLWFParameters"),
   m_algoParameters("ECLWFAlgoParams"),
   m_noiseParameters("ECLWFNoiseParams")
@@ -91,11 +91,11 @@ ECLDigitizerModuleUp::ECLDigitizerModuleUp() : Module(), m_waveformParametersMC(
 
 }
 
-ECLDigitizerModuleUp::~ECLDigitizerModuleUp()
+ECLDigitizerUpModule::~ECLDigitizerUpModule()
 {
 }
 
-void ECLDigitizerModuleUp::initialize()
+void ECLDigitizerUpModule::initialize()
 {
   m_eclDsps.registerInDataStore();
   if (m_storeDspWithExtraMCInfo) m_eclDspsWithExtraMCInfo.registerInDataStore();
@@ -129,7 +129,7 @@ void ECLDigitizerModuleUp::initialize()
   EclConfigurationUp::get().setBackground(m_background);
 }
 
-void ECLDigitizerModuleUp::beginRun()
+void ECLDigitizerUpModule::beginRun()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   double ns_per_tick = ec.s_clock / (ec.m_ndt * ec.m_nta *
@@ -197,7 +197,7 @@ void ECLDigitizerModuleUp::beginRun()
 }
 
 // interface to C shape fitting function function
-void ECLDigitizerModuleUp::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
+void ECLDigitizerUpModule::shapeFitterWrapper(const int j, const int* FitA, const int ttrig,
                                               int& m_lar, int& m_ltr, int& m_lq, int& m_chi) const
 {
   const crystallinks_t& t = m_tbl[j]; //lookup table [0,8735]
@@ -270,7 +270,7 @@ void ECLDigitizerModuleUp::shapeFitterWrapper(const int j, const int* FitA, cons
   }
 }
 
-void ECLDigitizerModuleUp::shapeSignals()
+void ECLDigitizerUpModule::shapeSignals()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   ECLGeometryPar* eclp = ECLGeometryPar::Instance();
@@ -360,7 +360,7 @@ void ECLDigitizerModuleUp::shapeSignals()
   }
 }
 
-void ECLDigitizerModuleUp::makeElectronicNoiseAndPedestal(int J, int* FitA)
+void ECLDigitizerUpModule::makeElectronicNoiseAndPedestal(int J, int* FitA)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   if (m_noElectronicNoise) {
@@ -374,7 +374,7 @@ void ECLDigitizerModuleUp::makeElectronicNoiseAndPedestal(int J, int* FitA)
   for (int i = 0; i < ec.m_nsmp; i++) FitA[i] = AdcNoise[i] + 3000;
 }
 
-void ECLDigitizerModuleUp::makeWaveforms()
+void ECLDigitizerUpModule::makeWaveforms()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   BitStream out(ec.m_nch * ec.m_nsmp * 18 / 32);
@@ -403,7 +403,7 @@ void ECLDigitizerModuleUp::makeWaveforms()
   if (comp) delete comp;
 }
 
-void ECLDigitizerModuleUp::event()
+void ECLDigitizerUpModule::event()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   const int nSamples = ec.m_nsmp;
@@ -540,15 +540,15 @@ void ECLDigitizerModuleUp::event()
   if (comp) delete comp;
 }
 
-void ECLDigitizerModuleUp::endRun()
+void ECLDigitizerUpModule::endRun()
 {
 }
 
-void ECLDigitizerModuleUp::terminate()
+void ECLDigitizerUpModule::terminate()
 {
 }
 
-void ECLDigitizerModuleUp::callbackHadronSignalShapes()
+void ECLDigitizerUpModule::callbackHadronSignalShapes()
 {
 
   if (m_waveformParametersMC.hasChanged()) {
@@ -574,7 +574,7 @@ void ECLDigitizerModuleUp::callbackHadronSignalShapes()
 
 }
 
-void ECLDigitizerModuleUp::readDSPDB()
+void ECLDigitizerUpModule::readDSPDB()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
@@ -733,7 +733,7 @@ void ECLDigitizerModuleUp::readDSPDB()
   if (!m_useWaveformParameters) rootfile->Close();
 }
 
-void ECLDigitizerModuleUp::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams_t& t)
+void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams_t& t)
 {
   // filling short int array
   t.id[ 0] = eclWFAlgo.getlAT() + 128;
@@ -761,7 +761,7 @@ void ECLDigitizerModuleUp::repack(const ECLWFAlgoParamsUp& eclWFAlgo, algoparams
   t.id[15] = eclWFAlgo.getcT();
 }
 
-void ECLDigitizerModuleUp::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, fitparams_t& p)
+void ECLDigitizerUpModule::getfitparams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, fitparams_t& p)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 

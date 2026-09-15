@@ -160,7 +160,7 @@ def add_simulation(
     @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of all charged primary MCParticles that traverse PXD
     @param simulateECLUpgrade: if True, simulate the upgrade electronics for the ECL by using the
-        ECLDigitizerModuleUp in the simulation and activating the corresponding calibration and analysis options in reconstruction.
+        ECLDigitizerUp in the simulation and activating the corresponding calibration and analysis options in reconstruction.
         This includes a waveform threshold override of 40 MeV in the digitizer, which is motivated by the expected noise
         performance of the upgraded ECL electronics. The default value is False, which means that no changes are applied to
         the ECL simulation compared to the pre-upgrade version.
@@ -248,7 +248,7 @@ def add_simulation(
     if is_detector_present("ECL", components):
         if simulateECLUpgrade:
             ecl_digitizer = b2.register_module(
-                'ECLDigitizerModuleUp',
+                'ECLDigitizerUp',
                 useWaveformParameters=False,
                 WaveformThresholdOverride=-1,
                 DiodeDeposition=True,

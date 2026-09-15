@@ -63,16 +63,16 @@ namespace Belle2 {
      \endcorrelationdiagram
 
    */
-  class ECLDigitizerModuleUp : public Module {
+  class ECLDigitizerUpModule : public Module {
   public:
 
     /** Constructor.
      */
-    ECLDigitizerModuleUp();
+    ECLDigitizerUpModule();
 
     /** Destructor.
      */
-    ~ECLDigitizerModuleUp();
+    ~ECLDigitizerUpModule();
 
 
     /** Initialize variables  */
@@ -265,10 +265,4 @@ namespace Belle2 {
     /** Flag to disable electronic calibration for time (default: true) */
     bool m_timeCalib;
   };
-  // Compatibility wrapper: REG_MODULE expects to instantiate a class named
-  // <name>Module (it concatenates 'Module' to the token you pass). The
-  // implementation class in this file is named `ECLDigitizerModuleUp` and
-  // therefore does not end with 'Module'. Provide a thin subclass with the
-  // expected name so the `REG_MODULE(ECLDigitizerModuleUp)` macro works.
-  class ECLDigitizerModuleUpModule : public ECLDigitizerModuleUp {};
 }//Belle2

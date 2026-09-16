@@ -100,6 +100,8 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
 
 
 def run():
+
+    basf2.set_random_seed('tracking')
     path = basf2.create_path()
 
     # Read in the pre generated events

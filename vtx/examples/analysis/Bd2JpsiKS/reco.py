@@ -33,17 +33,12 @@ from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
 
 # create path
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10])
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
 
 # print event numbers
 main.add_module('EventInfoPrinter')

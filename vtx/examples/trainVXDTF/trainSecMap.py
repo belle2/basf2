@@ -34,12 +34,6 @@ import argparse
 import os
 
 
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
-
 # ---------------------------------------------------------------------------------------
 # Argument parser for input of training sample file via comandline option.
 arg_parser = argparse.ArgumentParser(description='Sector Map Training:\
@@ -70,7 +64,7 @@ path = b2.create_path()
 # in the prepared training sample root file.
 eventinfosetter = register_module('EventInfoSetter')
 # default phase3 geometry:
-exp_number = 0
+exp_number = 2003
 # if environment variable is set then phase2 (aka Beast2) geometry will be taken
 if os.environ.get('USE_BEAST2_GEOMETRY'):
     exp_number = 1002

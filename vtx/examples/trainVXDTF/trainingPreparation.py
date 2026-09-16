@@ -22,7 +22,6 @@
 # NOTE: if you want to use VTX you set usePXD=useSVD=False and useVTX=True in this script!
 #####################################################################
 
-from vtx import get_upgrade_globaltag
 import basf2 as b2
 from basf2 import register_module
 from setup_modules import setup_RTCtoSPTCConverters
@@ -56,10 +55,6 @@ use_noKick = arguments.use_NoKick
 
 # ---------------------------------------------------------------------------------------
 # Settings
-
-# Need to use default global tag prepended with upgrade GT
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
 # Logging and Debug Level
 # TODO: Remove logLevel, as it can be set via basf2 option -l

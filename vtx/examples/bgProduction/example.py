@@ -19,26 +19,22 @@
 # Output: output.root, mdst.root
 #############################################################
 
-from basf2 import *
 from simulation import add_simulation
 from L1trigger import add_tsim
-from reconstruction import add_reconstruction, add_cdst_output, add_mc_reconstruction
+from reconstruction import add_reconstruction
 from mdst import add_mdst_output
 
 import basf2 as b2
 
 
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag, get_upgrade_background_files
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
+from vtx import get_upgrade_background_files
 
 
 # create path
-main = create_path()
+main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10])
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
 
 # print event numbers
 main.add_module('EventInfoPrinter')
@@ -54,9 +50,7 @@ add_simulation(main, bkgfiles=get_upgrade_background_files(), useVTX=True)
 add_tsim(main)
 
 # reconstruction
-add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
-
-# add_reconstruction(main, useVTX=True)
+add_reconstruction(main, pruneTracks=False, useVTX=True)
 # or add_reconstruction(main, components, useVTX=True) to run the reconstruction of a selection of detectors
 
 # full output
@@ -69,5 +63,5 @@ add_mdst_output(main)
 # add_cdst_output(main)
 
 # process events and print call statistics
-process(main)
-print(statistics)
+b2.process(main)
+print(b2.statistics)

@@ -23,12 +23,6 @@ from basf2 import set_random_seed, create_path, process, statistics, \
     register_module
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
-import basf2 as b2
-
-# Need to use default global tag prepended with upgrade GT
-from vtx import get_upgrade_globaltag
-b2.conditions.disable_globaltag_replay()
-b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
 set_random_seed(1337)
 
@@ -37,7 +31,7 @@ main = create_path()
 main.add_module('EventInfoSetter',
                 evtNumList=[1500],
                 runList=[1],
-                expList=[0]
+                expList=[2003]
                 )
 
 main.add_module('ParticleGun',

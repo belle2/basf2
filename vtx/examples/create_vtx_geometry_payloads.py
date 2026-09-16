@@ -20,7 +20,6 @@ basf2 create_vtx_geometry_payloads.py -- --vtx VTX-CMOS-5layer
 
 import basf2
 import shutil
-import sys
 import re
 import os
 import subprocess
@@ -44,9 +43,9 @@ shutil.rmtree("localdb", ignore_errors=True)
 # create upgrade geometry. For this we need to manually add the upgrade
 # detectors and remove the old PXD+SVD detectors. Only for exp=0.
 upgrade = basf2.create_path()
-upgrade.add_module("EventInfoSetter")
+upgrade.add_module("EventInfoSetter", expList=[2003])
 upgrade.add_module("Gearbox")
-upgrade.add_module("Geometry", createPayloads=True, payloadIov=[0, 0, 0, -1],
+upgrade.add_module("Geometry", createPayloads=True, payloadIov=[2003, 0, 2006, -1],
                    excludedComponents=["PXD", "SVD"],
                    additionalComponents=[args['vtx']])
 basf2.process(upgrade)

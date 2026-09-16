@@ -15,10 +15,7 @@
 
 import basf2 as b2
 from simulation import add_simulation
-# from reconstruction import add_reconstruction
-from reconstruction import add_mc_reconstruction
-
-import glob
+from reconstruction import add_reconstruction
 
 # use globaltag or xmlfiles
 use_globaltag = True
@@ -33,17 +30,10 @@ num_events = 20
 output_filename = "VTXRootOutput.root"
 
 
-# Need to use default global tag prepended with upgrade GT
-if use_globaltag:
-    from vtx import get_upgrade_globaltag
-    b2.conditions.disable_globaltag_replay()
-    b2.conditions.prepend_globaltag(get_upgrade_globaltag())
-
-
 # create path
 main = b2.create_path()
 
-main.add_module("EventInfoSetter", evtNumList=num_events)
+main.add_module("EventInfoSetter", evtNumList=num_events, expList=[2003])
 
 
 # histomanager
@@ -66,7 +56,7 @@ else:
 add_simulation(main, bkgfiles=bg, useVTX=True)
 
 # reconstruction
-add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
+add_reconstruction(main, pruneTracks=False, useVTX=True)
 
 
 main.add_module('VTXDQMClusters', histogramDirectoryName='VTXCls')

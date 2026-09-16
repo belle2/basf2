@@ -16,9 +16,8 @@ Outputs a root file with default name train.root with training or testing data.
 
 Usage:
 
-Set the correct global tag and path to background files:
+Set the correct path to background files:
 
-export BELLE2_VTX_UPGRADE_GT=NameOfUpgradeGT
 export BELLE2_VTX_BACKGROUND_DIR=/path/to/overlay/files/
 
 Create training data:
@@ -34,7 +33,7 @@ basf2 collect_data.py -n 4000 -- --output=test.root
 import basf2 as b2
 
 from simulation import add_simulation
-from vtx import get_upgrade_globaltag, get_upgrade_background_files
+from vtx import get_upgrade_background_files
 from tracking.path_utils import add_vtx_track_finding_vxdtf2, add_hit_preparation_modules
 from vtx_bgr.path_utils import add_vtx_bg_collector
 import argparse
@@ -53,10 +52,6 @@ def main():
 
     # Parse the command line
     args = parse_args()
-
-    # Use default global tag prepended with upgrade GT to replace PXD+SVD by VTX
-    b2.conditions.disable_globaltag_replay()
-    b2.conditions.prepend_globaltag(get_upgrade_globaltag())
 
     # Set log level. Can be overridden with the "-l LEVEL" flag for basf2.
     b2.set_log_level(b2.LogLevel.WARNING)

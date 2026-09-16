@@ -20,6 +20,7 @@ using namespace std;
 // Constructor / Destructor
 HistoServer2::HistoServer2(int port, const string& filename)
 {
+  TMessage::EnableSchemaEvolutionForAll(kTRUE);
   m_port = port;
   m_force_exit = 0;
   m_filename = filename;
@@ -53,10 +54,12 @@ int HistoServer2::init()
   // ROOT socket
   int rootPort = m_port + 1;
   m_root_server_sock = new TServerSocket(rootPort, kTRUE);
+  printf("before ROOT socket connection\n");
   if (!m_root_server_sock->IsValid()) {
     return -1;
   }
   m_root_server_sock->SetOption(kNoBlock, 1);
+  printf("ROOT socket connected\n");
 
   return 0;
 
@@ -68,7 +71,7 @@ int HistoServer2::server()
   SocketIO sio;
   MsgHandler msghdl(0);
   char mbstr[100];
-  time_t now;
+  time_t now = time(0);
   char* buffer = new char[c_maxBufSize];
   //  vector<int> recvsock;
   int loop_counter = 0;
@@ -85,8 +88,10 @@ int HistoServer2::server()
         handle_objects(objlist, strlist, root_fd, updated);
       }
       // Objects were cloned in recvRootMessage().
-      for (auto* obj : objlist)
+      for (auto* obj : objlist) {
+        if (dynamic_cast<TH1*>(obj)) continue;
         delete obj;
+      }
     }
     int exam_stat = m_man->examine();
     if (exam_stat == 0) {
@@ -107,6 +112,7 @@ int HistoServer2::server()
           if (ptr) {
             nr = atoi(ptr + 1);
           }
+          now = time(0);
           m_unit_last_conn_time[address] = now;
 
           int is = sio.get(fd, buffer, c_maxBufSize);
@@ -119,15 +125,19 @@ int HistoServer2::server()
             break;
           }
           m_units_connected[address] = std::pair(nr, true);
-          //    printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
+          // printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
 
           EvtMessage* hmsg = new EvtMessage(buffer);
           vector<TObject*> objlist;
           vector<string> strlist;
           msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
-          handle_objects(objlist, strlist, fd, updated);
-          //    string subdir = "ROOT";
+          int root_fd = -1;
+          if (recv_root_message(objlist, strlist, root_fd)) {
+            printf("HistoServer2: ROOT received nobjs=%zu\n", objlist.size());
+            handle_objects(objlist, strlist, root_fd, updated);
+          }
+          // string subdir = "ROOT";
           string subdir = "";
           now = time(0);
           strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
@@ -135,8 +145,8 @@ int HistoServer2::server()
           printf("[%s] HistoServer2 : received nobjs = %d from %s\n", mbstr, nobjs, address);
           if (nobjs > 0) m_unit_last_content_time[address] = now;
           for (int i = 0; i < nobjs; i++) {
-            //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
-            //                     (objlist.at(i))->ClassName() );
+            // printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
+            // (objlist.at(i))->ClassName() );
             string objname = strlist.at(i);
             if (objname == string("DQMRC:CLEAR")) {
               m_hman->clear();
@@ -165,7 +175,7 @@ int HistoServer2::server()
             if (lpos != string::npos) {
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";
-              //              printf("HistoServer2 : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
+              // printf("HistoServer2 : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
               // no update to histograms ...
             } else {
               m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
@@ -254,9 +264,14 @@ bool HistoServer2::recv_root_message(
 
     printf("HistoServer2: ROOT client connected fd=%d\n",
            m_root_socket->GetDescriptor());
-  }
 
-  // Check whether data is available.
+    time_t now = time(0);
+
+    m_units_connected["127.0.0.1"] = std::pair(0, true);
+    m_unit_last_conn_time["127.0.0.1"] = now;
+
+    return false;
+  }
 
   int ready = m_root_socket->Select(TSocket::kRead, 0);
 
@@ -265,9 +280,8 @@ bool HistoServer2::recv_root_message(
   }
 
   if (ready < 0) {
-
-    printf("HistoServer2: ROOT socket select error fd=%d\n",
-           m_root_socket->GetDescriptor());
+    printf("HistoServer2: ROOT Select failed fd=%d ready=%d\n",
+           m_root_socket->GetDescriptor(), ready);
 
     m_root_socket->Close();
     delete m_root_socket;
@@ -276,16 +290,22 @@ bool HistoServer2::recv_root_message(
     return false;
   }
 
-  // Receive TMessage.
-
   TMessage* msg = nullptr;
 
-  int recvSize = m_root_socket->Recv(msg);
+  int recv_size = m_root_socket->Recv(msg);
 
-  if (recvSize <= 0) {
+  printf("HistoServer2: ROOT Recv fd=%d ret=%d msg=%p\n",
+         m_root_socket->GetDescriptor(),
+         recv_size,
+         static_cast<void*>(msg));
 
-    printf("HistoServer2: ROOT client disconnected fd=%d\n",
-           m_root_socket->GetDescriptor());
+  if (recv_size <= 0 || !msg) {
+
+    printf("HistoServer2: ROOT client disconnected/error fd=%d ret=%d\n",
+           m_root_socket->GetDescriptor(),
+           recv_size);
+
+    m_units_connected["127.0.0.1"] = std::pair(0, false);
 
     delete msg;
 
@@ -296,11 +316,13 @@ bool HistoServer2::recv_root_message(
     return false;
   }
 
-  fd = m_root_socket->GetDescriptor();
+  time_t now = time(0);
+  m_unit_last_packet_time["127.0.0.1"] = now;
 
-  if (!msg) {
-    return false;
-  }
+  printf("HistoServer2: ROOT message fd=%d what=%d len=%d\n",
+         m_root_socket->GetDescriptor(),
+         msg->What(),
+         msg->Length());
 
   if (msg->What() != kMESS_OBJECT) {
 
@@ -361,6 +383,14 @@ bool HistoServer2::recv_root_message(
     }
   }
 
+  now = time(0);
+
+  m_unit_last_packet_time["127.0.0.1"] = now;
+
+  if (!objlist.empty()) {
+    m_unit_last_content_time["127.0.0.1"] = now;
+  }
+
   delete list;
   delete msg;
 
@@ -400,6 +430,7 @@ void HistoServer2::handle_objects(
     if (lpos != string::npos) {
       auto filename = objname.substr(11);
       m_hman->filedump(filename);
+      printf("DQMRC:SAVE? %s\n", filename.c_str());
       continue;
     }
 

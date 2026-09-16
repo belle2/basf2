@@ -73,6 +73,8 @@ namespace Belle2 {
       m_stateCreator.setHitFindingDirection(hitFindingDirection);
     }
 
+
+
     /** Set maximal candidates in flight for path selection
      *
      *  @param pathMaximalCandidatesInFlight Maximum number of candidates to keep in flight
@@ -90,6 +92,8 @@ namespace Belle2 {
     {
       m_stateFilter.setMaximalHitCandidates(stateMaximalHitCandidates);
     }
+
+
 
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.
     void apply(std::vector<CDCCKFPath>& paths,

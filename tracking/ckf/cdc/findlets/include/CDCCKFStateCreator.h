@@ -76,6 +76,16 @@ namespace Belle2 {
       m_param_writeOutDirectionAsString = hitFindingDirection;
     }
 
+    /** Set the first active CDC layer
+     *
+     *  @param firstLayer first active CDC layer
+     */
+    void setFirstActiveCDCLayer(unsigned int firstLayer)
+    {
+      m_firstActiveCDCLayer = firstLayer;
+    }
+
+
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
     {

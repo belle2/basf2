@@ -20,5 +20,5 @@
 #pragma link C++ class Belle2::CATFinderParameters+; // checksum=0xcbcdab45, version=1
 
 // SVDToCDCCKF Parameters Payload
-#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // checksum=0x97ba78f0, version=1
+#pragma link C++ class Belle2::SVDToCDCCKFParameters+; // checksum=0xd1c4a96a, version=2
 #endif

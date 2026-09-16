@@ -57,6 +57,7 @@ void CKFToCDCFindlet::beginRun()
   // Payload parameters (INTs, FLOATs)
   m_trackHandler.setMinimalPtRequirement(payload->getMinimalPtRequirement());
 
+
   m_treeSearcher.setMaximalDeltaPhi(payload->getMaximalDeltaPhi());
   m_treeSearcher.setMaximalLayerJump(payload->getMaximalLayerJump());
   m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());

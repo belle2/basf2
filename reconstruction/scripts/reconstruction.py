@@ -152,11 +152,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         instead of the default one.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
-    :param simulateECLUpgrade: if true, it simulates the ECL
-        upgrade by adding the ECLDigitCalibratorModule with the
-        simulateUpgrade option enabled. This is only for testing
-        and validation purposes, and should not be used for
-        physics analyses.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
 
     # Set the run for beam data
@@ -285,11 +281,7 @@ def add_prefilter_reconstruction(path,
         instead of the default one.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
-    :param simulateECLUpgrade: if true, it simulates the ECL
-        upgrade by adding the ECLDigitCalibratorModule with the
-        simulateUpgrade option enabled. This is only for testing
-        and validation purposes, and should not be used for
-        physics analyses.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -520,9 +512,7 @@ def add_prefilter_pretracking_reconstruction(
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
-    :param simulateECLUpgrade: if true, it simulates the ECL upgrade by adding the ECLDigitCalibratorModule with the
-        simulateUpgrade option enabled. This is only for testing and validation purposes, and should not be used
-        for physics analyses.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
 
     add_ecl_modules(path, components, simulateECLUpgrade=simulateECLUpgrade)
@@ -828,9 +818,7 @@ def add_ecl_modules(
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param simulateECLUpgrade: if true, it simulates the ECL upgrade by adding the ECLDigitCalibratorModule with the
-        simulateUpgrade option enabled. This is only for testing and validation purposes, and should not be used
-        for physics analyses.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
     if is_detector_present("ECL", components):
         if not simulateECLUpgrade:

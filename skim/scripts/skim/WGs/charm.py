@@ -1520,18 +1520,18 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         ma.applyCuts('Lambda0:merged', L0_sel, path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
-        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
-        ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
-        ma.rankByHighest(particleList='pi+:hadtag',
+        ma.cutAndCopyList('pi+:DstToD0Pi_D0ToGeneric_hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
+        ma.cutAndCopyList('K+:DstToD0Pi_D0ToGeneric_hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
+        ma.fillParticleList("p+:DstToD0Pi_D0ToGeneric_hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
+        ma.rankByHighest(particleList='pi+:DstToD0Pi_D0ToGeneric_hadtag',
                          variable='pionID',
                          numBest=15,
                          path=path)
-        ma.rankByHighest(particleList='K+:hadtag',
+        ma.rankByHighest(particleList='K+:DstToD0Pi_D0ToGeneric_hadtag',
                          variable='kaonID',
                          numBest=10,
                          path=path)
-        ma.rankByHighest(particleList='p+:hadtag',
+        ma.rankByHighest(particleList='p+:DstToD0Pi_D0ToGeneric_hadtag',
                          variable='protonID',
                          numBest=10,
                          path=path)
@@ -1542,29 +1542,29 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         )
 
         ma.fillParticleList(
-            "gamma:tag",
+            "gamma:DstToD0Pi_D0ToGeneric_tag",
             "E > 0.05 and " + ClusterQualityCut,
             path=path
         )
 
         ma.reconstructDecay(
-            "pi0:hadtag -> gamma:tag gamma:tag",
+            "pi0:DstToD0Pi_D0ToGeneric_hadtag -> gamma:DstToD0Pi_D0ToGeneric_tag gamma:DstToD0Pi_D0ToGeneric_tag",
             "0.115 < M < 0.160",
             path=path
         )
 
         # Dedicated pi0 list for the high-multiplicity D0 -> pi- pi+ pi0 pi0 mode.
-        ma.copyLists("pi0:hadtagDm8", ["pi0:hadtag"], path=path)
+        ma.copyLists("pi0:DstToD0Pi_D0ToGeneric_hadtagDm8", ["pi0:DstToD0Pi_D0ToGeneric_hadtag"], path=path)
         ma.rankByLowest(
-            "pi0:hadtagDm8",
+            "pi0:DstToD0Pi_D0ToGeneric_hadtagDm8",
             variable="abs(dM)",
             numBest=50,
             path=path
         )
 
         ma.cutAndCopyList(
-            "gamma:hadtag",
-            "gamma:tag",
+            "gamma:DstToD0Pi_D0ToGeneric_hadtag",
+            "gamma:DstToD0Pi_D0ToGeneric_tag",
             "E > 0.1",
             path=path
         )
@@ -1572,243 +1572,388 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         d0cuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
         # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
         D0_channels = [
-            "K-:hadtag pi+:hadtag",
-            "K-:hadtag pi+:hadtag pi0:hadtag",
-            "K-:hadtag pi+:hadtag pi0:hadtag pi0:hadtag",
-            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
-            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi0:hadtag",
-            "pi-:hadtag pi+:hadtag",
-            "pi-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
-            "pi-:hadtag pi+:hadtag pi0:hadtag",
-            "pi-:hadtag pi+:hadtag pi0:hadtagDm8 pi0:hadtagDm8",
-            "K_S0:merged pi+:hadtag pi-:hadtag",
-            "K_S0:merged pi+:hadtag pi-:hadtag pi0:hadtag",
-            "K_S0:merged pi0:hadtag",
-            "K-:hadtag K+:hadtag",
-            "K-:hadtag K+:hadtag pi0:hadtag",
-            "K-:hadtag K+:hadtag K_S0:merged"]
+            "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi0:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            (
+                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            (
+                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi0:DstToD0Pi_D0ToGeneric_hadtagDm8 pi0:DstToD0Pi_D0ToGeneric_hadtagDm8"
+            ),
+            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:merged pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged"]
 
         D0List = []
         for chID, channel in enumerate(D0_channels):
-            ma.reconstructDecay("D0:skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
+            ma.reconstructDecay("D0:DstToD0Pi_D0ToGeneric_skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
 
             if chID in (2, 8):
                 ma.rankByLowest(
-                    particleList="D0:skimDm" + str(chID),
+                    particleList="D0:DstToD0Pi_D0ToGeneric_skimDm" + str(chID),
                     variable="abs(dM)",
                     numBest=15,
                     path=path
                 )
 
-            D0List.append("D0:skimDm" + str(chID))
+            D0List.append("D0:DstToD0Pi_D0ToGeneric_skimDm" + str(chID))
 
         Dp_channels = [
-            "K-:hadtag pi+:hadtag pi+:hadtag",
-            "K-:hadtag pi+:hadtag pi+:hadtag pi0:hadtag",
-            "K-:hadtag K+:hadtag pi+:hadtag",
-            "K-:hadtag K+:hadtag pi+:hadtag pi0:hadtag",
-            "pi+:hadtag pi0:hadtag",
-            "pi+:hadtag pi+:hadtag pi-:hadtag",
-            "pi+:hadtag pi+:hadtag pi-:hadtag pi0:hadtag",
-            "K_S0:merged pi+:hadtag",
-            "K_S0:merged pi+:hadtag pi0:hadtag",
-            "K_S0:merged pi+:hadtag pi+:hadtag pi-:hadtag",
-            "K+:hadtag K_S0:merged K_S0:merged"]
+            "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged K_S0:merged"]
 
         dpcuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
         DpList = []
         for chID, channel in enumerate(Dp_channels):
-            ma.reconstructDecay("D+:skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
+            ma.reconstructDecay("D+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
 
             ma.rankByLowest(
-                particleList="D+:skimDm" + str(chID),
+                particleList="D+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID),
                 variable="abs(dM)",
                 numBest=15,
                 path=path
             )
 
-            DpList.append("D+:skimDm" + str(chID))
+            DpList.append("D+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID))
 
-        ma.reconstructDecay("Sigma+:hadtag -> p+:hadtag pi0:hadtag", "1.08 < M < 1.3", path=path)
+        ma.reconstructDecay(
+            "Sigma+:DstToD0Pi_D0ToGeneric_hadtag -> p+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "1.08 < M < 1.3",
+            path=path)
 
         # Dedicated Sigma+ list for the high-multiplicity Lambda_c mode 13.
-        ma.copyLists("Sigma+:hadtagDm13", ["Sigma+:hadtag"], path=path)
+        ma.copyLists("Sigma+:DstToD0Pi_D0ToGeneric_hadtagDm13", ["Sigma+:DstToD0Pi_D0ToGeneric_hadtag"], path=path)
         ma.rankByLowest(
-            "Sigma+:hadtagDm13",
+            "Sigma+:DstToD0Pi_D0ToGeneric_hadtagDm13",
             variable="abs(dM)",
             numBest=100,
             path=path
         )
 
         LC_channels = [
-                "p+:hadtag K-:hadtag pi+:hadtag",
-                "p+:hadtag pi-:hadtag pi+:hadtag",
-                "p+:hadtag K-:hadtag K+:hadtag",
-                "p+:hadtag K-:hadtag pi+:hadtag pi0:hadtag",
-                "p+:hadtag K-:hadtag pi+:hadtag pi0:hadtag pi0:hadtag",
-                "p+:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi-:hadtag",
-                "p+:hadtag K_S0:merged",
-                "p+:hadtag K_S0:merged pi0:hadtag",
-                "p+:hadtag K_S0:merged pi+:hadtag pi-:hadtag",
-                "Lambda0:merged pi+:hadtag",
-                "Lambda0:merged pi+:hadtag pi0:hadtag",
-                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag",
-                "Sigma+:hadtag pi+:hadtag pi-:hadtag",
-                "Sigma+:hadtagDm13 pi+:hadtag pi-:hadtag pi0:hadtag",
-                "Sigma+:hadtag pi0:hadtag"]
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "p+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag",
+                (
+                    "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+                ),
+                (
+                    "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi0:DstToD0Pi_D0ToGeneric_hadtag"
+                ),
+                (
+                    "p+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi-:DstToD0Pi_D0ToGeneric_hadtag"
+                ),
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged pi0:DstToD0Pi_D0ToGeneric_hadtag",
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+                (
+                    "Sigma+:DstToD0Pi_D0ToGeneric_hadtagDm13 pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+                ),
+                "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"]
 
         LCcuts = "2.18 < M < 2.38 and useCMSFrame(p) > 2.0"
 
         LambdacList = []
         for chID, channel in enumerate(LC_channels):
-            ma.reconstructDecay("Lambda_c+:skimDm" + str(chID) + " -> " + channel, LCcuts, chID, path=path)
-            LambdacList.append("Lambda_c+:skimDm" + str(chID))
+            ma.reconstructDecay("Lambda_c+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID) + " -> " + channel, LCcuts, chID, path=path)
+            LambdacList.append("Lambda_c+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID))
 
         Ds_channels = [
-                "K+:hadtag K-:hadtag pi+:hadtag",
-                "K+:hadtag K_S0:merged",
-                "K_S0:merged K_S0:merged pi+:hadtag",
-                "K+:hadtag K-:hadtag pi+:hadtag pi0:hadtag",
-                "K_S0:merged K-:hadtag pi+:hadtag pi+:hadtag",
-                "K_S0:merged K+:hadtag pi+:hadtag pi-:hadtag",
-                "pi+:hadtag pi+:hadtag pi-:hadtag",
-                "K_S0:merged pi+:hadtag",
-                "K_S0:merged pi+:hadtag pi0:hadtag",
-                "K+:hadtag K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag"]
+                "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+                "K_S0:merged K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                (
+                    "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+                ),
+                "K_S0:merged K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "K_S0:merged K+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+                "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+                (
+                    "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                    "pi-:DstToD0Pi_D0ToGeneric_hadtag"
+                )
+            ]
 
         DScuts = "1.82 < M < 2.12 and useCMSFrame(p) > 2.0"
 
         DsList = []
         for chID, channel in enumerate(Ds_channels):
-            ma.reconstructDecay("D_s+:skimDm" + str(chID) + " -> " + channel, DScuts, chID, path=path)
-            DsList.append("D_s+:skimDm" + str(chID))
+            ma.reconstructDecay("D_s+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID) + " -> " + channel, DScuts, chID, path=path)
+            DsList.append("D_s+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID))
 
-        ma.copyLists("D0:skim", D0List, path=path)
-        ma.copyLists("D+:skim", DpList, path=path)
-        ma.copyLists("Lambda_c+:skim", LambdacList, path=path)
-        ma.copyLists("D_s+:skim", DsList, path=path)
+        ma.copyLists("D0:DstToD0Pi_D0ToGeneric_skim", D0List, path=path)
+        ma.copyLists("D+:DstToD0Pi_D0ToGeneric_skim", DpList, path=path)
+        ma.copyLists("Lambda_c+:DstToD0Pi_D0ToGeneric_skim", LambdacList, path=path)
+        ma.copyLists("D_s+:DstToD0Pi_D0ToGeneric_skim", DsList, path=path)
 
-        ma.reconstructDecay("D*+:skim1 -> D0:skim pi+:hadtag", "0.135 < massDifference(0) < 0.155", 1, path=path)
-        ma.rankByLowest("D*+:skim1", variable="abs(dQ)", numBest=15, path=path)
+        ma.reconstructDecay(
+            "D*+:DstToD0Pi_D0ToGeneric_skim1 -> D0:DstToD0Pi_D0ToGeneric_skim pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "0.135 < massDifference(0) < 0.155",
+            1,
+            path=path)
+        ma.rankByLowest("D*+:DstToD0Pi_D0ToGeneric_skim1", variable="abs(dQ)", numBest=15, path=path)
 
-        ma.reconstructDecay("D*+:skim2 -> D+:skim pi0:hadtag", "0.130 < massDifference(0) < 0.160", 2, path=path)
-        ma.rankByLowest("D*+:skim2", variable="abs(dQ)", numBest=15, path=path)
+        ma.reconstructDecay(
+            "D*+:DstToD0Pi_D0ToGeneric_skim2 -> D+:DstToD0Pi_D0ToGeneric_skim pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "0.130 < massDifference(0) < 0.160",
+            2,
+            path=path)
+        ma.rankByLowest("D*+:DstToD0Pi_D0ToGeneric_skim2", variable="abs(dQ)", numBest=15, path=path)
 
-        ma.copyLists("D*+:skim", ["D*+:skim1", "D*+:skim2"], path=path)
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_skim",
+                     ["D*+:DstToD0Pi_D0ToGeneric_skim1", "D*+:DstToD0Pi_D0ToGeneric_skim2"], path=path)
 
-        ma.reconstructDecay("D*0:skim1 -> D0:skim pi0:hadtag", "0.130 < massDifference(0) < 0.160", 1, path=path)
-        ma.rankByLowest("D*0:skim1", variable="abs(dQ)", numBest=15, path=path)
+        ma.reconstructDecay(
+            "D*0:DstToD0Pi_D0ToGeneric_skim1 -> D0:DstToD0Pi_D0ToGeneric_skim pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "0.130 < massDifference(0) < 0.160",
+            1,
+            path=path)
+        ma.rankByLowest("D*0:DstToD0Pi_D0ToGeneric_skim1", variable="abs(dQ)", numBest=15, path=path)
 
-        ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", 2, path=path)
-        ma.rankByLowest("D*0:skim2", variable="abs(dQ)", numBest=15, path=path)
+        ma.reconstructDecay(
+            "D*0:DstToD0Pi_D0ToGeneric_skim2 -> D0:DstToD0Pi_D0ToGeneric_skim gamma:DstToD0Pi_D0ToGeneric_hadtag",
+            "0.120 < massDifference(0) < 0.165",
+            2,
+            path=path)
+        ma.rankByLowest("D*0:DstToD0Pi_D0ToGeneric_skim2", variable="abs(dQ)", numBest=15, path=path)
 
-        ma.copyLists("D*0:skim", ["D*0:skim1", "D*0:skim2"], path=path)
+        ma.copyLists("D*0:DstToD0Pi_D0ToGeneric_skim",
+                     ["D*0:DstToD0Pi_D0ToGeneric_skim1", "D*0:DstToD0Pi_D0ToGeneric_skim2"], path=path)
 
-        ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", path=path)
+        ma.reconstructDecay(
+            "D_s*+:DstToD0Pi_D0ToGeneric_skim -> D_s+:DstToD0Pi_D0ToGeneric_skim gamma:DstToD0Pi_D0ToGeneric_hadtag",
+            "0.120 < massDifference(0) < 0.165",
+            path=path)
 
         # ==============================================================================================
         # ============================ fragmentation part ==============================================
         # ==============================================================================================
 
         DstP_Xfrag = [
-            "", "pi0:hadtag", "pi+:hadtag pi-:hadtag", "pi+:hadtag pi-:hadtag pi0:hadtag"]
+            "",
+            "pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"]
 
         sigCuts = "1.81 < mRecoil < 2.21"
 
         sigDst_fromDstP = []
         for chID, channel in enumerate(DstP_Xfrag):
             n = len(DstP_Xfrag)
-            ma.reconstructDecay("D*+:dsp_" + str(chID) + " -> D*+:skim " + channel, sigCuts, chID, path=path)
-            ma.reconstructDecay("D*+:dsp_" + str(chID + n) + " -> D*+:skim " + channel +
-                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
-            sigDst_fromDstP.append("D*+:dsp_" + str(chID))
-            sigDst_fromDstP.append("D*+:dsp_" + str(chID + n))
-        ma.copyLists("D*+:fromDstP", sigDst_fromDstP, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_dsp_" +
+                str(chID) +
+                " -> D*+:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            ma.reconstructDecay("D*+:DstToD0Pi_D0ToGeneric_dsp_" + str(chID + n) + " -> D*+:DstToD0Pi_D0ToGeneric_skim " + channel +
+                                " K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDstP.append("D*+:DstToD0Pi_D0ToGeneric_dsp_" + str(chID))
+            sigDst_fromDstP.append("D*+:DstToD0Pi_D0ToGeneric_dsp_" + str(chID + n))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDstP", sigDst_fromDstP, path=path)
 
         sigDst_fromDp = []
         for chID, channel in enumerate(DstP_Xfrag):
             n = len(DstP_Xfrag)
-            ma.reconstructDecay("D*+:dp_" + str(chID) + " -> D+:skim " + channel, sigCuts, chID, path=path)
-            ma.reconstructDecay("D*+:dp_" + str(chID + n) + " -> D+:skim " + channel +
-                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
-            sigDst_fromDp.append("D*+:dp_" + str(chID))
-            sigDst_fromDp.append("D*+:dp_" + str(chID + n))
-        ma.copyLists("D*+:fromDp", sigDst_fromDp, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_dp_" +
+                str(chID) +
+                " -> D+:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            ma.reconstructDecay("D*+:DstToD0Pi_D0ToGeneric_dp_" + str(chID + n) + " -> D+:DstToD0Pi_D0ToGeneric_skim " + channel +
+                                " K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDp.append("D*+:DstToD0Pi_D0ToGeneric_dp_" + str(chID))
+            sigDst_fromDp.append("D*+:DstToD0Pi_D0ToGeneric_dp_" + str(chID + n))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDp", sigDst_fromDp, path=path)
 
-        Dst0_Xfrag = [
-            "pi+:hadtag", "pi+:hadtag pi0:hadtag", "pi+:hadtag pi-:hadtag pi+:hadtag"]
+        Dst0_Xfrag = ["pi+:DstToD0Pi_D0ToGeneric_hadtag",
+                      "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+                      "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag"]
 
         sigDst_fromDst0 = []
         for chID, channel in enumerate(Dst0_Xfrag):
             n = len(Dst0_Xfrag)
-            ma.reconstructDecay("D*+:dsz_" + str(chID) + " -> D*0:skim " + channel, sigCuts, chID, path=path)
-            ma.reconstructDecay("D*+:dsz_" + str(chID + n) + " -> D*0:skim " + channel +
-                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
-            sigDst_fromDst0.append("D*+:dsz_" + str(chID))
-            sigDst_fromDst0.append("D*+:dsz_" + str(chID + n))
-        ma.copyLists("D*+:fromDstz", sigDst_fromDst0, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_dsz_" +
+                str(chID) +
+                " -> D*0:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            ma.reconstructDecay("D*+:DstToD0Pi_D0ToGeneric_dsz_" + str(chID + n) + " -> D*0:DstToD0Pi_D0ToGeneric_skim " + channel +
+                                " K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDst0.append("D*+:DstToD0Pi_D0ToGeneric_dsz_" + str(chID))
+            sigDst_fromDst0.append("D*+:DstToD0Pi_D0ToGeneric_dsz_" + str(chID + n))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDstz", sigDst_fromDst0, path=path)
 
         sigDst_fromD0 = []
         for chID, channel in enumerate(Dst0_Xfrag):
             n = len(Dst0_Xfrag)
-            ma.reconstructDecay("D*+:dz_" + str(chID) + " -> D0:skim " + channel, sigCuts, chID, path=path)
-            ma.reconstructDecay("D*+:dz_" + str(chID + n) + " -> D0:skim " + channel +
-                                " K+:hadtag K-:hadtag", sigCuts, chID, path=path)
-            sigDst_fromD0.append("D*+:dz_" + str(chID))
-            sigDst_fromD0.append("D*+:dz_" + str(chID + n))
-        ma.copyLists("D*+:fromDz", sigDst_fromD0, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_dz_" +
+                str(chID) +
+                " -> D0:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            ma.reconstructDecay("D*+:DstToD0Pi_D0ToGeneric_dz_" + str(chID + n) + " -> D0:DstToD0Pi_D0ToGeneric_skim " + channel +
+                                " K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag", sigCuts, chID, path=path)
+            sigDst_fromD0.append("D*+:DstToD0Pi_D0ToGeneric_dz_" + str(chID))
+            sigDst_fromD0.append("D*+:DstToD0Pi_D0ToGeneric_dz_" + str(chID + n))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDz", sigDst_fromD0, path=path)
 
         LC_Xfrag = [
-            "pi+:hadtag anti-p-:hadtag",
-            "pi+:hadtag pi0:hadtag anti-p-:hadtag",
-            "pi+:hadtag pi-:hadtag pi+:hadtag anti-p-:hadtag"]
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag anti-p-:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag anti-p-:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag anti-p-:DstToD0Pi_D0ToGeneric_hadtag"
+            )
+        ]
 
         sigDst_fromLC = []
         for chID, channel in enumerate(LC_Xfrag):
-            ma.reconstructDecay("D*+:LC" + str(chID) + " -> Lambda_c+:skim " + channel, sigCuts, chID, path=path)
-            sigDst_fromLC.append("D*+:LC" + str(chID))
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_LC" +
+                str(chID) +
+                " -> Lambda_c+:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            sigDst_fromLC.append("D*+:DstToD0Pi_D0ToGeneric_LC" + str(chID))
 
-        ma.copyLists("D*+:fromLC", sigDst_fromLC, path=path)
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromLC", sigDst_fromLC, path=path)
 
         DstS_Xfrag = [
-            "K_S0:merged", "pi0:hadtag K_S0:merged",
-            "pi+:hadtag K-:hadtag", "pi+:hadtag pi0:hadtag K-:hadtag",
-            "pi+:hadtag pi-:hadtag K_S0:merged", "pi+:hadtag pi-:hadtag pi0:hadtag K_S0:merged",
-            "pi+:hadtag pi-:hadtag pi+:hadtag K-:hadtag"]
+            "K_S0:merged",
+            "pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+            (
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag"
+            )
+        ]
 
         sigDst_fromDstS = []
         for chID, channel in enumerate(DstS_Xfrag):
-            ma.reconstructDecay("D*+:Dsts" + str(chID) + " -> D_s*+:skim " + channel, sigCuts, chID, path=path)
-            sigDst_fromDstS.append("D*+:Dsts" + str(chID))
-        ma.copyLists("D*+:fromDstS", sigDst_fromDstS, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_Dsts" +
+                str(chID) +
+                " -> D_s*+:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            sigDst_fromDstS.append("D*+:DstToD0Pi_D0ToGeneric_Dsts" + str(chID))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDstS", sigDst_fromDstS, path=path)
 
         sigDst_fromcDS = []
         for chID, channel in enumerate(DstS_Xfrag):
-            ma.reconstructDecay("D*+:Ds" + str(chID) + " -> D_s+:skim " + channel, sigCuts, chID, path=path)
-            sigDst_fromcDS.append("D*+:Ds" + str(chID))
-        ma.copyLists("D*+:fromDs", sigDst_fromcDS, path=path)
+            ma.reconstructDecay(
+                "D*+:DstToD0Pi_D0ToGeneric_Ds" +
+                str(chID) +
+                " -> D_s+:DstToD0Pi_D0ToGeneric_skim " +
+                channel,
+                sigCuts,
+                chID,
+                path=path)
+            sigDst_fromcDS.append("D*+:DstToD0Pi_D0ToGeneric_Ds" + str(chID))
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromDs", sigDst_fromcDS, path=path)
 
-        sigDstList = ["D*+:fromDstP", "D*+:fromDstz", "D*+:fromLC", "D*+:fromDstS", "D*+:fromDp", "D*+:fromDz", "D*+:fromDs"]
+        sigDstList = [
+            "D*+:DstToD0Pi_D0ToGeneric_fromDstP",
+            "D*+:DstToD0Pi_D0ToGeneric_fromDstz",
+            "D*+:DstToD0Pi_D0ToGeneric_fromLC",
+            "D*+:DstToD0Pi_D0ToGeneric_fromDstS",
+            "D*+:DstToD0Pi_D0ToGeneric_fromDp",
+            "D*+:DstToD0Pi_D0ToGeneric_fromDz",
+            "D*+:DstToD0Pi_D0ToGeneric_fromDs"]
 
-        ma.copyLists("D*+:skimSig", sigDstList, path=path)
+        ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_skimSig", sigDstList, path=path)
 
         ma.rankByLowest(
-            particleList="D*+:skimSig",
+            particleList="D*+:DstToD0Pi_D0ToGeneric_skimSig",
             variable="abs(mRecoil - 2.010)",
             numBest=500,
             path=path
         )
 
-        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.08 < DelM < 0.27", path=path)
+        ma.reconstructDecay(
+            "D0:DstToD0Pi_D0ToGeneric_skimSig -> D*+:DstToD0Pi_D0ToGeneric_skimSig pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            "cms_p > 2.0 and 0.08 < DelM < 0.27",
+            path=path)
 
         ma.rankByLowest(
-            particleList="D0:skimSig",
+            particleList="D0:DstToD0Pi_D0ToGeneric_skimSig",
             variable="abs(DelM - 0.145)",
             numBest=15,
             path=path
         )
 
-        sigDzList = ["D0:skimSig"]
+        sigDzList = ["D0:DstToD0Pi_D0ToGeneric_skimSig"]
         return sigDzList
 
 

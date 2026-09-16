@@ -158,11 +158,7 @@ def add_simulation(
     @param useVTX: use the VTX instead of the VXD
     @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of all charged primary MCParticles that traverse PXD
-    @param simulateECLUpgrade: if True, simulate the upgrade electronics for the ECL by using the
-        ECLDigitizerUp in the simulation and activating the corresponding calibration and analysis options in reconstruction.
-        This includes a waveform threshold override of 40 MeV in the digitizer, which is motivated by the expected noise
-        performance of the upgraded ECL electronics. The default value is False, which means that no changes are applied to
-        the ECL simulation compared to the pre-upgrade version.
+    @param simulateECLUpgrade: if True, simulate the upgraded electronics for the ECL.
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
@@ -247,16 +243,10 @@ def add_simulation(
         if simulateECLUpgrade:
             ecl_digitizer = b2.register_module(
                 'ECLDigitizerUp',
-                useWaveformParameters=False,
-                WaveformThresholdOverride=-1,
-                DiodeDeposition=True,
-                StoreDspWithExtraMCInfo=False,
-                HadronPulseShapes=False,
             )
         else:
             ecl_digitizer = b2.register_module(
                 'ECLDigitizer',
-                StoreDspWithExtraMCInfo=False,
             )
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)

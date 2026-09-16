@@ -178,7 +178,7 @@ for m in main.modules():
 # ECL digitization
 if ECLup:
     main.add_module('ECLDigitizerUp', DiodeDeposition=True, HadronPulseShapes=False,
-                    NoElectronicNoise=not ECLnoise, WaveformMaker=True, CompressionAlgorithm=compression)
+                    WaveformMaker=True, CompressionAlgorithm=compression)
 else:
     main.add_module('ECLDigitizer', WaveformMaker=True, CompressionAlgorithm=compression)
 

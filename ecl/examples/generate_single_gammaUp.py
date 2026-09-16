@@ -57,15 +57,6 @@ parser.add_argument(
     help='Use modules and geometry for ECL upgrade (True/False)',
 )
 parser.add_argument(
-    '--NoElectronicNoise',
-    default=False,
-    action='store_true',
-    help=(
-        'Disable electronic noise in the ECL digitizer when '
-        'simulating the waveform digitization (True/False)'
-    ),
-)
-parser.add_argument(
     '-bgoPath',
     default='BGforOverlay.root',
     type=str,
@@ -77,21 +68,16 @@ parser.add_argument(
 args = parser.parse_args()
 
 print(args.nevt, ' , ', args.bg, ' , ', args.enrg)
-if args.NoElectronicNoise:
-    print('Electronic noise in the ECL digitizer will be disabled.')
-    elec_noise_str = '_NoElecNoise'
-else:
-    elec_noise_str = ''
 
 if not args.NoUpgrade:
     fname = (
         f'./ParticleGunOutput_photon_{args.enrg}GeV_bg'
-        f'{args.bg}_Up{elec_noise_str}_WF.root'
+        f'{args.bg}_Up.root'
     )
 else:
     fname = (
         f'./ParticleGunOutput_photon_{args.enrg}GeV_bg'
-        f'{args.bg}{elec_noise_str}_WF.root'
+        f'{args.bg}.root'
     )
 
 # suppress messages and warnings during processing:
@@ -200,7 +186,6 @@ if args.bg == '0':
     add_simulation(
         main,
         simulateECLUpgrade=not args.NoUpgrade,
-        ECLElectronicNoise=not args.NoElectronicNoise,
     )
 else:
     if args.bg == 'S1':
@@ -254,7 +239,6 @@ else:
     add_simulation(
         main,
         simulateECLUpgrade=not args.NoUpgrade,
-        ECLElectronicNoise=not args.NoElectronicNoise,
         bkgfiles=bkg,
     )
 

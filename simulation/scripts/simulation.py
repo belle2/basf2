@@ -139,8 +139,7 @@ def add_simulation(
         save_slow_pions_in_mc=False,
         useVTX=False,
         save_all_charged_particles_in_mc=False,
-        simulateECLUpgrade=False,
-        ECLElectronicNoise=True):
+        simulateECLUpgrade=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
@@ -164,7 +163,6 @@ def add_simulation(
         This includes a waveform threshold override of 40 MeV in the digitizer, which is motivated by the expected noise
         performance of the upgraded ECL electronics. The default value is False, which means that no changes are applied to
         the ECL simulation compared to the pre-upgrade version.
-    @param ECLElectronicNoise: if False, disable electronic noise in the ECL digitizer when simulating the waveform digitization.
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
@@ -254,13 +252,11 @@ def add_simulation(
                 DiodeDeposition=True,
                 StoreDspWithExtraMCInfo=False,
                 HadronPulseShapes=False,
-                NoElectronicNoise=not ECLElectronicNoise,
             )
         else:
             ecl_digitizer = b2.register_module(
                 'ECLDigitizer',
                 StoreDspWithExtraMCInfo=False,
-                NoElectronicNoise=not ECLElectronicNoise,
             )
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)

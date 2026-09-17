@@ -438,7 +438,10 @@ class TauTauTauTau(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: :math:`e^{+}e^{-} \\to \\tau^{+} \\tau^{-} \\tau^{+} \\tau^{-}`
+        **Physics channel**:
+        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\mu^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\pi^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}]`
 
         Cuts applied:
 

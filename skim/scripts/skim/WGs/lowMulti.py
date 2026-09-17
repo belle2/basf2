@@ -470,19 +470,13 @@ class TauTauTauTau(BaseSkim):
         PiMuChannel = "pi+:ftau pi+:ftau mu-:ftau mu-:ftau"
         PiEChannel = "pi+:ftau pi+:ftau e-:ftau e-:ftau"
         MuEChannel = "mu+:ftau mu+:ftau e-:ftau e-:ftau"
-        MuMuChannel = "mu+:ftau mu+:ftau mu-:ftau mu-:ftau"
-        EEChannel = "e+:ftau e+:ftau e-:ftau e-:ftau"
 
         ma.reconstructDecay(f"vpho:ftau_pimu -> {PiMuChannel}", Event_cuts_vis, path=path)
         ma.reconstructDecay(f"vpho:ftau_pie -> {PiEChannel}", Event_cuts_vis, path=path)
         ma.reconstructDecay(f"vpho:ftau_mue -> {MuEChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_mumu -> {MuMuChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_ee -> {EEChannel}", Event_cuts_vis, path=path)
 
         ftau_list.append("vpho:ftau_pimu")
         ftau_list.append("vpho:ftau_pie")
         ftau_list.append("vpho:ftau_mue")
-        ftau_list.append("vpho:ftau_mumu")
-        ftau_list.append("vpho:ftau_ee")
 
         return ftau_list

@@ -1,3 +1,15 @@
+Changes in the skim package in light-2609-l
+--------------------------------------------
+
+Low Multiplicity skims
++++++++++
+
+* Added new skim for the Physics channel
+  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\mu^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\pi^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}]
+  Registered as("18530800", "lowMulti", "TauTauTauTau")
+
 Changes in the skim package in light-2607-k
 --------------------------------------------
 
@@ -20,15 +32,3 @@ Dark skims
   New LFVZpVisible for PromptRel09 skimming campaign registered as
   ("18520401", "dark", "LFVZpVisible").
   The pre-PromptRel09 skim was made invalid: ("18520400", "dark", "LFVZpVisible_invalid")
-
-Changes in the skim package in light-2609-l
---------------------------------------------
-
-Low Multiplicity skims
-+++++++++
-
-* Added new skim for the Physics channel 
-  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\mu^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\pi^{-}]
-  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}]
-  e^{+}e^{-} \\to \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}]
-  Registered as("18530800", "lowMulti", "TauTauTauTau")

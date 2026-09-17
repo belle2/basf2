@@ -164,15 +164,15 @@ class SLUntagged(BaseSkim):
 
     * Event selection: :math:`n_{\\text{tracks}} > 4`
     * Leptons: :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
-    * B candidates: :math:`5.24 < M_{\\text{bc}} < 5.29`, :math:`|\\Delta E | < 0.5`
-    * Photons (:math:`\\gamma\\text{:loose}`): :math:`|clusterTiming| < 200`,
+    * B candidates: :math:`5.24 < M_{\\text{bc}} < 5.29,\\text{GeV}`, :math:`|\\Delta E | < 0.5\\,\\text{GeV}`
+    * Photons (:math:`\\gamma\\text{:loose}`): :math:`|clusterTiming| < 200\\,\\text{ns}`,
       :math:`|clusterTiming/clusterErrorTiming| < 2`
     * :math:`\\pi^0` candidates (shared quality cuts, applied to both standard lists below):
 
-      * :math:`0.120 < M_{\\pi^0} < 0.145`
-      * :math:`-1.5 < :math:`\\Delta \\phi (\\pi^0 `daughters`) < 1.5`
-      * :math:`\\theta (\\pi^0 `daughters`) < 1.4`
-      * per-daughter photon :math:`|clusterTiming| < 200`,
+      * :math:`0.120 < M_{\\pi^0} < 0.145\\,\\text{GeV}`
+      * :math:`-1.5 < \\Delta \\phi (\\pi^0 \\text{ daughters}) < 1.5\\,\\text{rad}`
+      * :math:`\\theta (\\pi^0 \\text{ daughters}) < 1.4\\,\\text{rad}`
+      * per-daughter photon :math:`|clusterTiming| < 200\\,\\text{ns}`,
         :math:`|clusterTiming/clusterErrorTiming| < 2`
 
     Reconstructed decays:
@@ -188,11 +188,11 @@ class SLUntagged(BaseSkim):
 
     Note:
 
-        This skim uses `stdPi0s.stdPi0s` and `skim.standardlists.charm.loadStdPi0ForBToHadrons`
-        where `bth_skim` :math:`\\pi^0` and `eff40_May2020` (slow) :math:`\\pi^0` are defined
-        (for additional selections to these lists, see above).
+        This skim uses `stdPi0s.stdPi0s` and `skim.standardlists.lightmesons.loadStdPi0ForBToHadrons`
+        where :math:`\\pi^0` and slow :math:`\\pi^0` are defined (for additional selections to these
+        lists, see above).
 
-        The pion and kaon lists used to define :math:`D^0` and :math:`D^{*-}` are:
+        The pion and kaon lists used to define :math:`D` and :math:`D^{*}` are:
         `skim.standardlists.charm.loadPiForBtoHadrons` and
         `skim.standardlists.charm.loadKForBtoHadrons`,
 
@@ -200,7 +200,6 @@ class SLUntagged(BaseSkim):
         CPU time per event. In previous releases, no additional selections were made to the standard
         lists.
     """
-
     __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
     __description__ = (
         "Skim for semileptonic decays, :math:`B` decays "

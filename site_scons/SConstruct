@@ -274,7 +274,7 @@ if(not GetOption('no-debuginfo')):
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
-        print(f"Note: overriding variable {v} ('{global_env[v]}') from environment (${v}='{os.environ[v]}').")
+        print(f"Note: overriding variable {v} ('{global_env.get(v, '')}') from environment (${v}='{os.environ[v]}').")
         global_env[v] = os.environ[v]
 
 if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:

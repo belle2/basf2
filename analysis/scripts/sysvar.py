@@ -8,13 +8,15 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import pandas as pd
-import numpy as np
-from dataclasses import dataclass
-import matplotlib.pyplot as plt
-import pdg
-import warnings
 import ast
+import hashlib
+import warnings
+from dataclasses import dataclass
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pdg
 from pandas.errors import PerformanceWarning
 
 warnings.warn(
@@ -39,6 +41,53 @@ _weight_cols = ['data_MC_ratio',
 
 _correction_types = ['PID', 'FEI']
 _fei_mode_col = 'dec_mode'
+
+#: Columns identifying a weight table, used to derive its seeds. Tables agreeing in all
+#: of them share seeds, so their variations can be correlated.
+_seed_key_cols = ['PDG', 'mcPDG', 'variable', 'threshold']
+
+
+def _table_key(table: pd.DataFrame) -> str:
+    """
+    Returns a stable identifier for a weight table, independent of the particle prefix.
+    """
+    cols = [col for col in _seed_key_cols if col in table.columns]
+    if not cols:
+        raise ValueError(
+            f'Cannot derive a seed from the weight table: it has none of the identifying '
+            f'columns {_seed_key_cols}, so distinct tables could not be told apart and would '
+            f'share their variations.'
+        )
+    ident = table[cols].drop_duplicates().sort_values(cols)
+    digest = pd.util.hash_pandas_object(ident, index=False).values.tobytes()
+    return hashlib.sha256(digest).hexdigest()
+
+
+def _derive_seed(base_seed: int, key: str) -> int:
+    """
+    Derives a reproducible 32-bit seed from a base seed and a key.
+    """
+    return int.from_bytes(hashlib.sha256(f'{base_seed}:{key}'.encode()).digest()[:4], 'big')
+
+
+def _check_seeds(sys_seed: int, seed: int) -> None:
+    """
+    Rejects ambiguous seed arguments and warns about the behaviour of sys_seed.
+    """
+    if sys_seed is None:
+        return
+    if seed is not None:
+        raise ValueError('Pass either seed or sys_seed, not both.')
+    warnings.warn(
+        'sys_seed only seeds the systematic variations; the statistical variations are '
+        'drawn anew on every call, so applying the same weight table to several dataframes '
+        'separately underestimates their contribution. Sharing sys_seed between weight '
+        'tables also correlates the systematic variations of tables with the same number of '
+        'rows. Use seed instead, which makes both components reproducible and independent '
+        'between tables.',
+        UserWarning,
+        stacklevel=3,
+    )
 
 
 @dataclass
@@ -71,7 +120,7 @@ class ReweighterParticle:
     #: Internal list of the names of the weight columns
     column_names: list = None
 
-    #: Random seed for systematics
+    #: Random seed for systematics only (legacy, prefer seed)
     sys_seed: int = None
 
     #: Covariance matrix corresponds to the total uncertainty
@@ -85,6 +134,9 @@ class ReweighterParticle:
 
     #: Values for the plots
     plot_values: dict = None
+
+    #: Base seed for all variations, see get_seed. None falls back to sys_seed
+    seed: int = None
 
     def get_varname(self, varname: str) -> str:
         """
@@ -135,6 +187,19 @@ class ReweighterParticle:
         self.merged_table[self.column_names] = weights.T
         self.column_names.insert(0, self.weight_name)
 
+    def get_seed(self, component: str) -> int:
+        """
+        Returns the seed for one component of the variations: 'sys', 'stat', or 'total'
+        for the combined draw when cov is set.
+
+        Derived from seed, the table identity and the component, so a table gives the
+        same variations in every dataframe it is applied to, while different tables and
+        components are independent.
+        """
+        if self.seed is None:
+            return None
+        return _derive_seed(self.seed, f'{component}:{_table_key(self.merged_table)}')
+
     def get_covariance(self,
                        n_variations: int,
                        rho_sys: np.ndarray = None,
@@ -158,11 +223,20 @@ class ReweighterParticle:
             stat_cov = np.matmul(
                 np.matmul(np.diag(self.merged_table['stat_error']), rho_stat), np.diag(self.merged_table['stat_error'])
             )
+            if self.seed is not None:
+                # Local generators, so the caller's global RNG state is left untouched
+                sys = np.random.default_rng(self.get_seed('sys')).multivariate_normal(zeros, sys_cov, n_variations)
+                stat = np.random.default_rng(self.get_seed('stat')).multivariate_normal(zeros, stat_cov, n_variations)
+                return sys + stat
+            # Legacy sys_seed behaviour
             np.random.seed(self.sys_seed)
             sys = np.random.multivariate_normal(zeros, sys_cov, n_variations)
             np.random.seed(None)
             stat = np.random.multivariate_normal(zeros, stat_cov, n_variations)
             return sys + stat
+        # Total covariance: a single draw covers sys and stat
+        if self.seed is not None:
+            return np.random.default_rng(self.get_seed('total')).multivariate_normal(zeros, self.cov, n_variations)
         errors = np.random.multivariate_normal(zeros, self.cov, n_variations)
         return errors
 
@@ -188,16 +262,16 @@ class ReweighterParticle:
             return
         vars = set(sum([list(d.keys()) for d in self.plot_values.values()], []))
         if fig is None:
-            fig, axs = plt.subplots(len(self.plot_values), len(vars), figsize=(5*len(vars), 3*len(self.plot_values)), dpi=120)
+            fig, axs = plt.subplots(len(self.plot_values), len(vars), figsize=(5 * len(vars), 3 * len(self.plot_values)), dpi=120)
         axs = np.array(axs)
-        if len(axs.shape) < 1:
+        if len(axs.shape) < 2:
             axs = axs.reshape(len(self.plot_values), len(vars))
         bin_plt = {'linewidth': 3, 'linestyle': '--', 'color': '0.5'}
         fig.suptitle(f'{self.type} particle {self.prefix.strip("_")}')
         for (reco_pdg, mc_pdg), ax_row in zip(self.plot_values, axs):
             for var, ax in zip(self.plot_values[(reco_pdg, mc_pdg)], ax_row):
                 ymin = 0
-                ymax = self.plot_values[(reco_pdg, mc_pdg)][var][1].max()*1.1
+                ymax = self.plot_values[(reco_pdg, mc_pdg)][var][1].max() * 1.1
                 # Plot binning
                 if self.type == 'PID':
                     ax.vlines(self.pdg_binning[(reco_pdg, mc_pdg)][var], ymin, ymax,
@@ -206,22 +280,22 @@ class ReweighterParticle:
                               **bin_plt)
                 elif self.type == 'FEI':
                     values = np.array([int(val[4:]) for val in self.pdg_binning[(reco_pdg, mc_pdg)][var]])
-                    ax.bar(values+0.5,
-                           np.ones(len(values))*ymax,
+                    ax.bar(values + 0.5,
+                           np.ones(len(values)) * ymax,
                            width=1,
                            alpha=0.5,
                            label='Binning',
                            **bin_plt)
                     rest = np.setdiff1d(self.plot_values[(reco_pdg, mc_pdg)][var][0], values)
-                    ax.bar(rest+0.5,
-                           np.ones(len(rest))*ymax,
+                    ax.bar(rest + 0.5,
+                           np.ones(len(rest)) * ymax,
                            width=1,
                            alpha=0.2,
                            label='Rest category',
                            **bin_plt)
                 # Plot values
                 widths = (self.plot_values[(reco_pdg, mc_pdg)][var][0][1:] - self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1])
-                centers = self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1] + widths/2
+                centers = self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1] + widths / 2
                 ax.bar(centers,
                        self.plot_values[(reco_pdg, mc_pdg)][var][1],
                        width=widths,
@@ -376,7 +450,7 @@ class Reweighter:
                 continue
             plot_values[(reco_pdg, mc_pdg)] = {}
             for var in particle.pdg_binning[(reco_pdg, mc_pdg)]:
-                labels = [(particle.pdg_binning[(reco_pdg, mc_pdg)][var][i-1], particle.pdg_binning[(reco_pdg, mc_pdg)][var][i])
+                labels = [(particle.pdg_binning[(reco_pdg, mc_pdg)][var][i - 1], particle.pdg_binning[(reco_pdg, mc_pdg)][var][i])
                           for i in range(1, len(particle.pdg_binning[(reco_pdg, mc_pdg)][var]))]
                 binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg), var] = pd.cut(ntuple_df.query(
                     ntuple_cut)[f'{particle.get_varname(var)}'],
@@ -414,7 +488,8 @@ class Reweighter:
                          pdg_pid_variable_dict: dict,
                          variable_aliases: dict = None,
                          sys_seed: int = None,
-                         syscorr: bool = True) -> None:
+                         syscorr: bool = True,
+                         seed: int = None) -> None:
         """
         Adds weight variations according to the total uncertainty for easier error propagation.
 
@@ -423,10 +498,13 @@ class Reweighter:
             weights_dict (pandas.DataFrame): Dataframe containing the efficiency weights.
             pdg_pid_variable_dict (dict): Dictionary containing the PID variables and thresholds.
             variable_aliases (dict): Dictionary containing variable aliases.
-            sys_seed (int): Seed for the systematic variations.
+            sys_seed (int): Seed for the systematic variations only. Prefer seed.
             syscorr (bool): When true assume systematics are 100% correlated defaults to
         true. Note this is overridden by provision of a None value rho_sys
+            seed (int): Base seed for the systematic and statistical variations. Makes
+        them reproducible for a given weight table and independent between tables.
         """
+        _check_seeds(sys_seed, seed)
         # Empty prefix means no prefix
         if prefix is None:
             prefix = ''
@@ -447,7 +525,8 @@ class Reweighter:
                                       variable_aliases=variable_aliases,
                                       weight_name=self.weight_name,
                                       sys_seed=sys_seed,
-                                      syscorr=syscorr)
+                                      syscorr=syscorr,
+                                      seed=seed)
         self.particles += [particle]
 
     def get_particle(self, prefix: str) -> ReweighterParticle:
@@ -513,6 +592,7 @@ class Reweighter:
                          threshold: float,
                          cov: np.ndarray = None,
                          variable_aliases: dict = None,
+                         seed: int = None,
                          ) -> None:
         """
         Adds weight variations according to the total uncertainty for easier error propagation.
@@ -523,6 +603,7 @@ class Reweighter:
             threshold (float): Threshold for the efficiency weights.
             cov (numpy.ndarray): Covariance matrix for the efficiency weights.
             variable_aliases (dict): Dictionary containing variable aliases.
+            seed (int): Base seed for the variations, see :meth:`add_pid_particle`.
         """
         # Empty prefix means no prefix
         if prefix is None:
@@ -544,7 +625,8 @@ class Reweighter:
                                       pdg_binning=pdg_binning,
                                       variable_aliases=variable_aliases,
                                       weight_name=self.weight_name,
-                                      cov=cov)
+                                      cov=cov,
+                                      seed=seed)
         self.particles += [particle]
 
     def add_fei_weight_columns(self, ntuple_df: pd.DataFrame, particle: ReweighterParticle):
@@ -560,7 +642,8 @@ class Reweighter:
         # Copy the mode ID from the ntuple
         binning_df['num_mode'] = ntuple_df[particle.get_varname(_fei_mode_col)].astype(int)
         # Default value in case if reco PDG is not a B-meson PDG
-        binning_df[_fei_mode_col] = np.nan
+        # Object dtype, as string mode labels are assigned below
+        binning_df[_fei_mode_col] = pd.Series(np.nan, index=binning_df.index, dtype='object')
         plot_values = {}
         for reco_pdg, mc_pdg in particle.pdg_binning:
             plot_values[(reco_pdg, mc_pdg)] = {}
@@ -570,7 +653,7 @@ class Reweighter:
                 binning_df.loc[(binning_df['PDG'] == reco_pdg) & (binning_df['num_mode'] == int(mode[4:])), _fei_mode_col] = mode
             if self.evaluate_plots:
                 values = ntuple_df[f'{particle.get_varname(_fei_mode_col)}']
-                x_range = np.linspace(values.min(), values.max(), int(values.max())+1)
+                x_range = np.linspace(values.min(), values.max(), int(values.max()) + 1)
                 plot_values[(reco_pdg, mc_pdg)][_fei_mode_col] = x_range, np.histogram(values, bins=x_range, density=True)[0]
 
         # merge the weight table with the ntuple on binning columns
@@ -613,7 +696,7 @@ class Reweighter:
         """
         print('Coverage:')
         for particle in self.particles:
-            print(f'{particle.type} {particle.prefix.strip("_")}: {particle.coverage*100 :0.1f}%')
+            print(f'{particle.type} {particle.prefix.strip("_")}: {particle.coverage*100:0.1f}%')
 
     def plot_coverage(self):
         """
@@ -646,7 +729,8 @@ def add_weights_to_dataframe(prefix: str,
         variable_aliases (dict): Dictionary containing variable aliases.
         cov_matrix (numpy.ndarray): Covariance matrix for the custom efficiency weights.
         fillna (int): Value to fill NaN values with.
-        sys_seed (int): Seed for the systematic variations.
+        sys_seed (int): Seed for the systematic variations only, custom_PID only. Prefer seed.
+        seed (int): Base seed for the variations, see :meth:`Reweighter.add_pid_particle`.
         syscorr (bool): When true assume systematics are 100% correlated defaults to true.
         **kw_args: Additional arguments for the Reweighter class.
     """
@@ -661,13 +745,17 @@ def add_weights_to_dataframe(prefix: str,
                                 weight_name=weight_name,
                                 fillna=fillna)
         variable_aliases = kw_args.get('variable_aliases')
+        seed = kw_args.get('seed')
         if systematic.lower() == 'custom_fei':
+            if kw_args.get('sys_seed') is not None:
+                warnings.warn('sys_seed has no effect for custom_FEI. Use seed instead.', UserWarning, stacklevel=2)
             cov_matrix = kw_args.get('cov_matrix')
             reweighter.add_fei_particle(prefix=prefix,
                                         table=custom_tables,
                                         threshold=custom_thresholds,
                                         variable_aliases=variable_aliases,
-                                        cov=cov_matrix
+                                        cov=cov_matrix,
+                                        seed=seed
                                         )
         elif systematic.lower() == 'custom_pid':
             sys_seed = kw_args.get('sys_seed')
@@ -679,7 +767,8 @@ def add_weights_to_dataframe(prefix: str,
                                         pdg_pid_variable_dict=custom_thresholds,
                                         variable_aliases=variable_aliases,
                                         sys_seed=sys_seed,
-                                        syscorr=syscorr
+                                        syscorr=syscorr,
+                                        seed=seed
                                         )
         else:
             raise ValueError(f'Systematic {systematic} is not supported!')

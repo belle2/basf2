@@ -730,7 +730,7 @@ def add_weights_to_dataframe(prefix: str,
         cov_matrix (numpy.ndarray): Covariance matrix for the custom efficiency weights.
         fillna (int): Value to fill NaN values with.
         sys_seed (int): Seed for the systematic variations only, custom_PID only. Prefer seed.
-        seed (int): Base seed for the variations, see :meth:`Reweighter.add_pid_particle`.
+        seed (int): Base seed for the variations, reproducible per weight table and independent between tables.
         syscorr (bool): When true assume systematics are 100% correlated defaults to true.
         **kw_args: Additional arguments for the Reweighter class.
     """

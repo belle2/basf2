@@ -447,6 +447,7 @@
       dropDistance=0.2
       inputWireHits=CDCWireHitVector
       mergeMinFitProb=0.85
+      mergeRemoveHitsAfterSuperLayerBreak=True
       tracks=CDCTrackVector
   58. TFCDC_TrackQualityAsserter
       corrections=['B2B']
@@ -3405,6 +3406,7 @@
       dropDistance=0.2
       inputWireHits=CDCWireHitVector
       mergeMinFitProb=0.85
+      mergeRemoveHitsAfterSuperLayerBreak=True
       tracks=CDCTrackVector
   58. TFCDC_TrackQualityAsserter
       corrections=['B2B']

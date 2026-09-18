@@ -439,9 +439,12 @@ class TauTauTauTau(BaseSkim):
     def build_lists(self, path):
         """
         **Physics channel**:
-        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\mu^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\pi^{-}]`
-        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}]`
-        :math:`e^{+}e^{-} \\to \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]`
+        :math:`e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]`
 
         Cuts applied:
 
@@ -463,23 +466,32 @@ class TauTauTauTau(BaseSkim):
         pion_id_cut = "pionID > 0.2"
         electron_id_cut = "electronID > 0.2"
 
-        ma.cutAndCopyList("pi+:ftau", "pi+:all", f"[{pion_id_cut}]", path=path)
-        ma.cutAndCopyList("mu+:ftau", "mu+:all", f"[{muon_id_cut}]", path=path)
-        ma.cutAndCopyList("e+:ftau", "e+:all", f"[{electron_id_cut}]", path=path)
+        ma.cutAndCopyList("pi+:tautautautau", "pi+:all", f"[{pion_id_cut}]", path=path)
+        ma.cutAndCopyList("mu+:tautautautau", "mu+:all", f"[{muon_id_cut}]", path=path)
+        ma.cutAndCopyList("e+:tautautautau", "e+:all", f"[{electron_id_cut}]", path=path)
 
         Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6] and [M < 9.5]"
 
         # Reconstruction: prompt with same charge
-        PiMuChannel = "pi+:ftau pi+:ftau mu-:ftau mu-:ftau"
-        PiEChannel = "pi+:ftau pi+:ftau e-:ftau e-:ftau"
-        MuEChannel = "mu+:ftau mu+:ftau e-:ftau e-:ftau"
+        PiMuChannel = "pi+:tautautautau pi+:tautautautau mu-:tautautautau mu-:tautautautau"
+        PiEChannel = "pi+:tautautautau pi+:tautautautau e-:tautautautau e-:tautautautau"
+        MuEChannel = "mu+:tautautautau mu+:tautautautau e-:tautautautau e-:tautautautau"
+        PiMuEChannel = "pi+:tautautautau pi+:tautautautau mu-:tautautautau e-:tautautautau"
+        MuEPiChannel = "mu+:tautautautau mu+:tautautautau e-:tautautautau pi-:tautautautau"
+        EPiMuChannel = "e+:tautautautau e+:tautautautau mu-:tautautautau pi-:tautautautau"
 
-        ma.reconstructDecay(f"vpho:ftau_pimu -> {PiMuChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_pie -> {PiEChannel}", Event_cuts_vis, path=path)
-        ma.reconstructDecay(f"vpho:ftau_mue -> {MuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_pimu -> {PiMuChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_pie -> {PiEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_mue -> {MuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_pimue -> {PiMuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_muepi -> {MuEPiChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_epimu -> {EPiMuChannel}", Event_cuts_vis, path=path)
 
-        ftau_list.append("vpho:ftau_pimu")
-        ftau_list.append("vpho:ftau_pie")
-        ftau_list.append("vpho:ftau_mue")
+        ftau_list.append("vpho:tautautautau_pimu")
+        ftau_list.append("vpho:tautautautau_pie")
+        ftau_list.append("vpho:tautautautau_mue")
+        ftau_list.append("vpho:tautautautau_pimue")
+        ftau_list.append("vpho:tautautautau_muepi")
+        ftau_list.append("vpho:tautautautau_epimu")
 
         return ftau_list

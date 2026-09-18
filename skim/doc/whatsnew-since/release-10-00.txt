@@ -5,9 +5,12 @@ Low Multiplicity skims
 +++++++++
 
 * Added new skim for the Physics channel
-  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\mu^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> \\pi^{-}]
-  e^{+}e^{-} \\to \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\pi^{+}] \\tau^{-}[-> e^{-}]
-  e^{+}e^{-} \\to \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}] \\tau^{+}[-> \\mu^{+}] \\tau^{-}[-> e^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]
+  e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]
   Registered as("18530800", "lowMulti", "TauTauTauTau")
 
 Changes in the skim package in light-2607-k

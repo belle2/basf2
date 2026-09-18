@@ -15,7 +15,7 @@ Low Multiplicity skims
 
   Registered as("18530800", "lowMulti", "TauTauTauTau")
 
-Changes in the skim package in light-2607-k
+Changes in the skim package in light-2607-kasei
 --------------------------------------------
 
 FEI skims

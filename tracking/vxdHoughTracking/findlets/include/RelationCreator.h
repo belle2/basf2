@@ -46,6 +46,7 @@ namespace Belle2 {
         TrackingUtilities::RelationFilterUtil::appendUsing(m_relationFilter, hits, hits, relations, m_maxRelations);
       };
 
+      /// Set the maximum number of relations valule
       void setMaxRelations(const ushort maxRelations) { m_maxRelations = maxRelations; }
 
     private:

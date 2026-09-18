@@ -439,13 +439,35 @@ class TauTauTauTau(BaseSkim):
     def build_lists(self, path):
         """
         **Physics channel**:
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}]`
-          :math:`\\tau^{-}[\\to \\mu^{-}]`
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]`
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]`
-        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]`
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
+            \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
+
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
+            \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]
+
+        * .. math::
+
+            e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}]
+            \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]
 
         Cuts applied:
 

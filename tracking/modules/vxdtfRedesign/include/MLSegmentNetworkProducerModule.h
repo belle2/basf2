@@ -49,7 +49,6 @@ namespace Belle2 {
 
     void event() override; /**< event */
 
-    void terminate() override; /**< terminate module */
 
   private:
 

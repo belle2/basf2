@@ -156,6 +156,7 @@ def stdPhotons(
             path=path
         )
     elif listtype == 'base':
+        # also check base cuts applied for FEI photons and other tools when changing this selection
         ma.fillParticleList(
             'gamma:base',
             'inCDCAcceptance and [abs(clusterTiming) < 200]',

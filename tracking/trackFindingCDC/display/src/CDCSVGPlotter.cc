@@ -86,12 +86,12 @@ static void printDataStoreContent()
 {
   B2INFO("Current content of the DataStore:");
   B2INFO("StoreArrays:");
-  for (auto n : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0))) {
+  for (const auto& n : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0))) {
     B2INFO(n);
   }
   B2INFO("");
   B2INFO("StoreObjPtr:");
-  for (auto n : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0))) {
+  for (const auto& n : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0))) {
     B2INFO(n);
   }
 }

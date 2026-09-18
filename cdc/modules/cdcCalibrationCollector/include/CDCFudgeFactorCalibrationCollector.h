@@ -35,7 +35,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCFudgeFactorCalibrationCollectorModule();
+      virtual ~CDCFudgeFactorCalibrationCollectorModule() override;
 
       /**
        * Initializes the Module.
@@ -69,7 +69,7 @@ namespace Belle2 {
 
       Double_t m_minCollinearityTheta = 10; /**<Minimum requirement for accolinear theta in c.m frame */
       Double_t m_minCollinearityPhi0  = 10; /**<Minimum requirement for accolinear phi0 in c.m frame */
-      bool m_StoreNtuple;            /**< Option to store ntuple, =true: tree with these variables will be stored. */
+      bool m_StoreNtuple = false;            /**< Option to store ntuple, =true: tree with these variables will be stored. */
       Int_t expRun;                 /**< Exp and run numbers, encoded by exp*10^6+run. */
       Float_t ndfPos;               /**< NDF of the positive track. */
       Float_t ndfNeg;               /**< NDF of the negative track. */

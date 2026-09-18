@@ -447,7 +447,7 @@ void SVDDigitizerModule::processHit()
     double lastFraction {0};
     double lastElectrons {0};
 
-    for (auto& segment : segments) {
+    for (const auto& segment : segments) {
       //Simhit returns step fraction and cumulative electrons. We want the
       //center of these steps and electrons in this step
       const double f = (segment.first + lastFraction) / 2;
@@ -707,14 +707,14 @@ void SVDDigitizerModule::saveDigits()
   vector<pair<unsigned int, float> > digit_weights;
 
   // Take samples at the desired times, add noise, zero-suppress and save digits.
-  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+  for (const Waveforms::value_type& sensorWaveforms : m_waveforms) {
     int sensorID = sensorWaveforms.first;
     // u-side digits:
 
     // Cycle through signals and generate samples
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
       short int iStrip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
       // ... to store digit-digit relations
@@ -792,9 +792,9 @@ void SVDDigitizerModule::saveDigits()
     // v-side digits:
 
     // Cycle through signals and generate samples
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
       short int iStrip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Now generate samples in time and save as digits.
       vector<double> samples;
       // ... to store digit-digit relations
@@ -869,16 +869,16 @@ void SVDDigitizerModule::saveDigits()
 
 void SVDDigitizerModule::saveWaveforms()
 {
-  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+  for (const Waveforms::value_type& sensorWaveforms : m_waveforms) {
     tree_vxdID = sensorWaveforms.first;
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     tree_uv = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
       tree_strip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdU)
         continue;
@@ -890,9 +890,9 @@ void SVDDigitizerModule::saveWaveforms()
     // v-side digits:
     tree_uv = 0;
     double thresholdV = 3.0 * info.getElectronicNoiseV();
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
       tree_strip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Read the values only if the signal is large enough
       if (s.getCharge() < thresholdV)
         continue;
@@ -912,16 +912,16 @@ void SVDDigitizerModule::saveSignals()
   regex startLine("^|\n"); // for inserting event/sensor/etc info
   ofstream outfile(m_signalsList, ios::out | ios::app);
   if (recordNo == 0) outfile << header << endl;
-  for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
+  for (const Waveforms::value_type& sensorWaveforms : m_waveforms) {
     VxdID sensorID(sensorWaveforms.first);
     const SensorInfo& info =
       dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     size_t isU = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.first) {
       size_t strip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdU)
         continue;
@@ -937,9 +937,9 @@ void SVDDigitizerModule::saveSignals()
     // x-side digits:
     isU = 0;
     double thresholdV = 3.0 * info.getElectronicNoiseV();
-    for (StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
+    for (const StripWaveforms::value_type& stripWaveform : sensorWaveforms.second.second) {
       size_t strip = stripWaveform.first;
-      SVDWaveform& s = stripWaveform.second;
+      const SVDWaveform& s = stripWaveform.second;
       // Read the value only if the signal is large enough.
       if (s.getCharge() < thresholdV)
         continue;

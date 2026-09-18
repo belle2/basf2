@@ -34,17 +34,17 @@ namespace Belle2 {
     ~KLMTrackFitter();
 
     //! do fit and returns chi square of the fit.
-    double fit(std::list<KLMHit2d*>& listTrackPoint);
+    double fit(const std::list<KLMHit2d*>& listTrackPoint);
 
 
     //! Distance from track to a hit in the global system
-    double globalDistanceToHit(KLMHit2d* hit,
+    double globalDistanceToHit(const KLMHit2d* hit,
                                double& error,
                                double& sigma);
 
 
     //! do fit in the global system
-    double fit1dTrack(std::list< KLMHit2d* > hitList,
+    double fit1dTrack(const std::list< KLMHit2d* >& hitList,
                       CLHEP::HepVector&  eta,
                       CLHEP::HepSymMatrix&  error,
                       int depDir,    int indDir);

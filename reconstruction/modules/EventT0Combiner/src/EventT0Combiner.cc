@@ -148,7 +148,7 @@ void EventT0CombinerModule::event()
   }
 }
 
-EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<EventT0::EventT0Component> measurements) const
+EventT0::EventT0Component EventT0CombinerModule::computeCombination(const std::vector<EventT0::EventT0Component>& measurements)
 {
   if (measurements.size() == 0) {
     B2FATAL("Need at least one EvenT0 Measurement to do a sensible combination.");

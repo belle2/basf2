@@ -145,7 +145,7 @@ namespace Belle2 {
       //energyToSort vector is used for sorting digits by calibrated energy
       for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
-        const auto caldigit = relatedDigits.object(iRel);
+        const auto* caldigit = relatedDigits.object(iRel);
         const auto weight = relatedDigits.weight(iRel);
         bool goodFit = true;
 
@@ -465,7 +465,7 @@ namespace Belle2 {
       }
       const Track* track = particle->getTrack();
       if (track) {
-        ExtHit* edgeExtHit = nullptr;
+        const ExtHit* edgeExtHit = nullptr;
         if (front) {
           for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
             if (extHit.getDetectorID() != Const::EDetector::ECL) continue;

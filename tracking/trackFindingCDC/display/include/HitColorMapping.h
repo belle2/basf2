@@ -125,7 +125,7 @@ namespace Belle2 {
       std::vector<std::string> m_colors;
 
       /// Index of the color to be used next.
-      int m_iColor;
+      int m_iColor {};
 
       /**
        *  Mapping of the already used colors by the MCParticle::getArrayId to map later CDCHits to

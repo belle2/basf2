@@ -458,7 +458,6 @@ void SVDHotStripFinderModule::terminate()
             it = 0;
             // first pass
             for (int l = 0; l < 768; l++) {
-              div_t test = div(l, ibase);
               float threshold_corrections = 1.0;
               /*
                        threshold is corrected by the real number of alive strips
@@ -476,6 +475,7 @@ void SVDHotStripFinderModule::terminate()
               } else {
                 hsflag[l] = 0; // not a HS
                 //recalculate the occupancy in DSSD only for good strip after first pass
+                div_t test = div(l, ibase);
                 occupancy[test.quot] = occupancy[test.quot] + hm_occupancy->getHistogram(*itSvdSensors, k)->GetBinContent(l + 1);
                 it++; //number of good strips after first pass
               }

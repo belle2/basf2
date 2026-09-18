@@ -84,7 +84,7 @@ void PXDInjectionDQMModule::defineHisto()
 
   if (m_eachModule) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (VxdID& avxdid : sensors) {
+    for (const VxdID& avxdid : sensors) {
       VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
       if (info.getType() != VXD::SensorInfoBase::PXD) continue;
       // Only interested in PXD sensors
@@ -191,6 +191,8 @@ void PXDInjectionDQMModule::beginRun()
 void PXDInjectionDQMModule::event()
 {
   // And check if the stored data is valid
+  // the second isValid() is EventLevelTriggerTimeInfo's, not StoreObjPtr's
+  // cppcheck-suppress knownConditionTrueFalse
   if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // get last injection time
     hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.);

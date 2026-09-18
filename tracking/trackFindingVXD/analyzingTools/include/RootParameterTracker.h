@@ -140,7 +140,7 @@ namespace Belle2 {
     *
     * calling it more than once will result in a B2FATAL-message.
     */
-    void initialize(std::string fileName, std::string fileTreatment)
+    void initialize(const std::string& fileName, const std::string& fileTreatment)
     {
       if (fileTreatment != std::string("RECREATE") and fileTreatment != std::string("UPDATE")) {
         B2FATAL("RootParameterTracker::initialize(), specified fileTreatment is " << fileTreatment <<

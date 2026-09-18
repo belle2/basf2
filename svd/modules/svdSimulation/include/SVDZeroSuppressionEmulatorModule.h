@@ -30,7 +30,7 @@ namespace Belle2 {
     /** Constructor defining the parameters */
     SVDZeroSuppressionEmulatorModule();
 
-    virtual ~SVDZeroSuppressionEmulatorModule();
+    virtual ~SVDZeroSuppressionEmulatorModule() override;
 
     /** Initialize the SVDZeroSuppressionEmulator.*/
     virtual void initialize() override;

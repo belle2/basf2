@@ -22,13 +22,13 @@ namespace Belle2 {
       eclAutocovarianceCalibrationC4Algorithm();
 
       /**..Destructor */
-      virtual ~eclAutocovarianceCalibrationC4Algorithm() {}
+      virtual ~eclAutocovarianceCalibrationC4Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_minEntries */
       void setMinEntries(int minEntries) {m_minEntries = minEntries;}
@@ -51,7 +51,7 @@ namespace Belle2 {
 
       std::string m_outputName = "eclAutocovarianceCalibrationC4Algorithm.root"; /**< file name for histogram output */
       int m_minEntries = 1000;  /**<  Minimum entries to fit a crystal */
-      float m_lowestEnergyFraction; /**<  m_lowestEnergyFraction */
+      float m_lowestEnergyFraction = 0.0; /**<  m_lowestEnergyFraction */
 
     };
   }

@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMDigitTimeShifterModule();
+    ~KLMDigitTimeShifterModule() override;
 
     /**
      * Initializer.

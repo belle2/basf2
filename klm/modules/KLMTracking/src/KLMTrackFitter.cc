@@ -57,7 +57,7 @@ KLMTrackFitter::~KLMTrackFitter()
 {
 }
 //! do fit and returns chi square of the fit.
-double KLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
+double KLMTrackFitter::fit(const std::list<KLMHit2d* >& listHitSector)
 {
 
   // We can only do fit if there are at least two hits
@@ -106,7 +106,7 @@ double KLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
 
 
 //! Distance from track to a hit calculated in the global system
-double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
+double KLMTrackFitter::globalDistanceToHit(const KLMHit2d* hit,
                                            double& error,
                                            double& sigma)
 {
@@ -123,7 +123,7 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
   double z_mea = hit->getPositionZ();
 
   //there is some subdetector dependence so let's define this first.
-  double x_pre, y_pre, z_pre, dx, dy, dz;
+  double x_pre = 0., y_pre = 0., z_pre = 0., dx, dy, dz;
 
   // Error is composed of four parts: error due to tracking;
   // and error in hit, y(x)  or z(x).
@@ -251,7 +251,7 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 
 
 //! do fit in global system, handle tracks that go thrugh multi-sectors
-double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
+double KLMTrackFitter::fit1dTrack(const std::list< KLMHit2d* >& hitList,
                                   HepVector&  eta,
                                   HepSymMatrix&  error,
                                   int depDir,    int indDir)
@@ -282,9 +282,9 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
 
 
   int n = 0;
-  for (std::list< KLMHit2d* >::iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
+  for (std::list< KLMHit2d* >::const_iterator iHit = hitList.begin(); iHit != hitList.end(); ++iHit) {
 
-    KLMHit2d* hit = *iHit;
+    const KLMHit2d* hit = *iHit;
 
     CLHEP::Hep3Vector globalPos(hit->getPositionX(),  hit->getPositionY(),  hit->getPositionZ());
 

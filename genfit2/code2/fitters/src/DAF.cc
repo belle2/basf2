@@ -27,6 +27,7 @@
 #include "Tools.h"
 #include "Track.h"
 #include "TrackPoint.h"
+#include "MathHelpers.h"
 
 #include <assert.h>
 #include <cmath>
@@ -302,9 +303,9 @@ bool DAF::calcWeights(Track* tr, const AbsTrackRep* rep, double beta) {
         if (hitDim == 2)
           twoPiN *= twoPiN;
         else if (hitDim > 2)
-          twoPiN = pow(twoPiN, hitDim);
+          twoPiN = powN(twoPiN, hitDim);
 
-        double chi2 = Vinv.Similarity(resid);
+        double chi2 = tools::similarity(resid, Vinv);
         if (debugLvl_ > 1) {
           debugOut<<"chi2 = " << chi2 << "\n";
         }

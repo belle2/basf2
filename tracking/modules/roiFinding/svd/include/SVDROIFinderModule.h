@@ -60,10 +60,6 @@ namespace Belle2 {
      */
     void endRun() override;
 
-    /**
-     * Termination action.
-     */
-    void terminate() override;
 
   protected:
     ROIToUnitTranslator<SVDIntercept>* m_theStripTranslator = nullptr; /**< the strip translator object*/

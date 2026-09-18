@@ -48,7 +48,7 @@ void MsgHandler::add(const TObject* obj, const string& name)
   m_msg->WriteObject(obj);
 
   int len = m_msg->Length();
-  char* buf = m_msg->Buffer();
+  const char* buf = m_msg->Buffer();
 
   if (len > c_maxObjectSizeBytes) {
     B2WARNING("MsgHandler: Object " << name << " is very large (" << len  << " bytes), parallel processing may be slow.");
@@ -113,17 +113,18 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     // apparently message is compressed, let's decompress
     m_compBuf.clear();
     int nzip{0}, nout{0};
-    // ROOT wants unsigned char so make a new pointer to the data
-    auto* zipptr = (unsigned char*) msgptr;
+    // ROOT wants a non-const unsigned char pointer although it only reads the data
+    auto* zipptr = reinterpret_cast<unsigned char*>(const_cast<char*>(msgptr));
+    const auto* zipend = reinterpret_cast<const unsigned char*>(end);
     // and uncompress everything
-    while (zipptr < (unsigned char*)end) {
+    while (zipptr < zipend) {
       // first get a header of the next block so we know how big the output will be
       if (R__unzip_header(&nzip, zipptr, &nout) != 0) {
         B2FATAL("Cannot uncompress message header");
       }
       // no more output? fine
       if (!nout) break;
-      if (std::distance(zipptr, (unsigned char*) end) > nzip) {
+      if (zipend - zipptr > nzip) {
         B2FATAL("Not enough bytes left to uncompress");
       }
       // otherwise make sure output buffer is large enough
@@ -131,7 +132,7 @@ void MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
       m_compBuf.resize(old_size + nout);
       // and uncompress, the amount of bytes will be returned as irep
       int irep{0};
-      R__unzip(&nzip, zipptr, &nout, (unsigned char*)(m_compBuf.data() + old_size), &irep);
+      R__unzip(&nzip, zipptr, &nout, reinterpret_cast<unsigned char*>(m_compBuf.data() + old_size), &irep);
       // if that is not positive an error happened, bail
       if (irep <= 0) {
         B2FATAL("Cannot uncompress message");

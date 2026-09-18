@@ -44,7 +44,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~KLMDigitizerModule();
+    ~KLMDigitizerModule() override;
 
     /**
      * Initializer.
@@ -65,11 +65,6 @@ namespace Belle2 {
      * This method is called if the current run ends.
      */
     void endRun() override;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
 
   private:
 
@@ -117,7 +112,7 @@ namespace Belle2 {
      * @param[in] efficiency Efficiency.
      * @return True if the digitization passes the efficiency correction.
      */
-    bool efficiencyCorrection(float efficiency);
+    static bool efficiencyCorrection(float efficiency);
 
     /** Channel status. */
     DBObjPtr<KLMChannelStatus> m_ChannelStatus;
@@ -165,7 +160,7 @@ namespace Belle2 {
     bool m_CreateMultiStripDigits;
 
     /** Whether to create multi-strip digits for one particular run. */
-    bool m_CreateMultiStripDigitsByRun;
+    bool m_CreateMultiStripDigitsByRun = false;
 
     /** Use debug mode in EKLM::ScintillatorSimulator or not. */
     bool m_Debug;
@@ -180,15 +175,15 @@ namespace Belle2 {
     std::multimap<KLMElectronicsChannel, const KLMSimHit*> m_MapAsicSimHit;
 
     /** Digits corresponding to ASIC channels. */
-    KLMDigit* m_AsicDigits[KLM::c_NChannelsAsic];
+    KLMDigit* m_AsicDigits[KLM::c_NChannelsAsic] {};
 
     /** Simulation hits lower bound for ASIC digit. */
     std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
-    m_AsicDigitSimHitsLowerBound[KLM::c_NChannelsAsic];
+    m_AsicDigitSimHitsLowerBound[KLM::c_NChannelsAsic] {};
 
     /** Simulation hits upper bound for ASIC digit. */
     std::multimap<KLMChannelNumber, const KLMSimHit*>::iterator
-    m_AsicDigitSimHitsUpperBound[KLM::c_NChannelsAsic];
+    m_AsicDigitSimHitsUpperBound[KLM::c_NChannelsAsic] {};
 
     /** FPGA fitter. */
     KLM::ScintillatorFirmware* m_Fitter;

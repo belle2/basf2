@@ -18,6 +18,7 @@ using namespace CDC;
 using namespace TrackingUtilities;
 
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
 void TrackingUtilitiesTestWithTopology::SetUpTestCase()
 {
   /// Manually open the database and prepare the cdc geometry parameters.
@@ -27,6 +28,7 @@ void TrackingUtilitiesTestWithTopology::SetUpTestCase()
   CDCWireTopology::getInstance();
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
 void TrackingUtilitiesTestWithTopology::TearDownTestCase()
 {
   CDCGeometryLoader::closeDatabase();

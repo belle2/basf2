@@ -69,7 +69,7 @@ namespace Belle2::Conditions {
     });
   }
 
-  bool PayloadProvider::getLocalFile(const PayloadLocation& loc, PayloadMetadata& metadata) const
+  bool PayloadProvider::getLocalFile(const PayloadLocation& loc, PayloadMetadata& metadata)
   {
     // look in both flat and hashed directory structures.
     for (EDirectoryLayout structure : {EDirectoryLayout::c_hashed, EDirectoryLayout::c_flat}) {

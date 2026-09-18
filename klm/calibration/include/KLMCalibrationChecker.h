@@ -146,7 +146,7 @@ namespace Belle2 {
     /**
      * Reset the database.
      */
-    void resetDatabase();
+    static void resetDatabase();
 
     /**
      * Print payload information.

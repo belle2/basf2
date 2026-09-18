@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxCosLayerAlgorithm() {}
+    virtual ~CDCDedxCosLayerAlgorithm() override {}
 
     /**
     * function to set truncation method (local vs global)
@@ -99,7 +99,7 @@ namespace Belle2 {
     * Representative CDC layer for each SL group (used to access group-wise constants):
     * SL0 => 1, SL1 => 9, SL2-8 => 17
     */
-    unsigned int getRepresentativeLayer(unsigned int igroup) const
+    static unsigned int getRepresentativeLayer(unsigned int igroup)
     {
       static const std::array<unsigned int, m_kNGroups> repLayer = {1, 9, 17};
       return repLayer.at(igroup);
@@ -128,7 +128,7 @@ namespace Belle2 {
     /**
     * function to get truncated mean
     */
-    double getTruncationMean(TH1D* hist, int binlow, int binhigh);
+    static double getTruncationMean(TH1D* hist, int binlow, int binhigh);
 
     /**
     * Extract mean dE/dx vs costh for a given group from the histogram
@@ -143,7 +143,8 @@ namespace Belle2 {
     /**
     * function to draw the dE/dx histogram in costh bins
     */
-    void plotdedxHist(std::array<std::vector<TH1D*>, m_kNGroups>& hdedx, const std::string& tag);
+    void plotdedxHist(std::array<std::vector<TH1D*>, 3>& hDedxCos_all, std::array<std::vector<TH1D*>, 3>& hDedxCos_neg,
+                      std::array<std::vector<TH1D*>, 3>& hDedxCos_pos, int iter);
 
     /**
     * function to draw dedx dist. for Inner/outer layer
@@ -163,7 +164,7 @@ namespace Belle2 {
     /**
     * Plot overlay of positive, negative, and average cosine means for one SL group
     */
-    void plotmeanChargeOverlay(const std::array<std::vector<double>, 3>& cosine_pos, const std::string& sltag, int iter);
+    void plotmeanChargeOverlay(const std::array<std::array<std::vector<double>, 3>, 3>& mean, int iter);
 
     /**
     * function to draw the old/new final constants

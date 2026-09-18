@@ -207,7 +207,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (auto& e : relIndex.getElementsFrom((evtData)[0])) {
+      for (const auto& e : relIndex.getElementsFrom((evtData)[0])) {
         ++size;
         allweights += e.weight;
       }
@@ -217,7 +217,7 @@ namespace {
     {
       int size(0);
       double allweights(0);
-      for (auto& e : relIndex.getElementsTo((profileData)[0])) {
+      for (const auto& e : relIndex.getElementsTo((profileData)[0])) {
         ++size;
         allweights += e.weight;
       }

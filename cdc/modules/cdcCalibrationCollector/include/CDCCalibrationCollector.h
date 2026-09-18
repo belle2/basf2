@@ -42,7 +42,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCCalibrationCollectorModule();
+      virtual ~CDCCalibrationCollectorModule() override;
 
       /**
        * Initializes the Module.
@@ -75,9 +75,9 @@ namespace Belle2 {
       /**
        * extrapolates the helix fit to a given layer and finds the wire which it would be hitting
        */
-      const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz,
-                                         const CDCWireLayer& layer,
-                                         const Helix& helixFit) const;
+      static const CDCWire& getIntersectingWire(const ROOT::Math::XYZVector& xyz,
+                                                const CDCWireLayer& layer,
+                                                const Helix& helixFit);
 
       StoreObjPtr<EventT0> m_eventTimeStoreObject;  /**< Event t0 object */
       StoreArray<Track> m_Tracks;                   /**< Tracks. */
@@ -126,8 +126,9 @@ namespace Belle2 {
 
       unsigned short wireID;                   /**< wireID for hit-level wire monitoring */
       unsigned short layerID;                  /**< layerID for hit-level wire monitoring */
-      float z;                                 /**< z of hit for hit-level wire monitoring */
-      bool isFound;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
+      float z = 0.0;                                 /**< z of hit for hit-level wire monitoring */
+      bool isFound =
+        false;                            /**< flag for a hit that has been found near a track as expected by extrapolation */
     };
   }
 }

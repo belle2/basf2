@@ -1,0 +1,31 @@
+# EventType: 1110020201
+# Descriptor: [B0 -> K*0 K_L0 K_L0]
+# NickName: Bd_Ks0t0KLKL
+# Tested: YES
+# PhysicsWG: EWP
+# Responsible: Merna Abumusabh
+# Email: merna.abumusabh@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260609
+
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K*0sig K_L0 K_L0           PHSP;
+Enddecay
+
+CDecay anti-B0sig
+
+Decay K*0sig
+1.0 K+ pi-    VSS;
+Enddecay
+
+CDecay anti-K*0sig
+
+End

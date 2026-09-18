@@ -24,8 +24,8 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDGeoSensorPlacementPar(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
-                             bool flipU = false, bool flipV = false, bool flipW = false):
+    explicit VXDGeoSensorPlacementPar(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
+                                      bool flipU = false, bool flipV = false, bool flipW = false):
       m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_flipU(flipU), m_flipV(flipV), m_flipW(flipW) {}
     //! Destructor
     ~VXDGeoSensorPlacementPar() {}

@@ -143,7 +143,4 @@ void SVDROIFinderModule::endRun()
 }
 
 
-void SVDROIFinderModule::terminate()
-{
-}
 

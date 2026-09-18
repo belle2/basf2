@@ -36,8 +36,17 @@ namespace {
     std::vector<std::string> result;
     Belle2::PyObjConvUtils::iteratePythonObject(obj, [&result](const boost::python::object & item) {
       py::object str(py::handle<>(PyObject_Str(item.ptr()))); // convert to string
+      // boost::python::extract<std::string> triggers a false-positive
+      // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
       py::extract<std::string> extract(str); // and extract
       result.emplace_back(extract()); // and push back
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
       return true;
     });
     // done, return
@@ -357,10 +366,19 @@ namespace Belle2::Conditions {
       if (py::len(kwargs) > 0) {
         std::string message = "Unrecognized keyword arguments: ";
         auto keys = kwargs.keys();
+        // boost::python::extract<std::string> triggers a false-positive
+        // -Wmaybe-uninitialized in GCC; silence it around the extraction.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         for (int i = 0; i < len(keys); ++i) {
           if (i > 0) message += ", ";
           message += py::extract<std::string>(keys[i]);
         }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
         PyErr_SetString(PyExc_TypeError, message.c_str());
         py::throw_error_already_set();
       }

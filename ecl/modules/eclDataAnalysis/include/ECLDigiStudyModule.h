@@ -40,7 +40,7 @@ namespace Belle2 {
     ECLDigiStudyModule();
 
     /** Destructor. */
-    virtual ~ECLDigiStudyModule() {}
+    virtual ~ECLDigiStudyModule() override {}
 
     /** Initializes the module. */
     virtual void initialize() override;

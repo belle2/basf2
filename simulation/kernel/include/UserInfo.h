@@ -12,8 +12,8 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <simulation/dataobjects/MCParticleTrajectory.h>
 
-#include "G4VUserTrackInformation.hh"
-#include "G4VUserPrimaryParticleInformation.hh"
+#include <G4VUserTrackInformation.hh>
+#include <G4VUserPrimaryParticleInformation.hh>
 
 
 namespace Belle2 {

@@ -55,7 +55,7 @@ namespace Belle2 {
 
 
     /** returns info about tc in formatted without having the last piece of the Information */
-    std::string getInfo() { return m_tcInfo; }
+    const std::string& getInfo() const { return m_tcInfo; }
 
 
     /** returns pdgCode of tc in the tc-file */

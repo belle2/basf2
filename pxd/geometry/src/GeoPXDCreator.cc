@@ -268,14 +268,14 @@ namespace Belle2 {
         );
 
         //Add radiation sensor positions
-        for (GearDir& position : radiationDir.getNodes("position")) {
+        for (const GearDir& position : radiationDir.getNodes("position")) {
           VXDGeoRadiationSensorsPositionPar diamonds(position.getLength("z"),
                                                      position.getLength("radius"),
                                                      position.getAngle("theta")
                                                     );
 
           //Loop over all phi positions
-          for (GearDir& sensor : position.getNodes("phi")) {
+          for (const GearDir& sensor : position.getNodes("phi")) {
             //Add sensor with angle and id
             diamonds.addSensor(sensor.getInt("@id"), sensor.getAngle());
           }

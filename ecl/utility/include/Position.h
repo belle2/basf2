@@ -25,7 +25,7 @@ namespace Belle2 {
      \param weights List of weights
      \param parameters List of parameters
      */
-    B2Vector3D computePositionLiLo(const std::vector<ECLCalDigit>& digits, std::vector<double>& weights,
+    B2Vector3D computePositionLiLo(const std::vector<ECLCalDigit>& digits, const std::vector<double>& weights,
                                    const std::vector<double>& parameters);
 
     //! Computes the sum of all energies.
@@ -33,7 +33,7 @@ namespace Belle2 {
      \param digits List of ECLCalDigits
      \param weights List of weights
      */
-    double computeEnergySum(const std::vector<ECLCalDigit>& digits, std::vector<double>& weights);
+    double computeEnergySum(const std::vector<ECLCalDigit>& digits, const std::vector<double>& weights);
 
   } // namespace ECL
 } // namespace Belle2

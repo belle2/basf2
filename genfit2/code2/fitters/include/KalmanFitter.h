@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_KalmanFitter_h
-#define genfit_KalmanFitter_h
+#pragma once
 
 #include "AbsKalmanFitter.h"
 
@@ -79,5 +78,3 @@ class KalmanFitter : public AbsKalmanFitter {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif //genfit_KalmanFitter_h

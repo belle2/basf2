@@ -150,7 +150,7 @@ namespace Belle2 {
        * @param length length of dhp data
        * @param vxd_id vertex Detector ID
        */
-      void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
+      static void unpack_fce(unsigned short* data, unsigned int length, VxdID vxd_id);
 
       /** Error Mask set per packet / frame*/
       PXDError::PXDErrorFlags m_errorMask{0};

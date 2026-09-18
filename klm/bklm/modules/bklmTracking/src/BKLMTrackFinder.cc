@@ -43,7 +43,7 @@ void BKLMTrackFinder::registerFitter(BKLMTrackFitter* fitter)
 
 //! find associated hits and do fit
 bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
-                             std::list<KLMHit2d*>& hits,
+                             const std::list<KLMHit2d*>& hits,
                              std::list<KLMHit2d*>& track)
 {
   track = seed;
@@ -90,7 +90,7 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
 
   // Do this the hard way to count each layer separately.
   std::list<int> hitLayers;
-  for (KLMHit2d* hit2d : track) {
+  for (const KLMHit2d* hit2d : track) {
     hitLayers.push_back(hit2d->getLayer());
   }
   hitLayers.sort();

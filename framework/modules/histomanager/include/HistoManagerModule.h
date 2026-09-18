@@ -19,7 +19,7 @@ namespace Belle2 {
 
     //! Constructor and Destructor
     HistoManagerModule();
-    virtual ~HistoManagerModule();
+    virtual ~HistoManagerModule() override;
 
     //! module functions
     virtual void initialize() override;

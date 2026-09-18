@@ -48,7 +48,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMAlignmentAlongStripsCollectorModule();
+    ~EKLMAlignmentAlongStripsCollectorModule() override;
 
     /**
      * Initializer.

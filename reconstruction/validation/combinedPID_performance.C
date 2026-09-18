@@ -14,8 +14,8 @@
 </header>
 */
 
-#include "TFile.h"
-#include "TEfficiency.h"
+#include <TFile.h>
+#include <TEfficiency.h>
 #include <TApplication.h>
 #include <TROOT.h>
 #include <TSystem.h>
@@ -36,16 +36,16 @@ void combinedPID_performance(){
   }
 
   // efficiencies for all PID detectors
-  TEfficiency* epi = (TEfficiency*)infile->Get("epik_7");
-  TEfficiency* ek = (TEfficiency*)infile->Get("ekpi_7");
-  TEfficiency* ep = (TEfficiency*)infile->Get("eppi_7");
-  TEfficiency* epk = (TEfficiency*)infile->Get("epk_7");
+  TEfficiency* epi = static_cast<TEfficiency*>(infile->Get("epik_7"));
+  TEfficiency* ek = static_cast<TEfficiency*>(infile->Get("ekpi_7"));
+  TEfficiency* ep = static_cast<TEfficiency*>(infile->Get("eppi_7"));
+  TEfficiency* epk = static_cast<TEfficiency*>(infile->Get("epk_7"));
 
   // fake rates for all PID detectors
-  TEfficiency* fpi = (TEfficiency*)infile->Get("fpik_7");
-  TEfficiency* fk = (TEfficiency*)infile->Get("fkpi_7");
-  TEfficiency* fp = (TEfficiency*)infile->Get("fppi_7");
-  TEfficiency* fpk = (TEfficiency*)infile->Get("fpk_7");
+  TEfficiency* fpi = static_cast<TEfficiency*>(infile->Get("fpik_7"));
+  TEfficiency* fk = static_cast<TEfficiency*>(infile->Get("fkpi_7"));
+  TEfficiency* fp = static_cast<TEfficiency*>(infile->Get("fppi_7"));
+  TEfficiency* fpk = static_cast<TEfficiency*>(infile->Get("fpk_7"));
 
   TFile* outfile = new TFile("pid_combinedPerformance.root","RECREATE");
   outfile->cd();

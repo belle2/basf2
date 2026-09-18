@@ -267,6 +267,45 @@ class B0toDpi_Kpipi(BaseSkim):
 
 
 @fancy_skim_header
+class B0toDh_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) \\pi^+`
+    * :math:`B^{0}\\to D^{-} (D^{0} \\to K^+ \\pi^- \\pi^-) K^+`
+
+    Cuts applied:
+
+    * ``Mbc > 5.26``
+    * ``abs(deltaE) < 0.2``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdDplus_Kpipi`, where :math:`D^-`
+        channel is defined.
+    """
+
+    __authors__ = ["Markus Prim"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.26 < Mbc and abs(deltaE) < 0.2"
+        ma.reconstructDecay("B0:Dh_Kpipi_pi -> D-:Kpipi pi+:GoodTrack", Bcuts, 0, path=path)
+        ma.reconstructDecay("B0:Dh_Kpipi_K  -> D-:Kpipi K+:GoodTrack", Bcuts, 0, path=path)
+        ma.copyLists('B0:Dh_Kpipi', ['B0:Dh_Kpipi_pi', 'B0:Dh_Kpipi_K'], path=path)
+
+        return ["B0:Dh_Kpipi"]
+
+
+@fancy_skim_header
 class B0toDpi_KpipiLooseDelE(BaseSkim):
     """
     Reconstructed decay modes:

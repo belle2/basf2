@@ -52,7 +52,7 @@ namespace Belle2 {
     /** Get tolerance for Geant4 steps to be merged to a single step */
     float getDistanceTolerance() const { return m_distanceTolerance; }
     /** Get default material */
-    std::string getDefaultMaterial() const { return m_defaultMaterial; }
+    const std::string& getDefaultMaterial() const { return m_defaultMaterial; }
 
   private:
     //! tolerance for the energy deposition in electrons to be merged in a single step

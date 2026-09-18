@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsHMatrix_h
-#define genfit_AbsHMatrix_h
+#pragma once
 
 #include <TObject.h>
 #include <TMatrixDSym.h>
@@ -75,5 +74,3 @@ class AbsHMatrix : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsHMatrix_h

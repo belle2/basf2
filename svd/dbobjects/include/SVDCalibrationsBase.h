@@ -50,9 +50,9 @@ namespace Belle2 {
 
     /** The default constructor initialize all the vectors
      */
-    SVDCalibrationsBase(typename T::calibrationType defaultT =
-                          typename T::calibrationType(),
-                        const TString& uniqueID = ""): m_uniqueID(uniqueID)    // Add a string as unique identifier for a given configuration dataset
+    explicit SVDCalibrationsBase(typename T::calibrationType defaultT =
+                                   typename T::calibrationType(),
+                                 const TString& uniqueID = ""): m_uniqueID(uniqueID)    // Add a string as unique identifier for a given configuration dataset
     {
 
       calibrations.resize(7); // Layers 0 1 2 3 4 5 6

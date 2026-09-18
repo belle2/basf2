@@ -297,11 +297,23 @@ class LFVZpVisible(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**: ee --> e mu Z'; Z' --> e mu
+        **Physics channel**: :math:`e^{+}e^{-} \\to e\\mu Z^{\\prime}; Z^{\\prime} \\to e\\mu`
+
+        Cuts applied:
+
+        * ``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
+        * ``electronID cut: electronID > 0.2``
+        * ``muonID cut: muonID > 0.2``
+        * ``At least one electron and one muon: formula(nParticlesInList(mu+:lfvzp) + nParticlesInList(e+:lfvzp)) > 1``
+        * ``nCleanedTracks == 4, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        * ``electron identified with electrondID > 0.2``
+        * ``muon idenfied with muonID > 0.2``
         """
+
         lfvzp_list = []
 
-        # Here we just want four gpood tracks to be reconstructed
+        # Here we just want four good tracks to be reconstructed
+        # with at least one muon and one electron
         track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
         electron_id_cut = "electronID > 0.2"
         muon_id_cut = "muonID > 0.2"
@@ -319,15 +331,63 @@ class LFVZpVisible(BaseSkim):
 
         lfvzp_list.append("vpho:vislfvzp")
 
-        LFVZpVisChannel = "e+:lfvzp mu+:lfvzp e+:all mu+:all"
+        # Z' to lfv: same charge
+        LFVZpVisChannel = "e+:lfvzp mu-:lfvzp e+:all mu-:all"
 
-        # Z' to lfv: part reco
-        ma.reconstructDecay(f"vpho:ecv_vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path,
-                            allowChargeViolation=True)
+        ma.reconstructDecay(f"vpho:ecv_vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path)
 
         lfvzp_list.append("vpho:ecv_vislfvzp")
 
         return lfvzp_list
+
+
+@fancy_skim_header
+class ZpVisible(BaseSkim):
+    __authors__ = ["Luigi Corona and Giovanni Gaudino"]
+    __description__ = "Skim for the Z' to visible final states."
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        """
+        **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}Z^{\\prime};`
+        :math:`Z^{\\prime} \\to x^{+}x^{-} \\ (x = e, \\mu, \\tau, \\pi, K)`
+
+        Cuts applied:
+
+        * ``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
+        * ``muonID cut: muonID > 0.2``
+        * ``nCleanedTracks < 6, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        * ``Two prompt tracks satisfying [muonID > 0.2] and [abs(dz) < 2.0 and abs(dr) < 0.5]``
+        """
+        zp_list = []
+
+        track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
+        muon_id_cut = "muonID > 0.2"
+
+        ma.cutAndCopyList("mu+:zp", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
+
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6]"
+
+        # Z' fully reconstructed
+        ZpVisChannel = "mu+:zp mu-:zp mu+:all mu-:all"
+
+        ma.reconstructDecay(f"vpho:viszp -> {ZpVisChannel}", Event_cuts_vis, path=path)
+
+        zp_list.append("vpho:viszp")
+
+        # Z' same charge
+        ZpVisChannel = "mu+:zp mu+:zp mu-:all mu-:all"
+
+        ma.reconstructDecay(f"vpho:ecv_viszp -> {ZpVisChannel}", Event_cuts_vis, path=path)
+
+        zp_list.append("vpho:ecv_viszp")
+
+        return zp_list
 
 
 @fancy_skim_header

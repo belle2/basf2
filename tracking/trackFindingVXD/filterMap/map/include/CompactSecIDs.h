@@ -83,7 +83,7 @@ namespace Belle2 {
       auto ladder = fullSecIDs[0][0].getLadderID();
       auto sensor = fullSecIDs[0][0].getVxdID().getSensorNumber();
 
-      for (auto fullSecIDrow : fullSecIDs) {
+      for (const auto& fullSecIDrow : fullSecIDs) {
         // Check that the fullSecIDs vector of vector is rectangular
         if (fullSecIDrow.size() != normalizedVsup.size() + 1)
           return 0;
@@ -348,7 +348,7 @@ namespace Belle2 {
     /// @param sector: the FullSectorID of the sector, the sublayer id will be ignored during searching for the sector
     /// @param sublayer: the new sublayer id
     /// @return true if successful
-    bool setSubLayerID(FullSecID& sector, int sublayer)
+    bool setSubLayerID(const FullSecID& sector, int sublayer)
     {
       // cross check if sector is registered in the map, compactID will be 0 if not
       sectorID_t compactID = getCompactID(sector);
@@ -406,7 +406,7 @@ namespace Belle2 {
 
       int addedSectors = 0;
 
-      for (auto sectorRow : fullSecIDs)
+      for (const auto& sectorRow : fullSecIDs)
         for (auto sector : sectorRow) {
           auto secID = sector.getSecID();
           try {

@@ -34,7 +34,7 @@ namespace Belle2 {
   {
     assert(obj);
     bool isArrayType = dynamic_cast<const TClonesArray*>(obj) != nullptr;
-    TClass* const objClass = isArrayType ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
+    const TClass* const objClass = isArrayType ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
     return DBStoreEntry(c_Object, name, objClass, isArrayType, isRequired);
   }
 
@@ -53,7 +53,7 @@ namespace Belle2 {
     // if we don't have intra run dependency we don't care about event number
     if (!m_intraRunDependency) return;
     // otherwise update the object and call notify all accessors on change
-    TObject* const old = m_object;
+    const TObject* const old = m_object;
     m_object = m_intraRunDependency->getObject(event);
     if (old != m_object) {
       B2DEBUG(35, "IntraRunDependency for " << m_name << ": new object (" << old << ", " << m_object << "), notifying accessors");
@@ -154,7 +154,7 @@ namespace Belle2 {
 
   void DBStoreEntry::overrideObject(TObject* obj, const IntervalOfValidity& iov)
   {
-    if (!checkType(obj)) return;
+    checkType(obj);
 
     m_globaltag = "";
     m_revision = 0;
@@ -191,13 +191,13 @@ namespace Belle2 {
     if (onDestruction) m_accessors.clear();
   }
 
-  bool DBStoreEntry::checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse) const
+  void DBStoreEntry::checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse) const
   {
     if (type != m_payloadType) {
       B2FATAL("Existing entry '" << m_name << "' is of a different type than requested");
     }
     // OK, all other checks only make sense for objects
-    if (type != c_Object) return true;
+    if (type != c_Object) return;
     // Check whether the existing entry and the requested object are both arrays or both single objects
     if (m_isArray != array) {
       B2FATAL("Existing entry '" << m_name << "' is an " << ((m_isArray) ? "array" : "object") <<
@@ -218,22 +218,21 @@ namespace Belle2 {
                 objClass->GetName());
       }
     }
-    return true;
   }
 
-  bool DBStoreEntry::checkType(const TObject* object) const
+  void DBStoreEntry::checkType(const TObject* object) const
   {
     // Get class information from object
     if (object->InheritsFrom(IntraRunDependency::Class())) {
       object = static_cast<const IntraRunDependency*>(object)->getAnyObject();
     }
-    TClass* objClass = object->IsA();
+    const TClass* objClass = object->IsA();
     bool array = (objClass == TClonesArray::Class());
     if (array) {
       objClass = static_cast<const TClonesArray*>(object)->GetClass();
     }
 
-    return checkType(c_Object, objClass, array, true);
+    checkType(c_Object, objClass, array, true);
   }
 
 }

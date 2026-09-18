@@ -94,10 +94,10 @@ void KLMScintillatorSimulatorModule::initialize()
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  m_hDir = (float*)malloc(m_SciSimPar->getNDigitizations() * sizeof(float));
+  m_hDir = static_cast<float*>(malloc(m_SciSimPar->getNDigitizations() * sizeof(float)));
   if (m_hDir == nullptr)
     B2FATAL(MemErr);
-  m_hRef = (float*)malloc(m_SciSimPar->getNDigitizations() * sizeof(float));
+  m_hRef = static_cast<float*>(malloc(m_SciSimPar->getNDigitizations() * sizeof(float)));
   if (m_hRef == nullptr)
     B2FATAL(MemErr);
   if (m_mode.compare("Strips") == 0) {
@@ -117,18 +117,6 @@ void KLMScintillatorSimulatorModule::initialize()
   free(m_hRef);
   m_fout->Close();
   delete m_fout;
-}
-
-void KLMScintillatorSimulatorModule::beginRun()
-{
-}
-
-void KLMScintillatorSimulatorModule::event()
-{
-}
-
-void KLMScintillatorSimulatorModule::endRun()
-{
 }
 
 void KLMScintillatorSimulatorModule::terminate()

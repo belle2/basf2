@@ -17,6 +17,9 @@
 #include <mdst/dbobjects/TRGGDLDBInputBits.h>
 #include <mdst/dbobjects/TRGGDLDBFTDLBits.h>
 #include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include <TH2I.h>
 #include <TH1I.h>
@@ -146,6 +149,17 @@ namespace Belle2 {
     bool isFired_quick(const std::string& bitname, const bool& isPsnm);
     int getinbitnum(const char* c) const;
     int getoutbitnum(const char* c) const;
+
+    /** bit name -> input bit number, built once in initialize() */
+    std::unordered_map<std::string, int> m_inbitIndex;
+    /** bit name -> output bit number, built once in initialize() */
+    std::unordered_map<std::string, int> m_outbitIndex;
+    /** per-event cache: psnm output bit fired in at least one clock cycle */
+    std::vector<char> m_firedPsnm;
+    /** per-event cache: ftdl output bit fired in at least one clock cycle */
+    std::vector<char> m_firedFtdl;
+    /** per-event cache: input bit fired in at least one clock cycle */
+    std::vector<char> m_firedInput;
     unsigned n_clocks = 0;
     unsigned evtno = 0;
     unsigned _exp = 0;
@@ -160,6 +174,12 @@ namespace Belle2 {
     static const char* output_pure_extra[n_output_pure_extra];
     static const int nsample_fast = 500; //!< number of sample for fast efficiency monitor
     int array_psn_extra_fast[nskim_gdldqm][nsample_fast][n_output_extra] = {{{0}}}; //!< array to store past nsample events
+    int m_fastPos[nskim_gdldqm] = {0}; //!< ring-buffer index of the newest slot of array_psn_extra_fast
+    int m_fastSum[nskim_gdldqm][n_output_extra] = {{0}}; //!< running sum of array_psn_extra_fast over the whole ring
+    bool m_leavesResolved = false; //!< whether the leaf positions below are valid for the current run
+    int m_evtLeaf = -1; //!< position of the "evt" leaf in m_unpackername, -1 if absent
+    int m_clkLeaf = 0; //!< position of the "clk" leaf in m_unpackername
+    std::vector<std::pair<int, int>> m_leafMap; //!< (position in m_unpacker, leaf number) for every mapped leaf
 
     //! condition database for unpacker
     DBObjPtr<TRGGDLDBUnpacker> m_unpacker;

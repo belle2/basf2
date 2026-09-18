@@ -61,7 +61,7 @@ eclTValidationAlgorithm::eclTValidationAlgorithm():
    but a bhabha event selection also exists and uses the same algorithm to
    analyse the results:
    The collector name should be set in the steering script.*/
-eclTValidationAlgorithm::eclTValidationAlgorithm(string physicsProcessCollectorName):
+eclTValidationAlgorithm::eclTValidationAlgorithm(const string& physicsProcessCollectorName):
   // Parameters
   CalibrationAlgorithm(physicsProcessCollectorName.c_str()),
   cellIDLo(1),
@@ -352,9 +352,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
     TH1D* h_time = clusterTime_cid->ProjectionY((std::string("h_time_psi__") + std::to_string(crys_id)).c_str(),
                                                 crys_id, crys_id);
-    TH1D* h_timeMask = (TH1D*)h_time->Clone();
-    TH1D* h_timeMasked = (TH1D*)h_time->Clone((std::string("h_time_psi_masked__") + std::to_string(crys_id)).c_str());
-    TH1D* h_timeRebin = (TH1D*)h_time->Clone();
+    TH1D* h_timeMask = static_cast<TH1D*>(h_time->Clone());
+    TH1D* h_timeMasked = static_cast<TH1D*>(h_time->Clone((std::string("h_time_psi_masked__") + std::to_string(crys_id)).c_str()));
+    TH1D* h_timeRebin = static_cast<TH1D*>(h_time->Clone());
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down
     if (meanCleanRebinFactor != 1 || meanCleanCutMinFactor != 1) {
@@ -630,9 +630,9 @@ CalibrationAlgorithm::EResult eclTValidationAlgorithm::calibrate()
 
     B2INFO("bin " << Ebin_counter << ": low E = " << lowE << ", high E = " << highE << " GeV");
 
-    TH1D* h_timeMask = (TH1D*)h_time->Clone();
-    TH1D* h_timeMasked = (TH1D*)h_time->Clone((std::string("h_time_E_slice_masked__") + std::to_string(meanE)).c_str());
-    TH1D* h_timeRebin = (TH1D*)h_time->Clone();
+    TH1D* h_timeMask = static_cast<TH1D*>(h_time->Clone());
+    TH1D* h_timeMasked = static_cast<TH1D*>(h_time->Clone((std::string("h_time_E_slice_masked__") + std::to_string(meanE)).c_str()));
+    TH1D* h_timeRebin = static_cast<TH1D*>(h_time->Clone());
 
 
     if (meanCleanRebinFactor != 1 || meanCleanCutMinFactor != 1) {

@@ -335,7 +335,7 @@ void SPTCRefereeModule::terminate()
 }
 
 // ====================================================================== CHECK SAME SENSORS ======================================
-const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrackCand* trackCand)
+const std::vector<int> SPTCRefereeModule::checkSameSensor(const Belle2::SpacePointTrackCand* trackCand)
 {
   B2DEBUG(20, "Checking SpacePointTrackCand " << trackCand->getArrayIndex() << " from Array " << trackCand->getArrayName() <<
           " for consecutive SpacePoints on the same sensor");
@@ -364,7 +364,7 @@ const std::vector<int> SPTCRefereeModule::checkSameSensor(Belle2::SpacePointTrac
 }
 
 // ========================================================================= CHECK MIN DISTANCE ===================================
-const std::vector<int> SPTCRefereeModule::checkMinDistance(Belle2::SpacePointTrackCand* trackCand, double minDistance)
+const std::vector<int> SPTCRefereeModule::checkMinDistance(const Belle2::SpacePointTrackCand* trackCand, double minDistance)
 {
   B2DEBUG(20, "Checking the distances between consecutive SpacePoints for SpacePointTrackCand " << trackCand->getArrayIndex() <<
           " from Array " << trackCand->getArrayIndex());

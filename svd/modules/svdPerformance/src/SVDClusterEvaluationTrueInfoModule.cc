@@ -202,10 +202,6 @@ void SVDClusterEvaluationTrueInfoModule::initialize()
 }
 
 
-void SVDClusterEvaluationTrueInfoModule::beginRun()
-{
-}
-
 
 void SVDClusterEvaluationTrueInfoModule::event()
 {
@@ -568,10 +564,6 @@ void SVDClusterEvaluationTrueInfoModule::endRun()
 }
 
 
-void SVDClusterEvaluationTrueInfoModule::terminate()
-{
-}
-
 
 ///////////////////
 //EXTRA FUNCTIONS//
@@ -671,8 +663,8 @@ TString SVDClusterEvaluationTrueInfoModule::UVFromIndex(int idx)
   return name;
 }
 
-void SVDClusterEvaluationTrueInfoModule::createEfficiencyGraph(const char* name, const char* title, int vNum[m_Nsets],
-    int vDen[m_Nsets],
+void SVDClusterEvaluationTrueInfoModule::createEfficiencyGraph(const char* name, const char* title, const int vNum[m_Nsets],
+    const int vDen[m_Nsets],
     TString xTitle, TString yTitle, TList* list)
 {
 

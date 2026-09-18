@@ -32,7 +32,7 @@ void plot(const TString &input_filename)
     exit(1);
   }
 
-  TTree *tree = (TTree*)f->Get("tree");
+  TTree *tree = static_cast<TTree*>(f->Get("tree"));
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
@@ -67,7 +67,7 @@ void plot(const TString &input_filename)
     //now create histograms with this (unweighted) probability
     tree->Project(TString::Format("%d_prob(110,0,1.10)", pdg_codes[part]), logl_strings[part].Data(),
 		  TString::Format("abs(CDCDedxTracks.m_pdg) == %d", pdg_codes[part]));
-    TH1D* hist = (TH1D*)output_file->Get(TString::Format("%d_prob", pdg_codes[part]));
+    TH1D* hist = static_cast<TH1D*>(output_file->Get(TString::Format("%d_prob", pdg_codes[part])));
     hist->SetTitle(TString::Format("CDC dE/dx: Unweighted PID for true %s; %s PID (CDC); entries", pdg_names[part], pdg_names[part]));
     hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
     if (pdg_codes[part] == 211) {

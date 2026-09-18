@@ -49,8 +49,8 @@ namespace Belle2 {
 
   protected:
 
-    void calculateProb(TH2F* signal, TH2F* background, TH2F* probability); /**<compute probability*/
-    void calculateError(TH2F* signal, TH2F* background, TH2F* error); /**<compute error*/
+    static void calculateProb(TH2F* signal, TH2F* background, TH2F* probability); /**<compute probability*/
+    static void calculateError(TH2F* signal, TH2F* background, TH2F* error); /**<compute error*/
 
     // Data members
     std::string m_svdClustersName; /**< SVDCluster collection name */

@@ -69,12 +69,12 @@ void SVDStripMaskingModule::event()
     m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return m_HotStripsCalib.isHot(shaper->getSensorID(), shaper->isUStrip(), shaper->getCellID());});
 
   B2DEBUG(27, "     shaper digits = " << m_storeShaper.getEntries() <<
-          ", shaper digits Unmasked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));
+          ", shaper digits Unmasked = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorIN.getSubSet()))->getEntries()));
 
   if (m_createOutside)
     B2DEBUG(27, "     shaper digits = " << m_storeShaper.getEntries() <<
-            ", shaper digits Unmasked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()) <<
-            ", shaper digits Masked = " << (((StoreArray<SVDShaperDigit>*)(m_selectorOUT.getSubSet()))->getEntries()));
+            ", shaper digits Unmasked = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorIN.getSubSet()))->getEntries()) <<
+            ", shaper digits Masked = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorOUT.getSubSet()))->getEntries()));
 
 }
 

@@ -1,0 +1,29 @@
+# EventType: 1110020900
+# Descriptor: [B0 -> K_S0 n anti-n]
+# NickName: Bd_KSnn
+# Tested: No
+# PhysicsWG: EWP
+# Responsible: Giulio Dujany
+# Email: giulio.dujany@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260715
+
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K_S0sig  n0 anti-n0    PHSP;
+Enddecay
+
+CDecay anti-B0sig
+
+Decay K_S0sig
+1.0    pi- pi+ PHSP;
+Enddecay
+
+End
+
+

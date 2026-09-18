@@ -74,9 +74,9 @@ void ZMQTxInputModule::event()
       timeout = 0;
     }
 
-    bool terminate = false;
+    bool terminateRequested = false;
 
-    const auto multicastAnswer = [this, &terminate](const auto & socket) {
+    const auto multicastAnswer = [this, &terminateRequested](const auto & socket) {
       const auto multicastMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       const std::string& data = multicastMessage->getData();
 
@@ -99,7 +99,7 @@ void ZMQTxInputModule::event()
         return true;
       } else if (multicastMessage->isMessage(EMessageTypes::c_terminateMessage)) {
         B2DEBUG(30, "Having received a stop message. I can not do much here, but just hope for the best.");
-        terminate = true;
+        terminateRequested = true;
         return false;
       }
 
@@ -133,7 +133,7 @@ void ZMQTxInputModule::event()
       while (m_nextWorker.size() < numproc * numbuf) {
         m_zmqClient.poll(timeout, multicastAnswer, socketAnswer);
         // false positive due to lambda capture ...
-        if (terminate) {
+        if (terminateRequested) {
           m_zmqClient.terminate();
           return;
         }
@@ -162,7 +162,7 @@ void ZMQTxInputModule::event()
     // Normal event processing
     m_zmqClient.poll(timeout, multicastAnswer, socketAnswer);
     // false positive due to lambda capture ...
-    if (terminate) {
+    if (terminateRequested) {
       m_zmqClient.terminate();
       return;
     }

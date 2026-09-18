@@ -174,7 +174,7 @@ namespace Belle2 {
       /**
        * alter the cluster position (applied on MC to match resolution measured on data)
        */
-      void alterClusterPosition(Belle2::SVDTrueHit* trueHit);
+      void alterClusterPosition(const Belle2::SVDTrueHit* trueHit);
 
       /**
        * alter the cluster time (applied on MC to match resolution measured on data)

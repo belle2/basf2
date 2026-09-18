@@ -118,6 +118,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
   for (unsigned int i = 0; i < m_cosBin; ++i) {
 
     double meanDedx = 1.0; //This is what we need for calibration
+    // cppcheck-suppress unreadVariable ; overwritten before it is read
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     double meanDedxErr = 0.0;
 
     if (!isMethodSep) {
@@ -313,7 +315,7 @@ void CDCDedxCosineAlgorithm::fitGaussianWithRange(TH1D*& temphist, TString& stat
 }
 
 //--------------------------------------------------
-void CDCDedxCosineAlgorithm::createPayload(std::vector<double> cosine)
+void CDCDedxCosineAlgorithm::createPayload(const std::vector<double>& cosine)
 {
   m_coscors.resize(m_kNGroups);
 
@@ -369,7 +371,7 @@ void CDCDedxCosineAlgorithm::plotdedxHist(std::vector<TH1D*>& hDedxCos_all,
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
-  int nx = isMethodSep ? 2 : 2;
+  int nx = 2;
   int ny = isMethodSep ? 1 : 2;
   unsigned int nPads = nx * ny;
   if (isMethodSep) ctmp.SetCanvasSize(1200, 600);
@@ -556,6 +558,14 @@ void CDCDedxCosineAlgorithm::plotFitResults(const std::vector<std::vector<double
 void CDCDedxCosineAlgorithm::plotConstants()
 {
 
+  const std::string pdfName =
+    Form("cdcdedx_coscorr_fconsts_%s.pdf", m_suffix.data());
+
+  const std::string rootName =
+    Form("cdcdedx_coscorr_fconsts_%s.root", m_suffix.data());
+
+  TFile rootFile(rootName.c_str(), "RECREATE");
+
   for (int il = 0; il < m_kNGroups; il++) {
 
     unsigned int nbins = m_DBCosineCor->getSize(getRepresentativeLayer(il));
@@ -578,7 +588,7 @@ void CDCDedxCosineAlgorithm::plotConstants()
     }
 
     // --- Ratio ---
-    TH1D* hratio = (TH1D*)hnew->Clone(Form("hratio_%s", m_label[il].data()));
+    TH1D* hratio = static_cast<TH1D*>(hnew->Clone(Form("hratio_%s", m_label[il].data())));
     hratio->Divide(hold);
 
     TCanvas c(Form("c_%s", m_label[il].data()), Form("Final constants %s", m_label[il].data()), 1000, 500);
@@ -618,8 +628,19 @@ void CDCDedxCosineAlgorithm::plotConstants()
     line->SetLineStyle(2);
     line->Draw();
 
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.pdf", m_label[il].data(), m_suffix.data()));
-    c.SaveAs(Form("cdcdedx_coscorr_fconsts_%s_%s.root", m_label[il].data(), m_suffix.data()));
+    c.Update();
+
+    if (il == 0) {
+      c.Print((pdfName + "(").c_str());
+    } else if (il == m_kNGroups - 1) {
+      c.Print((pdfName + ")").c_str());
+    } else {
+      c.Print(pdfName.c_str());
+    }
+
+    // Save this canvas in the ROOT file
+    rootFile.cd();
+    c.Write();
 
     // cleanup
     delete hnew;

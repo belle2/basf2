@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "G4VModularPhysicsList.hh"
+#include <G4VModularPhysicsList.hh>
 
 namespace Belle2 {
 

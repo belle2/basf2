@@ -124,8 +124,8 @@ namespace Belle2 {
      * @param[in] segmentAlignment Segment displacements.
      * @param[in] outputFile       Output file.
      */
-    void saveDisplacement(EKLMAlignment* alignment,
-                          EKLMSegmentAlignment* segmentAlignment,
+    void saveDisplacement(const EKLMAlignment* alignment,
+                          const EKLMSegmentAlignment* segmentAlignment,
                           const char* outputFile);
 
   private:

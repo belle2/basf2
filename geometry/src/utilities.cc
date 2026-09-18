@@ -284,15 +284,19 @@ namespace Belle2 {
         //going directly along x. because of that we check that the z
         //coordinates for inner and outer line are always the same, reusing one
         //point if necessary
-        // cppcheck-suppress knownConditionTrueFalse
-        if (!innerPoints.empty() && innerPoints.front().first <= outerPoints.front().first) {
+        // cppcheck cannot model the two lists emptying independently; both guards are required
+        // cppcheck-suppress-begin knownConditionTrueFalse
+        if (!innerPoints.empty() &&
+            (outerPoints.empty() || innerPoints.front().first <= outerPoints.front().first)) {
           boost::tie(innerZ, innerX) = innerPoints.front();
           popInner = true;
         }
-        if (!outerPoints.empty() && outerPoints.front().first <= innerPoints.front().first) {
+        if (!outerPoints.empty() &&
+            (innerPoints.empty() || outerPoints.front().first <= innerPoints.front().first)) {
           boost::tie(outerZ, outerX) = outerPoints.front();
           outerPoints.pop_front();
         }
+        // cppcheck-suppress-end knownConditionTrueFalse
         if (popInner) innerPoints.pop_front();
         if (innerZ != outerZ) {
           B2ERROR("createRotationSolid: Something is wrong, z values should be identical");

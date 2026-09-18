@@ -17,6 +17,7 @@ bool RelationSVDResultVarSet::extract(const CKFToSVDResult* result)
   const RecoTrack* svdTrack = result->getRelatedSVDRecoTrack();
   B2ASSERT("Should have a related SVD track at this stage;", svdTrack);
 
+  // cppcheck-suppress nullPointerRedundantCheck ; the B2ASSERT above aborts if the pointer is null
   const auto& svdHits = svdTrack->getSVDHitList();
   B2ASSERT("SVD hits must be present", not svdHits.empty());
 

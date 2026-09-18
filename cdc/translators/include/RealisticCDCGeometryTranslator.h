@@ -20,7 +20,7 @@ namespace Belle2 {
       explicit RealisticCDCGeometryTranslator(bool wireSag = false) : m_wireSag(wireSag) {}
 
       /** Destructor. */
-      ~RealisticCDCGeometryTranslator() {}
+      ~RealisticCDCGeometryTranslator() override {}
 
       /** Get wire position at forward end. */
       const B2Vector3D getWireForwardPosition(const WireID& wireID) override

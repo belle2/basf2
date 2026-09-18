@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
   const KLMElementNumbers* elementNumbers = &(KLMElementNumbers::Instance());
   const KLMChannelArrayIndex* channelArrayIndex = &(KLMChannelArrayIndex::Instance());
   const KLMSectorArrayIndex* sectorArrayIndex = &(KLMSectorArrayIndex::Instance());
-  TH1* histoSummary = (TH1*)inputFile->Get("KLM/masked_channels");
+  TH1* histoSummary = static_cast<TH1*>(inputFile->Get("KLM/masked_channels"));
   if (!histoSummary) {
     B2ERROR("The histogram KLM/masked_channels is not found!");
     return 0;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
                                        "_section_" + std::to_string(section) +
                                        "_sector_" + std::to_string(sector) +
                                        "_" + std::to_string(j);
-      TH1* histoOccupancy = (TH1*)inputFile->Get(histoOccupancyName.c_str());
+      TH1* histoOccupancy = static_cast<TH1*>(inputFile->Get(histoOccupancyName.c_str()));
       if (!histoOccupancy) {
         B2ERROR("The histogram " << histoOccupancyName << " is not found!");
         return 0;

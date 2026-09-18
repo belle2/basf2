@@ -112,7 +112,7 @@ void ECLTrackBremFinderModule::event()
     B2DEBUG(20, "Checking track for related ECLCluster");
 
     // searching for an assigned primary cluster
-    ECLCluster* primaryClusterOfTrack = nullptr;
+    const ECLCluster* primaryClusterOfTrack = nullptr;
     auto relatedClustersToTrack =
       track.getRelationsWith<ECLCluster>
       (m_param_eclClustersStoreArrayName);       //check the cluster hypothesis ID here (take c_nPhotons hypothesis)!!

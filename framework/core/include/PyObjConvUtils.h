@@ -35,6 +35,14 @@ namespace Belle2 {
    */
   namespace PyObjConvUtils {
 
+// Throughout this header, values are converted out of Python objects via
+// boost::python::extract. For std::string (and containers/variants of it) this
+// triggers a false-positive -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
+
     /*
      * We need forward declarations here, because otherwise the compiler ends up calling
      * the wrong function!
@@ -711,5 +719,8 @@ namespace Belle2 {
       }
       return tmpOptional;
     }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
   }
 }

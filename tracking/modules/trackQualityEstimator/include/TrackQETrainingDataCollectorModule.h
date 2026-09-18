@@ -38,8 +38,6 @@ namespace Belle2 {
     /** Initializes the Module. */
     void initialize() override;
 
-    /** sets magnetic field strength */
-    void beginRun() override;
 
     /** applies the selected quality estimation method for a given set of TCs */
     void event() override;

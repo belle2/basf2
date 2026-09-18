@@ -214,12 +214,13 @@ void cdcDQM7Module::event()
   const int ndiv[9] = {160, 160, 192, 224, 256, 288, 320, 352, 384};
 
   for (int i = 0; i < nent; i++) {
-    CDCHit* cdchit = static_cast<CDCHit*>(m_CDCHits[i]);
+    const CDCHit* cdchit = static_cast<CDCHit*>(m_CDCHits[i]);
 
     int sL = cdchit->getISuperLayer();
     int iL = cdchit->getILayer();
     int wid = cdchit->getIWire();
     int adcsum = cdchit->getADCCount();
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     int vtdc = cdchit->getTDCCount();
 
     if (sL > 8) continue; // error
@@ -301,7 +302,7 @@ void cdcDQM7Module::event()
 
   // new
   for (int j = 0; j < r_nent; j++) {
-    CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(m_CDCRawHits[j]);
+    const CDCRawHit* cdcrawhit = static_cast<CDCRawHit*>(m_CDCRawHits[j]);
 
     int brd = cdcrawhit->getBoardId();
     int v_adc = cdcrawhit->getFADC();
@@ -375,16 +376,4 @@ void cdcDQM7Module::event()
 
 
 
-}
-
-
-void cdcDQM7Module::endRun()
-{
-  //
-}
-
-
-void cdcDQM7Module::terminate()
-{
-  //
 }

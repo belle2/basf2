@@ -29,10 +29,9 @@ namespace Belle2 {
       /// @param icHit B2Vector3D of the second-inner hit used for calculating the single variables
       /// @param iHit B2Vector3D of the inner hit used for calculating the single variables
       FourHitVariables(const B2Vector3D& oHit, const B2Vector3D& ocHit, const B2Vector3D& icHit, const B2Vector3D& iHit) :
+        m_outerThreeHitVariables(oHit, ocHit, icHit), m_innerThreeHitVariables(ocHit, icHit, iHit),
         m_oHit(oHit), m_ocHit(ocHit), m_icHit(icHit), m_iHit(iHit)
       {
-        m_outerThreeHitVariables = ThreeHitVariables(oHit, ocHit, icHit);
-        m_innerThreeHitVariables = ThreeHitVariables(ocHit, icHit, iHit);
       };
 
       /// Set hits if not given in constructor of if they need to be changed.

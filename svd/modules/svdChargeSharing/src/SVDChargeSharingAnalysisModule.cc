@@ -59,6 +59,7 @@ SVDChargeSharingAnalysisModule::~SVDChargeSharingAnalysisModule()
 
 void SVDChargeSharingAnalysisModule::initialize()
 {
+  delete m_outputRootFile;
   m_outputRootFile = new TFile((m_outputDirName + "/" + m_outputRootFileName).c_str(), "RECREATE");
 
   //StoreArrays
@@ -190,7 +191,6 @@ void SVDChargeSharingAnalysisModule::event()
 
     RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(&track);
     RelationVector<SVDCluster> svdClustersTrack = DataStore::getRelationsWithObj<SVDCluster>(theRC[0]);
-    RelationVector<VXDDedxTrack> VXDdedxTr = DataStore::getRelationsWithObj<VXDDedxTrack>(&track);
     // if (theRC.size() == 0 || svdClustersTrack.size() == 0 || VXDdedxTr.size() == 0) continue;
 
     // double trkMom = VXDdedxTr[0]->getMomentum();

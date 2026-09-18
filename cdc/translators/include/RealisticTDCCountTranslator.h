@@ -25,7 +25,7 @@ namespace Belle2 {
       explicit RealisticTDCCountTranslator(bool useInWirePropagationDelay = false, bool fromTrackCreator = false);
 
       /** Destructor. */
-      ~RealisticTDCCountTranslator() {};
+      ~RealisticTDCCountTranslator() override {};
 
       /**
        * Get Drift length.
@@ -87,13 +87,13 @@ namespace Belle2 {
        * true : activated, false : the propagation delay is not used.
        *
        */
-      bool m_useInWirePropagationDelay;
+      bool m_useInWirePropagationDelay = false;
 
       /**
        * Flag to use EventT0 from SVD and CDC with higher priority.
        *
        */
-      bool m_fromTrackCreator;
+      bool m_fromTrackCreator = false;
 
       /**
        * Flag to distinguish betw. data and MC.
@@ -129,7 +129,7 @@ namespace Belle2 {
        * Cached TDC bin width (ns).
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
-      const double m_tdcBinWidth;
+      const double m_tdcBinWidth = 0.0;
 
       /**
        * Cached fudge factor for space resol.

@@ -84,12 +84,12 @@ void SVDZeroSuppressionEmulatorModule::event()
     m_selectorOUT.select([&](const SVDShaperDigit * shaper) { return ! this->passesZS(shaper) ;});
 
   B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
-          ", shaper digits IN = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()));
+          ", shaper digits IN = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorIN.getSubSet()))->getEntries()));
 
   if (m_createOutside)
     B2DEBUG(10, "     shaper digits = " << m_storeShaper.getEntries() <<
-            ", shaper digits IN = " << (((StoreArray<SVDShaperDigit>*)(m_selectorIN.getSubSet()))->getEntries()) <<
-            ", shaper digits OUT = " << (((StoreArray<SVDShaperDigit>*)(m_selectorOUT.getSubSet()))->getEntries()));
+            ", shaper digits IN = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorIN.getSubSet()))->getEntries()) <<
+            ", shaper digits OUT = " << ((static_cast<StoreArray<SVDShaperDigit>*>(m_selectorOUT.getSubSet()))->getEntries()));
 
 }
 

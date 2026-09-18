@@ -23,7 +23,7 @@ namespace Belle2 {
       /// Constructor.
       T0CalibrationAlgorithm();
       /// Destructor
-      ~T0CalibrationAlgorithm() {}
+      ~T0CalibrationAlgorithm() override {}
       /// store Hisotgram or not.
       void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// minimum ndf require for track.
@@ -59,11 +59,11 @@ namespace Belle2 {
       /// write output or store db
       int write();
       /// calculate mean of the T0 distribution
-      double getMeanT0(TH1F* h1);
+      static double getMeanT0(TH1F* h1);
     private:
-      TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
-      TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
-      TH1F* m_hT0b[300];      /**<1D histogram for each board*/
+      TH1F* m_hTotal = nullptr;       /**< 1D histogram of delta T whole channel */
+      TH1F* m_h1[56][385] = {};    /**<1D histogram for each channel*/
+      TH1F* m_hT0b[300] = {};      /**<1D histogram for each board*/
       double m_xmin = 0.07;   /**< minimum drift length*/
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */

@@ -47,13 +47,21 @@ void WholeWireHitRelationFilter::exposeParameters(ModuleParamList* moduleParamLi
                  m_param_degree);
 }
 
+void WholeWireHitRelationFilter::prepare(const std::vector<CDCWireHit*>& wireHits)
+{
+  m_preparedWires.clear();
+  m_preparedWires.reserve(wireHits.size());
+  for (const CDCWireHit* wireHit : wireHits) {
+    m_preparedWires.push_back(&wireHit->getWire());
+  }
+  m_preparedWireHitsData = wireHits.data();
+  m_preparedWireHitsSize = wireHits.size();
+}
+
 std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
   CDCWireHit* from,
   const std::vector<CDCWireHit*>& wireHits) const
 {
-  assert(std::is_sorted(wireHits.begin(), wireHits.end(), LessOf<Deref>()) &&
-         "Expected wire hits to be sorted");
-
   const int nWireNeighbors = 8 + 10 * (m_param_degree - 1);
   std::vector<const CDCWire*> m_wireNeighbors;
   m_wireNeighbors.reserve(nWireNeighbors);
@@ -85,7 +93,9 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
   if (cwInWireNeighbor) m_wireNeighbors.push_back(cwInWireNeighbor);
   if (ccwInWireNeighbor) m_wireNeighbors.push_back(ccwInWireNeighbor);
 
+  // cppcheck-suppress knownConditionTrueFalse ; defensive null check on the wire neighbour lookup
   if (cwWireNeighbor) m_wireNeighbors.push_back(cwWireNeighbor);
+  // cppcheck-suppress knownConditionTrueFalse ; defensive null check on the wire neighbour lookup
   if (ccwWireNeighbor) m_wireNeighbors.push_back(ccwWireNeighbor);
 
   if (cwOutWireNeighbor) m_wireNeighbors.push_back(cwOutWireNeighbor);
@@ -143,9 +153,28 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
 
   std::sort(std::begin(m_wireNeighbors), std::end(m_wireNeighbors));
 
+  // Use the wires precomputed by prepare() when called with the prepared vector.
+  // The comparison LessOf<Deref>() used below resolves to operator<(CDCWireHit, CDCWire),
+  // which compares the *address* of the wire of the hit with the address of the wire.
+  // Searching the precomputed wire addresses therefore evaluates exactly the same
+  // predicate on exactly the same values, only without dereferencing the wire hits.
+  const bool prepared =
+    wireHits.data() == m_preparedWireHitsData and wireHits.size() == m_preparedWireHitsSize;
+
   for (const CDCWire* neighborWire : m_wireNeighbors) {
-    ConstVectorRange<CDCWireHit*> neighborWireHits{
-      std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())};
+    ConstVectorRange<CDCWireHit*> neighborWireHits = [&]() -> ConstVectorRange<CDCWireHit*> {
+      if (prepared)
+      {
+        const auto itRange =
+        std::equal_range(m_preparedWires.begin(), m_preparedWires.end(), neighborWire);
+        return {
+          wireHits.begin() + (itRange.first - m_preparedWires.begin()),
+          wireHits.begin() + (itRange.second - m_preparedWires.begin())};
+      }
+      return ConstVectorRange<CDCWireHit*>{
+        std::equal_range(wireHits.begin(), wireHits.end(), neighborWire, LessOf<Deref>())
+      };
+    }();
 
     m_wireHitNeighbors.insert(m_wireHitNeighbors.end(),
                               neighborWireHits.begin(),

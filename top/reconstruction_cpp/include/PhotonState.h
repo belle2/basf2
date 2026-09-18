@@ -233,12 +233,15 @@ namespace Belle2 {
 
       /**
        * Propagate photon to the exit of bar segment.
+       * The state is not reliable if propagation fails.
        * @param bar bar segment data
        */
       void propagate(const RaytracerBase::BarSegment& bar);
 
       /**
        * Propagate photon to the mirror and reflect it using semi-linear mirror optics.
+       * The state is not reliable if propagation fails.
+       *
        * Semi-linear: mirror surface approximated with a cylinder along y-axis
        * and using linear optics approximation in y for the photon reflection.
        * Useful to get rid of some of the discontinuities in the TOP image at given wavelength,
@@ -250,6 +253,7 @@ namespace Belle2 {
 
       /**
        * Propagate photon to the mirror and reflect it using exact mirror optics.
+       * The state is not reliable if propagation fails.
        * @param bar mirror segment data
        * @param mirror spherical mirror data
        */
@@ -257,6 +261,7 @@ namespace Belle2 {
 
       /**
        * Propagate photon in the prism to the detector plane.
+       * The state is not reliable if propagation fails.
        * @param prism prism data
        */
       void propagate(const RaytracerBase::Prism& prism);

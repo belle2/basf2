@@ -169,7 +169,8 @@ namespace Belle2 {
     int get_wirecnt_tsf8() const {return m_wirecnt_tsf8;}
 
     /** ECLTRG ML tau nn input*/
-    int get_ml_tau_nn_input() const {return m_ml_tau_nn_input;}
+    int get_ml_tau_nn_input() const {return m_ml_tau_nn_input[0];}
+    int get_ml_tau_nn_input(int i) const {return m_ml_tau_nn_input[i];}
     /** ECLTRG ML tau nn output*/
     int get_ml_tau_nn_output_0() const {return m_ml_tau_nn_output_0;}
     int get_ml_tau_nn_output_1() const {return m_ml_tau_nn_output_1;}
@@ -181,6 +182,22 @@ namespace Belle2 {
     int get_ml_tau_nn_output_7() const {return m_ml_tau_nn_output_7;}
     int get_ml_tau_nn_output_8() const {return m_ml_tau_nn_output_8;}
     int get_ml_tau_nn_output_9() const {return m_ml_tau_nn_output_9;}
+    int get_ml_tau_nn_output(int i) const
+    {
+      switch (i) {
+        case 0: return get_ml_tau_nn_output_0();
+        case 1: return get_ml_tau_nn_output_1();
+        case 2: return get_ml_tau_nn_output_2();
+        case 3: return get_ml_tau_nn_output_3();
+        case 4: return get_ml_tau_nn_output_4();
+        case 5: return get_ml_tau_nn_output_5();
+        case 6: return get_ml_tau_nn_output_6();
+        case 7: return get_ml_tau_nn_output_7();
+        case 8: return get_ml_tau_nn_output_8();
+        case 9: return get_ml_tau_nn_output_9();
+        default: return 0;
+      }
+    }
 
     /**m_map_TSF0 integer leaf*/
     int get_map_TSF0_int(int i) const {return m_map_TSF0_int[i];}
@@ -448,7 +465,12 @@ namespace Belle2 {
 
 
     /** ECLTRG ML tau nn input*/
-    void set_ml_tau_nn_input(int ml_tau_nn_input) { m_ml_tau_nn_input = ml_tau_nn_input;}
+    void set_ml_tau_nn_input(int ml_tau_nn_input)
+    {
+      for (int& input : m_ml_tau_nn_input) input = 0;
+      m_ml_tau_nn_input[0] = ml_tau_nn_input;
+    }
+    void set_ml_tau_nn_input(int i, int ml_tau_nn_input) { m_ml_tau_nn_input[i] = ml_tau_nn_input;}
     /** ECLTRG ML tau nn output*/
     void set_ml_tau_nn_output_0(int ml_tau_nn_output_0) { m_ml_tau_nn_output_0 = ml_tau_nn_output_0;}
     void set_ml_tau_nn_output_1(int ml_tau_nn_output_1) { m_ml_tau_nn_output_1 = ml_tau_nn_output_1;}
@@ -460,6 +482,21 @@ namespace Belle2 {
     void set_ml_tau_nn_output_7(int ml_tau_nn_output_7) { m_ml_tau_nn_output_7 = ml_tau_nn_output_7;}
     void set_ml_tau_nn_output_8(int ml_tau_nn_output_8) { m_ml_tau_nn_output_8 = ml_tau_nn_output_8;}
     void set_ml_tau_nn_output_9(int ml_tau_nn_output_9) { m_ml_tau_nn_output_9 = ml_tau_nn_output_9;}
+    void set_ml_tau_nn_output(int i, int ml_tau_nn_output)
+    {
+      switch (i) {
+        case 0: set_ml_tau_nn_output_0(ml_tau_nn_output); break;
+        case 1: set_ml_tau_nn_output_1(ml_tau_nn_output); break;
+        case 2: set_ml_tau_nn_output_2(ml_tau_nn_output); break;
+        case 3: set_ml_tau_nn_output_3(ml_tau_nn_output); break;
+        case 4: set_ml_tau_nn_output_4(ml_tau_nn_output); break;
+        case 5: set_ml_tau_nn_output_5(ml_tau_nn_output); break;
+        case 6: set_ml_tau_nn_output_6(ml_tau_nn_output); break;
+        case 7: set_ml_tau_nn_output_7(ml_tau_nn_output); break;
+        case 8: set_ml_tau_nn_output_8(ml_tau_nn_output); break;
+        case 9: set_ml_tau_nn_output_9(ml_tau_nn_output); break;
+      }
+    }
 
     /**m_map_TSF0 integer leaf*/
     void set_map_TSF0_int(int i, int map_TSF0_int)  { m_map_TSF0_int[i] = map_TSF0_int; }
@@ -731,7 +768,7 @@ namespace Belle2 {
 
 
     /** ECLTRG ML tau nn input*/
-    int m_ml_tau_nn_input;
+    std::vector<int> m_ml_tau_nn_input = std::vector<int>(24, 0);
     /** ECLTRG ML tau nn output*/
     int m_ml_tau_nn_output_0;
     int m_ml_tau_nn_output_1;
@@ -848,7 +885,7 @@ namespace Belle2 {
     /**m_maxrvc leafs*/
     int m_maxrvc;
     /** the class title*/
-    ClassDef(TRGGRLUnpackerStore, 4);
+    ClassDef(TRGGRLUnpackerStore, 5);
 
   };
 

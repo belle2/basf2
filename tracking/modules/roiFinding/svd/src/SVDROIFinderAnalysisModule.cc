@@ -789,9 +789,6 @@ void SVDROIFinderAnalysisModule::event()
 }
 
 
-void SVDROIFinderAnalysisModule::endRun()
-{
-}
 
 
 void SVDROIFinderAnalysisModule::terminate()

@@ -456,7 +456,7 @@ void PXDROIFinderAnalysisModule::event()
     m_pTmc = (aMcParticle->getMomentum()).Rho();
 
     //SVDhits
-    RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
+    // RelationVector<SVDCluster> svdRelations = aMcParticle->getRelationsFrom<SVDCluster>();
 
     /*    Int_t nMCPartSVDhits = 0;
     Int_t nSVDhitLadder[4] = {0};

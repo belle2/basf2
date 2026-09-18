@@ -121,7 +121,7 @@ namespace Belle2 {
 
     private:
       /// Reference to the CDCMCMap to be used in this event
-      const CDCMCMap* m_ptrMCMap;
+      const CDCMCMap* m_ptrMCMap {};
 
       /// Memory for the look up relation of close primary CDCSimHits
       std::map<const CDCHit*, TrackingUtilities::MayBePtr<const CDCSimHit> >  m_primarySimHits;

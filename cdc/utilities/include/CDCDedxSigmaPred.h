@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
     * set the parameters from file
     */
-    void setParameters(std::string infile);
+    void setParameters(const std::string& infile);
 
     /**
     * set the parameters
@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
     * write the parameters in file
     */
-    void printParameters(std::string infile);
+    void printParameters(const std::string& infile);
 
     /**
     * Return the predicted resolution depending on dE/dx, nhit, and cos(theta)
@@ -96,9 +96,9 @@ namespace Belle2 {
 
   private:
 
-    double m_dedxpars[2]; /**< parameters for sigma vs. dE/dx curve */
-    double m_cospars[10]; /**< parameters for sigma vs. cos(theta) curve */
-    double m_nhitpars[5]; /**< parameters for sigma vs. nhit curve */
+    double m_dedxpars[2] = {}; /**< parameters for sigma vs. dE/dx curve */
+    double m_cospars[10] = {}; /**< parameters for sigma vs. cos(theta) curve */
+    double m_nhitpars[5] = {}; /**< parameters for sigma vs. nhit curve */
 
     const DBObjPtr<CDCDedxSigmaPars> m_DBSigmaPars; /**< db object for dE/dx resolution parameters */
 

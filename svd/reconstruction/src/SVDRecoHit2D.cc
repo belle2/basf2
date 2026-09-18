@@ -170,7 +170,7 @@ void SVDRecoHit2D::setDetectorPlane()
   setPlane(detPlane, m_sensorID);
 }
 
-TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, std::vector<double> planarParameters,
+TVectorD SVDRecoHit2D::applyPlanarDeformation(TVectorD rawHit, const std::vector<double>& planarParameters,
                                               const genfit::StateOnPlane& state) const
 {
   // Legendre parametrization of deformation

@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_WireTrackCandHit_h
-#define genfit_WireTrackCandHit_h
+#pragma once
 
 #include "TrackCandHit.h"
 
@@ -85,5 +84,3 @@ class WireTrackCandHit : public TrackCandHit {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TrackCandHit_h

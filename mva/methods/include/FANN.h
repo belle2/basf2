@@ -109,7 +109,7 @@ namespace Belle2 {
       /**
        * Destructor of FANN Expert
        */
-      virtual ~FANNExpert();
+      virtual ~FANNExpert() override;
 
       /**
        * Load the expert from a Weightfile

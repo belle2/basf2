@@ -61,7 +61,7 @@ void HadronSaturation::fillSample(TString infilename)
 
   for (int i = 0; i < int(types.size()); ++i) {
 
-    TTree* satTree = (TTree*)satFile->Get(types[i]);
+    TTree* satTree = static_cast<TTree*>(satFile->Get(types[i]));
     double satbg, satcosth, satdedx, satdedxerr;
     satTree->SetBranchAddress("bg", &satbg);
     satTree->SetBranchAddress("costh", &satcosth);
@@ -167,6 +167,7 @@ double HadronSaturation::myFunction(double alpha, double gamma, double delta,
 }
 
 void
+// cppcheck-suppress constParameterCallback ; ROOT fixes this signature
 HadronSaturation::minuitFunction(int&, double*, double& result, double* par, int)
 {
   result = HC_obj->myFunction(par[0], par[1], par[2], par[3], par[4]);

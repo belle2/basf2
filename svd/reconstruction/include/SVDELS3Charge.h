@@ -26,12 +26,6 @@ namespace Belle2::SVD {
   class SVDELS3Charge : public SVDClusterCharge {
 
   public:
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDELS3Charge() {};
-
     /**
     * compute the cluster charge, charge error and SNR with ELS3
      */

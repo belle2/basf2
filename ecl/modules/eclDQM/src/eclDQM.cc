@@ -341,10 +341,10 @@ void ECLDQMModule::event()
     if (aECLDigit.getAmp() >= (v_totalthrApsd[i] / 4 * 4)) NDigits ++;
     for (const auto& id : m_WaveformOption) {
       if (id != "psd") continue;
-      else if (id == "psd" && (m_iEvent % 1000 == 999 ||
-                               isRandomTrigger() ||
-                               bhatrig ||
-                               aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
+      else if (m_iEvent % 1000 == 999 ||
+               isRandomTrigger() ||
+               bhatrig ||
+               aECLDigit.getAmp() < (v_totalthrApsd[i] / 4 * 4)) continue;
       h_cell_psd_norm->Fill(aECLDigit.getCellId());
     }
   }
@@ -421,7 +421,7 @@ void ECLDQMModule::event()
     m_geom->Mapping(i);
     h_pedrms_thetaid->Fill(m_geom->GetThetaID(), m_PedestalRms[i]);
 
-    ECLDigit* aECLDigit = ECLDigit::getByCellID(aECLDsp.getCellId());
+    const ECLDigit* aECLDigit = ECLDigit::getByCellID(aECLDsp.getCellId());
 
     for (const auto& iter : m_WaveformOption | indexed(0)) {
       const auto& index  = iter.index();
@@ -442,15 +442,6 @@ void ECLDQMModule::event()
     h_adc_hits->Fill((double)NDigits / (double)m_ECLDigits.getEntries()); //Fraction of high-energy hits
 
   fillInvMassHistogram();
-}
-
-void ECLDQMModule::endRun()
-{
-}
-
-
-void ECLDQMModule::terminate()
-{
 }
 
 bool ECLDQMModule::isRandomTrigger()

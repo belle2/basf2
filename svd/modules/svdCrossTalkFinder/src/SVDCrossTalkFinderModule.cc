@@ -53,8 +53,8 @@ void SVDCrossTalkFinderModule::initialize()
     //Prepare histograms for payload.
     VXD::GeoCache& geo = VXD::GeoCache::getInstance();
     for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-      for (auto& ladders : geo.getLadders(layers)) {
-        for (auto& sensors : geo.getSensors(ladders)) {
+      for (const auto& ladders : geo.getLadders(layers)) {
+        for (const auto& sensors : geo.getSensors(ladders)) {
           for (int side = 0; side <= 1; side++) {
             occupancyPDFName(sensors, side, sensorName);
             if (m_sensorHistograms.count(sensorName) == 0) {
@@ -189,8 +189,8 @@ void SVDCrossTalkFinderModule::terminate()
     std::string sensorName;
     VXD::GeoCache& geo = VXD::GeoCache::getInstance();
     for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-      for (auto& ladders : geo.getLadders(layers)) {
-        for (auto& sensors : geo.getSensors(ladders)) {
+      for (const auto& ladders : geo.getLadders(layers)) {
+        for (const auto& sensors : geo.getSensors(ladders)) {
           for (int side = 0; side <= 1; side++) {
 
             occupancyPDFName(sensors, side, sensorName);

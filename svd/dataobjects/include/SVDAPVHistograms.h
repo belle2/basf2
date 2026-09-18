@@ -103,10 +103,10 @@ namespace Belle2 {
     void clean()
     {
 
-      for (auto layer : m_histograms)
-        for (auto ladder : layer)
-          for (auto sensor : ladder)
-            for (auto view : sensor)
+      for (const auto& layer : m_histograms)
+        for (const auto& ladder : layer)
+          for (const auto& sensor : ladder)
+            for (const auto& view : sensor)
               for (auto apv : view)
                 delete apv;
     }

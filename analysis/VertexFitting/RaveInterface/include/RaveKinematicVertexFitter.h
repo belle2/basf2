@@ -125,7 +125,7 @@ namespace Belle2 {
       bool m_useBeamSpot;
 
       /** pointer to the mother particle who's daughters will be used in the fit. the fit result will be written back to the mother particle */
-      Particle* m_motherParticlePtr;
+      Particle* m_motherParticlePtr = nullptr;
 
       /** Algorithm used by rave (kalman, avr, ...) */
       std::string m_raveAlgorithm;
@@ -148,15 +148,15 @@ namespace Belle2 {
       std::vector<Particle*> m_belleDaughters;
 
       /** flag determines if the mass fit is performed */
-      bool m_massConstFit;
+      bool m_massConstFit = false;
       /** flag determines if the vertex fit is performed */
-      bool m_vertFit;
+      bool m_vertFit = false;
       /** Ndf of the vertex fit */
-      double m_fittedNdf;
+      double m_fittedNdf = 0;
       /** Pvalue of the fit result */
-      double m_fittedPValue;
+      double m_fittedPValue = 0;
       /** chi^2 of the vertex fit */
-      double m_fittedChi2;
+      double m_fittedChi2 = 0;
       /** Fitted vertex position */
       ROOT::Math::XYZVector m_fittedPos;
       /** 4 momentum of the mother particle after the fit */

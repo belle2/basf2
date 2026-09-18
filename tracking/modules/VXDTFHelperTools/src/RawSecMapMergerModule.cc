@@ -305,7 +305,7 @@ void RawSecMapMergerModule::printData(
 
 
 void RawSecMapMergerModule::printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters,
-                                              std::string configName, unsigned int nHitCombinations, bool print2File)
+                                              const std::string& configName, unsigned int nHitCombinations, bool print2File)
 {
   SecMapHelper::printStaticSectorRelations<SpacePoint>(filters, configName, nHitCombinations, print2File);
 }

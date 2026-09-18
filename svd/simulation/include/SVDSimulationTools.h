@@ -151,7 +151,7 @@ namespace Belle2 {
     class WaveGenerator {
     public:
       /** Constructor takes waveform function. */
-      WaveGenerator(WaveformShape waveform = w_betaprime):
+      explicit WaveGenerator(WaveformShape waveform = w_betaprime):
         m_samples({{0, 0, 0, 0, 0, 0}}), m_waveform(waveform)
       {}
       /** Set waveform */

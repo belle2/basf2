@@ -33,7 +33,7 @@ namespace Belle2 {
     CDCDedxSkimModule();
 
     /** Destructor */
-    virtual ~CDCDedxSkimModule();
+    virtual ~CDCDedxSkimModule() override;
 
     /** Initialize routine **/
     virtual void initialize() override;

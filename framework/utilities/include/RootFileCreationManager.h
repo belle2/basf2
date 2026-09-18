@@ -44,7 +44,7 @@ namespace Belle2 {
      * WARNING: When you get this file it is probably not set as current
      * directory so before you use it you have to call file->cd();
      */
-    std::shared_ptr<TFile> getFile(std::string, bool ignoreErrors = false);
+    std::shared_ptr<TFile> getFile(const std::string&, bool ignoreErrors = false);
 
   private:
     /** Constructor is private. */

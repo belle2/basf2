@@ -33,7 +33,7 @@ SelectorMVA::SelectorMVA(bool belleFlag, bool trainFlag, const std::string& tFil
 
 SelectorMVA::~SelectorMVA() = default;
 
-void SelectorMVA::updateVariables(Particle* iPart, Particle* jPart)
+void SelectorMVA::updateVariables(const Particle* iPart, const Particle* jPart)
 {
   if (m_TrainFlag) {
     m_IsCurl = Variable::genParticleIndex(iPart) == Variable::genParticleIndex(jPart);

@@ -212,7 +212,8 @@ _RegisteredSkims = [
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
     ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0
-    ("17240101", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
+    ("17240100", "charm", "DstToD0Pi_D0ToHpJm_invalid"),  # deprecated
+    ("17240101", "charm", "DstToD0Pi_D0ToHpJm"),  # 17240100 --> 17240101 in PromptRel9
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
     ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),  # D* -> D0 -> h h pi0
     # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0

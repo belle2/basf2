@@ -578,6 +578,7 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
+        stdPi("all", path=path)
 
     def build_lists(self, path):
         D0List = self.D0ToHpJm(path)

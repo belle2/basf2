@@ -8,3 +8,10 @@ FEI skims
   Provide it via the ``feiPrefix`` constructor argument, the ``FEIPrefix``
   instance attribute, or the ``feiPrefix`` parameter of `CombinedSkim`.
   A ``B2FATAL`` is raised if the FEI is run without setting the prefix.
+
+Modified skims
+++++++++++++++
+
+* Charm: `17240101 <skim.WGs.charm.DstToD0Pi_D0ToHpJm>`: added the required
+  ``pi+:all`` standard list for the slow pion and updated the skim code from
+  ``17240100`` to ``17240101`` for PromptRel9.

@@ -123,8 +123,9 @@ def build_variable_names(has_inputs, input_size, is_main):
 def package_as_mva_weightfile(onnx_path, root_path, variables, n_classes, identifier):
     """Wrap an ONNX file in a basf2 MVA weightfile, saved as .root file.
 
-    The variable list records the raw feature indices the model was trained on and the
-    identifier records the feature schema it expects, both read back at inference time.
+    The variable list records the raw feature indices the model was trained on. The contract
+    version is added as an extra weightfile element, and the identifier holds the training
+    name. All three are read back at inference time.
     """
     from basf2_mva_util import create_onnx_mva_weightfile
     wf = create_onnx_mva_weightfile(
@@ -133,6 +134,7 @@ def package_as_mva_weightfile(onnx_path, root_path, variables, n_classes, identi
         nClasses=n_classes,
         identifier=identifier,
     )
+    wf.addElement('contract_version', config.MODEL_CONTRACT_VERSION)
     wf.save(root_path)
     print(f"Packaged {onnx_path} -> {root_path} ({len(variables)} features, {n_classes} classes)")
     print(f"  identifier: {identifier}")
@@ -173,9 +175,9 @@ def main():
                         help='Payload name for the category model (default: derived from the contract version)')
     parser.add_argument('--main-payload-name', default=None,
                         help='Payload name for the main model (default: derived from the contract version)')
-    parser.add_argument('--training-id', default='unspecified',
-                        help='Name identifying this training, recorded in the weightfile and '
-                             'logged at inference time (for example the training campaign or date)')
+    parser.add_argument('--identifier', default='unspecified',
+                        help='Name of this training, stored as the weightfile identifier and '
+                             'logged at inference time (for example sample and iteration)')
     parser.add_argument('--first-exp', type=int, default=0,
                         help='First experiment of the interval of validity')
     parser.add_argument('--first-run', type=int, default=0,
@@ -186,19 +188,15 @@ def main():
                         help='Final run of the interval of validity')
     args = parser.parse_args()
 
-    schema = config.feature_schema_hash()
-    identifier = (f'schema={schema};contractVersion={config.MODEL_CONTRACT_VERSION};'
-                  f'training={args.training_id}')
-    print(f"Contract version {config.MODEL_CONTRACT_VERSION}, feature layout {schema}")
+    print(f"Contract version {config.MODEL_CONTRACT_VERSION}")
 
     model_specs = [
         ('net_category.pt', 'modeSelector_cat.onnx', 'modeSelector_cat.root', False),
         ('net_main.pt', 'modeSelector_main.onnx', 'modeSelector_main.root', True),
     ]
 
-    # A payload records the contract version and layout hash of the code that exported it.
-    # If the two disagree, the payload would claim a version it does not match and only be
-    # rejected once someone loads it, so refuse before any payload is produced.
+    # A payload records the contract version of the code that exported it, so refuse to
+    # export from code whose contract configuration is inconsistent.
     error = config.contract_consistency_error()
     if error:
         raise RuntimeError('Cannot export: ' + error)
@@ -248,7 +246,7 @@ def main():
         if os.path.exists(pt_path):
             input_size, num_labels, has_inputs = convert_network_to_onnx(pt_path, onnx_path)
             variables = build_variable_names(has_inputs, input_size, is_main)
-            package_as_mva_weightfile(onnx_path, root_path, variables, num_labels, identifier)
+            package_as_mva_weightfile(onnx_path, root_path, variables, num_labels, args.identifier)
             exported_root[root_name] = root_path
             selections[pt_name] = list(has_inputs)
         else:

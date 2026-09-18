@@ -175,7 +175,7 @@ class ModeSelectorModule(b2.Module):
         return indices if indices else None
 
     def _check_contract_is_self_consistent(self):
-        """Check the declared contract version still matches the layout in config.py.
+        """Check that SUPPORTED_CONTRACT_VERSIONS is consistent with the current contract version.
 
         A mismatch is a developer error in the release, not a problem with the payload.
         The same rule is applied by convert_to_onnx.py before exporting.
@@ -184,59 +184,42 @@ class ModeSelectorModule(b2.Module):
         if error:
             b2.B2FATAL("ModeSelector: " + error)
 
-    def _check_contract(self, identifier, label):
-        """Check a model's contract information and return its (contract version, training id).
+    def _check_contract(self, weightfile, identifier, label):
+        """Check a model's contract version and return it together with the training name.
 
-        The contract version must be one this release supports: the current one, or an older
-        one whose code path the release still provides. A newer version, or an older one that
-        is no longer supported, would run without error and give wrong results, so it is
-        fatal. The layout hash is compared with the hash pinned for the payload's own contract
-        version, since an older contract has its own layout. Weightfiles written before the
-        contract information existed are treated as contract version 1: they are subject to the
-        same support rule, but their layout cannot be checked.
+        The contract version is an extra element of the weightfile; the identifier holds the
+        training name. The contract version must be one this release supports: the current
+        one, or an older one whose code path the release still provides. A newer version, or
+        an older one that is no longer supported, would run without error and give wrong
+        results, so it is fatal. Weightfiles written before the contract version was recorded
+        are treated as contract version 1 and are subject to the same support rule.
         """
-        fields = {}
-        for part in str(identifier).split(';'):
-            if '=' in part:
-                key, value = part.split('=', 1)
-                fields[key.strip()] = value.strip()
-
-        stored = fields.get('schema')
-        if stored is None:
+        training = str(identifier)
+        if not weightfile.containsElement('contract_version'):
             b2.B2WARNING(
-                "ModeSelector: " + label + " model weightfile carries no contract information, "
-                "so it is treated as contract version 1 and cannot be checked against this "
-                "release. Re-export it with convert_to_onnx.py."
+                "ModeSelector: " + label + " model weightfile carries no contract version, "
+                "so it is treated as contract version 1. Re-export it with convert_to_onnx.py."
             )
             # Still subject to the support rule: without it, a release that dropped contract 1
             # would run such a model with the wrong code path.
             self._require_supported_contract(1, label)
-            return 1, None
+            return 1, training
 
+        raw_version = str(weightfile.getElement['std::string']('contract_version'))
         try:
-            # Written since the contract was introduced; anything older is version 1.
-            version = int(fields.get('contractVersion', '1'))
+            version = int(raw_version)
         except ValueError:
             b2.B2FATAL(
                 "ModeSelector: " + label + " model weightfile has a malformed contract version '"
-                + fields.get('contractVersion') + "'. Re-export it with convert_to_onnx.py."
+                + raw_version + "'. Re-export it with convert_to_onnx.py."
             )
 
         self._require_supported_contract(version, label)
-
-        expected = config.KNOWN_CONTRACT_SCHEMAS[version]
-        if stored != expected:
-            b2.B2FATAL(
-                "ModeSelector: " + label + " model was built against feature layout '"
-                + stored + "' but contract version " + str(version) + " uses '" + expected + "'. "
-                "The payload does not match the contract it claims, so the model cannot be used."
-            )
-
         b2.B2INFO(
-            "ModeSelector: " + label + " model training '" + fields.get('training', 'unspecified')
-            + "' (contract v" + str(version) + ", feature layout " + stored + ")"
+            "ModeSelector: " + label + " model training '" + training
+            + "' (contract v" + str(version) + ")"
         )
-        return version, fields.get('training')
+        return version, training
 
     def _require_supported_contract(self, version, label):
         """Stop unless this release can run models built for the given contract version."""
@@ -284,12 +267,10 @@ class ModeSelectorModule(b2.Module):
 
         The main network takes the category network outputs as inputs, so a pair from
         different trainings runs without error but gives wrong results. Such a pair shares
-        the contract version and layout hash, so only the training id, which
-        convert_to_onnx.py writes identically into both weightfiles, can tell them apart.
-        Weightfiles without contract information carry no training id and are not compared.
+        the contract version, so only the training name in the weightfile
+        identifier, which convert_to_onnx.py writes identically into both weightfiles, can
+        tell them apart.
         """
-        if cat_training is None or main_training is None:
-            return
         if cat_training != main_training:
             b2.B2FATAL(
                 "ModeSelector: the category model comes from training '" + cat_training
@@ -454,8 +435,8 @@ class ModeSelectorModule(b2.Module):
         main_wf.getOptions(main_opts)
 
         self._check_contract_is_self_consistent()
-        cat_version, cat_training = self._check_contract(cat_opts.m_identifier, 'category')
-        main_version, main_training = self._check_contract(main_opts.m_identifier, 'main')
+        cat_version, cat_training = self._check_contract(cat_wf, cat_opts.m_identifier, 'category')
+        main_version, main_training = self._check_contract(main_wf, main_opts.m_identifier, 'main')
         self._check_same_training(cat_training, main_training)
         self.contract_version = self._select_contract_version(cat_version, main_version)
         self._check_output_classes(cat_opts, config.NUM_CAT_LABELS, 'category')

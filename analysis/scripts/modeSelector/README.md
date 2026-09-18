@@ -80,8 +80,7 @@ Key contents:
 | `DEFAULT_CAT_PAYLOAD` | `modeSelector_cat_model_perf_c1` | Default DB payload name for the category model, derived from `MODEL_CONTRACT_VERSION` |
 | `DEFAULT_MAIN_PAYLOAD` | `modeSelector_main_model_perf_c1` | Default DB payload name for the main model, derived from `MODEL_CONTRACT_VERSION` |
 | `payload_names(version)` | function | (category, main) payload names for any contract version |
-| `MODEL_CONTRACT_VERSION` | 1 | Bumped by hand for behavioural changes the layout hash cannot see |
-| `KNOWN_CONTRACT_SCHEMAS` | {1: hash} | Layout hash each contract version must produce |
+| `MODEL_CONTRACT_VERSION` | 1 | Contract version between the code and its payloads, bumped by hand |
 | `SUPPORTED_CONTRACT_VERSIONS` | {1} | Contract versions the module can run (current plus older ones with a kept code path) |
 | `FEATURE_VAR_PREFIX` | `msfeat_` | Prefix for the raw-feature entries in the weightfile variable list |
 | `MAIN_EXTRA_VARS` | 4 names | The main network's extra inputs (3 category outputs + charged flag) |
@@ -167,35 +166,6 @@ input_id encoding, which candidate represents an input_id slot, the preselection
 or how the outputs become scores. It is not a software version, so unrelated
 changes elsewhere must not bump it.
 
-**`feature_schema_hash()`** - Short hash over the *declarative* part of that
-contract, the part readable straight off the definitions in `config.py`: the
-sector sizes (which fix the input_id encoding), the block names paired with the
-basf2 variable each reads, the event feature names in order, and the names of the
-extra main-network inputs. Written into the weightfile at export, and compared at load
-with the hash pinned for the payload's own contract version.
-
-The two are complementary and deliberately independent. The hash catches
-declarative drift automatically. Everything behavioural is invisible to it -- the
-transforms (hashing a lambda means hashing bytecode, which is not stable across
-Python versions), the deduplication rule, the preselection cuts, the output
-interpretation -- and that is what the contract version covers. The version is
-**not** part of the hash, so the two can be compared separately and an older
-payload stays identifiable rather than just being "different".
-
-`KNOWN_CONTRACT_SCHEMAS` records the layout hash each version must produce. If
-the version were always bumped correctly the hash would be redundant; its job is to
-enforce that bump for layout changes, since it is easy to forget. This matters more
-because the module requests payloads by a name derived from the contract version: a
-missed bump would place an incompatible model under a name all code implementing that
-contract requests. The rule lives in
-`config.contract_consistency_error()` and is checked in two places: by
-`convert_to_onnx.py` before exporting, so an inconsistent payload never reaches the
-conditions database, and at the start of a job. Add a line when bumping; keep the
-old entries.
-
-The accepted experiment ids are deliberately outside both, since extending them is
-a routine update when a new campaign arrives.
-
 **`FEI_CALIB_*`** - Per-decay-mode FEI calibration weights for two sigProb
 working points (0.001, 0.01).
 The calibration corresponds to [release 8, run1 + run2](https://gitlab.desy.de/belle2/performance/correction-tables/-/tree/20260126/MC16/FEI/hadronic?ref_type=tags).
@@ -244,25 +214,25 @@ the payload itself:
 
 - the weightfile records the **feature selection** its model was trained on, so
   the payload does not depend on `config.HAS_INPUTS` being in sync
-- the weightfile records the **layout hash**, which is compared with the hash pinned
-  for the payload's contract version when it is loaded; a mismatch is fatal
+- the weightfile records the **contract version** as an extra element
+  (`contract_version`), checked against the supported contract versions
+  when it is loaded (see below)
 
-A third check compares the model's output class count (`m_nClasses`) against what
+A further check compares the model's output class count (`m_nClasses`) against what
 the module interprets: 3 for the category network, `N_INPUT_IDS + 3` for the main
 network. The outputs are read positionally, so a model with a different number of
 classes would be misread rather than rejected; a mismatch is fatal.
 
-A fourth check compares the training ids of the category and main models. The main
-network takes the category outputs as inputs, so a pair from different trainings would
-run but give wrong results, and it would pass every other check since both share the
-contract version and layout hash. A mismatch is fatal. Weightfiles without contract
-information carry no training id and are not compared.
+Another check compares the weightfile identifiers of the category and main models,
+which hold the training name. The main network takes the category outputs as inputs, so
+a pair from different trainings would run but give wrong results, and it would pass every
+other check since both share the contract version. A mismatch is fatal.
 
 All of these are written by `convert_to_onnx.py` and logged at the start of a job
-together with the training id:
+together with the training name:
 
 ```
-[INFO] ModeSelector: category model training 'mc16rd_v3' (contract v1, feature layout b59b6c7fc0a1)
+[INFO] ModeSelector: category model training 'mc16rd_v3' (contract v1)
 [INFO] ModeSelector: Using 976 selected features from the weightfile
 ```
 
@@ -280,11 +250,9 @@ construction, expected output classes, output interpretation) branches on
 - a payload for a newer version, or an older one that is no longer supported, is fatal;
 - the category and main models must share one contract version.
 
-The layout hash of a payload is compared with the hash pinned for its own contract
-version in `KNOWN_CONTRACT_SCHEMAS`, which is why old entries must be kept.
-`config.contract_consistency_error()` additionally requires that the current version
-is supported, that no newer version is listed, and that every supported version has a
-pinned hash. At the moment only contract version 1 exists, so there is no older code
+`config.contract_consistency_error()` requires that the current version is supported
+and that no newer version is listed; it is checked by `convert_to_onnx.py` before
+exporting and at the start of a job. At the moment only contract version 1 exists, so there is no older code
 path yet.
 
 An older contract is loaded by naming its payloads explicitly, for example
@@ -294,7 +262,7 @@ weightfiles are not reported.
 
 Weightfiles exported before this (with placeholder variable names) still load:
 the module warns, treats them as contract version 1 (fatal if that version is no longer
-supported), falls back to `config.HAS_INPUTS`, and skips the layout check.
+supported) and falls back to `config.HAS_INPUTS`.
 
 To create a local payload database use:
 
@@ -804,15 +772,14 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   feature index is stored as `msfeat_<index>` (taken from the checkpoint's own
   `has_inputs`, not from `config.HAS_INPUTS`), followed for the main network by
   the four names in `config.MAIN_EXTRA_VARS`.
-- Stores `schema=<hash>;contractVersion=<n>;training=<id>` as the weightfile
-  identifier, where the hash comes from `config.feature_schema_hash()`, the version
-  from `config.MODEL_CONTRACT_VERSION` and the id from `--training-id`.
+- Adds the contract version (`config.MODEL_CONTRACT_VERSION`) as an extra weightfile
+  element, and stores the training name from `--identifier` as the weightfile
+  identifier.
 - Refuses to export if the two checkpoints were trained on different feature
   selections, since that means they come from different trainings.
 - Before converting anything, refuses to run if the contract configuration is
   inconsistent (`config.contract_consistency_error()`: the current version is missing
-  from `SUPPORTED_CONTRACT_VERSIONS`, a newer version is listed, a supported version has
-  no pinned hash, or the layout was changed without bumping the version), or if
+  from `SUPPORTED_CONTRACT_VERSIONS` or a newer version is listed), or if
   `--add-payloads` is given and
   `localdb/database.txt` already exists, since adding payloads appends to it and would
   leave stale entries with overlapping iovs.
@@ -831,9 +798,9 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   version (`config.DEFAULT_CAT_PAYLOAD` / `config.DEFAULT_MAIN_PAYLOAD`), which are
   the names the module requests for this contract version. Exporting under any other
   name prints a warning, since the module will not request it.
-- `--training-id` names the training; it is stored in the weightfile and logged
-  at inference time. Defaults to `unspecified`, so set it for anything that gets
-  uploaded.
+- `--identifier` names the training (for example `mc16rd_v3`); it is stored as the
+  weightfile identifier and logged at inference time. Defaults to `unspecified`, so
+  set it for anything that gets uploaded.
 - `--first-exp`, `--first-run`, `--final-exp`, `--final-run` control the
   interval of validity for local payload entries.
 

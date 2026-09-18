@@ -15,7 +15,6 @@ used by the ModeSelector module. Both inference and training must use these
 definitions to ensure consistency.
 """
 
-import hashlib
 
 # Number of FEI decay modes per B type (dmID range)
 N_BP_MODES = 36  # B+/B- decay modes (dmID 0-35)
@@ -153,8 +152,8 @@ MAIN_EXTRA_VARS = ['mscat_b0', 'mscat_bp', 'mscat_cont', 'mscharged_cat']
 #   - the preselection the candidates went through
 #   - how the network outputs are turned into scores (BplusScore, the fallback, ranking)
 # It is NOT a software version: unrelated changes elsewhere in the release must not bump
-# it. feature_schema_hash() below catches the declarative part of the contract on its own,
-# so this constant is what covers the behavioural part, which cannot be hashed.
+# it. Nothing checks that it was bumped, so a missed bump lets an incompatible model load
+# under a name this code trusts.
 MODEL_CONTRACT_VERSION = 1
 
 
@@ -177,38 +176,6 @@ DEFAULT_CAT_PAYLOAD = payload_names(MODEL_CONTRACT_VERSION)[0]
 DEFAULT_MAIN_PAYLOAD = payload_names(MODEL_CONTRACT_VERSION)[1]
 
 
-def feature_schema_hash():
-    """Return a short hash over the declarative part of the payload contract.
-
-    Covers what fixes the meaning of a raw feature index and can be read off the
-    definitions in this file: the sector sizes (which set the input_id encoding), the
-    feature block names together with the basf2 variable each one reads, the event-level
-    feature names in order, and the names of the extra main-network inputs.
-
-    Deliberately not covered: the transforms (hashing a lambda means hashing bytecode,
-    which is not stable across Python versions), the preselection cuts (checked at
-    runtime instead) and the accepted experiment ids (extended routinely when a new
-    campaign arrives). Those are behavioural, and MODEL_CONTRACT_VERSION covers them.
-
-    The contract version is deliberately NOT part of this hash, so that the version and
-    the layout can be compared independently and an older payload stays identifiable.
-    """
-    parts = [str(N_BP_MODES), str(N_B0_MODES)]
-    parts += [name + '=' + variable for name, variable, _transform in FEATURE_BLOCKS]
-    parts += list(EVENT_FEATURES)
-    parts += list(MAIN_EXTRA_VARS)
-    return hashlib.sha1(';'.join(parts).encode('utf-8')).hexdigest()[:12]
-
-
-# Layout hash that each contract version is expected to produce. Checked at inference
-# start: if the layout changed but MODEL_CONTRACT_VERSION was not bumped, the mismatch
-# is caught here rather than silently shipping a payload that claims the wrong version.
-# Add a line when bumping the version; keep the old entries so historical payloads stay
-# identifiable.
-KNOWN_CONTRACT_SCHEMAS = {
-    1: 'b59b6c7fc0a1',
-}
-
 # Contract versions this release can run. It always contains MODEL_CONTRACT_VERSION. An older
 # version stays in this set only as long as the release still provides that contract's code
 # path, i.e. everything that differs between contract versions (feature construction,
@@ -220,12 +187,9 @@ SUPPORTED_CONTRACT_VERSIONS = frozenset((1,))
 
 
 def contract_consistency_error():
-    """Describe why the declared contract version does not match the layout, or return None.
+    """Describe why SUPPORTED_CONTRACT_VERSIONS is inconsistent with the current version, or return None.
 
-    The layout hash does not replace bumping MODEL_CONTRACT_VERSION, it enforces it: a
-    layout change made without a bump shows up here as a hash that no longer matches the
-    one recorded for the version. Checked when a payload is exported, so an inconsistent
-    payload never reaches the conditions database, and again when a job starts.
+    Checked when a payload is exported and again when a job starts.
     """
     if MODEL_CONTRACT_VERSION not in SUPPORTED_CONTRACT_VERSIONS:
         return ('SUPPORTED_CONTRACT_VERSIONS does not contain the current contract version '
@@ -234,20 +198,6 @@ def contract_consistency_error():
     if newer:
         return ('SUPPORTED_CONTRACT_VERSIONS contains versions newer than the current contract '
                 'version ' + str(MODEL_CONTRACT_VERSION) + ': ' + str(newer) + '.')
-    unpinned = sorted(v for v in SUPPORTED_CONTRACT_VERSIONS if v not in KNOWN_CONTRACT_SCHEMAS)
-    if unpinned:
-        return ('KNOWN_CONTRACT_SCHEMAS has no layout hash for supported contract versions '
-                + str(unpinned) + '.')
-    expected = KNOWN_CONTRACT_SCHEMAS.get(MODEL_CONTRACT_VERSION)
-    actual = feature_schema_hash()
-    if expected is None:
-        return ('KNOWN_CONTRACT_SCHEMAS has no entry for contract version '
-                + str(MODEL_CONTRACT_VERSION) + '. Add the layout hash for it.')
-    if expected != actual:
-        return ("the feature layout produces '" + actual + "' but contract version "
-                + str(MODEL_CONTRACT_VERSION) + " is recorded as '" + expected + "'. The layout "
-                "was changed without bumping MODEL_CONTRACT_VERSION, or without adding its hash "
-                "to KNOWN_CONTRACT_SCHEMAS.")
     return None
 
 

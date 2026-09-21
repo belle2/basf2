@@ -107,11 +107,15 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     const CDCWire& wire = rlWireHit.getWire();
     const WireLine& wireLine = wire.getWireLine();
     double signedDriftLength = rlWireHit.getSignedRefDriftLength();
-    for (const Vector3D& recoPos3D : trajectory2D.reconstructBoth3D(wireLine, signedDriftLength)) {
+    // Equivalent to trajectory2D.reconstructBoth3D(wireLine, signedDriftLength), but the z bounds check,
+    // which only depends on the z solution, is done before the costly calculation of the xy position.
+    for (const double recoZ : trajectory2D.reconstructBothZ(wireLine, signedDriftLength)) {
       // Skip hits out of CDC
-      if (not wire.isInCellZBounds(recoPos3D, m_param_checkForInWireBoundsFactor)) {
+      if (not wire.isInCellZBounds(Vector3D(0.0, 0.0, recoZ), m_param_checkForInWireBoundsFactor)) {
         continue;
       }
+      const Vector3D recoWirePos3D = wireLine.sagPos3DAtZ(recoZ);
+      const Vector3D recoPos3D(trajectory2D.getClosest(recoWirePos3D.xy()), recoWirePos3D.z());
 
       // If the track is a curler, shift all perpS values to positive ones.
       // Else do not use this hit if m_param_checkForB2BTracks is enabled.

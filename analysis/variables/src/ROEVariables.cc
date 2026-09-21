@@ -2223,43 +2223,43 @@ namespace Belle2 {
                           The missing neutrino momentum is scaled so that the energy difference :math:`d_E = 0`. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`. The default mask name is ``all``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2, R"DOC(
+    REGISTER_METAVARIABLE("weMissM2([maskName, ]opt)", WE_MissM2, R"DOC(
                           Returns the invariant mass squared of the missing momentum (see :b2:var:`weMissE` possible options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the invariant mass squared is :math:`[\text{GeV}/\text{c}^2]^2`.)DOC",
+                          The unit of the invariant mass squared is :math:`[\text{GeV}/\text{c}^2]^2`. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPTheta(maskName, opt)", WE_MissPTheta, R"DOC(
+    REGISTER_METAVARIABLE("weMissPTheta([maskName, ]opt)", WE_MissPTheta, R"DOC(
                           Returns the polar angle of the missing momentum (see possible :b2:var:`weMissE` options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the polar angle is ``rad``.)DOC",
+                          The unit of the polar angle is ``rad``. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissP(maskName, opt)", WE_MissP, R"DOC(
+    REGISTER_METAVARIABLE("weMissP([maskName, ]opt)", WE_MissP, R"DOC(
                           Returns the magnitude of the missing momentum (see possible :b2:var:`weMissE` options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the magnitude of missing momentum is ``GeV/c``.)DOC",
+                          The unit of the magnitude of missing momentum is ``GeV/c``. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPx(maskName, opt)", WE_MissPx, R"DOC(
+    REGISTER_METAVARIABLE("weMissPx([maskName, ]opt)", WE_MissPx, R"DOC(
                           Returns the x component of the missing momentum (see :b2:var:`weMissE` possible options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the missing momentum is ``GeV/c``.)DOC",
+                          The unit of the missing momentum is ``GeV/c``. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPy(maskName, opt)", WE_MissPy, R"DOC(
+    REGISTER_METAVARIABLE("weMissPy([maskName, ]opt)", WE_MissPy, R"DOC(
                           Returns the y component of the missing momentum (see :b2:var:`weMissE` possible options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the missing momentum is ``GeV/c``.)DOC",
+                          The unit of the missing momentum is ``GeV/c``. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissPz(maskName, opt)", WE_MissPz, R"DOC(
+    REGISTER_METAVARIABLE("weMissPz([maskName, ]opt)", WE_MissPz, R"DOC(
                           Returns the z component of the missing momentum (see :b2:var:`weMissE` possible options).
                           The variable can be used with the ``use***Frame()`` function.
-                          The unit of the missing momentum is ``GeV/c``.)DOC",
+                          The unit of the missing momentum is ``GeV/c``. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissE(maskName, opt)", WE_MissE,
+    REGISTER_METAVARIABLE("weMissE([maskName, ]opt)", WE_MissE,
                           R"DOC(Returns the energy of the missing momentum. The variable can be used with the ``use***Frame()`` function. The unit of the Energy is ``GeV`` . Possible options ``opt`` are the following:
 
 - ``0``: use energy and momentum of charged particles and photons
@@ -2267,7 +2267,7 @@ namespace Belle2 {
 - ``2``: same as ``0``, fix :math:`E_\mathrm{roe} = E_\mathrm{cms}/2`
 - ``3``: use only energy and momentum of signal side
 - ``4``: same as ``3``, update with direction of ROE momentum. Only works in CMS frame.
-- ``7``: correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0` (used for :math:`M_\mathrm{bc}` calculation). Only works in CMS frame.)DOC",
+- ``7``: correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0` (used for :math:`M_\mathrm{bc}` calculation). Only works in CMS frame. If only ``opt`` is given, the default mask name ``all`` is used.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weXiZ([maskName])", WE_xiZ,

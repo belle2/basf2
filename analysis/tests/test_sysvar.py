@@ -9,11 +9,13 @@
 ##########################################################################
 
 
+import itertools
 import unittest
+import warnings
+
 import numpy as np
 import pandas as pd
-from sysvar import Reweighter
-import itertools
+from sysvar import Reweighter, add_weights_to_dataframe
 
 
 class TestSysVar(unittest.TestCase):
@@ -137,7 +139,7 @@ class TestSysVar(unittest.TestCase):
         n_variations = 50
         reweighter = Reweighter(n_variations=n_variations)
         thresholds = {11: ('electronID', 0.8)}
-        reweighter.add_pid_particle('', self.pid_tables, thresholds, sys_seed=42)
+        reweighter.add_pid_particle('', self.pid_tables, thresholds, seed=42)
         reweighter.add_fei_particle('B0', self.fei_table, 0.01, None)
         local_data = self.user_data.copy(deep=True)
         reweighter.reweight(local_data)
@@ -171,6 +173,98 @@ class TestSysVar(unittest.TestCase):
         self.assertFalse((local_data_shift[['Weight']+cols].isna()).any().any())
         cols = [f'B0_Weight_{i}' for i in range(0, n_variations)]
         self.assertFalse((local_data_shift[['B0_Weight']+cols].isna()).any().any())
+
+    def get_pid_weights(self, pid_tables, thresholds, df, **kwargs):
+        """Reweights a copy of df with a single PID particle and returns the weight columns"""
+        reweighter = Reweighter(n_variations=20)
+        reweighter.add_pid_particle('', pid_tables, thresholds, **kwargs)
+        local_data = df.copy(deep=True)
+        reweighter.reweight(local_data)
+        return local_data[reweighter.get_particle('').column_names]
+
+    def get_variations(self, pid_tables, thresholds, **kwargs):
+        """Returns the generated variations of a PID particle per bin of its weight table"""
+        reweighter = Reweighter(n_variations=20)
+        reweighter.add_pid_particle('', pid_tables, thresholds, **kwargs)
+        particle = reweighter.get_particle('')
+        particle.generate_variations(n_variations=20)
+        return particle.merged_table[particle.column_names].values
+
+    def relabelled_pid_tables(self):
+        """Muon ID tables with the same binning and values as the electron ID tables"""
+        tables = {}
+        for (reco_pdg, mc_pdg), table in self.pid_tables.items():
+            table = table.copy(deep=True)
+            table['variable'] = 'muonID'
+            tables[(13, 13 if mc_pdg == 11 else mc_pdg)] = table
+        return tables
+
+    def test_seed_reproducible(self):
+        """Tests that seed makes the variations reproducible, also between different dataframes"""
+        thresholds = {11: ('electronID', 0.8)}
+        weights = self.get_pid_weights(self.pid_tables, thresholds, self.user_data, seed=42)
+        weights_again = self.get_pid_weights(self.pid_tables, thresholds, self.user_data, seed=42)
+        pd.testing.assert_frame_equal(weights, weights_again)
+        # A different dataframe gets the same variations for the same bins
+        subset = self.user_data.iloc[[1, 3]]
+        weights_subset = self.get_pid_weights(self.pid_tables, thresholds, subset, seed=42)
+        pd.testing.assert_frame_equal(weights.iloc[[1, 3]], weights_subset)
+        # A different seed gives different variations, but the same nominal weight
+        weights_other = self.get_pid_weights(self.pid_tables, thresholds, self.user_data, seed=43)
+        pd.testing.assert_series_equal(weights['Weight'], weights_other['Weight'])
+        self.assertFalse(np.allclose(weights.drop(columns='Weight'), weights_other.drop(columns='Weight')))
+
+    def test_seed_stat_reproducible(self):
+        """Tests that seed also fixes the statistical variations, unlike sys_seed"""
+        thresholds = {11: ('electronID', 0.8)}
+        # Remove the systematic uncertainties, so only the statistical variations remain
+        stat_only = {key: table.assign(data_MC_uncertainty_sys_up=0., data_MC_uncertainty_sys_dn=0.)
+                     for key, table in self.pid_tables.items()}
+        np.testing.assert_array_equal(self.get_variations(stat_only, thresholds, seed=42),
+                                      self.get_variations(stat_only, thresholds, seed=42))
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            self.assertFalse(np.allclose(self.get_variations(stat_only, thresholds, sys_seed=42),
+                                         self.get_variations(stat_only, thresholds, sys_seed=42)))
+
+    def test_seed_independent_tables(self):
+        """Tests that tables with the same shape but different identity get independent variations"""
+        electron = self.get_variations(self.pid_tables, {11: ('electronID', 0.8)}, seed=42)
+        muon = self.get_variations(self.relabelled_pid_tables(), {13: ('muonID', 0.8)}, seed=42)
+        self.assertEqual(electron.shape, muon.shape)
+        self.assertFalse(np.allclose(electron, muon))
+        # With sys_seed the systematic variations of both tables are identical
+        no_stat = {key: table.assign(data_MC_uncertainty_stat_up=0., data_MC_uncertainty_stat_dn=0.)
+                   for key, table in self.pid_tables.items()}
+        no_stat_muon = {key: table.assign(data_MC_uncertainty_stat_up=0., data_MC_uncertainty_stat_dn=0.)
+                        for key, table in self.relabelled_pid_tables().items()}
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            np.testing.assert_allclose(self.get_variations(no_stat, {11: ('electronID', 0.8)}, sys_seed=42),
+                                       self.get_variations(no_stat_muon, {13: ('muonID', 0.8)}, sys_seed=42))
+        # ... while with seed they are independent
+        self.assertFalse(np.allclose(self.get_variations(no_stat, {11: ('electronID', 0.8)}, seed=42),
+                                     self.get_variations(no_stat_muon, {13: ('muonID', 0.8)}, seed=42)))
+
+    def test_seed_global_rng(self):
+        """Tests that seed leaves the global numpy random state untouched"""
+        np.random.seed(1)
+        expected = np.random.uniform(size=5)
+        np.random.seed(1)
+        self.get_variations(self.pid_tables, {11: ('electronID', 0.8)}, seed=42)
+        np.testing.assert_array_equal(np.random.uniform(size=5), expected)
+
+    def test_seed_fei(self):
+        """Tests the seed for FEI particles, with and without a covariance matrix"""
+        cov = np.diag(np.full(4, 0.01))
+        for cov_matrix in [None, cov]:
+            results = [add_weights_to_dataframe('B0', self.user_data.copy(deep=True), 'custom_FEI',
+                                                custom_tables=self.fei_table, custom_thresholds=0.01,
+                                                n_variations=10, cov_matrix=cov_matrix, seed=seed)
+                       for seed in [42, 42, 43]]
+            cols = [f'B0_Weight_{i}' for i in range(10)]
+            pd.testing.assert_frame_equal(results[0][cols], results[1][cols])
+            self.assertFalse(np.allclose(results[0][cols], results[2][cols]))
 
 
 if __name__ == '__main__':

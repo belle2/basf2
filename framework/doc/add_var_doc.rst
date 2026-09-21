@@ -38,4 +38,14 @@ function with the same name.
 .. important:: Please document any parameters your variable might have using
    :ref:`googlestyle`
 
+.. note::
+
+   The variable signature (the ``name(...)`` string passed to
+   ``REGISTER_VARIABLE()``) is used to document the expected arguments. Mark
+   optional arguments with square brackets, e.g. ``myVariable(required[,
+   optional])``. Do **not** use Python-style keyword/default syntax such as
+   ``myVariable(required, optional=default)``: ``basf2`` arguments are always
+   positional and keyword arguments are not supported. Describe the default
+   value of an optional argument in the description text instead.
+
 .. _reStructuredText: http://www.sphinx-doc.org/en/stable/rest.html

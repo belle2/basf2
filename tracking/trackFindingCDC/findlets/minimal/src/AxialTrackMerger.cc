@@ -37,6 +37,12 @@ void AxialTrackMerger::exposeParameters(ModuleParamList* moduleParamList, const 
                                 "Minimal fit probability of the common fit "
                                 "of two tracks to be eligible for merging",
                                 m_param_minFitProb);
+
+  moduleParamList->addParameter(prefixed(prefix, "removeHitsAfterSuperLayerBreak"),
+                                m_param_removeHitsAfterSuperLayerBreak,
+                                "Remove the hits of the tracks after a super layer break "
+                                "before merging the tracks",
+                                m_param_removeHitsAfterSuperLayerBreak);
 }
 
 void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
@@ -46,7 +52,9 @@ void AxialTrackMerger::apply(std::vector<CDCTrack>& axialTracks,
   // if holes exist then track is split
   for (CDCTrack& track : axialTracks) {
     if (track.size() < 5) continue;
-    AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);
+    if (m_param_removeHitsAfterSuperLayerBreak) {
+      AxialTrackUtil::removeHitsAfterSuperLayerBreak(track);
+    }
     AxialTrackUtil::normalizeTrack(track);
   }
 

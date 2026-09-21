@@ -2057,35 +2057,38 @@ namespace Belle2 {
                       "Returns number of tracks in ROE - number of tracks of given particle"
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
 
-    REGISTER_METAVARIABLE("nROE_RemainingTracks(maskName)", nROE_RemainingTracksWithMask,
+    REGISTER_METAVARIABLE("nROE_RemainingTracks([maskName])", nROE_RemainingTracksWithMask,
                           "Returns number of remaining tracks between the ROE (specified via a mask) and the given particle. For the given particle only tracks are counted which are in the RoE."
                           "One can use this variable only in a for_each loop over the RestOfEvent StoreArray."
-                          "Is required for the specific FEI. :noindex:", Manager::VariableDataType::c_int);
+                          "Is required for the specific FEI. The default mask name is ``all``. :noindex:", Manager::VariableDataType::c_int);
     // nROE_RemainingTracks is overloaded (two C++ functions sharing one
     // variable name) so one of the two needs to be made the indexed
     // variable in sphinx
 
     REGISTER_VARIABLE("nROE_KLMClusters", nROE_KLMClusters,
                       "Returns number of all remaining KLM clusters in the related RestOfEvent object. "
-                      "This variable takes no ROE mask and always uses the default mask; use ``nROE_NeutralHadrons(maskName)``, "
+                      "This variable takes no ROE mask and always uses the default mask; use ``nROE_NeutralHadrons([maskName])``, "
                       "which counts the same candidates, if you need a specific mask.");
 
-    REGISTER_METAVARIABLE("nROE_Charged(maskName, PDGcode = 0)", nROE_ChargedParticles,
+    REGISTER_METAVARIABLE("nROE_Charged([maskName, PDGcode])", nROE_ChargedParticles,
                           "Returns number of all charged particles in the related RestOfEvent object. First optional argument is ROE mask name. "
                           "Second argument is a PDG code to count only one charged particle species, independently of charge. "
                           "For example: ``nROE_Charged(cleanMask, 321)`` will output number of kaons in Rest Of Event with ``cleanMask``. "
-                          "PDG code 0 is used to count all charged particles", Manager::VariableDataType::c_int);
-
-    REGISTER_METAVARIABLE("nROE_Photons(maskName)", nROE_Photons,
-                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
-                          "Only ECL-cluster-based ROE particles with the photon (N1) hypothesis are counted, which makes this a subset of "
-                          "``nROE_NeutralECLClusters``: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``.",
+                          "The default mask name is ``all`` and the default PDG code is 0, which counts all charged particles",
                           Manager::VariableDataType::c_int);
 
-    REGISTER_METAVARIABLE("nROE_NeutralHadrons(maskName)", nROE_NeutralHadrons,
+    REGISTER_METAVARIABLE("nROE_Photons([maskName])", nROE_Photons,
+                          "Returns number of all photons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
+                          "Only ECL-cluster-based ROE particles with the photon (N1) hypothesis are counted, which makes this a subset of "
+                          "``nROE_NeutralECLClusters``: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``. "
+                          "The default mask name is ``all``.",
+                          Manager::VariableDataType::c_int);
+
+    REGISTER_METAVARIABLE("nROE_NeutralHadrons([maskName])", nROE_NeutralHadrons,
                           "Returns number of all neutral hadrons in the related RestOfEvent object, accepts 1 optional argument of ROE mask name. "
                           "Note that only KLM-cluster-based candidates are counted, so this is the mask-aware equivalent of ``nROE_KLMClusters``; "
-                          "neutral hadron candidates built from ECL clusters are counted by ``nROE_NeutralECLClusters`` instead.",
+                          "neutral hadron candidates built from ECL clusters are counted by ``nROE_NeutralECLClusters`` instead. "
+                          "The default mask name is ``all``.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("particleRelatedToCurrentROE(var)", particleRelatedToCurrentROE,
@@ -2121,98 +2124,103 @@ namespace Belle2 {
                       "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
                       "rad");
 
-    REGISTER_METAVARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
-                          "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("roeMC_MissFlags([maskName])", ROE_MC_MissingFlags,
+                          "Returns flags corresponding to missing particles on ROE side. The default mask name is ``all``.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("nROE_Tracks(maskName)",  nROE_Tracks,
-                          "Returns number of tracks in the related RestOfEvent object that pass the selection criteria.",
+    REGISTER_METAVARIABLE("nROE_Tracks([maskName])",  nROE_Tracks,
+                          "Returns number of tracks in the related RestOfEvent object that pass the selection criteria. The default mask name is ``all``.",
                           Manager::VariableDataType::c_int);
 
-    REGISTER_METAVARIABLE("nROE_ECLClusters(maskName)", nROE_ECLClusters,
+    REGISTER_METAVARIABLE("nROE_ECLClusters([maskName])", nROE_ECLClusters,
                           "Returns number of ECL clusters in the related RestOfEvent object that pass the selection criteria. "
                           "This counts the neutral (unmatched) clusters plus the clusters matched to charged ROE particles, so it is the "
-                          "widest of the three ECL counters: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``.",
+                          "widest of the three ECL counters: ``nROE_Photons`` <= ``nROE_NeutralECLClusters`` <= ``nROE_ECLClusters``. "
+                          "The default mask name is ``all``.",
                           Manager::VariableDataType::c_int);
 
-    REGISTER_METAVARIABLE("nROE_NeutralECLClusters(maskName)", nROE_NeutralECLClusters,
+    REGISTER_METAVARIABLE("nROE_NeutralECLClusters([maskName])", nROE_NeutralECLClusters,
                           "Returns number of neutral ECL clusters in the related RestOfEvent object that pass the selection criteria. "
                           "This counts every ECL-cluster-based ROE particle regardless of hypothesis, and is therefore the ECL counterpart of "
                           "``nROE_NeutralHadrons``. It differs from ``nROE_Photons``, which counts only the subset with the photon (N1) "
-                          "hypothesis, and from ``nROE_ECLClusters``, which additionally counts clusters matched to charged ROE particles.",
+                          "hypothesis, and from ``nROE_ECLClusters``, which additionally counts clusters matched to charged ROE particles. "
+                          "The default mask name is ``all``.",
                           Manager::VariableDataType::c_int);
 
-    REGISTER_METAVARIABLE("nROE_Composites(maskName)", nROE_Composites,
-                          "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria.",
+    REGISTER_METAVARIABLE("nROE_Composites([maskName])", nROE_Composites,
+                          "Returns number of composite particles or V0s in the related RestOfEvent object that pass the selection criteria. The default mask name is ``all``.",
                           Manager::VariableDataType::c_int);
 
     REGISTER_METAVARIABLE("nROE_ParticlesInList(pListName[, maskName])", nROE_ParticlesInList,
                           "Returns the number of particles in ROE from the given particle list. If a mask name is provided the selection criteria are applied.\n"
+                          "The default mask name is ``all``.\n"
                           "Use of variable aliases is advised.", Manager::VariableDataType::c_int);
 
-    REGISTER_METAVARIABLE("roeCharge(maskName)", ROE_Charge,
-                          "Returns total charge of the related RestOfEvent object. The unit of the charge is ``e`` ", Manager::VariableDataType::c_double);
-
-    REGISTER_METAVARIABLE("roeEextra(maskName)", ROE_ExtraEnergy,
-                          "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("roeCharge([maskName])", ROE_Charge,
+                          "Returns total charge of the related RestOfEvent object. The unit of the charge is ``e``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeNeextra(maskName)", ROE_NeutralExtraEnergy,
-                          "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("roeEextra([maskName])", ROE_ExtraEnergy,
+                          "Returns extra energy from ECLClusters in the calorimeter that is not associated to the given Particle. The unit of the energy is ``GeV``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeE(maskName)", ROE_E,
-                          "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("roeNeextra([maskName])", ROE_NeutralExtraEnergy,
+                          "Returns extra energy from neutral ECLClusters in the calorimeter that is not associated to the given Particle, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeM(maskName)", ROE_M,
-                          "Returns invariant mass of unused tracks and clusters in ROE. The unit of the invariant mass is :math:`\\text{GeV/c}^2`",
+    REGISTER_METAVARIABLE("roeE([maskName])", ROE_E,
+                          "Returns energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the energy is ``GeV``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeP(maskName)", ROE_P,
-                          "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("roeM([maskName])", ROE_M,
+                          "Returns invariant mass of unused tracks and clusters in ROE. The unit of the invariant mass is :math:`\\text{GeV/c}^2`. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roePt(maskName)", ROE_Pt,
-                          "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("roeP([maskName])", ROE_P,
+                          "Returns momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roePx(maskName)", ROE_Px,
-                          "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("roePt([maskName])", ROE_Pt,
+                          "Returns transverse component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roePy(maskName)", ROE_Py,
-                          "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("roePx([maskName])", ROE_Px,
+                          "Returns x component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roePz(maskName)", ROE_Pz,
-                          "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c`` ",
+    REGISTER_METAVARIABLE("roePy([maskName])", ROE_Py,
+                          "Returns y component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roePTheta(maskName)", ROE_PTheta,
-                          "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the angle is ``rad`` ",
+    REGISTER_METAVARIABLE("roePz([maskName])", ROE_Pz,
+                          "Returns z component of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the momentum is ``GeV/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeDeltae(maskName)", ROE_DeltaE,
-                          "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV`` ",
+    REGISTER_METAVARIABLE("roePTheta([maskName])", ROE_PTheta,
+                          "Returns theta angle of momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function. The unit of the angle is ``rad``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("roeMbc(maskName)", ROE_Mbc,
-                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`.",
+    REGISTER_METAVARIABLE("roeDeltae([maskName])", ROE_DeltaE,
+                          "Returns energy difference of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the energy is ``GeV``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weDeltae(maskName)", WE_DeltaE, R"DOC(
+    REGISTER_METAVARIABLE("roeMbc([maskName])", ROE_Mbc,
+                          "Returns beam constrained mass of the related RestOfEvent object with respect to :math:`E_\\mathrm{cms}/2`. The unit of the beam constrained mass is :math:`\\text{GeV/c}^2`. The default mask name is ``all``.",
+                          Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("weDeltae([maskName])", WE_DeltaE, R"DOC(
                           Returns the energy difference of the B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
-                          The variable can be used with the ``use***Frame()`` function. The unit of the energy is ``GeV``.)DOC",
+                          The variable can be used with the ``use***Frame()`` function. The unit of the energy is ``GeV``. The default mask name is ``all``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMbc(maskName)", WE_Mbc, R"DOC(
+    REGISTER_METAVARIABLE("weMbc([maskName])", WE_Mbc, R"DOC(
                           Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
-                          The variable can be used with the ``use***Frame()`` function. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
+                          The variable can be used with the ``use***Frame()`` function. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`. The default mask name is ``all``.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMbcWithdEZero(maskName)", WE_MbcWithdEZero, R"DOC(
+    REGISTER_METAVARIABLE("weMbcWithdEZero([maskName])", WE_MbcWithdEZero, R"DOC(
                           Returns beam constrained mass of B meson, corrected with the missing neutrino momentum (reconstructed side + neutrino) with respect to :math:`E_{\mathrm{cms}}/2`.
-                          The missing neutrino momentum is scaled so that the energy difference :math:`d_E = 0`. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`.)DOC",
+                          The missing neutrino momentum is scaled so that the energy difference :math:`d_E = 0`. The unit of the beam constrained mass is :math:`\text{GeV/c}^2`. The default mask name is ``all``.)DOC",
                           Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("weMissM2(maskName, opt)", WE_MissM2, R"DOC(
@@ -2262,14 +2270,15 @@ namespace Belle2 {
 - ``7``: correct pmiss 3-momentum vector with factor alpha so that :math:`d_E = 0` (used for :math:`M_\mathrm{bc}` calculation). Only works in CMS frame.)DOC",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weXiZ(maskName)", WE_xiZ,
-                          "Returns Xi_z in event (for Bhabha suppression and two-photon scattering). The unit of this variable is ``1/c`` ",
+    REGISTER_METAVARIABLE("weXiZ([maskName])", WE_xiZ,
+                          "Returns Xi_z in event (for Bhabha suppression and two-photon scattering). The unit of this variable is ``1/c``. The default mask name is ``all``.",
                           Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("bssMassDifference(maskName)", bssMassDifference,
-                          "Bs* - Bs mass difference. The unit of the mass is :math:`\\text{GeV/c}^2`.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("bssMassDifference([maskName])", bssMassDifference,
+                          "Bs* - Bs mass difference. The unit of the mass is :math:`\\text{GeV/c}^2`. The default mask name is ``all``.",
+                          Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weCosThetaEll(maskName)", WE_cosThetaEll, R"DOC(
+    REGISTER_METAVARIABLE("weCosThetaEll([maskName])", WE_cosThetaEll, R"DOC(
 
 Returns the cosine of the angle between :math:`M` and lepton in :math:`W` rest frame in the decays of the type:
 :math:`M \to h_1 ... h_n \ell`, where W 4-momentum is given as
@@ -2281,25 +2290,27 @@ The neutrino momentum is calculated from ROE taking into account the specified m
 
 .. math::
     E_{\nu} = |p_{miss}|.
+
+The default mask name is ``all``.
     
 )DOC", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weQ2lnuSimple(maskName,option)", WE_q2lnuSimple,
+    REGISTER_METAVARIABLE("weQ2lnuSimple([maskName, option])", WE_q2lnuSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
-                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
+                      "By default, option is set to ``1`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The default mask name is ``all``. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weQ2lnu(maskName,option)", WE_q2lnu,
+    REGISTER_METAVARIABLE("weQ2lnu([maskName, option])", WE_q2lnu,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_l + p_\\nu)^2`, \n"
                       "where :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`. Lepton is assumed to be the last reconstructed daughter. \n"
                       "This calculation uses constraints from dE = 0 and Mbc = Mb to correct the neutrino direction. \n"
-                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
+                      "By default, option is set to ``7`` (see :b2:var:`weMissE`). Unless you know what you are doing, keep this default value. The default mask name is ``all``. The unit of the momentum transfer squared is :math:`[\\text{GeV}/\\text{c}]^2`.", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("weMissM2OverMissE(maskName)", WE_MissM2OverMissE,
-                      "Returns missing mass squared over missing energy. The unit of the missing mass squared is :math:`\\text{GeV/c}^4`.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("weMissM2OverMissE([maskName])", WE_MissM2OverMissE,
+                          "Returns missing mass squared over missing energy. The unit of the missing mass squared is :math:`\\text{GeV/c}^4`. The default mask name is ``all``.", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("passesROEMask(maskName)", passesROEMask,
-                      "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path.", Manager::VariableDataType::c_bool);
+    REGISTER_METAVARIABLE("passesROEMask([maskName])", passesROEMask,
+                          "Returns boolean value if a particle passes a certain mask or not. Only to be used in for_each path. The default mask name is ``all``.", Manager::VariableDataType::c_bool);
 
     REGISTER_VARIABLE("printROE", printROE,
                       "For debugging, prints indices of all particles in the ROE and all masks. Returns 0.");

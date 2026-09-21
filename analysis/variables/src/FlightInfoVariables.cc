@@ -733,27 +733,29 @@ namespace Belle2 {
                       "Returns the flight distance error of particle. If a treeFit has been performed the flight distance error calculated by TreeFitter is returned. Otherwise if a beam constrained rave fit has been performed the production vertex set by rave and the decay vertex are used to calculate the flight distance error. If neither fit has been performed the i.p. is taken to be the production vertex.\n\n",
                       "cm");
     // Daughters
-    REGISTER_VARIABLE("flightTimeOfDaughter(daughterN, gdaughterN = -1)", flightTimeOfDaughter,
-                      "Returns the flight time between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).\n\n",
+    REGISTER_VARIABLE("flightTimeOfDaughter(daughterN[, gdaughterN])", flightTimeOfDaughter,
+                      "Returns the flight time between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter). The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
                       "ns");
-    REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN, gdaughterN = -1)", flightTimeOfDaughterErr,
-                      "Returns the flight time error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).\n\n",
+    REGISTER_VARIABLE("flightTimeOfDaughterErr(daughterN[, gdaughterN])", flightTimeOfDaughterErr,
+                      "Returns the flight time error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter). The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
                       "ns");
-    REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN, gdaughterN = -1)", flightDistanceOfDaughter,
-                      "Returns the flight distance between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).\n\n",
+    REGISTER_VARIABLE("flightDistanceOfDaughter(daughterN[, gdaughterN])", flightDistanceOfDaughter,
+                      "Returns the flight distance between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter). The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
                       "cm");
-    REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN, gdaughterN = -1)", flightDistanceOfDaughterErr,
-                      "Returns the flight distance error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter).\n\n",
+    REGISTER_VARIABLE("flightDistanceOfDaughterErr(daughterN[, gdaughterN])", flightDistanceOfDaughterErr,
+                      "Returns the flight distance error between mother and daughter particle with daughterN index. If a treeFit has been performed the value calculated by treeFitter is returned. Otherwise the value is calculated using the decay vertices of the mother and daughter particle. If a second index granddaughterM is given the value is calculated between the mother and the Mth grandaughter (Mth daughter of Nth daughter). The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
                       "cm");
     // MC Info
     REGISTER_VARIABLE("mcFlightDistance", mcFlightDistance,
                       "Returns the MC flight distance of the particle\n\n", "cm");
     REGISTER_VARIABLE("mcFlightTime", mcFlightTime,
                       "Returns the MC flight time of the particle\n\n", "ns");
-    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN, gdaughterN = -1)", mcFlightDistanceOfDaughter,
-                      "Returns the MC flight distance between mother and daughter particle using generated info\n\n", "cm");
-    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN, gdaughterN = -1)", mcFlightTimeOfDaughter,
-                      "Returns the MC flight time between mother and daughter particle using generated info\n\n", "ns");
+    REGISTER_VARIABLE("mcFlightDistanceOfDaughter(daughterN[, gdaughterN])", mcFlightDistanceOfDaughter,
+                      "Returns the MC flight distance between mother and daughter particle using generated info. The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
+                      "cm");
+    REGISTER_VARIABLE("mcFlightTimeOfDaughter(daughterN[, gdaughterN])", mcFlightTimeOfDaughter,
+                      "Returns the MC flight time between mother and daughter particle using generated info. The default value of ``gdaughterN`` is ``-1``, i.e. the direct daughter is used.\n\n",
+                      "ns");
     //Vertex Distance
     REGISTER_VARIABLE("vertexDistance", vertexDistance,
                       "Returns the distance between the production and decay vertex of a particle. Returns NaN if particle has no production or decay vertex.\n\n",
@@ -765,14 +767,14 @@ namespace Belle2 {
                       "Returns the distance between the production and decay vertex of a particle in units of the uncertainty on this value, i.e. the significance of the vertex separation.");
     REGISTER_VARIABLE("vertexDistanceOfDaughter(daughterN[, option])", vertexDistanceOfDaughter,
                       "If any integer is provided as second argument it returns the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
+                      "Otherwise (the default, when the optional second argument is omitted), it is assumed that the particle has a production vertex (typically the IP) which is used to calculate the distance to the daughter's decay vertex.\n"
                       "Returns NaN in case anything goes wrong.\n\n", "cm");
     REGISTER_VARIABLE("vertexDistanceOfDaughterErr(daughterN[, option])", vertexDistanceOfDaughterErr,
                       "If any integer is provided as second argument it returns the uncertainty on the distance between the decay vertices of the particle and of its daughter with index daughterN.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
+                      "Otherwise (the default, when the optional second argument is omitted), it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix to calculate the uncertainty on the distance to the daughter's decay vertex.\n"
                       "Returns NaN in case anything goes wrong.\n\n", "cm");
-    REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN[, option)", vertexDistanceOfDaughterSignificance,
+    REGISTER_VARIABLE("vertexDistanceOfDaughterSignificance(daughterN[, option])", vertexDistanceOfDaughterSignificance,
                       "If any integer is provided as second argument it returns the distance between the decay vertices of the particle and of its daughter with index daughterN in units of the uncertainty on this value.\n"
-                      "Otherwise, it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.");
+                      "Otherwise (the default, when the optional second argument is omitted), it is assumed that the particle has a production vertex (typically the IP) with a corresponding covariance matrix and the significance of the separation to this vertex is calculated.");
   }
 } // Belle2 namespace

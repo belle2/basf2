@@ -4,6 +4,13 @@ Changes in the analysis package in light-2609-l
 FlavorTagger TFlaT
 ++++++++++++++++++
 * Fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
+Changes in the analysis package in light-2609-luna
+--------------------------------------------------
+
+sysvar (former pidvar)
+++++++++++++++++++++++
+* Added a ``seed`` argument to ``Reweighter.add_pid_particle``, ``Reweighter.add_fei_particle`` and ``add_weights_to_dataframe``. It makes both the systematic and the statistical weight variations reproducible, so a weight table gives the same variations in every dataframe it is applied to, while the variations of different tables remain independent. The previous ``sys_seed`` argument only seeded the systematic variations and initialised a random seed for the statistical variations, so they were not reproducible. It is kept for backward compatibility but now issues a warning.
+* Fixed the coverage plots of ``ReweighterParticle.plot_coverage`` for a single particle hypothesis or binning variable, and a pandas warning when adding FEI weight columns.
 
 Changes in the analysis package in light-2607-kasei
 ---------------------------------------------------

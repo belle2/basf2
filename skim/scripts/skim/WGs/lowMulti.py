@@ -438,49 +438,26 @@ class TauTauTauTau(BaseSkim):
 
     def build_lists(self, path):
         """
-        **Physics channel**:
-        * .. math::
+        **Physics channel**: :math:`e^{+}e^{-} \\to  \\tau^{+} \\tau^{-} \\tau^{+} \\tau^{-}`
 
-            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
-            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+        **Decay Modes**:
 
-        * .. math::
-
-            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
-            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
-
-        * .. math::
-
-            e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
-            \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
-
-        * .. math::
-
-            e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
-            \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
-
-        * .. math::
-
-            e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
-            \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]
-
-        * .. math::
-
-            e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}]
-            \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to\\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]`
 
         Cuts applied:
 
-        * ``track cut: abs(dz) < 2.0 and abs(dr) < 0.5``
-        * ``electronID cut: electronID > 0.2``
-        * ``muonID cut: muonID > 0.2``
-        * ``pionID cut: pionID > 0.2``
-        * ``nCleanedTracks < 6, where a clean track satisfies [abs(dz) < 2.0 and abs(dr) < 0.5]``
-        * ``total M  < 9.5 GeV``
-        * ``electrons identified with electrondID > 0.2``
-        * ``muons idenfied with muonID > 0.2``
-        * ``pions identifed with pionID > 0.2``
-        * `` we select events where particles with same PID have the same charge``
+        * Track cut: ``abs(dz) < 2.0 and abs(dr) < 0.5``
+        * ``nCleanedTracks < 6``, where a clean track satisfies above trackcut
+        * ``M total  < 9.5 GeV``
+        * Electrons identified with ``electronID > 0.2``
+        * Muons idenfied with ``muonID > 0.2``
+        * Pions identifed with  ``pionID > 0.2``
+        * We select events where particles with same PID have the same charge
         """
         ftau_list = []
 

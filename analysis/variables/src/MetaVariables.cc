@@ -4035,7 +4035,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns variable output for the Klong MCParticle which has the best match with the ECLCluster of the given Particle.\n"
                       "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching Klong MCParticle", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
+    REGISTER_METAVARIABLE("countInList(particleList[, cut])", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"

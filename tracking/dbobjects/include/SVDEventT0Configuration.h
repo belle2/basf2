@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Get payload name
      */
-    const std::string& get_name() const {return s_name;}
+    static const std::string& get_name()  {return s_name;}
 
     /**
      * Get the unique ID  of the calibration

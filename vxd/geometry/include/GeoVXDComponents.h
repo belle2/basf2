@@ -30,8 +30,8 @@ namespace Belle2 {
       c_above   /**< Place the component above the mother */
     };
     /** Constructor */
-    VXDGeoPlacement(const std::string& name = "", double u = 0, double v = 0,
-                    std::string w = "bottom", double woffset = 0);
+    explicit VXDGeoPlacement(const std::string& name = "", double u = 0, double v = 0,
+                             std::string w = "bottom", double woffset = 0);
     /** get Name of the component */
     const std::string& getName() const { return m_name; }
     /** get local u coordinate where to place the component */
@@ -59,8 +59,8 @@ namespace Belle2 {
   class VXDGeoComponent {
   public:
     /** Constructor */
-    VXDGeoComponent(const std::string& material = "", const std::string& color = "",
-                    double width = 0, double width2 = 0, double length = 0, double height = 0):
+    explicit VXDGeoComponent(const std::string& material = "", const std::string& color = "",
+                             double width = 0, double width2 = 0, double length = 0, double height = 0):
       m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
       m_height(height) {}
     /** get the pointer to the logical volume, NULL if not yet created */
@@ -106,8 +106,8 @@ namespace Belle2 {
   class VXDGeoSensor: public VXDGeoComponent {
   public:
     /** Constructor */
-    VXDGeoSensor(const std::string& material = "", const std::string& color = "",
-                 double width = 0, double width2 = 0, double length = 0, double height = 0, bool slanted = false):
+    explicit VXDGeoSensor(const std::string& material = "", const std::string& color = "",
+                          double width = 0, double width2 = 0, double length = 0, double height = 0, bool slanted = false):
       VXDGeoComponent(material, color, width, width2, length, height), m_info(0), m_slanted(slanted) {}
     /** set the active area
      * @param area component description of the active area
@@ -148,8 +148,8 @@ namespace Belle2 {
   class VXDGeoSensorPlacement {
   public:
     /** Constructor */
-    VXDGeoSensorPlacement(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
-                          bool flipU = false, bool flipV = false, bool flipW = false):
+    explicit VXDGeoSensorPlacement(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
+                                   bool flipU = false, bool flipV = false, bool flipW = false):
       m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_flipU(flipU), m_flipV(flipV), m_flipW(flipW) {}
     /** get the sensor id inside the ladder */
     int getSensorID() const { return m_sensorID; }
@@ -182,9 +182,9 @@ namespace Belle2 {
   class VXDGeoLadder {
   public:
     /** Constructor */
-    VXDGeoLadder(int layerID = 0, double shift = 0, double radius = 0,
-                 double slantedAngle = 0, double slantedRadius = 0,
-                 double glueSize = -1, const std::string& glueMaterial = ""):
+    explicit VXDGeoLadder(int layerID = 0, double shift = 0, double radius = 0,
+                          double slantedAngle = 0, double slantedRadius = 0,
+                          double glueSize = -1, const std::string& glueMaterial = ""):
       m_layerID(layerID), m_shift(shift), m_radius(radius),
       m_slantedAngle(slantedAngle), m_slantedRadius(slantedRadius),
       m_glueSize(glueSize), m_glueMaterial(glueMaterial) {}

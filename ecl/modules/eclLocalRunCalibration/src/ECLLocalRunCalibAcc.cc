@@ -48,7 +48,7 @@ void ECLLocalRunCalibAcc::add(const float& value)
 // using variance and number of
 // accepted events.
 float ECLLocalRunCalibAcc::calcStdDev(const float& variance,
-                                      const int& count) const
+                                      const int& count)
 {
   return sqrt((variance * count) / (count - 1));
 }

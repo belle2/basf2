@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_MeasurementProducer_h
-#define genfit_MeasurementProducer_h
+#pragma once
 
 #include "Exception.h"
 #include "TrackCand.h"
@@ -116,5 +115,3 @@ AbsMeasurement* MeasurementProducer<hit_T, measurement_T>::produce(int index, co
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_MeasurementProducer_h

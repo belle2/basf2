@@ -110,15 +110,15 @@
       payloadIov=[0, 0, -1, -1]
       useDB=True
   17. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   18. RegisterEventLevelTrackingInfo
       EventLevelTrackingInfoName=EventLevelTrackingInfo
@@ -297,6 +297,7 @@
       dropDistance=0.2
       inputWireHits=CDCWireHitVector
       mergeMinFitProb=0.85
+      mergeRemoveHitsAfterSuperLayerBreak=True
       tracks=CDCTrackVector
   31. TFCDC_TrackQualityAsserter
       corrections=['B2B']
@@ -1258,6 +1259,7 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
+      vertexFitter=Rave
   102. KinkFinder
       CopiedRecoTracks=RecoTracksKinkTmp
       Kinks=

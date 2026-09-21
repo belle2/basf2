@@ -37,7 +37,7 @@ namespace Belle2 {
     BFieldComponent3d() = default;
 
     /** The BFieldComponent3d destructor. */
-    virtual ~BFieldComponent3d() = default;
+    virtual ~BFieldComponent3d() override = default;
 
     /**
      * Initializes the magnetic field component.
@@ -53,13 +53,6 @@ namespace Belle2 {
      *         Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
     virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
-
-    /**
-     * Terminates the magnetic field component.
-     * This method closes the magnetic field map file.
-     */
-    virtual void terminate() override;
-
     /**
      * Sets the filename of the magnetic field map.
      * @param filename The filename of the magnetic field map.
@@ -155,7 +148,7 @@ namespace Belle2 {
     /** Flag to switch on/off interpolation > */
     bool m_interpolate{true};
     /** The size of the map in r, phi and z. */
-    int m_mapSize[3];
+    int m_mapSize[3] = {0, 0, 0};
     /** The min and max boundaries of the map region in z. */
     double m_mapRegionZ[2] {0};
     /** Offset required because the accelerator group defines the Belle center as zero. */

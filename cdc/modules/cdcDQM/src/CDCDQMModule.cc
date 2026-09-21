@@ -187,7 +187,7 @@ void CDCDQMModule::event()
       continue;
     }
 
-    Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    const Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
     if (!track) {
       B2WARNING("Can not access RecoTrack of this Belle2::Track");
       continue;
@@ -251,6 +251,7 @@ void CDCDQMModule::event()
 
       //for tracking efficiency part
       double nsvdhits = fitresult->getHitPatternVXD().getNSVDHits();
+      // cppcheck-suppress variableScope ; kept next to the related declarations for readability
       double ncdchits = fitresult->getHitPatternCDC().getNHits();
       if (nsvdhits > 6) {
         if (ncdchits >= 100)ncdchits = 99.5; //push to last bin
@@ -285,10 +286,6 @@ void CDCDQMModule::event()
 void CDCDQMModule::endRun()
 {
   m_hNEvents->SetBinContent(1, m_nEvents);
-}
-
-void CDCDQMModule::terminate()
-{
 }
 
 int CDCDQMModule::findPhiBin(double phi, const int& lay)

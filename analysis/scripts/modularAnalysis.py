@@ -277,7 +277,8 @@ def printPrimaryMCParticles(path, **kwargs):
 
 
 def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
-                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False):
+                     showProperties=False, showMomenta=False, showVertices=False, showStatus=False, suppressPrint=False,
+                     storeCompact=False):
     """
     Prints all MCParticles or just primary MCParticles up to specified level. -1 means no limit.
 
@@ -381,15 +382,38 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
 
     The same information will be stored in the branch ``__MCDecayString__`` of
     TTree created by `VariablesToNtuple` or `VariablesToEventBasedTree` module.
-    This branch is automatically created when `PrintMCParticles` modules is called.
+    This branch is automatically created when `PrintMCParticles` module is called.
     Printing the information on the log message can be suppressed if ``suppressPrint``
-    is True, while the branch ``__MCDecayString__``. This option helps to reduce the
+    is True, while the branch ``__MCDecayString__`` is still created. This option helps to reduce the
     size of the log message.
+
+    By default the stored string is the full indented tree shown above. If
+    ``storeCompact`` is True, a compact single-line representation is stored
+    instead::
+
+        Upsilon(4S) -> [B+ -> mu+ nu_mu gamma] [B- -> pi- [D0 -> pi- pi+]]
+
+    Here ``->`` separates a particle from its daughters, ``[...]`` groups a
+    composite daughter with its descendants, and ``~`` prefixes secondary
+    particles. Radiative photons are also given a distinct name to tell them
+    apart from generator-level photons: ``gammaI`` for initial state
+    radiation, ``gammaF`` for final state radiation, and ``gammaP`` for
+    photons added by PHOTOS. A particle whose PDG code is not known to
+    ``TDatabasePDG`` is named ``UNKNOWN(<pdg code>)``.
+
+    If ``maxLevel`` cuts off a particle that still has further daughters,
+    ``-> ...`` is appended after that particle instead of showing its
+    daughters, e.g. ``B+ -> ...``, just like the ``→ …``
+    indicator used in the default indented tree. This does not happen by
+    default, since the default ``maxLevel=-1`` means the tree is never
+    truncated. The compact string uses less storage space and is easier to
+    parse. Note that this only affects the ``__MCDecayString__`` branch in the
+    ROOT file; the log output always shows the full indented tree.
 
     Parameters:
         onlyPrimaries (bool): If True show only primary particles, that is particles coming from
             the generator and not created by the simulation.
-        maxLevel (int): If 0 or less print the whole tree, otherwise stop after n generations
+        maxLevel (int): If 0 or less print the whole tree (the default -1 means unlimited), otherwise stop after n generations
         showProperties (bool): If True show mass, energy and charge of the particles
         showMomenta (bool): if True show the momenta of the particles
         showVertices (bool): if True show production vertex and production time of all particles
@@ -397,6 +421,9 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
             For secondary particles this includes creation process.
         suppressPrint (bool): if True printing the information on the log message is suppressed.
             Even if True, the branch ``__MCDecayString__`` is created.
+        storeCompact (bool): if True, store a compact single-line string (see above) in the
+            ``__MCDecayString__`` branch instead of the full indented tree. Only affects the
+            ROOT branch, not the log output. Default False.
     """
 
     return path.add_module(
@@ -408,6 +435,7 @@ def printMCParticles(onlyPrimaries=False, maxLevel=-1, path=None, *,
         showVertices=showVertices,
         showStatus=showStatus,
         suppressPrint=suppressPrint,
+        storeCompact=storeCompact,
     )
 
 
@@ -424,15 +452,16 @@ def correctBrems(outputList,
     4-vector of the photon(s) in the ``gammaList`` which has(have) a weighted named relation to
     the particle's track, set by the ``ECLTrackBremFinder`` module during reconstruction.
 
-    Warning:
-        So far, there haven't been any comprehensive comparisons of the performance of the `BremsFinder` module, which
-        is called in this function, with the `BelleBremRecovery` module, which is called via the `correctBremsBelle`
-        function. If your analysis is very sensitive to the Bremsstrahlung corrections, it is currently advised to use
-        `correctBremsBelle`.
+    Tip:
+        Since release-08 (proc16 and MC16), `correctBrems` is the recommended way of performing the Bremsstrahlung
+        recovery and is preferred over `correctBremsBelle`. The cuts applied by the ``ECLTrackBremFinder`` module
+        used to be too tight, which is why the Belle-like approach was recommended in the past; they were loosened
+        for proc16 and MC16.
 
-        The reason is that studies by the tau WG revealed that in the past the cuts applied by the
-        ``ECLTrackBremFinder`` module were too tight. They were only loosened for proc16 and MC16. New performance
-        studies are needed to verify that now this module outperforms the Belle-like approach.
+        For the recommended selection of the Bremsstrahlung photons, the recommended values of the parameters
+        below and the studies these are based on, refer to :ref:`b2help-recommendation`
+        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_),
+        which is kept up to date with the current data-taking and processing campaign.
 
     Information:
         A detailed description of how the weights are set can be found directly at the documentation of the
@@ -499,8 +528,14 @@ def correctBremsBelle(outputListName,
     Adds all photons in ``gammaListName`` to a copy of the charged particle that are within
     ``angleThreshold``.
 
+    Warning:
+        Since release-08 (proc16 and MC16), `correctBrems` is preferred over this function. Refer to
+        :ref:`b2help-recommendation`
+        (web version: `Performance Recommendations <https://belle2.pages.desy.de/performance/recommendations/>`_)
+        for the current recommendation on the Bremsstrahlung recovery.
+
     Tip:
-        Studies by the tau WG show that using a rather wide opening angle (up to
+        If you still use this function, studies by the tau WG show that using a rather wide opening angle (up to
         0.2 rad) and rather low energetic photons results in good correction.
         However, this should only serve as a starting point for your own studies
         because the optimal criteria are likely mode-dependent
@@ -2961,6 +2996,13 @@ def buildContinuumSuppression(list_name, roe_mask, ipprofile_fit=False, path=Non
     """
     Creates for each Particle in the given ParticleList a ContinuumSuppression
     dataobject and makes basf2 relation between them.
+
+    .. note::
+        `buildRestOfEvent` must be called on the same ParticleList beforehand: every
+        Particle needs a related RestOfEvent object, otherwise the module stops with
+        a fatal error. Unless ``roe_mask`` is the default mask (``'all'`` or an empty
+        string), it must also have been created with `appendROEMask` or
+        `appendROEMasks`.
 
     :param list_name: name of the input ParticleList
     :param roe_mask: name of the ROE mask

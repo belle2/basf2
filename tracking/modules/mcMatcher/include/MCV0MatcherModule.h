@@ -29,11 +29,6 @@ namespace Belle2 {
      */
     void initialize() override;
 
-    /** Called once before a new run begins.
-     *
-     * (empty)
-     */
-    void beginRun() override;
 
     /** Called once for each event.
      *
@@ -42,17 +37,7 @@ namespace Belle2 {
      */
     void event() override;
 
-    /** Called once when a run ends.
-     *
-     *  (empty)
-     */
-    void endRun() override;
 
-    /** Clean up anything you created in initialize().
-     *
-     *  (empty)
-     */
-    void terminate() override;
   private:
     StoreArray<V0>          m_V0s;          /**< V0s StoreArray */
     StoreArray<MCParticle>  m_MCParticles;  /**< MCParticles StoreArray */

@@ -325,7 +325,7 @@ void SVDPerformanceTTreeModule::event()
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
 
-              SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              const SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
               array<float, 6> Samples = ShaperDigit->getSamples();
 
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
@@ -402,7 +402,7 @@ void SVDPerformanceTTreeModule::event()
           //skip clusters created because of missing APV
           if (m_svdSize < 128)
             for (unsigned int d = 0; d < m_svdSize; d++) {
-              SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
+              const SVDShaperDigit* ShaperDigit = theRecoDigits[d]->getRelated<SVDShaperDigit>();
               array<float, 6> Samples = ShaperDigit->getSamples();
               m_svdStripCharge.push_back(theRecoDigits[d]->getCharge());
               std::copy(std::begin(Samples), std::end(Samples), std::back_inserter(m_svdStrip6Samples));

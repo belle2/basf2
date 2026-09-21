@@ -363,15 +363,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf
@@ -447,6 +447,7 @@
       dropDistance=0.2
       inputWireHits=CDCWireHitVector
       mergeMinFitProb=0.85
+      mergeRemoveHitsAfterSuperLayerBreak=True
       tracks=CDCTrackVector
   58. TFCDC_TrackQualityAsserter
       corrections=['B2B']
@@ -1316,6 +1317,7 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
+      vertexFitter=Rave
   143. TrackFinderMCTruthRecoTracks
       AllowFirstCDCSuperLayerOnly=False
       EnergyCut=0.0
@@ -3321,15 +3323,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
-      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
+      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useVXDAlignment=True
+      useBFieldCache=False
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf
@@ -3405,6 +3407,7 @@
       dropDistance=0.2
       inputWireHits=CDCWireHitVector
       mergeMinFitProb=0.85
+      mergeRemoveHitsAfterSuperLayerBreak=True
       tracks=CDCTrackVector
   58. TFCDC_TrackQualityAsserter
       corrections=['B2B']
@@ -4291,6 +4294,7 @@
             useNewV0Fitter=False
             v0FitterMode=1
             vertexChi2CutOutside=10000.0
+            vertexFitter=Rave
         3. TrackFinderMCTruthRecoTracks
             AllowFirstCDCSuperLayerOnly=False
             EnergyCut=0.0

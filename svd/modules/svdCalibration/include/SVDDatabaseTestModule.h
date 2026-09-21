@@ -32,9 +32,6 @@ namespace Belle2 {
       /** Constructor */
       SVDDatabaseTestModule();
 
-      /** Initialize the module */
-      virtual void initialize() override;
-
       /** Retrieve calibrations from database */
       virtual void event() override;
 

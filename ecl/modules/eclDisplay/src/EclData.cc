@@ -425,7 +425,7 @@ void EclData::update(bool reset_event_ranges)
   B2DEBUG(250, end - start << " events handled.");
 }
 
-int EclData::addEvent(ECLCalDigit* event, int _evtn)
+int EclData::addEvent(const ECLCalDigit* event, int _evtn)
 {
   if (event->getEnergy() <= 0 || event->getCellId() <= 0) {
     return -1;

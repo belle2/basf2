@@ -22,13 +22,13 @@ namespace Belle2 {
       eclWaveformTemplateCalibrationC2Algorithm();
 
       /**..Destructor */
-      virtual ~eclWaveformTemplateCalibrationC2Algorithm() {}
+      virtual ~eclWaveformTemplateCalibrationC2Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_firstCellID */
       void setFirstCellID(int firstCellID) {m_firstCellID = firstCellID;}
@@ -54,8 +54,8 @@ namespace Belle2 {
 
       std::string m_outputName = "eclWaveformTemplateCalibrationC2Algorithm.root"; /**< file name for histogram output */
 
-      int m_firstCellID; /**< First crystal to calibrate */
-      int m_lastCellID; /**< Last crystal to calibrate */
+      int m_firstCellID = 0; /**< First crystal to calibrate */
+      int m_lastCellID = 0; /**< Last crystal to calibrate */
       int m_CollectorLimit = 6; /**< max number of waveforms to simultaneously fit */
       double m_ParamLimitFactor = 0.25; /**< Factor to determine parameter limits in fit */
       int m_AttemptLimit = 10;  /**< Number of attempts before increasing parameter limits or resLimt */

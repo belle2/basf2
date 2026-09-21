@@ -46,12 +46,12 @@ void KLM::ScintillatorSimulator::reallocPhotoElectronBuffers(int size)
    * matter because a fatal error is issued in this case.
    */
   m_Photoelectrons =
-    (struct Photoelectron*)realloc(m_Photoelectrons,
-                                   size * sizeof(struct Photoelectron));
-  m_PhotoelectronIndex = (int*)realloc(m_PhotoelectronIndex,
-                                       size * sizeof(int));
-  m_PhotoelectronIndex2 = (int*)realloc(m_PhotoelectronIndex2,
-                                        size * sizeof(int));
+    static_cast<struct Photoelectron*>(realloc(m_Photoelectrons,
+                                               size * sizeof(struct Photoelectron)));
+  m_PhotoelectronIndex = static_cast<int*>(realloc(m_PhotoelectronIndex,
+                                                   size * sizeof(int)));
+  m_PhotoelectronIndex2 = static_cast<int*>(realloc(m_PhotoelectronIndex2,
+                                                    size * sizeof(int)));
   if (size != 0) {
     if (m_Photoelectrons == nullptr || m_PhotoelectronIndex == nullptr ||
         m_PhotoelectronIndex2 == nullptr)
@@ -84,26 +84,26 @@ KLM::ScintillatorSimulator::ScintillatorSimulator(
   m_PhotoelectronAmplitude = m_DigPar->getADCPEAmplitude();
   m_Threshold = m_DigPar->getADCThreshold();
   /* Amplitude arrays. */
-  m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
-                                     sizeof(float));
+  m_amplitudeDirect = static_cast<float*>(malloc(m_DigPar->getNDigitizations() *
+                                                 sizeof(float)));
   if (m_amplitudeDirect == nullptr)
     B2FATAL(MemErr);
-  m_amplitudeReflected = (float*)malloc(m_DigPar->getNDigitizations() *
-                                        sizeof(float));
+  m_amplitudeReflected = static_cast<float*>(malloc(m_DigPar->getNDigitizations() *
+                                                    sizeof(float)));
   if (m_amplitudeReflected == nullptr)
     B2FATAL(MemErr);
-  m_amplitude = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
+  m_amplitude = static_cast<float*>(malloc(m_DigPar->getNDigitizations() * sizeof(float)));
   if (m_amplitude == nullptr)
     B2FATAL(MemErr);
-  m_ADCAmplitude = (int*)malloc(m_DigPar->getNDigitizations() * sizeof(int));
+  m_ADCAmplitude = static_cast<int*>(malloc(m_DigPar->getNDigitizations() * sizeof(int)));
   if (m_ADCAmplitude == nullptr)
     B2FATAL(MemErr);
-  m_SignalTimeDependence = (double*)malloc((m_DigPar->getNDigitizations() + 1) *
-                                           sizeof(double));
+  m_SignalTimeDependence = static_cast<double*>(malloc((m_DigPar->getNDigitizations() + 1) *
+                                                       sizeof(double)));
   if (m_SignalTimeDependence == nullptr)
     B2FATAL(MemErr);
-  m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->getNDigitizations() *
-                                               sizeof(double));
+  m_SignalTimeDependenceDiff = static_cast<double*>(malloc(m_DigPar->getNDigitizations() *
+                                                           sizeof(double)));
   if (m_SignalTimeDependenceDiff == nullptr)
     B2FATAL(MemErr);
   attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
@@ -166,7 +166,7 @@ void KLM::ScintillatorSimulator::simulate(
 {
   m_stripName = "strip_" + std::to_string(firstHit->first);
   prepareSimulation();
-  bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
+  const bklm::GeometryPar* geoPar = bklm::GeometryPar::instance();
   const KLMSimHit* hit = firstHit->second;
   double stripLength;
   bool isBKLM = (hit->getSubdetector() == KLMElementNumbers::c_BKLM);
@@ -191,12 +191,12 @@ void KLM::ScintillatorSimulator::simulate(
     hit = *it;
     m_Energy = m_Energy + hit->getEnergyDeposit();
     /* Poisson mean for number of photons. */
-    double nPhotons = hit->getEnergyDeposit() * m_DigPar->getNPEperMeV();
+    double nPhotons = hit->getEnergyDeposit() * static_cast<double>(m_DigPar->getNPEperMeV());
     /* Fill histograms. */
     double sipmDistance, time;
     if (isBKLM) {
       sipmDistance = hit->getPropagationTime() *
-                     m_DigPar->getFiberLightSpeed();
+                     static_cast<double>(m_DigPar->getFiberLightSpeed());
       time = hit->getTime() + hit->getPropagationTime();
       if (m_MCTime < 0) {
         m_MCTime = hit->getTime();
@@ -423,7 +423,7 @@ void KLM::ScintillatorSimulator::fillSiPMOutput(float* hist, bool useDirect,
   double attenuationTime, sig, expSum;
   /* cppcheck-suppress variableScope */
   int ind1, ind2, ind3;
-  int* indexArray;
+  const int* indexArray;
   if (m_npe == 0)
     return;
   attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();

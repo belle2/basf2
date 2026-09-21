@@ -14,11 +14,11 @@ using namespace Belle2;
 
 
 
-void ExporterEventInfo::addHit(ExporterHitInfo aHit) { m_hits.push_back(aHit); }
+void ExporterEventInfo::addHit(const ExporterHitInfo& aHit) { m_hits.push_back(aHit); }
 
 
 
-void ExporterEventInfo::addTc(ExporterTcInfo aTc) { m_tcs.push_back(aTc); }
+void ExporterEventInfo::addTc(const ExporterTcInfo& aTc) { m_tcs.push_back(aTc); }
 
 
 
@@ -49,7 +49,7 @@ int ExporterEventInfo::getNMCHits()
 int ExporterEventInfo::countHitsOfType(int type)
 {
   int counter = 0;
-  for (ExporterHitInfo hit : m_hits) {
+  for (const ExporterHitInfo& hit : m_hits) {
     if (hit.getType() == type) { ++counter; }
   }
   return counter;

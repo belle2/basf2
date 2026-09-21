@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-bool ParticleWeightingAxis::isOverlappingBin(ParticleWeightingBinLimits* bin)
+bool ParticleWeightingAxis::isOverlappingBin(const ParticleWeightingBinLimits* bin)
 {
   for (auto i_bin : m_unnamedAxis) {
     /**
@@ -60,7 +60,7 @@ int ParticleWeightingAxis::addBin(ParticleWeightingBinLimits* bin)
 }
 
 
-int ParticleWeightingAxis::findBin(ParticleWeightingBinLimits* bin) const
+int ParticleWeightingAxis::findBin(const ParticleWeightingBinLimits* bin) const
 {
   for (auto i_bin : m_unnamedAxis) {
     if ((bin->first() == i_bin.second->first()) and (bin->second() == i_bin.second->second())) {

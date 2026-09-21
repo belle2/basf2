@@ -81,7 +81,7 @@ namespace Belle2 {
     } // return unit: none
 
     /** nice little nanChecker returns 0 if value was nan or inf, else returns value itself */
-    double filterNan(double value) const;
+    static double filterNan(double value);
 
   protected:
 

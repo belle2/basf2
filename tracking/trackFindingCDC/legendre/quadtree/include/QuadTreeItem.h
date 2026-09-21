@@ -7,11 +7,10 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackingUtilities/eventdata/segments/CDCSegment2D.h>
+
 namespace Belle2 {
-  namespace TrackingUtilities {
-    class CDCWireHit;
-    class CDCSegment2D;
-  }
   namespace TrackFindingCDC {
 
     /**
@@ -73,26 +72,41 @@ namespace Belle2 {
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
+     *
+     *  Defined here rather than in the source file because the quad tree search asks for the
+     *  used flag of an item millions of times per event.
      */
     template<>
-    bool QuadTreeItem<const TrackingUtilities::CDCWireHit>::isUsed() const;
+    inline bool QuadTreeItem<const TrackingUtilities::CDCWireHit>::isUsed() const
+    {
+      return (*getPointer())->hasTakenFlag() or (*getPointer())->hasMaskedFlag();
+    }
 
     /**
      *  As special case: the QuadTreeHitWrapper has a used flag itself
      */
     template<>
-    void QuadTreeItem<const TrackingUtilities::CDCWireHit>::setUsedFlag(bool usedFlag);
+    inline void QuadTreeItem<const TrackingUtilities::CDCWireHit>::setUsedFlag(bool usedFlag)
+    {
+      (*getPointer())->setTakenFlag(usedFlag);
+    }
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself
      */
     template<>
-    bool QuadTreeItem<TrackingUtilities::CDCSegment2D>::isUsed() const;
+    inline bool QuadTreeItem<TrackingUtilities::CDCSegment2D>::isUsed() const
+    {
+      return getPointer()->getAutomatonCell().hasTakenFlag();
+    }
 
     /**
      *  As special case: the CDCSegment2D has a used flag itself
      */
     template<>
-    void QuadTreeItem<TrackingUtilities::CDCSegment2D>::setUsedFlag(bool usedFlag);
+    inline void QuadTreeItem<TrackingUtilities::CDCSegment2D>::setUsedFlag(bool usedFlag)
+    {
+      getPointer()->getAutomatonCell().setTakenFlag(usedFlag);
+    }
   }
 }

@@ -42,7 +42,6 @@ namespace Belle2 {
           if (aCluster.isUCluster() == wantUCluster) { clusters.push_back(&aCluster); }
         }
       }
-      // cppcheck-suppress returnDanglingLifetime
       return clusters;
     }
 

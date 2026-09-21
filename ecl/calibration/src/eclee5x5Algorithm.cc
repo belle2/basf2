@@ -39,13 +39,13 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up existing histograms if necessary */
   TH1F* dummy;
-  dummy = (TH1F*)gROOT->FindObject("AverageExpECrys");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageExpECrys"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageElecCalib");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageElecCalib"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageInitCalib");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageInitCalib"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("meanEnvsCrysID");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("meanEnvsCrysID"));
   if (dummy) {delete dummy;}
 
   /** Put root into batch mode so that we don't try to open a graphics window */
@@ -238,7 +238,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
         CalibVsCrysID->SetBinContent(cellID, newCalib);
         CalibVsCrysID->SetBinError(cellID, 0.);
 
-        if (vectorg[cellID - 1] < 0. and NRvsCrysID->GetBinContent(cellID) > 0.) {foundConst = false;}
+        if (vectorg[cellID - 1] < 0.0 && NRvsCrysID->GetBinContent(cellID) > 0.0) {foundConst = false;}
       }
     }
 
@@ -377,10 +377,10 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   }
   histfile->Close();
 
-  dummy = (TH1F*)gROOT->FindObject("gVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("CalibVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ExpEnergyperCrys"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("dPhiperCrys"); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("gVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("CalibVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ExpEnergyperCrys")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("dPhiperCrys")); delete dummy;
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Set the return code appropriately */

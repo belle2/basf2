@@ -115,7 +115,7 @@ double MuidBuilder::getLongitudinalPDF(const KLMMuidLikelihood* muid) const
 {
   /* Setup the main ingredients for the calculation. */
   unsigned int outcome = muid->getOutcome();
-  if ((outcome <= MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::getMaximalOutcome()))
+  if ((outcome == MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::getMaximalOutcome()))
     return 0.0;
   int barrelExtLayer = muid->getBarrelExtLayer();
   if (barrelExtLayer > MuidElementNumbers::getMaximalBarrelLayer())

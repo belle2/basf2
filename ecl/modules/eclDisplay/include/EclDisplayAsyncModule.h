@@ -29,7 +29,7 @@ namespace Belle2 {
     }
 
     /**  */
-    ~EclDisplayAsyncModule() { }
+    ~EclDisplayAsyncModule() override { }
 
   };
 }

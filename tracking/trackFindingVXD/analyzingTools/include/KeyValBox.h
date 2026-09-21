@@ -51,11 +51,7 @@ namespace Belle2 {
 
 
     /** push_back for new pair given */
-    void push_back(std::pair<KeyType, ValueType>& newPair) { m_container.push_back(newPair); }
-
-
-    /** push_back for new pair given */
-    void push_back(std::pair<KeyType, ValueType> newPair) { m_container.push_back(newPair); }
+    void push_back(const std::pair<KeyType, ValueType>& newPair) { m_container.push_back(newPair); }
 
 
     /** returns iterator for container: begin */

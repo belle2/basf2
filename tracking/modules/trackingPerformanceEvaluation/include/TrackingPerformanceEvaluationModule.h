@@ -79,7 +79,7 @@ namespace Belle2 {
 
     void fillHitsUsedInTrackFitHistograms(const Track& track); /**< fill TH2F*/
 
-    bool isTraceable(const MCParticle& the_mcParticle); /**< is traceable*/
+    static bool isTraceable(const MCParticle& the_mcParticle); /**< is traceable*/
 
     void addMoreEfficiencyPlots(TList* histoList); /**< add efficiency plots*/
     void addMoreInefficiencyPlots(TList* histoList); /**< add inefficiency plots*/

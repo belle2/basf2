@@ -14,9 +14,9 @@
 
 using namespace Belle2;
 
-void Spline::muidSpline(int n, double dx, double Y[], double B[], double C[], double D[])
+void Spline::muidSpline(int n, double dx, const double Y[], double B[], double C[], double D[])
 {
-  if (n < 2)
+  if (n < 3)
     B2FATAL("The spline interpolation can't be applied (histograms with less than 3 bins).");
   D[0] = dx;
   C[1] = (Y[1] - Y[0]) / dx;

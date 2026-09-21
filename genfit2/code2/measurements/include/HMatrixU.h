@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_HMatrixU_h
-#define genfit_HMatrixU_h
+#pragma once
 
 #include "AbsHMatrix.h"
 
@@ -61,5 +60,3 @@ class HMatrixU : public AbsHMatrix {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_HMatrixU_h

@@ -59,14 +59,14 @@ namespace Belle2 {
      * This also resets all internal variables for the new event.
      * @param SPs StoreArray of SpacePoints of the event to be analyzed.
      */
-    void addSpacePoints(std::vector<StoreArray<SpacePoint>> SPs)
+    void addSpacePoints(const std::vector<StoreArray<SpacePoint>>& SPs)
     {
       m_spacePoints.clear();
       m_direction.clear();
       m_start.clear();
       m_reducedChi2 = 10;
-      for (auto& spArray : SPs) {
-        for (auto& sp : spArray) {
+      for (const auto& spArray : SPs) {
+        for (const auto& sp : spArray) {
           addSpacePoint(&sp);
         }
       }
@@ -90,7 +90,6 @@ namespace Belle2 {
       bool fitting = true;
       int rejected = 0;
 
-      // cppcheck-suppress knownConditionTrueFalse
       while (m_reducedChi2 > qualityCut && fitting) {
         fitting = doLineFit(minSPs);
         if (not fitting) {return false;}
@@ -127,7 +126,7 @@ namespace Belle2 {
      * If the fit did not meet the requirements, the last set which was used for the current event is returned.
      * @return vector of sorted SpacePoints used for the final fit.
      */
-    std::vector<const SpacePoint*> getSPTC()
+    const std::vector<const SpacePoint*>& getSPTC()
     {
       return m_spacePoints;
     }

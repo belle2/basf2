@@ -186,7 +186,7 @@ namespace Belle2 {
     void addVariableToTree(const std::string& varName, int& varReference);
 
     /** find a match between crystals in which energy was deposited and the cell or its neighbors that a track entered  */
-    void findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours, int& matchedToNeighbours, const int& cell);
+    void findECLCalDigitMatchInNeighbouringCell(const ECL::ECLNeighbours* eclneighbours, int& matchedToNeighbours, const int& cell);
 
     /** determine whether energy has been deposited in crystal with ID cell and write result to matched */
     void findECLCalDigitMatch(const int& cell, int& matched);

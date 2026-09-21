@@ -16,17 +16,17 @@ namespace Belle2 {
   {
     static_assert(sizeof(float) == sizeof(int32_t));
     // cppcheck-suppress invalidPointerCast
-    return std::fabs(*(int32_t*)&a - * (int32_t*)&b) <= 2 or (a == b);
+    return std::fabs(*reinterpret_cast<const int32_t*>(&a) - *reinterpret_cast<const int32_t*>(&b)) <= 2 or (a == b);
   }
 
   bool almostEqualDouble(const double& a, const double& b)
   {
     static_assert(sizeof(double) == sizeof(int64_t));
     // cppcheck-suppress invalidPointerCast
-    return std::fabs(*(int64_t*)&a - * (int64_t*)&b) <= 2 or (a == b);
+    return std::fabs(*reinterpret_cast<const int64_t*>(&a) - *reinterpret_cast<const int64_t*>(&b)) <= 2 or (a == b);
   }
 
-  unsigned long int findMatchedParenthesis(std::string str, char open, char close)
+  unsigned long int findMatchedParenthesis(const std::string& str, char open, char close)
   {
     unsigned long int end = 1;
     if (str[0] == open) {
@@ -42,7 +42,7 @@ namespace Belle2 {
     return end - 1;
   }
 
-  unsigned long int findIgnoringParenthesis(std::string str, std::string pattern, unsigned int begin)
+  unsigned long int findIgnoringParenthesis(const std::string& str, const std::string& pattern, unsigned int begin)
   {
 
     if (str.size() < pattern.size())
@@ -74,7 +74,7 @@ namespace Belle2 {
     return std::string::npos;
   }
 
-  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(std::string str, char delimiter, char open, char close)
+  std::vector<std::string> splitOnDelimiterAndConserveParenthesis(const std::string& str, char delimiter, char open, char close)
   {
 
     std::vector<std::string> result;

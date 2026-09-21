@@ -45,7 +45,7 @@ namespace Belle2 {
      * Module destructor. Empty because all resources are freed in
      * terminate().
      */
-    virtual ~EclDisplayModule();
+    virtual ~EclDisplayModule() override;
 
     /**
      * Initialize EclChannelMapper.
@@ -62,11 +62,6 @@ namespace Belle2 {
      * if m_autoDisplay flag is set.
      */
     virtual void event() override;
-
-    /**
-     * Empty method.
-     */
-    virtual void endRun() override;
 
     /**
      * Wait till EclFrame is closed then free allocated resources.

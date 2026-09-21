@@ -13,7 +13,7 @@ Low Multiplicity skims
 	* e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]
 	* e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]
 
-  Registered as("18530800", "lowMulti", "TauTauTauTau")
+  Registered as `("18530800", "lowMulti", "TauTauTauTau")`
 
 Changes in the skim package in light-2607-kasei
 --------------------------------------------
@@ -29,11 +29,19 @@ FEI skims
 Dark skims
 ++++++++++
 
-* Added new skim for the Physics channel e^{+}e^{-} \\to \\mu^{+}\\mu^{-}Z^{\\prime}
-  `Z^{\\prime} \\to x^{+}x^{-} \\ (x = e, \\mu, \\tau, \\pi, K)
-  Registered as ("18520600", "dark", "ZpVisible")
+* Added new skim for the Physics channel `e^{+}e^{-} \\to \\mu^{+}\\mu^{-}Z^{\\prime}`
+  `Z^{\\prime} \\to x^{+}x^{-} \\ (x = e, \\mu, \\tau, \\pi, K)`
+  Registered as `("18520600", "dark", "ZpVisible")`
   
-* Fixed a bug for the LFVZpVisible skim.
-  New LFVZpVisible for PromptRel09 skimming campaign registered as
-  ("18520401", "dark", "LFVZpVisible").
-  The pre-PromptRel09 skim was made invalid: ("18520400", "dark", "LFVZpVisible_invalid")
+
+Modified skims
+++++++++++++++
+
+* Charm: `17240101 <skim.WGs.charm.DstToD0Pi_D0ToHpJm>`: added the required
+  ``pi+:all`` standard list for the slow pion and updated the skim code from
+  ``17240100`` to ``17240101`` for PromptRel9.
+
+* Dark: Fixed a bug for the `LFVZpVisible` skim.
+  New `LFVZpVisible` for PromptRel09 skimming campaign registered as
+  `("18520401", "dark", "LFVZpVisible")`.
+  The `pre-PromptRel09` skim was made invalid: `("18520400", "dark", "LFVZpVisible_invalid")`

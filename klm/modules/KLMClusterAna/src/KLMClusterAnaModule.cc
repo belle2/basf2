@@ -38,7 +38,7 @@ static double expectation(std::vector<double> vec)
   return accumulate(vec.begin(), vec.end(), 0.0) / vec.size();
 }
 
-static std::vector<double> addition(std::vector<double> vec1, std::vector<double> vec2)
+static std::vector<double> addition(const std::vector<double>& vec1, const std::vector<double>& vec2)
 {
   std::vector<double> output(vec1.size());
   if (vec1.size() != vec2.size()) {
@@ -57,7 +57,7 @@ static std::vector<double> addition(std::vector<double> vec1, std::vector<double
 
 
 
-static std::vector<double> product(std::vector<double> vec1, std::vector<double> vec2)
+static std::vector<double> product(const std::vector<double>& vec1, const std::vector<double>& vec2)
 {
   std::vector<double> output(vec1.size());
   if (vec1.size() != vec2.size())  {
@@ -75,12 +75,13 @@ static std::vector<double> product(std::vector<double> vec1, std::vector<double>
 }
 
 
-static std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
+static std::vector<double> covariance_matrix3x3(const std::vector<double>& xcoord, const std::vector<double>& ycoord,
+                                                const std::vector<double>& zcoord)
 {
 
   if (xcoord.size() != ycoord.size() || (ycoord.size() != zcoord.size()))  {
     B2ERROR("Vector lengths don't match so error. (Covariance Matrix)");
-    double array[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    const double array[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     std::vector <double>output(std::begin(array), std::end(array));
     return output;
   }
@@ -103,14 +104,14 @@ static std::vector<double> covariance_matrix3x3(std::vector<double> xcoord, std:
   double yzterm = expectation(product(deltay, deltaz));
   double zzterm = expectation(product(deltaz, deltaz));
 
-  double array[] = {xxterm, xyterm, xzterm, xyterm, yyterm, yzterm, xzterm, yzterm, zzterm};
+  const double array[] = {xxterm, xyterm, xzterm, xyterm, yyterm, yzterm, xzterm, yzterm, zzterm};
   std::vector <double>output(std::begin(array), std::end(array));
 
   return output;
 }
 
 
-static TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
+static TMatrixT<double> eigenvectors3x3(const std::vector<double>& matrix)
 {
   //[rows][columns]
   TMatrixT<double> output(4, 3);
@@ -145,7 +146,8 @@ static TMatrixT<double> eigenvectors3x3(std::vector<double> matrix)
 
 
 
-static TMatrixT<double> spatialVariances(std::vector<double> xcoord, std::vector<double> ycoord, std::vector<double> zcoord)
+static TMatrixT<double> spatialVariances(const std::vector<double>& xcoord, const std::vector<double>& ycoord,
+                                         const std::vector<double>& zcoord)
 {
   /**
    Takes lists of x/y/z coordinates (as vectors) and converts that to provide a list of eigenvectors
@@ -183,10 +185,6 @@ void KLMClusterAnaModule::initialize()
   m_klmHit2ds.isRequired();
   m_KLMClusters.registerRelationTo(m_KLMClusterShape);
   m_KLMClusterShape.registerRelationTo(m_klmHit2ds);
-}
-
-void KLMClusterAnaModule::beginRun()
-{
 }
 
 void KLMClusterAnaModule::event()

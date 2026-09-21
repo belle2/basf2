@@ -29,10 +29,12 @@ namespace Belle2 {
      */
     DQMHistAnalysisDeltaTestModule();
 
+  private:
+
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisDeltaTestModule();
+    ~DQMHistAnalysisDeltaTestModule() override final;
 
     /**
      * Initializer.
@@ -58,8 +60,6 @@ namespace Belle2 {
      * This method is called at the end of the event processing.
      */
     void terminate(void) override final;
-
-  private:
 
     // Data members
     //! name of histogram directory

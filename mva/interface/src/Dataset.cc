@@ -364,7 +364,7 @@ namespace Belle2 {
     }
 
 
-    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant) const
+    float ROOTDataset::castVarVariantToFloat(RootDatasetVarVariant& variant)
     {
       if (std::holds_alternative<double>(variant))
         return static_cast<float>(std::get<double>(variant));
@@ -495,7 +495,7 @@ namespace Belle2 {
       return values;
     }
 
-    bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname) const
+    bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname)
     {
       auto branch = tree->GetListOfBranches()->FindObject(branchname.c_str());
       return branch != nullptr;
@@ -586,7 +586,7 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantType(const std::string type, RootDatasetVarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantType(const std::string& type, RootDatasetVarVariant& varVariantTarget)
     {
       if (type == "Double_t")
         varVariantTarget = 0.0;
@@ -603,11 +603,11 @@ namespace Belle2 {
     }
 
 
-    void ROOTDataset::initialiseVarVariantForBranch(const std::string branch_name, RootDatasetVarVariant& varVariantTarget)
+    void ROOTDataset::initialiseVarVariantForBranch(const std::string& branch_name, RootDatasetVarVariant& varVariantTarget)
     {
       std::string compatible_branch_name = Belle2::MakeROOTCompatible::makeROOTCompatible(branch_name);
       // try the branch as is first then fall back to root safe name.
-      if (checkForBranch(m_tree, branch_name.c_str())) {
+      if (checkForBranch(m_tree, branch_name)) {
         TBranch* branch = m_tree->GetBranch(branch_name.c_str());
         TLeaf* leaf = branch->GetLeaf(branch_name.c_str());
         std::string type_name = leaf->GetTypeName();
@@ -627,13 +627,11 @@ namespace Belle2 {
 
       // set feature variables
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); i++) {
-        auto variable = m_general_options.m_variables[i];
         initialiseVarVariantForBranch(m_general_options.m_variables[i], m_input_variant[i]);
       }
 
       // set spectator variables
       for (unsigned int i = 0; i < m_general_options.m_spectators.size(); i++) {
-        auto variable = m_general_options.m_spectators[i];
         initialiseVarVariantForBranch(m_general_options.m_spectators[i], m_spectators_variant[i]);
       }
 

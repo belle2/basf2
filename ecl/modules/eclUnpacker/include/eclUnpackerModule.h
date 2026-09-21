@@ -33,7 +33,7 @@ namespace Belle2 {
     /** constructor */
     ECLUnpackerModule();
     /** destructor */
-    virtual ~ECLUnpackerModule() {}
+    virtual ~ECLUnpackerModule() override {}
 
     /** initialize */
     virtual void initialize() override;
@@ -41,10 +41,6 @@ namespace Belle2 {
     virtual void beginRun() override;
     /** event */
     virtual void event() override;
-    /** endRun */
-    virtual void endRun() override;
-    /** terminate */
-    virtual void terminate() override;
 
     /** exception should be thrown when the unexpected      */
     BELLE2_DEFINE_EXCEPTION(Unexpected_end_of_FINESSE_buffer,

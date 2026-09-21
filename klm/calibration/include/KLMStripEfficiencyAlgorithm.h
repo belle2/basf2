@@ -152,7 +152,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~KLMStripEfficiencyAlgorithm();
+    ~KLMStripEfficiencyAlgorithm() override;
 
     /**
      * Calibration.

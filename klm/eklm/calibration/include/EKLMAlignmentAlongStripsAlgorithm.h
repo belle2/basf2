@@ -46,7 +46,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~EKLMAlignmentAlongStripsAlgorithm();
+    ~EKLMAlignmentAlongStripsAlgorithm() override;
 
     /**
      * Calibration.
@@ -65,7 +65,7 @@ namespace Belle2 {
      * @param[in] sector Sector number.
      * @param[in] plane  Plane number.
      */
-    int getAveragedPlane(int sector, int plane) const;
+    static int getAveragedPlane(int sector, int plane);
 
     /** Output file name. */
     std::string m_OutputFile;

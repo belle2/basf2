@@ -97,8 +97,10 @@ namespace Belle2 {
     /** escape string literals. */
     std::string escape(const char* value) const { return escape(std::string(value)); }
     /** escape numeric value. */
-    template <class T> std::string escape(const T& value) const { return std::to_string(value); }
+    template <class T> static std::string escape(const T& value) { return std::to_string(value); }
     /** escape vector<T>. */
+    // it calls the non-static escape(const std::string&) overload, so it cannot be static
+    // cppcheck-suppress functionStatic
     template <class T> std::string escape(const std::vector<T>& value) const
     {
       std::string delim = "";

@@ -56,7 +56,7 @@ namespace Belle2 {
     }
 
     /** Return dEdX but not with dX = path length but with dX = thickness of cluster. */
-    double getDEDXWithThickness(const ClusterType& cluster) const
+    static double getDEDXWithThickness(const ClusterType& cluster)
     {
       const double calibratedCharge = getCalibratedCharge(cluster);
       const double pathLength = getThicknessOfCluster(cluster);

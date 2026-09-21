@@ -236,10 +236,6 @@ void ECLDQMInjectionModule::event()
     int time_within_cycle = difference % 1280;
     // Time within beam revolution (in microseconds)
     double time_in_cycle_us = time_within_cycle / 127.;
-    // Time within beam revolution (in ADC ticks)
-    // https://xwiki.desy.de/xwiki/rest/p/4630a
-    int time_within_cycle_adc_ticks = (1280 - time_within_cycle) / 72;
-
     int is_her = it.GetIsHER(0);
 
     if (is_her < 0 || is_her > 1) continue;
@@ -293,14 +289,17 @@ void ECLDQMInjectionModule::event()
     //== Filling hInjkickTimeShift histograms
 
     if (diff2 < 10e3) {
+      // Time within beam revolution (in ADC ticks)
+      // https://xwiki.desy.de/xwiki/rest/p/4630a
+      int time_within_cycle_adc_ticks = (1280 - time_within_cycle) / 72;
       for (auto& aECLDsp : m_ECLDsps) {
         int adc[31];
         aECLDsp.getDspA(adc);
         // Do a naive estimate of inj peak position by
         // searching for the maximum ADC sample in the
         // pedestal part of the waveform.
-        int* ped_max = std::max_element(adc, adc + 16);
-        int* ped_min = std::min_element(adc, adc + 16);
+        const int* ped_max = std::max_element(adc, adc + 16);
+        const int* ped_min = std::min_element(adc, adc + 16);
         // The waveform should have at least ~10 MeV peak amplitude
         if (*ped_max - *ped_min < 200) continue;
         int max_ped_id = ped_max - adc;

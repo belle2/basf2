@@ -150,7 +150,7 @@ namespace Belle2 {
      * @param value - new value we wish the parameter of the histogram to have. Int and double values are parsed from string so they must be given correctly. */
     void ProcessHistogramParameterChange(const std::string& name, const std::string& parameter, const std::string& value);
     /** On given histogram sets given parameter to given value. Used in the function above. */
-    void EditHistogramParameter(TH1* histogram, const std::string& parameter, std::string value);
+    void EditHistogramParameter(TH1* histogram, const std::string& parameter, const std::string& value);
 
     /** All the following Define- functions should be used in the defineHisto() function to define histograms. The convention is that every Define- function is responsible for creating its
      * own TDirectory (if it's needed). In any case the function must then return to the original gDirectory.

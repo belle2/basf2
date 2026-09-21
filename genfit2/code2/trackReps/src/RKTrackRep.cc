@@ -1,5 +1,5 @@
-/* Copyright 2008-2013, Technische Universitaet Muenchen, Ludwig-Maximilians-Universität München
-   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Tobias Schlüter
+/* Copyright 2008-2026, Technische Universitaet Muenchen, Ludwig-Maximilians-Universität München, DESY
+   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Tobias Schlüter & Christian Wessel
 
    This file is part of GENFIT.
 
@@ -19,6 +19,8 @@
 
 #include "RKTrackRep.h"
 #include "IO.h"
+#include "MathHelpers.h"
+#include "Tools.h"
 
 #include <Exception.h>
 #include <FieldManager.h>
@@ -901,7 +903,7 @@ double RKTrackRep::getMomVar(const MeasuredStateOnPlane& state) const {
   // delta means sigma
   // cov(0,0) is sigma^2
 
-  return state.getCov()(0,0) * pow(getCharge(state), 2)  / pow(state.getState()(0), 4);
+  return state.getCov()(0,0) * square(getCharge(state))  / pow4(state.getState()(0));
 }
 
 
@@ -946,9 +948,19 @@ void RKTrackRep::calcForwardJacobianAndNoise(const M1x7& startState7, const DetP
   // The Jacobians returned from RKutta are transposed.
   TMatrixD jac(TMatrixD::kTransposed, TMatrixD(7, 7, ExtrapSteps_.back().jac7_.begin()));
   TMatrixDSym noise(7, ExtrapSteps_.back().noise7_.begin());
-  for (int i = ExtrapSteps_.size() - 2; i >= 0; --i) {
-    noise += TMatrixDSym(7, ExtrapSteps_[i].noise7_.begin()).Similarity(jac);
-    jac *= TMatrixD(TMatrixD::kTransposed, TMatrixD(7, 7, ExtrapSteps_[i].jac7_.begin()));
+  if (ExtrapSteps_.size() > 1) {
+    // The 7x7 buffers are allocated once and refilled inside the loop.
+    TMatrixDSym stepNoise(7);
+    TMatrixDSym transportedNoise(7);
+    TMatrixD stepJac(7, 7);
+    for (int i = ExtrapSteps_.size() - 2; i >= 0; --i) {
+      stepNoise.SetMatrixArray(ExtrapSteps_[i].noise7_.begin());
+      tools::similarity(jac, stepNoise, transportedNoise);
+      noise += transportedNoise;
+      stepJac.SetMatrixArray(ExtrapSteps_[i].jac7_.begin());
+      stepJac.T();
+      jac *= stepJac;
+    }
   }
 
   // Project into 5x5 space.
@@ -1042,7 +1054,7 @@ void RKTrackRep::getBackwardJacobianAndNoise(TMatrixD& jacobian, TMatrixDSym& no
 
   noise.ResizeTo(5,5);
   noise = fNoise_;
-  noise.Similarity(jacobian);
+  tools::similarity(jacobian, noise);
 
   // lastStartState_ = jacobian * lastEndState_  + deltaState
   deltaState.ResizeTo(5);
@@ -1185,18 +1197,18 @@ void RKTrackRep::setPosMomErr(MeasuredStateOnPlane& state, const TVector3& pos, 
 
   TMatrixDSym& cov(state.getCov());
 
-  cov(0,0) = pow(getCharge(state), 2) / pow(mom.Mag(), 6) *
+  cov(0,0) = square(getCharge(state)) / cube(mom.Mag2()) *
              (mom.X()*mom.X() * momErr.X()*momErr.X()+
               mom.Y()*mom.Y() * momErr.Y()*momErr.Y()+
               mom.Z()*mom.Z() * momErr.Z()*momErr.Z());
 
-  cov(1,1) = pow((U.X()/pw - W.X()*pu/(pw*pw)),2.) * momErr.X()*momErr.X() +
-             pow((U.Y()/pw - W.Y()*pu/(pw*pw)),2.) * momErr.Y()*momErr.Y() +
-             pow((U.Z()/pw - W.Z()*pu/(pw*pw)),2.) * momErr.Z()*momErr.Z();
+  cov(1,1) = square(U.X()/pw - W.X()*pu/(pw*pw)) * momErr.X()*momErr.X() +
+             square(U.Y()/pw - W.Y()*pu/(pw*pw)) * momErr.Y()*momErr.Y() +
+             square(U.Z()/pw - W.Z()*pu/(pw*pw)) * momErr.Z()*momErr.Z();
 
-  cov(2,2) = pow((V.X()/pw - W.X()*pv/(pw*pw)),2.) * momErr.X()*momErr.X() +
-             pow((V.Y()/pw - W.Y()*pv/(pw*pw)),2.) * momErr.Y()*momErr.Y() +
-             pow((V.Z()/pw - W.Z()*pv/(pw*pw)),2.) * momErr.Z()*momErr.Z();
+  cov(2,2) = square(V.X()/pw - W.X()*pv/(pw*pw)) * momErr.X()*momErr.X() +
+             square(V.Y()/pw - W.Y()*pv/(pw*pw)) * momErr.Y()*momErr.Y() +
+             square(V.Z()/pw - W.Z()*pv/(pw*pw)) * momErr.Z()*momErr.Z();
 
   cov(3,3) = posErr.X()*posErr.X() * U.X()*U.X() +
              posErr.Y()*posErr.Y() * U.Y()*U.Y() +

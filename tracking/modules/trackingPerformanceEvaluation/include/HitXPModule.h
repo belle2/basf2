@@ -45,8 +45,6 @@ namespace Belle2 {
      * This method is called only once before the actual event processing starts.   */
     void initialize() override;
 
-    /** Called when entering a new run.     */
-    void beginRun() override;
 
     /** This method is the core of the module.
      * This method is called for each event. All processing of the event has to take place in this method.   */
@@ -55,8 +53,6 @@ namespace Belle2 {
     /** This method is called if the current run ends. */
     void endRun() override;
 
-    /** This method is called at the end of the event processing.   */
-    void terminate() override;
 
   private:
     TTree* m_tree = nullptr; /**< full output tree */

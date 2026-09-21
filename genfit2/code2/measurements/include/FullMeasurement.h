@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_FullMeasurement_h
-#define genfit_FullMeasurement_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsHMatrix.h"
@@ -66,5 +65,3 @@ class FullMeasurement : public AbsMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_FullMeasurement_h

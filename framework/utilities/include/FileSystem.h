@@ -134,7 +134,7 @@ namespace Belle2 {
       /** close file and delete on destruction */
       ~TemporaryFile();
       /** get filename of the temporary file */
-      std::string getName() const { return m_filename; }
+      const std::string& getName() const { return m_filename; }
     private:
       /** filename of the temporary file */
       std::string m_filename;

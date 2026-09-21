@@ -332,12 +332,3 @@ void PhysicsObjectsMiraBelleModule::event()
   }
   m_h_nECLClusters->Fill(neclClusters);
 }
-
-void PhysicsObjectsMiraBelleModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleModule::terminate()
-{
-}
-

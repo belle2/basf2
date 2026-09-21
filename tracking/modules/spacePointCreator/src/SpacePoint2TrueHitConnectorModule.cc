@@ -644,7 +644,7 @@ SpacePoint2TrueHitConnectorModule::getTHwithWeight(const MapType& aMap, Belle2::
   if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 999, PACKAGENAME())) {
     std::stringstream output;
     output << "The candidates are: ";
-    for (auto& info : trueHitInfos) { output << info; }
+    for (const auto& info : trueHitInfos) { output << info; }
     B2DEBUG(29, output.str());
 
     std::pair<double, double> spacePointLocal = getLocalPos(spacePoint);
@@ -809,7 +809,7 @@ void SpacePoint2TrueHitConnectorModule::initializeRootFile()
 {
   if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
     std::string output;
-    for (std::string entry : m_PARAMrootFileName) {
+    for (const std::string& entry : m_PARAMrootFileName) {
       output += "'" + entry + "' ";
     }
     B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
@@ -900,7 +900,8 @@ std::pair<double, double> SpacePoint2TrueHitConnectorModule::getLocalError(Belle
 // TODO TODO TODO TODO TODO TODO TODO: remove if not needed, only for tessting at the moment (i.e. do not commit)
 
 // ==================================================== CALCULATE RELATION WEIGHT ==================================================
-double SpacePoint2TrueHitConnectorModule::calculateRelationWeight(const TrueHitInfo& trueHitInfo, Belle2::SpacePoint* spacePoint)
+double SpacePoint2TrueHitConnectorModule::calculateRelationWeight(const TrueHitInfo& trueHitInfo,
+    const Belle2::SpacePoint* spacePoint)
 {
   bool isUAssigned = spacePoint->getIfClustersAssigned().first; // get if the Cluster in the SpacePoint is a U-Cluster
   // get if two Clusters are related to the Truehit (always false for single Cluster SPs

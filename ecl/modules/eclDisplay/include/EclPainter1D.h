@@ -35,7 +35,12 @@ namespace Belle2 {
     /**
      * Destructor for EclPainter subclass.
      */
-    virtual ~EclPainter1D();
+    virtual ~EclPainter1D() override;
+    /** Copy constructor (disabled). */
+    EclPainter1D(const EclPainter1D&) = delete;
+
+    /** Operator = (disabled). */
+    EclPainter1D& operator=(const EclPainter1D&) = delete;
 
   private:
     /**  Display subtypes of this class. */

@@ -51,7 +51,7 @@ void SpacePointCreatorTestModule::initialize()
   m_svdClusters.isOptional(m_svdClustersName);
 
 
-  for (auto aName : m_containerSpacePointsName) {
+  for (const auto& aName : m_containerSpacePointsName) {
     m_allSpacePointStoreArrays.push_back({/* aName,*/ StoreArray<SpacePoint>(aName) });
   }
 
@@ -142,15 +142,16 @@ void SpacePointCreatorTestModule::event()
     for (auto& aSP : aStoreArrayInterface) {
       std::vector<genfit::PlanarMeasurement> tempMeasurements = aSP.getGenfitCompatible();
 
-      for (genfit::PlanarMeasurement& measurement : tempMeasurements) {
+      for (const genfit::PlanarMeasurement& measurement : tempMeasurements) {
         hitOutput.push_back({aSP.getType(), measurement.clone()});
       }
     }
 
     for (unsigned i = 0; i < hitOutput.size(); i++) {
       track.insertMeasurement(hitOutput[i].second);
-      genfit::TrackPoint* point = track.getPointWithMeasurement(i);
-      genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
+      const genfit::TrackPoint* point = track.getPointWithMeasurement(i);
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
+      const genfit::AbsMeasurement* rawPoint = point->getRawMeasurement();
       B2DEBUG(20, " executing AbsMeasurement " << i << " with detectorID(PXD = 0,SVD=1,TEL=2,VXD=-1) : " << hitOutput[i].first << ":\n");
       point->Print();
       B2DEBUG(20, " converted absMeasurement is of detID: " << rawPoint->getDetId() << ", hitID: " << rawPoint->getHitId());

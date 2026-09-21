@@ -44,7 +44,7 @@ namespace Belle2 {
 
 
     /// Fit the data with specified initial values of parameters and limits on them
-    std::pair<Pars, Eigen::MatrixXd> fitData(Pars pars, Limits limits, bool UseCheb = true);
+    std::pair<Pars, Eigen::MatrixXd> fitData(const Pars& pars, Limits limits, bool UseCheb = true);
 
 
   private:
@@ -62,18 +62,10 @@ namespace Belle2 {
     /// Calculate Chebyshev coefficients for the data set
     Eigen::VectorXd getDataGrid() const;
 
-    /// Calculate Chebyshev coefficients with the covariance (useful for toy studies)
-    std::pair<Eigen::VectorXd, Eigen::MatrixXd> getDataGridWithCov() const;
-
-    /// Evaluate the fitted function approximated with the Chebyshev polynomial, typically runs faster
-    double getFunctionFast(const Pars& pars, double x);
-
-
 
 
     std::vector<double> m_data;         ///< vector with the data points to be fitted
     Eigen::VectorXd m_dataGrid;         ///< vector with the data points related to the cheb nodes (m_dataGrid.size = nodes.size)
-    Eigen::MatrixXd m_dataGridCov;      ///< vector with the data points covariances (useful for toy studies)
     Eigen::MatrixXd m_coefsMat;         ///< transformation matrix from chebPol to gridPoints
 
     Eigen::VectorXd m_nodes;            ///< vector with cheb nodes

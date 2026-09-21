@@ -58,10 +58,10 @@ void ROICalculator::apply(const std::vector<std::pair<VxdID, long>>& uExtrapolat
 
   const PXD::SensorInfo* currentSensor;
 
-  for (auto& uExtrapolatedHit : uExtrapolations) {
+  for (const auto& uExtrapolatedHit : uExtrapolations) {
     const VxdID& uHitSensorID = uExtrapolatedHit.first;
 
-    for (auto& vExtrapolatedHit : vExtrapolations) {
+    for (const auto& vExtrapolatedHit : vExtrapolations) {
       const VxdID& vHitSensorID = vExtrapolatedHit.first;
 
       if (uHitSensorID != vHitSensorID) {

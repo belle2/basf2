@@ -23,6 +23,7 @@ EKLM::LineSegment2D::~LineSegment2D()
 }
 
 int EKLM::LineSegment2D::
+// cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
 findIntersection(const Line2D& line,
                  HepGeom::Point3D<double>* intersection) const
 {
@@ -52,12 +53,13 @@ findIntersection(const LineSegment2D& lineSegment,
 }
 
 int EKLM::LineSegment2D::
+// cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
 findIntersection(const Circle2D& circle,
                  HepGeom::Point3D<double> intersections[2]) const
 {
   int i, n;
   double t[2], angles[2];
-  bool condition[2];
+  bool condition[2] = {false, false};
   n = Line2D::findIntersection(circle, intersections, t, angles);
   for (i = 0; i < n; i++)
     condition[i] = tWithinRange(t[i]);
@@ -65,19 +67,20 @@ findIntersection(const Circle2D& circle,
 }
 
 int EKLM::LineSegment2D::
+// cppcheck-suppress duplInheritedMember ; the line segment versions intentionally hide the Line2D ones
 findIntersection(const Arc2D& arc,
                  HepGeom::Point3D<double> intersections[2]) const
 {
   int i, n;
   double t[2], angles[2];
-  bool condition[2];
+  bool condition[2] = {false, false};
   n = Line2D::findIntersection(arc, intersections, t, angles);
   for (i = 0; i < n; i++)
     condition[i] = tWithinRange(t[i]) && arc.angleWithinRange(angles[i]);
   return selectIntersections(intersections, condition, n);
 }
 
-bool EKLM::LineSegment2D::tWithinRange(double t) const
+bool EKLM::LineSegment2D::tWithinRange(double t)
 {
   return (t >= 0 && t <= 1);
 }

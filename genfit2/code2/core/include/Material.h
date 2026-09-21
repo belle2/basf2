@@ -1,5 +1,4 @@
-#ifndef genfit_Material_h
-#define genfit_Material_h
+#pragma once
 
 #include <TObject.h>
 
@@ -31,5 +30,3 @@ namespace genfit {
     bool operator!=(const Material &lhs, const Material &rhs);
 
 }
-
-#endif

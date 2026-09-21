@@ -47,7 +47,7 @@ namespace Belle2 {
     private:
 
       /// Precision level for the width of the off origin hough search
-      double m_levelPrecision;
+      double m_levelPrecision {};
       //.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
     };
   }

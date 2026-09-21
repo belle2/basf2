@@ -96,10 +96,6 @@ void SVDCoGTimeEstimatorModule::initialize()
   B2DEBUG(25, " -->  RecoDigitTrueRel:     " << m_relRecoDigitTrueHitName);
 
 }
-void SVDCoGTimeEstimatorModule::beginRun()
-{
-}
-
 
 void SVDCoGTimeEstimatorModule::event()
 {
@@ -135,7 +131,6 @@ void SVDCoGTimeEstimatorModule::event()
   createRelationLookup(relShaperDigitTrueHit, m_trueRelation, nDigits);
 
   //start loop on SVDSHaperDigits
-  Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
 
   m_NumberOfAPVSamples = m_storeSVDEvtInfo->getNSamples();
 
@@ -145,6 +140,7 @@ void SVDCoGTimeEstimatorModule::event()
 
     m_StopCreationReco = false;
 
+    Belle2::SVDShaperDigit::APVFloatSamples samples_vec;
     samples_vec = shaper.getSamples();
 
     //retrieve the VxdID, sensor and cellID of the current RecoDigit
@@ -226,14 +222,6 @@ void SVDCoGTimeEstimatorModule::event()
 }
 
 
-void SVDCoGTimeEstimatorModule::endRun()
-{
-}
-
-
-void SVDCoGTimeEstimatorModule::terminate()
-{
-}
 
 
 float SVDCoGTimeEstimatorModule::CalculateWeightedMeanPeakTime(Belle2::SVDShaperDigit::APVFloatSamples samples)

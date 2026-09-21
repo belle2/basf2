@@ -23,7 +23,7 @@ namespace Belle2 {
     typedef std::unordered_map<unsigned int, unsigned short> SinglePixelThresholdsSet;
 
     /** Default constructor */
-    PXDPixelThresholdPar(unsigned short defaultThr = 7) : m_defaultThreshold(defaultThr), m_MapSingleThresholds() {}
+    explicit PXDPixelThresholdPar(unsigned short defaultThr = 7) : m_defaultThreshold(defaultThr), m_MapSingleThresholds() {}
 
     /** Destructor */
     ~PXDPixelThresholdPar() {}

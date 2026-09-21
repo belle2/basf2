@@ -24,7 +24,7 @@ namespace Belle2 {
     InvariantMassAlgorithm();
 
     /// Destructor
-    virtual ~InvariantMassAlgorithm() {}
+    virtual ~InvariantMassAlgorithm() override {}
 
     /// Set outer loss function (for calibration intervals)
     void setOuterLoss(const std::string& loss) { m_lossFunctionOuter = loss; }

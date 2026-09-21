@@ -35,19 +35,13 @@ namespace Belle2 {
     BKLMAnaModule();
 
     //! Destructor
-    ~BKLMAnaModule();
+    ~BKLMAnaModule() override;
 
     //! Initialize at start of job
     void initialize() override;
 
-    //! Do any needed actions at the start of a simulation run
-    void beginRun() override;
-
     //! This method is called for each event
     void event() override;
-
-    //! Do any needed actions at the end of a simulation run
-    void endRun() override;
 
     //! Terminate at the end of job
     void terminate() override;

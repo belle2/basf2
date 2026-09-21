@@ -1,0 +1,46 @@
+# EventType: 1290021000
+# Descriptor: [Bu -> eta' K*+]cc
+# NickName: Bu_etapKst
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Michele Veronesi
+# Email: michele.veronesi@ipmu.jp
+# Cuts: None
+# Date: 20260825
+#
+#
+Alias      eta'sig       eta'
+ChargeConj eta'sig       eta'sig
+Alias      etasig        eta
+ChargeConj etasig        etasig
+Alias      K*-sig        K*-
+ChargeConj K*-sig        K*+
+Alias      K_0*-sig      K_0*-
+ChargeConj K_0*-sig      K_0*+
+Alias      K_2*-sig      K_2*-
+ChargeConj K_2*-sig      K_2*+
+#
+Decay Upsilon(4S)
+0.5    B+sig B-                                VSS;
+0.5    B+ B-sig                                VSS;
+Enddecay
+#
+Decay B-sig
+0.126316   K*-sig  eta'sig                   SVS;
+0.136842   K_0*-sig  eta'sig                 PHSP;
+0.736842   K_2*-sig  eta'sig                 STS;
+Enddecay
+CDecay B+sig
+#
+Decay eta'sig
+0.590278         etasig     pi+     pi-       ETAPRIME_DALITZ -0.047 -0.069 0.0 0.073;
+0.409722         rho0       gamma             SVP_HELAMP  1.0 0.0 1.0 0.0;
+Enddecay
+#
+Decay etasig
+0.630971   gamma  gamma                       PHSP;
+0.369029   pi+   pi-    pi0                   ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173;
+Enddecay
+#
+End

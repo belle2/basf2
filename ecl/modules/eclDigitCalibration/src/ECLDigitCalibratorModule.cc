@@ -246,7 +246,8 @@ void ECLDigitCalibratorModule::event()
     if (is_pure_csi) {
       calibratedEnergy = amplitude * m_pureCsIEnergyCalib;
     } else {
-      calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
+      calibratedEnergy = static_cast<double>(amplitude * v_calibrationCrystalElectronics[cellid - 1] *
+                                             v_calibrationCrystalEnergy[cellid - 1]);
     }
     if (calibratedEnergy < 0.0)
       calibratedEnergy = 0.0;
@@ -367,14 +368,8 @@ void ECLDigitCalibratorModule::event()
 }
 
 // end run
-void ECLDigitCalibratorModule::endRun()
-{
-}
 
 // terminate
-void ECLDigitCalibratorModule::terminate()
-{
-}
 
 // Time resolution calibration
 double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const

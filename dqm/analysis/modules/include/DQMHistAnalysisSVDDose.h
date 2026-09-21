@@ -87,7 +87,7 @@ namespace Belle2 {
 
     /** Utility method */
     template<typename T>
-    inline T* findHistT(TString name) { return dynamic_cast<T*>(findHist(name.Data())); }
+    static T* findHistT(TString name) { return dynamic_cast<T*>(findHist(name.Data())); }
 
     /** Divide two histograms, ignoring errors on the second histogram.
      * @param num The numerator histogram.
@@ -108,7 +108,7 @@ namespace Belle2 {
     {
       if (!res) {
         TString name = TString("occu_from_") + num->GetName();
-        res = (T*)num->Clone(name);
+        res = dynamic_cast<T*>(num->Clone(name));
       }
       for (int i = 0; i < num->GetNcells(); i++) {
         float n = num->GetBinContent(i), d = den->GetBinContent(i), e = num->GetBinError(i);

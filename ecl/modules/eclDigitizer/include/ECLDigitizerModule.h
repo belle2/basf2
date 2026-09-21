@@ -72,7 +72,7 @@ namespace Belle2 {
 
     /** Destructor.
      */
-    ~ECLDigitizerModule();
+    ~ECLDigitizerModule() override;
 
 
     /** Initialize variables  */
@@ -86,12 +86,6 @@ namespace Belle2 {
      *  The digitized hits are written into the DataStore.
      */
     virtual void event() override;
-
-    /** Nothing so far. */
-    virtual void endRun() override;
-
-    /** Free memory */
-    virtual void terminate() override;
 
   private:
     using algoparams_t   = ECL::EclConfiguration::algoparams_t;   /**< algorithm parameters */

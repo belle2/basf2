@@ -1,11 +1,9 @@
-Changes in the analysis package in light-2609-l
------------------------------------------------
+Changes in the analysis package in light-2609-luna
+--------------------------------------------------
 
 FlavorTagger TFlaT
 ++++++++++++++++++
 * Fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
-Changes in the analysis package in light-2609-luna
---------------------------------------------------
 
 sysvar (former pidvar)
 ++++++++++++++++++++++

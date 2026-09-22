@@ -169,7 +169,7 @@ _RegisteredSkims = [
     ("14121500", "btocharm", "B0toDstaretapi_D0pi_Kpi"),
     ("14140200", "btocharm", "BtoD0h_Kshh"),
     ("14141000", "btocharm", "BtoD0rho_Kpi"),
-    ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
+    ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0_invalid"),
     ("14141002", "btocharm", "B0toDD_Kpipi_Kspi"),
     ("14141003", "btocharm", "B0toDstarD"),
     ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
@@ -276,7 +276,8 @@ _RegisteredSkims = [
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
-    ("19120400", "btocharmless", "BtoRhopRhom"),
+    ("19120400", "btocharmless", "BtoRhopRhom_invalid"),
+    ("19120401", "btocharmless", "BtoRhopRhom"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),

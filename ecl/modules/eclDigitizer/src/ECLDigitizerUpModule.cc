@@ -577,7 +577,6 @@ void ECLDigitizerUpModule::readDSPDB()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
-  TFile* rootfile = nullptr;
   TTree* tree  = nullptr;
   TTree* tree2 = nullptr;
   TTree* tree3 = nullptr;

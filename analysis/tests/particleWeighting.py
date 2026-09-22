@@ -216,7 +216,9 @@ with b2test_utils.clean_working_directory():
                     selectedDaughters='rho0 -> ^pi+ pi-')
 
     variables.addAlias('daughterWeight', 'daughter(0, extraInfo(' + weight_table_id + '_Weight))')
-    ma.variablesToNtuple('rho0:gen', ['daughterWeight'], filename=ntupleNameDaughters, treename=treeNameDaughters, path=main)
+    variables.addAlias('daughterIndex', 'daughter(0, mdstIndex)')
+    ma.variablesToNtuple('rho0:gen', ['daughterWeight', 'daughterIndex'],
+                         filename=ntupleNameDaughters, treename=treeNameDaughters, path=main)
 
     b2test_utils.safe_process(main)
 
@@ -224,6 +226,10 @@ with b2test_utils.clean_working_directory():
     ntuple = ntuplefile.Get(treeNameDaughters)
     if ntuple.GetEntries() == 0:
         B2FATAL("No rho0 candidates saved")
+    # make sure that the test really contains pi+ shared by several rho0 candidates
+    selectedDaughters = [(entry.__event__, entry.daughterIndex) for entry in ntuple]
+    if len(set(selectedDaughters)) == len(selectedDaughters):
+        B2FATAL("No selected daughter is shared by several candidates")
     if ntuple.GetEntries("daughterWeight == daughterWeight") != ntuple.GetEntries():
         B2FATAL("Weights are not applied to all selected daughters")
     B2RESULT("Weights are applied to selected daughters shared by several candidates")

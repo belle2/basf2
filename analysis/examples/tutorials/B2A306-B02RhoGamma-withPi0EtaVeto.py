@@ -90,10 +90,12 @@ ma.writePi0EtaVeto(particleList='B0',
                    path=my_path)
 
 # Add the pi0 veto Data/MC efficiency ratio weights for a given veto threshold.
-# They are stored in the payload named '{tableName}_{mode}{thresholdPercent}', where thresholdPercent
-# is the veto threshold in percent as a two-digit integer (here 30 for a threshold of 0.30), and
-# depend on the hard photon energy. The ParticleWeighting module stores them as extraInfo of the
-# hard photon selected with the '^' in the decay string.
+# They are stored in payloads named '{tableName}_{mode}{thresholdPercent}' with
+#  - tableName: the version of the weight tables (here 'Pi0VetoEfficiencySystematics_Mar2022'),
+#  - mode: the pi0 veto mode the weights were derived for ('standard', 'tight', 'cluster' or 'both'),
+#  - thresholdPercent: the veto threshold in percent as a two-digit integer (here 30 for 0.30).
+# The weights depend on the hard photon energy. The ParticleWeighting module stores them as
+# extraInfo of the hard photon selected with the '^' in the decay string.
 pi0VetoWeightTable = 'Pi0VetoEfficiencySystematics_Mar2022_standard30'
 my_path.add_module('ParticleWeighting',
                    particleList='B0',

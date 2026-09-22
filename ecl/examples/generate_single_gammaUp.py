@@ -113,6 +113,10 @@ progress = register_module('Progress')
 # Save output of simulation
 output = register_module('RootOutput')
 
+# Add payloads for ECLWFParametersUp, ECLWFAlgoParamsUp, ECLWFNoiseParamsUp
+# use this for testing untill payloads will be included in main GT
+# conditions.prepend_globaltag("temp_smoneta_main_20260921-124621")
+
 # Setting the option for all non particle gun modules
 if args.bg == 'Exp26r1485':
     conditions.append_globaltag("mcrd_proc16")

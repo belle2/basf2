@@ -78,8 +78,6 @@ ECLDigitizerUpModule::ECLDigitizerUpModule() : Module()
            "Use DSP coefficients from the database for the processing. This "
            "will significantly reduce performance so this option is to be "
            "used for testing only.", false);
-  addParam("useWaveformParameters", m_useWaveformParameters,
-           "Use ECLWF{Parameters,AlgoParams,NoiseParams} payloads", false);
   addParam("unitscale", m_unitscale,
            "Normalization coefficient for ECL signal shape. "
            "If positive, use same static value for all ECL channels. "
@@ -134,7 +132,7 @@ void ECLDigitizerUpModule::beginRun()
                                      ec.getRF()) *
                        1e3; // convert to ns
 
-  if (m_useWaveformParameters || m_loadOnce) {
+  if (m_loadOnce) {
     readDSPDB();
     m_loadOnce = false;
   }
@@ -584,33 +582,16 @@ void ECLDigitizerUpModule::readDSPDB()
   TTree* tree2 = nullptr;
   TTree* tree3 = nullptr;
 
-  if (m_useWaveformParameters) {
-    bool hasChanged = false;
-    hasChanged |= m_waveformParameters.hasChanged();
-    hasChanged |= m_algoParameters.hasChanged();
-    hasChanged |= m_noiseParameters.hasChanged();
+  bool hasChanged = false;
+  hasChanged |= m_waveformParameters.hasChanged();
+  hasChanged |= m_algoParameters.hasChanged();
+  hasChanged |= m_noiseParameters.hasChanged();
 
-    if (!hasChanged) return;
+  if (!hasChanged) return;
 
-    tree  = const_cast<TTree*>(&*m_waveformParameters);
-    tree2 = const_cast<TTree*>(&*m_algoParameters);
-    tree3 = const_cast<TTree*>(&*m_noiseParameters);
-  } else {
-    string dataFileName;
-    if (m_background) {
-      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-BG-Up.root");
-      B2DEBUG(150, "ECLDigitizer: Reading configuration data with background from: " << dataFileName);
-    } else {
-      dataFileName = FileSystem::findFile("/data/ecl/ECL-WF-Up.root");
-      B2DEBUG(150, "ECLDigitizer: Reading configuration data without background from: " << dataFileName);
-    }
-    assert(! dataFileName.empty());
-
-    rootfile = new TFile(dataFileName.c_str(), "read");
-    tree  = (TTree*) rootfile->Get("EclWF");
-    tree2 = (TTree*) rootfile->Get("EclAlgo");
-    tree3 = (TTree*) rootfile->Get("EclNoise");
-  }
+  tree  = const_cast<TTree*>(&*m_waveformParameters);
+  tree2 = const_cast<TTree*>(&*m_algoParameters);
+  tree3 = const_cast<TTree*>(&*m_noiseParameters);
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
 
@@ -712,24 +693,16 @@ void ECLDigitizerUpModule::readDSPDB()
   m_shapeSignalSamples.resize(2);
   float MP[14]; eclWFData->getWaveformParArray(MP);
   m_shapeSignalSamples[0].initSample(MP, 1.0);
-  // parameters vector from ps.dat file, time offset 0.5 usec added to
-  // have peak position with parameters from ps.dat roughly in the
-  // same place as in current MC
   for (int i = 0; i < ec.c_nChannels; i++) m_tbl[i].iss = 0;
-  // one sampled diode response in the pool, parameters vector from
-  // pg.dat file, time offset 0.5 usec added to have peak position with
-  // parameters from ps.dat roughly in the same place as in current MC
+
   const double t_adc_up = ec.c_clock / ec.getRF(); // ADC clock period in us
   const double time_to_units_up = ec.c_step / t_adc_up; // Convert time to units of ADC clock
   double diode_params[] = {0.242 * time_to_units_up, 0.2111 * time_to_units_up, time_to_units_up / 0.1767, 0.2441 * time_to_units_up, time_to_units_up / 0.0929, 11.134 * time_to_units_up, 0.0872, 0.010 * time_to_units_up, 6.975 * time_to_units_up, 0., 0.378 * time_to_units_up, 0.720, 0.70235, 0.0}; // default parameters
-
   m_shapeSignalSamples[1].initSample(diode_params, 1.0);
 
   B2DEBUG(150, "ECLDigitizer: " << m_shapeSignalSamples.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;
-
-  if (!m_useWaveformParameters) rootfile->Close();
 }
 
 void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, AlgoParams& t)

@@ -173,8 +173,6 @@ namespace Belle2 {
     bool m_hadronPulseShape{false};
     /** DSP data usage flag. */
     bool m_dspDataTest{false};
-    /** Use waveform, algorithm and noise parameters from the Conditions DB. */
-    bool m_useWaveformParameters{false};
     /** Enable electronic calibration for time. */
     bool m_timeCalib{true};
     /** Always load waveform parameters at least once */
@@ -209,13 +207,13 @@ namespace Belle2 {
     DBObjPtr<ECLDigitWaveformParametersForMC> m_waveformParametersMC{"ECLDigitWaveformParametersForMC"};
 
     /** CellID-specific signal shapes. */
-    DBObjPtr<TTree> m_waveformParameters{"ECLWFParameters"};
+    DBObjPtr<TTree> m_waveformParameters{"ECLWFParametersUp"};
 
     /** Shape fitting algorithm parameters. */
-    DBObjPtr<TTree> m_algoParameters{"ECLWFAlgoParams"};
+    DBObjPtr<TTree> m_algoParameters{"ECLWFAlgoParamsUp"};
 
     /** Electronics noise covariance matrix. */
-    DBObjPtr<TTree> m_noiseParameters{"ECLWFNoiseParams"};
+    DBObjPtr<TTree> m_noiseParameters{"ECLWFNoiseParamsUp"};
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_crystalElectronics{"ECLCrystalElectronics"};

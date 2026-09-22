@@ -134,7 +134,7 @@ def main():
                 algo_params_by_cid[cid - 1] = algo_params
 
     noise_data = Belle2.ECLNoiseDataUp()
-    file_path_noiseM = 'output/ecl/ecl_noise_matrix.dat'
+    file_path_noiseM = '/home/belle2/smoneta/ecl/ecl_noise_matrix.dat'
     with open(file_path_noiseM) as f:
         lines = f.readlines()
         idx = 0
@@ -205,16 +205,15 @@ def main():
 
     #==== Save data, both to localdb and to ECL-WF.root
 
-    #db = Database.Instance()
-    #db.storeData('ECLWFParameters' , t1, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
-    #db.storeData('ECLWFAlgoParams' , t2, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
-    #db.storeData('ECLWFNoiseParams', t3, Belle2.IntervalOfValidity(FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN))
+    iov = Belle2.IntervalOfValidity(
+        FIRST_EXP, FIRST_RUN, LAST_EXP, LAST_RUN
+    )
 
-    f_out = ROOT.TFile('data/ecl/ECL-WF-Up.root', 'recreate')
-    t1.Write()
-    t2.Write()
-    t3.Write()
-    f_out.Close()
+    db = Database.Instance()
+
+    db.storeData('ECLWFParametersUp', t1, iov)
+    db.storeData('ECLWFAlgoParamsUp', t2, iov)
+    db.storeData('ECLWFNoiseParamsUp', t3, iov)
 
 ################################################
 
@@ -252,7 +251,7 @@ def readShaperDSPConfig(dir_path, shaper_id, board_id):
     noise_data = Belle2.ECLNoiseDataUp()
     for channel in range(16):
         wf_data = Belle2.ECLWaveformDataUp()
-        file_path_noiseM = 'output/ecl/ecl_noise_matrix.dat'
+        file_path_noiseM = '/home/belle2/smoneta/ecl/ecl_noise_matrix.dat'
         with open(file_path_noiseM) as f:
             fit_samples_cut = noise_data.c_nADC - wf_data.c_nADCsignal
             lines = f.readlines()
@@ -288,7 +287,7 @@ def readShaperDSPConfig(dir_path, shaper_id, board_id):
     algo_params.hitThresh    = 100
     algo_params.lowAmpThresh = dsp.getlAT() - 128
 
-    # FIXME: Skip threshould is negative for some reason
+    # FIXME: Skip threshold is negative for some reason
     # algo_params.skipThresh   = dsp.getsT() - 128
     algo_params.skipThresh   = -20
 

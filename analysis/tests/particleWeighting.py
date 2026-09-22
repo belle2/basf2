@@ -50,12 +50,12 @@ def check(ntupleName, treeName):
     if ntuple.GetEntries() == 0:
         B2FATAL("No pions saved")
 
-    if not(ntuple.GetEntries("binID > 0 ") > 0):
+    if not (ntuple.GetEntries("binID > 0 ") > 0):
         B2FATAL("Binning was applied incorrectly: no pions in physical bins")
     else:
         B2RESULT("Bins are defined")
 
-    if not(ntuple.GetEntries("Weight > 0") > 0):
+    if not (ntuple.GetEntries("Weight > 0") > 0):
         B2FATAL("Weights are not applied")
     else:
         B2RESULT("Weights are applied")
@@ -201,5 +201,31 @@ with b2test_utils.clean_working_directory():
     b2test_utils.safe_process(main)
 
     check(ntupleName, treeName)
+
+    # test the selectedDaughters option with daughters shared by several candidates
+    main = Path()
+    ntupleNameDaughters = 'particleWeightingDaughters.root'
+    treeNameDaughters = 'rhotree'
+    ma.inputMdst(inputfile, path=main)
+    ma.fillParticleListFromMC('pi+:gen', '', path=main)
+    ma.reconstructDecay('rho0:gen -> pi+:gen pi-:gen', '', path=main)
+
+    main.add_module('ParticleWeighting',
+                    tableName=weight_table_id,
+                    particleList='rho0:gen',
+                    selectedDaughters='rho0 -> ^pi+ pi-')
+
+    variables.addAlias('daughterWeight', 'daughter(0, extraInfo(' + weight_table_id + '_Weight))')
+    ma.variablesToNtuple('rho0:gen', ['daughterWeight'], filename=ntupleNameDaughters, treename=treeNameDaughters, path=main)
+
+    b2test_utils.safe_process(main)
+
+    ntuplefile = TFile(ntupleNameDaughters)
+    ntuple = ntuplefile.Get(treeNameDaughters)
+    if ntuple.GetEntries() == 0:
+        B2FATAL("No rho0 candidates saved")
+    if ntuple.GetEntries("daughterWeight == daughterWeight") != ntuple.GetEntries():
+        B2FATAL("Weights are not applied to all selected daughters")
+    B2RESULT("Weights are applied to selected daughters shared by several candidates")
 
 B2RESULT("Weights were applied correctly")

@@ -86,8 +86,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                        switch_off_slow_modules_for_online=False,
                        use_cat_finder=False,
-                       useVTX=False, useVTXClusterShapes=True,
-                       simulateECLUpgrade=False):
+                       simulateECLUpgrade=False,
+                       useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -150,9 +150,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         to true in order to speed up the reconstruction.
     :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
         instead of the default one.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
-    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
 
     # Set the run for beam data
@@ -191,8 +191,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
                                  use_cat_finder=use_cat_finder,
-                                 useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes,
-                                 simulateECLUpgrade=simulateECLUpgrade)
+                                 simulateECLUpgrade=simulateECLUpgrade,
+                                 useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and are_detectors_present(["CDC", "ECL", "KLM"], components):
@@ -231,8 +231,8 @@ def add_prefilter_reconstruction(path,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                                  switch_off_slow_modules_for_online=False,
                                  use_cat_finder=False,
-                                 useVTX=False,
                                  simulateECLUpgrade=False,
+                                 useVTX=False,
                                  useVTXClusterShapes=True):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
@@ -265,23 +265,18 @@ def add_prefilter_reconstruction(path,
         steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
         and provides the CDC temporary EventT0.
-    :param skip_full_grid_cdc_eventt0_if_svd_time_present:
-        if true, and if also append_full_grid_cdc_eventt0 is
-        true, the FullGridChi2TrackTimeExtractor is only
-        executed in the events where no SVD-based EventT0 is
-        found. If false, but append_full_grid_cdc_eventt0 is
-        true, FullGridChi2TrackTimeExtractor will be executed
-        in each event regardless of SVD EventT0 being present.
-        Has no effect if append_full_grid_cdc_eventt0 is false.
-        Default: true
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
         to true in order to speed up the reconstruction.
     :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
         instead of the default one.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
-    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -295,8 +290,7 @@ def add_prefilter_reconstruction(path,
     check_components(components)
 
     # Add modules that have to be run BEFORE track reconstruction
-    add_prefilter_pretracking_reconstruction(path, components=components,
-                                             simulateECLUpgrade=simulateECLUpgrade)
+    add_prefilter_pretracking_reconstruction(path, components=components, simulateECLUpgrade=simulateECLUpgrade)
 
     # Add prefilter tracking reconstruction modules
     add_prefilter_tracking_reconstruction(
@@ -504,8 +498,7 @@ def add_cosmics_reconstruction(
                                             useVTX=useVTX)
 
 
-def add_prefilter_pretracking_reconstruction(
-        path, components=None, simulateECLUpgrade=False):
+def add_prefilter_pretracking_reconstruction(path, components=None, simulateECLUpgrade=False):
     """
     This function adds the standard reconstruction modules BEFORE tracking
     to a path.
@@ -791,9 +784,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
     Add the MuID module to the path.
 
     :param path: The path to add the modules to.
-    :param add_hits_to_reco_track: Add the found KLM hits
-        also to the RecoTrack. Make sure to refit the track
-        afterwards.
+    :param add_hits_to_reco_track: Add the found KLM hits also to the RecoTrack. Make sure to refit the track afterwards.
     :param components: The components to use or None to use all standard components.
     """
     # Muid is needed for muonID computation AND ECLCluster-Track matching.
@@ -811,8 +802,7 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
                             ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
-def add_ecl_modules(
-        path, components=None, simulateECLUpgrade=False):
+def add_ecl_modules(path, components=None, simulateECLUpgrade=False):
     """
     Add the ECL reconstruction modules to the path.
 

@@ -137,9 +137,9 @@ def add_simulation(
         skipExperimentCheckForBG=False,
         ignoreRunNumberForBG=False,
         save_slow_pions_in_mc=False,
+        simulateECLUpgrade=False,
         useVTX=False,
-        save_all_charged_particles_in_mc=False,
-        simulateECLUpgrade=False):
+        save_all_charged_particles_in_mc=False):
     """
     This function adds the standard simulation modules to a path.
     @param forceSetPXDDataReduction: override settings from the DB with the value set in 'usePXDDataReduction'
@@ -155,15 +155,15 @@ def add_simulation(
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
+    @param simulateECLUpgrade: if True, simulate the upgraded electronics for the ECL.
     @param useVTX: use the VTX instead of the VXD
     @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of all charged primary MCParticles that traverse PXD
-    @param simulateECLUpgrade: if True, simulate the upgraded electronics for the ECL.
     """
 
     path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
-    # Check compoments.
+    # Check components.
     check_components(components)
 
     # background mixing or overlay input before process forking
@@ -241,13 +241,9 @@ def add_simulation(
     # ECL digitization
     if is_detector_present("ECL", components):
         if simulateECLUpgrade:
-            ecl_digitizer = b2.register_module(
-                'ECLDigitizerUp',
-            )
+            ecl_digitizer = b2.register_module('ECLDigitizerUp')
         else:
-            ecl_digitizer = b2.register_module(
-                'ECLDigitizer',
-            )
+            ecl_digitizer = b2.register_module('ECLDigitizer')
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)

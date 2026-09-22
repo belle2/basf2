@@ -1,4 +1,21 @@
-Changes in the skim package in light-2607-k
+Changes in the skim package in light-2609-l
+--------------------------------------------
+
+Low Multiplicity skims
++++++++++
+
+* Added new skim for the Physics channel
+
+	* e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]
+	* e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+	* e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]
+	* e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]
+	* e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]
+	* e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]
+
+  Registered as `("18530800", "lowMulti", "TauTauTauTau")`
+
+Changes in the skim package in light-2607-kasei
 --------------------------------------------
 
 FEI skims
@@ -9,9 +26,22 @@ FEI skims
   instance attribute, or the ``feiPrefix`` parameter of `CombinedSkim`.
   A ``B2FATAL`` is raised if the FEI is run without setting the prefix.
 
+Dark skims
+++++++++++
+
+* Added new skim for the Physics channel `e^{+}e^{-} \\to \\mu^{+}\\mu^{-}Z^{\\prime}`
+  `Z^{\\prime} \\to x^{+}x^{-} \\ (x = e, \\mu, \\tau, \\pi, K)`
+  Registered as `("18520600", "dark", "ZpVisible")`
+  
+
 Modified skims
 ++++++++++++++
 
 * Charm: `17240101 <skim.WGs.charm.DstToD0Pi_D0ToHpJm>`: added the required
   ``pi+:all`` standard list for the slow pion and updated the skim code from
   ``17240100`` to ``17240101`` for PromptRel9.
+
+* Dark: Fixed a bug for the `LFVZpVisible` skim.
+  New `LFVZpVisible` for PromptRel09 skimming campaign registered as
+  `("18520401", "dark", "LFVZpVisible")`.
+  The `pre-PromptRel09` skim was made invalid: `("18520400", "dark", "LFVZpVisible_invalid")`

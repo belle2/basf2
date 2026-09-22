@@ -268,6 +268,7 @@ _RegisteredSkims = [
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
     ("18530600", "lowMulti", "LowMassOneTrack"),
     ("18530700", "lowMulti", "PNbarHad"),
+    ("18530800", "lowMulti", "TauTauTauTau"),  # PromptRel9
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
     ("18570800", "taupair", "TauKshort"),

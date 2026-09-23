@@ -17,7 +17,7 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
-#include <ecl/dbobjects/ECLWaveformDataUp.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompressUp.h>
 #include <ecl/digitization/shaperdspUp.h>
@@ -550,15 +550,18 @@ void ECLDigitizerUpModule::terminate()
 void ECLDigitizerUpModule::callbackHadronSignalShapes()
 {
 
+  const EclConfigurationUp& ec = EclConfigurationUp::get();
+  const int nWaveformParameters = ec.c_nWaveformParameters;
+
   if (m_waveformParametersMC.hasChanged()) {
 
     m_hadronShapeSignalSamples.resize(3);
 
     //read MC templates from database
-    float photonParsPSD[14];
-    float hadronParsPSD[14];
-    float diodeParsPSD[14];
-    for (int i = 0; i < 14; i++) {
+    float photonParsPSD[nWaveformParameters];
+    float hadronParsPSD[nWaveformParameters];
+    float diodeParsPSD[nWaveformParameters];
+    for (int i = 0; i < nWaveformParameters; i++) {
       photonParsPSD[i] = m_waveformParametersMC->getPhotonParameters()[i + 1];
       hadronParsPSD[i] = m_waveformParametersMC->getHadronParameters()[i + 1];
       diodeParsPSD[i] = m_waveformParametersMC->getDiodeParameters()[i + 1];
@@ -612,12 +615,12 @@ void ECLDigitizerUpModule::readDSPDB()
   }
   B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matrices will be used.");
 
-  ECLWFAlgoParamsUp* algo = new ECLWFAlgoParamsUp;
+  ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
   tree2->SetBranchAddress("ncellId", &ncellId);
   tree2->SetBranchAddress("cellId", cellId.data());
   Long64_t jmax2 = tree2->GetEntries();
-  vector<ECLWFAlgoParamsUp> eclWFAlgoParams;
+  vector<ECLWFAlgoParams> eclWFAlgoParams;
   eclWFAlgoParams.reserve(jmax2);
   for (Long64_t j = 0; j < jmax2; j++) {
     tree2->GetEntry(j);
@@ -629,7 +632,7 @@ void ECLDigitizerUpModule::readDSPDB()
   if (algo) delete algo;
   B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " parameter sets of fitting algorithm were read.");
 
-  ECLNoiseDataUp* noise = new ECLNoiseDataUp;
+  ECLNoiseData* noise = new ECLNoiseData;
   tree3->SetBranchAddress("NoiseM", &noise);
   tree3->SetBranchAddress("ncellId", &ncellId);
   tree3->SetBranchAddress("cellId", cellId.data());
@@ -674,7 +677,7 @@ void ECLDigitizerUpModule::readDSPDB()
   // now we know how many distinct elements of the (Waveform x AlgoParams) matrix should be
   m_fitparams.resize(pairIdx.size());
 
-  ECLWaveformDataUp* eclWFData = new ECLWaveformDataUp;
+  ECLWaveformData* eclWFData = new ECLWaveformData;
   tree->SetBranchAddress("CovarianceM", &eclWFData);
   tree->SetBranchStatus("ncellId", 0); // do not read it at the moment
   tree->SetBranchStatus("cellId", 0); // do not read it at the moment
@@ -690,7 +693,7 @@ void ECLDigitizerUpModule::readDSPDB()
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
   m_shapeSignalSamples.resize(2);
-  float MP[14]; eclWFData->getWaveformParArray(MP);
+  float MP[ec.c_nWaveformParameters]; eclWFData->getWaveformParArray(MP);
   m_shapeSignalSamples[0].initSample(MP, 1.0);
   for (int i = 0; i < ec.c_nChannels; i++) m_tbl[i].iss = 0;
 
@@ -704,7 +707,7 @@ void ECLDigitizerUpModule::readDSPDB()
   if (eclWFData) delete eclWFData;
 }
 
-void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, AlgoParams& t)
+void ECLDigitizerUpModule::repack(const ECLWFAlgoParams& eclWFAlgo, AlgoParams& t)
 {
   // filling short int array
   t.id[ 0] = eclWFAlgo.getlAT() + 128;
@@ -732,11 +735,11 @@ void ECLDigitizerUpModule::repack(const ECLWFAlgoParamsUp& eclWFAlgo, AlgoParams
   t.id[15] = eclWFAlgo.getcT();
 }
 
-void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, const ECLWFAlgoParamsUp& eclWFAlgo, FitParams& p)
+void ECLDigitizerUpModule::getFitParams(const ECLWaveformData& eclWFData, const ECLWFAlgoParams& eclWFAlgo, FitParams& p)
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
 
-  constexpr int nAdcSignalSamples = ECLWaveformDataUp::c_nADCsignal;
+  constexpr int nAdcSignalSamples = ec.c_nAdcSamples;
   constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
   constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
   constexpr int nLowAmplitudeFitTimeShifts = ec.c_nLowAmplitudeFitTimeShifts;
@@ -746,7 +749,7 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformDataUp& eclWFData, cons
 
   double ssd[nAdcSignalSamples][nAdcSignalSamples];
   eclWFData.getMatrix(ssd);
-  vector<double> MP(14);
+  vector<double> MP(ec.c_nWaveformParameters);
   eclWFData.getWaveformParArray(MP.data());
 
   // shape function parameters

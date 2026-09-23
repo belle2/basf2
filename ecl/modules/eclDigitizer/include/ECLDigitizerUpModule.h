@@ -30,9 +30,9 @@ class TTree;
 
 namespace Belle2 {
 
-  class ECLWaveformDataUp;
-  class ECLNoiseDataUp;
-  class ECLWFAlgoParamsUp;
+  class ECLWaveformData;
+  class ECLNoiseData;
+  class ECLWFAlgoParams;
   class ECLHit;
   class ECLSimHit;
   class ECLDigit;
@@ -134,9 +134,9 @@ namespace Belle2 {
     /** Produce and compress waveforms for beam background overlay */
     void makeWaveforms();
     /** repack waveform fit parameters from ROOT format to plain array of unsigned short for the shapeFitter function */
-    void repack(const ECLWFAlgoParamsUp&, AlgoParams&);
+    void repack(const ECLWFAlgoParams&, AlgoParams&);
     /** load waveform fit parameters for the shapeFitter function */
-    void getFitParams(const ECLWaveformDataUp&, const ECLWFAlgoParamsUp&, FitParams&);
+    void getFitParams(const ECLWaveformData&, const ECLWFAlgoParams&, FitParams&);
     /** Fill the waveform array with electronic noise and pedestal for channel j [0-8735]. */
     void makeElectronicNoiseAndPedestal(int j, int* fitA);
 
@@ -184,7 +184,7 @@ namespace Belle2 {
     /** Fit algorithm parameters shared by group of crystals */
     std::vector<AlgoParams> m_idn; /**< parameters that needs for waveform fit */
     std::vector<FitParams> m_fitparams; /**< Pairs of (waveform parameters, fit parameters) */
-    std::vector<ECLNoiseDataUp> m_noise; /**< parameters for correlated noise simulation */
+    std::vector<ECLNoiseData> m_noise; /**< parameters for correlated noise simulation */
     std::vector<SignalSample> m_shapeSignalSamples; /**< tabulated shape line */
     std::vector<SignalSample> m_hadronShapeSignalSamples; /**< tabulated shape line for hadron shape simulations */
 

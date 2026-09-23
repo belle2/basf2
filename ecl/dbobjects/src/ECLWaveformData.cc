@@ -21,7 +21,7 @@ using namespace std;
 void Belle2::ECLWaveformData::print() const
 {
   string line;
-  for (size_t i = 0; i < c_nElements; ++ i) {
+  for (size_t i = 0; i < getNElements(); ++ i) {
     line += to_string(m_matrixElement[i]);
     line += ' ';
   }

@@ -10,6 +10,7 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
+#include <array>
 
 namespace Belle2 {
   namespace ECL {
@@ -43,6 +44,28 @@ namespace Belle2 {
       static constexpr int       c_nFitTimeShifts = 4; /**< number of time shifts for signal fit procedure parameters */
       static constexpr int       c_nLowAmplitudeFitTimeShifts =
         32; /**< number of time shifts for signal fit procedure parameters in low amplitude case */
+
+      static constexpr int       c_nWaveformParameters = 14; /**< number of parameters defining the waveform shape */
+
+      /** Default parameters of the upgraded shaper response function. */
+      static constexpr double c_tauD = 0.242;
+      static constexpr double c_tau0 = 0.2111;
+      static constexpr double c_omega0 = 0.1767;
+      static constexpr double c_tau1 = 0.2441;
+      static constexpr double c_omega1 = 0.0929;
+      static constexpr double c_tauI = 11.134;
+      static constexpr double c_fractionI = 0.0872;
+      static constexpr double c_tauS = 0.966;
+      static constexpr double c_tauS1 = 6.975;
+      static constexpr double c_alpha = 0.603;
+      static constexpr double c_timeShift = 0.378;
+      static constexpr double c_eta = 0.720;
+      static constexpr double c_amplitudeNorm = 0.70235;
+      static constexpr double c_timeOffset = 0.0;
+
+      /** Return the default waveform parameters in shaper internal units. */
+      static std::array<double, c_nWaveformParameters>
+      getDefaultWaveformParameters();
 
       /** See s_rf. This will try to use the value from the database */
       static double getRF();

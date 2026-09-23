@@ -43,6 +43,29 @@ double EclConfigurationUp::getRF()
   return s_rf;
 }
 
+std::array<double, EclConfigurationUp::c_nWaveformParameters>
+EclConfigurationUp::getDefaultWaveformParameters()
+{
+  const double timeToUnits = getRF() * c_step / c_clock;
+
+  return {
+    c_tauD * timeToUnits,
+    c_tau0 * timeToUnits,
+    timeToUnits / c_omega0,
+    c_tau1 * timeToUnits,
+    timeToUnits / c_omega1,
+    c_tauI * timeToUnits,
+    c_fractionI,
+    c_tauS * timeToUnits,
+    c_tauS1 * timeToUnits,
+    c_alpha,
+    c_timeShift * timeToUnits,
+    c_eta,
+    c_amplitudeNorm,
+    c_timeOffset
+  };
+}
+
 void EclConfigurationUp::SignalSample::initSample(const double* waveformParameters, double unitScale)
 {
   const int nSignalSamples = c_nSamplesPerAdcClock * c_nSignalAdcClocks;

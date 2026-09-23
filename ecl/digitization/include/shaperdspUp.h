@@ -88,8 +88,6 @@ namespace Belle2 {
       };
 
     private:
-      /** parameters of the response function that use as default    */
-      static const double _defs[]; //
       /** time shift that include in response function for numerical calculation time convolutions.  Integration  with histogram
        * is used. Int g(s-t)f(t)dt=g(s)+a*(g(s+_filterdt)-g(s-_filterdt))/2   */
       //static constexpr double _filterdt = 0.2;
@@ -218,13 +216,13 @@ namespace Belle2 {
 
     public:
       /** class constructor  */
-      ShaperDSPUp_t() { init(_defs); }
+      ShaperDSPUp_t();
       /** calculate derivative of the   response function */
       explicit ShaperDSPUp_t(const std::vector<double>& s) { init(s); }
       /** class constructor */
       ShaperDSPUp_t(const std::vector<double>& s, double u) { init(s, u); }
 
-      ~ShaperDSPUp_t() {}
+      ~ShaperDSPUp_t() = default;
       /** Initialization of the parameters response function
        *  @param s   vector of shape parameters
        *  @param u   'unitscale' of the waveform template

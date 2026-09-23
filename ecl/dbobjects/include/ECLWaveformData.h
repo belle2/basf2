@@ -38,6 +38,10 @@ namespace Belle2 {
     static constexpr size_t c_nElements = c_nADCsignal * (c_nADCsignal + 1) / 2;  /**< number of independent matrix elements */
     static constexpr size_t c_nParams = 10; /**< number of parameters defining the waveform shape */
 
+    /** Constructor.
+     * @param nADCsignal number of ADC samples used in the waveform fit
+     * @param nParams number of waveform-shape parameters
+     */
     explicit ECLWaveformData(size_t nADCsignal = c_nADCsignal, size_t nParams = c_nParams):
       m_nADCsignal(nADCsignal),
       m_nParams(nParams),
@@ -148,21 +152,21 @@ namespace Belle2 {
                 P);
     }
 
+    /** Return the number of ADC samples used in the waveform fit. */
     size_t getNADCsignal() const { return m_nADCsignal; }
 
+    /** Return the number of waveform-shape parameters. */
     size_t getNParams() const { return m_nParams; }
 
-    size_t getNElements() const
-    {
-      return m_matrixElement.size();
-    }
+    /** Return the number of stored independent matrix elements. */
+    size_t getNElements() const { return m_matrixElement.size(); }
 
     /** print-out function for debugging purpose*/
     void print() const;
 
   private:
-    UInt_t m_nADCsignal{c_nADCsignal};
-    UInt_t m_nParams{c_nParams};
+    UInt_t m_nADCsignal{c_nADCsignal};  /**< Number of ADC samples used in the waveform fit. */
+    UInt_t m_nParams{c_nParams};  /**< Number of waveform-shape parameters. */
 
     std::vector<float> m_matrixElement; /**< the matrix elements */
     std::vector<float> m_waveformPar; /**< the waveform parameters */
@@ -206,6 +210,9 @@ namespace Belle2 {
     static constexpr size_t c_nADC = 31; /**< number of ADC samples */
     static constexpr size_t c_nElements =  c_nADC * (c_nADC + 1) / 2; /**< number of independent elements */
 
+    /** Constructor.
+     * @param nADC number of ADC samples
+     */
     explicit ECLNoiseData(size_t nADC = c_nADC):
       m_nADC(nADC),
       m_matrixElement(nADC * (nADC + 1) / 2)
@@ -262,18 +269,14 @@ namespace Belle2 {
       }
     }
 
-    size_t getNADC() const
-    {
-      return m_nADC;
-    }
+    /** Return the number of ADC samples. */
+    size_t getNADC() const { return m_nADC; }
 
-    size_t getNElements() const
-    {
-      return m_matrixElement.size();
-    }
+    /** Return the number of stored independent matrix elements. */
+    size_t getNElements() const { return m_matrixElement.size(); }
 
   private:
-    UInt_t m_nADC{c_nADC};
+    UInt_t m_nADC{c_nADC};  /**< Number of ADC samples. */
 
     std::vector<float> m_matrixElement; /**< electronic noise matrix */
 

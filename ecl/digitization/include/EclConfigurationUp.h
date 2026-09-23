@@ -47,21 +47,20 @@ namespace Belle2 {
 
       static constexpr int       c_nWaveformParameters = 14; /**< number of parameters defining the waveform shape */
 
-      /** Default parameters of the upgraded shaper response function. */
-      static constexpr double c_tauD = 0.242;
-      static constexpr double c_tau0 = 0.2111;
-      static constexpr double c_omega0 = 0.1767;
-      static constexpr double c_tau1 = 0.2441;
-      static constexpr double c_omega1 = 0.0929;
-      static constexpr double c_tauI = 11.134;
-      static constexpr double c_fractionI = 0.0872;
-      static constexpr double c_tauS = 0.966;
-      static constexpr double c_tauS1 = 6.975;
-      static constexpr double c_alpha = 0.603;
-      static constexpr double c_timeShift = 0.378;
-      static constexpr double c_eta = 0.720;
-      static constexpr double c_amplitudeNorm = 0.70235;
-      static constexpr double c_timeOffset = 0.0;
+      static constexpr double c_tauD = 0.242;          /**< Default upgraded shaper parameter tauD. */
+      static constexpr double c_tau0 = 0.2111;         /**< Default upgraded shaper parameter tau0. */
+      static constexpr double c_omega0 = 0.1767;       /**< Default upgraded shaper parameter omega0. */
+      static constexpr double c_tau1 = 0.2441;         /**< Default upgraded shaper parameter tau1. */
+      static constexpr double c_omega1 = 0.0929;       /**< Default upgraded shaper parameter omega1. */
+      static constexpr double c_tauI = 11.134;         /**< Default upgraded shaper parameter tauI. */
+      static constexpr double c_fractionI = 0.0872;    /**< Default upgraded shaper parameter fractionI. */
+      static constexpr double c_tauS = 0.966;          /**< Default upgraded shaper parameter tauS. */
+      static constexpr double c_tauS1 = 6.975;         /**< Default upgraded shaper parameter tauS1. */
+      static constexpr double c_alpha = 0.603;         /**< Default upgraded shaper parameter alpha. */
+      static constexpr double c_timeShift = 0.378;     /**< Default upgraded shaper time-shift parameter. */
+      static constexpr double c_eta = 0.720;           /**< Default upgraded shaper parameter eta. */
+      static constexpr double c_amplitudeNorm = 0.70235; /**< Default upgraded shaper amplitude normalization. */
+      static constexpr double c_timeOffset = 0.0;      /**< Default upgraded shaper time offset. */
 
       /** Return the default waveform parameters in shaper internal units. */
       static std::array<double, c_nWaveformParameters>

@@ -16,7 +16,9 @@ namespace Belle2 {
     typedef struct ECLShapeFit {
       /** Fit amplitude, -128..262015, ADC units (20 ADC units ~= 1 MeV) */
       int amp;
-      /** Fit time, -2048..2047 (with reference to trigger time), ADC ticks (1 tick ~= 0.5 ns) */
+      /** Fit time:
+       * for current electronics: -2048..2047 (with reference to trigger time), ADC ticks (1 tick ~= 0.5 ns);
+       * for upgraded electronics: -8192..8191 (with reference to trigger time), ADC ticks (1 tick ~= 0.03 ns) */
       int time;
       /** Quality flag, see enum QualityFlag in emulator implementation */
       int quality;
@@ -35,7 +37,7 @@ namespace Belle2 {
     } ECLShapeFit;
 
     /**
-     * @brief Function that emulates shape fitting algorithm used in ShaperDSP.
+     * @brief Function that emulates shape fitting algorithm used in ShaperDSP for current ECL electronics.
      *        f, f1, fg* are coefficients from ECLDspData
      * See ecl/examples/EclShapeFitter.py for usage example.
      *
@@ -78,5 +80,46 @@ namespace Belle2 {
                        int k_c, int k_16, int k1_chi, int k2_chi,
                        int chi_thres, bool adjusted_timing = false);
 
+    /**
+    * @brief Function that emulates shape fitting algorithm used in ShaperDSP for upgraded ECL electronics.
+    *        f, f1, fg* are coefficients from ECLDspData
+    * See ecl/examples/EclShapeFitter.py for usage example.
+    *
+    * @param[in] f[nGridPoints][nFitSamples]          Array with tabulated signal waveform.
+    * @param[in] f1[nGridPoints][nFitSamples]         Array with tabulated derivative of signal waveform
+    * @param[in] fg41[nGridPointsLowAmp][nFitSamples] Alternative for FG31 for signals with small amplitude
+    * @param[in] fg43[nGridPointsLowAmp][nFitSamples] Alternative for FG33 for signals with small amplitude
+    * @param[in] fg31[nGridPoints][nFitSamples]       Array used to estimate signal amplitude.
+    * @param[in] fg32[nGridPoints][nFitSamples]       Array used to estimate Amplitude * delta_t.
+    * @param[in] fg33[nGridPoints][nFitSamples]       Array used to estimate pedestal height in signal.
+    *
+    * @param[in] y[nADC] Array of signal measurements
+    * @param[in] ttrig2  Trigger time (0-255)
+    *
+    * @param[in] la_thr    Low amplitude threshold
+    * @param[in] hit_thr   Hit threshold
+    * @param[in] skip_thr  Skip threshold
+    *
+    * @param[in] k_a Number of bits for FG31, FG41
+    * @param[in] k_b Number of bits for FG32
+    * @param[in] k_c Number of bits for FG33, FG43
+    *
+    * @param[in] k1_chi    Bit shift for chi2 calculation
+    * @param[in] k2_chi    Bit shift for chi2 threshold calculation
+    * @param[in] chi_thres Base value for chi2 threshold
+    *
+    * @param[in] adjusted_timing Optional. Use adjusted formula to determine fit time.
+    *              Implemented in ShaperDSP firmware since exp 14.
+    *              If true, algorithm will determine time near 0 with higher
+    *              precision, time of low-energy hits will be one of {-4,0,4}
+    *              If false, time will be one of {-32, -16, 0}
+    */
+    template <typename INT>
+    ECLShapeFit lftdaUp_(const INT* f, const INT* f1, const INT* fg41,
+                         const INT* fg43, const INT* fg31, const INT* fg32,
+                         const INT* fg33, int* y, int ttrig2, int la_thr,
+                         int hit_thr, int skip_thr, int k_a, int k_b,
+                         int k_c, int k1_chi, int k2_chi,
+                         int chi_thres, bool adjusted_timing = false);
   }
 }

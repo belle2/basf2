@@ -9,7 +9,7 @@
 #pragma once
 
 #include <vector>
-#include <ecl/utility/ECLDspEmulatorUp.h>
+#include <ecl/utility/ECLDspEmulator.h>
 
 namespace Belle2 {
   class ECLDigit;
@@ -68,8 +68,8 @@ namespace Belle2 {
        *              precision, time of low-energy hits will be one of {-4,0,4}
        *              If false, time will be one of {-32, -16, 0}
        */
-      static ECLShapeFitUp shapeFitter(int cid, std::vector<int> adc, int ttrig,
-                                       bool adjusted_timing = true);
+      static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig,
+                                     bool adjusted_timing = true);
 
       /**
        * Load DSP coefficients used in the pedestal fit function.

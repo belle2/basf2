@@ -128,7 +128,7 @@ void ECLDigitizerUpModule::initialize()
 void ECLDigitizerUpModule::beginRun()
 {
   const EclConfigurationUp& ec = EclConfigurationUp::get();
-  double ns_per_tick = ec.c_clock / (ec.c_nFitPointsPerAdcTick * ec.c_nLowAmplitudeFitTimeShifts *
+  double ns_per_tick = ec.c_clock / (ec.c_nFitPointsPerAdcTick * ec.c_nSubTimeCorr *
                                      ec.getRF()) *
                        1e3; // convert to ns
 
@@ -203,7 +203,7 @@ void ECLDigitizerUpModule::shapeFitterWrapper(
   const EclConfigurationUp& ec = EclConfigurationUp::get();
   const int nSamples = ec.c_nAdcSamples;
 
-  ECLShapeFitUp result;
+  ECLShapeFit result;
 
   if (!m_dspDataTest) {
     short int* id = (short int*)m_idn[t.idn].id;
@@ -222,10 +222,10 @@ void ECLDigitizerUpModule::shapeFitterWrapper(
 
     int trg_time = triggerTime;
 
-    result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-                    (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)fitA,
-                    trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k1_chi,
-                    k2_chi, chi_thres);
+    result = lftdaUp_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
+                      (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)fitA,
+                      trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k1_chi,
+                      k2_chi, chi_thres);
   } else {
     std::vector<int> adc(nSamples);
     for (int i = 0; i < nSamples; i++) adc[i] = fitA[i];
@@ -742,7 +742,7 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformData& eclWFData, const 
   constexpr int nAdcSignalSamples = ec.c_nAdcSamples;
   constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
   constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
-  constexpr int nLowAmplitudeFitTimeShifts = ec.c_nLowAmplitudeFitTimeShifts;
+  constexpr int nLowAmplitudeFitTimeShifts = nFitPointsPerAdcTick / 4;
   constexpr int nFitGridPoints = nFitTimeShifts * nFitPointsPerAdcTick;
 
   using FitRow = std::array<double, nAdcSignalSamples>;

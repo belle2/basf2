@@ -263,8 +263,8 @@ short int* vectorsplitUp(std::vector<short int>& vectorFrom, int channel)
   return (vectorFrom.data() + (size / 16) * (channel - 1));
 }
 
-ECLShapeFitUp ECLDspUtilitiesUp::shapeFitter(int cid, std::vector<int> adc, int ttrig,
-                                             bool adjusted_timing)
+ECLShapeFit ECLDspUtilitiesUp::shapeFitter(int cid, std::vector<int> adc, int ttrig,
+                                           bool adjusted_timing)
 {
   ECLChannelMapper mapper;
   mapper.initFromDB();
@@ -322,9 +322,9 @@ ECLShapeFitUp ECLDspUtilitiesUp::shapeFitter(int cid, std::vector<int> adc, int 
   int Askip = thr_StoreDigit->getCalibVector()[cid - 1];
 
   //== Perform fit
-  auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
-                       Ahard, Askip, k_a, k_b, k_c, k_1, k_2,
-                       chi_thres, adjusted_timing);
+  auto result = lftdaUp_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
+                         Ahard, Askip, k_a, k_b, k_c, k_1, k_2,
+                         chi_thres, adjusted_timing);
 
   return result;
 }

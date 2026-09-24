@@ -33,7 +33,8 @@ settings = CalibrationSettings(
                    "digitArrayName": "ECLTrimmedDigits",
                    "showerArrayName": "ECLTrimmedShowers",
                    "nGroupPerThetaID": 8,
-                   "lowEnergyThreshold": 0.},
+                   "lowEnergyThreshold": 0.04,
+                   "max_subjobs": 10},
     produced_payloads=["ECLnOptimal", "ECLLeakageCorrections"])
 
 #
@@ -92,6 +93,9 @@ def get_calibrations(input_data, **kwargs):
         algorithms=algo_nOptimal,
         input_files=input_files_single_gamma)
 
+    # Set max subjobs
+    cal_ecl_nOptimal.max_subjobs = expert_config["max_subjobs"]
+
     # ..pre_path is empty
     ecl_nOptimal_pre_path = basf2.create_path()
     cal_ecl_nOptimal.pre_collector_path = ecl_nOptimal_pre_path
@@ -122,6 +126,9 @@ def get_calibrations(input_data, **kwargs):
         collector=ecl_leakage_collector,
         algorithms=algo_leakage,
         input_files=input_files_single_gamma)
+
+    # Set max subjobs
+    cal_ecl_leakage.max_subjobs = expert_config["max_subjobs"]
 
     # ..Depends on nOptimal
     cal_ecl_leakage.depends_on(cal_ecl_nOptimal)

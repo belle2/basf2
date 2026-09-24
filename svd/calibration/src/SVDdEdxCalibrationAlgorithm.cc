@@ -173,6 +173,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
   RooRealVar ProtonSVDdEdxTrackMomentum("ProtonSVDdEdxTrackMomentum", "momentum for p", -1.e8, 1.e8);
   RooRealVar ProtonSVDdEdx("ProtonSVDdEdx", "", -1.e8, 1.e8);
   RooRealVar ProtonSVDdEdxTrackCosTheta("ProtonSVDdEdxTrackCosTheta", "", -10., 10.);
+  RooRealVar ProtonnSVDHits("ProtonnSVDHits", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e7);
@@ -185,6 +186,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
   variables->add(ProtonSVDdEdxTrackMomentum);
   variables->add(ProtonSVDdEdx);
   variables->add(ProtonSVDdEdxTrackCosTheta);
+  variables->add(ProtonnSVDHits);
   variables->add(exp);
   variables->add(run);
 
@@ -316,7 +318,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* i
                                     m_dedxCutoff);
 
   inputTree->Draw("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum>>hist_d1_2212_truncMomentum",
-                  "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonSVDdEdxTrackMomentum>0.13)", "goff");
+                  "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonnSVDHits>4) * (ProtonSVDdEdxTrackMomentum>0.13)", "goff");
 
 // create isopopulated beta*gamma binning
   inputTree->Draw(Form("ProtonSVDdEdxTrackMomentum/%f", m_ProtonPDGMass), "", "goff",
@@ -339,7 +341,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* i
                                      m_dedxMaxPossible);
 
   inputTree->Draw(Form("ProtonSVDdEdx:ProtonSVDdEdxTrackMomentum/%f>>hist_d1_2212_truncBetaGamma", m_ProtonPDGMass),
-                  "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonSVDdEdxTrackMomentum>0.13) * (ProtonSVDdEdx>1.2e6 - 1.e6*ProtonSVDdEdxTrackMomentum)",
+                  "nSignalLambda_sw * (ProtonSVDdEdx>0) * (ProtonnSVDHits>4) * (ProtonSVDdEdxTrackMomentum>0.13) * (ProtonSVDdEdx>1.2e6 - 1.e6*ProtonSVDdEdxTrackMomentum)",
                   "goff");
 
   // produce the 1D profile
@@ -399,6 +401,9 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
   RooRealVar SlowPionSVDdEdxTrackMomentum("SlowPionSVDdEdxTrackMomentum", "momentum for slow pion (GeV), from the track", -1.e8,
                                           1.e8);
   RooRealVar SlowPionSVDdEdx("SlowPionSVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar KaonnSVDHits("KaonnSVDHits", "", -1.e8, 1.e8);
+  RooRealVar PionDnSVDHits("PionDnSVDHits", "", -1.e8, 1.e8);
+  RooRealVar SlowPionnSVDHits("SlowPionnSVDHits", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e8);
@@ -415,6 +420,9 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
   variables->add(SlowPionMomentum);
   variables->add(SlowPionSVDdEdxTrackMomentum);
   variables->add(SlowPionSVDdEdx);
+  variables->add(KaonnSVDHits);
+  variables->add(PionDnSVDHits);
+  variables->add(SlowPionnSVDHits);
   variables->add(exp);
   variables->add(run);
   variables->add(event);
@@ -528,15 +536,17 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
                                     pbins.data(),
                                     m_numDEdxBins, 0, m_dedxCutoff);
 
-  inputTree->Draw("KaonSVDdEdx:KaonSVDdEdxTrackMomentum>>hist_d1_321_truncMomentum", "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
+  inputTree->Draw("KaonSVDdEdx:KaonSVDdEdxTrackMomentum>>hist_d1_321_truncMomentum",
+                  "nSignalDstar_sw * (KaonSVDdEdx>0) * (KaonnSVDHits>4)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
   TH2F* hDstarPiPart1Momentum = static_cast<TH2F*>(hDstarPiMomentum->Clone("hist_d1_211_truncPart1Momentum"));
   TH2F* hDstarPiPart2Momentum = static_cast<TH2F*>(hDstarPiMomentum->Clone("hist_d1_211_truncPart2Momentum"));
 
-  inputTree->Draw("PionDSVDdEdx:PionDSVDdEdxTrackMomentum>>hist_d1_211_truncPart1Momentum", "nSignalDstar_sw * (PionDSVDdEdx>0)",
+  inputTree->Draw("PionDSVDdEdx:PionDSVDdEdxTrackMomentum>>hist_d1_211_truncPart1Momentum",
+                  "nSignalDstar_sw * (PionDSVDdEdx>0) * (PionDnSVDHits>4)",
                   "goff");
   inputTree->Draw("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum>>hist_d1_211_truncPart2Momentum",
-                  "nSignalDstar_sw * (SlowPionSVDdEdx>0)",
+                  "nSignalDstar_sw * (SlowPionSVDdEdx>0) * (SlowPionnSVDHits>4)",
                   "goff");
   hDstarPiMomentum->Add(hDstarPiPart1Momentum);
   hDstarPiMomentum->Add(hDstarPiPart2Momentum);
@@ -575,16 +585,16 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
                                      m_numDEdxBins, 0, m_dedxMaxPossible);
 
   inputTree->Draw(Form("KaonSVDdEdx:KaonSVDdEdxTrackMomentum/%f>>hist_d1_321_truncBetaGamma", m_KaonPDGMass),
-                  "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
+                  "nSignalDstar_sw * (KaonSVDdEdx>0) * (KaonnSVDHits>4)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
   TH2F* hDstarPiPart1BetaGamma = static_cast<TH2F*>(hDstarPiBetaGamma->Clone("hist_d1_211_truncPart1BetaGamma"));
   TH2F* hDstarPiPart2BetaGamma = static_cast<TH2F*>(hDstarPiBetaGamma->Clone("hist_d1_211_truncPart2BetaGamma"));
 
   inputTree->Draw(Form("PionDSVDdEdx:PionDSVDdEdxTrackMomentum/%f>>hist_d1_211_truncPart1BetaGamma", m_PionPDGMass),
-                  "nSignalDstar_sw * (PionDSVDdEdx>0)",
+                  "nSignalDstar_sw * (PionDSVDdEdx>0) * (PionDnSVDHits>4)",
                   "goff");
   inputTree->Draw(Form("SlowPionSVDdEdx:SlowPionSVDdEdxTrackMomentum/%f>>hist_d1_211_truncPart2BetaGamma", m_PionPDGMass),
-                  "nSignalDstar_sw * (SlowPionSVDdEdx>0)", "goff");
+                  "nSignalDstar_sw * (SlowPionSVDdEdx>0) * (SlowPionnSVDHits>4)", "goff");
   hDstarPiBetaGamma->Add(hDstarPiPart1BetaGamma);
   hDstarPiBetaGamma->Add(hDstarPiPart2BetaGamma);
 
@@ -678,9 +688,9 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
   TH2F* hGammaEPart2Momentum = static_cast<TH2F*>(hGammaEMomentum->Clone("hist_d1_11_truncPart2Momentum"));
 
   preselTree->Draw("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum>>hist_d1_11_truncPart1Momentum",
-                   "FirstElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2", "goff");
+                   "FirstElectronSVDdEdx>0 && FirstElectronnSVDHits>4 && DIRA>0.995 && dr>1.2", "goff");
   preselTree->Draw("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum>>hist_d1_11_truncPart2Momentum",
-                   "SecondElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2", "goff");
+                   "SecondElectronSVDdEdx>0 && SecondElectronnSVDHits>4 && DIRA>0.995 && dr>1.2", "goff");
   hGammaEMomentum->Add(hGammaEPart1Momentum);
   hGammaEMomentum->Add(hGammaEPart2Momentum);
 
@@ -708,10 +718,10 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
 
   preselTree->Draw(Form("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_truncPart1BetaGamma",
                         m_ElectronPDGMass),
-                   "FirstElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2 && FirstElectronSVDdEdx<1.8e6", "goff");
+                   "FirstElectronSVDdEdx>0 && FirstElectronnSVDHits>4 && DIRA>0.995 && dr>1.2 && FirstElectronSVDdEdx<1.8e6", "goff");
   preselTree->Draw(Form("SecondElectronSVDdEdx:SecondElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_truncPart2BetaGamma",
                         m_ElectronPDGMass),
-                   "SecondElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2 && SecondElectronSVDdEdx<1.8e6", "goff");
+                   "SecondElectronSVDdEdx>0 && SecondElectronnSVDHits>4 && DIRA>0.995 && dr>1.2 && SecondElectronSVDdEdx<1.8e6", "goff");
   hGammaEBetaGamma->Add(hGammaEPart1BetaGamma);
   hGammaEBetaGamma->Add(hGammaEPart2BetaGamma);
 

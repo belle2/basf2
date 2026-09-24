@@ -1514,13 +1514,23 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         charm_skim_std_charged('K', path=path)
         stdKshorts(path=path)
         stdLambdas(path=path)
+
+    def build_lists(self, path):
         Ks_sel = '[0.468 < M < 0.506] and goodBelleKshort == 1'
         L0_sel = '[1.111 < M < 1.121] and [dr > 0.1] and [extraInfo(chiSquared) < 100]' + \
                  ' and [cosAngleBetweenMomentumAndVertexVectorInXYPlane > 0.99]'
-        ma.applyCuts('K_S0:merged', Ks_sel, path=path)
-        ma.applyCuts('Lambda0:merged', L0_sel, path=path)
-
-    def build_lists(self, path):
+        ma.cutAndCopyList(
+            'K_S0:DstToD0Pi_D0ToGeneric_hadtag',
+            'K_S0:merged',
+            Ks_sel,
+            path=path
+        )
+        ma.cutAndCopyList(
+            'Lambda0:DstToD0Pi_D0ToGeneric_hadtag',
+            'Lambda0:merged',
+            L0_sel,
+            path=path
+        )
         ma.cutAndCopyList('pi+:DstToD0Pi_D0ToGeneric_hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
         ma.cutAndCopyList('K+:DstToD0Pi_D0ToGeneric_hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
         ma.fillParticleList("p+:DstToD0Pi_D0ToGeneric_hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
@@ -1575,35 +1585,28 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         D0_channels = [
             "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
             "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-            (
-                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi0:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
-            (
-                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
-            (
-                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi0:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
+            ("K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi0:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            ("K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"),
+            ("K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi0:DstToD0Pi_D0ToGeneric_hadtag"),
             "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-            (
-                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
+            ("pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"),
             "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            ("pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi0:DstToD0Pi_D0ToGeneric_hadtagDm8 pi0:DstToD0Pi_D0ToGeneric_hadtagDm8"),
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
             (
-                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi0:DstToD0Pi_D0ToGeneric_hadtagDm8 pi0:DstToD0Pi_D0ToGeneric_hadtagDm8"
+                "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
             ),
-            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-            "K_S0:merged pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
             "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag",
             "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged"]
+            "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag"]
 
         D0List = []
         for chID, channel in enumerate(D0_channels):
@@ -1621,25 +1624,22 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         Dp_channels = [
             "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-            (
-                "K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
+            ("K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
             "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-            (
-                "K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-            ),
+            ("K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            ("pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
             (
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
+                "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
             ),
-            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
-            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-            "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-            "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged K_S0:merged"]
+            "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag"]
 
         dpcuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
         DpList = []
@@ -1670,35 +1670,33 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         )
 
         LC_channels = [
-                "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "p+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag",
-                (
-                    "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-                ),
-                (
-                    "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi0:DstToD0Pi_D0ToGeneric_hadtag"
-                ),
-                (
-                    "p+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi-:DstToD0Pi_D0ToGeneric_hadtag"
-                ),
-                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
-                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged pi0:DstToD0Pi_D0ToGeneric_hadtag",
-                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-                "Lambda0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-                (
-                    "Sigma+:DstToD0Pi_D0ToGeneric_hadtagDm13 pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-                ),
-                "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"]
+            "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "p+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag",
+            ("p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            ("p+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            ("p+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi-:DstToD0Pi_D0ToGeneric_hadtag"),
+            "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag",
+            "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "p+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "Lambda0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "Lambda0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            (
+                "Lambda0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            ("Sigma+:DstToD0Pi_D0ToGeneric_hadtagDm13 pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            "Sigma+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"]
 
         LCcuts = "2.18 < M < 2.38 and useCMSFrame(p) > 2.0"
 
@@ -1708,24 +1706,25 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             LambdacList.append("Lambda_c+:DstToD0Pi_D0ToGeneric_skimDm" + str(chID))
 
         Ds_channels = [
-                "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
-                "K_S0:merged K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                (
-                    "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"
-                ),
-                "K_S0:merged K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "K_S0:merged K+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
-                "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag",
-                "K_S0:merged pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
-                (
-                    "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
-                    "pi-:DstToD0Pi_D0ToGeneric_hadtag"
-                )
-            ]
+            "K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K+:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            ("K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag"),
+            (
+                "K_S0:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            (
+                "K_S0:DstToD0Pi_D0ToGeneric_hadtag K+:DstToD0Pi_D0ToGeneric_hadtag "
+                "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag",
+            ("K+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi+:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi-:DstToD0Pi_D0ToGeneric_hadtag")]
 
         DScuts = "1.82 < M < 2.12 and useCMSFrame(p) > 2.0"
 
@@ -1886,17 +1885,17 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         ma.copyLists("D*+:DstToD0Pi_D0ToGeneric_fromLC", sigDst_fromLC, path=path)
 
         DstS_Xfrag = [
-            "K_S0:merged",
-            "pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+            "K_S0:DstToD0Pi_D0ToGeneric_hadtag",
+            "pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag",
             "pi+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag",
             "pi+:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag",
-            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
-            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:merged",
+            "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag",
             (
                 "pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
-                "pi+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag"
-            )
-        ]
+                "pi0:DstToD0Pi_D0ToGeneric_hadtag K_S0:DstToD0Pi_D0ToGeneric_hadtag"
+            ),
+            ("pi+:DstToD0Pi_D0ToGeneric_hadtag pi-:DstToD0Pi_D0ToGeneric_hadtag "
+             "pi+:DstToD0Pi_D0ToGeneric_hadtag K-:DstToD0Pi_D0ToGeneric_hadtag")]
 
         sigDst_fromDstS = []
         for chID, channel in enumerate(DstS_Xfrag):

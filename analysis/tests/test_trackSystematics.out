@@ -1,5 +1,6 @@
 [INFO] Steering file: analysis/tests/test_trackSystematics.py
 [INFO] The random number seed is set to "1103"
+[WARNING] A constant scale value (1.01) was provided to scaleTrackMomenta: the default 'tracking_MomentumScaling' payload from the global tag will NOT be used. The constant scale is applied instead.
 [INFO] Starting event processing, random seed is set to '1103'
 [INFO] Added file ${BELLE2_VALIDATION_DATA_DIR}/mdst16.root
 [INFO] ParticleLoader's Summary of Actions:

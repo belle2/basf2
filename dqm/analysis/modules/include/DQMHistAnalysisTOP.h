@@ -36,11 +36,6 @@ namespace Belle2 {
     DQMHistAnalysisTOPModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisTOPModule();
-
-    /**
      * Initializer.
      */
     void initialize() override final;
@@ -84,9 +79,19 @@ namespace Belle2 {
     void updateWindowVsSlotCanvas();
 
     /**
+     * Updates canvas of window_vs_slot median w/ alarming
+     */
+    void updateWindowMedianCanvas();
+
+    /**
      * Updates canvas of event desynchronization monitor w/ alarming
      */
     void updateEventMonitorCanvas();
+
+    /**
+     * Updates canvas of unpacker errors w/ alarming
+     */
+    void updateUnpackerErrCanvas();
 
     /**
      * Updates canvas of number of good hits per event w/ alarming (injection BG)
@@ -114,7 +119,7 @@ namespace Belle2 {
      * @param h2 second histogram
      * @return true if (nbins, xmin, xmax) match
      */
-    bool sameHistDefinition(TH1* h1, TH1* h2);
+    static bool sameHistDefinition(TH1* h1, TH1* h2);
 
     /**
      * Makes a plot of dead and hot channel fractions per slot
@@ -138,7 +143,7 @@ namespace Belle2 {
      * @param name the name of histograms
      * @param scale scale factor for the histogram z-axis range (maximum = average * scale)
      */
-    void setZAxisRange(const std::string& name, double scale);
+    static void setZAxisRange(const std::string& name, double scale);
 
     /**
      * Makes background subtracted time distribution plot
@@ -146,7 +151,7 @@ namespace Belle2 {
      * @param trackHits histogram used to scale background in case it is available
      * @param slot slot number
      */
-    void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
+    static void makeBGSubtractedTimingPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
      * Makes plots of the number of PMT hits per event
@@ -164,7 +169,7 @@ namespace Belle2 {
      * @param histogram resulting histogram w/ fractions
      * @param canvas canvas to plot
      */
-    void makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas);
+    static void makeFlagFractPlot(const std::string& hname, TH1* histogram, TCanvas* canvas);
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -212,8 +217,8 @@ namespace Belle2 {
      * @param alarmLines alarm lines [out]
      * @param bigRed on true red color for large values, else red color for small values
      */
-    void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
-                       bool bigRed = true);
+    static void setAlarmLines(const std::vector<double>& alarmLevels, double xmin, double xmax, std::vector<TLine*>& alarmLines,
+                              bool bigRed = true);
 
     /**
      * Sets all alarm lines.
@@ -225,7 +230,7 @@ namespace Belle2 {
      * @param h pixel or channel distribution of hits (1D or 2D histogram)
      * @return cut levels (first = dead, second = hot)
      */
-    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
+    static std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables
@@ -244,11 +249,19 @@ namespace Belle2 {
      */
     void setIncludedBoardstacks(const std::vector<std::string>& excludedBoardstacks);
 
+    /**
+     * Sets grid x on the canvas
+     * @param canvasName canvas name
+     */
+    static void setGridX(const std::string& canvasName);
+
     // module parameters
 
     std::vector<int> m_asicWindowsBand = {215, 235}; /**< lower and upper bin of a band denoting good windows */
     std::vector<double> m_asicWindowsAlarmLevels = {0.002, 0.02}; /**< alarm levels for fraction of windows outside the band */
+    std::vector<double> m_windowMedianAlarmLevels = {50, 100}; /**< alarm levels for window_vs_slot medians */
     std::vector<double> m_eventMonitorAlarmLevels = {1e-4, 2e-3}; /**< alarm levels for fraction of desynchronized digits */
+    std::vector<double> m_unpackerErrAlarmLevels = {0.01, 0.10}; /**< alarm levels for the fraction of unpacker errors */
     std::vector<double> m_junkHitsAlarmLevels = {0.05, 0.25}; /**< alarm levels for the fraction of junk hits */
     std::vector<double> m_deadChannelsAlarmLevels = {0.1, 0.35}; /**< alarm levels for the fraction of dead + hot channels */
     std::vector<double> m_backgroundAlarmLevels = {5.0, 10.0}; /**< alarm levels for background rates [MHz/PMT] */
@@ -277,6 +290,12 @@ namespace Belle2 {
     double m_numEvents = 0; /**< number of events processed with TOPDQM module */
 
     // new histogram and canvases
+
+    TH1D* m_evtMonitorFract = nullptr; /**< fractions of de-synchronized hits */
+    TCanvas* m_c_evtMonitorFract = nullptr; /**< Canvas: fractions of de-synchronized hits */
+
+    TH1F* m_windowMedian = nullptr; /**< window_vs_slot medians */
+    TCanvas* m_c_windowMedian = nullptr; /**< Canvas: window_vs_slot medians */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
@@ -310,7 +329,6 @@ namespace Belle2 {
     // graphic primitives
 
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
-    std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_deadChannelsAlarmLines; /**< lines representing alarm levels */
     std::vector<TLine*> m_backgroundAlarmLines; /**< lines representing alarm levels */

@@ -23,7 +23,7 @@ namespace Belle2 {
     explicit SVD3SampleELSTimeCalibrationAlgorithm(const std::string& str);
 
     /** Destructor */
-    virtual ~SVD3SampleELSTimeCalibrationAlgorithm() {}
+    virtual ~SVD3SampleELSTimeCalibrationAlgorithm() override {}
 
     /** Setter for m_allowedTimeShift */
     void setAllowedTimeShift(float value) {m_allowedTimeShift = value;}

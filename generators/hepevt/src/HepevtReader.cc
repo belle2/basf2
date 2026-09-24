@@ -26,6 +26,8 @@ const boost::char_separator<char> HepevtReader::sep(",; \t");
 void HepevtReader::open(const string& filename)
 {
   m_lineNr = 0;
+  if (m_input.is_open()) m_input.close();
+  m_input.clear();
   m_input.open(filename.c_str());
   if (!m_input) throw(HepEvtCouldNotOpenFileError() << filename);
 }
@@ -85,6 +87,24 @@ bool HepevtReader::skipEvents(int n)
     for (int j = 0; j < nparticles; j++) getLine();
   }
   return true;
+}
+
+int HepevtReader::countEvents(const std::string& filename)
+{
+  open(filename);
+
+  int count = 0;
+  int eventID;
+  double weight;
+
+  int nparticles;
+  while ((nparticles = readEventHeader(eventID, weight)) >= 0) {
+    count++;
+    for (int j = 0; j < nparticles; j++) getLine();
+  }
+
+  B2INFO("Counted " << count << " events in " << filename << ".");
+  return count;
 }
 
 

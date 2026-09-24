@@ -178,14 +178,14 @@ namespace Belle2 {
 
     void TOPRecoManager::setMirrorCenter(int moduleID, double xc, double yc)
     {
-      auto& inverseRaytracers = getInstance().inverseRaytracers();
-      auto& fastRaytracers = getInstance().fastRaytracers();
-      auto& yScanners = getInstance().yScanners();
+      auto& InverseRaytracers = getInstance().inverseRaytracers();
+      auto& FastRaytracers = getInstance().fastRaytracers();
+      auto& YScanners = getInstance().yScanners();
       unsigned k = moduleID - 1;
-      if (k < yScanners.size()) {
-        inverseRaytracers[k].setMirrorCenter(xc, yc);
-        fastRaytracers[k].setMirrorCenter(xc, yc);
-        yScanners[k].setMirrorCenter(xc, yc);
+      if (k < YScanners.size()) {
+        InverseRaytracers[k].setMirrorCenter(xc, yc);
+        FastRaytracers[k].setMirrorCenter(xc, yc);
+        YScanners[k].setMirrorCenter(xc, yc);
         return;
       }
 

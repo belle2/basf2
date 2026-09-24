@@ -152,7 +152,7 @@ namespace Belle2 {
        * @param name histogram name
        * @param title histogram title
        */
-      TH1F getHistogram(std::string name, std::string title) const;
+      TH1F getHistogram(const std::string& name, const std::string& title) const;
 
     private:
 
@@ -168,7 +168,7 @@ namespace Belle2 {
        * @param yRight bin content of right-to-minimal bin
        * @return minimum given as a fraction of step to be added to central bin position
        */
-      Minimum getMinimum(double yLeft, double yCenter, double yRight) const;
+      static Minimum getMinimum(double yLeft, double yCenter, double yRight);
 
       double m_xmin = 0; /**< lower limit of search region */
       double m_xmax = 0; /**< upper limit of search region */

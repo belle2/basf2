@@ -32,11 +32,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDReductionModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDReductionModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

@@ -68,7 +68,7 @@ namespace Belle2 {
     public:
 
       /// Virtual destructor
-      virtual ~BaseSoftConstraint();
+      virtual ~BaseSoftConstraint() override;
 
       /// Returns the chi2
       virtual double getChi2() const = 0;

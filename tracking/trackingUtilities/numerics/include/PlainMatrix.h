@@ -125,6 +125,7 @@ namespace Belle2 {
       {
         for (int i = 0; i < rhs.rows(); ++i) {
           out << rhs(i, 0) << ", ";
+          // cppcheck-suppress knownConditionTrueFalse ; the condition depends on the template arguments of the instantiation
           for (int j = 1; j < rhs.cols(); ++j) {
             out << rhs(i, j);
           }
@@ -216,7 +217,7 @@ namespace Belle2 {
       /// Total number of values in the matrix
       static constexpr size_t size()
       {
-        return M * N;
+        return static_cast<size_t>(M) * static_cast<size_t>(N);
       }
 
       /// Total number of rows in the matrix
@@ -258,7 +259,7 @@ namespace Belle2 {
 
     private:
       /// Memory of the flat value content.
-      std::array<T, M* N> m_values;
+      std::array<T, M* N> m_values{};
     };
   }
 }

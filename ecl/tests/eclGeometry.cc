@@ -31,7 +31,7 @@ namespace {
     G4ThreeVector vertices[] = {G4ThreeVector(-1, -1, -1), G4ThreeVector(1, -1, -1), G4ThreeVector(1, 1, -1), G4ThreeVector(-1, 1, -1),
                                 G4ThreeVector(-1, -1, 1), G4ThreeVector(1, -1, 1), G4ThreeVector(1, 1, 1), G4ThreeVector(-1, 1, 1)
                                };
-    BelleCrystal* crystal = new BelleCrystal("solid4", 4, vertices);
+    const BelleCrystal* crystal = new BelleCrystal("solid4", 4, vertices);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -58,7 +58,7 @@ namespace {
     G4ThreeVector vertices[] = {G4ThreeVector(0, 1, -z), G4ThreeVector(-s1, c1, -z), G4ThreeVector(-s2, -c2, -z), G4ThreeVector(s2, -c2, -z), G4ThreeVector(s1, c1, -z),
                                 G4ThreeVector(0, 1, z), G4ThreeVector(-s1, c1, z), G4ThreeVector(-s2, -c2, z), G4ThreeVector(s2, -c2, z), G4ThreeVector(s1, c1, z)
                                };
-    BelleCrystal* crystal = new BelleCrystal("solid5", 5, vertices);
+    const BelleCrystal* crystal = new BelleCrystal("solid5", 5, vertices);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -99,7 +99,7 @@ namespace {
     vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
     double wrapthickness = 0.17;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
-      shape_t* s = *it;
+      const shape_t* s = *it;
       std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
       G4Translate3D tw;
       G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
@@ -118,7 +118,7 @@ namespace {
     vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
     double wrapthickness = 0.17;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
-      shape_t* s = *it;
+      const shape_t* s = *it;
       std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
       G4Translate3D tw;
       G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
@@ -137,7 +137,7 @@ namespace {
     vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_backward.dat");
     double wrapthickness = 0.17;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
-      shape_t* s = *it;
+      const shape_t* s = *it;
       std::string prefix("sv_"); prefix += "barrel"; prefix += "_wrap";
       G4Translate3D tw;
       G4VSolid* c = s->get_solid(prefix, wrapthickness, tw);
@@ -157,7 +157,7 @@ namespace {
     // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0}, {1, 0}, {1, 1}, { -1, 1}}; //z, r
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
-    BelleLathe* sect = new BelleLathe("sect", M_PI / 2, M_PI, contourb);
+    const BelleLathe* sect = new BelleLathe("sect", M_PI / 2, M_PI, contourb);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -182,7 +182,7 @@ namespace {
     // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0}, {1, 0}, {1, 1}, { -1, 1}}; //z, r
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
-    BelleLathe* sect = new BelleLathe("sect", 3 * M_PI / 2, M_PI, contourb);
+    const BelleLathe* sect = new BelleLathe("sect", 3 * M_PI / 2, M_PI, contourb);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -207,7 +207,7 @@ namespace {
     // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0}, {1, 0}, {1, 1}, { -1, 1}}; //z, r
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
-    BelleLathe* sect = new BelleLathe("sect", M_PI, M_PI / 2, contourb);
+    const BelleLathe* sect = new BelleLathe("sect", M_PI, M_PI / 2, contourb);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -232,7 +232,7 @@ namespace {
     // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0}, {1, 0}, {1, 1}, { -1, 1}}; //z, r
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
-    BelleLathe* sect = new BelleLathe("sect", 0, 3 * M_PI / 2, contourb);
+    const BelleLathe* sect = new BelleLathe("sect", 0, 3 * M_PI / 2, contourb);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;
@@ -257,7 +257,7 @@ namespace {
     // Create the Belle Lathe
     zr_t bint[] = {{ -1, 0.5}, {1, 0.5}, {1, 1}, { -1, 1}}; //z, r, rmin is 0.5
     std::vector<zr_t> contourb(bint, bint + sizeof(bint) / sizeof(zr_t));
-    BelleLathe* sect = new BelleLathe("sect", M_PI / 4, M_PI / 2, contourb);
+    const BelleLathe* sect = new BelleLathe("sect", M_PI / 4, M_PI / 2, contourb);
 
     // Get bounding box
     G4ThreeVector pMin; G4ThreeVector pMax;

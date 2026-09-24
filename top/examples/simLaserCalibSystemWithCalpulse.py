@@ -47,7 +47,7 @@ main = b2.create_path()
 
 # Set number of events to generate
 main.add_module('EventInfoSetter',
-                expList=[1003],  # 0 for nominal phase 3, 1002 for phase II, 1003 for early phase III
+                expList=[1003],  # 0 for nominal phase 3, 1002 for Run 0 (phase 2), 1003 for Run 1 (early phase 3)
                 evtNumList=[100])
 
 # Gearbox: access to database (xml files)

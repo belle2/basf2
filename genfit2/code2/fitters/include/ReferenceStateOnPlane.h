@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_ReferenceStateOnPlane_h
-#define genfit_ReferenceStateOnPlane_h
+#pragma once
 
 #include "StateOnPlane.h"
 
@@ -110,5 +109,3 @@ class ReferenceStateOnPlane : public StateOnPlane {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ReferenceStateOnPlane_h

@@ -9,12 +9,13 @@
 
 #include <tracking/trackFindingCDC/legendre/quadtree/BaseCandidateReceiver.h>
 
+#include <Math/Vector2D.h>
+
 #include <vector>
 
 namespace Belle2 {
   namespace TrackingUtilities {
     class CDCWireHit;
-    class Vector2D;
   }
   namespace TrackFindingCDC {
 
@@ -40,13 +41,13 @@ namespace Belle2 {
        * @param theta angle between x-axis and vector to the center of the circle which represents trajectory
        * @return vector of CDCWireHit objects which satisfy legendre transformation with respect to the given parameters
        */
-      std::vector<const TrackingUtilities::CDCWireHit*> getHitsWRTtoRefPos(const TrackingUtilities::Vector2D& refPos, float curv,
+      std::vector<const TrackingUtilities::CDCWireHit*> getHitsWRTtoRefPos(const ROOT::Math::XYVector& refPos, float curv,
           float theta);
 
     private:
 
       /// Precision level for the width of the off origin hough search
-      double m_levelPrecision;
+      double m_levelPrecision {};
       //.5 - 0.24 * exp(-4.13118 * TrackCandidate::convertRhoToPt(fabs(track_par.second)) + 2.74);
     };
   }

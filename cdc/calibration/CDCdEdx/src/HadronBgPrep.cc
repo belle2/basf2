@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <cdc/calibration/CDCdEdx/HadronBgPrep.h>
+#include <framework/utilities/MathHelpers.h>
 using namespace Belle2;
 
 HadronBgPrep::HadronBgPrep()
@@ -52,20 +53,20 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
   std::map<int, std::vector<TH1F*>>  hchi_inj, hchicos_allbg, hchicos_1by3bg, hchicos_2by3bg, hchicos_3by3bg;
 
   //define histograms
-  defineHisto(hdedx_bg, "dedx", "bg", pdg.data());
-  defineHisto(hchi_bg, "chi", "bg", pdg.data());
-  defineHisto(hionzsigma_bg, "ionzsigma", "bg", pdg.data());
+  defineHisto(hdedx_bg, "dedx", "bg", pdg);
+  defineHisto(hchi_bg, "chi", "bg", pdg);
+  defineHisto(hionzsigma_bg, "ionzsigma", "bg", pdg);
   for (int i = 0; i < 2; ++i) {
 
-    defineHisto(hchi_inj[i], "chi", Form("inj_%d", i), pdg.data());
+    defineHisto(hchi_inj[i], "chi", Form("inj_%d", i), pdg);
 
     std::string charge = "pos";
     if (i == 1) charge = "neg";
 
-    defineHisto(hchicos_allbg[i], "chi", Form("%s_allbg_cos", charge.data()), pdg.data());
-    defineHisto(hchicos_1by3bg[i], "chi", Form("%s_1b3bg_cos", charge.data()), pdg.data());
-    defineHisto(hchicos_2by3bg[i], "chi", Form("%s_2b3bg_cos", charge.data()), pdg.data());
-    defineHisto(hchicos_3by3bg[i], "chi", Form("%s_3b3bg_cos", charge.data()), pdg.data());
+    defineHisto(hchicos_allbg[i], "chi", Form("%s_allbg_cos", charge.data()), pdg);
+    defineHisto(hchicos_1by3bg[i], "chi", Form("%s_1b3bg_cos", charge.data()), pdg);
+    defineHisto(hchicos_2by3bg[i], "chi", Form("%s_2b3bg_cos", charge.data()), pdg);
+    defineHisto(hchicos_3by3bg[i], "chi", Form("%s_3b3bg_cos", charge.data()), pdg);
   }
 
 
@@ -179,7 +180,7 @@ void HadronBgPrep::prepareSample(std::shared_ptr<TTree> hadron, TFile*& outfile,
 
     m_sumcos[bgBin] += costh;
     m_sumbg[bgBin] += bg;
-    m_sumres_square[bgBin] += pow(dedx_res, 2);
+    m_sumres_square[bgBin] += square(dedx_res);
     m_sumsize[bgBin] += 1;
 
     // make histograms of dE/dx vs. cos(theta) for validation
@@ -354,7 +355,7 @@ void HadronBgPrep::plotDist(std::vector<TH1F*>& hist, const std::string& sname, 
 }
 
 //----------------------------------------
-void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
+void HadronBgPrep::setPars(TFile*& outfile, const std::string& pdg, std::vector<TH1F*>& hdedx_bg, std::vector<TH1F*>& hchi_bg,
                            std::vector<TH1F*>& hionzsigma_bg, std::map<int, std::vector<TH1F*>>& hchi_inj)
 {
   outfile->cd();
@@ -412,7 +413,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     //1. -------------------------
     // fit the dE/dx distribution in bins of beta-gamma
     gstatus bgstat;
-    fit(hdedx_bg[i],  pdg.data(), bgstat);
+    fit(hdedx_bg[i],  pdg, bgstat);
     TF1* f = hdedx_bg[i]->GetFunction("gaus");
     if (bgstat == OK && f) {
       const auto mean = f->GetParameter(1);
@@ -427,7 +428,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     //2. -------------------------
     // fit the chi distribution  in bins of beta-gamma
     gstatus chistat;
-    fit(hchi_bg[i], pdg.data(), chistat);
+    fit(hchi_bg[i], pdg, chistat);
     f = hchi_bg[i]->GetFunction("gaus");
     if (chistat == OK && f) {
       satchi = f->GetParameter(1);
@@ -440,7 +441,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
     //3. -------------------------
     // fit the chi distribution  in bins of beta-gamma
     gstatus ionstat;
-    fit(hionzsigma_bg[i], pdg.data(), ionstat);
+    fit(hionzsigma_bg[i], pdg, ionstat);
     if (ionstat == OK) {
       sationzres = hionzsigma_bg[i]->GetFunction("gaus")->GetParameter(2);
     } else sationzres = 0.0;
@@ -480,7 +481,7 @@ void HadronBgPrep::setPars(TFile*& outfile, std::string pdg, std::vector<TH1F*>&
 
       // fit the dE/dx distribution in bins of injection time'
       gstatus injstat;
-      fit(hchi_inj[ir][i],  pdg.data(), injstat);
+      fit(hchi_inj[ir][i],  pdg, injstat);
       if (injstat == OK) {
         mean = hchi_inj[ir][i]->GetFunction("gaus")->GetParameter(1);
         mean_err = hchi_inj[ir][i]->GetFunction("gaus")->GetParError(1);
@@ -540,7 +541,7 @@ void HadronBgPrep::fitGaussianWRange(TH1F*& temphist, gstatus& status, double si
       return;
     } else {
       temphist->GetXaxis()->SetRangeUser(mean - 5.0 * width, mean + 5.0 * width);
-      B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
+      B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
       status = OK;
     }
   }
@@ -579,7 +580,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
     for (int i = 0; i < m_cosBins; ++i) {
       if (hchicos_allbg[c][i]->Integral() > 100) {
         gstatus allbgstat;
-        fit(hchicos_allbg[c][i],  pdg.data(), allbgstat);
+        fit(hchicos_allbg[c][i],  pdg, allbgstat);
         if (allbgstat == OK) {
           chicos[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParameter(1);
           chicoserr[c][i] = hchicos_allbg[c][i]->GetFunction("gaus")->GetParError(1);
@@ -591,7 +592,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
       if (hchicos_1by3bg[c][i]->Integral() > 100) {
         gstatus all1bgstat;
 
-        fit(hchicos_1by3bg[c][i],  pdg.data(), all1bgstat);
+        fit(hchicos_1by3bg[c][i],  pdg, all1bgstat);
         if (all1bgstat == OK) {
           chicos_1b3bg[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
           chicos_1b3bgerr[c][i] = hchicos_1by3bg[c][i]->GetFunction("gaus")->GetParError(1);
@@ -603,7 +604,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
       if (hchicos_2by3bg[c][i]->Integral() > 100) {
         gstatus all2bgstat;
-        fit(hchicos_2by3bg[c][i],  pdg.data(), all2bgstat);
+        fit(hchicos_2by3bg[c][i],  pdg, all2bgstat);
         if (all2bgstat == OK) {
           chicos_2b3bg[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
           chicos_2b3bgerr[c][i] = hchicos_2by3bg[c][i]->GetFunction("gaus")->GetParError(1);
@@ -615,7 +616,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
       if (hchicos_3by3bg[c][i]->Integral() > 100) {
         gstatus all3bgstat;
-        fit(hchicos_3by3bg[c][i],  pdg.data(), all3bgstat);
+        fit(hchicos_3by3bg[c][i],  pdg, all3bgstat);
         if (all3bgstat == OK) {
           chicos2[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParameter(1);
           chicos2err[c][i] = hchicos_3by3bg[c][i]->GetFunction("gaus")->GetParError(1);
@@ -701,7 +702,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
   cchi.cd(2);
   bghigh = int(m_bgBins / 3);
-  FormatGraph(grchicos_1b3bg, 0, Form("first 1/3 bg bins, p =(%0.02f, %0.02f)", m_bgMin * mass, bghigh * bgstep * mass));
+  FormatGraph(grchicos_1b3bg, 0, Form("first 1/3 bg bins, p =(%0.02f, %0.02f)", m_bgMin * mass, (m_bgMin + bghigh * bgstep) * mass));
   FormatGraph(grchicos_1b3bgn, 1);
   grchicos_1b3bg.Draw("AP");
   grchicos_1b3bgn.Draw("P,same");
@@ -711,7 +712,8 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   cchi.cd(3);
   bglow = int(m_bgBins / 3);
   bghigh = int(2 * m_bgBins / 3);
-  FormatGraph(grchicos_2b3bg, 0, Form("second 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, bghigh * bgstep * mass));
+  FormatGraph(grchicos_2b3bg, 0, Form("second 1/3 bg bins, p =(%0.02f, %0.02f)", (m_bgMin + bglow * bgstep) * mass,
+                                      (m_bgMin + bghigh * bgstep) * mass));
   FormatGraph(grchicos_2b3bgn, 1);
   grchicos_2b3bg.Draw("AP");
   grchicos_2b3bgn.Draw("P,same");
@@ -720,7 +722,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
   cchi.cd(4);
   bglow = int(2 * m_bgBins / 3);
-  FormatGraph(grchicos2, 0, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, m_bgMax * mass));
+  FormatGraph(grchicos2, 0, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", (m_bgMin + bglow * bgstep) * mass, m_bgMax * mass));
   FormatGraph(grchicos2n, 1);
   grchicos2.Draw("AP");
   grchicos2n.Draw("P,same");
@@ -738,7 +740,8 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
   cchi.cd(2);
   bghigh = int(m_bgBins / 3);
-  FormatGraph(grsigmacos_1b3bg, 2, Form("first 1/3 bg bins, p =(%0.02f, %0.02f)", m_bgMin * mass, bghigh * bgstep * mass));
+  FormatGraph(grsigmacos_1b3bg, 2, Form("first 1/3 bg bins, p =(%0.02f, %0.02f)", m_bgMin * mass,
+                                        (m_bgMin + bghigh * bgstep) * mass));
   FormatGraph(grsigmacos_1b3bgn, 1);
   grsigmacos_1b3bg.Draw("AP");
   grsigmacos_1b3bgn.Draw("P,same");
@@ -748,7 +751,8 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
   cchi.cd(3);
   bglow = int(m_bgBins / 3);
   bghigh = int(2 * m_bgBins / 3);
-  FormatGraph(grsigmacos_2b3bg, 2, Form("second 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, bghigh * bgstep * mass));
+  FormatGraph(grsigmacos_2b3bg, 2, Form("second 1/3 bg bins, p =(%0.02f, %0.02f)", (m_bgMin + bglow * bgstep) * mass,
+                                        (m_bgMin + bghigh * bgstep) * mass));
   FormatGraph(grsigmacos_2b3bgn, 1);
   grsigmacos_2b3bg.Draw("AP");
   grsigmacos_2b3bgn.Draw("P,same");
@@ -757,7 +761,7 @@ void HadronBgPrep::printCanvasCos(std::map<int, std::vector<TH1F*>>& hchicos_all
 
   cchi.cd(4);
   bglow = int(2 * m_bgBins / 3);
-  FormatGraph(grsigmacos2, 2, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", bglow * bgstep * mass, m_bgMax * mass));
+  FormatGraph(grsigmacos2, 2, Form("third 1/3 bg bins, p =(%0.02f, %0.02f)", (m_bgMin + bglow * bgstep) * mass, m_bgMax * mass));
   FormatGraph(grsigmacos2n, 1);
   grsigmacos2.Draw("AP");
   grsigmacos2n.Draw("P,same");

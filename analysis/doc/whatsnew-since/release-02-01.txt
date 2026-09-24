@@ -22,7 +22,7 @@ As usual, please ask at https://questions.belle2.org if anything is unclear or y
 * **Removal** of the PhysicsTriggerVariables (all of which were experimental and only intended for use in the study of triggers).
 
   .. seealso::
-      Pull request `[PR#2581] <https://stash.desy.de/projects/B2/repos/software/pull-requests/2581>`_
+      Merge request `[MR#2581] <https://gitlab.desy.de/belle2/software/software/-/merge_requests/2581>`_
 
 New Modular Analysis Tools
 ++++++++++++++++++++++++++

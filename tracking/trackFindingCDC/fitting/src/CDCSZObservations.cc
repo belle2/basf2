@@ -17,6 +17,9 @@
 
 #include <framework/logging/Logger.h>
 
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;
@@ -52,17 +55,17 @@ std::size_t CDCSZObservations::append(const CDCRecoHit3D& recoHit3D)
     // by the taking the projected wire vector part parallel to the displacement
     // as a proportionality factor to the z direction.
     const CDCWire& wire = recoHit3D.getWire();
-    const Vector3D& wireVector = wire.getWireVector();
-    const Vector2D disp2D = recoHit3D.getRecoDisp2D();
+    const ROOT::Math::XYZVector& wireVector = wire.getWireVector();
+    const ROOT::Math::XYVector disp2D = recoHit3D.getRecoDisp2D();
     const double driftlengthVariance = recoHit3D.getRecoDriftLengthVariance();
 
-    double dispNorm = disp2D.norm();
+    double dispNorm = disp2D.R();
 
     double zeta = 1.0;
     if (dispNorm == 0.0) {
-      zeta = wireVector.xy().norm() / wireVector.z();
+      zeta = wireVector.Rho() / wireVector.z();
     } else {
-      zeta = wireVector.xy().dot(disp2D) / wireVector.z() / dispNorm;
+      zeta = VectorUtil::getXYVector(wireVector).Dot(disp2D) / wireVector.z() / dispNorm;
     }
 
     weight = zeta * zeta / driftlengthVariance;
@@ -93,34 +96,34 @@ std::size_t CDCSZObservations::appendRange(const CDCTrack& track)
   return this->appendRange(recoHit3Ds);
 }
 
-Vector2D CDCSZObservations::getCentralPoint() const
+ROOT::Math::XYVector CDCSZObservations::getCentralPoint() const
 {
   std::size_t n = size();
-  if (n == 0) return Vector2D(NAN, NAN);
+  if (n == 0) return ROOT::Math::XYVector(NAN, NAN);
   std::size_t i = n / 2;
 
   if (isEven(n)) {
     // For even number of observations use the middle one with the bigger distance from IP
-    Vector2D center1(getS(i), getZ(i));
-    Vector2D center2(getS(i - 1), getZ(i - 1));
-    return center1.normSquared() > center2.normSquared() ? center1 : center2;
+    ROOT::Math::XYVector center1(getS(i), getZ(i));
+    ROOT::Math::XYVector center2(getS(i - 1), getZ(i - 1));
+    return center1.Mag2() > center2.Mag2() ? center1 : center2;
   } else {
-    Vector2D center1(getS(i), getZ(i));
+    ROOT::Math::XYVector center1(getS(i), getZ(i));
     return center1;
   }
 }
 
-void CDCSZObservations::passiveMoveBy(const Vector2D& origin)
+void CDCSZObservations::passiveMoveBy(const ROOT::Math::XYVector& origin)
 {
   Eigen::Matrix<double, 1, 2> eigenOrigin(origin.x(), origin.y());
   EigenObservationMatrix eigenObservations = getEigenObservationMatrix(this);
   eigenObservations.leftCols<2>().rowwise() -= eigenOrigin;
 }
 
-Vector2D CDCSZObservations::centralize()
+ROOT::Math::XYVector CDCSZObservations::centralize()
 {
   // Pick an observation at the center
-  Vector2D centralPoint = getCentralPoint();
+  ROOT::Math::XYVector centralPoint = getCentralPoint();
   passiveMoveBy(centralPoint);
   return centralPoint;
 }

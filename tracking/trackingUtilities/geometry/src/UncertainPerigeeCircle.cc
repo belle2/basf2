@@ -28,12 +28,12 @@ UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
   PerigeeParameters avgPar;
   PerigeeCovariance avgCov;
 
-  double chi2 = PerigeeUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
+  double loc_chi2 = PerigeeUtil::average(fromPar, fromCov, toPar, toCov, avgPar, avgCov);
 
   // Calculating 3 parameters from 6 input parameters. 3 NDF remaining.
-  size_t ndf = 3;
+  size_t loc_ndf = 3;
 
-  return UncertainPerigeeCircle(avgPar, avgCov, chi2, ndf);
+  return UncertainPerigeeCircle(avgPar, avgCov, loc_chi2, loc_ndf);
 }
 
 std::ostream& TrackingUtilities::operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)

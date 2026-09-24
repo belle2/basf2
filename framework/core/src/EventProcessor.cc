@@ -110,7 +110,7 @@ namespace {
   };
 }
 
-long EventProcessor::getMaximumEventNumber(long maxEvent) const
+long EventProcessor::getMaximumEventNumber(long maxEvent)
 {
   //Check whether the number of events was set via command line argument
   unsigned int numEventsArgument = Environment::Instance().getNumberEventsOverride();
@@ -472,7 +472,7 @@ void EventProcessor::processBeginRun(bool skipDB)
   MetadataService::Instance().addBasf2Status("beginning run");
 
   m_inRun = true;
-  auto dbsession = Database::Instance().createScopedUpdateSession(); // cppcheck-suppress unreadVariable
+  auto dbsession = Database::Instance().createScopedUpdateSession();
 
   LogSystem& logSystem = LogSystem::Instance();
   m_processStatisticsPtr->startGlobal();

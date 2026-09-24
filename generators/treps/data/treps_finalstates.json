@@ -1,0 +1,22 @@
+{
+  "e+e-pi+pi-": {
+    "parameter": "generators/treps/data/parameterFiles/treps_par_pipi.dat",
+    "differential_cross_section": "generators/treps/data/differentialCrossSectionFiles/pipidcs.dat",
+    "w_list": "generators/treps/data/wListFiles/wlist_table_pipi.dat"
+  },
+  "e+e-K+K-": {
+    "parameter": "generators/treps/data/parameterFiles/treps_par_kk.dat",
+    "differential_cross_section": "generators/treps/data/differentialCrossSectionFiles/kkdcs.dat",
+    "w_list": "generators/treps/data/wListFiles/wlist_table_kk.dat"
+  },
+  "e+e-ppbar": {
+    "parameter": "generators/treps/data/parameterFiles/treps_par_ppbar.dat",
+    "differential_cross_section": "generators/treps/data/differentialCrossSectionFiles/ppbardcs.dat",
+    "w_list": "generators/treps/data/wListFiles/wlist_table_ppbar.dat"
+  },
+  "gammapi+pi-jpsi": {
+    "parameter": "generators/treps/data/parameterFiles/treps_par_chic2p.dat",
+    "differential_cross_section": "generators/treps/data/differentialCrossSectionFiles/chic2p_dcs.dat",
+    "w_list": "generators/treps/data/wListFiles/wlist_table_chic2p.dat"
+  }
+}

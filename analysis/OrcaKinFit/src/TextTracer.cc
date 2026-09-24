@@ -96,7 +96,7 @@ namespace Belle2 {
     void TextTracer::printFitObjects(BaseFitter& fitter)
     {
       chi2fo = 0;
-      FitObjectContainer* fitobjects = fitter.getFitObjects();
+      const FitObjectContainer* fitobjects = fitter.getFitObjects();
       if (!fitobjects) return;
       os << "Fit objects:\n";
       for (auto fo : *fitobjects) {
@@ -138,7 +138,7 @@ namespace Belle2 {
 
     void TextTracer::printTraceValues(const BaseFitter& fitter)
     {
-      for (auto& traceValue : fitter.traceValues) {
+      for (const auto& traceValue : fitter.traceValues) {
         std::string name = traceValue.first;
         double value = traceValue.second;
         os << "Value of " << name << ": " << value << std::endl;;

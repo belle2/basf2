@@ -44,10 +44,6 @@ DQMHistAnalysisHLTMonObjModule::DQMHistAnalysisHLTMonObjModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-DQMHistAnalysisHLTMonObjModule::~DQMHistAnalysisHLTMonObjModule()
-{
-}
-
 void DQMHistAnalysisHLTMonObjModule::initialize()
 {
   // make monitoring object related to this module
@@ -188,12 +184,24 @@ void DQMHistAnalysisHLTMonObjModule::endRun()
   double n_hlt = 0.;
   if (h_hlt) n_hlt = (double)h_hlt->GetBinContent((h_hlt->GetXaxis())->FindFixBin("total_result"));
   m_monObj->setVariable("n_hlt", n_hlt);
+
   double n_l1 = 0.;
-  if (h_l1) n_l1 = h_l1->GetEntries();
-  m_monObj->setVariable("n_l1", n_l1);
-  double n_procs = 0.;
-  if (h_procs) n_procs = h_procs->GetEntries();
-  m_monObj->setVariable("n_procs", n_procs);
+  if (h_l1) {
+    n_l1 = h_l1->GetEntries();
+    m_monObj->setVariable("n_l1", n_l1);
+    for (int i = 2; i <= h_l1->GetXaxis()->GetNbins(); i++) {
+      std::string label = "n_l1_HLT" + std::to_string(i - 1);
+      m_monObj->setVariable(label, h_l1->GetBinContent(i));
+    }
+  }
+
+  if (h_procs) {
+    m_monObj->setVariable("n_procs", h_procs->GetEntries());
+    for (int i = 2; i <= h_procs->GetXaxis()->GetNbins(); i++) {
+      std::string label = "n_procs_HLT" + std::to_string(i - 1);
+      m_monObj->setVariable(label, h_procs->GetBinContent(i));
+    }
+  }
 
   if (h_skim) {
     // loop bins, add variable to monObj named as "effCS_" + bin label w/o "accept"

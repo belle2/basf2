@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <utility>
 #include <vector>
 
 #include <svd/calibration/SVDHitTimeSelection.h>
@@ -15,10 +16,13 @@
 #include <svd/dataobjects/SVDCluster.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dbobjects/SVDSpacePointSNRFractionSelector.h>
+#include <svd/reconstruction/SVDMaxSumAlgorithm.h>
 
+#include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/database/DBObjPtr.h>
+#include <framework/utilities/MathHelpers.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 
 #include <vxd/dataobjects/VxdID.h>
@@ -40,12 +44,22 @@ namespace Belle2 {
 
   public:
 
-    /** member function to automatically add the cluster to its corresponding entry */
-    inline void addCluster(const SVDCluster* entry)
+    /** member function to automatically add the cluster to its corresponding entry
+     *
+     * index is the position of the cluster in the SVDCluster StoreArray, it is kept
+     * to be able to add the relations to the SpacePoints without having to look the
+     * clusters up in the DataStore again.
+     */
+    inline void addCluster(const SVDCluster* entry, int index)
     {
       vxdID = entry->getSensorID();
-      if (entry->isUCluster() == true) { clustersU.push_back(entry); return; }
+      if (entry->isUCluster() == true) {
+        clustersU.push_back(entry);
+        indicesU.push_back(index);
+        return;
+      }
       clustersV.push_back(entry);
+      indicesV.push_back(index);
     }
 
     /** Id of sensor, TODO can be removed if struct is used in a map */
@@ -63,6 +77,12 @@ namespace Belle2 {
      */
     std::vector<const SVDCluster*> clustersV;
 
+    /** stores the StoreArray indices of the clusters in clustersU, in the same order */
+    std::vector<int> indicesU;
+
+    /** stores the StoreArray indices of the clusters in clustersV, in the same order */
+    std::vector<int> indicesV;
+
   };
 
   /** simply store one spacePoint for each existing SVDCluster.
@@ -73,11 +93,14 @@ namespace Belle2 {
   template <class SpacePointType> void provideSVDClusterSingles(const StoreArray<SVDCluster>& svdClusters,
       StoreArray<SpacePointType>& spacePoints)
   {
+    // RelationArray is much cheaper than addRelationTo
+    RelationArray spacePointsToClusters(spacePoints, svdClusters);
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
       const SVDCluster* currentCluster = svdClusters[i];
       std::vector<const SVDCluster*> currentClusterCombi = { currentCluster };
-      SpacePointType* newSP = spacePoints.appendNew(currentClusterCombi);
-      newSP->addRelationTo(currentCluster);
+      const int spacePointIndex = spacePoints.getEntries();
+      spacePoints.appendNew(currentClusterCombi);
+      spacePointsToClusters.add(spacePointIndex, i);
     }
   }
 
@@ -95,16 +118,24 @@ namespace Belle2 {
     float noise = 0;
     for (auto iSD : shaperDigits) {
       auto samples = iSD.getSamples();
+      std::vector<float> selectedSamples;
+      if (samples.size() == 6) {
+        Belle2::SVD::SVDMaxSumAlgorithm maxSum(samples);
+        auto maxSamples = maxSum.getSelectedSamples();
+        selectedSamples.assign(maxSamples.begin(), maxSamples.end());
+      } else {
+        selectedSamples.assign(samples.begin(), samples.end());
+      }
+      if (selectedSamples.size() < 3) continue;
 
-      inputVector[0] += samples[0];
-      inputVector[1] += samples[1];
-      inputVector[2] += samples[2];
+      inputVector[0] += selectedSamples[0];
+      inputVector[1] += selectedSamples[1];
+      inputVector[2] += selectedSamples[2];
 
       VxdID thisSensorID = iSD.getSensorID();
       bool thisSide = iSD.isUStrip();
       int thisCellID = iSD.getCellID();
       float thisNoise = noiseCal.getNoise(thisSensorID, thisSide, thisCellID);
-
       noise += thisNoise * thisNoise;
     }
     noise = sqrt(noise);
@@ -122,18 +153,21 @@ namespace Belle2 {
    * Condition which has to be fulfilled: the first entry is always an u cluster, the second always a v-cluster
    */
   inline void findPossibleCombinations(const Belle2::ClustersOnSensor& aSensor,
-                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations, const SVDHitTimeSelection& hitTimeCut,
+                                       std::vector< std::vector<const SVDCluster*> >& foundCombinations,
+                                       std::vector< std::pair<int, int> >& foundCombinationIndices, const SVDHitTimeSelection& hitTimeCut,
                                        const bool& useSVDGroupInfo,  const int& numberOfSignalGroups, const bool& formSingleSignalGroup,
                                        const SVDNoiseCalibrations& noiseCal, const DBObjPtr<SVDSpacePointSNRFractionSelector>& svdSpacePointSelectionFunction,
                                        bool useSVDSpacePointSNRFractionSelector)
   {
 
-    for (const SVDCluster* uCluster : aSensor.clustersU) {
+    for (size_t iU = 0; iU < aSensor.clustersU.size(); ++iU) {
+      const SVDCluster* uCluster = aSensor.clustersU[iU];
       if (! hitTimeCut.isClusterInTime(uCluster->getSensorID(), 1, uCluster->getClsTime())) {
         B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << uCluster->getClsTime());
         continue;
       }
-      for (const SVDCluster* vCluster : aSensor.clustersV) {
+      for (size_t iV = 0; iV < aSensor.clustersV.size(); ++iV) {
+        const SVDCluster* vCluster = aSensor.clustersV[iV];
         if (! hitTimeCut.isClusterInTime(vCluster->getSensorID(), 0, vCluster->getClsTime())) {
           B2DEBUG(29, "Cluster rejected due to timing cut. Cluster time: " << vCluster->getClsTime());
           continue;
@@ -151,9 +185,9 @@ namespace Belle2 {
 
           if (int(uTimeGroupId.size()) && int(vTimeGroupId.size())) { // indirect check if the clusterizer module is disabled
             bool isContinue = true;
-            for (auto& uitem : uTimeGroupId) {
+            for (const auto& uitem : uTimeGroupId) {
               if (uitem < 0 || uitem >= numberOfSignalGroups) continue;
-              for (auto& vitem : vTimeGroupId) {
+              for (const auto& vitem : vTimeGroupId) {
                 if (vitem < 0 || vitem >= numberOfSignalGroups) continue;
                 if ((uitem == vitem) || formSingleSignalGroup) { isContinue = false; break; }
               }
@@ -182,6 +216,7 @@ namespace Belle2 {
         }
 
         foundCombinations.push_back({uCluster, vCluster});
+        foundCombinationIndices.emplace_back(aSensor.indicesU[iU], aSensor.indicesV[iV]);
 
 
       }
@@ -239,7 +274,7 @@ namespace Belle2 {
    */
 
 
-  inline void calculatePairingProb(TFile* pdfFile, std::vector<const SVDCluster*>& clusters, double& prob, double& error,
+  inline void calculatePairingProb(TFile* pdfFile, const std::vector<const SVDCluster*>& clusters, double& prob, double& error,
                                    bool useLegacyNaming)
   {
 
@@ -298,11 +333,11 @@ namespace Belle2 {
     }
 
     prob = chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality();
-    error = prob * sqrt(pow(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError, 2) +
-                        pow(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError, 2) +
-                        pow(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError, 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError(), 2) +
-                        pow(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError(), 2));
+    error = prob * sqrt(square(timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * chargeProbError) +
+                        square(chargeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * timeProbError) +
+                        square(chargeProb * timeProb * clusters[0]->getQuality() * clusters[1]->getQuality() * sizeProbError) +
+                        square(chargeProb * timeProb * sizeProb * clusters[1]->getQuality() * clusters[0]->getQualityError()) +
+                        square(chargeProb * timeProb * sizeProb * clusters[0]->getQuality() * clusters[1]->getQualityError()));
   }
 
   /** finds all possible combinations of U and V Clusters for SVDClusters.
@@ -323,19 +358,21 @@ namespace Belle2 {
     activatedSensors; // collects one entry per sensor, each entry will contain all Clusters on it TODO: better to use a sorted vector/list?
     std::vector<std::vector<const SVDCluster*> >
     foundCombinations; // collects all combinations of Clusters which were possible (condition: 1u+1v-Cluster on the same sensor)
+    std::vector<std::pair<int, int> >
+    foundCombinationIndices; // StoreArray indices of the (u, v) clusters of each entry of foundCombinations
 
     // sort Clusters by sensor. After the loop, each entry of activatedSensors contains all U and V-type clusters on that sensor
     for (unsigned int i = 0; i < uint(svdClusters.getEntries()); ++i) {
       SVDCluster* currentCluster = svdClusters[i];
 
-      activatedSensors[currentCluster->getSensorID().getID()].addCluster(currentCluster);
+      activatedSensors[currentCluster->getSensorID().getID()].addCluster(currentCluster, i);
     }
 
 
-    for (auto& aSensor : activatedSensors)
-      findPossibleCombinations(aSensor.second, foundCombinations, hitTimeCut, useSVDGroupInfo, numberOfSignalGroups,
-                               formSingleSignalGroup,
-                               noiseCal, svdSpacePointSelectionFunction, useSVDSpacePointSNRFractionSelector);
+    for (const auto& aSensor : activatedSensors)
+      findPossibleCombinations(aSensor.second, foundCombinations, foundCombinationIndices, hitTimeCut, useSVDGroupInfo,
+                               numberOfSignalGroups, formSingleSignalGroup, noiseCal, svdSpacePointSelectionFunction,
+                               useSVDSpacePointSNRFractionSelector);
 
     // Do not make space-points if their number would be too large to be considered by tracking
     if (foundCombinations.size() > numMaxSpacePoints) {
@@ -346,7 +383,13 @@ namespace Belle2 {
       return;
     }
 
-    for (auto& clusterCombi : foundCombinations) {
+    // RelationArray is much cheaper than addRelationTo
+    // The relation weight codes the type of the cluster: +1 for u and -1 for v.
+    RelationArray spacePointsToClusters(spacePoints, svdClusters);
+
+    for (size_t iCombi = 0; iCombi < foundCombinations.size(); ++iCombi) {
+      auto& clusterCombi = foundCombinations[iCombi];
+      const int spacePointIndex = spacePoints.getEntries();
       SpacePointType* newSP = spacePoints.appendNew(clusterCombi);
       if (useQualityEstimator == true) {
         double probability;
@@ -355,9 +398,9 @@ namespace Belle2 {
         newSP->setQualityEstimation(probability);
         newSP->setQualityEstimationError(error);
       }
-      for (auto* cluster : clusterCombi) {
-        newSP->addRelationTo(cluster, cluster->isUCluster() ? 1. : -1.);
-      }
+      // the first cluster of the combination is always the u one, the second one the v one
+      spacePointsToClusters.add(spacePointIndex, foundCombinationIndices[iCombi].first, 1.);
+      spacePointsToClusters.add(spacePointIndex, foundCombinationIndices[iCombi].second, -1.);
     }
   }
 

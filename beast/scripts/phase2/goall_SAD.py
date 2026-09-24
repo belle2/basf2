@@ -23,7 +23,7 @@ outdir_sub = 'phase2.1.4_collimators_1_upd'  # output sub directory
 fileSAD = 'phase2.1.4_collimators_1_upd'  # sad filename from /group/belle2/BGcampaigns/SAD/forG4/
 # check the directory for existing SAD samples
 # 28.2.2019
-# early_phase3_1_step5, early phase 3; use 31 for phase!
+# early_phase3_1_step5, Run 1 (early phase 3); use 31 for phase!
 # phase2.1.7_Touschek_step5
 # phase2.1.3_june_Touschek_EM_0
 # phase2.1.3_june_Touschek_EM_1

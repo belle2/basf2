@@ -78,15 +78,13 @@ namespace Belle2 {
         unsigned short iCLayer = wireID.getICLayer();
         const CDC::CDCGeometryPar& geometryPar = CDC::CDCGeometryPar::Instance();
         const CDC::CDCGeoControlPar& controlPar = CDC::CDCGeoControlPar::getInstance();
-        B2Vector3D backwardWirePos =
-          geometryPar.wireBackwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
-        B2Vector3D forwardWirePos =
-          geometryPar.wireForwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
+        const ROOT::Math::XYZVector& backwardWirePos = geometryPar.wireBackwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
+        const ROOT::Math::XYZVector& forwardWirePos = geometryPar.wireForwardPosition(wireID, CDC::CDCGeometryPar::c_Aligned);
         double zDistance = z - backwardWirePos.Z();
 
         // Actually are very small correction
         double stereoFactor =
-          (forwardWirePos - backwardWirePos).Mag() / (forwardWirePos.Z() - backwardWirePos.Z());
+          (forwardWirePos - backwardWirePos).R() / (forwardWirePos.Z() - backwardWirePos.Z());
 
         double distance = zDistance * stereoFactor;
         if (controlPar.getSenseWireZposMode() == 1) {

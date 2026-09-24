@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "TH1F.h"
+#include <TH1.h>
 
 namespace Belle2 {
 

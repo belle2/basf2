@@ -343,6 +343,8 @@ void SVDDQMHitTimeModule::event()
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
     const auto bestSVDEvtT0 = m_eventT0->getBestSVDTemporaryEventT0() ;
     //    There is only one estimate of SVD EVentT0 for the moment
+
+    // cppcheck-suppress variableScope ; used in every branch of the block below
     float svdEventT0 = bestSVDEvtT0->eventT0 ;
 
     if (m_3Samples) {

@@ -10,14 +10,10 @@
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/core/Environment.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string/classification.hpp>
+
 #include <TString.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace boost::algorithm;
 
 // Register module in the framework
 REG_MODULE(SkimFilter);
@@ -28,7 +24,8 @@ SkimFilterModule::SkimFilterModule() : Module()
   setDescription("Filter based on ParticleLists, by setting return value to true if at least one of the given lists is not empty.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
-  addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());
+  addParam("particleLists", m_strParticleLists, "List of ParticleLists",
+           std::vector<std::string>());
 
   // initializing the rest of private members
   m_nPass   = 0;

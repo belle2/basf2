@@ -11,6 +11,7 @@
 #include <framework/particledb/EvtGenDatabasePDG.h>
 #include <string>
 #include <unordered_map>
+#include <regex>
 
 #include <TROOT.h>
 #include <TRandom.h>
@@ -47,10 +48,6 @@ DQMHistAnalysisEcmsMonObjModule::DQMHistAnalysisEcmsMonObjModule()
 {
   setDescription("Module to monitor Ecms information.");
   B2DEBUG(20, "DQMHistAnalysisEcmsMonObj: Constructor done.");
-}
-
-DQMHistAnalysisEcmsMonObjModule::~DQMHistAnalysisEcmsMonObjModule()
-{
 }
 
 void DQMHistAnalysisEcmsMonObjModule::initialize()
@@ -160,7 +157,7 @@ TCanvas*  DQMHistAnalysisEcmsMonObjModule::plotArgusFit(RooDataHist* dataE, RooA
 
 
 // Fit the EcmsBB histogram with Gaus+Argus function
-unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::fitEcmsBB(TH1D* hB0, TH1D* hBp)
+unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::fitEcmsBB(TH1* hB0, TH1* hBp)
 {
   const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
   const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
@@ -251,7 +248,22 @@ unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::fitEcmsBB(TH1D* 
 
 
   return {{"EcmsBBcnt",    2 * sigmean.getValV()},  {"EcmsBBcntUnc",    2 * sigmean.getError()},
-    {"EcmsBBspread", 2 * sigwidth.getValV()}, {"EcmsBBspreadUnc", 2 * sigwidth.getError()}};
+    {"EcmsBBspread", 2 * sigwidth.getValV()}, {"EcmsBBspreadUnc", 2 * sigwidth.getError()}, {"EcmsBBnsigB0", nsigB0.getValV()}, {"EcmsBBnsigB0Unc", nsigB0.getError()}, {"EcmsBBnsigBp", nsigBp.getValV()}, {"EcmsBBnsigBpUnc", nsigBp.getError()}};
+}
+
+unordered_map<string, double>  DQMHistAnalysisEcmsMonObjModule::parseTitle(const std::string& title)
+{
+  std::regex re(R"(exp\s+(\d+)\s+run\s+(\d+).*?=\s*([\d.]+))");
+  std::smatch m;
+  double exp = 0;
+  double run = 0;
+  double lumi = -1.;
+  if (std::regex_search(title, m, re)) {
+    exp = std::stoi(m[1]);
+    run = std::stoi(m[2]);
+    lumi = std::stod(m[3]);
+  }
+  return {{"exp", exp}, {"run", run}, {"lumi", lumi}};
 }
 
 
@@ -259,13 +271,24 @@ void DQMHistAnalysisEcmsMonObjModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisEcmsMonObj: endRun called.");
 
-  auto* hB0 = (TH1D*)findHist("PhysicsObjectsMiraBelleEcmsBB/hB0");
-  auto* hBp = (TH1D*)findHist("PhysicsObjectsMiraBelleEcmsBB/hBp");
+  auto* hB0 = dynamic_cast<TH1*>(findHist("PhysicsObjectsMiraBelleEcmsBB/hB0"));
+  auto* hBp = dynamic_cast<TH1D*>(findHist("PhysicsObjectsMiraBelleEcmsBB/hBp"));
+  if (hB0 == nullptr || hBp == nullptr) return;
 
   auto res = fitEcmsBB(hB0, hBp);
 
+  auto tit = parseTitle(std::string(hB0->GetTitle()));
+
   m_monObj->setVariable("EcmsBBcnt", res.at("EcmsBBcnt"), res.at("EcmsBBcntUnc"));
   m_monObj->setVariable("EcmsBBspread", res.at("EcmsBBspread"), res.at("EcmsBBspreadUnc"));
+  if (tit.at("lumi") > 1.) {
+    m_monObj->setVariable("EcmsBBnsigB0", res.at("EcmsBBnsigB0") / tit.at("lumi"), res.at("EcmsBBnsigB0Unc") / tit.at("lumi"));
+    m_monObj->setVariable("EcmsBBnsigBp", res.at("EcmsBBnsigBp") / tit.at("lumi"), res.at("EcmsBBnsigBpUnc") / tit.at("lumi"));
+  }
+
+  m_monObj->setVariable("EcmsBBcnt_firstExp", tit.at("exp"));
+  m_monObj->setVariable("EcmsBBcnt_firstRun", tit.at("run"));
+
 }
 
 void DQMHistAnalysisEcmsMonObjModule::terminate()

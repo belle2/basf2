@@ -8,7 +8,7 @@
 
 #include <pxd/modules/pxdDQM/PXDROIDQMModule.h>
 #include <pxd/dataobjects/PXDRawROIs.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;
@@ -74,7 +74,7 @@ void PXDROIDQMModule::defineHisto()
   }
   if (m_eachModule && m_offlineDQM) {
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (VxdID& avxdid : sensors) {
+    for (const VxdID& avxdid : sensors) {
       VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
       if (info.getType() != VXD::SensorInfoBase::PXD) continue;
       // Only interested in PXD sensors

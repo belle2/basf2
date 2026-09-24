@@ -9,11 +9,12 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackingUtilities/geometry/LineParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 
 #include <tracking/trackingUtilities/numerics/Matrix.h>
 
 #include <framework/logging/Logger.h>
+
+#include <Math/Vector2D.h>
 
 #include <gtest/gtest.h>
 

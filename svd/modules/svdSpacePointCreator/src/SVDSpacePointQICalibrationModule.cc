@@ -60,8 +60,8 @@ void SVDSpacePointQICalibrationModule::initialize()
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto& ladders : geo.getLadders(layers)) {
-      for (auto& sensors : geo.getSensors(ladders)) {
+    for (const auto& ladders : geo.getLadders(layers)) {
+      for (const auto& sensors : geo.getSensors(ladders)) {
 
         for (int uSize = 1; uSize <= m_maxClusterSize; uSize++) {
           for (int vSize = 1; vSize <= m_maxClusterSize; vSize++) {
@@ -162,8 +162,8 @@ void SVDSpacePointQICalibrationModule::terminate()
   std::vector<std::string> usedSensors;
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto& ladders : geo.getLadders(layers)) {
-      for (auto& sensors : geo.getSensors(ladders)) {
+    for (const auto& ladders : geo.getLadders(layers)) {
+      for (const auto& sensors : geo.getSensors(ladders)) {
         for (int uSize = 1; uSize <= m_maxClusterSize; uSize++) {
           for (int vSize = 1; vSize <= m_maxClusterSize; vSize++) {
             std::string sensorName;

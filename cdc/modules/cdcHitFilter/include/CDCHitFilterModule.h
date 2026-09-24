@@ -34,7 +34,7 @@ namespace Belle2 {
       /**
        * Destructor of the module.
        */
-      virtual ~CDCHitFilterModule();
+      virtual ~CDCHitFilterModule() override;
 
       /**
        * Initializes the Module.

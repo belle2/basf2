@@ -12,10 +12,11 @@
 
 #include <tracking/trackingUtilities/ca/AutomatonCell.h>
 
+#include <Math/Vector2D.h>
+
 namespace Belle2 {
   namespace TrackingUtilities {
     class ParameterLine2D;
-    class Vector2D;
     class CDCRLWireHit;
     class CDCRecoHit2D;
     class CDCTangent;
@@ -42,9 +43,10 @@ namespace Belle2 {
                const UncertainParameterLine2D& fitLine);
 
       /// Reverses the facet in place including the fit line.
-      void reverse();
+      void reverse() override;
 
       /// Constructs the reverse triple from this one.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
       CDCFacet reversed() const;
 
       /// Adjusts the contained fit line to touch such that it touches the first and third hit.
@@ -87,13 +89,13 @@ namespace Belle2 {
       ParameterLine2D getMiddleToEndLine() const;
 
       /// Getter for the reconstructed position at the first hit on the fit line
-      Vector2D getStartRecoPos2D() const;
+      ROOT::Math::XYVector getStartRecoPos2D() const;
 
       /// Getter for the reconstructed position at the second hit on the fit line
-      Vector2D getMiddleRecoPos2D() const;
+      ROOT::Math::XYVector getMiddleRecoPos2D() const;
 
       /// Getter for the reconstructed position at the third hit on the fit line
-      Vector2D getEndRecoPos2D() const;
+      ROOT::Math::XYVector getEndRecoPos2D() const;
 
       /// Getter for the first reconstructed hit
       CDCRecoHit2D getStartRecoHit2D() const;

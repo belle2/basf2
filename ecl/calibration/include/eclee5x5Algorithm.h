@@ -25,13 +25,13 @@ namespace Belle2 {
       eclee5x5Algorithm();
 
       /**..Destructor */
-      virtual ~eclee5x5Algorithm() {}
+      virtual ~eclee5x5Algorithm() override {}
 
       /** Setter for m_outputName */
       void setOutputName(const std::string& outputName) {m_outputName = outputName;}
 
       /** Getter for m_outputName */
-      std::string getOutputName() {return m_outputName;}
+      const std::string& getOutputName() {return m_outputName;}
 
       /** Setter for m_minEntries */
       void setMinEntries(int minEntries) {m_minEntries = minEntries;}
@@ -43,7 +43,7 @@ namespace Belle2 {
       void setPayloadName(const std::string& payloadname) {m_payloadName = payloadname;}
 
       /** Getter for m_payloadname */
-      std::string getPayloadName() {return m_payloadName;}
+      const std::string& getPayloadName() {return m_payloadName;}
 
       /** Setter for m_storeConst */
       void setStoreConst(bool storeConst) {m_storeConst = storeConst;}

@@ -73,7 +73,7 @@ namespace Belle2 {
       TrackingUtilities::MayBePtr<const CDCHit> getHit(const CDCSimHit* simHit) const;
 
       /// Indicates if the CDCSimHit is considered background.
-      bool isBackground(const CDCSimHit* simHit) const;
+      static bool isBackground(const CDCSimHit* simHit);
 
       /// Indicates if the CDCSimHit is considered background.
       bool isBackground(const CDCHit* hit) const;

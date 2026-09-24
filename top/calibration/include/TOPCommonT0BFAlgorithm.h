@@ -23,9 +23,6 @@ namespace Belle2 {
       /** Constructor */
       TOPCommonT0BFAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPCommonT0BFAlgorithm() {}
-
       /**
        * Sets minimal number of histogram entries to perform a fit
        */

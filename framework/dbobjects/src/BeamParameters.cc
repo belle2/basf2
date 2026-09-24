@@ -9,6 +9,7 @@
 #include <framework/dbobjects/BeamParameters.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/MathHelpers.h>
 
 using namespace std;
 using namespace Belle2;
@@ -48,10 +49,10 @@ void Belle2::BeamParameters::setVertex(const ROOT::Math::XYZVector& vertex, cons
 
 ROOT::Math::PxPyPzEVector Belle2::BeamParameters::getFourVector(double energy, double angleX, double angleY, bool isHER)
 {
-  double p   = sqrt(pow(energy, 2) - pow(Const::electronMass, 2));
+  double p   = sqrt(square(energy) - square(Const::electronMass));
   double dir = isHER ? 1 : -1;
 
-  double pz = dir * p / sqrt(1 + pow(tan(angleX), 2) + pow(tan(angleY), 2));
+  double pz = dir * p / sqrt(1 + square(tan(angleX)) + square(tan(angleY)));
 
   return ROOT::Math::PxPyPzEVector(pz * tan(angleX), pz * tan(angleY), pz, energy);
 }

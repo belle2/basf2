@@ -13,6 +13,7 @@
 #include <top/reconstruction_cpp/RaytracerBase.h>
 #include <framework/database/DBObjPtr.h>
 #include <top/dbobjects/TOPCalModuleAlignment.h>
+#include <top/dbobjects/TOPCalTOFCorrection.h>
 #include <top/dbobjects/TOPFrontEndSetting.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -125,6 +126,12 @@ namespace Belle2 {
         m_valid = setHelix(transform);
         return m_valid;
       }
+
+      /**
+       * Sets time-of-flight correction value
+       * @param tofCorrections payload with TOF corrections
+       */
+      void setTOFCorrection(const DBObjPtr<TOPCalTOFCorrection>& tofCorrections);
 
       /**
        * Checks if track is successfully constructed
@@ -287,6 +294,7 @@ namespace Belle2 {
       double m_pT = 0; /**< transverse momentum at POCA */
       double m_charge = 0;  /**< track charge in units of elementary charge */
       double m_TOFLength = 0; /**< trajectory length corresponding to TOF of extrapolated hit */
+      double m_TOFCorrection = 0; /**< time-of-flight correction */
       double m_trackLength = 0;  /**< trajectory length from IP to average photon emission point */
       double m_length = 0; /**< trajectory length within quartz */
       TOP::HelixSwimmer m_helix; /**< trajectory helix in nominal slot frame */
@@ -319,7 +327,7 @@ namespace Belle2 {
 
     inline double TOPTrack::getTOF(const Const::ChargedStable& chargedStable, double dL, double overrideMass) const
     {
-      return (m_trackLength + dL) / getBeta(chargedStable, overrideMass) / Const::speedOfLight;
+      return (m_trackLength + dL) / getBeta(chargedStable, overrideMass) / Const::speedOfLight + m_TOFCorrection;
     }
 
 

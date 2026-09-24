@@ -15,6 +15,9 @@
 /* ROOT headers. */
 #include <TTree.h>
 
+/* C++ headers. */
+#include <memory>
+
 using namespace Belle2;
 
 KLMChannelStatusAlgorithm::Results::Results()
@@ -23,8 +26,10 @@ KLMChannelStatusAlgorithm::Results::Results()
 
 KLMChannelStatusAlgorithm::Results::Results(const Results& results)
 {
-  m_ModuleStatus = new KLMChannelStatus(*results.m_ModuleStatus);
-  m_ChannelStatus = new KLMChannelStatus(*results.m_ChannelStatus);
+  if (results.m_ModuleStatus != nullptr)
+    m_ModuleStatus = new KLMChannelStatus(*results.m_ModuleStatus);
+  if (results.m_ChannelStatus != nullptr)
+    m_ChannelStatus = new KLMChannelStatus(*results.m_ChannelStatus);
   m_HitMapChannel = results.m_HitMapChannel;
   m_HitMapModule = results.m_HitMapModule;
   m_HitMapSector = results.m_HitMapSector;
@@ -36,6 +41,36 @@ KLMChannelStatusAlgorithm::Results::Results(const Results& results)
   m_HitNumberEKLM = results.m_HitNumberEKLM;
   m_HitNumberBKLMNoHot = results.m_HitNumberBKLMNoHot;
   m_HitNumberEKLMNoHot = results.m_HitNumberEKLMNoHot;
+}
+
+KLMChannelStatusAlgorithm::Results&
+KLMChannelStatusAlgorithm::Results::operator=(const Results& results)
+{
+  if (this == &results)
+    return *this;
+  /* Copy the owned payloads first: if an allocation fails, *this is unchanged. */
+  std::unique_ptr<KLMChannelStatus> moduleStatus;
+  std::unique_ptr<KLMChannelStatus> channelStatus;
+  if (results.m_ModuleStatus != nullptr)
+    moduleStatus = std::make_unique<KLMChannelStatus>(*results.m_ModuleStatus);
+  if (results.m_ChannelStatus != nullptr)
+    channelStatus = std::make_unique<KLMChannelStatus>(*results.m_ChannelStatus);
+  delete m_ModuleStatus;
+  delete m_ChannelStatus;
+  m_ModuleStatus = moduleStatus.release();
+  m_ChannelStatus = channelStatus.release();
+  m_HitMapChannel = results.m_HitMapChannel;
+  m_HitMapModule = results.m_HitMapModule;
+  m_HitMapSector = results.m_HitMapSector;
+  m_HitMapModuleNoHot = results.m_HitMapModuleNoHot;
+  m_HitMapSectorNoHot = results.m_HitMapSectorNoHot;
+  m_ModuleActiveChannelMap = results.m_ModuleActiveChannelMap;
+  m_TotalHitNumber = results.m_TotalHitNumber;
+  m_HitNumberBKLM = results.m_HitNumberBKLM;
+  m_HitNumberEKLM = results.m_HitNumberEKLM;
+  m_HitNumberBKLMNoHot = results.m_HitNumberBKLMNoHot;
+  m_HitNumberEKLMNoHot = results.m_HitNumberEKLMNoHot;
+  return *this;
 }
 
 KLMChannelStatusAlgorithm::Results::~Results()
@@ -95,7 +130,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   /* If there are no hits, then mark all channels as dead. */
   KLMChannelIndex klmChannels;
   if (m_Results.m_TotalHitNumber == 0) {
-    for (KLMChannelIndex& klmChannel : klmChannels) {
+    for (const KLMChannelIndex& klmChannel : klmChannels) {
       channel = klmChannel.getKLMChannelNumber();
       m_Results.m_ChannelStatus->setChannelStatus(channel, KLMChannelStatus::c_Dead);
     }
@@ -104,12 +139,12 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   }
   /* Fill module and sector hit maps. */
   KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
-  for (KLMChannelIndex& klmModule : klmModules)
+  for (const KLMChannelIndex& klmModule : klmModules)
     m_Results.m_HitMapModule.setChannelData(klmModule.getKLMModuleNumber(), 0);
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors)
+  for (const KLMChannelIndex& klmSector : klmSectors)
     m_Results.m_HitMapSector.setChannelData(klmSector.getKLMSectorNumber(), 0);
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     channel = klmChannel.getKLMChannelNumber();
     module = klmChannel.getKLMModuleNumber();
     sector = klmChannel.getKLMSectorNumber();
@@ -123,7 +158,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
    * Mark all channels in modules without hits as dead.
    * Search for hot channels.
    */
-  for (KLMChannelIndex& klmModule : klmModules) {
+  for (const KLMChannelIndex& klmModule : klmModules) {
     module = klmModule.getKLMModuleNumber();
     moduleHits = m_Results.m_HitMapModule.getChannelData(module);
     KLMChannelIndex klmNextModule(klmModule);
@@ -172,13 +207,13 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
     }
   }
   /* Fill module and sector hit maps with hot channels subtracted. */
-  for (KLMChannelIndex& klmModule : klmModules)
+  for (const KLMChannelIndex& klmModule : klmModules)
     m_Results.m_HitMapModuleNoHot.setChannelData(klmModule.getKLMModuleNumber(), 0);
-  for (KLMChannelIndex& klmSector : klmSectors)
+  for (const KLMChannelIndex& klmSector : klmSectors)
     m_Results.m_HitMapSectorNoHot.setChannelData(klmSector.getKLMSectorNumber(), 0);
   m_Results.m_HitNumberBKLMNoHot = 0;
   m_Results.m_HitNumberEKLMNoHot = 0;
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     channel = klmChannel.getKLMChannelNumber();
     if (m_Results.m_ChannelStatus->getChannelStatus(channel) == KLMChannelStatus::c_Hot)
       continue;
@@ -197,7 +232,7 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   /* Sector status. */
   int activeSectorsBKLM = 0;
   int activeSectorsEKLM = 0;
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (const KLMChannelIndex& klmSector : klmSectors) {
     sector = klmSector.getKLMSectorNumber();
     hits = m_Results.m_HitMapSectorNoHot.getChannelData(sector);
     if (hits > 0) {
@@ -229,11 +264,11 @@ CalibrationAlgorithm::EResult KLMChannelStatusAlgorithm::calibrate()
   /* Module status. */
   if (m_Results.m_ModuleStatus == nullptr)
     m_Results.m_ModuleStatus = new KLMChannelStatus();
-  for (KLMChannelIndex& klmModule : klmModules)
+  for (const KLMChannelIndex& klmModule : klmModules)
     calibrateModule(klmModule.getKLMModuleNumber());
   /* Channel-based calibration. */
   bool notEnoughData = false;
-  for (KLMChannelIndex& klmModule : klmModules) {
+  for (const KLMChannelIndex& klmModule : klmModules) {
     module = klmModule.getKLMModuleNumber();
     moduleHits = m_Results.m_HitMapModuleNoHot.getChannelData(module);
     KLMChannelIndex klmNextModule(klmModule);

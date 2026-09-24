@@ -1,0 +1,37 @@
+# EventType: 1113062002
+# Descriptor: [B0 -> D-(-> K+ pi- pi-) omega pi+ ]cc
+# NickName: Bd_Domegapi
+# Documentation: B0 -> D- omega pi+
+# Responsible: Dmitry Matvienko
+# Email: dmitry.matvienko@gmail.com
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 06/05/2026
+
+Alias Myomega omega
+Alias Mypi0 pi0
+
+Decay Upsilon(4S)
+1.000  B0sig anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+1.000 D+sig Myomega pi-            PHOTOS PHSP;
+Enddecay
+CDecay B0sig
+
+Decay D+sig
+1.000 K- pi+ pi+                  PHOTOS D_DALITZ;
+Enddecay
+CDecay D-sig
+
+Decay Myomega 
+1.000 pi- pi+ Mypi0               PHOTOS OMEGA_DALITZ;
+Enddecay
+
+Decay Mypi0
+1.000 gamma gamma                 PHSP;
+Enddecay
+
+End

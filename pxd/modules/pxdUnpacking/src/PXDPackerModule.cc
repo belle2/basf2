@@ -82,7 +82,7 @@ void PXDPackerModule::initialize()
   /// read in the mapping for ONSEN->DHC->DHE->DHP
   /// until now ONSEN->DHC is not needed yet (might be based on event numbers per event)
   /// DHE->DHP is only defined by port number/active mask ... not implemented yet.
-  for (auto& it : m_dhe_to_dhc) {
+  for (const auto& it : m_dhe_to_dhc) {
     bool flag;
     int dhc_id;
     B2DEBUG(27, "PXD Packer --> DHC/DHE");
@@ -91,7 +91,7 @@ void PXDPackerModule::initialize()
       /// means [ 1 2 3 4 5 -1 ] DHC 1 has DHE 2,3,4,5 on port 0-3 and nothing on port 4
       B2WARNING("PXD Packer --> DHC/DHE maps 1 dhc to 5 dhe (1+5 values), but I found " << it.size());
     }
-    for (auto& it2 : it) {
+    for (const auto& it2 : it) {
       if (flag) {
         int v;
         v = it2;
@@ -119,10 +119,10 @@ void PXDPackerModule::initialize()
 //     B2DEBUG(27, "PXD Packer --> DHE " << it.first << " connects to DHC " << it.second);
 //   }
 
-  for (auto& it : m_dhc_mapto_dhe) {
+  for (const auto& it : m_dhc_mapto_dhe) {
     int port = 0;
     B2DEBUG(27, "PXD Packer --> DHC " << it.first);
-    for (auto& it2 : it.second) {
+    for (const auto& it2 : it.second) {
       B2DEBUG(27, "PXD Packer --> .. connects to DHE " << it2 << " port " << port);
       port++;
     }
@@ -215,11 +215,11 @@ void PXDPackerModule::pack_event(void)
 
   // loop for each DHC in system
   // get active DHCs from a database?
-  for (auto& it : m_dhc_mapto_dhe) {
+  for (const auto& it : m_dhc_mapto_dhe) {
     int port = 1, port_inx = 0;
     int act_port = 0;
 
-    for (auto& it2 : it.second) {
+    for (const auto& it2 : it.second) {
       if (it2 >= 0) act_port += port;
       port += port;
       dhe_ids[port_inx] = it2;
@@ -287,7 +287,7 @@ void PXDPackerModule::start_frame(void)
   m_current_frame.clear();
 }
 
-void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
+void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, const int* dhe_ids)
 {
   B2DEBUG(27, "PXD Packer --> pack_dhc ID " << dhc_id << " DHE act: " << dhe_active);
 
@@ -468,6 +468,8 @@ void PXDPackerModule::do_the_reverse_mapping(unsigned int& /*row*/, unsigned int
   // PXDMappingLookup::map_uv_to_rc_IB_OF(unsigned int& v_cellID, unsigned int& u_cellID, unsigned int& dhp_id, unsigned int dhe_ID)
 }
 
+// only called from the commented-out code above, kept until the firmware is checked
+// cppcheck-suppress unusedPrivateFunction
 void PXDPackerModule::pack_dhp_raw(int chip_id, int dhe_id)
 {
   B2FATAL("This code needs to be checked against new firmware");
@@ -534,6 +536,8 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_has_remapped, in
         // ADC cut for sim should have been done already
         B2DEBUG(26, "Pixel: ROW: " << row << ", COL: " << col << ", Ch " << (int)halfladder_pixmap[row][col]);
         if (rowstart) {
+          // the '| 0' documents where the common mode bits belong
+          // cppcheck-suppress badBitmaskCheck
           last_rowstart = ((row & 0x3FE) << (6 - 1)) | 0; // plus common mode 6 bits ... set to 0
           append_int16(last_rowstart);
           rowstart = false;

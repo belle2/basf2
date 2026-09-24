@@ -1,0 +1,6 @@
+         2     401   1   :NUMBER OF DECAY PRODUCTS, PHYSICS AND FF MODEL  NUMBER (what's for chic2p?)
+    100443    3.6861          0.        3        0.
+        22    0.              0.        0        0.
+        211   0.139570        0.  :Use a wrong charge 0 to avoid kinematic check
+       -211   0.139570        0.
+       443    3.0969          0.

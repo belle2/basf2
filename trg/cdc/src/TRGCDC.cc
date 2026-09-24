@@ -379,7 +379,7 @@ namespace Belle2 {
 
     //...Loop over layers...
     int superLayerId = -1;
-    vector<TRGCDCLayer*>* superLayer;
+    vector<TRGCDCLayer*>* superLayer = nullptr;
     unsigned lastNWires = 0;
     int lastShifts = -1000;
     int ia = -1;

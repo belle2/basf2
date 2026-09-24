@@ -31,14 +31,13 @@ namespace Belle2 {
       * All private members are set to 0 (all vectors are empty).
       */
     TagVertex()
+      : m_tagVertex(ROOT::Math::XYZVector(0, 0, 0))
     {
-      m_tagVertex = ROOT::Math::XYZVector(0, 0, 0);
       m_tagVertexPval = 0;
       m_deltaT = 0;
       m_deltaTErr = 0;
       m_mcDeltaTau = 0;
       m_mcDeltaT = 0;
-      m_mcTagV = ROOT::Math::XYZVector(0, 0, 0);
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
       resetConstraintCov();
@@ -125,8 +124,7 @@ namespace Belle2 {
     /**
      * get the constraint type used in the tag fit
      */
-
-    std::string getConstraintType() const;
+    const std::string& getConstraintType() const;
 
     /**
      * Returns number of tracks used in the fit

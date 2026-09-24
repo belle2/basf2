@@ -23,7 +23,7 @@ namespace Belle2 {
     explicit CDCStateFilterFactory(const std::string& defaultFilterName = "all");
 
     /// Default destructor
-    ~CDCStateFilterFactory();
+    ~CDCStateFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

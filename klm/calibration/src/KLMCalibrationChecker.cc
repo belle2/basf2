@@ -19,6 +19,7 @@
 #include <klm/dbobjects/KLMStripEfficiency.h>
 #include <klm/dbobjects/KLMTimeCableDelay.h>
 #include <klm/dbobjects/KLMTimeConstants.h>
+#include <klm/dbobjects/KLMEventT0HitResolution.h>
 
 /* Belle II headers. */
 #include <framework/database/Database.h>
@@ -163,7 +164,7 @@ void KLMCalibrationChecker::checkAlignment()
   const KLMAlignmentData* alignment, *alignmentError, *alignmentCorrection;
   KLMAlignmentData zeroAlignment(0, 0, 0, 0, 0, 0);
   KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
-  for (KLMChannelIndex& klmModule : klmModules) {
+  for (const KLMChannelIndex& klmModule : klmModules) {
     KLMModuleNumber module = klmModule.getKLMModuleNumber();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM) {
       alignment = bklmAlignment->getModuleAlignment(module);
@@ -376,7 +377,7 @@ void KLMCalibrationChecker::checkStripEfficiency()
   efficiencyTree->Branch("efficiency", &efficiency, "efficiency/F");
   efficiencyTree->Branch("error", &error, "error/F");
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
-  for (KLMChannelIndex& klmPlane : klmPlanes) {
+  for (const KLMChannelIndex& klmPlane : klmPlanes) {
     subdetector = klmPlane.getSubdetector();
     section = klmPlane.getSection();
     sector = klmPlane.getSector();
@@ -408,7 +409,7 @@ void KLMCalibrationChecker::createStripEfficiencyHistograms()
   /* Finally, loop over KLM sectors to check the efficiency. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   TCanvas* canvas = new TCanvas();
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (const KLMChannelIndex& klmSector : klmSectors) {
     int subdetector = klmSector.getSubdetector();
     int section = klmSector.getSection();
     int sector = klmSector.getSector();
@@ -497,7 +498,7 @@ void KLMCalibrationChecker::checkTimeCableDelay()
   cableDelayTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
   cableDelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
-  for (KLMChannelIndex& klmStrip : klmStrips) {
+  for (const KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
     section = klmStrip.getSection();
     sector = klmStrip.getSector();
@@ -548,7 +549,7 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Branch("delayRPCPhi", &delayRPCPhi, "delayRPCPhi/F");
   constantsTree->Branch("delayRPCZ", &delayRPCZ, "delayRPCZ/F");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
-  for (KLMChannelIndex& klmStrip : klmStrips) {
+  for (const KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
     section = klmStrip.getSection();
     sector = klmStrip.getSector();
@@ -566,6 +567,48 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Write();
   delete constantsTree;
   delete timeConstantsResults;
+  /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
+  resetDatabase();
+}
+
+void KLMCalibrationChecker::checkEventT0HitResolution()
+{
+  /* Initialize the database. */
+  initializeDatabase();
+  /* Now we can read the payload. */
+  DBObjPtr<KLMEventT0HitResolution> eventT0HitResolution;
+  if (!eventT0HitResolution.isValid())
+    B2FATAL("EventT0 Hit Resolution data are not valid.");
+  if (m_GlobalTagName != "")
+    printPayloadInformation(eventT0HitResolution);
+  /* Create tree with EventT0 hit resolution (one row per detector category). */
+  int category;
+  float sigma, sigmaErr;
+  TFile* eventT0HitResolutionResults =
+    new TFile(m_EventT0HitResolutionResultsFile.c_str(), "recreate");
+  TTree* resolutionTree = new TTree("eventT0HitResolution", "KLM EventT0 hit resolution data");
+  resolutionTree->Branch("experiment", &m_experiment, "experiment/I");
+  resolutionTree->Branch("run", &m_run, "run/I");
+  resolutionTree->Branch("category", &category, "category/I");
+  resolutionTree->Branch("sigma", &sigma, "sigma/F");
+  resolutionTree->Branch("sigmaErr", &sigmaErr, "sigmaErr/F");
+  /* Category order must match KLMEventT0HitResolution::Category enum. */
+  const int categories[5] = {
+    KLMEventT0HitResolution::c_EKLMScint,
+    KLMEventT0HitResolution::c_BKLMScint,
+    KLMEventT0HitResolution::c_RPC,
+    KLMEventT0HitResolution::c_RPCPhi,
+    KLMEventT0HitResolution::c_RPCZ,
+  };
+  for (int cat : categories) {
+    category = cat;
+    sigma = eventT0HitResolution->getSigma(cat);
+    sigmaErr = eventT0HitResolution->getSigmaErr(cat);
+    resolutionTree->Fill();
+  }
+  resolutionTree->Write();
+  delete resolutionTree;
+  delete eventT0HitResolutionResults;
   /* Reset the database. Needed to avoid mess if we call this method multiple times with different GTs. */
   resetDatabase();
 }

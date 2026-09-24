@@ -95,6 +95,7 @@ namespace Belle2 {
   int TOPCalChannelMask::getNumOf(EStatus check) const
   {
     int n = 0;
+    // cppcheck-suppress constVariableReference
     for (const auto& statuses : m_status) {
       for (const auto status : statuses) {
         if (status == check) n++;
@@ -108,6 +109,7 @@ namespace Belle2 {
     unsigned module = moduleID - 1;
     if (module < c_numModules) {
       int n = 0;
+      // cppcheck-suppress constVariableReference
       const auto& statuses = m_status[module];
       for (const auto status : statuses) {
         if (status == check) n++;

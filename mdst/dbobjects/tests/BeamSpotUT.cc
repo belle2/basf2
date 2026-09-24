@@ -73,6 +73,8 @@ namespace Belle2 {
 
     BeamSpot bs3;
     bs3 = bs;
+    // the point of the test is to assert that assignment produces an equal object
+    // cppcheck-suppress knownConditionTrueFalse
     EXPECT_EQ(bs == bs3, true);
 
     BeamSpot bs4;

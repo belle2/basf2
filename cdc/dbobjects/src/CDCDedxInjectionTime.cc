@@ -13,7 +13,7 @@
 
 using namespace Belle2;
 
-void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) const
+void CDCDedxInjectionTime::printCorrection(const std::string& svar, const std::string& sfx) const
 {
 
   if (svar != "mean" && svar != "reso") {
@@ -79,8 +79,7 @@ void CDCDedxInjectionTime::printCorrection(std::string svar, std::string sfx) co
 
 }
 
-
-double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, unsigned int time) const
+double CDCDedxInjectionTime::getCorrection(const std::string& svar, unsigned int ring, unsigned int time) const
 {
   if (svar != "mean" && svar != "reso") {
     B2ERROR("wrong var input, choose mean or reso");
@@ -142,15 +141,16 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
     }
   }
 
-  double thisdedx = getSafely(iv, thisbin);
-  double nextdedx = getSafely(iv, nextbin);
-
-  double thistime = 0.5 * (getSafely(ring * 3, thisbin) + getSafely(ring * 3, thisbin + 1));
-  double nexttime = 0.5 * (getSafely(ring * 3, nextbin) + getSafely(ring * 3, nextbin + 1));
-
   double newdedx = getSafely(iv, it);
-  if (thisbin != nextbin)
+  if (thisbin != nextbin) {
+    double thisdedx = getSafely(iv, thisbin);
+    double nextdedx = getSafely(iv, nextbin);
+
+    double thistime = 0.5 * (getSafely(ring * 3, thisbin) + getSafely(ring * 3, thisbin + 1));
+    double nexttime = 0.5 * (getSafely(ring * 3, nextbin) + getSafely(ring * 3, nextbin + 1));
+
     newdedx = thisdedx + ((nextdedx - thisdedx) / (nexttime - thistime)) * (time - thistime);
+  }
 
   return newdedx;
 }

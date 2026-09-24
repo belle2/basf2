@@ -11,8 +11,8 @@
   </Cover>
   <Cover id="1" desc="Backward middle cover">
     <Name>BackwardCover</Name>
-    <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
-    <InnerR2 desc="Inner radius far from IP" unit="mm">290.5</InnerR2>
+    <InnerR1 desc="Inner radius near IP" unit="mm">350.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">350.5</InnerR2>
     <OuterR1 desc="Outer radius near IP" unit="mm">442.0</OuterR1>
     <OuterR2 desc="Outer radius far from IP" unit="mm">442.0</OuterR2>
     <Thickness desc="The thickness of the cover" unit="mm">3.5</Thickness>

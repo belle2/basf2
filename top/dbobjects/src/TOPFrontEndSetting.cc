@@ -13,7 +13,7 @@ using namespace std;
 
 namespace Belle2 {
 
-  void TOPFrontEndSetting::setWindowShifts(std::vector<int> shifts)
+  void TOPFrontEndSetting::setWindowShifts(const std::vector<int>& shifts)
   {
     if (shifts.size() != 6) {
       B2ERROR("TOPFrontEndSetting::setWindowShifts: vector size must be 6");

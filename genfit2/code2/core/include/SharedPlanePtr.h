@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_SharedPlanePtr_h
-#define genfit_SharedPlanePtr_h
+#pragma once
 
 #include "DetPlane.h"
 
@@ -56,5 +55,3 @@ namespace genfit {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_SharedPlanePtr_h

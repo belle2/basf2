@@ -42,7 +42,7 @@ ma.variablesToNtuple(
     "B0",
     variables=['Mbc'],
     filename="Bd2JpsiKS.root",
-    treename="tree",
+    treename="ntuple",
     path=main,
 )
 

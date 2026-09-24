@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #include "dqm/modules/DelayDQMModule.h"
-#include "TMath.h"
-#include "TDirectory.h"
+#include <TMath.h>
+#include <TDirectory.h>
 
 #include <chrono>
 

@@ -45,7 +45,7 @@ void Advancer::setMaterialEffectsToParameterValue() const
   genfit::MaterialEffects::getInstance()->setNoEffects(not m_param_useMaterialEffects);
 }
 
-void Advancer::resetMaterialEffects() const
+void Advancer::resetMaterialEffects()
 {
   genfit::MaterialEffects::getInstance()->setNoEffects(false);
 }

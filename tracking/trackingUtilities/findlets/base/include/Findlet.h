@@ -49,7 +49,7 @@ namespace Belle2 {
       using IOVectors = std::tuple< std::vector<AIOTypes>... >;
 
       /// Make destructor of interface virtual
-      virtual ~Findlet() = default;
+      ~Findlet() override = default;
 
     public:
       /// Brief description of the purpose of the concrete findlet.

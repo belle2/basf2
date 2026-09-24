@@ -8,6 +8,8 @@
 
 #include "reconstruction/modules/detectorOccupanciesDQM/DetectorOccupanciesDQMModule.h"
 
+#include <bitset>
+
 #include <framework/dataobjects/EventMetaData.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
@@ -237,7 +239,7 @@ void DetectorOccupanciesDQMModule::event()
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash)
     return;
 
-  if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort)
+  if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTPrefilterDiscard)
     return;
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
@@ -303,12 +305,14 @@ void DetectorOccupanciesDQMModule::event()
   }
   m_TOP_Occupancy[index]->Fill(topGoodHits);
 
-  std::array<bool, ECLElementNumbers::c_NCrystals> crystal_hit;
+  // std::bitset is zero-initialised by its default constructor, so the crystals that are
+  // not hit are guaranteed to be false without relying on an explicit initialiser
+  std::bitset<ECLElementNumbers::c_NCrystals> crystal_hit;
 
   for (const auto& digit : m_eclCalDigits) {
     const double thresholdGeV = m_eclEnergyThr * 1e-3;
     if (digit.getEnergy() > thresholdGeV)
-      crystal_hit.at(digit.getCellId() - 1) = true;
+      crystal_hit.set(digit.getCellId() - 1);
   }
   for (int cid0 = 0; cid0 < ECLElementNumbers::c_NCrystals; cid0++) {
     m_ECL_Occupancy[index]->Fill(cid0 + 1, crystal_hit[cid0]);

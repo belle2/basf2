@@ -73,7 +73,7 @@ namespace Belle2 {
 
     public:
       /// Return name of the selected filter
-      std::string getFilterName() const
+      const std::string& getFilterName() const
       {
         return m_param_filterName;
       }

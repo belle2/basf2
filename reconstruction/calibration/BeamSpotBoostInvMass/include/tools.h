@@ -34,7 +34,7 @@ namespace Belle2 {
   inline TString rn() {return Form("%d", gRandom->Integer(1000000000)); }
 
   ///merge { vector<double> a, vector<double> b} into {a, b}
-  inline std::vector<std::vector<double>> merge(std::vector<std::vector<std::vector<double>>> toMerge)
+  inline std::vector<std::vector<double>> merge(const std::vector<std::vector<std::vector<double>>>& toMerge)
   {
     std::vector<std::vector<double>> allVecs;
     for (const auto& v : toMerge)
@@ -44,7 +44,7 @@ namespace Belle2 {
 
 
   /// std vector -> ROOT vector
-  inline Eigen::VectorXd vec2vec(std::vector<double> vec)
+  inline Eigen::VectorXd vec2vec(const std::vector<double>& vec)
   {
     Eigen::VectorXd v(vec.size());
     for (unsigned i = 0; i < vec.size(); ++i) {
@@ -54,7 +54,7 @@ namespace Belle2 {
   }
 
   /// ROOT vector -> std vector
-  inline std::vector<double> vec2vec(Eigen::VectorXd v)
+  inline std::vector<double> vec2vec(const Eigen::VectorXd& v)
   {
     std::vector<double> vNew(v.rows());
     for (int i = 0; i < v.rows(); ++i)
@@ -65,7 +65,7 @@ namespace Belle2 {
 
 
   /// merge columns (from std::vectors) into ROOT matrix
-  inline Eigen::MatrixXd vecs2mat(std::vector<std::vector<double>> vecs)
+  inline Eigen::MatrixXd vecs2mat(const std::vector<std::vector<double>>& vecs)
   {
     Eigen::MatrixXd m(vecs[0].size(), vecs.size());
     for (unsigned i = 0; i < vecs[0].size(); ++i)
@@ -99,7 +99,7 @@ namespace Belle2 {
 
 
   /// put slice of original vector v[ind:ind+n] into new one, n is number of elements
-  inline std::vector<double> slice(std::vector<double> v, unsigned ind, unsigned n)
+  inline std::vector<double> slice(const std::vector<double>& v, unsigned ind, unsigned n)
   {
     std::vector<double> vNew;
     for (unsigned i = ind; i < ind + n && i < v.size(); ++i)

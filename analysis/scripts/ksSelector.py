@@ -125,7 +125,7 @@ def LightGBM2ONNX(dumping_file_name,
 
 def V0Selector_Training(
     train_data,
-    tree_name="tree",
+    tree_name="ntuple",
     mva_identifier="MVAFastBDT_V0Selector.root",
     target_variable="isSignal",
     parameters={},
@@ -200,7 +200,7 @@ def V0Selector_Training(
 
 def LambdaVeto_Training(
     train_data,
-    tree_name="tree",
+    tree_name="ntuple",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
     target_variable="isSignal",
     parameters={},

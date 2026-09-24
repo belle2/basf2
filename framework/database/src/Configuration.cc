@@ -21,7 +21,7 @@
 #include <regex>
 
 // Current default globaltag when generating events.
-#define CURRENT_DEFAULT_TAG "main_2026-02-26"
+#define CURRENT_DEFAULT_TAG "main_2026-06-06"
 
 namespace py = boost::python;
 
@@ -36,8 +36,17 @@ namespace {
     std::vector<std::string> result;
     Belle2::PyObjConvUtils::iteratePythonObject(obj, [&result](const boost::python::object & item) {
       py::object str(py::handle<>(PyObject_Str(item.ptr()))); // convert to string
+      // boost::python::extract<std::string> triggers a false-positive
+      // -Wmaybe-uninitialized in GCC.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
       py::extract<std::string> extract(str); // and extract
       result.emplace_back(extract()); // and push back
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
       return true;
     });
     // done, return
@@ -106,7 +115,8 @@ namespace Belle2::Conditions {
     // The list of the metadata providers we are going to query:
     const std::string metatadaProviders = serverList + " " + // First, the list of servers provided via env. variable
                                           m_defaultLocalMetadataProviderPath + "/database.sqlite" + " " +  // Then the default local provider (CVMFS)
-                                          m_defaultRemoteMetadataProviderServer;  // And finally, the default remote provider (BNL)
+                                          m_defaultLegacyRemoteMetadataProviderServer + " " + // Then the Java-based legacy central provider
+                                          m_defaultHSFRemoteMetadataProviderServer;  // Finally the HSF central provider
     fillFromEnv(m_metadataProviders, "BELLE2_CONDB_METADATA", metatadaProviders);
     fillFromEnv(m_payloadLocations, "BELLE2_CONDB_PAYLOADS", m_defaultLocalMetadataProviderPath);
   }
@@ -119,7 +129,7 @@ namespace Belle2::Conditions {
     *this = Configuration();
   }
 
-  std::vector<std::string> Configuration::getDefaultGlobalTags() const
+  std::vector<std::string> Configuration::getDefaultGlobalTags()
   {
     // currently the default globaltag can be overwritten by environment variable
     // so keep that
@@ -356,10 +366,19 @@ namespace Belle2::Conditions {
       if (py::len(kwargs) > 0) {
         std::string message = "Unrecognized keyword arguments: ";
         auto keys = kwargs.keys();
+        // boost::python::extract<std::string> triggers a false-positive
+        // -Wmaybe-uninitialized in GCC; silence it around the extraction.
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
         for (int i = 0; i < len(keys); ++i) {
           if (i > 0) message += ", ";
           message += py::extract<std::string>(keys[i]);
         }
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
         PyErr_SetString(PyExc_TypeError, message.c_str());
         py::throw_error_already_set();
       }
@@ -517,6 +536,10 @@ to point to this location.
 )DOC")
     .add_property("default_metadata_provider_server", &Configuration::getDefaultRemoteMetadataProviderServer, R"DOC(
 URL of the default central metadata provider to look for payloads in the
+conditions database.
+)DOC")
+    .add_property("default_hsf_metadata_provider_server", &Configuration::getDefaultHSFRemoteMetadataProviderServer, R"DOC(
+URL of the default HSF central metadata provider to look for payloads in the
 conditions database.
 )DOC")
     .add_property("payload_locations", &Configuration::getPayloadLocationsPy, &Configuration::setPayloadLocationsPy, R"DOC(

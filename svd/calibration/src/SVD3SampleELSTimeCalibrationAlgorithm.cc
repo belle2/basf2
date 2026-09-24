@@ -89,9 +89,9 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           B2INFO("Projecting for Sensor: " << binLabel << " with Bin Number: " << ij + 1);
 
           __hEventT0vsCoG__->GetZaxis()->SetRange(ij + 1, ij + 1);
-          auto hEventT0vsELS  = (TH2D*)__hEventT0vsCoG__->Project3D("yxe");
-          auto hEventT0       = (TH1D*)__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1);
-          auto hEventT0nosync = (TH1D*)__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1);
+          auto hEventT0vsELS  = static_cast<TH2D*>(__hEventT0vsCoG__->Project3D("yxe"));
+          auto hEventT0       = static_cast<TH1D*>(__hEventT0__->ProjectionX("hEventT0_tmp", ij + 1, ij + 1));
+          auto hEventT0nosync = static_cast<TH1D*>(__hEventT0NoSync__->ProjectionX("hEventT0NoSync_tmp", ij + 1, ij + 1));
 
           hEventT0vsELS->SetName(Form("eventT0vsCoG__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));
           hEventT0->SetName(Form("eventT0__L%dL%dS%d%c", layer_num, ladder_num, sensor_num, side));

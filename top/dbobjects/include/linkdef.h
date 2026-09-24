@@ -59,5 +59,7 @@
 #pragma link C++ class Belle2::TOPCalEventT0Offset+; // checksum=0x115ee83c, version=1
 #pragma link C++ class Belle2::TOPCalFillPatternOffset+; // checksum=0x2130d86c, version=2
 #pragma link C++ class Belle2::TOPCalPhotonYields+; // checksum=0x684d61bb, version=2
+#pragma link C++ class Belle2::TOPCalPrecision+; // checksum=0x77e3edd9, version=1
+#pragma link C++ class Belle2::TOPCalTOFCorrection+; // checksum=0x2479acac, version=1
 
 #endif

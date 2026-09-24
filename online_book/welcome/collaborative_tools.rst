@@ -569,7 +569,8 @@ developers very happy.
 
 .. seealso:: :ref:`doctools`
 
-.. seealso:: `How do I make a pull request? <https://questions.belle2.org/question/683/how-do-i-make-a-pull-request/>`_
+.. seealso:: `How do I make a merge request? <https://questions.belle2.org/question/683/how-do-i-make-a-pull-request/>`_ 
+    (previously called pull request)
 
 
 And finally: Be bold!

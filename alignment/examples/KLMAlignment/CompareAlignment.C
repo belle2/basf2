@@ -20,13 +20,13 @@ void CompareAlignment(const char *displacementFile, const char *alignmentFile,
   TTree *tDisplacementEKLMModule, *tDisplacementEKLMSegment;
   if (displacementFile != nullptr) {
     fDisplacement = new TFile(displacementFile);
-    tDisplacementEKLMModule = (TTree*)fDisplacement->Get("eklm_module");
-    tDisplacementEKLMSegment = (TTree*)fDisplacement->Get("eklm_segment");
+    tDisplacementEKLMModule = static_cast<TTree*>(fDisplacement->Get("eklm_module"));
+    tDisplacementEKLMSegment = static_cast<TTree*>(fDisplacement->Get("eklm_segment"));
   }
   TFile *fAlignment = new TFile(alignmentFile);
-  TTree *tAlignmentEKLMModule = (TTree*)fAlignment->Get("eklm_module");
-  TTree *tAlignmentEKLMSegment = (TTree*)fAlignment->Get("eklm_segment");
-  TTree *tAlignmentBKLMModule = (TTree*)fAlignment->Get("bklm_module");
+  TTree *tAlignmentEKLMModule = static_cast<TTree*>(fAlignment->Get("eklm_module"));
+  TTree *tAlignmentEKLMSegment = static_cast<TTree*>(fAlignment->Get("eklm_segment"));
+  TTree *tAlignmentBKLMModule = static_cast<TTree*>(fAlignment->Get("bklm_module"));
   TFile *fComparison = new TFile(comparisonFile, "recreate");
   TTree *tComparisonEKLMModule = new TTree("eklm_module", "");
   TTree *tComparisonEKLMSegment = new TTree("eklm_segment", "");

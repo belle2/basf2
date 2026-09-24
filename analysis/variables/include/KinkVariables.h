@@ -56,8 +56,8 @@ namespace Belle2 {
      * cosine of the angle between the daughter particle momentum
      * in the mother rest frame with respect to the mother particle momentum in the laboratory frame
      */
-    double kinkDaughterMomentumAndCosThetaInMotherRF(const Particle* part, Const::ChargedStable motherType,
-                                                     Const::ChargedStable daughterType, bool returnCosTheta);
+    double kinkDaughterMomentumAndCosThetaInMotherRF(const Particle* part, const Const::ChargedStable& motherType,
+                                                     const Const::ChargedStable& daughterType, bool returnCosTheta);
 
     /**
      * Calculates the four-momentum of the MCParticle at its decay vertex

@@ -282,7 +282,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   track->SetTitle(ObjectInfo::getTitle(&recoTrack));
   track->SetSmooth(true);
 
-  for (auto recoHit : recoTrack.getRecoHitInformations()) {
+  for (const auto recoHit : recoTrack.getRecoHitInformations()) {
     // skip for reco hits which have not been used in the fit (and therefore have no fitted information on the plane
     if (!recoHit->useInFit())
       continue;
@@ -343,12 +343,15 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   addObject(&recoTrack, track);
 }
 
+
+/** Add a CDCTriggerTrack or CDCTrigger3DHTrack. */
+template <typename TriggerTrack>
 void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
-                                          const CDCTriggerTrack& trgTrack)
+                                          const TriggerTrack& trgTrack)
 {
   const TString label = ObjectInfo::getIdentifier(&trgTrack);
 
-  B2Vector3D track_pos = B2Vector3D(0, 0, trgTrack.getZ0());
+  B2Vector3D track_pos(0, 0, trgTrack.getZ0());
   B2Vector3D track_mom = (trgTrack.getChargeSign() == 0) ?
                          trgTrack.getDirection() * 1000 :
                          trgTrack.getMomentum(1.5);
@@ -358,10 +361,11 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   rectrack.fV.Set(track_pos);
 
   TEveTrack* track_lines = new TEveTrack(&rectrack, m_consttrackpropagator);
-  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetName(label); // popup label set at end of function
   track_lines->SetPropagator(m_consttrackpropagator);
   track_lines->SetLineColor(kOrange + 2);
   track_lines->SetLineWidth(1);
+
   track_lines->SetTitle(ObjectInfo::getTitle(&trgTrack) +
                         TString::Format("\ncharge: %d, phi: %.2fdeg, pt: %.2fGeV, theta: %.2fdeg, z: %.2fcm",
                                         trgTrack.getChargeSign(),
@@ -369,7 +373,6 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
                                         trgTrack.getTransverseMomentum(1.5),
                                         trgTrack.getDirection().Theta() * 180 / M_PI,
                                         trgTrack.getZ0()));
-
 
   track_lines->SetCharge(trgTrack.getChargeSign());
 
@@ -380,6 +383,12 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
   addToGroup(collectionName, track_lines);
   addObject(&trgTrack, track_lines);
 }
+
+template void EVEVisualization::addCDCTriggerTrack<CDCTriggerTrack>(
+  const std::string&, const CDCTriggerTrack&);
+
+template void EVEVisualization::addCDCTriggerTrack<CDCTrigger3DHTrack>(
+  const std::string&, const CDCTrigger3DHTrack&);
 
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {
@@ -468,7 +477,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
     const unsigned int numpoints = hitPoints.size();
 
     int hitCounter = -1;
-    for (genfit::TrackPoint* tp : hitPoints) { // loop over all points in the track
+    for (const genfit::TrackPoint* tp : hitPoints) { // loop over all points in the track
       hitCounter++;
 
       // get the fitter infos ------------------------------------------------------------------
@@ -600,9 +609,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         double_t hit_v = 0;
         double_t plane_size = 4;
 
-        int hit_coords_dim = m->getDim();
-
         if (dynamic_cast<const genfit::PlanarMeasurement*>(m) != NULL) {
+          int hit_coords_dim = m->getDim();
           planar_hit = true;
           if (hit_coords_dim == 1) {
             hit_u = hit_coords(0);
@@ -846,7 +854,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   addObject(belle2Track, eveTrack);
 }
 
-TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud,
+TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v,
+                                      float ud,
                                       float vd, float depth)
 {
   //force minimum width of polygon to deal with Eve limits
@@ -886,7 +895,8 @@ TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math
   return box;
 }
 
-void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
+void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState,
+                                 const genfit::StateOnPlane* state,
                                  const genfit::AbsTrackRep* rep,
                                  TEvePathMark::EType_e markType, bool drawErrors, int markerPos)
 {
@@ -1493,7 +1503,7 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
 
 void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
 {
-  bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
+  const bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
   const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
   CLHEP::Hep3Vector global;
@@ -1903,6 +1913,7 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
   }
 
 }
+
 void EVEVisualization::addObject(const TObject* dataStoreObject, TEveElement* visualRepresentation)
 {
   VisualRepMap::getInstance()->add(dataStoreObject, visualRepresentation);

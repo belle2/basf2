@@ -165,6 +165,13 @@ namespace Belle2 {
     inline float getShapeStdDev3() const { return m_shapeStdDev3; }
 
     /**
+     * Get number of KLM digits in the cluster.
+     * @return Number of KLM digits.
+     */
+    inline int getKLMnDigits() const
+    { return m_KLMnDigits; }
+
+    /**
      * Set KLM cluster-track rotation angle.
      * @param[in] rotation angle to the nearest track.
      */
@@ -259,6 +266,13 @@ namespace Belle2 {
     }
 
     /**
+     * Set number of KLM digits in the cluster.
+     * @param[in] nDigits Number of KLM digits.
+     */
+    void setKLMnDigits(int nDigits)
+    { m_KLMnDigits = nDigits; }
+
+    /**
      * Set momentum magnitude.
      * @param[in] momentumMag Momentum magnitude.
      */
@@ -308,8 +322,11 @@ namespace Belle2 {
     /** Std deviation of axis 3 (from Cluster Shape PCA). */
     float m_shapeStdDev3 = 0;
 
+    /** Number of KLM digits in the cluster. */
+    int m_KLMnDigits = 0;
+
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 4);
+    ClassDef(Belle2::KLMCluster, 5);
 
   };
 }

@@ -60,7 +60,7 @@ TH1D *GetBandPlot(TFile *file, TTree *tree, TString det="temp", Int_t ipart=0){
   file->cd();
   tree->Project(TString::Format("%s", hname.Data()), TString::Format("%s", proj.Data()), TString::Format("%s", cut.Data()));
   
-  TH1D* hist = (TH1D*)file->Get(TString::Format("%s", name.Data()));
+  TH1D* hist = static_cast<TH1D*>(file->Get(TString::Format("%s", name.Data())));
   if(hist)std::cout << "histogram created as : " << hist->GetName() << std::endl;
   hist->SetTitle(TString::Format("dE/dx curve for %s (%s w/ CC); p [GeV/c]; %s dE/dx", det.Data(), pname.Data(), det.Data()));
   hist->GetListOfFunctions()->Add(new TNamed("Description", hist->GetTitle()));
@@ -86,7 +86,7 @@ void plot(const TString &input_filename)
     exit(1);
   }
   
-  TTree *tree = (TTree*)f->Get("tree");
+  TTree *tree = static_cast<TTree*>(f->Get("tree"));
   if(!tree) {
     std::cerr << "Couldn't find 'tree'!\n";
     exit(1);
@@ -110,11 +110,12 @@ void plot(const TString &input_filename)
   int count=-1;
   TH1D *hSVD[7], *hCDC[7];
   TFile *output_file = new TFile("dedx_curves.root", "RECREATE");
+  // cppcheck-suppress-begin arrayIndexOutOfBoundsCond ; the list has exactly 7 entries
   for ( auto pdg : { 0,11,13,211,321,2212,1000010020}) {
     count++;
     //prepare CDC/SVD plots
-    hSVD[count] = (TH1D*)GetBandPlot(f,tree,"SVD",pdg); //0 for all
-    hCDC[count] = (TH1D*)GetBandPlot(f,tree,"CDC",pdg); //0 for all
+    hSVD[count] = static_cast<TH1D*>(GetBandPlot(f,tree,"SVD",pdg)); //0 for all
+    hCDC[count] = static_cast<TH1D*>(GetBandPlot(f,tree,"CDC",pdg)); //0 for all
     //add SVD plots to file
     Color_t color = count+1;
     if(count==4) color = kGreen+3;
@@ -124,6 +125,7 @@ void plot(const TString &input_filename)
     output_file->cd();
     hSVD[count]->Write();
   }
+  // cppcheck-suppress-end arrayIndexOutOfBoundsCond
   
   //add CDC plots now
   for (int i=0; i<7; i++) {

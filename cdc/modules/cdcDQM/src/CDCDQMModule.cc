@@ -63,11 +63,11 @@ void CDCDQMModule::defineHisto()
   m_hTDC->SetTitle("TDC vs CDC-Boards;Board index;TDC");
   m_hHit = new TH2F("hHit", "hHit", 56, 0, 56, 400, 0, 400);
   m_hHit->SetTitle("CDC-hits;layer number;wire number");
-  m_hPhi = new TH1F("hPhi", "", 360, -180.0, 180.0);
+  m_hPhi = new TH1F("hPhi", "", 180, -180.0, 180.0);
   m_hPhi->SetTitle("CDC-track-#phi;cdctrack #phi (IP tracks + all events);entries");
-  m_hPhiIndex = new TH2F("hPhiIndex", "", 360, -180.0, 180.0, 8, 0, 8.0);
+  m_hPhiIndex = new TH2F("hPhiIndex", "", 180, -180.0, 180.0, 8, 0, 8.0);
   m_hPhiIndex->SetTitle("CDC-track-#phi;cdctrack #phi vs skims;selection-index");
-  m_hPhiEff = new TH2F("hPhiEff", "", 360, -180.0, 180.0, 100, 0, 100.0);
+  m_hPhiEff = new TH2F("hPhiEff", "", 180, -180.0, 180.0, 100, 0, 100.0);
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
@@ -187,7 +187,7 @@ void CDCDQMModule::event()
       continue;
     }
 
-    Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
+    const Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
     if (!track) {
       B2WARNING("Can not access RecoTrack of this Belle2::Track");
       continue;
@@ -251,6 +251,7 @@ void CDCDQMModule::event()
 
       //for tracking efficiency part
       double nsvdhits = fitresult->getHitPatternVXD().getNSVDHits();
+      // cppcheck-suppress variableScope ; kept next to the related declarations for readability
       double ncdchits = fitresult->getHitPatternCDC().getNHits();
       if (nsvdhits > 6) {
         if (ncdchits >= 100)ncdchits = 99.5; //push to last bin
@@ -285,10 +286,6 @@ void CDCDQMModule::event()
 void CDCDQMModule::endRun()
 {
   m_hNEvents->SetBinContent(1, m_nEvents);
-}
-
-void CDCDQMModule::terminate()
-{
 }
 
 int CDCDQMModule::findPhiBin(double phi, const int& lay)

@@ -125,13 +125,13 @@ namespace Belle2 {
       // after each subrun change?
       bool alignmentHierarchyChanged = false;
       bool lorentzHierarchyChanged = false;
-      for (auto& uid : getAlignmentHierarchy().getUsedDBObjUniqueIDs()) {
+      for (const auto& uid : getAlignmentHierarchy().getUsedDBObjUniqueIDs()) {
         if (alignment::timeline::getContinuousIndexByTimeID(m_iniTimeTable, uid, subrun) == 1) {
           alignmentHierarchyChanged = true;
           break;
         }
       }
-      for (auto& uid : getLorentzShiftHierarchy().getUsedDBObjUniqueIDs()) {
+      for (const auto& uid : getLorentzShiftHierarchy().getUsedDBObjUniqueIDs()) {
         if (alignment::timeline::getContinuousIndexByTimeID(m_iniTimeTable, uid, subrun) == 1) {
           lorentzHierarchyChanged = true;
           break;

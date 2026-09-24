@@ -24,9 +24,6 @@ namespace Belle2 {
       /** Constructor */
       TOPChannelMaskAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPChannelMaskAlgorithm() {}
-
       /**
        * Sets minimal average channel statistics needed to provide calibration
        * @param minHits minimal number of hits per channel (on average)

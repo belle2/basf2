@@ -44,10 +44,6 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("TRG:"));
 }
 
-DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
-{
-}
-
 void DQMHistAnalysisTRGGDLModule::initialize()
 {
   gROOT->cd();

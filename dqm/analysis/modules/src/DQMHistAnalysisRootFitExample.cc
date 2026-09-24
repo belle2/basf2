@@ -35,10 +35,6 @@ DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   B2DEBUG(1, "DQMHistAnalysisRooFitExample: Constructor done.");
 }
 
-DQMHistAnalysisRooFitExampleModule::~DQMHistAnalysisRooFitExampleModule()
-{
-}
-
 void DQMHistAnalysisRooFitExampleModule::initialize()
 {
   B2INFO("DQMHistAnalysisRooFitExample: initialized.");
@@ -58,7 +54,7 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
   B2INFO("DQMHistAnalysisRooFitExample: beginRun called.");
   m_c0->Clear();
 
-  TH1* hh1 = findHist("FirstDet/h_HitXPositionCh01");
+  auto hh1 = findHist("FirstDet/h_HitXPositionCh01");
   if (hh1 != NULL) {
 
     //RooDataHist::RooDataHist(const char *name, const char *title, const RooArgList& vars, const TH1* hist, Double_t wgt) :

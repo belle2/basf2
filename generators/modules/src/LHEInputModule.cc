@@ -11,6 +11,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/Environment.h>
 
 using namespace std;
 using namespace Belle2;
@@ -59,6 +60,13 @@ void LHEInputModule::initialize()
     //let's start with the first file:
     m_inputFileName = m_inputFileNames[m_iFile];
   }
+
+  unsigned int totalEvents = 0;
+  for (const auto& fileName : m_inputFileNames) {
+    totalEvents += m_lhe.countEvents(fileName);
+  }
+  Environment::Instance().setNumberOfMCEvents(totalEvents);
+
   try {
     B2INFO("Opening first file: " << m_inputFileName);
     m_lhe.open(m_inputFileName);

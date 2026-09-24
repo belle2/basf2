@@ -54,11 +54,6 @@ namespace Belle2 {
       ChannelMapper();
 
       /**
-       * destructor
-       */
-      ~ChannelMapper();
-
-      /**
        * Initialize from Gearbox (XML)
        * @param channelMapping XML data directory
        */
@@ -91,17 +86,17 @@ namespace Belle2 {
        * Return electornic name
        * @return name
        */
-      std::string getName() const {return m_typeName;}
+      const std::string& getName() const {return m_typeName;}
 
       /**
        * Checks validity of pixel ID
        * @param pixel pixel ID (1-based)
        * @return true for valid ID
        */
-      bool isPixelIDValid(int pixel) const
+      static bool isPixelIDValid(int pixel)
       {
         unsigned pix = pixel - 1;
-        return pix < c_numPixels;
+        return pix < c_numPixels; // cppcheck-suppress knownConditionTrueFalse
       }
 
       /**
@@ -109,7 +104,7 @@ namespace Belle2 {
        * @param channel hardware channel number (0-based)
        * @return true for valid ID
        */
-      bool isChannelValid(unsigned channel) const
+      static bool isChannelValid(unsigned channel)
       {
         return channel < c_numPixels;
       }
@@ -129,10 +124,10 @@ namespace Belle2 {
        * @param chan ASIC channel number (0-based)
        * @return channel number (or c_invalidChannel for invalid pixel)
        */
-      unsigned getChannel(unsigned boardstack,
-                          unsigned carrier,
-                          unsigned asic,
-                          unsigned chan) const
+      static unsigned getChannel(unsigned boardstack,
+                                 unsigned carrier,
+                                 unsigned asic,
+                                 unsigned chan)
       {
         return chan + c_numChannels * (asic + c_numAsics *
                                        (carrier + c_numCarrierBoards * boardstack));
@@ -146,11 +141,11 @@ namespace Belle2 {
        * @param asic ASIC number (0-based) [output]
        * @param chan ASIC channel number (0-based) [output]
        */
-      void splitChannelNumber(unsigned channel,
-                              unsigned& boardstack,
-                              unsigned& carrier,
-                              unsigned& asic,
-                              unsigned& chan) const;
+      static void splitChannelNumber(unsigned channel,
+                                     unsigned& boardstack,
+                                     unsigned& carrier,
+                                     unsigned& asic,
+                                     unsigned& chan);
 
       /**
        * Converts hardware channel number to pixel ID (1-based)
@@ -164,7 +159,7 @@ namespace Belle2 {
        * @param pixel pixelID (1-based)
        * @return PMT ID (or 0 for invalid pixel)
        */
-      int getPmtID(int pixel) const;
+      static int getPmtID(int pixel);
 
       /**
        * Print mappings to terminal screen
@@ -179,19 +174,6 @@ namespace Belle2 {
     private:
 
       /**
-       * Copy constructor
-       */
-      ChannelMapper(const ChannelMapper&)
-      {}
-
-      /**
-       * Assignment operator
-       */
-      ChannelMapper& operator=(const ChannelMapper&)
-      {return *this;}
-
-
-      /**
        * Clear
        */
       void clear();
@@ -204,7 +186,7 @@ namespace Belle2 {
       EType m_type = c_unknown;                /**< electornic type */
       std::string m_typeName;                  /**< electronic type name */
       std::vector<TOPChannelMap> m_mapping;    /**< mappings from gearbox */
-      DBArray<TOPChannelMap>* m_mappingDB = 0; /**< mappings from database */
+      DBArray<TOPChannelMap> m_mappingDB;      /**< mappings from database */
       bool m_valid = false;                    /**< true if mapping available */
       bool m_fromDB = false;                   /**< true, if from database */
 

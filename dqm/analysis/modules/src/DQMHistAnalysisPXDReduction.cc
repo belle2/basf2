@@ -45,10 +45,6 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
-DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
-{
-}
-
 void DQMHistAnalysisPXDReductionModule::initialize()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: initialized.");
@@ -58,7 +54,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
 
   //collect the list of all PXD Modules in the geometry here
   std::vector<VxdID> sensors = geo.getListOfSensors();
-  for (VxdID& aVxdID : sensors) {
+  for (const auto& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
@@ -77,7 +73,7 @@ void DQMHistAnalysisPXDReductionModule::initialize()
       "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
       "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
-    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+    for (const auto& it : mod) m_PXDModules.push_back(VxdID(it));
   }
 
   m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
@@ -205,7 +201,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     if (!std::isnan(m_meanLowerWarn)) m_meanLowerWarnLine->Draw();
     if (!std::isnan(m_meanUpperWarn)) m_meanUpperWarnLine->Draw();
     if (!std::isnan(m_meanUpperAlarm)) m_meanUpperAlarmLine->Draw();
-    for (auto& it : m_excluded) {
+    for (const auto& it : m_excluded) {
       static std::map <int, TLatex*> ltmap;
       auto tt = ltmap[it];
       if (!tt) {

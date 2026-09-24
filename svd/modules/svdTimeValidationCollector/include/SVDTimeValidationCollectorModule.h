@@ -9,15 +9,16 @@
 #pragma once
 
 #include <calibration/CalibrationCollectorModule.h>
+#include <svd/dbobjects/SVDAbsoluteClusterTimeShift.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <string>
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TH3F.h"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TH3F.h>
 
 #include <svd/dataobjects/SVDCluster.h>
 #include <framework/dataobjects/EventT0.h>
@@ -77,6 +78,11 @@ namespace Belle2 {
     /**Tracks */
     std::string m_track = "Tracks"; /**< Name of the Tracks store object pointer used as parameter of the module*/
     StoreArray<Track> m_trk; /**< Tracks store object pointer*/
+
+    /**SVDAbsoluteClusterTimeShift */
+    DBObjPtr<SVDAbsoluteClusterTimeShift> m_svdAbsTimeShift; /**< SVDCluster absolute time shift*/
+
+    std::string m_timeAlgo; /**< Time algorithm being validated (CoG6, CoG3, ELS3) */
 
   };
 

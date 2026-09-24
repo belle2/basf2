@@ -12,7 +12,8 @@
 #include <tracking/trackingUtilities/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -37,7 +38,7 @@ bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
     axialStereoFusion.reconstructFuseTrajectories(segmentPair);
   }
   CDCTrajectory3D fit = segmentPair.getTrajectory3D();
-  Vector3D support3D = fit.getSupport();
+  ROOT::Math::XYZVector support3D = fit.getSupport();
 
   finitevar<named("ndf")>() = fit.isFitted() ? fit.getNDF() : NAN;
   finitevar<named("chi2")>() = fit.getChi2();

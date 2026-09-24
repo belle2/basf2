@@ -18,15 +18,15 @@ import sys
 import versioning
 import basf2 as b2
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import Dict
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 import pygments.formatters
 import terminal_utils
 import itertools
 
-MC_CAMPAIGN = ['MC15', 'MC16']
-RELEASE = [6, 8]
+MC_CAMPAIGN = ['MC15', 'MC16', 'rel09']
+RELEASE = [6, 8, 9]
 
 class FormatterStrategy(ABC):
     """
@@ -383,11 +383,12 @@ def convert_json_to_payload(localfile: str, payload: str):
     db = Belle2.Database.Instance()
     db.addPayload(payload, localfile, iov)
 
-def print_tags(tools: list, mccampaign:str, n_tag_columns: int = 2):
+   
+def print_tags(tools: list, release_name: str, n_tag_columns: int = 2):
     """
     Print all available tags.
     """
-    print(f"Available tags for {mccampaign}:")
+    print(f"Available tags for {release_name}:")
     available_tags = get_available_tags(tools)
     if n_tag_columns < 2 or n_tag_columns >= len(available_tags):
         for tag in available_tags:
@@ -451,8 +452,6 @@ def get_argument_parser():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-r", "--release", help="Show recommendations for this release's MC campaign and the corresponding data processing",
                         choices=RELEASE, type=int)
-    group.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
-                        choices=MC_CAMPAIGN)
     group.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-t", "--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
                         nargs='+', default=None)
@@ -492,19 +491,17 @@ def main():
             sys.exit(0)
 
     if args.localfile is None:
-        if (args.mccampaign is None) and (args.release is None):
+        if args.release is None:
             b2.B2ERROR(f"The release (to corresponding MC campaign and data processsing) is not provided! Available choices for -r/--release argument: {RELEASE}")
             sys.exit(1)
-        elif args.release is None:
-            b2.B2WARNING("The -mc/--mccampaign argument is being deprecated. Please use -r/--release argument instead.")
         else:
-            args.mccampaign = MC_CAMPAIGN[RELEASE.index(args.release)]
+            _mccampaign = MC_CAMPAIGN[RELEASE.index(args.release)]
         gt_name = args.globaltag
         if gt_name is None:
-            gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
+            gt_name = versioning.performance_recommendation_global_tag(_mccampaign)['global_tag']
         payload_name = args.payload
         if payload_name is None:
-            payload_name = versioning.performance_recommendation_global_tag(args.mccampaign)['payload']
+            payload_name = versioning.performance_recommendation_global_tag(_mccampaign)['payload']
 
         b2.conditions.prepend_globaltag(gt_name)
 
@@ -530,24 +527,24 @@ def main():
 
     else:
         tools = load_data(args.localfile, formatter)
-        args.mccampaign = "local"
 
+    release_name = f"release-{args.release}" if args.release else "local"
     if args.tags is None:
-        print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
+        print_tags(tools, release_name, n_tag_columns=args.n_tag_columns)
         display_summary(tools, 'all')
         sys.exit(0)
 
     tags_line = '[' + ', '.join(args.tags) + ']'
     if args.summary:
-        print(f'Showing tools for {args.mccampaign} and {tags_line} tags:')
+        print(f'Showing tools for {release_name} and {tags_line} tags:')
         display_summary(tools, args.tags)
         sys.exit(0)
 
-    print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')
+    print(f'Recommendations for {release_name} and {tags_line} tags:')
     if args.no_pager:
         display_tags(tools, args.tags)
     else:
-        with terminal_utils.Pager(f'Recommendations for {args.mccampaign} and {tags_line} tags', True):
+        with terminal_utils.Pager(f'Recommendations for {release_name} and {tags_line} tags', True):
             display_tags(tools, args.tags)
 
 if __name__ == "__main__":

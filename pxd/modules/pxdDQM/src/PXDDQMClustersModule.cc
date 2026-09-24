@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "pxd/modules/pxdDQM/PXDDQMClustersModule.h"
+#include <pxd/modules/pxdDQM/PXDDQMClustersModule.h>
 
 #include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
@@ -24,7 +24,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;
@@ -423,7 +423,6 @@ void PXDDQMClustersModule::event()
     int iSensor = digit.getSensorID().getSensorNumber();
     VxdID sensorID(iLayer, iLadder, iSensor);
     int index = gTools->getPXDSensorIndex(sensorID);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     Pixels[index]++;
     int iChip = PXDMappingLookup::getDCDID(digit.getUCellID(), digit.getVCellID(), sensorID);
     int indexChip = gTools->getPXDChipIndex(sensorID, kTRUE, iChip);

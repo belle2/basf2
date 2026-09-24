@@ -32,7 +32,7 @@ namespace Belle2 {
        *                    If an empty string is supplied, the type name will be used.
        *  @param durability Decides durability map used for getting the accessed object.
        */
-      StoreWrappedObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) :
+      explicit StoreWrappedObjPtr(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event) :
         StoreObjPtr<StoreWrapper<T> >(name, durability)
       {}
 
@@ -43,6 +43,7 @@ namespace Belle2 {
        *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to default to transient, non-streamed registration
       bool registerInDataStore(DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
         return StoreObjPtr<StoreWrapper<T> >::registerInDataStore(storeFlags);
@@ -55,6 +56,7 @@ namespace Belle2 {
        *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. Defaults to c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered.
        *  @return            True if the registration succeeded.
        */
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to default to transient, non-streamed registration
       bool registerInDataStore(const std::string& name,
                                DataStore::EStoreFlags storeFlags = DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)
       {
@@ -62,12 +64,14 @@ namespace Belle2 {
       }
 
       /// Dereference to the wrapped object.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to unwrap the StoreWrapper
       T& operator*() const
       {
         return StoreObjPtr<StoreWrapper<T> >::operator*().get();
       }
 
       /// Forward pointer access to the wrapped object.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to unwrap the StoreWrapper
       T* operator->() const
       {
         return  &(operator*());

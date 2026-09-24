@@ -18,6 +18,7 @@ using namespace CDC;
 using namespace TrackingUtilities;
 
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
 void TrackingUtilitiesTestWithTopology::SetUpTestCase()
 {
   /// Manually open the database and prepare the cdc geometry parameters.
@@ -27,6 +28,7 @@ void TrackingUtilitiesTestWithTopology::SetUpTestCase()
   CDCWireTopology::getInstance();
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, as required for the gtest fixture hooks
 void TrackingUtilitiesTestWithTopology::TearDownTestCase()
 {
   CDCGeometryLoader::closeDatabase();
@@ -35,9 +37,9 @@ void TrackingUtilitiesTestWithTopology::TearDownTestCase()
 
 
 template<>
-bool Belle2::TestHelpers::allNear<TrackingUtilities::Vector3D>(const TrackingUtilities::Vector3D& expected,
-    const TrackingUtilities::Vector3D& actual,
-    double tolerance)
+bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                                         const ROOT::Math::XYZVector& actual,
+                                                         double tolerance)
 {
   bool xNear = std::fabs(expected.x() - actual.x()) < tolerance;
   bool yNear = std::fabs(expected.y() - actual.y()) < tolerance;

@@ -10,7 +10,7 @@
 #include <ecl/modules/eclCovarianceMatrix/ECLCovarianceMatrixModule.h>
 
 // ROOT
-#include "TMath.h"
+#include <TMath.h>
 
 // MDST
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>

@@ -117,7 +117,7 @@ namespace Belle2 {
      * Returns additional event words
      * @return extraWords
      */
-    std::vector<unsigned int> getExtraWords() const { return m_extraWords; }
+    const std::vector<unsigned int>& getExtraWords() const { return m_extraWords; }
 
 
   private:

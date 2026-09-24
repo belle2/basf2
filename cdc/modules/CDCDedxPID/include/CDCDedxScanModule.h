@@ -27,7 +27,7 @@ namespace Belle2 {
     CDCDedxScanModule();
 
     /** Destructor */
-    virtual ~CDCDedxScanModule();
+    ~CDCDedxScanModule() override;
 
     /** Initialize the module */
     virtual void initialize() override;

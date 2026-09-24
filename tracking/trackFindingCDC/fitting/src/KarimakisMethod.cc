@@ -14,7 +14,8 @@
 
 #include <tracking/trackingUtilities/geometry/UncertainPerigeeCircle.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector2D.h>
 
 #include <Eigen/Core>
 
@@ -34,20 +35,20 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   trajectory2D.clear();
   if (not nObservations) return;
 
-  Vector2D ref = observations2D.getCentralPoint();
+  ROOT::Math::XYVector ref = observations2D.getCentralPoint();
   observations2D.passiveMoveBy(ref);
 
   UncertainPerigeeCircle perigeeCircle = fitInternal(observations2D);
 
   double frontX = observations2D.getX(0);
   double frontY = observations2D.getY(0);
-  Vector2D frontPos(frontX, frontY);
+  ROOT::Math::XYVector frontPos(frontX, frontY);
 
   double backX = observations2D.getX(nObservations - 1);
   double backY = observations2D.getY(nObservations - 1);
-  Vector2D backPos(backX, backY);
+  ROOT::Math::XYVector backPos(backX, backY);
 
-  Vector2D overPos(0, 0);
+  ROOT::Math::XYVector overPos(0, 0);
   double totalPerps = (perigeeCircle->arcLengthBetween(frontPos, overPos) +
                        perigeeCircle->arcLengthBetween(overPos, backPos));
 
@@ -119,7 +120,7 @@ namespace {
                           bool lineConstrained = false)
   {
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
-    const Vector2D vecPhi = -parameters.tangential();
+    const ROOT::Math::XYVector vecPhi = -parameters.tangential();
 
     const double cosphi = vecPhi.x();
     const double sinphi = vecPhi.y();
@@ -154,7 +155,7 @@ namespace {
     const double I =  parameters.impact();
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
-    const Vector2D vecPhi = -parameters.tangential();
+    const ROOT::Math::XYVector vecPhi = -parameters.tangential();
 
     // Ternminology Karimaki using in the paper
     const double cosphi = vecPhi.x();

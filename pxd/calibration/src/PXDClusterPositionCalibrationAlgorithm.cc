@@ -9,13 +9,14 @@
 #include <pxd/calibration/PXDClusterPositionCalibrationAlgorithm.h>
 #include <pxd/dbobjects/PXDClusterShapeIndexPar.h>
 #include <pxd/dbobjects/PXDClusterPositionEstimatorPar.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <string>
 #include <tuple>
-#include "TH2F.h"
-#include "TMatrixDSym.h"
-#include "TVectorD.h"
-#include "TMatrixDSymEigen.h"
+#include <TH2F.h>
+#include <TMatrixDSym.h>
+#include <TVectorD.h>
+#include <TMatrixDSymEigen.h>
 
 #include <boost/format.hpp>
 #include <cmath>
@@ -157,8 +158,8 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
 }
 
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(PXDClusterShapeClassifierPar*
-    shapeClassifier, PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(const PXDClusterShapeClassifierPar*
+    shapeClassifier, const PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
 {
   // Create a mirrored shape classifier
   auto mirroredShapeClassifier = PXDClusterShapeClassifierPar();
@@ -197,7 +198,7 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
       auto likelyhood = likelyhoodMap[shapeIndex][etaBin];
       mirroredShapeClassifier.addEtaLikelyhood(mirroredIndex, likelyhood);
       // Mirror the offset: v offset shifts and covariance swaps sign
-      double shift = (m_sizeMap[shapeName] - 1) * m_pitchMap[clusterKind];
+      double shift = (m_sizeMap[shapeName] - 1) * static_cast<double>(m_pitchMap[clusterKind]);
       auto mirroredOffset = PXDClusterOffsetPar(offset.getU(), shift - offset.getV(), offset.getUSigma2(), offset.getVSigma2(),
                                                 -offset.getUVCovariance());
       mirroredShapeClassifier.addEtaOffset(mirroredIndex, mirroredOffset);
@@ -208,8 +209,9 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
   return mirroredShapeClassifier;
 }
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(PXDClusterShapeClassifierPar* shapeClassifier,
-    PXDClusterShapeIndexPar* shapeIndexer, PXDClusterShapeIndexPar* globalShapeIndexer)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(const PXDClusterShapeClassifierPar*
+    shapeClassifier,
+    const PXDClusterShapeIndexPar* shapeIndexer, const PXDClusterShapeIndexPar* globalShapeIndexer)
 {
   // Create a shape classifier using global shape indices
   auto globalShapeClassifier = PXDClusterShapeClassifierPar();
@@ -439,8 +441,8 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
       double offsetU = histo.GetMean(1);
       double offsetV = histo.GetMean(2);
       double covUV = histo.GetCovariance();
-      double covU = pow(histo.GetRMS(1), 2);
-      double covV = pow(histo.GetRMS(2), 2);
+      double covU = square(histo.GetRMS(1));
+      double covV = square(histo.GetRMS(2));
 
       B2INFO("Name " << name  << ", posU=" << offsetU << ", posV=" << offsetV << ", covU=" << covU << ", covV=" << covV << ", covUV=" <<
              covUV);

@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <top/calibration/TOPPulseHeightAlgorithm.h>
-#include "TROOT.h"
+#include <TROOT.h>
 #include <TDirectory.h>
 #include <TF1.h>
 #include <TMath.h>

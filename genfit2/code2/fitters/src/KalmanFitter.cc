@@ -45,10 +45,10 @@ bool KalmanFitter::fitTrack(Track* tr, const AbsTrackRep* rep,
     int startId, int endId, int& nFailedHits)
 {
 
-  if (multipleMeasurementHandling_ == unweightedClosestToReference ||
-      multipleMeasurementHandling_ == weightedClosestToReference ||
-      multipleMeasurementHandling_ == unweightedClosestToReferenceWire ||
-      multipleMeasurementHandling_ == weightedClosestToReferenceWire) {
+  if (multipleMeasurementHandling_ == EMultipleMeasurementHandling::unweightedClosestToReference ||
+      multipleMeasurementHandling_ == EMultipleMeasurementHandling::weightedClosestToReference ||
+      multipleMeasurementHandling_ == EMultipleMeasurementHandling::unweightedClosestToReferenceWire ||
+      multipleMeasurementHandling_ == EMultipleMeasurementHandling::weightedClosestToReferenceWire) {
     Exception exc("KalmanFitter::fitTrack ==> cannot use (un)weightedClosestToReference(Wire) as multiple measurement handling.",__LINE__,__FILE__);
     exc.setFatal();
     throw exc;
@@ -521,7 +521,7 @@ KalmanFitter::processTrackPoint(TrackPoint* tp,
         }
 
         stateVector += update;
-        covSumInv.Similarity(CHt); // with (C H^T)^T = H C^T = H C  (C is symmetric)
+        tools::similarity(CHt, covSumInv); // with (C H^T)^T = H C^T = H C  (C is symmetric)
         cov -= covSumInv;
       }
 
@@ -549,7 +549,7 @@ KalmanFitter::processTrackPoint(TrackPoint* tp,
 
       tools::invertMatrix(HCHt);
 
-      chi2inc += HCHt.Similarity(resNew);
+      chi2inc += tools::similarity(resNew, HCHt);
 
       if (!canIgnoreWeights()) {
         ndfInc += weight * measurement.GetNrows();
@@ -656,7 +656,7 @@ KalmanFitter::processTrackPoint(TrackPoint* tp,
 
       tools::invertMatrix(HCHt);
 
-      chi2inc += HCHt.Similarity(res);
+      chi2inc += tools::similarity(res, HCHt);
 
       if (!canIgnoreWeights()) {
         ndfInc += weight * measurement.GetNrows();

@@ -136,14 +136,6 @@ VertexFitKFit::getVertexError() const
   return m_AfterVertexError;
 }
 
-
-double
-VertexFitKFit::getCHIsq() const
-{
-  return KFitBase::getCHIsq();
-}
-
-
 double
 VertexFitKFit::getCHIsqVertex() const
 {
@@ -641,7 +633,7 @@ VertexFitKFit::prepareInputMatrix() {
   HepMatrix    tmp_property(m_TrackCount, 3, 0);
 
 
-  for (auto& track : m_Tracks)
+  for (const auto& track : m_Tracks)
   {
     // momentum x,y,z and position x,y,z
     for (int j = 0; j < KFitConst::kNumber6; j++)

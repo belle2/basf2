@@ -21,7 +21,7 @@ In addition to the code of this repository, the following three repositories are
 * Belle II externals ([public repository](https://github.com/belle2/externals), [internal repository](https://gitlab.desy.de/belle2/software/externals)): Manages external dependencies of basf2
 * Belle II versioning ([public repository](https://github.com/belle2/versioning), [internal repository](https://gitlab.desy.de/belle2/software/versioning/)): Manages the different versions of basf2 and related conditions database global tags
 
-Note that the history of the code is split in a part before ([public repository](https://github.com/belle2/basf2/commits/history), [internal repository](https://stash.desy.de/projects/B2/repos/history/commits)) and after ([public repository](https://github.com/belle2/basf2/commits/main), [internal repository](https://gitlab.desy.de/belle2/software/basf2/-/commits/main)) July 7, 2021.
+Note that the history of the code is split in a part before ([public repository](https://github.com/belle2/basf2/commits/history), [internal repository](https://gitlab.desy.de/belle2/software/software)) and after ([public repository](https://github.com/belle2/basf2/commits/main), [internal repository](https://gitlab.desy.de/belle2/software/basf2/-/commits/main)) July 7, 2021.
 Both parts are combined to a complete history with the `b2code-history` command.
 
 Head to [our documentation](https://software.belle2.org/) to learn about

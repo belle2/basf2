@@ -169,12 +169,6 @@ void KLMEventT0EstimatorModule::beginRun()
           << LogVar("sigma_EKLM_Scint (ns)", m_eventT0HitResolution->getSigmaEKLMScint()));
 }
 
-void KLMEventT0EstimatorModule::endRun()
-{
-}
-
-void KLMEventT0EstimatorModule::terminate() {}
-
 /* Helper methods. */
 
 bool KLMEventT0EstimatorModule::passesADCCut(double charge, int subdetector, int layer, bool inRPC) const
@@ -271,12 +265,10 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
     }
     if (tSub < 0) continue;
 
-    bool crossed = false;
-
     if (isB) {
-      crossed = muidLikelihood
-                ? muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1)
-                : true;
+      const bool crossed = muidLikelihood
+                           ? muidLikelihood->isExtrapolatedBarrelLayerCrossed(tLay - 1)
+                           : true;
       if (!crossed) continue;
 
       const bool isRPC = (tLay >= BKLMElementNumbers::c_FirstRPCLayer);
@@ -298,9 +290,9 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
     }
 
     if (isE) {
-      crossed = muidLikelihood
-                ? muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1)
-                : true;
+      const bool crossed = muidLikelihood
+                           ? muidLikelihood->isExtrapolatedEndcapLayerCrossed(tLay - 1)
+                           : true;
       if (!crossed) continue;
 
       unsigned int channelKey =

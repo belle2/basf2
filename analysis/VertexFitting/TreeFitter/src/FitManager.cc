@@ -122,6 +122,9 @@ namespace TreeFitter {
     return (m_status == VertexStatus::Success);
   }
 
+  // returncov is an output parameter: ROOT's const operator() overload hides the
+  // assignments below from cppcheck
+  // cppcheck-suppress constParameterReference
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 
@@ -344,7 +347,7 @@ namespace TreeFitter {
     return getDecayLength(pb, *m_fitparams);
   }
 
-  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams) const
+  std::tuple<double, double> FitManager::getDecayLength(const ParticleBase* pb, const FitParams& fitparams)
   {
     if (pb->tauIndex() >= 0 && pb->mother()) {
       const int tauindex = pb->tauIndex();

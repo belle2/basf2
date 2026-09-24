@@ -233,10 +233,10 @@ namespace Belle2 {
       BoundingBox m_boundingBox;
 
       /// Memory for the width of the SVG drawing in pixels
-      float m_canvasWidth;
+      float m_canvasWidth {};
 
       /// Memory for the height of the SVG drawing in pixels
-      float m_canvasHeight;
+      float m_canvasHeight {};
     };
   }
 }

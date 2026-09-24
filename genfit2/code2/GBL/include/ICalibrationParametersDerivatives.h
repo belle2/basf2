@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_ICalibrationParametersDerivatives_h
-#define genfit_ICalibrationParametersDerivatives_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "StateOnPlane.h"
@@ -68,7 +67,7 @@ class ICalibrationParametersDerivatives {
     * G = ( du/da du/db du/dc ... )
     *     (   0     0     0   ... )    for U-strip,
     *
-    * Measurements with more dimesions (slopes, curvature) should provide
+    * Measurements with more dimensions (slopes, curvature) should provide
     * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
     * 
     * 
@@ -117,7 +116,7 @@ class ICalibrationParametersDerivatives {
     * 
     * A possible algorithm using these derivatives
     * should be able to resolve this based on the measurement HMatrix.
-    * Measurements with more dimesions (slopes, curvature) should provide
+    * Measurements with more dimensions (slopes, curvature) should provide
     * full 4-5Dx(n params) matrix (state as (q/p, u', v', u, v) or (u', v', u, v))
     * 
     * 
@@ -132,7 +131,7 @@ class ICalibrationParametersDerivatives {
     * @brief Derivatives for additional local parameters to be fitted
     * in global calibration algorithms together with with global parameters
     * 
-    * Local parameters are not neccesarily identified by label because their number
+    * Local parameters are not necessarily identified by label because their number
     * is proportional to number of measurements included in calibration
     * (possibly very huge number!)
     * 
@@ -154,5 +153,3 @@ class ICalibrationParametersDerivatives {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ICalibrationParametersDerivatives_h

@@ -28,6 +28,21 @@ FinalTriggerDecisionCalculator::getFinalTriggerDecision(const SoftwareTriggerRes
 
   // Revision 2: filters are called "filter" and "skim". skim does not change the result.
   // if "filter" rejected the event, the event is rejected
+  // Appended new filtering stage: "prefilter" operated before the "filter" stage to reject
+  // background from injection strip, and events with high occupancy.
+
+  // --- Prefilter stage --- //
+  const std::string& prefilterTotalResultName = SoftwareTriggerDBHandler::makeTotalResultName("prefilter");
+
+  auto prefilterTotalResultIterator = results.find(prefilterTotalResultName);
+
+  if (prefilterTotalResultIterator != results.end()) {
+    auto prefilterTotalResult = static_cast<SoftwareTriggerCutResult>(prefilterTotalResultIterator->second);
+    if (prefilterTotalResult == SoftwareTriggerCutResult::c_reject) {
+      return false;
+    }
+  }
+
   const std::string& filterTotalResultName = SoftwareTriggerDBHandler::makeTotalResultName("filter");
 
   auto filterTotalResultIterator = results.find(filterTotalResultName);

@@ -22,7 +22,7 @@ namespace TreeFitter {
     RecoTrack(Belle2::Particle* bc, const ParticleBase* mother) ;
 
     /** destructor */
-    virtual ~RecoTrack() {};
+    virtual ~RecoTrack() override = default;
 
     /**   init with mother particle (replacing initPar2)  */
     virtual ErrCode initParticleWithMother(FitParams& fitparams) override;

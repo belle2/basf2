@@ -12,7 +12,7 @@ using namespace TrackingUtilities;
 
 NamedFloatTuple::~NamedFloatTuple() = default;
 
-std::map<std::string, Float_t> NamedFloatTuple::getNamedValues(std::string prefix) const
+std::map<std::string, Float_t> NamedFloatTuple::getNamedValues(const std::string& prefix) const
 {
   std::map<std::string, Float_t> namedValues;
   size_t nVars = size();

@@ -7,9 +7,11 @@
  **************************************************************************/
 
 #include <tracking/trackingUtilities/eventdata/trajectories/CDCTrajectory3D.h>
+#include <framework/geometry/VectorUtil.h>
 
 #include <genfit/TrackCand.h>
 
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
 
 #include <gtest/gtest.h>
@@ -20,16 +22,16 @@ using namespace TrackingUtilities;
 
 TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory3D_constructorPosMomCharge)
 {
-  Vector3D newMom3D(1.0, 2.0, 1.0);
-  Vector3D newPos3D(1.0, 2.0, 1.0);
+  ROOT::Math::XYZVector newMom3D(1.0, 2.0, 1.0);
+  ROOT::Math::XYZVector newPos3D(1.0, 2.0, 1.0);
   double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
   double bZ = 2.0;
 
   CDCTrajectory3D trajectory(newPos3D, newTime, newMom3D, newChargeSign, bZ);;
 
-  Vector3D mom3D = trajectory.getMom3DAtSupport(bZ);
-  Vector3D pos3D = trajectory.getSupport();
+  ROOT::Math::XYZVector mom3D = trajectory.getMom3DAtSupport(bZ);
+  ROOT::Math::XYZVector pos3D = trajectory.getSupport();
   ESign chargeSign = trajectory.getChargeSign();
 
 
@@ -48,8 +50,8 @@ TEST(TrackingUtilitiesTest, eventdata_trajectories_CDCTrajectory3D_constructorPo
 
 TEST(TrackingUtilitiesTest, CDCTrajectory3D_clear)
 {
-  Vector3D newMom3D(1.0, 2.0, 1.0);
-  Vector3D newPos3D(1.0, 2.0, 1.0);
+  ROOT::Math::XYZVector newMom3D(1.0, 2.0, 1.0);
+  ROOT::Math::XYZVector newPos3D(1.0, 2.0, 1.0);
   double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
 
@@ -80,14 +82,14 @@ TEST(TrackingUtilitiesTest, CDCTrajectory3D_clear)
 
 TEST(TrackingUtilitiesTest, CDCTrajectory3D_GFTrackRoundTrip)
 {
-  Vector3D expectedMomentum(1.0, 0.0, 0.0);
-  Vector3D expectedPosition(0.0, 1.0, 0.0);
+  ROOT::Math::XYZVector expectedMomentum(1.0, 0.0, 0.0);
+  ROOT::Math::XYZVector expectedPosition(0.0, 1.0, 0.0);
   ESign expectedCharge = ESign::c_Plus;
   double bZ = 2;
 
   genfit::TrackCand expectedGFTrackCand;
-  expectedGFTrackCand.setPosMomSeed(expectedPosition,
-                                    expectedMomentum,
+  expectedGFTrackCand.setPosMomSeed(XYZToTVector(expectedPosition),
+                                    XYZToTVector(expectedMomentum),
                                     expectedCharge);
 
   TMatrixDSym expectedCov6(6);
@@ -106,8 +108,8 @@ TEST(TrackingUtilitiesTest, CDCTrajectory3D_GFTrackRoundTrip)
   genfit::TrackCand gfTrackCand;
   trajectory3D.fillInto(gfTrackCand, bZ);
 
-  Vector3D position(gfTrackCand.getPosSeed());
-  Vector3D momentum(gfTrackCand.getMomSeed());
+  ROOT::Math::XYZVector position(gfTrackCand.getPosSeed());
+  ROOT::Math::XYZVector momentum(gfTrackCand.getMomSeed());
   ESign charge = sign(gfTrackCand.getChargeSeed());
   TMatrixDSym cov6 = gfTrackCand.getCovSeed();
 

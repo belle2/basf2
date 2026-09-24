@@ -36,7 +36,7 @@ namespace Belle2 {
     CDCRecoHit(const CDCHit* cdcHit, const genfit::TrackCandHit* trackCandHit);
 
     /** Destructor. */
-    ~CDCRecoHit() {}
+    ~CDCRecoHit() override {}
 
     /** Creating a copy of this hit. */
     CDCRecoHit* clone() const override;

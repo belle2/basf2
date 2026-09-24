@@ -78,11 +78,6 @@ namespace Belle2 {
     addParam("slitZ", m_slitZ, "slit distance to source [cm], if > 0.01, otherwise slit full open", 0.0);
   }
 
-  OpticalGunModule::~OpticalGunModule()
-  {
-    if (m_customDistribution) delete m_customDistribution;
-  }
-
   void OpticalGunModule::initialize()
   {
     // data store objects registration
@@ -122,8 +117,8 @@ namespace Belle2 {
         }
         testPoint += (m_maxAlpha - m_minAlpha) / 100.;
       }
-      m_customDistribution = new TF1("m_customDistribution", m_angularDistribution.c_str(), m_minAlpha * Unit::deg,
-                                     m_maxAlpha * Unit::deg);
+      m_customDistribution = TF1("m_customDistribution", m_angularDistribution.c_str(), m_minAlpha * Unit::deg,
+                                 m_maxAlpha * Unit::deg);
     }
 
     // set other private variables
@@ -264,7 +259,7 @@ namespace Belle2 {
 
   XYZVector OpticalGunModule::getDirectionCustom() const
   {
-    double alpha = m_customDistribution->GetRandom();
+    double alpha = m_customDistribution.GetRandom();
     double phi = 2.0 * M_PI * gRandom->Rndm();
     return XYZVector(cos(phi) * sin(alpha), sin(phi) * sin(alpha), cos(alpha));
   }

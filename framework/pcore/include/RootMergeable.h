@@ -65,7 +65,7 @@ namespace Belle2 {
       gROOT->GetListOfCleanups()->Add(this);
     }
 
-    virtual ~RootMergeable()
+    virtual ~RootMergeable() override
     {
       gROOT->GetListOfCleanups()->Remove(this);
       delete m_wrapped;

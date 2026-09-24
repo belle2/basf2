@@ -25,8 +25,8 @@ b2file-mix -n 10000 --exclude ROIs --keep-eventinfo -o ${INPUT_FILE} ${VALIDATIO
 
 # Run the HLT script
 ${PARENT} basf2 ${PROCESSES} \
-    ${BELLE2_RELEASE_DIR}/hlt/operation/ringbuffer/hlt/beam_reco_monitor.py -- \
-    UNUSED UNUSED 6666 \
+    ${BELLE2_RELEASE_DIR}/hlt/operation/zmqbasf2/hlt/beam_reco_monitor.py -- \
+    --input UNUSED --output UNUSED --dqm 6666 \
     --input-file ${INPUT_FILE} \
     --output-file ${OUTPUT_ROOT_DIR}/beam_reco_monitor-hlt-out.root \
     --histo-output-file ${OUTPUT_ROOT_DIR}/beam_reco_monitor-hlt-dqm.root \

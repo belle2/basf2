@@ -53,7 +53,7 @@ TBranch: nROE_Charged__bo__bc, 2
 TBranch: nROE_Photons__bo__bc, 10
 TBranch: nROE_NeutralHadrons__bo__bc, 4
 TFile: KlongDecayReconstructionExample.root
-TTree: tree
+TTree: B0
 TBranch: __experiment__, 0
 TBranch: __run__, 0
 TBranch: __event__, 2

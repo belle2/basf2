@@ -65,8 +65,8 @@ void SVDClusterQualityEstimatorCalibrationModule::initialize()
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto& ladders : geo.getLadders(layers)) {
-      for (auto& sensors : geo.getSensors(ladders)) {
+    for (const auto& ladders : geo.getLadders(layers)) {
+      for (const auto& sensors : geo.getSensors(ladders)) {
 
         for (int side = 0; side <= 1; side++) {
           for (int size = 1; size <= m_maxClusterSize; size++) {
@@ -142,8 +142,8 @@ void SVDClusterQualityEstimatorCalibrationModule::terminate()
 
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   for (auto& layers : geo.getLayers(VXD::SensorInfoBase::SVD)) {
-    for (auto& ladders : geo.getLadders(layers)) {
-      for (auto& sensors : geo.getSensors(ladders)) {
+    for (const auto& ladders : geo.getLadders(layers)) {
+      for (const auto& sensors : geo.getSensors(ladders)) {
         for (int side = 0; side <= 1; side++) {
           for (int size = 1; size <= m_maxClusterSize; size++) {
             std::string sensorName;

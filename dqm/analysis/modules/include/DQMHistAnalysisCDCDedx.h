@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <boost/format.hpp>
 #include <TROOT.h>
 
 #include <TLine.h>
@@ -44,6 +43,8 @@ namespace Belle2 {
     * constructor
     */
     DQMHistAnalysisCDCDedxModule();
+
+  private:
 
     /**
     * init function for default values
@@ -135,13 +136,13 @@ namespace Belle2 {
     * function to add text style
     * @param obj pavetext variable
     */
-    void setTextStyle(TPaveText* obj);
+    static void setTextStyle(TPaveText* obj);
 
     /**
     * function to set the style of histogram
     * @param obj histogram
     */
-    void setHistStyle(TH1* obj);
+    static void setHistStyle(TH1* obj);
 
     /**
     * function to reset pad margins
@@ -150,15 +151,13 @@ namespace Belle2 {
     * @param t top
     * @param b bottom
     */
-    void setPadStyle(double l, double r, double t, double b);
+    static void setPadStyle(double l, double r, double t, double b);
 
     /**
     * function to set the bhabha event info
     * @param pt pavetext variable
     */
     void setBEvtInfo(TPaveText* pt);
-
-  private:
 
     std::string m_iexprun{""}; /**<  info of exp/run */
     std::string m_status{""}; /**<  fit status */

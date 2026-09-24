@@ -79,17 +79,13 @@ void LowEnergyPi0VetoExpertModule::beginRun()
   }
 }
 
-void LowEnergyPi0VetoExpertModule::endRun()
-{
-}
-
 void LowEnergyPi0VetoExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
   weightfile.addSignalFraction(0.5);
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
+  m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;
   /* The number of input variables depends on the experiment. */
@@ -108,7 +104,7 @@ float LowEnergyPi0VetoExpertModule::getMaximumVeto(const Particle* gamma1,
   float maxVeto = 0;
   int n = m_ListGamma->getListSize();
   for (int i = 0; i < n; ++i) {
-    Particle* gamma2 = m_ListGamma->getParticle(i);
+    const Particle* gamma2 = m_ListGamma->getParticle(i);
     if (gamma1 == gamma2)
       continue;
     if (pi0Gamma != nullptr) {

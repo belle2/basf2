@@ -48,7 +48,7 @@ namespace Belle2 {
       StoreArray<PXDDigit> m_storeDigits;
 
       /** Utility function to check pixel coordinates */
-      inline bool goodHit(const PXDRawHit* const rawhit) const
+      static inline bool goodHit(const PXDRawHit* const rawhit)
       {
         short u = rawhit->getColumn();
         bool goodU = (u == std::min(std::max(u, short(0)), short(249)));

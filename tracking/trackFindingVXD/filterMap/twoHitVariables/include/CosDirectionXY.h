@@ -24,6 +24,7 @@ namespace Belle2 {
     PUT_NAME_FUNCTION(COSDIRECTIONXY_NAME);
 
     /** calculates the distance between the hits in z (1D), returning unit: cm */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static double value(const PointType& outerHit, const PointType& innerHit)
     {
       double result = (outerHit.X() * innerHit.X() + outerHit.Y() * innerHit.Y());

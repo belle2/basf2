@@ -37,11 +37,6 @@ namespace Belle2 {
   private:
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisTRGModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

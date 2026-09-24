@@ -337,6 +337,12 @@ namespace Belle2 {
     Manager::FunctionPtr atan(const std::vector<std::string>& arguments);
 
     /**
+     * Returns function which returns the atan2 value (variable y / variable x).
+     * First argument in the argument vector must be the name of variable for y, second argument for x.
+     */
+    Manager::FunctionPtr atan2(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the exponential value of a variable of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -526,6 +532,11 @@ namespace Belle2 {
      * Returns variable of particle's gen-level ancestor of given type
      */
     Manager::FunctionPtr varForFirstMCAncestorOfType(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns variable for nth daughter of given type
+     */
+    Manager::FunctionPtr varForNthDaughterOfType(const std::vector<std::string>& arguments);
 
     /**
      * return number of TrackFitResults for a given particleTyle

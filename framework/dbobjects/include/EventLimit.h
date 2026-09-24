@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
 
     /** Constructor. */
-    EventLimit(long event = -1) : m_event_limit(event) {}
+    explicit EventLimit(long event = -1) : m_event_limit(event) {}
 
     /** Destructor. */
     ~EventLimit() {}

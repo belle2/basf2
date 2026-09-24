@@ -34,6 +34,7 @@ settings = ValidationSettings(name='KLM time',
                                   "UpperTimeBoundaryScintillatorsBKLM": -4600.0,
                                   "LowerTimeBoundaryScintillatorsEKLM": -4850.0,
                                   "UpperTimeBoundaryScintillatorsEKLM": -4600.0,
+                                  "UpperSigmaAxisEventT0": 20.0,
                               })
 
 # Avoid looking for the release globaltag
@@ -58,6 +59,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     UpperTimeBoundaryScintillatorsBKLM = expert_config['UpperTimeBoundaryScintillatorsBKLM']
     LowerTimeBoundaryScintillatorsEKLM = expert_config['LowerTimeBoundaryScintillatorsEKLM']
     UpperTimeBoundaryScintillatorsEKLM = expert_config['UpperTimeBoundaryScintillatorsEKLM']
+    UpperSigmaAxisEventT0 = expert_config['UpperSigmaAxisEventT0']
 
     # Ignore the ROOT command line options.
     ROOT.PyConfig.IgnoreCommandLineOptions = True  # noqa
@@ -71,11 +73,13 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # Path to the database.txt file.
     database_file = os.path.join(f'{job_path}', 'KLMTime', 'outputdb', 'database.txt')
 
-    # Check the list of runs from the file database.txt for both payloads.
+    # Check the list of runs from the file database.txt for all payloads.
     exp_run_dict_cabledelay = {}
     exp_run_dict_constants = {}
+    exp_run_dict_resolution = {}
     previous_exp_cabledelay = -666
     previous_exp_constants = -666
+    previous_exp_resolution = -666
 
     with open(database_file) as f:
         for line in f:
@@ -98,6 +102,15 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                     previous_exp_constants = exp
                 else:
                     exp_run_dict_constants[exp].append(run)
+            elif fields[0] == 'dbstore/KLMEventT0HitResolution':
+                iov = fields[2].split(',')
+                exp = int(iov[0])
+                run = int(iov[1])
+                if exp != previous_exp_resolution:
+                    exp_run_dict_resolution[exp] = [run]
+                    previous_exp_resolution = exp
+                else:
+                    exp_run_dict_resolution[exp].append(run)
 
     # Tweak the IoV range if the first run is 0.
     # This is needed for display purposes.
@@ -108,6 +121,12 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
                 run_list[0] = run_list[1] - 5
 
     for exp, run_list in exp_run_dict_constants.items():
+        run_list.sort()
+        if len(run_list) > 1:
+            if run_list[0] == 0 and run_list[1] > 5:
+                run_list[0] = run_list[1] - 5
+
+    for exp, run_list in exp_run_dict_resolution.items():
         run_list.sort()
         if len(run_list) > 1:
             if run_list[0] == 0 and run_list[1] > 5:
@@ -132,6 +151,16 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
             basf2.B2INFO(f'Creating time constants results tree for experiment {exp}, run {run}.')
             checker.setTimeConstantsResultsFile(f'time_constants_exp{exp}_run{run}.root')
             checker.checkTimeConstants()
+
+    # Run the KLMCalibrationChecker class for EventT0 hit resolution.
+    for exp, run_list in exp_run_dict_resolution.items():
+        for run in run_list:
+            checker = KLMCalibrationChecker()
+            checker.setExperimentRun(exp, run)
+            checker.setTestingPayload(database_file)
+            basf2.B2INFO(f'Creating EventT0 hit resolution results tree for experiment {exp}, run {run}.')
+            checker.setEventT0HitResolutionResultsFile(f'eventT0HitResolution_exp{exp}_run{run}.root')
+            checker.checkEventT0HitResolution()
 
     # Run the validation for cable delay.
     for exp, run_list in exp_run_dict_cabledelay.items():
@@ -167,22 +196,22 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
         tree = input_file.Get("cabledelay")
         assert isinstance(tree, ROOT.TTree) == 1
-        myC = TCanvas("myC")
+        myC_cd = TCanvas("myC_cd")
 
         tree.Draw("timeDelay>>barrel_RPC", "subdetector==1 & layer>=3")
         barrel_RPC.GetXaxis().SetTitle("T_{cable} (ns)")
         barrel_RPC.GetYaxis().SetTitle("Entries")
-        myC.Print("barrel_RPC.png")
+        myC_cd.Print("barrel_RPC.png")
 
         tree.Draw("timeDelay>>barrel_scintillator", "subdetector==1 & layer<3")
         barrel_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
         barrel_scintillator.GetYaxis().SetTitle("Entries")
-        myC.Print("barrel_scintillator.png")
+        myC_cd.Print("barrel_scintillator.png")
 
         tree.Draw("timeDelay>>endcap_scintillator", "subdetector==2")
         endcap_scintillator.GetXaxis().SetTitle("T_{cable} (ns)")
         endcap_scintillator.GetYaxis().SetTitle("Entries")
-        myC.Print("endcap_scintillator.png")
+        myC_cd.Print("endcap_scintillator.png")
 
         # Write out histograms
         fout = TFile("KLMTimeCableDelay.root", "recreate")
@@ -235,33 +264,116 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
         tree = input_file.Get("constants")
         assert isinstance(tree, ROOT.TTree) == 1
-        myC = TCanvas("myC")
+        myC_const = TCanvas("myC_const")
 
         tree.Draw("delayRPCPhi:channelNumber>>barrel_RPCPhi", "subdetector==1 & layer>=3", "colz")
         barrel_RPCPhi.GetXaxis().SetTitle("Channel number")
         barrel_RPCPhi.GetYaxis().SetTitle("Time Delay constants")
-        myC.Print("barrel_RPCPhi.png")
+        myC_const.Print("barrel_RPCPhi.png")
 
         tree.Draw("delayRPCZ:channelNumber>>barrel_RPCZ", "subdetector==1 & layer>=3", "colz")
         barrel_RPCZ.GetXaxis().SetTitle("Channel number")
         barrel_RPCZ.GetYaxis().SetTitle("Time Delay constants")
-        myC.Print("barrel_RPCZ.png")
+        myC_const.Print("barrel_RPCZ.png")
 
         tree.Draw("delayBKLM:channelNumber>>barrel_scintillator_constants", "subdetector==1 & layer<3", "colz")
         barrel_scintillator_constants.GetXaxis().SetTitle("Channel number")
         barrel_scintillator_constants.GetYaxis().SetTitle("Time Delay constants")
-        myC.Print("barrel_scintillator_constants.png")
+        myC_const.Print("barrel_scintillator_constants.png")
 
         tree.Draw("delayEKLM:channelNumber>>endcap_scintillator_constants", "subdetector==2", "colz")
         endcap_scintillator_constants.GetXaxis().SetTitle("Channel number")
         endcap_scintillator_constants.GetYaxis().SetTitle("Time Delay constants")
-        myC.Print("endcap_scintillator_constants.png")
+        myC_const.Print("endcap_scintillator_constants.png")
 
         fout = TFile("KLMTimeConstants.root", "recreate")
         barrel_RPCPhi.Write()
         barrel_RPCZ.Write()
         barrel_scintillator_constants.Write()
         endcap_scintillator_constants.Write()
+        input_file.Close()
+        fout.Close()
+
+        # Delete the chunk files
+        for chunk_file in chunk_files:
+            try:
+                os.remove(chunk_file)
+            except OSError as e:
+                basf2.B2ERROR(f'The file {chunk_file} can not be removed: {e.strerror}')
+
+    # Run the validation for EventT0 hit resolution.
+    # Category enum (must match KLMEventT0HitResolution::Category):
+    #   1 = EKLM Scint, 2 = BKLM Scint, 3 = RPC combined, 4 = RPC Phi, 5 = RPC Z
+    category_labels = {1: "EKLM Scint", 2: "BKLM Scint", 3: "RPC combined", 4: "RPC Phi", 5: "RPC Z"}
+    category_order = [2, 4, 5, 3, 1]  # BKLM Scint, RPC Phi, RPC Z, RPC comb, EKLM Scint
+
+    for exp, run_list in exp_run_dict_resolution.items():
+        # For each experiment, merge the files in chunks of some runs.
+        chunks = math.ceil(len(run_list) / chunk_size)
+        chunk_files = []
+        for chunk in range(chunks):
+            file_name = f'eventT0HitResolution_exp{exp}_chunk{chunk}.root'
+            run_files = [
+                f'eventT0HitResolution_exp{exp}_run{run}.root' for run in run_list[chunk * chunk_size:(chunk + 1) * chunk_size]]
+            subprocess.run(['hadd', '-f', file_name] + run_files, check=True)
+            chunk_files.append(file_name)
+
+            # Let's delete the files for single IoVs.
+            for run_file in run_files:
+                try:
+                    os.remove(run_file)
+                except OSError as e:
+                    basf2.B2ERROR(f'The file {run_file} can not be removed: {e.strerror}')
+
+        # Now merge all chunks into one final file for plotting
+        final_file_name = f'eventT0HitResolution_exp{exp}_all.root'
+        subprocess.run(['hadd', '-f', final_file_name] + chunk_files, check=True)
+        input_file = ROOT.TFile(final_file_name)
+
+        gStyle.SetOptStat(0)
+
+        tree = input_file.Get("eventT0HitResolution")
+        assert isinstance(tree, ROOT.TTree) == 1
+
+        # Mean sigma per category (across runs), with stat error on the mean.
+        nCats = len(category_order)
+        hSigma = TH1F("eventT0_sigma_per_category",
+                      f"KLM EventT0 hit resolution (exp {exp});Detector;#sigma_{{t}} (ns)",
+                      nCats, 0, nCats)
+
+        for iBin, cat in enumerate(category_order, start=1):
+            sumS = 0.0
+            sumS2 = 0.0
+            n = 0
+            for entry in tree:
+                if int(entry.category) == cat:
+                    sumS += entry.sigma
+                    sumS2 += entry.sigma * entry.sigma
+                    n += 1
+            if n > 0:
+                mean = sumS / n
+                var = max(sumS2 / n - mean * mean, 0.0)
+                stderr = (var ** 0.5) / (n ** 0.5) if n > 1 else 0.0
+            else:
+                mean = 0.0
+                stderr = 0.0
+            hSigma.SetBinContent(iBin, mean)
+            hSigma.SetBinError(iBin, stderr)
+            hSigma.GetXaxis().SetBinLabel(iBin, category_labels[cat])
+
+        hSigma.SetMinimum(0.0)
+        hSigma.SetMaximum(UpperSigmaAxisEventT0)
+        hSigma.SetMarkerStyle(20)
+        hSigma.SetMarkerSize(1.2)
+        hSigma.SetLineWidth(2)
+
+        myC_evt = TCanvas("myC_evt", "", 800, 600)
+        hSigma.Draw("E1P")
+        myC_evt.Print(f"eventT0HitResolution_exp{exp}.png")
+
+        # Write out histogram
+        fout = TFile("KLMEventT0HitResolution.root", "recreate")
+        hSigma.Write()
         input_file.Close()
         fout.Close()
 

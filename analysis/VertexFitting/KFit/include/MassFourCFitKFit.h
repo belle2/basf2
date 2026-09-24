@@ -30,11 +30,9 @@ namespace Belle2 {
       /** Construct an object with no argument. */
       MassFourCFitKFit();
       /** Destruct the object. */
-      ~MassFourCFitKFit(void);
-
+      ~MassFourCFitKFit(void) override;
 
     public:
-
 
       /** Set an invariant mass of daughter particle for the mass-four-momentum-constraint fit.
        * @param m invariant mass
@@ -87,8 +85,6 @@ namespace Belle2 {
        * @return error code (zero if success)
        */
       enum KFitError::ECode       setTrackZeroVertexError(void);
-      enum KFitError::ECode       setCorrelation(const CLHEP::HepMatrix& m) override;
-      enum KFitError::ECode       setZeroCorrelation(void) override;
 
 
       /** Get a vertex position.

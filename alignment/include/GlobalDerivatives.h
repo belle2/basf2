@@ -46,7 +46,7 @@ namespace Belle2 {
       /// Add one parameter - label and the corresponding residual derivative
       /// @param paramLabel label of the global parameter to calibrate
       /// @param dResiduals_dParam vector od derivatives of local residual (U, v) versus global parameter
-      void add(int paramLabel, std::vector<double> dResiduals_dParam);
+      void add(int paramLabel, const std::vector<double>& dResiduals_dParam);
       /// Add derivative of local U residual w.r.t. global parameter
       /// Global derivative versus V residual is set to zero.
       /// For (u, v) measurement use add(p, {dru/dp, drv/dp}.

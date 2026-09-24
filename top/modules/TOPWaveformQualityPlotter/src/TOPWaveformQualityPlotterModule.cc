@@ -14,9 +14,8 @@
 #include <utility>
 
 //ROOT
-#include "TDirectory.h"
-#include "TCanvas.h"
-#include "TGraphErrors.h"
+#include <TCanvas.h>
+#include <TGraphErrors.h>
 
 using namespace std;
 
@@ -89,9 +88,9 @@ namespace Belle2 {
     m_moduleID->Fill(v.getModuleID());
     m_pixelID->Fill(v.getPixelID());
 
-    if (m_hitmap.find(scrodid) == m_hitmap.end()) {
-      m_hitmap[scrodid] = new TH2F((string("scrod ") + to_string(scrodid) + string("Hitmap")).c_str(),
-                                   (string("scrod ") + to_string(scrodid) + string("carrier vs. asic;asic;carrier")).c_str(), 4, 0, 4, 4, 0, 4);
+    if (not m_hitmap[scrodid]) {
+      m_hitmap[scrodid] = new TH2F((string("scrod_") + to_string(scrodid) + string("Hitmap")).c_str(),
+                                   (string("scrod ") + to_string(scrodid) + string(" carrier vs. asic;asic;carrier")).c_str(), 4, 0, 4, 4, 0, 4);
     }
     m_hitmap[scrodid]->Fill(asicid, carrierid);
     const vector<short>& waveform = v.getWaveform();

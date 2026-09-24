@@ -118,7 +118,7 @@ namespace Belle2 {
     }
 
     /** write csv header to the given stream */
-    void csv_header(std::ostream& output) const;
+    static void csv_header(std::ostream& output);
     /** write data to the given stream in csv format */
     void csv(std::ostream& output) const;
 

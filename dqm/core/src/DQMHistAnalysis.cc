@@ -117,17 +117,10 @@ bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::s
 
 TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
 {
-  std::string fullname;
-  if (dirname.size() > 0) {
-    fullname = dirname + "/" + histname;
-  } else {
-    fullname = histname;
-  }
-  return getDelta(fullname, n, onlyIfUpdated);
-}
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool onlyIfUpdated)
-{
   auto it = s_deltaList.find(fullname);
   if (it != s_deltaList.end()) {
     return it->second.getDelta(n, onlyIfUpdated);
@@ -157,26 +150,23 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findHist(const std::string& histname, bool was_updated)
+
+TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool was_updated)
 {
-  if (s_histList.find(histname) != s_histList.end()) {
-    if (was_updated && !s_histList[histname].isUpdated()) return nullptr;
-    if (s_histList[histname].getHist()) {
-      return s_histList[histname].getHist();
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
+
+  if (s_histList.find(fullname) != s_histList.end()) {
+    if (was_updated && !s_histList[fullname].isUpdated()) return nullptr;
+    if (s_histList[fullname].getHist()) {
+      return s_histList[fullname].getHist();
     } else {
-      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
+      B2ERROR("Histogram " << fullname << " in histogram list but nullptr.");
     }
   }
-  B2INFO("Histogram " << histname << " not in list.");
+  B2INFO("Histogram " << fullname << " not in list.");
   return nullptr;
-}
-
-TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool updated)
-{
-  if (dirname.size() > 0) {
-    return findHist(dirname + "/" + histname, updated);
-  }
-  return findHist(histname, updated);
 }
 
 TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref)
@@ -205,24 +195,20 @@ TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist,
   return ref;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling scaling, const TH1* hist)
-{
-  if (s_refList.find(histname) != s_refList.end()) {
-    // get a copy of the reference which we can modify
-    // (it is still owned and managed by the framework)
-    // then do the scaling
-    return scaleReference(scaling, hist, s_refList[histname].getReference());
-  }
-  return nullptr;
-}
-
 TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, ERefScaling scaling,
                                         const TH1* hist)
 {
-  if (dirname.size() > 0) {
-    return findRefHist(dirname + "/" + histname, scaling, hist);
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
+
+  if (s_refList.find(fullname) != s_refList.end()) {
+    // get a copy of the reference which we can modify
+    // (it is still owned and managed by the framework)
+    // then do the scaling
+    return scaleReference(scaling, hist, s_refList[fullname].getReference());
   }
-  return findRefHist(histname, scaling, hist);
+  return nullptr;
 }
 
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
@@ -290,7 +276,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
   return nullptr;
 }
 
-double DQMHistAnalysisModule::getSigma68(TH1* h) const
+double DQMHistAnalysisModule::getSigma68(TH1* h)
 {
   double probs[2] = {0.16, 1 - 0.16};
   double quant[2] = {0, 0};
@@ -315,7 +301,7 @@ void DQMHistAnalysisModule::clearCanvases(void)
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
       cnv->Clear();
-      colorizeCanvas(cnv, c_StatusDefault);
+      DQMHistAnalysisModule::colorizeCanvas(cnv, c_StatusDefault);
     }
   }
 }
@@ -351,7 +337,7 @@ void DQMHistAnalysisModule::resetDeltaList(void)
   }
 }
 
-void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
+void DQMHistAnalysisModule::UpdateCanvas(const std::string& name, bool updated)
 {
   s_canvasUpdatedList[name] = updated;
 }
@@ -385,17 +371,18 @@ void DQMHistAnalysisModule::ExtractNEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerExternalEpicsPV(const std::string& pvname, const std::string& keyname)
 {
   return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
 }
 
-int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(const std::string& prefix, const std::string& pvname,
+                                                     const std::string& keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -422,7 +409,7 @@ int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::st
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, double value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -434,7 +421,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
+void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -446,7 +433,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string value)
+void DQMHistAnalysisModule::setEpicsStringPV(const std::string& keyname, const std::string& value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -488,7 +475,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
 #endif
 }
 
-void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
+void DQMHistAnalysisModule::setEpicsStringPV(int index, const std::string& value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
 #ifdef _BELLE2_EPICS
@@ -503,7 +490,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
 #endif
 }
 
-double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
+double DQMHistAnalysisModule::getEpicsPV(const std::string& keyname)
 {
   double value{NAN};
   if (!m_useEpics) return value;
@@ -549,7 +536,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   return NAN;
 }
 
-std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
+std::string DQMHistAnalysisModule::getEpicsStringPV(const std::string& keyname, bool& status)
 {
   status = false;
   char value[40] = "";
@@ -599,7 +586,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
   return std::string(value);
 }
 
-chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
+chid DQMHistAnalysisModule::getEpicsPVChID(const std::string& keyname)
 {
 #ifdef _BELLE2_EPICS
   if (m_useEpics) {
@@ -654,8 +641,8 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
 #endif
 }
 
-bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(std::string name, double& lowerAlarm, double& lowerWarn, double& upperWarn,
-                                                      double& upperAlarm)
+bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(const std::string& name, double& lowerAlarm, double& lowerWarn,
+                                                      double& upperWarn, double& upperAlarm)
 {
   return requestLimitsFromEpicsPVs(getEpicsPVChID(name), lowerAlarm, lowerWarn, upperWarn, upperAlarm);
 }
@@ -749,7 +736,7 @@ DQMHistAnalysisModule::EStatusColor DQMHistAnalysisModule::getStatusColor(EStatu
 void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 {
   if (!canvas) return;
-  auto color = getStatusColor(stat);
+  auto color = DQMHistAnalysisModule::getStatusColor(stat);
 
   canvas->Pad()->SetFillColor(color);
 
@@ -763,7 +750,7 @@ void DQMHistAnalysisModule::checkPVStatus(void)
 {
   B2INFO("Check PV Connections");
 
-  for (auto& it : m_epicsChID) {
+  for (const auto& it : m_epicsChID) {
     printPVStatus(it);
   }
   B2INFO("Check PVs done");

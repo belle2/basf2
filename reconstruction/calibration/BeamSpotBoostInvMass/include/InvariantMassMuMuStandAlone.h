@@ -61,7 +61,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     @return A tuple containing vector with invariant mass, vector with invariant mass stat. error and a spread of the invariant mass
   */
   std::tuple<std::vector<Eigen::VectorXd>, std::vector<Eigen::MatrixXd>, Eigen::MatrixXd>  runMuMuInvariantMassAnalysis(
-    std::vector<Event> evts,
+    const std::vector<Event>& evts,
     const std::vector<double>& splitPoints);
 
 

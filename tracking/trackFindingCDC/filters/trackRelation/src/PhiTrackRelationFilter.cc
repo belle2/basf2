@@ -35,8 +35,8 @@ Weight PhiTrackRelationFilter::operator()(const CDCTrack& fromTrack, const CDCTr
     return NAN;
   }
 
-  const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
-  const double rhsPhi = toTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().phi();
+  const double lhsPhi = fromTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().Phi();
+  const double rhsPhi = toTrack.getStartTrajectory3D().getFlightDirection3DAtSupport().Phi();
 
   const double phiDistance = std::fabs(AngleUtil::normalised(lhsPhi - rhsPhi));
 

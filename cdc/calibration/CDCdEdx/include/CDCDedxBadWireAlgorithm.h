@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDedxBadWireAlgorithm() {}
+    virtual ~CDCDedxBadWireAlgorithm() override {}
 
     /**
     * function to enable plotting
@@ -64,8 +64,8 @@ namespace Belle2 {
     void setMeanThres(double value) {m_meanThres = value;}
 
     /**
-     * function to choose adc or dedx as variable
-     */
+    * function to choose adc or dedx as variable
+    */
     void setADC(bool value = false)
     {
       m_isADC = value;
@@ -89,39 +89,39 @@ namespace Belle2 {
     void getExpRunInfo();
 
     /**
-      * function to draw per wire plots
-      */
+    * function to draw per wire plots
+    */
     void plotWireDist(const std::vector<double>& inwires, std::map<int, std::vector<double>>& vhitvar);
 
     /**
-     * function to print canvas
-     */
+    * function to print canvas
+    */
     void printCanvas(TList* list, TList* hflist, Color_t color);
 
     /**
-     * function to plot wire status map (all, bad and dead)
-     */
+    * function to plot wire status map (all, bad and dead)
+    */
     void plotBadWireMap(const std::vector<double>& vbadwires, const std::vector<double>& vdeadwires);
 
     /**
-     * function to get wire map with input file (all, bad and dead)
-     */
+    * function to get wire map with input file (all, bad and dead)
+    */
     TH2F* getHistoPattern(const std::vector<double>& inwires, const std::string& suffix, int& total);
 
     /**
-     * function to plot the QA (decision) parameters
-     */
+    * function to plot the QA (decision) parameters
+    */
     void plotQaPars(std::map<int, std::vector<double>>& qapars);
 
     /**
-     * function to draw the stats
-     */
+    * function to draw the stats
+    */
     void plotEventStats();
 
     /**
-     * function to change text styles
-     */
-    void setTextCosmetics(TPaveText* pt, double size)
+    * function to change text styles
+    */
+    static void setTextCosmetics(TPaveText* pt, double size)
     {
       pt->SetTextAlign(11);
       pt->SetFillStyle(3001);
@@ -131,9 +131,9 @@ namespace Belle2 {
     }
 
     /**
-     * function to change histogram styles
-     */
-    void setHistCosmetics(TH2F* hist, Color_t color)
+    * function to change histogram styles
+    */
+    static void setHistCosmetics(TH2F* hist, Color_t color)
     {
       hist->SetMarkerStyle(20);
       hist->SetMarkerSize(0.3);
@@ -145,8 +145,8 @@ namespace Belle2 {
   protected:
 
     /**
-     * cdcdedx badwire algorithm
-     */
+    * cdcdedx badwire algorithm
+    */
     virtual EResult calibrate() override;
 
   private:
@@ -162,11 +162,18 @@ namespace Belle2 {
     double m_meanThres; /**< mean Threshold accepted for good wire */
     double m_rmsThres; /**< rms Threshold accepted for good wire */
     double m_fracThres; /**< high-frac Threshold accepted for good wire */
-    double m_amean; /**< average mean of dedx for all wires */
-    double m_arms; /**< average rms of dedx for all wires */
+
+    double m_amean_IL = 0.0; /**< average mean of dedx for inner wires */
+    double m_arms_IL = 0.0; /**< average rms of dedx for inner wires */
+    double m_amean_OL = 0.0; /**< average mean of dedx for outer wires */
+    double m_arms_OL = 0.0; /**< average rms of dedx for outer wires */
 
     std::string m_varName; /**< std::string to set var name (adc or dedx) */
     std::string m_suffix; /**< suffix std::string for naming plots */
+
+    int m_exp = 0;   /**< exp no to set SL boundaries */
+
+    int m_slWireBoundary = 0; /**< Boundary between inner layers: SL0 (<40), SL0+SL1 (>=40) */
 
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Badwire DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wiregain DB object */

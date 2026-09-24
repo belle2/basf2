@@ -16,7 +16,9 @@
 #include <tracking/trackingUtilities/geometry/HelixParameters.h>
 #include <tracking/trackingUtilities/geometry/PerigeeParameters.h>
 #include <tracking/trackingUtilities/geometry/SZParameters.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
 
 #include <cstddef>
 #include <iosfwd>
@@ -24,7 +26,6 @@
 namespace Belle2 {
 
   namespace TrackingUtilities {
-    class Vector3D;
 
     /// A general helix class including a covariance matrix.
     class UncertainHelix {
@@ -67,7 +68,7 @@ namespace Belle2 {
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance
       /// matrix.
       UncertainHelix(const double curvature,
-                     const Vector2D& phi0Vec,
+                     const ROOT::Math::XYVector& phi0Vec,
                      const double impact,
                      const double tanLambda,
                      const double z0,
@@ -308,7 +309,7 @@ namespace Belle2 {
     public:
       /// Moves the coordinate system by the vector by and calculates the new perigee and its
       /// covariance matrix. Change is inplace.
-      void passiveMoveBy(const Vector3D& by)
+      void passiveMoveBy(const ROOT::Math::XYZVector& by)
       {
         // Move the covariance matrix first to have access to the original parameters
         HelixJacobian jacobian = m_helix.passiveMoveByJacobian(by);
@@ -323,7 +324,7 @@ namespace Belle2 {
       double shiftPeriod(int nPeriods)
       {
         double arcLength2D = m_helix.shiftPeriod(nPeriods);
-        SZJacobian szJacobian = m_helix.szLine().passiveMoveByJacobian(Vector2D(arcLength2D, 0));
+        SZJacobian szJacobian = m_helix.szLine().passiveMoveByJacobian(ROOT::Math::XYVector(arcLength2D, 0));
         PerigeeJacobian perigeeJacobian = PerigeeUtil::identity();
         HelixJacobian jacobian = HelixUtil::stackBlocks(perigeeJacobian, szJacobian);
         HelixUtil::transport(jacobian, m_helixCovariance);

@@ -69,12 +69,12 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   // call the calibration function
   std::unique_ptr<TList> GeneratedList = GenerateNewHistograms(ttreeLambda, ttreeDstar, ttreeGamma, ttreeGeneric);
 
-  TH2F* histoE = (TH2F*) GeneratedList->FindObject("Electron2DHistogramNew");
-  TH2F* histoMu = (TH2F*) GeneratedList->FindObject("Muon2DHistogramNew");
-  TH2F* histoPi = (TH2F*) GeneratedList->FindObject("Pion2DHistogramNew");
-  TH2F* histoK = (TH2F*) GeneratedList->FindObject("Kaon2DHistogramNew");
-  TH2F* histoP = (TH2F*) GeneratedList->FindObject("Proton2DHistogramNew");
-  TH2F* histoDeut = (TH2F*) GeneratedList->FindObject("Deuteron2DHistogramNew");
+  TH2F* histoE = static_cast<TH2F*>(GeneratedList->FindObject("Electron2DHistogramNew"));
+  TH2F* histoMu = static_cast<TH2F*>(GeneratedList->FindObject("Muon2DHistogramNew"));
+  TH2F* histoPi = static_cast<TH2F*>(GeneratedList->FindObject("Pion2DHistogramNew"));
+  TH2F* histoK = static_cast<TH2F*>(GeneratedList->FindObject("Kaon2DHistogramNew"));
+  TH2F* histoP = static_cast<TH2F*>(GeneratedList->FindObject("Proton2DHistogramNew"));
+  TH2F* histoDeut = static_cast<TH2F*>(GeneratedList->FindObject("Deuteron2DHistogramNew"));
 
   std::vector<double> pbins = CreatePBinningScheme();
   TH2F hEmpty("hEmpty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
@@ -298,10 +298,7 @@ TTree* SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselT
       B2FATAL("Lambda: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
-                                                      *LambdaDataset->get());
-
-  TTree* treeLambdaSWeighted = LambdaDatasetSWeighted->GetClonedTree();
+  TTree* treeLambdaSWeighted = LambdaDataset->GetClonedTree();
   treeLambdaSWeighted->SetName("treeLambdaSWeighted");
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
@@ -348,7 +345,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* i
   // produce the 1D profile
   // momentum: for data-MC comparisons
 
-  TH1F* ProtonProfileMomentum = (TH1F*)hLambdaPMomentum->ProfileX("ProtonProfileMomentum");
+  TH1D* ProtonProfileMomentum = static_cast<TH1D*>(hLambdaPMomentum->ProfileX("ProtonProfileMomentum"));
   ProtonProfileMomentum->SetTitle("ProtonProfile");
   ProtonProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   ProtonProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
@@ -356,7 +353,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::LambdaHistogramming(TTree* i
   ProtonProfileMomentum->SetLineColor(kRed);
 
   //beta*gamma: for the fit
-  TH1F* ProtonProfileBetaGamma = (TH1F*)hLambdaPBetaGamma->ProfileX("ProtonProfileBetaGamma");
+  TH1D* ProtonProfileBetaGamma = static_cast<TH1D*>(hLambdaPBetaGamma->ProfileX("ProtonProfileBetaGamma"));
   if (m_CustomProfile) {
     ProtonProfileBetaGamma = PrepareProfile(hLambdaPBetaGamma, "ProtonProfileBetaGamma");
   }
@@ -510,10 +507,7 @@ TTree* SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTr
       B2FATAL("Dstar: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
-                                                     *DstarDataset->get());
-
-  TTree* treeDstarSWeighted = DstarDatasetSWeighted->GetClonedTree();
+  TTree* treeDstarSWeighted = DstarDataset->GetClonedTree();
   treeDstarSWeighted->SetName("treeDstarSWeighted");
 
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
@@ -536,8 +530,8 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
 
   inputTree->Draw("KaonSVDdEdx:KaonSVDdEdxTrackMomentum>>hist_d1_321_truncMomentum", "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
-  TH2F* hDstarPiPart1Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_truncPart1Momentum");
-  TH2F* hDstarPiPart2Momentum = (TH2F*)hDstarPiMomentum->Clone("hist_d1_211_truncPart2Momentum");
+  TH2F* hDstarPiPart1Momentum = static_cast<TH2F*>(hDstarPiMomentum->Clone("hist_d1_211_truncPart1Momentum"));
+  TH2F* hDstarPiPart2Momentum = static_cast<TH2F*>(hDstarPiMomentum->Clone("hist_d1_211_truncPart2Momentum"));
 
   inputTree->Draw("PionDSVDdEdx:PionDSVDdEdxTrackMomentum>>hist_d1_211_truncPart1Momentum", "nSignalDstar_sw * (PionDSVDdEdx>0)",
                   "goff");
@@ -583,8 +577,8 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
   inputTree->Draw(Form("KaonSVDdEdx:KaonSVDdEdxTrackMomentum/%f>>hist_d1_321_truncBetaGamma", m_KaonPDGMass),
                   "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
-  TH2F* hDstarPiPart1BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_truncPart1BetaGamma");
-  TH2F* hDstarPiPart2BetaGamma = (TH2F*)hDstarPiBetaGamma->Clone("hist_d1_211_truncPart2BetaGamma");
+  TH2F* hDstarPiPart1BetaGamma = static_cast<TH2F*>(hDstarPiBetaGamma->Clone("hist_d1_211_truncPart1BetaGamma"));
+  TH2F* hDstarPiPart2BetaGamma = static_cast<TH2F*>(hDstarPiBetaGamma->Clone("hist_d1_211_truncPart2BetaGamma"));
 
   inputTree->Draw(Form("PionDSVDdEdx:PionDSVDdEdxTrackMomentum/%f>>hist_d1_211_truncPart1BetaGamma", m_PionPDGMass),
                   "nSignalDstar_sw * (PionDSVDdEdx>0)",
@@ -599,14 +593,14 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
   // produce the 1D profiles
 
 
-  TH1F* PionProfileMomentum = (TH1F*)hDstarPiMomentum->ProfileX("PionProfileMomentum");
+  TH1D* PionProfileMomentum = static_cast<TH1D*>(hDstarPiMomentum->ProfileX("PionProfileMomentum"));
   PionProfileMomentum->SetTitle("PionProfile");
   PionProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   PionProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
   PionProfileMomentum->GetYaxis()->SetTitle("dE/dx");
   PionProfileMomentum->SetLineColor(kRed);
 
-  TH1F* PionProfileBetaGamma = (TH1F*)hDstarPiBetaGamma->ProfileX("PionProfileBetaGamma");
+  TH1D* PionProfileBetaGamma = static_cast<TH1D*>(hDstarPiBetaGamma->ProfileX("PionProfileBetaGamma"));
   if (m_CustomProfile) {
     PionProfileBetaGamma = PrepareProfile(hDstarPiBetaGamma, "PionProfileBetaGamma");
   }
@@ -617,7 +611,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
   PionProfileBetaGamma->SetLineColor(kRed);
 
 
-  TH1F* KaonProfileMomentum = (TH1F*)hDstarKMomentum->ProfileX("KaonProfileMomentum");
+  TH1D* KaonProfileMomentum = static_cast<TH1D*>(hDstarKMomentum->ProfileX("KaonProfileMomentum"));
   KaonProfileMomentum->SetTitle("KaonProfile");
   KaonProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   KaonProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
@@ -625,7 +619,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::DstarHistogramming(TTree* in
   KaonProfileMomentum->SetLineColor(kRed);
 
 
-  TH1F* KaonProfileBetaGamma = (TH1F*)hDstarKBetaGamma->ProfileX("KaonProfileBetaGamma");
+  TH1D* KaonProfileBetaGamma = static_cast<TH1D*>(hDstarKBetaGamma->ProfileX("KaonProfileBetaGamma"));
   if (m_CustomProfile) {
     KaonProfileBetaGamma = PrepareProfile(hDstarKBetaGamma, "KaonProfileBetaGamma");
   }
@@ -680,8 +674,8 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
   TH2F* hGammaEMomentum = new TH2F("hist_d1_11_truncMomentum", "hist_d1_11_trunc;Momentum [GeV/c];dEdx [arb. units]", m_numPBins,
                                    pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
-  TH2F* hGammaEPart1Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_truncPart1Momentum");
-  TH2F* hGammaEPart2Momentum = (TH2F*)hGammaEMomentum->Clone("hist_d1_11_truncPart2Momentum");
+  TH2F* hGammaEPart1Momentum = static_cast<TH2F*>(hGammaEMomentum->Clone("hist_d1_11_truncPart1Momentum"));
+  TH2F* hGammaEPart2Momentum = static_cast<TH2F*>(hGammaEMomentum->Clone("hist_d1_11_truncPart2Momentum"));
 
   preselTree->Draw("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum>>hist_d1_11_truncPart1Momentum",
                    "FirstElectronSVDdEdx>0 && DIRA>0.995 && dr>1.2", "goff");
@@ -709,8 +703,8 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
                                     m_numBGBins,
                                     binsMinEdgesE,
                                     m_numDEdxBins, 0, m_dedxMaxPossible);
-  TH2F* hGammaEPart1BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_truncPart1BetaGamma");
-  TH2F* hGammaEPart2BetaGamma = (TH2F*)hGammaEBetaGamma->Clone("hist_d1_11_truncPart2BetaGamma");
+  TH2F* hGammaEPart1BetaGamma = static_cast<TH2F*>(hGammaEBetaGamma->Clone("hist_d1_11_truncPart1BetaGamma"));
+  TH2F* hGammaEPart2BetaGamma = static_cast<TH2F*>(hGammaEBetaGamma->Clone("hist_d1_11_truncPart2BetaGamma"));
 
   preselTree->Draw(Form("FirstElectronSVDdEdx:FirstElectronSVDdEdxTrackMomentum/%f>>hist_d1_11_truncPart1BetaGamma",
                         m_ElectronPDGMass),
@@ -723,7 +717,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
 
 
   // produce the 1D profile (for data-MC comparisons)
-  TH1F* ElectronProfileMomentum = (TH1F*)hGammaEMomentum->ProfileX("ElectronProfileMomentum");
+  TH1D* ElectronProfileMomentum = static_cast<TH1D*>(hGammaEMomentum->ProfileX("ElectronProfileMomentum"));
   ElectronProfileMomentum->SetTitle("ElectronProfile");
   ElectronProfileMomentum->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
   ElectronProfileMomentum->GetXaxis()->SetTitle("Momentum, GeV/c");
@@ -731,7 +725,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GammaHistogramming(std::shar
   ElectronProfileMomentum->SetLineColor(kRed);
 
 // beta*gamma profile for the fit
-  TH1F* ElectronProfileBetaGamma = (TH1F*)hGammaEBetaGamma->ProfileX("ElectronProfileBetaGamma");
+  TH1D* ElectronProfileBetaGamma = static_cast<TH1D*>(hGammaEBetaGamma->ProfileX("ElectronProfileBetaGamma"));
   if (m_CustomProfile) {
     ElectronProfileBetaGamma = PrepareProfile(hGammaEBetaGamma, "ElectronProfileBetaGamma");
   }
@@ -769,19 +763,19 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 // run the background subtraction and histogramming parts
   TTree* treeLambda = LambdaMassFit(ttreeLambda);
   std::unique_ptr<TList> HistListLambda = LambdaHistogramming(treeLambda);
-  TH1F* ProtonProfileBetaGamma = (TH1F*) HistListLambda->FindObject("ProtonProfileBetaGamma");
-  TH2F* Proton2DHistogram = (TH2F*) HistListLambda->FindObject("hist_d1_2212_truncMomentum");
+  TH1D* ProtonProfileBetaGamma = static_cast<TH1D*>(HistListLambda->FindObject("ProtonProfileBetaGamma"));
+  TH2F* Proton2DHistogram = static_cast<TH2F*>(HistListLambda->FindObject("hist_d1_2212_truncMomentum"));
 
   TTree* treeDstar = DstarMassFit(ttreeDstar);
   std::unique_ptr<TList> HistListDstar = DstarHistogramming(treeDstar);
-  TH1F* PionProfileBetaGamma = (TH1F*) HistListDstar->FindObject("PionProfileBetaGamma");
-  TH2F* Pion2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_211_truncMomentum");
-  TH1F* KaonProfileBetaGamma = (TH1F*) HistListDstar->FindObject("KaonProfileBetaGamma");
-  TH2F* Kaon2DHistogram = (TH2F*) HistListDstar->FindObject("hist_d1_321_truncMomentum");
+  TH1D* PionProfileBetaGamma = static_cast<TH1D*>(HistListDstar->FindObject("PionProfileBetaGamma"));
+  TH2F* Pion2DHistogram = static_cast<TH2F*>(HistListDstar->FindObject("hist_d1_211_truncMomentum"));
+  TH1D* KaonProfileBetaGamma = static_cast<TH1D*>(HistListDstar->FindObject("KaonProfileBetaGamma"));
+  TH2F* Kaon2DHistogram = static_cast<TH2F*>(HistListDstar->FindObject("hist_d1_321_truncMomentum"));
 
   std::unique_ptr<TList> HistListGamma = GammaHistogramming(ttreeGamma);
-  TH1F* ElectronProfileBetaGamma = (TH1F*) HistListGamma->FindObject("ElectronProfileBetaGamma");
-  TH2F* Electron2DHistogram = (TH2F*) HistListGamma->FindObject("hist_d1_11_truncMomentum");
+  TH1D* ElectronProfileBetaGamma = static_cast<TH1D*>(HistListGamma->FindObject("ElectronProfileBetaGamma"));
+  TH2F* Electron2DHistogram = static_cast<TH2F*>(HistListGamma->FindObject("hist_d1_11_truncMomentum"));
 
   int cred = TColor::GetColor("#e31a1c");
   PionProfileBetaGamma->SetMarkerSize(4);
@@ -829,7 +823,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
     if (PionEdges[i] > borderline) CombinedEdgesVector.push_back(PionEdges[i]);
 
 
-  TH1F* CombinedHistogramPAndPi = new TH1F("CombinedHistogramPAndPi", "histo_for_fit", CombinedEdgesVector.size() - 1,
+  TH1D* CombinedHistogramPAndPi = new TH1D("CombinedHistogramPAndPi", "histo_for_fit", CombinedEdgesVector.size() - 1,
                                            CombinedEdgesVector.data());
 
   int iterator = 1;
@@ -1024,21 +1018,21 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 
   // in case we assume that all hadrons are equal
   if (m_UsePionBGFunctionForEverything) {
-    BetaGammaFunctionKaon = (TF1*) BetaGammaFunctionPion->Clone("BetaGammaFunctionKaon");
-    BetaGammaFunctionProton = (TF1*) BetaGammaFunctionPion->Clone("BetaGammaFunctionProton");
+    BetaGammaFunctionKaon = static_cast<TF1*>(BetaGammaFunctionPion->Clone("BetaGammaFunctionKaon"));
+    BetaGammaFunctionProton = static_cast<TF1*>(BetaGammaFunctionPion->Clone("BetaGammaFunctionProton"));
   }
   if (m_UseProtonBGFunctionForEverything) {
-    BetaGammaFunctionKaon = (TF1*) BetaGammaFunctionProton->Clone("BetaGammaFunctionKaon");
-    BetaGammaFunctionPion = (TF1*) BetaGammaFunctionProton->Clone("BetaGammaFunctionPion");
+    BetaGammaFunctionKaon = static_cast<TF1*>(BetaGammaFunctionProton->Clone("BetaGammaFunctionKaon"));
+    BetaGammaFunctionPion = static_cast<TF1*>(BetaGammaFunctionProton->Clone("BetaGammaFunctionPion"));
   }
 
   // sanity checks: are all fits ok?
   if ((FitResultBetaGammaProton->Status() > 1) || (BetaGammaFunctionProton->Eval(1) < 5.e5)
       || (BetaGammaFunctionProton->Eval(1) > 5.e6)) {
     if (FitResultBetaGammaPion->Status() == 0) {
-      BetaGammaFunctionProton = (TF1*) BetaGammaFunctionPion->Clone("BetaGammaFunctionProton");
+      BetaGammaFunctionProton = static_cast<TF1*>(BetaGammaFunctionPion->Clone("BetaGammaFunctionProton"));
     } else if (FitResultBetaGammaKaon->Status() == 0) {
-      BetaGammaFunctionProton = (TF1*) BetaGammaFunctionKaon->Clone("BetaGammaFunctionProton");
+      BetaGammaFunctionProton = static_cast<TF1*>(BetaGammaFunctionKaon->Clone("BetaGammaFunctionProton"));
     } else {
       B2WARNING("Problem with the beta*gamma fit for protons, reverting to the default values");
       BetaGammaFunctionProton->SetParameters(450258, -10900.8, 1, 0.126797, 1.155, 641907, 86304.5);
@@ -1047,9 +1041,9 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 
   if ((FitResultBetaGammaKaon->Status() > 1) || (BetaGammaFunctionKaon->Eval(1) < 5.e5) || (BetaGammaFunctionKaon->Eval(1) > 5.e6)) {
     if (FitResultBetaGammaProton->Status() == 0) {
-      BetaGammaFunctionKaon = (TF1*) BetaGammaFunctionProton->Clone("BetaGammaFunctionKaon");
+      BetaGammaFunctionKaon = static_cast<TF1*>(BetaGammaFunctionProton->Clone("BetaGammaFunctionKaon"));
     } else if (FitResultBetaGammaPion->Status() == 0) {
-      BetaGammaFunctionKaon = (TF1*) BetaGammaFunctionPion->Clone("BetaGammaFunctionKaon");
+      BetaGammaFunctionKaon = static_cast<TF1*>(BetaGammaFunctionPion->Clone("BetaGammaFunctionKaon"));
     } else {
       B2WARNING("Problem with the beta*gamma fit for kaons, reverting to the default values");
       BetaGammaFunctionKaon->SetParameters(543386, 3013.81, 1, 0.135517, 1.19742, 619509, 15484.4);
@@ -1058,9 +1052,9 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
 
   if ((FitResultBetaGammaPion->Status() > 1) || (BetaGammaFunctionPion->Eval(1) < 5.e5) || (BetaGammaFunctionPion->Eval(1) > 5.e6)) {
     if (FitResultBetaGammaKaon->Status() == 0) {
-      BetaGammaFunctionPion = (TF1*) BetaGammaFunctionKaon->Clone("BetaGammaFunctionPion");
+      BetaGammaFunctionPion = static_cast<TF1*>(BetaGammaFunctionKaon->Clone("BetaGammaFunctionPion"));
     } else if (FitResultBetaGammaProton->Status() == 0) {
-      BetaGammaFunctionPion = (TF1*) BetaGammaFunctionProton->Clone("BetaGammaFunctionPion");
+      BetaGammaFunctionPion = static_cast<TF1*>(BetaGammaFunctionProton->Clone("BetaGammaFunctionPion"));
     } else {
       B2WARNING("Problem with the beta*gamma fit for pions, reverting to the default values");
       BetaGammaFunctionPion->SetParameters(537623, -1937.62, 1, 0.15292, 1.23803, 623678, 30400.9);
@@ -1106,25 +1100,25 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
     ElectronFitPlotFile.Close();
   }
 
-  TF1* MomentumFunctionElectron = (TF1*) BetaGammaFunctionElectron->Clone("MomentumFunctionElectron");
+  TF1* MomentumFunctionElectron = static_cast<TF1*>(BetaGammaFunctionElectron->Clone("MomentumFunctionElectron"));
   MomentumFunctionElectron->SetParameter(2, m_ElectronPDGMass);
   MomentumFunctionElectron->SetRange(0.01, 5.5);
   MomentumFunctionElectron->SetLineColor(kRed);
   MomentumFunctionElectron->SetLineWidth(4);
 
-  TF1* MomentumFunctionPion = (TF1*) BetaGammaFunctionPion->Clone("MomentumFunctionPion");
+  TF1* MomentumFunctionPion = static_cast<TF1*>(BetaGammaFunctionPion->Clone("MomentumFunctionPion"));
   MomentumFunctionPion->SetParameter(2, m_PionPDGMass);
   MomentumFunctionPion->SetRange(0.01, 5.5);
   MomentumFunctionPion->SetLineColor(kRed);
   MomentumFunctionPion->SetLineWidth(4);
 
-  TF1* MomentumFunctionProton = (TF1*) BetaGammaFunctionProton->Clone("MomentumFunctionProton");
+  TF1* MomentumFunctionProton = static_cast<TF1*>(BetaGammaFunctionProton->Clone("MomentumFunctionProton"));
   MomentumFunctionProton->SetParameter(2, m_ProtonPDGMass);
   MomentumFunctionProton->SetRange(0.01, 5.5);
   MomentumFunctionProton->SetLineColor(kRed);
   MomentumFunctionProton->SetLineWidth(4);
 
-  TF1* MomentumFunctionKaon = (TF1*) BetaGammaFunctionKaon->Clone("MomentumFunctionKaon");
+  TF1* MomentumFunctionKaon = static_cast<TF1*>(BetaGammaFunctionKaon->Clone("MomentumFunctionKaon"));
   MomentumFunctionKaon->SetParameter(2, m_KaonPDGMass);
   MomentumFunctionKaon->SetRange(0.01, 5.5);
   MomentumFunctionKaon->SetLineColor(kRed);
@@ -1139,12 +1133,12 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   CanvasOverlays->cd(4); Proton2DHistogram->Draw();  MomentumFunctionProton->Draw("SAME");
   CanvasOverlays->Print("SVDdEdxOverlaysFitsHistos.pdf");
 
-  TF1* MomentumFunctionDeuteron = (TF1*) BetaGammaFunctionProton->Clone("MomentumFunctionDeuteron");
+  TF1* MomentumFunctionDeuteron = static_cast<TF1*>(BetaGammaFunctionProton->Clone("MomentumFunctionDeuteron"));
   MomentumFunctionDeuteron->SetParameter(2, m_DeuteronPDGMass);
   MomentumFunctionDeuteron->SetRange(0.01, 5.5);
   MomentumFunctionDeuteron->SetLineColor(kRed);
 
-  TF1* MomentumFunctionMuon = (TF1*) BetaGammaFunctionPion->Clone("MomentumFunctionMuon");
+  TF1* MomentumFunctionMuon = static_cast<TF1*>(BetaGammaFunctionPion->Clone("MomentumFunctionMuon"));
   MomentumFunctionMuon->SetParameter(2, m_MuonPDGMass);
   MomentumFunctionMuon->SetRange(0.01, 5.5);
   MomentumFunctionMuon->SetLineColor(kRed);
@@ -1240,8 +1234,8 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   B2INFO("resolution for kaons: fit status" << FitResultResolutionKaon->Status());
 
   if ((FitResultResolutionKaon->Status() > 1)
-      && (FitResultResolutionPion->Status() <= 1)) KaonResolutionFunction = (TF1*)
-            PionResolutionFunction->Clone("KaonResolutionFunction");
+      && (FitResultResolutionPion->Status() <= 1)) KaonResolutionFunction = static_cast<TF1*>
+            (PionResolutionFunction->Clone("KaonResolutionFunction"));
 
 
 
@@ -1292,7 +1286,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
                                                  PionResolutionFunction, BiasCorrectionPion);
 
 // sanity check: residual between the generated distribution and the data one
-  TH2F* Pion2DHistogramResidual = (TH2F*) Pion2DHistogram->Clone("Pion2DHistogramResidual");
+  TH2F* Pion2DHistogramResidual = static_cast<TH2F*>(Pion2DHistogram->Clone("Pion2DHistogramResidual"));
   Pion2DHistogramResidual->Add(Pion2DHistogramNew, Pion2DHistogram, 1, -1);
   Pion2DHistogramResidual->SetMinimum(-0.15);
   Pion2DHistogramResidual->SetMaximum(0.15);
@@ -1314,7 +1308,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
   TH2F* Kaon2DHistogramNew = PrepareNewHistogram(Kaon2DHistogram, Form("%sNew", Kaon2DHistogram->GetName()), MomentumFunctionKaon,
                                                  KaonResolutionFunction, BiasCorrectionKaon);
 // residual generated - data for kaons
-  TH2F* Kaon2DHistogramResidual = (TH2F*) Kaon2DHistogram->Clone("Kaon2DHistogramResidual");
+  TH2F* Kaon2DHistogramResidual = static_cast<TH2F*>(Kaon2DHistogram->Clone("Kaon2DHistogramResidual"));
   Kaon2DHistogramResidual->Add(Kaon2DHistogramNew, Kaon2DHistogram, 1, -1);
   Kaon2DHistogramResidual->SetMinimum(-0.15);
   Kaon2DHistogramResidual->SetMaximum(0.15);
@@ -1325,7 +1319,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
                                                    KaonResolutionFunction, BiasCorrectionProton);
 
 // residual for protons
-  TH2F* Proton2DHistogramResidual = (TH2F*) Proton2DHistogram->Clone("Proton2DHistogramResidual");
+  TH2F* Proton2DHistogramResidual = static_cast<TH2F*>(Proton2DHistogram->Clone("Proton2DHistogramResidual"));
   Proton2DHistogramResidual->Add(Proton2DHistogramNew, Proton2DHistogram, 1, -1);
   Proton2DHistogramResidual->SetMinimum(-0.15);
   Proton2DHistogramResidual->SetMaximum(0.15);
@@ -1349,7 +1343,7 @@ std::unique_ptr<TList> SVDdEdxCalibrationAlgorithm::GenerateNewHistograms(std::s
                                                      MomentumFunctionElectron,
                                                      ElectronResolutionFunction, BiasCorrectionElectron);
 
-  TH2F* Electron2DHistogramResidual = (TH2F*) Electron2DHistogram->Clone("Electron2DHistogramResidual");
+  TH2F* Electron2DHistogramResidual = static_cast<TH2F*>(Electron2DHistogram->Clone("Electron2DHistogramResidual"));
   Electron2DHistogramResidual->Add(Electron2DHistogramNew, Electron2DHistogram, 1, -1);
   Electron2DHistogramResidual->SetMinimum(-0.15);
   Electron2DHistogramResidual->SetMaximum(0.15);

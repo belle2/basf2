@@ -48,7 +48,7 @@ namespace Belle2 {
        * @param title histogram title
        * @return PDF (signal + background)
        */
-      TH1F getHistogram(std::string name, std::string title) const;
+      TH1F getHistogram(const std::string& name, const std::string& title) const;
 
       /**
        * Returns photon times of selected photons in a given slot

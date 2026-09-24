@@ -117,7 +117,7 @@ namespace TreeFitter {
     for (int row = 0; row < m_constraintDimension; ++row) {
       fitpar.getCovariance()(posindex + row, posindex + row) = 1000 * m_covariance(row, row);
     }
-    for (auto daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       status |= daughter->initCovariance(fitpar);
     }
     return status;
@@ -157,7 +157,7 @@ namespace TreeFitter {
 
   void Origin::addToConstraintList(constraintlist& list, int depth) const
   {
-    for (auto daughter : m_daughters) {
+    for (const auto* daughter : m_daughters) {
       daughter->addToConstraintList(list, depth - 1);
     }
     list.push_back(Constraint(this, Constraint::origin, depth, m_constraintDimension)) ;

@@ -78,11 +78,11 @@ void TrackCreatorSegmentPairAutomaton::apply(
     // Set the start and end trajectory from the original fits
     // Only necessary for the work around
     {
-      Vector3D startPos = track.getStartTrajectory3D().getLocalOrigin();
+      ROOT::Math::XYZVector startPos = track.getStartTrajectory3D().getLocalOrigin();
       startTrajectory3D.setLocalOrigin(startPos);
       track.setStartTrajectory3D(startTrajectory3D);
 
-      Vector3D endPos = track.getEndTrajectory3D().getLocalOrigin();
+      ROOT::Math::XYZVector endPos = track.getEndTrajectory3D().getLocalOrigin();
       endTrajectory3D.setLocalOrigin(endPos);
       track.setEndTrajectory3D(endTrajectory3D);
     }

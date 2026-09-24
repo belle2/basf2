@@ -17,7 +17,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 
-#include "TMatrixDSym.h"
+#include <TMatrixDSym.h>
 #include <Math/Vector3D.h>
 
 using namespace Belle2;
@@ -131,7 +131,7 @@ void PXDDQMEfficiencyNtupleSelftrackModule::event()
 
     //loop over all PXD sensors to get the intersections
     std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-    for (VxdID& aVxdID : sensors) {
+    for (const VxdID& aVxdID : sensors) {
       VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(aVxdID);
       if (info.getType() != VXD::SensorInfoBase::PXD) continue;
       //Search for intersections of the track with all PXD layers

@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~LowEnergyPi0IdentificationExpertModule();
+    ~LowEnergyPi0IdentificationExpertModule() override;
 
     /**
      * Initializer.
@@ -58,11 +58,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override;
 
     /**
      * This method is called at the end of the event processing.

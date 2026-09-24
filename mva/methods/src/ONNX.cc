@@ -15,7 +15,7 @@
 using namespace Belle2::MVA;
 using namespace Belle2::MVA::ONNX;
 
-Session::Session(const std::string filename)
+Session::Session(const std::string& filename)
 {
   // Ensure single-threaded execution, see
   // https://onnxruntime.ai/docs/performance/tune-performance/threading.html

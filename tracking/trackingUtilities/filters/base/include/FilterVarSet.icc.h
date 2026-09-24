@@ -103,7 +103,7 @@ namespace Belle2 {
     template <class AFilter>
     MayBePtr<Float_t> FilterVarSet<AFilter>::find(const std::string& varName)
     {
-      if (varName.find(m_filterNamePrefix) == 0) {
+      if (varName.starts_with(m_filterNamePrefix)) {
         std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());
         MayBePtr<Float_t> found = Super::find(varNameWithoutPrefix);
         if (found) return found;

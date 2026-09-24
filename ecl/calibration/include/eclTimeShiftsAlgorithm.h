@@ -36,7 +36,7 @@ namespace Belle2 {
       eclTimeShiftsAlgorithm();
 
       /**..Destructor */
-      ~eclTimeShiftsAlgorithm() {}
+      ~eclTimeShiftsAlgorithm() override {}
 
 
       /*** Parameters ***/
@@ -46,14 +46,14 @@ namespace Belle2 {
 
       /** List of time offsets, one per crate, used just to centre the time
            constants around zero */
-      double timeShiftForPlotStyle[52] ;
+      double timeShiftForPlotStyle[52]  = {};
 
-      double crysCrateShift_min;   /**< Plotting time min for crystal+crate shift plots */
-      double crysCrateShift_max;   /**< Plotting time max for crystal+crate shift plots */
+      double crysCrateShift_min = 0.0;   /**< Plotting time min for crystal+crate shift plots */
+      double crysCrateShift_max = 0.0;   /**< Plotting time max for crystal+crate shift plots */
 
       /** Whether or not to have the algorithm code to loop
           over all the runs and read the payloads itself.  */
-      bool algorithmReadPayloads;
+      bool algorithmReadPayloads = false;
 
     protected:
 
@@ -96,7 +96,7 @@ namespace Belle2 {
       double m_tcrate_min_cut = -150;           /**< Minimum value cut for the crate time calibration constant for plotting */
       double m_tcrate_max_cut = 150;            /**< Maximum value cut for the crate time calibration constant for plotting  */
       double m_tcrate_unc_min_cut = 0.0001 ;    /**< Minimum value cut for the crate time calibration constant uncertainty for plotting */
-      double m_tcrate_unc_max_cut = 0.4 ;       /**< Maximum value cut for the crate time calibration constant uncertainty for plotting */
+      double m_tcrate_unc_max_cut = 999.; /**< Maximum value cut for the crate time calibration constant uncertainty for plotting */
 
 
     };

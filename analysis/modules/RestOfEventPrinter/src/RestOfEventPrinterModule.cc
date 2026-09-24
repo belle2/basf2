@@ -92,7 +92,7 @@ void RestOfEventPrinterModule::event()
   B2INFO("[RestOfEventPrinterModule] END ------------------------------------------");
 }
 
-void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles) const
+void RestOfEventPrinterModule::printMaskParticles(const std::vector<const Particle*>& maskParticles)
 {
   for (auto* particle : maskParticles) {
     particle->print();

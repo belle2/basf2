@@ -34,7 +34,7 @@ namespace Belle2 {
     // CHARGE-RELATED VARIABLES
     double seedCharge(const Particle* particle)
     {
-      RecoTrack* recoTrack = getRecoTrack(particle);
+      const RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
         return Const::doubleNaN;
       return recoTrack->getChargeSeed();
@@ -43,7 +43,7 @@ namespace Belle2 {
     //! @returns the quality indicator of the first MVA of the Flip&Refit
     double firstFlipQualityIndicator(const Particle* particle)
     {
-      RecoTrack* recoTrack = getRecoTrack(particle);
+      const RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
         return Const::doubleNaN;
       return recoTrack->getFlipQualityIndicator();
@@ -51,7 +51,7 @@ namespace Belle2 {
     //! @returns the quality indicator of the second MVA of the Flip&Refit
     double secondFlipQualityIndicator(const Particle* particle)
     {
-      RecoTrack* recoTrack = getRecoTrack(particle);
+      const RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
         return Const::doubleNaN;
       return recoTrack->get2ndFlipQualityIndicator();
@@ -63,7 +63,7 @@ namespace Belle2 {
     //! @returns the see time of the RecoTrack
     double seedTime(const Particle* particle)
     {
-      RecoTrack* recoTrack = getRecoTrack(particle);
+      const RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
         return Const::doubleNaN;
       return recoTrack->getTimeSeed();

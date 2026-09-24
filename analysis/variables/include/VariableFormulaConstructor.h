@@ -114,7 +114,7 @@ namespace Belle2 {
     }
 
     /** Apply operator on a double and a variable */
-    type operator()(Op op, double& a, const type& b)
+    type operator()(Op op, const double& a, const type& b)
     {
       return [op, a, b](const Particle * p) {
         switch (op) {

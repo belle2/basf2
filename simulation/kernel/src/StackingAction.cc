@@ -21,14 +21,8 @@ using namespace Belle2;
 using namespace Simulation;
 
 
-StackingAction::StackingAction(): m_photonFraction(1.0)
+StackingAction::StackingAction()
 {
-  if (false) {
-    G4Track* aTrack;
-    ClassifyNewTrack(aTrack);
-    NewStage();
-    PrepareNewEvent();
-  }
 }
 
 StackingAction::~StackingAction()

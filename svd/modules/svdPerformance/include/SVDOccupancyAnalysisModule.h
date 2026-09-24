@@ -41,7 +41,7 @@ namespace Belle2 {
     SVDOccupancyAnalysisModule();
 
     /** destructor */
-    virtual ~SVDOccupancyAnalysisModule() {};
+    virtual ~SVDOccupancyAnalysisModule() override {};
 
     virtual void initialize() override; /**< check StoreArrays & create rootfile */
     virtual void beginRun() override; /**< create histograms */

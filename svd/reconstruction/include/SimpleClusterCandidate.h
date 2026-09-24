@@ -56,7 +56,7 @@ namespace Belle2 {
        * @param aStrip to add to the cluster
        * @return true if the strip is on the expected side and sensor and it's next to the last strip added to the cluster candidate
        */
-      bool add(VxdID vxdID, bool isUside, struct  stripInCluster& aStrip);
+      bool add(VxdID vxdID, bool isUside, const struct stripInCluster& aStrip);
 
       /**
        * compute the position, time and their error of the cluster
@@ -122,11 +122,11 @@ namespace Belle2 {
       /**
        * return the time of the cluster for the 3-sample CoG
        */
-      float get3SampleCoGTimeError() const;
+      static float get3SampleCoGTimeError();
       /**
        * return the time of the cluster for the 3-sample ELS
        */
-      float get3SampleELSTimeError() const;
+      static float get3SampleELSTimeError();
 
       /**
        * returns the APVFloatSamples obtained summing
@@ -173,7 +173,7 @@ namespace Belle2 {
       int size() const { return m_strips.size(); }
 
       /** returns the vector of the strips in the cluster*/
-      const std::vector<stripInCluster> getStripsInCluster() const { return m_strips; };
+      const std::vector<stripInCluster>& getStripsInCluster() const { return m_strips; };
 
     protected:
 

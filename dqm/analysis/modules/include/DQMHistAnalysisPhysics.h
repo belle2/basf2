@@ -29,11 +29,6 @@ namespace Belle2 {
     DQMHistAnalysisPhysicsModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPhysicsModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

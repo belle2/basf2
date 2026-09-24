@@ -83,7 +83,7 @@ C IRCLH3PI=1  TAUOLA RChL COEF(I,J) =  COEFr(I,J) [suggested default]
       
 ! switch on initialization of FF mixing in tau- -> K-  PI- PI+ nu, PI- K0B PI0 nu 
 C IFKPIPI = 0 CLEO initialization (suggested default)
-C IFKPIPI = 1 BaBar initialization 
+C IFKPIPI = 1 BaBar initialization (new default)
 C-- Improve Form Factors for tau->K-pi-pi+nu 
 C   New modelling using parameters from CLEO, PRD62, 072006 (2000):
 C   M(1270) = 1.254 GeV, M(1400) = 1.463 GeV
@@ -93,8 +93,12 @@ C   F2 = (eta BW[K1(1270)]+BW[K1(1400)]) X BW[K*],
 C   eta=0.33 (M. Finkemeier, E. Mirkes, ZPC69, 243 (1996))
 C Similar tuning also applied to tau- -> PI- K0B PI0 nu 
       INTEGER IFKPIPI
-      DATA    IFKPIPI /0/
+      DATA    IFKPIPI /1/
       COMMON /IFKPIPI/ IFKPIPI
+
+      INTEGER IPHSPAC
+      DATA    IPHSPAC /0/
+      COMMON /IPHSPAC/ IPHSPAC
 
 C     pi- pi0 pi0 pi0, pi- pi- pi+ pi0:
 C     IFCURR4PI = 0  CPC 146 2002, hep-ph/0201149 [Novosibirsk] [suggested default]
@@ -137,6 +141,14 @@ C     [Note: LAMDEC=1 will reset its lifetime, so turn the flag should be turned
       DATA    LAMDEC /0/
       COMMON /LAMDEC/ LAMDEC
 C
+      COMMON /PHOTOS_PAR/ ISINGLE,IEXPONENTIAL,IB_ME_FD
+      INTEGER             ISINGLE,IEXPONENTIAL,IB_ME_FD
+C
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOF_R_VAINT,OFF_PHOT
+C
       SAVE
 C-------------------------------------------------------------------------------
       idff    = xpar(ITAUXPAR+3) ! Lund identifier for first tau (15 for  tau-)
@@ -172,6 +184,7 @@ C  KeyA1 is used for formfactors actually not in use
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
       TauToElOrMu= XPAR(ITAUXPAR+910)
+      IPHSPAC = INT(XPAR(ITAUXPAR+930))
 C
       DO IUSER = 1,100
          USERACTIVE(IUSER) = 0
@@ -209,6 +222,30 @@ C     Print optional flags
       ENDIF
       WRITE(iout,*) 'AMDARK, GMDARK, EPDARK = ',AMDARK,GMDARK,EPDARK
       
+      ISINGLE = INT(XPAR(ITAUXPAR+951))
+      IEXPONENTIAL = INT(XPAR(ITAUXPAR+952))
+      IB_ME_FD = INT(XPAR(ITAUXPAR+953))
+
+      CV_LL = XPAR(ITAUXPAR+961)
+      CV_LR = XPAR(ITAUXPAR+962)
+      CS_RL = XPAR(ITAUXPAR+963)
+      CS_RR = XPAR(ITAUXPAR+964)
+      CV_RL = XPAR(ITAUXPAR+965)
+      CV_RR = XPAR(ITAUXPAR+966)
+      CS_LL = XPAR(ITAUXPAR+967)
+      CS_LR = XPAR(ITAUXPAR+968)
+      MNURD = XPAR(ITAUXPAR+969)
+
+      ONOF_L_IB    = INT(XPAR(ITAUXPAR+970))
+      ONOF_L_V     = INT(XPAR(ITAUXPAR+971))
+      ONOF_L_A     = INT(XPAR(ITAUXPAR+972))
+      ONOF_L_VAINT = INT(XPAR(ITAUXPAR+973))
+      ONOF_R_IB    = INT(XPAR(ITAUXPAR+974))
+      ONOF_R_V     = INT(XPAR(ITAUXPAR+975))
+      ONOF_R_A     = INT(XPAR(ITAUXPAR+976))
+      ONOF_R_VAINT = INT(XPAR(ITAUXPAR+977))
+      OFF_PHOT     = INT(XPAR(ITAUXPAR+978))
+
       if(IRCHL3PI.eq.1) then
          CALL INIRChL(1)        ! (IRCHL)
       endif
@@ -795,6 +832,9 @@ C
          APKMAS=AMKZ                      ! K0L
       ELSEIF  (ABS(IDENT).EQ. 313) THEN
          APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*0(892)
+      ELSEIF  (ABS(IDENT).EQ. 323) THEN
+         XRANGE=5.0
+         APKMAS=QQBRWG(AMKST,GAMKST,XRANGE)! K*+-(892)
       ELSEIF  (ABS(IDENT).EQ. 3122) THEN
          APKMAS=1.115683                   ! Lambda
       ELSEIF  (ABS(IDENT).EQ.10211) THEN
@@ -907,6 +947,8 @@ C
          IPKDEF=ABS(IDENT)! K0L
       ELSEIF  (ABS(IDENT).EQ.313) THEN
          IPKDEF=IDENT     ! K*0(892)
+      ELSEIF  (ABS(IDENT).EQ.323) THEN
+         IPKDEF=IDENT     ! K*+-(892)
       ELSEIF  (ABS(IDENT).EQ.3122) THEN
          IPKDEF=IDENT     ! Lambda
       ELSEIF  (ABS(IDENT).EQ.10211) THEN

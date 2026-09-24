@@ -11,9 +11,9 @@ path = basf2.create_path()
 
 path.add_module('DQMHistAnalysisInputRootFile', FileList="dqm_histo.root")
 # path.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
-path.add_module('DQMHistAnalysisHLT', bhabhaName="accept_bhabha_all", columnMapping={
+path.add_module('DQMHistAnalysisHLT', bhabhaName="accept_bhabha_trk_ecl", columnMapping={
     "accept_hadron": "hadron",
-    "accept_bhabha_all": "bhabha_all",
+    "accept_bhabha_all": "bhabha_trk_ecl",
     "accept_mumutight": "mumutight",
     "accept_gamma_gamma": "gamma_gamma",
     "accept_radmumu": "radmumu",

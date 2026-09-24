@@ -121,8 +121,8 @@ namespace Belle2 {
       double xmi = 0, xma = 0;
       bool ok = rangeOfX(prism.zD, xmi, xma);
       if (not ok) return;
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x and over pixel columns
 
@@ -150,8 +150,8 @@ namespace Belle2 {
       double xmi = 0, xma = 0;
       bool ok = rangeOfX(mirror.zb, xmi, xma);
       if (not ok) return;
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x before mirror
 
@@ -190,8 +190,8 @@ namespace Belle2 {
       double xmi = xDs.front();
       double xma = xDs.back();
 
-      int kmi = lround(xmi / bar.A);
-      int kma = lround(xma / bar.A);
+      int kmi = func::lround(xmi / bar.A);
+      int kma = func::lround(xma / bar.A);
 
       // loop over reflections in x after mirror and over pixel columns
 
@@ -292,7 +292,7 @@ namespace Belle2 {
       while (m_rayTracers.size() < 3) m_rayTracers.push_back(*m_fastRaytracer); // push back a copy of the object
 
       bool ok = true;
-      auto& rayTracer_dL = m_rayTracers[0];
+      const auto& rayTracer_dL = m_rayTracers[0];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_dL, dL);
         if (ok) break;
@@ -300,7 +300,7 @@ namespace Belle2 {
       }
       if (not ok) return false;
 
-      auto& rayTracer_de = m_rayTracers[1];
+      const auto& rayTracer_de = m_rayTracers[1];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_de, 0, de);
         if (ok) break;
@@ -308,7 +308,7 @@ namespace Belle2 {
       }
       if (not ok) return false;
 
-      auto& rayTracer_dFic = m_rayTracers[2];
+      const auto& rayTracer_dFic = m_rayTracers[2];
       for (int i = 0; i < 10; i++) {
         ok = raytrace(rayTracer_dFic, 0, 0, dFic);
         if (ok) break;
@@ -482,8 +482,10 @@ namespace Belle2 {
                                              SignalPDF::EPeakType type) const
     {
       double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
-      double surf = m_yScanner->getBars().front().reflectivity;
-      double p = exp(-propLen / bulk) * pow(surf, std::abs(nx) + std::abs(ny));
+      // the surface reflectivity is a constant of the module, so its powers are tabulated
+      // once per module by the YScanner instead of being re-computed for every photon
+      double surf = m_yScanner->getSurfaceReflectivity(std::abs(nx) + std::abs(ny));
+      double p = exp(-propLen / bulk) * surf;
       if (type == SignalPDF::c_Reflected) p *= std::min(m_yScanner->getMirror().reflectivity, 1.0);
       return p;
     }
@@ -569,7 +571,7 @@ namespace Belle2 {
     }
 
 
-    double PDFConstructor::derivativeOfReflectedX(double x, double xe, double ze, double zd) const
+    double PDFConstructor::derivativeOfReflectedX(double x, double xe, double ze, double zd)
     {
       double z = sqrt(1 - x * x);
       double kx = (x - xe);
@@ -588,7 +590,7 @@ namespace Belle2 {
 
 
     double PDFConstructor::findReflectionExtreme(double xE, double zE, double zD, int Nxm, double A,
-                                                 const RaytracerBase::Mirror& mirror) const
+                                                 const RaytracerBase::Mirror& mirror)
     {
 
       if (Nxm % 2 == 0) {

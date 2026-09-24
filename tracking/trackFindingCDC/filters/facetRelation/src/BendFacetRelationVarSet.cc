@@ -9,6 +9,8 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCFacet.h>
 
+#include <Math/VectorUtil.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
@@ -46,13 +48,13 @@ bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRe
   const double toEndVarL = toEndRLWireHit.getRefDriftLengthVariance();
 
   // Lets call the four involved hits A, B, C and D.
-  const double fromAB = fromStartToMiddle.tangential().norm();
-  const double fromAC = fromStartToEnd.tangential().norm();
-  const double fromBC = fromMiddleToEnd.tangential().norm();
+  const double fromAB = fromStartToMiddle.tangential().R();
+  const double fromAC = fromStartToEnd.tangential().R();
+  const double fromBC = fromMiddleToEnd.tangential().R();
 
-  const double toBC = toStartToMiddle.tangential().norm();
-  const double toBD = toStartToEnd.tangential().norm();
-  const double toCD = toMiddleToEnd.tangential().norm();
+  const double toBC = toStartToMiddle.tangential().R();
+  const double toBD = toStartToEnd.tangential().R();
+  const double toCD = toMiddleToEnd.tangential().R();
 
   const double sAB = fromAB;
   const double sBC = (fromBC + toBC) / 2;
@@ -64,9 +66,9 @@ bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRe
   // const double sBD = sBC + sCD;
 
   const double fromDeltaPhi =
-    fromStartToMiddle.tangential().angleWith(fromStartToEnd.tangential());
+    ROOT::Math::VectorUtil::DeltaPhi(fromStartToMiddle.tangential(), fromStartToEnd.tangential());
   const double toDeltaPhi =
-    toStartToMiddle.tangential().angleWith(toStartToEnd.tangential());
+    ROOT::Math::VectorUtil::DeltaPhi(toStartToMiddle.tangential(), toStartToEnd.tangential());
 
   const double deltaPhi = fromDeltaPhi - toDeltaPhi;
 
@@ -109,7 +111,7 @@ bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRe
   var<named("delta_curv")>() = std::fabs(deltaCurv);
   var<named("delta_curv_pull")>() = std::fabs(deltaCurvPull);
 
-  double r = (fromFacet.getMiddleRecoPos2D().norm() + fromFacet.getMiddleRecoPos2D().norm()) / 2;
+  double r = (fromFacet.getMiddleRecoPos2D().R() + fromFacet.getMiddleRecoPos2D().R()) / 2;
   var<named("delta_phi_pull_per_r")>() = std::fabs(deltaPhiPull) / r;
   var<named("delta_curv_pull_per_r")>() = std::fabs(deltaCurvPull) / r;
 

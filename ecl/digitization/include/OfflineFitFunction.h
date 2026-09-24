@@ -11,6 +11,7 @@
 
 namespace Belle2 {
   namespace ECL {
+    // cppcheck-suppress constParameterCallback ; fit callbacks must keep the signature required by ROOT
     double WaveFuncTwoComponent(double* x, double* par)
     {
       //Used for fitting with ROOT::FIT and drawing offline fit results

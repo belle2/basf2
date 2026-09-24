@@ -17,7 +17,7 @@
 #include <TClass.h>
 #include <TStyle.h>
 #include <TROOT.h>
-#include "TLatex.h"
+#include <TLatex.h>
 
 #include <fstream>
 #include <iostream>
@@ -40,11 +40,6 @@ DQMHistAnalysisTRGEFFModule::DQMHistAnalysisTRGEFFModule()
   setDescription("Modify and analyze the data quality histograms of TRGEFF");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("alert", m_enableAlert, "Enable color alert", true);
-}
-
-DQMHistAnalysisTRGEFFModule::~DQMHistAnalysisTRGEFFModule()
-{
-
 }
 
 void DQMHistAnalysisTRGEFFModule::initialize()
@@ -236,6 +231,16 @@ void DQMHistAnalysisTRGEFFModule::endRun()
        ***********************************************************/
       TH1F* hist     = (TH1F*)effHist->GetTotalHistogram();
       TH1F* histFtdf = (TH1F*)effHist->GetPassedHistogram();
+
+      if (!hist) {
+        B2WARNING(std::string("DQMHistAnalysisTRGEFF: Failed to get total histogram"));
+        continue;
+      }
+
+      if (!histFtdf) {
+        B2WARNING(std::string("DQMHistAnalysisTRGEFF: Failed to get passed histogram"));
+        continue;
+      }
 
       Double_t* newBins = nullptr;
       int nBins = 1;

@@ -98,7 +98,7 @@ void CDCDedxSkimCDSTModule::event()
             continue;
           }
 
-          CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
+          const CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
           if (!dedxTrack) {
             B2WARNING("Searching w/ 2nd Gen >> No related CDCDedxTrack found");
             continue;
@@ -121,7 +121,7 @@ void CDCDedxSkimCDSTModule::event()
           continue;
         }
 
-        CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
+        const CDCDedxTrack* dedxTrack = track->getRelatedTo<CDCDedxTrack>();
         if (!dedxTrack) {
           B2WARNING("No related CDCDedxTrack found");
           continue;

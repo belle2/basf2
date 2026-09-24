@@ -33,7 +33,8 @@ G4MonopoleFieldSetup::G4MonopoleFieldSetup()
   //Take existing setup from basf2
   fFieldManager = G4TransportationManager::GetTransportationManager()->GetFieldManager();
   fbasf2ChordFinder = fFieldManager->GetChordFinder();
-  fMagneticField = (G4MagneticField*)fFieldManager->GetDetectorField();
+  // G4MonopoleEquation and G4ChordFinder both want a non-const field
+  fMagneticField = const_cast<G4MagneticField*>(static_cast<const G4MagneticField*>(fFieldManager->GetDetectorField()));
   fMonopoleEquation = new G4MonopoleEquation(fMagneticField);
   fMinStep     = 0.01 * mm ; // minimal step of 1 mm is default
   fMonopoleStepper = new G4ClassicalRK4(fMonopoleEquation, 8);   // for time information..

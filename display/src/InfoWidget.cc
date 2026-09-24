@@ -144,7 +144,7 @@ TString InfoWidget::createMainPage() const
       }
       info += "</h2>";
     }
-    for (std::string name : arrayNames) {
+    for (const std::string& name : arrayNames) {
       const StoreArray<TObject> array(name, durabilities[i]);
       int nEntries = array.getEntries();
       if (nEntries)
@@ -163,7 +163,7 @@ TString InfoWidget::createMainPage() const
       }
       info += "</h2>";
     }
-    for (std::string name : objNames) {
+    for (const std::string& name : objNames) {
       const StoreObjPtr<TObject> obj(name, durabilities[i]);
       if (obj)
         info += TString::Format("<a href='%s:%s/'>%s</a><br>", scheme.Data(), name.c_str(), name.c_str());

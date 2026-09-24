@@ -118,7 +118,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
     # plot histograms for each board
     rangeBorad = range(1, 301)
     board_1D = [f_histTW_tw.Get(f'h1D/board_{boardID}_1') for boardID in rangeBorad]
-    can = [ROOT.TCanvas(f'c{c}', f'c{c}', 2000, 1500) for c in range(12)]
+    can = [ROOT.TCanvas(f'c_tw_{c}', f'c{c}', 2000, 1500) for c in range(12)]
     for c in range(12):
         ni, nj = 5, 5
         can[c].Divide(ni, nj)
@@ -158,7 +158,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
 
         print(f"number of valid histograms = {count_h} => canvas layout = ({ncols}, {nrows})")
 
-        c2 = ROOT.TCanvas('c2', '', ncols * 700, nrows * 400)   # ncols * 700, nrows * 400)
+        c2 = ROOT.TCanvas(f'c_sr_lr{LR}_al{alpha}_th{theta}', '', ncols * 700, nrows * 400)   # ncols * 700, nrows * 400)
         c2.Divide(ncols, nrows)
         j = 0
         for h in histograms:
@@ -196,7 +196,7 @@ def run_validation(job_path, input_data_path, requested_iov, expert_config):
         if mod != 0:
             nrows += 1
 
-        c2 = ROOT.TCanvas('c2', '', ncols * 900, nrows * 600)
+        c2 = ROOT.TCanvas(f'c_xt_lr{LR}_al{alphaID}_th{thetaID}', '', ncols * 900, nrows * 600)
         c2.Divide(ncols, nrows)
         j = 0
         for histo in histograms:

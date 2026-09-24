@@ -14,6 +14,9 @@
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
 #include <framework/core/ModuleParamList.templateDetails.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/Vector2D.h>
 
 #include <cmath>
 
@@ -62,17 +65,17 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
   const ParameterLine2D& startToEndLine = facet.getStartToEndLine();
   const ParameterLine2D& middleToEndLine = facet.getMiddleToEndLine();
 
-  const Vector2D& startToMiddleTangentialVector = startToMiddleLine.tangential();
-  const Vector2D& startToEndTangentialVector = startToEndLine.tangential();
-  const Vector2D& middleToEndTangentialVector = middleToEndLine.tangential();
+  const ROOT::Math::XYVector& startToMiddleTangentialVector = startToMiddleLine.tangential();
+  const ROOT::Math::XYVector& startToEndTangentialVector = startToEndLine.tangential();
+  const ROOT::Math::XYVector& middleToEndTangentialVector = middleToEndLine.tangential();
 
-  const double startToMiddleLength = startToMiddleTangentialVector.norm();
-  const double startToEndLength = startToEndTangentialVector.norm();
-  const double middleToEndLength = middleToEndTangentialVector.norm();
+  const double startToMiddleLength = startToMiddleTangentialVector.R();
+  const double startToEndLength = startToEndTangentialVector.R();
+  const double middleToEndLength = middleToEndTangentialVector.R();
 
-  const double startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
-  const double middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
-  const double endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
+  const double startCos = VectorUtil::CosPhi(startToMiddleTangentialVector, startToEndTangentialVector);
+  const double middleCos = VectorUtil::CosPhi(startToMiddleTangentialVector, middleToEndTangentialVector);
+  const double endCos = VectorUtil::CosPhi(startToEndTangentialVector, middleToEndTangentialVector);
 
   const double startPhi = acos(startCos);
   const double middlePhi = acos(middleCos);

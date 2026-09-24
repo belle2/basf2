@@ -9,10 +9,7 @@
 
 // STL
 #include <vector>
-// BOOST
-#include <boost/accumulators/accumulators.hpp>
-#include <boost/accumulators/statistics.hpp>
-namespace bacc = boost::accumulators;
+
 namespace Belle2 {
   /**
    * ECLLocalRunCalibAcc is the
@@ -79,8 +76,8 @@ namespace Belle2 {
      * @param count is the number of
      accepted events.
      */
-    float calcStdDev(const float& variance,
-                     const int& count) const;
+    static float calcStdDev(const float& variance,
+                            const int& count);
     /**
      * Update value limits.
      * @param mean is the mean value.

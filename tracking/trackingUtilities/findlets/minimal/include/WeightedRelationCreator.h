@@ -58,7 +58,7 @@ namespace Belle2 {
       std::string getDescription() final
       {
         return "Constructs geometrically constrained relations between " +
-               getClassMnemomicParameterDescription((AObject*)nullptr) +
+               getClassMnemomicParameterDescription(static_cast<AObject*>(nullptr)) +
                " filter by some acceptance criterion.";
       }
 
@@ -69,7 +69,7 @@ namespace Belle2 {
         moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
                                       m_param_onlyBest,
                                       "Maximal number of the best relation to keep from each " +
-                                      getClassMnemomicParameterDescription((AObject*)nullptr),
+                                      getClassMnemomicParameterDescription(static_cast<AObject*>(nullptr)),
                                       m_param_onlyBest);
       }
 
@@ -77,7 +77,10 @@ namespace Belle2 {
       void apply(const std::vector<AObject*>& inputObjects,
                  std::vector<WeightedRelation<AObject>>& weightedRelations) final
       {
-
+        // The relation filters look their possible partners up with a std::equal_range over
+        // inputObjects. An unsorted input does not make that search fail, it makes it return
+        // the wrong range, so the mistake would show up as quietly missing relations instead
+        // of as a crash. Checking it here only costs one linear scan per event.
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
                  std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
 
@@ -96,7 +99,6 @@ namespace Belle2 {
               return nCurrentRepetitions > nMaxRepetitions;
             } else
             {
-              // cppcheck-suppress unreadVariable
               nCurrentRepetitions = 1;
               return false;
             }

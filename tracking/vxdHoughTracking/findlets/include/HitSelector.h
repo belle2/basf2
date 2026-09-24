@@ -30,14 +30,13 @@ namespace Belle2 {
 
         for (auto& hit : hits) {
 
-          const VXDHoughState::DataCache& hitData = hit.getDataCache();
-          const VxdID& currentHitSensorID = hitData.sensorID;
+          const VxdID& currentHitSensorID = hit.getHit()->getVxdID();
 
           if (std::find(friendSensorList.begin(), friendSensorList.end(), currentHitSensorID) == friendSensorList.end()) {
             continue;
           }
 
-          const double hitZPosition = hitData.z;
+          const double hitZPosition = hit.getHit()->Z();
 
           if (sensorInLayerSixLadder == 1 and hitZPosition >= -1.0) {
             selectedHits.emplace_back(&hit);

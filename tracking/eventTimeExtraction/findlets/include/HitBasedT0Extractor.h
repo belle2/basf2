@@ -31,7 +31,7 @@ namespace Belle2 {
     HitBasedT0Extractor() = default;
 
     /// Make destructor of interface virtual
-    virtual ~HitBasedT0Extractor() = default;
+    virtual ~HitBasedT0Extractor() override = default;
 
     /// Short description of the findlet
     std::string getDescription() override final;

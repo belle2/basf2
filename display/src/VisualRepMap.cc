@@ -100,7 +100,7 @@ void VisualRepMap::select(const TObject* object) const
   m_currentlySelecting = false;
 }
 
-void VisualRepMap::selectOnly(const TEveElement* eveObj) const
+void VisualRepMap::selectOnly(const TEveElement* eveObj)
 {
   //copy current selection, then deselect each element
   const std::list<TEveElement*> sel(gEve->GetSelection()->BeginChildren(), gEve->GetSelection()->EndChildren());
@@ -124,13 +124,14 @@ void VisualRepMap::selectRelated(TEveElement* eveObj) const
   }
 }
 
-void VisualRepMap::clearSelection() const
+void VisualRepMap::clearSelection()
 {
   if (!gEve)
     return;
   //equivalent to clicking into empty space
   gEve->GetSelection()->UserPickedElement(nullptr);
 }
+
 void VisualRepMap::add(const TObject* dataStoreObject, TEveElement* visualRepresentation)
 {
   if (!dataStoreObject) {

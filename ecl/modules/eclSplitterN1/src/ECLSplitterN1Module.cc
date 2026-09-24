@@ -204,12 +204,6 @@ void ECLSplitterN1Module::event()
 }
 
 
-void ECLSplitterN1Module::endRun()
-{
-//  if (m_tg2OptimalNumberOfDigitsForEnergy) delete m_tg2OptimalNumberOfDigitsForEnergy;
-}
-
-
 void ECLSplitterN1Module::terminate()
 {
   if (m_NeighbourMap9) delete m_NeighbourMap9;
@@ -271,7 +265,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     const double energyEstimation = estimateEnergy(highestEnergyID);
 
     // Check if 21 would be better in the present background conditions:
-    ECLNeighbours* neighbourMap; // FIXME pointer needed?
+    const ECLNeighbours* neighbourMap; // FIXME pointer needed?
     int nNeighbours = getNeighbourMap(energyEstimation, backgroundLevel);
     if (nNeighbours == 9 and !m_useOptimalNumberOfDigitsForEnergy) neighbourMap = m_NeighbourMap9;
     else neighbourMap = m_NeighbourMap21;
@@ -666,7 +660,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       const double energyEstimation = estimateEnergy(locmaxcellid);
 
       // Get the neighbour list.
-      ECLNeighbours* neighbourMap; // FIXME need pointer?
+      const ECLNeighbours* neighbourMap; // FIXME need pointer?
       int nNeighbours = getNeighbourMap(energyEstimation, backgroundLevel);
       if (nNeighbours == 9 and !m_useOptimalNumberOfDigitsForEnergy) neighbourMap = m_NeighbourMap9;
       else neighbourMap = m_NeighbourMap21;

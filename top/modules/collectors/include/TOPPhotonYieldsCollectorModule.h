@@ -57,6 +57,7 @@ namespace Belle2 {
     double m_dz; /**< cut on POCA in z */
 
     // cuts (do not change the values)
+    const double m_minZprism = -140.0; /**< most minimal local z of extrapolated track (this includes prism) */
     const double m_minZ = -130.0; /**< minimal local z of extrapolated track */
     const double m_maxZ = 130.0; /**< maximal local z of extrapolated track */
     const double m_excludedZ = 50.0; /**< excluded central region of extrapolated track for photon impact angle counting */

@@ -100,6 +100,9 @@ class State():
         else:
             B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
 
+    # Doxygen doesn't understand @method_dispatch overloads (def _) and emits
+    # "no uniquely matching class member found" warnings. Hide them from doxygen.
+    # @cond
     @_add_callbacks.register(tuple)
     @_add_callbacks.register(list)
     def _(self, callbacks, attribute):
@@ -112,6 +115,7 @@ class State():
                     attribute.append(function)
                 else:
                     B2ERROR(f"Something other than a function (callable) passed into State {self.name}.")
+    # @endcond
 
     def __str__(self):
         """
@@ -797,10 +801,12 @@ class CalibrationMachine(Machine):
             # Define the input files
             input_data_files = set(collection.input_files)
             # Reduce the input data files to only those that overlap with the optional requested IoV
-            if self.iov_to_calibrate:
+            # Local variable avoids doxygen "no uniquely matching class member" warning
+            iov_to_calibrate = self.iov_to_calibrate
+            if iov_to_calibrate:
                 input_data_files = self.files_containing_iov(input_data_files,
                                                              collection.files_to_iovs,
-                                                             self.iov_to_calibrate)
+                                                             iov_to_calibrate)
             # Remove any files that ONLY contain runs from our optional ignored_runs list
             files_to_ignore = set()
             for exprun in self.calibration.ignored_runs:
@@ -1033,7 +1039,9 @@ class AlgorithmMachine(Machine):
         b2conditions.override_globaltags()
 
         # Apply all the databases in order, starting with the user-set chain for this Calibration
-        for database in self.database_chain:
+        # Local variable avoids doxygen "no uniquely matching class member" warning
+        database_chain = self.database_chain
+        for database in database_chain:
             if database.db_type == 'local':
                 B2INFO(f"Adding Local Database {database.filepath.as_posix()} to head of chain of local databases, "
                        f"for {self.algorithm.name}.")

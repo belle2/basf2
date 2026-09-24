@@ -215,14 +215,14 @@ namespace Belle2 {
         // throw helpful error if name provided was not in allowed list
         if (index == -1) {
           std::string allowed = "";
-          for (auto n : names)
+          for (const auto& n : names)
             allowed += n + ", ";
           B2FATAL("Variable name provided: " << variableName << " is not one of the allowed options. Please choose from one of:" << allowed);
         }
 
         auto func = [index, useFS1, maskName](const Particle * particle) -> double {
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
-          ContinuumSuppression* qq = nullptr;
+          const ContinuumSuppression* qq = nullptr;
           if (maskName.empty())
           {
             if (continuumSuppressionRelations.size() == 1) {
@@ -283,7 +283,7 @@ namespace Belle2 {
 
         auto func = [coneNumber, useROE, maskName](const Particle * particle) -> double {
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = particle->getRelationsTo<ContinuumSuppression>("ALL");
-          ContinuumSuppression* qq = nullptr;
+          const ContinuumSuppression* qq = nullptr;
           if (maskName.empty())
           {
             if (continuumSuppressionRelations.size() == 1) {
@@ -368,7 +368,7 @@ namespace Belle2 {
           StoreObjPtr<RestOfEvent> roe("RestOfEvent");
           const Particle* Bparticle = roe->getRelatedFrom<Particle>();
           RelationVector<ContinuumSuppression> continuumSuppressionRelations = Bparticle->getRelationsTo<ContinuumSuppression>("ALL");
-          ContinuumSuppression* qq = nullptr;
+          const ContinuumSuppression* qq = nullptr;
           if (maskName.empty())
           {
             if (continuumSuppressionRelations.size() == 1) {

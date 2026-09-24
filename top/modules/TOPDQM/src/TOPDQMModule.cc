@@ -12,10 +12,11 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <boost/format.hpp>
 #include <algorithm>
 #include <cmath>
+#include <map>
 
 using namespace std;
 using boost::format;
@@ -48,10 +49,6 @@ namespace Belle2 {
   }
 
 
-  TOPDQMModule::~TOPDQMModule()
-  {
-  }
-
   void TOPDQMModule::defineHisto()
   {
     // Create a separate histogram directory and cd into it.
@@ -67,20 +64,25 @@ namespace Belle2 {
 
     // Histograms
 
-    m_BoolEvtMonitor = new TH1D("BoolEvtMonitor", "Event synchronization", 2, -0.5, 1.5);
-    m_BoolEvtMonitor->GetYaxis()->SetTitle("number of digits");
-    m_BoolEvtMonitor->GetXaxis()->SetBinLabel(1, "synchronized");
-    m_BoolEvtMonitor->GetXaxis()->SetBinLabel(2, "de-synchronized");
-    m_BoolEvtMonitor->GetXaxis()->SetLabelSize(0.05);
-    m_BoolEvtMonitor->GetXaxis()->SetAlphanumeric();
+    m_BoolEvtMonitor = new TH2D("BoolEvtMonitor", "Event synchronization", 64, 1, 17, 2, 0, 2);
+    m_BoolEvtMonitor->SetXTitle("slot number");
+    m_BoolEvtMonitor->SetYTitle("     synchonized hits | de-synchronized hits");
+    m_BoolEvtMonitor->GetXaxis()->SetNdivisions(16);
+    m_BoolEvtMonitor->GetXaxis()->CenterLabels();
+    m_BoolEvtMonitor->GetYaxis()->SetNdivisions(2);
+    m_BoolEvtMonitor->GetYaxis()->SetBinLabel(1, "0");
+    m_BoolEvtMonitor->GetYaxis()->SetBinLabel(2, "1");
+    m_BoolEvtMonitor->GetYaxis()->SetLabelSize(0.05);
+    m_BoolEvtMonitor->GetYaxis()->SetAlphanumeric();
+    m_BoolEvtMonitor->GetYaxis()->CenterTitle();
     m_BoolEvtMonitor->SetMinimum(0);
 
-    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 16, 0.5, 16.5, 512, 0, 512);
+    m_window_vs_slot = new TH2F("window_vs_slot", "Asic windows", 64, 1, 17, 512, 0, 512);
     m_window_vs_slot->SetXTitle("slot number");
     m_window_vs_slot->SetYTitle("window number w.r.t reference window");
-    m_window_vs_slot->SetStats(kFALSE);
-    m_window_vs_slot->SetMinimum(0);
     m_window_vs_slot->GetXaxis()->SetNdivisions(16);
+    m_window_vs_slot->GetXaxis()->CenterLabels();
+    m_window_vs_slot->SetMinimum(0);
 
     int nbinsT0 = 75;
     double rangeT0 = nbinsT0 * m_bunchTimeSep;
@@ -280,14 +282,24 @@ namespace Belle2 {
       m_pulseHeights.push_back(prof);
     }
 
-    m_skipProcFlag = new TH2F("skipProcFlag", "Skip processing flag; slot number; flag value", 64, 0.5, 16.5, 2, -0.5, 1.5);
+    m_skipProcFlag = new TH2F("skipProcFlag", "Skip processing flag; slot number; flag value", 64, 1, 17, 2, 0, 2);
     m_skipProcFlag->GetXaxis()->SetNdivisions(16);
+    m_skipProcFlag->GetXaxis()->CenterLabels();
     m_skipProcFlag->GetYaxis()->SetNdivisions(2);
+    m_skipProcFlag->GetYaxis()->SetBinLabel(1, "0");
+    m_skipProcFlag->GetYaxis()->SetBinLabel(2, "1");
+    m_skipProcFlag->GetYaxis()->SetLabelSize(0.05);
+    m_skipProcFlag->GetYaxis()->SetAlphanumeric();
     m_skipProcFlag->SetMinimum(0);
 
-    m_injVetoFlag = new TH2F("injVetoFlag", "Injection veto flag; slot number; flag value", 64, 0.5, 16.5, 2, -0.5, 1.5);
+    m_injVetoFlag = new TH2F("injVetoFlag", "Injection veto flag; slot number; flag value", 64, 1, 17, 2, 0, 2);
     m_injVetoFlag->GetXaxis()->SetNdivisions(16);
+    m_injVetoFlag->GetXaxis()->CenterLabels();
     m_injVetoFlag->GetYaxis()->SetNdivisions(2);
+    m_injVetoFlag->GetYaxis()->SetBinLabel(1, "0");
+    m_injVetoFlag->GetYaxis()->SetBinLabel(2, "1");
+    m_injVetoFlag->GetYaxis()->SetLabelSize(0.05);
+    m_injVetoFlag->GetYaxis()->SetAlphanumeric();
     m_injVetoFlag->SetMinimum(0);
 
     m_injVetoFlagDiff = new TH1F("injVetoFlagDiff", "Injection veto flags check; ; fraction of events", 2, -0.5, 1.5);
@@ -298,10 +310,20 @@ namespace Belle2 {
     m_injVetoFlagDiff->GetXaxis()->SetAlphanumeric();
     m_injVetoFlagDiff->SetMinimum(0);
 
-    m_PSBypassMode = new TH2F("PSBypassMode", "PS-bypass mode; slot number; mode", 64, 0.5, 16.5, 8, -0.5, 7.5);
+    m_PSBypassMode = new TH2F("PSBypassMode", "PS-bypass mode; slot number; mode", 64, 1, 17, 8, 0, 8);
     m_PSBypassMode->GetXaxis()->SetNdivisions(16);
     m_PSBypassMode->GetYaxis()->SetNdivisions(8);
+    m_PSBypassMode->GetXaxis()->CenterLabels();
+    m_PSBypassMode->GetYaxis()->CenterLabels();
     m_PSBypassMode->SetMinimum(0);
+
+    m_unpackErr = new TProfile("unpackErr", "Unpacker errors (per boardstack); slot number; fraction of events", 64, 1, 17, 0, 2);
+    m_unpackErr->GetXaxis()->SetNdivisions(16);
+    m_unpackErr->GetXaxis()->CenterLabels();
+    m_unpackErr->SetMinimum(0);
+    m_unpackErr->SetMarkerStyle(24);
+    m_unpackErr->SetFillColor(2);
+    m_unpackErr->SetDrawOption("hist");
 
     // cd back to root directory
     oldDir->cd();
@@ -317,6 +339,7 @@ namespace Belle2 {
 
     m_rawFTSWs.isOptional(); /// better use isRequired(), but RawFTSW is not in sim
     m_productionEventDebugs.isOptional(); // not in sim
+    m_unpackerErrors.isOptional(); // not in sim
     m_digits.isRequired();
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
@@ -370,6 +393,7 @@ namespace Belle2 {
     m_injVetoFlag->Reset();
     m_injVetoFlagDiff->Reset();
     m_PSBypassMode->Reset();
+    m_unpackErr->Reset();
   }
 
   void TOPDQMModule::event()
@@ -399,9 +423,24 @@ namespace Belle2 {
     // fill event desynchronization
 
     if (m_digits.getEntries() > 0) {
+
+      // determine most common window number
+      std::map<unsigned, unsigned> firstWindows;
       for (const auto& digit : m_digits) {
-        int x = digit.getFirstWindow() != m_digits[0]->getFirstWindow() ? 1 : 0 ;
-        m_BoolEvtMonitor->Fill(x);
+        firstWindows[digit.getFirstWindow()] += 1;
+      }
+      auto it0 = firstWindows.begin();
+      for (auto it = firstWindows.begin(); it != firstWindows.end(); ++it) {
+        if (it->second > it0->second) it0 = it;
+      }
+
+      // fill histogram
+      for (const auto& digit : m_digits) {
+        int slot = digit.getModuleID();
+        int bs = digit.getBoardstackNumber();
+        double x = slot + bs / 4.0;
+        double y = digit.getFirstWindow() != it0->first ? 1 : 0 ;
+        m_BoolEvtMonitor->Fill(x, y);
       }
     }
 
@@ -452,8 +491,10 @@ namespace Belle2 {
       int asic_no = digit.getChannel() / 8;
       int asic_ch = digit.getChannel() % 8;
 
-      m_window_vs_slot->Fill(digit.getModuleID(), digit.getRawTime() / 64 + 220);
-      m_window_vs_asic[slot - 1]->Fill(asic_no, digit.getRawTime() / 64 + 220);
+      double window = digit.getRawTime() / 64 + 220;
+      if (window < 0) window += 512;
+      m_window_vs_slot->Fill(digit.getModuleID() + digit.getBoardstackNumber() / 4.0, window);
+      m_window_vs_asic[slot - 1]->Fill(asic_no, window);
 
       if (digit.getHitQuality() != TOPDigit::c_Junk) { // good hits
         m_goodHitsXY[slot - 1]->Fill(digit.getPixelCol(), digit.getPixelRow());
@@ -546,13 +587,23 @@ namespace Belle2 {
       }
       auto slot = femap->getModuleID();
       auto bs = femap->getBoardstackNumber();
-      double x = slot + bs / 4. - 0.5;
+      double x = slot + bs / 4.0;
       m_skipProcFlag->Fill(x, dbg.getSkipProcessingFlag());
       m_injVetoFlag->Fill(x, dbg.getInjectionVetoFlag());
       m_PSBypassMode->Fill(x, dbg.getPSBypassMode());
       if (dbg.getInjectionVetoFlag() != m_productionEventDebugs[0]->getInjectionVetoFlag()) differ = 1;
     }
     m_injVetoFlagDiff->Fill(differ);
+
+    if (m_unpackerErrors.isValid()) {
+      const auto& flags = m_unpackerErrors->getErrorFlags();
+      for (size_t bit = 0; bit < flags.size(); bit++) {
+        int slot = bit / 4 + 1;
+        int bs = bit % 4;
+        double x = slot + bs / 4.0;
+        m_unpackErr->Fill(x, flags[bit]);
+      }
+    }
 
   }
 

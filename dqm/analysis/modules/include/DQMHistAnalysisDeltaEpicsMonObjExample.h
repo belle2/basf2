@@ -32,11 +32,6 @@ namespace Belle2 {
   private:
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisDeltaEpicsMonObjExampleModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;

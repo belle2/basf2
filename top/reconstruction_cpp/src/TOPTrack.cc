@@ -132,7 +132,7 @@ namespace Belle2 {
         }
       }
 
-      // background rate estimation (TODO to be improved ...)
+      // background rate estimation
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
       const auto& tdc = geo->getNominalTDC();
@@ -377,6 +377,20 @@ namespace Belle2 {
       }
 
       return false;
+    }
+
+    void TOPTrack::setTOFCorrection(const DBObjPtr<TOPCalTOFCorrection>& tofCorrections)
+    {
+      if (not m_valid) return;
+      if (not tofCorrections.isValid()) return;
+      if (not tofCorrections->isCalibrated()) return;
+
+      const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      const auto& topModule = geo->getModule(m_moduleID);
+      const auto globalPosition = m_extHit->getPosition();
+      const auto position = topModule.pointGlobalToNominal(static_cast<XYZPoint>(globalPosition));
+
+      m_TOFCorrection = tofCorrections->get(position.Z());
     }
 
 

@@ -28,7 +28,7 @@ namespace Belle2 {
     using CDCRecoHit::CDCRecoHit;
 
     /// Destructor
-    ~AlignableCDCRecoHit() {}
+    ~AlignableCDCRecoHit() override {}
 
     /// Creating a copy of this hit.
     AlignableCDCRecoHit* clone() const override

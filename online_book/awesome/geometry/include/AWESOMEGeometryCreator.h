@@ -45,14 +45,14 @@ namespace Belle2::AWESOME {
     /**
      * Default destructor.
      */
-    virtual ~AWESOMEGeometryCreator();
+    ~AWESOMEGeometryCreator() override;
 
     /**
      * Create the AWESOME detector geometry in the world volume.
      * @param content Gearbox path to the detector geometry.
      * @param topVolume Geant4 world volume.
      */
-    void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes);
+    void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes) override;
 
   private:
 

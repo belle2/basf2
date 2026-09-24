@@ -163,7 +163,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   eclNeutral = 0;
   eclTrack = 0;
   for (int i = 0; i < nG; ++i) {
-    Particle* gamma = gamma_list->getParticle(i);
+    const Particle* gamma = gamma_list->getParticle(i);
     eclNeutral += gamma->getEnergy();
   }
   B2DEBUG(29, "Sum of neutral ECL " << eclNeutral);
@@ -174,7 +174,7 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   int charge_sum = 0;
 
   for (int i = 0; i < nCandidates; ++i) {
-    Particle* part = m_DiMuonList->getParticle(i);
+    const Particle* part = m_DiMuonList->getParticle(i);
     //vertex from vertex fit
     ROOT::Math::XYZVector v0Vertex = part->getVertex();
 

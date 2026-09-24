@@ -7,8 +7,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
 #include <cdc/topology/ILayer.h>
+
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -52,11 +53,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the local origin relative to which the parameters of the hough space are understood
-      TrackingUtilities::Vector2D getLocalOrigin() const
-      { return TrackingUtilities::Vector2D(m_localOriginX, m_localOriginY); }
+      ROOT::Math::XYVector getLocalOrigin() const
+      { return ROOT::Math::XYVector(m_localOriginX, m_localOriginY); }
 
       /// Setter for the local origin relative to which the parameters of the hough space are understood
-      void setLocalOrigin(const TrackingUtilities::Vector2D& localOrigin)
+      void setLocalOrigin(const ROOT::Math::XYVector& localOrigin)
       {
         m_localOriginX = localOrigin.x();
         m_localOriginY = localOrigin.y();

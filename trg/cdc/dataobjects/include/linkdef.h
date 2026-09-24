@@ -12,14 +12,19 @@
 #pragma link C++ class bitset <256>+; // checksum=0x88f1ea, version=2
 #pragma link C++ class Belle2::CDCTriggerSegmentHit+; // checksum=0x8fa70532, version=5
 #pragma link C++ class Belle2::CDCTriggerTrack+; // checksum=0x83d20587, version=14
+#pragma link C++ class Belle2::CDCTrigger3DHTrack+; // checksum=0xf0c0753c, version=1
 #pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x67ae26ef, version=11
 #pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x62b29f0b, version=5
+#pragma link C++ class Belle2::CDCTriggerHoughMLP+; // checksum=0xd5f781f1, version=1
+#pragma link C++ class Belle2::NeuroParametersHough+; // checksum=0x3d4f01f1, implicit, version=1
+#pragma link C++ class Belle2::CDCTriggerDVTMLP+; // checksum=0xf70accbc, implicit, version=1
+#pragma link C++ class Belle2::CDCTrigger3DHMLP+; // checksum=0x78d58679, implicit, version=1
+#pragma link C++ class Belle2::CDCTriggerNDFinderLUTs+;
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x219165f4, version=2
 #pragma link C++ class Belle2::CDCTriggerFinderClone+; // checksum=0x6581a3cf, version=1
 #pragma link C++ class Belle2::TRGCDCTSFUnpackerStore+; // checksum=0x8b9e5f2, version=1
 #pragma link C++ class Belle2::TRGCDCETFUnpackerStore+; // checksum=0x3723963b, version=2
-#pragma link C++ class Belle2::CDCTrigger3DFinderInfo+; // checksum=0x310d99ca, version=2
 
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, 429>, 4>, 5> >+; // checksum=0xc26a7849, version=4
 #pragma link C++ class Belle2::Bitstream<array<array<array<char, TSF_TO_2D_WIDTH>, NUM_2D>, NUM_TSF> >+; // checksum=0xc3cfbe4d, version=4

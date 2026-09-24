@@ -34,8 +34,7 @@ ParticleMCDecayStringModule::ParticleMCDecayStringModule() : Module(), m_tree(""
                  "The mapping hash <-> MC decay string in saved in a TTree by this module.  "
                  "The 32bit pattern must be saved as a float (because our extra info field, variable manager and ntuple output only supports float) "
                  "but they just represent 32 bits of a hash!  "
-                 "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  "
-                 "Details on the MC decay string format can be found here: `MCDecayString`");
+                 "The MC decay string can also be stored in an analysis ROOT file using the MCDecayString NtupleTool.  ");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
   addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
   addParam("fileName", m_fileName, "Filename in which the hash strings are saved, if empty the strings are not saved",
@@ -118,8 +117,6 @@ void ParticleMCDecayStringModule::event()
     m_decayHash = bitconverter.f;
     particle->addExtraInfo(c_ExtraInfoName, m_decayHash);
 
-    // cppcheck doesn't like this use of union and throws warnings
-    // cppcheck-suppress redundantAssignment
     bitconverter.i = decayHashExtended;
     m_decayHashExtended = bitconverter.f;
     particle->addExtraInfo(c_ExtraInfoNameExtended, m_decayHashExtended);
@@ -166,7 +163,7 @@ const MCParticle* ParticleMCDecayStringModule::getInitialParticle(const MCPartic
   if (mcPMother == nullptr) {
     return mcP;
   } else {
-    return getInitialParticle(mcPMother);
+    return ParticleMCDecayStringModule::getInitialParticle(mcPMother);
   }
 }
 
@@ -211,7 +208,7 @@ std::string ParticleMCDecayStringModule::getDecayStringFromParticle(const Partic
 
   if (not isFSP(p->getPDGCode())) {
     output += " (-->";
-    for (auto daughter : p->getDaughters()) {
+    for (const auto* daughter : p->getDaughters()) {
       output += getDecayStringFromParticle(daughter);
     }
     output += ")";
@@ -229,7 +226,7 @@ std::string ParticleMCDecayStringModule::getMCDecayStringFromParticle(const Part
   output = getMCDecayStringFromMCParticle(p->getRelatedTo<MCParticle>());
   // Some FSPs can have daughters, e.g. converted Photons and K-Shorts
   if (not isFSP(p->getPDGCode())) {
-    for (auto& daughter : p->getDaughters()) {
+    for (const auto* daughter : p->getDaughters()) {
       output += " | " + getMCDecayStringFromParticle(daughter);
     }
   }
@@ -268,7 +265,7 @@ std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mc
 
   if (not isFSP(mcPMother->getPDG())) {
     ss << " (-->";
-    for (auto daughter : mcPMother->getDaughters()) {
+    for (const auto* daughter : mcPMother->getDaughters()) {
       ss << buildMCDecayString(daughter, mcPMatched);
     }
     ss << ")";

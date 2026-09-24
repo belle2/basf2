@@ -9,14 +9,18 @@
 
 #include <tracking/trackingUtilities/eventdata/hits/CDCRLWireHit.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
-#include <tracking/trackingUtilities/geometry/Vector2D.h>
+#include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/ERotation.h>
 
 #include <cdc/topology/EStereoKind.h>
 #include <cdc/topology/ISuperLayer.h>
 
-#include <tracking/trackingUtilities/numerics/ERightLeft.h>
-#include <tracking/trackingUtilities/numerics/ERotation.h>
+#include <framework/geometry/VectorUtil.h>
+#include <tracking/trackingUtilities/geometry/VectorUtil.h>
+
+#include <Math/Vector3D.h>
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   class CDCSimHit;
@@ -54,7 +58,7 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const ROOT::Math::XYZVector& recoPos3D, double arcLength2D = 0);
 
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the associated wirehit.
@@ -176,7 +180,7 @@ namespace Belle2 {
       {
         return (getRLWireHit() < other.getRLWireHit() or
                 (getRLWireHit() == other.getRLWireHit() and
-                 getRecoPos3D() < other.getRecoPos3D()));
+                 VectorUtil::smaller(getRecoPos3D(), other.getRecoPos3D())));
       }
 
       /// Defines wires and the three dimensional reconstructed hits as coaligned.
@@ -281,21 +285,23 @@ namespace Belle2 {
       }
 
       /// Getter for the 3d position of the hit.
-      const Vector3D& getRecoPos3D() const
+      const ROOT::Math::XYZVector& getRecoPos3D() const
       {
         return m_recoPos3D;
       }
 
       /// Setter for the 3d position of the hit.
-      void setRecoPos3D(const Vector3D& recoPos3D)
+      void setRecoPos3D(const ROOT::Math::XYZVector& recoPos3D)
       {
         m_recoPos3D = recoPos3D;
       }
 
       /// Getter for the 2d position of the hit.
-      const Vector2D& getRecoPos2D() const
+      /// This used to return a reference, but that's not possible when creating the vector on the fly
+      /// after moving to ROOT::Math::Vector(2/3)D
+      const ROOT::Math::XYVector getRecoPos2D() const
       {
-        return getRecoPos3D().xy();
+        return VectorUtil::getXYVector(getRecoPos3D());
       }
 
       /// Getter for the z coordinate of the reconstructed position.
@@ -305,19 +311,19 @@ namespace Belle2 {
       }
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
-      Vector2D getRecoDisp2D() const;
+      ROOT::Math::XYVector getRecoDisp2D() const;
 
       /// Getter for the direction of flight
-      Vector2D getFlightDirection2D() const
+      ROOT::Math::XYVector getFlightDirection2D() const
       {
         ERotation rotation = static_cast<ERotation>(-getRLInfo());
-        return getRecoDisp2D().orthogonal(rotation);
+        return VectorUtil::Orthogonal(getRecoDisp2D(), rotation);
       }
 
       /// Getter for the direction of flight relative to the position
       double getAlpha() const
       {
-        return getRecoPos2D().angleWith(getFlightDirection2D());
+        return ROOT::Math::VectorUtil::DeltaPhi(getRecoPos2D(), getFlightDirection2D());
       }
 
       /**
@@ -333,7 +339,7 @@ namespace Belle2 {
       CDCRecoHit2D stereoProjectToRef() const;
 
       /// Returns the position of the wire in the xy plain the reconstructed position is located in.
-      Vector2D getRecoWirePos2D() const;
+      ROOT::Math::XYVector getRecoWirePos2D() const;
 
       /// Scales the displacement vector in place to lie on the drift circle.
       void snapToDriftCircle(bool switchSide = false);
@@ -388,7 +394,7 @@ namespace Belle2 {
       CDCRLWireHit m_rlWireHit;
 
       /// Memory for the reconstructed hit position.
-      Vector3D m_recoPos3D;
+      ROOT::Math::XYZVector m_recoPos3D;
 
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D = 0;

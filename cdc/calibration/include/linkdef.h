@@ -17,5 +17,6 @@
 #pragma link C++ class Belle2::CDC::CrudeT0CalibrationAlgorithm-;
 #pragma link C++ class Belle2::CDC::WireEfficiencyAlgorithm-;
 #pragma link C++ class Belle2::CDC::FudgeFactorCalibrationAlgorithm-;
+#pragma link C++ class Belle2::CDC::DeadBoardAlgorithm-;
 
 #endif

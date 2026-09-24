@@ -22,7 +22,7 @@ namespace Belle2 {
     TestDBAccessAlgorithm();
 
     /// Destructor
-    virtual ~TestDBAccessAlgorithm() {}
+    ~TestDBAccessAlgorithm() override {}
     /// Setter for m_generatePayloads
     void setGeneratePayloads(const bool& value) {m_generatePayloads = value;}
     /// Getter for m_generatePayloads
@@ -32,7 +32,7 @@ namespace Belle2 {
   protected:
 
     /// Run algo on data
-    virtual EResult calibrate() override;
+    EResult calibrate() override;
 
   private:
     /// Grabs DBObjects from the Database and finds out the average distance from 42.

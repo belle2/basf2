@@ -24,8 +24,8 @@
 #include <top/dbobjects/TOPSampleTimes.h>
 
 // Root
-#include "TFile.h"
-#include "TProfile.h"
+#include <TFile.h>
+#include <TProfile.h>
 #include <TSystem.h>
 #include <TMatrixDSym.h>
 
@@ -95,10 +95,6 @@ namespace Belle2 {
 
   }
 
-  TOPTimeBaseCalibratorModule::~TOPTimeBaseCalibratorModule()
-  {
-  }
-
   void TOPTimeBaseCalibratorModule::initialize()
   {
 
@@ -135,10 +131,6 @@ namespace Belle2 {
 
   }
 
-
-  void TOPTimeBaseCalibratorModule::beginRun()
-  {
-  }
 
   void TOPTimeBaseCalibratorModule::event()
   {
@@ -208,10 +200,6 @@ namespace Belle2 {
 
   }
 
-
-  void TOPTimeBaseCalibratorModule::endRun()
-  {
-  }
 
   void TOPTimeBaseCalibratorModule::terminate()
   {
@@ -363,7 +351,7 @@ namespace Belle2 {
     // calculate average time difference
 
     double meanTimeDifference = 0;
-    for (auto& x : profMeans) meanTimeDifference += x;
+    for (const auto& x : profMeans) meanTimeDifference += x;
     meanTimeDifference /= profMeans.size();
     meanTimeDifference -= int(meanTimeDifference / static_cast<double>(c_TimeAxisSize)) * c_TimeAxisSize;
 
@@ -672,8 +660,6 @@ namespace Belle2 {
     for (const auto& twoTimes : ntuple) {
       if (!twoTimes.good) continue;
 
-      std::vector<double> m(c_TimeAxisSize, 0.0);
-
       int i1 = int(twoTimes.t1);
       double fr = twoTimes.t1 - i1;
       double samp0 = i1 % 256;
@@ -708,7 +694,7 @@ namespace Belle2 {
                                                     const std::string& name,
                                                     const std::string& title,
                                                     const std::string& xTitle,
-                                                    const std::string& yTitle) const
+                                                    const std::string& yTitle)
   {
     if (vec.empty()) return;
 
@@ -728,7 +714,7 @@ namespace Belle2 {
                                                     const string& name,
                                                     const string& title,
                                                     const string& xTitle,
-                                                    const string& yTitle) const
+                                                    const string& yTitle)
   {
     if (vec.empty()) return;
 
@@ -745,7 +731,7 @@ namespace Belle2 {
 
   void TOPTimeBaseCalibratorModule::saveAsHistogram(const TMatrixDSym& M,
                                                     const string& name,
-                                                    const string& title) const
+                                                    const string& title)
   {
     int n = M.GetNrows();
     TH2F h(name.c_str(), title.c_str(), n, 0, n, n, 0, n);

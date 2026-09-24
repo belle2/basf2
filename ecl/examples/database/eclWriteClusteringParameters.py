@@ -25,6 +25,7 @@
 #   CRF_timeCut_maxEnergy0 [ECLCRFinder]: max energy for seed time cut [GeV]
 #   CRF_timeCut_maxEnergy1 [ECLCRFinder]: max energy for growth time cut [GeV]
 #   CRF_timeCut_maxEnergy2 [ECLCRFinder]: max energy for digit time cut [GeV]
+#   F_clusterEnergyCutMin [ECLFinalizer]: min energy for cluster [GeV]
 
 from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import ECLClusteringParameters, Database, IntervalOfValidity
@@ -41,6 +42,8 @@ parameters.setCRFTimeCut(CRF_time_cut)
 
 CRF_timeCut_maxEnergy = array.array('d', [99999.0, 99999.0, 0.0])
 parameters.setCRFTimeCutMaxEnergy(CRF_timeCut_maxEnergy)
+
+parameters.setFClusterEnergyCutMin(0.020)
 
 database = Database.Instance()
 

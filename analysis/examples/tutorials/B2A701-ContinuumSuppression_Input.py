@@ -156,7 +156,7 @@ targetVar = ['isNotContinuumEvent']
 # Create output file.
 ma.variablesToNtuple(decayString='B0',
                      variables=trainVars + targetVar,
-                     treename='tree',
+                     treename='B0',
                      filename=outfile,
                      path=my_path)
 

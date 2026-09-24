@@ -13,6 +13,8 @@
 
 #include <cdc/dataobjects/WireID.h>
 
+#include <Math/Vector3D.h>
+
 using namespace Belle2;
 using namespace TrackingUtilities;
 
@@ -30,8 +32,8 @@ TEST_F(TrackingUtilitiesTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
   }
   // Try to iterate over the track
   for (CDCRecoHit3D& recoHit3D : track) {
-    recoHit3D.setRecoPos3D(Vector3D(0.0, 0.0, 0.0));
+    recoHit3D.setRecoPos3D(ROOT::Math::XYZVector(0.0, 0.0, 0.0));
   }
 
-  EXPECT_ALL_NEAR(Vector3D(0.0, 0.0, 0.0), track[0].getRecoPos3D(), 1);
+  EXPECT_ALL_NEAR(ROOT::Math::XYZVector(0.0, 0.0, 0.0), track[0].getRecoPos3D(), 1);
 }

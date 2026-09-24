@@ -104,6 +104,22 @@ def importEmptyGainMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     Belle2.Database.Instance().storeData('PXDGainMapPar', GainMap, iov)
 
 
+def importEmptyPixelThresholdMap(expLow=0, runLow=0, expHigh=-1, runHigh=-1):
+    """
+    This function imports an empty payloads for the PXD
+    charge threshold.
+
+    This function works for every Belle 2 geometry
+    """
+
+    # Create an empty pixel threshold set
+    PixelThreshold = Belle2.PXDPixelThresholdPar()
+
+    # Set the iov for the mask
+    iov = Belle2.IntervalOfValidity(expLow, runLow, expHigh, runHigh)
+    Belle2.Database.Instance().storeData('PXDPixelThresholdPar', PixelThreshold, iov)
+
+
 def importRandomPixelMaskPhase2(HotPixelFraction=0.001, expLow=0, runLow=0, expHigh=-1, runHigh=-1):
     """
     This function imports payloads for the PXD

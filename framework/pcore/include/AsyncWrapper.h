@@ -34,7 +34,7 @@ namespace Belle2 {
      */
     explicit AsyncWrapper(const std::string& moduleType);
 
-    ~AsyncWrapper();
+    ~AsyncWrapper() override;
 
     /** Access wrapped module (owned by AsyncWrapper). */
     ModulePtr getWrapped() { return m_wrappedModule; }

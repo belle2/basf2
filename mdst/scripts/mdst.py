@@ -19,7 +19,6 @@ MDST_OBJECTS = (
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
     'Kinks',
-    'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
     'TrackFitResults',
@@ -131,7 +130,7 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable"],
+        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable", "getCDCnLayerHitsUsed"],
                          (
                              {
                                  "isAvailable": pid_detectors,
@@ -179,7 +178,7 @@ def add_mdst_dump(path, print_untested=False, print_mutable=True):
             "getAssociatedEclClusterFlag", "getAssociatedTrackFlag",
             "getClusterTrackRotationAngle", "getClusterTrackSeparationAngle",
             "getClusterTrackSeparation",
-            "getShapeStdDev1", "getShapeStdDev2", "getShapeStdDev3"
+            "getShapeStdDev1", "getShapeStdDev2", "getShapeStdDev3", "getKLMnDigits"
         ], {
             "getRelationsWith": ["KlIds", "MCParticles"],
         }),

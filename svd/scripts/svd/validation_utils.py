@@ -86,6 +86,17 @@ def get_agreement(histo_eventT0, histo_diff, min_entries=100):
         return np.nan
 
 
+def get_difference(histo1, histo2, min_entries=100):
+    '''
+    Get the difference between mean of two histograms, e.g. between CDC and SVD event T0
+    Not sure yet i need this, maybe get_agreement() is enough.
+    '''
+    if histo1.GetEntries() > min_entries and histo2.GetEntries() > min_entries:
+        return histo1.GetMean() - histo2.GetMean()
+    else:
+        return np.nan
+
+
 def get_precision(histo_diff, min_entries=100):
     '''
     Get the RMS of the difference between the mean time of the clusters on tracks
@@ -197,7 +208,6 @@ def make_combined_plot(pattern, histos, title=None):
 
     # normalise h_eventT0 to have same number of entries as h_onTracks
     h_eventT0 = (h_eventT0[0]*sum(h_onTracks[0])/sum(h_eventT0[0]), h_eventT0[1])
-
     plt.figure()
     plt.hist(h_onTracks[1][0][:-1], h_onTracks[1][0], weights=h_onTracks[0], histtype='step', label='on tracks')
     plt.hist(h_offTracks[1][0][:-1], h_offTracks[1][0], weights=h_offTracks[0], histtype='step', label='off tracks')
@@ -218,7 +228,7 @@ for layer in range(3, 7):
         for sensor in range(1, sensor_on_layer[layer-3]+1):
             for side in ['U', 'V']:
                 names_sides.append(f'L{layer}L{ladder}S{sensor}{side}')
-
+names_layer_sides = [f'L{layer}S{side}' for layer in range(3, 7) for side in ['U', 'V']]
 
 # grouped sensors integrating phi
 names_grouped_sides = []
@@ -235,18 +245,27 @@ def get_histos(CollectorHistograms):
 
     histos = {}
 
+    for det in ['CDC', 'SVD']:
+        try:
+            histos[f'{det}eventT0'] = CollectorHistograms[f'hEventT0From{det}']
+        except KeyError:
+            print(f'No eventT0 histogram for {det}, creating empty histogram')
+            #  empty histos
+            histos[f'{det}eventT0'] = r.TH1F(f'{det}eventT0', f'{det}eventT0', 300, -150, 150)
     histos['eventT0'] = CollectorHistograms['hEventT0']
 
     histos_all = {}
     histos['onTracks'] = {}
     histos['diff'] = {}
     histos['timeShifter'] = {}
+    histos['absoluteShift'] = {}
 
     __hClsTimeOnTracks__ = CollectorHistograms['hClsTimeOnTracks']
     __hClsTimeAll__ = CollectorHistograms['hClsTimeAll']
     __hClsDiffTimeOnTracks__ = CollectorHistograms['hClsDiffTimeOnTracks']
     __hClusterSizeVsTimeResidual__ = CollectorHistograms['hClusterSizeVsTimeResidual']
     __hBinToSensorMap__ = CollectorHistograms['hBinToSensorMap']
+    __hAbsoluteShiftValues__ = CollectorHistograms['hAbsoluteShiftValues']
 
     for name_side in names_sides:
         sensorBin = __hBinToSensorMap__.GetXaxis().FindBin(name_side)
@@ -273,6 +292,13 @@ def get_histos(CollectorHistograms):
         histos_all[name_side] = hClsTimeAll
         histos['diff'][name_side] = hClsDiffTimeOnTracks
         histos['timeShifter'][name_side] = hClusterSizeVsTimeResidual
+    # __hAbsoluteShiftValues__.SetDirectory(0)
+    #  for the absolute shift we are iterating on pair layers/side, not individual sensors
+    for layer in range(3, 7):
+        for side in [True, False]:
+            layder_side = f'L{layer}S{"U" if side else "V"}'
+            histos["absoluteShift"][layder_side] = __hAbsoluteShiftValues__.GetBinContent(
+                __hAbsoluteShiftValues__.GetXaxis().FindBin(layder_side))
 
     histos['offTracks'] = {key: get_histo_offTracks(histos_all[key], histos['onTracks'][key])
                            for key in histos['onTracks']}
@@ -313,9 +339,15 @@ def get_merged_collector_histograms(files):
                                                        "hClsTimeAll": [],
                                                        "hClsDiffTimeOnTracks": [],
                                                        "hClusterSizeVsTimeResidual": [],
-                                                       "hBinToSensorMap": []}
+                                                       "hBinToSensorMap": [],
+                                                       "hEventT0FromCDC": [],
+                                                       "hEventT0FromSVD": [],
+                                                       "hAbsoluteShiftValues": []
+                                                       }
 
             __hEventT0__ = in_file.Get(get_full_path('hEventT0', exp, run, base_dir))
+            __hEventT0FromCDC__ = in_file.Get(get_full_path('hEventT0FromCDC', exp, run, base_dir))
+            __hEventT0FromSVD__ = in_file.Get(get_full_path('hEventT0FromSVD', exp, run, base_dir))
             __hClsTimeOnTracks__ = in_file.Get(get_full_path('__hClsTimeOnTracks__',
                                                              exp, run, base_dir))
             __hClsTimeAll__ = in_file.Get(get_full_path('__hClsTimeAll__',
@@ -326,18 +358,31 @@ def get_merged_collector_histograms(files):
                                                                        exp, run, base_dir))
             __hBinToSensorMap__ = in_file.Get(get_full_path('__hBinToSensorMap__',
                                                             exp, run, base_dir))
+            __hAbsoluteShiftValues__ = in_file.Get(get_full_path('hAbsoluteShiftValues',
+                                                                 exp, run, base_dir))
+
             __hEventT0__.SetDirectory(0)
+            __hEventT0FromCDC__.SetDirectory(0)
+            __hEventT0FromSVD__.SetDirectory(0)
             __hClsTimeOnTracks__.SetDirectory(0)
             __hClsTimeAll__.SetDirectory(0)
             __hClsDiffTimeOnTracks__.SetDirectory(0)
             __hClusterSizeVsTimeResidual__.SetDirectory(0)
             __hBinToSensorMap__.SetDirectory(0)
+            __hAbsoluteShiftValues__.SetDirectory(0)
             CollectorHistograms[algo][exp][run]["hEventT0"].append(__hEventT0__)
             CollectorHistograms[algo][exp][run]["hClsTimeOnTracks"].append(__hClsTimeOnTracks__)
             CollectorHistograms[algo][exp][run]["hClsTimeAll"].append(__hClsTimeAll__)
             CollectorHistograms[algo][exp][run]["hClsDiffTimeOnTracks"].append(__hClsDiffTimeOnTracks__)
             CollectorHistograms[algo][exp][run]["hClusterSizeVsTimeResidual"].append(__hClusterSizeVsTimeResidual__)
             CollectorHistograms[algo][exp][run]["hBinToSensorMap"].append(__hBinToSensorMap__)
+            CollectorHistograms[algo][exp][run]["hEventT0FromCDC"].append(__hEventT0FromCDC__)
+            CollectorHistograms[algo][exp][run]["hEventT0FromSVD"].append(__hEventT0FromSVD__)
+            # absolute shift values are the same for a given exp and run, so don't append.
+            # just overwrite: if not already present it is setting the histo,
+            # overwrting else. It avoids logic of checking wether or not it is already
+            # here
+            CollectorHistograms[algo][exp][run]["hAbsoluteShiftValues"] = [__hAbsoluteShiftValues__]
 
         in_file.Close()
 

@@ -59,24 +59,32 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   vector<double>* dedxhit = 0;
   ttree->SetBranchAddress("dedxhit", &dedxhit);
 
+  double costh;
+  ttree->SetBranchAddress("costh", &costh);
+
   // dedxhit vector to store dE/dx values for each wire
   map<int, vector<double>> wirededx;
 
   //IL = Inner Layer and OL = Outer Layer
   array<TH1D*, 2> hdedxL;
   string label[2] = {"IL", "OL"};
+
   for (int il = 0; il < 2; il++)
     hdedxL[il] = new TH1D(Form("hdedx%s_%s", label[il].data(), m_suffix.data()), "", m_dedxBins, m_dedxMin, m_dedxMax);
 
+  int slWireBoundary = 2240; // Outer layers (used for normalization) start here
+
   for (int i = 0; i < ttree->GetEntries(); ++i) {
     ttree->GetEvent(i);
-    for (unsigned int j = 0; j < wire->size(); ++j) {
-      int jwire = wire->at(j);
-      double jhitdedx = dedxhit->at(j);
-      wirededx[jwire].push_back(jhitdedx);
-      //wire # 1279 end of inner layers
-      if (jwire < 1280) hdedxL[0]->Fill(jhitdedx);
-      else hdedxL[1]->Fill(jhitdedx);
+    if (costh > -0.55 && costh < 0.82) {
+      for (unsigned int j = 0; j < wire->size(); ++j) {
+        int jwire = wire->at(j);
+        double jhitdedx = dedxhit->at(j);
+        wirededx[jwire].push_back(jhitdedx);
+
+        if (jwire < slWireBoundary) hdedxL[0]->Fill(jhitdedx);
+        else hdedxL[1]->Fill(jhitdedx);
+      }
     }
   }
 
@@ -87,7 +95,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   if (minstat > 0.10 * c_nwireCDC) return c_NotEnoughData;
 
-  //25-75 is average bin # for truncation
+  //25-75 is average bin # for trunction
   array<unsigned int, 2> minbinL, maxbinL;
   for (int il = 0; il < 2; il++) {
     getTruncatedBins(hdedxL[il], minbinL[il], maxbinL[il]);
@@ -100,7 +108,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
   vector<TH1D*> hdedxhit(c_nwireCDC);
 
   B2INFO("Creating CDCGeometryPar object");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   vector<double> layermean(c_maxNSenseLayers);
 
@@ -126,7 +134,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
       if (!m_isWireTruc) {
         getTruncatedBins(hdedxhit[jwire], minbin, maxbin);
       } else {
-        if (jwire < 1280) {
+        if (jwire < slWireBoundary) {
           minbin = minbinL[0];
           maxbin =  maxbinL[0];
         } else {
@@ -160,7 +168,8 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
     else layermean[il] = 1.0;
 
     //calculate outer layer average for active layer
-    if (il >= 8 && layermean[il] > 0) {
+    unsigned int layerBoundary = 14; // Outer layers (used for normalization) start here
+    if (il >= layerBoundary && layermean[il] > 0) {
       layeravg += layermean[il];
       activelayers++;
     }
@@ -217,6 +226,8 @@ void CDCDedxWireGainAlgorithm::getExpRunInfo()
 
   const auto erEnd = getRunList()[cruns - 1];
   int rend = erEnd.second;
+
+  m_exp = estart;
 
   updateDBObjPtrs(1, rstart, estart);
 
@@ -300,7 +311,7 @@ void CDCDedxWireGainAlgorithm::plotLayerDist(array<TH1D*, 2> hdedxL)
     hdedxL[il]->SetTitle(Form("%s, trunc(%0.02f - %0.02f);dedxhit;entries", hdedxL[il]->GetTitle(), lowedge, upedge));
     hdedxL[il]->Draw("histo");
 
-    TH1D* hdedxLC = (TH1D*)hdedxL[il]->Clone(Form("%s_c", hdedxL[il]->GetName()));
+    TH1D* hdedxLC = static_cast<TH1D*>(hdedxL[il]->Clone(Form("%s_c", hdedxL[il]->GetName())));
     hdedxLC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxLC->SetFillColor(kAzure + 1);
     hdedxLC->Draw("same histo");
@@ -338,7 +349,7 @@ void CDCDedxWireGainAlgorithm::plotWireDist(const vector<TH1D*>& hist, const vec
     ctmp.cd(iw % 16 + 1);
     hist[iw]->DrawCopy();
 
-    TH1D* hdedxhitC = (TH1D*)hist[iw]->Clone(Form("%sC", hist[iw]->GetName()));
+    TH1D* hdedxhitC = static_cast<TH1D*>(hist[iw]->Clone(Form("%sC", hist[iw]->GetName())));
     hdedxhitC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxhitC->SetFillColor(kAzure + 1);
     hdedxhitC->DrawCopy("same histo");
@@ -374,7 +385,7 @@ void CDCDedxWireGainAlgorithm::plotWireGain(const vector<double>& vdedx_means, c
         && i == 0) hconstpw[i]->SetTitle(Form("merged wiregain rel-const  (%s), avg = %0.03f; wire numbers;<dedxhit>", m_suffix.data(),
                                                 layeravg));
 
-    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%s", m_suffix.data()), "", 400, -0.5, 2.5);
+    hconstpwvar[i] = new TH1D(Form("hconstpwvar_%d_%s", i, m_suffix.data()), "", 400, -0.5, 2.5);
     hconstpwvar[i]->SetTitle(Form("wiregain const (%s); wire gains; nentries", m_suffix.data()));
     if (m_isMerge
         && i == 0) hconstpwvar[i]->SetTitle(Form("merged wiregain rel-const (%s), avg = %0.03f; wire gains; nentries", m_suffix.data(),
@@ -445,7 +456,7 @@ void CDCDedxWireGainAlgorithm::plotLayerGain(const vector<double>& layermean, do
 void CDCDedxWireGainAlgorithm::plotWGPerLayer(const vector<double>& vdedx_means, const vector<double>& layermean, double layeravg)
 {
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   TCanvas clconst("clconst", "", 800, 500);
   clconst.Divide(2, 2);

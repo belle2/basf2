@@ -308,7 +308,7 @@ Quick plots
         plt.style.use('belle2')
         
         var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(var_list, library='pd')
         
         m_bins = 50
         m_range = (0, 10)
@@ -340,7 +340,7 @@ Quick plots
         plt.style.use('belle2')
         
         var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(var_list, library='pd')
         
         m_bins = 50
         m_range = (0, 10)

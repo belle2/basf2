@@ -22,9 +22,6 @@ namespace Belle2 {
       /** Constructor */
       TOPModuleT0LLAlgorithm();
 
-      /** Destructor */
-      virtual ~TOPModuleT0LLAlgorithm() {}
-
       /**
        * Sets minimal module T0 uncertainty to declare this calibration as c_OK
        * @param minError minimal uncertainty [ns]

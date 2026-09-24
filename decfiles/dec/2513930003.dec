@@ -1,0 +1,21 @@
+# EventType: 2513930003
+# Descriptor: [ccbar Lambdacm2PpEmEm]
+# NickName: Lambdacm2PpEmEm
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal 
+# Date: 20260327 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+# Pythia6 definition "32" for "vpho -> q qbar" should be used.
+#   (this is automatically converted to Pythia8 definition "91")
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Decay anti-Lambda_c-
+1.000 p+  e-  e-          PHOTOS  PHSP;
+Enddecay
+
+
+End

@@ -88,7 +88,7 @@ namespace Belle2::Conditions {
     boost::python::list getGlobalTagsPy() { return m_globalTags.ensurePy(); }
 
     /** Get the std::vector of default globaltags */
-    std::vector<std::string> getDefaultGlobalTags() const;
+    static std::vector<std::string> getDefaultGlobalTags();
     /** Get the tuple of default globaltags as python version */
     boost::python::tuple getDefaultGlobalTagsPy() const;
 
@@ -231,9 +231,18 @@ namespace Belle2::Conditions {
     /** Get the list of metadata providers in python */
     boost::python::list getMetadataProvidersPy() { return m_metadataProviders.ensurePy(); }
     /** Get the default server URL for the remote metadata provider */
-    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultRemoteMetadataProviderServer; }
+    // exposed to Python as a property: boost::python cannot wrap a function
+    // returning a reference without an explicit return_value_policy
+    // cppcheck-suppress returnByReference
+    std::string getDefaultRemoteMetadataProviderServer() { return m_defaultLegacyRemoteMetadataProviderServer; }
+    /** Get the default server URL for the HSF central metadata provider */
+    // exposed to Python as a property: boost::python cannot wrap a function
+    // returning a reference without an explicit return_value_policy
+    // cppcheck-suppress returnByReference
+    std::string getDefaultHSFRemoteMetadataProviderServer() { return m_defaultHSFRemoteMetadataProviderServer; }
     /** Get the default local path for the local metadata provider */
-    std::string getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+    const std::string& getDefaultLocalMetadataProviderPath() { return m_defaultLocalMetadataProviderPath; }
+
     ///@}
 
     /** @name Payload Location Configuration
@@ -274,14 +283,14 @@ namespace Belle2::Conditions {
     /** Set the file where to save newly created payload information */
     void setNewPayloadLocation(const std::string& filename) { ensureEditable(); m_newPayloadFile = filename; }
     /** Get the filename where to save newly created payload information */
-    std::string getNewPayloadLocation() const { return m_newPayloadFile; }
+    const std::string& getNewPayloadLocation() const { return m_newPayloadFile; }
 
     /** Set the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
     void setDownloadCacheDirectory(const std::string& directory) { ensureEditable(); m_downloadCacheDirectory = directory; }
     /** Get the directory where to place downloaded payloads. Empty string is
      * shorthand to put them in a folder `basf2-conditions` in the temp dir */
-    std::string getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
+    const std::string& getDownloadCacheDirectory() const { return m_downloadCacheDirectory; }
 
     /** Set the timeout we try to lock a file in the download cache directory for downloading */
     void setDownloadLockTimeout(size_t timeout) { ensureEditable(); m_downloadLockTimeout = timeout; }
@@ -333,8 +342,10 @@ namespace Belle2::Conditions {
     CppOrPyList m_metadataProviders;
     /** the list with all the payload locations */
     CppOrPyList m_payloadLocations;
-    /** default server URL for the remote metadata provider */
-    std::string m_defaultRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
+    /** default server URL for the (legacy) remote metadata provider */
+    std::string m_defaultLegacyRemoteMetadataProviderServer{"http://belle2db.sdcc.bnl.gov/b2s/rest/"};
+    /** default server URL for the HSF remote metadata provider */
+    std::string m_defaultHSFRemoteMetadataProviderServer{"http://blcdb.sdcc.bnl.gov/api/cdb_rest/"};
     /** default local path for the local metadata provider */
     std::string m_defaultLocalMetadataProviderPath{"/cvmfs/belle.cern.ch/conditions"};
     /** the file to put the newly created payload information */
@@ -343,8 +354,9 @@ namespace Belle2::Conditions {
     std::string m_downloadCacheDirectory{""};
     /** the timeout when trying to lock files in the download directory */
     size_t m_downloadLockTimeout{120};
-    /** the tag states accepted for processing */
-    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING"};
+    /** the tag states accepted for processing, including states from the HSF CDB */
+    std::set<std::string> m_usableTagStates{"TESTING", "VALIDATED", "PUBLISHED", "RUNNING",
+      "locked", "frozen"};
     /** the callback function to determine the final final list of globaltags */
     std::optional<boost::python::object> m_callback;
     /** bool indicating whether the database has been initialized, in which case any changes to the configuration object

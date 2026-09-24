@@ -10,6 +10,7 @@
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -156,7 +157,7 @@ namespace Belle2 {
           int imin = -1; double dmin = 1e100;
           for (unsigned int i = 0; i < m_triangleCenters.size(); i++) {
             const xy_t& p = m_triangleCenters[i];
-            double d = pow(p.x - x, 2) + pow(p.y - y, 2);
+            double d = square(p.x - x) + square(p.y - y);
             if (d < dmin) {imin = i; dmin = d;}
           }
           int k = iy + ny * ix;
@@ -252,17 +253,17 @@ namespace Belle2 {
     /** Spatial index */
     vector<short int> m_spatialIndex;
     /** Border of the region where the spatial index is constructed */
-    double m_xmin;
+    double m_xmin{0};
     /** Border of the region where the spatial index is constructed */
-    double m_xmax;
+    double m_xmax{0};
     /** Border of the region where the spatial index is constructed */
-    double m_ymin;
+    double m_ymin{0};
     /** Border of the region where the spatial index is constructed */
-    double m_ymax;
+    double m_ymax{0};
     /** Spatial index grid size */
-    unsigned int m_nx;
+    unsigned int m_nx{0};
     /** Spatial index grid size */
-    unsigned int m_ny;
+    unsigned int m_ny{0};
     /** Reciprocals to speedup the index calculation */
     double m_ixnorm{1};
     /** Reciprocals to speedup the index calculation */
@@ -678,10 +679,6 @@ namespace Belle2 {
     return res;
   }
 
-  void BFieldComponentBeamline::terminate()
-  {
-  }
-
   /** Static function holding the instance.*/
   BFieldComponentBeamline** GetInstancePtr()
   {
@@ -697,6 +694,8 @@ namespace Belle2 {
       // Constructor creates a new instance, inits gInstance.
       new BFieldComponentBeamline();
     }
+    // the constructor above assigns *gInstance, which cppcheck does not track
+    // cppcheck-suppress nullPointerRedundantCheck
     return **gInstance;
   }
 

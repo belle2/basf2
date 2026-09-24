@@ -23,7 +23,7 @@ bool CDCPathTruthVarSet::extract(const BaseCDCPathFilter::Object* path)
   auto* seedRecoTrack = seed.getSeed();
   auto* seedMCTrack = seedRecoTrack->getRelated<RecoTrack>("MCRecoTracks");
 
-  MCParticle* seedMCParticle;
+  const MCParticle* seedMCParticle;
   if (seedMCTrack) {
     seedMCParticle = seedMCTrack->getRelated<MCParticle>();
   }

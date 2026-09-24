@@ -31,7 +31,7 @@ namespace Belle2 {
       RelationsObject(),
       m_cosTheta(0), m_p(0), m_pCDC(0), m_length(0.0), m_injring(-1), m_injtime(-1),
       m_track(0), m_charge(0), m_pdg(-999), m_mcmass(0), m_motherPDG(0), m_pTrue(0), m_cosThetaTrue(0),
-      m_scale(0), m_cosCor(0), m_cosEdgeCor(0), m_runGain(0), m_timeGain(0), m_timeReso(0),
+      m_scale(0), m_cosEdgeCor(0), m_runGain(0), m_timeGain(0), m_timeReso(0),
       m_lNHitsUsed(0)
     {
       m_simDedx = m_dedxAvg = m_dedxAvgTruncated = m_dedxAvgTruncatedNoSat = m_dedxAvgTruncatedErr = 0.0;
@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Add a single hit to the object */
     void addHit(int lwire, int wire, int layer, double doca, double docaRS, double enta, double entaRS,
                 int adcCount, int adcbaseCount, double dE, double path, double dedx, double cellHeight, double cellHalfWidth,
-                int driftT, double driftD, double driftDRes, double wiregain, double twodcor,
+                int driftT, double driftD, double driftDRes, double coscor, double wiregain, double twodcor,
                 double onedcor, int foundByTrackFinder, double weightPionHypo, double weightKaonHypo, double weightProtHypo)
     {
 
@@ -81,6 +81,7 @@ namespace Belle2 {
       m_hCellHalfWidth.push_back(cellHalfWidth);
       m_hDriftD.push_back(driftD);
       m_hDriftDRes.push_back(driftDRes);
+      m_hCosCor.push_back(coscor);
       m_hWireGain.push_back(wiregain);
       m_hTwodCor.push_back(twodcor);
       m_hOnedCor.push_back(onedcor);
@@ -109,7 +110,7 @@ namespace Belle2 {
     double getDedxMean() const { return m_dedxAvg; }
 
     /** Return the vector of dE/dx values for this track */
-    std::vector< double > getDedxList() const { return m_hDedx; }
+    const std::vector<double>& getDedxList() const { return m_hDedx; }
 
     /** Return the track momentum valid in the CDC */
     double getMomentum() const { return m_pCDC; }
@@ -128,9 +129,6 @@ namespace Belle2 {
 
     /** Return the total path length for this track */
     double getLength() const { return m_length; }
-
-    /** Return the cosine correction for this track */
-    double getCosineCorrection() const { return m_cosCor; }
 
     /** Return the cosine correction for this track */
     double getCosEdgeCorrection() const { return m_cosEdgeCor; }
@@ -250,6 +248,9 @@ namespace Belle2 {
     /** Return the drift distance resolution for this hit */
     double getDriftDRes(int i) const { return m_hDriftDRes[i]; }
 
+    /** Return the cosine correction for this hit */
+    double getCosineCorrection(int i) const { return m_hCosCor[i]; }
+
     /** Return the wire gain for this hit */
     double getWireGain(int i) const { return m_hWireGain[i]; }
 
@@ -331,12 +332,13 @@ namespace Belle2 {
     // calibration constants
     double m_predmean[Const::ChargedStable::c_SetSize]; /**< predicted dE/dx truncated mean */
     double m_predres[Const::ChargedStable::c_SetSize];  /**< predicted dE/dx resolution */
+
+    std::vector<double> m_hCosCor;  /**< calibration cosine correction (indexed on number of hits) */
     std::vector<double> m_hWireGain; /**< calibration hit gain (indexed on number of hits) */
     std::vector<double> m_hTwodCor;  /**< calibration 2-D correction (indexed on number of hits) */
     std::vector<double> m_hOnedCor;  /**< calibration 1-D correction (indexed on number of hits) */
 
     double m_scale; /**< scale factor to make electrons ~1 */
-    double m_cosCor;  /**< calibration cosine correction */
     double m_cosEdgeCor;  /**< calibration cosine edge correction */
     double m_runGain; /**< calibration run gain */
     double m_timeGain; /**< calibration injection time gain */
@@ -359,6 +361,6 @@ namespace Belle2 {
     std::vector<double> m_lDedx;   /**< extracted dE/dx (arb. units, detector dependent) */
     int m_lNHitsUsed; /**< number of hits on this track used for truncated mean */
 
-    ClassDef(CDCDedxTrack, 18); /**< Debug output for CDCDedxPID module. */
+    ClassDef(CDCDedxTrack, 19); /**< Debug output for CDCDedxPID module. */
   };
 }

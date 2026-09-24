@@ -51,7 +51,7 @@ float Belle2::PXD::PXDGainCalibrator::getADUToEnergy(Belle2::VxdID id, unsigned 
 
 
 
-unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU) const
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int uid, unsigned int vid, unsigned short nBinsU)
 {
   unsigned int drainsPerBin = 4 * Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getUCells() / nBinsU;
   return (uid * 4 + vid % 4) / drainsPerBin;
@@ -62,7 +62,7 @@ unsigned short Belle2::PXD::PXDGainCalibrator::getBinU(VxdID id, unsigned int ui
   return getBinU(id, uid, vid, m_gains.getBinsU());
 }
 
-unsigned short Belle2::PXD::PXDGainCalibrator::getBinV(VxdID id, unsigned int vid, unsigned short nBinsV) const
+unsigned short Belle2::PXD::PXDGainCalibrator::getBinV(VxdID id, unsigned int vid, unsigned short nBinsV)
 {
   unsigned int rowsPerBin = Belle2::VXD::GeoCache::getInstance().getSensorInfo(id).getVCells() / nBinsV;
   return vid / rowsPerBin;

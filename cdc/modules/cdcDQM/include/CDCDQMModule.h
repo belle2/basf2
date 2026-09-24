@@ -41,7 +41,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~CDCDQMModule();
+    virtual ~CDCDQMModule() override;
 
     /**
      * Initialize the Module.
@@ -73,12 +73,6 @@ namespace Belle2 {
     void endRun() override;
 
     /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    void terminate() override;
-
-    /**
      * Compute and shift phi if it is stereo layer
      * return [0,2pi]
      */
@@ -88,7 +82,7 @@ namespace Belle2 {
      * Find bin corresponds to a specific phi in a layer
      * phi must be in [0,2pi]
      */
-    int findPhiBin(double phi, const int& lay);
+    static int findPhiBin(double phi, const int& lay);
 
   protected:
 

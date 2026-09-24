@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    ~DBImportObjPtr()
+    ~DBImportObjPtr() override
     {
       if (m_object) delete m_object;
     }

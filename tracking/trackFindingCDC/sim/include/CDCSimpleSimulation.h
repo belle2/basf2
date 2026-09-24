@@ -11,7 +11,8 @@
 
 #include <tracking/trackingUtilities/utilities/VectorRange.h>
 
-#include <tracking/trackingUtilities/geometry/Vector3D.h>
+#include <Math/Vector3D.h>
+
 #include <vector>
 #include <memory>
 
@@ -66,7 +67,7 @@ namespace Belle2 {
         SimpleSimHit(const TrackingUtilities::CDCWireHit& wireHit,
                      size_t iMCTrack,
                      TrackingUtilities::ERightLeft rlInfo,
-                     const TrackingUtilities::Vector3D& pos3D,
+                     const ROOT::Math::XYZVector& pos3D,
                      double arcLength2D = NAN,
                      double trueDriftLength = NAN) :
           m_wireHit(wireHit),
@@ -87,7 +88,7 @@ namespace Belle2 {
         TrackingUtilities::ERightLeft m_rlInfo;
 
         /// Memory for the true position on the track closest to the wire
-        TrackingUtilities::Vector3D m_pos3D  = m_wireHit.getRefPos3D();
+        ROOT::Math::XYZVector m_pos3D  = m_wireHit.getRefPos3D();
 
         /// Memory for the true two dimensional arc length on the helix to this hit
         double m_arcLength2D = NAN;

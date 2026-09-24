@@ -33,6 +33,8 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <Math/Vector2D.h>
+#include <Math/VectorUtil.h>
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -126,7 +128,8 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
       CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
       if (not recoHit2D.isAxial()) continue;
 
-      CDCRecoHit3D recoHit3D(recoHit2D.getRLWireHit(), {recoHit2D.getRecoPos2D(), 0}, NAN);
+      const auto& tmp = recoHit2D.getRecoPos2D();
+      CDCRecoHit3D recoHit3D(recoHit2D.getRLWireHit(), {tmp.X(), tmp.Y(), 0}, NAN);
       axialTrack.push_back(recoHit3D);
     }
 
@@ -137,9 +140,9 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
   for (CDCTrack& track : outputAxialTracks) {
     for (CDCRecoHit3D& recoHit3D : track) {
-      Vector2D recoPos2D = recoHit3D.getRecoPos2D();
-      Vector2D flightDirection = recoHit3D.getFlightDirection2D();
-      double alpha = recoPos2D.angleWith(flightDirection);
+      ROOT::Math::XYVector recoPos2D = recoHit3D.getRecoPos2D();
+      ROOT::Math::XYVector flightDirection = recoHit3D.getFlightDirection2D();
+      double alpha = ROOT::Math::VectorUtil::DeltaPhi(recoPos2D, flightDirection);
 
       const CDCWire& wire = recoHit3D.getWire();
       const bool rl = recoHit3D.getRLInfo() == ERightLeft::c_Right;
@@ -188,7 +191,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
     CDCKarimakiFitter fitter;
     for (CDCTrack& track : outputAxialTracks) {
       CDCTrajectory2D trajectory2D = fitter.fit(track);
-      trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
+      trajectory2D.setLocalOrigin(ROOT::Math::XYVector(0.0, 0.0));
       track.setStartTrajectory3D({trajectory2D, CDCTrajectorySZ::basicAssumption()});
     }
   } else {

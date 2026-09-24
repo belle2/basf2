@@ -4,7 +4,7 @@ import basf2_mva
 
 general_options = basf2_mva.GeneralOptions()
 general_options.m_datafiles = basf2_mva.vector("ContinuumSuppression.root")
-general_options.m_treename = "tree"
+general_options.m_treename = "ntuple"
 general_options.m_identifier = "MVAFastBDT.root"  # outputted weightfile
 general_options.m_variables = basf2_mva.vector(
     "R2",

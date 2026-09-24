@@ -428,7 +428,7 @@ MockConditionsDB: "GET /v2/globalTag/newgt HTTP/1.1" 200 -
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = newgt
 	status = NEW
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] Starting event processing, random seed is set to 'something important'
@@ -440,7 +440,7 @@ MockConditionsDB: "GET /v2/globalTag/invalidgt HTTP/1.1" 200 -
 [ERROR] The globaltag has a status which is not permitted for use. This is for your own protection
 	globaltag = invalidgt
 	status = INVALID
-	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED
+	allowed states = PUBLISHED, RUNNING, TESTING, VALIDATED, frozen, locked
 [WARNING] Conditions data: One (or more) globaltag is not available in the current metadata proivder, trying next one ...
 [FATAL] Conditions data: No more metadata providers available
 [INFO] Starting event processing, random seed is set to 'something important'

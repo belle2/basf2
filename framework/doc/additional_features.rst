@@ -11,5 +11,5 @@ Additional Features
 * We have support for easy linking to ``basf2`` GitLab issues by using
   ``:issue:`XXXX```, for example ``:issue:`9819``` (:issue:`9819`).
   Note that this works only for the issues related to the
-  `basf2 project <https://gitlab.desy.de/belle2/software/basf2/-/issues/>`_.
+  `basf2 project <https://gitlab.desy.de/belle2/software/basf2/-/work_items/>`_.
   Issues from different projects have to be linked in the standard way.

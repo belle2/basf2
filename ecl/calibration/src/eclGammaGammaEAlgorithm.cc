@@ -26,7 +26,7 @@ using namespace ECL;
 
 /**-----------------------------------------------------------------------------------------------*/
 /** Novosibirsk function, plus constant H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426 */
-// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+// cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
 double eclGammaGammaNovoConst(double* x, double* par)
 {
   double qc = 0;
@@ -103,13 +103,13 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up existing histograms if necessary */
   TH1F* dummy;
-  dummy = (TH1F*)gROOT->FindObject("IntegralVsCrysID");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("IntegralVsCrysID"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageExpECrys");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageExpECrys"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageElecCalib");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageElecCalib"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageInitCalib");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageInitCalib"));
   if (dummy) {delete dummy;}
 
   /**-----------------------------------------------------------------------------------------------*/
@@ -272,7 +272,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
     double dIter = 0.1 * (histMax - histMin) / hEnergy->GetNbinsX();
     double fitProb(0.);
     double fitProbDefault(0.);
-    double lowold(0.), lowoldold(0.);
+    double lowold(0.);
     bool fixConst = false;
     int nIter = 0;
     double histIntegral = IntegralVsCrysID->GetBinContent(crysID + 1);
@@ -315,7 +315,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
       double tRatio = (func->Eval(fitlow) - constant) / peak;
       if (tRatio < m_tRatioMin || tRatio > m_tRatioMax) {
         double targetY = constant + 0.5 * (m_tRatioMin + m_tRatioMax) * peak;
-        lowoldold = lowold;
+        double lowoldold = lowold;
         lowold = fitlow;
         fitlow = func->GetX(targetY, histMin, peakE);
         fitHist = true;
@@ -557,20 +557,20 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Clean up histograms in case Algorithm is called again */
-  dummy = (TH1F*)gROOT->FindObject("PeakVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("EdgeVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("effSigVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("etaVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("constVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("normVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fitLimitVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("StatusVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("FitProbVsCrysID"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fracPeakUnc"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("nIterations"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("hStatus"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ExpEnergyperCrys"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("CalibVsCrysID"); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("PeakVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("EdgeVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("effSigVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("etaVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("constVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("normVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fitLimitVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("StatusVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("FitProbVsCrysID")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fracPeakUnc")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("nIterations")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("hStatus")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ExpEnergyperCrys")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("CalibVsCrysID")); delete dummy;
 
 
   /**-----------------------------------------------------------------------------------------------*/

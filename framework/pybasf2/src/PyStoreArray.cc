@@ -11,8 +11,8 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
 
-#include "TClonesArray.h"
-#include "TClass.h"
+#include <TClonesArray.h>
+#include <TClass.h>
 
 using namespace Belle2;
 using namespace std;
@@ -223,6 +223,8 @@ void PyStoreArray::ensureAttached() const
 {
   if (not m_storeEntry) {
     attach();
+    // attach() assigns the mutable m_storeEntry, which cppcheck does not track
+    // cppcheck-suppress identicalInnerCondition
     if (not m_storeEntry) {
       B2ERROR("PyStoreArray " << m_storeAccessor.readableName() << " has not been registered!");
     }

@@ -18,9 +18,9 @@
 #include <svd/dbobjects/SVDDQMPlotsConfiguration.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
-#include "TList.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include <TList.h>
+#include <TH1F.h>
+#include <TH2F.h>
 
 namespace Belle2 {
 
@@ -34,7 +34,7 @@ namespace Belle2 {
     /** Copy constructor (disabled) */
     SVDDQMClustersOnTrackModule(const SVDDQMClustersOnTrackModule&) = delete;
     /* Destructor */
-    virtual ~SVDDQMClustersOnTrackModule();
+    virtual ~SVDDQMClustersOnTrackModule() override;
     /** Operator = (disabled) */
     SVDDQMClustersOnTrackModule& operator=(const SVDDQMClustersOnTrackModule&) = delete;
 

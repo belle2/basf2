@@ -15,12 +15,12 @@
 #include <limits>
 
 // ROOT
-#include "TF1.h"
-#include "TFile.h"
-#include "TH2F.h"
-#include "TMath.h"
-#include "TROOT.h"
-#include "TTree.h"
+#include <TF1.h>
+#include <TFile.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
+#include <TTree.h>
 
 // Belle II
 #include <framework/logging/Logger.h>
@@ -131,7 +131,7 @@ static double TTSPDF(double x, double time, double deltaT, double sigma1, double
 // 2 TTSPDF
 // 1 crystal ball PDF for the extra peak at +1 ns we don't understand
 // 1 gaussian to help modelling the tail
-// cppcheck-suppress constParameter
+// cppcheck-suppress constParameterCallback
 static double laserPDF(double* x, double* p)
 {
   // Define parameters
@@ -218,6 +218,9 @@ void Belle2::TOP::TOPLocalCalFitter::setupOutputTreeAndFile()
   m_fitTree->Branch<short>("slot", &m_slot);
   m_fitTree->Branch<short>("row", &m_row);
   m_fitTree->Branch<short>("col", &m_col);
+  m_fitTree->Branch<short>("asic", &m_asic);
+  m_fitTree->Branch<short>("asicChannel", &m_asicChannel);
+  m_fitTree->Branch<short>("boardstack", &m_boardstack);
   m_fitTree->Branch<float>("peakTime", &m_peakTime);
   m_fitTree->Branch<float>("peakTimeErr", &m_peakTimeErr);
   m_fitTree->Branch<float>("deltaT", &m_deltaT);
@@ -258,6 +261,9 @@ void Belle2::TOP::TOPLocalCalFitter::setupOutputTreeAndFile()
     m_timewalkTree->Branch<short>("slot", &m_slot);
     m_timewalkTree->Branch<short>("row", &m_row);
     m_timewalkTree->Branch<short>("col", &m_col);
+    m_timewalkTree->Branch<short>("asic", &m_asic);
+    m_timewalkTree->Branch<short>("asicChannel", &m_asicChannel);
+    m_timewalkTree->Branch<short>("boardstack", &m_boardstack);
     m_timewalkTree->Branch<float>("histoIntegral", &m_histoIntegral);
     m_timewalkTree->Branch<float>("peakTime", &m_peakTime);
     m_timewalkTree->Branch<float>("peakTimeErr", &m_peakTimeErr);
@@ -316,6 +322,9 @@ void Belle2::TOP::TOPLocalCalFitter::setupOutputTreeAndFile()
     m_fitTree_noXtalk->Branch<short>("slot", &m_slot);
     m_fitTree_noXtalk->Branch<short>("row", &m_row);
     m_fitTree_noXtalk->Branch<short>("col", &m_col);
+    m_fitTree_noXtalk->Branch<short>("asic", &m_asic);
+    m_fitTree_noXtalk->Branch<short>("asicChannel", &m_asicChannel);
+    m_fitTree_noXtalk->Branch<short>("boardstack", &m_boardstack);
     m_fitTree_noXtalk->Branch<float>("peakTime", &m_peakTime);
     m_fitTree_noXtalk->Branch<float>("peakTimeErr", &m_peakTimeErr);
     m_fitTree_noXtalk->Branch<float>("deltaT", &m_deltaT);
@@ -500,6 +509,7 @@ void Belle2::TOP::TOPLocalCalFitter::fitChannel(short iSlot, short iChannel, TH1
 
   // save the results in the variables linked to the tree branches
   m_channel = iChannel;
+  setHardwareIdentifiers(m_channel);
   m_row = rowOf(iSlot, iChannel);
   m_col = colOf(iSlot, iChannel);
   m_slot = iSlot + 1;
@@ -758,7 +768,7 @@ Belle2::CalibrationAlgorithm::EResult Belle2::TOP::TOPLocalCalFitter::calibrate(
 
                 // same slot and neighboring pixels
                 if (hi.slot != hj.slot) continue;
-                if (!areNeighbors(hi.slot, hi.ch, hj.ch)) continue;
+                if (!areNeighbors(hi.slot - 1, hi.ch, hj.ch)) continue;
 
                 // near-coincident in time (laser)
                 if (std::fabs(hi.t - hj.t) > dtMax) continue;
@@ -818,7 +828,7 @@ Belle2::CalibrationAlgorithm::EResult Belle2::TOP::TOPLocalCalFitter::calibrate(
       for (size_t mm = ll + 1; mm < evtHits.size(); ++mm) {
         const auto& hj = evtHits[mm];
         if (hi.slot != hj.slot) continue;
-        if (!areNeighbors(hi.slot, hi.ch, hj.ch)) continue;
+        if (!areNeighbors(hi.slot - 1, hi.ch, hj.ch)) continue;
         if (std::fabs(hi.t - hj.t) > dtMax) continue;
         const float qsum = hi.q + hj.q;
         if (qsum <= epsQ) continue;

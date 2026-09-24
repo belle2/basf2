@@ -45,7 +45,7 @@ namespace Belle2 {
   private:
 
     /** Fills the pdf-related branches */
-    void fillPDF(Belle2::Const::ChargedStable, const Track*, TH2F*, short*, float*,  int&, int&);
+    void fillPDF(const Belle2::Const::ChargedStable&, const Track*, TH2F*, short*, float*,  int&, int&);
 
     /** reset the tree variables. Call it at the beginning of the event method! */
     void resetTree();

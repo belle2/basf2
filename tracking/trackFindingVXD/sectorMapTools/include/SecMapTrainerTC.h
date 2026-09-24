@@ -29,7 +29,7 @@ namespace Belle2 {
 
     /** adds hit to Track.
      * Always add from outer to inner hits, the TC-Class can not detect that by itself! */
-    void addHit(SecMapTrainerHit hit) { m_hits.push_back(hit); }
+    void addHit(const SecMapTrainerHit& hit) { m_hits.push_back(hit); }
 
     /** returns hits of track. */
     const std::vector<SecMapTrainerHit>& getHits() const { return m_hits; }

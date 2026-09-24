@@ -8,8 +8,8 @@
 
 #pragma once
 #include <framework/database/DBObjPtr.h>
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 
 namespace Belle2 {
   /**
@@ -24,7 +24,7 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDGlobalConfigParameters(const TString& uniqueID = "")
+    explicit SVDGlobalConfigParameters(const TString& uniqueID = "")
       : m_uniqueID(uniqueID),
         m_zeroSuppression(3),
         m_latency(0),

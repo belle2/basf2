@@ -95,6 +95,15 @@ namespace Belle2 {
       m_TimeConstantsResultsFile = timeConstantsResultsFile;
     }
 
+    /**
+     * Set EventT0 hit resolution results file.
+     */
+    void setEventT0HitResolutionResultsFile(
+      const std::string& eventT0HitResolutionResultsFile)
+    {
+      m_EventT0HitResolutionResultsFile = eventT0HitResolutionResultsFile;
+    }
+
 
     /**
      * Check alignment.
@@ -121,6 +130,11 @@ namespace Belle2 {
      */
     void checkTimeConstants();
 
+    /**
+     * Check EventT0 hit resolution.
+     */
+    void checkEventT0HitResolution();
+
 
   private:
 
@@ -132,7 +146,7 @@ namespace Belle2 {
     /**
      * Reset the database.
      */
-    void resetDatabase();
+    static void resetDatabase();
 
     /**
      * Print payload information.
@@ -169,6 +183,9 @@ namespace Belle2 {
 
     /** Output file for time constants results. */
     std::string m_TimeConstantsResultsFile = "timeConstants.root";
+
+    /** Output file for EventT0 hit resolution results. */
+    std::string m_EventT0HitResolutionResultsFile = "eventT0HitResolution.root";
 
     /** Element numbers. */
     const KLMElementNumbers* m_ElementNumbers;

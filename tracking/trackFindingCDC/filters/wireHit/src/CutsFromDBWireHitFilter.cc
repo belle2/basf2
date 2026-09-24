@@ -62,7 +62,7 @@ bool CutsFromDBWireHitFilter::isInRange(const T& value, const std::pair<T, T>& r
 /** Check if value <= upper_value
 If upper_value == -1, then return true */
 template <typename T>
-bool CutsFromDBWireHitFilter::isLessThanOrEqualTo(const T& value, const T& upper_value) const
+bool CutsFromDBWireHitFilter::isLessThanOrEqualTo(const T& value, const T& upper_value)
 {
   if (upper_value == -1) {
     return true;

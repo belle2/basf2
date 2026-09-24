@@ -30,19 +30,10 @@ namespace Belle2 {
     SVDTriggerQualityGeneratorModule();
 
     /** if required */
-    virtual ~SVDTriggerQualityGeneratorModule();
-
-    /** initializes the module */
-    virtual void beginRun() override;
+    virtual ~SVDTriggerQualityGeneratorModule() override;
 
     /** processes the event */
     virtual void event() override;
-
-    /** end the run */
-    virtual void endRun() override;
-
-    /** terminates the module */
-    virtual void terminate() override;
 
     /** init the module */
     virtual void initialize() override;

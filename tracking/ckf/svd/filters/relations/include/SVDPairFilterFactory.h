@@ -24,7 +24,7 @@ namespace Belle2 {
     explicit SVDPairFilterFactory(const std::string& defaultFilterName = "sensor");
 
     /// Default destructor
-    ~SVDPairFilterFactory();
+    ~SVDPairFilterFactory() override;
 
     /// Getter for a short identifier for the factory
     std::string getIdentifier() const override;

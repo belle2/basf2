@@ -23,7 +23,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     SeqRootInputModule();
-    virtual ~SeqRootInputModule();
+    virtual ~SeqRootInputModule() override;
 
     //! Module functions to be called from main process
     virtual void initialize() override;

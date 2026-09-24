@@ -59,6 +59,8 @@ class Full(TrackingValidationRun):
     resolution = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
+    #: draw validation plots of track quality indicator
+    plotTrackQualityIndicator = True
 
 
 def main():

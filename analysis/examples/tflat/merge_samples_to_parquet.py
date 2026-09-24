@@ -25,20 +25,20 @@ def merge_root_to_parquet(root_dir, parquet_dir, mask_value, uniqueIdentifier, t
     '''
     files = sorted(glob.glob(os.path.join(root_dir, f"{uniqueIdentifier}_training_data*.root")))
     writer = None
+    n_rows = 0
     print("Merging root files into parquet")
     for i in range(len(files)):
         print(f"\r{i+1}/{len(files)}", end="", flush=True)
         f = files[i]
         with uproot.open(f)[tree_name] as tree:
             df = tree.arrays(library="pd")
+        n_rows += len(df)
 
         # Rescale target variable from [-1,1] to [0,1]
-        m = df["qrCombined"].min()
-        if m != 0:
-            df["qrCombined"] = df["qrCombined"].where(df["qrCombined"] != m, 0)
+        df["qrCombined"] = df["qrCombined"].where(df["qrCombined"] != -1, 0)
 
         # verify two-class output
-        assert len(df["qrCombined"].unique()) == 2
+        assert set(df["qrCombined"].unique()).issubset([0, 1])
 
         # Mask NaN values
         df = df.fillna(mask_value)
@@ -55,6 +55,7 @@ def merge_root_to_parquet(root_dir, parquet_dir, mask_value, uniqueIdentifier, t
         writer.write_table(table)
 
     writer.close()
+    print(f'\nNumber of events: {n_rows}')
 
 
 def create_dataset(pf, parquet_path, index, chunk_size, n_rowgroups, rowgroup_edges):
@@ -108,11 +109,11 @@ def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size, uniqueIdentifi
     n_training_samples = int(n_rows*val_split)
     index_training = index[:n_training_samples]
     index_validation = index[n_training_samples:]
-    print('\nCreating training dataset')
+    print('Creating training dataset')
     create_dataset(
         pf,
         os.path.join(
-            parquet_dir +
+            parquet_dir,
             f'{uniqueIdentifier}_training_samples.parquet'),
         index_training,
         chunk_size,
@@ -122,7 +123,7 @@ def shuffle_and_chunk_parquet(parquet_dir, val_split, chunk_size, uniqueIdentifi
     create_dataset(
         pf,
         os.path.join(
-            parquet_dir +
+            parquet_dir,
             f'{uniqueIdentifier}_validation_samples.parquet'),
         index_validation,
         chunk_size,

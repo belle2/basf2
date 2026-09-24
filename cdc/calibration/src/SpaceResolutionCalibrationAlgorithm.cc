@@ -200,22 +200,24 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           m_hBiased[il][lr][al][th]->FitSlicesY(g0b, firstbin, ib1, minEntry);
 
           // mean
-          m_hMeanBiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_m", il,
-                                          lr, al,
-                                          th));
+          m_hMeanBiased[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al,
+                                                             th))->Clone(Form("hb_%d_%d_%d_%d_m", il,
+                                                                 lr, al,
+                                                                 th)));
           // sigma
-          m_hSigmaBiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hb_%d_%d_%d_%d_s",
-                                           il, lr, al,
-                                           th));
+          m_hSigmaBiased[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al,
+                                                              th))->Clone(Form("hb_%d_%d_%d_%d_s",
+                                                                  il, lr, al,
+                                                                  th)));
           m_hMeanBiased[il][lr][al][th]->SetDirectory(0);
           m_hSigmaBiased[il][lr][al][th]->SetDirectory(0);
 
           //Apply slice fit for other regions
           m_hBiased[il][lr][al][th]->FitSlicesY(gb, ib1 + 1, np, minEntry);
           // mean
-          m_hMeanBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th)));
+          m_hMeanBiased[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_1", il, lr, al, th))));
           //sigma
-          m_hSigmaBiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th)));
+          m_hSigmaBiased[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hb_%d_%d_%d_%d_2", il, lr, al, th))));
           B2DEBUG(21, "entries (2nd): " << m_hSigmaBiased[il][lr][al][th]->GetEntries());
 
           // With unbiased track fit result
@@ -223,13 +225,15 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           // Apply slice fit for the region near sense wire
           m_hUnbiased[il][lr][al][th]->FitSlicesY(g0u, firstbin, ib1, minEntry);
           // mean
-          m_hMeanUnbiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_m",
-                                            il, lr, al,
-                                            th));
+          m_hMeanUnbiased[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al,
+                                                               th))->Clone(Form("hu_%d_%d_%d_%d_m",
+                                                                   il, lr, al,
+                                                                   th)));
           // sigma
-          m_hSigmaUnbiased[il][lr][al][th] = (TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))->Clone(Form("hu_%d_%d_%d_%d_s",
-                                             il, lr, al,
-                                             th));
+          m_hSigmaUnbiased[il][lr][al][th] = static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al,
+                                                                th))->Clone(Form("hu_%d_%d_%d_%d_s",
+                                                                    il, lr, al,
+                                                                    th)));
           m_hMeanUnbiased[il][lr][al][th]->SetDirectory(0);
           m_hSigmaUnbiased[il][lr][al][th]->SetDirectory(0);
 
@@ -237,9 +241,9 @@ void SpaceResolutionCalibrationAlgorithm::createHisto()
           //Apply slice fit for other regions
           m_hUnbiased[il][lr][al][th]->FitSlicesY(gu, ib1 + 1, np, minEntry);
           //mean
-          m_hMeanUnbiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th)));
+          m_hMeanUnbiased[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_1", il, lr, al, th))));
           //sigma
-          m_hSigmaUnbiased[il][lr][al][th]->Add((TH1F*)gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th)));
+          m_hSigmaUnbiased[il][lr][al][th]->Add(static_cast<TH1F*>(gDirectory->Get(Form("hu_%d_%d_%d_%d_2", il, lr, al, th))));
           if (!m_hSigmaUnbiased[il][lr][al][th] || !m_hSigmaBiased[il][lr][al][th]) {
             B2WARNING("sliced histo  not found");
             m_fitStatus[il][lr][al][th] = -1;

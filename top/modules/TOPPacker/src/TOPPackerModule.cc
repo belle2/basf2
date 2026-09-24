@@ -59,10 +59,6 @@ namespace Belle2 {
 
   }
 
-  TOPPackerModule::~TOPPackerModule()
-  {
-  }
-
   void TOPPackerModule::initialize()
   {
 
@@ -92,10 +88,6 @@ namespace Belle2 {
 
   }
 
-  void TOPPackerModule::beginRun()
-  {
-  }
-
   void TOPPackerModule::event()
   {
 
@@ -113,15 +105,6 @@ namespace Belle2 {
         B2ERROR("TOPPacker: data format unknown or not implemented");
     }
 
-  }
-
-
-  void TOPPackerModule::endRun()
-  {
-  }
-
-  void TOPPackerModule::terminate()
-  {
   }
 
 

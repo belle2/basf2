@@ -33,11 +33,6 @@ void RandomBarrierModule::initialize()
 {
   RandomNumbers::barrier();
 }
-void RandomBarrierModule::terminate()
-{
-  //terminate() is called in reverse order. If you use random numbers there, we can't help you.
-}
-
 void RandomBarrierModule::beginRun()
 {
   RandomNumbers::barrier();

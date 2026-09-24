@@ -31,7 +31,12 @@ namespace Belle2 {
     ECLShowerCorrectorModule();
 
     /** Destructor. */
-    ~ECLShowerCorrectorModule();
+    ~ECLShowerCorrectorModule() override;
+    /** Copy constructor (disabled). */
+    ECLShowerCorrectorModule(const ECLShowerCorrectorModule&) = delete;
+
+    /** Operator = (disabled). */
+    ECLShowerCorrectorModule& operator=(const ECLShowerCorrectorModule&) = delete;
 
     /** Initialize. */
     virtual void initialize() override;

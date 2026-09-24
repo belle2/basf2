@@ -37,7 +37,7 @@ namespace Belle2 {
 
       public:
         /// Default constructor for an invalid shape
-        Shape();
+        Shape() = default;
 
         /// Constructor from cell extend and o'clock direction change
         Shape(const short startToMiddleCellDistance,
@@ -61,13 +61,13 @@ namespace Belle2 {
 
       private:
         /// The cell distances from start to middle.
-        char m_startToMiddleCellDistance;
+        char m_startToMiddleCellDistance = (CHAR_MAX / 2);
 
         /// The cell distances from middle to end.
-        char m_middleToEndCellDistance;
+        char m_middleToEndCellDistance = (CHAR_MAX / 2);
 
         /// The o'clock direction difference from start to middle compared to middle to end.
-        short m_oClockDelta;
+        short m_oClockDelta = (SHRT_MIN);
       };
 
       /// Default constructor for ROOT
@@ -83,7 +83,7 @@ namespace Belle2 {
       CDCRLWireHitTriple reversed() const;
 
       /// Reverses the triple inplace.
-      void reverse();
+      virtual void reverse();
 
       /// Returns the aliased version of this oriented wire hit triple
       CDCRLWireHitTriple getAlias() const;

@@ -119,7 +119,7 @@ void CDCDedxHadSatAlgorithm::createPayload()
 
 }
 
-void CDCDedxHadSatAlgorithm::prepareSample(std::vector< std::string >& particles, const std::string& filename,
+void CDCDedxHadSatAlgorithm::prepareSample(const std::vector< std::string >& particles, const std::string& filename,
                                            const std::string& sfx,
                                            bool correct)
 {

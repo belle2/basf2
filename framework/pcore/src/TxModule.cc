@@ -84,7 +84,7 @@ void TxModule::event()
 
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize(), true);
+    int stat = m_rbuf->insq(reinterpret_cast<const int*>(msg->buffer()), msg->paddedSize(), true);
     if (stat >= 0) break;
     if (!m_blockingInsert) {
       B2WARNING("Ring buffer seems full, removing some previous data.");

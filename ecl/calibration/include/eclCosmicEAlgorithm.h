@@ -24,18 +24,19 @@ namespace Belle2 {
       eclCosmicEAlgorithm();
 
       /** Destructor. */
-      virtual ~eclCosmicEAlgorithm() {}
+      virtual ~eclCosmicEAlgorithm() override {}
 
       /** Parameters to control Novosibirsk fit to signal measured in each crystal */
-      int cellIDLo;  /**<  First cellID to be fit */
-      int cellIDHi;  /**<  Last cellID to be fit */
-      int minEntries;  /**<  All crystals to be fit must have at least minEntries events in the fit range */
-      int maxIterations; /**< no more than maxIteration iterations */
-      double tRatioMin; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
-      double tRatioMax; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
-      bool performFits;  /**<  if false, input histograms are copied to output, but no fits are done. */
-      bool findExpValues;  /**< if true, fits are used to find expected energy deposit for each crystal instead of the calibration constant */
-      int storeConst; /**< controls which values are written to the database.
+      int cellIDLo = 0;  /**<  First cellID to be fit */
+      int cellIDHi = 0;  /**<  Last cellID to be fit */
+      int minEntries = 0;  /**<  All crystals to be fit must have at least minEntries events in the fit range */
+      int maxIterations = 0; /**< no more than maxIteration iterations */
+      double tRatioMin = 0.0; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
+      double tRatioMax = 0.0; /**< Fit range is adjusted so that fit at upper endpoint is between tRatioMin and tRatioMax of peak */
+      bool performFits = false;  /**<  if false, input histograms are copied to output, but no fits are done. */
+      bool findExpValues =
+        false;  /**< if true, fits are used to find expected energy deposit for each crystal instead of the calibration constant */
+      int storeConst = 0; /**< controls which values are written to the database.
                              0 (default): store value found by successful fits, or -|input value| otherwise;
                              -1 : do not store values
                              1 : store values if every fit for [cellIDLo,cellIDHi] was successful */

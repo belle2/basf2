@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    ECLDatabaseImporter(std::vector<std::string> inputFileNames, const std::string& m_name);
+    ECLDatabaseImporter(const std::vector<std::string>& inputFileNames, const std::string& m_name);
 
     /**
      * Destructor.
@@ -81,7 +81,7 @@ namespace Belle2 {
     /**
      * Extract a root object rootObjName from a root file file. The file is assumed to be valid (pointer valid and not zombie). If rootObjName doesn't exist in file, do B2FATAL.
      */
-    template <class rootClass> rootClass getRootObjectFromFile(TFile* file, const std::string& rootObjName) const
+    template <class rootClass> static rootClass getRootObjectFromFile(TFile* file, const std::string& rootObjName)
     {
       rootClass rootObj = (rootClass)file->Get(rootObjName.data());
       if (!rootObj) {

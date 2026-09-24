@@ -94,11 +94,6 @@ DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
   B2DEBUG(20, "DQMHistAnalysisInputPVSrv: Constructor done.");
 }
 
-
-DQMHistAnalysisInputPVSrvModule::~DQMHistAnalysisInputPVSrvModule()
-{
-}
-
 void DQMHistAnalysisInputPVSrvModule::initialize()
 {
   m_eventMetaDataPtr.registerInDataStore();

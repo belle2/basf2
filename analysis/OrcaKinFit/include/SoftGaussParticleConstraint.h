@@ -73,7 +73,7 @@ namespace Belle2 {
       explicit SoftGaussParticleConstraint(double sigma_     ///< The sigma value
                                           );
       /// Virtual destructor
-      virtual ~SoftGaussParticleConstraint() {};
+      virtual ~SoftGaussParticleConstraint() override = default;
 
       /// Adds several ParticleFitObject objects to the list
       virtual void setFOList(std::vector <ParticleFitObject*>* fitobjects_ ///< A list of BaseFitObject objects
@@ -131,7 +131,7 @@ namespace Belle2 {
 
 
       /// Invalidates any cached values for the next event
-      void invalidateCache() const {}
+      static void invalidateCache() {}
 
       void test1stDerivatives();
       void test2ndDerivatives();
@@ -150,7 +150,7 @@ namespace Belle2 {
                               double eps2  ///< variation of 2nd local parameter
                              );
 
-      int getVarBasis() const;
+      static int getVarBasis();
 
     protected:
 

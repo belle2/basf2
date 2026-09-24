@@ -102,11 +102,6 @@ namespace Belle2 {
   }
 
 
-  TOPRawDigitConverterModule::~TOPRawDigitConverterModule()
-  {
-  }
-
-
   void TOPRawDigitConverterModule::initialize()
   {
 
@@ -145,6 +140,11 @@ namespace Belle2 {
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
       }
+      if (not m_calPrecision.isValid()) {
+        B2WARNING("Calibration precision requested but not available for run "
+                  << evtMetaData->getRun()
+                  << " of experiment " << evtMetaData->getExperiment());
+      }
     }
     if (m_useAsicShiftCalibration) {
       if (not m_asicShift.isValid()) {
@@ -167,18 +167,18 @@ namespace Belle2 {
                 << " of experiment " << evtMetaData->getExperiment());
       }
     }
-    if (not m_timeWalk.isValid()) {
-      // B2FATAL("Time-walk calibration is not available for run "
-      B2WARNING("Time-walk calibration is not available for run "
+    if (m_useTimeWalkCalibration) {
+      if (not m_timeWalk.isValid()) {
+        B2FATAL("Time-walk calibration is not available for run "
                 << evtMetaData->getRun()
                 << " of experiment " << evtMetaData->getExperiment());
+      }
     }
     if (m_pedestalRMS > 0 and not m_noises.isValid()) {
       B2FATAL("Channel noise levels are not available for run "
               << evtMetaData->getRun()
               << " of experiment " << evtMetaData->getExperiment());
     }
-
     if (not m_feSetting.isValid()) {
       B2FATAL("Front-end settings are not available for run "
               << evtMetaData->getRun()
@@ -380,21 +380,22 @@ namespace Belle2 {
           timeError = rawErr * sampleTimes->getTimeBin(window, sample); // [ns]
         }
 
-        auto pulseHeight = rawDigit.getValuePeak();
         double timeErrorSq = timeError * timeError;
-        if (m_timeWalk.isValid()) timeErrorSq += m_timeWalk->getSigmaSq(pulseHeight);
 
-        if (m_useTimeWalkCalibration and m_timeWalk.isValid()) {
+        if (m_useTimeWalkCalibration) {
           if (m_timeWalk->isCalibrated()) {
+            auto pulseHeight = rawDigit.getValuePeak();
             time -= m_timeWalk->getTimeWalk(pulseHeight);
+            timeErrorSq += m_timeWalk->getSigmaSq(pulseHeight);
           }
         }
         if (m_useChannelT0Calibration) {
           const auto& cal = m_channelT0;
           if (cal->isCalibrated(moduleID, channel)) {
             time -= cal->getT0(moduleID, channel);
-            double err = cal->getT0Error(moduleID, channel);
-            timeErrorSq += err * err;
+            double err = cal->getT0Error(moduleID, channel); // statistical, from laser data fit
+            double sys = m_calPrecision.isValid() ? m_calPrecision->get(moduleID) : 0; // systematical, from di-muon events
+            timeErrorSq += err * err + sys * sys;
             statusBits |= TOPDigit::c_ChannelT0Calibrated;
           }
         }
@@ -467,15 +468,6 @@ namespace Belle2 {
       }
     }
 
-  }
-
-
-  void TOPRawDigitConverterModule::endRun()
-  {
-  }
-
-  void TOPRawDigitConverterModule::terminate()
-  {
   }
 
 

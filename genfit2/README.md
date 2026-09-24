@@ -1,15 +1,15 @@
 ### How to update GenFit in basf2
 
-To update the GenFit version in basf2, we follow the procedure described in https://gitlab.desy.de/belle2/software/basf2/-/issues/12:
+To update the GenFit version in basf2, we follow the procedure described in https://gitlab.desy.de/belle2/software/basf2/-/work_items/12:
 
 * `git remote add genfit2-on-github "https://github.com/GenFit/GenFit"`
 * `git fetch genfit2-on-github`
-* `git checkout -b feature/update-genfit`
+* `git checkout -b feature/update-genfit-${TODAY}`
 * `git rm -r genfit2/code2`
-* `git read-tree --prefix=genfit2/code2/ -u genfit2-on-github/master`
+* `git read-tree --prefix=genfit2/code2/ -u genfit2-on-github/main`
 * `touch genfit2/code2/.imported && git add genfit2/code2/.imported`
 * `git commit -m "Update GenFit"`
-* `git push --set-upstream origin feature/update-genfit`
+* `git push --set-upstream origin feature/update-genfit-${TODAY}`
 
 or, even better:
 

@@ -186,6 +186,19 @@ namespace Belle2 {
 
 
       /**
+       * Geometry-only quantities needed to project a pixel to a given unfolded prism exit window.
+       * They only depend on the prism, therefore they are calculated once in the constructor.
+       */
+      struct WindowProjection {
+        double sy = 0; /**< window surface direction in y */
+        double sz = 0; /**< window surface direction in z */
+        double y0 = 0; /**< y of the window origin, displaced to the prism entrance plane */
+        double z0 = 0; /**< z of the window origin, displaced to the prism entrance plane */
+        bool evenReflection = false; /**< true if the window has the same orientation as the true one */
+      };
+
+
+      /**
        * Single PDF peak data
        */
       struct Result {
@@ -355,6 +368,19 @@ namespace Belle2 {
       double getSigmaAlpha() const {return m_sigmaAlpha;}
 
       /**
+       * Returns the reflectivity of the bar surface raised to the given power.
+       * The reflectivity is a constant of the module, therefore the powers are tabulated on
+       * first use and kept for the whole job (they do not depend on the track or the hypothesis).
+       * @param n power, i.e. the number of reflections
+       * @return reflectivity to the power of n
+       */
+      double getSurfaceReflectivity(unsigned n) const
+      {
+        if (n < m_surfaceReflectivities.size()) return m_surfaceReflectivities[n];
+        return tabulateSurfaceReflectivity(n);
+      }
+
+      /**
        * Returns photon energy distribution
        * @return photon energy distribution
        */
@@ -365,7 +391,7 @@ namespace Belle2 {
        * Map entries correspond to different Gaussian widths due to different number of reflections.
        * @return photon energy distributions convoluted with multiple scattering and surface roughness
        */
-      const std::map<int, Table> getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
+      const std::map<int, Table>& getQuasyEnergyDistributions() const {return m_quasyEnergyDistributions;}
 
       /**
        * Returns the results of PDF expansion in y
@@ -411,7 +437,39 @@ namespace Belle2 {
        * @param dydz Photon slope at prism entrance; dydz is used for even projections and -dydz is used for odd projections.
        * @param proj Projections of a pixel to prism entrance (results)
        */
-      void projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const;
+      void projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const
+      {
+        const auto& win = m_windowProjections[k];
+        double halfSize = win.evenReflection ? size / 2 : -size / 2;
+        const double ypix[2] =  {yc - halfSize, yc + halfSize}; // pixel edges in y
+        double yproj[2][2] = {{0}}; // pixel projections to prism entrance window (second index corresponds to pixel edges)
+
+        #pragma omp simd
+        for (int i = 0; i < 2; ++i) {
+          /* Formerly YScanner::prismEntranceY. */
+          double z = ypix[i] * win.sz + win.z0;
+          double y = ypix[i] * win.sy + win.y0;
+          double dy = dydz * (m_prismZR - z);
+          yproj[0][i] = y + dy; // even reflections
+          yproj[1][i] = y - dy; // odd reflections
+        }
+
+        double Bh = m_halfBarThickness;
+        for (int i = 0; i < 2; ++i) {
+          yproj[i][0] = std::max(yproj[i][0], -Bh);
+          yproj[i][1] = std::min(yproj[i][1], Bh);
+          proj[i].yc = (yproj[i][0] + yproj[i][1]) / 2;
+          proj[i].Dy = yproj[i][1] - yproj[i][0];
+        }
+      }
+
+      /**
+       * Extends the table of surface reflectivity powers up to n and returns the value.
+       * Called by getSurfaceReflectivity only when the table is not long enough.
+       * @param n power, i.e. the number of reflections
+       * @return reflectivity to the power of n
+       */
+      double tabulateSurfaceReflectivity(unsigned n) const;
 
       /**
        * Performs expansion w/ the scan over reflections.
@@ -445,11 +503,17 @@ namespace Belle2 {
        */
       PixelEfficiencies& pixelEfficiencies() {return m_pixelEfficiencies;}
 
-      // variables set in constructor (slot dependent)
+      // variables set in constructor or, for m_surfaceReflectivities, filled lazily on first use
+      // (slot dependent, therefore not reset by clear())
       PixelPositions m_pixelPositions; /**< positions and sizes of pixels */
       PixelMasks m_pixelMasks; /**< pixel masks */
       PixelEfficiencies m_pixelEfficiencies; /**< pixel relative efficiencies */
       Table m_efficiency; /**< nominal photon detection efficiencies (PDE) */
+      std::vector<WindowProjection> m_windowProjections; /**< pixel projection constants of unfolded prism exit windows */
+      mutable std::vector<double>
+      m_surfaceReflectivities; /**< bar surface reflectivity to the power of the index; filled on demand, never cleared */
+      double m_prismZR = 0; /**< z of the prism-bar joint (copy of m_prism.zR) */
+      double m_halfBarThickness = 0; /**< half thickness of the bar at prism entrance */
       double m_meanE0 = 0; /**< mean photon energy for beta = 1 */
       double m_rmsE0 = 0; /**< r.m.s of photon energy for beta = 1 */
       double m_cosTotal = 0; /**< cosine of total reflection angle */
@@ -474,6 +538,7 @@ namespace Belle2 {
       mutable bool m_scanDone = false;  /**< true if scan performed, false if reflections just merged */
 
       static int s_maxReflections; /**< maximal number of reflections to perform scan */
+      static unsigned s_maxTabulatedPower; /**< maximal power of the surface reflectivity that is tabulated */
 
       friend class TOPRecoManager;
 
@@ -531,7 +596,7 @@ namespace Belle2 {
 
     inline double YScanner::Table::getXmax() const {return x0 + step * (entries.size() - 1);}
 
-    inline int YScanner::Table::getIndex(double x) const {return lround((x - x0) / step);}
+    inline int YScanner::Table::getIndex(double x) const {return func::lround((x - x0) / step);}
 
     inline double YScanner::Table::getY(int i) const
     {

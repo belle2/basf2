@@ -88,7 +88,7 @@ bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRe
   for (RecoHitInformation* recoHitInformation : relatedRecoHitInformation) {
     const genfit::TrackPoint* trackPoint = recoTrack.getCreatedTrackPoint(recoHitInformation);
     if (trackPoint) {
-      genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
+      const genfit::KalmanFitterInfo* kalmanFitterInfo = trackPoint->getKalmanFitterInfo(&trackRepresentation);
       if (not kalmanFitterInfo) {
         recoHitInformation->setFlag(RecoHitInformation::RecoHitFlag::c_dismissedByFit);
       } else {
@@ -158,7 +158,7 @@ void TrackFitter::resetFitterToDBSettings(const DAFConfiguration::ETrackFitType 
   m_skipDirtyCheck = false;
 }
 
-void TrackFitter::resetFitterToUserSettings(DAFParameters* DAFParams)
+void TrackFitter::resetFitterToUserSettings(const DAFParameters* DAFParams)
 {
   if (DAFParams == nullptr)
     B2FATAL("DAF parameters are not available.");

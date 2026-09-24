@@ -143,6 +143,7 @@ namespace Belle2 {
       // 4. Calibration Objects
       bool m_returnRawClusterTime = false; /**< if true cluster time is not calibrated, to be used for time calibration */
       bool m_shiftSVDClusterTime = true; /**< if true applies SVDCluster time shift based on cluster-size*/
+      bool m_absoluteShiftSVDClusterTime = true; /**< if true applies an absolute SVDCluster time shift, based on the layer/side*/
 
       DBObjPtr<HardwareClockSettings> m_hwClock;  /**< systems clock*/
       DBObjPtr<SVDRecoConfiguration> m_recoConfig; /**< SVD Reconstruction Configuration payload*/
@@ -173,7 +174,7 @@ namespace Belle2 {
       /**
        * alter the cluster position (applied on MC to match resolution measured on data)
        */
-      void alterClusterPosition(Belle2::SVDTrueHit* trueHit);
+      void alterClusterPosition(const Belle2::SVDTrueHit* trueHit);
 
       /**
        * alter the cluster time (applied on MC to match resolution measured on data)

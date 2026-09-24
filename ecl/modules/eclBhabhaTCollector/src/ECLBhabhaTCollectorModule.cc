@@ -661,12 +661,6 @@ void ECLBhabhaTCollectorModule::collect()
 
     /* Test if the loose track is also a tight track */
 
-    // Number of hits in the CDC
-    if (nCDChits < 20) {
-      continue;
-    }
-
-
     // d0 and z0 cuts
     if (fabs(d0) > m_tightTrkD0) {
       continue;
@@ -792,7 +786,7 @@ void ECLBhabhaTCollectorModule::collect()
             double tempE = m_EperCrys[tempCrysID];
 
             int eclDigitIndex = m_eclDigitID[tempCrysID];
-            ECLDigit*    ecl_dig = m_eclDigitArray[eclDigitIndex];
+            const ECLDigit*    ecl_dig = m_eclDigitArray[eclDigitIndex];
 
             // for the max E crystal
             if (tempE > crysEMax[icharge]) {
@@ -854,8 +848,8 @@ void ECLBhabhaTCollectorModule::collect()
     int eclCalDigitIndex = m_eclCalDigitID[crystal_idx];
     int eclDigitIndex = m_eclDigitID[crystal_idx];
 
-    ECLDigit*    ecl_dig = m_eclDigitArray[eclDigitIndex];
-    ECLCalDigit* ecl_cal = m_eclCalDigitArray[eclCalDigitIndex];
+    const ECLDigit*    ecl_dig = m_eclDigitArray[eclDigitIndex];
+    const ECLCalDigit* ecl_cal = m_eclCalDigitArray[eclCalDigitIndex];
 
     //== Check whether specific ECLDigits should be excluded.
 
@@ -886,8 +880,8 @@ void ECLBhabhaTCollectorModule::collect()
     // Absolute time should be in specified range condition.
     if (fabs(time) > m_timeAbsMax) continue;
 
-    // Fit quality flag -- choose only events with best fit quality
-    if (ecl_dig->getQuality() != 0) continue;
+    // Fit quality flag -- choose valid fit results with E > ~2 MeV
+    if (ecl_dig->getQuality() != 0 and ecl_dig->getQuality() != 3) continue;
 
     //== Save time and crystal information.  Fill plot after both electrons are tested
     crystalIDs[iCharge] = cid;

@@ -9,6 +9,7 @@
 #pragma once
 #include <array>
 #include <string>
+#include <top/dataobjects/TOPDigit.h>
 #include <calibration/CalibrationAlgorithm.h>
 
 class TH1;
@@ -31,6 +32,12 @@ namespace Belle2 {
 
       /** Destructor */
       ~TOPLocalCalFitter() override;
+
+      /** Copy constructor (disabled) */
+      TOPLocalCalFitter(const TOPLocalCalFitter&) = delete;
+
+      /** Assignment operator (disabled) */
+      TOPLocalCalFitter& operator=(const TOPLocalCalFitter&) = delete;
 
       /** Sets the minimum number of entries to perform the calibration in one channel */
       void setMinEntries(int minEntries)
@@ -191,6 +198,9 @@ namespace Belle2 {
       short m_slot = 0; /**< Slot ID (1-16)*/
       short m_row = 0; /**< Pixel row */
       short m_col = 0; /**< Pixel column*/
+      short m_asic = 0; /**< ASIC number (0-3) */
+      short m_asicChannel = 0; /**< ASIC channel number (0-7) */
+      short m_boardstack = 0; /**< Boardstack number (0-3) */
       float m_peakTime = 0; /**< Fitted time of the main (i.e. latest) peak */
       float m_deltaT =
         0; /**< Time difference between the main peak and the secondary peak. Can be either fixed to the MC value or fitted. */
@@ -257,6 +267,24 @@ namespace Belle2 {
       inline short colOf(short slot, short ch) const noexcept
       {
         return (slot >= 0 && slot < 16 && ch >= 0 && ch < 512) ? m_colOf[slot][ch] : short(-1);
+      }
+
+      /**
+       * Set the hardware identifiers corresponding to a TOP channel.
+       *
+       * The identifiers are derived from the channel number and stored in the
+       * member variables used to fill the output tree branches.
+       *
+       * @param channel channel number within the TOP slot
+       */
+      void setHardwareIdentifiers(short channel)
+      {
+        TOPDigit digit;
+        digit.setChannel(channel);
+
+        m_asic = static_cast<short>(digit.getASICNumber());
+        m_asicChannel = static_cast<short>(digit.getASICChannel());
+        m_boardstack = static_cast<short>(digit.getBoardstackNumber());
       }
 
       /**

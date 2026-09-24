@@ -322,6 +322,7 @@ namespace Belle2 {
     const ROOT::Math::Transform3D& getTransformation() const
     {
       if (not m_transform) setTransformation();
+      // cppcheck-suppress nullPointerRedundantCheck
       return *m_transform;
     }
 
@@ -332,6 +333,7 @@ namespace Belle2 {
     const ROOT::Math::Transform3D& getTransformationNominal() const
     {
       if (not m_transformNominal) setTransformation();
+      // cppcheck-suppress nullPointerRedundantCheck
       return *m_transformNominal;
     }
 

@@ -13,10 +13,12 @@
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/v0Finding/fitter/V0VertexFitter.h>
 #include <genfit/Track.h>
 
 #include <Math/Vector3D.h>
 
+#include <memory>
 #include <utility>
 
 namespace genfit {
@@ -39,11 +41,11 @@ namespace Belle2 {
 
   public:
     /// Constructor for the V0Fitter.
-    V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
-             const std::string& v0ValidationVerticesName = "",
-             const std::string& recoTracksName = "",
-             const std::string& copiedRecoTracksName = "CopiedRecoTracks",
-             bool enableValidation = false);
+    explicit V0Fitter(const std::string& trackFitResultsName = "", const std::string& v0sName = "",
+                      const std::string& v0ValidationVerticesName = "",
+                      const std::string& recoTracksName = "",
+                      const std::string& copiedRecoTracksName = "CopiedRecoTracks",
+                      bool enableValidation = false);
 
     /// Initialize the cuts which will be applied during the fit and store process.
     void initializeCuts(double beamPipeRadius,
@@ -51,6 +53,10 @@ namespace Belle2 {
                         std::tuple<double, double> invMassRangeKshort,
                         std::tuple<double, double> invMassRangeLambda,
                         std::tuple<double, double> invMassRangePhoton);
+
+    /// Set the vertex fitter to be used, replacing the default one.
+    /// The instances are created by the V0VertexFitterFactory.
+    void setVertexFitter(std::unique_ptr<V0VertexFitter> vertexFitter);
 
     /// set V0 fitter mode.
     /// switch the mode of fitAndStore function.
@@ -64,7 +70,7 @@ namespace Belle2 {
                      bool&  isHitRemoved);
 
     /// Get track hypotheses for a given v0 hypothesis.
-    std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis) const;
+    static std::pair<Const::ParticleType, Const::ParticleType> getTrackHypotheses(const Const::ParticleType& v0Hypothesis);
 
   private:
 
@@ -92,14 +98,14 @@ namespace Belle2 {
      * @param origRecoTrack original RecoTrack
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrack(RecoTrack* origRecoTrack);
+    RecoTrack* copyRecoTrack(const RecoTrack* origRecoTrack);
 
     /** Create a copy of RecoTrack and fit the Track.
      * @param origRecoTrack original RecoTrack
      * @param trackPDG signed PDG used for the track fit hypothesis
      * @return copied RecoTrack stored in the m_copiedRecoTracks, nullptr if track fit fails (this should not happen)
      */
-    RecoTrack* copyRecoTrackAndFit(RecoTrack* origRecoTrack, const int trackPDG);
+    RecoTrack* copyRecoTrackAndFit(const RecoTrack* origRecoTrack, const int trackPDG);
 
     /** Remove inner hits from RecoTrack at once.
      * Hits are removed from the minus-end of the momentum direction.
@@ -122,23 +128,14 @@ namespace Belle2 {
      */
     int checkSharedInnermostCluster(const RecoTrack* recoTrackPlus, const RecoTrack* recoTrackMinus);
 
-    /** Fit the V0 vertex.
-     *
-     * @param trackPlus
-     * @param trackMinus
-     * @param vertex Result of the fit is returned via reference.
-     * @return
-     */
-    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
-
     /// Extrapolate the fit results to the perigee to the vertex.
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
                              const ROOT::Math::XYZVector& vertexPosition);
 
     /// Extrapolate the fit results to the perigee to the vertex.
     /// If the daughter tracks have hits inside the V0 vertex, bits in the hasInnerHiStatus variable are set.
-    bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
-                             const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
+    static bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stPlus, genfit::MeasuredStateOnPlane& stMinus,
+                                    const ROOT::Math::XYZVector& vertexPosition, unsigned int& hasInnerHitStatus);
 
     /// Build TrackFitResult of V0 Track and set relation to genfit Track.
     TrackFitResult* buildTrackFitResult(const genfit::Track& track, const RecoTrack* recoTrack,
@@ -164,6 +161,7 @@ namespace Belle2 {
     int    m_v0FitterMode;  ///< 0: store V0 at the first vertex fit, regardless of inner hits, 1: remove hits inside the V0 vertex position, 2: mode 1 +  don't use SVD hits if there is only one available SVD hit-pair (default)
     bool   m_forcestore;///< true only if the V0Fitter mode is 1
     bool   m_useOnlyOneSVDHitPair;///< false only if the V0Fitter mode is 3
+    std::unique_ptr<V0VertexFitter> m_vertexFitter; ///< Vertex fitter used to fit the V0 vertex.
   };
 
 }

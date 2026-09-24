@@ -67,6 +67,7 @@ namespace Belle2 {
 
           // Create the wire hit relations within the supercluster.
           m_wireHitRelations.clear();
+          m_wireHitRelationFilter.prepare(wireHitPtrs);
           TrackingUtilities::RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
           const std::size_t nClustersBefore = outputClusters.size();
           m_wireHitClusterizer.apply(superCluster, m_wireHitRelations, outputClusters);

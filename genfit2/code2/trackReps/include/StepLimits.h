@@ -21,16 +21,15 @@
  * @{
  */
 
-#ifndef genfit_StepLimits_h
-#define genfit_StepLimits_h
+#pragma once
 
-#include <vector>
-#include <math.h>
+#include <array>
+#include <cmath>
 
 
 namespace genfit {
 
-enum StepLimitType {
+enum class EStepLimitType {
   // soft limits (only rough estimation, can go beyond safely)
   stp_noLimit = 0,    // only for internal use
 
@@ -44,7 +43,6 @@ enum StepLimitType {
   stp_boundary,   // stepsize limited by stepper because material boundary is encountered
   stp_plane,      // stepsize limited because destination plane is reached
 
-  ENUM_NR_ITEMS   // only for internal use
 };
 
 
@@ -54,16 +52,21 @@ enum StepLimitType {
 class StepLimits {
 
  public:
-  StepLimits()
-  : limits_(ENUM_NR_ITEMS, maxLimit_), stepSign_(1) {;}
+
+  //! Number of step-limit types.
+  static constexpr size_t c_nStepLimitTypes = 7;
+
+  StepLimits() {
+    limits_.fill(maxLimit_);
+  }
 
   StepLimits(const StepLimits&) = default;
 
   StepLimits& operator=(const StepLimits& other);
 
   //! Get limit of type. If that limit has not yet been set, return max double value.
-  double getLimit(StepLimitType type) const {return limits_[type];}
-  double getLimitSigned(StepLimitType type) const {
+  double getLimit(EStepLimitType type) const {return limits_[static_cast<int>(type)];}
+  double getLimitSigned(EStepLimitType type) const {
     return stepSign_*getLimit(type);
   }
 
@@ -74,7 +77,7 @@ class StepLimits {
    * (default margin is 0.1, i.e. medium limits can be exceeded by up to 10%).
    * If no limit has been set yet, return std::pair<stp_noLimit, std::numeric_limits<double>::max>.
    */
-  std::pair<StepLimitType, double> getLowestLimit(double margin = 1.E-3) const;
+  std::pair<EStepLimitType, double> getLowestLimit(double margin = 1.E-3) const;
 
   //! Get the unsigned numerical value of the lowest limit.
   double getLowestLimitVal(double margin = 1.E-3) const;
@@ -86,27 +89,28 @@ class StepLimits {
   char getStepSign() const {return stepSign_;} // +- 1
 
   //! absolute of value will be taken! If limit is already lower, it will stay.
-  void reduceLimit(StepLimitType type, double value);
+  void reduceLimit(EStepLimitType type, double value);
   //! absolute of value will be taken! If limit is already lower, it will be set to value anyway.
-  void setLimit(StepLimitType type, double value) {limits_[type] = fabs(value);}
+  void setLimit(EStepLimitType type, double value) {limits_[static_cast<int>(type)] = fabs(value);}
   //! sets #stepSign_ to sign of signedVal
   void setStepSign(char signedVal);
   //! sets #stepSign_ to sign of signedVal
   void setStepSign(double signedVal);
 
-  void removeLimit(StepLimitType type) {limits_[type] = maxLimit_;}
+  void removeLimit(EStepLimitType type) {limits_[static_cast<int>(type)] = maxLimit_;}
 
   void reset();
   void Print();
 
  private:
-  std::vector<double> limits_; // limits are unsigned (i.e. non-negative)
-  signed char stepSign_;
+
+  // limits are unsigned (i.e. non-negative)
+  std::array<double, c_nStepLimitTypes> limits_;
+
+  signed char stepSign_ = 1;
   static const double maxLimit_;
 
 };
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_StepLimits_h

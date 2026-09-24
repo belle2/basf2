@@ -74,7 +74,7 @@ namespace Belle2 {
                                                      std::map<ExpRun, std::pair<double, double>>& runsRemoved);
 
   /// get the range of interval with nIntervals and breaks stored in a vector
-  std::pair<int, int> getStartEndIndexes(int nIntervals,  std::vector<int> breaks, int indx);
+  std::pair<int, int> getStartEndIndexes(int nIntervals,  const std::vector<int>& breaks, int indx);
 
 
   /// Slice the vector to contain only elements with indexes s .. e (included)
@@ -124,7 +124,7 @@ namespace Belle2 {
       * @param res: A single calibration interval
       * @return: Vector of times [hours] of the break points, i.e. the subintervals boundaries
       **/
-    static std::vector<double> getBreaks(std::vector<std::map<ExpRun, std::pair<double, double>>> res)
+    static std::vector<double> getBreaks(const std::vector<std::map<ExpRun, std::pair<double, double>>>& res)
     {
       std::vector<double> breaks;
       for (int k = 0; k < int(res.size()) - 1; ++k) {
@@ -141,8 +141,8 @@ namespace Belle2 {
       * @param I2: Second subinterval to merge
       * @return: The resulting subinterval
       **/
-    static std::map<ExpRun, std::pair<double, double>> mergeIntervals(std::map<ExpRun, std::pair<double, double>> I1,
-                                                    std::map<ExpRun, std::pair<double, double>> I2);
+    static std::map<ExpRun, std::pair<double, double>> mergeIntervals(const std::map<ExpRun, std::pair<double, double>>& I1,
+                                                    const std::map<ExpRun, std::pair<double, double>>& I2);
 
 
     /** Function to merge/divide runs into the calibration intervals of given
@@ -244,7 +244,7 @@ namespace Belle2 {
       * @param intSize: Intended size of the small intervals
       * @return: A vector with resulting time boundaries of the atoms
       **/
-    static std::vector<std::pair<double, double>> splitToSmall(std::map<ExpRun, std::pair<double, double>> runs,
+    static std::vector<std::pair<double, double>> splitToSmall(const std::map<ExpRun, std::pair<double, double>>& runs,
                                                                double intSize = 1. / 60);
 
     /** Get the vector with parameters of the calibration Atoms
@@ -253,7 +253,7 @@ namespace Belle2 {
       * @return  A vector of atoms, each including start/end times and the number of events inside
       **/
     template<typename Evt>
-    inline std::vector<Atom> createAtoms(const std::vector<std::pair<double, double>>& atomsTimes,  const std::vector<Evt>& evts)
+    static inline std::vector<Atom> createAtoms(const std::vector<std::pair<double, double>>& atomsTimes,  const std::vector<Evt>& evts)
     {
       std::vector<Atom> atoms(atomsTimes.size());
 
@@ -309,7 +309,7 @@ namespace Belle2 {
   {
     std::map<ExpRun, std::pair<double, double>> runsInfo;
 
-    for (auto& evt : evts) {
+    for (const auto& evt : evts) {
       int Exp = evt.exp;
       int Run = evt.run;
       double time = evt.t;
@@ -338,7 +338,7 @@ namespace Belle2 {
   {
     ExpRunEvt evt(-1, -1, -1);
     double tBreak = -1e10;
-    for (auto& e : events) {
+    for (const auto& e : events) {
       if (e.t < tEdge) {
         if (e.t > tBreak) {
           tBreak = e.t;
@@ -356,7 +356,7 @@ namespace Belle2 {
     @return a vector with calibration break-points in the exp-run-evt format
    */
   template<typename Evt>
-  std::vector<ExpRunEvt> convertSplitPoints(const std::vector<Evt>& events, std::vector<double> splitPoints)
+  std::vector<ExpRunEvt> convertSplitPoints(const std::vector<Evt>& events, const std::vector<double>& splitPoints)
   {
 
     std::vector<ExpRunEvt>  breakPos;

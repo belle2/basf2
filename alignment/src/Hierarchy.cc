@@ -19,9 +19,9 @@ namespace Belle2 {
 
     void GlobalDerivativesHierarchy::buildConstraints(Constraints& constraints)
     {
-      for (auto& parent_children : m_hierarchy) {
-        auto parent = parent_children.first;
-        auto children = parent_children.second;
+      for (const auto& parent_children : m_hierarchy) {
+        const auto& parent = parent_children.first;
+        const auto& children = parent_children.second;
 
         // We need to check if such constraint entry already exists.
         // For timedep parameters, some to all labels (and coefficients optionally, too) can change and
@@ -141,7 +141,7 @@ namespace Belle2 {
       return labels;
     }
 
-    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, B2Vector3D bField)
+    TMatrixD LorentShiftHierarchy::getLorentzShiftDerivatives(const genfit::StateOnPlane* sop, const B2Vector3D& bField)
     {
       // values for global derivatives
       //TMatrixD derGlobal(2, 6);

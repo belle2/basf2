@@ -81,6 +81,13 @@ namespace Belle2 {
      */
     bool skipEvents(int n);
 
+    /**
+     * Count events in the file by reading through it.
+     * @param filename The filename of the file to count events in.
+     * @return The number of events in the file.
+     */
+    int countEvents(const std::string& filename);
+
     int m_nVirtual;        /**< The number of particles in each event with a set Virtual flag. */
     bool m_wrongSignPz;    /**< Bool to indicate that HER and LER were swapped. */
 

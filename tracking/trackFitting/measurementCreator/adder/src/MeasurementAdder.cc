@@ -41,7 +41,8 @@ MeasurementAdder::MeasurementAdder(
   const std::string& storeArrayNameOfCDCHits,
   const std::string& storeArrayNameOfBKLMHits,
   const std::string& storeArrayNameOfEKLMHits,
-  const bool initializeCDCTranslators) :
+  const bool initializeCDCTranslators,
+  bool fromTrackCreator) :
   m_param_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
   m_param_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_param_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
@@ -55,7 +56,7 @@ MeasurementAdder::MeasurementAdder(
     // Create new Translators and give them to the CDCRecoHits.
     CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
                                new CDC::RealisticCDCGeometryTranslator(true),
-                               new CDC::RealisticTDCCountTranslator(true),
+                               new CDC::RealisticTDCCountTranslator(true, fromTrackCreator),
                                true);
   }
   createGenfitMeasurementFactory();
@@ -250,7 +251,7 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
 }
 
 void MeasurementAdder::addMeasurementsToRecoTrack(RecoTrack& recoTrack,
-                                                  const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators) const
+                                                  const std::vector<std::shared_ptr<BaseMeasurementCreator>>& measurementCreators)
 {
   for (const auto& measurementCreator : measurementCreators) {
     const std::vector<genfit::TrackPoint*>& trackPoints = measurementCreator->createMeasurementPoints(recoTrack);

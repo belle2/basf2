@@ -177,7 +177,7 @@ namespace Belle2 {
     /**
      * Last channel for BKLM.
      */
-    KLMChannelIndex& endBKLM();
+    static KLMChannelIndex& endBKLM();
 
     /**
      * First channel for EKLM.
@@ -187,7 +187,7 @@ namespace Belle2 {
     /**
      * Last channel for EKLM.
      */
-    KLMChannelIndex& endEKLM();
+    static KLMChannelIndex& endEKLM();
 
     /**
      * First channel.
@@ -200,7 +200,7 @@ namespace Belle2 {
     /**
      * Last channel.
      */
-    KLMChannelIndex& end()
+    static KLMChannelIndex& end()
     {
       return endEKLM();
     }

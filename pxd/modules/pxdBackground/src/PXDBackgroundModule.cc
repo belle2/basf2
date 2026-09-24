@@ -134,10 +134,6 @@ void PXDBackgroundModule::initialize()
   m_integrationTime *= Unit::us;
 }
 
-void PXDBackgroundModule::beginRun()
-{
-}
-
 void PXDBackgroundModule::event()
 {
   //Register collections
@@ -361,10 +357,6 @@ void PXDBackgroundModule::event()
   }
 }
 
-void PXDBackgroundModule::endRun()
-{
-}
-
 
 void PXDBackgroundModule::terminate()
 {
@@ -385,7 +377,7 @@ void PXDBackgroundModule::terminate()
           << endl;
   double componentTime = m_componentTime / Unit::us;
   for (auto vxdSensor : m_sensorData) {
-    outfile << m_componentName.c_str() << "\t"
+    outfile << m_componentName << "\t"
             << componentTime << "\t"
             << vxdSensor.first.getLayerNumber() << "\t"
             << vxdSensor.first.getLadderNumber() << "\t"

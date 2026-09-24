@@ -34,7 +34,7 @@ namespace Belle2 {
       DBStoreEntry& dbEntry = entry->second;
 
       // Check whether the types match
-      if (!dbEntry.checkType(type, objClass, array)) return nullptr;
+      dbEntry.checkType(type, objClass, array);
 
       B2DEBUG(39, "DBEntry " << name << " was requested once more.");
       if (required && !dbEntry.isRequired()) {

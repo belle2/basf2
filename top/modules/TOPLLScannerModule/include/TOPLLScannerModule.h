@@ -33,24 +33,17 @@ namespace Belle2 {
      */
     TOPLLScannerModule();
 
-    /** Default destructor, Nothing to see here */
-    ~TOPLLScannerModule() override;
-
     /** Setup the storearrays */
     void initialize() override;
 
     /** Performs the scan */
     void event() override;
 
-    /** Saves the results */
-    void terminate() override;
-
-
   private:
 
     /** Finds best fit value and confidence interval form a LL via direct scan */
-    void scanLikelihood(std::vector<float>masses, std::vector<float>logLs, float deltaLL, float& maxLL, float& massMax,
-                        float& minMassRange, float& maxMassRange);
+    static void scanLikelihood(const std::vector<float>& masses, const std::vector<float>& logLs, float deltaLL,
+                               float& maxLL, float& massMax, float& minMassRange, float& maxMassRange);
 
     std::vector<float> m_massPoints; /**< vector with the mass points used in the coarse scan */
     short m_nFineScanPoints = 50; /**< number of points for the fine-graned scan */

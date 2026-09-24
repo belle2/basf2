@@ -72,7 +72,7 @@ void PrintCollectionsModule::event()
 
 
 /** remove Belle2 namespace prefix from className, if present. */
-std::string shorten(std::string className)
+std::string shorten(const std::string& className)
 {
   if (className.compare(0, 8, "Belle2::") == 0) {
     //we know the experiment name, thanks

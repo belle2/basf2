@@ -9,12 +9,13 @@
 
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
+#include <Math/Vector2D.h>
+
 #include <vector>
 
 namespace Belle2 {
 
   namespace TrackingUtilities {
-    class Vector2D;
     class CDCTrack;
     class CDCRecoHit3D;
     class CDCSegment3D;
@@ -124,13 +125,13 @@ namespace Belle2 {
       std::size_t appendRange(const TrackingUtilities::CDCTrack& track);
 
       /// Extracts the observation center that is at the index in the middle.
-      TrackingUtilities::Vector2D getCentralPoint() const;
+      ROOT::Math::XYVector getCentralPoint() const;
 
       /// Moves all observations passively such that the given vector becomes to origin of the new coordinate system
-      void passiveMoveBy(const TrackingUtilities::Vector2D& origin);
+      void passiveMoveBy(const ROOT::Math::XYVector& origin);
 
       /// Picks one observation as a reference point and transform all observations to that new origin
-      TrackingUtilities::Vector2D centralize();
+      ROOT::Math::XYVector centralize();
 
     public:
       /// Setter for the indicator that the drift variance should be used.

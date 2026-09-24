@@ -43,7 +43,7 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
         hitXPDerivate entry(hit, *cluster, *particle, sensorInfo);
         int NClusterU = 0;
         int NClusterV = 0;
-        for (SVDCluster Ncluster : hit.getRelationsFrom<SVDCluster>()) {
+        for (const SVDCluster& Ncluster : hit.getRelationsFrom<SVDCluster>()) {
           if (Ncluster.isUCluster()) NClusterU++;
           else NClusterV++;
         }
@@ -85,7 +85,7 @@ void NoKickRTSel::hitXPBuilder(const RecoTrack& track)
       }
     }
 
-    for (auto element : m_setHitXP) {
+    for (const auto& element : m_setHitXP) {
       m_hitXP.push_back(element);
     }
 
@@ -116,7 +116,7 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
   int lay4 = 0;
   int lay5 = 0;
   int lay6 = 0;
-  for (hitXP XP : track8) {
+  for (const hitXP& XP : track8) {
     if (XP.getSensorLayer() == 3) lay3 = 1;
     if (XP.getSensorLayer() == 4) lay4 = 1;
     if (XP.getSensorLayer() == 5) lay5 = 1;
@@ -132,7 +132,8 @@ bool NoKickRTSel::globalCut(const std::vector<hitXP>& track8)
   else return false;
 }
 
-bool NoKickRTSel::segmentSelector(hitXP hit1, hitXP hit2, std::vector<double> selCut, NoKickCuts::EParameters par, bool is0)
+bool NoKickRTSel::segmentSelector(const hitXP& hit1, const hitXP& hit2, const std::vector<double>& selCut,
+                                  NoKickCuts::EParameters par, bool is0)
 {
   if (hit2.m_sensorLayer - hit1.m_sensorLayer > 1) return true;
   else {

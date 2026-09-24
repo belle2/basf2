@@ -26,7 +26,7 @@ namespace Belle2 {
     ScanCDCGeoModule();
 
     /** destructor */
-    virtual ~ScanCDCGeoModule() {};
+    virtual ~ScanCDCGeoModule() override {};
 
     /** init  */
     virtual void initialize() override;;

@@ -49,7 +49,7 @@ void NeutralHadronMatcherModule::initialize()
     B2FATAL("Unsupported mcPDG value: " << m_mcPDG);
   }
 
-  for (auto& iList : m_ParticleLists)
+  for (const auto& iList : m_ParticleLists)
     StoreObjPtr<ParticleList>().isRequired(iList);
 
   if (! StoreArray<MCParticle>().isValid())
@@ -67,7 +67,7 @@ void NeutralHadronMatcherModule::event()
     B2FATAL("Missing mcparticles list for MC");
 
   // Initialize extra info
-  for (auto& iList : m_ParticleLists) {
+  for (const auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
     //check particle List has particles
@@ -95,7 +95,7 @@ void NeutralHadronMatcherModule::event()
   if (nMCPart == 0)
     return;
 
-  for (auto& iList : m_ParticleLists) {
+  for (const auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
     // loop over particles first

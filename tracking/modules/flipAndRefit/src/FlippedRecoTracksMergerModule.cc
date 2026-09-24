@@ -83,7 +83,7 @@ void FlippedRecoTracksMergerModule::event()
     }
 
     // get the tracksflipped
-    Track* trackFlipped = flippedRecoTrack->getRelatedFrom<Belle2::Track>("Tracks_flipped");
+    const Track* trackFlipped = flippedRecoTrack->getRelatedFrom<Belle2::Track>("Tracks_flipped");
     if (!trackFlipped) continue;
     std::vector<Track::ChargedStableTrackFitResultPair> fitResultsAfter =
       trackFlipped->getTrackFitResultsByName("TrackFitResults_flipped");

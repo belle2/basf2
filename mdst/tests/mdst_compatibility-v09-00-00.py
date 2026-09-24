@@ -15,6 +15,11 @@ See https://xwiki.desy.de/xwiki/rest/p/0a372 if this test fails.
 
 CHANGES since release-09-00-00:
 
+- ECLCluster:
+  + setLogEnergy
+  + setLogEnergyRaw
+  + setLogEnergyHighestCrystal
+
 None
 """
 

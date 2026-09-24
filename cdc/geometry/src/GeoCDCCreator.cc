@@ -500,7 +500,6 @@ namespace Belle2 {
             wbF.SetY(rF * sin(phi));
 
             B2Vector3D wfF = wf;
-            rF = rmax_sensitive_middle - 0.5 * diameter;
             phi = atan2(wfF.Y(), wfF.X());
             wfF.SetX(rF * cos(phi));
             wfF.SetY(rF * sin(phi));
@@ -560,7 +559,6 @@ namespace Belle2 {
             wbF.SetY(rF * sin(phi + dphi));
 
             wfF = wf;
-            rF = rmax_sensitive_middle - 0.5 * diameter;
             phi = atan2(wfF.Y(), wfF.X());
             wfF.SetX(rF * cos(phi + dphi));
             wfF.SetY(rF * sin(phi + dphi));
@@ -1228,7 +1226,7 @@ namespace Belle2 {
         if (ribID > 109 && ribID < 126) // H2O tube (rmin = 0)
           logicalV = new G4LogicalVolume(tubeShape, medH2O,  logicalName, 0, 0, 0);
         [[clang::suppress]]
-        if (ribID > 127 && ribID < 132) // cppcheck-suppress syntaxError // HV bundle
+        if (ribID > 127 && ribID < 132) // HV bundle
           logicalV = new G4LogicalVolume(boxShape, medHV,  logicalName, 0, 0, 0);
         /*if( ribID > 145 && ribID < 149 )// Fiber box
           logicalV = new G4LogicalVolume(boxShape, medFiber,  logicalName, 0, 0, 0);

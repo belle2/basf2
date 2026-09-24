@@ -27,11 +27,6 @@ namespace Belle2 {
     DQMHistAnalysisMonObjModule();
 
     /**
-     * Destructor
-     */
-    ~DQMHistAnalysisMonObjModule();
-
-    /**
      * Initialize the Module.
      */
     void initialize() override final;

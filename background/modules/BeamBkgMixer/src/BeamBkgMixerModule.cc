@@ -99,9 +99,6 @@ BeamBkgMixerModule::BeamBkgMixerModule() : Module()
            "file cache size in Mbytes. If negative, use root default", 0);
 }
 
-BeamBkgMixerModule::~BeamBkgMixerModule()
-{
-}
 
 void BeamBkgMixerModule::initialize()
 {
@@ -140,7 +137,7 @@ void BeamBkgMixerModule::initialize()
 
   // check files and append them to sample container
 
-  for (auto file : m_backgroundFiles) {
+  for (const auto& file : m_backgroundFiles) {
 
     // wildcarding is not allowed anymore
     if (TString(file.c_str()).Contains("*")) {
@@ -185,7 +182,7 @@ void BeamBkgMixerModule::initialize()
     double realTime = 0;
     for (unsigned k = 0; k < persistent.GetEntries(); k++) {
       persistent.GetEntry(k);
-      BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
+      const BackgroundMetaData* bgMD = static_cast<BackgroundMetaData*>(bkgMetaData);
       tags.push_back(bgMD->getBackgroundTag());
       types.push_back(bgMD->getBackgroundType());
       fileTypes.push_back(bgMD->getFileType());
@@ -318,7 +315,7 @@ void BeamBkgMixerModule::initialize()
   bkgInfo->setMaxTimePXD(m_maxTimePXD);
   bkgInfo->setWrapAround(m_wrapAround);
   bkgInfo->setMaxEdepECL(m_maxEdepECL);
-  for (auto& bkg : m_backgrounds) {
+  for (const auto& bkg : m_backgrounds) {
     BackgroundInfo::BackgroundDescr descr;
     descr.tag = bkg.tag;
     descr.type = bkg.type;
@@ -332,10 +329,6 @@ void BeamBkgMixerModule::initialize()
     bkgInfo->appendBackgroundDescr(descr);
   }
 
-}
-
-void BeamBkgMixerModule::beginRun()
-{
 }
 
 void BeamBkgMixerModule::event()
@@ -481,10 +474,6 @@ void BeamBkgMixerModule::event()
 }
 
 
-void BeamBkgMixerModule::endRun()
-{
-}
-
 void BeamBkgMixerModule::terminate()
 {
 
@@ -546,7 +535,7 @@ bool BeamBkgMixerModule::acceptEvent(TClonesArray* cloneArrayECL)
 
   int numEntries = cloneArrayECL->GetEntriesFast();
   for (int i = 0; i < numEntries; i++) {
-    ECLHit* simHit = static_cast<ECLHit*>(cloneArrayECL->AddrAt(i));
+    const ECLHit* simHit = static_cast<ECLHit*>(cloneArrayECL->AddrAt(i));
     if (simHit->getEnergyDep() > m_maxEdepECL) return false;
   }
   return true;

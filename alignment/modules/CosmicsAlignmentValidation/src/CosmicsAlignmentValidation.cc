@@ -86,10 +86,6 @@ void CosmicsAlignmentValidationModule::initialize()
 
 }
 
-void CosmicsAlignmentValidationModule::beginRun()
-{
-}
-
 void CosmicsAlignmentValidationModule::event()
 {
   B2DEBUG(99, "[CosmicsAlignmentValidationModule] begin event");
@@ -115,8 +111,8 @@ void CosmicsAlignmentValidationModule::event()
 
   else {
 
-    genfit::Track* tr1 = m_GenfitTracks[0];
-    genfit::Track* tr2 = m_GenfitTracks[1];
+    const genfit::Track* tr1 = m_GenfitTracks[0];
+    const genfit::Track* tr2 = m_GenfitTracks[1];
 
     const TrackFitResult* fitResult1 = findRelatedTrackFitResult(tr1);
     const TrackFitResult* fitResult2 = findRelatedTrackFitResult(tr2);
@@ -178,10 +174,6 @@ void CosmicsAlignmentValidationModule::event()
     tree->Fill();
   }
 
-}
-
-void CosmicsAlignmentValidationModule::endRun()
-{
 }
 
 void CosmicsAlignmentValidationModule::terminate()

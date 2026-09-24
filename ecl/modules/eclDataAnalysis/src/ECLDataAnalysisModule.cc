@@ -857,10 +857,6 @@ void ECLDataAnalysisModule::initialize()
 
 }
 
-void ECLDataAnalysisModule::beginRun()
-{
-}
-
 
 void ECLDataAnalysisModule::event()
 {
@@ -1340,7 +1336,7 @@ void ECLDataAnalysisModule::event()
       if (idx[0] > -1) {
         m_eclCalDigitToMCWeight1->push_back(wi[0]);
         m_eclCalDigitToMC1->push_back(idx[0]);
-        MCParticle* amcParticle = m_mcParticles[idx[0]];
+        const MCParticle* amcParticle = m_mcParticles[idx[0]];
         m_eclCalDigitToMC1PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclCalDigitToMCWeight1->push_back(-1);
@@ -1350,7 +1346,7 @@ void ECLDataAnalysisModule::event()
       if (idx[1] > -1) {
         m_eclCalDigitToMCWeight2->push_back(wi[1]);
         m_eclCalDigitToMC2->push_back(idx[1]);
-        MCParticle* amcParticle = m_mcParticles[idx[1]];
+        const MCParticle* amcParticle = m_mcParticles[idx[1]];
         m_eclCalDigitToMC2PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclCalDigitToMCWeight2->push_back(-1);
@@ -1360,7 +1356,7 @@ void ECLDataAnalysisModule::event()
       if (idx[2] > -1) {
         m_eclCalDigitToMCWeight3->push_back(wi[2]);
         m_eclCalDigitToMC3->push_back(idx[2]);
-        MCParticle* amcParticle = m_mcParticles[idx[2]];
+        const MCParticle* amcParticle = m_mcParticles[idx[2]];
         m_eclCalDigitToMC3PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclCalDigitToMCWeight3->push_back(-1);
@@ -1370,7 +1366,7 @@ void ECLDataAnalysisModule::event()
       if (idx[3] > -1) {
         m_eclCalDigitToMCWeight4->push_back(wi[3]);
         m_eclCalDigitToMC4->push_back(idx[3]);
-        MCParticle* amcParticle = m_mcParticles[idx[3]];
+        const MCParticle* amcParticle = m_mcParticles[idx[3]];
         m_eclCalDigitToMC4PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclCalDigitToMCWeight4->push_back(-1);
@@ -1380,7 +1376,7 @@ void ECLDataAnalysisModule::event()
       if (idx[4] > -1) {
         m_eclCalDigitToMCWeight5->push_back(wi[4]);
         m_eclCalDigitToMC5->push_back(idx[4]);
-        MCParticle* amcParticle = m_mcParticles[idx[4]];
+        const MCParticle* amcParticle = m_mcParticles[idx[4]];
         m_eclCalDigitToMC5PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclCalDigitToMCWeight5->push_back(-1);
@@ -1412,7 +1408,7 @@ void ECLDataAnalysisModule::event()
   //CR
   int CRmultip = m_eclConnectedRegions.getEntries();
   for (int i = 0; i < CRmultip; i++) {
-    ECLConnectedRegion* aECLCR = m_eclConnectedRegions[i];
+    const ECLConnectedRegion* aECLCR = m_eclConnectedRegions[i];
     m_eclCRIdx->push_back(aECLCR->getCRId());
     m_eclCRIsTrack->push_back(aECLCR->isTrack());
     m_eclCRLikelihoodMIPNGamma->push_back(aECLCR->getLikelihoodMIPNGamma());
@@ -1489,7 +1485,7 @@ void ECLDataAnalysisModule::event()
   //LM
   m_eclLMMultip = m_eclLocalMaximums.getEntries();
   for (unsigned int ilms = 0; ilms < (unsigned int)m_eclLocalMaximums.getEntries() ; ilms++) {
-    ECLLocalMaximum* aECLLMs = m_eclLocalMaximums[ilms];
+    const ECLLocalMaximum* aECLLMs = m_eclLocalMaximums[ilms];
     m_eclLMId->push_back(aECLLMs->getLMId());
     m_eclLMType->push_back(aECLLMs->getType());
     m_eclLMCellId->push_back(aECLLMs->getCellId());
@@ -1591,7 +1587,7 @@ void ECLDataAnalysisModule::event()
     if (idx[0] > -1) {
       m_eclClusterToMCWeight1->push_back(wi[0]);
       m_eclClusterToMC1->push_back(idx[0]);
-      MCParticle* amcParticle = m_mcParticles[idx[0]];
+      const MCParticle* amcParticle = m_mcParticles[idx[0]];
       m_eclClusterToMC1PDG->push_back(amcParticle->getPDG());
     } else {
       m_eclClusterToMCWeight1->push_back(-1);
@@ -1601,7 +1597,7 @@ void ECLDataAnalysisModule::event()
     if (idx[1] > -1) {
       m_eclClusterToMCWeight2->push_back(wi[1]);
       m_eclClusterToMC2->push_back(idx[1]);
-      MCParticle* amcParticle = m_mcParticles[idx[1]];
+      const MCParticle* amcParticle = m_mcParticles[idx[1]];
       m_eclClusterToMC2PDG->push_back(amcParticle->getPDG());
     } else {
       m_eclClusterToMCWeight2->push_back(-1);
@@ -1611,7 +1607,7 @@ void ECLDataAnalysisModule::event()
     if (idx[2] > -1) {
       m_eclClusterToMCWeight3->push_back(wi[2]);
       m_eclClusterToMC3->push_back(idx[2]);
-      MCParticle* amcParticle = m_mcParticles[idx[2]];
+      const MCParticle* amcParticle = m_mcParticles[idx[2]];
       m_eclClusterToMC3PDG->push_back(amcParticle->getPDG());
     } else {
       m_eclClusterToMCWeight3->push_back(-1);
@@ -1621,7 +1617,7 @@ void ECLDataAnalysisModule::event()
     if (idx[3] > -1) {
       m_eclClusterToMCWeight4->push_back(wi[3]);
       m_eclClusterToMC4->push_back(idx[3]);
-      MCParticle* amcParticle = m_mcParticles[idx[3]];
+      const MCParticle* amcParticle = m_mcParticles[idx[3]];
       m_eclClusterToMC4PDG->push_back(amcParticle->getPDG());
     } else {
       m_eclClusterToMCWeight4->push_back(-1);
@@ -1631,7 +1627,7 @@ void ECLDataAnalysisModule::event()
     if (idx[4] > -1) {
       m_eclClusterToMCWeight5->push_back(wi[4]);
       m_eclClusterToMC5->push_back(idx[4]);
-      MCParticle* amcParticle = m_mcParticles[idx[4]];
+      const MCParticle* amcParticle = m_mcParticles[idx[4]];
       m_eclClusterToMC5PDG->push_back(amcParticle->getPDG());
     } else {
       m_eclClusterToMCWeight5->push_back(-1);
@@ -1718,7 +1714,7 @@ void ECLDataAnalysisModule::event()
       if (idx[0] > -1) {
         m_eclPureCalDigitToMCWeight1->push_back(wi[0]);
         m_eclPureCalDigitToMC1->push_back(idx[0]);
-        MCParticle* amcParticle = m_mcParticles[idx[0]];
+        const MCParticle* amcParticle = m_mcParticles[idx[0]];
         m_eclPureCalDigitToMC1PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureCalDigitToMCWeight1->push_back(-1);
@@ -1728,7 +1724,7 @@ void ECLDataAnalysisModule::event()
       if (idx[1] > -1) {
         m_eclPureCalDigitToMCWeight2->push_back(wi[1]);
         m_eclPureCalDigitToMC2->push_back(idx[1]);
-        MCParticle* amcParticle = m_mcParticles[idx[1]];
+        const MCParticle* amcParticle = m_mcParticles[idx[1]];
         m_eclPureCalDigitToMC2PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureCalDigitToMCWeight2->push_back(-1);
@@ -1738,7 +1734,7 @@ void ECLDataAnalysisModule::event()
       if (idx[2] > -1) {
         m_eclPureCalDigitToMCWeight3->push_back(wi[2]);
         m_eclPureCalDigitToMC3->push_back(idx[2]);
-        MCParticle* amcParticle = m_mcParticles[idx[2]];
+        const MCParticle* amcParticle = m_mcParticles[idx[2]];
         m_eclPureCalDigitToMC3PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureCalDigitToMCWeight3->push_back(-1);
@@ -1748,7 +1744,7 @@ void ECLDataAnalysisModule::event()
       if (idx[3] > -1) {
         m_eclPureCalDigitToMCWeight4->push_back(wi[3]);
         m_eclPureCalDigitToMC4->push_back(idx[3]);
-        MCParticle* amcParticle = m_mcParticles[idx[3]];
+        const MCParticle* amcParticle = m_mcParticles[idx[3]];
         m_eclPureCalDigitToMC4PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureCalDigitToMCWeight4->push_back(-1);
@@ -1758,7 +1754,7 @@ void ECLDataAnalysisModule::event()
       if (idx[4] > -1) {
         m_eclPureCalDigitToMCWeight5->push_back(wi[4]);
         m_eclPureCalDigitToMC5->push_back(idx[4]);
-        MCParticle* amcParticle = m_mcParticles[idx[4]];
+        const MCParticle* amcParticle = m_mcParticles[idx[4]];
         m_eclPureCalDigitToMC5PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureCalDigitToMCWeight5->push_back(-1);
@@ -1789,7 +1785,7 @@ void ECLDataAnalysisModule::event()
     //CR
     int PureCRmultip = m_eclPureConnectedRegions.getEntries();
     for (int i = 0; i < PureCRmultip; i++) {
-      ECLConnectedRegion* aECLPureCR = m_eclPureConnectedRegions[i];
+      const ECLConnectedRegion* aECLPureCR = m_eclPureConnectedRegions[i];
       m_eclPureCRIdx->push_back(aECLPureCR->getCRId());
       m_eclPureCRIsTrack->push_back(aECLPureCR->isTrack());
       m_eclPureCRLikelihoodMIPNGamma->push_back(aECLPureCR->getLikelihoodMIPNGamma());
@@ -1803,7 +1799,7 @@ void ECLDataAnalysisModule::event()
     //LM
     m_eclPureLMMultip = m_eclPureLocalMaximums.getEntries();
     for (unsigned int pure_ilms = 0; pure_ilms < (unsigned int)m_eclPureLocalMaximums.getEntries() ; pure_ilms++) {
-      ECLLocalMaximum* aECLLMs = m_eclPureLocalMaximums[pure_ilms];
+      const ECLLocalMaximum* aECLLMs = m_eclPureLocalMaximums[pure_ilms];
       m_eclPureLMId->push_back(aECLLMs->getLMId());
       m_eclPureLMType->push_back(aECLLMs->getType());
       m_eclPureLMCellId->push_back(aECLLMs->getCellId());
@@ -1898,7 +1894,7 @@ void ECLDataAnalysisModule::event()
       if (idx[0] > -1) {
         m_eclPureClusterToMCWeight1->push_back(wi[0]);
         m_eclPureClusterToMC1->push_back(idx[0]);
-        MCParticle* amcParticle = m_mcParticles[idx[0]];
+        const MCParticle* amcParticle = m_mcParticles[idx[0]];
         m_eclPureClusterToMC1PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureClusterToMCWeight1->push_back(-1);
@@ -1908,7 +1904,7 @@ void ECLDataAnalysisModule::event()
       if (idx[1] > -1) {
         m_eclPureClusterToMCWeight2->push_back(wi[1]);
         m_eclPureClusterToMC2->push_back(idx[1]);
-        MCParticle* amcParticle = m_mcParticles[idx[1]];
+        const MCParticle* amcParticle = m_mcParticles[idx[1]];
         m_eclPureClusterToMC2PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureClusterToMCWeight2->push_back(-1);
@@ -1918,7 +1914,7 @@ void ECLDataAnalysisModule::event()
       if (idx[2] > -1) {
         m_eclPureClusterToMCWeight3->push_back(wi[2]);
         m_eclPureClusterToMC3->push_back(idx[2]);
-        MCParticle* amcParticle = m_mcParticles[idx[2]];
+        const MCParticle* amcParticle = m_mcParticles[idx[2]];
         m_eclPureClusterToMC3PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureClusterToMCWeight3->push_back(-1);
@@ -1928,7 +1924,7 @@ void ECLDataAnalysisModule::event()
       if (idx[3] > -1) {
         m_eclPureClusterToMCWeight4->push_back(wi[3]);
         m_eclPureClusterToMC4->push_back(idx[3]);
-        MCParticle* amcParticle = m_mcParticles[idx[3]];
+        const MCParticle* amcParticle = m_mcParticles[idx[3]];
         m_eclPureClusterToMC4PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureClusterToMCWeight4->push_back(-1);
@@ -1938,7 +1934,7 @@ void ECLDataAnalysisModule::event()
       if (idx[4] > -1) {
         m_eclPureClusterToMCWeight5->push_back(wi[4]);
         m_eclPureClusterToMC5->push_back(idx[4]);
-        MCParticle* amcParticle = m_mcParticles[idx[4]];
+        const MCParticle* amcParticle = m_mcParticles[idx[4]];
         m_eclPureClusterToMC5PDG->push_back(amcParticle->getPDG());
       } else {
         m_eclPureClusterToMCWeight5->push_back(-1);
@@ -2113,7 +2109,7 @@ void ECLDataAnalysisModule::event()
         double vtxx = mcParticle->getProductionVertex().X();
         double vtxy = mcParticle->getProductionVertex().Y();
         double vtxz = mcParticle->getProductionVertex().Z();
-        MCParticle* amcParticle = mcParticle->getMother();
+        const MCParticle* amcParticle = mcParticle->getMother();
         double px = amcParticle->getMomentum().X();
         double py = amcParticle->getMomentum().Y();
         double pz = amcParticle->getMomentum().Z();
@@ -2151,7 +2147,7 @@ void ECLDataAnalysisModule::event()
     if (idx[0] > -1) {
       m_eclShowerToMCWeight1->push_back(wi[0]);
       m_eclShowerToMC1->push_back(idx[0]);
-      MCParticle* amcParticle = m_mcParticles[idx[0]];
+      const MCParticle* amcParticle = m_mcParticles[idx[0]];
       m_eclShowerToMC1PDG->push_back(amcParticle->getPDG());
       if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC1Moth->push_back(amcParticle->getMother()->getIndex());
@@ -2181,7 +2177,7 @@ void ECLDataAnalysisModule::event()
     if (idx[1] > -1) {
       m_eclShowerToMCWeight2->push_back(wi[1]);
       m_eclShowerToMC2->push_back(idx[1]);
-      MCParticle* amcParticle = m_mcParticles[idx[1]];
+      const MCParticle* amcParticle = m_mcParticles[idx[1]];
       m_eclShowerToMC2PDG->push_back(amcParticle->getPDG());
       if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC2Moth->push_back(amcParticle->getMother()->getIndex());
@@ -2211,7 +2207,7 @@ void ECLDataAnalysisModule::event()
     if (idx[2] > -1) {
       m_eclShowerToMCWeight3->push_back(wi[2]);
       m_eclShowerToMC3->push_back(idx[2]);
-      MCParticle* amcParticle = m_mcParticles[idx[2]];
+      const MCParticle* amcParticle = m_mcParticles[idx[2]];
       m_eclShowerToMC3PDG->push_back(amcParticle->getPDG());
       if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC3Moth->push_back(amcParticle->getMother()->getIndex());
@@ -2241,7 +2237,7 @@ void ECLDataAnalysisModule::event()
     if (idx[3] > -1) {
       m_eclShowerToMCWeight4->push_back(wi[3]);
       m_eclShowerToMC4->push_back(idx[3]);
-      MCParticle* amcParticle = m_mcParticles[idx[3]];
+      const MCParticle* amcParticle = m_mcParticles[idx[3]];
       m_eclShowerToMC4PDG->push_back(amcParticle->getPDG());
       if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC4Moth->push_back(amcParticle->getMother()->getIndex());
@@ -2271,7 +2267,7 @@ void ECLDataAnalysisModule::event()
     if (idx[4] > -1) {
       m_eclShowerToMCWeight5->push_back(wi[4]);
       m_eclShowerToMC5->push_back(idx[4]);
-      MCParticle* amcParticle = m_mcParticles[idx[4]];
+      const MCParticle* amcParticle = m_mcParticles[idx[4]];
       m_eclShowerToMC5PDG->push_back(amcParticle->getPDG());
       if (amcParticle->getMother() != nullptr) {
         m_eclShowerToMC5Moth->push_back(amcParticle->getMother()->getIndex());
@@ -2303,7 +2299,7 @@ void ECLDataAnalysisModule::event()
 
   m_mcMultip = m_mcParticles.getEntries();
   for (int imcpart = 0; imcpart < m_mcParticles.getEntries(); imcpart++) {
-    MCParticle* amcParticle = m_mcParticles[imcpart];
+    const MCParticle* amcParticle = m_mcParticles[imcpart];
     m_mcIdx->push_back(amcParticle->getArrayIndex());
     m_mcPdg->push_back(amcParticle->getPDG());
     if (amcParticle->getMother() != nullptr) m_mcMothPdg->push_back(amcParticle->getMother()->getPDG());
@@ -2379,10 +2375,6 @@ void ECLDataAnalysisModule::event()
   }
 
   m_tree->Fill();
-}
-
-void ECLDataAnalysisModule::endRun()
-{
 }
 
 void ECLDataAnalysisModule::terminate()

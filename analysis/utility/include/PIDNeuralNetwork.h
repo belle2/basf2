@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Constructor with given paramenter-set name
      */
-    PIDNeuralNetwork(const std::string& parameterName):
+    explicit PIDNeuralNetwork(const std::string& parameterName):
       m_pidNeuralNetworkParametersName(parameterName),
       m_pidNeuralNetworkParametersDB(nullptr),
       m_model(nullptr)

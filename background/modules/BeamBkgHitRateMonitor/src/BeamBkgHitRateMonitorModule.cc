@@ -325,23 +325,23 @@ void BeamBkgHitRateMonitorModule::collectFileMetaData()
   // low and high experiment, run and event numbers
   unsigned long experiment =  m_eventMetaData->getExperiment();
   unsigned long run =  m_eventMetaData->getRun();
-  unsigned long event = m_eventMetaData->getEvent();
+  unsigned long evt = m_eventMetaData->getEvent();
   if (m_experimentLow > m_experimentHigh) { //starting condition
     m_experimentLow = m_experimentHigh = experiment;
     m_runLow = m_runHigh = run;
-    m_eventLow = m_eventHigh = event;
+    m_eventLow = m_eventHigh = evt;
   } else {
     if ((experiment < m_experimentLow) or ((experiment == m_experimentLow) and ((run < m_runLow) or ((run == m_runLow)
-                                           and (event < m_eventLow))))) {
+                                           and (evt < m_eventLow))))) {
       m_experimentLow = experiment;
       m_runLow = run;
-      m_eventLow = event;
+      m_eventLow = evt;
     }
     if ((experiment > m_experimentHigh) or ((experiment == m_experimentHigh) and ((run > m_runHigh) or ((run == m_runHigh)
-                                            and (event > m_eventHigh))))) {
+                                            and (evt > m_eventHigh))))) {
       m_experimentHigh = experiment;
       m_runHigh = run;
-      m_eventHigh = event;
+      m_eventHigh = evt;
     }
   }
 

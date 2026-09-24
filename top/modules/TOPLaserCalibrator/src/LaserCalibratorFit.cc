@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TOP {
     //Crystal Ball function
-    // cppcheck-suppress constParameter
+    // cppcheck-suppress constParameterCallback
     double fcnCB(double* x, double* par)
     {
       double m1 = par[1];
@@ -30,7 +30,7 @@ namespace Belle2 {
     }
 
     //double Crystal Ball function
-    // cppcheck-suppress constParameter
+    // cppcheck-suppress constParameterCallback
     double fcnCB2(double* x, double* par)
     {
       double m1 = par[1];
@@ -87,7 +87,7 @@ namespace Belle2 {
 
     int LaserCalibratorFit::fitChannel(unsigned channel)
     {
-      if (channel > m_hist.size()) {
+      if (channel >= m_hist.size()) {
         B2WARNING("Wrong channel!");
         return 0;
       }

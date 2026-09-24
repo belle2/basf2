@@ -57,7 +57,7 @@ namespace {
   {
     MRUCache<int, int> cache(5);
     cache.insert(1, 1);
-    int var;
+    int var = 0;
     EXPECT_EQ(cache.size(), 1u);
     EXPECT_TRUE(cache.retrieve(1, var));
     EXPECT_EQ(var, 1);

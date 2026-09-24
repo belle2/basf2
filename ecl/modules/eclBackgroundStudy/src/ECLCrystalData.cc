@@ -196,12 +196,10 @@ int ECLCrystalData::GetCrystalIndex()
   } else if (m_theta_ID >= 59) {               //backward ECL crystal
     return  m_phi_ID % Ring[m_theta_ID] + sumPrevious[m_theta_ID - 46];
 
-  } else if (12 < m_theta_ID  && m_theta_ID < 59) { //barrel ECL crystal
-    return m_theta_ID - 13;
   }
 
-  B2ERROR("ERROR: invalid theta_ID=" << m_theta_ID);
-  return -1;
+  //barrel ECL crystal
+  return m_theta_ID - 13;
 }
 
 inline bool ECLCrystalData::IsEndCap()

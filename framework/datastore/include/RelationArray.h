@@ -146,6 +146,7 @@ namespace Belle2 {
      *  @param replace   Should an existing object be replaced?
      *  @return          True if the creation succeeded.
      **/
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     bool create(bool replace = false)
     {
       bool result = DataStore::Instance().createObject(0, replace, *this);
@@ -221,7 +222,7 @@ namespace Belle2 {
     }
 
     /** Empty destructor */
-    ~RelationArray() {}
+    ~RelationArray() override {}
 
     /** Check whether the object was created.
      *
@@ -476,7 +477,7 @@ namespace Belle2 {
     unsigned int nElements = (*m_relations)->getEntries();
     TClonesArray& elements = (*m_relations)->elements();
     for (unsigned int i = 0; i < nElements; ++i) {
-      RelationElement& element = *static_cast<RelationElement*>(elements[i]);
+      const RelationElement& element = *static_cast<RelationElement*>(elements[i]);
       //Replace from index
       consolidation_type from = replaceFrom(element.getFromIndex());
 

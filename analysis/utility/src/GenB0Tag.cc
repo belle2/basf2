@@ -13,7 +13,7 @@ using namespace Belle2;
 
 GenB0Tag::GenB0Tag() = default;
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2)
 {
   int ndau = gp.size();
   if (ndau == 2) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2);}
@@ -24,7 +24,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2)
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3)
 {
   int ndau = gp.size();
   if (ndau == 3) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3);}
@@ -35,7 +35,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3)
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4)
 {
   int ndau = gp.size();
   if (ndau == 4) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4);}
@@ -46,7 +46,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int d
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5)
 {
   int ndau = gp.size();
   if (ndau == 5) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5);}
@@ -57,7 +57,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int d
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6)
 {
   int ndau = gp.size();
   if (ndau == 6) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6);}
@@ -68,7 +68,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int d
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7)
 {
   int ndau = gp.size();
   if (ndau == 7) { m_nPhotos = 0;  return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7);}
@@ -79,7 +79,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int d
   else return false;
 }
 
-bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
+bool GenB0Tag::PcheckDecay(const std::vector<int>& gp, int da1, int da2, int da3, int da4, int da5, int da6, int da7, int da8)
 {
   int ndau = gp.size();
   if (ndau == 8) { m_nPhotos = 0; return CheckDecay::CheckDecay(gp, da1, da2, da3, da4, da5, da6, da7, da8);}
@@ -92,7 +92,7 @@ bool GenB0Tag::PcheckDecay(std::vector<int> gp, int da1, int da2, int da3, int d
 
 //All the tag number for various decay mode is defined here
 
-int GenB0Tag::Mode_B0(std::vector<int> genpart)
+int GenB0Tag::Mode_B0(const std::vector<int>& genpart)
 {
   if (GenB0Tag::PcheckDecay(genpart, -413, -11, 12)) {
     return +1 * (100000 * m_nPhotos + 1001);
@@ -3098,7 +3098,7 @@ int GenB0Tag::Mode_B0(std::vector<int> genpart)
 }// Rest of the B0 decays
 
 
-int GenB0Tag::Mode_anti_B0(std::vector<int> genpart)
+int GenB0Tag::Mode_anti_B0(const std::vector<int>& genpart)
 {
   if (GenB0Tag::PcheckDecay(genpart, 413, 11, -12)) {
     return -1 * (100000 * m_nPhotos + 1001);

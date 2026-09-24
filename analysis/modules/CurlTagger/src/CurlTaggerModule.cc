@@ -65,7 +65,7 @@ CurlTaggerModule::CurlTaggerModule() : Module()
 
 CurlTaggerModule::~CurlTaggerModule() = default;
 
-bool CurlTaggerModule::passesPreSelection(Particle* p)
+bool CurlTaggerModule::passesPreSelection(const Particle* p)
 {
   if (Variable::particlePt(p) > m_PtCut) {return false;}
   if (!(Variable::trackNCDCHits(p) > 0 || Variable::trackNVXDHits(p) > 0)) {return false;} //should never happen anyway but might as well check
@@ -103,7 +103,7 @@ void CurlTaggerModule::beginRun()
 
 void CurlTaggerModule::event()
 {
-  for (auto& iList : m_ParticleLists) {
+  for (const auto& iList : m_ParticleLists) {
     StoreObjPtr<ParticleList> particleList(iList);
 
     //check particle List exists and has particles
@@ -166,7 +166,7 @@ void CurlTaggerModule::event()
         if (m_McStatsFlag) {
           bool addedParticleToTruthBundle = false;
           for (auto& truthBundle : truthBundles) {
-            Particle* bPart = truthBundle.getParticle(0);
+            const Particle* bPart = truthBundle.getParticle(0);
             if (Variable::genParticleIndex(iPart) == Variable::genParticleIndex(bPart)) {
               truthBundle.addParticle(iPart);
               addedParticleToTruthBundle = true;
@@ -207,10 +207,6 @@ void CurlTaggerModule::event()
       } //iPart
     } // Training events
   } // particle Lists
-}
-
-void CurlTaggerModule::endRun()
-{
 }
 
 void CurlTaggerModule::terminate()

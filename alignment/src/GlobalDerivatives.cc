@@ -43,7 +43,7 @@ namespace Belle2 {
       main.second = allDerivatives;
 
     }
-    void GlobalDerivatives::add(int paramLabel, std::vector< double > dResiduals_dParam)
+    void GlobalDerivatives::add(int paramLabel, const std::vector< double >& dResiduals_dParam)
     {
       int nRows = m_globals.second.GetNrows();
       int nCols = m_globals.second.GetNcols();

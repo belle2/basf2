@@ -121,8 +121,8 @@ namespace Belle2 {
         typedef int int_array_192x16_t[c_nFitTimeShifts * c_nFitPointsPerAdcTick][c_nFitSamples]; /**< Array for DSP coefs in normal fit */
         typedef int int_array_24x16_t[c_nLowAmpFitPoints][c_nFitSamples]; /**< Array for DSP coefs in fast fit */
 
-        using IntArrayGridXAdc = int_array_192x16_t;
-        using IntArraySubXAdc = int_array_24x16_t;
+        using IntArrayGridXAdc = int_array_192x16_t; /**< Array for DSP coefficients in normal fit. */
+        using IntArraySubXAdc = int_array_24x16_t; /**< Array for DSP coefficients in low-amplitude fit. */
 
         int_array_192x16_t f; /**< Array with tabulated signal waveform */
         int_array_192x16_t f1; /**< Array with tabulated derivative of signal waveform */
@@ -141,10 +141,10 @@ namespace Belle2 {
         };
       };
 
-      using SignalSample = signalsample_t;
-      using AdcCounts = adccounts_t;
-      using FitParams = fitparams_t;
-      using AlgoParams = algoparams_t;
+      using SignalSample = signalsample_t; /**< Signal sample type. */
+      using AdcCounts = adccounts_t; /**< ADC counts type. */
+      using FitParams = fitparams_t; /**< Fit parameters type. */
+      using AlgoParams = algoparams_t; /**< Algorithm parameters type. */
 
     };
   }

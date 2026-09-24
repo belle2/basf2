@@ -37,7 +37,9 @@ namespace Belle2 {
       /** Constructor using the current-electronics number of ADC samples. */
       ECLCompress();
 
-      /** Constructor with configurable waveform length. */
+      /** Constructor with configurable waveform length.
+       * @param nAdcSamples Number of ADC samples in the waveform.
+       */
       explicit ECLCompress(unsigned int nAdcSamples);
 
       /** Virtual destructor. */
@@ -65,7 +67,9 @@ namespace Belle2 {
      */
     class ECLBaseCompress: public ECLCompress {
     public:
-      /** Constructor for BASE compression algorithm */
+      /** Constructor for BASE compression algorithm with configurable waveform length.
+       * @param nAdcSamples Number of ADC samples in the waveform.
+       */
       ECLBaseCompress() = default;
 
       /** Constructor for BASE compression algorithm with configurable waveform length */
@@ -81,7 +85,9 @@ namespace Belle2 {
      */
     class ECLDeltaCompress: public ECLCompress {
     public:
-      /** Constructor for DELTA compression algorithm */
+      /** Constructor for DELTA compression algorithm with configurable waveform length.
+       * @param nAdcSamples Number of ADC samples in the waveform.
+       */
       ECLDeltaCompress() = default;
 
       /** Constructor for DELTA compression algorithm with configurable waveform length */

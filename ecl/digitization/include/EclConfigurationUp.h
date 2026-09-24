@@ -41,6 +41,7 @@ namespace Belle2 {
         96; /**< length of samples signal in number of ADC clocks (used for waveform generation) */
       static constexpr int       c_nSamplesPerAdcClock = 32; /**< number of samples per ADC clock (used for waveform generation) */
 
+      static constexpr int       c_nFitSamples = c_nAdcSamples; /**< number of samples in the fitting window */
       static constexpr int       c_nFitPointsPerAdcTick =
         128; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
       static constexpr int       c_nSubTimeCorr = 32; /**< number of sub-divisions for time correction for signal fit procedure */
@@ -107,8 +108,6 @@ namespace Belle2 {
         double m_timeShift; /**< simulated time shift*/
         double m_timeToSensor; /**< simulated time to sensor*/
       };
-
-      static constexpr int c_nFitSamples = c_nAdcSamples; /**< number of samples in the fitting window */
 
       /** a struct for the fit parameters */
       struct FitParams {

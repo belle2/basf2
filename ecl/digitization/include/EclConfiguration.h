@@ -40,6 +40,27 @@ namespace Belle2 {
       static constexpr int         m_ns = 32; /**< number of samples per ADC clock */
       static constexpr int        m_ndt = 96; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
 
+      // Common configuration interface shared with EclConfigurationUp.
+      static constexpr int       c_nChannels = m_nch; /**< total number of electronic channels (crystals) in calorimeter */
+      static constexpr double    c_step = m_step;  /**< time between points in internal units t_{asrto}*m_rf/2./24./12. */
+      static constexpr double    c_clock = s_clock;  /**< digitization clock in RF units */
+      static constexpr int       c_nTriggerCounts = m_ntrg; /**< number of trigger counts per ADC clock tick */
+
+      static constexpr int       c_nAdcSamples = m_nsmp;  /**< number of ADC measurements for signal fitting */
+      static constexpr double    c_fitTimeMin = m_tmin;  /**< lower range of the signal fitting region in ADC clocks */
+
+      static constexpr int       c_nSignalAdcClocks =
+        m_nl;   /**< length of samples signal in number of ADC clocks (used for waveform generation) */
+      static constexpr int       c_nSamplesPerAdcClock = m_ns;  /**< number of samples per ADC clock (used for waveform generation) */
+
+      static constexpr int       c_nFitSamples = 16;  /**< number of samples in the fitting window */
+      static constexpr int       c_nFitPointsPerAdcTick =
+        m_ndt;  /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
+      static constexpr int       c_nSubTimeCorr = 12;  /**< number of sub-divisions for time correction for signal fit procedure */
+      static constexpr int       c_nFitTimeShifts = 2;  /**< number of time shifts for signal fit procedure parameters */
+
+      static constexpr int       c_nWaveformParameters = 10; /**< number of parameters defining the waveform shape */
+
     private:
       static double m_rf; /**< RF clock, www-linac.kek.jp/linac-com/report/skb-tdr/, ch. 6 */
       static double m_tick; /**< == 72/127 digitization clock tick (in microseconds) */
@@ -96,6 +117,10 @@ namespace Belle2 {
       struct fitparams_t {
         typedef int int_array_192x16_t[2 * m_ndt][16]; /**< Array for DSP coefs in normal fit */
         typedef int int_array_24x16_t[m_ndt / 4][16]; /**< Array for DSP coefs in fast fit */
+
+        using IntArrayGridXAdc = int_array_192x16_t;
+        using IntArraySubXAdc = int_array_24x16_t;
+
         int_array_192x16_t f; /**< Array with tabulated signal waveform */
         int_array_192x16_t f1; /**< Array with tabulated derivative of signal waveform */
         int_array_192x16_t fg31; /**< Array to estimate signal amplitude */
@@ -112,6 +137,11 @@ namespace Belle2 {
           unsigned char ic[32]; /**< */
         };
       };
+
+      using SignalSample = signalsample_t;
+      using AdcCounts = adccounts_t;
+      using FitParams = fitparams_t;
+      using AlgoParams = algoparams_t;
 
     };
   }

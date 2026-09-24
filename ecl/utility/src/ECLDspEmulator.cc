@@ -472,9 +472,9 @@ namespace Belle2 {
       constexpr int N_DT = EclConfigurationUp::c_nFitPointsPerAdcTick;    // number of time divisions in 1 step
       constexpr int N_TF = EclConfigurationUp::c_nFitTimeShifts;    // number of time time shifts
       constexpr int N_TRG = EclConfigurationUp::c_nTriggerCounts; // number of trigger divisions in 1 step
-      constexpr int N_TA = N_DT / 4;   // number of time divisions in 1 step for low amplitude case
+      constexpr int N_TA = EclConfigurationUp::c_nLowAmpFitPoints;   // number of time divisions in 1 step for low amplitude case
       constexpr int N_SUB = EclConfigurationUp::c_nSubTimeCorr;   // number of sub-divisions for time correction
-      constexpr int N_PED = N_ADC + EclConfigurationUp::c_fitTimeMin;     // pedestal samples for rough amplitude estimation
+      constexpr int N_PED = EclConfigurationUp::c_nPedestalSamples;     // pedestal samples for rough amplitude estimation
       constexpr int MAX_ITER = 20; // max number of iterations for time correction
       constexpr int N_TICKS = N_DT * N_TF * N_SUB; // number of time ticks in the fit window
 

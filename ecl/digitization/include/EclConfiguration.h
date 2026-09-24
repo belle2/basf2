@@ -48,6 +48,7 @@ namespace Belle2 {
 
       static constexpr int       c_nAdcSamples = m_nsmp;  /**< number of ADC measurements for signal fitting */
       static constexpr double    c_fitTimeMin = m_tmin;  /**< lower range of the signal fitting region in ADC clocks */
+      static constexpr int       c_nPedestalSamples = c_nAdcSamples + c_fitTimeMin; /**< number of samples used for pedestal fit */
 
       static constexpr int       c_nSignalAdcClocks =
         m_nl;   /**< length of samples signal in number of ADC clocks (used for waveform generation) */
@@ -58,6 +59,8 @@ namespace Belle2 {
         m_ndt;  /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
       static constexpr int       c_nSubTimeCorr = 12;  /**< number of sub-divisions for time correction for signal fit procedure */
       static constexpr int       c_nFitTimeShifts = 2;  /**< number of time shifts for signal fit procedure parameters */
+      static constexpr int       c_nLowAmpFitPoints = c_nFitPointsPerAdcTick /
+                                                      4;  /**< number of points for low amplitude fit procedure */
 
       static constexpr int       c_nWaveformParameters = 10; /**< number of parameters defining the waveform shape */
 
@@ -115,8 +118,8 @@ namespace Belle2 {
 
       /** a struct for the fit parameters */
       struct fitparams_t {
-        typedef int int_array_192x16_t[2 * m_ndt][16]; /**< Array for DSP coefs in normal fit */
-        typedef int int_array_24x16_t[m_ndt / 4][16]; /**< Array for DSP coefs in fast fit */
+        typedef int int_array_192x16_t[c_nFitTimeShifts * c_nFitPointsPerAdcTick][c_nFitSamples]; /**< Array for DSP coefs in normal fit */
+        typedef int int_array_24x16_t[c_nLowAmpFitPoints][c_nFitSamples]; /**< Array for DSP coefs in fast fit */
 
         using IntArrayGridXAdc = int_array_192x16_t;
         using IntArraySubXAdc = int_array_24x16_t;

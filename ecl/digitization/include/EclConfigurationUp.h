@@ -36,6 +36,7 @@ namespace Belle2 {
 
       static constexpr int       c_nAdcSamples = 64; /**< number of ADC measurements for signal fitting */
       static constexpr double    c_fitTimeMin = -32; /**< lower range of the signal fitting region in ADC clocks */
+      static constexpr int       c_nPedestalSamples = c_nAdcSamples + c_fitTimeMin; /**< number of samples used for pedestal fit */
 
       static constexpr int       c_nSignalAdcClocks =
         96; /**< length of samples signal in number of ADC clocks (used for waveform generation) */
@@ -46,6 +47,8 @@ namespace Belle2 {
         128; /**< number of points per ADC tick where signal fit procedure parameters are evaluated */
       static constexpr int       c_nSubTimeCorr = 32; /**< number of sub-divisions for time correction for signal fit procedure */
       static constexpr int       c_nFitTimeShifts = 4; /**< number of time shifts for signal fit procedure parameters */
+      static constexpr int       c_nLowAmpFitPoints = c_nFitPointsPerAdcTick /
+                                                      4;  /**< number of points for low amplitude fit procedure */
 
       static constexpr int       c_nWaveformParameters = 14; /**< number of parameters defining the waveform shape */
 
@@ -112,7 +115,7 @@ namespace Belle2 {
       /** a struct for the fit parameters */
       struct FitParams {
         typedef int IntArrayGridXAdc[c_nFitTimeShifts * c_nFitPointsPerAdcTick][c_nFitSamples]; /**< Array for DSP coefs in normal fit */
-        typedef int IntArraySubXAdc[c_nFitPointsPerAdcTick / 4][c_nFitSamples]; /**< Array for DSP coefs in low amplitude fast fit */
+        typedef int IntArraySubXAdc[c_nLowAmpFitPoints][c_nFitSamples]; /**< Array for DSP coefs in low amplitude fast fit */
         IntArrayGridXAdc f; /**< Array with tabulated signal waveform */
         IntArrayGridXAdc f1; /**< Array with tabulated derivative of signal waveform */
         IntArrayGridXAdc fg31; /**< Array to estimate signal amplitude */

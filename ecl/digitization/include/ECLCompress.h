@@ -34,8 +34,14 @@ namespace Belle2 {
      */
     class ECLCompress {
     public:
-      /** virtual destructure */
-      virtual ~ECLCompress() {};
+      /** Constructor using the current-electronics number of ADC samples. */
+      ECLCompress();
+
+      /** Constructor with configurable waveform length. */
+      explicit ECLCompress(unsigned int nAdcSamples);
+
+      /** Virtual destructor. */
+      virtual ~ECLCompress() = default;
 
       /** Compress the ECL waveform
        * @param out -- where we stream the compressed data
@@ -48,6 +54,10 @@ namespace Belle2 {
        * @param adc -- the decompressed waveform
        */
       virtual void uncompress(BitStream& in, int* adc) = 0;
+
+    protected:
+      /** Number of ADC samples in the waveform. */
+      unsigned int m_nAdcSamples;
     };
 
     /** ECL waveform compression/decompression to/from the BitStream
@@ -55,6 +65,13 @@ namespace Belle2 {
      */
     class ECLBaseCompress: public ECLCompress {
     public:
+      /** Constructor for BASE compression algorithm */
+      ECLBaseCompress() = default;
+
+      /** Constructor for BASE compression algorithm with configurable waveform length */
+      explicit ECLBaseCompress(unsigned int nAdcSamples):
+        ECLCompress(nAdcSamples) {}
+
       void compress(BitStream& out, const int* adc) override;
       void uncompress(BitStream& out, int* adc) override;
     };
@@ -64,6 +81,13 @@ namespace Belle2 {
      */
     class ECLDeltaCompress: public ECLCompress {
     public:
+      /** Constructor for DELTA compression algorithm */
+      ECLDeltaCompress() = default;
+
+      /** Constructor for DELTA compression algorithm with configurable waveform length */
+      explicit ECLDeltaCompress(unsigned int nAdcSamples):
+        ECLCompress(nAdcSamples) {}
+
       /**
        * function to compress the ECL waveform with the DELTA algorithm
        */
@@ -100,9 +124,11 @@ namespace Belle2 {
     };
 
     /** The compression algorithm selector function
-     *  @param compAlgo compression algorithm -- 1 - BASE, 2 - DELTA, 3 - DCT
-     *  @return pointer to the selected algorithm or nullptr in case of the wrong parameter
-     */
-    ECLCompress* selectAlgo(int compAlgo);
+     *  @param compAlgo compression algorithm -- 1 - BASE, 2 - DELTA,
+     *                  3/4 - DCT (current electronics only)
+     *  @param upgrade use upgraded-electronics waveform length
+     *  @return pointer to the selected algorithm or nullptr for an unsupported algorithm
+    */
+    ECLCompress* selectAlgo(int compAlgo, bool upgrade = false);
   }
 }

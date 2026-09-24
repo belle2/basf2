@@ -19,7 +19,7 @@
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <ecl/dbobjects/ECLWaveformData.h>
 #include <ecl/digitization/BitStream.h>
-#include <ecl/digitization/ECLCompressUp.h>
+#include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/shaperdspUp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/utility/ECLDspUtilities.h>
@@ -378,7 +378,7 @@ void ECLDigitizerUpModule::makeWaveforms()
   const int nSamples = ec.c_nAdcSamples;
   BitStream out(ec.c_nChannels * nSamples * 18 / 32);
   out.putNBits(m_compAlgo & 0xff, 8);
-  ECLCompressUp* comp = selectAlgoUp(m_compAlgo & 0xff);
+  ECLCompress* comp = selectAlgo(m_compAlgo & 0xff, true);  // if upgrade
   if (comp == nullptr)
     B2FATAL("Unknown compression algorithm: " << m_compAlgo);
 
@@ -420,14 +420,14 @@ void ECLDigitizerUpModule::event()
 
   bool isBGOverlay = m_eclWaveforms.isValid(), isTrigTime = false;
   BitStream out;
-  ECLCompressUp* comp = nullptr;
+  ECLCompress* comp = nullptr;
 
   // check background overlay
   if (isBGOverlay) {
     std::swap(out.getStore(), m_eclWaveforms->getStore());
     out.setPos(0);
     unsigned int compAlgo = out.getNBits(8);
-    comp = selectAlgoUp(compAlgo & 0x7f);
+    comp = selectAlgo(compAlgo & 0x7f, true); // if upgrade
     if (comp == nullptr)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
     isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrieved

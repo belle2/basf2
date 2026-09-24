@@ -41,17 +41,19 @@ namespace Belle2 {
        *
        * @param[in] raw_file Path to dsp??.dat file.
        * @param[in] boardNumber Number of shaperDSP board, from 1 to 52*12
+       * @param[in] upgrade Boolean indicating whether to use upgraded electronics
        * @return ECLDspData object
        */
-      static ECLDspData* readEclDsp(const char* raw_file, int boardNumber);
+      static ECLDspData* readEclDsp(const char* raw_file, int boardNumber, bool upgrade = false);
 
       /**
        * @brief Convert ECLDspData from Root object to *.dat file.
        *
        * @param[in] raw_file Path to dsp??.dat file to be created.
        * @param[in] obj      Object to be written
+       * @param[in] upgrade Boolean indicating whether to use upgraded electronics
        */
-      static void writeEclDsp(const char* raw_file, ECLDspData* obj);
+      static void writeEclDsp(const char* raw_file, ECLDspData* obj, bool upgrade = false);
 
       /**
        * @brief Emulate shape fitting algorithm from ShaperDSP
@@ -67,9 +69,10 @@ namespace Belle2 {
        *              If true, algorithm will determine time near 0 with higher
        *              precision, time of low-energy hits will be one of {-4,0,4}
        *              If false, time will be one of {-32, -16, 0}
+       * @param[in] upgrade Optional. Set to true to use upgraded electronics fit.
        */
       static ECLShapeFit shapeFitter(int cid, std::vector<int> adc, int ttrig,
-                                     bool adjusted_timing = true);
+                                     bool adjusted_timing = true, bool upgrade = false);
 
       /**
        * Load DSP coefficients used in the pedestal fit function.

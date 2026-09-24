@@ -22,7 +22,7 @@
 #include <ecl/digitization/ECLCompressUp.h>
 #include <ecl/digitization/shaperdspUp.h>
 #include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/utility/ECLDspUtilitiesUp.h>
+#include <ecl/utility/ECLDspUtilities.h>
 /* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
@@ -234,7 +234,9 @@ void ECLDigitizerUpModule::shapeFitterWrapper(
     // triggerTime = triggerTime_packed - 2 * (triggerTime_packed / 8);
     // triggerTime = 6*Z + q
     int triggerTime_packed = triggerTime / 6 * 8 + triggerTime % 6;
-    result = ECLDspUtilitiesUp::shapeFitter(j + 1, adc, triggerTime_packed);
+    result = ECLDspUtilities::shapeFitter(j + 1, adc, triggerTime_packed,
+                                          true); // if upgrade electronics, use true for the last argument
+    //result = ECLDspUtilities::shapeFitter(j + 1, adc, triggerTime_packed);
   }
 
   amplitude = result.amp;
@@ -742,7 +744,7 @@ void ECLDigitizerUpModule::getFitParams(const ECLWaveformData& eclWFData, const 
   constexpr int nAdcSignalSamples = ec.c_nAdcSamples;
   constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
   constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
-  constexpr int nLowAmplitudeFitTimeShifts = nFitPointsPerAdcTick / 4;
+  constexpr int nLowAmplitudeFitTimeShifts = ec.c_nLowAmpFitPoints;
   constexpr int nFitGridPoints = nFitTimeShifts * nFitPointsPerAdcTick;
 
   using FitRow = std::array<double, nAdcSignalSamples>;

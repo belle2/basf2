@@ -295,7 +295,7 @@ def readShaperDSPConfig(
 
 
     dsp_utils = Belle2.ECL.ECLDspUtilities
-    dsp = dsp_utils.readEclDsp(f'{dir_path}/dsp{board_id:02}.dat', 0)
+    dsp = dsp_utils.readEclDsp(f'{dir_path}/dsp{board_id:02}.dat', 0, True)
 
     algo_params = Belle2.ECLWFAlgoParams()
     algo_params.ka           = ord(dsp.getka())

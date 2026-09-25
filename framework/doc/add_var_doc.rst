@@ -43,8 +43,9 @@ function with the same name.
    The variable signature (the ``name(...)`` string passed to
    ``REGISTER_VARIABLE()``) is used to document the expected arguments. Mark
    optional arguments with square brackets, e.g. ``myVariable(required[,
-   optional])``. If an optional argument precedes a required one, write
-   ``myVariable([optional, ]required)``. Do **not** use Python-style
+   optional])``. Optional arguments must always come **after** all required
+   arguments: do not write signatures such as ``myVariable([optional,
+   ]required)``. Do **not** use Python-style
    keyword/default syntax such as ``myVariable(required, optional=default)``:
    ``basf2`` arguments are always positional and keyword arguments are not
    supported. Describe the default value of an optional argument in the

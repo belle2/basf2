@@ -305,6 +305,7 @@ having to change anything in the script itself.
     For a quick example...
 
     .. code-block:: python 
+
         import argparse
 
         # initialize what command-line inputs you might want 
@@ -314,7 +315,7 @@ having to change anything in the script itself.
                     epilog='Text at the bottom of help')
         parser.add_argument('filename')           # positional argument, sys.argv equivalent
         parser.add_argument('-c', '--count')      # option that takes a value
-        parser.add_argument('t', '--test',
+        parser.add_argument('-t', '--test',
                                 type = str, 
                                 help='This is a test variable.',
                                 default = "my_test")

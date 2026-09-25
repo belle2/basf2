@@ -21,17 +21,17 @@ from reconstruction import prepare_user_cdst_analysis
 # You can view the available input data formats from CalibrationSettings.allowed_data_formats
 
 #: Tells the automated system some details of this script.
-#     Default is to read in "bhabha_all_calib" since we want to
-#     run over cdst bhabha_all_calib skim files.
+#     Default is to read in "bhabha_combined_calib" since we want to
+#     run over cdst bhabha_combined_calib skim files.
 settings = CalibrationSettings(
     name="ECL time validations - bhabha",
     expert_username="ehill",
     description=__doc__,
     input_data_formats=["cdst"],
-    input_data_names=["bhabha_all_calib"],
+    input_data_names=["bhabha_combined_calib"],
     input_data_filters={
-        "bhabha_all_calib": [
-            "bhabha_all_calib",
+        "bhabha_combined_calib": [
+            "bhabha_combined_calib",
             "4S",
             "Continuum",
             "Scan",
@@ -76,7 +76,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     # The input data should be the bhabha skim
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     max_events_per_run = 3000
 

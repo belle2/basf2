@@ -574,14 +574,13 @@ namespace Belle2 {
 
       const std::string trackListName = arguments[0];
 
-      std::size_t parsed = 0;
       double angleDegrees = 0.;
       try {
-        angleDegrees = std::stod(arguments[1], &parsed);
+        angleDegrees = Belle2::convertString<double>(arguments[1]);
       } catch (const std::exception&) {
         B2FATAL("Invalid cone half-angle: " << arguments[1]);
       }
-      if (parsed != arguments[1].size() || !std::isfinite(angleDegrees)
+      if (!std::isfinite(angleDegrees)
           || angleDegrees < 0. || angleDegrees > 180.) {
         B2FATAL("The cone half-angle must be between 0 and 180 degrees");
       }

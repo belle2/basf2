@@ -78,6 +78,9 @@ namespace Belle2 {
         return m_param_filterName;
       }
 
+      /// need access to underlying filter to set parameters
+      std::unique_ptr<AFilter>& getFilterPtr() { return  m_filter; }
+
     private:
       /// Parameters : Name of the selected filter
       std::string m_param_filterName;

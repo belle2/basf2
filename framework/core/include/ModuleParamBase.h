@@ -58,6 +58,14 @@ namespace Belle2 {
     const std::string& getDescription() const;
 
     /**
+      * Sets description to new value
+      *
+      * @param description set the description to this value
+      *
+    */
+    void setDescription(const std::string& description);
+
+    /**
      * Returns true if the parameter was set in the steering file.
      *
      * If the value was not set in the steering file but is still the

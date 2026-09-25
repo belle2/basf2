@@ -93,6 +93,11 @@ namespace Belle2 {
       m_stateFilter.setMaximalHitCandidates(stateMaximalHitCandidates);
     }
 
+    void setMaxArcLengthRoughCDCStateFilter(double newval)
+    {
+      m_stateFilter.setMaxArcLengthRoughCDCStateFilter(newval);
+    }
+
 
 
     /// Main method to update the paths. Input: vector of the selected paths and a vector of CDC wirehits to be considered.

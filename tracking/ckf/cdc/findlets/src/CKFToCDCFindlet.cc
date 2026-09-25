@@ -38,10 +38,12 @@ void CKFToCDCFindlet::exposeParameters(ModuleParamList* moduleParamList, const s
   m_resultFinalizer.exposeParameters(moduleParamList, prefix);
   m_resultStorer.exposeParameters(moduleParamList, prefix);
 
+  // TODO: this may fail if there is a prefix
   moduleParamList->getParameter<std::string>("statePreFilter").setDefaultValue("all");
   moduleParamList->getParameter<std::string>("stateBasicFilter").setDefaultValue("rough");
   moduleParamList->getParameter<std::string>("stateExtrapolationFilter").setDefaultValue("extrapolate_and_update");
   moduleParamList->getParameter<std::string>("stateFinalFilter").setDefaultValue("distance");
+
 }
 
 void CKFToCDCFindlet::beginRun()
@@ -63,6 +65,13 @@ void CKFToCDCFindlet::beginRun()
   m_treeSearcher.setMaximalLayerJumpBackwardSeed(payload->getMaximalLayerJumpBackwardSeed());
   m_treeSearcher.setPathMaximalCandidatesInFlight(payload->getPathMaximalCandidatesInFlight());
   m_treeSearcher.setStateMaximalHitCandidates(payload->getStateMaximalHitCandidates());
+
+  // sets max arc length only in the case RoughCDCStateFilter is used
+  m_treeSearcher.setMaxArcLengthRoughCDCStateFilter(999.);
+  // this parameter is only relevant if the "rough" filter is used
+  //if(getParamList().getParameter<std::string>("stateBasicFilter").getValue() == "rough"){
+  // rough filter is in the stacktreesearcher of CKFToCDCFindlet
+  //}
 
   B2DEBUG(20, "CKFToCDCFindlet: Loaded and applied parameters from DB payload 'SVDToCDCCKFParameters'.");
 }

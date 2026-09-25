@@ -35,3 +35,6 @@ unsigned int SVDToCDCCKFParameters::getStateMaximalHitCandidates() const { retur
 
 void SVDToCDCCKFParameters::setStateCreatorFirstCDCLayer(unsigned int layer) { m_stateCreatorFirstCDCLayer = layer; }
 unsigned int SVDToCDCCKFParameters::getStateCreatorFirstCDCLayer() const { return m_stateCreatorFirstCDCLayer; }
+
+void SVDToCDCCKFParameters::setMaxArcLengthRoughCDCStateFilter(double arclength) { m_maxArcLengthRoughCDCStateFilter = arclength;}
+double SVDToCDCCKFParameters::getMaxArcLengthRoughCDCStateFilter() const { return m_maxArcLengthRoughCDCStateFilter;}

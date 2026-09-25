@@ -43,6 +43,9 @@ namespace Belle2 {
      */
     Manager::FunctionPtr nParticlesInList(const std::vector<std::string>& arguments);
 
+    /** Number of distinct reconstructed tracks in a cone around this particle. */
+    Manager::FunctionPtr nTracksInCone(const std::vector<std::string>& arguments);
+
     /**
      * Returns 1 if the particle is contained in the particle list
      */

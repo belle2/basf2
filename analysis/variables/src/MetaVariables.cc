@@ -41,6 +41,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <regex>
+#include <unordered_set>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
@@ -562,6 +563,91 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function nParticlesInList");
       }
+    }
+
+    Manager::FunctionPtr nTracksInCone(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 3 && arguments.size() != 4) {
+        B2FATAL("nTracksInCone requires two lists, a cone half-angle in degrees, "
+                "and optionally a track cut");
+      }
+
+      const std::string centreListName = arguments[0];
+      const std::string trackListName = arguments[1];
+
+      std::size_t parsed = 0;
+      double angleDegrees = 0.;
+      try {
+        angleDegrees = std::stod(arguments[2], &parsed);
+      } catch (const std::exception&) {
+        B2FATAL("Invalid cone half-angle: " << arguments[2]);
+      }
+      if (parsed != arguments[2].size() || !std::isfinite(angleDegrees)
+          || angleDegrees < 0. || angleDegrees > 180.) {
+        B2FATAL("The cone half-angle must be between 0 and 180 degrees");
+      }
+      const double cosineThreshold =
+        std::cos(angleDegrees * std::acos(-1.) / 180.);
+
+      std::shared_ptr<Variable::Cut> cut;
+      if (arguments.size() == 4 && !arguments[3].empty()) {
+        cut = std::shared_ptr<Variable::Cut>(
+                Variable::Cut::compile(arguments[3]));
+      }
+
+      return [centreListName, trackListName, cosineThreshold, cut]
+      (const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> centres(centreListName);
+        StoreObjPtr<ParticleList> tracks(trackListName);
+        if (!centres.isValid())
+        {
+          B2FATAL("Invalid central list in nTracksInCone: " << centreListName);
+        }
+        if (!tracks.isValid())
+        {
+          B2FATAL("Invalid track list in nTracksInCone: " << trackListName);
+        }
+        if (!particle || !centres->contains(particle) || !particle->getTrack())
+        {
+          return Const::doubleNaN;
+        }
+
+        const int ownIndex = particle->getTrack()->getArrayIndex();
+        const auto labToCms = PCmsLabTransform().rotateLabToCms();
+        const auto central = labToCms * particle->get4Vector();
+        const double cx = central.Px();
+        const double cy = central.Py();
+        const double cz = central.Pz();
+        const double c2 = cx * cx + cy * cy + cz * cz;
+        if (!std::isfinite(c2) || c2 <= 0.) return Const::doubleNaN;
+
+        std::unordered_set<int> usedTracks;
+        int count = 0;
+        for (unsigned i = 0; i < tracks->getListSize(); ++i)
+        {
+          const Particle* other = tracks->getParticle(i);
+          const Track* track = other->getTrack();
+          if (!track) continue;
+
+          const int index = track->getArrayIndex();
+          if (index == ownIndex || usedTracks.count(index)) continue;
+          if (cut && !cut->check(other)) continue;
+
+          const auto momentum = labToCms * other->get4Vector();
+          const double px = momentum.Px();
+          const double py = momentum.Py();
+          const double pz = momentum.Pz();
+          const double p2 = px * px + py * py + pz * pz;
+          if (!std::isfinite(p2) || p2 <= 0.) continue;
+          usedTracks.insert(index);
+
+          double cosine = (cx * px + cy * py + cz * pz) / std::sqrt(c2 * p2);
+          if (cosine > 1.) cosine = 1.;
+          if (cosine < -1.) cosine = -1.;
+          if (cosine >= cosineThreshold) ++count;
+        }
+        return count;
+      };
     }
 
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments)
@@ -3725,6 +3811,19 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE(
+      "nTracksInCone(centreList, trackList, halfAngleDegrees, cut='')",
+      nTracksInCone,
+      R"DOC(
+Counts distinct reconstructed tracks within a cone around this particle
+in the e+e- centre-of-mass frame. The half-angle is in degrees (0 to 180).
+The optional cut applies to particles in trackList. Charge-conjugate lists
+are included. The central track is excluded by Track array index. An empty
+track list gives zero. Returns NaN if the current particle is not in
+centreList or has no valid reconstructed momentum.
+)DOC",
+      Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
                       "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,

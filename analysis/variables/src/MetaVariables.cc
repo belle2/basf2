@@ -3806,7 +3806,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE(
-      "nTracksInCone(trackList, halfAngleDegrees, cut='')",
+      "nTracksInCone(trackList, halfAngleDegrees[, cut])",
       nTracksInCone,
       R"DOC(
 Counts distinct reconstructed tracks within a cone around this particle

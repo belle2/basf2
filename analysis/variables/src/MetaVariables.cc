@@ -567,22 +567,21 @@ namespace Belle2 {
 
     Manager::FunctionPtr nTracksInCone(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() != 3 && arguments.size() != 4) {
-        B2FATAL("nTracksInCone requires two lists, a cone half-angle in degrees, "
+      if (arguments.size() != 2 && arguments.size() != 3) {
+        B2FATAL("nTracksInCone requires a track list, a cone half-angle in degrees, "
                 "and optionally a track cut");
       }
 
-      const std::string centreListName = arguments[0];
-      const std::string trackListName = arguments[1];
+      const std::string trackListName = arguments[0];
 
       std::size_t parsed = 0;
       double angleDegrees = 0.;
       try {
-        angleDegrees = std::stod(arguments[2], &parsed);
+        angleDegrees = std::stod(arguments[1], &parsed);
       } catch (const std::exception&) {
-        B2FATAL("Invalid cone half-angle: " << arguments[2]);
+        B2FATAL("Invalid cone half-angle: " << arguments[1]);
       }
-      if (parsed != arguments[2].size() || !std::isfinite(angleDegrees)
+      if (parsed != arguments[1].size() || !std::isfinite(angleDegrees)
           || angleDegrees < 0. || angleDegrees > 180.) {
         B2FATAL("The cone half-angle must be between 0 and 180 degrees");
       }
@@ -590,24 +589,19 @@ namespace Belle2 {
         std::cos(angleDegrees * std::acos(-1.) / 180.);
 
       std::shared_ptr<Variable::Cut> cut;
-      if (arguments.size() == 4 && !arguments[3].empty()) {
+      if (arguments.size() == 3 && !arguments[2].empty()) {
         cut = std::shared_ptr<Variable::Cut>(
-                Variable::Cut::compile(arguments[3]));
+                Variable::Cut::compile(arguments[2]));
       }
 
-      return [centreListName, trackListName, cosineThreshold, cut]
+      return [trackListName, cosineThreshold, cut]
       (const Particle * particle) -> double {
-        StoreObjPtr<ParticleList> centres(centreListName);
         StoreObjPtr<ParticleList> tracks(trackListName);
-        if (!centres.isValid())
-        {
-          B2FATAL("Invalid central list in nTracksInCone: " << centreListName);
-        }
         if (!tracks.isValid())
         {
           B2FATAL("Invalid track list in nTracksInCone: " << trackListName);
         }
-        if (!particle || !centres->contains(particle) || !particle->getTrack())
+        if (!particle || !particle->getTrack())
         {
           return Const::doubleNaN;
         }
@@ -3812,15 +3806,14 @@ Specifying the lab frame is useful in some corner-cases. For example:
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE(
-      "nTracksInCone(centreList, trackList, halfAngleDegrees, cut='')",
+      "nTracksInCone(trackList, halfAngleDegrees, cut='')",
       nTracksInCone,
       R"DOC(
 Counts distinct reconstructed tracks within a cone around this particle
 in the e+e- centre-of-mass frame. The half-angle is in degrees (0 to 180).
 The optional cut applies to particles in trackList. Charge-conjugate lists
 are included. The central track is excluded by Track array index. An empty
-track list gives zero. Returns NaN if the current particle is not in
-centreList or has no valid reconstructed momentum.
+track list gives zero. Returns NaN if the current particle has no valid reconstructed momentum.
 )DOC",
       Manager::VariableDataType::c_double);
 

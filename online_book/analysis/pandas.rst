@@ -17,7 +17,7 @@ you skipped it and are just familiar with ROOT (and basic python syntax).
 This page might also be a useful page for a quick reference on how to exploit pandas. 
 
 If you are working with ntuples, the recommended way is to use the :ref:`VariablesToTable <v2t>` module to write out particle lists directly to ``parquet`` or ``hdf5`` format.
-In case this is not possible for you, cou can use uproot as described below.
+In case this is not possible, you can use uproot as described below.
 
 Importing ROOT files
 ---------------------------------
@@ -240,7 +240,7 @@ For details, see `pandas.merge doc <https://pandas.pydata.org/docs/reference/api
 
 **Adding Variables**:
 
-Let's take an example where you have a DataFrame with the three momenta (:math:`p_x, p_y, p_z`) for two different electrons (e1, e2)
+Let's take an example where you have a DataFrame with the three momenta (:math:`p_x, p_y, p_z`) for two different electrons (:math:`e_1, e_2`)
 and you forgot to include the energy and momentum magnitude. You can simply take your existing DataFrame and add them. 
 
 .. code:: python
@@ -271,8 +271,7 @@ and you forgot to include the energy and momentum magnitude. You can simply take
     }
     df = df.assign(**new_columns_for_e2)
 
-There are a `couple other methods <https://www.geeksforgeeks.org/adding-new-column-to-existing-DataFrame-in-pandas/>`_ 
-but we've tried to outline a few of our favorites methods. 
+There are a `couple other methods <https://www.geeksforgeeks.org/adding-new-column-to-existing-DataFrame-in-pandas/>`_.
 
 
 .. rubric:: Author(s) of this topic

@@ -2429,6 +2429,7 @@ In other words, this variable checks the generated flavor of the other generated
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
 The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
+The default mask name is ``all``.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.

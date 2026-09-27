@@ -1205,12 +1205,12 @@ Returns the track array index of the nearest track to the cluster. The nearest t
 using the `minC2TDist` variable. 
 
 )DOC");
-    REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList='pi-:all')", eclClusterIsolationVar, R"DOC(
+    REGISTER_METAVARIABLE("minC2TDistVar(variable[, particleList])", eclClusterIsolationVar, R"DOC(
 Returns the value of your chosen variable for the track nearest to the given cluster as calculated by 
 `minC2TDist`. 
 
 The first parameter ``variable`` is the variable name e.g. `nCDCHits`, while the second (optional) parameter ``particleList`` 
-is the particle list name which will be used in the calculation of `minC2TDist`. The default particle list used 
+is the particle list name which will be used in the calculation of `minC2TDist`. The default value of ``particleList`` 
 is ``pi-:all``. 
 
 )DOC", Manager::VariableDataType::c_double);

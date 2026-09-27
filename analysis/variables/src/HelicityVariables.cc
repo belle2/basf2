@@ -427,7 +427,7 @@ namespace Belle2 {
                       Cosine of the helicity angle (see``Particle::getCosHelicity``) assuming the center of mass system as mother rest frame.
                       See `PDG Polarization Review <http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-decays-polarization.pdf>`_ for the definition of the helicity angle.)DOC");
 
-    REGISTER_VARIABLE("cosHelicityAngleDaughter(i [, j] )", cosHelicityAngleDaughter, R"DOC(
+    REGISTER_VARIABLE("cosHelicityAngleDaughter(i[, j])", cosHelicityAngleDaughter, R"DOC(
                       Cosine of the helicity angle of the i-th daughter (see ``Particle::getCosHelicityDaughter``).
                       The optional second argument is the index of the granddaughter that defines the angle, default is 0.
 

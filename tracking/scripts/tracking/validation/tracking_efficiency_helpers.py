@@ -169,8 +169,10 @@ def run_simulation(path, pt_value, output_filename='', useVTX=False):
 
     else:
         from vtx import get_upgrade_background_files
+        from geometry import get_components
         add_simulation(
             path,
+            components=get_components(2003),
             bkgfiles=get_upgrade_background_files(),
             useVTX=useVTX)
 
@@ -195,7 +197,12 @@ def run_reconstruction(path, output_file_name, input_file_name='', useVTX=False)
         geometry.param("useDB", True)
         path.add_module(geometry)
 
-    add_reconstruction(path, get_reconstruction_components(), pruneTracks=0, useVTX=useVTX)
+    if useVTX:
+        from geometry import get_components
+        components = get_components(2003)
+    else:
+        components = get_reconstruction_components()
+    add_reconstruction(path, components, pruneTracks=0, useVTX=useVTX)
 
     tracking_efficiency = b2.register_module('StandardTrackingPerformance')
     # tracking_efficiency.logging.log_level = LogLevel.DEBUG

@@ -31,6 +31,7 @@ import reconstruction as rec
 import modularAnalysis as ana
 import vertex as vx
 from ROOT import Belle2
+from geometry import get_components
 
 import ROOT
 ROOT.gROOT.SetBatch(0)
@@ -49,7 +50,8 @@ else:
 
 
 main = b2.create_path()
-main.add_module('EventInfoSetter', expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', expList=[exp_number])
 
 if args['gen'] == 'bbar':
     main.add_module('EvtGenInput')
@@ -78,10 +80,10 @@ else:
                     useDB=False)
 
 # Add simulation modules
-sim.add_simulation(main, useVTX=True)
+sim.add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 # Add mc reconstruction
-rec.add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
+rec.add_mc_reconstruction(main, components=get_components(exp_number), pruneTracks=False, useVTX=True)
 
 main.add_module('DAFRecoFitter')
 

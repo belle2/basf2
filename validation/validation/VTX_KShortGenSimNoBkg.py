@@ -23,15 +23,17 @@ from basf2 import set_random_seed, create_path, process, statistics, \
     register_module
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
+from geometry import get_components
 
 set_random_seed(1337)
 
 main = create_path()
 
+exp_number = 2003
 main.add_module('EventInfoSetter',
                 evtNumList=[1500],
                 runList=[1],
-                expList=[2003]
+                expList=[exp_number]
                 )
 
 main.add_module('ParticleGun',
@@ -49,7 +51,7 @@ main.add_module('ParticleGun',
                 zVertexParams=[0.0, 0.0]
                 )
 
-add_simulation(main, useVTX=True)
+add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 main.add_module(register_module('Profile'))
 main.add_module('RootOutput', outputFileName='../VTX_KShortGenSimNoBkg.root')

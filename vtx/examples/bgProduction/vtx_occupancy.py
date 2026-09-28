@@ -28,6 +28,7 @@ import numpy as np
 
 
 from vtx import get_upgrade_background_files
+from geometry import get_components
 
 
 def getID(VxdId):
@@ -130,7 +131,8 @@ class VTXOccupancy(b2.Module):
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[exp_number])
 
 # main.add_module('HistoManager', histoFileName="VTX_DQM_Histos.root")
 
@@ -141,13 +143,13 @@ main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
 # detector simulation
-add_simulation(main, bkgfiles=get_upgrade_background_files(), useVTX=True)
+add_simulation(main, components=get_components(exp_number), bkgfiles=get_upgrade_background_files(), useVTX=True)
 
 # trigger simulation
 add_tsim(main)
 
 # reconstruction
-add_mc_reconstruction(main, pruneTracks=False, useVTX=True)
+add_mc_reconstruction(main, components=get_components(exp_number), pruneTracks=False, useVTX=True)
 
 main.add_module(VTXOccupancy())
 

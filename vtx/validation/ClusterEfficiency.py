@@ -25,6 +25,7 @@ import ROOT
 import math
 import basf2 as b2
 from ROOT import PyConfig
+from geometry import get_components
 PyConfig.IgnoreCommandLineOptions = 1
 b2.set_log_level(b2.LogLevel.ERROR)
 # set some random seed
@@ -176,10 +177,11 @@ main = b2.create_path()
 
 print(b2.conditions.globaltags)
 
+exp_number = 2003
 eventinfosetter = main.add_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [10000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [2003])
+eventinfosetter.param('expList', [exp_number])
 
 particlegun = main.add_module("ParticleGun")
 particlegun.param({
@@ -193,10 +195,10 @@ particlegun.param({
 })
 
 # Add simulation modules
-add_simulation(main, useVTX=True)
+add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 # Add mc reconstruction
-rec.add_reconstruction(main, pruneTracks=False, useVTX=True)
+rec.add_reconstruction(main, components=get_components(exp_number), pruneTracks=False, useVTX=True)
 
 
 clusterefficiency = ClusterEfficiency()

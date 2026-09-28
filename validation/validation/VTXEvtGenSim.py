@@ -22,20 +22,22 @@ from vtx import get_upgrade_background_files
 from basf2 import set_random_seed, create_path, process, statistics
 from simulation import add_simulation
 from validation import statistics_plots, event_timing_plot
+from geometry import get_components
 
 set_random_seed(12345)
 
 main = create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', evtNumList=[1000], runList=[1], expList=[exp_number])
 
 # generate BBbar events
 main.add_module('EvtGenInput')
 
 # detector simulation
 # Overlay file location from environment variable  'BELLE2_VTX_BACKGROUND_DIR'
-add_simulation(main, bkgfiles=get_upgrade_background_files(), useVTX=True)
+add_simulation(main, components=get_components(exp_number), bkgfiles=get_upgrade_background_files(), useVTX=True)
 
 
 # memory profile

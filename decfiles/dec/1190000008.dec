@@ -17,8 +17,7 @@ JetSetPar PARJ(11)=.85
 JetSetPar PARJ(25)=.01
 
 Decay Upsilon(4S)
-0.5 B0sig anti-B0 VSS_BMIX dm;
-0.5 anti-B0sig B0 VSS_BMIX dm;
+1.00 B0sig anti-B0sig B0 anti-B0  VSS_BMIX dm;
 Enddecay
 
 Decay B0sig
@@ -30,7 +29,7 @@ Decay B0sig
 0.23 K''*0 anti-nu_e nu_e       PHSP;
 0.16 Xsd anti-nu_e nu_e           BTOXSNUNU_FERMI  0.1 0.0 0.461 1.1 4.68 0.1;
 Enddecay
-CDecay B-sig
+CDecay anti-B0sig
 
 Decay Xsd
 1.0  d  anti-s     PYTHIA 43;

@@ -60,7 +60,7 @@ def flavorTagger(
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
                                                BGx1 stands for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` (default).
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
                                                ``FTDefaultMask`` (default): tentative mask definition that will be created

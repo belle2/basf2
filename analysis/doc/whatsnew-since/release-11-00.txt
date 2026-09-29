@@ -1,9 +1,11 @@
 Changes in the analysis package in light-2609-luna
 --------------------------------------------------
 
-FlavorTagger TFlaT
-++++++++++++++++++
-* Fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
+FlavorTagger
+++++++++++++
+* TFlaT: fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
+* Category-based: the ``FANN``-based combination method (``FANN_qrCombined``) is no longer available, as basf2 no longer supports ``FANN``. The only available combination method is the ``FastBDT``-based one (``FBDT_qrCombined``). This change does not affect GFlaT or TFlaT.
+
 
 sysvar (former pidvar)
 ++++++++++++++++++++++

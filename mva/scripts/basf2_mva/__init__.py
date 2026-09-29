@@ -12,7 +12,7 @@ the Belle2::MVA namespace.
 '''
 
 from variables import std_vector as vector  # noqa
-from basf2_mva.options import CombinationOptions, FANNOptions, FastBDTOptions, GeneralOptions, MetaOptions, \
+from basf2_mva.options import CombinationOptions, FastBDTOptions, GeneralOptions, MetaOptions, \
     PDFOptions, PythonOptions, RegressionFastBDTOptions, ReweighterOptions, TMVAOptionsClassification, \
     TMVAOptionsMulticlass, TMVAOptionsRegression, TrivialOptions, ONNXOptions  # noqa
 from basf2_mva.weightfile import Weightfile  # noqa

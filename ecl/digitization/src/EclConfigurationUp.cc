@@ -44,9 +44,10 @@ double EclConfigurationUp::getRF()
 }
 
 std::array<double, EclConfigurationUp::c_nWaveformParameters>
-EclConfigurationUp::getDefaultWaveformParameters()
+EclConfigurationUp::getDefaultWaveformParameters(bool diode)
 {
-  const double timeToUnits = getRF() * c_step / c_clock;
+  const double adcClock = c_clock / getRF();
+  const double timeToUnits = c_step / adcClock;
 
   return {
     c_tauD * timeToUnits,
@@ -56,14 +57,20 @@ EclConfigurationUp::getDefaultWaveformParameters()
     timeToUnits / c_omega1,
     c_tauI * timeToUnits,
     c_fractionI,
-    c_tauS * timeToUnits,
+    (diode ? c_tauDiode : c_tauS)* timeToUnits,
     c_tauS1 * timeToUnits,
-    c_alpha,
+    diode ? 0.0 : c_alpha,
     c_timeShift * timeToUnits,
     c_eta,
     c_amplitudeNorm,
     c_timeOffset
   };
+}
+
+std::array<double, EclConfigurationUp::c_nWaveformParameters>
+EclConfigurationUp::getDefaultDiodeParameters()
+{
+  return getDefaultWaveformParameters(true);
 }
 
 void EclConfigurationUp::SignalSample::initSample(const double* waveformParameters, double unitScale)

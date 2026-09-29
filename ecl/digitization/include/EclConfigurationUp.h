@@ -10,6 +10,8 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* C++ headers. */
 #include <array>
 
 namespace Belle2 {
@@ -67,9 +69,19 @@ namespace Belle2 {
       static constexpr double c_amplitudeNorm = 0.70235; /**< Default upgraded shaper amplitude normalization. */
       static constexpr double c_timeOffset = 0.0;      /**< Default upgraded shaper time offset. */
 
-      /** Return the default waveform parameters in shaper internal units. */
+      static constexpr double c_signalUnitScale = 1.0; /**< Normalization of the default signal waveform. */
+
+      static constexpr double c_tauDiode = 0.010;      /**< Decay time for diode ionization. */
+      static constexpr double c_alphaDiode = 0.0;      /**< Fraction of secondary decay time for diode ionization. */
+      static constexpr double c_diodeUnitScale = 1.0; /**< Normalization of the default diode waveform. */
+
+      /** Return the default signal waveform parameters in shaper internal units. */
       static std::array<double, c_nWaveformParameters>
-      getDefaultWaveformParameters();
+      getDefaultWaveformParameters(bool diode = false);
+
+      /** Return the default diode waveform parameters in shaper internal units. */
+      static std::array<double, c_nWaveformParameters>
+      getDefaultDiodeParameters();
 
       /** See s_rf. This will try to use the value from the database */
       static double getRF();

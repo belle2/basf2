@@ -50,7 +50,24 @@ double EclConfiguration::getTick()
   return 24.*12. / getRF();
 }
 
-void EclConfiguration::signalsample_t::InitSample(const double* MPd, double u)
+std::array<double, EclConfiguration::c_nWaveformParameters>
+EclConfiguration::getDefaultDiodeParameters()
+{
+  return {
+    0.5,
+    0.100002,
+    0.756483,
+    0.456153,
+    0.0729031,
+    0.3906 / 9.98822,
+    2.85128,
+    0.842469,
+    0.854184,
+    0.110284
+  };
+}
+
+void EclConfiguration::SignalSample::initSample(const double* MPd, double u)
 {
   const int N = m_ns * m_nl;
   vector<double> MP(MPd, MPd + 10);
@@ -64,19 +81,20 @@ void EclConfiguration::signalsample_t::InitSample(const double* MPd, double u)
 }
 
 
-void EclConfiguration::signalsample_t::InitSample(const float* MP, double u)
+void EclConfiguration::SignalSample::initSample(const float* MP, double u)
 {
   double MPd[10];
   for (int i = 0; i < 10; i++) MPd[i] = MP[i];
-  InitSample(MPd, u);
+  initSample(MPd, u);
 }
 
-void EclConfiguration::adccounts_t::AddHit(const double a, const double t0, const EclConfiguration::signalsample_t& s)
+void EclConfiguration::AdcCounts::addHit(const double amplitude, const double timeOffset,
+                                         const EclConfiguration::SignalSample& signalSample)
 {
-  total += s.Accumulate(a, t0, c);
+  m_total += signalSample.accumulate(amplitude, timeOffset, m_adcCounts);
 }
 
-double EclConfiguration::signalsample_t::Accumulate(const double a, const double t0, double* s) const
+double EclConfiguration::SignalSample::accumulate(const double a, const double t0, double* s) const
 {
   // input parameters
   // a -- signal amplitude

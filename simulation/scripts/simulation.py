@@ -240,10 +240,7 @@ def add_simulation(
 
     # ECL digitization
     if is_detector_present("ECL", components):
-        if simulateECLUpgrade:
-            ecl_digitizer = b2.register_module('ECLDigitizerUp')
-        else:
-            ecl_digitizer = b2.register_module('ECLDigitizer')
+        ecl_digitizer = b2.register_module('ECLDigitizer', ECLupgrade=simulateECLUpgrade)
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)

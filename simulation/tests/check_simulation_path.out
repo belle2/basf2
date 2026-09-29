@@ -182,10 +182,11 @@
       ADCThreshold=25
       Background=True
       Calibration=False
-      CompressionAlgorithm=0
+      CompressionAlgorithm=-1
       DiodeDeposition=True
       DspDataTest=False
       DspWithExtraMCInfoThreshold=0.02
+      ECLupgrade=False
       HadronPulseShapes=True
       NoElectronicNoise=False
       StoreDspWithExtraMCInfo=False
@@ -194,7 +195,6 @@
       WaveformThresholdOverride=-1.0
       eclWaveformsName=
       unitscale=-1.0
-      useWaveformParameters=True
   12. KLMDigitizer
       CreateMultiStripDigits=True
       Debug=False

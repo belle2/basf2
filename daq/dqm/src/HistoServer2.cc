@@ -132,11 +132,6 @@ int HistoServer2::server()
           vector<string> strlist;
           msghdl.decode_msg(hmsg, objlist, strlist);
           int nobjs = (hmsg->header())->reserved[1];
-          int root_fd = -1;
-          if (recv_root_message(objlist, strlist, root_fd)) {
-            printf("HistoServer2: ROOT received nobjs=%zu\n", objlist.size());
-            handle_objects(objlist, strlist, root_fd, updated);
-          }
           // string subdir = "ROOT";
           string subdir = "";
           now = time(0);
@@ -148,30 +143,7 @@ int HistoServer2::server()
             // printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             // (objlist.at(i))->ClassName() );
             string objname = strlist.at(i);
-            if (objname == string("DQMRC:CLEAR")) {
-              m_hman->clear();
-              m_hman->merge();
-              updated = false; // have merged, thus reset updated
-              m_last_merge_time = time(0);
-              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_merge_time));
-              printf("[%s] HistoServer2: CLEAR\n", mbstr);
-              continue;
-            }
-            if (objname == string("DQMRC:MERGE")) {
-              m_hman->merge();
-              updated = false; // have merged, thus reset updated
-              m_last_merge_time = time(0);
-              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_merge_time));
-              printf("[%s] HistoServer2: MERGE\n", mbstr);
-              continue;
-            }
-            auto lpos = objname.find("DQMRC:SAVE:");
-            if (lpos != string::npos) {
-              auto filename = objname.substr(11);
-              m_hman->filedump(filename);
-              continue;
-            }
-            lpos = objname.find("SUBDIR:");
+            auto lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";
@@ -457,10 +429,6 @@ void HistoServer2::handle_objects(
     }
 
     m_hman->update(subdir, objname, fd, histo);
-
-    // Ownership transferred to HistoManager2.
-
-    objlist[i] = nullptr;
 
     updated = true;
   }

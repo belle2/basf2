@@ -1,5 +1,0 @@
-Import('env')
-
-env['TOOLS_LIBS']['merger_merge'] = [ ]
-
-Return('env')

@@ -143,7 +143,7 @@ namespace Belle2 {
      */
     unsigned int getStateCreatorFirstCDCLayer() const;
 
-    /** Sets the maximal allowed arc length used in the RoughCDCStateFilter
+    /** Set the maximal allowed arc length used in the RoughCDCStateFilter
      * @param arclength the new arc length value which will be set
      */
     void setMaxArcLengthRoughCDCStateFilter(double arclength);

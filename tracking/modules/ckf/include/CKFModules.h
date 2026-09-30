@@ -88,23 +88,23 @@ namespace Belle2 {
       for (const auto& varName : payloadVarNames) {
         auto typeInfo = getParamList().getParameterTypeInfo(varName);
 
-        ModuleParamBase* p  = nullptr;
+        ModuleParamBase* paramPtr  = nullptr;
         if (typeInfo == "int") {
-          p = &(getParamList().getParameter<int>(varName));
+          paramPtr = &(getParamList().getParameter<int>(varName));
         } else if (typeInfo == "double") {
-          p = &(getParamList().getParameter<double>(varName));
+          paramPtr = &(getParamList().getParameter<double>(varName));
         } else if (typeInfo == "float") {
-          p = &(getParamList().getParameter<float>(varName));
+          paramPtr = &(getParamList().getParameter<float>(varName));
         } else if (typeInfo == "unsigned long int") {
-          p = &(getParamList().getParameter<unsigned long int>(varName));
+          paramPtr = &(getParamList().getParameter<unsigned long int>(varName));
         } else if (typeInfo == "dict(str -> variant(bool, int, float, str, list(str)))") {
           using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
-          p = &(getParamList().getParameter< std::map<std::string, variantType> >(varName));
+          paramPtr = &(getParamList().getParameter< std::map<std::string, variantType> >(varName));
         } else {
           B2FATAL("Type " << typeInfo << " not supported ");
         }
         // the pointer should be safe as the getParameter<>() function throws an exception if parameter is not present (not sure if should be caught in constructor)
-        p->setDescription("[WARNING: may be overridden by payload] " + p->getDescription());
+        paramPtr->setDescription("[WARNING: may be overridden by payload] " + paramPtr->getDescription());
 
       }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
 
 
     // override module parameter
-    void beginRun()
+    void beginRun() override
     {
 
       DBObjPtr<SVDToCDCCKFParameters> payload;
@@ -122,8 +122,8 @@ namespace Belle2 {
         B2FATAL("ToCDCCKFModule: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
       }
 
-      auto& p = Belle2::Module::getParam<int>("firstActiveCDCLayer");
-      p.setValue(payload->getStateCreatorFirstCDCLayer());
+      auto& paramRef = Belle2::Module::getParam<int>("firstActiveCDCLayer");
+      paramRef.setValue(payload->getStateCreatorFirstCDCLayer());
 
       // need to be set before TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun()
       using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;

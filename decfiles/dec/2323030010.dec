@@ -1,0 +1,19 @@
+# EventType: 2323030010
+# Descriptor: [ccbar DspToKpipi_BESIII_Isobar_model]
+# NickName: DspToKpipi_BESIII_Isobar_model
+# PhysicsWG: Charm
+# Responsible: Roman Sultanov
+# Email: roman.sultanov@physics.uu.se
+# Date: 20260930 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c anti-c              PYTHIA 91;
+Enddecay
+
+Decay D_s+
+1.000 K- pi+ pi+            DsToKpipi;
+Enddecay
+
+End

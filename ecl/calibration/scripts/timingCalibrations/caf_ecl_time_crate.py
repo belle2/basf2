@@ -21,19 +21,25 @@ from reconstruction import prepare_cdst_analysis
 
 #: Tells the automated system some details of this script.
 #     Default is to read bhabha skim files.
-settings = CalibrationSettings(name="ECL crate time calibrations",
-                               expert_username="ehill",
-                               description=__doc__,
-                               input_data_formats=["cdst"],
-                               input_data_names=["bhabha_all_calib"],
-                               # input_data_filters={"bhabha_all_calib": [input_data_filters["Data Tag"]["bhabha_all_calib"],
-                               #                                          input_data_filters["Beam Energy"]["4S"],
-                               #                                          input_data_filters["Beam Energy"]["Continuum"],
-                               #                                          input_data_filters["Beam Energy"]["Scan"],
-                               #                                          input_data_filters["Data Quality Tag"]["Good"],
-                               #                                          input_data_filters["Run Type"]["physics"],
-                               #                                          input_data_filters["Magnet"]["On"]]},
-                               depends_on=[])
+settings = CalibrationSettings(
+    name="ECL crate time calibrations",
+    expert_username="ehill",
+    description=__doc__,
+    input_data_formats=["cdst"],
+    input_data_names=["bhabha_combined_calib"],
+    # input_data_filters={
+    #     "bhabha_combined_calib": [
+    #         input_data_filters["Data Tag"]["bhabha_combined_calib"],
+    #         input_data_filters["Beam Energy"]["4S"],
+    #         input_data_filters["Beam Energy"]["Continuum"],
+    #         input_data_filters["Beam Energy"]["Scan"],
+    #         input_data_filters["Data Quality Tag"]["Good"],
+    #         input_data_filters["Run Type"]["physics"],
+    #         input_data_filters["Magnet"]["On"],
+    #     ]
+    # },
+    depends_on=[],
+)
 
 
 ##############################
@@ -72,7 +78,7 @@ def get_calibrations(input_data, **kwargs):
     # In this script we want to use one sources of input data.
     # Get the input files  from the input_data variable
     # The input data should be the bhabha skim
-    file_to_iov_physics = input_data["bhabha_all_calib"]
+    file_to_iov_physics = input_data["bhabha_combined_calib"]
 
     # We might have requested an enormous amount of data across a run range.
     # There's a LOT more files than runs!
@@ -84,9 +90,13 @@ def get_calibrations(input_data, **kwargs):
     # already. This procedure respects that ordering
     from prompt.utils import filter_by_max_files_per_run
 
-    reduced_file_to_iov_physics = filter_by_max_files_per_run(file_to_iov_physics, max_files_per_run)
+    reduced_file_to_iov_physics = filter_by_max_files_per_run(
+        file_to_iov_physics, max_files_per_run
+    )
     input_files_physics = list(reduced_file_to_iov_physics.keys())
-    basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
+    basf2.B2INFO(
+        f"Total number of files actually used as input = {len(input_files_physics)}"
+    )
 
     ###################################################
     from basf2 import register_module, create_path
@@ -95,13 +105,13 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Collector setup
-    root_input = register_module('RootInput')
+    root_input = register_module("RootInput")
     rec_path_bhabha = create_path()
     rec_path_bhabha.add_module(root_input)
-    if 'Gearbox' not in rec_path_bhabha:
-        rec_path_bhabha.add_module('Gearbox')
-    if 'Geometry' not in rec_path_bhabha:
-        rec_path_bhabha.add_module('Geometry', useDB=True)
+    if "Gearbox" not in rec_path_bhabha:
+        rec_path_bhabha.add_module("Gearbox")
+    if "Geometry" not in rec_path_bhabha:
+        rec_path_bhabha.add_module("Geometry", useDB=True)
 
     prepare_cdst_analysis(rec_path_bhabha)  # for new 2020 cdst format
 
@@ -109,17 +119,18 @@ def get_calibrations(input_data, **kwargs):
     t0BiasCorrection = -0.9  # Correct for the CDC t0 bias
     # ====================================================
 
-    col_bhabha = register_module('ECLBhabhaTCollector')
-    col_bhabha.param('timeAbsMax', 250)
-    col_bhabha.param('minCrystal', 1)
-    col_bhabha.param('maxCrystal', 8736)
-    col_bhabha.param('saveTree', False)
-    col_bhabha.param('hadronEventT0_TO_bhabhaEventT0_correction', t0BiasCorrection)
+    col_bhabha = register_module("ECLBhabhaTCollector")
+    col_bhabha.param("timeAbsMax", 250)
+    col_bhabha.param("minCrystal", 1)
+    col_bhabha.param("maxCrystal", 8736)
+    col_bhabha.param("saveTree", False)
+    col_bhabha.param("hadronEventT0_TO_bhabhaEventT0_correction", t0BiasCorrection)
 
-    eclTCol = Collection(collector=col_bhabha,
-                         input_files=input_files_physics,
-                         pre_collector_path=rec_path_bhabha,
-                         )
+    eclTCol = Collection(
+        collector=col_bhabha,
+        input_files=input_files_physics,
+        pre_collector_path=rec_path_bhabha,
+    )
 
     ###################################################
     # Algorithm setup
@@ -161,5 +172,6 @@ def get_calibrations(input_data, **kwargs):
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [cal_test]
+
 
 ##############################

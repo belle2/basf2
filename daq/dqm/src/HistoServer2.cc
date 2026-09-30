@@ -364,14 +364,14 @@ bool HistoServer2::recv_root_message(
 
     if (!copy) continue;
 
-    if (auto* hist = dynamic_cast<TH1*>(copy)) {
+    if (auto* hist = dynamic_cast<TH1*>(copy); hist != nullptr) {
 
       hist->SetDirectory(nullptr);
 
       objlist.push_back(hist);
       strlist.push_back(hist->GetName());
 
-    } else if (auto* text = dynamic_cast<TText*>(copy)) {
+    } else if (auto* text = dynamic_cast<TText*>(copy); text != nullptr) {
 
       objlist.push_back(text);
       strlist.push_back(text->GetTitle());

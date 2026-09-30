@@ -1,5 +1,6 @@
 Changes in the tracking package since release-09-00
-----------------------------------------------------
+---------------------------------------------------
+... (new features of release-10)
 
 Track Fit
 ++++++++++
@@ -14,3 +15,8 @@ Convenience Functions
 * it is now possible to append the Cellular Automaton pattern recognition to the path via python parameter
 
 * it is now possible to run the so-called inverted tracking chain (SVD before CDC) easily by changing a python parameter
+
+Package Structure
++++++++++++++++++
+
+* a large restructuring of the tracking package has been merged, with functionalities unchanged

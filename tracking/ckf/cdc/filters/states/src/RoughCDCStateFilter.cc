@@ -25,7 +25,6 @@ TrackingUtilities::Weight RoughCDCStateFilter::operator()(const BaseCDCStateFilt
   // TODO: magic number
   std::cout << "m_maximalArcLengthDistance " << m_maximalArcLengthDistance << std::endl;
   std::cout << "m_maximalHitDistance " << m_maximalHitDistance << std::endl;
-  exit(1);
 
   if (arcLength <= 0 or arcLength > m_maximalArcLengthDistance) {
     return NAN;

@@ -115,7 +115,6 @@ namespace Belle2 {
     // override module parameter
     void beginRun()
     {
-      TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun();
 
       DBObjPtr<SVDToCDCCKFParameters> payload;
 
@@ -126,19 +125,14 @@ namespace Belle2 {
       auto& p = Belle2::Module::getParam<int>("firstActiveCDCLayer");
       p.setValue(payload->getStateCreatorFirstCDCLayer());
 
-      /** Question to Giacomo's friend Claude: Why does this not work? I can set the value without error, but the value does not change in the corresponding filter. Maybe due to the strange things tracking code does? There are warnings during compilation, but I guessed they are harmless????
-
+      // need to be set before TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun()
       using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
-      std::map<std::string,variantType> & value = Belle2::Module::getParam< std::map<std::string,variantType> >("stateBasicFilterParameters").getValue();
-      value["maximalArcLengthDistance"] = 9.999;
-      */
+      std::map<std::string, variantType>& value =
+        Belle2::Module::getParam< std::map<std::string, variantType> >("stateBasicFilterParameters").getValue();
+      value["maximalArcLengthDistance"] = payload->getMaxArcLengthRoughCDCStateFilter();
 
-      /** Same question for this:
-      using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
-      std::map<std::string, variantType> newval;
-      newval["maximalArcLengthDistance"] = 9.999;
-      Belle2::Module::getParam< std::map<std::string,variantType> >("stateBasicFilterParameters").setValue(newval);
-      */
+
+      TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun();
 
     }
   };

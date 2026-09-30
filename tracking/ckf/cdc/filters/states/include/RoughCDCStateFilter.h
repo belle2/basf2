@@ -24,11 +24,6 @@ namespace Belle2 {
     /// Expose the parameters of the sub findlets.
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
-    /** Sets the maximal arc lenght allowed for this filter
-      * @param arclength the arc length to be set
-      */
-    void setMaximalArcLengthDistance(double arclength);
-
   private:
     /// maximal distance from track to trajectory (in XY)
     double m_maximalHitDistance = 2;

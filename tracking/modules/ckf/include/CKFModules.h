@@ -82,7 +82,7 @@ namespace Belle2 {
       setDescription("Combinatorial Kalman Filter used for extrapolating SVD tracks into "
                      "CDC and create merged tracks.");
 
-      // add warnings for all parameters which will be overridden by the payload in the beginRun() function
+      // add warnings for all parameters which will be overridden by the payload in the beginRun() function (here and in the findlet)
       std::vector<std::string> payloadVarNames = {"maximalDeltaPhi", "firstActiveCDCLayer", "maximalLayerJump", "maximalLayerJumpBackwardSeed", "pathMaximalCandidatesInFlight", "stateMaximalHitCandidates", "stateBasicFilterParameters"};
 
       for (const auto& varName : payloadVarNames) {

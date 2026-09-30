@@ -22,7 +22,6 @@
 #include <vector>
 
 namespace Belle2 {
-  //class ModuleParamList;
 
   namespace TrackingUtilities {
     /// Filter can delegate to a filter chosen and set up at run time by parameters
@@ -75,7 +74,6 @@ namespace Belle2 {
 
       /// Evaluate the MVA method over a vector of objects. Returns float weight or NAN (when object is rejected) for each object
       virtual std::vector<float> operator()(const std::vector <Object*>& objs) override;
-
 
     public:
       /// Return name of the selected filter

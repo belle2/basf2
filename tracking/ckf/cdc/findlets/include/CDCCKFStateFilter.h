@@ -27,8 +27,6 @@
 
 #include <Math/Vector2D.h>
 
-#include <tracking/ckf/cdc/filters/states/RoughCDCStateFilter.h>
-
 namespace Belle2 {
   /// A stack of pre-, helix-extrapolation- , Kalman-extrapolation- and Kalman-update-filters.
   class CDCCKFStateFilter : public TrackingUtilities::Findlet<const CDCCKFState, CDCCKFState> {
@@ -60,25 +58,6 @@ namespace Belle2 {
      *  @param maximalHitCandidates Maximum number of hit candidates to test
      */
     void setMaximalHitCandidates(size_t maximalHitCandidates) { m_maximalHitCandidates = maximalHitCandidates; }
-
-
-    /** Sets the parameter for all "rough" filters present (maybe more granular would be good???) */
-    void setMaxArcLengthRoughCDCStateFilter(double newval)
-    {
-      std::cout << m_preFilter.getFilterName() << std::endl;
-      std::cout << m_basicFilter.getFilterName() << std::endl;
-
-      if (m_basicFilter.getFilterName() == "rough") {
-        //Belle2::RoughCDCStateFilter * filterPtr = std::dynamic_pointer_cast<RoughCDCStateFilter>( m_basicFilter.getFilterPtr() );
-        //if( filterPtr ) filterPtr->setMaximalArcLengthDistance(12345.);
-      }
-      /// Basic Filter (uses helix extrapolation)
-      //TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_basicFilter;
-      /// Extrapolation Filter  (after Kalman extrapolation)
-      //TrackingUtilities::ChooseableFilter<CDCStateFilterFactory> m_extrapolationFilter;
-      /// Final Selection Filter (after Kalman update)
-    }
-
 
     /// Apply the findlet and do the state selection
     void apply(const CDCCKFPath& path, std::vector<CDCCKFState>& nextStates) override

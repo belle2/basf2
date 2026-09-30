@@ -127,10 +127,24 @@ namespace Belle2 {
 
       // need to be set before TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun()
       using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
-      std::map<std::string, variantType>& value =
-        Belle2::Module::getParam< std::map<std::string, variantType> >("stateBasicFilterParameters").getValue();
-      value["maximalArcLengthDistance"] = payload->getMaxArcLengthRoughCDCStateFilter();
 
+      // there are 4 potential filter which can be set to the "rough" filter (or derived filters)
+      std::vector<std::string> filterNames = {
+        "statePreFilter",
+        "stateFinalFilter",
+        "stateExtrapolationFilter",
+        "stateBasicFilter"
+      };
+
+      for (const std::string& filterName : filterNames) {
+        const std::string& filterNameValue = Belle2::Module::getParam<std::string>(filterName).getValue();
+
+        if (filterNameValue.find("rough") != filterNameValue.npos) {
+          std::map<std::string, variantType>& value =
+            Belle2::Module::getParam< std::map<std::string, variantType> >(filterName + "Parameters").getValue();
+          value["maximalArcLengthDistance"] = payload->getMaxArcLengthRoughCDCStateFilter();
+        }
+      }
 
       TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun();
 

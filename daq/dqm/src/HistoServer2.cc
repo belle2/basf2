@@ -89,7 +89,6 @@ int HistoServer2::server()
       }
       // Objects were cloned in recvRootMessage().
       for (auto* obj : objlist) {
-        if (dynamic_cast<TH1*>(obj)) continue;
         delete obj;
       }
     }
@@ -422,13 +421,14 @@ void HistoServer2::handle_objects(
 
     TH1* histo = dynamic_cast<TH1*>(objlist.at(i));
 
-    if (!histo) {
+    if (histo != nullptr) {
+      m_hman->update(subdir, objname, fd, histo);
+      objlist.at(i) = nullptr;
+    } else {
       printf("HistoServer2: invalid object '%s', class=%s\n",
              objname.c_str(), objlist.at(i)->ClassName());
       continue;
     }
-
-    m_hman->update(subdir, objname, fd, histo);
 
     updated = true;
   }

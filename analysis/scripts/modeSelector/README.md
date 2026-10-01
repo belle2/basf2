@@ -62,6 +62,12 @@ while the non-predicted sector is ranked independently by `sigProb`.
 
 ## Files
 
+The package is split by audience: `__init__.py`, `ModeSelectorModule.py`, `dstarVeto.py`
+and `generatedDecayWeights.py` are what an analysis uses at run time and need only basf2
+and numpy. The scripts under `training/` produce and export the models and pull in torch,
+uproot and scipy; nothing imports them at inference. `config.py` is shared by both and
+stays at the top level.
+
 ### `config.py` -- shared configuration
 
 Single source of truth for all constants, feature definitions, and calibration factors used
@@ -276,7 +282,7 @@ the checks above, in `beginRun()` whenever either changes.
 To create a local payload database use:
 
 ```bash
-python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloads
+python3 training/convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloads
 ```
 
 This creates `localdb/database.txt`. To test, prepend it in a steering file with:
@@ -516,7 +522,7 @@ it is visible through any `ParticleList` that references the same candidate
 
 ---
 
-### `train.py` -- neural network training
+### `training/train.py` -- neural network training
 
 Trains the category and main networks from the ROOT files produced in training mode.
 Training inputs are produced by running `analysis/examples/modeSelector/produceTrainingInputs.py`
@@ -527,13 +533,13 @@ including grid submission).
 
 ```bash
 # Step 1: train category network (B0 vs B+ vs continuum)
-python3 train.py \
+python3 training/train.py \
     --input modeSelector_training*.root \
     --network category \
     --use_sparse
 
 # Step 2: train main network (requires trained category network)
-python3 train.py \
+python3 training/train.py \
     --input modeSelector_training*.root \
     --network main \
     --cat_model networks/net_category.pt \
@@ -704,7 +710,7 @@ used by `analysis/examples/modeSelector/plot_training.py`.
 
 ---
 
-### `convert_training_inputs.py` -- ROOT to .npz shard conversion
+### `training/convert_training_inputs.py` -- ROOT to .npz shard conversion
 
 Converts `produceTrainingInputs.py` ROOT outputs into compact `.npz` shards that `train.py`
 reads directly. Run this once per training-input production; then point `train.py --input`
@@ -723,19 +729,19 @@ changing them does not require reconverting.
 
 ```bash
 # one shard per gbasf2 dataset directory (parallelise over directories with HTCondor)
-python3 convert_training_inputs.py \
+python3 training/convert_training_inputs.py \
     --input '<project>/ModeSelector_v7_ccbar_1/**/*.root' \
     --output /path/to/converted \
     --name ModeSelector_v7_ccbar_1
 
 # or everything at once, split into shards of 200 input files
-python3 convert_training_inputs.py \
+python3 training/convert_training_inputs.py \
     --input '<project>/**/*.root' \
     --output /path/to/converted \
     --name ModeSelector_v7 --files_per_shard 200
 
 # then train
-python3 train.py --input '/path/to/converted/*.npz' --network category --use_sparse
+python3 training/train.py --input '/path/to/converted/*.npz' --network category --use_sparse
 ```
 
 Quote glob patterns containing `**` so that Python expands them recursively rather than the
@@ -759,14 +765,14 @@ already small and load speed matters more than size. `train.py` refuses shards w
 
 ---
 
-### `convert_to_onnx.py` -- PyTorch to ONNX conversion
+### `training/convert_to_onnx.py` -- PyTorch to ONNX conversion
 
 Converts trained `.pt` checkpoints to ONNX for use in basf2 (via `onnxruntime`).
 It can also copy the exported ONNX files into `localdb/database.txt` as
 conditions payloads.
 
 ```bash
-python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloads \
+python3 training/convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloads \
         --cat-payload-name=<cat_payload_name> --main-payload-name=<main_payload_name>
 ```
 

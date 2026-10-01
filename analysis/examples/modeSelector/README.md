@@ -104,7 +104,7 @@ gbasf2 splits jobs per input file, so the download will contain many small
 a glob:
 
 ```bash
-python3 analysis/scripts/modeSelector/train.py \
+python3 analysis/scripts/modeSelector/training/train.py \
     --input modeSelector_train_<date>/**/*.root --network category --use_sparse
 ```
 
@@ -251,18 +251,18 @@ Alternatively point `--cat-model` / `--main-model` at the local
    basf2 analysis/examples/modeSelector/produceTrainingInputs.py
 
 2. Train category network:
-   python3 analysis/scripts/modeSelector/train.py \
+   python3 analysis/scripts/modeSelector/training/train.py \
            --input training_data/*.root --network category --use_sparse
 
 3. Train main network:
-   python3 analysis/scripts/modeSelector/train.py \
+   python3 analysis/scripts/modeSelector/training/train.py \
            --input training_data/*.root --network main --cat_model networks/net_category.pt --use_sparse
            
 4. Plot training diagnostics
    python3 analysis/examples/modeSelector/plot_training.py networks/net_category.pt networks/net_main.pt
 
 5. Export to ONNX and produce payloads:
-   python3 analysis/scripts/modeSelector/convert_to_onnx.py \
+   python3 analysis/scripts/modeSelector/training/convert_to_onnx.py \
            --input-dir networks/ --output-dir onnx/ --add-payloads
 
 6. Apply to MC/data for testing:

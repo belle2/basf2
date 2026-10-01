@@ -13,12 +13,17 @@ Decay vpho
 Enddecay
 
 Alias Mypi0 pi0
+Alias Myeta eta
 
 Decay D-
-1.000 pi- pi0 eta           DTopipi0Eta;
+1.000 pi- Mypi0 Myeta           DTopipi0Eta;
 Enddecay
 
 Decay Mypi0
+1.000 gamma gamma           PHSP;
+Enddecay
+
+Decay Myeta
 1.000 gamma gamma           PHSP;
 Enddecay
 

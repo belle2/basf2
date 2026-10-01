@@ -214,9 +214,9 @@ the payload itself:
 
 - the weightfile records the **feature selection** its model was trained on, so
   the payload does not depend on `config.HAS_INPUTS` being in sync
-- the weightfile records the **contract version** as an extra element
-  (`contract_version`), checked against the supported contract versions
-  when it is loaded (see below)
+- the weightfile records the **contract version** (`Weightfile::addContractVersion`,
+  read back with `hasContractVersion` / `getContractVersion`), checked against the
+  supported contract versions when it is loaded (see below)
 
 A further check compares the model's output class count (`m_nClasses`) against what
 the module interprets: 3 for the category network, `N_INPUT_IDS + 3` for the main
@@ -263,6 +263,15 @@ weightfiles are not reported.
 Weightfiles exported before this (with placeholder variable names) still load:
 the module warns, treats them as contract version 1 (fatal if that version is no longer
 supported) and falls back to `config.HAS_INPUTS`.
+
+**Intervals of validity.** ModeSelector uses one training for all datasets (the
+experiment number is a network input), so its payloads have a single open-ended iov
+(`0,0,-1,-1`, the `convert_to_onnx.py` default). The module reads both payloads once in
+`initialize()` and does not reload them, so payloads with several iovs would silently
+keep the model valid at the start of the job. The naming scheme does not prevent
+dataset-dependent trainings: they would be uploaded as further revisions under the same
+name with different iovs, and the module would have to reload both payloads, repeating
+the checks above, in `beginRun()` whenever either changes.
 
 To create a local payload database use:
 
@@ -802,7 +811,8 @@ python3 convert_to_onnx.py --input-dir networks/ --output-dir onnx/ --add-payloa
   weightfile identifier and logged at inference time. Defaults to `unspecified`, so
   set it for anything that gets uploaded.
 - `--first-exp`, `--first-run`, `--final-exp`, `--final-run` control the
-  interval of validity for local payload entries.
+  interval of validity for local payload entries. Keep the open-ended default: the module
+  does not reload payloads when the iov changes (see "Intervals of validity" above).
 
 For a practical end-to-end workflow using the example steering files, see
 `analysis/examples/modeSelector/README.md`.

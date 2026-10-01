@@ -195,7 +195,7 @@ class ModeSelectorModule(b2.Module):
         are treated as contract version 1 and are subject to the same support rule.
         """
         training = str(identifier)
-        if not weightfile.containsElement('contract_version'):
+        if not weightfile.hasContractVersion():
             b2.B2WARNING(
                 "ModeSelector: " + label + " model weightfile carries no contract version, "
                 "so it is treated as contract version 1. Re-export it with convert_to_onnx.py."
@@ -205,13 +205,13 @@ class ModeSelectorModule(b2.Module):
             self._require_supported_contract(1, label)
             return 1, training
 
-        raw_version = str(weightfile.getElement['std::string']('contract_version'))
-        try:
-            version = int(raw_version)
-        except ValueError:
+        # getContractVersion() also returns the default if the stored value is not an
+        # integer, which hasContractVersion() above has already ruled out as 'not stored'.
+        version = weightfile.getContractVersion(-1)
+        if version < 0:
             b2.B2FATAL(
-                "ModeSelector: " + label + " model weightfile has a malformed contract version '"
-                + raw_version + "'. Re-export it with convert_to_onnx.py."
+                "ModeSelector: " + label + " model weightfile has a malformed contract "
+                "version. Re-export it with convert_to_onnx.py."
             )
 
         self._require_supported_contract(version, label)

@@ -134,7 +134,7 @@ def package_as_mva_weightfile(onnx_path, root_path, variables, n_classes, identi
         nClasses=n_classes,
         identifier=identifier,
     )
-    wf.addElement('contract_version', config.MODEL_CONTRACT_VERSION)
+    wf.addContractVersion(config.MODEL_CONTRACT_VERSION)
     wf.save(root_path)
     print(f"Packaged {onnx_path} -> {root_path} ({len(variables)} features, {n_classes} classes)")
     print(f"  identifier: {identifier}")

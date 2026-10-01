@@ -1,6 +1,11 @@
 Changes in the analysis package in light-2609-luna
 --------------------------------------------------
 
+ModeSelector
+++++++++++++
+* Added `ModeSelector`, an event-level classifier on top of the hadronic FEI. It uses all FEI :math:`B` candidates of an event together to predict the :math:`B` type and the decay mode of the tag :math:`B`, which mainly reduces :math:`B^0` / :math:`B^+` crossfeed.
+* Its models are taken from a performance globaltag instead of the analysis globaltag. The payload names carry no campaign or training version, so the training is selected by the globaltag alone. See :ref:`mva_contract_version` for the contract version scheme.
+
 FlavorTagger
 ++++++++++++
 * TFlaT: fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.

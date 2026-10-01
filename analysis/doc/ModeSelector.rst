@@ -212,8 +212,6 @@ calibration. They must be reproduced at inference time::
     modeSelector.modeSelector(
         bp_list='B+:feiHadronic',
         b0_list='B0:feiHadronic',
-        payload_cat_model='<cat_payload_name>',
-        payload_main_model='<main_payload_name>',
         output_variable='BplusScore',
         path=my_path,
     )
@@ -222,9 +220,21 @@ calibration. They must be reproduced at inference time::
     for b in ['B+:feiHadronic', 'B0:feiHadronic']:
         ma.applyCuts(b, 'extraInfo(modeSelector_rank) == 1', path=my_path)
 
-Models are loaded from the conditions database using the payload names
-specified via ``payload_cat_model`` and ``payload_main_model``, provided
-in the recommended analysis global tag.
+Models are loaded from the conditions database. The payload names are not given
+by the user: they are derived from the contract version this release implements,
+so the training is selected by the globaltag alone. Prepend the recommended
+ModeSelector performance globaltag in addition to the analysis globaltag:
+
+.. code-block:: python
+
+    basf2.conditions.prepend_globaltag('<performance globaltag>')
+
+The payload names can still be given explicitly with ``payload_cat_model`` and
+``payload_main_model``, which is the way to load the models of an older contract
+version that this release still supports. Doing so emits a warning, since the
+training is then no longer selected by the globaltag. A payload built for a newer
+contract version, or for one that is no longer supported, is rejected with a fatal
+error rather than used. See :ref:`mva_contract_version` for the scheme.
 
 The following variables are available after running ``modeSelector()``.
 Event-level outputs are in ``EventExtraInfo`` and accessed via
@@ -260,9 +270,9 @@ activations.
 
 All training scripts and configuration are in ``analysis/scripts/modeSelector/``:
 
-- ``train.py``: training pipeline for both networks
 - ``config.py``: training configuration, feature definitions and used FEI calibration weights
-- ``convert_to_onnx.py``: export trained models to basf2 MVA weightfiles using ONNX
+- ``training/train.py``: training pipeline for both networks
+- ``training/convert_to_onnx.py``: export trained models to basf2 MVA weightfiles using ONNX
 
 See ``analysis/scripts/modeSelector/README.md`` for full details.
 

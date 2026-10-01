@@ -55,8 +55,8 @@ except Exception:
     # interpreter is the venv's, pybasf2's compiled module is found and fails to initialise
     # with SystemError rather than ImportError.
     import importlib.util
-    #: Path to config.py next to this file, loaded directly instead of through the package
-    _config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.py')
+    #: Path to config.py in the package directory above, loaded directly instead of through the package
+    _config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'config.py')
     #: Import spec used to load config.py as a standalone module
     _spec = importlib.util.spec_from_file_location('modeSelector_config', _config_path)
     #: ModeSelector configuration, loaded without importing the basf2-dependent package

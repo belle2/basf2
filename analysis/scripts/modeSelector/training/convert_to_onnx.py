@@ -20,7 +20,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from modeSelector import config
-from modeSelector.train import MultiClassNet
+from modeSelector.training.train import MultiClassNet
 from ROOT import Belle2
 
 

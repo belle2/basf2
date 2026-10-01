@@ -45,7 +45,7 @@ from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
 
 try:
-    from modeSelector.train import concat_file_data, load_training_file, save_npz_shard
+    from modeSelector.training.train import concat_file_data, load_training_file, save_npz_shard
 except Exception:
     # Same reason (and same deliberate breadth) as the config import in train.py: the
     # modeSelector package __init__ pulls in basf2 and ROOT, which a standalone venv does

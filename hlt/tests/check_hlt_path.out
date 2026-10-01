@@ -933,6 +933,7 @@
       exportTracks=True
       filter=size
       filterParameters={}
+      firstActiveCDCLayer=0
       hitFindingDirection=forward
       ignoreTracksWithCDChits=True
       inputRecoTrackStoreArrayName=SVDPlusCDCStandaloneRecoTracks
@@ -3892,6 +3893,7 @@
       exportTracks=True
       filter=size
       filterParameters={}
+      firstActiveCDCLayer=0
       hitFindingDirection=forward
       ignoreTracksWithCDChits=True
       inputRecoTrackStoreArrayName=SVDPlusCDCStandaloneRecoTracks

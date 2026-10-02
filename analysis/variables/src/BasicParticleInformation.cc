@@ -90,7 +90,7 @@ Returns 1.0 if this particle was created from a V0 particle or 0.0 otherwise.
 )DOC");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
 
-Returns the mDST source use to create the particle. 
+Returns the mDST source used to create the particle. 
 
 The meaning of the values are:
 
@@ -141,7 +141,7 @@ The contexts are:
 * If this particle is cluster-based then this variable is currently unused.
 
 .. attention:: 
-    If multiple vertex fits have performed then the last one sets the ``chiProb`` value and overwrites all the previous ones.
+    If multiple vertex fits have been performed then the last one sets the ``chiProb`` value and overwrites all the previous ones.
 
 )DOC");
     REGISTER_VARIABLE("nDaughters", particleNDaughters, "Returns number of daughter particles or 0.0 otherwise for a particle with no daughters.");

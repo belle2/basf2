@@ -689,22 +689,6 @@ namespace Belle2 {
       return evtTimeFrac;
     }
 
-    double eventT0(const Particle*)
-    {
-      StoreObjPtr<EventT0> evtT0;
-
-      if (!evtT0) {
-        B2WARNING("StoreObjPtr<EventT0> does not exist, are you running over cDST data?");
-        return Const::doubleNaN;
-      }
-
-      if (evtT0->hasEventT0()) {
-        return evtT0->getEventT0();
-      } else {
-        return Const::doubleNaN;
-      }
-    }
-
     double timeSincePrevTriggerClockTicks(const Particle*)
     {
       StoreObjPtr<EventLevelTriggerTimeInfo> TTDInfo;
@@ -1243,16 +1227,5 @@ Please note that other subdetectors may also have contributed, so store the vari
 [Eventbased] It returns true if the ECL subdetector contributed in the calculation of the EventT0.
 Please note that other subdetectors may also have contributed, so store the variables for these as well.
 )DOC");
-    
-    VARIABLE_GROUP("Event (cDST only)");
-    REGISTER_VARIABLE("eventT0", eventT0, R"DOC(
-**[Calibration][Eventbased]** Returns :math:`t_0` which is the event time relative to the trigger time
-
-.. topic::
-    The event time can be measured by several sub-detectors including the SVD, CDC, ECL, and TOP.
-    This variable is the final combined value of all the individual event time measurements.
-    Currently, only the SVD and ECL are used in this combination.
-
-)DOC","ns");
   }
 }

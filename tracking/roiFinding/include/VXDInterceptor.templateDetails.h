@@ -81,7 +81,7 @@ namespace Belle2 {
 
   template<class aIntercept>
   void VXDInterceptor<aIntercept>::appendIntercepts(StoreArray<aIntercept>* interceptList,
-                                                    std::list<ROIDetPlane> planeList,
+                                                    const std::list<ROIDetPlane>& planeList,
                                                     genfit::MeasuredStateOnPlane state,
                                                     int recoTrackIndex,
                                                     RelationArray* recoTrackToIntercepts)
@@ -92,7 +92,7 @@ namespace Belle2 {
 
     double lambda = 0;
 
-    std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
+    std::list<ROIDetPlane>::const_iterator itPlanes = planeList.begin();
     while (itPlanes != planeList.end()) {
       B2DEBUG(20, " searching in appendIntercepts :  " << (itPlanes->getVxdID()));
 

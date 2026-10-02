@@ -122,7 +122,7 @@ namespace Belle2 {
 
 
     /** for debugging purposes: print VXDTFFilters into a file of name of the sectorMapConfig. */
-    static void printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters, std::string configName,
+    static void printVXDTFFilters(const VXDTFFilters<SpacePoint>& filters, const std::string& configName,
                                   unsigned int nHitCombinations, bool print2File);
 
 

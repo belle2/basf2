@@ -332,8 +332,9 @@ namespace Belle2 {
         TrackingUtilities::clearIfApplicable(m_topNode);
         m_topNode.unlink();
         m_topNode.m_tree = this;
-        for (typename Node::Children& children : m_children) {
-          for (Node& node : children) {
+        // Only the children used since the last felling can hold content, all others are already cleared.
+        for (size_t iChildren = 0; iChildren < m_nUsedChildren; ++iChildren) {
+          for (Node& node : m_children[iChildren]) {
             TrackingUtilities::clearIfApplicable(node);
             node.unlink();
           }

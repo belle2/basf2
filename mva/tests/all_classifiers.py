@@ -49,7 +49,6 @@ if __name__ == "__main__":
         ('Trivial.xml', basf2_mva.TrivialOptions(), None),
         ('FastBDT.xml', basf2_mva.FastBDTOptions(), None),
         ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification(), None),
-        ('FANN.xml', basf2_mva.FANNOptions(), None),
         ('Python_sklearn.xml', basf2_mva.PythonOptions(), 'sklearn'),
         ('Python_xgb.xml', basf2_mva.PythonOptions(), 'xgboost'),
         ('Python_tensorflow.xml', basf2_mva.PythonOptions(), 'tensorflow'),

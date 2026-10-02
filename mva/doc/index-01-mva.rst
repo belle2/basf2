@@ -128,12 +128,6 @@ Advanced feature preprocessing like Decorrelation, PCA, Gaussianisation, ... are
 Each method provides a lot of configuration options.
 Often the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
 
-FANN
-^^^^
-
-is the fast artificial neural network.
-It is used in the Flavor Tagger and by the HLT people.
-
 NeuroBayes
 ^^^^^^^^^^
 
@@ -532,10 +526,6 @@ Websites and papers for the frameworks which are supported by the mva package
 
   * `<http://tmva.sourceforge.net/>`_
   * Andreas Hoecker et al. „TMVA: Toolkit for Multivariate Data Analysis“. `<https://arxiv.org/abs/physics/0703039>`_
-
-* FANN
-
-  * S. Nissen. Implementation of a Fast Artificial Neural Network Library (fann). `<http://fann.sourceforge.net/fann.pdf>`_
 
 * SKLearn
 

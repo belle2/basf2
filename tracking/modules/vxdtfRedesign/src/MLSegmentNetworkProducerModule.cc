@@ -129,10 +129,6 @@ void MLSegmentNetworkProducerModule::event()
 
 }
 
-void MLSegmentNetworkProducerModule::terminate()
-{
-
-}
 
 
 void MLSegmentNetworkProducerModule::setupClassifier(const std::string& filename)

@@ -58,7 +58,8 @@ rec.add_reconstruction(path)
 # Optionally add mdst output so you can look at the events again
 mdst.add_mdst_output(
     filename="test_events.mdst.root",
-    path=path
+    path=path,
+    additionalBranches="EventExtraInfo"
 )
 
 # Apply the skim

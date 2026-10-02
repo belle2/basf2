@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_ProlateSpacepointMeasurement_h
-#define genfit_ProlateSpacepointMeasurement_h
+#pragma once
 
 #include "SpacepointMeasurement.h"
 
@@ -70,5 +69,3 @@ class ProlateSpacepointMeasurement : public SpacepointMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ProlateSpacepointMeasurement_h

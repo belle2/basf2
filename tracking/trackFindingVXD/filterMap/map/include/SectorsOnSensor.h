@@ -114,7 +114,7 @@ namespace Belle2 {
           normalizedVsup->push_back(vIndexPair.first);
 
       // and finally we copy the array of full sec ids
-      for (auto col : m_fullSecIDs) {
+      for (const auto& col : m_fullSecIDs) {
         std::vector< unsigned int > tmp_col;
         for (auto id : col)
           tmp_col.push_back(id);

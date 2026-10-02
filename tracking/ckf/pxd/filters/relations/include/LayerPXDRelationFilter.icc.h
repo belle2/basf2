@@ -102,7 +102,7 @@ namespace Belle2 {
     // Patch for the PXD layer 2 overlap inefficiency fix
     // previous implementation of maximumLadderNumber was calculated using GeoCache gave incorrect value for exp1003
     // Geometrically, PXD layer 1 has 8 ladders, pxd layer 2 has 12 ladder
-    int numberOfLaddersForLayer[2] = {8, 12};
+    const int numberOfLaddersForLayer[2] = {8, 12};
 
     for (CKFToPXDState* nextState : states) {
       const CKFToPXDState::stateCache& nextStateCache = nextState->getStateCache();

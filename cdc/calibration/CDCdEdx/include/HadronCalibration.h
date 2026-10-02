@@ -57,25 +57,25 @@ namespace Belle2 {
     * fit the beta-gamma curve
     */
     void fitBGCurve(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
-                    const std::string& suffx);
+                    const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. ionzation
     */
     void fitSigmavsIonz(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
-                        const std::string& suffix);
+                        const std::string& suffix, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. nhit
     */
     static void fitSigmaVsNHit(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramsigma,
-                               const std::string& suffx);
+                               const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * fit sigma vs. cos(theta)
     */
     static void fitSigmaVsCos(const std::vector< std::string >& particles, const std::string& filename, const std::string& paramfile,
-                              const std::string& suffx);
+                              const std::string& suffx, const bool makeIterationSummary);
 
     /**
     * plots mean and width after fitting

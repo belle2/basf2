@@ -228,7 +228,7 @@ void RT2SPTCConverterModule::event()
 }
 
 std::pair<std::vector<const SpacePoint*>, ConversionState>
-RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(std::vector<RecoHitInformation*> hitInfos)
+RT2SPTCConverterModule::getSpacePointsFromRecoHitInformationViaTrueHits(const std::vector<RecoHitInformation*>& hitInfos)
 {
   std::vector<const SpacePoint*> finalSpacePoints;
   ConversionState state;

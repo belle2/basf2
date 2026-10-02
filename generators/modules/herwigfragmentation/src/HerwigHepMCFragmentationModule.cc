@@ -357,7 +357,6 @@ bool HerwigHepMCFragmentationModule::applyEvtGenDecays()
 {
   if (!m_useEvtGen) return true;
   try {
-    int nDecayed = 0;
     const size_t nBefore = m_mcParticleGraph.size();
 
     for (size_t i = 0; i < nBefore; ++i) {
@@ -387,8 +386,7 @@ bool HerwigHepMCFragmentationModule::applyEvtGenDecays()
       // Layer 4: skip particles with no decay modes in DECAY_BELLE2.DEC or UserDecFile
       if (EvtDecayTable::getInstance()->getNModes(id) == 0) continue;
 
-      int result = m_evtGenInterface.simulateDecay(m_mcParticleGraph, gp);
-      if (result > 0) nDecayed++;
+      m_evtGenInterface.simulateDecay(m_mcParticleGraph, gp);
     }
 
     // Second generateList: write EvtGen daughters and PHOTOS photons to StoreArray

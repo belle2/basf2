@@ -26,8 +26,7 @@
  * @{
  */
 
-#ifndef genfit_HelixTrackModel_h
-#define genfit_HelixTrackModel_h
+#pragma once
 
 #include <TObject.h>
 #include <TVector3.h>
@@ -70,5 +69,3 @@ class HelixTrackModel : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_HelixTrackModel_h

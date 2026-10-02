@@ -41,6 +41,7 @@ namespace Belle2 {
       }
 
       /// Initialize the tree with the given values.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which it extends and then calls
       void initialize()
       {
         Super::template constructArray<0>(-getMaximumX(), getMaximumX(), getOverlapX());

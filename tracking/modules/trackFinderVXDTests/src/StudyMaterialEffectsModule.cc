@@ -16,7 +16,7 @@
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <Math/Vector3D.h>
-#include "TMath.h"
+#include <TMath.h>
 
 using namespace Belle2;
 

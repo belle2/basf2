@@ -51,9 +51,6 @@ void MCV0MatcherModule::initialize()
 }
 
 
-void MCV0MatcherModule::beginRun()
-{
-}
 
 void MCV0MatcherModule::event()
 {
@@ -96,10 +93,4 @@ void MCV0MatcherModule::event()
   B2DEBUG(20, "MC matching finished.");
 }
 
-void MCV0MatcherModule::endRun()
-{
-}
 
-void MCV0MatcherModule::terminate()
-{
-}

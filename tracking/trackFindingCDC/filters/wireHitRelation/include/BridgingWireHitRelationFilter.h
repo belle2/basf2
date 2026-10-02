@@ -80,7 +80,7 @@ namespace Belle2 {
       {{0, 2}, {2, 2}, {4, 2}, {6, 2}, {8, 2}, {10, 2}};
 
       /// Array for the number of primary drift cells to be included for the o'clock position at each index.
-      std::array<short, 12> m_missingPrimaryNeighborThresholds;
+      std::array<short, 12> m_missingPrimaryNeighborThresholds {};
 
       /// Indices of the considered o'clock positions of the secondary neighborhood.
       std::vector<short> m_consideredSecondaryNeighbors;

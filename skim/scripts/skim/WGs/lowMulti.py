@@ -13,7 +13,7 @@
 import math
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdPi
+from stdCharged import stdE, stdPi, stdMu
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
@@ -421,3 +421,77 @@ class PNbarHad(BaseSkim):
         vpholists = [f"vpho:p{mode}_{label}" for mode in ["1pi", "3pi", "5pi", "7pi", "1pi2K", "3pi2K", "5pi2K"]]
 
         return vpholists
+
+
+@fancy_skim_header
+class TauTauTauTau(BaseSkim):
+    __authors__ = ["Luigi Corona"]
+    __description__ = "Skim for the four tau final state."
+    __contact__ = __liaison__
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdMu("all", path=path)
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+        """
+        **Physics channel**: :math:`e^{+}e^{-} \\to  \\tau^{+} \\tau^{-} \\tau^{+} \\tau^{-}`
+
+        **Decay Modes**:
+
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to\\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to \\pi^{+}] \\tau^{-}[\\to e^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to e^{-}] \\tau^{+}[\\to \\mu^{+}] \\tau^{-}[\\to \\pi^{-}]`
+        * :math:`e^{+}e^{-} \\to \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\mu^{-}] \\tau^{+}[\\to e^{+}] \\tau^{-}[\\to \\pi^{-}]`
+
+        Cuts applied:
+
+        * Track cut: ``abs(dz) < 2.0 and abs(dr) < 0.5``
+        * ``nCleanedTracks < 6``, where a clean track satisfies above trackcut
+        * ``M total  < 9.5 GeV``
+        * Electrons identified with ``electronID > 0.2``
+        * Muons idenfied with ``muonID > 0.2``
+        * Pions identifed with  ``pionID > 0.2``
+        * We select events where particles with same PID have the same charge
+        """
+        ftau_list = []
+
+        track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
+        muon_id_cut = "muonID > 0.2"
+        pion_id_cut = "pionID > 0.2"
+        electron_id_cut = "electronID > 0.2"
+
+        ma.cutAndCopyList("pi+:tautautautau", "pi+:all", f"[{pion_id_cut}]", path=path)
+        ma.cutAndCopyList("mu+:tautautautau", "mu+:all", f"[{muon_id_cut}]", path=path)
+        ma.cutAndCopyList("e+:tautautautau", "e+:all", f"[{electron_id_cut}]", path=path)
+
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) < 6] and [M < 9.5]"
+
+        # Reconstruction: prompt with same charge
+        PiMuChannel = "pi+:tautautautau pi+:tautautautau mu-:tautautautau mu-:tautautautau"
+        PiEChannel = "pi+:tautautautau pi+:tautautautau e-:tautautautau e-:tautautautau"
+        MuEChannel = "mu+:tautautautau mu+:tautautautau e-:tautautautau e-:tautautautau"
+        PiMuEChannel = "pi+:tautautautau pi+:tautautautau mu-:tautautautau e-:tautautautau"
+        MuEPiChannel = "mu+:tautautautau mu+:tautautautau e-:tautautautau pi-:tautautautau"
+        EPiMuChannel = "e+:tautautautau e+:tautautautau mu-:tautautautau pi-:tautautautau"
+
+        ma.reconstructDecay(f"vpho:tautautautau_pimu -> {PiMuChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_pie -> {PiEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_mue -> {MuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_pimue -> {PiMuEChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_muepi -> {MuEPiChannel}", Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:tautautautau_epimu -> {EPiMuChannel}", Event_cuts_vis, path=path)
+
+        ftau_list.append("vpho:tautautautau_pimu")
+        ftau_list.append("vpho:tautautautau_pie")
+        ftau_list.append("vpho:tautautautau_mue")
+        ftau_list.append("vpho:tautautautau_pimue")
+        ftau_list.append("vpho:tautautautau_muepi")
+        ftau_list.append("vpho:tautautautau_epimu")
+
+        return ftau_list

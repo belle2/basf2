@@ -130,7 +130,7 @@ const RecoTrack* TrackMatchLookUp::getRelatedMCRecoTrack(const RecoTrack& prReco
 }
 
 const TrackFitResult* TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack,
-    Const::ChargedStable chargedStable) const
+    const Const::ChargedStable& chargedStable) const
 {
   B2ASSERT("This RecoTrack isn't a PR RecoTrack as it is supposed to be.", isPRRecoTrack(prRecoTrack));
   const Belle2::Track* b2track = prRecoTrack.getRelatedFrom<Belle2::Track>();

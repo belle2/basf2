@@ -50,6 +50,9 @@ void TOPLaserCalibratorCollectorModule::prepare()
 
   auto hitTree = new TTree("hitTree", "hitTree");
   hitTree->Branch<short>("channel", &m_channel);
+  hitTree->Branch<short>("asic", &m_asic);
+  hitTree->Branch<short>("asicChannel", &m_asicChannel);
+  hitTree->Branch<short>("boardstack", &m_boardstack);
   hitTree->Branch<short>("slot", &m_slot);
   hitTree->Branch<float>("hitTime", &m_hitTime);
   hitTree->Branch<float>("dVdt", &m_dVdt);
@@ -114,6 +117,9 @@ void TOPLaserCalibratorCollectorModule::collect()
     if (digit.getHitQuality() == TOPDigit::c_Junk) continue; // remove the bad hits
     m_channel = digit.getChannel();
     m_slot = digit.getModuleID(); // this is 1-based
+    m_asic = digit.getASICNumber();
+    m_asicChannel = digit.getASICChannel();
+    m_boardstack = digit.getBoardstackNumber();
     m_dVdt = 0.5 * TMath::Sqrt(-2.*TMath::Log(0.5)) * digit.getPulseHeight() / digit.getPulseWidth();
 
     if (m_refSlot > 0) {

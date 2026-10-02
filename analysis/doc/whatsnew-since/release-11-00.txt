@@ -1,3 +1,27 @@
+Changes in the analysis package in light-2609-luna
+--------------------------------------------------
+
+FlavorTagger
+++++++++++++
+* TFlaT: fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
+* Category-based: the ``FANN``-based combination method (``FANN_qrCombined``) is no longer available, as basf2 no longer supports ``FANN``. The only available combination method is the ``FastBDT``-based one (``FBDT_qrCombined``). This change does not affect GFlaT or TFlaT.
+
+
+sysvar (former pidvar)
+++++++++++++++++++++++
+* Added a ``seed`` argument to ``Reweighter.add_pid_particle``, ``Reweighter.add_fei_particle`` and ``add_weights_to_dataframe``. It makes both the systematic and the statistical weight variations reproducible, so a weight table gives the same variations in every dataframe it is applied to, while the variations of different tables remain independent. The previous ``sys_seed`` argument only seeded the systematic variations and initialised a random seed for the statistical variations, so they were not reproducible. It is kept for backward compatibility but now issues a warning.
+* Fixed the coverage plots of ``ReweighterParticle.plot_coverage`` for a single particle hypothesis or binning variable, and a pandas warning when adding FEI weight columns.
+
+Variables
++++++++++
+* Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
+* Improved documentation for the Helicity and FEI variable groups
+
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* Deprecated the ``Pi0VetoEfficiencySystematics`` module and `modularAnalysis.addPi0VetoEfficiencySystematics`, which will be removed in February 2027. The pi0 veto Data/MC efficiency weights can be obtained with the generic `ParticleWeighting` module. See the documentation of `modularAnalysis.addPi0VetoEfficiencySystematics` for details.
+* `ParticleWeighting` no longer throws an exception when ``selectedDaughters`` is used and the same daughter is shared by several candidates of the input list.
+
 Changes in the analysis package in light-2607-kasei
 ---------------------------------------------------
 

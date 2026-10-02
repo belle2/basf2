@@ -22,7 +22,7 @@ namespace Belle2 {
   class SelectionVariableFactory {
   public:
     /** constructor where virtual IP has been passed */
-    SelectionVariableFactory(double x = 0, double y = 0, double z = 0, double = 0) :
+    explicit SelectionVariableFactory(double x = 0, double y = 0, double z = 0, double = 0) :
       m_virtualIP(PointType(x, y, z)) {}
 
     /** typedef for more readable function-type - to be used for 2-hit-selectionVariables. */

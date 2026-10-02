@@ -43,12 +43,7 @@ namespace Belle2 {
       /// Cumulated weight of the contained items.
       TrackingUtilities::Weight getWeight() const
       {
-        return std::accumulate(begin(),
-                               end(),
-                               static_cast<TrackingUtilities::Weight>(0.0),
-        [](TrackingUtilities::Weight accumulatedWeight, const TrackingUtilities::WithWeight<AItem>& weightedItem) {
-          return accumulatedWeight + weightedItem.getWeight();
-        });
+        return m_weightSum;
       }
 
       /// Erase items from this node that satisfy the predicate.
@@ -60,15 +55,25 @@ namespace Belle2 {
         // m_itEnd = std::partition(m_items.begin(), m_items.end(), notPredicate);
         // Properly delete use the following.
         m_itEnd = std::remove_if(m_items.begin(), m_items.end(), predicate);
-        m_items.erase(m_itEnd, m_items.end());
+        if (m_itEnd != m_items.end()) {
+          m_items.erase(m_itEnd, m_items.end());
+          // Recompute the cumulated weight in the same order as a fresh accumulation
+          m_weightSum = std::accumulate(begin(),
+                                        end(),
+                                        static_cast<TrackingUtilities::Weight>(0.0),
+          [](TrackingUtilities::Weight accumulatedWeight, const TrackingUtilities::WithWeight<AItem>& weightedItem) {
+            return accumulatedWeight + weightedItem.getWeight();
+          });
+        }
       }
 
       /// Add an item with weight.
       void insert(const AItem& item, TrackingUtilities::Weight weight = 1.0)
       {
-        m_itEnd = m_items.insert(end(), TrackingUtilities::WithWeight<AItem>(item));
-        m_itEnd->setWeight(weight);
-        ++m_itEnd;
+        // The end marker always coincides with the end of the item vector, hence append.
+        m_items.emplace_back(item, weight);
+        m_itEnd = m_items.end();
+        m_weightSum += weight;
       }
 
       /// Add the items from another item range assigning a weight from the predicate.
@@ -119,6 +124,7 @@ namespace Belle2 {
       {
         m_items.clear();
         m_itEnd = m_items.end();
+        m_weightSum = 0.0;
         Super& super = *this;
         TrackingUtilities::clearIfApplicable(super);
       }
@@ -129,6 +135,9 @@ namespace Belle2 {
 
       /// Memory for the end of the items that are not erased.
       typename std::vector<TrackingUtilities::WithWeight<AItem>>::iterator m_itEnd{m_items.end()};
+
+      /// Cumulated weight of the contained items, kept up to date on insertion and removal.
+      TrackingUtilities::Weight m_weightSum = 0.0;
     };
   }
 }

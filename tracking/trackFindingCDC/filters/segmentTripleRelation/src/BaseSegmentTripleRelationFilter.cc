@@ -16,7 +16,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -32,9 +31,6 @@ std::vector<const CDCSegmentTriple*> BaseSegmentTripleRelationFilter::getPossibl
   const CDCSegmentTriple* from,
   const std::vector<const CDCSegmentTriple*>& segmentTriples) const
 {
-  assert(std::is_sorted(segmentTriples.begin(), segmentTriples.end(), LessOf<Deref>()) &&
-         "Expected segment triples to be sorted");
-
   const CDCSegment2D* endSegment = from->getEndSegment();
 
   ConstVectorRange<const CDCSegmentTriple*> neighbors{

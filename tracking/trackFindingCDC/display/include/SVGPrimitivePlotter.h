@@ -235,7 +235,7 @@ namespace Belle2 {
       std::ostringstream m_svgContentStream;
 
       /// Memory for the number of spaces that shall be prepended to each line.
-      int m_nIndentationSpaces;
+      int m_nIndentationSpaces {};
 
       /// Memory for additional attributes to the top-level svg element.
       AttributeMap m_svgAttributes;

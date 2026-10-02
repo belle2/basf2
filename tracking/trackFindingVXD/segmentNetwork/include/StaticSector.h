@@ -245,10 +245,10 @@ namespace Belle2 {
 
         char typeID = accessor[index].first;
         void* valuePtr = accessor[index].second;
-        if (typeID == TBranchLeafType(double())) x = *((double*)valuePtr);
-        else if (typeID == TBranchLeafType(int())) x = (double)(*((int*)valuePtr));
-        else if (typeID == TBranchLeafType(float())) x = (double)(*((float*)valuePtr));
-        else if (typeID == TBranchLeafType(bool())) x = (double)(*((bool*)valuePtr));
+        if (typeID == TBranchLeafType(double())) x = *static_cast<double*>(valuePtr);
+        else if (typeID == TBranchLeafType(int())) x = static_cast<double>(*static_cast<int*>(valuePtr));
+        else if (typeID == TBranchLeafType(float())) x = static_cast<double>(*static_cast<float*>(valuePtr));
+        else if (typeID == TBranchLeafType(bool())) x = static_cast<double>(*static_cast<bool*>(valuePtr));
         else {
           B2FATAL("Unrecognized type : " << typeID);
         } // end else if
@@ -263,10 +263,10 @@ namespace Belle2 {
         double result = f.EvalPar(&x, &y);
 
         // now cast back to original type and set the value
-        if (typeID == TBranchLeafType(double())) *((double*)valuePtr) = result;
-        else if (typeID == TBranchLeafType(int())) *((int*)valuePtr) = result;
-        else if (typeID == TBranchLeafType(float())) *((float*)valuePtr) = result;
-        else if (typeID == TBranchLeafType(bool())) *((bool*)valuePtr) = result;
+        if (typeID == TBranchLeafType(double())) *static_cast<double*>(valuePtr) = result;
+        else if (typeID == TBranchLeafType(int())) *static_cast<int*>(valuePtr) = result;
+        else if (typeID == TBranchLeafType(float())) *static_cast<float*>(valuePtr) = result;
+        else if (typeID == TBranchLeafType(bool())) *static_cast<bool*>(valuePtr) = result;
         else {
           B2FATAL("Unrecognized type : " << typeID);
         } // end else if

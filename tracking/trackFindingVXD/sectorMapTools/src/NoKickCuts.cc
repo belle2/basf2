@@ -8,9 +8,9 @@
 
 #include <tracking/trackFindingVXD/sectorMapTools/NoKickCuts.h>
 
-#include "TH3.h"
+#include <TH3.h>
 
-#include "TFile.h"
+#include <TFile.h>
 #include <string>
 
 using namespace Belle2;
@@ -56,18 +56,18 @@ double NoKickCuts::getCut(int layer1, int layer2, EParameters par, EMinMax m, EC
   return out;
 }
 
-void NoKickCuts::FillCuts(std::string m_fileName)
+void NoKickCuts::FillCuts(const std::string& m_fileName)
 {
   TFile* file = TFile::Open(m_fileName.c_str());
 
 
-  TH3F* input_norm_m = (TH3F*)file->Get("output_norm_m");
-  TH3F* input_pow_m = (TH3F*)file->Get("output_pow_m");
-  TH3F* input_bkg_m = (TH3F*)file->Get("output_bkg_m") ;
+  auto* input_norm_m = dynamic_cast<TH3F*>(file->Get("output_norm_m"));
+  auto* input_pow_m = dynamic_cast<TH3F*>(file->Get("output_pow_m"));
+  auto* input_bkg_m = dynamic_cast<TH3F*>(file->Get("output_bkg_m"));
 
-  TH3F* input_norm_M = (TH3F*)file->Get("output_norm_M");
-  TH3F* input_pow_M = (TH3F*)file->Get("output_pow_M");
-  TH3F* input_bkg_M = (TH3F*)file->Get("output_bkg_M");
+  auto* input_norm_M = dynamic_cast<TH3F*>(file->Get("output_norm_M"));
+  auto* input_pow_M = dynamic_cast<TH3F*>(file->Get("output_pow_M"));
+  auto* input_bkg_M = dynamic_cast<TH3F*>(file->Get("output_bkg_M"));
 
 
   for (int mm = 0; mm < 2; mm++) {

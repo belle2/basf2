@@ -143,7 +143,7 @@ void AxialTrackUtil::updateRecoHit3D(const CDCTrajectory2D& trajectory2D, CDCRec
 void AxialTrackUtil::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  auto farFromTrajectory = [&trajectory2D, &maximumDistance](CDCRecoHit3D & recoHit3D) {
+  auto farFromTrajectory = [&trajectory2D, &maximumDistance](const CDCRecoHit3D & recoHit3D) {
     ROOT::Math::XYVector refPos2D = recoHit3D.getRefPos2D();
     double distance = trajectory2D.getDist2D(refPos2D) - recoHit3D.getSignedRecoDriftLength();
     if (std::fabs(distance) > maximumDistance) {

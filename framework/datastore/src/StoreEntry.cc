@@ -32,7 +32,16 @@ void StoreEntry::recoverFromNullObject()
   if (object)
     return;
   if (isArray) {
-    object = new TClonesArray(objClass);
+    // The TClonesArray is created with a small initial capacity instead of the
+    // ROOT default of 1000: it grows geometrically as soon as it is filled, so
+    // nothing is lost for the arrays which are actually used, while resetting
+    // an array (TClonesArray::Delete(), see resetForGetEntry()) costs time
+    // proportional to the *capacity* and not to the number of stored objects.
+    // Most of the DataStore entries are empty most of the time, so this makes
+    // clearing them (e.g. in PruneDataStore or at the end of each event)
+    // essentially free.
+    // Same argument applies to the RelationContainer dataobject.
+    object = new TClonesArray(objClass, 10);
   } else {
     // Oh dear, where to begin. So we want to create a new object of the class
     // we have and we require this class to be inheriting from TObject. Fine,

@@ -40,6 +40,12 @@ namespace Belle2 {
     /// Destructor
     ~RT2SPTCConverterModule() override;
 
+    /// copy constructor, deleted since the class owns a bare pointer
+    RT2SPTCConverterModule(const RT2SPTCConverterModule&) = delete;
+
+    /// assignment operator, deleted since the class owns a bare pointer
+    RT2SPTCConverterModule& operator=(const RT2SPTCConverterModule&) = delete;
+
     /// Initialize module (e.g. check if all required StoreArrays are present or registering new StoreArrays)
     void initialize() override;
 
@@ -70,7 +76,7 @@ namespace Belle2 {
 
     /** Convert Clusters to SpacePoints using the Relation: Cluster->TrueHit->SpacePoint */
     std::pair<std::vector<const SpacePoint*>, ConversionState>
-    getSpacePointsFromRecoHitInformationViaTrueHits(std::vector<RecoHitInformation*> hitInfos);
+    getSpacePointsFromRecoHitInformationViaTrueHits(const std::vector<RecoHitInformation*>& hitInfos);
 
     /** reset counters to 0 to avoid indeterministic behaviour */
     void initializeCounters()

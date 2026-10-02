@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_ThinScatterer_h
-#define genfit_ThinScatterer_h
+#pragma once
 
 #include "SharedPlanePtr.h"
 #include "Material.h"
@@ -62,5 +61,3 @@ class ThinScatterer : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ThinScatterer_h

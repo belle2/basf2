@@ -351,7 +351,7 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, cons
     trueTitle = std::string(title) + name2;
   }
 
-  TH1F* h = (TH1F*)duplicateHistogram(total.c_str(), trueTitle.c_str(), h1_den, histoList);
+  TH1F* h = dynamic_cast<TH1F*>(duplicateHistogram(total.c_str(), trueTitle.c_str(), h1_den, histoList));
   h->GetYaxis()->SetRangeUser(0., 1);
 
   for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {
@@ -395,7 +395,7 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
 
   TH1F* h[2];
 
-  h[0] = (TH1F*)duplicateHistogram(total2.c_str(), title2.c_str(), h1_RecoTrack, histoList);
+  h[0] = dynamic_cast<TH1F*>(duplicateHistogram(total2.c_str(), title2.c_str(), h1_RecoTrack, histoList));
   h[0]->GetYaxis()->SetRangeUser(0., 1);
 
   for (int bin = 0; bin < h[0]->GetXaxis()->GetNbins(); bin++) {
@@ -412,7 +412,7 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
     h[0]->SetBinError(bin + 1, err);
   }
 
-  h[1] = (TH1F*)duplicateHistogram(total1.c_str(), title1.c_str(), h1_MC, histoList);
+  h[1] = dynamic_cast<TH1F*>(duplicateHistogram(total1.c_str(), title1.c_str(), h1_MC, histoList));
   h[1]->GetYaxis()->SetRangeUser(0., 1);
 
   for (int bin = 0; bin < h[1]->GetXaxis()->GetNbins(); bin++) {
@@ -468,8 +468,8 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
   }
 
   TH2F* h2[2];
-  h2[0] = (TH2F*)duplicateHistogram(total.c_str(), trueTitle.c_str(), h2_den, histoList);
-  h2[1] = (TH2F*)duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList);
+  h2[0] = dynamic_cast<TH2F*>(duplicateHistogram(total.c_str(), trueTitle.c_str(), h2_den, histoList));
+  h2[1] = dynamic_cast<TH2F*>(duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList));
 
   for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
     for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
@@ -525,8 +525,8 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
 
   TH2F* h2[4];
 
-  h2[0] = (TH2F*)duplicateHistogram(total2.c_str(), title2.c_str(), h2_RecoTrack, histoList);
-  h2[1] = (TH2F*)duplicateHistogram(error2.c_str(), titleErr.c_str(), h2_RecoTrack, histoList);
+  h2[0] = dynamic_cast<TH2F*>(duplicateHistogram(total2.c_str(), title2.c_str(), h2_RecoTrack, histoList));
+  h2[1] = dynamic_cast<TH2F*>(duplicateHistogram(error2.c_str(), titleErr.c_str(), h2_RecoTrack, histoList));
 
   for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
     for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
@@ -546,8 +546,8 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
     }
   }
 
-  h2[2] = (TH2F*)duplicateHistogram(total1.c_str(), title1.c_str(), h2_MC, histoList);
-  h2[3] = (TH2F*)duplicateHistogram(error1.c_str(), titleErr.c_str(), h2_MC, histoList);
+  h2[2] = dynamic_cast<TH2F*>(duplicateHistogram(total1.c_str(), title1.c_str(), h2_MC, histoList));
+  h2[3] = dynamic_cast<TH2F*>(duplicateHistogram(error1.c_str(), titleErr.c_str(), h2_MC, histoList));
 
   for (int binX = 0; binX < h2[2]->GetXaxis()->GetNbins(); binX++) {
     for (int binY = 0; binY < h2[2]->GetYaxis()->GetNbins(); binY++) {
@@ -579,7 +579,7 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack,
 
 TH1F* PerformanceEvaluationBaseClass::geoAcc1D(TH1F* h1_den, TH1F* h1_num, const char* name, const char* title, TList* histoList)
 {
-  TH1F* h = (TH1F*)duplicateHistogram(name, title, h1_den, histoList);
+  TH1F* h = dynamic_cast<TH1F*>(duplicateHistogram(name, title, h1_den, histoList));
   h->GetYaxis()->SetRangeUser(0., 1);
 
   for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {
@@ -612,8 +612,8 @@ TH2F* PerformanceEvaluationBaseClass::geoAcc2D(TH2F* h2_den, TH2F* h2_num,
   std::string titleErr = addTitle + std::string(title);
 
   TH2F* h2[2];
-  h2[0] = (TH2F*)duplicateHistogram(name, title, h2_den, histoList);
-  h2[1] = (TH2F*)duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList);
+  h2[0] = dynamic_cast<TH2F*>(duplicateHistogram(name, title, h2_den, histoList));
+  h2[1] = dynamic_cast<TH2F*>(duplicateHistogram(error.c_str(), titleErr.c_str(), h2_den, histoList));
 
   for (int binX = 0; binX < h2[0]->GetXaxis()->GetNbins(); binX++) {
     for (int binY = 0; binY < h2[0]->GetYaxis()->GetNbins(); binY++) {
@@ -645,7 +645,7 @@ TH1F* PerformanceEvaluationBaseClass::V0FinderEff(TH1F* h1_dau0, TH1F* h1_dau1, 
                                                   const char* name, const char* title, TList* histoList)
 {
 
-  TH1F* h = (TH1F*)duplicateHistogram(name, title, h1_Mother, histoList);
+  TH1F* h = dynamic_cast<TH1F*>(duplicateHistogram(name, title, h1_Mother, histoList));
   h->GetYaxis()->SetRangeUser(0., 1);
 
   for (int bin = 0; bin < h->GetXaxis()->GetNbins(); bin++) {

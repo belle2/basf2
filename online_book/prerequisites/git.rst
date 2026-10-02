@@ -30,10 +30,10 @@ Creating a physics analysis or developing a piece of software is not a straight
 forward process without errors. There will be a lot of changes to the scripts,
 notes, documents, code over time.
 
-Sometimes the changes will be wrong and we need to fix these errors. Sometimes
+Sometimes, the changes will be wrong and we need to fix these errors. Sometimes,
 we might get feedback to a specific version of our paper but we might have
 changed this part already and we need to figure out what still applies. And
-sometimes we might get an email like this:
+sometimes, we might get an email like this:
 
 .. raw:: html
 
@@ -90,7 +90,7 @@ be aware of.
 Belle II Specifics
 ==================
 
-In Belle II we use GitLab by GitLab Inc. for our git repositories, with our instance hosted at DESY.
+In Belle II, we use GitLab by GitLab Inc. for our git repositories, with our instance hosted at DESY.
 This is quite similar to github in some regards. It is strongly advised to use
 ``ssh`` as access protocol and for that you need to upload your public key to
 https://gitlab.desy.de.

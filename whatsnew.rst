@@ -213,6 +213,8 @@ automatically done when switching the calculation on.
 
 .. include:: generators/doc/whatsnew-since/release-10-00.txt
 
+.. include:: tracking/doc/whatsnew-since/release-10-00.txt
+
 Changes since release-09
 ========================
 
@@ -1265,6 +1267,7 @@ Changes since release-08
 .. include:: analysis/doc/whatsnew-since/release-08-00.txt
 .. include:: skim/doc/whatsnew-since/release-08-00.txt
 .. include:: mva/doc/whatsnew-since/release-08-00.txt
+.. include:: tracking/doc/whatsnew-since/release-08-00.txt
 
 Changes since release-07
 ========================
@@ -1330,6 +1333,8 @@ the associated password. More information can be found in the section
 .. List of changes for the mva package
 
 .. include:: mva/doc/whatsnew-since/release-07-00.txt
+
+.. include:: tracking/doc/whatsnew-since/release-07-00.txt
 
 Changes since release-06
 ========================

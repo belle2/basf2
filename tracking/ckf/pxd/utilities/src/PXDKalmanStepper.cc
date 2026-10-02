@@ -30,7 +30,7 @@ double PXDKalmanStepper::kalmanStep(genfit::MeasuredStateOnPlane& measuredStateO
   return chi2;
 }
 
-double PXDKalmanStepper::calculateResidual(genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state)
+double PXDKalmanStepper::calculateResidual(const genfit::MeasuredStateOnPlane& measuredStateOnPlane, const CKFToPXDState& state)
 {
   double residual = 0;
   for (const PXDRecoHit& pxdRecoHit : state.getRecoHits()) {

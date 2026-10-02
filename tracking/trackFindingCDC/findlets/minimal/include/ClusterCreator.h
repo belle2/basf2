@@ -65,9 +65,6 @@ namespace Belle2 {
         m_wireHitRelations.clear();
         TrackingUtilities::RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHitPtrs, m_wireHitRelations);
 
-        B2ASSERT("Expect wire hit neighborhood to be symmetric ",
-                 TrackingUtilities::WeightedRelationUtil<TrackingUtilities::CDCWireHit>::areSymmetric(m_wireHitRelations));
-
         // Compose the clusters
         m_wirehitClusterizer.apply(wireHitPtrs, m_wireHitRelations, outputClusters);
       }

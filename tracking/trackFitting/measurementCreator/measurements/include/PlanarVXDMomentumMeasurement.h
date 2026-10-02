@@ -105,6 +105,7 @@ namespace Belle2 {
     const RecoTrack* m_recoTrack = nullptr;
 
     /// Return the detector ID.
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     static int getDetId()
     {
       return -1;

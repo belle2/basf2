@@ -62,4 +62,6 @@ German scientists working on ATLAS, CMS and ILC as well as the entire Belle II c
 To apply for a NAF account, please go to the registration link on the `Internal Links <https://www.belle2.org/internal_links/>`_
 page. 
 
-Documentation for NAF, including a short walk-through, can be found on the `NAF Documentation <https://docs.desy.de/naf/>`_ page
+Documentation for NAF, including a short walk-through, can be found on the `NAF Documentation <https://docs.desy.de/naf/>`_ page.
+It is also recommended to have a look at the
+`Best Practices and Examples <https://gitlab.desy.de/belle2/computing/computing-facilities/desy-analysis-facility/-/wikis/home/Best-Practices-and-Examples>`_ page.

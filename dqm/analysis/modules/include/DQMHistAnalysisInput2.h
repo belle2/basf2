@@ -27,7 +27,11 @@
 
 namespace Belle2 {
   /**
-   * Class to read histograms from a root file for online analysis modules.
+   * DQM framework core module to read histograms from a root file.
+   * The stored histograms are then available for the DQM online analysis
+   * modules by the base class interfaces.
+   * This module must be the first in the analysis chain as it provides
+   * the (faked) EventMetaData for the basf2 processing ("InputModule").
    */
 
   class DQMHistAnalysisInput2Module : public DQMHistAnalysisModule {
@@ -70,13 +74,17 @@ namespace Belle2 {
      */
     static void addToHistList(std::vector<TH1*>& inputHistList, const std::string& dirname, TKey* key);
 
+    /**
+     * Write state of analysis to a file
+     */
+    void write_state(void);
+
     // Data members
-    /** The name of the shared memory for the histograms. */
-    std::string m_mempath;
-    /** The name of the memory file (HLT or ExpressReco). */
+    /** The input root-file name for the histograms. */
+    std::string m_inputFileName;
     /** The refresh interval. */
     int m_interval;
-    /** Whether to enable the run info to be displayed. */
+    /** Whether to the run info canvas should be created. */
     bool m_enable_run_info;
     /** The canvas hold the basic DQM info. */
     TCanvas* m_c_info{nullptr};
@@ -99,8 +107,6 @@ namespace Belle2 {
 
     /** The file name of the analysis for stats */
     std::string m_statname;
-    /** Write stats of analysis */
-    void write_state(void);
     /** last time event loop entered */
     time_t m_last_event{};
     /** last time begin run entered */

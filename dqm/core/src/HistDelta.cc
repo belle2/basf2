@@ -40,7 +40,7 @@ void HistDelta::update(const TH1* currentHist)
 {
   m_updated = false;
   if (currentHist == nullptr) return; // this won't make sense
-  gROOT->cd(); // make sure we dont accidentally write the histograms to a open file
+  gROOT->cd(); // make sure we dont accidentally write the histograms to an open file
   // cover first update after start
   if (m_lastHist == nullptr) {
     m_lastHist = std::unique_ptr<TH1>(static_cast<TH1*>(currentHist->Clone()));
@@ -106,6 +106,6 @@ void HistDelta::reset(void)
 TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated) const
 {
   if (onlyIfUpdated && !m_updated) return nullptr;// not updated, but requested
-  if (n >= m_deltaHists.size()) return nullptr;
+  if (n >= m_deltaHists.size()) return nullptr;// request beyond the number of existing deltas
   return m_deltaHists.at(n).get();
 }

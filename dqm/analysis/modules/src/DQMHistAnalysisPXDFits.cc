@@ -14,11 +14,9 @@
 #include <dqm/analysis/modules/DQMHistAnalysisPXDFits.h>
 #include <TROOT.h>
 
-#include <boost/format.hpp>
+#include <format>
 
 using namespace Belle2;
-
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -102,7 +100,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     auto layer = (((id >> 5) & 0x1) + 1);
     auto ladder = ((id >> 1) & 0xF);
     auto sensor = ((id & 0x1) + 1);
-    std::string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
+    std::string s2 = std::format("_{}.{}.{}", layer, ladder, sensor);
 
     m_hSignalAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
     m_hCommonAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
@@ -172,8 +170,6 @@ void DQMHistAnalysisPXDFitsModule::beginRun()
 
 void DQMHistAnalysisPXDFitsModule::event()
 {
-//  bool flag = false;
-
   m_hSignalAll->Reset(); // dont sum up!!!
   m_hCommonAll->Reset(); // dont sum up!!!
   m_hCountsAll->Reset(); // dont sum up!!!
@@ -191,11 +187,10 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        std::string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
+        std::string s2 = std::format("_{}.{}.{}_{}_{}", layer, ladder, sensor, j, k);
         {
           std::string name = "hrawPxdHitsCharge" + s2;
           if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fLandau->SetParameter(0, 1000);
 //           m_fLandau->SetParameter(1, 0);
 //           m_fLandau->SetParameter(2, 10);
@@ -211,7 +206,6 @@ void DQMHistAnalysisPXDFitsModule::event()
         {
           std::string name = "hrawPxdHitsCommonMode" + s2;
           if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 10);
 //           m_fGaus->SetParameter(2, 10);
@@ -227,7 +221,6 @@ void DQMHistAnalysisPXDFitsModule::event()
         {
           std::string name = "hrawPxdCount" + s2;
           if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
-//           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 100);
 //           m_fGaus->SetParameter(2, 10);
@@ -301,15 +294,3 @@ void DQMHistAnalysisPXDFitsModule::event()
     m_cOccupancyAll->Update();
   }
 }
-
-void DQMHistAnalysisPXDFitsModule::endRun()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDFits : endRun called");
-}
-
-
-void DQMHistAnalysisPXDFitsModule::terminate()
-{
-  B2DEBUG(1, "DQMHistAnalysisPXDFits: terminate called");
-}
-

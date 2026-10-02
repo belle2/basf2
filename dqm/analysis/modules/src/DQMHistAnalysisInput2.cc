@@ -33,7 +33,7 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory");
+  addParam("HistMemoryPath", m_inputFileName, "Path to input ROOT-file");
   addParam("StatFileName", m_statname, "Filename for status export", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
@@ -108,7 +108,7 @@ void DQMHistAnalysisInput2Module::event()
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
 
-  const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_mempath);
+  const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_inputFileName);
 
   if (m_lasttime == ftime) {
     B2INFO("File not updated! -> Sleep");
@@ -124,9 +124,9 @@ void DQMHistAnalysisInput2Module::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Load File");
 
-  std::unique_ptr<TFile> pFile = std::unique_ptr<TFile> (new TFile(m_mempath.c_str(), "READ"));
+  std::unique_ptr<TFile> pFile = std::unique_ptr<TFile> (new TFile(m_inputFileName.c_str(), "READ"));
   if (pFile->IsZombie()) {
-    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + " is Zombie -> Sleep");
+    B2WARNING("DQMHistAnalysisInput2: " << m_inputFileName + " is Zombie -> Sleep");
     sleep(m_interval);
     setReturnValue(false);
     return;
@@ -200,20 +200,19 @@ void DQMHistAnalysisInput2Module::event()
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
-    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
-              mmt.AsString());
+    B2WARNING("DQMHistAnalysisInput2: " << m_inputFileName + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype +
+              ", Last Updated " + mmt.AsString());
     setReturnValue(false);
     for (auto& h : inputHistList)  delete h;
     return;
   } else {
-    if (m_c_info != NULL) m_c_info->SetTitle((m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
-                                                + m_lastChange + ", Last Updated "
-                                                + mmt.AsString() + ", Last DQM event " + std::string(mbstr)).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_inputFileName + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype +
+                                                ", Last Changed " + m_lastChange + ", Last Updated " + mmt.AsString() + ", Last DQM event " + std::string(mbstr)).c_str());
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }
-  B2INFO("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
-         mmt.AsString());
+  B2INFO("DQMHistAnalysisInput2: " << m_inputFileName + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated "
+         + mmt.AsString());
 
 
   m_count++;
@@ -276,7 +275,7 @@ void DQMHistAnalysisInput2Module::write_state(void)
     char mbstr[100];
     time_t now = time(0);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    fprintf(fh, "%s,%s,%s,", m_statname.c_str(), m_mempath.c_str(), mbstr);
+    fprintf(fh, "%s,%s,%s,", m_statname.c_str(), m_inputFileName.c_str(), mbstr);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_event));
     fprintf(fh, "%s,", mbstr);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_beginrun));

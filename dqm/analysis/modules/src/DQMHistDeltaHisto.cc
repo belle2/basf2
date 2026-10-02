@@ -31,6 +31,8 @@ REG_MODULE(DQMHistDeltaHisto);
 DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM Module to create delta histograms for all histograms with fixed time intervall");
+
   addParam("Interval", m_interval, "Interval time for diff histos [s]", 180);
   addParam("MonitoredHistos", m_monitoredHistos, "List of histograms to monitor", vector<string>());
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");

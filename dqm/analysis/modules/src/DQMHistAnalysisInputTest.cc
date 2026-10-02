@@ -18,7 +18,6 @@
 
 #include <TROOT.h>
 
-//#include <iostream>
 using namespace Belle2;
 using namespace boost::property_tree;
 
@@ -34,7 +33,8 @@ REG_MODULE(DQMHistAnalysisInputTest);
 DQMHistAnalysisInputTestModule::DQMHistAnalysisInputTestModule()
   : DQMHistAnalysisModule()
 {
-  setDescription("Testing input file functionality for DQMHistAnalysisModules");
+  setDescription("DQM histogram input testing/simulating");
+  // This module CAN NOT be run in parallel!
   addParam("Experiment", m_expno, "Experiment Nr", 26u);
   addParam("Run", m_runno, "Run Number List", 1u);
   addParam("RunType", m_runtype, "Run Type", std::string("physics"));

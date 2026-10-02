@@ -6,15 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TRGGDLDQMANALYSISMODULE_H
-#define TRGGDLDQMANALYSISMODULE_H
-
 #pragma once
-
-#ifdef _BELLE2_EPICS
-// EPICS
-#include <cadef.h>
-#endif
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
@@ -218,4 +210,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

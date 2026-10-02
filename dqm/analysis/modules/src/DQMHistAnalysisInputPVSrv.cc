@@ -18,6 +18,11 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
+#ifdef _BELLE2_EPICS
+#include <cantProceed.h>
+#endif
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -66,6 +71,7 @@ static void accessRightsCallback(struct access_rights_handler_args args)
 
   printChidInfo(ichid, "accessRightsCallback");
 }
+
 static void eventCallback(struct event_handler_args eha)
 {
   chid  ichid = eha.chid;
@@ -86,6 +92,9 @@ static void eventCallback(struct event_handler_args eha)
 DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM histogram analysis example module to read PV arrays into histogram data");
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms in ms", 2000);
   addParam("HistoList", m_histlist, "pvname, histname, histtitle, (bins,min,max[,bins,min,max])");

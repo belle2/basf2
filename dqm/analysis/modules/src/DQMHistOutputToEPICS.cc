@@ -14,7 +14,6 @@
 #include <dqm/analysis/modules/DQMHistOutputToEPICS.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -29,6 +28,7 @@ REG_MODULE(DQMHistOutputToEPICS);
 DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM histogram analysis module for writing out Histogram Content to EPICS Arrays");
   // This module CAN NOT be run in parallel!
 
   //Parameter definition

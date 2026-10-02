@@ -8,7 +8,6 @@
 
 #include <dqm/analysis/modules/DQMHistReferenceModule.h>
 #include <TROOT.h>
-#include <TStyle.h>
 #include <TKey.h>
 
 using namespace std;
@@ -28,11 +27,6 @@ DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
   //Parameter definition
   addParam("ReferenceFile", m_referenceFileName, "Name of the reference histrogram files", string(""));
   B2DEBUG(1, "DQMHistReference: Constructor done.");
-}
-
-void DQMHistReferenceModule::initialize()
-{
-  B2DEBUG(1, "DQMHistReference: initialized.");
 }
 
 void DQMHistReferenceModule::beginRun()
@@ -119,19 +113,3 @@ void DQMHistReferenceModule::loadReferenceHistos()
   refFile->Close();
   delete refFile;
 }
-
-void DQMHistReferenceModule::event()
-{
-  B2DEBUG(1, "DQMHistReference: event called");
-}
-
-void DQMHistReferenceModule::endRun()
-{
-  B2DEBUG(1, "DQMHistReference: endRun called");
-}
-
-void DQMHistReferenceModule::terminate()
-{
-  B2DEBUG(1, "DQMHistReference: terminate called");
-}
-

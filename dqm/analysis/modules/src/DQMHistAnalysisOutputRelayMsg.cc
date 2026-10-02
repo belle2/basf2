@@ -19,7 +19,6 @@
 #include <TMessage.h>
 #include <ctime>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -47,13 +46,6 @@ void DQMHistAnalysisOutputRelayMsgModule::initialize()
   m_sock = new TSocket(m_hostname.c_str(), m_port);
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: initialized.");
 }
-
-
-void DQMHistAnalysisOutputRelayMsgModule::beginRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: beginRun called.");
-}
-
 
 void DQMHistAnalysisOutputRelayMsgModule::event()
 {
@@ -108,12 +100,6 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after sending " << sent_canvases << " of " << seq->GetEntries() << " objects.");
 }
-
-void DQMHistAnalysisOutputRelayMsgModule::endRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: endRun called");
-}
-
 
 void DQMHistAnalysisOutputRelayMsgModule::terminate()
 {

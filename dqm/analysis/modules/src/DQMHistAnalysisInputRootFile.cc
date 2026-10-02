@@ -19,7 +19,6 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string/replace.hpp>
-#include <iostream>
 
 using namespace Belle2;
 
@@ -35,6 +34,9 @@ REG_MODULE(DQMHistAnalysisInputRootFile);
 DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM framework core module for reading histograms from (offline) root file, e.g. for MiraBelle");
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
   addParam("FileList", m_fileList, "List of input files", std::vector<std::string> {"input_histo.root"});
   addParam("SelectHistograms", m_histograms, "List of histogram name patterns, empty for all. Support wildcard matching (* and ?).",

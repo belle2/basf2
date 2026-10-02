@@ -8,17 +8,7 @@
 
 #pragma once
 
-// EPICS
-#ifdef _BELLE2_EPICS
-#include <cadef.h>
-// #include <dbDefs.h>
-// #include <epicsString.h>
-// #include <cantProceed.h>
-#endif
-
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TH1.h>
-#include <TCanvas.h>
 #include <time.h>
 
 namespace Belle2 {

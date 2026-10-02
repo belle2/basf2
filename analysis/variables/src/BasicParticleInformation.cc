@@ -85,7 +85,7 @@ namespace Belle2 {
                       "Returns 1.0 if this particle was created from a ``KLMCluster`` or 0.0 otherwise.");
     REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns 1.0 if this particle was created from a track or 0.0 otherwise.");
     REGISTER_VARIABLE("isFromV0", particleIsFromV0, R"DOC(
-Returns 1.0 if this particle was created from a :ref:`V0 particle <tracking_v0Finding>` or 0.0 otherwise.
+Returns 1.0 if this particle was created from a V0 particle or 0.0 otherwise.
     
 )DOC");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
@@ -98,7 +98,7 @@ The meaning of the values are:
 * 1: created from track
 * 2: created from an ``ECLCluster``
 * 3: created from a ``KLMCluster``
-* 4: reated from a ref:`V0 particle <tracking_v0Finding>`
+* 4: created from a V0 particle
 * 5: MC particle
 * 6: composite particle
 

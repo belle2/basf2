@@ -1353,9 +1353,9 @@ read their definitions below.
 
 .. topic:: In Belle II
 
-    It is calculated as the cluster time minus the `eventT0`. The cluster time is obtained by a fit to 
+    It is calculated as the cluster time minus the event time (``eventT0``). The cluster time is obtained by a fit to 
     the recorded waveform of the highest energy crystal in the cluster. For a cluster produced by a 
-    particle from the IP, the cluster time should be consistent with `eventT0` within the uncertainties 
+    particle from the IP, the cluster time should be consistent with the event time (``eventT0``) within the uncertainties 
     following all calibrations and corrections. For MC, note that the calibrations and corrections are not 
     fully simulated. In order to see if the waveform fit fails, see `clusterHasFailedTiming`.    
 
@@ -1805,22 +1805,22 @@ Returns the ``StoreArray`` index of the cluster mDST object. This can be useful 
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals, R"DOC(
-**[Eventbased]** Returns the number of crystals that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+**[Eventbased]** Returns the number of crystals that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
 7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap, R"DOC(
-**[Eventbased]** Returns the number of crystals in the forward endcap that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+**[Eventbased]** Returns the number of crystals in the forward endcap that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
 7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel, R"DOC(
-**[Eventbased]** Returns the number of crystals in the barrel that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+**[Eventbased]** Returns the number of crystals in the barrel that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
 7 MeV are are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap, R"DOC(
-**[Eventbased]** Returns the number of crystals in the backward endcap that are out of time with the `eventT0` by more than 110.0 ns. Only crystals with an energy greater than 
+**[Eventbased]** Returns the number of crystals in the backward endcap that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
 7 MeV are are counted.  
 )DOC");
 

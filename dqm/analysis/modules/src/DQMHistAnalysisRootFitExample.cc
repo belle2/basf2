@@ -59,7 +59,7 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
 
     //RooDataHist::RooDataHist(const char *name, const char *title, const RooArgList& vars, const TH1* hist, Double_t wgt) :
     x = w->var("x");
-    data = new RooDataHist("data", "dataset with x", *x, (const TH1*) hh1);
+    data = new RooDataHist("data", "dataset with x", *x, hh1);
     plot = x->frame();
     r = model->fitTo(*data);
 

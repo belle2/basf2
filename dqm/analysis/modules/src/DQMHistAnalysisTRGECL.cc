@@ -121,7 +121,7 @@ void DQMHistAnalysisTRGECLModule::endRun()
 void DQMHistAnalysisTRGECLModule::event()
 {
 
-  auto hhh = (TH1F*) findHist("TRGECLEventTiming/h_MaxTCE");
+  auto* hhh = findHist("TRGECLEventTiming/h_MaxTCE");
   if (hhh != nullptr) {
     // calculate fraction of event timing with max TC E threshold
     int n_bin = hhh->GetNbinsX();
@@ -183,6 +183,7 @@ void DQMHistAnalysisTRGECLModule::terminate()
   delete h_EventT0Width;
 }
 
+// cppcheck-suppress constParameterCallback ; the signature is fixed by TF1
 double DQMHistAnalysisTRGECLModule::fGaus(double* x, double* par)
 {
   double yield = par[0];
@@ -191,7 +192,7 @@ double DQMHistAnalysisTRGECLModule::fGaus(double* x, double* par)
   return yield * TMath::Gaus(x[0], mean, sigma);
 }
 
-void DQMHistAnalysisTRGECLModule::getEventT0(std::vector<std::string> s_HistName,
+void DQMHistAnalysisTRGECLModule::getEventT0(const std::vector<std::string>& s_HistName,
                                              TGraphErrors* h_tge_mean,
                                              TGraphErrors* h_tge_width)
 {

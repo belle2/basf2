@@ -38,7 +38,7 @@ DQMHistOutputToEPICSModule::DQMHistOutputToEPICSModule()
 
 void DQMHistOutputToEPICSModule::initialize()
 {
-  for (auto& it : m_histlist) {
+  for (const auto& it : m_histlist) {
     if (it.size() < 2) {
       B2WARNING("Histolist with wrong nr of parameters " << it.size());
       continue;
@@ -67,10 +67,10 @@ void DQMHistOutputToEPICSModule::cleanPVs(void)
     int length = int(ca_element_count(it->mychid));
     if (length > 0) {
       it->data.resize(length, 0.0);
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)(it->data.data())), "ca_put failure");
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, it->data.data()), "ca_put failure");
       if (it->mychid_last) {
         if (length == int(ca_element_count(it->mychid_last))) {
-          SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, (void*)(it->data.data())), "ca_put failure");
+          SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, it->data.data()), "ca_put failure");
         }
       }
     }
@@ -113,7 +113,7 @@ void DQMHistOutputToEPICSModule::event()
         }
       }
 
-      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, (void*)it->data.data()), "ca_set failure");
+      SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid, it->data.data()), "ca_set failure");
     }
   }
 #endif
@@ -128,7 +128,7 @@ void DQMHistOutputToEPICSModule::copyToLast(void)
       // copy PVs to last-run-PV if existing
       int length = it->data.size();
       if (length > 0 && length == int(ca_element_count(it->mychid_last))) {
-        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, (void*)it->data.data()), "ca_put failure");
+        SEVCHK(ca_array_put(DBR_DOUBLE, length, it->mychid_last, it->data.data()), "ca_put failure");
       }
     }
   }

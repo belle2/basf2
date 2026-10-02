@@ -81,7 +81,7 @@ void DQMHistAnalysisKLMMonObjModule::CalculateKLMHitRate(auto* hist, int layerGl
   int nBinsX = hist->GetNbinsX();
   int nBinsY = hist->GetNbinsY();
 
-  if (layerGlobalBin > 0 && layerGlobalBin <= nBinsX) {
+  if (layerGlobalBin <= nBinsX) {
     for (int binY = 1; binY <= nBinsY; binY++) {
       Double_t binContent = hist->GetBinContent(layerGlobalBin, binY);
       numDigits += binContent;
@@ -118,9 +118,9 @@ void DQMHistAnalysisKLMMonObjModule::endRun()
   //   - Layers 3-15: RPC
 
   std::string histPrefix = "/bklm_plane_trg_occupancy";
-  TH2F* bklm_trg[2];
+  TH2* bklm_trg[2];
   for (size_t i = 0; i < 2; i++) {
-    bklm_trg[i] = (TH2F*)findHist(m_histogramDirectoryName + histPrefix + "_" + m_tag[i]);
+    bklm_trg[i] = dynamic_cast<TH2*>(findHist(m_histogramDirectoryName + histPrefix + "_" + m_tag[i]));
   }
 
   auto* background_trigger_count = findHist("KLM/event_background_trigger_summary");

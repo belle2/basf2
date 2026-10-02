@@ -56,7 +56,7 @@ namespace Belle2 {
 
     //! if new variables is added to run summary TTree this files
     // missing (previous) entries in the TTree (with the value from the first run)
-    void fillBranch(TBranch* br);
+    static void fillBranch(TBranch* br);
 
     // Data members
   private:

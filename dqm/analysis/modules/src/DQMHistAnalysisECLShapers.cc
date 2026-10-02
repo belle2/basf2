@@ -13,7 +13,7 @@
 #include <TProfile.h>
 
 //boost
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 //std
 #include <numeric>
@@ -65,7 +65,7 @@ void DQMHistAnalysisECLShapersModule::beginRun()
 void DQMHistAnalysisECLShapersModule::event()
 {
   TH1* h_fail_crateid  = findHist("ECL/fail_crateid");
-  TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
+  auto* h_pedrms_cellid = dynamic_cast<TProfile*>(findHist("ECL/pedrms_cellid"));
 
   if (h_pedrms_cellid != NULL) {
     double pedwidth_sum = 0;
@@ -146,7 +146,7 @@ void DQMHistAnalysisECLShapersModule::endRun()
   //= Set the contents of ECL monitoring object
   m_c_main->Clear(); // clear existing content
 
-  TProfile* h_pedrms_cellid = (TProfile*)findHist("ECL/pedrms_cellid");
+  auto* h_pedrms_cellid = dynamic_cast<TProfile*>(findHist("ECL/pedrms_cellid"));
   if (h_pedrms_cellid == nullptr) {
     m_monObj->setVariable("comment", "No ECL pedestal width histograms available");
     B2INFO("Histogram named ECL/pedrms_cellid is not found.");
@@ -169,7 +169,7 @@ void DQMHistAnalysisECLShapersModule::endRun()
 }
 
 
-double DQMHistAnalysisECLShapersModule::robust_max(std::multiset<double> values)
+double DQMHistAnalysisECLShapersModule::robust_max(const std::multiset<double>& values)
 {
   int len = values.size();
   if (len < 10) {

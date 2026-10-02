@@ -13,7 +13,7 @@
 
 #ifdef _BELLE2_EPICS
 // EPICS
-#include "cadef.h"
+#include <cadef.h>
 #endif
 
 //DQM
@@ -93,9 +93,9 @@ namespace Belle2 {
       "mumutight"
     }; /**<name of HLT skims*/
 
-    TH1D* m_h_psn_extra[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
-    TH1D* m_h_psn_extra_fast[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
-    TH1D* m_h_psn_pure_extra = nullptr;   /**<DQM Histogram for PSN bits with offline selection*/
+    TH1* m_h_psn_extra[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
+    TH1* m_h_psn_extra_fast[nskim_gdldqm] = {}; /**<DQM Histogram for PSN bits in each HLT skim*/
+    TH1* m_h_psn_pure_extra = nullptr;   /**<DQM Histogram for PSN bits with offline selection*/
     TCanvas* m_c_eff[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
     TCanvas* m_c_eff_fast[nskim_gdldqm] = {}; /**<Canvas for TRGGDL efficiency in each HLT skim*/
     TH1D* m_h_eff[nskim_gdldqm] = {};   /**<Histogram for TRGGDL efficiency in each HLT skim*/
@@ -204,7 +204,7 @@ namespace Belle2 {
     std::vector<std::string> m_temp_pvnames; /**<Names of PVs for the efficiencies monitored by shifters*/
 
     /** Run type flag for physics runs. */
-    bool m_IsPhysicsRun;
+    bool m_IsPhysicsRun = false;
 
     //mirabelle
     Belle2::MonitoringObject* m_mon_h_eff_shifter_fast = nullptr; /**< Mirabelle, MonitoringObject for m_h_eff_shifter_fast */

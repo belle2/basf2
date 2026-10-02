@@ -73,9 +73,9 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
   B2INFO("[" << mbstr << "] before sending " << seq->GetEntries() << " objects.");
   bool first_try = true;
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
-      TCanvas* c = (TCanvas*) obj;
+      auto* c = dynamic_cast<TCanvas*>(obj);
       auto process_canvas = m_canvasSendDefault;
 
       auto it = clist.find(c->GetName());

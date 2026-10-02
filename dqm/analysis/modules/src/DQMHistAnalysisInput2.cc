@@ -61,7 +61,7 @@ void DQMHistAnalysisInput2Module::beginRun()
   m_lasttime -= std::chrono::seconds(1); // just change
 }
 
-void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& inputHistList, std::string dirname, TKey* key)
+void DQMHistAnalysisInput2Module::addToHistList(std::vector<TH1*>& inputHistList, const std::string& dirname, TKey* key)
 {
   auto h = dynamic_cast<TH1*>(key->ReadObj());
   if (h == nullptr) return; // would be strange, but better check
@@ -160,7 +160,7 @@ void DQMHistAnalysisInput2Module::event()
   while (auto key = dynamic_cast<TKey*>(next())) {
     TClass* cl = gROOT->GetClass(key->GetClassName());
     if (cl->InheritsFrom("TDirectory")) {
-      TDirectory* d = (TDirectory*)key->ReadObj();
+      TDirectory* d = static_cast<TDirectory*>(key->ReadObj());
       std::string dirname = d->GetName();
 
       d->cd();

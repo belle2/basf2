@@ -9,7 +9,7 @@
 #pragma once
 
 #ifdef _BELLE2_EPICS
-#include "cadef.h"
+#include <cadef.h>
 #endif
 
 #include <dqm/core/DQMHistAnalysis.h>

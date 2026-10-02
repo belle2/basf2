@@ -155,8 +155,8 @@ void DQMHistAnalysisTRGEFFModule::event()
     const std::string& xtitle   = std::get<4>(entry);   // Get the histogram X-title
 
     B2DEBUG(1, "The current histogram name is   " << name);  // Debug print
-    TH1F* hist = (TH1F*)findHist(name);
-    TH1F* histFtdf = (TH1F*)findHist(name + "_ftdf");
+    TH1* hist = findHist(name);
+    TH1* histFtdf = findHist(name + "_ftdf");
     if (hist == nullptr || histFtdf == nullptr) {
       B2WARNING("Histogram for " + name + " or its Ftdf counterpart is not found.");
       return;
@@ -229,8 +229,10 @@ void DQMHistAnalysisTRGEFFModule::endRun()
       /***********************************************************
        *     rebin the histogram for MonitoringObject            *
        ***********************************************************/
-      TH1F* hist     = (TH1F*)effHist->GetTotalHistogram();
-      TH1F* histFtdf = (TH1F*)effHist->GetPassedHistogram();
+      // TEfficiency hands out const histograms, but Rebin() below is a non-const method:
+      // it does not modify the original histogram, since a new name is passed to it.
+      TH1* hist     = const_cast<TH1*>(effHist->GetTotalHistogram());
+      TH1* histFtdf = const_cast<TH1*>(effHist->GetPassedHistogram());
 
       if (!hist) {
         B2WARNING(std::string("DQMHistAnalysisTRGEFF: Failed to get total histogram"));
@@ -273,8 +275,8 @@ void DQMHistAnalysisTRGEFFModule::endRun()
       TEfficiency* efficiencyRebinnedPtr = nullptr;
 
       // rebin the found histograms
-      TH1F* histRebinned     = (TH1F*)hist->Rebin(nBins, (name + "_rebinned").c_str(), newBins);
-      TH1F* histFtdfRebinned = (TH1F*)histFtdf->Rebin(nBins, (name + "_ftdf_rebinned").c_str(), newBins);
+      TH1* histRebinned     = hist->Rebin(nBins, (name + "_rebinned").c_str(), newBins);
+      TH1* histFtdfRebinned = histFtdf->Rebin(nBins, (name + "_ftdf_rebinned").c_str(), newBins);
 
       // delete the allocated memory
       delete[] newBins;

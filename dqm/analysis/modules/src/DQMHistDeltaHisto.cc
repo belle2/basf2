@@ -40,7 +40,7 @@ void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
   B2DEBUG(20, "DQMHistDeltaHisto: initialized.");
-  for (auto& histoname : m_monitoredHistos) {
+  for (const auto& histoname : m_monitoredHistos) {
     queue<SSNODE*> hq;
     m_histosQueues[histoname] = hq;
   }

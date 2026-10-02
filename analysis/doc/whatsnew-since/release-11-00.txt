@@ -16,6 +16,11 @@ Variables
 +++++++++
 * Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
 
+Modules and Modular Analysis
+++++++++++++++++++++++++++++
+* Deprecated the ``Pi0VetoEfficiencySystematics`` module and `modularAnalysis.addPi0VetoEfficiencySystematics`, which will be removed in February 2027. The pi0 veto Data/MC efficiency weights can be obtained with the generic `ParticleWeighting` module. See the documentation of `modularAnalysis.addPi0VetoEfficiencySystematics` for details.
+* `ParticleWeighting` no longer throws an exception when ``selectedDaughters`` is used and the same daughter is shared by several candidates of the input list.
+
 Changes in the analysis package in light-2607-kasei
 ---------------------------------------------------
 

@@ -100,7 +100,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     auto layer = (((id >> 5) & 0x1) + 1);
     auto ladder = ((id >> 1) & 0xF);
     auto sensor = ((id & 0x1) + 1);
-    std::string s2 = format("_{}.{}.{}", layer, ladder, sensor);
+    std::string s2 = std::format("_{}.{}.{}", layer, ladder, sensor);
 
     m_hSignalAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
     m_hCommonAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
@@ -187,7 +187,7 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        std::string s2 = format("_{}.{}.{}_{}_{}", layer, ladder, sensor, j, k);
+        std::string s2 = std::format("_{}.{}.{}_{}_{}", layer, ladder, sensor, j, k);
         {
           std::string name = "hrawPxdHitsCharge" + s2;
           if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {

@@ -1,6 +1,6 @@
-# EventType: 2123032100
-# Descriptor: [ccbar DpToKSKpi0_BESIII_Isobar_model]
-# NickName: DpToKSKpi0_BESIII_Isobar_model
+# EventType: 2113032101
+# Descriptor: [ccbar DmToKSKpi0_BESIII_Isobar_model]
+# NickName: DmToKSKpi0_BESIII_Isobar_model
 # PhysicsWG: Charm
 # Responsible: Roman Sultanov
 # Email: roman.sultanov@physics.uu.se
@@ -15,8 +15,8 @@ Enddecay
 Alias Mypi0 pi0
 Alias MyK_S0 K_S0
 
-Decay D+
-1.000 MyK_S0 K+ Mypi0           DToKSKpi0;
+Decay D-
+1.000 MyK_S0 K- Mypi0           DToKSKpi0;
 Enddecay
 
 Decay MyK_S0

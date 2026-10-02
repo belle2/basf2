@@ -1,6 +1,6 @@
-# EventType: 2323030000
-# Descriptor: [ccbar DspToKKpi_BESIII_Isobar_model]
-# NickName: DspToKKpi_BESIII_Isobar_model
+# EventType: 2313030010
+# Descriptor: [ccbar DspToKpipi_BESIII_Isobar_model]
+# NickName: DspToKpipi_BESIII_Isobar_model
 # PhysicsWG: Charm
 # Responsible: Roman Sultanov
 # Email: roman.sultanov@physics.uu.se
@@ -13,7 +13,7 @@ Decay vpho
 Enddecay
 
 Decay D_s+
-1.000 K- K+ pi+             DsToKKpi;
+1.000 K- pi+ pi+            DsToKpipi;
 Enddecay
 
 End

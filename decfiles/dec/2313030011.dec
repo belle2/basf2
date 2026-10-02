@@ -1,6 +1,6 @@
-# EventType: 2323030010
-# Descriptor: [ccbar DspToKpipi_BESIII_Isobar_model]
-# NickName: DspToKpipi_BESIII_Isobar_model
+# EventType: 2313030011
+# Descriptor: [ccbar DsmToKpipi_BESIII_Isobar_model]
+# NickName: DsmToKpipi_BESIII_Isobar_model
 # PhysicsWG: Charm
 # Responsible: Roman Sultanov
 # Email: roman.sultanov@physics.uu.se
@@ -12,8 +12,8 @@ Decay vpho
 1.000 c anti-c              PYTHIA 91;
 Enddecay
 
-Decay D_s+
-1.000 K- pi+ pi+            DsToKpipi;
+Decay D_s-
+1.000 K+ pi- pi-            DsToKpipi;
 Enddecay
 
 End

@@ -85,27 +85,22 @@ namespace Belle2 {
                       "Returns 1.0 if this particle was created from a ``KLMCluster`` or 0.0 otherwise.");
     REGISTER_VARIABLE("isFromTrack", particleIsFromTrack, "Returns 1.0 if this particle was created from a track or 0.0 otherwise.");
     REGISTER_VARIABLE("isFromV0", particleIsFromV0, R"DOC(
-
-.. only:: not light
-
-    Returns 1.0 if this particle was created from a :ref:`V0 particle <tracking_v0Finding>` or 0.0 otherwise.
+Returns 1.0 if this particle was created from a :ref:`V0 particle <tracking_v0Finding>` or 0.0 otherwise.
     
 )DOC");
     REGISTER_VARIABLE("particleSource", particleSource, R"DOC(
 
-.. only:: not light
+Returns the mDST source use to create the particle. 
 
-    Returns the mDST source use to create the particle. 
+The meaning of the values are:
 
-    The meaning of the values are:
-
-    * 0: undefined
-    * 1: created from track
-    * 2: created from an ``ECLCluster``
-    * 3: created from a ``KLMCluster``
-    * 4: reated from a ref:`V0 particle <tracking_v0Finding>`
-    * 5: MC particle
-    * 6: composite particle
+* 0: undefined
+* 1: created from track
+* 2: created from an ``ECLCluster``
+* 3: created from a ``KLMCluster``
+* 4: reated from a ref:`V0 particle <tracking_v0Finding>`
+* 5: MC particle
+* 6: composite particle
 
 )DOC");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex, R"DOC(

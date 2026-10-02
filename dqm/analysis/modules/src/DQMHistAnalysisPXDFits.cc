@@ -16,7 +16,6 @@
 
 #include <boost/format.hpp>
 
-using namespace std;
 using namespace Belle2;
 
 using boost::format;
@@ -103,7 +102,7 @@ void DQMHistAnalysisPXDFitsModule::initialize()
     auto layer = (((id >> 5) & 0x1) + 1);
     auto ladder = ((id >> 1) & 0xF);
     auto sensor = ((id & 0x1) + 1);
-    string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
+    std::string s2 = str(format("_%d.%d.%d") % layer % ladder % sensor);
 
     m_hSignalAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
     m_hCommonAll->GetXaxis()->SetBinLabel(i + 1, TString(s2));
@@ -192,16 +191,10 @@ void DQMHistAnalysisPXDFitsModule::event()
 
     for (auto j = 0; j < 6; j++) {
       for (auto k = 0; k < 4; k++) {
-        //TH1* hh1 = NULL;
-        string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
-
-        std::string name = "hrawPxdHitsCharge" + s2;
-        TH1* hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
-
-        if (hh1 != NULL) {
+        std::string s2 = str(format("_%d.%d.%d_%d_%d") % layer % ladder % sensor % j % k);
+        {
+          std::string name = "hrawPxdHitsCharge" + s2;
+          if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fLandau->SetParameter(0, 1000);
 //           m_fLandau->SetParameter(1, 0);
@@ -209,19 +202,15 @@ void DQMHistAnalysisPXDFitsModule::event()
 //           hh1->Fit(m_fLandau, "0");
 //           m_hSignal[i]->Fill(j, k, m_fLandau->GetParameter(1));
 //           cout << m_fLandau->GetParameter(0) << " " << m_fLandau->GetParameter(1) << " " << m_fLandau->GetParameter(2) << endl;
-          m_hSignal[i]->Fill(j, k, hh1->GetMean());
-          m_hSignalAll->Fill(i, hh1->GetMean());
-        } else {
-          B2INFO("Histo " << name << " not found");
+            m_hSignal[i]->Fill(j, k, hh1->GetMean());
+            m_hSignalAll->Fill(i, hh1->GetMean());
+          } else {
+            B2INFO("Histo " << name << " not found");
+          }
         }
-
-        name = "hrawPxdHitsCommonMode" + s2;
-        hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
-
-        if (hh1 != NULL) {
+        {
+          std::string name = "hrawPxdHitsCommonMode" + s2;
+          if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 10);
@@ -229,19 +218,15 @@ void DQMHistAnalysisPXDFitsModule::event()
 //           hh1->Fit(m_fGaus, "0");
 //           m_hCommon[i]->Fill(j, k, m_fGaus->GetParameter(1));
 //           cout << m_fGaus->GetParameter(0) << " " << m_fGaus->GetParameter(1) << " " << m_fGaus->GetParameter(2) << endl;
-          m_hCommon[i]->Fill(j, k, hh1->GetMean());
-          m_hCommonAll->Fill(i, hh1->GetMean());
-        } else {
-          B2INFO("Histo " << name << " not found");
+            m_hCommon[i]->Fill(j, k, hh1->GetMean());
+            m_hCommonAll->Fill(i, hh1->GetMean());
+          } else {
+            B2INFO("Histo " << name << " not found");
+          }
         }
-
-        name = "hrawPxdCount" + s2;
-        hh1 = findHist(name);
-        if (hh1 == NULL) {
-          hh1 = findHist(m_histogramDirectoryName, name);
-        }
-
-        if (hh1 != NULL) {
+        {
+          std::string name = "hrawPxdCount" + s2;
+          if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //           cout << "do da fit " << endl;
 //           m_fGaus->SetParameter(0, 1000);
 //           m_fGaus->SetParameter(1, 100);
@@ -249,12 +234,14 @@ void DQMHistAnalysisPXDFitsModule::event()
 //           hh1->Fit(m_fGaus, "0");
 //           m_hCounts[i]->Fill(j, k, m_fGaus->GetParameter(1));
 //           cout << m_fGaus->GetParameter(0) << " " << m_fGaus->GetParameter(1) << " " << m_fGaus->GetParameter(2) << endl;
-          m_hCounts[i]->Fill(j, k, hh1->GetMean());
-          m_hCountsAll->Fill(i, hh1->GetMean());
-          m_hOccupancyAll->Fill(i, hh1->GetMean() / (250 * 768 / 24)); // Occupancy in percent
-        } else {
-          B2INFO("Histo " << name << " not found");
+            m_hCounts[i]->Fill(j, k, hh1->GetMean());
+            m_hCountsAll->Fill(i, hh1->GetMean());
+            m_hOccupancyAll->Fill(i, hh1->GetMean() / (250 * 768 / 24)); // Occupancy in percent
+          } else {
+            B2INFO("Histo " << name << " not found");
+          }
         }
+
       }
     }
     if (m_cSignal[i]) {

@@ -13,11 +13,16 @@
 
 using namespace Belle2;
 
+bool PathUtils::isWorthParallelising(const Path& path)
+{
+  for (const ModulePtr& module : path.getModules()) {
+    if (not module->hasProperties(Module::c_NoParallelWork)) return true;
+  }
+  return false;
+}
+
 std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 {
-  //modules that can be parallelized, but should not go into a parallel section by themselves
-  std::set<std::string> uselessParallelModules({"HistoManager", "Gearbox", "Geometry"});
-
   PathPtr inputPath(new Path);
   PathPtr mainPath(new Path);
   PathPtr outputPath(new Path);
@@ -41,14 +46,7 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
       stage++;
 
       if (stage == 2) {
-        bool path_is_useful = false;
-        for (const auto& parallelModule : mainPath->getModules()) {
-          if (uselessParallelModules.count(parallelModule->getType()) == 0) {
-            path_is_useful = true;
-            break;
-          }
-        }
-        if (not path_is_useful) {
+        if (not isWorthParallelising(*mainPath)) {
           //merge mainPath back into input path
           inputPath->addPath(mainPath);
           mainPath.reset(new Path);

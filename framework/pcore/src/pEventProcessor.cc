@@ -13,6 +13,7 @@
 #include <framework/pcore/TxModule.h>
 #include <framework/pcore/DataStoreStreamer.h>
 #include <framework/pcore/RbTuple.h>
+#include <framework/pcore/PathUtils.h>
 
 #include <framework/core/ModuleManager.h>
 #include <framework/core/Environment.h>
@@ -295,8 +296,8 @@ void pEventProcessor::process(const PathPtr& spath, long maxEvent)
 
 void pEventProcessor::analyzePath(const PathPtr& path)
 {
-  //modules that can be parallelised, but should not go into a parallel section by themselves
-  std::set<std::string> uselessParallelModules({"HistoManager", "Gearbox", "Geometry"});
+  //NOTE: PathUtils::splitPath() is a copy of this function, used by the ZMQ processor. The two
+  //share PathUtils::isWorthParallelising() but nothing else; keep them in sync.
 
   PathPtr inpath(new Path);
   PathPtr mainpath(new Path);
@@ -319,14 +320,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       stage++;
 
       if (stage == 2) {
-        bool path_is_useful = false;
-        for (const auto& parallelModule : mainpath->getModules()) {
-          if (uselessParallelModules.count(parallelModule->getType()) == 0) {
-            path_is_useful = true;
-            break;
-          }
-        }
-        if (not path_is_useful) {
+        if (not PathUtils::isWorthParallelising(*mainpath)) {
           //merge mainpath back into input path
           inpath->addPath(mainpath);
           mainpath.reset(new Path);

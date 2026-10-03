@@ -72,6 +72,7 @@ void RxModule::initialize()
   gSystem->Load("libdataobjects");
 
   // Start small and non-empty; readEvent() grows it to whatever the records need.
+  // 4096 words -> 16 kB
   m_evtbuf.resize(4096);
 
   m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);

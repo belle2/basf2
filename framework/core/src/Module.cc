@@ -369,6 +369,10 @@ void Module::exposePythonAPI()
 .. attribute:: TERMINATEINALLPROCESSES
 
   When using parallel processing, call this module's terminate() function in all processes. This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process.
+
+.. attribute:: NOPARALLELWORK
+
+  This module does no per-event work that is worth running in parallel, for example because it only sets something up. It can still be parallel processing certified: the flag only says that a parallel section consisting of nothing but such modules is not worth creating, so it is merged back into the input path and the search for a parallel section continues after it.
 )")
   .value("INPUT", Module::EModulePropFlags::c_Input)
   .value("OUTPUT", Module::EModulePropFlags::c_Output)
@@ -376,6 +380,7 @@ void Module::exposePythonAPI()
   .value("HISTOGRAMMANAGER", Module::EModulePropFlags::c_HistogramManager)
   .value("INTERNALSERIALIZER", Module::EModulePropFlags::c_InternalSerializer)
   .value("TERMINATEINALLPROCESSES", Module::EModulePropFlags::c_TerminateInAllProcesses)
+  .value("NOPARALLELWORK", Module::EModulePropFlags::c_NoParallelWork)
   ;
 
   //Python class definition

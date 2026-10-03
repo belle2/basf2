@@ -78,6 +78,7 @@ namespace Belle2 {
       c_InternalSerializer          = 16,  /**< This module is an internal serializer/deserializer for parallel processing */
       c_TerminateInAllProcesses     = 32,  /**< When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process. */
       c_DontCollectStatistics       = 64,  /**< No statistics is collected for this module. */
+      c_NoParallelWork              = 128, /**< This module does no per-event work that is worth running in parallel. A parallel section made up only of such modules is merged back into the input path, so that a single uncertified module in between does not prevent the modules after it from being parallelised. */
     };
 
     /// Forward the EAfterConditionPath definition from the ModuleCondition.

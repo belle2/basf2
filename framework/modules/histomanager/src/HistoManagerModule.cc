@@ -29,7 +29,7 @@ HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleM
 {
   // Module description
   setDescription("Manage histograms/Ntuples/TTrees for modules inheriting from the HistoModule class. See https://xwiki.desy.de/xwiki/rest/p/297bb for details.");
-  setPropertyFlags(Module::c_HistogramManager);
+  setPropertyFlags(Module::c_HistogramManager | Module::c_NoParallelWork);
 
   // Parameters
   addParam("histoFileName", m_histoFileName, "Name of histogram output file.", string("histofile.root"));

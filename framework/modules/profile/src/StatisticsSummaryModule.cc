@@ -22,7 +22,7 @@ StatisticsSummaryModule::StatisticsSummaryModule() : Module(), m_processStatisti
 {
   // Set module description
   setDescription("Sums up the statistics of preceding modules. All modules until the first module or another StatisticsSummary module in the module statistics are included.");
-  setPropertyFlags(c_ParallelProcessingCertified | c_DontCollectStatistics);
+  setPropertyFlags(c_ParallelProcessingCertified | c_DontCollectStatistics | c_NoParallelWork);
 }
 
 void StatisticsSummaryModule::initialize()

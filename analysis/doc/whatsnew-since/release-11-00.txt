@@ -1,11 +1,15 @@
 Changes in the analysis package in light-2609-luna
 --------------------------------------------------
 
+ModeSelector
+++++++++++++
+* Added `ModeSelector`, an event-level classifier on top of the hadronic FEI. It uses all FEI :math:`B` candidates of an event together to predict the :math:`B` type and the decay mode of the tag :math:`B`, which mainly reduces :math:`B^0` / :math:`B^+` crossfeed.
+* Its models are taken from a performance globaltag instead of the analysis globaltag. The payload names carry no campaign or training version, so the training is selected by the globaltag alone. See :ref:`mva_contract_version` for the contract version scheme.
+
 FlavorTagger
 ++++++++++++
 * TFlaT: fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
 * Category-based: the ``FANN``-based combination method (``FANN_qrCombined``) is no longer available, as basf2 no longer supports ``FANN``. The only available combination method is the ``FastBDT``-based one (``FBDT_qrCombined``). This change does not affect GFlaT or TFlaT.
-
 
 sysvar (former pidvar)
 ++++++++++++++++++++++
@@ -14,6 +18,7 @@ sysvar (former pidvar)
 
 Variables
 +++++++++
+* Added :b2:var:`nParticlesInCone` to count Track, ECLCluster and KLMCluster particles within a cone.
 * Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
 * Improved documentation for the Helicity, FEI, Basic Particle Information variable groups
 * Removed the Calibration variable group from the analysis package
@@ -35,7 +40,6 @@ Modules and Modular Analysis
 Variables
 +++++++++
 * Added metavariable `varForNthDaughterOfType`, which searches a given number of daughter generations of the given particle for the nth particle of the given type and, if such a particle exists, returns the given variable for it, otherwise NaN.
-* Added :b2:var:`nParticlesInCone` to count Track, ECLCluster and KLMCluster particles within a cone.
 
 Command line tools
 ++++++++++++++++++

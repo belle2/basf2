@@ -73,7 +73,11 @@ namespace Belle2 {
             weightedRelations.emplace_back(from, weight, to);
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
-              B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
+              // Only issue warning about skipping the event if AObject is not from HoughTracking
+              // as in HoughTracking only a single track candidate is skipped, not the processing of the whole event
+              if (not std::is_base_of<AObject, vxdHoughTracking::VXDHoughState>::value) {
+                B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
+              }
               // Constructing a StoreObjPtr on every iteration of an hot loop is not cheap:
               // let's do it only if we need to set an AbortionFlag.
               StoreObjPtr<EventLevelTrackingInfo> eventLevelTrackingInfo;

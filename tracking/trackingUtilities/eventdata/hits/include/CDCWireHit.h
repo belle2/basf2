@@ -316,8 +316,8 @@ namespace Belle2 {
       /// Memory for the CDCWire pointer - Trailing comment indicates to not stream this member
       mutable CDC::CDCWire const* m_wire = nullptr; //!
 
-      /// Memory for the CDCHit pointer - not streamed (ROOT would deep-copy the pointee and
-      /// leak it on reading); m_iHit carries the link instead.
+      /// Memory for the CDCHit pointer - not streamed (ROOT would deep-copy the pointed object
+      /// and leak it on reading); m_iHit carries the CDCHit index instead.
       const CDCHit* m_hit = nullptr; //!
 
       /// Index of the CDCHit in its StoreArray, so the link survives serialisation.

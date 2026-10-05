@@ -276,7 +276,8 @@ namespace Belle2 {
 
     private:
       /// Memory for the reference to the assiziated wire hit - not streamed (ROOT would
-      /// deep-copy the pointee and leak it on reading); m_iHit carries the link instead.
+      /// deep-copy the pointed object and leak it on reading); m_iHit carries the CDCWireHit
+      // index instead.
       const CDCWireHit* m_wireHit = nullptr; //!
 
       /// Index of the underlying CDCHit in its StoreArray, so the link survives serialisation.

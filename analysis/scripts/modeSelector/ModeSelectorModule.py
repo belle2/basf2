@@ -827,8 +827,11 @@ class ModeSelectorModule(b2.Module):
         Compute the per-event training scalar fields written to EventExtraInfo.
 
         best_bp_iid/best_bp_dp/best_b0_iid/best_b0_dp come from the truth-tag-matched
-        particle_by_input_id scan already performed in event(); everything else is
-        derived from the best-B+/best-B0 MC truth scalars for this event.
+        particle_by_input_id scan already performed in event() and are only stored for
+        the labels; everything else is derived from the best-B+/best-B0 MC truth scalars
+        for this event. In particular, the FEI calibration weight is defined for the
+        highest-sigProb candidate, so its DeltaP requirement uses that candidate's own
+        DeltaP, as at inference in _compute_fei_calib_weight().
         """
         bp_pdg = bp_truth['pdg']
         b0_pdg = b0_truth['pdg']
@@ -874,7 +877,7 @@ class ModeSelectorModule(b2.Module):
 
         use_bp = bp_is_best == 1
         tag_is_gen_ev = bp_tag_is_gen if use_bp else b0_tag_is_gen
-        best_dp_ev = best_bp_dp if use_bp else best_b0_dp
+        best_dp_ev = bp_truth['dp'] if use_bp else b0_truth['dp']
         sigprob_iid_ev = best_bp_sigprob_iid if use_bp else best_b0_sigprob_iid
         bb_mask_ev = is_cont != 1
         use_reco_ev = (tag_is_gen_ev == 1) and (best_dp_ev < config.DELTA_P_THRESH) and (sigprob_iid_ev >= 0)

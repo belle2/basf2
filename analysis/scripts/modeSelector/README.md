@@ -661,9 +661,11 @@ ReLU activations, Xavier initialization (gain=0.5, bias=0.01).
   downscale applied on top; in standard usage it is left at 1.0.
 - Optimiser: AdamW, `CosineAnnealingLR`, gradient clipping at norm 1.0
 - Early stopping: patience 5 epochs on validation loss
-- **Per-event FEI calibration weights** are applied to the loss. Derived from
-  the overall highest-sigProb candidate:
-  - **Reco path** (when `tag_is_gen == 1` and `DeltaP < DELTA_P_THRESH`):
+- **Per-event FEI calibration weights** are applied to the loss. They are computed by
+  `ModeSelectorModule` when the training inputs are produced (`fei_calib_weight`) and
+  used as stored by `train.py`. Derived from the overall highest-sigProb candidate:
+  - **Reco path** (when that candidate has `tag_is_gen == 1` and its own
+    `DeltaP < DELTA_P_THRESH`):
     weight looked up by reconstructed dmID: `input_id // 2` for B+,
     `(input_id - N_BP_MODES*2) // 2` for B0 (see input_id encoding above)
   - **Gen path** (fallback): uses `genDecayModeID`; 999 falls back

@@ -453,8 +453,8 @@ def load_and_sample_data(input_files, fraction=1.0, cont_fraction=1.0,
         calib_inputs (tuple): (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
             bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w) -- per-event arrays for FEI
             calibration weight computation. bp/b0_gen_dm_id are int16 with sentinel -1
-            (missing) or 999 (rest calibration). stored_fei_calib_w is the pre-computed
-            event-level weight from the ROOT file, used to verify recomputed weights in
+            (missing) or 999 (rest calibration). stored_fei_calib_w is the event-level
+            weight computed by ModeSelectorModule and used as the training weight in
             compute_event_weights. bp/b0_gen_calib_w are float32 stored calibration weights
             from generatedDecayWeights.
     """
@@ -1186,143 +1186,44 @@ def build_category_labels(is_cont, gen_pdg):
     ).astype(np.int64)
 
 
-def compute_event_weights(event_scalars, mc_truth_cand, calib_inputs,
-                          delta_p_thresh=config.DELTA_P_THRESH):
+def compute_event_weights(event_scalars, calib_inputs):
     """
-    Compute per-event FEI calibration weights for the training loss.
+    Return the per-event FEI calibration weights for the training loss.
 
-    Uses the calibration weight for the highest-sigProb candidate's decay mode
-    when that candidate has a truth-compatible tag PDG and DeltaP below
-    delta_p_thresh; falls back to the generated decay mode weight otherwise.
-    Continuum events always receive weight config.FEI_CALIB_CONT.
+    The weights are computed by ModeSelectorModule when the training inputs are produced
+    and stored as fei_calib_weight: the calibration weight for the highest-sigProb
+    candidate's decay mode when that candidate has a truth-compatible tag PDG and its own
+    DeltaP is below config.DELTA_P_THRESH, the generated decay mode weight otherwise, and
+    config.FEI_CALIB_CONT for continuum.
 
     Parameters:
         event_scalars (tuple): From load_and_sample_data: (is_cont, gen_pdg, bp_is_best,
             best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid).
-        mc_truth_cand (tuple): From load_and_sample_data: (best_bp_iid, best_bp_dp,
-            best_b0_iid, best_b0_dp).
         calib_inputs (tuple): From load_and_sample_data: (bp_tag_is_gen, b0_tag_is_gen,
             bp_gen_dm_id, b0_gen_dm_id, bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w).
-        delta_p_thresh (float): DeltaP threshold for tag quality (default: config.DELTA_P_THRESH).
 
     Returns:
         ndarray of float32: Per-event FEI calibration weights, shape (n_events,).
     """
-    is_cont, gen_pdg, bp_is_best, _, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
-    _, best_bp_dp, _, best_b0_dp = mc_truth_cand
-    (bp_tag_is_gen, b0_tag_is_gen, bp_gen_dm_id, b0_gen_dm_id,
-     bp_gen_calib_w, b0_gen_calib_w, stored_fei_calib_w) = calib_inputs
+    is_cont = event_scalars[0]
+    weights = np.asarray(calib_inputs[-1], dtype=np.float32)
 
-    # Build per-sector lookup arrays (index = dmID, value = calibration weight)
-    bp_calib_map = config.get_fei_calibration_map(521)
-    bp_calib_rest = config.get_fei_calibration_rest(521)
-    bp_lookup = np.full(config.N_BP_MODES, bp_calib_rest, dtype=np.float32)
-    for dm, w in bp_calib_map.items():
-        if 0 <= dm < config.N_BP_MODES:
-            bp_lookup[dm] = w
-
-    b0_calib_map = config.get_fei_calibration_map(511)
-    b0_calib_rest = config.get_fei_calibration_rest(511)
-    b0_lookup = np.full(config.N_B0_MODES, b0_calib_rest, dtype=np.float32)
-    for dm, w in b0_calib_map.items():
-        if 0 <= dm < config.N_B0_MODES:
-            b0_lookup[dm] = w
-
-    # Determine primary sector per event (sector with overall best sigProb candidate)
-    use_bp = (bp_is_best == 1)
-    tag_is_gen = np.where(use_bp, bp_tag_is_gen.astype(np.int8),
-                          b0_tag_is_gen.astype(np.int8))
-    best_dp = np.where(use_bp, best_bp_dp, best_b0_dp)
-    sigprob_iid = np.where(use_bp,
-                           best_bp_sigprob_iid.astype(np.int32),
-                           best_b0_sigprob_iid.astype(np.int32))
-
-    # use_reco: best-sigProb candidate has truth-compatible tag PDG, good DeltaP,
-    # and a reconstructed candidate is present in this sector
-    use_reco = (tag_is_gen == 1) & (best_dp < delta_p_thresh) & (sigprob_iid >= 0)
-
-    # Start with continuum weight for all events; overwrite BB below
-    weights = np.full(len(is_cont), config.FEI_CALIB_CONT, dtype=np.float32)
-    bb_mask = (is_cont != 1)
-    bp_threshold = config.N_BP_MODES * 2
-
-    # --- Reco path: decode decay mode from best sigprob input_id ---
-    reco_mask = bb_mask & use_reco
-
-    reco_bp = reco_mask & use_bp
-    if reco_bp.any():
-        dm = np.clip(best_bp_sigprob_iid[reco_bp].astype(np.int32) // 2,
-                     0, config.N_BP_MODES - 1)
-        weights[reco_bp] = bp_lookup[dm]
-
-    reco_b0 = reco_mask & ~use_bp
-    if reco_b0.any():
-        dm = np.clip(
-            (best_b0_sigprob_iid[reco_b0].astype(np.int32) - bp_threshold) // 2,
-            0, config.N_B0_MODES - 1
-        )
-        weights[reco_b0] = b0_lookup[dm]
-
-    # --- Gen path: look up by generated decay mode id ---
-    gen_mask = bb_mask & ~use_reco
-    if gen_mask.any():
-        abs_pdg = np.abs(gen_pdg.astype(np.int32))
-        gen_dm = np.where(use_bp,
-                          bp_gen_dm_id.astype(np.int32),
-                          b0_gen_dm_id.astype(np.int32))
-
-        gen_bp = gen_mask & (abs_pdg == 521)
-        if gen_bp.any():
-            dm = gen_dm[gen_bp]
-            w = np.full(int(gen_bp.sum()), bp_calib_rest, dtype=np.float32)
-            valid = (dm >= 0) & (dm < config.N_BP_MODES)
-            if valid.any():
-                w[valid] = bp_lookup[dm[valid]]
-            weights[gen_bp] = w
-
-        gen_b0 = gen_mask & (abs_pdg == 511)
-        if gen_b0.any():
-            dm = gen_dm[gen_b0]
-            w = np.full(int(gen_b0.sum()), b0_calib_rest, dtype=np.float32)
-            valid = (dm >= 0) & (dm < config.N_B0_MODES)
-            if valid.any():
-                w[valid] = b0_lookup[dm[valid]]
-            weights[gen_b0] = w
-
-        # Verify recomputed gen weights against stored values
-        stored_gen_w = np.where(use_bp,
-                                bp_gen_calib_w.astype(np.float32),
-                                b0_gen_calib_w.astype(np.float32))
-        check_mask = gen_mask & ((abs_pdg == 521) | (abs_pdg == 511))
-        if check_mask.any():
-            recomputed = weights[check_mask]
-            stored = stored_gen_w[check_mask]
-            mismatch = np.abs(recomputed - stored) > 1e-4
-            if mismatch.any():
-                print(
-                    f"  WARNING: {int(mismatch.sum())} gen-path weight mismatches "
-                    f"(recomputed vs stored). Max delta: "
-                    f"{float(np.abs(recomputed - stored).max()):.6f}"
-                )
-
-    diff = np.abs(weights - stored_fei_calib_w.astype(np.float32))
-    n_mismatch = int((diff > 1e-5).sum())
-    if n_mismatch > 0:
+    n_bad = int((~np.isfinite(weights) | (weights <= 0)).sum())
+    if n_bad > 0:
+        raise ValueError(f"compute_event_weights: {n_bad}/{len(weights)} events have a non-finite or non-positive weight")
+    cont_mask = (is_cont == 1)
+    n_cont_mismatch = int((weights[cont_mask] != np.float32(config.FEI_CALIB_CONT)).sum())
+    if n_cont_mismatch > 0:
         print(
-            f"  [WARNING] compute_event_weights: {n_mismatch}/{len(weights)} events "
-            f"have stored/recomputed weight mismatch "
-            f"(max diff={diff.max():.6f})"
+            f"  [WARNING] compute_event_weights: {n_cont_mismatch}/{int(cont_mask.sum())} continuum events "
+            f"do not have the continuum weight {config.FEI_CALIB_CONT}"
         )
 
     print(
         f"  Event weights: mean={weights.mean():.4f}, "
         f"min={weights.min():.4f}, max={weights.max():.4f}"
     )
-    print(
-        f"  Reco path: {int(reco_mask.sum())} events, "
-        f"Gen path: {int(gen_mask.sum())} events, "
-        f"Continuum: {int((is_cont == 1).sum())} events"
-    )
+    print(f"  Continuum: {int(cont_mask.sum())} events")
     return weights
 
 
@@ -1428,7 +1329,7 @@ def main():
     is_cont, gen_pdg, bp_is_best, best_sigprob, best_bp_sigprob_iid, best_b0_sigprob_iid = event_scalars
 
     print("\nComputing event weights...")
-    event_weights = compute_event_weights(event_scalars, mc_truth_cand, calib_inputs)
+    event_weights = compute_event_weights(event_scalars, calib_inputs)
 
     print(f"\nFeature matrix shape: {features.shape}")
     print(f"  Sparse matrix memory: {features.data.nbytes / 1024**2:.1f} MB")

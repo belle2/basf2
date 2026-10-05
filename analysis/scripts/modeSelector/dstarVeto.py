@@ -153,7 +153,7 @@ def addDstarVeto(
     # Create pi+ list for D*+ -> D0 pi+ reconstruction
     from_ip = "[[dr < 2] and [abs(dz) < 4]]"
     p_cut = " and [p > 0.05] and [useCMSFrame(p) < 0.5]"
-    ma.fillParticleList('pi+:forDstVeto', from_ip + p_cut, path=path)
+    ma.fillParticleList('pi+:dstVeto', from_ip + p_cut, path=path)
 
     # Create pi0 list for D* veto reconstruction. The lists are private to the veto,
     # so they cannot collide with a list of the same name created elsewhere, e.g. one
@@ -162,19 +162,19 @@ def addDstarVeto(
     # (photon and pi0 cuts, mass-constrained fit) that the models were trained with.
     photon_cuts = '[clusterNHits > 1.5] and thetaInCDCAcceptance and ' \
         '[[clusterReg == 1 and E > 0.025] or [clusterReg == 2 and E > 0.025] or [clusterReg == 3 and E > 0.040]]'
-    ma.fillParticleList('gamma:forDstVeto', photon_cuts, path=path)
+    ma.fillParticleList('gamma:dstVeto', photon_cuts, path=path)
     # Photon MVA weights the training was done with (MC16rd)
-    ma.getBeamBackgroundProbability('gamma:forDstVeto', weight='MC16rd', path=path)
-    ma.getFakePhotonProbability('gamma:forDstVeto', weight='MC16rd', path=path)
-    ma.reconstructDecay('pi0:forDstVeto -> gamma:forDstVeto gamma:forDstVeto', '0.105 < InvM < 0.150', dmID=1, path=path)
-    kFit('pi0:forDstVeto', 0.0, 'mass', path=path)
+    ma.getBeamBackgroundProbability('gamma:dstVeto', weight='MC16rd', path=path)
+    ma.getFakePhotonProbability('gamma:dstVeto', weight='MC16rd', path=path)
+    ma.reconstructDecay('pi0:dstVetoAll -> gamma:dstVeto gamma:dstVeto', '0.105 < InvM < 0.150', dmID=1, path=path)
+    kFit('pi0:dstVetoAll', 0.0, 'mass', path=path)
 
     # Apply additional pi0 cuts (matching training preprocessing)
     pi0Cuts = '[useCMSFrame(p) < 0.5]'
     pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
     pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
 
-    ma.cutAndCopyList('pi0:dstarVeto', 'pi0:forDstVeto', pi0Cuts, path=path)
+    ma.cutAndCopyList('pi0:dstVeto', 'pi0:dstVetoAll', pi0Cuts, path=path)
 
     # --- Process each particle list ---
     for particleList in particleLists:
@@ -183,8 +183,8 @@ def addDstarVeto(
 
         # --- Process B candidates with D*+ or D*0 as first daughter ---
         # These already have the correct mass difference, just store it
-        dstp_daughter_list = f'{particle_type}:Dstp_daughter_{list_label}'
-        dst0_daughter_list = f'{particle_type}:Dst0_daughter_{list_label}'
+        dstp_daughter_list = f'{particle_type}:dstVeto_Dstp_{list_label}'
+        dst0_daughter_list = f'{particle_type}:dstVeto_Dst0_{list_label}'
 
         ma.cutAndCopyList(dstp_daughter_list, particleList,
                           '[abs(daughter(0,PDG)) == 413]', path=path)
@@ -197,7 +197,7 @@ def addDstarVeto(
 
         # --- Process B candidates with D0 or D+ as first daughter (veto) ---
         for d_pdg, d_str in [(421, 'D0'), (411, 'Dp')]:
-            channel_name = f'{particle_type}:{d_str}_daughter_{list_label}'
+            channel_name = f'{particle_type}:dstVeto_{d_str}_{list_label}'
             d_particle = 'D0' if d_pdg == 421 else 'D+'
 
             ma.cutAndCopyList(channel_name, particleList,
@@ -222,18 +222,18 @@ def addDstarVeto(
 
             # Get particles from ROE or direct B daughters
             roe_condition = f'[isInRestOfEvent == 1] or [isDescendantOfList({channel_name},1) == 1]'
-            ma.cutAndCopyList('pi0:roe', 'pi0:dstarVeto', roe_condition, path=roe_path)
+            ma.cutAndCopyList('pi0:dstVetoROE', 'pi0:dstVeto', roe_condition, path=roe_path)
 
             if d_str == 'D0':
                 # D0 can form D*+ (with pi+) or D*0 (with pi0)
                 dst_daughters = ['pi+', 'pi0']
-                ma.cutAndCopyList('pi+:roe', 'pi+:forDstVeto', roe_condition, path=roe_path)
+                ma.cutAndCopyList('pi+:dstVetoROE', 'pi+:dstVeto', roe_condition, path=roe_path)
             else:
                 # D+ can only form D*+ (with pi0)
                 dst_daughters = ['pi0']
 
             # Fill signal side D
-            ma.fillSignalSideParticleList(f'{d_particle}:sig', f'Xsd -> [{particle_type} -> ^{d_particle}]',
+            ma.fillSignalSideParticleList(f'{d_particle}:dstVetoSig', f'Xsd -> [{particle_type} -> ^{d_particle}]',
                                           path=roe_path)
 
             dstp_lists = []
@@ -241,11 +241,11 @@ def addDstarVeto(
 
             for i, dst_daughter in enumerate(dst_daughters):
                 if d_str == 'Dp' or (d_str == 'D0' and dst_daughter == 'pi+'):
-                    dst_list = f'D*+:veto_{i}'
+                    dst_list = f'D*+:dstVeto_{i}'
                 else:
-                    dst_list = f'D*0:veto_{i}'
+                    dst_list = f'D*0:dstVeto_{i}'
 
-                ma.reconstructDecay(f'{dst_list} -> {d_particle}:sig {dst_daughter}:roe',
+                ma.reconstructDecay(f'{dst_list} -> {d_particle}:dstVetoSig {dst_daughter}:dstVetoROE',
                                     '', dmID=i, path=roe_path)
 
                 # Mass window cuts
@@ -276,34 +276,34 @@ def addDstarVeto(
                     if dst_daughter == 'pi+':
                         ma.rankByHighest(dst_list, 'chiProb', 1, path=roe_path)
 
-                if 'D*+:veto' in dst_list:
+                if 'D*+:dstVeto' in dst_list:
                     dstp_lists.append(dst_list)
                 else:
                     dst0_lists.append(dst_list)
 
             # Merge D* lists
             if dstp_lists:
-                ma.copyLists('D*+:veto', dstp_lists, writeOut=False, path=roe_path)
-                ma.applyCuts('D*+:veto', 'useCMSFrame(p) < 3', path=roe_path)
-                ma.rankByLowest('D*+:veto', 'dmID', 1, path=roe_path)
+                ma.copyLists('D*+:dstVeto', dstp_lists, writeOut=False, path=roe_path)
+                ma.applyCuts('D*+:dstVeto', 'useCMSFrame(p) < 3', path=roe_path)
+                ma.rankByLowest('D*+:dstVeto', 'dmID', 1, path=roe_path)
 
             if dst0_lists:
-                ma.copyLists('D*0:veto', dst0_lists, writeOut=False, path=roe_path)
-                ma.applyCuts('D*0:veto', 'useCMSFrame(p) < 3', path=roe_path)
-                ma.rankByLowest('D*0:veto', 'dmID', 1, path=roe_path)
+                ma.copyLists('D*0:dstVeto', dst0_lists, writeOut=False, path=roe_path)
+                ma.applyCuts('D*0:dstVeto', 'useCMSFrame(p) < 3', path=roe_path)
+                ma.rankByLowest('D*0:dstVeto', 'dmID', 1, path=roe_path)
 
             # Create dummy particles to transfer ExtraInfo back to signal side
             if dstp_lists:
-                ma.reconstructDecay('Xsd:dstp -> D*+:veto', '', allowChargeViolation=True, path=roe_path)
+                ma.reconstructDecay('Xsd:dstVetoDstp -> D*+:dstVeto', '', allowChargeViolation=True, path=roe_path)
                 roe_path.modules()[-1].set_log_level(b2.LogLevel.ERROR)
                 if writeExtraInfo:
-                    ma.variableToSignalSideExtraInfo('Xsd:dstp', extra_info_veto_dstp, path=roe_path)
+                    ma.variableToSignalSideExtraInfo('Xsd:dstVetoDstp', extra_info_veto_dstp, path=roe_path)
 
             if dst0_lists:
-                ma.reconstructDecay('Xsd:dst0 -> D*0:veto', '', allowChargeViolation=True, path=roe_path)
+                ma.reconstructDecay('Xsd:dstVetoDst0 -> D*0:dstVeto', '', allowChargeViolation=True, path=roe_path)
                 roe_path.modules()[-1].set_log_level(b2.LogLevel.ERROR)
                 if writeExtraInfo:
-                    ma.variableToSignalSideExtraInfo('Xsd:dst0', extra_info_veto_dst0, path=roe_path)
+                    ma.variableToSignalSideExtraInfo('Xsd:dstVetoDst0', extra_info_veto_dst0, path=roe_path)
 
             # Execute ROE path
             path.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -128,6 +128,12 @@ Variables by group
 Here is a categorised list of variables known to ``basf2``.
 You can also look at the alphabetical index: :ref:`b2-varindex`.
 
+Basic Particle Information
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. b2-variables::
+   :group: Basic particle information
+
 Kinematics
 ~~~~~~~~~~
 
@@ -177,12 +183,6 @@ Here is a list of particle identification variables:
 
 .. b2-variables::
    :group: PID
-
-Basic particle information
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. b2-variables::
-   :group: Basic particle information
 
 PID for expert
 """"""""""""""

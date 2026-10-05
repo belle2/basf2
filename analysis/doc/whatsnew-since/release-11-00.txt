@@ -11,7 +11,6 @@ FlavorTagger
 * TFlaT: fixed a bug affecting events with multiple signal side B candidates: The ranking of tracks in the ROE was only done for the first B candidate and not refreshed for later candidates. After the bugfix, the effective tagging efficiency improved slightly. Using the bugfixed version is the new recommendation.
 * Category-based: the ``FANN``-based combination method (``FANN_qrCombined``) is no longer available, as basf2 no longer supports ``FANN``. The only available combination method is the ``FastBDT``-based one (``FBDT_qrCombined``). This change does not affect GFlaT or TFlaT.
 
-
 sysvar (former pidvar)
 ++++++++++++++++++++++
 * Added a ``seed`` argument to ``Reweighter.add_pid_particle``, ``Reweighter.add_fei_particle`` and ``add_weights_to_dataframe``. It makes both the systematic and the statistical weight variations reproducible, so a weight table gives the same variations in every dataframe it is applied to, while the variations of different tables remain independent. The previous ``sys_seed`` argument only seeded the systematic variations and initialised a random seed for the statistical variations, so they were not reproducible. It is kept for backward compatibility but now issues a warning.
@@ -22,6 +21,8 @@ Variables
 * Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
 * Improved documentation for the Helicity, FEI, Basic Particle Information variable groups
 * Removed the Calibration variable group from the analysis package
+* Improved documentation for the Helicity and FEI variable groups.
+* Added :b2:var:`nParticlesInCone` to count Track, ECLCluster and KLMCluster particles within a cone.
 
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++
@@ -40,7 +41,6 @@ Modules and Modular Analysis
 Variables
 +++++++++
 * Added metavariable `varForNthDaughterOfType`, which searches a given number of daughter generations of the given particle for the nth particle of the given type and, if such a particle exists, returns the given variable for it, otherwise NaN.
-* Added :b2:var:`nParticlesInCone` to count Track, ECLCluster and KLMCluster particles within a cone.
 
 Command line tools
 ++++++++++++++++++

@@ -89,7 +89,6 @@ void DQMHistAnalysisModule::addRefHist(const std::string& dirname, TH1* hist)
   hist->SetDirectory(0);
   n.setRefHist(hist); // transfer ownership!
   n.setRefCopy(nullptr);
-  n.setCanvas(nullptr);
 }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
@@ -417,7 +416,7 @@ void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, double value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], &value), "ca_set failure", keyname);
 #endif
 }
 
@@ -429,7 +428,7 @@ void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], &value), "ca_set failure", keyname);
 #endif
 }
 
@@ -459,7 +458,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, double value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], &value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -471,7 +470,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], &value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -502,7 +501,7 @@ double DQMHistAnalysisModule::getEpicsPV(const std::string& keyname)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], &value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;
@@ -525,7 +524,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], &value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;

@@ -56,28 +56,28 @@ namespace Belle2 {
     /// Which HLT filter lines to use for calculation retention rate per unit
     std::vector<std::string> m_retentionPerUnit;
     /// Histogram with final efficiencies to HLT
-    std::pair<TCanvas*, TH1F*> m_hEfficiency = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hEfficiency = {nullptr, nullptr};
     /// Histogram with final efficiencies to all events
-    std::pair<TCanvas*, TH1F*> m_hEfficiencyTotal = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hEfficiencyTotal = {nullptr, nullptr};
     /// Histogram with final cross sections
-    std::pair<TCanvas*, TH1F*> m_hCrossSection = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hCrossSection = {nullptr, nullptr};
     /// Histogram with final ratios to bhabha
-    std::pair<TCanvas*, TH1F*> m_hRatios = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hRatios = {nullptr, nullptr};
     /// Histogram with hlt&l1 ratios to l1 numbers
-    std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hl1Ratios;
+    std::map<std::string, std::pair<TCanvas*, TH1*>> m_hl1Ratios;
     /// Histogram with retention rate per unit of some hlt filter lines
-    std::map<std::string, std::pair<TCanvas*, TH1F*>> m_hRetentionPerUnit;
+    std::map<std::string, std::pair<TCanvas*, TH1*>> m_hRetentionPerUnit;
     /// Histogram with mean processing time per process
-    std::pair<TCanvas*, TH1F*> m_hMeanTime = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hMeanTime = {nullptr, nullptr};
     /// Histogram with fraction of events with error flags
-    std::pair<TCanvas*, TH1D*> m_hErrorFlagFraction = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hErrorFlagFraction = {nullptr, nullptr};
     /// Histogram with fraction of events filtered per unit
-    std::pair<TCanvas*, TH1D*> m_hFilteredFractionPerUnit = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hFilteredFractionPerUnit = {nullptr, nullptr};
     /// Histogram with mean budget time per unit per process
-    std::pair<TCanvas*, TH1F*> m_hMeanBudgetTimePerUnit = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hMeanBudgetTimePerUnit = {nullptr, nullptr};
     /// Histogram with mean processing time per unit per process
-    std::pair<TCanvas*, TH1F*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hMeanProcessingTimePerUnit = {nullptr, nullptr};
     /// Histogram with mean memory change per process
-    std::pair<TCanvas*, TH1F*> m_hMeanMemory = {nullptr, nullptr};
+    std::pair<TCanvas*, TH1*> m_hMeanMemory = {nullptr, nullptr};
   };
 }

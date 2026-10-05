@@ -3,32 +3,6 @@
 Skimming
 ========
 
-.. sidebar:: Overview
-    :class: overview
-
-    **Length**: 30-45 min
-
-    **Prerequisites**:
-
-    * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
-
-    **Questions**:
-
-    * What are skims, and why should analysts use skims?
-
-    * How can I find information about what skims are available?
-
-    **Objectives**:
-
-    * Find documentation about available skims.
-
-    * Run a skim on a file using the command-line tool :ref:`b2skim-run
-      <b2skim-run>`.
-
-    * Add an existing skim to a steering file.
-
-    * Find information about skims available on the grid.
-
 
 What is skimming?
 -----------------
@@ -256,7 +230,7 @@ start with the not so mysterious name "Skim".
 
 Skimmed samples are produced and stored on the grid. The output LFNs are
 documented on the *dataset searcher*. You can then run your analysis these
-centrally-produced skims with :ref:`gbasf2 <onlinebook_gbasf2>`.
+centrally-produced skims with :ref:`gbasf2 <onlinebook_grid>`.
 LFNs on the grid have a maximum length restriction, so we can't include the
 plain skim name in the LFN. Instead, we have standardised eight-digit *skim
 codes* to identify skims. When searching for skimmed datasets on the grid, use

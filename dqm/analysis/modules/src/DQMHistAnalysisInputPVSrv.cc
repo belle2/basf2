@@ -18,6 +18,11 @@
 #include <TH1F.h>
 #include <TH2F.h>
 
+#ifdef _BELLE2_EPICS
+#include <cantProceed.h>
+#endif
+
+
 using namespace std;
 using namespace Belle2;
 
@@ -66,10 +71,11 @@ static void accessRightsCallback(struct access_rights_handler_args args)
 
   printChidInfo(ichid, "accessRightsCallback");
 }
+
 static void eventCallback(struct event_handler_args eha)
 {
   chid  ichid = eha.chid;
-  MYNODE* n = (MYNODE*)eha.usr;
+  MYNODE* n = static_cast<MYNODE*>(eha.usr);
 
   if (eha.status != ECA_NORMAL) {
     printChidInfo(ichid, "eventCallback");
@@ -86,6 +92,9 @@ static void eventCallback(struct event_handler_args eha)
 DQMHistAnalysisInputPVSrvModule::DQMHistAnalysisInputPVSrvModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM histogram analysis example module to read PV arrays into histogram data");
+  // This module CAN NOT be run in parallel!
+
   //Parameter definition
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms in ms", 2000);
   addParam("HistoList", m_histlist, "pvname, histname, histtitle, (bins,min,max[,bins,min,max])");
@@ -106,7 +115,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
       B2WARNING("Histolist with wrong nr of parameters " << it.size());
       continue;
     }
-    auto n = (MYNODE*) callocMustSucceed(1, sizeof(MYNODE), "caMonitor");
+    auto n = static_cast<MYNODE*>(callocMustSucceed(1, sizeof(MYNODE), "caMonitor"));
     pmynode.push_back(n);
 
     {
@@ -137,7 +146,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
       is >> xmin;
       is >> xmax;
       if (it.size() == 4) {
-        n->histo = (TH1*)new TH1F(tok, it.at(2).c_str(), x, xmin, xmax);
+        n->histo = new TH1F(tok, it.at(2).c_str(), x, xmin, xmax);
         n->binx = x;
         n->biny = 0;
         n->binmax = x;
@@ -148,7 +157,7 @@ void DQMHistAnalysisInputPVSrvModule::initialize()
         iss >> y;
         iss >> ymin;
         iss >> ymax;
-        n->histo = (TH1*)new TH2F(tok, it.at(2).c_str(), x, xmin, xmax, y, ymin, ymax);
+        n->histo = new TH2F(tok, it.at(2).c_str(), x, xmin, xmax, y, ymin, ymax);
         n->binx = x;
         n->biny = y;
         n->binmax = x * y;
@@ -202,7 +211,7 @@ void DQMHistAnalysisInputPVSrvModule::event()
     auto bufferorg = new char[dbr_size_n(ca_field_type(n->mychid), ca_element_count(n->mychid))];
 #pragma GCC diagnostic pop
 
-    void* buffer = (void*) bufferorg;
+    void* buffer = bufferorg;
     int status;
 
     status = ca_array_get(ca_field_type(n->mychid), ca_element_count(n->mychid), n->mychid, buffer);
@@ -219,32 +228,32 @@ void DQMHistAnalysisInputPVSrvModule::event()
         for (unsigned int j = ca_element_count(n->mychid); j < n->binmax; j++) histo->SetBinContent(j + 1, 0); // zero out undefined bins
         switch (ca_field_type(n->mychid)) {
           case DBF_CHAR: {
-            dbr_char_t* b = (dbr_char_t*)buffer;
+            dbr_char_t* b = static_cast<dbr_char_t*>(buffer);
             for (unsigned int j = 0; j < bins; j++) {
               histo->SetBinContent(j + 1, b[j]);
             }
           }; break;
 //         case DBF_INT:
           case DBF_SHORT: { // same as INT
-            dbr_short_t* b = (dbr_short_t*)buffer;
+            dbr_short_t* b = static_cast<dbr_short_t*>(buffer);
             for (unsigned int j = 0; j < bins; j++) {
               histo->SetBinContent(j + 1, b[j]);
             }
           }; break;
           case DBF_LONG: {
-            dbr_long_t* b = (dbr_long_t*)buffer;
+            dbr_long_t* b = static_cast<dbr_long_t*>(buffer);
             for (unsigned int j = 0; j < bins; j++) {
               histo->SetBinContent(j + 1, b[j]);
             }
           }; break;
           case DBF_FLOAT: {
-            dbr_float_t* b = (dbr_float_t*)buffer;
+            dbr_float_t* b = static_cast<dbr_float_t*>(buffer);
             for (unsigned int j = 0; j < bins; j++) {
               histo->SetBinContent(j + 1, b[j]);
             }
           }; break;
           case DBF_DOUBLE: {
-            dbr_double_t* b = (dbr_double_t*)buffer;
+            dbr_double_t* b = static_cast<dbr_double_t*>(buffer);
             for (unsigned int j = 0; j < bins; j++) {
               histo->SetBinContent(j + 1, b[j]);
             }

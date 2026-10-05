@@ -130,16 +130,6 @@ void PhysicsObjectsDQMModule::beginRun()
 }
 
 
-void PhysicsObjectsDQMModule::endRun()
-{
-}
-
-
-void PhysicsObjectsDQMModule::terminate()
-{
-}
-
-
 void PhysicsObjectsDQMModule::event()
 {
   StoreObjPtr<SoftwareTriggerResult> result;
@@ -179,8 +169,8 @@ void PhysicsObjectsDQMModule::event()
 
       if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
         for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
-          Particle* mergeKsCand = ks0Particles->getParticle(i);
-          const double isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
+          const Particle* mergeKsCand = ks0Particles->getParticle(i);
+          const bool isKsCandGood = Variable::goodBelleKshort(mergeKsCand);
 
           if (isKsCandGood) {
             m_h_nKshortAllH->Fill(mergeKsCand->getMass());                   // Fill all Ks events
@@ -216,13 +206,13 @@ void PhysicsObjectsDQMModule::event()
 
       if (pi0Particles.isValid() && abs(pi0Particles->getPDGCode()) == Const::pi0.getPDGCode()) {
         for (unsigned int i = 0; i < pi0Particles->getListSize(); i++) {
-          Particle* pi0 = pi0Particles->getParticle(i);
+          const Particle* pi0 = pi0Particles->getParticle(i);
           m_h_mPI0->Fill(pi0->getMass());
         }
       }
       if (ks0Particles.isValid() && abs(ks0Particles->getPDGCode()) == Const::Kshort.getPDGCode()) {
         for (unsigned int i = 0; i < ks0Particles->getListSize(); i++) {
-          Particle* ks0 = ks0Particles->getParticle(i);
+          const Particle* ks0 = ks0Particles->getParticle(i);
           m_h_mKS0->Fill(ks0->getMass());
         }
       }
@@ -239,7 +229,7 @@ void PhysicsObjectsDQMModule::event()
       StoreObjPtr<ParticleList> UpsParticles(m_upsPListName);
       if (UpsParticles.isValid()) {
         for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
-          Particle* Ups = UpsParticles->getParticle(i);
+          const Particle* Ups = UpsParticles->getParticle(i);
           m_h_mUPS->Fill(Ups->getMass());
         }
       }
@@ -261,7 +251,7 @@ void PhysicsObjectsDQMModule::event()
       StoreObjPtr<ParticleList> UpsbhabhaParticles(m_upsBhabhaPListName);
       if (UpsbhabhaParticles.isValid()) {
         for (unsigned int i = 0; i < UpsbhabhaParticles->getListSize(); i++) {
-          Particle* Upse = UpsbhabhaParticles->getParticle(i);
+          const Particle* Upse = UpsbhabhaParticles->getParticle(i);
           m_h_mUPSe->Fill(Upse->getMass());
         }
       }

@@ -133,7 +133,6 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
 
     //Convert mBC and deltaE to the Y4S reference
     double pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
-    double mInv        = Bpart->getMass();
     double pdg       = Bpart->getPDGCode();
     double R2        = Variable::R2(Bpart);
 
@@ -143,7 +142,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
 
     // Filling the histograms
     if (c_mDmin < mD && mD < c_mDmax)
-      if (std::abs(mInv - mB) < c_mBwindow)
+      if (std::abs(Bpart->getMass() - mB) < c_mBwindow)
         if (R2 < c_R2max)
           if (std::isnan(dmDstar) || (c_dmDstarMin < dmDstar && dmDstar < c_dmDstarMax)) {
             double eBC = sqrt(pBcms * pBcms + mB * mB); // beam constrained energy

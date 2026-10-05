@@ -9,14 +9,19 @@
 ##########################################################################
 
 """
-Perform code quality cppchecks for every commit to the dqm package.
+Write out the location and direction of all ECL crystals. Uses information
+from the payload ECLCrystalsPositionAndShape for the experiment and run of
+set via EventInfoSetter
 """
 
-import re
-from b2test_utils import check_error_free
+import basf2 as b2
+from ecl_utils import ECLDumpGeometry
 
-if __name__ == "__main__":
+main = b2.Path()
 
-    ignoreme = r"^((?!dqm\/).)*$"
-    check_error_free("b2code-cppcheck", "cppcheck", "dqm",
-                     lambda x: re.findall(ignoreme, x) or x == "'", toolopts=['-D_BELLE2_EPICS'])
+main.add_module('EventInfoSetter')
+main.add_module('Gearbox')
+main.add_module('Geometry')
+main.add_module(ECLDumpGeometry())
+
+b2.process(main, 1)

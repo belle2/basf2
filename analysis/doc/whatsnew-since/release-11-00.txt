@@ -15,7 +15,8 @@ sysvar (former pidvar)
 Variables
 +++++++++
 * Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
-* Improved documentation for the Helicity, FEI and Basic Particle Information variable groups
+* Improved documentation for the Helicity, FEI, Basic Particle Information variable groups
+* Removed the Calibration variable group from the analysis package
 
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++

@@ -492,12 +492,11 @@ Other variable that can be handy in development:
 FEI Variables
 ~~~~~~~~~~~~~
 
-As known by many analysts by using the ``isSignal`` flag for truth matching
-for the  tagging B meson from the FEI there is still a peak visible for the
-background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
-determine e.g. a yield there.
+These variables provide more information for :math:`B` mesons reconstructed
+using the FEI. It can help deal with the peaking background that exists for correctly
+reconstructed FEI candidates. 
 
-New variables seem to be found to address this problem.
+.. attention:: These variables only make sense when used on FEI-reconstructed :math:`B` mesons. 
 
 .. b2-variables::
    :group: FEIVariables

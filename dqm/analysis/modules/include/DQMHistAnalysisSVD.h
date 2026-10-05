@@ -45,6 +45,16 @@ namespace Belle2 {
      */
     ~ DQMHistAnalysisSVDModule() override;
 
+    /**
+     * Copy constructor, deleted since the class owns bare pointers.
+     */
+    DQMHistAnalysisSVDModule(const DQMHistAnalysisSVDModule&) = delete;
+
+    /**
+     * Assignment operator, deleted since the class owns bare pointers.
+     */
+    DQMHistAnalysisSVDModule& operator=(const DQMHistAnalysisSVDModule&) = delete;
+
     void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg = true, int histoType = kOffline); /**< set status of Canvas */
     static  TString getHistoNameFromCanvas(TString cName, TString view = "",
                                            TString cPrefix = "c_", TString hPrefix = ""); /**< get histogram name from Canvas name*/

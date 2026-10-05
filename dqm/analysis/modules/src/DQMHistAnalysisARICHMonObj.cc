@@ -78,11 +78,11 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   TH1* bits = findHist("ARICH/bits");
   TH1* hitsPerTrack = findHist("ARICH/hitsPerTrack");
   TH1* theta = findHist("ARICH/theta");
-  TH2* tracks2D = (TH2*)findHist("ARICH/tracks2D");
+  auto* tracks2D = dynamic_cast<TH2*>(findHist("ARICH/tracks2D"));
   TH1* hitsPerEvent = findHist("ARICH/hitsPerEvent");
-  TH2* hapdHitPerEvent = (TH2*)findHist("ARICH/hapdHitPerEvent");
-  TH2* thetaPhi = (TH2*)findHist("ARICH/thetaPhi");
-  TH3* mirrorThetaPhi = (TH3*)findHist("ARICH/mirrorThetaPhi");
+  auto* hapdHitPerEvent = dynamic_cast<TH2*>(findHist("ARICH/hapdHitPerEvent"));
+  auto* thetaPhi = dynamic_cast<TH2*>(findHist("ARICH/thetaPhi"));
+  auto* mirrorThetaPhi = dynamic_cast<TH3*>(findHist("ARICH/mirrorThetaPhi"));
   TH1* chDigit = findHist("ARICH/chDigit");
   TH1* hapdDigit = findHist("ARICH/hapdDigit");
 
@@ -147,7 +147,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   gPad->SetLogz();
   //m_c_main->Update();
 
-  TH1F* flash = (TH1F*)hapdHitPerEvent->ProjectionX("flash", 40, 144);
+  auto* flash = hapdHitPerEvent->ProjectionX("flash", 40, 144);
   m_hapdHist->fillFromTH1(flash);
   if (nevt) m_hapdHist->Scale(1. / float(nevt));
 
@@ -233,7 +233,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
 
 
   //TCanvas mirror
-  TH1F* thetaCl = (TH1F*)theta->Clone("thetaCl");
+  auto* thetaCl = dynamic_cast<TH1*>(theta->Clone("thetaCl"));
   thetaCl->SetLineColor(16);
   thetaCl->SetLineWidth(2);
   thetaCl->SetTitle("");
@@ -242,7 +242,7 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
 
   if (mirrorThetaPhi) {
     for (int i = 1; i < 18 + 1; i++) {
-      TH1F* hmir = (TH1F*)mirrorThetaPhi->ProjectionZ(TString::Format("hmir_%d", i), i, i, 1, 10000);
+      auto* hmir = mirrorThetaPhi->ProjectionZ(TString::Format("hmir_%d", i), i, i, 1, 10000);
       hmir->SetTitle(TString::Format("mirror %d", i));
       if (hmir->GetEntries() > 0) hmir->Scale(theta->GetEntries() / hmir->GetEntries());
       hmir->Rebin(2);

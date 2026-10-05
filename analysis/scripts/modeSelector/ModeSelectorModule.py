@@ -324,6 +324,8 @@ class ModeSelectorModule(b2.Module):
 
     def initialize(self):
         """Called at the beginning of processing."""
+        Belle2.PyStoreObj('EventExtraInfo').registerInDataStore()
+
         # Build feature index mapping (needed for both inference and training)
         self._build_feature_indices()
 

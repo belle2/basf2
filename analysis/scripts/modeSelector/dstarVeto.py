@@ -93,6 +93,10 @@ def addDstarVeto(
     For B candidates with D+ as first daughter:
         - D*+ -> D+ pi0 (from ROE)
 
+    The veto builds its own ROE on private particles that wrap the B candidates, so it
+    neither uses nor creates an ROE related to the B candidates. An ROE built by the user
+    on the input lists, before or after this function, is independent of the veto.
+
     Parameters:
         particleLists (str or list): Name(s) of B meson particle list(s)
             (e.g., 'B+:feiHadronic' or ['B+:feiHadronic', 'B0:feiHadronic'])
@@ -199,14 +203,22 @@ def addDstarVeto(
             ma.cutAndCopyList(channel_name, particleList,
                               f'abs(daughter(0,PDG)) == {d_pdg}', path=path)
 
-            # Build ROE for these candidates
-            ma.buildRestOfEvent(channel_name, path=path)
+            # Wrap each B candidate in a new single-daughter particle and build the ROE for
+            # the wrappers. A particle can only have one ROE, so building it on the B
+            # candidates would make the veto reuse an ROE built by the user on the same
+            # candidates (with possibly different input lists), and an ROE built here would
+            # in turn be reused by the user. The wrappers are private to the veto, and their
+            # ROE contains the same tracks and clusters as an ROE of the B candidate.
+            wrapper_list = f'Xsd:dstVeto_{d_str}_{"Bp" if particle_type == "B+" else "B0"}_{list_label}'
+            ma.reconstructDecay(f'{wrapper_list} -> {channel_name}', '', allowChargeViolation=True, path=path)
+            path.modules()[-1].set_log_level(b2.LogLevel.ERROR)
+            ma.buildRestOfEvent(wrapper_list, path=path)
 
             # Create ROE path
             roe_path = b2.Path()
             dead_end_path = b2.Path()
 
-            ma.signalSideParticleFilter(channel_name, '', roe_path, dead_end_path)
+            ma.signalSideParticleFilter(wrapper_list, '', roe_path, dead_end_path)
 
             # Get particles from ROE or direct B daughters
             roe_condition = f'[isInRestOfEvent == 1] or [isDescendantOfList({channel_name},1) == 1]'
@@ -221,7 +233,7 @@ def addDstarVeto(
                 dst_daughters = ['pi0']
 
             # Fill signal side D
-            ma.fillSignalSideParticleList(f'{d_particle}:sig', f'{particle_type} -> ^{d_particle}',
+            ma.fillSignalSideParticleList(f'{d_particle}:sig', f'Xsd -> [{particle_type} -> ^{d_particle}]',
                                           path=roe_path)
 
             dstp_lists = []
@@ -295,6 +307,15 @@ def addDstarVeto(
 
             # Execute ROE path
             path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+            # The ROE loop writes the results to the wrappers; copy them to the B candidates
+            if writeExtraInfo:
+                veto_keys = list(extra_info_veto_dstp.values())
+                if d_str == 'D0':
+                    veto_keys += list(extra_info_veto_dst0.values())
+                ma.variablesToDaughterExtraInfo(
+                    wrapper_list, f'Xsd -> ^{particle_type}',
+                    {f'extraInfo({key})': key for key in veto_keys}, path=path)
 
         if writeExtraInfo:
             # After all real values are set, fill any remaining missing deltaMassDiff

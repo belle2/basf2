@@ -380,6 +380,15 @@ the `MC16rd` weights. Photon pairs with `0.105 < InvM < 0.150` are fitted with a
 constraint (`kFit`), and the pi0s used in the veto must satisfy `useCMSFrame(p) < 0.5`
 and, for both photons, `beamBackgroundSuppression > 0.5` and `fakePhotonSuppression > 0.1`.
 
+The ROE loop runs on private `Xsd` particles that each wrap one B candidate, not on
+the B candidates themselves. A particle can only have one ROE, so building it on the B
+candidates would make the veto reuse an ROE the user built on the same list (e.g. for
+continuum suppression), and a user ROE built after the veto would be skipped for some
+candidates. The wrapper's ROE contains the same tracks and clusters as an ROE of the B
+candidate, and the results are copied to the B candidates with
+`variablesToDaughterExtraInfo`. User ROEs on the input lists are therefore independent
+of the veto, in either order.
+
 **ExtraInfo fields added to B candidates:**
 
 | Field | Meaning |

@@ -11,6 +11,7 @@
 #include <cdc/topology/ISuperLayer.h>
 
 #include <tracking/trackingUtilities/numerics/ERightLeft.h>
+#include <tracking/trackingUtilities/numerics/Index.h>
 #include <tracking/trackingUtilities/numerics/ESign.h>
 
 #include <Math/Vector2D.h>
@@ -164,6 +165,9 @@ namespace Belle2 {
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const;
 
+      /// Getter for the index of the underlying CDCHit in the StoreArray holding it.
+      Index getStoreIHit() const { return m_iHit; }
+
       /// Getter for the wire the oriented hit associated to.
       const CDC::CDCWire& getWire() const;
 
@@ -272,8 +276,13 @@ namespace Belle2 {
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, double z = 0) const;
 
     private:
-      /// Memory for the reference to the assiziated wire hit.
-      const CDCWireHit* m_wireHit = nullptr;
+      /// Memory for the reference to the assiziated wire hit - not streamed (ROOT would
+      /// deep-copy the pointed object and leak it on reading); m_iHit carries the CDCWireHit
+      // index instead.
+      const CDCWireHit* m_wireHit = nullptr; //!
+
+      /// Index of the underlying CDCHit in its StoreArray, so the link survives serialisation.
+      Index m_iHit = c_InvalidIndex;
 
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;

@@ -5,8 +5,8 @@
 
 #pragma extra_include <tracking/trackingUtilities/utilities/WeightedRelation.h>;
 
-#pragma link C++ class Belle2::TrackingUtilities::CDCWireHit+; // checksum=0xa11ee4bb, version=-1
-#pragma link C++ class Belle2::TrackingUtilities::CDCRLWireHit+; // checksum=0xd30b83b9, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCWireHit+; // checksum=0xf5aca58d, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCRLWireHit+; // checksum=0x60fc2444, version=-1
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit2D+; // checksum=0x9b12c4d, version=-1
 #pragma link C++ class Belle2::TrackingUtilities::CDCRecoHit3D+; // checksum=0x1c170e75, version=-1

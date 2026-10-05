@@ -34,9 +34,7 @@ __all__ = [
     'addGeneratedDecayWeights',
     'modeSelector',
     'addDstarVeto',
-    'add_dstar_veto_aliases',
     'GeneratedDecayWeightModule',
-    'get_exact_dmid_from_signature',
     'ModeSelectorModule',
 ]
 

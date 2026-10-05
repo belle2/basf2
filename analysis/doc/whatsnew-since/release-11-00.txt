@@ -23,6 +23,8 @@ Variables
 * Removed the Calibration variable group from the analysis package
 * Improved documentation for the Helicity and FEI variable groups.
 * Added :b2:var:`nParticlesInCone` to count Track, ECLCluster and KLMCluster particles within a cone.
+* Deprecated the single-argument form of `weMissE`, `weMissM2`, `weMissP`, `weMissPTheta`, `weMissPx`, `weMissPy` and `weMissPz`, which relied on the default ROE mask name ``all``. It now issues a warning; the ROE mask name will become a mandatory argument in a future release.
+* Improved documentation for the Helicity and FEI variable groups
 
 Modules and Modular Analysis
 ++++++++++++++++++++++++++++

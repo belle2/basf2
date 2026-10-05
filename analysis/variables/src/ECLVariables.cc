@@ -1806,22 +1806,22 @@ Returns the ``StoreArray`` index of the cluster mDST object. This can be useful 
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystals", nECLOutOfTimeCrystals, R"DOC(
 **[Eventbased]** Returns the number of crystals that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
-7 MeV are are counted.  
+7 MeV are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsFWDEndcap", nECLOutOfTimeCrystalsFWDEndcap, R"DOC(
 **[Eventbased]** Returns the number of crystals in the forward endcap that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
-7 MeV are are counted.  
+7 MeV are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBarrel", nECLOutOfTimeCrystalsBarrel, R"DOC(
 **[Eventbased]** Returns the number of crystals in the barrel that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
-7 MeV are are counted.  
+7 MeV are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nECLOutOfTimeCrystalsBWDEndcap", nECLOutOfTimeCrystalsBWDEndcap, R"DOC(
 **[Eventbased]** Returns the number of crystals in the backward endcap that are out of time with the event time (``eventT0``) by more than 110.0 ns. Only crystals with an energy greater than 
-7 MeV are are counted.  
+7 MeV are counted.  
 )DOC");
 
     REGISTER_VARIABLE("nRejectedECLShowers", nRejectedECLShowers, R"DOC(

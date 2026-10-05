@@ -93,8 +93,8 @@ class ModeSelectorModule(b2.Module):
         self.payload_cat_model = payload_cat_model if payload_cat_model is not None else config.DEFAULT_CAT_PAYLOAD
         #: Payload name for main model
         self.payload_main_model = payload_main_model if payload_main_model is not None else config.DEFAULT_MAIN_PAYLOAD
-        #: Contract version the loaded models were built for. Set in initialize() from the
-        #: weightfiles. Everything that differs between supported contract versions (feature
+        #: Contract version the loaded models were built for. Set from the weightfiles when
+        #: the models are loaded. Everything that differs between supported contract versions (feature
         #: construction, expected output classes, output interpretation) branches on this, so a
         #: model for an older supported contract runs with that contract's behaviour.
         self.contract_version = config.MODEL_CONTRACT_VERSION
@@ -363,8 +363,6 @@ class ModeSelectorModule(b2.Module):
             )
             return
 
-        import basf2_mva
-
         # A non-default payload name is the wrong way to pick a training: the names are
         # deliberately version-free so that the globaltag decides which models are served.
         # Only warn for names that are actually used, i.e. not overridden by a local file.
@@ -386,47 +384,97 @@ class ModeSelectorModule(b2.Module):
         # Load models through the basf2 MVA Expert framework.
         # Single-threaded ONNX execution is enforced by the framework in mva/methods/src/ONNX.cc.
         Belle2.MVA.AbstractInterface.initSupportedInterfaces()
-        supported = Belle2.MVA.AbstractInterface.getSupportedInterfaces()
+        #: ONNX MVA interface used to create the experts
+        self._onnx_interface = Belle2.MVA.AbstractInterface.getSupportedInterfaces()["ONNX"]
 
+        # Local weightfiles are loaded once. Payloads are looked up in beginRun, so a
+        # globaltag can serve different models for different run ranges.
+        #: Category weightfile loaded from a local file (None if taken from the database)
+        self._cat_local_wf = None
+        #: Main weightfile loaded from a local file (None if taken from the database)
+        self._main_local_wf = None
+        #: Database accessor for the category payload (None if a local file is used)
+        self._cat_accessor = None
+        #: Database accessor for the main payload (None if a local file is used)
+        self._main_accessor = None
         if self.cat_model_path:
-            cat_wf = self._load_weightfile(self.cat_model_path, 'category')
+            self._cat_local_wf = self._load_weightfile(self.cat_model_path, 'category')
         else:
-            db_accessor = Belle2.DBAccessorBase(
+            self._cat_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_cat_model, True
             )
-            cat_filename = db_accessor.getFilename()
-            if not cat_filename:
-                b2.B2FATAL(
-                    "ModeSelector: category model payload '"
-                    + self.payload_cat_model
-                    + "' not found in the conditions database. This release implements "
-                    "contract version " + str(config.MODEL_CONTRACT_VERSION) + ", so the "
-                    "configured performance globaltag must provide payloads for it."
-                )
-            cat_wf = Belle2.MVA.Weightfile.loadFromFile(cat_filename)
-
         if self.main_model_path:
-            main_wf = self._load_weightfile(self.main_model_path, 'main')
+            self._main_local_wf = self._load_weightfile(self.main_model_path, 'main')
         else:
-            db_accessor = Belle2.DBAccessorBase(
+            self._main_accessor = Belle2.DBAccessorBase(
                 Belle2.DBStoreEntry.c_RawFile, self.payload_main_model, True
             )
-            main_filename = db_accessor.getFilename()
-            if not main_filename:
-                b2.B2FATAL(
-                    "ModeSelector: main model payload '"
-                    + self.payload_main_model
-                    + "' not found in the conditions database. This release implements "
-                    "contract version " + str(config.MODEL_CONTRACT_VERSION) + ", so the "
-                    "configured performance globaltag must provide payloads for it."
-                )
-            main_wf = Belle2.MVA.Weightfile.loadFromFile(main_filename)
+        #: Checksums of the currently loaded payloads, used to detect a change between runs
+        self._loaded_checksums = None
+
+        self._check_contract_is_self_consistent()
+        if self._cat_accessor is None and self._main_accessor is None:
+            self._setup_models(self._cat_local_wf, self._main_local_wf)
+
+    def beginRun(self):
+        """Load the models from the conditions database if the payloads changed."""
+        if self.training_mode or self.skip_nn_evaluation:
+            return
+        if self._cat_accessor is None and self._main_accessor is None:
+            return
+
+        # Same pattern as MVAExpert, but comparing checksums instead of hasChanged(): for
+        # payloads accessed as plain files (c_RawFile) the changed flag can stay unset for
+        # the payload already loaded when the accessor was created, so the models would
+        # never be loaded.
+        checksums = tuple(
+            accessor.getChecksum() if accessor is not None else None
+            for accessor in (self._cat_accessor, self._main_accessor)
+        )
+        if checksums == self._loaded_checksums:
+            return
+
+        first_load = self._loaded_checksums is None
+        cat_wf = self._cat_local_wf
+        if cat_wf is None:
+            cat_wf = self._load_payload(self._cat_accessor, self.payload_cat_model, 'category')
+        main_wf = self._main_local_wf
+        if main_wf is None:
+            main_wf = self._load_payload(self._main_accessor, self.payload_main_model, 'main')
+        if not first_load:
+            b2.B2INFO("ModeSelector: model payloads changed, reloading the models")
+        self._setup_models(cat_wf, main_wf)
+        self._loaded_checksums = checksums
+        if first_load and not self.cat_model_path:
+            self._warn_if_newer_contract_available()
+
+    def _load_payload(self, accessor, payload_name, label):
+        """Load a basf2 MVA weightfile from the conditions database payload of the current run."""
+        filename = accessor.getFilename()
+        if not filename:
+            b2.B2FATAL(
+                "ModeSelector: " + label + " model payload '"
+                + payload_name
+                + "' not found in the conditions database. This release implements "
+                "contract version " + str(config.MODEL_CONTRACT_VERSION) + ", so the "
+                "configured performance globaltag must provide payloads for it."
+            )
+        return Belle2.MVA.Weightfile.loadFromFile(filename)
+
+    def _setup_models(self, cat_wf, main_wf):
+        """Create the experts for a pair of weightfiles and validate them.
+
+        Called once for local weightfiles, and for each run in which a payload changes.
+        Everything derived from the weightfiles (contract version, feature selection, input
+        sizes) is set here, so a new pair of models can differ in all of them.
+        """
+        import basf2_mva
 
         #: Category network expert
-        self.cat_expert = supported["ONNX"].getExpert()
+        self.cat_expert = self._onnx_interface.getExpert()
         self.cat_expert.load(cat_wf)
         #: Main network expert
-        self.main_expert = supported["ONNX"].getExpert()
+        self.main_expert = self._onnx_interface.getExpert()
         self.main_expert.load(main_wf)
 
         cat_opts = basf2_mva.GeneralOptions()
@@ -434,15 +482,12 @@ class ModeSelectorModule(b2.Module):
         main_opts = basf2_mva.GeneralOptions()
         main_wf.getOptions(main_opts)
 
-        self._check_contract_is_self_consistent()
         cat_version, cat_training = self._check_contract(cat_wf, cat_opts.m_identifier, 'category')
         main_version, main_training = self._check_contract(main_wf, main_opts.m_identifier, 'main')
         self._check_same_training(cat_training, main_training)
         self.contract_version = self._select_contract_version(cat_version, main_version)
         self._check_output_classes(cat_opts, config.NUM_CAT_LABELS, 'category')
         self._check_output_classes(main_opts, config.N_INPUT_IDS + 3, 'main')
-        if not self.cat_model_path:
-            self._warn_if_newer_contract_available()
 
         # The payload records which raw feature indices its model was trained on, so a
         # retraining can change the selection without a software release.

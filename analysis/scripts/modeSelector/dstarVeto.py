@@ -25,6 +25,7 @@ import basf2 as b2
 import modularAnalysis as ma
 from ROOT import Belle2
 from variables import variables as vm
+from vertex import kFit, treeFit
 
 
 class _SetDstarVetoDefaults(b2.Module):
@@ -150,36 +151,26 @@ def addDstarVeto(
     p_cut = " and [p > 0.05] and [useCMSFrame(p) < 0.5]"
     ma.fillParticleList('pi+:forDstVeto', from_ip + p_cut, path=path)
 
-    # Create pi0 list for D* veto reconstruction
-
-    # Current default pi0 list and photon-MVA configuration.
-    pi0_list = 'eff50_May2020Fit'
-    usePhotonMVA = True
-
-    # Optional alternative configuration kept here for future studies.
-    # pi0_list = 'eff40_May2020Fit'
-    # usePhotonMVA = False
-
-    # Check if stdPi0 list was already added to this path
-    existing_modules = [m.name() for m in path.modules()]
-    if not any(f'pi0:{pi0_list}' in m for m in existing_modules):
-        from stdPi0s import stdPi0s
-        if usePhotonMVA:
-            # Using MC16rd weights for background suppression
-            beamBackgroundMVAWeight = "MC16rd"
-            fakePhotonMVAWeight = "MC16rd"
-            stdPi0s(pi0_list, path=path, beamBackgroundMVAWeight=beamBackgroundMVAWeight,
-                    fakePhotonMVAWeight=fakePhotonMVAWeight)
-        else:
-            stdPi0s(pi0_list, path=path)
+    # Create pi0 list for D* veto reconstruction. The lists are private to the veto,
+    # so they cannot collide with a list of the same name created elsewhere, e.g. one
+    # without the photon MVA, whose suppression cuts would then silently reject all pi0s.
+    # The selection reproduces the 50% efficiency pi0 selection optimised in May 2020
+    # (photon and pi0 cuts, mass-constrained fit) that the models were trained with.
+    photon_cuts = '[clusterNHits > 1.5] and thetaInCDCAcceptance and ' \
+        '[[clusterReg == 1 and E > 0.025] or [clusterReg == 2 and E > 0.025] or [clusterReg == 3 and E > 0.040]]'
+    ma.fillParticleList('gamma:forDstVeto', photon_cuts, path=path)
+    # Photon MVA weights the training was done with (MC16rd)
+    ma.getBeamBackgroundProbability('gamma:forDstVeto', weight='MC16rd', path=path)
+    ma.getFakePhotonProbability('gamma:forDstVeto', weight='MC16rd', path=path)
+    ma.reconstructDecay('pi0:forDstVeto -> gamma:forDstVeto gamma:forDstVeto', '0.105 < InvM < 0.150', dmID=1, path=path)
+    kFit('pi0:forDstVeto', 0.0, 'mass', path=path)
 
     # Apply additional pi0 cuts (matching training preprocessing)
     pi0Cuts = '[useCMSFrame(p) < 0.5]'
-    if usePhotonMVA:
-        pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
-        pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
+    pi0Cuts += ' and [daughter(0,beamBackgroundSuppression) > 0.5] and [daughter(0,fakePhotonSuppression) > 0.1]'
+    pi0Cuts += ' and [daughter(1,beamBackgroundSuppression) > 0.5] and [daughter(1,fakePhotonSuppression) > 0.1]'
 
-    ma.cutAndCopyList('pi0:dstarVeto', f'pi0:{pi0_list}', pi0Cuts, path=path)
+    ma.cutAndCopyList('pi0:dstarVeto', 'pi0:forDstVeto', pi0Cuts, path=path)
 
     # --- Process each particle list ---
     for particleList in particleLists:
@@ -261,8 +252,7 @@ def addDstarVeto(
 
                 if not skipTreeFit:
                     # Vertex fit with mass constraints
-                    import vertex
-                    vertex.treeFit(
+                    treeFit(
                         list_name=dst_list,
                         conf_level=0,
                         ipConstraint=False,

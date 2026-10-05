@@ -270,14 +270,14 @@ Weightfiles exported before this (with placeholder variable names) still load:
 the module warns, treats them as contract version 1 (fatal if that version is no longer
 supported) and falls back to `config.HAS_INPUTS`.
 
-**Intervals of validity.** ModeSelector uses one training for all datasets (the
+**Intervals of validity.** ModeSelector currently uses one training for all datasets (the
 experiment number is a network input), so its payloads have a single open-ended iov
-(`0,0,-1,-1`, the `convert_to_onnx.py` default). The module reads both payloads once in
-`initialize()` and does not reload them, so payloads with several iovs would silently
-keep the model valid at the start of the job. The naming scheme does not prevent
-dataset-dependent trainings: they would be uploaded as further revisions under the same
-name with different iovs, and the module would have to reload both payloads, repeating
-the checks above, in `beginRun()` whenever either changes.
+(`0,0,-1,-1`, the `convert_to_onnx.py` default). The module still looks up the payloads
+in `beginRun()` and, whenever the checksum of either one changes, reloads both and
+repeats all the checks above (contract version, same training, output classes, feature
+selection). Dataset-dependent trainings can therefore be uploaded as further revisions
+under the same name with different iovs, without changing the module. Local weightfiles
+(`cat_model_path` / `main_model_path`) are loaded once in `initialize()`.
 
 To create a local payload database use:
 
@@ -373,6 +373,12 @@ addDstarVeto(
 2. **Has D0 or D+ daughter**: reconstructs D\* candidates from ROE soft pions/pi0s.
    - `D0` → tries `D*+ → D0 π+` and `D*0 → D0 π0`
    - `D+` → tries `D*+ → D+ π0`
+
+The pi0s are reconstructed from photons passing the cuts of the former 50% efficiency
+May 2020 pi0 selection, with the beam background and fake photon MVAs evaluated using
+the `MC16rd` weights. Photon pairs with `0.105 < InvM < 0.150` are fitted with a mass
+constraint (`kFit`), and the pi0s used in the veto must satisfy `useCMSFrame(p) < 0.5`
+and, for both photons, `beamBackgroundSuppression > 0.5` and `fakePhotonSuppression > 0.1`.
 
 **ExtraInfo fields added to B candidates:**
 

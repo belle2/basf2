@@ -66,7 +66,9 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
            FileSystem::findFile("/data/ecl/background_norm.root"));
   addParam("simulatePure", m_simulatePure, "Flag to simulate pure CsI option", false);
-  addParam("simulateUpgrade", m_simulateUpgrade, "Flag to simulate upgrade electronics option", false);
+  addParam("simulateUpgrade", m_eclUpgradeOverride,
+           "Upgraded electronics option: -1 from the payload ECLElectronicsConfiguration, 0 current electronics, "
+           "1 upgraded electronics", -1);
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -115,6 +117,9 @@ void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& ca
 // initialize
 void ECLDigitCalibratorModule::initialize()
 {
+  if (m_eclUpgradeOverride < -1 || m_eclUpgradeOverride > 1)
+    B2FATAL("ECLDigitCalibrator: simulateUpgrade must be -1, 0 or 1, not " << m_eclUpgradeOverride);
+
   // mdst dataobjects
   // This object is registered by few packages. Let's be agnostic about the
   // execution order of the modules: the first package run registers the module
@@ -153,6 +158,11 @@ void ECLDigitCalibratorModule::initialize()
 // begin run
 void ECLDigitCalibratorModule::beginRun()
 {
+  if (m_eclUpgradeOverride == -1)
+    m_eclUpgrade = m_electronicsConfiguration.isValid() && m_electronicsConfiguration->getUpgrade();
+  else
+    m_eclUpgrade = (m_eclUpgradeOverride == 1);
+
   // Check if any of the calibration constants have changed
   if (m_calibrationCrystalElectronics.hasChanged()) {
     if (m_calibrationCrystalElectronics) {
@@ -249,7 +259,7 @@ void ECLDigitCalibratorModule::event()
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                                     v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
                          + m_pureCsITimeOffset;
-      } else if (m_simulateUpgrade) {
+      } else if (m_eclUpgrade) {
         calibratedTime = (time * m_timeInverseSlopeUp);
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
@@ -276,7 +286,7 @@ void ECLDigitCalibratorModule::event()
     B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
-    if (!m_simulateUpgrade) {
+    if (!m_eclUpgrade) {
       // Calibrating offline fit results
       ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
       aECLCalDigit->setTwoComponentChi2(-1);

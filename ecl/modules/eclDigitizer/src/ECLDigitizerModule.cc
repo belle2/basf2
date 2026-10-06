@@ -86,13 +86,21 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
            "Normalization coefficient for ECL signal shape. "
            "If positive, use same static value for all ECL channels. "
            "If negative, calculate dynamically at beginRun().", -1.0);
-  addParam("ECLupgrade", m_eclUpgrade,
-           "Simulate ECL upgraded electronics digitization (default: false)", false);
+  addParam("ECLupgrade", m_eclUpgradeOverride,
+           "Simulate ECL upgraded electronics digitization: -1 from the payload ECLElectronicsConfiguration, "
+           "0 current electronics, 1 upgraded electronics (default: -1)", -1);
 
 }
 
 void ECLDigitizerModule::initialize()
 {
+  if (m_eclUpgradeOverride < -1 || m_eclUpgradeOverride > 1)
+    B2FATAL("ECLDigitizer: ECLupgrade must be -1, 0 or 1, not " << m_eclUpgradeOverride);
+  /* The payloads of the first run are already available here. */
+  if (m_eclUpgradeOverride == -1)
+    m_eclUpgrade = m_electronicsConfiguration.isValid() && m_electronicsConfiguration->getUpgrade();
+  else
+    m_eclUpgrade = (m_eclUpgradeOverride == 1);
   if (m_eclUpgrade) {
     m_backend.emplace<UpgradeBackend>();
     /* Pulse shape discrimination not implemented yet for upgraded electronics */
@@ -143,6 +151,10 @@ void ECLDigitizerModule::initialize()
 
 void ECLDigitizerModule::beginRun()
 {
+  const bool eclUpgrade = m_electronicsConfiguration.isValid() && m_electronicsConfiguration->getUpgrade();
+  if (m_eclUpgradeOverride == -1 && eclUpgrade != m_eclUpgrade)
+    B2FATAL("ECLDigitizer: the ECL electronics (ECLElectronicsConfiguration) changes within the job, this is not supported.");
+
   const EclConfiguration& ec = EclConfiguration::get();
   double ns_per_tick = ec.c_clock / (ec.c_nFitPointsPerAdcTick * ec.c_nSubTimeCorr *
                                      ec.getRF()) *

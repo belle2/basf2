@@ -11,6 +11,7 @@
 /* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <ecl/dbobjects/ECLElectronicsConfiguration.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/digitization/EclConfigurationUp.h>
 #include <ecl/mapper/ECLChannelMapper.h>
@@ -200,6 +201,8 @@ namespace Belle2 {
     bool m_hadronPulseShape{true};
     /** DSP data usage flag. */
     bool m_dspDataTest{false};
+    /** Upgraded electronics: -1 from ECLElectronicsConfiguration, 0 current, 1 upgraded */
+    int m_eclUpgradeOverride{-1};
     /** Enable upgraded electronics digitization */
     bool m_eclUpgrade{false};
     /** Always load waveform parameters at least once */
@@ -244,6 +247,9 @@ namespace Belle2 {
 
     /** Electronics noise covariance matrix for upgraded electronics. */
     DBObjPtr<TTree> m_noiseParametersUp{"ECLWFNoiseParamsUp", false};
+
+    /** ECL electronics configuration (optional: current electronics if missing). */
+    DBObjPtr<ECLElectronicsConfiguration> m_electronicsConfiguration{"ECLElectronicsConfiguration", false};
 
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_crystalElectronics{"ECLCrystalElectronics"};

@@ -10,6 +10,7 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLElectronicsConfiguration.h>
 #include <ecl/utility/ECLTimingUtilities.h>
 
 /* Basf2 headers. */
@@ -117,6 +118,8 @@ namespace Belle2 {
     std::vector < float > v_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF as vector*/
     std::vector < float > v_calibrationCrystalFlightTimeUnc;  /**< single crystal time calibration TOF as vector uncertainty*/
     DBObjPtr<ECLCrystalCalib> m_calibrationCrystalFlightTime;  /**< single crystal time calibration TOF*/
+    /** ECL electronics configuration (optional: current electronics if missing). */
+    DBObjPtr<ECLElectronicsConfiguration> m_electronicsConfiguration{"ECLElectronicsConfiguration", false};
 
     StoreObjPtr <EventLevelClusteringInfo> m_eventLevelClusteringInfo; /**< event level clustering info */
 
@@ -156,7 +159,8 @@ namespace Belle2 {
     const double c_minT99 = 3.5; /**< The minimum t99 */
 
     bool m_simulatePure = 0; /**< Flag to set pure CsI simulation option */
-    bool m_simulateUpgrade = 0; /**< Flag to set upgrade electronics simulation option */
+    int m_eclUpgradeOverride = -1; /**< Upgraded electronics: -1 from ECLElectronicsConfiguration, 0 current, 1 upgraded */
+    bool m_eclUpgrade = false; /**< Upgraded electronics is used */
 
 
     std::unique_ptr< Belle2::ECL::ECLTimingUtilities > ECLTimeUtil =

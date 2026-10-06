@@ -186,7 +186,7 @@
       DiodeDeposition=True
       DspDataTest=False
       DspWithExtraMCInfoThreshold=0.02
-      ECLupgrade=False
+      ECLupgrade=-1
       HadronPulseShapes=True
       NoElectronicNoise=False
       StoreDspWithExtraMCInfo=False

@@ -202,6 +202,7 @@
       Chi2Threshold25dof=57.1
       Chi2Threshold27dof=60.0
       CovarianceMatrix=True
+      ECLupgrade=-1
       EnergyThreshold=0.03
       RegParam1=1.0
   36. ECLDigitCalibrator
@@ -209,7 +210,7 @@
       backgroundTimingCut=110.0
       fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
       simulatePure=False
-      simulateUpgrade=False
+      simulateUpgrade=-1
   37. ECLEventT0
       T0bin=1.0
       ethresh=0.06
@@ -3174,6 +3175,7 @@
       Chi2Threshold25dof=57.1
       Chi2Threshold27dof=60.0
       CovarianceMatrix=True
+      ECLupgrade=-1
       EnergyThreshold=0.03
       RegParam1=1.0
   36. ECLDigitCalibrator
@@ -3181,7 +3183,7 @@
       backgroundTimingCut=110.0
       fileBackgroundName=${BELLE2_SOFTWARE_DIR}/data/ecl/background_norm.root
       simulatePure=False
-      simulateUpgrade=False
+      simulateUpgrade=-1
   37. ECLEventT0
       T0bin=1.0
       ethresh=0.06

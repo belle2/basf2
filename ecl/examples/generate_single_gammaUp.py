@@ -115,7 +115,8 @@ output = register_module('RootOutput')
 
 # Add payloads for ECLWFParametersUp, ECLWFAlgoParamsUp, ECLWFNoiseParamsUp
 # use this for testing untill payloads will be included in main GT
-# conditions.prepend_globaltag("temp_smoneta_main_20260921-124621")
+conditions.prepend_globaltag("temp_smoneta_main_20260921-124621")
+conditions.prepend_globaltag("temp_vsagar_upgrade_ecl")
 
 # Setting the option for all non particle gun modules
 if args.bg == 'Exp26r1485':
@@ -167,7 +168,7 @@ else:
         {
             'evtNumList': [args.nevt],
             'runList': [1],
-            'expList': [0],
+            'expList': [2003 if args.NoUpgrade else 2004],
         }
     )
 
@@ -187,10 +188,7 @@ DATA_PROD_DIR = '/group/belle2/dataprod/BGOverlay/'
 print('bg scenario is number ', args.bg)
 # add machine bg
 if args.bg == '0':
-    add_simulation(
-        main,
-        simulateECLUpgrade=not args.NoUpgrade,
-    )
+    add_simulation(main)
 else:
     if args.bg == 'S1':
         bkg_file = (
@@ -242,11 +240,10 @@ else:
     bkg = glob.glob(bkg_file)
     add_simulation(
         main,
-        simulateECLUpgrade=not args.NoUpgrade,
         bkgfiles=bkg,
     )
 
-add_reconstruction(main, simulateECLUpgrade=not args.NoUpgrade)
+add_reconstruction(main)
 main.add_module(output)
 # add_mdst_output(main)
 

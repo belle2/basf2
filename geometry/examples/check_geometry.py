@@ -28,8 +28,8 @@ parser.add_argument(
     "--use-db",
     dest="use_db",
     action=argparse.BooleanOptionalAction,
-    default=True,
-    help="Use conditions database for geometry (default: True). Set --no-use-db to build from local XML files.")
+    default=False,
+    help="Use conditions database for geometry (default: False).")
 parser.add_argument("--output", default="Overlaps.root", help="Output ROOT file for overlaps (default: Overlaps.root)")
 args = parser.parse_args()
 

@@ -17,7 +17,7 @@ import basf2 as b2
 import subprocess
 
 
-def run_overlap_check(exp=None, use_db=True, points=100):
+def run_overlap_check(exp=None, use_db=False, points=100):
     """
     Run the Belle II geometry overlap checker and assert no overlaps are detected.
     Also ensures that the check actually ran by verifying 'Checking overlaps for volume' is present.
@@ -26,7 +26,9 @@ def run_overlap_check(exp=None, use_db=True, points=100):
     cmd = ['basf2', overlap_checker, '--', str(points)]
     if exp is not None:
         cmd += ['--exp', str(exp)]
-    if not use_db:
+    if use_db:
+        cmd += ['--use-db']
+    else:
         cmd += ['--no-use-db']
 
     try:
@@ -49,7 +51,7 @@ def run_overlap_check(exp=None, use_db=True, points=100):
         print('\n'.join(errors))
         b2.B2FATAL(
             f"There are overlaps in the geometry (exp={exp}, use_db={use_db}). "
-            f"Please run '{overlap_checker}' to fix them."
+            f"Please run '{overlap_checker}' and fix them."
         )
 
 

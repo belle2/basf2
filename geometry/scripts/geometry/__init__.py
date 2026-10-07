@@ -15,12 +15,12 @@ Functions related to building or using the simulation/reconstruction geometry
 import basf2
 
 
-ALLOWED_COMPONENTS = ['VTX', 'PXD', 'SVD', 'STL', 'FTL', 'CDCReducedNoSL0SL1', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']
+ALLOWED_COMPONENTS = ['VTX', 'PXD', 'SVD', 'STL', 'FTL', 'rCDC', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']
 
 # Pairs of component sets that are mutually exclusive alternatives for the
 # same subsystem (e.g. VTX replaces PXD+SVD): a components list may not
 # contain a member of both sides of a pair at the same time.
-_MUTUALLY_EXCLUSIVE_COMPONENT_GROUPS = [({'VTX'}, {'PXD', 'SVD'}), ({'STL', 'FTL', 'CDCReducedNoSL0SL1'}, {'CDC'})]
+_MUTUALLY_EXCLUSIVE_COMPONENT_GROUPS = [({'VTX'}, {'PXD', 'SVD'}), ({'STL', 'FTL', 'rCDC'}, {'CDC'})]
 
 # Experiment-number ranges (half-open: [exp_min, exp_max)) mapped to their
 # canonical detector-component set. A new detector generation should be added
@@ -29,8 +29,8 @@ _MUTUALLY_EXCLUSIVE_COMPONENT_GROUPS = [({'VTX'}, {'PXD', 'SVD'}), ({'STL', 'FTL
 _COMPONENT_SETS_BY_EXPERIMENT = [
     (0,    2000, ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # standard Belle II
     (2003, 2004, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
-    (2004, 2005, ['VTX', 'STL', 'FTL', 'CDCReducedNoSL0SL1', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
-    (2005, 2006, ['VTX', 'CDCReducedNoSL0SL1', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
+    (2004, 2005, ['VTX', 'STL', 'FTL', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
+    (2005, 2006, ['VTX', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
     (2006, 2007, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
 ]
 

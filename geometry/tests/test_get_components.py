@@ -12,7 +12,7 @@
 Test `geometry.get_components()` (experiment-number -> canonical detector
 component list) and the mutual-exclusion checks in `geometry.check_components()`
 that keep VTX from being combined with PXD/SVD, and the CDC alternative
-components (STL/FTL/CDCReducedNoSL0SL1) from being combined with plain CDC.
+components (STL/FTL/rCDC) from being combined with plain CDC.
 '''
 
 import subprocess
@@ -67,12 +67,12 @@ if __name__ == '__main__':
     # --- ... and must reject the CDC-alternative components combined with plain CDC ---
     expect_failure("from geometry import check_components; check_components(['STL', 'CDC'])")
     expect_failure("from geometry import check_components; check_components(['FTL', 'CDC'])")
-    expect_failure("from geometry import check_components; check_components(['CDCReducedNoSL0SL1', 'CDC'])")
+    expect_failure("from geometry import check_components; check_components(['rCDC', 'CDC'])")
 
     # --- ... but PXD+SVD together (standard, no VTX), and the CDC-alternative
     #     components together (no plain CDC), must still be allowed ---
     check_components(['PXD', 'SVD', 'CDC'])
-    check_components(['VTX', 'STL', 'FTL', 'CDCReducedNoSL0SL1'])
+    check_components(['VTX', 'STL', 'FTL', 'rCDC'])
 
     # components=None ("use everything", the add_simulation()/add_reconstruction()
     # default) must remain untouched by any of this.

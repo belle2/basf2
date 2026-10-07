@@ -33,6 +33,8 @@ def default_payload(p):
     p.setMaximalLayerJumpBackwardSeed(3)
     p.setPathMaximalCandidatesInFlight(3)
     p.setStateMaximalHitCandidates(4)
+    p.setStateCreatorFirstCDCLayer(0)
+    p.setMaxArcLengthRoughCDCStateFilter(20.)
 
     return p
 
@@ -42,12 +44,14 @@ def print_payload(p):
 
     print(f"\n{PAYLOAD_NAME} payload values:")
     print()
-    print(f"  maximalDeltaPhi                = {p.getMaximalDeltaPhi()}")
-    print(f"  minimalPtRequirement           = {p.getMinimalPtRequirement()}")
-    print(f"  maximalLayerJump               = {p.getMaximalLayerJump()}")
-    print(f"  maximalLayerJumpBackwardSeed   = {p.getMaximalLayerJumpBackwardSeed()}")
-    print(f"  pathMaximalCandidatesInFlight  = {p.getPathMaximalCandidatesInFlight()}")
-    print(f"  stateMaximalHitCandidates      = {p.getStateMaximalHitCandidates()}")
+    print(f"  maximalDeltaPhi                      = {p.getMaximalDeltaPhi()}")
+    print(f"  minimalPtRequirement                 = {p.getMinimalPtRequirement()}")
+    print(f"  maximalLayerJump                     = {p.getMaximalLayerJump()}")
+    print(f"  maximalLayerJumpBackwardSeed         = {p.getMaximalLayerJumpBackwardSeed()}")
+    print(f"  pathMaximalCandidatesInFlight        = {p.getPathMaximalCandidatesInFlight()}")
+    print(f"  stateMaximalHitCandidates            = {p.getStateMaximalHitCandidates()}")
+    print(f"  stateCreatorFirstCDCLayer            = {p.getStateCreatorFirstCDCLayer()}")
+    print(f"  maxArcLengthRoughCDCStateFilter      = {p.getMaxArcLengthRoughCDCStateFilter()}")
     print()
 
 

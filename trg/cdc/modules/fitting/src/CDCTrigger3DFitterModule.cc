@@ -369,6 +369,7 @@ CDCTrigger3DFitterModule::getIWireBegin(double phi0, double omega)
     int iLayerInSL = iLayer % m_nLayerInSuperLayer;
 
     // Skip if track and hit don't intersect
+    if (m_nWire[iLayer] == 0) continue;
     if (abs(1.0 / 2 * m_rWire[iLayer] * omega) > 1) continue;
 
     double phiCross = calPhiCross(m_rWire[iLayer], phi0, omega);

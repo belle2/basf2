@@ -58,6 +58,5 @@ If you need to cite this online book, please use the following citation:
    prerequisites
    basf2
    analysis
-   computing
    workflowmanagement
    join_us

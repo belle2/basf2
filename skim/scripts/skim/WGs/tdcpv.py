@@ -12,9 +12,8 @@ import modularAnalysis as ma
 from skim.standardlists.dileptons import (loadStdJpsiToee, loadStdJpsiTomumu,
                                           loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
-                                            loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
-                                            loadStdSkimHighEffEta, loadStdSkimHighEffKstar0,
-                                            loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
+                                            loadStdSkimHighEffPhi, loadStdSkimHighEffEta,
+                                            loadStdSkimHighEffKstar0, loadStdSkimHighEffRho0,
                                             loadStdSkimHighEffF_0, loadStdAllRho0)
 
 from skim import BaseSkim, fancy_skim_header
@@ -27,7 +26,8 @@ from stdKlongs import stdKlongs
 
 __authors__ = [
     "Chiara La Licata <chiara.lalicata@ts.infn.it>",
-    "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>"
+    "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>",
+    "nbrenny <nbrenny@iastate.edu>"
 ]
 
 __liaison__ = "Noah BRENNY <nbrenny@iastate.edu>"
@@ -74,8 +74,6 @@ class TDCPV_qqs(BaseSkim):
     **Particle lists used**:
 
     * ``phi:SkimHighEff``
-    * ``eta':SkimHighEff``
-    * ``eta:SkimHighEff``
     * ``pi0:eff40_May2020``
     * ``pi0:skim``
     * ``pi0:SkimHighEff``
@@ -94,7 +92,20 @@ class TDCPV_qqs(BaseSkim):
     **Cuts used**:
 
     * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
-    * 5.2 < Mbc < 5.29
+    * photon quality:
+        * abs(clusterTiming) < 200
+        * abs(formula(clusterTiming/clusterErrorTiming)) < 2
+        * clusterNHits > 1.5
+        * thetaInCDCAcceptance
+        * E > 0.05
+    * pi0 quality:
+        * daughter(0, abs(clusterTiming)) < 200
+        * daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * daughter(1, abs(clusterTiming)) < 200
+        * daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * 0.1 < InvM < 0.17
+        * -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4 for pi0s not in eta -> 3pi mode
+    * Mbc > 5.2
     * abs(deltaE) < 0.5
     * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1
     * E_ECL_TDCPV < 9
@@ -109,38 +120,86 @@ class TDCPV_qqs(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        clusterQualityCut = " \
+            abs(clusterTiming) < 200 \
+            and abs(formula(clusterTiming/clusterErrorTiming)) < 2 \
+            and clusterNHits > 1.5 \
+            and thetaInCDCAcceptance \
+            and E > 0.05 \
+        "
+        pi0QualityCut = " \
+            daughter(0, abs(clusterTiming)) < 200 \
+            and daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and daughter(1, abs(clusterTiming)) < 200 \
+            and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and 0.1 < InvM < 0.17 \
+        "
+        pi0QualityCutWithDaughterAngleCuts = pi0QualityCut + \
+            " and -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4"
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
+        ma.cutAndCopyList('gamma:tight_TDCPV_qqs', 'gamma:tight', clusterQualityCut, path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
+        ma.cutAndCopyList('pi0:skim_TDCPV_qqs', 'pi0:skim', pi0QualityCutWithDaughterAngleCuts, path=path)
         loadStdSkimHighEffPi0(path=path)
+        ma.cutAndCopyList('pi0:SkimHighEff_TDCPV_qqs', 'pi0:SkimHighEff', pi0QualityCutWithDaughterAngleCuts, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
-        loadStdAllRho0(path=path)
+        ma.cutAndCopyList('pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_qqs', 'pi0:eff40_May2020', pi0QualityCut, path=path)
+        ma.cutAndCopyList('pi0:eff40_May2020_TDCPV_qqs', 'pi0:eff40_May2020', pi0QualityCutWithDaughterAngleCuts, path=path)
 
+        loadStdAllRho0(path=path)
         loadStdSkimHighEffPhi(path=path)
-        loadStdSkimHighEffEta(path=path)
-        loadStdSkimHighEffEtaPrime(path=path)
+        # loadStdSkimHighEffEta with appropriately cut pi0 list (for dmID=2)
+        ma.reconstructDecay(
+            'eta:SkimHighEff1_TDCPV_qqs -> gamma:tight_TDCPV_qqs gamma:tight_TDCPV_qqs',
+            '0.4 < M < 0.6',
+            dmID=1,
+            path=path)
+        ma.reconstructDecay(
+                'eta:SkimHighEff2_TDCPV_qqs -> pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_qqs pi-:SkimHighEff pi+:SkimHighEff',
+                '0.4 < M < 0.6',
+                dmID=2,
+                path=path)
+        ma.copyLists('eta:SkimHighEff_TDCPV_qqs', ['eta:SkimHighEff1_TDCPV_qqs', 'eta:SkimHighEff2_TDCPV_qqs'], path=path)
+        # loadStdSkimHighEffEtaPrime with appropriately cut pi0 list (for dmID=2)
+        ma.reconstructDecay(
+            'eta\':SkimHighEff1_TDCPV_qqs -> pi+:SkimHighEff pi-:SkimHighEff gamma:tight_TDCPV_qqs',
+            '0.8 < M < 1.1',
+            dmID=1, path=path)
+        ma.reconstructDecay(
+            'eta\':SkimHighEff2_TDCPV_qqs -> pi+:SkimHighEff pi-:SkimHighEff eta:SkimHighEff_TDCPV_qqs',
+            '0.8 < M < 1.1',
+            dmID=2,
+            path=path)
+        ma.copyLists('eta\':SkimHighEff_TDCPV_qqs', ['eta\':SkimHighEff1_TDCPV_qqs', 'eta\':SkimHighEff2_TDCPV_qqs'], path=path)
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffRho0(path=path)
-        loadStdSkimHighEffOmega(path=path)
+        # loadStdSkimHighEffOmega with appropriately cut pi0 list
+        ma.reconstructDecay(
+                'omega:SkimHighEff_TDCPV_qqs -> pi0:eff40_May2020_TDCPV_qqs pi-:SkimHighEff pi+:SkimHighEff',
+                '0.73 < M < 0.83',
+                path=path)
         loadStdSkimHighEffF_0(path=path)
 
         # Additional non-standard lists
-        ma.reconstructDecay('phi:SkimHighEff2_TDCPV_qqs -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
-        ma.reconstructDecay('K_S0:pi0pi0_TDCPV_qqs -> pi0:skim pi0:skim', '0.4 < M < 0.6', path=path)
+        ma.reconstructDecay(
+            'phi:SkimHighEff2_TDCPV_qqs -> pi0:skim_TDCPV_qqs pi-:SkimHighEff pi+:SkimHighEff',
+            '0.97 < M < 1.1',
+            path=path)
+        ma.reconstructDecay('K_S0:pi0pi0_TDCPV_qqs -> pi0:skim_TDCPV_qqs pi0:skim_TDCPV_qqs', '0.4 < M < 0.6', path=path)
 
-        ma.cutAndCopyList('pi0:SkimHighEffCut_TDCPV_qqs', 'pi0:SkimHighEff', 'M > 0.105 and M < 0.150', path=path)
+        ma.cutAndCopyList('pi0:SkimHighEffCut_TDCPV_qqs', 'pi0:SkimHighEff_TDCPV_qqs', 'M > 0.105 and M < 0.150', path=path)
 
         ma.reconstructDecay('K*+:kshort_pip_TDCPV_qqs -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
         ma.reconstructDecay('K*+:kp_piz_TDCPV_qqs -> K+:SkimHighEff pi0:SkimHighEffCut_TDCPV_qqs', '0.74 < M < 1.04', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('gamma:E15_TDCPV_qqs', 'gamma:all', '1.4<E<4', path=path)
-        ma.cutAndCopyList('gamma:ECMS16_TDCPV_qqs', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+        ma.fillParticleList('gamma:E15_TDCPV_qqs', '1.4<E<4', path=path)
+        ma.fillParticleList('gamma:ECMS16_TDCPV_qqs', 'useCMSFrame(E)>1.6', path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
@@ -152,37 +211,37 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
             'phi:SkimHighEff K*0:SkimHighEff',
-            'eta\':SkimHighEff K_S0:merged',
-            'eta:SkimHighEff K_S0:merged',
-            'eta\':SkimHighEff K*0:SkimHighEff',
-            'eta:SkimHighEff K*0:SkimHighEff',
+            'eta\':SkimHighEff_TDCPV_qqs K_S0:merged',
+            'eta:SkimHighEff_TDCPV_qqs K_S0:merged',
+            'eta\':SkimHighEff_TDCPV_qqs K*0:SkimHighEff',
+            'eta:SkimHighEff_TDCPV_qqs K*0:SkimHighEff',
             'K_S0:merged K_S0:merged K_S0:merged',
             'pi0:SkimHighEffCut_TDCPV_qqs K_S0:merged',
             'rho0:SkimHighEff K_S0:merged',
-            'omega:SkimHighEff K_S0:merged',
+            'omega:SkimHighEff_TDCPV_qqs K_S0:merged',
             'f_0:SkimHighEff K_S0:merged',
-            'pi0:skim pi0:skim K_S0:merged',
-            'phi:SkimHighEff K_S0:merged pi0:skim',
+            'pi0:skim_TDCPV_qqs pi0:skim_TDCPV_qqs K_S0:merged',
+            'phi:SkimHighEff K_S0:merged pi0:skim_TDCPV_qqs',
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged',
             'pi+:SkimHighEff pi-:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
-            'pi0:skim K_S0:merged gamma:E15_TDCPV_qqs',
-            'pi0:SkimHighEff K_S0:merged gamma:ECMS16_TDCPV_qqs',
+            'pi0:skim_TDCPV_qqs K_S0:merged gamma:E15_TDCPV_qqs',
+            'pi0:SkimHighEff_TDCPV_qqs K_S0:merged gamma:ECMS16_TDCPV_qqs',
             'phi:SkimHighEff2_TDCPV_qqs K_S0:merged',
             'phi:SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
-            'eta\':SkimHighEff K_S0:pi0pi0_TDCPV_qqs',
+            'eta\':SkimHighEff_TDCPV_qqs K_S0:pi0pi0_TDCPV_qqs',
             'phi:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
-            'eta:SkimHighEff K_S0:merged gamma:E15_TDCPV_qqs',
+            'eta:SkimHighEff_TDCPV_qqs K_S0:merged gamma:E15_TDCPV_qqs',
             'rho0:SkimHighEff gamma:E15_TDCPV_qqs',
-            'omega:SkimHighEff gamma:E15_TDCPV_qqs',
+            'omega:SkimHighEff_TDCPV_qqs gamma:E15_TDCPV_qqs',
             'phi:SkimHighEff gamma:E15_TDCPV_qqs'
         ]
 
         bu_qqs_Channels = [
-            'eta\':SkimHighEff K+:SkimHighEff',
+            'eta\':SkimHighEff_TDCPV_qqs K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K*+:kshort_pip_TDCPV_qqs',
             'phi:SkimHighEff K*+:kp_piz_TDCPV_qqs',
-            'omega:SkimHighEff K+:SkimHighEff',
+            'omega:SkimHighEff_TDCPV_qqs K+:SkimHighEff',
             'rho0:SkimHighEff K+:SkimHighEff',
             'K_S0:merged K_S0:merged K+:SkimHighEff',
             'pi+:SkimHighEff pi-:SkimHighEff K+:SkimHighEff gamma:E15_TDCPV_qqs'
@@ -230,7 +289,8 @@ class TDCPV_qqs(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import ValidationMetadataSetter
 
-        ma.reconstructDecay("B0:etap_TDCPV_qqs -> eta':SkimHighEff K_S0:merged", '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+        ma.reconstructDecay("B0:etap_TDCPV_qqs -> eta':SkimHighEff_TDCPV_qqs K_S0:merged",
+                            '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
         ma.reconstructDecay("K_10:all_TDCPV_qqs -> K_S0:merged pi+:all pi-:all ", "", path=path)
         ma.reconstructDecay("B0:Kspipig_TDCPV_qqs -> K_10:all_TDCPV_qqs gamma:E15_TDCPV_qqs",
@@ -266,8 +326,6 @@ class TDCPV_klong(BaseSkim):
     **Particle lists used**:
 
     * ``phi:SkimHighEff``
-    * ``eta:SkimHighEff1``
-    * ``eta:SkimHighEff2``
     * ``rho0:SkimHighEff``
     * ``K_L0:allklm``
     * ``K_L0:allecl``
@@ -275,6 +333,19 @@ class TDCPV_klong(BaseSkim):
     **Cuts used**:
 
     * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
+    * photon quality:
+        * abs(clusterTiming) < 200
+        * abs(formula(clusterTiming/clusterErrorTiming)) < 2
+        * clusterNHits > 1.5
+        * thetaInCDCAcceptance
+        * E > 0.05
+    * pi0 quality:
+        * daughter(0, abs(clusterTiming)) < 200
+        * daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * daughter(1, abs(clusterTiming)) < 200
+        * daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2
+        * 0.1 < InvM < 0.17
+        * -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4 for pi0s not in eta -> 3pi mode
     * clusterE>0.150 for loose ECL KL
     * klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for loose KLM KL
     * clusterPulseShapeDiscriminationMVA<0.15 and clusterE>0.25 for tight ECL KL
@@ -294,41 +365,78 @@ class TDCPV_klong(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        clusterQualityCut = " \
+            abs(clusterTiming) < 200 \
+            and abs(formula(clusterTiming/clusterErrorTiming)) < 2 \
+            and clusterNHits > 1.5 \
+            and thetaInCDCAcceptance \
+            and E > 0.05 \
+        "
+        pi0QualityCut = " \
+            daughter(0, abs(clusterTiming)) < 200 \
+            and daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and daughter(1, abs(clusterTiming)) < 200 \
+            and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and 0.1 < InvM < 0.17 \
+        "
+        pi0QualityCutWithDaughterAngleCuts = pi0QualityCut + \
+            " and -1.5 < daughterDiffOf(0,1,phi) < 1.5 and daughterAngle(0,1) < 1.4"
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
+        ma.cutAndCopyList('gamma:tight_TDCPV_klong', 'gamma:tight', clusterQualityCut, path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
+        ma.cutAndCopyList('pi0:skim_TDCPV_klong', 'pi0:skim', pi0QualityCutWithDaughterAngleCuts, path=path)
         loadStdSkimHighEffPi0(path=path)
+        ma.cutAndCopyList('pi0:SkimHighEff_TDCPV_klong', 'pi0:SkimHighEff', pi0QualityCutWithDaughterAngleCuts, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        ma.cutAndCopyList('pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_klong', 'pi0:eff40_May2020', pi0QualityCut, path=path)
+        ma.cutAndCopyList('pi0:eff40_May2020_TDCPV_klong', 'pi0:eff40_May2020', pi0QualityCutWithDaughterAngleCuts, path=path)
 
         loadStdSkimHighEffPhi(path=path)
-        loadStdSkimHighEffEta(path=path)
+        ma.reconstructDecay(
+            'eta:SkimHighEff1_TDCPV_klong -> gamma:tight_TDCPV_klong gamma:tight_TDCPV_klong',
+            '0.4 < M < 0.6',
+            dmID=1,
+            path=path)
+        ma.reconstructDecay(
+            'eta:SkimHighEff2_TDCPV_klong -> pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_klong pi-:SkimHighEff pi+:SkimHighEff',
+            '0.4 < M < 0.6',
+            dmID=2,
+            path=path)
+        ma.copyLists('eta:SkimHighEff_TDCPV_klong', ['eta:SkimHighEff1_TDCPV_klong', 'eta:SkimHighEff2_TDCPV_klong'], path=path)
         loadStdSkimHighEffRho0(path=path)
-        loadStdSkimHighEffOmega(path=path)
+        # loadStdSkimHighEffOmega with appropriately cut pi0 list
+        ma.reconstructDecay(
+                'omega:SkimHighEff_TDCPV_klong -> pi0:eff40_May2020_TDCPV_klong pi-:SkimHighEff pi+:SkimHighEff',
+                '0.73 < M < 0.83',
+                path=path)
 
         # Additional non-standard lists
-        ma.reconstructDecay('phi:SkimHighEff2_TDCPV_klong -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
+        ma.reconstructDecay(
+            'phi:SkimHighEff2_TDCPV_klong -> pi0:skim_TDCPV_klong pi-:SkimHighEff pi+:SkimHighEff',
+            '0.97 < M < 1.1',
+            path=path)
 
-        ma.cutAndCopyList('eta:SkimKlong2_TDCPV_klong', 'eta:SkimHighEff2', '0.5 < M < 0.6', path=path)
+        ma.cutAndCopyList('eta:SkimKlong2_TDCPV_klong', 'eta:SkimHighEff2_TDCPV_klong', '0.5 < M < 0.6', path=path)
 
-        ma.reconstructDecay('eta\':klong_ggpp_TDCPV_klong -> eta:SkimHighEff1 pi+:SkimHighEff pi-:SkimHighEff',
+        ma.reconstructDecay('eta\':klong_ggpp_TDCPV_klong -> eta:SkimHighEff1_TDCPV_klong pi+:SkimHighEff pi-:SkimHighEff',
                             '0.8 < M < 1.1', path=path)
         ma.reconstructDecay(
             'eta\':klong_pipipi_TDCPV_klong -> eta:SkimKlong2_TDCPV_klong pi+:SkimHighEff pi-:SkimHighEff',
             '0.9 < M < 1',
             path=path)
-        ma.reconstructDecay('eta\':klong_rhogam_TDCPV_klong -> rho0:SkimHighEff gamma:tight', '0.9 < M < 1', path=path)
+        ma.reconstructDecay('eta\':klong_rhogam_TDCPV_klong -> rho0:SkimHighEff gamma:tight_TDCPV_klong', '0.9 < M < 1', path=path)
 
         stdKlongs(listtype='allklm', path=path)
         stdKlongs(listtype='allecl', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('gamma:E15_TDCPV_klong', 'gamma:all', '1.4<E<4', path=path)
-        ma.cutAndCopyList('gamma:ECMS16_TDCPV_klong', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+        ma.fillParticleList('gamma:E15_TDCPV_klong', '1.4<E<4', path=path)
+        ma.fillParticleList('gamma:ECMS16_TDCPV_klong', 'useCMSFrame(E)>1.6', path=path)
 
         # loose KL
         ma.cutAndCopyList(
@@ -385,9 +493,9 @@ class TDCPV_klong(BaseSkim):
             'eta\':klong_ggpp_TDCPV_klong K_L0:eclklm_qqs_2',
             'eta\':klong_pipipi_TDCPV_klong K_L0:eclklm_qqs_3',
             'eta\':klong_rhogam_TDCPV_klong K_L0:eclklm_qqs_4',
-            'omega:SkimHighEff K_L0:eclklm_qqs_5',
+            'omega:SkimHighEff_TDCPV_klong K_L0:eclklm_qqs_5',
             'rho0:SkimHighEff K_L0:eclklm_qqs_6',
-            'pi0:skim K_L0:eclklm_qqs_7'
+            'pi0:skim_TDCPV_klong K_L0:eclklm_qqs_7'
         ]
 
         bd_klong_List = []
@@ -479,20 +587,37 @@ class TDCPV_ccs(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        clusterQualityCut = " \
+            abs(clusterTiming) < 200 \
+            and abs(formula(clusterTiming/clusterErrorTiming)) < 2 \
+            and clusterNHits > 1.5 \
+            and thetaInCDCAcceptance \
+            and E > 0.05 \
+        "
+        pi0QualityCut = " \
+            daughter(0, abs(clusterTiming)) < 200 \
+            and daughter(0, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and daughter(1, abs(clusterTiming)) < 200 \
+            and daughter(1, abs(formula(clusterTiming/clusterErrorTiming))) < 2 \
+            and 0.1 < InvM < 0.17 \
+        "
         stdE("all", path=path)
         stdK("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path)
         stdPhotons("tight", path=path)
+        ma.applyCuts('gamma:tight', clusterQualityCut, path=path)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
 
         loadStdSkimPi0(path=path)
+        ma.applyCuts('pi0:skim', pi0QualityCut, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        ma.applyCuts('pi0:eff40_May2020', pi0QualityCut, path=path)
         stdPi0s("eff60_May2020", path=path)
+        ma.applyCuts('pi0:eff60_May2020', pi0QualityCut, path=path)
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffEta(path=path)
 

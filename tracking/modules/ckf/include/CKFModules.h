@@ -14,7 +14,12 @@
 #include <tracking/ckf/svd/findlets/CKFToSVDSeedFindlet.h>
 #include <tracking/ckf/cdc/findlets/CKFToCDCFromEclFindlet.h>
 
+#include <tracking/dbobjects/SVDToCDCCKFParameters.h>
+
 #include <tracking/trackingUtilities/eventdata/utils/ClassMnemomics.h>
+
+#include <boost/variant/variant.hpp>
+
 
 namespace Belle2 {
   /**
@@ -76,8 +81,78 @@ namespace Belle2 {
     {
       setDescription("Combinatorial Kalman Filter used for extrapolating SVD tracks into "
                      "CDC and create merged tracks.");
+
+      // add warnings for all parameters which will be overridden by the payload in the beginRun() function (here and in the findlet)
+      std::vector<std::string> payloadVarNames = {"maximalDeltaPhi", "firstActiveCDCLayer", "maximalLayerJump", "maximalLayerJumpBackwardSeed", "pathMaximalCandidatesInFlight", "stateMaximalHitCandidates", "stateBasicFilterParameters"};
+
+      for (const auto& varName : payloadVarNames) {
+        auto typeInfo = getParamList().getParameterTypeInfo(varName);
+
+        ModuleParamBase* paramPtr  = nullptr;
+        if (typeInfo == "int") {
+          paramPtr = &(getParamList().getParameter<int>(varName));
+        } else if (typeInfo == "double") {
+          paramPtr = &(getParamList().getParameter<double>(varName));
+        } else if (typeInfo == "float") {
+          paramPtr = &(getParamList().getParameter<float>(varName));
+        } else if (typeInfo == "unsigned long int") {
+          paramPtr = &(getParamList().getParameter<unsigned long int>(varName));
+        } else if (typeInfo == "dict(str -> variant(bool, int, float, str, list(str)))") {
+          using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
+          paramPtr = &(getParamList().getParameter< std::map<std::string, variantType> >(varName));
+        } else {
+          B2FATAL("Type " << typeInfo << " not supported ");
+        }
+        // the pointer should be safe as the getParameter<>() function throws an exception if parameter is not present (not sure if should be caught in constructor)
+        paramPtr->setDescription("[WARNING: may be overridden by payload] " + paramPtr->getDescription());
+
+      }
+
+    }
+
+
+
+    // override module parameter
+    void beginRun() override
+    {
+
+      DBObjPtr<SVDToCDCCKFParameters> payload;
+
+      if (!payload.isValid()) {
+        B2FATAL("ToCDCCKFModule: DB payload 'SVDToCDCCKFParameters' not found or not valid for current run.");
+      }
+
+      auto& paramRef = Belle2::Module::getParam<int>("firstActiveCDCLayer");
+      paramRef.setValue(payload->getStateCreatorFirstCDCLayer());
+
+      // need to be set before TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun()
+      using variantType = boost::variant<bool, int, double, std::string, std::vector<std::string> >;
+
+      // there are 4 potential filter which can be set to the "rough" filter (or derived filters)
+      std::vector<std::string> filterNames = {
+        "statePreFilter",
+        "stateFinalFilter",
+        "stateExtrapolationFilter",
+        "stateBasicFilter"
+      };
+
+      for (const std::string& filterName : filterNames) {
+        const std::string& filterNameValue = Belle2::Module::getParam<std::string>(filterName).getValue();
+
+        if (filterNameValue.find("rough") != filterNameValue.npos) {
+          std::map<std::string, variantType>& value =
+            Belle2::Module::getParam< std::map<std::string, variantType> >(filterName + "Parameters").getValue();
+          value["maximalArcLengthDistance"] = payload->getMaxArcLengthRoughCDCStateFilter();
+        }
+      }
+
+      TrackingUtilities::FindletModule<CKFToCDCFindlet>::beginRun();
+
     }
   };
+
+
+
 
   /**
    * Combinatorial Kalman Filter that extrapolates every ECLShower into the CDC

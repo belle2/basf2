@@ -171,7 +171,7 @@ void DQMHistAnalysisSVDDoseModule::event()
 
     // Write updateInterval PV and state PV first
     if (m_timeSinceLastPVUpdateChan) {
-      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, (void*)&timeSinceLastPVUpdate), "ca_put");
+      SEVCHK(ca_put(DBR_DOUBLE, m_timeSinceLastPVUpdateChan, &timeSinceLastPVUpdate), "ca_put");
     } else {
       SEVCHK(ca_create_channel((m_pvPrefix + m_deltaTPVSuffix).data(), NULL, NULL, 10, &m_timeSinceLastPVUpdateChan),
              "ca_create_channel (reconnection)");
@@ -208,7 +208,7 @@ void DQMHistAnalysisSVDDoseModule::event()
       double delta_nEvts = nEvts - pv.lastNEvts;
       double occ = delta_nEvts > 0.0 ? (delta_nHits / delta_nEvts * 100.0 / group.nStrips) : -1.0;
       if (pv.mychid) {
-        SEVCHK(ca_put(DBR_DOUBLE, pv.mychid, (void*)&occ), "ca_put");
+        SEVCHK(ca_put(DBR_DOUBLE, pv.mychid, &occ), "ca_put");
       } else {
         SEVCHK(ca_create_channel((m_pvPrefix + c_sensorGroups[g].pvMiddle + m_pvSuffix).data(),
                                  NULL, NULL, 10, &m_myPVs[g].mychid), "ca_create_channel (reconnection)");

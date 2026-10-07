@@ -32,7 +32,7 @@ from skim.standardlists.lightmesons import (
 from stdPi0s import stdPi0s
 from stdCharged import stdPi
 from stdPhotons import stdPhotons
-
+from vertex import kFit
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
@@ -337,7 +337,14 @@ class BtoRhopRhom(BaseSkim):
 
     def load_standard_lists(self, path):
         loadStdVeryLooseTracks('pi', path=path)
-        loadStdPi0ForBToCharmless(path=path)
+        stdPi0s(listtype='eff60_May2020', path=path)
+        ma.cutAndCopyList(
+            'pi0:charmlessFit',
+            'pi0:eff60_May2020',
+            'M > 0.105 and M < 0.160 and daughter(0, abs(clusterTiming))<200 and daughter(1, abs(clusterTiming))<200',
+            path=path)
+        kFit('pi0:charmlessFit', -1, fit_type='mass', path=path)
+
         loadStdVeryLooseRhoPlus(path=path)
 
     def build_lists(self, path):

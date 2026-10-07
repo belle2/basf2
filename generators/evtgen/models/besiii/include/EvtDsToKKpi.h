@@ -57,7 +57,7 @@ namespace Belle2 {
     double phi[6], rho[6], mass[6], width[6];
     int modetype[6];
     double mD, mDs, rRes, rD, mkstr, mk0, mass_Kaon, mass_Pion, mass_Pi0, mass_EtaP, mass_Eta, math_pi, afRatio;
-    int G[4][4], E[4][4][4][4];
+    int G[4][4];
 
   };
 } // Belle2 namespace

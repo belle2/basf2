@@ -167,8 +167,8 @@ void DQMHistAnalysisPXDCMModule::event()
     std::string name = "PXDDAQCM_" + modname;
     bool excluded = find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end();
 
-    auto hh1 = getDelta(m_histogramDirectoryName, name); // default, only updated
-    if (hh1) {
+    // default, only updated
+    if (auto hh1 = getDelta(m_histogramDirectoryName, name); hh1 != nullptr) {
       auto scale = hh1->GetBinContent(0); // misuse underflow as event counter
       bool update = scale >= m_minEntries ; // filter initial sampling
       anyupdate |= update;

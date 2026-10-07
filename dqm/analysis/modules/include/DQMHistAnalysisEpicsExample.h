@@ -18,7 +18,9 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * DQM histogram analysis example with EPICS usage (old)
+   */
 
   class DQMHistAnalysisEpicsExampleModule final : public DQMHistAnalysisModule {
 

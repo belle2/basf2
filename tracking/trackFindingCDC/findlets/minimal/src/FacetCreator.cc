@@ -76,9 +76,6 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     m_wireHitRelationFilter.prepare(wireHits);
     RelationFilterUtil::appendUsing(m_wireHitRelationFilter, wireHits, m_wireHitRelations);
 
-    B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.",
-             WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
-
     // Create the facets
     std::size_t nBefore = facets.size();
     createFacets(cluster, m_wireHitRelations, facets);

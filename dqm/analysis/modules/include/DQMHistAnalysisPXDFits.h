@@ -18,7 +18,7 @@
 #include <TF1.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM analysis for PXD, histogram fits */
 
   class DQMHistAnalysisPXDFitsModule final : public DQMHistAnalysisModule {
 
@@ -45,16 +45,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event() override final;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
 
   private:
 

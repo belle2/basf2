@@ -30,8 +30,7 @@ namespace Belle2 {
     -The highest category probability in Event Level for each category
     -The qr Output of each category, i.e. the Combiner input values. They could be used for independent tags.
     -qr Output of the Combiner.
-    -Direct Output of the FBDT Combiner: Combined probability of being a B0.
-    -Direct Output of the FANN Combiner: Combined probability of being a B0. */
+    -Direct Output of the FBDT Combiner: Combined probability of being a B0. */
 
   class FlavorTaggerInfoFillerModule : public Module {
   private:
@@ -47,8 +46,6 @@ namespace Belle2 {
 
     /** Used Flavor Tagger eventLevel Categories of the lists */
     std::vector<std::tuple<std::string, std::string, std::string>> m_eventLevelParticleLists;
-
-    bool m_FANNmlp; /**< Sets if FANN Combiner output will be saved or not **/
 
     bool m_TMVAfbdt; /**< Sets if FastBDT Combiner output will be saved or not **/
 

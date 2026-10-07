@@ -486,6 +486,7 @@ In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'FS1', the KSFW moment is calculated from the B final state daughters.
 Otherwise, the KSFW moment is calculated from the B primary daughters.
 The ROE mask name is then either the second or the third argument and must not be called 'FS1'.
+By default (when the optional arguments are omitted), the KSFW moment is calculated from the B primary daughters using the default ROE mask.
 Allowed input values for ``variable`` argument are the following:
 
 * mm2,   pt_sum
@@ -507,6 +508,7 @@ In that case the desired ROE mask name must be provided as well.
 If the second argument is set to 'ROE', the CleoCones are calculated only from ROE particles.
 Otherwise, the CleoCones are calculated from all final state particles.
 The ROE mask name is then either the second or the third argument and must not be called 'ROE'. The unit of the CleoConeCS is ``GeV/c``.
+By default (when the optional arguments are omitted), the CleoCones are calculated from all final state particles using the default ROE mask.
 
 .. warning:: You have to run the Continuum Suppression builder module for this variable to be meaningful.
 .. seealso:: :ref:`analysis_continuumsuppression` and `buildContinuumSuppression`.

@@ -137,9 +137,9 @@ Lambda and Kaon category, qp is weighted among the three candidates with the
 highest RightCategory. It means that the combiner gets 13 inputs, each one
 belonging to a specific category.  The multivariate method of the CombinerLevel
 is trained to give the qr value belonging to the tagged B-meson as output. Here
-q means flavor, and r is the so-called dilution factor. Currently, there are
-two combiner methods: one fast BDT and a multilayer-perceptron from the FANN
-library. In future, also new methods could be included.
+q means flavor, and r is the so-called dilution factor. Currently, the available
+combiner method is based on FastBDT. In future, also new methods could be
+included.
 
 .. figure:: figs/allCategories.png
   :width: 30em
@@ -201,11 +201,9 @@ To save this information you just have to add the predefined list
 ``flavor_tagging``
 to the variables that you use as argument for the module :func:`modularAnalysis.variablesToNtuple`.
 
-The two available combiners provide two different flavor tags which can be
-found in the ntuple of the output root file: ``FBDT_qrCombined`` or
-``FANN_qrCombined``. FBDT is the output of a fast boosted decision tree and
-FANN is the output of a multi-layer perceptron of the open source library fast
-artificial neural network . The default output -2 is saved for events without
+The combiners provide the flavor tag which can be found in the ntuple of the output root
+file (``FBDT_qrCombined``). FBDT is the output of a fast boosted decision tree (based on
+the ``FastBDT`` library). The default output -2 is saved for events without
 tracks in the ROE.
 
 The following variable is also saved by default,

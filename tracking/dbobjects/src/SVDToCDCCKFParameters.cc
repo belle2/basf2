@@ -32,3 +32,9 @@ unsigned int SVDToCDCCKFParameters::getPathMaximalCandidatesInFlight() const { r
 
 void SVDToCDCCKFParameters::setStateMaximalHitCandidates(unsigned int max) { m_stateMaximalHitCandidates = max; }
 unsigned int SVDToCDCCKFParameters::getStateMaximalHitCandidates() const { return m_stateMaximalHitCandidates; }
+
+void SVDToCDCCKFParameters::setStateCreatorFirstCDCLayer(unsigned int layer) { m_stateCreatorFirstCDCLayer = layer; }
+unsigned int SVDToCDCCKFParameters::getStateCreatorFirstCDCLayer() const { return m_stateCreatorFirstCDCLayer; }
+
+void SVDToCDCCKFParameters::setMaxArcLengthRoughCDCStateFilter(double arclength) { m_maxArcLengthRoughCDCStateFilter = arclength;}
+double SVDToCDCCKFParameters::getMaxArcLengthRoughCDCStateFilter() const { return m_maxArcLengthRoughCDCStateFilter;}

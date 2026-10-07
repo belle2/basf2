@@ -35,11 +35,12 @@ namespace Belle2 {
       m_A = x[2];
       m_B = x[1];
       m_C = x[0];
+      m_threeSquare = (m_C / m_A > 0.001);
 
       unsigned N = (m_A + m_B + m_C) / 2.0 / dE + 1;
       if (N < s_Nmin or N > s_Nmax) return;
 
-      if (m_C / m_A > 0.001) {
+      if (m_threeSquare) {
         for (unsigned i = 0; i <= N; i++) {
           double E = i * dE;
           double p = threeSquareConvolution(E);
@@ -57,7 +58,7 @@ namespace Belle2 {
 
     double EnergyMask::getMask(double E) const
     {
-      if (m_C / m_A > 0.001) {
+      if (m_threeSquare) {
         return threeSquareConvolution(E);
       } else {
         return twoSquareConvolution(E);

@@ -374,7 +374,7 @@ void MillepedeCollectorModule::collect()
       TMatrixD extProjection(5, 3);
       TMatrixD locProjection(3, 5);
 
-      // geometric constaint: 3 common (position) parameters + 3 external (curv., directions) per daughter
+      // geometric constraint: 3 common (position) parameters + 3 external (curv., directions) per daughter
       //TODO: revert due to alignment issues in rel9 (!5184)
       //TMatrixD innerTrafo(5, 3 + 3 * mother->getDaughters().size());
       //unsigned int iCol(3);

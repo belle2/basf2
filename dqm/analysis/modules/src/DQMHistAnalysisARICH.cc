@@ -102,7 +102,7 @@ void DQMHistAnalysisARICHModule::event()
 
   //Show alert by empty bins = red and strange entries = yellow
   //Draw lines on mergerHits histogram for shifters to divide sectors
-  TH1* m_h_mergerHit = findHist("ARICH/mergerHit");/**<The number of hits in each Merger Boards*/
+  auto m_h_mergerHit = findHist("ARICH", "mergerHit"); /**<The number of hits in each Merger Boards*/
   m_c_mergerHit = findCanvas("ARICH/c_mergerHit");
   if (m_h_mergerHit != NULL && m_c_mergerHit != NULL) {
     m_c_mergerHit->Clear();
@@ -139,7 +139,7 @@ void DQMHistAnalysisARICHModule::event()
 
 
   //Show alert by the ratio of center 2 bins to side 2bins. <1.5 = red, <2 = yellow
-  TH1* m_h_bits = findHist("ARICH/bits");/**<The number of hits in each timing bit*/
+  auto m_h_bits = findHist("ARICH", "bits"); /**<The number of hits in each timing bit*/
   m_c_bits = findCanvas("ARICH/c_bits");
   if (m_h_bits != NULL && m_c_bits != NULL) {
     m_c_bits->Clear();
@@ -184,10 +184,10 @@ void DQMHistAnalysisARICHModule::event()
   }
 
   //Draw 2D hit map of channels and APDs
-  TH1* m_h_chHit = findHist("ARICH/chipHit");/**<The number of hits in each chip */
+  auto m_h_chHit = findHist("ARICH", "chipHit"); /**<The number of hits in each chip */
   if (m_h_chHit != NULL) {
     int nevt = 0;
-    TH1* htmp = findHist("ARICH/hitsPerEvent");
+    TH1* htmp = findHist("ARICH", "hitsPerEvent");
     if (htmp) nevt = htmp->GetEntries();
     m_apdHist->fillFromTH1(m_h_chHit);
     if (nevt) m_apdHist->Scale(1. / float(nevt));
@@ -205,7 +205,7 @@ void DQMHistAnalysisARICHModule::event()
     B2INFO("Histogram named chipHit is not found.");
   }
 
-  TH1F* chDigit = (TH1F*)findHist("ARICH/chDigit");
+  auto chDigit = findHist("ARICH", "chDigit");
   int nhot = 0;
   double avgOcc = 0;
   if (chDigit != NULL && nEvents != 0) {
@@ -220,7 +220,7 @@ void DQMHistAnalysisARICHModule::event()
   setEpicsPV("hotChannels", nhot);
 
   int ndeadHapd = 0;
-  TH1F* hapdDigit = (TH1F*)findHist("ARICH/hapdDigit");
+  auto hapdDigit = findHist("ARICH", "hapdDigit");
   if (hapdDigit != NULL && avgOcc * 144. > 100.) {
     for (int i = 0; i < hapdDigit->GetNbinsX(); i++) {
       if (hapdDigit->GetBinContent(i + 1) == 0) ndeadHapd++;
@@ -230,7 +230,7 @@ void DQMHistAnalysisARICHModule::event()
 
   auto h_theta =  getDelta("ARICH", "theta", 0, false); // change this to false
   auto c_theta = findCanvas("ARICH/c_theta");
-  auto h_thetaInt = (TH1F*)findHist("ARICH/theta");
+  auto h_thetaInt = findHist("ARICH", "theta");
   if (h_theta != NULL && c_theta != NULL && h_thetaInt != NULL) {
     int binmax = h_theta->GetMaximumBin();
     double x = h_theta->GetXaxis()->GetBinCenter(binmax);

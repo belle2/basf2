@@ -3,33 +3,6 @@
 SSH - Secure Shell
 ==================
 
-.. sidebar:: Overview
-    :class: overview
-
-    **Length**: 1.5-3 hrs
-
-    **Prerequisites**:
-
-    * The ssh client installed on your computer
-    * To be able to enter simple commands on the terminal
-    * How to edit a text file on your computer
-    * A DESY account
-    * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
-
-    **Questions**:
-
-    * How to log in to a server?
-    * Why should I have a SSH config?
-    * How to generate and use keys?
-    * How to forward ports?
-    * How to copy files from and to a server?
-    * How can I get Jupyter notebooks running on a server?
-
-    **Objectives**:
-
-    * Be able to work comfortably on a remote machine.
-
-
 Secure Shell (SSH) is a protocol to access other computers. It was invented in
 1995 to make the old methods more secure but on first glance it still behaves
 similar to remote shell or telnet from the eighties: You can connect to a remote
@@ -162,9 +135,7 @@ impatient you can also press ``Ctrl-D`` as a shortcut.
 .. warning::
 
     Don't run long-running and CPU or memory heavy jobs on login nodes like
-    KEKCC and DESY where they have a dedicated batch systems (e.g.
-    :ref:`onlinebook_gbasf2`, :ref:`LSF <onlinebook_bsub>` or
-    :ref:`onlinebook_htcondor`). The login nodes are shared
+    KEKCC and DESY where they have a dedicated batch systems (see :ref:`onlinebook_batch`). The login nodes are shared
     resources for all users and it's not very polite and mostly also not
     permitted to occupy them with calculations that could be done on dedicated
     machines.

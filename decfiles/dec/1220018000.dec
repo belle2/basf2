@@ -1,0 +1,24 @@
+# EventType: 1220018000
+# Descriptor: B+ -> K+ eta eta
+# NickName: Bu_Ketaeta
+# Documentation:   
+# Tested: YES
+# PhysicsWG: BHADRONIC
+# Responsible: Sebastiano Raiz
+# Email: sebastiano.raiz@desy.de
+# Cuts: None
+# Date: 20260901
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.000 K+ eta eta PHSP;
+Enddecay
+
+CDecay B-sig
+
+End
+

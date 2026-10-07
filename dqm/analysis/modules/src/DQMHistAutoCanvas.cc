@@ -14,7 +14,6 @@
 #include <TStyle.h>
 #include <fstream>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -34,7 +33,8 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
            std::vector<std::string>());
   addParam("ExcludeFolders", m_exclfolders, "List of folders to exclude from create canvases, empty for none, \"all\" for all",
            std::vector<std::string>());
-  addParam("IncludeListFile", m_listfile, "List canvases to create canvases from, empty for using include/exclide folder parameter",
+  addParam("IncludeListFile", m_listfile,
+           "File with a list of canvas names to create and plot. Empty string for using include/exclude folder parameter",
            std::string(""));
   B2DEBUG(1, "DQMHistAutoCanvas: Constructor done.");
 }

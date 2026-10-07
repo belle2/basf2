@@ -1,0 +1,21 @@
+# EventType: 1210010800
+# Descriptor: [B+ -> K+ n anti-n]
+# NickName: Bplus_Kplus_nn
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Merna Abumusabh
+# Email: merna.abumusabh@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260923
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 K+ n0 anti-n0 PHSP;
+Enddecay
+CDecay B-sig
+
+End

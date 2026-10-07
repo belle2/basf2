@@ -29,8 +29,8 @@ _MUTUALLY_EXCLUSIVE_COMPONENT_GROUPS = [({'VTX'}, {'PXD', 'SVD'}), ({'STL', 'FTL
 _COMPONENT_SETS_BY_EXPERIMENT = [
     (0,    2000, ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # standard Belle II
     (2003, 2004, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
-    (2004, 2005, ['VTX', 'STL', 'FTL', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
-    (2005, 2006, ['VTX', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM']),  # upgrade scenario
+    (2004, 2005, ['VTX', 'STL', 'FTL', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
+    (2005, 2006, ['VTX', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
     (2006, 2007, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
 ]
 

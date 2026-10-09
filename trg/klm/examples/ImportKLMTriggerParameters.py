@@ -22,6 +22,8 @@ if (len(sys.argv) >= 2):
 
 parameters = KLMTriggerParameters()
 parameters.setWhichLayers('0:16')
+parameters.setNPlanes(7)
+
 
 database = Database.Instance()
 

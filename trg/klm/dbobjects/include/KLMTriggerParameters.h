@@ -37,10 +37,12 @@ namespace Belle2 {
 
     /**
      * Constructor
+     * @param[in] nPlanes      Number of planes used in the trigger logic.
      * @param[in] nLayers      Number of layers used in the trigger logic.
      * @param[in] whichLayers  Pattern of layers used in the trigger logic.
      */
-    KLMTriggerParameters(int32_t nLayers, const std::string& whichLayers) :
+    KLMTriggerParameters(int32_t nPlanes, int32_t nLayers, const std::string& whichLayers) :
+      m_nPlanes{nPlanes},
       m_nLayers{nLayers},
       m_whichLayers{whichLayers}
     {
@@ -52,6 +54,29 @@ namespace Belle2 {
     ~KLMTriggerParameters()
     {
     }
+
+
+    /**
+     * Set the number of planes used in the trigger logic.
+     * @param[in] nPlanes Max number of active KLM planes for an event.
+     */
+    void setNPlanes(int32_t nPlanes)
+    {
+      // Reject values that exceed the number of layers in backward EKLM,
+      // since it is the part with the smallest number of layers.
+      int32_t threshold{static_cast<int32_t>(EKLMElementNumbers::Instance().getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection)) * 2};
+      if (nPlanes > threshold) {
+        B2FATAL("The value passed to 'setNPlanes' exceed the maximum allowed number of layers."
+                << LogVar("nPlanes", nPlanes)
+                << LogVar("layers threshold", threshold));
+      } else if (nPlanes < 0) {
+        B2FATAL("The value passed to 'setNPlanes' is smaller than zero."
+                << LogVar("nPlanes", nPlanes)
+               );
+      }
+      m_nPlanes = nPlanes;
+    }
+
 
     /**
      * Set the number of layers used in the trigger logic.
@@ -85,6 +110,16 @@ namespace Belle2 {
                 << LogVar("string", whichLayers));
       m_whichLayers = whichLayers;
     }
+
+
+    /**
+     * Get the number of planes used in the trigger logic.
+     */
+    int32_t getNPlanes() const
+    {
+      return m_nPlanes;
+    }
+
 
     /**
      * Get the number of layers used in the trigger logic.
@@ -171,6 +206,7 @@ namespace Belle2 {
     /**
      * Number of layers used in the trigger logic.
      */
+    int32_t m_nPlanes{7};
     int32_t m_nLayers{0};
 
     std::vector<int32_t> m_Subdetector;
@@ -193,7 +229,7 @@ namespace Belle2 {
     /**
      * Class version.
      */
-    ClassDef(KLMTriggerParameters, 2);
+    ClassDef(KLMTriggerParameters, 3);
 
   };
 

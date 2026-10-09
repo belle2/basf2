@@ -14,7 +14,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysisRootFitExample.h>
 #include <RooRealVar.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -29,6 +28,7 @@ REG_MODULE(DQMHistAnalysisRooFitExample);
 DQMHistAnalysisRooFitExampleModule::DQMHistAnalysisRooFitExampleModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM histogram analysis example module featuring RooFit");
   // This module CAN NOT be run in parallel!
 
   //Parameter definition
@@ -54,12 +54,11 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
   B2INFO("DQMHistAnalysisRooFitExample: beginRun called.");
   m_c0->Clear();
 
-  auto hh1 = findHist("FirstDet/h_HitXPositionCh01");
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist("FirstDet", "h_HitXPositionCh01"); hh1 != nullptr) {
 
     //RooDataHist::RooDataHist(const char *name, const char *title, const RooArgList& vars, const TH1* hist, Double_t wgt) :
     x = w->var("x");
-    data = new RooDataHist("data", "dataset with x", *x, (const TH1*) hh1);
+    data = new RooDataHist("data", "dataset with x", *x, hh1);
     plot = x->frame();
     r = model->fitTo(*data);
 
@@ -78,11 +77,7 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
 
 void DQMHistAnalysisRooFitExampleModule::event()
 {
-  TH1* hh1;
-
-  hh1 = findHist("FirstDet/h_HitXPositionCh01");
-
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist("FirstDet", "h_HitXPositionCh01"); hh1 != nullptr) {
     if (data) delete data;
 
     data = new RooDataHist("data", "dataset with x", *(w->var("x")), hh1);
@@ -111,16 +106,5 @@ void DQMHistAnalysisRooFitExampleModule::event()
 
   double fitdata = 0;
   setEpicsPV("fit_value", fitdata);
-}
-
-void DQMHistAnalysisRooFitExampleModule::endRun()
-{
-  B2INFO("DQMHistAnalysisRooFitExample: endRun called");
-}
-
-
-void DQMHistAnalysisRooFitExampleModule::terminate()
-{
-  B2INFO("DQMHistAnalysisRooFitExample: terminate called");
 }
 

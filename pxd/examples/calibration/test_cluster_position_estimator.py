@@ -35,7 +35,7 @@ class PXDPositionEstimation(b2.Module):
 
         #: Counter for all clusters
         self.nclusters = 0
-        #: Counter for cluster where shape likelyhood was found in payload
+        #: Counter for cluster where shape likelihood was found in payload
         self.nfound_shapes = 0
         #: Counter for clusters where position correction was found in payload
         self.nfound_offset = 0

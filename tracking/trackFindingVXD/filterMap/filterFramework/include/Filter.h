@@ -357,7 +357,7 @@ namespace Belle2 {
 
   private:
     /// Member pointer to boolean indicating if filters are bypassed (true) or their actual result is returned (false).
-    const bool* m_bypass;
+    const bool* m_bypass {};
   };
 
 
@@ -464,7 +464,7 @@ namespace Belle2 {
 
   private:
     /// Member pointer to boolean indicating if filters are active (true) or inactive (false).
-    const bool* m_enable;
+    const bool* m_enable {};
   };
 
 
@@ -767,7 +767,6 @@ namespace Belle2 {
     class FilterB,
     class templateObserverType
     >
-  // cppcheck-suppress copyCtorAndEqOperator
   class Filter <Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
     /// Char suffix to be used in the filter name for ROOT to indicate the filter A of the combination A OR B.
     const char* c_orSuffixA = "_or_A";

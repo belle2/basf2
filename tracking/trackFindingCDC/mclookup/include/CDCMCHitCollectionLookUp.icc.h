@@ -33,7 +33,7 @@ namespace Belle2 {
     template <class ACDCHitCollection>
     std::map<ITrackType, size_t>
     CDCMCHitCollectionLookUp<ACDCHitCollection>::getHitCountByMCTrackId(
-      const ACDCHitCollection& hits) const
+      const ACDCHitCollection& hits)
     {
       const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
@@ -189,6 +189,7 @@ namespace Belle2 {
         return TrackingUtilities::EForwardBackward::c_Forward;
       } else if (firstInTrackId > lastInTrackId) {
         return TrackingUtilities::EForwardBackward::c_Backward;
+        // cppcheck-suppress knownConditionTrueFalse ; defensive check kept deliberately
       } else if (firstInTrackId == lastInTrackId) {
         return TrackingUtilities::EForwardBackward::c_Unknown;
       }

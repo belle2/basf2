@@ -320,6 +320,7 @@ bool TimeExtractionUtils::buildFullCovarianceMatrix(const RecoTrack& recoTrack,
       }
 
       // update at i
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
       const genfit::MeasuredStateOnPlane* update = fi->getForwardUpdate();
       // transport to i+1 prediction at i+1
       const genfit::ReferenceStateOnPlane* rsop = fiNext->getReferenceState();

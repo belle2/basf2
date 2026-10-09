@@ -15,7 +15,6 @@
 #include <tracking/trackingUtilities/utilities/Functional.h>
 
 #include <algorithm>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,9 +30,6 @@ std::vector<const CDCSegmentPair*> BaseSegmentPairRelationFilter::getPossibleTos
   const CDCSegmentPair* from,
   const std::vector<const CDCSegmentPair*>& segmentPairs) const
 {
-  assert(std::is_sorted(segmentPairs.begin(), segmentPairs.end(), LessOf<Deref>()) &&
-         "Expected segment pairs to be sorted");
-
   const CDCSegment2D* toSegment = from->getToSegment();
 
   ConstVectorRange<const CDCSegmentPair*> neighbors{

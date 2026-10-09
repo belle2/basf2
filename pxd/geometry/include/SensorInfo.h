@@ -19,8 +19,8 @@ namespace Belle2 {
     class SensorInfo: public VXD::SensorInfoBase {
     public:
       /** Constructor which automatically sets the SensorType */
-      SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
-                 float splitLength = 0, int vCells2 = 0):
+      explicit SensorInfo(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
+                          float splitLength = 0, int vCells2 = 0):
         VXD::SensorInfoBase(SensorInfo::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2), m_temperature(300),
         m_bulkDoping(0), m_backVoltage(0), m_topVoltage(0), m_sourceBorderSmallPitch(0), m_clearBorderSmallPitch(0),
         m_drainBorderSmallPitch(0), m_sourceBorderLargePitch(0), m_clearBorderLargePitch(0), m_drainBorderLargePitch(0),
@@ -162,13 +162,13 @@ namespace Belle2 {
        * @param v Local v coordinate
        * @return pixel kind ID in range 0..7, 0-3 for Layer=1, 4-7 for Layer=2
        */
-      int getPixelKind(const VxdID sensorID, double v) const;
+      static int getPixelKind(const VxdID sensorID, double v);
       /** Return pixel kind ID
        * @param sensorID the sensor identification
        * @param vID Local vcell ID
        * @return pixel kind ID in range 0, 1, 2, 3 for z55, z60, z70, z85 pixels
        */
-      int getPixelKindNew(const VxdID& sensorID, int vID) const;
+      static int getPixelKindNew(const VxdID& sensorID, int vID);
 
     protected:
       /** Calculate Lorentz shift factor.

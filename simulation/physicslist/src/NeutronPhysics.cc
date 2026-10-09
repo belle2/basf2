@@ -8,26 +8,26 @@
 
 #include <simulation/physicslist/NeutronPhysics.h>
 
-#include "G4ProcessManager.hh"
-#include "G4HadronInelasticProcess.hh"
-#include "G4HadronElasticProcess.hh"
-#include "G4NeutronCaptureProcess.hh"
-#include "G4NeutronKiller.hh"
+#include <G4ProcessManager.hh>
+#include <G4HadronInelasticProcess.hh>
+#include <G4HadronElasticProcess.hh>
+#include <G4NeutronCaptureProcess.hh>
+#include <G4NeutronKiller.hh>
 
-#include "G4CascadeInterface.hh"
-#include "G4TheoFSGenerator.hh"
-#include "G4FTFModel.hh"
-#include "G4ExcitedStringDecay.hh"
-#include "G4LundStringFragmentation.hh"
-#include "G4GeneratorPrecompoundInterface.hh"
-#include "G4ChipsElasticModel.hh"
-#include "G4NeutronRadCapture.hh"
+#include <G4CascadeInterface.hh>
+#include <G4TheoFSGenerator.hh>
+#include <G4FTFModel.hh>
+#include <G4ExcitedStringDecay.hh>
+#include <G4LundStringFragmentation.hh>
+#include <G4GeneratorPrecompoundInterface.hh>
+#include <G4ChipsElasticModel.hh>
+#include <G4NeutronRadCapture.hh>
 
-#include "G4BGGNucleonInelasticXS.hh"
-#include "G4NeutronElasticXS.hh"
-#include "G4NeutronCaptureXS.hh"
+#include <G4BGGNucleonInelasticXS.hh>
+#include <G4NeutronElasticXS.hh>
+#include <G4NeutronCaptureXS.hh>
 
-#include "G4SystemOfUnits.hh"
+#include <G4SystemOfUnits.hh>
 
 using namespace Belle2;
 using namespace Simulation;

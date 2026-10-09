@@ -33,13 +33,13 @@ namespace Belle2 {
     }
 
     /** Set the name of the weight file */
-    void setIdentifierName(const std::string identifier)
+    void setIdentifierName(const std::string& identifier)
     {
       m_weightFileIdentifier = identifier;
     }
 
     /** Get the name of the weight file */
-    std::string getIdentifierName() const
+    const std::string& getIdentifierName() const
     {
       return m_weightFileIdentifier;
     }

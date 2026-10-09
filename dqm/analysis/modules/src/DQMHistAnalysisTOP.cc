@@ -7,9 +7,6 @@
  **************************************************************************/
 
 #include <dqm/analysis/modules/DQMHistAnalysisTOP.h>
-#include <boost/format.hpp>
-#include <boost/algorithm/string.hpp>
-#include <TClass.h>
 #include <TF1.h>
 #include <TROOT.h>
 #include <TStyle.h>
@@ -21,7 +18,6 @@
 
 using namespace std;
 using namespace Belle2;
-using boost::format;
 
 //-----------------------------------------------------------------
 //                 Register the Module
@@ -440,6 +436,7 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
   int alarmState = c_Gray;
   m_text2->Clear();
   if (m_evtMonitorFract) delete m_evtMonitorFract;
+  m_evtMonitorFract = nullptr;
 
   auto* h = findHist("TOP/BoolEvtMonitor");
   if (h) {

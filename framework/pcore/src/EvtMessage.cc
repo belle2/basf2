@@ -80,11 +80,11 @@ char* EvtMessage::buffer()
 
 void EvtMessage::buffer(const char* bufadr)
 {
-  UInt_t size = *(UInt_t*)bufadr;
-  int bufsize = roundToNearestInt(size);
+  UInt_t msgSize = *reinterpret_cast<const UInt_t*>(bufadr);
+  int bufsize = roundToNearestInt(msgSize);
   m_data = new char[bufsize];
-  memcpy(m_data, bufadr, size);
-  for (int i = bufsize - size; i > 0; i--)
+  memcpy(m_data, bufadr, msgSize);
+  for (int i = bufsize - msgSize; i > 0; i--)
     m_data[bufsize - i] = '\0'; //zero extra bytes
   m_ownsBuffer = true;
 }

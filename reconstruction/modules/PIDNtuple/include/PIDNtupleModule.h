@@ -11,7 +11,7 @@
 #include <framework/core/Module.h>
 #include <string>
 #include <reconstruction/modules/PIDNtuple/PIDTree.h>
-#include "TFile.h"
+#include <TFile.h>
 
 namespace Belle2 {
 

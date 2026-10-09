@@ -69,7 +69,7 @@ def run_job_submission(backend, mc_iov_list):
             # Append to job to jobs
             jobs.append(job)
 
-    # Submit alls jobs at once
+    # Submit all jobs at once
     backend.submit(jobs)
 
     from basf2 import B2INFO

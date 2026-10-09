@@ -128,12 +128,6 @@ Advanced feature preprocessing like Decorrelation, PCA, Gaussianisation, ... are
 Each method provides a lot of configuration options.
 Often the methods are rather slow and there are bugs and pitfalls (e.g. TMVA crashes in case it encounters NaNs, has too few statistics, sometimes with negative weights, and other reasons).
 
-FANN
-^^^^
-
-is the fast artificial neural network.
-It is used in the Flavor Tagger and by the HLT people.
-
 NeuroBayes
 ^^^^^^^^^^
 
@@ -410,6 +404,43 @@ E.g. with ``basf2_mva_download`` if you saved it in the database (or ``basf2_mva
 Afterwards you can open the .xml file in a text-editor and change the variable name by hand.
 Finally you can use ``basf2_mva_upload`` again to add the weightfile to your local database again.
 
+.. _mva_contract_version:
+
+Contract version of a weightfile
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A payload name that contains the training version, for example ``...rel8_v2``, ties a weightfile to the code that requests it: a wrong globaltag gives "payload not found" rather than a wrong model.
+That link is lost when the name has to stay the same across trainings, which is the case for models served from a performance globaltag, where the globaltag selects the campaign and a new training is uploaded as a new revision under the same name.
+A weightfile from another globaltag then resolves under the name the code asks for, and gives wrong results if it was built for code that has changed since.
+
+To make a weightfile say which code it fits, it can record a **contract version**:
+
+.. code-block:: python
+
+    # when the weightfile is created
+    weightfile.addContractVersion(1)
+
+    # when it is applied
+    if not weightfile.hasContractVersion():
+        # written before contract versions existed: treat as the oldest version you know
+        ...
+    version = weightfile.getContractVersion()  # returns -1 if there is none
+
+All three methods use the same element key, ``contract_version``, so the contract of any weightfile can be read the same way.
+
+The contract version describes the agreement between the weightfile and the code applying it: how the inputs are built and how the outputs are interpreted.
+It is bumped by hand whenever a change breaks that agreement, and it is not a software version, so unrelated changes in a release must not bump it.
+The applying code decides what to do with the version it finds: it either implements that version, with its current behaviour or an older code path it still provides, or it refuses to run.
+
+A useful convention is to derive the payload name from the contract version as well, for example with a ``_c1`` suffix, so that one performance globaltag can hold the payloads of several contract versions side by side and every release automatically requests the one it implements.
+The figure below shows the scheme as it is used by :ref:`ModeSelector`.
+
+.. figure:: figs/contract_version_scheme.svg
+  :width: 100 %
+
+  Payload naming and contract versions, with the ModeSelector payloads as an example.
+  Left: a payload name carrying the training version. Right: contract-versioned names in one performance globaltag, where each release requests the contract version it implements.
+
 Reading List
 ------------
 
@@ -532,10 +563,6 @@ Websites and papers for the frameworks which are supported by the mva package
 
   * `<http://tmva.sourceforge.net/>`_
   * Andreas Hoecker et al. „TMVA: Toolkit for Multivariate Data Analysis“. `<https://arxiv.org/abs/physics/0703039>`_
-
-* FANN
-
-  * S. Nissen. Implementation of a Fast Artificial Neural Network Library (fann). `<http://fann.sourceforge.net/fann.pdf>`_
 
 * SKLearn
 

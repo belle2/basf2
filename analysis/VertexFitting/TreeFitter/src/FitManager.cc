@@ -122,6 +122,9 @@ namespace TreeFitter {
     return (m_status == VertexStatus::Success);
   }
 
+  // returncov is an output parameter: ROOT's const operator() overload hides the
+  // assignments below from cppcheck
+  // cppcheck-suppress constParameterReference
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
   {
 

@@ -22,6 +22,9 @@ namespace Belle2 {
 
     //! Constructor
     DQMHistAnalysisTRGECLModule();
+
+  private:
+
     //! initialization
     void initialize() override final;
     //! begin run
@@ -33,16 +36,14 @@ namespace Belle2 {
     //! delete pointers
     void terminate() override final;
 
-  private:
-
     //! minimum entry in EventT0 histogram to fit
     int m_MinEntryForFit = 200;
     //! get EventT0 mean and width
-    void getEventT0(std::vector<std::string>, TGraphErrors*, TGraphErrors*);
+    void getEventT0(const std::vector<std::string>&, TGraphErrors*, TGraphErrors*);
     //! single Gaussian function
     static double fGaus(double* x, double* par);
     //! fit on EventT0 histogram
-    void fitEventT0(TH1* hist, std::vector<double>&);
+    static void fitEventT0(TH1* hist, std::vector<double>&);
     //! name of EventT0 histograms
     std::vector<std::string> s_histNameEventT0;
     //! fraction of event timing with different max TC selection

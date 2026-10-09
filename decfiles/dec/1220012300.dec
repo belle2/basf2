@@ -1,0 +1,43 @@
+# EventType: 1220012300
+# Descriptor: [B+ -> K*+ K_L0 K_L0]
+# NickName: Bplus_Ksplust0KLKL
+# Tested: No
+# PhysicsWG: EWP
+# Responsible: Merna Abumusabh
+# Email: merna.abumusabh@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260609
+
+
+Alias K*+sig K*+
+Alias K*-sig K*-
+ChargeConj K*+sig K*-sig
+Alias K_S0sig K_S0
+Alias pi0sig pi0
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 K*+sig K_L0 K_L0                 PHSP;
+Enddecay
+CDecay B-sig
+
+Decay K*+sig
+0.5      K+  pi0sig                        VSS;
+0.5      K_S0sig  pi+                        VSS;
+Enddecay
+
+CDecay K*-sig
+
+Decay K_S0sig
+1.0    pi- pi+ PHSP;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+End

@@ -16,7 +16,12 @@
 #include <set>
 
 namespace Belle2 {
-  /** Class definition for the reference histogram display. */
+  /**
+   * DQM framework core module to create canvases for histograms.
+   * It provides automatic plotting of histogram plus the reference if
+   * available. For DQM operation, the list of canvases is provides as a file,
+   * but there are also some other options for testing.
+   */
 
   class DQMHistAutoCanvasModule final : public DQMHistAnalysisModule {
 

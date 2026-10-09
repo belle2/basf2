@@ -39,7 +39,7 @@ namespace {
   class AcceptHighWeight : public Findlet<const int* const, WithWeight<int*> > {
   public:
     void apply(const std::vector<const int*>& currentPath __attribute__((unused)),
-               std::vector<WithWeight<int*>>& nextStates __attribute__((unused)))
+               std::vector<WithWeight<int*>>& nextStates __attribute__((unused))) override
     {
       // Remove states with low weight
       erase_remove_if(nextStates, GetWeight() < 0.5);

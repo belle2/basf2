@@ -96,7 +96,7 @@ void ROIDQMModule::event()
 
   m_hnInter->Fill(m_pxdIntercept.getEntries());
 
-  for (auto& it : m_pxdIntercept)
+  for (const auto& it : m_pxdIntercept)
     fillSensorInterHistos(&it);
 
 

@@ -105,7 +105,7 @@ void KLMDigitizerModule::initialize()
 void KLMDigitizerModule::checkScintillatorFEEParameters()
 {
   KLMChannelIndex klmChannels;
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     KLMChannelNumber channel = m_ElementNumbers->channelNumber(klmChannel.getSubdetector(), klmChannel.getSection(),
                                                                klmChannel.getSector(), klmChannel.getLayer(),
                                                                klmChannel.getPlane(), klmChannel.getStrip());
@@ -274,7 +274,7 @@ void KLMDigitizerModule::digitizeScintillator()
     digit->setEnergyDeposit(simulator.getEnergy());
     if (m_SaveFPGAFit && (simulator.getFitStatus() ==
                           KLM::c_ScintillatorFirmwareSuccessfulFit)) {
-      KLMScintillatorFirmwareFitResult* fit =
+      const KLMScintillatorFirmwareFitResult* fit =
         m_FPGAFits.appendNew(*simulator.getFPGAFit());
       digit->addRelationTo(fit);
     }
@@ -543,6 +543,3 @@ void KLMDigitizerModule::endRun()
   delete m_Fitter;
 }
 
-void KLMDigitizerModule::terminate()
-{
-}

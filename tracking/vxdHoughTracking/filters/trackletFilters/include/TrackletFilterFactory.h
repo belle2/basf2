@@ -25,7 +25,7 @@ namespace Belle2 {
       explicit TrackletFilterFactory(const std::string& defaultFilterName = "all");
 
       /// Default destructor
-      ~TrackletFilterFactory();
+      ~TrackletFilterFactory() override;
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

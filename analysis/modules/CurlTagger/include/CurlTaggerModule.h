@@ -46,7 +46,7 @@ namespace Belle2 {
 
   private:
     /** preselects particles that may be curl tracks */
-    bool passesPreSelection(Particle* particle);
+    bool passesPreSelection(const Particle* particle);
 
     //params
     /** input particle lists */

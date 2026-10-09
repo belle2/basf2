@@ -50,6 +50,7 @@ void CDCFacet::reverse()
   m_fitLine.reverse();
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
 CDCFacet CDCFacet::reversed() const
 {
   return CDCFacet(getEndRLWireHit().reversed(),

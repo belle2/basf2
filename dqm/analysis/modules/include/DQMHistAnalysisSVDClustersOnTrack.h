@@ -36,6 +36,11 @@ namespace Belle2 {
     DQMHistAnalysisSVDClustersOnTrackModule();
 
     /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisSVDClustersOnTrackModule() override;
+
+    /**
      * Initializer.
      */
     void initialize() override final;

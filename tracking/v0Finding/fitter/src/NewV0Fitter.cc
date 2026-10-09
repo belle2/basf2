@@ -6,28 +6,26 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/v0Finding/fitter/NewV0Fitter.h>
+#include <tracking/v0Finding/fitter/V0VertexFitterFactory.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/geometry/BFieldManager.h>
-#include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFitting/trackBuilder/factories/TrackBuilder.h>
 
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 
-#include <genfit/GFRaveVertexFactory.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
-
-#include <framework/utilities/IOIntercept.h>
 
 using namespace Belle2;
 
 NewV0Fitter::NewV0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
                          const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
                          const std::string& copiedRecoTracksName, bool enableValidation)
-  : m_recoTracksName(recoTracksName), m_validation(enableValidation)
+  : m_recoTracksName(recoTracksName), m_vertexFitter(V0VertexFitterFactory::create("Rave")),
+    m_validation(enableValidation)
 {
   B2ASSERT("V0Fitter: material effects not set up.  Please use SetupGenfitExtrapolationModule.",
            genfit::MaterialEffects::getInstance()->isInitialized());
@@ -144,17 +142,17 @@ bool NewV0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus, c
   const auto* fitMinus = saveTrackFitResult(m_trkMinus, sharedCluster);
   if (not fitMinus) return false;
 
-  auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, fitPlus),
-                             std::make_pair(trackMinus, fitMinus),
-                             m_fittedVertex.getPos().X(), m_fittedVertex.getPos().Y(), m_fittedVertex.getPos().Z());
+  const auto* v0 = m_v0s.appendNew(std::make_pair(trackPlus, fitPlus),
+                                   std::make_pair(trackMinus, fitMinus),
+                                   m_fittedVertex.getPos().X(), m_fittedVertex.getPos().Y(), m_fittedVertex.getPos().Z());
 
   if (m_validation) {
-    auto* validationV0 = m_validationV0s.appendNew(std::make_pair(trackPlus, fitPlus),
-                                                   std::make_pair(trackMinus, fitMinus),
-                                                   ROOT::Math::XYZVector(m_fittedVertex.getPos()),
-                                                   m_fittedVertex.getCov(),
-                                                   m_momentum, m_invMass,
-                                                   m_fittedVertex.getChi2());
+    const auto* validationV0 = m_validationV0s.appendNew(std::make_pair(trackPlus, fitPlus),
+                                                         std::make_pair(trackMinus, fitMinus),
+                                                         ROOT::Math::XYZVector(m_fittedVertex.getPos()),
+                                                         m_fittedVertex.getCov(),
+                                                         m_momentum, m_invMass,
+                                                         m_fittedVertex.getChi2());
     v0->addRelationTo(validationV0);
   }
 
@@ -185,7 +183,7 @@ int NewV0Fitter::vertexFit(const RecoTrack* recoTrackPlus, const RecoTrack* reco
   // fit vertex
 
   genfit::GFRaveVertex vert;
-  if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) return c_VertexFitFailed;
+  if (not m_vertexFitter->fit(gfTrackPlus, gfTrackMinus, pdgTrackPlus, pdgTrackMinus, vert)) return c_VertexFitFailed;
   auto vertexPos = ROOT::Math::XYZVector(vert.getPos());
 
   // apply cuts on the vertex
@@ -250,39 +248,6 @@ bool NewV0Fitter::setCardinalRep(genfit::Track& gfTrack, int pdgCode)
   return false;
 }
 
-
-bool NewV0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
-{
-  VertexVector vertexVector;
-  std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
-
-  try {
-    IOIntercept::OutputToLogMessages
-    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
-    logCapture.start();
-
-    genfit::GFRaveVertexFactory vertexFactory;
-    vertexFactory.findVertices(&vertexVector.v, trackPair);
-  } catch (...) {
-    B2ERROR("V0Fitter: exception during vertex fit.");
-    return false;
-  }
-
-  if (vertexVector.size() != 1) {
-    B2DEBUG(21, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
-    return false;
-  }
-
-  if ((*vertexVector[0]).getNTracks() != 2) {
-    B2DEBUG(20, "Wrong number of tracks in vertex.");
-    return false;
-  }
-
-  vertex = *vertexVector[0];
-  return true;
-}
-
-
 int NewV0Fitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, genfit::MeasuredStateOnPlane& stateMinus,
                                      const genfit::GFRaveVertex& vertex)
 {
@@ -312,7 +277,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   std::vector<bool> useInFit;
   const auto& recoHitInformations = origRecoTrack->getRecoHitInformations(true); // true to get sorted hits info
   useInFit.reserve(recoHitInformations.size());
-  for (const auto& hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
+  for (const auto* hitInfo : recoHitInformations) useInFit.push_back(hitInfo->useInFit());
 
   // get track representation for a given particle
   const auto* rep = getTrackRepresentation(origRecoTrack, abs(ptype.getPDGCode()));
@@ -322,7 +287,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
   int removedHits = 0;
   unsigned firstHit = 0;
   for (unsigned i = 0; i < recoHitInformations.size(); i++) {
-    const auto& hitInfo = recoHitInformations[i];
+    const auto* hitInfo = recoHitInformations[i];
     if (not hitInfo->useInFit()) continue;
     try {
       auto state = origRecoTrack->getMeasuredStateOnPlaneFromRecoHit(hitInfo, rep); // a copy of
@@ -353,7 +318,7 @@ const RecoTrack* NewV0Fitter::removeHitsAndRefit(const RecoTrack* origRecoTrack,
     std::vector<unsigned> svdIndex;
     for (unsigned i = 0; i < useInFit.size(); i++) {
       if (not useInFit[i]) continue;
-      const auto& hitInfo = recoHitInformations[i];
+      const auto* hitInfo = recoHitInformations[i];
       if (hitInfo->getTrackingDetector() == RecoHitInformation::c_SVD) svdIndex.push_back(i);
       else break;
     }

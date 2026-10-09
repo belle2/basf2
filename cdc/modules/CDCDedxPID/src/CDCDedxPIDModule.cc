@@ -19,6 +19,7 @@
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/MathHelpers.h>
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <reconstruction/dataobjects/DedxConstants.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
@@ -205,7 +206,7 @@ void CDCDedxPIDModule::event()
       const MCParticle* mcpart = track.getRelatedTo<MCParticle>();
 
       if (mcpart) {
-        if (m_onlyPrimaryParticles && !mcpart->hasStatus(MCParticle::c_PrimaryParticle)) {
+        if (!mcpart->hasStatus(MCParticle::c_PrimaryParticle)) {
           continue; //not a primary particle, ignore
         }
 
@@ -268,7 +269,7 @@ void CDCDedxPIDModule::event()
 
     // get the cosine edge correction only for data!
     bool isEdge = false;
-    if ((abs(costh + 0.860) < 0.010) || (abs(costh - 0.955) <= 0.005))isEdge = true;
+    if ((std::abs(costh + 0.860) < 0.010) || (std::abs(costh - 0.955) <= 0.005))isEdge = true;
     dedxTrack->m_cosEdgeCor = (m_DBCosEdgeCor && isData && isEdge) ? m_DBCosEdgeCor->getMean(costh) : 1.0;
 
     bool isvalidTime = true;
@@ -293,7 +294,7 @@ void CDCDedxPIDModule::event()
          tp != gftrackPoints.end(); ++tp) {
 
       // should also be possible to use this for svd and pxd hits...
-      genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);
+      const genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);
       const CDCRecoHit* cdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtr);
       if (!cdcRecoHit) continue;
       const CDCHit* cdcHit = cdcRecoHit->getCDCHit();
@@ -358,7 +359,7 @@ void CDCDedxPIDModule::event()
       bool lastHitInCurrentLayer = lastHit;
       if (!lastHit) {
         // peek at next hit
-        genfit::AbsMeasurement* aAbsMeasurementPtrNext = (*(tp + 1))->getRawMeasurement(0);
+        const genfit::AbsMeasurement* aAbsMeasurementPtrNext = (*(tp + 1))->getRawMeasurement(0);
         const CDCRecoHit* nextcdcRecoHit = dynamic_cast<const CDCRecoHit* >(aAbsMeasurementPtrNext);
         // if next hit fails, assume this is the last hit in the layer
         if (!nextcdcRecoHit || !(cdcRecoHit->getCDCHit()) || !((*(tp + 1))->getFitterInfo())) {
@@ -442,6 +443,7 @@ void CDCDedxPIDModule::event()
         if (std::abs(2 * atan(1) - std::abs(entAng)) < 0.01)tana = 100 * (entAng / std::abs(entAng)); //avoid infinity at pi/2
         else tana =  std::tan(entAng);
         double docaRS = doca * std::sqrt((1 + cellR * cellR * tana * tana) / (1 + tana * tana));
+        // cppcheck-suppress variableScope ; kept next to the related declarations for readability
         double entAngRS = std::atan(tana / cellR);
 
         LinearGlobalADCCountTranslator translator;
@@ -605,11 +607,11 @@ void CDCDedxPIDModule::event()
     double pidvalues[Const::ChargedStable::c_SetSize];
     Const::ParticleSet set = Const::chargedStableSet;
     if (m_usePrediction) {
-      for (const Const::ChargedStable pdgIter : set) {
+      for (const Const::ParticleType& pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = -0.5 * dedxTrack->m_cdcChi[pdgIter.getIndex()] * dedxTrack->m_cdcChi[pdgIter.getIndex()];
       }
     } else {
-      for (const Const::ChargedStable pdgIter : set) {
+      for (const Const::ParticleType& pdgIter : set) {
         pidvalues[pdgIter.getIndex()] = dedxTrack->m_cdcLogl[pdgIter.getIndex()];
       }
     }
@@ -774,7 +776,7 @@ double CDCDedxPIDModule::I2D(const double cosTheta, const double I) const
   return D;
 }
 
-double CDCDedxPIDModule::meanCurve(double* x, double* par, int version) const
+double CDCDedxPIDModule::meanCurve(double* x, const double* par, int version)
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending on the value of bg
@@ -785,7 +787,7 @@ double CDCDedxPIDModule::meanCurve(double* x, double* par, int version) const
       f = par[1] * std::pow(std::sqrt(x[0] * x[0] + 1), par[3]) / std::pow(x[0], par[3]) *
           (par[2] - par[5] * std::log(1 / x[0])) - par[4] + std::exp(par[6] + par[7] * x[0]);
     else if (par[0] == 2)
-      f = par[1] * std::pow(x[0], 3) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
+      f = par[1] * cube(x[0]) + par[2] * x[0] * x[0] + par[3] * x[0] + par[4];
     else if (par[0] == 3)
       f = -1.0 * par[1] * std::log(par[4] + std::pow(1 / x[0], par[2])) + par[3];
   }
@@ -824,7 +826,7 @@ double CDCDedxPIDModule::getMean(double bg) const
   return (A * partA + B * partB + C * partC);
 }
 
-double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) const
+double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version)
 {
   // calculate the predicted mean value as a function of beta-gamma (bg)
   // this is done with a different function depending dE/dx, nhit, and sin(theta)
@@ -834,12 +836,12 @@ double CDCDedxPIDModule::sigmaCurve(double* x, const double* par, int version) c
     if (par[0] == 1) { // return dedx parameterization
       f = par[1] + par[2] * x[0];
     } else if (par[0] == 2) { // return nhit or sin(theta) parameterization
-      f = par[1] * std::pow(x[0], 4) + par[2] * std::pow(x[0], 3) +
+      f = par[1] * pow4(x[0]) + par[2] * cube(x[0]) +
           par[3] * x[0] * x[0] + par[4] * x[0] + par[5];
     } else if (par[0] == 3) { // return cos(theta) parameterization
-      f = par[1] * exp(-0.5 * pow(((x[0] - par[2]) / par[3]), 2)) +
-          par[4] * pow(x[0], 6) + par[5] * pow(x[0], 5) + par[6] * pow(x[0], 4) +
-          par[7] * pow(x[0], 3) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
+      f = par[1] * exp(-0.5 * square((x[0] - par[2]) / par[3])) +
+          par[4] * (pow5(x[0]) * x[0]) + par[5] * pow5(x[0]) + par[6] * pow4(x[0]) +
+          par[7] * cube(x[0]) + par[8] * x[0] * x[0] + par[9] * x[0] + par[10];
     }
   }
 
@@ -890,7 +892,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;
-  for (const Const::ChargedStable pdgIter : set) {
+  for (const Const::ParticleType& pdgIter : set) {
     double bg = p / pdgIter.getMass();
 
     // determine the predicted mean and resolution

@@ -252,7 +252,7 @@ void CDCDedxCosEdgeAlgorithm::fitGaussianWRange(TH1D*& temphist, fitstatus& stat
 
 //------------------------------------
 void CDCDedxCosEdgeAlgorithm::plotHist(vector<TH1D*>& hdedx, map<int, vector<double>>& vpars,
-                                       string type)
+                                       const string& type)
 {
   TCanvas ctmp("ctmp", "ctmp", 1200, 1200);
   ctmp.Divide(5, 4);
@@ -297,8 +297,8 @@ void CDCDedxCosEdgeAlgorithm::plotFitPars(map<int, vector<double>>& vneg_fitpars
   TCanvas cQa("cQa", "cQa", 1200, 1200);
   cQa.Divide(2, 2);
 
-  double min[2] = {0.85, 0.04};
-  double max[2] = {1.05, 0.3};
+  const double min[2] = {0.85, 0.04};
+  const double max[2] = {1.05, 0.3};
 
   string vars[2] = {"#mu_{fit}", "#sigma_{fit}"};
   string side[2] = {"pcos", "ncos"};

@@ -14,7 +14,6 @@
 #include <TStyle.h>
 #include <fstream>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -34,7 +33,8 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
            std::vector<std::string>());
   addParam("ExcludeFolders", m_exclfolders, "List of folders to exclude from create canvases, empty for none, \"all\" for all",
            std::vector<std::string>());
-  addParam("IncludeListFile", m_listfile, "List canvases to create canvases from, empty for using include/exclide folder parameter",
+  addParam("IncludeListFile", m_listfile,
+           "File with a list of canvas names to create and plot. Empty string for using include/exclude folder parameter",
            std::string(""));
   B2DEBUG(1, "DQMHistAutoCanvas: Constructor done.");
 }
@@ -141,8 +141,7 @@ void DQMHistAutoCanvasModule::event()
 
       // not so nice as we actually touch the histogram by iterator
       // we could use findHist function, but then we do another lookup within iteration
-      auto hist = it.second.getHist();
-      if (hist) {
+      if (auto hist = it.second.getHist(); hist != nullptr) {
         if (hist->GetDimension() == 1) {
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);
@@ -150,7 +149,7 @@ void DQMHistAutoCanvasModule::event()
           // reference only for 1dim and only if *both* not empty
           if (hist->Integral() != 0) { // ignore empty histogram
             // default scaling to number of entries
-            auto refCopy = findRefHist(it.first, ERefScaling::c_RefScaleEntries, hist);
+            auto refCopy = findRefHist(it.first, "", ERefScaling::c_RefScaleEntries, hist);
             if (refCopy and abs(refCopy->Integral()) > 0) { // only if we have entries in reference
               // Adjust the y scale to cover the reference
               if (refCopy->GetMaximum() > hist->GetMaximum())

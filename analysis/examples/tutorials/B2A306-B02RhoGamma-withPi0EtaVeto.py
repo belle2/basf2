@@ -89,19 +89,18 @@ ma.writePi0EtaVeto(particleList='B0',
                    mode=modePi0EtaVeto,
                    path=my_path)
 
-# Perform addPi0VetoEfficiencySystematics
-# Data/MC ratio will be provided as extraInfo related with particleList for a given threshold.
-mode = 'standard'
-tableName = 'Pi0VetoEfficiencySystematics_Mar2022'
-threshold = 0.30
-suffix = '30'
-ma.addPi0VetoEfficiencySystematics(particleList='B0',
-                                   decayString='B0 -> rho0 ^gamma',
-                                   tableName=tableName,
-                                   threshold=threshold,
-                                   mode='standard',
-                                   suffix=suffix,
-                                   path=my_path)
+# Add the pi0 veto Data/MC efficiency ratio weights for a given veto threshold.
+# They are stored in payloads named '{tableName}_{mode}{thresholdPercent}' with
+#  - tableName: the version of the weight tables (here 'Pi0VetoEfficiencySystematics_Mar2022'),
+#  - mode: the pi0 veto mode the weights were derived for ('standard', 'tight', 'cluster' or 'both'),
+#  - thresholdPercent: the veto threshold in percent as a two-digit integer (here 30 for 0.30).
+# The weights depend on the hard photon energy. The ParticleWeighting module stores them as
+# extraInfo of the hard photon selected with the '^' in the decay string.
+pi0VetoWeightTable = 'Pi0VetoEfficiencySystematics_Mar2022_standard30'
+my_path.add_module('ParticleWeighting',
+                   particleList='B0',
+                   selectedDaughters='B0 -> rho0 ^gamma',
+                   tableName=pi0VetoWeightTable)
 
 # Then one can obtain the pi0/eta probability by the variables pi0Prob(arg) and etaProb(arg).
 # The argument corresponds to the mode which you set in writePi0EtaVeto function.
@@ -227,6 +226,11 @@ rho_vars = vc.cluster + \
 
 pi_vars = vc.track
 
+# pi0 veto Data/MC weights, which are stored as extraInfo of the hard photon
+pi0veto_weight_vars = [f'extraInfo({pi0VetoWeightTable}_{name})' for name in
+                       ['data_MC_ratio', 'data_MC_uncertainty_stat', 'data_MC_uncertainty_sys',
+                        'data_MC_uncertainty_total', 'threshold']]
+
 b_vars = vc.kinematics + \
     vc.deltae_mbc + \
     vc.mc_truth + \
@@ -237,11 +241,8 @@ b_vars = vc.kinematics + \
     vu.create_aliases_for_selected(list_of_variables=pi_vars,
                                    decay_string='B0 -> [rho0 -> ^pi+ ^pi-] gamma') + \
     [f'pi0Prob({modePi0EtaVeto})', f'etaProb({modePi0EtaVeto})', 'extraInfo(pi0veto)'] + \
-    [f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_ratio)',
-     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_stat)',
-     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_sys)',
-     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_data_MC_uncertainty_total)',
-     f'extraInfo(Pi0VetoEfficiencySystematics_{mode}{suffix}_threshold)']
+    vu.create_aliases_for_selected(list_of_variables=pi0veto_weight_vars,
+                                   decay_string='B0 -> rho0 ^gamma')
 
 
 # Saving variables to ntuple

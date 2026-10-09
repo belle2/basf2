@@ -34,7 +34,7 @@ namespace Belle2 {
     SVDEventT0EstimatorModule();
 
     /** default destructor*/
-    virtual ~SVDEventT0EstimatorModule();
+    virtual ~SVDEventT0EstimatorModule() override;
 
     /** Initialize the SVDEventT0Estimator.*/
     virtual void initialize() override;
@@ -62,7 +62,7 @@ namespace Belle2 {
     bool m_useDB = true; /**< To compute EvetT0, use configuration of selections stored in the DB */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
 
-    const UncertainHelix constructUncertainHelix(const RecoTrack&
-                                                 recoTrack); /**< return the UncertainHelix from the seed quantities of the RecoTrack */
+    static const UncertainHelix constructUncertainHelix(const RecoTrack&
+                                                        recoTrack); /**< return the UncertainHelix from the seed quantities of the RecoTrack */
   };
 }

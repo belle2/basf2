@@ -27,7 +27,7 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDAbsoluteClusterTimeShift(const TString& uniqueID = "")
+    explicit SVDAbsoluteClusterTimeShift(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
     {
       m_svdAbsTimeShift.clear();

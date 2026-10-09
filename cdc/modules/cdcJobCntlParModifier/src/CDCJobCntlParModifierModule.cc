@@ -358,7 +358,3 @@ void CDCJobCntlParModifierModule::initialize()
     m_gcp.setMapperPhiAngle(m_mapperPhiAngle);
   }
 }
-
-void CDCJobCntlParModifierModule::event()
-{
-}

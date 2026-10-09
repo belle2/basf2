@@ -8,14 +8,12 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
-#include <alignment/dbobjects/VXDAlignment.h>
 
 #include <string>
 
 namespace Belle2 {
   /** Setup material handling and magnetic fields for use by genfit's extrapolation code
-   *  (RKTrackRep).  This should be one of the first modules on any path working with tracks.
+   *  (RKTrackRep). This should be one of the first modules on any path working with track fits.
    */
   class SetupGenfitExtrapolationModule : public Module {
 
@@ -37,7 +35,7 @@ namespace Belle2 {
     /// choice of geometry representation: 'TGeo' or 'Geant4'.
     std::string m_geometry = "Geant4";
 
-    /// switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.
+    /// Switch on/off ALL material effects in Genfit. "true" overwrites "true" flags for the individual effects.
     bool m_noEffects = false;
     /// Determines if calculation of energy loss is on/off in Genfit
     bool m_energyLossBetheBloch = true;
@@ -49,11 +47,9 @@ namespace Belle2 {
     bool m_energyLossBrems = true;
     /// Determines if calculation of bremsstrahlung energy loss variance is on/off in Genfit
     bool m_noiseBrems = true;
+    /// Determines if the magnetic field cache is on/off in Genfit
+    bool m_useBFieldCache = false;
     /// Multiple scattering model
     std::string m_mscModel = "Highland";
-    /// Use VXD alignment from database?
-    bool m_useVXDAlignment = true;
-    /// DB object with VXD alignment
-    DBObjPtr<VXDAlignment> m_vxdAlignment;
   };
 }

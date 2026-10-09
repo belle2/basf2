@@ -60,7 +60,7 @@ namespace Belle2 {
     /**
      * Get the whole list.
      */
-    std::map<unsigned short, float> getPedestals() const
+    const std::map<unsigned short, float>& getPedestals() const
     {
       return m_pedestals;
     }

@@ -253,7 +253,7 @@ having to change anything in the script itself.
     :class: dropdown xhint stacked
 
     You should have learned about command-line arguments in `this
-    <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline/index.html>`_
+    <https://swcarpentry.github.io/python-novice-inflammation/12-cmdline.html>`_
     part of the python introduction from Software Carpentry. Otherwise, go
     back and refresh your memory. All you have to do is to import the system
     library, store the correct command-line argument (from ``sys.argv``) in a local
@@ -298,6 +298,35 @@ having to change anything in the script itself.
           File "myanalysis.py", line 3, in <module>
             filenumber = sys.argv[1]
         IndexError: list index out of range
+
+.. admonition:: Tip
+
+    One might also consider `argparse <https://docs.python.org/3/library/argparse.html>`_ as an alternative.
+    For a quick example...
+
+    .. code-block:: python 
+
+        import argparse
+
+        # initialize what command-line inputs you might want 
+        parser = argparse.ArgumentParser(
+                    prog='myAnalysis',
+                    description='What the program does',
+                    epilog='Text at the bottom of help')
+        parser.add_argument('filename')           # positional argument, sys.argv equivalent
+        parser.add_argument('-c', '--count')      # option that takes a value
+        parser.add_argument('-t', '--test',
+                                type = str, 
+                                help='This is a test variable.',
+                                default = "my_test")
+        parser.add_argument('-v', '--verbose',
+                                action='store_true')  # on/off flag
+        # call upon in your code 
+        args = parser.parse_args()
+        print(args.filename, args.count, args.verbose, args.test)
+        # should print out `data.root 90 True my_test`
+
+
 
 Filling particle lists
 ----------------------
@@ -674,7 +703,7 @@ happen to fulfill all your selection criteria.
         import matplotlib.pyplot as plt
         import uproot
 
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['Mbc'], library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(['Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3))
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')
@@ -779,7 +808,7 @@ definitely read it to understand at least the basics.
         import matplotlib.pyplot as plt
         import uproot
 
-        df = uproot.open('Bd2JpsiKS.root:tree').arrays(['isSignal', 'Mbc'], library='pd')
+        df = uproot.open('Bd2JpsiKS.root:ntuple').arrays(['isSignal', 'Mbc'], library='pd')
 
         df.hist('Mbc', bins=100, range=(4.3, 5.3), by='isSignal')
         plt.xlabel(r'M$_{\rm bc}$ [GeV/c$^{2}$]')

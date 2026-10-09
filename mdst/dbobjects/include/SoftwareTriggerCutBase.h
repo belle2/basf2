@@ -21,7 +21,7 @@ namespace Belle2 {
   class SoftwareTriggerCutBase {
   public:
     /// Create a new base instance. This should rarely be called by yourself.
-    SoftwareTriggerCutBase(unsigned int preScaleFactor = 1, const bool& isRejectCut = false) :
+    explicit SoftwareTriggerCutBase(unsigned int preScaleFactor = 1, const bool& isRejectCut = false) :
       m_preScaleFactor({preScaleFactor}), m_isRejectCut(isRejectCut)
     {
     }

@@ -214,7 +214,6 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -229,12 +228,12 @@ namespace Belle2 {
 
 
       // Add variables to the factory
-      for (auto& var : m_general_options.m_variables) {
+      for (const auto& var : m_general_options.m_variables) {
         data_loader.AddVariable(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
       // Add variables to the factory
-      for (auto& var : m_general_options.m_spectators) {
+      for (const auto& var : m_general_options.m_spectators) {
         data_loader.AddSpectator(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
@@ -317,7 +316,6 @@ namespace Belle2 {
         free(directory_template);
       }
 
-      // cppcheck-suppress unreadVariable
       auto guard = ScopeGuard::guardWorkingDirectory(directory);
 
       std::string jobName = specific_options.m_prefix;
@@ -331,12 +329,12 @@ namespace Belle2 {
       TMVA::Factory factory(jobName, &classFile, specific_options.m_factoryOption);
 
       // Add variables to the factory
-      for (auto& var : m_general_options.m_variables) {
+      for (const auto& var : m_general_options.m_variables) {
         data_loader.AddVariable(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 
       // Add variables to the factory
-      for (auto& var : m_general_options.m_spectators) {
+      for (const auto& var : m_general_options.m_spectators) {
         data_loader.AddSpectator(Belle2::MakeROOTCompatible::makeROOTCompatible(var));
       }
 

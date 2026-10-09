@@ -11,6 +11,8 @@
 
 #include <tracking/trackingUtilities/filters/base/FilterParamMap.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <tracking/trackingUtilities/numerics/Weight.h>
 
 #include <string>
@@ -20,7 +22,6 @@
 #include <vector>
 
 namespace Belle2 {
-  class ModuleParamList;
 
   namespace TrackingUtilities {
     /// Filter can delegate to a filter chosen and set up at run time by parameters
@@ -52,6 +53,9 @@ namespace Belle2 {
       /// Initialize before event processing.
       void initialize() override;
 
+      /// beginRun needed to reassign parameters if changed
+      void beginRun() override;
+
       /// Indicates if the filter requires Monte Carlo information.
       bool needsTruthInformation() override;
 
@@ -78,6 +82,9 @@ namespace Belle2 {
         return m_param_filterName;
       }
 
+      /// need access to underlying filter to set parameters
+      std::unique_ptr<AFilter>& getFilterPtr() { return  m_filter; }
+
     private:
       /// Parameters : Name of the selected filter
       std::string m_param_filterName;
@@ -91,6 +98,9 @@ namespace Belle2 {
 
       /// Chosen filter
       std::unique_ptr<AFilter> m_filter;
+
+      /// keep alive the ModuleParamList so that one can reapply parameters
+      ModuleParamList m_filterParamList;
     };
 
     /**

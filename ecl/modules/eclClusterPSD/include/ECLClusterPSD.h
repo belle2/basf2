@@ -38,7 +38,7 @@ namespace Belle2 {
 
     /** Destructor.
      */
-    ~ECLClusterPSDModule();
+    ~ECLClusterPSDModule() override;
 
     /** Initialize variables. */
     virtual void initialize() override;
@@ -49,12 +49,6 @@ namespace Belle2 {
     /** event per event.
      */
     virtual void event() override;
-
-    /** end run. */
-    virtual void endRun() override;
-
-    /** terminate.*/
-    virtual void terminate() override;
 
     /** ECLCalDigits array name.*/
     virtual const char* eclCalDigitArrayName() const

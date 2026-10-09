@@ -181,7 +181,7 @@ void EKLMAlignmentAlongStripsAlgorithm::setOutputFile(const char* outputFile)
 }
 
 int EKLMAlignmentAlongStripsAlgorithm::
-getAveragedPlane(int sector, int plane) const
+getAveragedPlane(int sector, int plane)
 {
   if (sector == 1 || sector == 4)
     return plane - 1;

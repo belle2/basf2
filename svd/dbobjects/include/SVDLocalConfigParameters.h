@@ -8,8 +8,8 @@
 
 #pragma once
 #include <framework/database/DBObjPtr.h>
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 
 
 namespace Belle2 {
@@ -25,7 +25,7 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDLocalConfigParameters(const TString& uniqueID = "")
+    explicit SVDLocalConfigParameters(const TString& uniqueID = "")
       : m_uniqueID(uniqueID),
         m_injectedCharge(22500)
     {};
@@ -54,7 +54,7 @@ namespace Belle2 {
      * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration
      * @return string corresponding to the time stamp of the current calibration in the format yyyymmdd_hhmm.
      */
-    std::string getCalibDate(void) const { return m_calibDate; };
+    const std::string& getCalibDate(void) const { return m_calibDate; };
 
     /**
      * Set the injected charge

@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_WireMeasurement_h
-#define genfit_WireMeasurement_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsHMatrix.h"
@@ -105,5 +104,3 @@ class WireMeasurement : public AbsMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_WireMeasurement_h

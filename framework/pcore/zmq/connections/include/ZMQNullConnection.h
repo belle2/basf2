@@ -19,8 +19,8 @@ namespace Belle2 {
     std::vector<zmq::socket_t*> getSockets() const final;
 
     /// Raise an exception if called - there should never be any incoming message
-    void handleIncomingData();
+    static void handleIncomingData();
     /// Return the connection string
-    std::string getEndPoint() const { return ""; }
+    static std::string getEndPoint() { return ""; }
   };
 }

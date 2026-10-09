@@ -33,10 +33,12 @@ namespace Belle2 {
 
   public:
     /// Number of variables to be generated.
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which is the empty default of VarNames
     static const size_t nVars = TrackingUtilities::size(cdcfromEclPathTruthVarNames);
 
     /// Get the name of the column.
     constexpr
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which is the empty default of VarNames
     static char const* getName(int iName)
     {
       return cdcfromEclPathTruthVarNames[iName];

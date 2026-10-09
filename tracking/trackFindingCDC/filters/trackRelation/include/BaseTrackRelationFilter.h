@@ -28,7 +28,7 @@ namespace Belle2 {
       BaseTrackRelationFilter();
 
       /// Default destructor
-      ~BaseTrackRelationFilter();
+      ~BaseTrackRelationFilter() override;
 
       /// Reinforce that the full range of tracks is possible as no particular default is applicable.
       std::vector<const TrackingUtilities::CDCTrack*> getPossibleTos(

@@ -1,0 +1,29 @@
+# EventType: 2653030002
+# Descriptor: [ccbar DstPToD0Pip, D02RhoNuNubar]
+# NickName: DstPToD0Pip_D02RhoNuNubar
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal
+# Date: 20260820 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyD0 D0
+Alias Myrho0 rho0
+
+Decay D*+
+1.000 MyD0  pi+             PHOTOS    VSS;
+Enddecay
+
+Decay MyD0
+1.000 Myrho0 nu_e anti-nu_e PHSP;
+Enddecay
+
+Decay Myrho0
+1.000 pi+  pi-              VSS;
+Enddecay
+
+End

@@ -35,6 +35,9 @@ skim = {{ skim }}(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
 {%- endif %}
 )
+{%- if fei_prefix %}
+skim.FEIPrefix = "{{ fei_prefix }}"
+{%- endif %}
 
 ma.inputMdstList(
     b2.find_file(skim.validation_sample, data_type="validation"),

@@ -176,7 +176,7 @@ namespace Belle2 {
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       std::map<std::string, float> importance;
-      for (auto& pair : classifier.GetVariableRanking()) {
+      for (const auto& pair : classifier.GetVariableRanking()) {
         importance[m_general_options.m_variables[pair.first]] = pair.second;
       }
       weightfile.addFeatureImportance(importance);

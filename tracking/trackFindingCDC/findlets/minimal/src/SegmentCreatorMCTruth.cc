@@ -153,7 +153,7 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
     }
   }
 
-  for (CDCSegment2D& segment : outputSegments) {
+  for (const CDCSegment2D& segment : outputSegments) {
     segment.receiveISuperCluster();
   }
   std::sort(outputSegments.begin(), outputSegments.end());

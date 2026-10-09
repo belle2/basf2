@@ -608,7 +608,7 @@ void SVDClusterEvaluationModule::endRun()
 
 
 
-bool SVDClusterEvaluationModule::isRelatedToTrack(SVDIntercept* inter)
+bool SVDClusterEvaluationModule::isRelatedToTrack(const SVDIntercept* inter)
 {
 
   RelationVector<RecoTrack> theRC = DataStore::getRelationsWithObj<RecoTrack>(inter);
@@ -800,7 +800,7 @@ void SVDClusterEvaluationModule::create_SVDHistograms_clsResid()
 double SVDClusterEvaluationModule::getOneSigma(TH1F* h1)
 {
 
-  TH1F* h1_res = (TH1F*)h1->Clone("h1_res");
+  TH1F* h1_res = static_cast<TH1F*>(h1->Clone("h1_res"));
   double probs[2] = {0.16, 1 - 0.16};
   double quant[2] = {0, 0};
   int nbinsHisto = h1_res->GetNbinsX();

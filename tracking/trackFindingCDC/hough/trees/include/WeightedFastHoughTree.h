@@ -16,6 +16,8 @@
 #include <cassert>
 #include <cfloat>
 #include <cmath>
+#include <algorithm>
+#include <type_traits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -128,9 +130,9 @@ namespace Belle2 {
        */
       template <class AItemInDomainMeasure>
       std::vector<std::pair<ADomain, std::vector<T>>>
-      findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
-                               int maxLevel,
-                               const TrackingUtilities::Weight minWeight = NAN)
+      static findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
+                                      int maxLevel,
+                                      const TrackingUtilities::Weight minWeight = NAN)
       {
         auto skipLowWeightNode = [minWeight](const Node * node) {
           return not(node->getWeight() >= minWeight);
@@ -222,7 +224,9 @@ namespace Belle2 {
           }
           return false;
         };
-        fillWalk(weightItemInDomain, isLeaf);
+        // The isLeaf predicate does not mark any items.
+        const bool isLeafMarksItems = false;
+        fillWalk(weightItemInDomain, isLeaf, isLeafMarksItems);
         return heaviestNode;
       }
 
@@ -233,7 +237,8 @@ namespace Belle2 {
        */
       template<class AItemInDomainMeasure, class AIsLeafPredicate>
       void fillWalk(AItemInDomainMeasure& weightItemInDomain,
-                    AIsLeafPredicate& isLeaf)
+                    AIsLeafPredicate& isLeaf,
+                    bool isLeafMarksItems = true)
       {
         auto walker = [&weightItemInDomain, &isLeaf](Node * node) {
           // Check if node is a leaf
@@ -250,28 +255,56 @@ namespace Belle2 {
           if (not children) {
             node->createChildren();
             children = node->getChildren();
-            for (Node& childNode : *children) {
-              assert(childNode.getChildren() == nullptr);
-              assert(childNode.size() == 0);
-              auto measure =
-              [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> TrackingUtilities::Weight {
+            if constexpr(std::is_invocable_v<AItemInDomainMeasure&, const T&, Node*>) {
+              // Weighting function does not modify the item: fill all children in a single pass
+              // over the parent items without copies. Each child receives the items in the same order.
+              for (const WithSharedMark<T>& markableItem : *node) {
                 // Weighting function should not see the mark, but only the item itself.
-                T & item(markableItem);
-                return weightItemInDomain(item, &childNode);
-              };
-              childNode.insert(*node, measure);
+                const T& item(markableItem);
+                for (Node& childNode : *children) {
+                  const TrackingUtilities::Weight weight = weightItemInDomain(item, &childNode);
+                  if (not std::isnan(weight)) {
+                    childNode.insert(markableItem, weight);
+                  }
+                }
+              }
+            } else {
+              for (Node& childNode : *children) {
+                assert(childNode.getChildren() == nullptr);
+                assert(childNode.size() == 0);
+                auto measure =
+                  // cppcheck-suppress constParameterReference ; the item is unwrapped as a non-const reference below
+                [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> TrackingUtilities::Weight {
+                  // Weighting function should not see the mark, but only the item itself.
+                  T & item(markableItem);
+                  return weightItemInDomain(item, &childNode);
+                };
+                childNode.insert(*node, measure);
+              }
             }
           }
           // Continue to walk the children.
           return true;
         };
-        walkHeighWeightFirst(walker);
+        walkHeighWeightFirst(walker, isLeafMarksItems);
       }
 
-      /// Walk the tree investigating the heaviest children with priority.
+      /**
+       * Walk the tree investigating the heaviest children with priority.
+       * If the walker is known not to mark items and no item is marked yet,
+       * the removal of marked items can be skipped as it would never erase anything.
+       */
       template<class ATreeWalker>
-      void walkHeighWeightFirst(ATreeWalker& walker)
+      void walkHeighWeightFirst(ATreeWalker& walker, bool walkerMarksItems = true)
       {
+        if (not walkerMarksItems and std::find(m_marks.begin(), m_marks.end(), true) == m_marks.end()) {
+          auto unmarkedPriority = [](Node * node) -> float {
+            return node->getWeight();
+          };
+          this->walk(walker, unmarkedPriority);
+          return;
+        }
+
         auto priority = [](Node * node) -> float {
           /// Clear items that have been marked as used before evaluating the weight.
           auto isMarked = [](const WithSharedMark<T>& markableItem) -> bool {
@@ -285,6 +318,7 @@ namespace Belle2 {
       }
 
       /// Fell to tree meaning deleting all child nodes from the tree. Keeps the top node.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which it extends and then calls
       void fell()
       {
         this->getTopNode().clear();
@@ -293,6 +327,7 @@ namespace Belle2 {
       }
 
       /// Like fell but also releases all memory the tree has acquired during long executions.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which it extends and then calls
       void raze()
       {
         this->fell();

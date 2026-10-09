@@ -617,7 +617,7 @@ def get_calibrations(input_data, **kwargs):
     absolute_shift_calibration.strategies = strategies.SequentialBoundaries
 
     for algorithm in absolute_shift_calibration.algorithms:
-        algorithm.params = {"apply_iov": output_iov}
+        algorithm.params = {"iov_coverage": output_iov}
         if "AbsoluteTimeShiftCalibration" not in listOfMutedCalibrations:
             list_of_calibrations.append(absolute_shift_calibration)
 

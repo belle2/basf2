@@ -52,7 +52,7 @@ namespace Belle2 {
       WireHitCreator();
 
       /// Default destructor
-      ~WireHitCreator();
+      ~WireHitCreator() override;
 
       /// Short description of the findlet
       std::string getDescription() final;

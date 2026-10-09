@@ -151,10 +151,6 @@ void SVDBackgroundModule::initialize()
   m_triggerWidth *= Unit::ns;
 }
 
-void SVDBackgroundModule::beginRun()
-{
-}
-
 void SVDBackgroundModule::event()
 {
   //Register collections
@@ -435,10 +431,6 @@ void SVDBackgroundModule::event()
   }
 }
 
-void SVDBackgroundModule::endRun()
-{
-}
-
 
 void SVDBackgroundModule::terminate()
 {
@@ -465,7 +457,7 @@ void SVDBackgroundModule::terminate()
           << endl;
   double componentTime = m_componentTime / Unit::us;
   for (auto vxdSensor : m_sensorData) {
-    outfile << m_componentName.c_str() << "\t"
+    outfile << m_componentName << "\t"
             << componentTime << "\t"
             << vxdSensor.first.getLayerNumber() << "\t"
             << vxdSensor.first.getLadderNumber() << "\t"

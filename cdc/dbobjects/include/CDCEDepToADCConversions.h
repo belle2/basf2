@@ -80,7 +80,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::map<unsigned short, std::vector<float>> getParams() const
+    const std::map<unsigned short, std::vector<float>>& getParams() const
     {
       return m_cvs;
     }

@@ -75,6 +75,7 @@ namespace Belle2 {
      * @param defaultValue value to return if the path es empty or does not exist
      * @return value of the parameter
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     std::string getString(const std::string& path, const std::string& defaultValue) const
     {
       return gearbox::Interface::getString(path, defaultValue);

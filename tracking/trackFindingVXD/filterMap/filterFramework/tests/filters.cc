@@ -40,6 +40,7 @@ namespace VXDTFfilterTest {
     static const std::string name(void) {return "SquaredDistance3D"; };
 
     /** value function does the actual calculation of this class. */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -57,6 +58,7 @@ namespace VXDTFfilterTest {
     static const std::string name(void) {return "SquaredDistance2Dxy"; };
 
     /** value function does the actual calculation of this class. */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -73,6 +75,7 @@ namespace VXDTFfilterTest {
     static const std::string name(void) {return "SquaredDistance1Dx"; };
 
     /** value function does the actual calculation of this class. */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -88,6 +91,7 @@ namespace VXDTFfilterTest {
     static const std::string name(void) {return "BooleanVariable"; };
 
     /** value function does the actual calculation of this class. */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which SelectionVariable leaves undefined
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
       return
@@ -263,7 +267,6 @@ namespace VXDTFfilterTest {
     auto dummyFilter = ((-10. <= SquaredDistance3D() <= 10.) &&
                         ((-100. <=  SquaredDistance2Dxy() <= -10.) ||    // put 2nd pair of parentheses to silence warning
                          (-10. <= SquaredDistance1Dx() <= 10.)) &&
-                        // cppcheck-suppress duplicateExpression
                         !(-10. <= SquaredDistance1Dx() <= -10.));
 
     // values are chosen in that way that all sub-filters of dummyFilter have to be called (see comment below)
@@ -381,7 +384,7 @@ namespace VXDTFfilterTest {
     EXPECT_FALSE(filterRange.accept(x1, x3));
     EXPECT_FALSE(filterRange.accept(x1, x4));
 
-    // cppcheck-suppress compareBoolExpressionWithInt
+    // cppcheck-suppress[compareBoolExpressionWithInt,compareValueOutOfTypeRangeError]
     auto filterClosedRange = (0. <= SquaredDistance3D() <= 1);
     EXPECT_TRUE(filterClosedRange.accept(x1, x1));
     EXPECT_TRUE(filterClosedRange.accept(x1, x2));

@@ -27,7 +27,7 @@ namespace Belle2 {
       eclMergingCrystalEAlgorithm();
 
       /**..Destructor */
-      virtual ~eclMergingCrystalEAlgorithm() {}
+      virtual ~eclMergingCrystalEAlgorithm() override {}
 
     protected:
 

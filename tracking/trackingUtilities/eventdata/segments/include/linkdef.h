@@ -6,7 +6,7 @@
 #pragma extra_include <tracking/trackingUtilities/eventdata/hits/CDCWireHit.h>;
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCWireHitSegment+; // checksum=0x3711d49, version=-1
-#pragma link C++ class Belle2::TrackingUtilities::CDCWireHitCluster+; // checksum=0x939ed350, version=-1
+#pragma link C++ class Belle2::TrackingUtilities::CDCWireHitCluster-; // hand written streamer, see CDCWireHitCluster.cc
 #pragma link C++ class Belle2::TrackingUtilities::CDCRLWireHitSegment+; // checksum=0xe6a48c12, version=-1
 
 #pragma link C++ class Belle2::TrackingUtilities::CDCTangentSegment+; // checksum=0xc1f1d970, version=-1

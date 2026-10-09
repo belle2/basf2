@@ -988,7 +988,7 @@ G4LogicalVolume* GeoBKLMCreator::getScintLogical(double dx, double dy, double dz
 
   int newLvol = 1;
   for (G4LogicalVolume* logicalVolume : m_ScintLogicals) {
-    G4Box* box = (G4Box*)(logicalVolume->GetSolid());
+    G4Box* box = static_cast<G4Box*>(logicalVolume->GetSolid());
     if ((std::fabs(box->GetXHalfLength() - dx) < 1.0E-4 * CLHEP::cm) &&
         (std::fabs(box->GetYHalfLength() - dy) < 1.0E-4 * CLHEP::cm) &&
         (std::fabs(box->GetZHalfLength() - dz - dzMPPC) < 1.0E-4 * CLHEP::cm)) {

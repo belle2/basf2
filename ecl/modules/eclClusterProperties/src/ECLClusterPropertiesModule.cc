@@ -80,7 +80,7 @@ void ECLClusterPropertiesModule::event()
   }
 }
 
-double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower, StoreArray<Track>& tracks,
+double ECLClusterPropertiesModule::computeTrkMinDistance(const ECLShower& shower, const StoreArray<Track>& tracks,
                                                          unsigned short& trackID) const
 {
   double minDist(10000);

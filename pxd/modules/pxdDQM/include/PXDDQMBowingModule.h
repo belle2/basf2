@@ -55,10 +55,10 @@ namespace Belle2 {
     StoreArray<RecoTrack> m_recoTracks;/**< store array of the recoTracks related to the particles selected with m_ParticleList*/
     StoreArray<RecoTrack> m_outputRecoTracks; /**< tracks without the PDX hits*/
 
-    Double_t m_cutResU; /**<value fot the cut on absolute value of the u residuals*/
-    Double_t m_cutP; /**< value fot the cut on the momentum of the particle*/
-    Double_t m_cutD0; /**< value fot the cut on absolute value of the track parameter d0*/
-    Double_t m_cutZ0; /**< value fot the cut on absolute value of the track parameter z0*/
+    Double_t m_cutResU; /**<value for the cut on absolute value of the u residuals*/
+    Double_t m_cutP; /**< value for the cut on the momentum of the particle*/
+    Double_t m_cutD0; /**< value for the cut on absolute value of the track parameter d0*/
+    Double_t m_cutZ0; /**< value for the cut on absolute value of the track parameter z0*/
 
     Double_t m_rangeV; /**< range for the histos of the v residuls*/
     Double_t m_rangeS; /**< range for the histos of the sagitta*/

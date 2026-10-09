@@ -31,7 +31,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCRecoTrackFilterModule();
+      virtual ~CDCRecoTrackFilterModule() override;
 
 
       /**
@@ -40,21 +40,9 @@ namespace Belle2 {
       void initialize() override;
 
       /**
-       * Begin run action.
-       */
-      void beginRun() override;
-      /**
        * Event action (main routine).
        */
       void event() override;
-      /**
-       * End run action.
-       */
-      void endRun() override;
-      /**
-       * Termination action.
-       */
-      void terminate() override;
 
 
     private:

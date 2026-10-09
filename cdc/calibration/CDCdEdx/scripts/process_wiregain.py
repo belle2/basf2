@@ -247,5 +247,3 @@ def process_wiregain(wgpath, gt):
             with PdfPages(pdf_path) as pdf:
                 plot_wiregain_all(il_prev, ol_prev, il_new, ol_new, exp, run, pdf)
                 plot_layergain(il_lm_prev, ol_lm_prev, il_lm_new, ol_lm_new, exp, run, pdf)
-
-    return exp_run_dict

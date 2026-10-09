@@ -9,6 +9,10 @@
 //
 // $Id: Helix.cc 10002 2007-02-26 06:56:17Z katayama $
 //
+// The local helix-parameter shorthands below deliberately carry the same names
+// as the accessors returning them.
+// cppcheck-suppress-file shadowFunction
+//
 // $Log$
 // Revision 1.19  2002/01/03 11:05:06  katayama
 // Point3D and other header files are cleaned
@@ -80,7 +84,7 @@
 #include <float.h>
 
 #include <cdc/simulation/Helix.h>
-#include "CLHEP/Matrix/Matrix.h"
+#include <CLHEP/Matrix/Matrix.h>
 
 using namespace CLHEP;
 using namespace Belle2;
@@ -478,6 +482,7 @@ Helix::set(const HepPoint3D& pivot,
 }
 
 Helix&
+// cppcheck-suppress operatorEqVarError ; m_ac is copied element by element below
 Helix::operator = (const Helix& i)
 {
   if (this == & i) return * this;
@@ -876,6 +881,7 @@ Helix::ignoreErrorMatrix(void)
 }
 
 void
+// cppcheck-suppress unusedPrivateFunction ; only called through DEBUG_HELIX/DEBUG_PRINT
 Helix::debugPrint(void) const
 {
 
@@ -892,6 +898,7 @@ Helix::debugPrint(void) const
 }
 
 void
+// cppcheck-suppress unusedPrivateFunction ; only called through DEBUG_HELIX/DEBUG_PRINT
 Helix::checkValid(void)
 {
 
@@ -914,6 +921,7 @@ Helix::checkValid(void)
 
 }
 
+// cppcheck-suppress unusedPrivateFunction ; only called through DEBUG_HELIX/DEBUG_PRINT
 void Helix::debugHelix(void) const
 {
   if (!m_helixValid) {

@@ -20,15 +20,6 @@ def CombinationOptions():
     return ROOT.Belle2.MVA.CombinationOptions()
 
 
-def FANNOptions():
-    '''
-    Wrapper around FANNOptions Belle2::MVA:FANNOptions().
-    '''
-    # Always avoid the top-level 'import ROOT'.
-    import ROOT  # noqa
-    return ROOT.Belle2.MVA.FANNOptions()
-
-
 def FastBDTOptions():
     '''
     Wrapper around FastBDTOptions Belle2::MVA:FastBDTOptions().

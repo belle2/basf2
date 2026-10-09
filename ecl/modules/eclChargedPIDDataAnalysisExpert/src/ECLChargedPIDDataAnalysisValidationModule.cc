@@ -123,10 +123,6 @@ void ECLChargedPIDDataAnalysisValidationModule::initialize()
   }
 }
 
-void ECLChargedPIDDataAnalysisValidationModule::beginRun()
-{
-}
-
 void ECLChargedPIDDataAnalysisValidationModule::event()
 {
 
@@ -258,10 +254,6 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
     m_tree[chargedIdx]->Fill();
 
   }
-}
-
-void ECLChargedPIDDataAnalysisValidationModule::endRun()
-{
 }
 
 void ECLChargedPIDDataAnalysisValidationModule::terminate()

@@ -21,7 +21,7 @@ namespace Belle2 {
   class VXDPolyConePlanePar: public TObject {
   public:
     /** Constructor */
-    VXDPolyConePlanePar(double posZ = 0, double innerRadius = 0, double outerRadius = 0):
+    explicit VXDPolyConePlanePar(double posZ = 0, double innerRadius = 0, double outerRadius = 0):
       m_posZ(posZ), m_innerRadius(innerRadius), m_outerRadius(outerRadius)
     {}
 
@@ -51,17 +51,17 @@ namespace Belle2 {
   class VXDPolyConePar: public TObject {
   public:
     /** Constructor */
-    VXDPolyConePar(const std::string& name = "", const std::string& material = "", double minPhi = 0, double maxPhi = 0,
-                   bool doCutOut = false, double cutOutWidth1 = 0, double cutOutWidth2 = 0, double cutOutHeight = 0, double cutOutDepth = 0):
+    explicit VXDPolyConePar(const std::string& name = "", const std::string& material = "", double minPhi = 0, double maxPhi = 0,
+                            bool doCutOut = false, double cutOutWidth1 = 0, double cutOutWidth2 = 0, double cutOutHeight = 0, double cutOutDepth = 0):
       m_name(name), m_material(material), m_minPhi(minPhi), m_maxPhi(maxPhi), m_doCutOut(doCutOut), m_cutOutWidth1(cutOutWidth1),
       m_cutOutWidth2(cutOutWidth2),
       m_cutOutHeight(cutOutHeight), m_cutOutDepth(cutOutDepth)
     {}
 
     //! Get name
-    std::string getName(void) const { return m_name; }
+    const std::string& getName(void) const { return m_name; }
     //! Get material name
-    std::string getMaterial(void) const { return m_material; }
+    const std::string& getMaterial(void) const { return m_material; }
     //! Get MinPhi in rad
     double getMinPhi(void) const { return m_minPhi; }
     //! Get MaxPhi in rad

@@ -38,7 +38,6 @@ namespace Belle2 {
       m_deltaTErr = 0;
       m_mcDeltaTau = 0;
       m_mcDeltaT = 0;
-      m_mcTagV = ROOT::Math::XYZVector(0, 0, 0);
       m_mcPDG = 0;
       resetTagVertexErrorMatrix();
       resetConstraintCov();

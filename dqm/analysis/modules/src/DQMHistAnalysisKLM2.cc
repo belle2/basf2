@@ -312,7 +312,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     effHist->Draw();
 
     //reference check
-    TH1* ref = findRefHist(effHist->GetName(), ERefScaling::c_RefScaleNone);
+    TH1* ref = findRefHist(effHist->GetName(), "", ERefScaling::c_RefScaleNone);
     if (ref) {ref->Draw("hist,same");}
 
     canvas->Modified();
@@ -547,18 +547,18 @@ void DQMHistAnalysisKLM2Module::event()
 
 
   /* Obtain plots necessary for efficiency plots */
-  TH1F* all_ext_bklm = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsBKLM");
-  TH1F* matched_hits_bklm = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsBKLM");
+  TH1* all_ext_bklm = findHist(m_histogramDirectoryName + "/all_ext_hitsBKLM");
+  TH1* matched_hits_bklm = findHist(m_histogramDirectoryName + "/matched_hitsBKLM");
 
-  TH1F* all_ext_eklm = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsEKLM");
-  TH1F* matched_hits_eklm = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsEKLM");
+  TH1* all_ext_eklm = findHist(m_histogramDirectoryName + "/all_ext_hitsEKLM");
+  TH1* matched_hits_eklm = findHist(m_histogramDirectoryName + "/matched_hitsEKLM");
 
 
-  TH1F* all_ext_bklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsBKLMSector");
-  TH1F* matched_hits_bklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsBKLMSector");
+  TH1* all_ext_bklm_sector = findHist(m_histogramDirectoryName + "/all_ext_hitsBKLMSector");
+  TH1* matched_hits_bklm_sector = findHist(m_histogramDirectoryName + "/matched_hitsBKLMSector");
 
-  TH1F* all_ext_eklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/all_ext_hitsEKLMSector");
-  TH1F* matched_hits_eklm_sector = (TH1F*)findHist(m_histogramDirectoryName + "/matched_hitsEKLMSector");
+  TH1* all_ext_eklm_sector = findHist(m_histogramDirectoryName + "/all_ext_hitsEKLMSector");
+  TH1* matched_hits_eklm_sector = findHist(m_histogramDirectoryName + "/matched_hitsEKLMSector");
 
   /* Check if efficiency histograms exist*/
   if ((all_ext_bklm == nullptr || matched_hits_bklm == nullptr) && (m_IsPhysicsRun)) {

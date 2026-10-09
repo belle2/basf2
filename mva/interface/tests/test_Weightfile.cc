@@ -98,6 +98,26 @@ namespace {
 
   }
 
+  TEST(WeightfileTest, ContractVersion)
+  {
+
+    MVA::Weightfile weightfile;
+    EXPECT_FALSE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), -1);
+    EXPECT_EQ(weightfile.getContractVersion(1), 1);
+
+    weightfile.addContractVersion(2);
+    EXPECT_TRUE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), 2);
+
+    // a stored value which is not an integer is reported like a missing one,
+    // but can be told apart with hasContractVersion()
+    weightfile.addElement("contract_version", "not_a_version");
+    EXPECT_TRUE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), -1);
+
+  }
+
   TEST(WeightfileTest, Stream)
   {
 
@@ -334,17 +354,18 @@ namespace {
     std::filesystem::remove_all(std::filesystem::path(filename).parent_path());
     EXPECT_FALSE(std::filesystem::exists(std::filesystem::path(filename).parent_path()));
 
-    char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2Sub.XXXXXX").c_str());
-    auto tempdir = std::string(mkdtemp(directory_template));
-    setenv("TMPDIR", tempdir.c_str(), 1);
+    std::string directory_template = (std::filesystem::temp_directory_path() / "Basf2Sub.XXXXXX").string();
+    if (mkdtemp(directory_template.data()) == nullptr) {
+      GTEST_SKIP() << "Skipping part of test GetFileName: failed to create local temporary directory: " << std::strerror(errno);
+    }
+    setenv("TMPDIR", directory_template.c_str(), 1);
     {
       MVA::Weightfile weightfile2;
       filename = weightfile2.generateFileName(".xml");
-      EXPECT_EQ(filename.substr(0, tempdir.size()), tempdir);
+      EXPECT_EQ(filename.substr(0, directory_template.size()), directory_template);
     }
-    free(directory_template);
-    std::filesystem::remove_all(tempdir);
-    EXPECT_FALSE(std::filesystem::exists(tempdir));
+    std::filesystem::remove_all(directory_template);
+    EXPECT_FALSE(std::filesystem::exists(directory_template));
     setenv("TMPDIR", "/tmp", 1);
   }
 

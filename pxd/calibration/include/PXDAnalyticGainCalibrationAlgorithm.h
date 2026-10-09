@@ -26,7 +26,7 @@ namespace Belle2 {
     PXDAnalyticGainCalibrationAlgorithm();
 
     /// Destructor
-    virtual ~PXDAnalyticGainCalibrationAlgorithm() {}
+    virtual ~PXDAnalyticGainCalibrationAlgorithm() override {}
 
     /// Minimum number of collected clusters for estimating gains
     int minClusters;
@@ -50,7 +50,7 @@ namespace Belle2 {
     void setBoundaries(const std::vector<Calibration::ExpRun>& boundaries) {m_requestedBoundaries = boundaries;}
 
     /// getter for current boundaries
-    std::vector<Calibration::ExpRun> getBoundaries() const {return m_requestedBoundaries;}
+    const std::vector<Calibration::ExpRun>& getBoundaries() const {return m_requestedBoundaries;}
 
   protected:
 

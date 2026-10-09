@@ -16,6 +16,7 @@ class TClonesArray;
 namespace Belle2 {
   /** Wraps a stored array/object, stored under unique (name, durability) key. See DataStore::m_storeEntryMap. */
   struct StoreEntry {
+    /** default constructor. */
     StoreEntry() : isArray(false), dontWriteOut(false), objClass(nullptr), object(nullptr), ptr(nullptr), name() {};
 
     /** useful constructor, creates 'object', but leaves 'ptr' NULL. */

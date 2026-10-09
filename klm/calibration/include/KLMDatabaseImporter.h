@@ -81,8 +81,8 @@ namespace Belle2 {
      * @param[in] fileName
      * Name of the ROOT file containing the efficiencies.
      */
-    void loadStripEfficiency(KLMStripEfficiency* stripEfficiency,
-                             std::string fileName);
+    static void loadStripEfficiency(KLMStripEfficiency* stripEfficiency,
+                                    const std::string& fileName);
 
     /**
      * Import strip efficiencies.

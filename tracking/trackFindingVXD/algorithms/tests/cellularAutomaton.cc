@@ -146,7 +146,7 @@ namespace CellularAutomatonTests {
     // -> the pathCollectorRecursive based on the CA also adds alternative paths with the same length.
     EXPECT_EQ(13, paths.size());
     unsigned int longestPath = 0;
-    for (auto& aPath : paths) {
+    for (const auto& aPath : paths) {
       if (longestPath < aPath.size()) {
         longestPath = aPath.size();
       }

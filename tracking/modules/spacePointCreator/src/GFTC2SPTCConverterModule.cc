@@ -196,7 +196,7 @@ GFTC2SPTCConverterModule::createSpacePointTC(const genfit::TrackCand* genfitTC)
   // for easier handling fill a taggedPair (typedef) to distinguish whether a hit has already been used or if is still open for procession
   std::vector<flaggedPair<int> > fHitIDs;
   for (int i = 0; i < nHits; ++i) {
-    auto aHit = genfitTC->getHit(i);
+    const auto* aHit = genfitTC->getHit(i);
     flaggedPair<int> aPair(false, aHit->getDetId(), aHit->getHitId());
     fHitIDs.push_back(aPair);
   }
@@ -461,7 +461,7 @@ std::pair<int, int> GFTC2SPTCConverterModule::checkExistAndValid(int clusterInd,
 }
 
 // ============================================================================ GET NDF =============================================================================================
-int GFTC2SPTCConverterModule::getNDF(Belle2::SpacePoint* spacePoint)
+int GFTC2SPTCConverterModule::getNDF(const Belle2::SpacePoint* spacePoint)
 {
   if (spacePoint == nullptr) {
     B2ERROR("Got nullptr pointer to determine the NDF of!");

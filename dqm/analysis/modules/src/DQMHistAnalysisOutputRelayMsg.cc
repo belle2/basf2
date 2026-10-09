@@ -19,7 +19,6 @@
 #include <TMessage.h>
 #include <ctime>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -48,13 +47,6 @@ void DQMHistAnalysisOutputRelayMsgModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: initialized.");
 }
 
-
-void DQMHistAnalysisOutputRelayMsgModule::beginRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: beginRun called.");
-}
-
-
 void DQMHistAnalysisOutputRelayMsgModule::event()
 {
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: event called.");
@@ -73,9 +65,9 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
   B2INFO("[" << mbstr << "] before sending " << seq->GetEntries() << " objects.");
   bool first_try = true;
-  while ((obj = (TObject*)nextkey())) {
+  while ((obj = nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
-      TCanvas* c = (TCanvas*) obj;
+      auto* c = dynamic_cast<TCanvas*>(obj);
       auto process_canvas = m_canvasSendDefault;
 
       auto it = clist.find(c->GetName());
@@ -108,12 +100,6 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after sending " << sent_canvases << " of " << seq->GetEntries() << " objects.");
 }
-
-void DQMHistAnalysisOutputRelayMsgModule::endRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: endRun called");
-}
-
 
 void DQMHistAnalysisOutputRelayMsgModule::terminate()
 {

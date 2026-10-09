@@ -28,7 +28,7 @@ clusteralgo.setInputFileNames(["PXDClusterPositionCollectorOutput_kind_0.root", 
                                "PXDClusterPositionCollectorOutput_kind_2.root", "PXDClusterPositionCollectorOutput_kind_3.root"])
 
 # Here, we can play around with algo parameters
-# Minimum number of collected clusters for estimating shape likelyhood
+# Minimum number of collected clusters for estimating shape likelihood
 clusteralgo.minClusterForShapeLikelyhood = 250
 # Minimum number of collected clusters for estimating cluster position offsets
 clusteralgo.minClusterForPositionOffset = 1000

@@ -43,15 +43,16 @@ if __name__ == "__main__":
         create_input = basf2.create_path()
         create_input.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1])
         create_input.add_module('Gearbox')
-        create_input.add_module('Geometry', components=['MagneticField', 'SVD'])
+        create_input.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         create_input.add_module('ParticleGun')
         create_input.add_module('FullSim')
-
+        create_input.add_module('SVDEventInfoSetter')
         create_input.add_module('SVDDigitizer')
         create_input.add_module('SVDPacker')
         create_input.add_module('RootOutput', outputFileName='rawPlusDigits.root')
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(create_input)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Generation {test_message[result]}.\n')
@@ -62,7 +63,7 @@ if __name__ == "__main__":
         read_shapers_default = basf2.create_path()
         read_shapers_default.add_module('RootInput', inputFileName='rawPlusDigits.root')
         read_shapers_default.add_module('Gearbox')
-        read_shapers_default.add_module('Geometry', components=['MagneticField', 'SVD'])
+        read_shapers_default.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         read_shapers_default.add_module('SVDUnpacker')
         add_svd_reconstruction(read_shapers_default)
 
@@ -79,12 +80,12 @@ if __name__ == "__main__":
                                  inputFileName='rawPlusDigits.root',
                                  branchNames=['EventMetaData', 'RawSVDs'])
         read_safe_way.add_module('Gearbox')
-        read_safe_way.add_module('Geometry', components=['MagneticField', 'SVD'])
+        read_safe_way.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         read_safe_way.add_module('SVDUnpacker')
         add_svd_reconstruction(read_safe_way)
-
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(read_safe_way)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Test {test_message[result]}.\n')
@@ -98,13 +99,13 @@ if __name__ == "__main__":
                                     inputFileName='rawPlusDigits.root',
                                     branchNames=['EventMetaData', 'RawSVDs', 'SVDShaperDigits'])
         read_append_sort.add_module('Gearbox')
-        read_append_sort.add_module('Geometry', components=['MagneticField', 'SVD'])
+        read_append_sort.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         read_append_sort.add_module('SVDUnpacker', silentlyAppend=True)
         read_append_sort.add_module('SVDShaperDigitSorter')
         add_svd_reconstruction(read_append_sort)
-
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(read_append_sort)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Test {test_message[result]}.\n')
@@ -118,12 +119,12 @@ if __name__ == "__main__":
                                       inputFileName='rawPlusDigits.root',
                                       branchNames=['EventMetaData', 'RawSVDs', 'SVDShaperDigits'])
         read_append_nosort.add_module('Gearbox')
-        read_append_nosort.add_module('Geometry', components=['MagneticField', 'SVD'])
+        read_append_nosort.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         read_append_nosort.add_module('SVDUnpacker', silentlyAppend=True)
         add_svd_reconstruction(read_append_nosort)
-
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(read_append_nosort)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Test {test_message[result]}.\n')
@@ -142,12 +143,12 @@ if __name__ == "__main__":
             inputFileName='rawPlusDigits.root',
             excludeBranchNames=['SVDShaperDigits'])
         unpack_with_data.add_module('Gearbox')
-        unpack_with_data.add_module('Geometry', components=['MagneticField', 'SVD'])
+        unpack_with_data.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         add_svd_unpacker(unpack_with_data)
         add_svd_reconstruction(unpack_with_data)
-
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(unpack_with_data)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Test {test_message[result]}.\n')
@@ -159,12 +160,12 @@ if __name__ == "__main__":
         unpack_without_data = basf2.create_path()
         unpack_without_data.add_module('EventInfoSetter', expList=[0], runList=[0], evtNumList=[1])
         unpack_without_data.add_module('Gearbox')
-        unpack_without_data.add_module('Geometry', components=['MagneticField', 'SVD'])
+        unpack_without_data.add_module('Geometry', components=['MagneticField', 'SVD'], useDB=False)
         add_svd_unpacker(unpack_without_data)
         add_svd_reconstruction(unpack_without_data)
-
         with b2test_utils.show_only_errors():
             result = b2test_utils.safe_process(unpack_without_data)
+            assert (result == 0)
 
         test_successful = test_successful and (result == 0)
         basf2.B2INFO(f'Test {test_message[result]}.\n')

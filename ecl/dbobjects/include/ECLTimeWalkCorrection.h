@@ -56,7 +56,7 @@ namespace Belle2 {
      * @see m_par
      * @see m_parFormat
      */
-    std::vector<double> getParams() const
+    const std::vector<double>& getParams() const
     {
       return m_par;
     }

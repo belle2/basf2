@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * Destructor of the module.
        */
-      virtual ~CDCPackerModule();
+      virtual ~CDCPackerModule() override;
 
       /**
        * Initializes the Module.

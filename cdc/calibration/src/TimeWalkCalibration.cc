@@ -121,7 +121,7 @@ bool TimeWalkCalibration::calibrate()
     m_h2[ib]->FitSlicesY(0, 1, -1, 10);
     TString name = m_h2[ib]->GetName();
     TString hm_name = name + "_1";
-    m_h1[ib] = (TH1D*)gDirectory->Get(hm_name);
+    m_h1[ib] = static_cast<TH1D*>(gDirectory->Get(hm_name));
     if (!m_h1[ib]) {m_flag[ib] = 0; continue;}
     m_h1[ib]->SetDirectory(0);
 

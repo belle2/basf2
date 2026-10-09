@@ -1,0 +1,129 @@
+# Herwig 7.2.0 LHE fragmentation configuration for e+e- collisions
+# Uses e+e- beam structure (e+/e- initial state + Z/gamma* + q qbar)
+# Specifying the beam structure avoids a Herwig "PartonBin NaN" issue that occurs with quark-only LHE input.
+#
+# Template placeholders replaced by HerwigFragmentationModule:
+#   {lhe_file}      - path to LHE input file
+#   {cache_file}    - path to LHE cache file
+#   {seed}          - random seed (from gRandom, mirrors Pythia's FragmentationRndm)
+#   {nevents}       - number of events generated and printed to HepMC 
+#   {print_event}   - whether to print internal event record (1=yes, 0=no)
+#   {output_file}   - HepMC output file path
+#   {runname}       - run name for Herwig .run file
+#   {shower_config} - shower mode configuration (injected by module)
+#   TUNE_SETTINGS   - ParameterFile tune (placeholder: tune_settings, injected verbatim, overrides above)
+#                     Intentionally written without braces: the tune content is multi-line, so using
+#                     the brace form here would cause content.replace() to inject Herwig commands
+#                     into this comment.
+
+##################################################
+# Load Les Houches library
+##################################################
+cd /Herwig/EventHandlers
+library LesHouches.so
+
+##################################################
+# Create LesHouchesEventHandler
+##################################################
+create ThePEG::LesHouchesEventHandler LHEHandler
+
+# Use EEExtractor for e+e- (NoPDF for leptons)
+set LHEHandler:PartonExtractor /Herwig/Partons/EEExtractor
+
+# Enable shower for FSR
+set LHEHandler:CascadeHandler /Herwig/Shower/ShowerHandler
+
+# Enable cluster hadronization
+set LHEHandler:HadronizationHandler /Herwig/Hadronization/ClusterHadHandler
+
+# Disable Herwig decays (EvtGen handles all decays in basf2)
+set LHEHandler:DecayHandler NULL
+
+# Weight handling for LHE events
+set LHEHandler:WeightOption VarNegWeight
+
+##################################################
+# Configure shower for e+e- (no ISR from beams since already handled by KKMC)
+##################################################
+cd /Herwig/Shower
+# Using NULL (not NoPDF) to disable PDF lookups in the shower 
+set ShowerHandler:PDFA NULL
+set ShowerHandler:PDFB NULL
+set ShowerHandler:MPIHandler NULL
+set ShowerHandler:MaxPtIsMuF Yes
+set ShowerHandler:RestrictPhasespace Yes
+# Explicitly disable ISR  
+set ShowerHandler:DoISR No
+
+# QED partner finder: IIandFF covers final-final dipoles (FSR from quarks), ISR is correctly ignored
+set PartnerFinder:QEDPartner IIandFF
+
+##################################################
+# Shower mode configuration (injected by module via ShowerMode parameter)
+##################################################
+{shower_config}
+
+##################################################
+# Create cuts object
+# Note that MHatMin must be > 0 to avoid log(0)=-Inf 
+##################################################
+cd /Herwig/Cuts
+create ThePEG::Cuts NoCuts
+set NoCuts:MHatMin 1.0*GeV
+
+##################################################
+# Create LHE file reader
+##################################################
+cd /Herwig/EventHandlers
+create ThePEG::LesHouchesFileReader LHEReader
+set LHEReader:FileName {lhe_file}
+set LHEReader:CacheFileName {cache_file}
+set LHEReader:AllowedToReOpen No
+# Do NOT initialize PDFs from the LHE PDFID (we use NoPDF for e+e-)
+set LHEReader:InitPDFs 0
+set LHEReader:Cuts /Herwig/Cuts/NoCuts
+# Accept quark 4-momenta exactly as given by KKMC  (do not use RescaleEnergy)
+set LHEReader:MomentumTreatment Accept
+set LHEReader:WeightWarnings 0
+# Use NoPDF for both beams (NoPDF is valid for LHEReader, unlike ShowerHandler)
+set LHEReader:PDFA /Herwig/Partons/NoPDF
+set LHEReader:PDFB /Herwig/Partons/NoPDF
+
+##################################################
+# Connect reader to handler
+##################################################
+insert LHEHandler:LesHouchesReaders 0 LHEReader
+
+##################################################
+# Make LHEHandler the active event handler
+##################################################
+cd /Herwig/Generators
+set EventGenerator:EventHandler /Herwig/EventHandlers/LHEHandler
+set EventGenerator:RandomNumberGenerator:Seed {seed}
+set EventGenerator:NumberOfEvents {nevents}
+set EventGenerator:PrintEvent {print_event}
+set EventGenerator:MaxErrors 10000
+
+##################################################
+# HepMC output
+##################################################
+library HepMCAnalysis.so
+create ThePEG::HepMCFile /Herwig/Analysis/HepMC HepMCAnalysis.so
+set /Herwig/Analysis/HepMC:Filename {output_file}
+set /Herwig/Analysis/HepMC:PrintEvent {nevents}
+insert EventGenerator:AnalysisHandlers 0 /Herwig/Analysis/HepMC
+
+##################################################
+# Tune settings (injected verbatim from ParameterFile)
+# Placed last so tune commands override any earlier template setting.
+# Analogous to Pythia's m_Pythia->readFile(pythia_belle2.dat).
+# See data/herwig_belle2.dat for the default Belle II tune.
+##################################################
+{tune_settings}
+
+##################################################
+# Run events directly from the .in file (single subprocess - no separate 'Herwig run' step).
+# 'run' writes the .run snapshot then immediately generates NumberOfEvents (= {nevents}) events.
+# NumberOfEvents and HepMC:PrintEvent must stay in sync.
+##################################################
+run {runname} EventGenerator

@@ -10,8 +10,8 @@
 
 using namespace std;
 
-void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, int* y,
-                              int* ttrig2, int* n16,  int* lar, int* ltr, int* lq, int* hi2)
+void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg43, int* fg31, int* fg32, int* fg33, const int* y,
+                              const int* ttrig2, const int* n16,  int* lar, int* ltr, int* lq, int* hi2)
 {
   static const long long int k_np[16] = {
     65536,
@@ -38,12 +38,12 @@ void Belle2::ECL::shapeFitter(short int* id, int* f, int* f1, int* fg41, int* fg
 
   int ttrig;
   int Ahard  = (int) * (id + 2);
-  int k_a = (int) * ((unsigned char*)id + 26);
-  int k_b = (int) * ((unsigned char*)id + 27);
-  int k_c = (int) * ((unsigned char*)id + 28);
-  int k_16 = (int) * ((unsigned char*)id + 29);
-  int k1_chi = (int) * ((unsigned char*)id + 24);
-  int k2_chi = (int) * ((unsigned char*)id + 25);
+  int k_a = (int) * (reinterpret_cast<unsigned char*>(id) + 26);
+  int k_b = (int) * (reinterpret_cast<unsigned char*>(id) + 27);
+  int k_c = (int) * (reinterpret_cast<unsigned char*>(id) + 28);
+  int k_16 = (int) * (reinterpret_cast<unsigned char*>(id) + 29);
+  int k1_chi = (int) * (reinterpret_cast<unsigned char*>(id) + 24);
+  int k2_chi = (int) * (reinterpret_cast<unsigned char*>(id) + 25);
 
   int chi_thres = (int) * (id + 15);
 

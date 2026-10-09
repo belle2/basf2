@@ -20,10 +20,10 @@ void printDQMFile(TString name="",TString opt=""){
   TKey* key;
   Belle2::DQMFileMetaData* meta = nullptr;
   std::vector<Belle2::MonitoringObject*> monobj;
-  while((key=(TKey*)next())){
+  while((key=dynamic_cast<TKey*>(next()))){
     std::cout << key->GetClassName() << std::endl;
-    if( TString(key->GetClassName()) == "Belle2::DQMFileMetaData") meta = (Belle2::DQMFileMetaData*)key->ReadObj();
-    if( TString(key->GetClassName()) == "Belle2::MonitoringObject") monobj.push_back((Belle2::MonitoringObject*)key->ReadObj());
+    if( TString(key->GetClassName()) == "Belle2::DQMFileMetaData") meta = dynamic_cast<Belle2::DQMFileMetaData*>(key->ReadObj());
+    if( TString(key->GetClassName()) == "Belle2::MonitoringObject") monobj.push_back(dynamic_cast<Belle2::MonitoringObject*>(key->ReadObj()));
   }
 
   std::cout << "DQM file content" << std::endl << std::endl;

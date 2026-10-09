@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <ecl/geometry/GeoECLCreator.h>
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
+#include <G4LogicalVolume.hh>
+#include <G4PVPlacement.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4IntersectionSolid.hh>
@@ -19,10 +19,10 @@
 #include <G4PVReplica.hh>
 
 #include <iostream>
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/Matrix.h"
-#include "G4Vector3D.hh"
-#include "G4Point3D.hh"
+#include <CLHEP/Matrix/Vector.h>
+#include <CLHEP/Matrix/Matrix.h>
+#include <G4Vector3D.hh>
+#include <G4Point3D.hh>
 
 #include "ecl/geometry/BelleLathe.h"
 #include "ecl/geometry/BelleCrystal.h"
@@ -434,7 +434,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::barrel);
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
-      shape_t* s = *it;
+      const shape_t* s = *it;
       wrapped_crystals.push_back(wrapped_crystal(s, "barrel", 0.17 - 0.0325));
     }
 

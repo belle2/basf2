@@ -54,7 +54,7 @@ namespace Belle2 {
     /**
      * Get the whole list
      */
-    std::array<std::array<float, c_nAlphaBins>, c_nLayers> getScaleFactors() const
+    const std::array<std::array<float, c_nAlphaBins>, c_nLayers>& getScaleFactors() const
     {
       return m_Scales;
     }

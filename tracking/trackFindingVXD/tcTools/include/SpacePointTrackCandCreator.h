@@ -18,7 +18,8 @@ namespace Belle2 {
 
     /** takes simple vectors of SpacePoints and convert them to real SpacePointTrackCand.
      *  Returns the created Space Point. */
-    SpacePointTrackCand* createSPTC(SPTCContainerType& tcContainer, std::vector<const SpacePoint*>& spacePoints, short family = -1)
+    static SpacePointTrackCand* createSPTC(SPTCContainerType& tcContainer, std::vector<const SpacePoint*>& spacePoints,
+                                           short family = -1)
     {
       SpacePointTrackCand* newSPTC = tcContainer.appendNew(spacePoints);
       newSPTC->setFamily(family);

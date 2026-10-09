@@ -26,9 +26,7 @@
  * @{
  */
 
-
-#ifndef GFRAVEVERTEXFACTORY_H
-#define GFRAVEVERTEXFACTORY_H
+#pragma once
 
 #include "GFRaveVertex.h"
 #include "Track.h"
@@ -94,5 +92,3 @@ class GFRaveVertexFactory {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // GFRAVEVERTEXFACTORY_H

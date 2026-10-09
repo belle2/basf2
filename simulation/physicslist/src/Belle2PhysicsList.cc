@@ -7,15 +7,15 @@
  **************************************************************************/
 
 #include <simulation/physicslist/Belle2PhysicsList.h>
-#include "G4SystemOfUnits.hh"
-#include "G4RegionStore.hh"
-#include "G4ProductionCuts.hh"
+#include <G4SystemOfUnits.hh>
+#include <G4RegionStore.hh>
+#include <G4ProductionCuts.hh>
 
 // EM and decay physics
-#include "G4EmStandardPhysics.hh"
-#include "G4EmStandardPhysics_option1.hh"
-#include "G4OpticalPhysics.hh"
-#include "G4DecayPhysics.hh"
+#include <G4EmStandardPhysics.hh>
+#include <G4EmStandardPhysics_option1.hh>
+#include <G4OpticalPhysics.hh>
+#include <G4DecayPhysics.hh>
 #include <simulation/physicslist/Geant4ePhysics.h>
 
 // Hadronic physics
@@ -29,12 +29,12 @@
 #include <simulation/physicslist/GammaLeptoNuclearPhysics.h>
 
 // Particles
-#include "G4BosonConstructor.hh"
-#include "G4LeptonConstructor.hh"
-#include "G4MesonConstructor.hh"
-#include "G4BaryonConstructor.hh"
-#include "G4IonConstructor.hh"
-#include "G4ShortLivedConstructor.hh"
+#include <G4BosonConstructor.hh>
+#include <G4LeptonConstructor.hh>
+#include <G4MesonConstructor.hh>
+#include <G4BaryonConstructor.hh>
+#include <G4IonConstructor.hh>
+#include <G4ShortLivedConstructor.hh>
 
 // Long lived
 #include "simulation/longlivedneutral/G4LongLivedNeutralPhysics.h"
@@ -108,7 +108,7 @@ void Belle2PhysicsList::ConstructParticle()
 
 void Belle2PhysicsList::ConstructG4eParticles()
 {
-  static G4ParticleDefinition* g4eParticle = NULL;
+  static const G4ParticleDefinition* g4eParticle = NULL;
 
   if (g4eParticle == NULL) {
     // Bohr Magneton for positron and positive muon

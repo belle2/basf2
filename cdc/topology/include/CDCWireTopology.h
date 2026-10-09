@@ -161,7 +161,7 @@ namespace Belle2 {
       { return 0 <= iSuperLayer and iSuperLayer < int(getWireSuperLayers().size()); }
 
       /// Returns the logical superlayer number at the given radius
-      ISuperLayer getISuperLayerAtCylindricalR(double cylindricalR);
+      static ISuperLayer getISuperLayerAtCylindricalR(double cylindricalR);
 
       /// Getter for wire superlayer getter by wireID object.
       const CDCWireSuperLayer& getWireSuperLayer(const WireID& wireID) const

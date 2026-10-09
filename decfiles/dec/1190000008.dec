@@ -1,0 +1,43 @@
+# EventType: 1190000008
+# Descriptor: [B0 -> Xsd nu anti-nu]cc
+# NickName: Bd_Xsdnunubar
+# Documentation: Rare b->s nu anti-nu processes in B+ decays
+# Tested: Yes 
+# PhysicsWG: EWP 
+# Responsible: Corentin Santos
+# Email: corentin.santos@iphc.cnrs.fr
+# Cuts: None
+# Date: 20260928
+
+# PYTHIA tuning parameters (taken from
+# https://gitlab.desy.de/zihan/b2sll/-/blob/main/mc/fragmentation/b1_evtgen/B2Xsll_pythiaTuned.dec?ref_type=heads)
+JetSetPar PARJ(2)=.10
+JetSetPar PARJ(11)=.85
+# JetSetPar PARJ(15)=.15
+JetSetPar PARJ(25)=.01
+
+Decay Upsilon(4S)
+1.00 B0sig anti-B0sig B0 anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.20 K_10 anti-nu_e nu_e       PHSP;
+0.04 K'_10 anti-nu_e nu_e       PHSP;
+0.14 K_0*0 anti-nu_e nu_e       PHSP;
+0.12 K_2*0 anti-nu_e nu_e       PHSP;
+0.11 K'*0 anti-nu_e nu_e       PHSP;
+0.23 K''*0 anti-nu_e nu_e       PHSP;
+0.16 Xsd anti-nu_e nu_e           BTOXSNUNU_FERMI  0.1 0.0 0.461 1.1 4.68 0.1;
+Enddecay
+CDecay anti-B0sig
+
+Decay Xsd
+1.0  d  anti-s     PYTHIA 43;
+0.0  K0 pi+ pi-   PHSP;
+0.0  K0 pi0 pi0    PHSP;
+0.0  K+ pi- pi0    PHSP;
+Enddecay
+CDecay anti-Xsd
+
+End
+

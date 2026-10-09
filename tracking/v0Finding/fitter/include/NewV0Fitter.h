@@ -14,9 +14,12 @@
 #include <mdst/dataobjects/V0.h>
 #include <tracking/dataobjects/V0ValidationVertex.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/v0Finding/fitter/V0VertexFitter.h>
 #include <genfit/Track.h>
 #include <genfit/GFRaveVertex.h>
 #include <map>
+#include <memory>
+#include <utility>
 
 namespace Belle2 {
 
@@ -66,12 +69,12 @@ namespace Belle2 {
      * @param copiedRecoTracksName name of the StoreArray of copied RecoTracks
      * @param enableValidation on true store additional data for validation
      */
-    NewV0Fitter(const std::string& trackFitResultsName = "",
-                const std::string& v0sName = "",
-                const std::string& v0ValidationVerticesName = "",
-                const std::string& recoTracksName = "",
-                const std::string& copiedRecoTracksName = "CopiedRecoTracks",
-                bool enableValidation = false);
+    explicit NewV0Fitter(const std::string& trackFitResultsName = "",
+                         const std::string& v0sName = "",
+                         const std::string& v0ValidationVerticesName = "",
+                         const std::string& recoTracksName = "",
+                         const std::string& copiedRecoTracksName = "CopiedRecoTracks",
+                         bool enableValidation = false);
 
     /**
      * Initialization of cuts applied during the fit and store process.
@@ -95,6 +98,13 @@ namespace Belle2 {
      * @param fitterMode fitter mode
      */
     void setFitterMode(int fitterMode) {m_fitterMode = fitterMode;}
+
+    /**
+     * Setter for the vertex fitter, replacing the default one.
+     * The instances are created by the V0VertexFitterFactory.
+     * @param vertexFitter vertex fitter to be used
+     */
+    void setVertexFitter(std::unique_ptr<V0VertexFitter> vertexFitter) {m_vertexFitter = std::move(vertexFitter);}
 
     /**
      * Fit V0 with given hypothesis and store results if fit is successful.
@@ -157,7 +167,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @return track representation on success or nullptr on failure
      */
-    const genfit::AbsTrackRep* getTrackRepresentation(const RecoTrack* recoTrack, int pdgCode);
+    static const genfit::AbsTrackRep* getTrackRepresentation(const RecoTrack* recoTrack, int pdgCode);
 
     /**
      * Sets cardinal representation of a given genfit track and PDG code.
@@ -165,16 +175,7 @@ namespace Belle2 {
      * @param pdgCode PDG code
      * @return true on success
      */
-    bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
-
-    /**
-     * Genfit Rave vertex fit called by vertexFit method.
-     * @param trackPlus positively charged genfit track
-     * @param trackMinus negatively charged genfit track
-     * @param vertex fitted vertex [out]
-     * @return true on success
-     */
-    bool fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex);
+    static bool setCardinalRep(genfit::Track& gfTrack, int pdgCode);
 
     /**
      * Extrapolation of both tracks to the vertex. On success the return value indicates if tracks have inner hits
@@ -184,8 +185,8 @@ namespace Belle2 {
      * @param vertex vertex
      * @return value >= 0 on success, value < 0 on failure
      */
-    int extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, genfit::MeasuredStateOnPlane& stateMinus,
-                            const genfit::GFRaveVertex& vertex);
+    static int extrapolateToVertex(genfit::MeasuredStateOnPlane& statePlus, genfit::MeasuredStateOnPlane& stateMinus,
+                                   const genfit::GFRaveVertex& vertex);
 
     /**
      * Make a copy of reco track.
@@ -235,6 +236,7 @@ namespace Belle2 {
     double m_vertexChi2Cut = 0;   /**< Chi2 cut */
     std::map<int, std::pair<double, double> > m_invMassCuts; /**< invariant mass cuts, key = abs(PDG) */
 
+    std::unique_ptr<V0VertexFitter> m_vertexFitter; /**< vertex fitter used to fit the V0 vertex */
     int m_fitterMode = 1;  /**< fitter mode */
     bool m_validation = false; /**< validation flag */
 

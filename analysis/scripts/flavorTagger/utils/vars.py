@@ -17,7 +17,6 @@ def set_output_vars():
 
     # aliases for FT output vars
     va.addAlias('FBDT_qrCombined', 'qrOutput(FBDT)')
-    va.addAlias('FANN_qrCombined', 'qrOutput(FANN)')
     va.addAlias('qrGNN', 'extraInfo(qrGNN)')
 
     # alias for FT target var

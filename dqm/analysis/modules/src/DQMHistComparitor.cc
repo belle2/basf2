@@ -87,14 +87,14 @@ void DQMHistComparitorModule::event()
     TH1* histo = nullptr;
     B2DEBUG(20, "== Search for " << it->histName << " with ref " << it->refName << "==");
     if (it->deltaflag) histo = getDelta(it->histName); // default: last delta
-    if (!histo) histo = findHist(it->histName, true); // only if changed
+    if (!histo) histo = findHist(it->histName, "", true); // only if changed
     if (!histo) {
       // B2DEBUG(20, "NOT Found " << it->histName);
       // Dont compare if missing or not updated ...
       continue;
     }
     // if compare normalized ... need configuration
-    auto refhist = findRefHist(it->refName, ERefScaling::c_RefScaleEntries, histo);
+    auto refhist = findRefHist(it->refName, "", ERefScaling::c_RefScaleEntries, histo);
     if (!refhist) {
       B2DEBUG(20, "NOT Found " << it->refName);
       // Dont compare if any of hists is missing ...
@@ -121,19 +121,6 @@ void DQMHistComparitorModule::event()
 
     refhist->SetLineStyle(3);// 2 or 3
     refhist->SetLineColor(3);
-
-    /*
-      // I think no need for this anymore
-      TIter nextkey(it->canvas->GetListOfPrimitives());
-      TObject* obj = NULL;
-      while ((obj = (TObject*)nextkey())) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          if (string(obj->GetName()) == string(refhist->GetName())) {
-            delete obj;
-          }
-        }
-      }
-    */
 
     refhist->Draw("hist");
     refhist->SetStats(kFALSE);

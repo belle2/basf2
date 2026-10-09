@@ -95,11 +95,6 @@ void EclPainterPolar::setTitles()
   m_hist->GetZaxis()->CenterTitle();
 }
 
-void EclPainterPolar::getInformation(int px, int py, MultilineWidget* panel)
-{
-  EclPainter::getInformation(px, py, panel);
-}
-
 EclPainterPolar::Type EclPainterPolar::getType()
 {
   return m_type;

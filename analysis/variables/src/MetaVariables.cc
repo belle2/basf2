@@ -41,6 +41,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <regex>
+#include <unordered_set>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
@@ -564,6 +565,89 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr nParticlesInCone(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2 && arguments.size() != 3) {
+        B2FATAL("nParticlesInCone requires a particle list, a cone half-angle in degrees, "
+                "and optionally a particle cut");
+      }
+
+      const std::string listName = arguments[0];
+
+      double angleDegrees = 0.;
+      try {
+        angleDegrees = Belle2::convertString<double>(arguments[1]);
+      } catch (const std::exception&) {
+        B2FATAL("Invalid cone half-angle: " << arguments[1]);
+      }
+      if (!std::isfinite(angleDegrees) || angleDegrees < 0. || angleDegrees > 180.) {
+        B2FATAL("The cone half-angle must be between 0 and 180 degrees");
+      }
+      const double cosineThreshold = std::cos(angleDegrees * std::acos(-1.) / 180.);
+
+      std::shared_ptr<Variable::Cut> cut;
+      if (arguments.size() == 3 && !arguments[2].empty()) {
+        cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(arguments[2]));
+      }
+
+      return [listName, cosineThreshold, cut](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> particles(listName);
+        if (!particles.isValid())
+        {
+          B2FATAL("Invalid particle list in nParticlesInCone: " << listName);
+        }
+
+        const auto isSupported = [](const Particle * candidate)
+        {
+          if (!candidate) return false;
+          const auto source = candidate->getParticleSource();
+          return source == Particle::c_Track ||
+          source == Particle::c_ECLCluster ||
+          source == Particle::c_KLMCluster;
+        };
+
+        if (!isSupported(particle)) return Const::doubleNaN;
+
+        const auto labToCms = PCmsLabTransform().rotateLabToCms();
+        const auto central = labToCms * particle->get4Vector();
+        const double cx = central.Px();
+        const double cy = central.Py();
+        const double cz = central.Pz();
+        const double c2 = cx * cx + cy * cy + cz * cz;
+        if (!std::isfinite(c2) || c2 <= 0.) return Const::doubleNaN;
+
+        const int ownSource = particle->getMdstSource();
+        std::unordered_set<int> countedSources;
+        int count = 0;
+
+        for (unsigned i = 0; i < particles->getListSize(); ++i)
+        {
+          const Particle* other = particles->getParticle(i);
+          if (!isSupported(other)) continue;
+
+          const int source = other->getMdstSource();
+          if (source == ownSource || countedSources.count(source)) continue;
+          if (cut && !cut->check(other)) continue;
+
+          const auto momentum = labToCms * other->get4Vector();
+          const double px = momentum.Px();
+          const double py = momentum.Py();
+          const double pz = momentum.Pz();
+          const double p2 = px * px + py * py + pz * pz;
+          if (!std::isfinite(p2) || p2 <= 0.) continue;
+
+          double cosine = (cx * px + cy * py + cz * pz) / std::sqrt(c2 * p2);
+          if (cosine > 1.) cosine = 1.;
+          if (cosine < -1.) cosine = -1.;
+
+          if (cosine >= cosineThreshold && countedSources.insert(source).second) {
+            ++count;
+          }
+        }
+        return count;
+      };
+    }
+
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments)
     {
       // unpack arguments, there should be only one: the name of the list we're checking
@@ -757,6 +841,8 @@ namespace Belle2 {
           for (const auto& iListName : listNames)
           {
             try {
+              // only used to test whether the name is a number
+              // cppcheck-suppress ignoredReturnValue
               std::stod(iListName);
               continue;
             } catch (const std::exception& e) {}
@@ -3475,6 +3561,85 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr varForNthDaughterOfType(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 4 || arguments.size() < 3) {
+        B2FATAL("Number of arguments for varForNthDaughterOfType must be 3 or 4");
+      }
+      // Get abs pdg id
+      std::string argPtype = arguments[0];
+      TDatabasePDG* pdgDatabase = TDatabasePDG::Instance();
+      TParticlePDG* part = pdgDatabase->GetParticle(argPtype.c_str());
+      int absPdg = -1;
+      if (part != nullptr) {
+        absPdg = std::abs(part->PdgCode());
+      } else {
+        try {
+          absPdg = std::abs(convertString<int>(argPtype));
+        } catch (const std::exception&) { }
+      }
+      if (absPdg == -1 || pdgDatabase->GetParticle(absPdg) == nullptr) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argPtype << "' is neither a valid particle name nor a PDG code");
+      }
+      // Get particle index
+      std::string argIndex = arguments[1];
+      int index = 0;
+      try {
+        index = convertString<int>(argIndex);
+      } catch (const std::exception&) { }
+      if (index <= 0) {
+        B2FATAL("varForNthDaughterOfType: argument '" << argIndex << "' is not a valid positive integer");
+      }
+      // Get variable
+      const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+      // Get depth
+      int depth = 1;
+      if (arguments.size() == 4) {
+        std::string argDepth = arguments[3];
+        try {
+          depth = convertString<int>(argDepth);
+        } catch (const std::exception&) {
+          depth = -1;
+        }
+        if (depth <= 0) {
+          B2FATAL("varForNthDaughterOfType: argument '" << argDepth << "' is not a valid positive integer");
+        }
+      }
+
+      auto func = [absPdg, index, var, depth](const Particle * particle) -> double {
+        int nFound = 0;
+        std::vector<Particle*> currentLevel = particle->getDaughters();
+        std::vector<Particle*> nextLevel;
+        for (int d = 0; d < depth; d++)
+        {
+          if (currentLevel.size() == 0) return Const::doubleNaN;
+          for (unsigned i = 0; i < currentLevel.size(); i++) {
+            Particle* p = currentLevel[i];
+            if (std::abs(p->getPDGCode()) == absPdg) {
+              nFound++;
+              if (nFound == index) {
+                auto result = var->function(p);
+                if (std::holds_alternative<double>(result)) {
+                  return std::get<double>(result);
+                } else if (std::holds_alternative<int>(result)) {
+                  return std::get<int>(result);
+                } else if (std::holds_alternative<bool>(result)) {
+                  return std::get<bool>(result);
+                } else return Const::doubleNaN;
+              }
+            }
+            std::vector<Particle*> newParticles = p->getDaughters();
+            nextLevel.insert(nextLevel.end(), newParticles.begin(), newParticles.end());
+          }
+          currentLevel.clear();
+          std::swap(currentLevel, nextLevel);
+        }
+        return Const::doubleNaN;
+      };
+
+      return func;
+    }
+
     Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments)
     {
       if (arguments.size() != 1) {
@@ -3605,17 +3770,19 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "It is strongly recommended to pass a ParticleList that contains at most only one Particle in each event. "
 		      "When more than one Particle is present in the ParticleList, only the first Particle in the list is used for "
 		      "computing the rest frame and a warning is thrown. If the given ParticleList is empty in an event, it returns NaN.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("useDaughterRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRestFrame,
+    REGISTER_METAVARIABLE("useDaughterRestFrame(variable, daughterIndex_1[, daughterIndex_2, ... daughterIndex_3])", useDaughterRestFrame,
                       "Returns the value of the variable in the rest frame of the selected daughter particle.\n"
 		      "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
-		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+		      "If two or more indices are given, the rest frame of the sum of the daughters is used. "
+		      "By default only ``daughterIndex_1`` is given, in which case the rest frame of that single daughter is used.",
 		      Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("useDaughterRecoilRestFrame(variable, daughterIndex_1, [daughterIndex_2, ... daughterIndex_3])", useDaughterRecoilRestFrame,
+    REGISTER_METAVARIABLE("useDaughterRecoilRestFrame(variable, daughterIndex_1[, daughterIndex_2, ... daughterIndex_3])", useDaughterRecoilRestFrame,
                       "Returns the value of the variable in the rest frame of the recoil of the selected daughter particle.\n"
           "The daughter is identified via generalized daughter index, e.g. ``0:1`` identifies the second daughter (1) "
           "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
-          "If two or more indices are given, the rest frame of the sum of the daughters is used.",
+          "If two or more indices are given, the rest frame of the sum of the daughters is used. "
+          "By default only ``daughterIndex_1`` is given, in which case the recoil rest frame of that single daughter is used.",
           Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
                       "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
@@ -3644,11 +3811,25 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE(
+      "nParticlesInCone(particleListName, halfAngleDegrees, cut='')",
+      nParticlesInCone,
+      R"DOC(
+Counts distinct reconstructed final-state particles from Tracks, ECLClusters,
+or KLMClusters within a cone around this particle in the e+e- centre-of-mass
+frame. The half-angle is in degrees (0 to 180). The optional cut applies to
+particles in particleListName. A particle sharing the central particle's MDST
+source is excluded; each MDST source is counted at most once. An empty list
+gives zero. Returns NaN if the central particle has an unsupported source or
+invalid momentum.
+)DOC",
+      Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
                       "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,
                       "Returns 1 if the given particle is a daughter of at least one of the particles in the given particle Lists.", Manager::VariableDataType::c_bool);
-    REGISTER_METAVARIABLE("isDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isDescendantOfList, R"DOC(
+    REGISTER_METAVARIABLE("isDescendantOfList(particleListName[, anotherParticleListName, ..., generationFlag])", isDescendantOfList, R"DOC(
                       Returns 1 if the given particle appears in the decay chain of the particles in the given ParticleLists.
 
                       Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
@@ -3658,7 +3839,7 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       * ``isDescendantOfList(<particle_list>,3)`` returns 1 if particle is a great-granddaughter of the list, etc.
                       * Default value is ``-1`` that is inclusive for all generations.
                       )DOC", Manager::VariableDataType::c_bool);
-    REGISTER_METAVARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName][, generationFlag = -1])", isMCDescendantOfList, R"DOC(
+    REGISTER_METAVARIABLE("isMCDescendantOfList(particleListName[, anotherParticleListName, ..., generationFlag])", isMCDescendantOfList, R"DOC(
                       Returns 1 if the given particle is linked to the same MC particle as any reconstructed daughter of the decay lists.
 
                       Passing an integer as the last argument, allows to check if the particle belongs to the specific generation:
@@ -3833,8 +4014,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                        daughter (3) of the second daughter (1) of the first daughter (0) of the mother particle. ``1`` simply
                        identifies the second daughter of the root particle.
 
-                       Both two and three generalized indexes can be given to ``daughterAngle``. If two indices are given, the
-                       variable returns the angle between the momenta of the two given particles. If three indices are given, the
+                       Both two and three generalized indexes can be given to ``daughterAngle``. By default two indices are given, in
+                       which case the variable returns the angle between the momenta of the two given particles. If three indices are given, the
                        variable returns the angle between the momentum of the third particle and a vector which is the sum of the
                        first two daughter momenta.
 
@@ -3846,8 +4027,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                            the first daughter of the fourth daughter.
 
                       )DOC", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2, [daughterIndex_3])", mcDaughterAngle,
-                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles. The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("mcDaughterAngle(daughterIndex_1, daughterIndex_2[, daughterIndex_3])", mcDaughterAngle,
+                      "MC matched version of the `daughterAngle` function. Also works if applied directly to MC particles. "
+                      "As for `daughterAngle`, by default two indices are given and the angle between the momenta of the two given particles is returned; "
+                      "if a third index is given, the angle between the momentum of the third particle and the sum of the first two daughter momenta is returned. "
+                      "The unit of the angle is ``rad``", Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("grandDaughterDecayAngle(i, j)", grandDaughterDecayAngle,
                       "Returns the decay angle of the granddaughter in the daughter particle's rest frame.\n"
                       "It is calculated with respect to the reverted momentum vector of the particle.\n"
@@ -3862,6 +4046,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterInvM(i[, j, ...])", daughterInvM, R"DOC(
                        Returns the invariant mass adding the Lorentz vectors of the given daughters. The unit of the invariant mass is GeV/:math:`\text{c}^2`
                        E.g. ``daughterInvM(0, 1, 2)`` returns the invariant Mass :math:`m = \sqrt{(p_0 + p_1 + p_2)^2}` of the first, second and third daughter.
+                       At least the first index ``i`` is required; by default no further indices are given, in which case the mass of the single given daughter is returned.
 
                        Daughters from different generations of the decay tree can be combined using generalized daughter indexes,
                        which are simply colon-separated daughter indexes for each generation, starting from the root particle. For
@@ -3934,11 +4119,12 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("pValueCombinationOfDaughters(variable)", pValueCombinationOfDaughters,
                       "Returns the combined p-value of the daughter p-values according to the formula given in `Nucl. Instr. and Meth. A 411 (1998) 449 <https://doi.org/10.1016/S0168-9002(98)00293-9>`_ .\n"
                       "If any of the p-values is invalid, i.e. smaller than zero, -1 is returned.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("veto(particleList, cut, pdgCode = 11)", veto,
+    REGISTER_METAVARIABLE("veto(particleList, cut[, pdgCode])", veto,
                       "Combines current particle with particles from the given particle list and returns 1 if the combination passes the provided cut. \n"
                       "For instance one can apply this function on a signal Photon and provide a list of all photons in the rest of event and a cut \n"
                       "around the neutral Pion mass (e.g. ``0.130 < M < 0.140``). \n"
-                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1", Manager::VariableDataType::c_bool);
+                      "If a combination of the signal Photon with a ROE photon fits this criteria, hence looks like a neutral pion, the veto-Metavariable will return 1 \n"
+                      "The default value of ``pdgCode`` is 11 (electron).", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("matchedMC(variable)", matchedMC,
                       "Returns variable output for the matched MCParticle by constructing a temporary Particle from it.\n"
                       "This may not work too well if your variable requires accessing daughters of the particle.\n"
@@ -3954,10 +4140,11 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns variable output for the Klong MCParticle which has the best match with the ECLCluster of the given Particle.\n"
                       "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching Klong MCParticle", Manager::VariableDataType::c_double);
 
-    REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
+    REGISTER_METAVARIABLE("countInList(particleList[, cut])", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"
                       "E.g. ``countInList(e+, isSignal == 1)`` returns the number of correctly reconstructed electrons in the event.\n"
+                      "The default value of ``cut`` is an empty string, so all particles in the list are counted.\n"
                       "The variable is event-based and does not need a valid particle pointer as input.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("getVariableByRank(particleList, rankedVariableName, variableName, rank)", getVariableByRank, R"DOC(
                       [Eventbased] Returns the value of ``variableName`` for the candidate in the ``particleList`` with the requested ``rank``.
@@ -4051,6 +4238,11 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
 Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("varForNthDaughterOfType(type, n, variable[, maxDepth])",varForNthDaughterOfType,R"DOC(Returns requested variable for nth daughter (``n`` starting at 1) of the given type.
+Particle type can be given as pdg code or by particle name (particles and antiparticles are treated the same, so e.g. ``211``, ``-211``, ``pi+`` and ``pi-`` will all match all charged pions). 
+Maximal depth controls how many generations of daughters are searched (``maxDepth=1`` only direct daughters, ``maxDepth=2`` also granddaughters, ...). The default value of ``maxDepth`` is 1.
+As an example, when reconstructing ``B0:my_list -> [K_S0:pipi -> pi+:all pi-:all] [pi0:gg -> gamma:all gamma:all]`` then ``varForNthDaughterOfType(pi+, 1, E, 2)`` will return the energy of the first charged pion found searching all daughters and then granddaughters of the given particle, so in this case the pi+, and ``varForNthDaughterOfType(22, 2, E, 2)`` will return the energy of the second daughter of the pi0. (Note that the kinematic distributions of the two pi0 daughters are not the same, unless the ``gamma:all`` list was shuffled beforehand!)
+If no nth daughter of the given type can be found at given maximal depth, returns NaN.)DOC", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
 			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",

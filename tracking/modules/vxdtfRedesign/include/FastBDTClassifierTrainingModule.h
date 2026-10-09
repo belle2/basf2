@@ -86,8 +86,8 @@ namespace Belle2 {
     Belle2::StoreObjPtr<Belle2::DirectedNodeNetworkContainer> m_network;
 
     /** create a trainings sample from the three hit combination */
-    const TrainSample makeTrainSample(const Belle2::SpacePoint* outerHit, const Belle2::SpacePoint* centerHit,
-                                      const Belle2::SpacePoint* innerHit);
+    static const TrainSample makeTrainSample(const Belle2::SpacePoint* outerHit, const Belle2::SpacePoint* centerHit,
+                                             const Belle2::SpacePoint* innerHit);
   };
 
 } // end namespace Belle2

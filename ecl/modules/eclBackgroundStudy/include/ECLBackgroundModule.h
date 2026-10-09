@@ -42,22 +42,16 @@ namespace Belle2 {
     ECLBackgroundModule();
 
     /** Destructor.*/
-    virtual ~ECLBackgroundModule();
+    virtual ~ECLBackgroundModule() override;
 
     /** Initialize variables. */
     virtual void initialize() override;
-
-    /** beginRun */
-    virtual void beginRun() override;
 
     /** Event method  */
     virtual void event() override;
 
     /** endRun */
     virtual void endRun() override;
-
-    /** terminate */
-    virtual void terminate() override;
 
     /** Initialize the histograms*/
     virtual void defineHisto() override;
@@ -161,7 +155,7 @@ namespace Belle2 {
     /**Convert histogram vs ARICH channel ID to *average* per ring ID */
     TH1F* BuildARICHringIDHisto(TH1F* h_cell);
     /** Get ARICH ring ID from the module index */
-    int ARICHmod2row(int modID);
+    static int ARICHmod2row(int modID);
 
     //ECL channels
     /** Number of thetaID values */

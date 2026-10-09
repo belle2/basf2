@@ -42,10 +42,10 @@ namespace Belle2 {
      * Constructor.
      * @param binEdges vector of vectors of bin edges in the N dimensions.
      */
-    ECLChargedPIDPhasespaceBinning(const std::vector<std::vector<float>> binEdges)
+    explicit ECLChargedPIDPhasespaceBinning(const std::vector<std::vector<float>>& binEdges) :
+      m_binEdges(binEdges)
     {
-      m_binEdges = binEdges;
-      for (auto dimensionBinEdges : binEdges) {
+      for (const auto& dimensionBinEdges : binEdges) {
         m_nBins.push_back(dimensionBinEdges.size() - 1);
       }
     }
@@ -59,7 +59,7 @@ namespace Belle2 {
      * Maps the vector of input values to a global bin index. If any of the values lies outside the binning -1 is returned.
      * @param values N dimensional vector of values to be mapped to a global linear bin index.
      */
-    int getLinearisedBinIndex(const std::vector<float> values)
+    int getLinearisedBinIndex(const std::vector<float>& values)
     {
       int globalBin(-1);
       std::vector<int> binIndices = getBinIndices(values);
@@ -81,7 +81,7 @@ namespace Belle2 {
      * If the values lie outside the covered region -1 is returned.
      * @param values N dimensional vector of values to be mapped to a global linear bin index.
      */
-    std::vector<int> getBinIndices(const std::vector<float> values)
+    std::vector<int> getBinIndices(const std::vector<float>& values)
     {
       std::vector<int> binIndices(m_binEdges.size());
 
@@ -157,7 +157,7 @@ namespace Belle2 {
     * @param mvaIndexForHypothesis unordered_map mapping hypothesis to index of mva response. Useful if we exclude a class from the MVA training
     *        but want to use the likelihood of a different particle. For example using the proton pdf for a deuteron.
     */
-    ECLChargedPIDPhasespaceCategory(const std::string weightfilePath,
+    ECLChargedPIDPhasespaceCategory(const std::string& weightfilePath,
                                     const MVAResponseTransformMode& mvaResponeTransformMode,
                                     const std::unordered_map<unsigned int, unsigned int>& mvaIndexForHypothesis) :
       m_log_transform_offset("logTransformOffset", 1e-15),
@@ -192,12 +192,12 @@ namespace Belle2 {
     /**
      * Getter for serialised weightfile.
      */
-    const std::string getSerialisedWeight() const {return m_weight;}
+    const std::string& getSerialisedWeight() const {return m_weight;}
 
     /**
      * Setter for serialised weightfile.
      */
-    void setSerialisedWeight(std::string weight) { m_weight = weight; }
+    void setSerialisedWeight(const std::string& weight) { m_weight = weight; }
 
     /**
      * Getter for the MVA transform mode.
@@ -237,21 +237,21 @@ namespace Belle2 {
      * Set the cdfs.
      * @param cdfs vector of map of cdfs to be stored in the payload.
      */
-    void setCDFs(std::vector<std::unordered_map<unsigned int, TH1F>> cdfs) {m_cdfs = cdfs;}
+    void setCDFs(const std::vector<std::unordered_map<unsigned int, TH1F>>& cdfs) {m_cdfs = cdfs;}
 
 
     /**
      * Set the pdfs.
      * @param pdfs vector of map of pdfs to be stored in the payload.
      */
-    void setPDFs(std::vector<std::unordered_map<unsigned int, TF1>>& pdfs) {m_pdfs = pdfs;}
+    void setPDFs(const std::vector<std::unordered_map<unsigned int, TF1>>& pdfs) {m_pdfs = pdfs;}
 
 
     /**
      * Set the decorrelation matrices.
      * @param decorrelationMatrices map of decorrelation matrices to be stored in the payload.
      */
-    void setDecorrelationMatrixMap(std::unordered_map<unsigned int, std::vector<float>> decorrelationMatrices)
+    void setDecorrelationMatrixMap(const std::unordered_map<unsigned int, std::vector<float>>& decorrelationMatrices)
     {
       m_decorrelationMatrices = decorrelationMatrices;
     }
@@ -329,7 +329,7 @@ namespace Belle2 {
     /**
      * Stores which transformation mode to apply to the mva responses.
      */
-    MVAResponseTransformMode m_mvaResponseTransformMode;
+    MVAResponseTransformMode m_mvaResponseTransformMode = MVAResponseTransformMode::c_LogTransform;
 
     /**
      * A vector of unodered maps. The vector corresponds to the return values of the MVA, one for each class correspondonding to charged stable particles considered by the MVA. In general this is the full six charged stable particles {e, mu, pi, K, p, d}.
@@ -390,7 +390,7 @@ namespace Belle2 {
               Each object contains all the data required to process tracks in that phasespace.
               The map does not need to cover all phasespace regions.
      */
-    void storeMVAWeights(std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
+    void storeMVAWeights(const std::unordered_map<unsigned int, ECLChargedPIDPhasespaceCategory>& phasespaceCategories)
     {
       m_phasespaceCategories = phasespaceCategories;
     }
@@ -424,7 +424,7 @@ namespace Belle2 {
     * @param values: N dimensional input vector of floats to be mapped to a globalBinIndex.
     */
 
-    unsigned int getLinearisedCategoryIndex(std::vector<float> values) const
+    unsigned int getLinearisedCategoryIndex(const std::vector<float>& values) const
     {
       if (!m_categories) {
         B2FATAL("No N dimensional grid was found in the ECLChargedPIDMVA DB payload. This should not happen! Abort...");
@@ -435,13 +435,13 @@ namespace Belle2 {
     /**
      * Returns string definitions of the variables used in defining the phasespace categories.
      */
-    std::vector<std::string> getBinningVariables() const {return m_binningVariables;}
+    const std::vector<std::string>& getBinningVariables() const {return m_binningVariables;}
 
     /**
      * Set string definitions of the variables used in defining the phasespace categories.
      * @param binningVariables string definitions of the variables used in defining the phasespace categories.
      */
-    void setBinningVariables(std::vector<std::string>& binningVariables) {m_binningVariables = binningVariables;}
+    void setBinningVariables(const std::vector<std::string>& binningVariables) {m_binningVariables = binningVariables;}
   private:
     /**
      * An N Dimensional binning whose bins define the boundaries of the categories for which the training is performed.

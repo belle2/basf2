@@ -23,19 +23,19 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDDQMPlotsConfiguration(const TString& uniqueID = "");
+    explicit SVDDQMPlotsConfiguration(const TString& uniqueID = "");
 
     /**
      * Returns sensor list
      * @return  sensor list
      **/
-    const std::vector<std::string> getListOfSensors() const { return m_svdListOfSensors; }
+    const std::vector<std::string>& getListOfSensors() const { return m_svdListOfSensors; }
 
     /**
      * Add sensor to list
      * @param label: sensor to add (e.g.: "4.1.1" for L4_1_1)
      */
-    void addSensorToList(std::string label) { m_svdListOfSensors.push_back(label); }
+    void addSensorToList(const std::string& label) { m_svdListOfSensors.push_back(label); }
 
     /**
      * Returns 3samples flag

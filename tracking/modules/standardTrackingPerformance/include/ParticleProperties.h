@@ -14,7 +14,7 @@ namespace Belle2 {
    */
   struct ParticleProperties {
 
-    ParticleProperties() = default; /**< default constructor */
+    ParticleProperties() { setAllTo(0); } /**< default constructor */
 
     /** constructor which sets all members to the given value */
     explicit ParticleProperties(double value)

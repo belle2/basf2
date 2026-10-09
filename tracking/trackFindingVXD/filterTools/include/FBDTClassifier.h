@@ -66,7 +66,7 @@ namespace Belle2 {
     FBDTForest getForest() const { return m_forest; }
 
     /** get the feature binnings */
-    std::vector<FastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
+    const std::vector<FastBDT::FeatureBinning<double> >& getFeatureBinnings()  const { return m_featBins; }
 
     /** get the decorrelation matrix */
     Belle2::DecorrelationMatrix<9> getDecorrelationMatrix() const { return m_decorrMat; }

@@ -66,9 +66,9 @@ namespace Belle2 {
     void addHits();
 
     /// Compute distance from a CDCWireHit to a RecoTrack using the mSoP found with a RecoHitInformation.
-    ReconstructionResults reconstruct(const TrackingUtilities::CDCWireHit& wireHit,
-                                      const RecoTrack& recoTrack,
-                                      const RecoHitInformation* recoHitInformation) const;
+    static ReconstructionResults reconstruct(const TrackingUtilities::CDCWireHit& wireHit,
+                                             const RecoTrack& recoTrack,
+                                             const RecoHitInformation* recoHitInformation);
 
     /// Translate a TrackingUtilities::ERightLeft into a RecoHitInformation::RightLeftInformation.
     RecoHitInformation::RightLeftInformation rightLeftInformationTranslator(TrackingUtilities::ERightLeft rlInfo) const;

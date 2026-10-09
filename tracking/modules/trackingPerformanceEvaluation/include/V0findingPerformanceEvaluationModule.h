@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~V0findingPerformanceEvaluationModule();
+    ~V0findingPerformanceEvaluationModule() override;
 
     /**
      * Initializer.
@@ -66,9 +66,9 @@ namespace Belle2 {
 
   private:
 
-    bool isV0(const MCParticle& the_mcParticle); /**< is V0*/
+    static bool isV0(const MCParticle& the_mcParticle); /**< is V0*/
 
-    int nMatchedDaughters(const MCParticle& the_mcParticle); /**< number of truth matched dauhters*/
+    static int nMatchedDaughters(const MCParticle& the_mcParticle); /**< number of truth matched dauhters*/
 
     /* user-defined parameters */
     std::string m_MCParticlesName; /**< MCParticle StoreArray name */

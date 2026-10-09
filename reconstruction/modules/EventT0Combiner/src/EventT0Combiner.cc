@@ -9,6 +9,7 @@
 #include <reconstruction/modules/EventT0Combiner/EventT0Combiner.h>
 
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
+#include <framework/utilities/MathHelpers.h>
 
 #include <cmath>
 
@@ -147,7 +148,7 @@ void EventT0CombinerModule::event()
   }
 }
 
-EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<EventT0::EventT0Component> measurements) const
+EventT0::EventT0Component EventT0CombinerModule::computeCombination(const std::vector<EventT0::EventT0Component>& measurements)
 {
   if (measurements.size() == 0) {
     B2FATAL("Need at least one EvenT0 Measurement to do a sensible combination.");
@@ -160,7 +161,7 @@ EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<
 
   for (auto const& meas : measurements) {
     usedDetectorSet += meas.detectorSet;
-    const double oneOverUncertaintySquared = 1.0f / std::pow(meas.eventT0Uncertainty, 2.0);
+    const double oneOverUncertaintySquared = 1.0f / square(meas.eventT0Uncertainty);
     eventT0 += meas.eventT0 * oneOverUncertaintySquared;
     preFactor += oneOverUncertaintySquared;
   }

@@ -145,7 +145,7 @@ namespace Belle2 {
       //energyToSort vector is used for sorting digits by calibrated energy
       for (unsigned int iRel = 0; iRel < relatedDigits.size(); iRel++) {
 
-        const auto caldigit = relatedDigits.object(iRel);
+        const auto* caldigit = relatedDigits.object(iRel);
         const auto weight = relatedDigits.weight(iRel);
         bool goodFit = true;
 
@@ -465,7 +465,7 @@ namespace Belle2 {
       }
       const Track* track = particle->getTrack();
       if (track) {
-        ExtHit* edgeExtHit = nullptr;
+        const ExtHit* edgeExtHit = nullptr;
         if (front) {
           for (const auto& extHit : track->getRelationsTo<ExtHit>()) {
             if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
@@ -1637,22 +1637,22 @@ namespace Belle2 {
                       "[calibration] Returns the caldigit time of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentFitTypeByEnergyRank(i[, b])", getTwoComponentFitTypeByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the offline fit type of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information. The default value of ``b`` is 0.0.");
 
     REGISTER_VARIABLE("eclcaldigitMCEnergyByEnergyRank(i)", getECLCalDigitMCEnergyByEnergyRank,
                       "[calibration] Returns the caldigit MC Energy of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2ByEnergyRank(i[, b])", getTwoComponentChi2ByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component chi2 of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information. The default value of ``b`` is 0.0.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentEnergyByEnergyRank(i)", getTwoComponentTotalEnergyByEnergyRank,
                       "[calibration] Returns the two component total energy of the i-th highest energy caldigit in the cluster (i>=0)");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyByEnergyRank(i[, b])", getTwoComponentHadronEnergyByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component fit Hadron Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information. The default value of ``b`` is 0.0.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentDiodeEnergyByEnergyRank(i[, b])", getTwoComponentDiodeEnergyByEnergyRank,
-                      "[calibration/eclChargedPIDExpert] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[calibration/eclChargedPIDExpert] Returns the two component fit Diode Energy of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information. The default value of ``b`` is 0.0.");
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentChi2SavedByEnergyRank_PhotonHadron(i)", getTwoComponentChi2SavedByEnergyRank_PhotonHadron,
                       "[calibration] Returns the chi2 for the photo+hadron fit type of the i-th highest energy caldigit in the cluster (i>=0)");
@@ -1689,7 +1689,7 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("eclcaldigitTwoComponentHadronEnergyFractionByEnergyRank(i[, b])",
                       getTwoComponentHadronEnergyFractionByEnergyRank,
-                      "[eclChargedPIDExpert] Returns the hadron energy fraction of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information.");
+                      "[eclChargedPIDExpert] Returns the hadron energy fraction of the i-th highest energy caldigit in the cluster (i>=0). If b is set to 1.0 only caldigits considered to have good quality PSD fits return PSD information. The default value of ``b`` is 0.0.");
     REGISTER_VARIABLE("eclcaldigitFractionOfTotalShowerEnergyByEnergyRank(i)", getECLCalDigitFractionOfShowerEnergyByEnergyRank,
                       "[eclChargedPIDExpert] Returns the fraction of the total Shower energy in the i-th highest energy caldigit in the Shower (i>=0). Assumes a photon hypothesis.");
     REGISTER_VARIABLE("eclcaldigitPhiRelativeToShowerByEnergyRank(i)", getECLCalDigitPhiRelativeToShowerByEnergyRank,

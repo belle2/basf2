@@ -25,7 +25,7 @@ using namespace Belle2;
 using namespace ECL;
 
 /**..Novosibirsk function, plus constant  H. Ikeda et al., Nuclear Instruments and Methods A 441 (2000) 401-426. */
-// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+// cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
 double eclCosmicNovoConst(double* x, double* par)
 {
   double qc = 0.;
@@ -85,25 +85,25 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /**..Clean up existing histograms if necessary */
   TH1F* dummy;
-  dummy = (TH1F*)gROOT->FindObject("EnvsCrysSameRing");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("EnvsCrysSameRing"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("EnvsCrysDifferentRing");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("EnvsCrysDifferentRing"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("IntegralVsCrysSame");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("IntegralVsCrysSame"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("IntegralVsCrysDifferent");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("IntegralVsCrysDifferent"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageExpECrysSame");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageExpECrysSame"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageExpECrysDifferent");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageExpECrysDifferent"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageElecCalibSame");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageElecCalibSame"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageElecCalibDifferent");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageElecCalibDifferent"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageInitialCalibSame");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageInitialCalibSame"));
   if (dummy) {delete dummy;}
-  dummy = (TH1F*)gROOT->FindObject("AverageInitialCalibDifferent");
+  dummy = static_cast<TH1F*>(gROOT->FindObject("AverageInitialCalibDifferent"));
   if (dummy) {delete dummy;}
 
   /**-----------------------------------------------------------------------------------------------*/
@@ -343,7 +343,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
 
       /**..parameters to control iterations.  dIter checks if we are stuck in a loop */
       double dIter = 0.1 * (histMax - histMin) / hEnergy->GetNbinsX();
-      double highold(0.), higholdold(0.);
+      double highold(0.);
       double fitProb(0.);
       double fitProbDefault(0.);
       bool fitHist = IntegralVsCrys[idir]->GetBinContent(histbin) >= minEntries; /* fit only if enough events */
@@ -378,7 +378,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
         double tRatio = (func->Eval(fithigh) - constant) / peak;
         if (tRatio < tRatioMin || tRatio > tRatioMax) {
           double targetY = constant + 0.5 * (tRatioMin + tRatioMax) * peak;
-          higholdold = highold;
+          double higholdold = highold;
           highold = fithigh;
           fithigh = func->GetX(targetY, peakE, histMax);
           fitHist = true;
@@ -610,25 +610,25 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..Clean up histograms in case Algorithm is called again */
-  dummy = (TH1F*)gROOT->FindObject("PeakperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("SigmaperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("EtaperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ConstperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("StatusperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("StatusSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fracPeakUncSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fitProbSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ExpEnergyperCrysSame"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("PeakperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("SigmaperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("EtaperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ConstperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("StatusperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("StatusDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fracPeakUncDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("fitProbDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("ExpEnergyperCrysDifferent"); delete dummy;
-  dummy = (TH1F*)gROOT->FindObject("CalibvsCrys"); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("PeakperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("SigmaperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("EtaperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ConstperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("StatusperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("StatusSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fracPeakUncSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fitProbSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ExpEnergyperCrysSame")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("PeakperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("SigmaperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("EtaperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ConstperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("StatusperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("StatusDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fracPeakUncDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("fitProbDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("ExpEnergyperCrysDifferent")); delete dummy;
+  dummy = static_cast<TH1F*>(gROOT->FindObject("CalibvsCrys")); delete dummy;
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..Set the return code appropriately */

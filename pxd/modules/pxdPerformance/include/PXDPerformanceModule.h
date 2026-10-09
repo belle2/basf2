@@ -33,7 +33,7 @@ namespace Belle2 {
     /** Constructor */
     PXDPerformanceModule();
     /** Destructor */
-    virtual ~PXDPerformanceModule();
+    virtual ~PXDPerformanceModule() override;
 
     /** Initialize module */
     virtual void initialize() override;
@@ -41,10 +41,6 @@ namespace Belle2 {
     virtual void beginRun() override;
     /** Event processing */
     virtual void event() override;
-    /** End-of-run tasks */
-    virtual void endRun() override;
-    /** Final summary and cleanup */
-    virtual void terminate() override;
 
   private:
 

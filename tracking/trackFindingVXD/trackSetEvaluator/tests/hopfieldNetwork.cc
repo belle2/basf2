@@ -26,11 +26,13 @@ protected:
   /**Container on which the Hopfield Algorithm runs.
    * Output comes in form of tcInfo4Hopfield.neuronValue. Typically > 0.7 signal, < 0.7 bkg;
    */
+  // cppcheck-suppress unusedStructMember ; fixture state used by the tests below
   vector <OverlapResolverNodeInfo> m_trackCandidateInfos;
 
   /**Container on which the Greedy Algorithm (Scrooge) runs.
    * Output comes in form of qiTrackOverlap.isActive, which is simply a bool,
    * if the corresponding track was taken or not. */
+  // cppcheck-suppress unusedStructMember ; fixture state used by the tests below
   vector <OverlapResolverNodeInfo> m_qiTrackOverlap;
 
   unsigned int myTrueTracks = 10; /**< Number of true tracks */

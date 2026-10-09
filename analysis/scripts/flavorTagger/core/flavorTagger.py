@@ -60,8 +60,7 @@ def flavorTagger(
                                                :math:`B^0_{\\rm sig}\\to J/\\psi (\\to \\mu^+ \\mu^-) K_s (\\to \\pi^+ \\pi^-)`.
                                                BGx1 stands for events simulated with background.
       @param workingDirectory                  Path to the directory containing the FlavorTagging/ folder.
-      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT` (default).
-                                               ``FANN-MLP`` is available only with ``prefix=''`` (MC13 weight files).
+      @param combinerMethods                   MVAs for the combiner: ``TMVA-FBDT`` (default).
       @param categories                        Categories used for flavor tagging. By default all are used.
       @param maskName                          Gets ROE particles from a specified ROE mask.
                                                ``FTDefaultMask`` (default): tentative mask definition that will be created
@@ -137,19 +136,16 @@ def flavorTagger(
     # ensure correct combiner method config
     if len(combinerMethods) == 0:
         B2FATAL('Flavor Tagger: Please specify at least one combinerMethods.\
-                 The available methods are "TMVA-FBDT" and "FANN-MLP"')
+                 The available method is "TMVA-FBDT"')
 
-    FANNmlp = False
     TMVAfbdt = False
 
     for method in combinerMethods:
         if method == 'TMVA-FBDT':
             TMVAfbdt = True
-        elif method == 'FANN-MLP':
-            FANNmlp = True
         else:
             B2FATAL('Flavor Tagger: Invalid list of combinerMethods. \
-                    The available methods are "TMVA-FBDT" and "FANN-MLP"')
+                    The available method is "TMVA-FBDT".')
 
     # check if working directory exists for download
     basf2.find_file(workingDirectory)
@@ -247,7 +243,6 @@ def flavorTagger(
             variablesCombinerLevel=variablesCombinerLevel,
             categoriesCombinationCode=categoriesCombinationCode,
             TMVAfbdt=TMVAfbdt,
-            FANNmlp=FANNmlp,
             downloadFlag=downloadFromDatabaseIfNotFound,
             useOnlyLocalFlag=useOnlyLocalWeightFiles,
             signal_fraction=signal_fraction,
@@ -259,7 +254,6 @@ def flavorTagger(
         flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
         flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
         flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
-        flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
         flavorTaggerInfoFiller.param('qpCategories', saveCategoriesInfo)
         flavorTaggerInfoFiller.param('istrueCategories', saveCategoriesInfo)
         flavorTaggerInfoFiller.param('targetProb', False)

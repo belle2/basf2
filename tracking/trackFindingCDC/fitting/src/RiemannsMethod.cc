@@ -61,7 +61,6 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
     Eigen::Matrix<double, 1, 2> pointMean;
     //RowVector2d pointMean;
-    // cppcheck-suppress constStatement
     pointMean << 0.0, 0.0;
     if (!(isOriginConstrained())) {
       // subtract the offset from the origin
@@ -98,7 +97,6 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
 
 
     Eigen::Matrix<double, 1, 3> pointMean;
-    // cppcheck-suppress constStatement
     pointMean << 0.0, 0.0, 0.0;
     if (!(isOriginConstrained())) {
       // subtract the offset from the origin

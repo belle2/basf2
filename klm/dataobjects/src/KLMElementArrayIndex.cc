@@ -20,7 +20,7 @@ KLMElementArrayIndex::KLMElementArrayIndex(
   uint16_t index = 0;
   KLMChannelIndex klmElements(indexLevel);
   m_NElements = 0;
-  for (KLMChannelIndex& klmElement : klmElements) {
+  for (const KLMChannelIndex& klmElement : klmElements) {
     uint16_t number;
     switch (indexLevel) {
       case KLMChannelIndex::c_IndexLevelStrip:

@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_GblTrackSegmentController_h
-#define genfit_GblTrackSegmentController_h
+#pragma once
 
 #include "Track.h"
 #include "GblFitterInfo.h"
@@ -67,5 +66,3 @@ namespace genfit {
   
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_GblTrackSegmentController_h

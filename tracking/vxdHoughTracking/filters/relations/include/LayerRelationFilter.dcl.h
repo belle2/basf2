@@ -28,7 +28,7 @@ namespace Belle2 {
       LayerRelationFilter();
 
       /// Default destructor
-      ~LayerRelationFilter();
+      ~LayerRelationFilter() override;
 
       /// Return all states the given state is possible related to.
       std::vector<VXDHoughState*> getPossibleTos(VXDHoughState* from, const std::vector<VXDHoughState*>& states) const final;

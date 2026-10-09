@@ -14,7 +14,6 @@
 #include <sstream>
 #include <iomanip>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -32,9 +31,10 @@ DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   : DQMHistAnalysisModule()
 {
 
-  setDescription("Module to save histograms from DQMHistAnalysisModules");
-  //Parameter definition
+  setDescription("Module to save canvas/histograms from analysis to a single root file");
+  // This module CAN NOT be run in parallel!
 
+  //Parameter definition
   addParam("OutputFolder", m_folder, "Output file path", std::string(""));
   addParam("FilePrefix", m_prefix,
            "prefix of the output filename {prefix}dqm_canvas_e####r######.root is generated (unless Filename is set)", std::string(""));
@@ -64,15 +64,8 @@ void DQMHistAnalysisOutputFileModule::endRun()
   if (m_savePerRun) save_to_file();
 }
 
-
-void DQMHistAnalysisOutputFileModule::terminate()
-{
-  B2INFO("DQMHistAnalysisOutputFile: terminate called");
-}
-
 void DQMHistAnalysisOutputFileModule::save_to_file()
 {
-
   std::stringstream ss;
   ss << m_folder << "/";
   if (m_filename != "") ss << m_filename;
@@ -99,7 +92,7 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
         B2INFO("found canvases");
         TIter next(seq) ;
         TObject* obj ;
-        while ((obj = (TObject*)next())) {
+        while ((obj = next())) {
           if (obj->InheritsFrom("TCanvas")) {
             B2DEBUG(1, "Saving canvas " << obj->GetName());
             obj->Write();
@@ -116,18 +109,18 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
         TIter nextfile(files) ;
         TObject* file ;
 
-        while ((file = (TObject*)nextfile())) {
+        while ((file = dynamic_cast<TObject*>(nextfile()))) {
           if (file->InheritsFrom("TFile")) {
             B2INFO("File name: " << file->GetName() << " title " << file->GetTitle());
             if (file == &f || file->GetName() == m_filename) continue;
 
-            TList* list = ((TFile*)file)->GetListOfKeys() ;
+            TList* list = (static_cast<TFile*>(file))->GetListOfKeys() ;
             if (list) {
               TIter next(list) ;
               TKey* key ;
               TObject* obj ;
 
-              while ((key = (TKey*)next())) {
+              while ((key = dynamic_cast<TKey*>(next()))) {
                 TString skey(key->GetClassName());
                 if (skey.BeginsWith(TString("Belle2::"))) continue;
                 TClass clkey(key->GetClassName());
@@ -158,8 +151,11 @@ void DQMHistAnalysisOutputFileModule::save_to_file()
                       break;
                     }
                   }
-                  ((TH1*)obj)->SetName(tok);
-                  obj->Write();
+                  auto obj2 = dynamic_cast<TH1*>(obj);  // actually inheritance checked above, so it should be a TH1
+                  if (obj2) {
+                    obj2->SetName(tok);
+                    obj2->Write();
+                  }
                   old->cd();
                 }
               }

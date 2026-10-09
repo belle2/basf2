@@ -49,7 +49,7 @@ namespace Belle2 {
     std::vector<float> Filter<AObject>::operator()(const std::vector <Object*>& objs)
     {
       std::vector<float> out;
-      for (const auto& obj : objs) {
+      for (const Object* obj : objs) {
         out.push_back(operator()(obj));
       }
       return out;

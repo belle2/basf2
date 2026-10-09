@@ -143,7 +143,7 @@ bool MCMatching::setMCTruth(const Particle* particle)
           break; //not found
       }
     }
-    if (lastMother >= 0)
+    if (lastMother >= 0 && !firstDaugMothers.empty())
       motherIndex = firstDaugMothers[lastMother];
   }
 

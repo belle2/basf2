@@ -25,7 +25,7 @@ namespace Belle2 {
       explicit PathFilterFactory(const std::string& defaultFilterName = "all");
 
       /// Default destructor
-      ~PathFilterFactory();
+      ~PathFilterFactory() override;
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;

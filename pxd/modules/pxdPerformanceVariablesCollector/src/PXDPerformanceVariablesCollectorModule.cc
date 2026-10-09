@@ -118,7 +118,7 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
   //-------------------------------------------------------------------------------------
   // PXDTrackClusterCounter: Count the number of PXD clusters from tracks (the same track selection as for PXDTrackPointCounter)
   //-------------------------------------------------------------------------------------
-  auto hPXDTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackClusterCounter");
+  auto hPXDTrackClusterCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDTrackClusterCounter"));
   hPXDTrackClusterCounter->SetTitle("Number of track clusters");
   hPXDTrackClusterCounter->GetYaxis()->SetTitle("Number of track clusters");
   registerObject<TH1I>("PXDTrackClusterCounter", hPXDTrackClusterCounter);
@@ -126,7 +126,7 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
   //-------------------------------------------------------------------------------------
   // PXDTrackPointCounter: Count the number of PXD track points
   //-------------------------------------------------------------------------------------
-  auto hPXDTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDTrackPointCounter");
+  auto hPXDTrackPointCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDTrackPointCounter"));
   hPXDTrackPointCounter->SetTitle("Number of track points");
   hPXDTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
   registerObject<TH1I>("PXDTrackPointCounter", hPXDTrackPointCounter);
@@ -134,7 +134,7 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
   //-------------------------------------------------------------------------------------
   // PXDSelTrackClusterCounter: Count the number of PXD clusters from tracks (the same track selection as for PXDSelTrackPointCounter)
   //-------------------------------------------------------------------------------------
-  auto hPXDSelTrackClusterCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDSelTrackClusterCounter");
+  auto hPXDSelTrackClusterCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDSelTrackClusterCounter"));
   hPXDSelTrackClusterCounter->SetTitle("Number of selected track clusters (the same selectrion as for PXDSelTrackPointCounter)");
   hPXDSelTrackClusterCounter->GetYaxis()->SetTitle("Number of track clusters");
   registerObject<TH1I>("PXDSelTrackClusterCounter", hPXDSelTrackClusterCounter);
@@ -142,7 +142,7 @@ void PXDPerformanceVariablesCollectorModule::prepare() // Do your initialise() s
   //-------------------------------------------------------------------------------------
   // PXDSelTrackPointCounter: Count the number of PXD track points if they are away from hot/dead pixels
   //-------------------------------------------------------------------------------------
-  auto hPXDSelTrackPointCounter = (TH1I*)hPXDClusterCounter->Clone("hPXDSelTrackPointCounter");
+  auto hPXDSelTrackPointCounter = static_cast<TH1I*>(hPXDClusterCounter->Clone("hPXDSelTrackPointCounter"));
   hPXDSelTrackPointCounter->SetTitle("Number of selected track points excluding hot/dead regions");
   hPXDSelTrackPointCounter->GetYaxis()->SetTitle("Number of track points");
   registerObject<TH1I>("PXDSelTrackPointCounter", hPXDSelTrackPointCounter);
@@ -317,9 +317,6 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
   int uBin(-1), vBin(-1);
   int binID = 0;
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-  auto layerNumber = sensorID.getLayerNumber();
-  auto ladderNumber = sensorID.getLadderNumber();
-  auto sensorNumber = sensorID.getSensorNumber();
   try {
     binID = getBinID(trackCluster, uBin, vBin, m_useClusterPosition);
   } catch (...) {
@@ -336,6 +333,9 @@ void PXDPerformanceVariablesCollectorModule::collectGainVariables(const TrackClu
 
   // Fill variables into tree
   if (m_fillChargeTree) {
+    auto sensorNumber = sensorID.getSensorNumber();
+    auto ladderNumber = sensorID.getLadderNumber();
+    auto layerNumber = sensorID.getLayerNumber();
     string treename = str(format("tree_%1%_%2%_%3%_%4%_%5%") % layerNumber % ladderNumber % sensorNumber % uBin % vBin);
     getObjectPtr<TTree>(treename)->Fill();
   }

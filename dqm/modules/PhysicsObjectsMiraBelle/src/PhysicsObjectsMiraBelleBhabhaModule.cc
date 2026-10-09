@@ -164,7 +164,7 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
   StoreObjPtr<ParticleList> UpsParticles(m_bhabhaPListName);
   if (UpsParticles.isValid()) {
     for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
-      Particle* Ups = UpsParticles->getParticle(i);
+      const Particle* Ups = UpsParticles->getParticle(i);
       m_h_inv_p->Fill(Ups->getMass());
     }
   }
@@ -172,7 +172,7 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
   // get electrons
   StoreObjPtr<ParticleList> electronParticles(m_ePListName);
   for (unsigned int i = 0; i < electronParticles->getListSize(); i++) {
-    Particle* electron = electronParticles->getParticle(i);
+    const Particle* electron = electronParticles->getParticle(i);
     const Belle2::Track* track = electron->getTrack();
     if (!track) {
       continue;
@@ -183,13 +183,13 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
     m_h_nsvd->Fill(Belle2::Variable::trackNSVDHits(electron));
     m_h_ncdc->Fill(Belle2::Variable::trackNCDCHits(electron));
     m_h_topdig->Fill(Belle2::Variable::TOPVariable::topDigitCount(electron));
-    ARICHLikelihood* lkh = track->getRelated<ARICHLikelihood>();
+    const ARICHLikelihood* lkh = track->getRelated<ARICHLikelihood>();
     if (lkh) {
       m_h_DetPhotonARICH->Fill(lkh->getDetPhot());
     }
 
     // electron ID
-    PIDLikelihood* pid_lkh = track->getRelated<PIDLikelihood>();
+    const PIDLikelihood* pid_lkh = track->getRelated<PIDLikelihood>();
     if (pid_lkh) {
       m_h_electronid->Fill(pid_lkh->getProbability(Belle2::Const::electron));
     }
@@ -241,12 +241,3 @@ void PhysicsObjectsMiraBelleBhabhaModule::event()
   }
   m_h_nECLClusters->Fill(neclClusters);
 }
-
-void PhysicsObjectsMiraBelleBhabhaModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleBhabhaModule::terminate()
-{
-}
-

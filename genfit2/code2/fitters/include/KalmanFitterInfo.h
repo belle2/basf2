@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_KalmanFitterInfo_h
-#define genfit_KalmanFitterInfo_h
+#pragma once
 
 #include "AbsFitterInfo.h"
 #include "KalmanFittedStateOnPlane.h"
@@ -145,5 +144,3 @@ class KalmanFitterInfo : public AbsFitterInfo {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_KalmanFitterInfo_h

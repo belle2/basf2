@@ -51,9 +51,9 @@ namespace Belle2 {
       /// write output or store db
       virtual void Write();
     private:
-      TH1F* m_hTotal;       /**< 1D histogram of delta T whole channel */
-      TH1F* m_h1[56][385];    /**<1D histogram for each channel*/
-      TH1F* m_hT0b[300];      /**<1D histogram for each board*/
+      TH1F* m_hTotal = nullptr;       /**< 1D histogram of delta T whole channel */
+      TH1F* m_h1[56][385] = {};    /**<1D histogram for each channel*/
+      TH1F* m_hT0b[300] = {};      /**<1D histogram for each board*/
       double m_xmin = 0.07;   /**< minimum drift length*/
       double m_ndfmin = 5;    /**< minimum ndf required */
       double m_Pvalmin = 0.;  /**< minimum pvalue required */
@@ -63,9 +63,9 @@ namespace Belle2 {
       double dtb[300] = {0.};        /**< dt of each board*/
       double err_dtb[300] =  {0.};    /**< error of dt of board*/
 
-      bool m_debug;   /**< debug. */
-      bool m_storeHisto; /**< store histo or not*/
-      bool m_useDB; /**< use DB or text mode*/
+      bool m_debug = false;   /**< debug. */
+      bool m_storeHisto = false; /**< store histo or not*/
+      bool m_useDB = false; /**< use DB or text mode*/
       std::string m_outputT0FileName = "t0_new.dat"; /**<output t0 file name for text file*/
       std::string m_inputRootFileName = "rootfile/output*"; /**< input file names*/
       int m_firstExperiment; /**< First experiment. */

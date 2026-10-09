@@ -67,6 +67,7 @@ namespace Belle2 {
     double m_precutRho;      ///< preselection cut on transverse radius of the track pair POCA
     double m_precutCosAlpha; ///< preselection cut on opening angle of the track pair
     bool   m_useNewV0Fitter; ///< toggle between old (false) and new (true) V0 fitter
+    std::string m_vertexFitterName; ///< name of the vertex fitter used to fit the V0 vertex
     bool   m_useValidation;  ///< on true save also fitted vertices in V0ValidationVertex StoreArray
 
     /// range for reconstructed Kshort mass used after removing material effects and inner hits

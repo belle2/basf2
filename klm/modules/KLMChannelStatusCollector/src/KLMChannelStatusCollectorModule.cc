@@ -48,7 +48,7 @@ void KLMChannelStatusCollectorModule::prepare()
 
 void KLMChannelStatusCollectorModule::collect()
 {
-  for (KLMDigit& digit : m_KLMDigits) {
+  for (const KLMDigit& digit : m_KLMDigits) {
     /* Multi-strip digits do not correspond to individual channels. */
     if (digit.isMultiStrip())
       continue;
@@ -68,7 +68,7 @@ void KLMChannelStatusCollectorModule::closeRun()
   calibrationData->Branch("channel", &channel, "channel/s");
   calibrationData->Branch("hits", &hits, "hits/i");
   KLMChannelIndex klmChannels;
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     channel = klmChannel.getKLMChannelNumber();
     hits = m_HitMap->getChannelData(channel);
     calibrationData->Fill();
@@ -83,7 +83,7 @@ void KLMChannelStatusCollectorModule::collectFromDQM(
   std::string histogramName;
   TFile* f = new TFile(dqmFile);
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (const KLMChannelIndex& klmSector : klmSectors) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -95,7 +95,7 @@ void KLMChannelStatusCollectorModule::collectFromDQM(
                       "_section_" + std::to_string(klmSector.getSection()) +
                       "_sector_" + std::to_string(klmSector.getSector()) +
                       "_" + std::to_string(j);
-      TH1* histogram = (TH1*)f->Get(histogramName.c_str());
+      TH1* histogram = static_cast<TH1*>(f->Get(histogramName.c_str()));
       if (histogram == nullptr) {
         B2ERROR("KLM DQM histogram " << histogramName << " is not found.");
         continue;

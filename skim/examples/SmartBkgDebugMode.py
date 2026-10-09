@@ -38,7 +38,8 @@ gen.add_evtgen_generator(finalstate=finalstate, path=path, eventType=finalstate)
 fei_skim = feiHadronic(
     analysisGlobaltag=ma.getAnalysisGlobaltag(),
     udstOutput=False,
-    roundToMdstPrecision=True
+    roundToMdstPrecision=True,
+    feiPrefix="FEIv1_2025_MC16ri_aldebaran_200",
 )
 
 # Add SmartBkg filtering by providing the skim
@@ -57,7 +58,8 @@ rec.add_reconstruction(path)
 # Optionally add mdst output so you can look at the events again
 mdst.add_mdst_output(
     filename="test_events.mdst.root",
-    path=path
+    path=path,
+    additionalBranches="EventExtraInfo"
 )
 
 # Apply the skim

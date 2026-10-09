@@ -25,7 +25,7 @@ void example()
 {
   // open the file with simulated and reconstructed EvtGen particles
   TFile* input = TFile::Open("../EvtGenSimRec.root");
-  TTree* tree = (TTree*) input->Get("tree");
+  TTree* tree = static_cast<TTree*>(input->Get("tree"));
 
   // open the output file for the validation histograms
   TFile* output = TFile::Open("example.root", "recreate");

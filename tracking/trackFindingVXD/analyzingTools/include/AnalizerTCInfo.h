@@ -74,7 +74,7 @@ namespace Belle2 {
 
 
     /** for given pair of TCs their compatibility will be checked and the testTC classified, the given threshold will be used to draw the line between Contaminated and Ghost */
-    static TCType::Type classifyTC(AnalizerTCInfo& referenceTC, AnalizerTCInfo& testTC, double purityThreshold,
+    static TCType::Type classifyTC(const AnalizerTCInfo& referenceTC, const AnalizerTCInfo& testTC, double purityThreshold,
                                    unsigned int ndfThreshold)
     {
       std::pair<int, float> testPurity = testTC.m_assignedID.getPurity();

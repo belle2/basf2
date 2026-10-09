@@ -137,7 +137,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   m_rootVariables.pT.push_back(pT);
 
   // check if the innermost hit is virtualIP, if so get the outer hit to retrieve the position information from it
-  auto spacePoint = inner.getInnerHit()->m_spacePoint;
+  const auto* spacePoint = inner.getInnerHit()->m_spacePoint;
   if (spacePoint->getType() == VXD::SensorInfoBase::VXD) {
     m_rootVariables.virtualIP.push_back(1);
     spacePoint = inner.getOuterHit()->m_spacePoint;
@@ -153,7 +153,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
 }
 
 template<typename EntryType, typename MetaInfoType >
-size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network) const
+size_t SegmentNetworkAnalyzerModule::getNConnections(Belle2::DirectedNodeNetwork<EntryType, MetaInfoType>& network)
 {
   size_t nLinks{};
   for (const auto& outerNodes : network) {

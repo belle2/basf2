@@ -87,6 +87,9 @@ namespace Belle2 {
                                     m_maximalDeltaPhi, "Maximal distance in phi between wires for Z=0 plane", m_maximalDeltaPhi);
       moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "hitFindingDirection"),
                                     m_param_writeOutDirectionAsString, "Start from innermost/outermost CDC layers", m_param_writeOutDirectionAsString);
+
+      moduleParamList->addParameter(TrackingUtilities::prefixed(prefix, "firstActiveCDCLayer"),
+                                    m_firstActiveCDCLayer, "First CDC layer which is active (i.e. considered for layer jumps)", m_firstActiveCDCLayer);
     }
 
     /// Clear the wireHit cache
@@ -136,7 +139,7 @@ namespace Belle2 {
       double lastICLayer = -1;
       if (lastState.isSeed()) {
         if (doForward) {
-          lastICLayer = 0;
+          lastICLayer = m_firstActiveCDCLayer; // if SL0 and SL1 turned off this 14, nominal 0
         } else {
           const auto& wireTopology = CDC::CDCWireTopology::getInstance();
           const auto& wires = wireTopology.getWires();
@@ -218,6 +221,8 @@ namespace Belle2 {
   private:
     /// Maximum allowed step over layers
     int m_maximalLayerJump = 2;
+    /// First active inner CDC layer (0 for default Belle II, 14 if SL0 and SL1 deactivated)
+    int m_firstActiveCDCLayer = 0;
     /// Maximum allowed step over layers (if outside->in CKF) for first step after seed (e.g. ECLShower)
     int m_maximalLayerJump_backwardSeed = 3;
     /// Maximal distance in phi between the path last hit/seed and the candidate hit

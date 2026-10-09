@@ -63,8 +63,6 @@ namespace Belle2 {
                               unsigned int maximumNumberOfRelations = std::numeric_limits<unsigned int>::max())
       {
         for (AObject* from : froms) {
-          StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
-
           std::vector<AObject*> possibleTos = relationFilter.getPossibleTos(from, tos);
 
           for (AObject* to : possibleTos) {
@@ -75,12 +73,19 @@ namespace Belle2 {
             weightedRelations.emplace_back(from, weight, to);
 
             if (weightedRelations.size() == maximumNumberOfRelations) {
-              B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
-              if (m_eventLevelTrackingInfo.isValid()) {
+              // Only issue warning about skipping the event if AObject is not from HoughTracking
+              // as in HoughTracking only a single track candidate is skipped, not the processing of the whole event
+              if (not std::is_base_of<AObject, vxdHoughTracking::VXDHoughState>::value) {
+                B2WARNING("Relations Creator reached maximal number of items: skipping the event.");
+              }
+              // Constructing a StoreObjPtr on every iteration of an hot loop is not cheap:
+              // let's do it only if we need to set an AbortionFlag.
+              StoreObjPtr<EventLevelTrackingInfo> eventLevelTrackingInfo;
+              if (eventLevelTrackingInfo.isValid()) {
                 if (std::is_base_of<AObject, CKFToPXDState>::value) {
-                  m_eventLevelTrackingInfo->setPXDCKFAbortionFlag();
+                  eventLevelTrackingInfo->setPXDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, CKFToSVDState>::value) {
-                  m_eventLevelTrackingInfo->setSVDCKFAbortionFlag();
+                  eventLevelTrackingInfo->setSVDCKFAbortionFlag();
                 } else if (std::is_base_of<AObject, vxdHoughTracking::VXDHoughState>::value) {
                   B2INFO("Skipping processing VXDHoughTracking track candidate, not setting AbortionFlag.");
                 } else {

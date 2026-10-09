@@ -69,38 +69,38 @@ namespace Belle2 {
     /** Vector to store baseline noise thresholds compute in stage C1. */
     std::vector<float> m_maxResLimit;
 
-    int m_CellID; /**< To read ntuple branch, waveform ECL crystal cell ID > */
-    int m_ADC0; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC1; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC2; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC3; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC4; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC5; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC6; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC7; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC8; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC9; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC10; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC11; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC12; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC13; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC14; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC15; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC16; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC17; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC18; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC19; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC20; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC21; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC22; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC23; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC24; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC25; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC26; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC27; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC28; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC29; /**< To read ntuple branch, ith ADC value of waveform > */
-    int m_ADC30; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_CellID = 0; /**< To read ntuple branch, waveform ECL crystal cell ID > */
+    int m_ADC0 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC1 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC2 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC3 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC4 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC5 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC6 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC7 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC8 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC9 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC10 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC11 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC12 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC13 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC14 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC15 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC16 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC17 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC18 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC19 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC20 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC21 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC22 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC23 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC24 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC25 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC26 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC27 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC28 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC29 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
+    int m_ADC30 = 0; /**< To read ntuple branch, ith ADC value of waveform > */
 
   };
 } // end Belle2 namespace

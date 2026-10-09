@@ -20,10 +20,5 @@ namespace Belle2 {
     AdditionalMeasurementCreatorFactory() : MeasurementCreatorFactory<BaseMeasurementCreator>()
     {}
 
-    /** No creator is implemented in the moment. */
-    BaseMeasurementCreator* createMeasurementCreatorFromName(const std::string& /*creatorName*/) const override
-    {
-      return nullptr;
-    }
   };
 }

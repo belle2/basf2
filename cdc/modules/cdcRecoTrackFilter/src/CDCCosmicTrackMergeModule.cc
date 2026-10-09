@@ -53,12 +53,12 @@ void CDCCosmicTrackMergerModule::event()
         recoTracks.push_back(&recoTrack);
       }
 
-      std::function < bool (RecoTrack*, RecoTrack*)> lmdSort = [](RecoTrack * lhs, RecoTrack * rhs) {
+      std::function < bool (RecoTrack*, RecoTrack*)> lmdSort = [](const RecoTrack * lhs, const RecoTrack * rhs) {
         return (lhs->getPositionSeed().Y() > rhs->getPositionSeed().Y());
       };
       std::sort(recoTracks.begin(), recoTracks.end(), lmdSort);
-      RecoTrack* upperTrack = recoTracks[0];
-      RecoTrack* lowerTrack = recoTracks[1];
+      const RecoTrack* upperTrack = recoTracks[0];
+      const RecoTrack* lowerTrack = recoTracks[1];
       B2DEBUG(99, "upper track posSeed :" << upperTrack->getPositionSeed().Y());
       B2DEBUG(99, "Lowee track posSeed :" << lowerTrack->getPositionSeed().Y());
       RecoTrack* MergedRecoTrack = m_MergedRecoTracks.appendNew(upperTrack->getPositionSeed(),

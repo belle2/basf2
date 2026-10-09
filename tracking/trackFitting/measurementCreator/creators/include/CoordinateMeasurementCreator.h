@@ -24,7 +24,7 @@ namespace Belle2 {
     std::vector<genfit::TrackPoint*> createMeasurementPoints(HitType* hit, RecoTrack& recoTrack,
                                                              const RecoHitInformation& recoHitInformation) const override;
     /** Destructor. */
-    virtual ~CoordinateMeasurementCreator() { }
+    ~CoordinateMeasurementCreator() override { }
   };
 
   /** Needed for templating. */

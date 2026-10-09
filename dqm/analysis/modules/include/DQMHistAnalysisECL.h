@@ -32,6 +32,8 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLModule();
 
+  private:
+
     /** Initialize the module. */
     void initialize() override final;
     /** Call when a run begins. */
@@ -42,8 +44,6 @@ namespace Belle2 {
     void endRun() override final;
     /** Terminate. */
     void terminate() override final;
-
-  private:
 
     /** Parameters for hit map histograms. */
     std::vector<double> m_HitMapThresholds{};
@@ -115,7 +115,7 @@ namespace Belle2 {
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
     /** Normalize histograms. */
-    void normalize(TCanvas*, const std::string&, const Double_t&);
+    static void normalize(TCanvas*, const std::string&, const Double_t&);
   };
 } // end namespace Belle2
 

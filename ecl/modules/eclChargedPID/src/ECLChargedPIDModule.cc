@@ -248,7 +248,7 @@ void ECLChargedPIDModule::transfoGaussDecorr(const unsigned int pdg, const int c
   }
 
   std::vector<double> vtransfo_gauss;
-  vtransfo_gauss.reserve(nvars);
+  vtransfo_gauss.resize(nvars);
 
   for (unsigned int ivar(0); ivar < nvars; ivar++) {
 
@@ -316,12 +316,4 @@ void ECLChargedPIDModule::transfoGaussDecorr(const unsigned int pdg, const int c
     variables[i] = vtransfo_decorr.at(i);
   }
 
-}
-
-void ECLChargedPIDModule::endRun()
-{
-}
-
-void ECLChargedPIDModule::terminate()
-{
 }

@@ -46,12 +46,12 @@ unsigned int Bundle::size()
   return m_Particles.size();
 }
 
-float Bundle::scaledImpactParam(Particle* particle)
+float Bundle::scaledImpactParam(const Particle* particle)
 {
   return TMath::Power(m_Gamma * Variable::particleDRho(particle), 2) + TMath::Power(Variable::particleDZ(particle), 2);
 }
 
-bool Bundle::compareParticles(Particle* iPart, Particle* jPart)
+bool Bundle::compareParticles(const Particle* iPart, const Particle* jPart)
 {
   return scaledImpactParam(iPart) < scaledImpactParam(jPart);
 }

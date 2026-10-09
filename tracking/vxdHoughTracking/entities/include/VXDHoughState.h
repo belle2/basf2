@@ -69,7 +69,7 @@ namespace Belle2 {
         unsigned short layer = std::numeric_limits<unsigned short>::quiet_NaN();
       };
       /// Get the cached data of this state
-      const DataCache getDataCache() const { return m_dataCache; }
+      const DataCache& getDataCache() const { return m_dataCache; }
 
     protected:
       /// Cache the most important data of this state for better runtime performance

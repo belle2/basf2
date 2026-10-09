@@ -40,55 +40,55 @@ namespace Belle2 {
       CDCMCHitLookUp& operator=(const CDCMCHitLookUp&) = delete;
 
       /// Method for forwarding a request to fill the Monte Carlo lookup tables from Python
-      void fill() const;
+      static void fill();
 
     public:
       /// Getter for the CDCSimHit which is related to the CDCHit contained in the given wire hit
-      const Belle2::CDCSimHit* getSimHit(const CDCHit* ptrHit) const;
+      static const Belle2::CDCSimHit* getSimHit(const CDCHit* ptrHit);
 
       /// Getter for the MCParticle which is related to the CDCHit contained in the given wire hit
-      const Belle2::MCParticle* getMCParticle(const CDCHit* ptrHit) const;
+      static const Belle2::MCParticle* getMCParticle(const CDCHit* ptrHit);
 
 
       /// Getter for the two dimensional reference position of the wire the given hit is located on - mainly for the python event display
-      const ROOT::Math::XYVector getRefPos2D(const CDCHit* ptrHit) const;
+      static const ROOT::Math::XYVector getRefPos2D(const CDCHit* ptrHit);
 
       /// Getter for the reference drift length in the two dimensional projection
-      float getRefDriftLength(const CDCHit* ptrHit) const;
+      static float getRefDriftLength(const CDCHit* ptrHit);
 
       /// Getter for the three dimensional position of the primary ionisation for the hit.
-      const ROOT::Math::XYZVector getRecoPos3D(const CDCHit* ptrHit) const;
+      static const ROOT::Math::XYZVector getRecoPos3D(const CDCHit* ptrHit);
 
       /// Getter for the three dimensional position of the ionisation of the primary simulated hit for the hit.
-      const ROOT::Math::XYZVector getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+      static const ROOT::Math::XYZVector getClosestPrimaryRecoPos3D(const CDCHit* ptrHit);
 
     public:
       /// Indicates if the hit was reassigned to a different mc particle because it was caused by a secondary.
-      bool isReassignedSecondary(const CDCHit* ptrHit) const;
+      static bool isReassignedSecondary(const CDCHit* ptrHit);
 
       /// Getter for the closest simulated hit of a primary particle to the given hit - may return nullptr of no closest is found
-      const CDCSimHit* getClosestPrimarySimHit(const CDCHit* ptrHit) const;
+      static const CDCSimHit* getClosestPrimarySimHit(const CDCHit* ptrHit);
 
       /// Returns the track id for the hit
-      ITrackType getMCTrackId(const CDCHit* ptrHit) const;
+      static ITrackType getMCTrackId(const CDCHit* ptrHit);
 
       /// Returns if this hit is considered background
-      bool isBackground(const CDCHit* ptrHit) const;
+      static bool isBackground(const CDCHit* ptrHit);
 
       /// Returns the position of the wire hit in the track along the travel direction
-      TrackingUtilities::Index getInTrackId(const CDCHit* ptrHit) const;
+      static TrackingUtilities::Index getInTrackId(const CDCHit* ptrHit);
 
       /// Returns the id of the segment in the track.
-      TrackingUtilities::Index getInTrackSegmentId(const CDCHit* ptrHit) const;
+      static TrackingUtilities::Index getInTrackSegmentId(const CDCHit* ptrHit);
 
       /// Returns the number of superlayers the track traversed until this hit.
-      TrackingUtilities::Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
+      static TrackingUtilities::Index getNPassedSuperLayers(const CDCHit* ptrHit);
 
       /// Returns the number of loops the track traversed until this hit.
-      TrackingUtilities::Index getNLoops(const CDCHit* ptrHit) const;
+      static TrackingUtilities::Index getNLoops(const CDCHit* ptrHit);
 
       /// Returns the true right left passage information
-      TrackingUtilities::ERightLeft getRLInfo(const CDCHit* ptrHit) const;
+      static TrackingUtilities::ERightLeft getRLInfo(const CDCHit* ptrHit);
     };
   }
 }

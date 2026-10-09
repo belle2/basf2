@@ -56,7 +56,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
 
 void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
 {
-  clearCanvases();
+  clearOwnCanvases();
 
   m_ECLTRGHLThadronECLT0 = -999.;
   m_ECLTRGHLThadronCDCT0 = -999.;
@@ -95,6 +95,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::terminate()
   deleteCanvases();
 }
 
+// cppcheck-suppress constParameterCallback ; the signature is fixed by TF1
 double DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus(double* x, double* par)
 {
   double N = par[0];
@@ -869,7 +870,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::initializeCanvases()
   m_cSVDTimeMuMuTOPTRG = new TCanvas("SVDTimeMuMuTOPTRG", "SVD time #mu#mu TOPTRG jitter");
 }
 
-void DQMHistAnalysisEventT0TriggerJitterModule::clearCanvases()
+void DQMHistAnalysisEventT0TriggerJitterModule::clearOwnCanvases()
 {
   m_cECLTimeHadronsECLTRG->Clear();
   m_cECLTimeBhaBhaECLTRG->Clear();

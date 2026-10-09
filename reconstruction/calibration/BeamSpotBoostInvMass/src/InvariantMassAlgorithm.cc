@@ -12,6 +12,7 @@
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
 #include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassBhadStandAlone.h>
 #include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
+#include <framework/utilities/MathHelpers.h>
 #include <TFile.h>
 
 #include <Eigen/Dense>
@@ -75,7 +76,7 @@ std::vector<CalibrationData>  runMuMuCalibration(const std::vector<Belle2::Invar
 
   //Loop over all calibration intervals
   std::vector<CalibrationData> calVec;
-  for (auto s : splits) {
+  for (const auto& s : splits) {
     CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the interval s
     calVec.push_back(calD);
   }
@@ -121,7 +122,7 @@ static std::vector<TTree*> getTrees(TString tag, TFile* f)
     return {};
 
   f->cd(tag + "/events");
-  TList* l = f->CurrentDirectory().load()->GetListOfKeys();
+  const TList* l = f->CurrentDirectory().load()->GetListOfKeys();
 
 
   std::vector<TTree*> treeVec;
@@ -131,17 +132,17 @@ static std::vector<TTree*> getTrees(TString tag, TFile* f)
 
     TString trDir = tag + "/events/" + TString(obj->GetName()) + "/events_1";
 
-    treeVec.push_back((TTree*) f->Get(trDir));
+    treeVec.push_back(static_cast<TTree*>(f->Get(trDir)));
   }
 
   return treeVec;
 }
 
 
-static std::vector<InvariantMassMuMuCalib::Event> readMuMuFiles(std::vector<std::string> files, bool is4S)
+static std::vector<InvariantMassMuMuCalib::Event> readMuMuFiles(const std::vector<std::string>& files, bool is4S)
 {
   std::vector<InvariantMassMuMuCalib::Event> events;
-  for (auto fName : files) {
+  for (const auto& fName : files) {
     TFile* f = TFile::Open(fName.c_str(), "READ");
     auto trees = getTrees("BoostVectorCollector", f);
 
@@ -154,15 +155,15 @@ static std::vector<InvariantMassMuMuCalib::Event> readMuMuFiles(std::vector<std:
     f->Close();
   }
 
-  sort(events.begin(), events.end(), [](InvariantMassMuMuCalib::Event e1, InvariantMassMuMuCalib::Event e2) {return e1.t < e2.t;});
+  sort(events.begin(), events.end(), [](const InvariantMassMuMuCalib::Event & e1, const InvariantMassMuMuCalib::Event & e2) {return e1.t < e2.t;});
   return events;
 }
 
 
-static std::vector<InvariantMassBhadCalib::Event> readBhadFiles(std::vector<std::string> files)
+static std::vector<InvariantMassBhadCalib::Event> readBhadFiles(const std::vector<std::string>& files)
 {
   std::vector<InvariantMassBhadCalib::Event> events;
-  for (auto fName : files) {
+  for (const auto& fName : files) {
     TFile* f = TFile::Open(fName.c_str(), "READ");
     auto trees = getTrees("EcmsCollector", f);
 
@@ -175,7 +176,7 @@ static std::vector<InvariantMassBhadCalib::Event> readBhadFiles(std::vector<std:
     f->Close();
   }
 
-  sort(events.begin(), events.end(), [](InvariantMassBhadCalib::Event e1, InvariantMassBhadCalib::Event e2) {return e1.t < e2.t;});
+  sort(events.begin(), events.end(), [](const InvariantMassBhadCalib::Event & e1, const InvariantMassBhadCalib::Event & e2) {return e1.t < e2.t;});
   return events;
 }
 
@@ -339,8 +340,8 @@ std::vector<std::vector<CalibrationData>> InvariantMassAlgorithm::adjustOffReson
       spread = weightAvg(spreads[0], spreadsUnc[0], spreads[1], spreadsUnc[1]);
       shift  = weightAvg(shifts[0], shiftsUnc[0], shifts[1], shiftsUnc[1]);
 
-      spreadUnc = sqrt(pow(spreads[0] - spreads[1], 2) + (pow(spreadsUnc[0], 2)  + pow(spreadsUnc[1], 2)) / 2);
-      shiftUnc  = sqrt((pow(shift - shifts[0], 2) + pow(shift - shifts[1], 2)) / 2 + (pow(shiftsUnc[0], 2)  + pow(shiftsUnc[1], 2)) / 2);
+      spreadUnc = sqrt(square(spreads[0] - spreads[1]) + (square(spreadsUnc[0])  + square(spreadsUnc[1])) / 2);
+      shiftUnc  = sqrt((square(shift - shifts[0]) + square(shift - shifts[1])) / 2 + (square(shiftsUnc[0])  + square(shiftsUnc[1])) / 2);
     }
 
     CalResultsBlocks[b] = addSpreadAndOffset(CalResultsBlocks[b], spread, spreadUnc, shift, shiftUnc);
@@ -361,7 +362,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   std::vector<std::string> files = getVecInputFileNames();
 
   std::vector<std::string> filesHad4S, filesMuMu4S, filesMuMuOff;
-  for (auto f : files) {
+  for (const auto& f : files) {
     if (f.find("/dimuon_4S/") != std::string::npos)
       filesMuMu4S.push_back(f);
     else if (f.find("/dimuon_Off/") != std::string::npos)
@@ -374,12 +375,12 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
   }
 
 
-  for (auto r : filesMuMu4S)
+  for (const auto& r : filesMuMu4S)
     B2INFO("MuMu4SFile name " << r);
-  for (auto r : filesMuMuOff) {
+  for (const auto& r : filesMuMuOff) {
     B2INFO("MuMuOffFile name " << r);
   }
-  for (auto r : filesHad4S)
+  for (const auto& r : filesHad4S)
     B2INFO("Had4SFile name " << r);
 
 
@@ -518,7 +519,7 @@ CalibrationAlgorithm::EResult InvariantMassAlgorithm::calibrate()
 
 
   std::vector<CalibrationData>  CalResults;
-  for (auto cb : CalResultsBlocks)
+  for (const auto& cb : CalResultsBlocks)
     for (auto c : cb)
       CalResults.push_back(c);
 

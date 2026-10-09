@@ -87,7 +87,7 @@ void ReattachCDCWireHitsToRecoTracksModule::findHits()
     const CDCTrajectorySZ& trajectorySZ(trajectory.getTrajectorySZ());
     const double d0Estimate(trajectory2D.getClosest(ROOT::Math::XYVector(0, 0)).R());
     const double z0Estimate(trajectorySZ.getZ0());
-    if (abs(d0Estimate) < m_maximumAbsD0 and abs(z0Estimate) < m_maximumAbsZ0) {
+    if (std::abs(d0Estimate) < m_maximumAbsD0 and std::abs(z0Estimate) < m_maximumAbsZ0) {
       if (trackFitter.fit(recoTrack)) {
         m_mapToHitsOnTrack[&recoTrack] = recoTrack.getSortedCDCHitList();
       }
@@ -175,7 +175,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
       std::unordered_map<CDCWireHit*, double> previousArcLength;
       std::unordered_map<CDCWireHit*, double> currentArcLength;
       // Initialise the arc-length maps to zero and unset the taken and background flags.
-      for (HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
+      for (const HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
         previousArcLength[hitToAddInfo.hit] = 0.0;
         currentArcLength[hitToAddInfo.hit] = 0.0;
         (hitToAddInfo.hit)->getAutomatonCell().setTakenFlag(false);
@@ -184,7 +184,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
 
       unsigned int sortingParameter(0);
       for (CDCHit* hitOnTrack : m_mapToHitsOnTrack[&recoTrack]) {
-        for (HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
+        for (const HitToAddInfo& hitToAddInfo : m_mapToHitsToAdd[&recoTrack]) {
           CDCWireHit& hitToAdd = *(hitToAddInfo.hit);
           if (not hitToAdd.getAutomatonCell().hasTakenFlag()) {
 
@@ -228,7 +228,7 @@ void ReattachCDCWireHitsToRecoTracksModule::addHits()
 
 ReattachCDCWireHitsToRecoTracksModule::ReconstructionResults ReattachCDCWireHitsToRecoTracksModule::reconstruct(
   const CDCWireHit& wireHit,
-  const RecoTrack& recoTrack, const RecoHitInformation* const recoHitInformation) const
+  const RecoTrack& recoTrack, const RecoHitInformation* const recoHitInformation)
 {
   ReconstructionResults results;
 

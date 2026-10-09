@@ -125,7 +125,7 @@ void ECLMatchingPerformanceExpertModule::event()
         int copyid = extHit.getCopyID();
         if (copyid == -1) continue;
         if (extHit.getDetectorID() != Const::EDetector::ECL) continue;
-        ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
+        const ECLCluster* eclClusterNear = extHit.getRelatedFrom<ECLCluster>();
         if (eclClusterNear) {
           distance = (eclClusterNear->getClusterPosition() - extHit.getPosition()).R();
           if (m_distance < 0 || distance < m_distance) {
@@ -395,7 +395,7 @@ void ECLMatchingPerformanceExpertModule::addVariableToTree(const std::string& va
   m_dataTree->Branch(varName.c_str(), &varReference, leaf.str().c_str());
 }
 
-void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(ECL::ECLNeighbours* eclneighbours,
+void ECLMatchingPerformanceExpertModule::findECLCalDigitMatchInNeighbouringCell(const ECL::ECLNeighbours* eclneighbours,
     int& matchedToNeighbours, const int& cell)
 {
   const auto& vec_of_neighbouring_cells = eclneighbours->getNeighbours(cell);

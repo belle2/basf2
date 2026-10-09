@@ -354,11 +354,11 @@ namespace Belle2 {
      * Get Delta histogram.
      * @param dirname directory
      * @param histname name of histogram
-     * @param n index of delta histogram, 0 is most recent one
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
+     * @param n index of delta histogram, 0 is most recent one
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname = "", int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(const std::string& dirname, const std::string& histname = "", bool onlyIfUpdated = true, int n = 0);
 
     /**
      * Add Delta histogram parameters.

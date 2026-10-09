@@ -114,7 +114,7 @@ bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::s
   return s_deltaList.find(fullname) != s_deltaList.end(); // contains() if we switch to C++20
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, bool onlyIfUpdated, int n)
 {
   std::string fullname = dirname + "/" + histname;
   if (dirname.size() == 0) fullname = histname; // assume contains dirname

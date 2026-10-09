@@ -124,9 +124,9 @@ void DQMHistAnalysisPXDBowModule::event()
     auto buff = (std::string)aPXDModule;
     std::replace(buff.begin(), buff.end(), '.', '_');
 
-    TH1* hV = getDelta(m_histogramDirectoryName, "resV_" + buff);
-    TH1* hS = getDelta(m_histogramDirectoryName, "sagitta_" + buff);
-    if (hS != NULL && hV != NULL) {
+    auto hV = getDelta(m_histogramDirectoryName, "resV_" + buff);
+    auto hS = getDelta(m_histogramDirectoryName, "sagitta_" + buff);
+    if (hS != nullptr && hV != nullptr) {
       bool enough = false, warnflag = false, errorflag = false;
       B2DEBUG(20, "Histos sagitta" << buff << " and resV_" << buff << " found");
       if (hS->GetEntries() > m_statThreshold) {
@@ -157,8 +157,7 @@ void DQMHistAnalysisPXDBowModule::event()
 
 void DQMHistAnalysisPXDBowModule::plotCanvas(bool enough, bool errorflag, bool warnflag, std::string buff)
 {
-  TH1* h = findHist(m_histogramDirectoryName, "resV_" + buff, true);
-  if (h != NULL) {
+  if (auto h = findHist(m_histogramDirectoryName, "resV_" + buff, true); h != nullptr) {
     m_hResV[buff].Clear();
     h->Copy(m_hResV[buff]);
     m_hResV[buff].SetName((std::string("ResV_") + buff).c_str());

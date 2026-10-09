@@ -63,6 +63,21 @@ namespace Belle2 {
       return Const::doubleNaN;
     }
 
+    static int getDaughterIndex(const std::string& daughterString, const Particle* particle)
+    {
+      if (particle == nullptr)
+        return -1;
+      int daughterNumber = 0;
+      try {
+        daughterNumber = convertString<int>(daughterString);
+      } catch (std::invalid_argument&) {
+        auto daughterFunction = convertToInt({daughterString, "-1"});
+        auto daughterVarResult = daughterFunction(particle);
+        daughterNumber = std::get<int>(daughterVarResult);
+      }
+      return daughterNumber;
+    }
+
     Manager::FunctionPtr useRestFrame(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -109,9 +124,9 @@ namespace Belle2 {
     {
       if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        auto daughterFunction = convertToDaughterIndex({arguments[1]});
-        auto func = [var, daughterFunction](const Particle * particle) -> double {
-          int daughterIndexTagB = std::get<int>(daughterFunction(particle));
+        const std::string daughterString = arguments[1];
+        auto func = [var, daughterString](const Particle * particle) -> double {
+          int daughterIndexTagB = getDaughterIndex(daughterString, particle);
           if (daughterIndexTagB < 0)
             return Const::doubleNaN;
 
@@ -1172,12 +1187,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        const std::string daughterString = arguments[0];
         std::string variableName = arguments[1];
-        auto func = [daughterFunction, variableName](const Particle * particle) -> double {
+        auto func = [daughterString, variableName](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          int daughterNumber = std::get<int>(daughterFunction(particle));
+          int daughterNumber = getDaughterIndex(daughterString, particle);
           if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           const Variable::Manager::Var* var = Manager::Instance().getVariable(variableName);
@@ -1216,12 +1231,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughterMotherNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        const std::string daughterString = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterFunction](const Particle * particle) -> double {
+        auto func = [var, daughterString](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          int daughterNumber = std::get<int>(daughterFunction(particle));
+          int daughterNumber = getDaughterIndex(daughterString, particle);
           if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           double daughterValue = 0.0, motherValue = 0.0;
@@ -2048,12 +2063,12 @@ namespace Belle2 {
     Manager::FunctionPtr daughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        const std::string daughterString = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterFunction](const Particle * particle) -> double {
+        auto func = [var, daughterString](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          int daughterNumber = std::get<int>(daughterFunction(particle));
+          int daughterNumber = getDaughterIndex(daughterString, particle);
           if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           auto var_result = var->function(particle->getDaughter(daughterNumber));
@@ -2077,12 +2092,12 @@ namespace Belle2 {
     Manager::FunctionPtr originalDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        const std::string daughterString = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterFunction](const Particle * particle) -> double {
+        auto func = [var, daughterString](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          int daughterNumber = std::get<int>(daughterFunction(particle));
+          int daughterNumber = getDaughterIndex(daughterString, particle);
           if (daughterNumber >= int(particle->getNDaughters()) or daughterNumber < 0)
             return Const::doubleNaN;
           else
@@ -2115,19 +2130,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         std::string daughterString = arguments[0];
         auto func = [daughterString](const Particle * particle) -> int {
-          if (particle == nullptr)
-            return -1;
-          int daughterNumber = 0;
-          try
-          {
-            daughterNumber = convertString<int>(daughterString);
-          } catch (std::invalid_argument&)
-          {
-            auto daughterFunction = convertToInt({daughterString, "-1"});
-            auto daughterVarResult = daughterFunction(particle);
-            daughterNumber = std::get<int>(daughterVarResult);
-          }
-          return daughterNumber;
+          return getDaughterIndex(daughterString, particle);
         };
         return func;
       } else {
@@ -2138,14 +2141,14 @@ namespace Belle2 {
     Manager::FunctionPtr mcDaughter(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
-        auto daughterFunction = convertToDaughterIndex({arguments[0]});
+        const std::string daughterString = arguments[0];
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
-        auto func = [var, daughterFunction](const Particle * particle) -> double {
+        auto func = [var, daughterString](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
           if (particle->getMCParticle()) // has MC match or is MCParticle
           {
-            int daughterNumber = std::get<int>(daughterFunction(particle));
+            int daughterNumber = getDaughterIndex(daughterString, particle);
             if (daughterNumber >= int(particle->getMCParticle()->getNDaughters()) or daughterNumber < 0)
               return Const::doubleNaN;
             Particle tempParticle = Particle(particle->getMCParticle()->getDaughters().at(daughterNumber));

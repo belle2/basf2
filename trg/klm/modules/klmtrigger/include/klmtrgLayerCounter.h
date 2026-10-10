@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
     void clear_layersUsed();
     void add_layersUsed(int layersUsed);
-    void set_NLayerTrigger(int NlayerTrigger);
+    void set_NPlaneTrigger(int NPlaneTrigger);
 
     void run(const KLM_TRG_definitions::KLM_Digit_compact_ts& hits);
 
@@ -30,7 +30,7 @@ namespace Belle2 {
 
   private:
     std::vector<nt::ntuple<KLM_TRG_definitions::layer>> m_layersUsed;
-    int m_NlayerTrigger;
+    int m_NPlaneTrigger;
 
 
 

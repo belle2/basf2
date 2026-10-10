@@ -42,9 +42,9 @@ namespace Belle2 {
     m_layersUsed.emplace_back(layersUsed);
   }
 
-  void klmtrgLayerCounter::set_NLayerTrigger(int NlayerTrigger)
+  void klmtrgLayerCounter::set_NPlaneTrigger(int NPlaneTrigger)
   {
-    m_NlayerTrigger = NlayerTrigger;
+    m_NPlaneTrigger = NPlaneTrigger;
   }
 
   void klmtrgLayerCounter::run(const KLM_Digit_compact_ts& hits)
@@ -76,15 +76,15 @@ namespace Belle2 {
     [](const auto & e1) {
       auto bit_mask = to_bit_mask(nt_span(e1, layer));
       return nt::ntuple(
-               ax_maker(layer_count) = countBits(bit_mask),
-               ax_maker(layer_mask) = bit_mask
+               ax_maker(plane_count) = countBits(bit_mask),
+               ax_maker(plane_mask) = bit_mask
              );
     });
 
 
     __CSV__WRITE__(grouped);
 
-    nt::algorithms::filter(grouped, [&](const auto & e) { return e.layer_count >= m_NlayerTrigger;  });
+    nt::algorithms::filter(grouped, [&](const auto & e) { return e.plane_count >= m_NPlaneTrigger;  });
 
 
 

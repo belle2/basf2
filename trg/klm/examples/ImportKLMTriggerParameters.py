@@ -22,9 +22,6 @@ if (len(sys.argv) >= 2):
 
 parameters = KLMTriggerParameters()
 parameters.setWhichLayers('0:16')
-parameters.setNPlanes(7)
-
-
 database = Database.Instance()
 
 if mc:
@@ -48,3 +45,7 @@ else:
     parameters.setNLayers(4)
     iov = IntervalOfValidity(17, 170, -1, -1)
     database.storeData('KLMTriggerParameters', parameters, iov)
+
+parameters.setNPlanes(8)
+iov = IntervalOfValidity(0, 0, -1, -1)
+database.storeData('KLMTriggerParameters', parameters, iov)

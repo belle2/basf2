@@ -22,10 +22,10 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    TRGGRLConfig() {}
+    TRGGRLConfig(): m_ecltaunn_threshold{0, 0, 0, 0, 0, 0, 0, 0, 0, 0} {}
 
     /** Getter functions*/
-    std::vector<std::vector<float>> get_ecltaunn_threshold() const
+    std::vector<float> get_ecltaunn_threshold() const
     {
       return m_ecltaunn_threshold;
     }
@@ -177,10 +177,18 @@ namespace Belle2 {
     {
       return m_ecltaunn_I_input;
     }
+    std::vector<std::vector<int>> get_ecltaunn_W_input_layer() const
+    {
+      return m_ecltaunn_W_input_layer;
+    }
+    std::vector<std::vector<int>> get_ecltaunn_I_input_layer() const
+    {
+      return m_ecltaunn_I_input_layer;
+    }
 
 
     /** Setter functions*/
-    void set_ecltaunn_threshold(std::vector<std::vector<float>> i)
+    void set_ecltaunn_threshold(const std::vector<float>& i)
     {
       m_ecltaunn_threshold = i;
     }
@@ -332,13 +340,21 @@ namespace Belle2 {
     {
       m_ecltaunn_I_input = i;
     };
+    void set_ecltaunn_W_input_layer(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_W_input_layer = i;
+    };
+    void set_ecltaunn_I_input_layer(std::vector<std::vector<int>> i)
+    {
+      m_ecltaunn_I_input_layer = i;
+    };
 
 
 
   private:
 
-    /** MVA Threshold of ecltaunn bit */
-    std::vector<std::vector<float>> m_ecltaunn_threshold;
+    /** MVA Thresholds for 10 MLP outputs */
+    std::vector<float> m_ecltaunn_threshold;
 
     /** Number of networks.
       For network specific parameters you can give either a list with
@@ -398,9 +414,12 @@ namespace Belle2 {
     std::vector<std::vector<int>> m_ecltaunn_saturation;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_W_input;
     std::vector<std::vector<std::vector<int>>> m_ecltaunn_I_input;
+    /** Input layer quantization: per-input W and I bit widths for the first dense layer */
+    std::vector<std::vector<int>> m_ecltaunn_W_input_layer;
+    std::vector<std::vector<int>> m_ecltaunn_I_input_layer;
 
 
-    ClassDef(TRGGRLConfig, 8);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(TRGGRLConfig, 9);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

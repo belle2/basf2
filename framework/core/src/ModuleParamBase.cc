@@ -32,6 +32,12 @@ const std::string& ModuleParamBase::getDescription() const
   return m_description;
 }
 
+
+void ModuleParamBase::setDescription(const std::string& description)
+{
+  m_description = description;
+}
+
 bool ModuleParamBase::isSetInSteering() const
 {
   return m_setInSteering;

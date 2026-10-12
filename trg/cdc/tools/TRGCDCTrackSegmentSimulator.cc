@@ -60,7 +60,7 @@ main(int argc, char* argv[])
   // const string tab = "    ";
 
   //...Arguments...
-  if (argc < 3) {
+  if (argc < 4) {
     cout << PROGRAM_NAME << " needs 3 arguments" << endl;
     return -1;
   }
@@ -71,7 +71,8 @@ main(int argc, char* argv[])
   TRGDebug::level(dl);
 
   //...Gearbox...
-  const string path = (getenv(ENV_PATH) != nullptr ? getenv(ENV_PATH) : "");
+  const char* envPath = getenv(ENV_PATH);
+  const string path = (envPath != nullptr ? envPath : "");
   const string patht = path + "/data/trg/cdc/";
   vector<std::string> backends;
   backends.push_back("file:");

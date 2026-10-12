@@ -1103,7 +1103,7 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
   int bit_3Dbhabha = (bhabha3D & 0x01);
 
   int bit_lowmulti1 = lowmultibit & 0x0FFF;
-  int bit_lowmulti2 = (lowmultibit >>= 12) & 0x3;
+  int bit_lowmulti2 = (lowmultibit >> 12) & 0x3;
   int bit_3DBhabha_sel = bhabha3D_sel & 0x01;
   int bit_mumu = mumubit & 0x01;
   int bit_prescale = prescale & 0x01;

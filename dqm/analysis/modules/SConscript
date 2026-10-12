@@ -7,7 +7,7 @@ env['LIBS'] = ['framework', 'dqm',
                'cdc_dataobjects', 'cdc_dbobjects',
                'ecl', 'ecl_mapper',
                'klm', 'klm_dataobjects', 'klm_dbobjects',
-               'svd_dataobjects',
+               'svd_dataobjects', 'svd_dbobjects',
                'tracking',
                'vxd', 'vxd_dataobjects',
 	       'RooFit', 'RooFitCore', 'ca', 'Com']

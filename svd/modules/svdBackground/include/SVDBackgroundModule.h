@@ -134,7 +134,7 @@ namespace Belle2 {
        * @param sensorID VxdID of the sensor
        * @return SensorInfo object for the desired sensor.
        */
-      static inline const SVD::SensorInfo& getInfo(VxdID sensorID);
+      static inline const SVD::SensorInfo& getInfo(const VxdID& sensorID);
       /** Return thickness of the sensor with the given sensor ID */
       static inline double getSensorThickness(VxdID sensorID);
       /** Return mass of the sensor with the given sensor ID */
@@ -191,7 +191,7 @@ namespace Belle2 {
 
     };
 
-    inline const SVD::SensorInfo& SVDBackgroundModule::getInfo(VxdID sensorID)
+    inline const SVD::SensorInfo& SVDBackgroundModule::getInfo(const VxdID& sensorID)
     {
       return dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }

@@ -60,6 +60,7 @@ namespace Belle2::vxdHoughTracking {
     } else {
       m_maxRelations = m_SVDHoughParameters->getMaxRelations();
     }
+    m_relationCreator.setMaxRelations(m_maxRelations);
 
   }
 
@@ -71,18 +72,35 @@ namespace Belle2::vxdHoughTracking {
     uint family = 0; // family of the SpacePointTrackCands
     for (auto& rawTrackCand : rawTrackCandidates) {
 
-      // If the capacity of a std::vector is too large, start with a fresh one.
+      // If the capacity of a std::vector is too large, start with a fresh one, but only do this if the capacity is too big.
       // Since std::vector.shrink() or std::vector.shrink_to_fit() not necessarily reduce the capacity in the desired way,
       // create a temporary vector of the same type and swap them to use the vector at the new location afterwards.
-      checkResizeClear<TrackingUtilities::WeightedRelation<AHit>>(m_relations, 8192);
-      checkResizeClear<Result>(m_results, 8192);
-      checkResizeClear<SpacePointTrackCand>(m_unfilteredResults, 8192);
-      checkResizeClear<SpacePointTrackCand>(m_filteredResults, 8192);
+      if (m_relations.capacity() <= c_MaxAllowedVectorSize) {
+        m_relations.clear();
+      } else {
+        checkResizeClear<TrackingUtilities::WeightedRelation<AHit>>(m_relations, c_MaxAllowedVectorSize);
+      }
+      if (m_results.capacity() <= c_MaxAllowedVectorSize) {
+        m_results.clear();
+      } else {
+        checkResizeClear<Result>(m_results, c_MaxAllowedVectorSize);
+      }
+      if (m_unfilteredResults.capacity() <= c_MaxAllowedVectorSize) {
+        m_unfilteredResults.clear();
+      } else {
+        checkResizeClear<SpacePointTrackCand>(m_unfilteredResults, c_MaxAllowedVectorSize);
+      }
+      if (m_filteredResults.capacity() <= c_MaxAllowedVectorSize) {
+        m_filteredResults.clear();
+      } else {
+        checkResizeClear<SpacePointTrackCand>(m_filteredResults, c_MaxAllowedVectorSize);
+      }
 
       m_relationCreator.apply(rawTrackCand, m_relations);
 
-      if (m_relations.size() > m_maxRelations) {
-        m_relations.clear();
+      // The m_relationCreator stops creating relations at m_maxRelations and clears the m_relations vector
+      // This sets the size of m_relations to 0 and there is nothing more to do for this track candidate.
+      if (m_relations.size() == 0) {
         continue;
       }
 

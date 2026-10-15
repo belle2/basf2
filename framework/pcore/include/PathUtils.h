@@ -45,10 +45,10 @@ namespace Belle2 {
     /** Prepend given 'prependModules' to 'modules', if they're not already present. */
     static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
-    /// Prepend given modules to the path
+    /// Append the given module to the path
     static void appendModule(PathPtr& path, const ModulePtr& module);
 
-    /// Append given modules to the path
-    static void prependModule(PathPtr& path, const ModulePtr& module);
+    /// Prepend the given modules to the path, keeping their order
+    static void prependModules(PathPtr& path, const ModulePtrList& modules);
   };
 } // namespace Belle2

@@ -303,10 +303,14 @@ void pEventProcessor::analyzePath(const PathPtr& path)
   PathPtr mainpath(new Path);
   PathPtr outpath(new Path);
 
+  // only collected here, and added below once the splitting is done: the merge-back
+  // discards and restarts the main path, taking anything put on it along
+  ModulePtrList histogramManagers;
+
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr& module : path->getModules()) {
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
-    //entire conditional path must also be compatible
+    // entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
       for (const auto& conditionPath : module->getAllConditionPaths()) {
         if (!ModuleManager::allModulesHaveFlag(conditionPath->getModules(), Module::c_ParallelProcessingCertified)) {
@@ -315,16 +319,16 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       }
     }
 
-    //update stage?
+    // update stage?
     if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag)) {
       stage++;
 
       if (stage == 2) {
         if (not PathUtils::isWorthParallelising(*mainpath)) {
-          //merge mainpath back into input path
+          // merge mainpath back into input path
           inpath->addPath(mainpath);
           mainpath.reset(new Path);
-          //and search for further parallel sections
+          // and search for further parallel sections
           stage = 0;
         }
       }
@@ -336,10 +340,7 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       if (module->hasProperties(Module::c_HistogramManager)) {
         // Initialize histogram manager if found in the path
         m_histoman = module;
-
-        //add histoman to other paths
-        mainpath->addModule(m_histoman);
-        outpath->addModule(m_histoman);
+        histogramManagers.push_back(module);
       }
     }
 
@@ -349,13 +350,17 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       outpath->addModule(module);
   }
 
-  bool createAllPaths = false; //usually we might not need e.g. an output path
+  // the histogram manager has to run in every process
+  PathUtils::prependModules(mainpath, histogramManagers);
+  PathUtils::prependModules(outpath, histogramManagers);
+
+  bool createAllPaths = false; // usually we might not need e.g. an output path
   for (const ModulePtr& module : path->getModules()) {
     if (module->hasProperties(Module::c_TerminateInAllProcesses))
-      createAllPaths = true; //ensure there are all kinds of processes
+      createAllPaths = true; // ensure there are all kinds of processes
   }
 
-  //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
+  // if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
   if (!mainpath->isEmpty())
     m_mainPath = mainpath;
   if (createAllPaths or !inpath->isEmpty())

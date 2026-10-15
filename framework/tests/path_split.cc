@@ -36,7 +36,12 @@ namespace {
     }
   };
 
-  /** Convenience maker. */
+  /** Convenience maker.
+   *
+   * The flags are the ones the real modules of that name declare. No flags at all is
+   * not a shortcut: EventInfoSetter and BGOverlayInput genuinely call no
+   * setPropertyFlags(), which is what makes them close a parallel section.
+   */
   ModulePtr mod(const std::string& type, unsigned int flags = 0)
   {
     return ModulePtr(new FlaggedModule(type, flags));
@@ -44,8 +49,18 @@ namespace {
 
   const unsigned int c_par = Module::c_ParallelProcessingCertified;
 
-  /** Parallel certified, but not worth forking for on its own. */
+  /** RootInput's flags: an input module is never put in the parallel section. */
+  const unsigned int c_input = Module::c_Input;
+
+  /** RootOutput's flags. */
+  const unsigned int c_output = Module::c_Output;
+
+  /** Parallel certified, but not worth forking for on its own (Gearbox, Geometry,
+   *  StatisticsSummary). */
   const unsigned int c_setup = Module::c_ParallelProcessingCertified | Module::c_NoParallelWork;
+
+  /** HistoManager's flags: not parallel certified, and copied into all three paths. */
+  const unsigned int c_histo = Module::c_HistogramManager | Module::c_NoParallelWork;
 
   /** Type names of the modules on a path, or {"<null>"} if the path is null. */
   std::vector<std::string> typesOf(const PathPtr& path)
@@ -86,7 +101,7 @@ namespace {
     path->addModule(mod("Gearbox", c_setup));
     path->addModule(mod("Geometry", c_setup));
     path->addModule(mod("RealWork", c_par));
-    path->addModule(mod("RootOutput"));
+    path->addModule(mod("RootOutput", c_output));
 
     expectSplit(path,
     {"EventInfoSetter", "StatisticsSummary", "BGOverlayInput"},
@@ -102,12 +117,12 @@ namespace {
     path->addModule(mod("EventInfoSetter"));
     path->addModule(mod("Gearbox", c_setup));
     path->addModule(mod("Geometry", c_setup));
-    path->addModule(mod("SomeInputModule"));
+    path->addModule(mod("SomeUncertifiedModule"));
     path->addModule(mod("RealWork", c_par));
-    path->addModule(mod("RootOutput"));
+    path->addModule(mod("RootOutput", c_output));
 
     expectSplit(path,
-    {"EventInfoSetter", "Gearbox", "Geometry", "SomeInputModule"},
+    {"EventInfoSetter", "Gearbox", "Geometry", "SomeUncertifiedModule"},
     {"RealWork"},
     {"RootOutput"});
   }
@@ -116,13 +131,94 @@ namespace {
   TEST(PathSplit, UsefulSectionIsKept)
   {
     PathPtr path(new Path);
-    path->addModule(mod("RootInput"));
+    path->addModule(mod("RootInput", c_input));
     path->addModule(mod("Gearbox", c_setup));
     path->addModule(mod("RealWork", c_par));
     path->addModule(mod("MoreWork", c_par));
-    path->addModule(mod("RootOutput"));
+    path->addModule(mod("RootOutput", c_output));
 
     expectSplit(path, {"RootInput"}, {"Gearbox", "RealWork", "MoreWork"}, {"RootOutput"});
+  }
+
+  /** An input or output module is kept out of the parallel section even when it is
+   *  parallel processing certified.
+   *
+   * No module declares that combination today, so nothing else pins it: without the
+   * exemption the input module would open the section itself and the input path would
+   * come back null, i.e. the reading would happen once per worker.
+   */
+  TEST(PathSplit, CertifiedInputAndOutputModulesStayOutOfTheMainPath)
+  {
+    PathPtr path(new Path);
+    path->addModule(mod("CertifiedInput", c_input | c_par));
+    path->addModule(mod("Gearbox", c_setup));
+    path->addModule(mod("RealWork", c_par));
+    path->addModule(mod("CertifiedOutput", c_output | c_par));
+
+    expectSplit(path, {"CertifiedInput"}, {"Gearbox", "RealWork"}, {"CertifiedOutput"});
+  }
+
+  /** The histogram manager runs in every process, so it is put on all three paths. */
+  TEST(PathSplit, HistogramManagerGoesOnAllThreePaths)
+  {
+    PathPtr path(new Path);
+    path->addModule(mod("HistoManager", c_histo));
+    path->addModule(mod("RootInput", c_input));
+    path->addModule(mod("RealWork", c_par));
+    path->addModule(mod("RootOutput", c_output));
+
+    expectSplit(path,
+    {"HistoManager", "RootInput"},
+    {"HistoManager", "RealWork"},
+    {"HistoManager", "RootOutput"});
+  }
+
+  /** Merging a pointless parallel section back must not disturb the histogram manager.
+   *
+   * The previous test crossed with the BGOverlayInput one: a DQM job with a simulation
+   * behind it. The section StatisticsSummary opens used to contain the histogram
+   * manager, so merging it back duplicated the manager into the input path and dropped
+   * it from the main path -- leaving the workers filling no histograms at all.
+   */
+  TEST(PathSplit, MergeKeepsHistogramManagerInMainPath)
+  {
+    PathPtr path(new Path);
+    path->addModule(mod("HistoManager", c_histo));
+    path->addModule(mod("EventInfoSetter"));
+    path->addModule(mod("StatisticsSummary", c_setup));
+    path->addModule(mod("BGOverlayInput"));
+    path->addModule(mod("Gearbox", c_setup));
+    path->addModule(mod("RealWork", c_par));
+    path->addModule(mod("RootOutput", c_output));
+
+    expectSplit(path,
+    {"HistoManager", "EventInfoSetter", "StatisticsSummary", "BGOverlayInput"},
+    {"HistoManager", "Gearbox", "RealWork"},
+    {"HistoManager", "RootOutput"});
+  }
+
+  /** Whether a section is worth parallelising must not depend on the histogram manager.
+   *
+   * The manager is on the main path because it has to run in every process, not because
+   * it is part of the section. Were it there during the splitting, [manager, Gearbox]
+   * would look like useful work whenever the manager lacks c_NoParallelWork -- the same
+   * collapse, from the other side. HistoManager does carry the flag today, so this pins
+   * the splitter rather than that one module.
+   */
+  TEST(PathSplit, HistogramManagerDoesNotKeepAPointlessSectionAlive)
+  {
+    PathPtr path(new Path);
+    path->addModule(mod("CustomHistogramManager", Module::c_HistogramManager));
+    path->addModule(mod("EventInfoSetter"));
+    path->addModule(mod("Gearbox", c_setup));
+    path->addModule(mod("SomeUncertifiedModule"));
+    path->addModule(mod("RealWork", c_par));
+    path->addModule(mod("RootOutput", c_output));
+
+    expectSplit(path,
+    {"CustomHistogramManager", "EventInfoSetter", "Gearbox", "SomeUncertifiedModule"},
+    {"CustomHistogramManager", "RealWork"},
+    {"CustomHistogramManager", "RootOutput"});
   }
 
   /** Nothing parallel certified at all: the whole path stays in the input path and
@@ -136,9 +232,9 @@ namespace {
   TEST(PathSplit, NothingParallelGivesNoMainPath)
   {
     PathPtr path(new Path);
-    path->addModule(mod("RootInput"));
+    path->addModule(mod("RootInput", c_input));
     path->addModule(mod("SerialWork"));
-    path->addModule(mod("RootOutput"));
+    path->addModule(mod("RootOutput", c_output));
 
     const auto [in, main, out] = PathUtils::splitPath(path);
 

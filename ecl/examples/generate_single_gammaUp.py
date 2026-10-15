@@ -54,7 +54,7 @@ parser.add_argument(
     '--NoUpgrade',
     default=False,
     action='store_true',
-    help='Use modules and geometry for ECL upgrade (True/False)',
+    help='Use modules and geometry for current ECL electronics',
 )
 parser.add_argument(
     '-bgoPath',
@@ -111,12 +111,21 @@ eventinfosetter = register_module('EventInfoSetter')
 # Show progress of processing
 progress = register_module('Progress')
 # Save output of simulation
-output = register_module('RootOutput')
+# output = register_module('RootOutput')
 
-# Add payloads for ECLWFParametersUp, ECLWFAlgoParamsUp, ECLWFNoiseParamsUp
-# use this for testing untill payloads will be included in main GT
-conditions.prepend_globaltag("temp_smoneta_main_20260921-124621")
-conditions.prepend_globaltag("temp_vsagar_upgrade_ecl")
+data_backgrounds = {
+    'Exp26r1485', 'Exp26r1968', 'Exp30r3493', 'Exp33r0274'
+}
+using_data_background = args.bg in data_backgrounds
+
+if using_data_background and not args.NoUpgrade:
+    parser.error('BGOs from data require --NoUpgrade flag to be set')
+
+if not using_data_background:
+    # Add payloads for ECLWFParametersUp, ECLWFAlgoParamsUp, ECLWFNoiseParamsUp
+    # use this for testing untill payloads will be included in main GT
+    conditions.prepend_globaltag("temp_smoneta_main_20260921-124621")
+    conditions.prepend_globaltag("temp_vsagar_upgrade_ecl")
 
 # Setting the option for all non particle gun modules
 if args.bg == 'Exp26r1485':
@@ -175,7 +184,7 @@ else:
 # print ('expList = ', eventinfosetter.expList)
 
 # Set output filename
-output.param('outputFileName', fname)
+# output.param('outputFileName', fname)
 
 
 main = create_path()
@@ -215,7 +224,7 @@ else:
     elif args.bg == 'Exp26r1485':
         bkg_file = (
             DATA_PROD_DIR
-            + 'rel8/BGOExp26rel8/release-08-00-04/'
+            + 'BGOrd/rel8/BGOExp26rel8/release-08-00-04/'
             + 'e0026/4S/r01485/beambg/sub00/*root'
         )
     elif args.bg == 'Exp26r1968':
@@ -237,14 +246,17 @@ else:
             + 'release-08-01-08/e0033/4S/r00274/beambg/sub00/*root'
         )
     print(bkg_file)
-    bkg = glob.glob(bkg_file)
+    bkg = sorted(glob.glob(bkg_file))
+    if not bkg:
+        raise FileNotFoundError(f'No BGO files found: {bkg_file}')
+    print(f'Using {len(bkg)} BGO files for {args.bg}', flush=True)
     add_simulation(
         main,
         bkgfiles=bkg,
     )
 
 add_reconstruction(main)
-main.add_module(output)
+# main.add_module(output)
 # add_mdst_output(main)
 
 ecldataanalysis = register_module('ECLDataAnalysis')

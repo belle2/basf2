@@ -113,6 +113,12 @@ void ECLDigitizerModule::initialize()
     m_compAlgo = m_eclUpgrade ? 1 : 0;
   }
 
+  if (m_eclUpgrade && (m_compAlgo == 3 || m_compAlgo == 4)) {
+    B2WARNING("ECLDigitizer: CompressionAlgorithm=" << m_compAlgo
+              << " is not supported for upgraded electronics; using 1.");
+    m_compAlgo = 1;
+  }
+
   m_eclDsps.registerInDataStore();
   if (m_storeDspWithExtraMCInfo) m_eclDspsWithExtraMCInfo.registerInDataStore();
   m_eclDigits.registerInDataStore();

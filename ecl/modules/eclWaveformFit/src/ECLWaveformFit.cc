@@ -205,6 +205,9 @@ ECLWaveformFitModule::ECLWaveformFitModule()
            "Option to use crystal-dependent covariance matrices (false uses identity matrix).",
            true);
   addParam("RegParam1", m_u1, "u1 parameter for regularization function).", 1.0);
+  addParam("ECLupgrade", m_eclUpgradeOverride,
+           "Upgraded electronics (no fit is done): -1 from the payload ECLElectronicsConfiguration, "
+           "0 current electronics, 1 upgraded electronics", -1);
 }
 
 ECLWaveformFitModule::~ECLWaveformFitModule()
@@ -245,6 +248,14 @@ void ECLWaveformFitModule::loadTemplateParameterArray()
 
 void ECLWaveformFitModule::beginRun()
 {
+
+  /* The offline waveform fit is not implemented for the upgraded electronics. */
+  if (m_eclUpgradeOverride == -1)
+    m_eclUpgrade = m_electronicsConfiguration.isValid() && m_electronicsConfiguration->getUpgrade();
+  else
+    m_eclUpgrade = (m_eclUpgradeOverride == 1);
+  if (m_eclUpgrade)
+    return;
 
   m_IsMCFlag = Environment::Instance().isMC();
   m_TemplatesLoaded = false;
@@ -318,6 +329,9 @@ void ECLWaveformFitModule::beginRun()
 
 void ECLWaveformFitModule::initialize()
 {
+  if (m_eclUpgradeOverride < -1 || m_eclUpgradeOverride > 1)
+    B2FATAL("ECLWaveformFit: ECLupgrade must be -1, 0 or 1, not " << m_eclUpgradeOverride);
+
   // ECL dataobjects
   m_eclDSPs.isRequired();
   m_eclDigits.isRequired();
@@ -363,6 +377,9 @@ void ECLWaveformFitModule::initialize()
 
 void ECLWaveformFitModule::event()
 {
+  if (m_eclUpgrade)
+    return;
+
   const EclConfiguration& ec = EclConfiguration::get();
 
   if (!m_TemplatesLoaded) {

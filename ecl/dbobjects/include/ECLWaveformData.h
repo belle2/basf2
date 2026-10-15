@@ -15,6 +15,7 @@
 #include <TObject.h>
 
 /* C++ headers. */
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <utility>
@@ -30,111 +31,147 @@ namespace Belle2 {
    */
   class ECLWaveformData : public TObject {
   public:
+    // Default sizes for the current ECL electronics:
+    // 16x16 sampled signal matrix -> 136 independent elements,
+    // and 10 parameters defining the waveform shape.
+    static constexpr size_t c_nADCsignal = 16; /**< number of ADC samples in the signal fit */
+    static constexpr size_t c_nElements = c_nADCsignal * (c_nADCsignal + 1) / 2;  /**< number of independent matrix elements */
+    static constexpr size_t c_nParams = 10; /**< number of parameters defining the waveform shape */
+
+    /** Constructor.
+     * @param nADCsignal number of ADC samples used in the waveform fit
+     * @param nParams number of waveform-shape parameters
+     */
+    explicit ECLWaveformData(size_t nADCsignal = c_nADCsignal, size_t nParams = c_nParams):
+      m_nADCsignal(nADCsignal),
+      m_nParams(nParams),
+      m_matrixElement(nADCsignal * (nADCsignal + 1) / 2),
+      m_waveformPar(nParams)
+    {}
 
     /** Setter method for independent matrix element */
     void setMatrixElement(size_t i, float value)
     {
-      assert(i < c_nElements);
+      assert(i < m_matrixElement.size());
       m_matrixElement[i] = value;
     }
+
     /** Getter method for independent matrix element */
     float getMatrixElement(size_t i) const
     {
-      assert(i < c_nElements);
+      assert(i < m_matrixElement.size());
       return m_matrixElement[i];
     }
 
     /** Getter method for independent matrix element */
     float getMatrixElement(size_t i, size_t j) const
     {
-      if (i < j) std::swap(i, j);
-      return m_matrixElement[ i * (i + 1) / 2 + j];
+      assert(i < m_nADCsignal);
+      assert(j < m_nADCsignal);
+      if (i < j)
+        std::swap(i, j);
+      return m_matrixElement[i * (i + 1) / 2 + j];
     }
 
     /** Getter method for all matrix as one dimensional array */
-    void getArray(float WF[136]) const  {for (int i = 0; i < 136; i++) { WF[i] = (float) m_matrixElement[i];}   }
+    void getArray(float* WF) const
+    {
+      std::copy(m_matrixElement.begin(),
+                m_matrixElement.end(),
+                WF);
+    }
 
     /** Getter method for all matrix as two dimensional array (floats) */
-    void getMatrix(float M[16][16]) const
+    template <size_t N>
+    void getMatrix(float (&M)[N][N]) const
     {
-      const float* A = m_matrixElement;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < i; j++) M[i][j] = M[j][i] = *A++;
-        M[i][i] = *A++;
+      assert(N == m_nADCsignal);
+      auto it = m_matrixElement.begin();
+      for (size_t i = 0; i < m_nADCsignal; ++i) {
+        for (size_t j = 0; j < i; ++j)
+          M[i][j] = M[j][i] = *it++;
+        M[i][i] = *it++;
       }
     }
 
     /** Getter method for all matrix as two dimensional array (doubles) */
-    void getMatrix(double M[16][16]) const
+    template <size_t N>
+    void getMatrix(double (&M)[N][N]) const
     {
-      const float* A = m_matrixElement;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < i; j++) M[i][j] = M[j][i] = *A++;
-        M[i][i] = *A++;
+      assert(N == m_nADCsignal);
+      auto it = m_matrixElement.begin();
+      for (size_t i = 0; i < m_nADCsignal; ++i) {
+        for (size_t j = 0; j < i; ++j)
+          M[i][j] = M[j][i] = *it++;
+        M[i][i] = *it++;
       }
     }
 
-    /** Setter for matrix from std::array of floats */
-    void storeMatrix(const std::array<std::array<float, 16>, 16>& M) // using std::array for intel compiler (TF)
+    /** Setter for matrix from std::array */
+    template <typename T, size_t N>
+    void storeMatrix(const std::array<std::array<T, N>, N>& M)
     {
-      float* A = m_matrixElement;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < i; j++) *A++ = M[i][j];
-        *A++ = M[i][i];
-      }
-    }
-
-    /** Setter for matrix from std::array of doubles */
-    void storeMatrix(const std::array<std::array<double, 16>, 16>& M) // using std::array for intel compiler (TF)
-    {
-      float* A = m_matrixElement;
-      for (int i = 0; i < 16; i++) {
-        for (int j = 0; j < i; j++) *A++ = static_cast<float>(M[i][j]);
-        *A++ = M[i][i];
+      assert(N == m_nADCsignal);
+      auto it = m_matrixElement.begin();
+      for (size_t i = 0; i < m_nADCsignal; ++i) {
+        for (size_t j = 0; j < i; ++j)
+          *it++ = static_cast<float>(M[i][j]);
+        *it++ = static_cast<float>(M[i][i]);
       }
     }
 
     /** Setter method for waveform shape parameter */
     void setWaveformPar(size_t i, float value)
     {
-      assert(i < c_nParams);
+      assert(i < m_waveformPar.size());
       m_waveformPar[i] = value;
     }
-
 
     /** Getter method for waveform shape parameter */
     float getWaveformPar(size_t i) const
     {
-      assert(i < c_nParams);
+      assert(i < m_waveformPar.size());
       return m_waveformPar[i];
     }
 
     /** Getter method for waveform shape parameters as one dimensional array of
      * floats */
-    void getWaveformParArray(float P[10]) const
+    void getWaveformParArray(float* P) const
     {
-      for (int i = 0; i < 10; i++)
-        P[i] = (float) m_waveformPar[i];
+      std::copy(m_waveformPar.begin(),
+                m_waveformPar.end(),
+                P);
     }
 
     /** Getter method for waveform shape parameters as one dimensional array of
      * doubles */
-    void getWaveformParArray(double P[10]) const
+    void getWaveformParArray(double* P) const
     {
-      for (int i = 0; i < 10; i++)
-        P[i] = m_waveformPar[i];
+      std::copy(m_waveformPar.begin(),
+                m_waveformPar.end(),
+                P);
     }
+
+    /** Return the number of ADC samples used in the waveform fit. */
+    size_t getNADCsignal() const { return m_nADCsignal; }
+
+    /** Return the number of waveform-shape parameters. */
+    size_t getNParams() const { return m_nParams; }
+
+    /** Return the number of stored independent matrix elements. */
+    size_t getNElements() const { return m_matrixElement.size(); }
 
     /** print-out function for debugging purpose*/
     void print() const;
 
-    static const size_t c_nElements = 136; /**< number of independent matrix elements*/
-    static const size_t c_nParams = 10; /**< number of parameters defining the waveform shape*/
   private:
-    Float_t m_matrixElement[c_nElements]; /**< the matrix elements */
-    Float_t m_waveformPar[c_nParams]; /**< the waveform parameters */
+    UInt_t m_nADCsignal{c_nADCsignal};  /**< Number of ADC samples used in the waveform fit. */
+    UInt_t m_nParams{c_nParams};  /**< Number of waveform-shape parameters. */
 
-    ClassDef(ECLWaveformData, 1); /**< ClassDef */
+    std::vector<float> m_matrixElement; /**< the matrix elements */
+    std::vector<float> m_waveformPar; /**< the waveform parameters */
+
+    ClassDef(ECLWaveformData, 2); /**< ClassDef */
   };
 
   /** Container for constant parameters used in waveform fits */
@@ -163,62 +200,87 @@ namespace Belle2 {
     int getlAT() const {return (int) lowAmpThresh;} /**< getter for the threshold to calculate time */
     int getsT()  const {return (int) skipThresh;}   /**< getter for the threshold to send data to collector */
 
-    ClassDef(ECLWFAlgoParams, 1) /**< ClassDef */
+    ClassDef(ECLWFAlgoParams, 1); /**< ClassDef */
   };
 
   /** Container for constant matrix used to generate electronic noise */
   class ECLNoiseData : public TObject {
   public:
+    // Noise is defined for full ADC window (fixed at 31 samples for current ECL electronics)
+    static constexpr size_t c_nADC = 31; /**< number of ADC samples */
+    static constexpr size_t c_nElements =  c_nADC * (c_nADC + 1) / 2; /**< number of independent elements */
+
+    /** Constructor.
+     * @param nADC number of ADC samples
+     */
+    explicit ECLNoiseData(size_t nADC = c_nADC):
+      m_nADC(nADC),
+      m_matrixElement(nADC * (nADC + 1) / 2)
+    {}
+
     /** Setter method for independent matrix element */
     void setMatrixElement(size_t i, float value)
     {
-      assert(i < c_nElements);
+      assert(i < m_matrixElement.size());
       m_matrixElement[i] = value;
     }
+
     /** Getter method for independent matrix element */
     float getMatrixElement(size_t i) const
     {
-      assert(i < c_nElements);
+      assert(i < m_matrixElement.size());
       return m_matrixElement[i];
     }
 
     /** Getter method for matrix as one dimensional array */
-    void getArray(float NoiseData[496]) const  {for (int i = 0; i < 496; i++) { NoiseData[i] = (float) m_matrixElement[i];}   }
+    void getArray(float* NoiseData) const
+    {
+      std::copy(m_matrixElement.begin(),
+                m_matrixElement.end(),
+                NoiseData);
+    }
 
     /** Getter method for matrix as two dimensional array */
-    void getMatrix(float M[31][31]) const
+    template<size_t N>
+    void getMatrix(float (&M)[N][N]) const
     {
-      const float* A = m_matrixElement;
-      for (int i = 0; i < 31; i++) {
-        for (int j = 0; j < 31; j++) {
-          if (j > i) { // fill only the lower triangle
+      assert(N == m_nADC);
+      auto it = m_matrixElement.begin();
+      for (size_t i = 0; i < m_nADC; ++i) {
+        for (size_t j = 0; j < m_nADC; ++j) {
+          if (j > i) {
             M[i][j] = 0.f;
           } else {
-            M[i][j] = *A++;
+            M[i][j] = *it++;
           }
         }
       }
     }
 
-    /** sampling a random vector x from the 31-dimensional multivariate normal distribution with covariance matrix C */
-    void generateCorrelatedNoise(const float z[31], float x[31]) const
+    /** sampling a random vector x from the N-dimensional multivariate normal distribution with covariance matrix C */
+    void generateCorrelatedNoise(const float* z, float* x) const
     {
-      // z = (z0, ..., z30) is a inpute vector whose components are 31 independent standard normal variates
-      // the output vector x is x0 + A*z, where x0 is 0 at the moment
-      // A*A^T = C where C is a positive definite covariance matrix, A is a lower triangular matrix
-      const float* A = m_matrixElement;
-      for (int i = 0; i < 31; i++) {
-        float sum = 0;
-        for (int j = 0; j <= i; j++) sum += z[j] * (*A++);
+      auto it = m_matrixElement.begin();
+      for (size_t i = 0; i < m_nADC; ++i) {
+        float sum = 0.f;
+        for (size_t j = 0; j <= i; ++j)
+          sum += z[j] * (*it++);
         x[i] = sum;
       }
     }
 
-    static const size_t c_nElements = 496; /**< number of independent elements */
+    /** Return the number of ADC samples. */
+    size_t getNADC() const { return m_nADC; }
 
-    Float_t m_matrixElement[c_nElements]; /**< electronic noise matrix */
+    /** Return the number of stored independent matrix elements. */
+    size_t getNElements() const { return m_matrixElement.size(); }
 
-    ClassDef(ECLNoiseData, 1) /**< ClassDef */
+  private:
+    UInt_t m_nADC{c_nADC};  /**< Number of ADC samples. */
+
+    std::vector<float> m_matrixElement; /**< electronic noise matrix */
+
+    ClassDef(ECLNoiseData, 2); /**< ClassDef */
   };
 
 

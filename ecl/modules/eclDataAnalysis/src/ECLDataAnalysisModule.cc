@@ -12,6 +12,8 @@
 /* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
@@ -54,6 +56,8 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_doTracking(0),
     m_eclSimHits(eclSimHitArrayName()),
     m_eclHits(eclHitArrayName()),
+    m_eclDsps(eclDspArrayName()),
+    m_eclDspWithExtraMCInfos(eclDspWithExtraMCInfoArrayName()),
     m_eclDigits(eclDigitArrayName()),
     m_eclCalDigits(eclCalDigitArrayName()),
     m_eclConnectedRegions(eclConnectedRegionArrayName()),
@@ -70,6 +74,21 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_iExperiment(0),
     m_iRun(0),
     m_iEvent(0),
+// Dpsp
+    m_eclDspMultip(0),
+    m_eclDspIdx(0),
+    m_eclDspCellId(0),
+    m_eclDspAVector(0),
+// DpspWithExtraMCInfo
+    m_eclDspWithExtraMCInfoMultip(0),
+    m_eclDspWithExtraMCInfoIdx(0),
+    m_eclDspWithExtraMCInfoCellId(0),
+    m_eclDspWithExtraMCInfoAVector(0),
+    m_eclDspWithExtraMCInfoEnergyDep(0),
+    m_eclDspWithExtraMCInfoFlightTime(0),
+    m_eclDspWithExtraMCInfoTimeShift(0),
+    m_eclDspWithExtraMCInfoTimeToSensor(0),
+    m_eclDspWithExtraMCInfoEnergyConversion(0),
 //Digit
     m_eclDigitMultip(0),
     m_eclDigitIdx(0),
@@ -427,13 +446,20 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
   addParam("doTracking", m_doTracking, "set true if you want to save the information from TrackFitResults'rootFileName'",
            bool(false));
   addParam("doHits", m_doHits, "set true if you want to save the Hit and SimHit informations'", bool(false));
+  addParam("doDsps", m_doDsps, "set true if you want to save the Dsp informations'", bool(false));
+  addParam("doDspWithExtraMCInfos", m_doDspWithExtraMCInfos,
+           "set true if you want to save the DspWithExtraMCInfo informations'", bool(false));
   addParam("doDigits", m_doDigits, "set true if you want to save the Digits and CalDigits informations'", bool(false));
   addParam("doPureCsI", m_doPureCsI, "set true if you want to save the information for upgrade option'", bool(false));
 
+  m_eclDspAVector = new std::vector<std::vector<int>>();
+  m_eclDspWithExtraMCInfoAVector = new std::vector<std::vector<int>>();
 }
 
 ECLDataAnalysisModule::~ECLDataAnalysisModule()
 {
+  delete m_eclDspAVector;
+  delete m_eclDspWithExtraMCInfoAVector;
 }
 
 
@@ -447,6 +473,8 @@ void ECLDataAnalysisModule::initialize()
   m_eclSimHits.registerInDataStore(eclSimHitArrayName());
   m_eclHits.registerInDataStore(eclHitArrayName());
 
+  m_eclDsps.registerInDataStore(eclDspArrayName());
+  m_eclDspWithExtraMCInfos.registerInDataStore(eclDspWithExtraMCInfoArrayName());
   m_eclDigits.registerInDataStore(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
@@ -498,6 +526,26 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclNumRejectedShowersFwd",     &m_nECLShowersRejectedFWD,         "eclNumRejectedShowersFwd/b");
   m_tree->Branch("eclNumRejectedShowersBrl",     &m_nECLShowersRejectedBarrel,         "eclNumRejectedShowersBrl/b");
   m_tree->Branch("eclNumRejectedShowersBwd",     &m_nECLShowersRejectedBWD,         "eclNumRejectedShowersBwd/b");
+
+  if (m_doDsps == 1) {
+    m_tree->Branch("eclDspMultip",     &m_eclDspMultip,         "eclDsp_Multip/I");
+    m_tree->Branch("eclDspIdx",        "std::vector<int>",         &m_eclDspIdx);
+    m_tree->Branch("eclDspCellId",     "std::vector<int>",         &m_eclDspCellId);
+    m_tree->Branch("eclDspAVector",    "std::vector<std::vector<int>>",         &m_eclDspAVector);
+  }
+
+  if (m_doDspWithExtraMCInfos == 1) {
+    m_tree->Branch("eclDspWithExtraMCInfoMultip",     &m_eclDspWithExtraMCInfoMultip,         "eclDspWithExtraMCInfo_Multip/I");
+    m_tree->Branch("eclDspWithExtraMCInfoIdx",        "std::vector<int>",         &m_eclDspWithExtraMCInfoIdx);
+    m_tree->Branch("eclDspWithExtraMCInfoCellId",     "std::vector<int>",         &m_eclDspWithExtraMCInfoCellId);
+    m_tree->Branch("eclDspWithExtraMCInfoAVector",    "std::vector<std::vector<int>>",         &m_eclDspWithExtraMCInfoAVector);
+    m_tree->Branch("eclDspWithExtraMCInfoEnergyDep",    "std::vector<double>",         &m_eclDspWithExtraMCInfoEnergyDep);
+    m_tree->Branch("eclDspWithExtraMCInfoFlightTime",    "std::vector<double>",         &m_eclDspWithExtraMCInfoFlightTime);
+    m_tree->Branch("eclDspWithExtraMCInfoTimeShift",    "std::vector<double>",         &m_eclDspWithExtraMCInfoTimeShift);
+    m_tree->Branch("eclDspWithExtraMCInfoTimeToSensor",    "std::vector<double>",         &m_eclDspWithExtraMCInfoTimeToSensor);
+    m_tree->Branch("eclDspWithExtraMCInfoEnergyConversion",    "std::vector<double>",
+                   &m_eclDspWithExtraMCInfoEnergyConversion);
+  }
 
   if (m_doDigits == 1) {
     m_tree->Branch("eclDigitMultip",     &m_eclDigitMultip,         "ecldigit_Multip/I");
@@ -874,6 +922,27 @@ void ECLDataAnalysisModule::event()
   m_nECLShowersRejectedFWD = 0;
   m_nECLShowersRejectedBarrel = 0;
   m_nECLShowersRejectedBWD = 0;
+
+  if (m_doDsps == 1) {
+    ///Dsps
+    m_eclDspMultip = 0;
+    m_eclDspCellId->clear();
+    m_eclDspIdx->clear();
+    m_eclDspAVector->clear();
+  }
+
+  if (m_doDspWithExtraMCInfos == 1) {
+    ///DspWithExtraMCInfos
+    m_eclDspWithExtraMCInfoMultip = 0;
+    m_eclDspWithExtraMCInfoCellId->clear();
+    m_eclDspWithExtraMCInfoIdx->clear();
+    m_eclDspWithExtraMCInfoAVector->clear();
+    m_eclDspWithExtraMCInfoEnergyDep->clear();
+    m_eclDspWithExtraMCInfoFlightTime->clear();
+    m_eclDspWithExtraMCInfoTimeShift->clear();
+    m_eclDspWithExtraMCInfoTimeToSensor->clear();
+    m_eclDspWithExtraMCInfoEnergyConversion->clear();
+  }
 
   if (m_doDigits == 1) {
     ///Digits
@@ -1257,6 +1326,33 @@ void ECLDataAnalysisModule::event()
   m_nECLShowersRejectedFWD = m_eventLevelClusteringInfo->getNECLShowersRejectedFWD();
   m_nECLShowersRejectedBarrel = m_eventLevelClusteringInfo->getNECLShowersRejectedBarrel();
   m_nECLShowersRejectedBWD = m_eventLevelClusteringInfo->getNECLShowersRejectedBWD();
+
+  if (m_doDsps == 1) {
+    // DSPS
+    m_eclDspMultip = m_eclDsps.getEntries();
+    for (int idsps = 0; idsps < m_eclDsps.getEntries() ; idsps++) {
+      ECLDsp* aECLDsps = m_eclDsps[idsps];
+      m_eclDspIdx->push_back(idsps);
+      m_eclDspCellId->push_back(aECLDsps->getCellId());
+      m_eclDspAVector->push_back(aECLDsps->getDspA());
+    }
+  }
+
+  if (m_doDspWithExtraMCInfos == 1) {
+    // DSPWITHEXTRAMCINFOS
+    m_eclDspWithExtraMCInfoMultip = m_eclDspWithExtraMCInfos.getEntries();
+    for (int idsps = 0; idsps < m_eclDspWithExtraMCInfos.getEntries() ; idsps++) {
+      ECLDspWithExtraMCInfo* aECLDspWithExtraMCInfos = m_eclDspWithExtraMCInfos[idsps];
+      m_eclDspWithExtraMCInfoIdx->push_back(idsps);
+      m_eclDspWithExtraMCInfoCellId->push_back(aECLDspWithExtraMCInfos->getCellId());
+      m_eclDspWithExtraMCInfoAVector->push_back(aECLDspWithExtraMCInfos->getDspA());
+      m_eclDspWithExtraMCInfoEnergyDep->push_back(aECLDspWithExtraMCInfos->getEnergyDep());
+      m_eclDspWithExtraMCInfoFlightTime->push_back(aECLDspWithExtraMCInfos->getFlightTime());
+      m_eclDspWithExtraMCInfoTimeShift->push_back(aECLDspWithExtraMCInfos->getTimeShift());
+      m_eclDspWithExtraMCInfoTimeToSensor->push_back(aECLDspWithExtraMCInfos->getTimeToSensor());
+      m_eclDspWithExtraMCInfoEnergyConversion->push_back(aECLDspWithExtraMCInfos->getEnergyConversion());
+    }
+  }
 
   if (m_doDigits == 1) {
     //DIGITS
@@ -2394,3 +2490,4 @@ void ECLDataAnalysisModule::terminate()
   }
 
 }
+

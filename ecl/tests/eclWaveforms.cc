@@ -9,6 +9,7 @@
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
+#include <ecl/digitization/EclConfigurationUp.h>
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -184,5 +185,60 @@ namespace Belle2 {
         for (int i = 0; i < 31; i++) EXPECT_NEAR(A[i], B[i], 10);
       }
     }
+
+    /** Test BASE compression for upgraded electronics. */
+    TEST_F(ECLBaseCompressTest, UpgradeElectronics)
+    {
+      constexpr unsigned int nSamples = EclConfigurationUp::c_nAdcSamples;
+      ECLBaseCompress q(nSamples);
+
+      int N = 128;
+      for (int off = 0; off < 32; ++off) {
+        BitStream q2(N);
+
+        q2.setPos(off);
+        int A[nSamples];
+        for (unsigned int i = 0; i < nSamples; ++i) {
+          A[i] = 4000 + ((i % 2) * 1000 - 500);
+        }
+        q.compress(q2, A);
+
+        q2.setPos(off);
+        int B[nSamples];
+        q.uncompress(q2, B);
+
+        for (unsigned int i = 0; i < nSamples; ++i) {
+          EXPECT_EQ(A[i], B[i]);
+        }
+      }
+    }
+
+    /** Test DELTA compression for upgraded electronics. */
+    TEST_F(ECLDeltaCompressTest, UpgradeElectronics)
+    {
+      constexpr unsigned int nSamples = EclConfigurationUp::c_nAdcSamples;
+      ECLDeltaCompress q(nSamples);
+
+      int N = 128;
+      for (int off = 0; off < 32; ++off) {
+        BitStream q2(N);
+
+        q2.setPos(off);
+        int A[nSamples];
+        for (unsigned int i = 0; i < nSamples; ++i) {
+          A[i] = 4000 + ((i % 2) * 1000 - 500);
+        }
+        q.compress(q2, A);
+
+        q2.setPos(off);
+        int B[nSamples];
+        q.uncompress(q2, B);
+
+        for (unsigned int i = 0; i < nSamples; ++i) {
+          EXPECT_EQ(A[i], B[i]);
+        }
+      }
+    }
+
   }
 }  // namespace

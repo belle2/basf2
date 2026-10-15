@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <framework/datastore/RelationsObject.h>
+#include <ecl/dataobjects/ECLDsp.h>
+
 namespace Belle2 {
 
   /*! Class to store ECL ShaperDSP waveform ADC data and additional information for ML studies
@@ -20,6 +21,14 @@ namespace Belle2 {
 
   class ECLDspWithExtraMCInfo : public ECLDsp {
   public:
+    /** Default constructor */
+    ECLDspWithExtraMCInfo() = default;
+
+    /** Constructor with configurable number of ADC samples */
+    explicit ECLDspWithExtraMCInfo(int nADCPoints) :
+      ECLDsp(nADCPoints)
+    {}
+
     /*! Set total true deposited energy
     */
     void setEnergyDep(double input) { m_energyDep = input; }

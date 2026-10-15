@@ -1,5 +1,36 @@
 #ifdef __CINT__
 
+// ECLWaveformData version 1 used fixed-size arrays.
+// Convert them to the variable-size vectors introduced in version 2.
+#pragma read sourceClass="Belle2::ECLWaveformData" version="[1]" \
+  source="float m_matrixElement[136]" \
+  targetClass="Belle2::ECLWaveformData" \
+  target="m_matrixElement,m_nADCsignal" \
+  code="{ \
+          m_matrixElement.assign(onfile.m_matrixElement, onfile.m_matrixElement + 136); \
+          m_nADCsignal = 16; \
+        }"
+
+#pragma read sourceClass="Belle2::ECLWaveformData" version="[1]" \
+  source="float m_waveformPar[10]" \
+  targetClass="Belle2::ECLWaveformData" \
+  target="m_waveformPar,m_nParams" \
+  code="{ \
+          m_waveformPar.assign(onfile.m_waveformPar, onfile.m_waveformPar + 10); \
+          m_nParams = 10; \
+        }"
+
+// ECLNoiseData version 1 used a fixed-size array.
+// Convert it to the variable-size vector introduced in version 2.
+#pragma read sourceClass="Belle2::ECLNoiseData" version="[1]" \
+  source="float m_matrixElement[496]" \
+  targetClass="Belle2::ECLNoiseData" \
+  target="m_matrixElement,m_nADC" \
+  code="{ \
+          m_matrixElement.assign(onfile.m_matrixElement, onfile.m_matrixElement + 496); \
+          m_nADC = 31; \
+        }"
+
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
@@ -33,14 +64,15 @@
 #pragma link C++ class Belle2::ECLChannelMap+; // checksum=0x31b65fac, version=1
 #pragma link C++ class Belle2::ECLCrystalLocalRunCalib; // checksum=0xf7c81e44, version=1
 #pragma link C++ class Belle2::ECLLocalRunCalibRef; // checksum=0x37dc8c50, version=1
-#pragma link C++ class Belle2::ECLWaveformData+; // checksum=0x82c9e7d2, version=1
+#pragma link C++ class Belle2::ECLWaveformData+; // checksum=0x5ccfe336, version=2
 #pragma link C++ class Belle2::ECLWFAlgoParams+; // checksum=0x731094cf, implicit, version=1
-#pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
+#pragma link C++ class Belle2::ECLNoiseData+; // checksum=0x7362e692, implicit, version=2
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
 #pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
 #pragma link C++ class Belle2::ECLnOptimal+; // checksum=0xe49fab6f, version=1
 #pragma link C++ class Belle2::ECLTimeWalkCorrection+; // checksum=0xd21ebfc6, version=1
 #pragma link C++ class Belle2::ECLClusteringParameters+; // , checksum=0x353dde2a, version=2
+#pragma link C++ class Belle2::ECLElectronicsConfiguration+; // checksum=0xea25592d, version=1
 
 // workaround for https://github.com/root-project/root/issues/7960
 #pragma link C++ class std::pair<int,std::unordered_map<int,vector<Belle2::ECLChargedPidPDFs::InputVar>>>+; // checksum=0xacd09862, version=-1

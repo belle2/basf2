@@ -13,6 +13,8 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDspData.h>
 #include <ecl/mapper/ECLChannelMapper.h>
+#include <ecl/digitization/EclConfiguration.h>
+#include <ecl/digitization/EclConfigurationUp.h>
 
 /* Basf2 headers. */
 #include <framework/database/DBArray.h>
@@ -34,6 +36,37 @@ int ECLDspUtilities::pedestal_fit_initialized = 0;
 float ECLDspUtilities::pedfit_fg31[768] = {};
 float ECLDspUtilities::pedfit_fg32[768] = {};
 
+namespace {
+
+  constexpr int c_nDspChannels = 16;
+
+  struct DspDimensions {
+    int nFitSamples;
+    int nFitPointsPerAdcTick;
+    int nFitTimeShifts;
+    int nLowAmpFitPoints;
+  };
+
+  DspDimensions getDspDimensions(bool upgrade)
+  {
+    if (upgrade) {
+      return {
+        EclConfigurationUp::c_nFitSamples,
+        EclConfigurationUp::c_nFitPointsPerAdcTick,
+        EclConfigurationUp::c_nFitTimeShifts,
+        EclConfigurationUp::c_nLowAmpFitPoints
+      };
+    }
+
+    return {
+      EclConfiguration::c_nFitSamples,
+      EclConfiguration::c_nFitPointsPerAdcTick,
+      EclConfiguration::c_nFitTimeShifts,
+      EclConfiguration::c_nLowAmpFitPoints
+    };
+  }
+}
+
 /**
  * @brief Read data from file to ptr.
  * @return Number of times successfully read.
@@ -46,7 +79,7 @@ void readEclDspCoefs(FILE* fl, void* ptr, int word_size, int word_count)
   }
 }
 
-ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
+ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber, bool upgrade)
 {
   FILE* fl;
   fl = fopen(filename, "rb");
@@ -102,19 +135,36 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
   data->setsT(id[192]);
   data->setaAT(id[208]);
 
-  std::vector<short int> f(49152), f1(49152), f31(49152),
-      f32(49152), f33(49152), f41(6144), f43(6144);
+  const auto dspDims = getDspDimensions(upgrade);
 
-  for (int i = 0; i < 16; ++i) {
-    nsiz1 = 384;
+  const int nFitCoefficients =
+    dspDims.nFitTimeShifts *
+    dspDims.nFitPointsPerAdcTick *
+    dspDims.nFitSamples;
+
+  const int nLowAmplitudeCoefficients =
+    dspDims.nLowAmpFitPoints *
+    dspDims.nFitSamples;
+
+  std::vector<short int>
+  f(nFitCoefficients * c_nDspChannels),
+  f1(nFitCoefficients * c_nDspChannels),
+  f31(nFitCoefficients * c_nDspChannels),
+  f32(nFitCoefficients * c_nDspChannels),
+  f33(nFitCoefficients * c_nDspChannels),
+  f41(nLowAmplitudeCoefficients * c_nDspChannels),
+  f43(nLowAmplitudeCoefficients * c_nDspChannels);
+
+  for (int i = 0; i < c_nDspChannels; ++i) {
+    nsiz1 = nLowAmplitudeCoefficients;
     readEclDspCoefs(fl, &(*(f41.begin() + i * nsiz1)), nsiz, nsiz1);
-    nsiz1 = 3072;
+    nsiz1 = nFitCoefficients;
     readEclDspCoefs(fl, &(*(f31.begin() + i * nsiz1)), nsiz, nsiz1);
     readEclDspCoefs(fl, &(*(f32.begin() + i * nsiz1)), nsiz, nsiz1);
     readEclDspCoefs(fl, &(*(f33.begin() + i * nsiz1)), nsiz, nsiz1);
-    nsiz1 = 384;
+    nsiz1 = nLowAmplitudeCoefficients;
     readEclDspCoefs(fl, &(*(f43.begin() + i * nsiz1)), nsiz, nsiz1);
-    nsiz1 = 3072;
+    nsiz1 = nFitCoefficients;
     readEclDspCoefs(fl, &(*(f.begin() + i * nsiz1)), nsiz, nsiz1);
     readEclDspCoefs(fl, &(*(f1.begin() + i * nsiz1)), nsiz, nsiz1);
   }
@@ -131,7 +181,7 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
   return data;
 }
 
-void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data)
+void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data, bool upgrade)
 {
   // Default header for DSP file.
   // Words '0xABCD' are overwritten with current parameters.
@@ -217,8 +267,25 @@ void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data)
     B2FATAL("Error writing header of DSP file " << filename);
   }
 
-  std::vector<short int> f(49152), f1(49152), f31(49152),
-      f32(49152), f33(49152), f41(6144), f43(6144);
+  const auto dspDims = getDspDimensions(upgrade);
+
+  const int nFitCoefficients =
+    dspDims.nFitTimeShifts *
+    dspDims.nFitPointsPerAdcTick *
+    dspDims.nFitSamples;
+
+  const int nLowAmplitudeCoefficients =
+    dspDims.nLowAmpFitPoints *
+    dspDims.nFitSamples;
+
+  std::vector<short int>
+  f(nFitCoefficients * c_nDspChannels),
+  f1(nFitCoefficients * c_nDspChannels),
+  f31(nFitCoefficients * c_nDspChannels),
+  f32(nFitCoefficients * c_nDspChannels),
+  f33(nFitCoefficients * c_nDspChannels),
+  f41(nLowAmplitudeCoefficients * c_nDspChannels),
+  f43(nLowAmplitudeCoefficients * c_nDspChannels);
   data->getF41(f41);
   data->getF31(f31);
   data->getF32(f32);
@@ -227,16 +294,16 @@ void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data)
   data->getF(f);
   data->getF1(f1);
 
-  for (int i = 0; i < 16; ++i) {
-    nsiz1 = 384;
+  for (int i = 0; i < c_nDspChannels; ++i) {
+    nsiz1 = nLowAmplitudeCoefficients;
     fwrite(&(*(f41.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-    nsiz1 = 3072;
+    nsiz1 = nFitCoefficients;
     fwrite(&(*(f31.begin() + i * nsiz1)), nsiz, nsiz1, fl);
     fwrite(&(*(f32.begin() + i * nsiz1)), nsiz, nsiz1, fl);
     fwrite(&(*(f33.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-    nsiz1 = 384;
+    nsiz1 = nLowAmplitudeCoefficients;
     fwrite(&(*(f43.begin() + i * nsiz1)), nsiz, nsiz1, fl);
-    nsiz1 = 3072;
+    nsiz1 = nFitCoefficients;
     fwrite(&(*(f.begin() + i * nsiz1)), nsiz, nsiz1, fl);
     fwrite(&(*(f1.begin() + i * nsiz1)), nsiz, nsiz1, fl);
   }
@@ -254,7 +321,7 @@ short int* vectorsplit(std::vector<short int>& vectorFrom, int channel)
 }
 
 ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig,
-                                         bool adjusted_timing)
+                                         bool adjusted_timing, bool upgrade)
 {
   ECLChannelMapper mapper;
   mapper.initFromDB();
@@ -313,6 +380,12 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   int Askip = thr_StoreDigit->getCalibVector()[cid - 1];
 
   //== Perform fit
+  if (upgrade) {
+    auto result = lftdaUp_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
+                           Ahard, Askip, k_a, k_b, k_c, k_1, k_2,
+                           chi_thres, adjusted_timing);
+    return result;
+  }
   auto result = lftda_(f, f1, fg41, fg43, fg31, fg32, fg33, y, ttrig2, A0,
                        Ahard, Askip, k_a, k_b, k_c, k_16, k_1, k_2,
                        chi_thres, adjusted_timing);
@@ -349,6 +422,8 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
     initPedestalFit();
   }
 
+  constexpr int nPedestalSamples = 16;
+
   ECLPedestalFit result;
   float amp;
 
@@ -356,7 +431,7 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
 
   int ped_max = 0;
   int ped_max_pos = 0;
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < nPedestalSamples; i++) {
     if (adc[i] > ped_max) {
       ped_max = adc[i];
       ped_max_pos = i;
@@ -377,9 +452,9 @@ ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
   for (int iter = 0; iter < 2; iter++) {
     amp = 0;
     float tim = 0;
-    for (int j = 0; j < 16; j++) {
-      amp += pedfit_fg31[j + time_index * 16] * adc[j];
-      tim += pedfit_fg32[j + time_index * 16] * adc[j];
+    for (int j = 0; j < nPedestalSamples; j++) {
+      amp += pedfit_fg31[j + time_index * nPedestalSamples] * adc[j];
+      tim += pedfit_fg32[j + time_index * nPedestalSamples] * adc[j];
     }
     tim = tim / amp;
     time_index -= tim * 4;

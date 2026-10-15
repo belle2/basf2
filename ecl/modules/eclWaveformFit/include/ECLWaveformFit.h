@@ -15,6 +15,7 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 #include <ecl/dbobjects/ECLDigitWaveformParametersForMC.h>
+#include <ecl/dbobjects/ECLElectronicsConfiguration.h>
 
 /* Basf2 headers. */
 #include <framework/core/Module.h>
@@ -224,6 +225,12 @@ namespace Belle2 {
     /** Flag to indicate if running over data or MC. */
     bool m_IsMCFlag{false};
 
+    /** Upgraded electronics: -1 from ECLElectronicsConfiguration, 0 current, 1 upgraded. */
+    int m_eclUpgradeOverride{-1};
+
+    /** Upgraded electronics is used. */
+    bool m_eclUpgrade{false};
+
     /** Crystal electronics. */
     DBObjPtr<ECLCrystalCalib> m_CrystalElectronics{"ECLCrystalElectronics"};
 
@@ -238,6 +245,9 @@ namespace Belle2 {
 
     /** Autocovariance. */
     DBObjPtr<ECLAutoCovariance> m_AutoCovariance;
+
+    /** ECL electronics configuration (optional: current electronics if missing). */
+    DBObjPtr<ECLElectronicsConfiguration> m_electronicsConfiguration{"ECLElectronicsConfiguration", false};
 
     /** StoreArray ECLDsp. */
     StoreArray<ECLDsp> m_eclDSPs;

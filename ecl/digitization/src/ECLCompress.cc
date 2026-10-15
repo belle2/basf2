@@ -9,12 +9,21 @@
 #include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/digitization/EclConfigurationUp.h>
 
 #include <algorithm>
 #include <math.h>
 
 using namespace Belle2;
 using namespace ECL;
+
+ECLCompress::ECLCompress():
+  m_nAdcSamples(EclConfiguration::c_nAdcSamples)
+{}
+
+ECLCompress::ECLCompress(unsigned int nAdcSamples):
+  m_nAdcSamples(nAdcSamples)
+{}
 
 unsigned int Belle2::ECL::ilog2(unsigned int v)  // find the log base 2 of 32-bit v
 {
@@ -35,7 +44,7 @@ unsigned int Belle2::ECL::ilog2(unsigned int v)  // find the log base 2 of 32-bi
 void ECLBaseCompress::compress(BitStream& out, const int* adc)
 {
   int amin = adc[0], amax = adc[0];
-  for (unsigned int i = 0; i < EclConfiguration::m_nsmp; i++) {
+  for (unsigned int i = 0; i < m_nAdcSamples; ++i) {
     amax = std::max(amax, adc[i]);
     amin = std::min(amin, adc[i]);
   }
@@ -46,7 +55,7 @@ void ECLBaseCompress::compress(BitStream& out, const int* adc)
   w &= 0x1f;
   out.putNBits(w, 5);
 
-  for (unsigned int i = 0; i < EclConfiguration::m_nsmp; i++) {
+  for (unsigned int i = 0; i < m_nAdcSamples; ++i) {
     unsigned int d = adc[i] - amin;
     out.putNBits(d, w);
   }
@@ -55,14 +64,14 @@ void ECLBaseCompress::compress(BitStream& out, const int* adc)
 void ECLBaseCompress::uncompress(BitStream& out, int* adc)
 {
   unsigned int amin = out.getNBits(18), w = out.getNBits(5);
-  for (unsigned int i = 0; i < EclConfiguration::m_nsmp; i++)
+  for (unsigned int i = 0; i < m_nAdcSamples; ++i)
     adc[i] = amin + out.getNBits(w);
 }
 
 void ECLDeltaCompress::compress(BitStream& out, const int* adc)
 {
   int a0 = adc[0], dmin = 0, dmax = 0;
-  for (int k = 1; k < EclConfiguration::m_nsmp; k++) {
+  for (unsigned int k = 1; k < m_nAdcSamples; k++) {
     int d = adc[k] - a0;
     dmin = std::min(dmin, d);
     dmax = std::max(dmax, d);
@@ -77,7 +86,7 @@ void ECLDeltaCompress::compress(BitStream& out, const int* adc)
   out.putNBits(a0, 18);
 
   unsigned int base = 1 << (w - 1);
-  for (unsigned int i = 1; i < EclConfiguration::m_nsmp; i++) {
+  for (unsigned int i = 1; i < m_nAdcSamples; i++) {
     unsigned int d = int(adc[i]) - a0 + base;
     out.putNBits(d, w);
     a0 = adc[i];
@@ -89,7 +98,7 @@ void ECLDeltaCompress::uncompress(BitStream& out, int* adc)
   unsigned int w = out.getNBits(4);
   adc[0] = out.getNBits(18);
   unsigned int base = 1 << (w - 1);
-  for (unsigned int i = 1; i < EclConfiguration::m_nsmp; i++) {
+  for (unsigned int i = 1; i < m_nAdcSamples; i++) {
     adc[i] = adc[i - 1] + out.getNBits(w) - base;
   }
 }
@@ -275,16 +284,19 @@ void ECLDCTCompress::uncompress(BitStream& in, int* adc)
   for (int k = 0; k < N; k++) adc[k] = lrint(out[k]);
 }
 
-ECLCompress* Belle2::ECL::selectAlgo(int compAlgo)
+ECLCompress* Belle2::ECL::selectAlgo(int compAlgo, bool upgrade)
 {
+  const unsigned int nAdcSamples =
+    upgrade ? EclConfigurationUp::c_nAdcSamples :
+    EclConfiguration::c_nAdcSamples;
   ECLCompress* comp = nullptr;
   if (compAlgo == 1) {
-    comp = new ECLBaseCompress;
+    comp = new ECLBaseCompress(nAdcSamples);
   } else if (compAlgo == 2) {
-    comp = new ECLDeltaCompress;
-  } else if (compAlgo == 3) {
+    comp = new ECLDeltaCompress(nAdcSamples);
+  } else if (!upgrade && compAlgo == 3) {
     comp = new ECLDCTCompress(1, 3012, widths_phs2_scale10);
-  } else if (compAlgo == 4) {
+  } else if (!upgrade && compAlgo == 4) {
     comp = new ECLDCTCompress(0.25, 3144, widths_scale025);
   }
   return comp;

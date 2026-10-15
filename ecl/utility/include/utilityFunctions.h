@@ -28,5 +28,3 @@ namespace Belle2 {
 
   } // namespace ECL
 } // namespace Belle2
-
-

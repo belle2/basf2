@@ -137,6 +137,7 @@ def add_simulation(
         skipExperimentCheckForBG=False,
         ignoreRunNumberForBG=False,
         save_slow_pions_in_mc=False,
+        simulateECLUpgrade=None,
         useVTX=False,
         save_all_charged_particles_in_mc=False):
     """
@@ -154,6 +155,8 @@ def add_simulation(
       process and the beam background files. Note that this check should be skipped only by experts.
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
+    @param simulateECLUpgrade: if True, simulate the upgraded electronics for the ECL, if False the current one.
+      If None, the payload ECLElectronicsConfiguration decides.
     @param useVTX: use the VTX instead of the VXD
     @param save_all_charged_particles_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of all charged primary MCParticles that traverse PXD
@@ -238,7 +241,8 @@ def add_simulation(
 
     # ECL digitization
     if is_detector_present("ECL", components):
-        ecl_digitizer = b2.register_module('ECLDigitizer')
+        ecl_upgrade = -1 if simulateECLUpgrade is None else int(simulateECLUpgrade)
+        ecl_digitizer = b2.register_module('ECLDigitizer', ECLupgrade=ecl_upgrade)
         if bkgfiles is not None:
             ecl_digitizer.param('Background', 1)
         path.add_module(ecl_digitizer)

@@ -86,6 +86,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                        switch_off_slow_modules_for_online=False,
                        use_cat_finder=False,
+                       simulateECLUpgrade=None,
                        useVTX=False, useVTXClusterShapes=True):
     """
     This function adds the standard reconstruction modules to a path.
@@ -149,6 +150,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         to true in order to speed up the reconstruction.
     :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
         instead of the default one.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics, if false the current one.
+        If None, the payload ECLElectronicsConfiguration decides.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
@@ -189,6 +192,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present,
                                  switch_off_slow_modules_for_online=switch_off_slow_modules_for_online,
                                  use_cat_finder=use_cat_finder,
+                                 simulateECLUpgrade=simulateECLUpgrade,
                                  useVTX=useVTX, useVTXClusterShapes=useVTXClusterShapes)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
@@ -228,6 +232,7 @@ def add_prefilter_reconstruction(path,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True,
                                  switch_off_slow_modules_for_online=False,
                                  use_cat_finder=False,
+                                 simulateECLUpgrade=None,
                                  useVTX=False,
                                  useVTXClusterShapes=True):
     """
@@ -270,6 +275,8 @@ def add_prefilter_reconstruction(path,
         to true in order to speed up the reconstruction.
     :param use_cat_finder: if True, it runs the CDC AI Track Finder (CATFinder) as CDC track finding algorithm
         instead of the default one.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics, if false the current one.
+        If None, the payload ECLElectronicsConfiguration decides.
     :param useVTX: If true, the VTX reconstruction is performed.
     :param useVTXClusterShapes: If true, use cluster shape corrections for hit position finding.
     """
@@ -285,7 +292,7 @@ def add_prefilter_reconstruction(path,
     check_components(components)
 
     # Add modules that have to be run BEFORE track reconstruction
-    add_prefilter_pretracking_reconstruction(path, components=components)
+    add_prefilter_pretracking_reconstruction(path, components=components, simulateECLUpgrade=simulateECLUpgrade)
 
     # Add prefilter tracking reconstruction modules
     add_prefilter_tracking_reconstruction(
@@ -493,16 +500,18 @@ def add_cosmics_reconstruction(
                                             useVTX=useVTX)
 
 
-def add_prefilter_pretracking_reconstruction(path, components=None):
+def add_prefilter_pretracking_reconstruction(path, components=None, simulateECLUpgrade=None):
     """
     This function adds the standard reconstruction modules BEFORE tracking
     to a path.
 
     :param path: The path to add the modules to.
     :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics, if false the current one.
+        If None, the payload ECLElectronicsConfiguration decides.
     """
 
-    add_ecl_modules(path, components)
+    add_ecl_modules(path, components, simulateECLUpgrade=simulateECLUpgrade)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Clustering')
@@ -796,16 +805,19 @@ def add_muid_module(path, add_hits_to_reco_track=False, components=None):
                             ' Make sure that this is fine for your purposes, otherwise please include also KLM.')
 
 
-def add_ecl_modules(path, components=None):
+def add_ecl_modules(path, components=None, simulateECLUpgrade=None):
     """
     Add the ECL reconstruction modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
+    :param simulateECLUpgrade: if true, it simulates the upgraded ECL electronics, if false the current one.
+        If None, the payload ECLElectronicsConfiguration decides.
     """
     if is_detector_present("ECL", components):
-        path.add_module('ECLWaveformFit')
-        path.add_module('ECLDigitCalibrator')
+        ecl_upgrade = -1 if simulateECLUpgrade is None else int(simulateECLUpgrade)
+        path.add_module('ECLWaveformFit', ECLupgrade=ecl_upgrade)
+        path.add_module('ECLDigitCalibrator', simulateUpgrade=ecl_upgrade)
         path.add_module('ECLEventT0')
         path.add_module('ECLCRFinder')  # connected region finder
         path.add_module('ECLLocalMaximumFinder')

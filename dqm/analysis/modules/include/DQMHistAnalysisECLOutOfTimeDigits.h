@@ -28,6 +28,8 @@ namespace Belle2 {
     /** Constructor. */
     DQMHistAnalysisECLOutOfTimeDigitsModule();
 
+  private:
+
     /** Initialize the module. */
     void initialize() override final;
     /** Event processor. */
@@ -37,7 +39,6 @@ namespace Belle2 {
     /** Terminate. */
     void terminate() override final {}
 
-  private:
     /**  Out-of-time ECLCalDigits for several cases */
     std::map<std::string, double> m_out_of_time_digits = {};
 

@@ -17,7 +17,9 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! DQM Delta Histogram Test code and example */
+  /**
+   * DQM histogram analysis example code including Delta Histograms, EPICS integration, MonitoringObjects
+   */
 
   class DQMHistAnalysisDeltaEpicsMonObjExampleModule final : public DQMHistAnalysisModule {
 

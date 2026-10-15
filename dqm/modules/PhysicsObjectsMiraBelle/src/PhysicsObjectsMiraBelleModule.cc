@@ -239,7 +239,7 @@ void PhysicsObjectsMiraBelleModule::event()
   StoreObjPtr<ParticleList> UpsParticles(m_mumuPListName);
   if (UpsParticles.isValid()) {
     for (unsigned int i = 0; i < UpsParticles->getListSize(); i++) {
-      Particle* Ups = UpsParticles->getParticle(i);
+      const Particle* Ups = UpsParticles->getParticle(i);
       m_h_inv_p->Fill(Ups->getMass());
     }
   }
@@ -247,7 +247,7 @@ void PhysicsObjectsMiraBelleModule::event()
   // get muons
   StoreObjPtr<ParticleList> muParticles(m_muPListName);
   for (unsigned int i = 0; i < muParticles->getListSize(); i++) {
-    Particle* mu = muParticles->getParticle(i);
+    const Particle* mu = muParticles->getParticle(i);
     const Belle2::Track* track = mu->getTrack();
     if (!track) {
       continue;
@@ -258,13 +258,13 @@ void PhysicsObjectsMiraBelleModule::event()
     m_h_nsvd->Fill(Belle2::Variable::trackNSVDHits(mu));
     m_h_ncdc->Fill(Belle2::Variable::trackNCDCHits(mu));
     m_h_topdig->Fill(Belle2::Variable::TOPVariable::topDigitCount(mu));
-    ARICHLikelihood* lkh = track->getRelated<ARICHLikelihood>();
+    const ARICHLikelihood* lkh = track->getRelated<ARICHLikelihood>();
     if (lkh) {
       m_h_DetPhotonARICH->Fill(lkh->getDetPhot());
     }
 
     // KLM total hits
-    KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
+    const KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
     if (muid) {
       unsigned int bklm_hit = muid->getTotalBarrelHits();
       unsigned int eklm_hit = muid->getTotalEndcapHits();
@@ -274,13 +274,13 @@ void PhysicsObjectsMiraBelleModule::event()
     }
 
     // KLM Cluster layers
-    KLMCluster* klmc = track->getRelated<KLMCluster>();
+    const KLMCluster* klmc = track->getRelated<KLMCluster>();
     if (klmc) {
       m_h_klmClusterLayers->Fill(klmc->getLayers());
     }
 
     // muon ID
-    PIDLikelihood* pid_lkh = track->getRelated<PIDLikelihood>();
+    const PIDLikelihood* pid_lkh = track->getRelated<PIDLikelihood>();
     if (pid_lkh) {
       m_h_muid->Fill(pid_lkh->getProbability(Belle2::Const::muon));
     }
@@ -332,12 +332,3 @@ void PhysicsObjectsMiraBelleModule::event()
   }
   m_h_nECLClusters->Fill(neclClusters);
 }
-
-void PhysicsObjectsMiraBelleModule::endRun()
-{
-}
-
-void PhysicsObjectsMiraBelleModule::terminate()
-{
-}
-

@@ -31,6 +31,8 @@ REG_MODULE(DQMHistDeltaHisto);
 DQMHistDeltaHistoModule::DQMHistDeltaHistoModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("DQM Module to create delta histograms for all histograms with fixed time intervall");
+
   addParam("Interval", m_interval, "Interval time for diff histos [s]", 180);
   addParam("MonitoredHistos", m_monitoredHistos, "List of histograms to monitor", vector<string>());
   B2DEBUG(20, "DQMHistDeltaHisto: Constructor done.");
@@ -40,7 +42,7 @@ void DQMHistDeltaHistoModule::initialize()
 {
   gROOT->cd();
   B2DEBUG(20, "DQMHistDeltaHisto: initialized.");
-  for (auto& histoname : m_monitoredHistos) {
+  for (const auto& histoname : m_monitoredHistos) {
     queue<SSNODE*> hq;
     m_histosQueues[histoname] = hq;
   }
@@ -85,8 +87,8 @@ void DQMHistDeltaHistoModule::event()
     queue<SSNODE*>& hq = m_histosQueues[histoname];
     if (hq.empty()) {
       SSNODE* n = new SSNODE;
-      n->histo = (TH1*)hh->Clone();
-      n->diff_histo = (TH1*)hh->Clone();
+      n->histo = dynamic_cast<TH1*>(hh->Clone());
+      n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
       n->time_modified = cur_mtime;
       hq.push(n);
     } else {
@@ -97,8 +99,8 @@ void DQMHistDeltaHistoModule::event()
             break;
           }
           SSNODE* n = new SSNODE;
-          n->histo = (TH1*)hh->Clone();
-          n->diff_histo = (TH1*)hh->Clone();
+          n->histo = dynamic_cast<TH1*>(hh->Clone());
+          n->diff_histo = dynamic_cast<TH1*>(hh->Clone());
           n->diff_histo->Add(nn->histo, -1);
           n->time_modified = cur_mtime;
           hq.push(n);

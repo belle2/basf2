@@ -127,7 +127,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
 {
 
   TFile* treeFile = new TFile(m_treeFile.c_str(), "update");
-  auto* tree = (TTree*)treeFile->Get("tree");
+  auto* tree = dynamic_cast<TTree*>(treeFile->Get("tree"));
 
   if (tree == NULL) tree = new TTree("tree", "tree");
 
@@ -246,7 +246,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
 
 void DQMHistAnalysisOutputMonObjModule::fillBranch(TBranch* branch)
 {
-  TTree* tree = (TTree*)branch->GetTree();
+  TTree* tree = branch->GetTree();
   int nentr = tree->GetEntries();
   for (int i = 0; i < nentr; i++) {
     tree->GetEntry(i);

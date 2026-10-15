@@ -80,7 +80,7 @@ void V0ObjectsDQMModule::event()
 
   if (V0Particles.isValid()) {
     for (unsigned int i = 0; i < V0Particles->getListSize(); i++) {
-      Particle* V0 = V0Particles->getParticle(i);
+      const Particle* V0 = V0Particles->getParticle(i);
       //Get the vertex position, fill accordingly
       float vtxx = V0->getX();
       float vtxy = V0->getY();

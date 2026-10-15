@@ -89,7 +89,6 @@ void DQMHistAnalysisModule::addRefHist(const std::string& dirname, TH1* hist)
   hist->SetDirectory(0);
   n.setRefHist(hist); // transfer ownership!
   n.setRefCopy(nullptr);
-  n.setCanvas(nullptr);
 }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
@@ -115,19 +114,12 @@ bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::s
   return s_deltaList.find(fullname) != s_deltaList.end(); // contains() if we switch to C++20
 }
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, int n, bool onlyIfUpdated)
+TH1* DQMHistAnalysisModule::getDelta(const std::string& dirname, const std::string& histname, bool onlyIfUpdated, int n)
 {
-  std::string fullname;
-  if (dirname.size() > 0) {
-    fullname = dirname + "/" + histname;
-  } else {
-    fullname = histname;
-  }
-  return getDelta(fullname, n, onlyIfUpdated);
-}
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
 
-TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool onlyIfUpdated)
-{
   auto it = s_deltaList.find(fullname);
   if (it != s_deltaList.end()) {
     return it->second.getDelta(n, onlyIfUpdated);
@@ -157,26 +149,23 @@ TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findHist(const std::string& histname, bool was_updated)
+
+TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool was_updated)
 {
-  if (s_histList.find(histname) != s_histList.end()) {
-    if (was_updated && !s_histList[histname].isUpdated()) return nullptr;
-    if (s_histList[histname].getHist()) {
-      return s_histList[histname].getHist();
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
+
+  if (s_histList.find(fullname) != s_histList.end()) {
+    if (was_updated && !s_histList[fullname].isUpdated()) return nullptr;
+    if (s_histList[fullname].getHist()) {
+      return s_histList[fullname].getHist();
     } else {
-      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
+      B2ERROR("Histogram " << fullname << " in histogram list but nullptr.");
     }
   }
-  B2INFO("Histogram " << histname << " not in list.");
+  B2INFO("Histogram " << fullname << " not in list.");
   return nullptr;
-}
-
-TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::string& histname, bool updated)
-{
-  if (dirname.size() > 0) {
-    return findHist(dirname + "/" + histname, updated);
-  }
-  return findHist(histname, updated);
 }
 
 TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist, TH1* ref)
@@ -205,24 +194,20 @@ TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist,
   return ref;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling scaling, const TH1* hist)
-{
-  if (s_refList.find(histname) != s_refList.end()) {
-    // get a copy of the reference which we can modify
-    // (it is still owned and managed by the framework)
-    // then do the scaling
-    return scaleReference(scaling, hist, s_refList[histname].getReference());
-  }
-  return nullptr;
-}
-
 TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, ERefScaling scaling,
                                         const TH1* hist)
 {
-  if (dirname.size() > 0) {
-    return findRefHist(dirname + "/" + histname, scaling, hist);
+  std::string fullname = dirname + "/" + histname;
+  if (dirname.size() == 0) fullname = histname; // assume contains dirname
+  if (histname.size() == 0) fullname = dirname; // assume contains histname
+
+  if (s_refList.find(fullname) != s_refList.end()) {
+    // get a copy of the reference which we can modify
+    // (it is still owned and managed by the framework)
+    // then do the scaling
+    return scaleReference(scaling, hist, s_refList[fullname].getReference());
   }
-  return findRefHist(histname, scaling, hist);
+  return nullptr;
 }
 
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
@@ -431,7 +416,7 @@ void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, double value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], &value), "ca_set failure", keyname);
 #endif
 }
 
@@ -443,7 +428,7 @@ void DQMHistAnalysisModule::setEpicsPV(const std::string& keyname, int value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], &value), "ca_set failure", keyname);
 #endif
 }
 
@@ -473,7 +458,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, double value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], &value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -485,7 +470,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], &value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -516,7 +501,7 @@ double DQMHistAnalysisModule::getEpicsPV(const std::string& keyname)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value);
+  auto r = ca_get(DBR_DOUBLE, m_epicsNameToChID[keyname], &value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;
@@ -539,7 +524,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value can't be assumed to be stable
   // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
   // outstanding get requests are not automatically reissued following reconnect.
-  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], (void*)&value);
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], &value);
   if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
   if (r == ECA_NORMAL) {
     return value;

@@ -60,15 +60,15 @@ namespace Belle2 {
     void terminate() override final;
 
   protected:
-    bool m_debug;/**<debug*/
+    bool m_debug = false;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
 
     /** Run type flag for physics runs. */
-    bool m_IsPhysicsRun;
+    bool m_IsPhysicsRun = false;
     /** Run type flag for cosmic runs. */
-    bool m_IsCosmicRun;
+    bool m_IsCosmicRun = false;
     /** Run type flag for debug runs. */
-    bool m_IsDebugRun;
+    bool m_IsDebugRun = false;
 
     /*************************************************************************************
      * More details meaning of the used histograms could be found in                     *

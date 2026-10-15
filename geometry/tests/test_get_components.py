@@ -39,8 +39,8 @@ if __name__ == '__main__':
     check_components(standard)  # must not raise
     assert get_components(1999) == standard, "exp 1999 should still resolve to standard Belle II components"
 
-    # --- VTX upgrade scenarios (currently registered: exp 2003-2006) ---
-    for exp in (2003, 2004, 2005, 2006):
+    # --- VTX upgrade scenarios (currently registered: exp 2003-2005) ---
+    for exp in (2003, 2004, 2005):
         components = get_components(exp)
         assert 'VTX' in components, f"exp {exp} should use VTX"
         assert 'PXD' not in components and 'SVD' not in components, f"exp {exp} should not use PXD/SVD"
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     #     wrong detector configuration. This also covers the gap between the
     #     standard range (< 2000) and the upgrade ranges (2003-2006): exp 2000-2002
     #     and >= 2007 are not currently registered. ---
-    for exp in (-1, 2000, 2001, 2002, 2007, 2023):
+    for exp in (-1, 2000, 2001, 2002, 2006, 2007, 2023):
         expect_failure(f'from geometry import get_components; get_components({exp})')
 
     # --- check_components() must reject VTX combined with PXD/SVD ---

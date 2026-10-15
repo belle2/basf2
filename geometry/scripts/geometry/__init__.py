@@ -31,7 +31,6 @@ _COMPONENT_SETS_BY_EXPERIMENT = [
     (2003, 2004, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
     (2004, 2005, ['VTX', 'STL', 'FTL', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
     (2005, 2006, ['VTX', 'rCDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
-    (2006, 2007, ['VTX', 'CDC', 'ECL', 'TOP', 'ARICH', 'KLM', 'TRG']),  # upgrade scenario
 ]
 
 

@@ -363,15 +363,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
+      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
-      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useBFieldCache=False
+      useVXDAlignment=True
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf
@@ -1322,7 +1322,6 @@
       useNewV0Fitter=False
       v0FitterMode=1
       vertexChi2CutOutside=10000.0
-      vertexFitter=Rave
   144. TrackFinderMCTruthRecoTracks
       AllowFirstCDCSuperLayerOnly=False
       EnergyCut=0.0
@@ -3324,15 +3323,15 @@
       useSVDSpacePointSNRFractionFor3Samples=False
       useSVDSpacePointSNRFractionFor6Samples=False
   53. SetupGenfitExtrapolation
+      MSCModel=Highland
       energyLossBetheBloch=True
       energyLossBrems=False
       ignoreIfPresent=True
-      multipleScatteringModel=Highland
       noEffects=False
       noiseBetheBloch=True
       noiseBrems=False
       noiseCoulomb=True
-      useBFieldCache=False
+      useVXDAlignment=True
       whichGeometry=Geant4
   54. TFCDC_WireHitPreparer
       UseNLoops=inf
@@ -4300,7 +4299,6 @@
             useNewV0Fitter=False
             v0FitterMode=1
             vertexChi2CutOutside=10000.0
-            vertexFitter=Rave
         3. TrackFinderMCTruthRecoTracks
             AllowFirstCDCSuperLayerOnly=False
             EnergyCut=0.0

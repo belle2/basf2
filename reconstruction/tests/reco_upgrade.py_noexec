@@ -6,11 +6,16 @@ import os
 
 import basf2
 from reconstruction import add_reconstruction
+from geometry import get_components
+
+# Matches the experiment number set in the companion evtgen_upgrade.py_noexec
+# steering file, which produced the RootInput file read below.
+exp_number = 2003
 
 main = basf2.create_path()
 main.add_module('RootInput', inputFileName='evtgen_upgrade_bbar.root')
 main.add_module('Gearbox')
-add_reconstruction(main, useVTX=True)
+add_reconstruction(main, components=get_components(exp_number), useVTX=True)
 main.add_module('RootOutput', outputFileName='rec_upgrade_bbar.root')
 main.add_module('Progress')
 

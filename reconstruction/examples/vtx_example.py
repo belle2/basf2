@@ -22,12 +22,14 @@ import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
+from geometry import get_components
 
 # create path
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[exp_number])
 
 # print event numbers
 main.add_module('EventInfoPrinter')
@@ -36,10 +38,10 @@ main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
 # detector and L1 trigger simulation
-add_simulation(main, useVTX=True)
+add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 # reconstruction
-add_reconstruction(main, useVTX=True)
+add_reconstruction(main, components=get_components(exp_number), useVTX=True)
 
 # full output
 main.add_module('RootOutput', outputFileName='vtx_output.root')

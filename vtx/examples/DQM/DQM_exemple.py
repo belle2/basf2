@@ -16,6 +16,7 @@
 import basf2 as b2
 from simulation import add_simulation
 from reconstruction import add_reconstruction
+from geometry import get_components
 
 # use globaltag or xmlfiles
 use_globaltag = True
@@ -33,7 +34,8 @@ output_filename = "VTXRootOutput.root"
 # create path
 main = b2.create_path()
 
-main.add_module("EventInfoSetter", evtNumList=num_events, expList=[2003])
+exp_number = 2003
+main.add_module("EventInfoSetter", evtNumList=num_events, expList=[exp_number])
 
 
 # histomanager
@@ -53,10 +55,10 @@ else:
                     useDB=False)
 
 # detector simulation
-add_simulation(main, bkgfiles=bg, useVTX=True)
+add_simulation(main, components=get_components(exp_number), bkgfiles=bg, useVTX=True)
 
 # reconstruction
-add_reconstruction(main, pruneTracks=False, useVTX=True)
+add_reconstruction(main, components=get_components(exp_number), pruneTracks=False, useVTX=True)
 
 
 main.add_module('VTXDQMClusters', histogramDirectoryName='VTXCls')

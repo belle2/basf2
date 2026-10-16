@@ -28,13 +28,15 @@ import basf2 as b2
 
 
 from vtx import get_upgrade_background_files
+from geometry import get_components
 
 
 # create path
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[exp_number])
 
 # print event numbers
 main.add_module('EventInfoPrinter')
@@ -43,15 +45,13 @@ main.add_module('EventInfoPrinter')
 main.add_module('EvtGenInput')
 
 # detector simulation
-add_simulation(main, bkgfiles=get_upgrade_background_files(), useVTX=True)
-# or add_simulation(main, components) to simulate a selection of detectors
+add_simulation(main, components=get_components(exp_number), bkgfiles=get_upgrade_background_files(), useVTX=True)
 
 # trigger simulation
 add_tsim(main)
 
 # reconstruction
-add_reconstruction(main, pruneTracks=False, useVTX=True)
-# or add_reconstruction(main, components, useVTX=True) to run the reconstruction of a selection of detectors
+add_reconstruction(main, components=get_components(exp_number), pruneTracks=False, useVTX=True)
 
 # full output
 main.add_module('RootOutput', outputFileName='output.root')

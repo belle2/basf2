@@ -32,13 +32,15 @@ from simulation import add_simulation
 from L1trigger import add_tsim
 from reconstruction import add_reconstruction
 from mdst import add_mdst_output
+from geometry import get_components
 
 
 # create path
 main = b2.create_path()
 
 # specify number of events to be generated
-main.add_module('EventInfoSetter', evtNumList=[10], expList=[2003])
+exp_number = 2003
+main.add_module('EventInfoSetter', evtNumList=[10], expList=[exp_number])
 
 # print event numbers
 main.add_module('EventInfoPrinter')
@@ -49,14 +51,14 @@ main.add_module('EventInfoPrinter')
 main.add_module("EvtGenInput", userDECFile=b2.find_file('decfiles/dec/1111540100.dec'))
 
 # detector simulation
-add_simulation(main, useVTX=True)
+add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 
 # trigger simulation
 add_tsim(main)
 
 # reconstruction
-add_reconstruction(main, useVTX=True)
+add_reconstruction(main, components=get_components(exp_number), useVTX=True)
 
 # mdst output
 add_mdst_output(main, filename='vtx_mdst_1111540100.root')

@@ -28,6 +28,7 @@ from basf2 import (
 from simulation import add_simulation
 from beamparameters import add_beamparameters
 from validation import statistics_plots, event_timing_plot
+from geometry import get_components
 
 set_random_seed(12345)
 
@@ -35,10 +36,11 @@ set_random_seed(12345)
 main = create_path()
 
 # specify number of events to be generated
+exp_number = 2003
 eventinfosetter = register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 eventinfosetter.param('runList', [1])
-eventinfosetter.param('expList', [2003])
+eventinfosetter.param('expList', [exp_number])
 main.add_module(eventinfosetter)
 
 # beam parameters
@@ -50,7 +52,7 @@ evtgeninput = register_module('EvtGenInput')
 main.add_module(evtgeninput)
 
 # detector simulation, no background files
-add_simulation(main, useVTX=True)
+add_simulation(main, components=get_components(exp_number), useVTX=True)
 
 # memory profile
 main.add_module(register_module('Profile'))

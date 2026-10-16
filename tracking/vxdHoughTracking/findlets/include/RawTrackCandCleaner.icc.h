@@ -122,7 +122,7 @@ namespace Belle2::vxdHoughTracking {
         m_unfilteredResults.emplace_back(spacePointsInResult);
       }
 
-      for (auto aTC : m_unfilteredResults) {
+      for (auto& aTC : m_unfilteredResults) {
         aTC.setFamily(family);
       }
 

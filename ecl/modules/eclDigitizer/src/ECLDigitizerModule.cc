@@ -663,8 +663,7 @@ void ECLDigitizerModule::terminate()
 
 void ECLDigitizerModule::callbackHadronSignalShapes()
 {
-  const EclConfiguration& ec = EclConfiguration::get();
-  const int nWaveformParameters = ec.c_nWaveformParameters;
+  constexpr int nWaveformParameters = EclConfiguration::c_nWaveformParameters;
 
   if (m_waveformParametersMC.hasChanged()) {
 
@@ -905,10 +904,10 @@ void ECLDigitizerModule::getFitParams(const ECLWaveformData& eclWFData,
 {
   const Config& ec = Config::get();
 
-  constexpr int nFitSamples = ec.c_nFitSamples;
-  constexpr int nFitPointsPerAdcTick = ec.c_nFitPointsPerAdcTick;
-  constexpr int nFitTimeShifts = ec.c_nFitTimeShifts;
-  constexpr int nLowAmpFitPoints = ec.c_nLowAmpFitPoints;
+  constexpr int nFitSamples = Config::c_nFitSamples;
+  constexpr int nFitPointsPerAdcTick = Config::c_nFitPointsPerAdcTick;
+  constexpr int nFitTimeShifts = Config::c_nFitTimeShifts;
+  constexpr int nLowAmpFitPoints = Config::c_nLowAmpFitPoints;
   constexpr int nFitGridPoints = nFitTimeShifts * nFitPointsPerAdcTick;
   constexpr bool isUpgrade = std::is_same_v<Config, ECL::EclConfigurationUp>;
 

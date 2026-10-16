@@ -36,6 +36,11 @@ namespace Belle2 {
     DQMHistAnalysisSVDEfficiencyModule();
 
     /**
+     * Destructor.
+     */
+    ~DQMHistAnalysisSVDEfficiencyModule() override;
+
+    /**
      * Initializer.
      */
     void initialize() override final;
@@ -94,7 +99,7 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrRPhiViewU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
     TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
 
-    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
+    static Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
     svdStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     svdStatus m_effVstatus;/**< number representing the status of the efficiency V side */

@@ -16,7 +16,7 @@ HistObject::~HistObject()
 bool HistObject::update(TH1* hist)
 {
   if (hist) {
-    // usual check for nullptr
+    // if it is not nullptr, check if there was an update
     m_updated |= hist->GetEntries() != m_entries;
     m_entries = hist->GetEntries();
   }

@@ -67,7 +67,7 @@ namespace Belle2 {
      * Returns ring number of HAPD with given moduleID
      * @param modID HAPD module ID
      */
-    int getRing(int modID);
+    static int getRing(int modID);
 
 
   protected:
@@ -75,8 +75,8 @@ namespace Belle2 {
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
     double m_hotLimit; /**<Occupancy limit for hot channels*/
     double m_badApdOccLimit; /**<Occupancy threshold for bad APDs, in units of average APD occupancy*/
-    double m_sigBitFracLowWarn; /**<Warning limit for overall signal/background fraction*/
-    double m_sigBitFracLowAlarm; /**<Alarm limit for overall signal/background fraction*/
+    double m_sigBitFracLowWarn = 2.0; /**<Warning limit for overall signal/background fraction*/
+    double m_sigBitFracLowAlarm = 1.5; /**<Alarm limit for overall signal/background fraction*/
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
     int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/

@@ -85,7 +85,7 @@ void DQMHistAnalysisHLTModule::initialize()
                                 ));
   }
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
+  for (const auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios}) {
     auto* histogram = canvasAndHisto.second;
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
@@ -95,7 +95,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->Draw("hist");
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hl1Ratios) {
+  for (const auto& nameAndcanvasAndHisto : m_hl1Ratios) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
     histogram->SetOption("bar");
@@ -104,7 +104,7 @@ void DQMHistAnalysisHLTModule::initialize()
     histogram->Draw("hist");
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
+  for (const auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* histogram = nameAndcanvasAndHisto.second.second;
     histogram->SetDirectory(0);
     histogram->SetOption("histe");
@@ -157,22 +157,22 @@ void DQMHistAnalysisHLTModule::initialize()
 
 void DQMHistAnalysisHLTModule::beginRun()
 {
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
+  for (const auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
 
-  for (auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
+  for (const auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
     auto* canvas = canvasAndHisto.first;
     canvas->Clear();
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hl1Ratios) {
+  for (const auto& nameAndcanvasAndHisto : m_hl1Ratios) {
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
 
-  for (auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
+  for (const auto& nameAndcanvasAndHisto : m_hRetentionPerUnit) {
     auto* canvas = nameAndcanvasAndHisto.second.first;
     canvas->Clear();
   }
@@ -381,32 +381,32 @@ void DQMHistAnalysisHLTModule::event()
   }
 
   if (m_hMeanTime.second) delete m_hMeanTime.second;
-  m_hMeanTime.second = (TH1F*) meanTimeHistogram->Clone("MeanTime");
+  m_hMeanTime.second = dynamic_cast<TH1*>(meanTimeHistogram->Clone("MeanTime"));
   m_hMeanTime.second->Scale(1 / numberOfProcesses);
 
   if (m_hMeanMemory.second) delete m_hMeanMemory.second;
-  m_hMeanMemory.second = (TH1F*) meanMemoryHistogram->Clone("MeanMemoryChange");
+  m_hMeanMemory.second = dynamic_cast<TH1*>(meanMemoryHistogram->Clone("MeanMemoryChange"));
   m_hMeanMemory.second->Scale(1 / numberOfProcesses);
 
   if (m_hErrorFlagFraction.second) delete m_hErrorFlagFraction.second;
-  m_hErrorFlagFraction.second = (TH1D*) errorFlagHistogram->Clone("ErrorFlagFraction");
+  m_hErrorFlagFraction.second = dynamic_cast<TH1*>(errorFlagHistogram->Clone("ErrorFlagFraction"));
   m_hErrorFlagFraction.second->Scale(1 / numberOfAllEvents);
   m_hErrorFlagFraction.second->SetTitle("Fraction of events with error flags");
 
   if (m_hFilteredFractionPerUnit.second) delete m_hFilteredFractionPerUnit.second;
-  m_hFilteredFractionPerUnit.second = (TH1D*) hltUnitNumberHistogram_filtered->Clone("FilteredFractionPerUnit");
+  m_hFilteredFractionPerUnit.second = dynamic_cast<TH1*>(hltUnitNumberHistogram_filtered->Clone("FilteredFractionPerUnit"));
   m_hFilteredFractionPerUnit.second->Divide(hltUnitNumberHistogram_filtered, hltUnitNumberHistogram);
   m_hFilteredFractionPerUnit.second->SetTitle("Fraction of events filtered per unit");
 
   if (m_hMeanBudgetTimePerUnit.second) delete m_hMeanBudgetTimePerUnit.second;
-  m_hMeanBudgetTimePerUnit.second = (TH1F*) fullTimeMeanPerUnitHistogram->Clone("MeanBudgetTimePerUnit");
+  m_hMeanBudgetTimePerUnit.second = dynamic_cast<TH1*>(fullTimeMeanPerUnitHistogram->Clone("MeanBudgetTimePerUnit"));
   m_hMeanBudgetTimePerUnit.second->Divide(fullTimeMeanPerUnitHistogram, processesPerUnitHistogram);
 
   if (m_hMeanProcessingTimePerUnit.second) delete m_hMeanProcessingTimePerUnit.second;
-  m_hMeanProcessingTimePerUnit.second = (TH1F*) processingTimeMeanPerUnitHistogram->Clone("MeanProcessingTimePerUnit");
+  m_hMeanProcessingTimePerUnit.second = dynamic_cast<TH1*>(processingTimeMeanPerUnitHistogram->Clone("MeanProcessingTimePerUnit"));
   m_hMeanProcessingTimePerUnit.second->Divide(processingTimeMeanPerUnitHistogram, processesPerUnitHistogram);
 
-  for (auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
+  for (const auto& canvasAndHisto : {m_hEfficiencyTotal, m_hEfficiency, m_hCrossSection, m_hRatios, m_hMeanTime, m_hMeanBudgetTimePerUnit, m_hMeanProcessingTimePerUnit, m_hMeanMemory}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 
@@ -417,7 +417,7 @@ void DQMHistAnalysisHLTModule::event()
     canvas->Update();
   }
 
-  for (auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
+  for (const auto& canvasAndHisto : {m_hErrorFlagFraction, m_hFilteredFractionPerUnit}) {
     auto* canvas = canvasAndHisto.first;
     auto* histogram = canvasAndHisto.second;
 
@@ -429,7 +429,7 @@ void DQMHistAnalysisHLTModule::event()
     canvas->Update();
   }
 
-  for (auto& nameAndCanvasAndHisto : m_hl1Ratios) {
+  for (const auto& nameAndCanvasAndHisto : m_hl1Ratios) {
     auto* canvas = nameAndCanvasAndHisto.second.first;
     auto* histogram = nameAndCanvasAndHisto.second.second;
 
@@ -440,7 +440,7 @@ void DQMHistAnalysisHLTModule::event()
     canvas->Update();
   }
 
-  for (auto& nameAndCanvasAndHisto : m_hRetentionPerUnit) {
+  for (const auto& nameAndCanvasAndHisto : m_hRetentionPerUnit) {
     auto* canvas = nameAndCanvasAndHisto.second.first;
     auto* histogram = nameAndCanvasAndHisto.second.second;
 

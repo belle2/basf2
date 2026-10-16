@@ -127,7 +127,7 @@ void DQMHistAnalysisKLMModule::initialize()
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
     KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
@@ -238,7 +238,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
 
@@ -464,7 +464,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       deltaDrawer(delta, histogram, canvas);
     }
     //reference check
-    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+    TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
     if (ref) {ref->Draw("hist,same");}
   }
 }
@@ -522,7 +522,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
   histogram->Draw();
 
   // Overlay reference histogram if available
-  TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
+  TH1* ref = findRefHist(histogram->GetName(), "", ERefScaling::c_RefScaleEntries, histogram);
   if (ref) {
     ref->Draw("hist,same");
   }
@@ -666,7 +666,7 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
     feHist->Draw();
 
     // Reference check
-    TH1* ref = findRefHist(feHist->GetName(), ERefScaling::c_RefScaleNone);
+    TH1* ref = findRefHist(feHist->GetName(), "", ERefScaling::c_RefScaleNone);
     if (ref) {
       ref->Draw("hist,same");
       B2INFO("processFEHistogram: Found and drew reference histogram.");
@@ -680,8 +680,8 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
 
     /* Delta component */
     // Use the latest available deltas, not only "updated in the same event".
-    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", 0, false);
-    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", 0, false);
+    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", false);
+    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", false);
 
     UpdateCanvas(canvas->GetName(), (feHist != nullptr));
     if (deltaNumer != nullptr && deltaDenom != nullptr) {
@@ -731,7 +731,7 @@ void DQMHistAnalysisKLMModule::event()
   latex.SetTextAlign(11);
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   // gathering relevant info for analyseChannelHitHistogram
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -771,7 +771,7 @@ void DQMHistAnalysisKLMModule::event()
   /* Temporary change the color palette. */
   gStyle->SetPalette(kLightTemperature);
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
-  for (KLMChannelIndex& klmSection : klmIndex) {
+  for (const KLMChannelIndex& klmSection : klmIndex) {
     KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
       KLMSubdetectorNumber section = klmSection.getSection();

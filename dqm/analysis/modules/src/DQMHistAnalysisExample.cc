@@ -42,9 +42,8 @@ void DQMHistAnalysisExampleModule::initialize()
 {
   B2DEBUG(20, "DQMHistAnalysisExample: initialized.");
   TString a = m_histogramName;
-  a.ReplaceAll("/", "_");
-  m_canvas = new TCanvas("c_" + a);
-  m_function = new TF1("f_" + a, TString("gaus"), -100, 100);
+  m_canvas = new TCanvas(m_histogramDirectoryName + "_c_" + a);
+  m_function = new TF1(m_histogramDirectoryName + "_f_" + a, TString("gaus"), -100, 100);
 }
 
 void DQMHistAnalysisExampleModule::beginRun()
@@ -55,8 +54,7 @@ void DQMHistAnalysisExampleModule::beginRun()
 
 void DQMHistAnalysisExampleModule::event()
 {
-  auto h = findHist(m_histogramName);
-  if (h != NULL) {
+  if (auto h = findHist(m_histogramDirectoryName, m_histogramName); h != nullptr) {
     m_canvas->Clear();
     m_canvas->cd();
     h->Fit(m_function, "R");
@@ -65,7 +63,7 @@ void DQMHistAnalysisExampleModule::event()
     B2DEBUG(20, "mean " << m_function->GetParameter(1));
     B2DEBUG(20, "sigma" << m_function->GetParameter(2));
   } else {
-    B2DEBUG(20, "Histo " << m_histogramName << " not found");
+    B2DEBUG(20, "Histo " << m_histogramDirectoryName << "/" << m_histogramName << " not found");
   }
 }
 
@@ -79,6 +77,6 @@ void DQMHistAnalysisExampleModule::endRun()
 void DQMHistAnalysisExampleModule::terminate()
 {
   // if this function is not needed, please remove
-  B2DEBUG(20, "terminate called");
+  B2DEBUG(20, "DQMHistAnalysisExample : terminate called");
 }
 

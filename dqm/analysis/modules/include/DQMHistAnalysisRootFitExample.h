@@ -22,7 +22,7 @@
 #include <RooAbsPdf.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM histogram analysis example featuring RooFit */
 
   class DQMHistAnalysisRooFitExampleModule final : public DQMHistAnalysisModule {
 
@@ -48,16 +48,6 @@ namespace Belle2 {
      * This method is called for each event.
      */
     void event(void) override final;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun(void) override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate(void) override final;
 
   private:
 

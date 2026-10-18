@@ -1,0 +1,53 @@
+# EventType: 1120043100
+# Descriptor: [B0 -> Xsd [ -> K_S0 [ -> pi+ pi-] eta [ -> pi+ pi- pi0 [ -> gamma gamma] ] ] gamma]cc
+# NickName: Bd_Xsdgamma_KS0eta_pi+pi-pi+pi-pi0
+# Documentation: photon polarization with TDCPV analysis, eta -> pi+ pi- pi0
+# Tested: No
+# Physics WG: TDCPV
+# Responsible: Rishabh Mehta
+# Email: rishabh.mehta@tifr.res.in
+# Cuts: None
+# Date: 20261016
+#
+
+Alias MyK_S0 K_S0
+
+Alias Myeta eta
+
+Alias Mypi0 pi0
+
+Alias MyXsd Xsd
+Alias Myanti_Xsd anti-Xsd
+ChargeConj MyXsd Myanti_Xsd
+
+Alias MyB0 B0
+Alias Myanti-B0 anti-B0
+ChargeConj MyB0 Myanti-B0
+
+Decay Upsilon(4S)
+1.000    MyB0 Myanti-B0 B0  anti-B0  VSS_BMIX dm;
+Enddecay
+
+Decay MyB0
+1.000    MyXsd  gamma  BTOXSGAMMA 2;
+Enddecay
+CDecay Myanti-B0
+
+Decay MyXsd
+1.00    Myeta MyK_S0  VSS;
+Enddecay
+CDecay Myanti_Xsd
+
+Decay MyK_S0
+1.000    pi- pi+ PHSP;
+Enddecay
+
+Decay Myeta
+1.000 pi- pi+ Mypi0 ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173;
+Enddecay
+
+Decay Mypi0
+1.000 gamma gamma PHSP;
+Enddecay
+
+End

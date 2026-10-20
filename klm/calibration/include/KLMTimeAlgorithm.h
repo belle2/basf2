@@ -542,7 +542,7 @@ namespace Belle2 {
     bool m_useEventT0 = true;
 
     /** Whether to apply ADC/charge restriction cuts for scintillators. */
-    bool m_applyChargeRestriction = false;
+    bool m_applyChargeRestriction = true;
 
     /** Calibration statistics for each channel. */
     TH1I* h_calibrated = nullptr;
@@ -844,6 +844,22 @@ namespace Belle2 {
 
     /** Corrected EventT0 for EKLM scintillator hits. */
     TH1F* hc_eventT0_scint_end = nullptr;
+
+    /**
+     * Normalised di-muon time difference z = dT0 / sqrt(1/N+ + 1/N-).
+     * By construction z is distributed as N(0, sigma_hit), so a Gaussian fit to
+     * its core measures sigma_hit directly and is insensitive to the non-Gaussian
+     * tails that bias the plain second moment <dT0^2/v>.
+     */
+    TH1F* h_z_bklm_scint = nullptr;
+    /** Normalised di-muon time difference, BKLM RPC phi readout. */
+    TH1F* h_z_bklm_rpc_phi = nullptr;
+    /** Normalised di-muon time difference, BKLM RPC z readout. */
+    TH1F* h_z_bklm_rpc_z = nullptr;
+    /** Normalised di-muon time difference, BKLM RPC, phi and z readouts together. */
+    TH1F* h_z_bklm_rpc = nullptr;
+    /** Normalised di-muon time difference, EKLM scintillator. */
+    TH1F* h_z_eklm_scint = nullptr;
 
     /** Number of RPC hits per mu+ track. */
     TH1F* h_nHits_plus_rpc = nullptr;

@@ -15,6 +15,8 @@
 #include <tracking/trackingUtilities/utilities/Range.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
+#include <unordered_set>
+
 namespace Belle2 {
   namespace vxdHoughTracking {
 
@@ -66,10 +68,10 @@ namespace Belle2 {
     }
 
     template <class AHit, class APathFilter, class AResult>
-    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(std::vector<TrackingUtilities::WithWeight<const AHit*>>&
-        path,
-        const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
-        std::vector<AResult>& results)
+    void SVDHoughTrackingTreeSearcher<AHit, APathFilter, AResult>::traverseTree(
+      std::vector<TrackingUtilities::WithWeight<const AHit*>>& path,
+      const std::vector<TrackingUtilities::WeightedRelation<AHit>>& relations,
+      std::vector<AResult>& results)
     {
       // Implement only graph traversal logic and leave the extrapolation and selection to the
       // rejecter.
@@ -83,7 +85,7 @@ namespace Belle2 {
         TrackingUtilities::Weight weight = continuation.getWeight();
         // the state may still include information from an other round of processing, so lets set it back
 
-        if (std::count(path.begin(), path.end(), childHit)) {
+        if (std::find(path.begin(), path.end(), childHit) != path.end()) {
           // Cycle detected -- is this the best handling?
           // Other options: Raise an exception and bail out of this seed
           B2FATAL("Cycle detected!");

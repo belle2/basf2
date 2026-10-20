@@ -15,8 +15,6 @@
 #include <tracking/trackingUtilities/utilities/Range.h>
 #include <tracking/trackingUtilities/utilities/StringManipulation.h>
 
-#include <unordered_set>
-
 namespace Belle2 {
   namespace vxdHoughTracking {
 

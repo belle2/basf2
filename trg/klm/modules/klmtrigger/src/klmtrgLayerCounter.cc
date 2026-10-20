@@ -42,9 +42,44 @@ namespace Belle2 {
     m_layersUsed.emplace_back(layersUsed);
   }
 
+  void klmtrgLayerCounter::set_NLayerTrigger(int NLayerTrigger)
+  {
+    m_NLayerTrigger = NLayerTrigger;
+  }
+
   void klmtrgLayerCounter::set_NPlaneTrigger(int NPlaneTrigger)
   {
     m_NPlaneTrigger = NPlaneTrigger;
+  }
+
+  void klmtrgLayerCounter::set_countPlanes(int countPlanes)
+  {
+    m_countPlanes = countPlanes;
+  }
+
+  KLM_Digit_compact_ts klmtrgLayerCounter::set_joiningAlgorithm(const KLM_Digit_compact_ts& hits, const int count_planes)
+  {
+    if (count_planes == 1) {
+      auto hits1 = nt::algorithms::join_vectors(
+                     hits,
+                     m_layersUsed,
+                     nt::comparators::on_common_args,
+      [&](auto e1, const auto&) {
+        e1.layer = e1.layer * 2 + e1.plane;
+        return e1;
+      });
+      return hits1;
+    } else {
+      auto hits1 = nt::algorithms::join_vectors(
+                     hits,
+                     m_layersUsed,
+                     nt::comparators::on_common_args,
+      [&](auto e1, const auto&) {
+        e1.layer = e1.layer;
+        return e1;
+      });
+      return hits1;
+    }
   }
 
   void klmtrgLayerCounter::run(const KLM_Digit_compact_ts& hits)
@@ -54,15 +89,7 @@ namespace Belle2 {
     m_sections_trig.clear();
     m_summary1.clear();
 
-    auto hits1 = nt::algorithms::join_vectors(
-                   hits,
-                   m_layersUsed,
-                   nt::comparators::on_common_args,
-    [&](auto e1, const auto&) {
-      e1.layer = e1.layer * 2 + e1.plane;
-      return e1;
-    }
-                 );
+    auto hits1 = set_joiningAlgorithm(hits, m_countPlanes);
 
     __CSV__WRITE__(hits1);
 
@@ -83,8 +110,8 @@ namespace Belle2 {
 
 
     __CSV__WRITE__(grouped);
-
-    nt::algorithms::filter(grouped, [&](const auto & e) { return e.plane_count >= m_NPlaneTrigger;  });
+    int threshold = (m_countPlanes == 1) ? m_NPlaneTrigger : m_NLayerTrigger;
+    nt::algorithms::filter(grouped, [&](const auto & e) { return e.plane_count >= threshold;  });
 
 
 
@@ -160,5 +187,6 @@ namespace Belle2 {
     }
     return 0;
   }
+
 
 }

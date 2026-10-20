@@ -39,11 +39,13 @@ namespace Belle2 {
      * Constructor
      * @param[in] nPlanes      Number of planes used in the trigger logic.
      * @param[in] nLayers      Number of layers used in the trigger logic.
+     * @param[in] countPlanes  Parameter to define when the algorithm changed from counting Layers to Planes
      * @param[in] whichLayers  Pattern of layers used in the trigger logic.
      */
-    KLMTriggerParameters(int32_t nPlanes, int32_t nLayers, const std::string& whichLayers) :
+    KLMTriggerParameters(int32_t nPlanes, int32_t nLayers, int32_t countPlanes, const std::string& whichLayers) :
       m_nPlanes{nPlanes},
       m_nLayers{nLayers},
+      m_countPlanes{countPlanes},
       m_whichLayers{whichLayers}
     {
     }
@@ -99,6 +101,17 @@ namespace Belle2 {
       m_nLayers = nLayers;
     }
 
+
+    /**
+     * Set the parameter to control counting Layers=0 or Planes=1
+     * @param[in] nLayers Max number of CDC hits for an event.
+     */
+    void setCountPlanes(int32_t countPlanes)
+    {
+      m_countPlanes = countPlanes;
+    }
+
+
     /**
      * Set the pattern of layers used in the trigger logic.
      * @param[in] whichLayers Pattern of layers used in the trigger logic.
@@ -127,6 +140,14 @@ namespace Belle2 {
     int32_t getNLayers() const
     {
       return m_nLayers;
+    }
+
+    /**
+     * Get the number of layers used in the trigger logic.
+     */
+    int32_t getcountPlanes() const
+    {
+      return m_countPlanes;
     }
 
     /**
@@ -208,6 +229,7 @@ namespace Belle2 {
      */
     int32_t m_nPlanes{8};
     int32_t m_nLayers{0};
+    int32_t m_countPlanes{1};
 
     std::vector<int32_t> m_Subdetector;
     std::vector<int32_t> m_section;

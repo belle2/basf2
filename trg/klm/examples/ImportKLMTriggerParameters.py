@@ -46,6 +46,15 @@ else:
     iov = IntervalOfValidity(17, 170, -1, -1)
     database.storeData('KLMTriggerParameters', parameters, iov)
 
+
 parameters.setNPlanes(8)
 iov = IntervalOfValidity(0, 0, -1, -1)
+database.storeData('KLMTriggerParameters', parameters, iov)
+
+parameters.setCountPlanes(0)
+iov = IntervalOfValidity(0, 0, 17, 169)
+database.storeData('KLMTriggerParameters', parameters, iov)
+
+parameters.setCountPlanes(1)
+iov = IntervalOfValidity(17, 170, -1, -1)
 database.storeData('KLMTriggerParameters', parameters, iov)

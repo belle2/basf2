@@ -1,0 +1,36 @@
+##############################################################
+# EventType: 2430842000
+# Descriptor: [gamma gamma -> omega [ ->  pi+ pi- pi0 ] Jpsi [ -> e+ e- / mu+ mu- ]] are generated via two photon process
+# NickName: diphoton_omegajpsi
+# Test : Yes
+# Documentation: MC16rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Shiqing Xie
+# Email: sqxie22@m.fudan.edu.cn
+# Cuts: None
+# Date: 2026/10/19
+#
+# Decay table to generate
+# gamma gamma ->   omega -> pi+ pi- pi0
+#                  J/psi 
+#                  |
+#                  -> e+ e-
+#                  -> mu+ mu- 
+#                     
+###############################################################
+
+Decay J/psi
+0.5  e+  e-                                       VLL;
+0.5  mu+  mu-                                     VLL;
+Enddecay
+
+Decay omega
+1.0   pi+ pi- pi0 PHOTOS OMEGA_DALITZ;
+Enddecay
+
+Decay pi0
+1.0   gamma  gamma                                 PHSP;
+Enddecay
+
+End
+

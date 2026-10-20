@@ -191,7 +191,7 @@ bool KLMEventT0EstimatorModule::passesADCCut(double charge, int subdetector, int
   return true;
 }
 
-double KLMEventT0EstimatorModule::getHitSigma(int subdetector, int layer, bool inRPC, int plane) const
+double KLMEventT0EstimatorModule::getHitSigma(int subdetector, int layer, bool inRPC) const
 {
   if (!m_eventT0HitResolution.isValid()) {
     B2ERROR("KLMEventT0Estimator: Calibrated hit resolution payload not available!");
@@ -200,15 +200,8 @@ double KLMEventT0EstimatorModule::getHitSigma(int subdetector, int layer, bool i
 
   if (subdetector == KLMElementNumbers::c_BKLM) {
     if (inRPC || layer >= BKLMElementNumbers::c_FirstRPCLayer) {
-      // Use direction-specific RPC resolution if available (version 2+)
-      // Fall back to combined RPC resolution for backward compatibility
-      if (plane == BKLMElementNumbers::c_ZPlane) {
-        float sigmaZ = m_eventT0HitResolution->getSigmaRPCZ();
-        return (sigmaZ > 0.0) ? sigmaZ : m_eventT0HitResolution->getSigmaRPC();
-      } else {
-        float sigmaPhi = m_eventT0HitResolution->getSigmaRPCPhi();
-        return (sigmaPhi > 0.0) ? sigmaPhi : m_eventT0HitResolution->getSigmaRPC();
-      }
+      // Both readout directions use the RPC resolution measured with the phi and z hits together.
+      return m_eventT0HitResolution->getSigmaRPC();
     } else {
       return m_eventT0HitResolution->getSigmaBKLMScint();
     }
@@ -308,20 +301,24 @@ void KLMEventT0EstimatorModule::collectExtrapolatedHits(const Track* track,
 /* Per-subdetector accumulators. */
 
 namespace {
-  // Weighted accumulation using per-hit sigma
-  inline void acc_stat_weighted(double t, double sigma, double& sumW, double& sumWT)
+  // Weighted accumulation using per-hit sigma; also counts the hit and its section and sector
+  inline void acc_stat_weighted(double t, double sigma, int section, int sector,
+                                KLMEventT0EstimatorModule::CategorySums& sums)
   {
     if (sigma <= 0.0 || !std::isfinite(sigma)) return;
     const double w = 1.0 / (sigma * sigma);
-    sumW += w;
-    sumWT += w * t;
+    sums.sumW += w;
+    sums.sumWT += w * t;
+    sums.nHits += 1;
+    sums.sumSector += sector;
+    sums.sumSection += section;
   }
 }
 
 /* EKLM scintillator */
 void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& klmHit2ds,
                                                const ExtMap& scintMap,
-                                               double& sumW, double& sumWT)
+                                               CategorySums& sums)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -382,7 +379,7 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
 
       // Weighted accumulation using calibrated sigma
       const double sigma = getHitSigma(KLMElementNumbers::c_EKLM, d.getLayer(), false);
-      acc_stat_weighted(t0_est, sigma, sumW, sumWT);
+      acc_stat_weighted(t0_est, sigma, d.getSection(), d.getSector(), sums);
     }
   }
 }
@@ -390,7 +387,7 @@ void KLMEventT0EstimatorModule::accumulateEKLM(const RelationVector<KLMHit2d>& k
 /* BKLM scintillator */
 void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& klmHit2ds,
                                                     const ExtMap& scintMap,
-                                                    double& sumW, double& sumWT)
+                                                    CategorySums& sums)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -457,7 +454,7 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
 
         // Weighted accumulation using calibrated sigma
         const double sigma = getHitSigma(KLMElementNumbers::c_BKLM, d.getLayer(), false);
-        acc_stat_weighted(t0_est, sigma, sumW, sumWT);
+        acc_stat_weighted(t0_est, sigma, hit2d.getSection(), hit2d.getSector(), sums);
       }
     }
   }
@@ -466,7 +463,7 @@ void KLMEventT0EstimatorModule::accumulateBKLMScint(RelationVector<KLMHit2d>& kl
 /* BKLM RPC */
 void KLMEventT0EstimatorModule::accumulateBKLMRPC(RelationVector<KLMHit2d>& klmHit2ds,
                                                   const ExtMap& rpcMap,
-                                                  double& sumW, double& sumWT)
+                                                  CategorySums& sums)
 {
   DBObjPtr<KLMTimeConstants> timeConstants;
   DBObjPtr<KLMTimeCableDelay> timeCableDelay;
@@ -532,10 +529,9 @@ void KLMEventT0EstimatorModule::accumulateBKLMRPC(RelationVector<KLMHit2d>& klmH
         const double t0_est = t - Tfly;
         if (!std::isfinite(t0_est)) continue;
 
-        // Weighted accumulation using calibrated sigma with direction-specific resolution
-        const int plane = isPhi ? BKLMElementNumbers::c_PhiPlane : BKLMElementNumbers::c_ZPlane;
-        const double sigma = getHitSigma(KLMElementNumbers::c_BKLM, d.getLayer(), true, plane);
-        acc_stat_weighted(t0_est, sigma, sumW, sumWT);
+        // Weighted accumulation using calibrated sigma
+        const double sigma = getHitSigma(KLMElementNumbers::c_BKLM, d.getLayer(), true);
+        acc_stat_weighted(t0_est, sigma, hit2d.getSection(), hit2d.getSector(), sums);
       }
     }
   }
@@ -602,11 +598,21 @@ void KLMEventT0EstimatorModule::event()
     return {mu, std::sqrt(var / v.size())};
   };
 
+  // Store the per-track result of one category as extra info of the muon
+  auto writeTrackInfo = [](Particle * particle, const std::string & category, double t0, double err,
+  const CategorySums & sums) {
+    particle->writeExtraInfo("klmTrackT0" + category, t0);
+    particle->writeExtraInfo("klmTrackT0Err" + category, err);
+    particle->writeExtraInfo("klmTrackNHits" + category, sums.nHits);
+    particle->writeExtraInfo("klmTrackSector" + category, std::round(double(sums.sumSector) / sums.nHits));
+    particle->writeExtraInfo("klmTrackSection" + category, std::round(double(sums.sumSection) / sums.nHits));
+  };
+
   // For per-event track-averages: pairs of (T0, SEM) for weighted averaging
   std::vector<std::pair<double, double>> vTrk_B, vTrk_R, vTrk_E, vTrk_All;
 
   for (unsigned i = 0; i < nTracks; ++i) {
-    const Particle* particle = m_MuonList->getParticle(i);
+    Particle* particle = m_MuonList->getParticle(i);
     if (!particle) continue;
     const Track* track = particle->getTrack();
     if (!track) continue;
@@ -620,32 +626,40 @@ void KLMEventT0EstimatorModule::event()
     collectExtrapolatedHits(track, m_extScint, m_extRPC);
 
     // Per-track digit sums per category (weighted)
-    double wE = 0, wTE = 0;
-    accumulateEKLM(hit2ds, m_extScint, wE, wTE);
-
-    double wB = 0, wTB = 0;
-    accumulateBKLMScint(hit2ds, m_extScint, wB, wTB);
-
-    double wR = 0, wTR = 0;
-    accumulateBKLMRPC(hit2ds, m_extRPC, wR, wTR);
+    CategorySums sumsE, sumsB, sumsR;
+    accumulateEKLM(hit2ds, m_extScint, sumsE);
+    accumulateBKLMScint(hit2ds, m_extScint, sumsB);
+    accumulateBKLMRPC(hit2ds, m_extRPC, sumsR);
+    const double wE = sumsE.sumW, wTE = sumsE.sumWT;
+    const double wB = sumsB.sumW, wTB = sumsB.sumWT;
+    const double wR = sumsR.sumW, wTR = sumsR.sumWT;
 
     // Per-track means and SEMs by category
     if (wB > 0.0) {
       auto [muB, seB] = weighted_result(wB, wTB);
       if (m_hT0Trk_BKLM_Scint && std::isfinite(muB)) m_hT0Trk_BKLM_Scint->Fill(muB);
-      if (std::isfinite(muB)) vTrk_B.push_back({muB, seB});
+      if (std::isfinite(muB)) {
+        vTrk_B.push_back({muB, seB});
+        writeTrackInfo(particle, "BKLMScint", muB, seB, sumsB);
+      }
     }
 
     if (wR > 0.0) {
       auto [muR, seR] = weighted_result(wR, wTR);
       if (m_hT0Trk_BKLM_RPC && std::isfinite(muR)) m_hT0Trk_BKLM_RPC->Fill(muR);
-      if (std::isfinite(muR)) vTrk_R.push_back({muR, seR});
+      if (std::isfinite(muR)) {
+        vTrk_R.push_back({muR, seR});
+        writeTrackInfo(particle, "BKLMRPC", muR, seR, sumsR);
+      }
     }
 
     if (wE > 0.0) {
       auto [muE, seE] = weighted_result(wE, wTE);
       if (m_hT0Trk_EKLM_Scint && std::isfinite(muE)) m_hT0Trk_EKLM_Scint->Fill(muE);
-      if (std::isfinite(muE)) vTrk_E.push_back({muE, seE});
+      if (std::isfinite(muE)) {
+        vTrk_E.push_back({muE, seE});
+        writeTrackInfo(particle, "EKLMScint", muE, seE, sumsE);
+      }
     }
 
     // Per-track overall (if any category present)
@@ -656,6 +670,8 @@ void KLMEventT0EstimatorModule::event()
         const double t0 = wtAll / wAll;
         const double se = std::sqrt(1.0 / wAll);
         vTrk_All.push_back({t0, se});
+        particle->writeExtraInfo("klmTrackT0All", t0);
+        particle->writeExtraInfo("klmTrackT0ErrAll", se);
       }
     }
   }
@@ -680,6 +696,17 @@ void KLMEventT0EstimatorModule::event()
   if (m_hT0Evt_TrkAvg_BKLM_RPC_SEM   && std::isfinite(seR_trk))   m_hT0Evt_TrkAvg_BKLM_RPC_SEM->Fill(seR_trk);
   if (m_hT0Evt_TrkAvg_EKLM_Scint_SEM && std::isfinite(seE_trk))   m_hT0Evt_TrkAvg_EKLM_Scint_SEM->Fill(seE_trk);
   if (m_hT0Evt_TrkAvg_All_SEM        && std::isfinite(seAll_trk)) m_hT0Evt_TrkAvg_All_SEM->Fill(seAll_trk);
+
+  // Store the per-event result of each category in EventExtraInfo
+  if (!m_eventExtraInfo.isValid()) m_eventExtraInfo.create();
+  auto writeEventInfo = [this](const std::string & category, double t0, double err) {
+    if (!std::isfinite(t0)) return;
+    m_eventExtraInfo->setExtraInfo("klmEventT0" + category, t0);
+    m_eventExtraInfo->setExtraInfo("klmEventT0Err" + category, err);
+  };
+  writeEventInfo("BKLMScint", muB_trk, seB_trk);
+  writeEventInfo("BKLMRPC", muR_trk, seR_trk);
+  writeEventInfo("EKLMScint", muE_trk, seE_trk);
 
   // ---------------- Final KLM combination (single saved component) ----------------
   const bool useB = std::isfinite(muB_trk);
@@ -721,7 +748,7 @@ void KLMEventT0EstimatorModule::event()
     const double quality = static_cast<double>((useB ? 1 : 0) + (useE ? 1 : 0) + (useR ? 1 : 0));
     EventT0::EventT0Component klmT0Component(finalT0, std::isfinite(finalSE) ? finalSE : 0.0,
                                              Const::KLM, "KLM", quality);
+    // Stored alongside the other detectors' values; the event T0 itself is never changed here.
     outT0->addTemporaryEventT0(klmT0Component);
-    outT0->setEventT0(klmT0Component);
   }
 }

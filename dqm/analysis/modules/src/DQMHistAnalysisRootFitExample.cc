@@ -14,7 +14,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysisRootFitExample.h>
 #include <RooRealVar.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -55,8 +54,7 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
   B2INFO("DQMHistAnalysisRooFitExample: beginRun called.");
   m_c0->Clear();
 
-  auto hh1 = findHist("FirstDet/h_HitXPositionCh01");
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist("FirstDet", "h_HitXPositionCh01"); hh1 != nullptr) {
 
     //RooDataHist::RooDataHist(const char *name, const char *title, const RooArgList& vars, const TH1* hist, Double_t wgt) :
     x = w->var("x");
@@ -79,11 +77,7 @@ void DQMHistAnalysisRooFitExampleModule::beginRun()
 
 void DQMHistAnalysisRooFitExampleModule::event()
 {
-  TH1* hh1;
-
-  hh1 = findHist("FirstDet/h_HitXPositionCh01");
-
-  if (hh1 != NULL) {
+  if (auto hh1 = findHist("FirstDet", "h_HitXPositionCh01"); hh1 != nullptr) {
     if (data) delete data;
 
     data = new RooDataHist("data", "dataset with x", *(w->var("x")), hh1);

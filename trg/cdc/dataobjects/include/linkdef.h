@@ -19,7 +19,7 @@
 #pragma link C++ class Belle2::NeuroParametersHough+; // checksum=0x3d4f01f1, implicit, version=1
 #pragma link C++ class Belle2::CDCTriggerDVTMLP+; // checksum=0xf70accbc, implicit, version=1
 #pragma link C++ class Belle2::CDCTrigger3DHMLP+; // checksum=0x78d58679, implicit, version=1
-#pragma link C++ class Belle2::CDCTriggerNDFinderLUTs+;
+#pragma link C++ class Belle2::CDCTriggerNDFinderLUTs+; // checksum=0xdd09ee0d, version=1
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x219165f4, version=2
 #pragma link C++ class Belle2::CDCTriggerFinderClone+; // checksum=0x6581a3cf, version=1

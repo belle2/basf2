@@ -222,7 +222,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     if (h) h->Draw("hist");
 
     // for testing, we use low level access to histograms here
-    // for analysis, better use getDelta(name,index) base class function
+    // for analysis, better use getDelta(dir,name,flag,index) base class function
     c->cd(2);
     auto it = getDeltaList().find(name);
     if (it != getDeltaList().end()) {

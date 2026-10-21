@@ -1,6 +1,6 @@
 ##############################################################
 # EventType: 2430842000
-# Descriptor: [gamma gamma -> omega [ ->  pi+ pi- pi0 ] Jpsi [ -> e+ e- / mu+ mu- ]] are generated via two photon process
+# Descriptor: [gamma gamma -> omega [ ->  pi+ pi- pi0 ] J/psi [ -> e+ e- / mu+ mu- ]] are generated via two photon process. The full generation uses TREPS and EVTGEN. TREPS simulates the gamma gamma -> omega J/psi, and EVTGEN simulates the subsequent decays of the omega and J/psi. This decay card covers only the decays of the omega and J/psi. 
 # NickName: diphoton_omegajpsi
 # Test : Yes
 # Documentation: MC16rd signal request
@@ -11,12 +11,11 @@
 # Date: 2026/10/19
 #
 # Decay table to generate
-# gamma gamma ->   omega -> pi+ pi- pi0
-#                  J/psi 
-#                  |
-#                  -> e+ e-
-#                  -> mu+ mu- 
-#                     
+# [gamma gamma ->  omega           J/psi] (is simulated using the TREPS generator)
+#                  |               |
+#                  -> pi+ pi- pi0  |
+#                                  -> mu+ mu- 
+#                                  -> e+ e-            
 ###############################################################
 
 Decay J/psi

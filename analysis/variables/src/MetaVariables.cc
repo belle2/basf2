@@ -65,8 +65,7 @@ namespace Belle2 {
 
     static int getDaughterIndex(const std::string& daughterString, const Particle* particle)
     {
-      if (particle == nullptr)
-        return -1;
+      if (particle == nullptr) return -1;
       int daughterNumber = 0;
       try {
         daughterNumber = convertString<int>(daughterString);

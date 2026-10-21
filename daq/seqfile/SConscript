@@ -1,0 +1,11 @@
+Import('env')
+
+# Mark this folder a sub-library
+env.Dictionary()['SUBLIB'] = True
+
+env['LIBS'] = [
+	    'framework',
+	    'boost_iostreams'
+]
+
+Return('env')

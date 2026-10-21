@@ -7,7 +7,7 @@ env['LIBS'] = ['$ROOT_LIBS', 'Geom',
                'boost_serialization',
                'boost_python', 'boost_filesystem',
                '$PYTHON_LIBS', '$XML_LIBS',
-               'framework', 'nsm2_basf2', 'pthread', 'ncurses', 'pq',
+               'framework', 'daq_seqfile', 'nsm2_basf2', 'pthread', 'ncurses', 'pq',
 		]
 
 Return('env')

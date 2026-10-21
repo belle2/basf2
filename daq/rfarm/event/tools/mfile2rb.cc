@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "framework/pcore/SeqFile.h"
+#include "daq/seqfile/SeqFile.h"
 #include "framework/pcore/RingBuffer.h"
 
 #define RBUFSIZE 100000000

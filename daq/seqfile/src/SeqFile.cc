@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/pcore/SeqFile.h>
+#include <daq/seqfile/SeqFile.h>
 #include <framework/logging/Logger.h>
 
 #include <ios>
@@ -51,7 +51,6 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag, const c
     }
   }
 
-  // Store StreamerInfo 2017.5.8
   m_streamerinfo = nullptr;
   m_streamerinfo_size = 0;
   if (streamerinfo != nullptr && streamerinfo_size > 0) {
@@ -92,9 +91,6 @@ void SeqFile::openFile(std::string filename, bool readonly)
     filter->exceptions(ios_base::badbit | ios_base::failbit);
     m_stream.reset(filter);
 
-    //
-    // Write StreamerInfo  (2017.5.8)
-    //
     if (m_streamerinfo == nullptr || m_streamerinfo_size <= 0) {
       // If you want to use SeqFile for non-sroot file type, please skip this B2FATAL
       B2FATAL("Invalid size of StreamerInfo : " << m_streamerinfo_size << "bytes");

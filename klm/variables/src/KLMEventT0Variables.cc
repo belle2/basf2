@@ -56,11 +56,12 @@ namespace Belle2 {
     REGISTER_VARIABLE("klmEventT0", klmEventT0, R"DOC(
 **[Calibration][Eventbased]** Returns the event time measured with the KLM: the KLM entry that ``KLMEventT0Estimator``
 adds to the ``EventT0`` object, alongside the values of the other detectors.
-Available on cDST only, and only if ``KLMEventT0Estimator`` ran; NaN otherwise.
+Available on cDST only. Requires a KLM module in the path, for example ``KLMEventT0Estimator``; NaN if
+``KLMEventT0Estimator`` did not run.
 )DOC", "ns");
     REGISTER_VARIABLE("klmEventT0Uncertainty", klmEventT0Uncertainty, R"DOC(
 **[Calibration][Eventbased]** Returns the uncertainty of :b2:var:`klmEventT0`, propagated from the calibrated per-hit
-time resolution. NaN if :b2:var:`klmEventT0` is not available.
+time resolution. Requires a KLM module in the path, as :b2:var:`klmEventT0` does; NaN if :b2:var:`klmEventT0` is NaN.
 )DOC", "ns");
 
   }

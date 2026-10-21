@@ -143,6 +143,10 @@ namespace Belle2 {
       /// vector containing track candidates, consisting of the found intersection values in the Hough Space
       std::vector<std::vector<VXDHoughState*>> m_trackCandidates;
 
+      /// per-recursion temporary buffers to hold the hits contained in a sub-cell (allocated once and reused)
+      std::array < std::vector<VXDHoughState*>, c_maxAllowedRecusionLevel + 1 > m_recursionBuffers;
+      /// per-recursion layer bitsets (reused)
+      std::array < std::bitset<8>, c_maxAllowedRecusionLevel + 1 > m_recursionLayerHits;
     };
 
   }

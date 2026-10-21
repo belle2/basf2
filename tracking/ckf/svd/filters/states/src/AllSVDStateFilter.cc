@@ -30,7 +30,7 @@ Weight AllSVDStateFilter::operator()(const BaseSVDStateFilter::Object& pair)
     return NAN;
   }
 
-  if (std::count(previousStates.begin(), previousStates.end(), currentState)) {
+  if (std::find(previousStates.begin(), previousStates.end(), currentState) != previousStates.end()) {
     B2FATAL("Have found a cycle!");
   }
 

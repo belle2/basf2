@@ -31,8 +31,6 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(nullptr), m_nrecv(-1
   }
 }
 
-
-
 RxModule::~RxModule() = default;
 
 void RxModule::initStreamer()
@@ -43,14 +41,13 @@ void RxModule::initStreamer()
 
 void RxModule::readEvent()
 {
-  auto* evtbuf = new char[EvtMessage::c_MaxEventSize];
   while (!m_rbuf->isDead()) {
-    int size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf));
-    if (size != 0) {
+    const int size = m_rbuf->remq(m_evtbuf.data(), m_evtbuf.size());
+    if (size > 0) {
       B2DEBUG(35, "Rx: got an event from RingBuffer, size=" << size);
 
       // Restore objects in DataStore
-      EvtMessage evtmsg(evtbuf);
+      EvtMessage evtmsg(reinterpret_cast<char*>(m_evtbuf.data()));
       m_streamer->restoreDataStore(&evtmsg);
       // Restore the event dependent random number object from Datastore
       if (m_randomgenerator.isValid()) {
@@ -58,15 +55,25 @@ void RxModule::readEvent()
       }
       break;
     }
-    usleep(20);
+    if (size < 0) {
+      // The record was too big for m_evtbuf, so remq() left it queued and returned minus the
+      // size it needs: grow the buffer and loop round to read the very same record. The 50%
+      // headroom keeps the next slightly larger event from triggering another round trip.
+      m_evtbuf.resize(-size + -size / 2);
+      B2DEBUG(32, "Rx: grew receive buffer to " << m_evtbuf.size() << " words");
+    } else {
+      usleep(20);
+    }
   }
-
-  delete[] evtbuf;
 }
 
 void RxModule::initialize()
 {
   gSystem->Load("libdataobjects");
+
+  // Start small and non-empty; readEvent() grows it to whatever the records need.
+  // 4096 words -> 16 kB
+  m_evtbuf.resize(4096);
 
   m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 

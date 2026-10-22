@@ -176,10 +176,10 @@ void pigamma_left_(//const double& Mtau, const double& Mpi, const double& m_rho,
   
   // compute interference terms 2Re(A_L^IB A_L^V*)
   
-  // \omega  = 2\operatorname{Re} [F_V^{(\pi)}  (1+C^V_{LL} -  C^V_{LR})(1+C^V_{LL} +  C^V_{LR})^\ast]  f_\pi m_\tau^2  
+  // \omega  = 2\operatorname{Re} [F_V^{(\pi)}  (1+C^V_{LL} +  C^V_{LR})(C^IB_{L})^\ast]  f_\pi m_\tau^2
   //           \frac{(k\cdot p_\nu)(k\cdot p_\pi)}{k\cdot p_\tau},
   
-  const double re_iv = CL_diff * CL_IB * std::real(FV_pi);
+  const double re_iv = CL_sum * CL_IB * std::real(FV_pi);
   double omega_5 = 2.0 * re_iv * f_pi * Mtau_sq * (PkPnu * PkPpi / PkPtau);
   
   // Compute each spatial component j = 1,2,3

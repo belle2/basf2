@@ -68,8 +68,6 @@ namespace Belle2::vxdHoughTracking {
   void RawTrackCandCleaner<AHit>::apply(std::vector<std::vector<AHit*>>& rawTrackCandidates,
                                         std::vector<SpacePointTrackCand>& trackCandidates)
   {
-
-    uint family = 0; // family of the SpacePointTrackCands
     for (auto& rawTrackCand : rawTrackCandidates) {
 
       // If the capacity of a std::vector is too large, start with a fresh one, but only do this if the capacity is too big.
@@ -122,17 +120,11 @@ namespace Belle2::vxdHoughTracking {
         m_unfilteredResults.emplace_back(spacePointsInResult);
       }
 
-      for (auto aTC : m_unfilteredResults) {
-        aTC.setFamily(family);
-      }
-
       m_resultRefiner.apply(m_unfilteredResults, m_filteredResults);
 
       for (const SpacePointTrackCand& trackCand : m_filteredResults) {
         trackCandidates.emplace_back(trackCand);
       }
-
-      family++;
     }
   }
 

@@ -222,7 +222,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             histogramDirectoryName="softwaretrigger_skim_nobhabha",
         ).set_name("SoftwareTriggerHLTDQM_skim_nobhabha")
 
-    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "filtered"]):
+    if dqm_environment == "hlt" and (dqm_mode in ["dont_care", "before_filter"]):
         # SVD DATA FORMAT
         if is_detector_present("SVD", components):
             svdunpackerdqm = b2.register_module('SVDUnpackerDQM')

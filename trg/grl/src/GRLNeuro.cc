@@ -89,8 +89,8 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     const auto quantize = [](float scaled_val, int mode) -> int64_t {
       using QuantizerFuncPtr = int64_t(*)(float);
       static constexpr QuantizerFuncPtr quantizers[] = {
-        [](float x) -> int64_t { return static_cast<int64_t>(std::trunc(x)); },
-        [](float x) -> int64_t { return static_cast<int64_t>(std::round(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x)); },
+        [](float x) -> int64_t { return static_cast<int64_t>(std::floor(x + 0.5f)); },
         [](float x) -> int64_t {
           return (x >= 0) ? static_cast<int64_t>(std::floor(x))
           : static_cast<int64_t>(std::ceil(x));
@@ -179,69 +179,72 @@ inline float sim_ap_fixed(float val, int total_bits, int int_bits,
     // --- 6. Final Conversion ---
     return static_cast<float>(fixed_val) * scale;
   }
-  //for sperical case with total_bits < int-bits (only used to this code, need modify for generic using)
+  // for total_bits < int_bits case (e.g., ap_fixed<8,11>)
   else {
-    // 1. calculate the bits
-    const int zero_bits = std::max(int_bits - total_bits, 0);//So called negative fraction bits
-    const int useful_bits = total_bits - 1;
+    // When W < I, the ap_fixed value has negative fractional bits.
+    // Firmware behavior is: quantize val / 2^(I-W), wrap that W-bit integer,
+    // then multiply back by 2^(I-W).
+    const int shift_amount = int_bits - total_bits;
+    const float scale = std::ldexp(1.0f, shift_amount);
 
-    // 2. value collections
-    std::vector<float> legal_values;
-    for (int64_t i = 0; i < (1LL << useful_bits); ++i) {
-      int64_t value = i << zero_bits;
-      legal_values.push_back(static_cast<float>(value));
-      legal_values.push_back(static_cast<float>(-1 * value)); //need confirm
-    }
-    std::sort(legal_values.begin(), legal_values.end());
-
-    // 3. find the closest values in legal_values
-    auto closest = std::min_element(legal_values.begin(), legal_values.end(),
-    [val](float a, float b) {
-      float dist_a = std::abs(a - val);
-      float dist_b = std::abs(b - val);
-
-      if (std::abs(dist_a - dist_b) < 1e-6f) {
-        return a > b;
+    const auto quantize = [](float scaled_val, int mode) -> int64_t {
+      switch (mode)
+      {
+        case 0:  // AP_TRN
+          return static_cast<int64_t>(std::floor(scaled_val));
+        case 1:  // AP_RND
+          return static_cast<int64_t>(std::floor(scaled_val + 0.5f));
+        case 2:  // AP_RND_ZERO
+          return (scaled_val >= 0) ? static_cast<int64_t>(std::floor(scaled_val))
+          : static_cast<int64_t>(std::ceil(scaled_val));
+        case 3:  // AP_RND_MIN_INF
+          return static_cast<int64_t>(std::floor(scaled_val));
+        case 4:  // AP_RND_INF
+          return static_cast<int64_t>(std::ceil(scaled_val));
+        case 5:  // AP_RND_CONV
+          return llrint(scaled_val);
+        default:
+          return static_cast<int64_t>(std::trunc(scaled_val));
       }
-      return dist_a < dist_b;
-    });
+    };
 
-    return *closest;
+    int64_t fixed_val = quantize(val / scale, quant_mode);
+    const int64_t mask = (1LL << total_bits) - 1;
+
+    if (overflow_mode == 2) {  // AP_WRAP
+      fixed_val &= mask;
+      if (is_signed) {
+        const int64_t sign_bit = 1LL << (total_bits - 1);
+        if (fixed_val & sign_bit) {
+          fixed_val -= (1LL << total_bits);
+        }
+      }
+    } else {
+      const int64_t min_val = is_signed ? -(1LL << (total_bits - 1)) : 0;
+      const int64_t max_val = is_signed ? ((1LL << (total_bits - 1)) - 1) : ((1LL << total_bits) - 1);
+      if (overflow_mode == 1 && (fixed_val < min_val || fixed_val > max_val)) {
+        fixed_val = 0;
+      } else {
+        fixed_val = std::clamp(fixed_val, min_val, max_val);
+      }
+    }
+
+    return static_cast<float>(fixed_val) * scale;
   }
-
 }
 
-// ---  Wrappers for this code---
-
-//=== for input layer ===//
-inline float sim_input_layer_t(float val)
-{
-  return sim_ap_fixed(val, 13, 12, false, 0, 4, 0); // AP_TRN,AP_SAT
-}
-
-inline float sim_dense_0_iq_t(float val)
-{
-  return sim_ap_fixed(val, 12, 12, false, 1, 2, 0); // AP_RND,AP_WAP
-}
-
-inline float sim_ap_dense_0_iq(float val, int w, int i)
-{
-  return sim_ap_fixed(val, w, i, false, 1, 4, 0);  // AP_RND, AP_SAT_SYM
-}
-
-// === for weights, bias and hiden layers ===
-inline float sim_fixed(float val, int total_bits, int int_bits,  bool is_signed = true,
-                       int rounding = 0,     // 0: trunc, 1: round
-                       int saturation = 2)   // 2: wrap
-{
-  return sim_ap_fixed(val, total_bits, int_bits, is_signed, rounding, saturation, 0);  // AP_TRN, AP_SAT_SYM
-}
-
-// === unsign for result ===
-inline float sim_result_t(float val)
-{
-  return sim_ap_fixed(val, 25, 9, true, 0, 2, 0);  // AP_RND, AP_SAT_SYM
-}
+// ---  Direct sim_ap_fixed calls for firmware compatibility ---
+// Parameters from firmware/defines.h:
+// input_layer_t: ap_fixed<13,13>
+// dense_0_iq_t: ap_fixed<12,13>
+// dense_0_weight_t: ap_fixed<9,4>
+// dense_0_accum_t: ap_fixed<18,16>
+// dense_0_t: ap_fixed<16,16>
+// dense_0_relu_t: ap_fixed<14,14>
+// dense_5_iq_t: ap_ufixed<13,8>
+// result_t: ap_fixed<19,10>
+// quant_mode: 0=trunc, 1=round
+// overflow_mode: 2=wrap, 4=AP_SAT_SYM
 
 
 void
@@ -249,14 +252,27 @@ GRLNeuro::initialize(const Parameters& p)
 {
   using std::vector;
 
-  B2DEBUG(10, "GRLNeuro::initialize: nMLP=" << p.nMLP);
-
   // ------------------------------------------------------------------
   // Basic parameter validation (fatal in initialize)
   // ------------------------------------------------------------------
 
   if (p.nHidden.size() != 1 && p.nHidden.size() != p.nMLP) {
     B2FATAL("Number of nHidden lists should be 1 or " << p.nMLP);
+  }
+
+  if (p.outputScale.size() != 1 && p.outputScale.size() != p.nMLP) {
+    B2FATAL("Number of outputScale lists should be 1 or " << p.nMLP);
+  }
+
+  unsigned short nTarget = static_cast<unsigned short>(p.targetresult);
+  if (nTarget < 1) {
+    B2FATAL("No outputs! Turn on targetresult.");
+  }
+
+  for (unsigned iScale = 0; iScale < p.outputScale.size(); ++iScale) {
+    if (p.outputScale.at(iScale).size() != 2 * nTarget) {
+      B2FATAL("outputScale should be exactly " << 2 * nTarget << " values");
+    }
   }
 
   // ------------------------------------------------------------------
@@ -275,7 +291,7 @@ GRLNeuro::initialize(const Parameters& p)
   check_size(p.i_cdc_sector, "i_cdc_sector");
   check_size(p.i_ecl_sector, "i_ecl_sector");
   check_size(p.nHidden, "nHidden");
-  check_size(p.nn_thres, "nn_thres");
+  check_size(p.outputScale, "outputScale");
 
   // bias
   check_size(p.total_bit_bias, "total_bit_bias");
@@ -315,6 +331,8 @@ GRLNeuro::initialize(const Parameters& p)
   // inputs
   check_size(p.W_input, "W_input");
   check_size(p.I_input, "I_input");
+  check_size(p.W_input_layer, "W_input_layer");
+  check_size(p.I_input_layer, "I_input_layer");
 
   // ------------------------------------------------------------------
   // Initialize MLPs
@@ -327,7 +345,7 @@ GRLNeuro::initialize(const Parameters& p)
 
     // helper: broadcast if size == 1
     auto pick = [&](const auto & container) -> const auto& {
-      return (container.size() == 1) ? container[0] : container[iMLP];
+      return (container.size() == 1) ? container.at(0) : container.at(iMLP);
     };
 
     unsigned short i_cdc = static_cast<unsigned short>(pick(p.i_cdc_sector));
@@ -340,14 +358,18 @@ GRLNeuro::initialize(const Parameters& p)
 
     for (unsigned iHid = 0; iHid < nhidden.size(); ++iHid) {
       if (p.multiplyHidden) {
-        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid] * nNodes[0]));
+        nNodes.push_back(static_cast<unsigned short>(nhidden.at(iHid) * nNodes.at(0)));
       } else {
-        nNodes.push_back(static_cast<unsigned short>(nhidden[iHid]));
+        nNodes.push_back(static_cast<unsigned short>(nhidden.at(iHid)));
       }
     }
-    nNodes.push_back(static_cast<float>(pick(p.nOutput)));
 
-    GRLMLP grlmlp_temp(nNodes);
+    nNodes.push_back(nTarget);
+    unsigned short targetVars = static_cast<unsigned short>(p.targetresult);
+
+    const vector<float>& outputScale = pick(p.outputScale);
+
+    GRLMLP grlmlp_temp(nNodes, targetVars, outputScale);
 
     // bias
     grlmlp_temp.set_total_bit_bias(pick(p.total_bit_bias));
@@ -387,15 +409,12 @@ GRLNeuro::initialize(const Parameters& p)
     // inputs
     grlmlp_temp.set_W_input(pick(p.W_input));
     grlmlp_temp.set_I_input(pick(p.I_input));
-
-    //threshold
-    grlmlp_temp.set_nn_thres(pick(p.nn_thres));
+    // input layer quantization parameters
+    grlmlp_temp.set_W_input_layer(pick(p.W_input_layer));
+    grlmlp_temp.set_I_input_layer(pick(p.I_input_layer));
 
     m_MLPs.push_back(std::move(grlmlp_temp));
   }
-
-  B2DEBUG(10, "GRLNeuro::initialize finished. created "
-          << m_MLPs.size() << " MLP(s).");
 }
 
 
@@ -403,7 +422,7 @@ GRLNeuro::initialize(const Parameters& p)
 std::vector<float>
 GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
 {
-  const GRLMLP& expert = m_MLPs[isector];
+  const GRLMLP& expert = m_MLPs.at(isector);
   vector<float> weights = expert.get_weights();
   vector<float> bias = expert.get_bias();
   vector<int> total_bit_bias = expert.get_total_bit_bias();
@@ -433,112 +452,117 @@ GRLNeuro::runMLP(unsigned isector, const std::vector<float>& input)
   vector<int> saturation = expert.get_saturation();
   vector<vector<int>> W_input = expert.get_W_input();
   vector<vector<int>> I_input = expert.get_I_input();
+  // Input layer quantization parameters
+  vector<vector<int>> W_input_layer = expert.get_W_input_layer();
+  vector<vector<int>> I_input_layer = expert.get_I_input_layer();
 
-
-  //input layer
+  // Use actual input
   vector<float> layerinput = input;
 
-  // quantizer the inputs
+  // Input layer quantization: firmware uses TWO steps:
+  // Step 1: float -> input_layer_t (ap_fixed<13,13>) with AP_RND, AP_SAT_SYM
+  // Step 2: input_layer_t -> dense_0_iq_t (per-input ap_fixed<W,I>) with AP_RND, AP_WRAP
+
+  // First, quantize raw input to input_layer_t (ap_fixed<13,13>)
+  // Firmware: ap_fixed<13,13> with AP_TRN (signed: floor toward -inf), AP_WRAP (defaults)
   for (size_t i = 0; i < layerinput.size(); ++i) {
+    // AP_TRN for signed = floor (toward -inf), AP_WRAP
+    layerinput.at(i) = sim_ap_fixed(layerinput.at(i), 13, 13, true, 3, 2,
+                                    0);  // signed, quant_mode=3 (floor), overflow_mode=2 (AP_WRAP)
+  }
 
-    int W_arr[24] = { 12, 12, 11, 11, 8, 8, 7, 7, 5, 6, 6, 6, 8, 8, 6, 5, 4, 5, 7, 7, 6, 4, 5, 5 };
-    int I_arr[24] = { 12, 12, 11, 11, 10, 9, 7, 7, 7, 7, 7, 7, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9 };
-    if (i != 23) {
-      layerinput[i] = sim_input_layer_t(layerinput[i]);
-      layerinput[i] = sim_ap_dense_0_iq(layerinput[i], W_arr[i], I_arr[i]);
+  // Use the first layer's W/I for input quantization (dense_0_iq)
+  const auto& w_layer = W_input_layer.at(0);
+  const auto& i_layer = I_input_layer.at(0);
 
-    } else layerinput[i] = 0;
+  // Step 2: dense_0_iq quantization with per-input W, I
+  for (size_t i = 0; i < layerinput.size(); ++i) {
+    // dense_0_iq quantization: signed, quant_mode=1 (AP_RND), overflow_mode=2 (AP_WRAP)
+    layerinput.at(i) = sim_ap_fixed(layerinput.at(i), w_layer.at(i), i_layer.at(i), true, 1, 2, 0);
   }
 
   //hidden layer and output layer
   vector<float> layeroutput = {};
   unsigned num_layers = expert.get_number_of_layers();
 
-  //output layer
-  vector<float> final_fixed = {};
-
   unsigned num_total_neurons = 0;
   unsigned iw = 0;
-  for (unsigned i_layer = 0; i_layer < num_layers - 1; i_layer++) {
+  for (unsigned iw_layer = 0; iw_layer < num_layers - 1; iw_layer++) {
     //read bias
-    unsigned num_neurons = expert.get_number_of_nodes_layer(i_layer + 1);
+    unsigned num_neurons = expert.get_number_of_nodes_layer(iw_layer + 1);
     layeroutput.clear();
     layeroutput.assign(num_neurons, 0.);
     layeroutput.shrink_to_fit();
 
-    for (unsigned io = 0; io < num_neurons; ++io) {
-      float bias_raw = bias[io + num_total_neurons];
-      float bias_fixed   = sim_fixed(bias_raw, total_bit_bias[i_layer], int_bit_bias[i_layer], is_signed_bias[i_layer],
-                                     rounding_bias[i_layer], saturation_bias[i_layer]);
-      float bias_contrib = sim_fixed(bias_fixed, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                     rounding_accum[i_layer], saturation_accum[i_layer]);
-      layeroutput[io] = bias_contrib;
 
+    for (unsigned io = 0; io < num_neurons; ++io) {
+      float bias_raw = bias.at(io + num_total_neurons);
+      float bias_fixed   = sim_ap_fixed(bias_raw, total_bit_bias.at(iw_layer), int_bit_bias.at(iw_layer), is_signed_bias.at(iw_layer),
+                                        rounding_bias.at(iw_layer), saturation_bias.at(iw_layer), 0);
+      float bias_contrib = sim_ap_fixed(bias_fixed, total_bit_accum.at(iw_layer), int_bit_accum.at(iw_layer),
+                                        is_signed_accum.at(iw_layer),
+                                        rounding_accum.at(iw_layer), saturation_accum.at(iw_layer), 0);
+      layeroutput.at(io) = bias_contrib;
     }
     num_total_neurons += num_neurons;
 
     //input*weight
     unsigned num_inputs = layerinput.size();
+
     for (unsigned ii = 0; ii < num_inputs; ++ii) {
-      float input_val = layerinput[ii];
+      float input_val = layerinput.at(ii);
       for (unsigned io = 0; io < num_neurons; ++io) {
-        float weight_raw = weights[iw];
-        float weight_fixed = sim_fixed(weight_raw, total_bit_weight[i_layer], int_bit_weight[i_layer], is_signed_weight[i_layer],
-                                       rounding_weight[i_layer], saturation_weight[i_layer]);
+        float weight_raw = weights.at(iw);
+        float weight_fixed = sim_ap_fixed(weight_raw, total_bit_weight.at(iw_layer), int_bit_weight.at(iw_layer),
+                                          is_signed_weight.at(iw_layer),
+                                          rounding_weight.at(iw_layer), saturation_weight.at(iw_layer), 0);
         float product = input_val * weight_fixed;
-        float contrib = sim_fixed(product, total_bit_accum[i_layer], int_bit_accum[i_layer], is_signed_accum[i_layer],
-                                  rounding_accum[i_layer], saturation_accum[i_layer]);
-        layeroutput[io] += contrib;
+        float contrib = sim_ap_fixed(product, total_bit_accum.at(iw_layer), int_bit_accum.at(iw_layer), is_signed_accum.at(iw_layer),
+                                     rounding_accum.at(iw_layer), saturation_accum.at(iw_layer), 0);
+        layeroutput.at(io) = sim_ap_fixed(layeroutput.at(io) + contrib, total_bit_accum.at(iw_layer), int_bit_accum.at(iw_layer),
+                                          is_signed_accum.at(iw_layer), rounding_accum.at(iw_layer), saturation_accum.at(iw_layer), 0);
         ++iw;
       }
     }
     //     input*weight done
-    if (i_layer < num_layers - 2) {
+
+    if (iw_layer < num_layers - 2) {
       //relu
       for (unsigned io = 0; io < num_neurons; ++io) {
-        float fixed_val = sim_fixed(layeroutput[io], total_bit[i_layer], int_bit[i_layer], is_signed[i_layer], rounding[i_layer],
-                                    saturation[i_layer]);
+        float fixed_val = sim_ap_fixed(layeroutput.at(io), total_bit.at(iw_layer), int_bit.at(iw_layer), is_signed.at(iw_layer), 0,
+                                       saturation.at(iw_layer), 0);
         float relu_val = (fixed_val > 0) ? fixed_val : 0;
-        layeroutput[io] = sim_fixed(relu_val, total_bit_relu[i_layer], int_bit_relu[i_layer], is_signed_relu[i_layer],
-                                    rounding_relu[i_layer], saturation_relu[i_layer]);
+        layeroutput.at(io) = sim_ap_fixed(relu_val, total_bit_relu.at(iw_layer), int_bit_relu.at(iw_layer), is_signed_relu.at(iw_layer),
+                                          rounding_relu.at(iw_layer), saturation_relu.at(iw_layer), 0);
       }
-
-
       //input to next layer
       layerinput.clear();
       layerinput.assign(num_neurons, 0);
       layerinput.shrink_to_fit();
 
       for (unsigned i = 0; i < num_neurons; ++i) {
-
-        layerinput[i] = sim_ap_fixed(layeroutput[i], W_input[i_layer][i], I_input[i_layer][i], false, 1, 4, 0);
-
+        // firmware: use ap_fixed with parameters from W_input/I_input
+        // quant_mode=1 (AP_RND), overflow_mode=2 (AP_WRAP)
+        // W=0 means this input is zeroed (sparse quantization)
+        if (W_input.at(iw_layer).at(i) == 0) {
+          layerinput.at(i) = 0.0f;
+        } else {
+          const bool iq_is_signed = (iw_layer != 3);  // dense_4_iq is ap_ufixed
+          layerinput.at(i) = sim_ap_fixed(layeroutput.at(i), W_input.at(iw_layer).at(i), I_input.at(iw_layer).at(i), iq_is_signed, 1, 2, 0);
+        }
       }
-      if (i_layer == 0) {}
-      else if (i_layer == 1) {
-
-        layerinput[1] = 0;
-        layerinput[10] = 0;
-        layerinput[18] = 0;
-
-      } else if (i_layer == 2) {
-        layerinput[2] = 0;
-        layerinput[16] = 0;
-
-      }
-
-
     } else {
-
-      // ===  HLS result_t: ap_fixed<19,5,AP_RND,AP_SAT_SYM,0> ===
-      unsigned num_final_fixed = layeroutput.size();
-      for (unsigned io = 0; io < num_final_fixed; ++io) {
-        final_fixed.push_back(sim_result_t(layeroutput[io]));
+      // Final output layer - return all 10 outputs
+      // firmware: result_t is ap_fixed<19,10> with default AP_TRN (signed floor), AP_WRAP
+      vector<float> final_output(10, 0.0f);
+      for (unsigned io = 0; io < 10; ++io) {
+        final_output.at(io) = sim_ap_fixed(layeroutput.at(io), 19, 10, true, 3, 2, 0);
       }
-
+      return final_output;
     }
   }
-  return final_fixed;
+
+  return vector<float>(10, 0.0f);
 }
 
 
@@ -561,7 +585,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
         B2WARNING("Could not open file " << biasfilename);
         return false;
       } else {
-        GRLMLP& expert = m_MLPs[isector];
+        GRLMLP& expert = m_MLPs.at(isector);
         std::vector<float> warray;
         std::vector<float> barray;
         warray.clear();
@@ -594,7 +618,7 @@ bool GRLNeuro::load(unsigned isector, const string& weightfilename, const string
 
 bool GRLNeuro::load(unsigned isector, std::vector<float> warray, std::vector<float> barray)
 {
-  GRLMLP& expert = m_MLPs[isector];
+  GRLMLP& expert = m_MLPs.at(isector);
   expert.set_weights(warray);
   expert.set_bias(barray);
   return true;

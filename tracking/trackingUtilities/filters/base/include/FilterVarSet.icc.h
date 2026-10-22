@@ -84,7 +84,7 @@ namespace Belle2 {
 
       // try to find the MVAFilter cut parameter and reset it such that we can set it
       std::vector<std::string> paramNames = moduleParamList.getParameterNames();
-      if (std::count(paramNames.begin(), paramNames.end(), "cut")) {
+      if (std::find(paramNames.begin(), paramNames.end(), "cut") != paramNames.end()) {
         ModuleParam<double>& cutParam = moduleParamList.getParameter<double>("cut");
         m_cut = cutParam.getValue();
         cutParam.setDefaultValue(NAN);

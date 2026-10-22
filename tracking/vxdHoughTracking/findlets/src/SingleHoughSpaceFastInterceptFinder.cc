@@ -90,6 +90,14 @@ void SingleHoughSpaceFastInterceptFinder::initialize()
   m_HSSinValuesLUT[m_nAngleSectors] = sin(m_maximumX);
   m_HSCosValuesLUT[m_nAngleSectors] = cos(m_maximumX);
 
+  // Reserve recursion buffers to reduce runtime allocations in the hot path.
+  // We reserve a modest amount — tune if you have a good upper bound for typical contained-hits per cell.
+  constexpr size_t reservePerLevel = 64;
+  for (ushort i = 0; i <= c_maxAllowedRecusionLevel; ++i) {
+    m_recursionBuffers[i].reserve(reservePerLevel);
+    m_recursionLayerHits[i].reset();
+  }
+
   B2DEBUG(29, "HS size x: " << (m_maximumX - m_minimumX) << " HS size y: " << m_verticalHoughSpaceSize <<
           " unitX: " << m_unitX << " unitY: " << m_unitY);
 }
@@ -130,17 +138,25 @@ void SingleHoughSpaceFastInterceptFinder::apply(std::vector<VXDHoughState>& hits
 void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vector<VXDHoughState*>& hits,
     const ushort xmin, const ushort xmax, const ushort ymin, const ushort ymax, const ushort currentRecursion)
 {
-  std::vector<VXDHoughState*> containedHits;
-  containedHits.reserve(hits.size());
-  std::bitset<8> layerHits; /* For layer filter */
-
-  if (currentRecursion == m_maxRecursionLevel + 1) return;
+  // Fast-paths
+  if (hits.empty()) return;
+  if (currentRecursion > m_maxRecursionLevel) return;
 
   // these int-divisions can cause {min, center} or {center, max} to be the same, which is a desired behaviour
   const ushort centerx = xmin + (ushort)((xmax - xmin) >> 1);   // >> 1 equals a division by 2
   const ushort centery = ymin + (ushort)((ymax - ymin) >> 1);   // >> 1 equals a division by 2
   const ushort xIndexCache[3] = {xmin, centerx, xmax};
   const ushort yIndexCache[3] = {ymin, centery, ymax};
+
+  // Pointers to LUTs to avoid member lookup in the hot loop
+  const float* const sinLUT = m_HSSinValuesLUT.data();
+  const float* const cosLUT = m_HSCosValuesLUT.data();
+  const float* const sinCenterLUT = m_HSCenterSinValuesLUT.data();
+  const float* const cosCenterLUT = m_HSCenterCosValuesLUT.data();
+
+  // Use per-recursion temporary containers (preallocated) to avoid repeated allocations.
+  auto& containedHitsBuffer = m_recursionBuffers[currentRecursion];
+  auto& layerBitsBuffer = m_recursionLayerHits[currentRecursion];
 
   for (int i = 0; i < 2 ; ++i) {
     const ushort left  = xIndexCache[i];
@@ -149,15 +165,21 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
 
     if (left == right) continue;
 
-    const float& sinLeft     = m_HSSinValuesLUT[left];
-    const float& cosLeft     = m_HSCosValuesLUT[left];
-    const float& sinRight    = m_HSSinValuesLUT[right];
-    const float& cosRight    = m_HSCosValuesLUT[right];
+    const float sinLeft  = sinLUT[left];
+    const float cosLeft  = cosLUT[left];
+    const float sinRight = sinLUT[right];
+    const float cosRight = cosLUT[right];
 
-    // the sin and cos of the current center can't be stored in a LUT, as the number of possible centers
-    // is quite large and the logic would become rather complex, so this is just an approximation which is good enough
-    const float sinCenter   = m_HSCenterSinValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
-    const float cosCenter   = m_HSCenterCosValuesLUT[(left + right) >> 1];    // >> 1 equals a division by 2
+    // the sin and cos of the current center can't be stored in a LUT for arbitrary centers,
+    // but we approximate via the center LUT as before — compute the center index once.
+    const ushort centerIndex = (left + right) >> 1;
+    const float sinCenter = sinCenterLUT[centerIndex];
+    const float cosCenter = cosCenterLUT[centerIndex];
+
+    // Precompute negated sines used for derivative calculations
+    const float negSinLeft   = -sinLeft;
+    const float negSinRight  = -sinRight;
+    const float negSinCenter = -sinCenter;
 
     for (int j = 0; j < 2; ++j) {
       const ushort lowerIndex = yIndexCache[j];
@@ -171,40 +193,44 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
       const float localUpperCoordinate = m_verticalHoughSpaceSize - m_unitY * lowerIndex;
       const float localLowerCoordinate = m_verticalHoughSpaceSize - m_unitY * upperIndex;
 
-      // reset layerHits and containedHits
-      layerHits = 0;
-      containedHits.clear();
+      // reset layerHits and containedHits for this sub-cell
+      layerBitsBuffer.reset();
+      containedHitsBuffer.clear();
+
+      // iterate over hits once for this sub-cell
       for (VXDHoughState* hit : hits) {
 
         const VXDHoughState::DataCache& hitData = hit->getDataCache();
-        const float& m = hitData.xConformal;
-        const float& a = hitData.yConformal;
+        const float m = hitData.xConformal;
+        const float a = hitData.yConformal;
 
-        const float derivativeyLeft   = m * -sinLeft   + a * cosLeft;
-        const float derivativeyRight  = m * -sinRight  + a * cosRight;
-        const float derivativeyCenter = m * -sinCenter + a * cosCenter;
+        // compute derivatives (use pre-negated sine)
+        const float derivativeyLeft   = m * negSinLeft   + a * cosLeft;
+        const float derivativeyRight  = m * negSinRight  + a * cosRight;
+        const float derivativeyCenter = m * negSinCenter + a * cosCenter;
 
         // Only interested in the rising arm of the sinosoidal curves.
         // Thus if derivative on both sides of the cell is negative, ignore and continue.
-        if (derivativeyLeft < 0 and derivativeyRight < 0 and derivativeyCenter < 0) continue;
+        if (derivativeyLeft < 0.0f && derivativeyRight < 0.0f && derivativeyCenter < 0.0f) continue;
 
         const float yLeft   = m * cosLeft   + a * sinLeft;
         const float yRight  = m * cosRight  + a * sinRight;
         const float yCenter = m * cosCenter + a * sinCenter;
 
         /* Check if HS-parameter curve is inside (or outside) actual sub-HS */
-        if ((yLeft <= localUpperCoordinate and yRight >= localLowerCoordinate) or
-            (yCenter <= localUpperCoordinate and yLeft >= localLowerCoordinate and yRight >= localLowerCoordinate) or
-            (yCenter >= localLowerCoordinate and yLeft <= localUpperCoordinate and yRight <= localUpperCoordinate)) {
-          layerHits[hitData.layer] = true;
-          containedHits.emplace_back(hit);
+        if ((yLeft <= localUpperCoordinate && yRight >= localLowerCoordinate) ||
+            (yCenter <= localUpperCoordinate && yLeft >= localLowerCoordinate && yRight >= localLowerCoordinate) ||
+            (yCenter >= localLowerCoordinate && yLeft <= localUpperCoordinate && yRight <= localUpperCoordinate)) {
+          layerBitsBuffer[hitData.layer] = true;
+          containedHitsBuffer.emplace_back(hit);
         }
       }
 
-      if (layerFilter(layerHits) > 0) {
+      if (layerFilter(layerBitsBuffer) > 0) {
         // recursive call of fastInterceptFinder2d, until currentRecursion == m_maxRecursionLevel
         if (currentRecursion < m_maxRecursionLevel) {
-          fastInterceptFinder2d(containedHits, left, right, lowerIndex, upperIndex, currentRecursion + 1);
+          // Pass a copy view of containedHitsBuffer (vector already holds pointers)
+          fastInterceptFinder2d(containedHitsBuffer, left, right, lowerIndex, upperIndex, currentRecursion + 1);
         } else {
           // As usual in creating a 2D-array as 1D, calculate the global index as
           // xIndex + yIndex * ySize
@@ -213,7 +239,7 @@ void SingleHoughSpaceFastInterceptFinder::fastInterceptFinder2d(const std::vecto
           // for creating HS clusters from bottom to top and from left to right, so this becomes
           // xIndex + ySize * (ySize - yIndex)   (eq. 0)
           const uint globalIndex = localIndexX + c_maxHSSectorNumber * (c_maxHSSectorNumber - localIndexY);
-          m_activeSectorsMap.insert({globalIndex, containedHits});
+          m_activeSectorsMap.insert({globalIndex, containedHitsBuffer});
           m_activeSectorsIndices.push_back(globalIndex);
         }
       }

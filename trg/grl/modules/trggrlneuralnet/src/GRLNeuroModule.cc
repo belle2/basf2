@@ -78,7 +78,12 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   {{24, 24, 24}});
   addParam("multiplyHidden", m_parameters.multiplyHidden,
            "If true, multiply nHidden with number of input nodes.", false);
-
+  addParam("outputScale", m_parameters.outputScale,
+           "Output scale for all networks (1 value list or nMLP value lists). "
+           "Output[i] of the MLP is scaled from [-1, 1] "
+           "to [outputScale[2*i], outputScale[2*i+1]]. "
+           "(units: z[cm] / theta[degree])",
+  {{ -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1., -1., 1.}});
   addParam("csvThetaPhiFile", m_csvThetaPhiFile,
            "CSV file for theta/phi correction per tcid.",
   {FileSystem::findFile("/data/trg/grl/tcid_correct_theta_phi.csv", true)});
@@ -86,9 +91,10 @@ GRLNeuroModule::GRLNeuroModule() : Module()
   addParam("TRGECLClusters", m_TrgECLClusterName,
            "Name of the StoreArray holding the information of trigger ecl clusters ",
            string("TRGECLClusters"));
-  addParam("MVACut", m_parameters.nn_thres,
-           "Cut value applied to the MLP output",
-  {{0}});
+  addParam("MVACut", m_nn_thres,
+  "Cut values applied to the 10 MLP outputs", {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  });
   addParam("useDB", m_useDB,
            "Flag to use database to set config", true);
 
@@ -159,7 +165,7 @@ GRLNeuroModule::initialize()
 
 
   B2INFO("Loaded TC geometry (theta/phi) from tcid_correct_theta_phi.csv");
-  B2INFO(Form("Example: TC 1 => theta = %.3f deg, phi = %.3f deg", TCThetaLab[0], TCPhiLab[0]));
+  B2INFO(Form("Example: TC 1 => theta = %.3f deg, phi = %.3f deg", TCThetaLab.at(0), TCPhiLab.at(0)));
 
 
 }
@@ -182,7 +188,7 @@ GRLNeuroModule::beginRun()
       m_parameters.n_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_n_ecl_sector();
       m_parameters.i_cdc_sector   = m_db_trggrlconfig->get_ecltaunn_i_cdc_sector();
       m_parameters.i_ecl_sector   = m_db_trggrlconfig->get_ecltaunn_i_ecl_sector();
-      m_parameters.nn_thres       = m_db_trggrlconfig->get_ecltaunn_threshold();
+      m_nn_thres                  = m_db_trggrlconfig->get_ecltaunn_threshold();
       m_parameters.total_bit_bias  = m_db_trggrlconfig->get_ecltaunn_total_bit_bias();
       m_parameters.int_bit_bias    = m_db_trggrlconfig->get_ecltaunn_int_bit_bias();
       m_parameters.is_signed_bias  = m_db_trggrlconfig->get_ecltaunn_is_signed_bias();
@@ -210,6 +216,9 @@ GRLNeuroModule::beginRun()
       m_parameters.saturation = m_db_trggrlconfig->get_ecltaunn_saturation();
       m_parameters.W_input = m_db_trggrlconfig->get_ecltaunn_W_input();
       m_parameters.I_input = m_db_trggrlconfig->get_ecltaunn_I_input();
+      // Wrap 2D database values into 3D for Parameters (nMLP x layer x input)
+      m_parameters.W_input_layer = { m_db_trggrlconfig->get_ecltaunn_W_input_layer() };
+      m_parameters.I_input_layer = { m_db_trggrlconfig->get_ecltaunn_I_input_layer() };
 
       B2INFO("DB GRLConfig: nMLP=" << m_db_trggrlconfig->get_ecltaunn_nMLP()
              << " weight=" << m_db_trggrlconfig->get_ecltaunn_weight().size()
@@ -220,7 +229,8 @@ GRLNeuroModule::beginRun()
       m_GRLNeuro.initialize(m_parameters);
 
       for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-        if (!m_GRLNeuro.load(isector, m_db_trggrlconfig->get_ecltaunn_weight()[isector], m_db_trggrlconfig->get_ecltaunn_bias()[isector])) {
+        if (!m_GRLNeuro.load(isector, m_db_trggrlconfig->get_ecltaunn_weight().at(isector),
+                             m_db_trggrlconfig->get_ecltaunn_bias().at(isector))) {
           B2ERROR("weight of GRL ecltaunn could not be loaded correctly.");
         }
       }
@@ -258,8 +268,8 @@ void GRLNeuroModule::event()
     //float energy = eclCluster->getEnergyDep() ;  // data
     float energy = eclTrgClusterArray[ic]->getEnergyDep() * 1000.0;//MC
     float time   = eclCluster->getTimeAve();
-    float theta = TCThetaLab[TC - 1 ];
-    float phi   = TCPhiLab[TC - 1  ] + 180;
+    float theta = TCThetaLab.at(TC - 1);
+    float phi   = TCPhiLab.at(TC - 1) + 180;
     float thetaComp = theta;
 
     eclClusters.emplace_back(energy, thetaComp, phi, time, TC);
@@ -277,11 +287,11 @@ void GRLNeuroModule::event()
   for (size_t i = 0; i < eclClusters.size() && i < 6; i++) {
     float energy, theta, phi, time;
     int TC;
-    std::tie(energy, theta, phi, time, TC) = eclClusters[i];
-    MLPinput[i]      = energy;
-    MLPinput[i + 6]  = theta;
-    MLPinput[i + 12] = phi;
-    MLPinput[i + 18] = time;
+    std::tie(energy, theta, phi, time, TC) = eclClusters.at(i);
+    MLPinput.at(i)      = energy;
+    MLPinput.at(i + 6)  = theta;
+    MLPinput.at(i + 12) = phi;
+    MLPinput.at(i + 18) = time;
   }
 
 
@@ -291,29 +301,21 @@ void GRLNeuroModule::event()
   std::for_each(MLPinput.begin() + 6,  MLPinput.begin() + 12, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
   std::for_each(MLPinput.begin() + 12, MLPinput.begin() + 18, [LSB_angle](float & x) { x = std::ceil(x * LSB_angle); });
 
-  for (size_t i = 0; i < eclClusters.size() && i < 6; i++) {
-    float energy, theta, phi, time;
-    int TC;
-    std::tie(energy, theta, phi, time, TC) = eclClusters[i];
-
-  }
-
-  // Run MLP
-  for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-    std::vector<float> target = m_GRLNeuro.runMLP(isector, MLPinput);
-    unsigned num_target = target.size();
-    std::vector<float> nn_thres = m_parameters.nn_thres[isector];
-
-    //if one of output exceed threshold, put true
-    bool target_output = false;
-    for (unsigned io = 0; io < num_target; io++) {
-      if (target[io] > nn_thres[io]) {
-        target_output = true;
-        break;
-      }
+  // Run MLP - returns 10 outputs
+  std::vector<float> outputs = m_GRLNeuro.runMLP(0, MLPinput);
+  if (m_saveHist) {
+    for (int i = 0; i < 10; i++) {
+      h_target.at(0)->Fill(outputs.at(i));
     }
-    trgInfo->setTauNN(isector, target_output);
   }
+  bool tauNN = false;
+  for (int i = 0; i < 10 && i < (int)m_nn_thres.size(); i++) {
+    if (outputs.at(i) > m_nn_thres.at(i)) {
+      tauNN = true;
+      break;
+    }
+  }
+  trgInfo->setTauNN(tauNN);
 }
 
 
@@ -324,7 +326,7 @@ GRLNeuroModule::terminate()
   if (m_saveHist) {
     TFile* file = new TFile(TString(m_HistFileName), "recreate");
     for (unsigned int isector = 0; isector < m_parameters.nMLP; isector++) {
-      h_target[isector]->Write();
+      h_target.at(isector)->Write();
     }
     file->Write();
     file->Close();

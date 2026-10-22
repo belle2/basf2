@@ -78,7 +78,6 @@ default:
     # Preliminary operations necessary for basf2
     - unset DISPLAY
     - if [ ! -f .release ]; then echo "head" > .release; fi
-    - rm -rf .git/hooks && ln -sf $(dirname ${GITLAB_BELLE2_TOOLS_B2SETUP})/hooks .git/hooks
     - ln -fs site_scons/SConstruct
     - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
   interruptible: true  # All the jobs can be interrupted by newer pipelines

@@ -1,0 +1,31 @@
+# EventType: 2613038005
+# Descriptor: [ccbar Dstarm_D0barTopipiEta_BESIII_Isobar_model]
+# NickName: Dstarm_D0barTopipiEta_BESIII_Isobar_model
+# PhysicsWG: Charm
+# Responsible: Jaeyoung Kim
+# Email: jaeyoung_kim@yonsei.ac.kr
+# Date: 20260928 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Alias Myanti-D0 anti-D0
+Alias Myeta eta
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Decay D*-
+1.000 Myanti-D0  pi-     VSS;
+Enddecay
+
+Decay Myanti-D0
+1.000 pi+ pi- Myeta   D0TopipiEta;
+Enddecay
+
+Decay Myeta
+1.000 gamma gamma    PHSP;
+Enddecay
+
+End
+

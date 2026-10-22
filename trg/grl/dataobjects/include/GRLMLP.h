@@ -24,7 +24,7 @@ namespace Belle2 {
     GRLMLP();
 
     /** constructor to set all parameters (not weights and relevantID ranges). */
-    GRLMLP(std::vector<unsigned short>& nodes);
+    GRLMLP(std::vector<unsigned short>& nodes, unsigned short targets, const std::vector<float>& outputscale);
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~GRLMLP() { }
@@ -34,7 +34,7 @@ namespace Belle2 {
     /** get number of layers */
     unsigned get_number_of_layers() const { return m_n_nodes.size(); }
     /** get number of nodes in a layer */
-    unsigned get_number_of_nodes_layer(unsigned i_layer) const { return m_n_nodes[i_layer]; }
+    unsigned get_number_of_nodes_layer(unsigned i_layer) const { return m_n_nodes.at(i_layer); }
     /** get number of weights from length of weights vector */
     unsigned get_number_of_weights() const { return m_weights.size(); }
     /** calculate number of weights from number of nodes */
@@ -112,6 +112,11 @@ namespace Belle2 {
     void set_saturation(const std::vector<int>& i) { m_saturation = i; }
     void set_W_input(const std::vector<std::vector<int>>& i) { m_W_input = i; }
     void set_I_input(const std::vector<std::vector<int>>& i) { m_I_input = i; }
+    /** Input layer quantization parameters */
+    void set_W_input_layer(const std::vector<std::vector<int>>& i) { m_W_input_layer = i; }
+    void set_I_input_layer(const std::vector<std::vector<int>>& i) { m_I_input_layer = i; }
+    std::vector<std::vector<int>> get_W_input_layer() const { return m_W_input_layer; }
+    std::vector<std::vector<int>> get_I_input_layer() const { return m_I_input_layer; }
 
     /** check if weights are default values or set by some trainer */
     void Trained(bool trained) { m_trained = trained; }
@@ -153,13 +158,21 @@ namespace Belle2 {
     std::vector<int> m_saturation;
     std::vector<std::vector<int>> m_W_input;
     std::vector<std::vector<int>> m_I_input;
+    /** Input layer quantization: per-input W and I bit widths for the first dense layer */
+    std::vector<std::vector<int>> m_W_input_layer;
+    std::vector<std::vector<int>> m_I_input_layer;
 
     /** Indicator whether the weights are just default values or have
      *  been set by some trainer (set to true when setWeights() is first called). */
     bool m_trained;
+    /** output variables: 1: z, 2: theta, 3: (z, theta) */
+    unsigned short m_target_vars;
+    /** Output[i] of the MLP is scaled from [-1, 1]
+     *  to [outputScale[2i], outputScale[2i+1]]. */
+    std::vector<float> m_output_scale;
 
     //! Needed to make the ROOT object storable
-    ClassDef(GRLMLP, 6);
+    ClassDef(GRLMLP, 7);
   };
 }
 #endif

@@ -136,7 +136,7 @@ namespace Belle2 {
       // Traverse the tree from each new state on
       B2DEBUG(25, "Having found " << childStates.size() << " child states.");
       for (WithWeight<AState*> childState : childStates) {
-        if (std::count(path.begin(), path.end(), childState)) {
+        if (std::find(path.begin(), path.end(), childState) != path.end()) {
           // Cycle detected -- is this the best handling?
           // Other options: Raise and exception and bail out of this seed
           continue;

@@ -115,6 +115,11 @@ void ParticleVertexFitterModule::initialize()
   if (m_withConstraint != "")
     B2INFO("ParticleVertexFitter: Additional " << m_withConstraint << " will be applied");
 
+  if (m_fitType == "fourC")
+    B2WARNING("ParticleVertexFitter: The fourC fit results stored in extraInfo have been fixed. "
+              "FourCFitProb now holds the p-value of the fit (previously the chi2), "
+              "FourCFitChi2 holds the chi2 (previously the NDF), and the NDF is stored in the new FourCFitNDF.");
+
 }
 
 void ParticleVertexFitterModule::beginRun()

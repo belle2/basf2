@@ -1,3 +1,10 @@
+Changes in the analysis package in light-2611-m
+-----------------------------------------------
+
+Vertex Fitting
+++++++++++++++
+* Fixed the extraInfo stored by the ``fourC`` fit of `vertex.kFit`: ``FourCFitProb`` contained the :math:`\chi^2` and ``FourCFitChi2`` the number of degrees of freedom. Now ``FourCFitProb`` holds the p-value of the fit, ``FourCFitChi2`` the :math:`\chi^2`, and the number of degrees of freedom is stored in the new ``FourCFitNDF``. A warning about this change is issued when the ``fourC`` fit is used.
+
 Changes in the analysis package in light-2609-luna
 --------------------------------------------------
 

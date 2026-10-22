@@ -115,6 +115,11 @@ void ParticleVertexFitterModule::initialize()
   if (m_withConstraint != "")
     B2INFO("ParticleVertexFitter: Additional " << m_withConstraint << " will be applied");
 
+  if (m_fitType == "fourC")
+    B2WARNING("ParticleVertexFitter: The fourC fit results stored in extraInfo have been fixed. "
+              "FourCFitProb now holds the p-value of the fit (previously the chi2), "
+              "FourCFitChi2 holds the chi2 (previously the NDF), and the NDF is stored in the new FourCFitNDF.");
+
 }
 
 void ParticleVertexFitterModule::beginRun()
@@ -1057,8 +1062,9 @@ bool ParticleVertexFitterModule::makeKFourCMother(analysis::FourCFitKFit& kf, Pa
   fitError = kf.updateMother(mother);
   if (fitError != analysis::KFitError::kNoError)
     return false;
-  mother->addExtraInfo("FourCFitProb", kf.getCHIsq());
-  mother->addExtraInfo("FourCFitChi2", kf.getNDF());
+  mother->addExtraInfo("FourCFitProb", TMath::Prob(kf.getCHIsq(), kf.getNDF()));
+  mother->addExtraInfo("FourCFitChi2", kf.getCHIsq());
+  mother->addExtraInfo("FourCFitNDF", kf.getNDF());
   if (m_decayString.empty() && m_updateDaughters == true) {
     // update daughter momenta as well
     // the order of daughters in the *fitter is the same as in the mother Particle

@@ -12,7 +12,6 @@
 #pragma link C++ class Belle2::MVA::PDFOptions-;
 #pragma link C++ class Belle2::MVA::RegressionFastBDTOptions-;
 #pragma link C++ class Belle2::MVA::CombinationOptions-;
-#pragma link C++ class Belle2::MVA::FANNOptions-;
 #pragma link C++ class Belle2::MVA::TMVAOptions-;
 #pragma link C++ class Belle2::MVA::TMVAOptionsClassification-;
 #pragma link C++ class Belle2::MVA::TMVAOptionsRegression-;

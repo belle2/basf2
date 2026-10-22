@@ -78,7 +78,7 @@ namespace Belle2 {
     void analyseCDCTRGEventT0Distributions(); /**< Analyse the CDCTRG EventT0 distributions*/
     void analyseTOPTRGEventT0Distributions(); /**< Analyse the TOPTRG EventT0 distributions*/
     void initializeCanvases(); /**< Initialise canvases */
-    void clearCanvases(); /**< Initialise canvases */
+    void clearOwnCanvases(); /**< Clear the canvases owned by this module */
     void printCanvases(); /**< Print canvases if required */
     void deleteCanvases(); /**< Delete canvases */
     void setDeltaT0Values(); /**< Set the deltaT0 values in the monObj */

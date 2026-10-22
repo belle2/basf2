@@ -41,6 +41,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <regex>
+#include <unordered_set>
 
 #include <TDatabasePDG.h>
 #include <Math/Vector4D.h>
@@ -562,6 +563,89 @@ namespace Belle2 {
       } else {
         B2FATAL("Wrong number of arguments for meta function nParticlesInList");
       }
+    }
+
+    Manager::FunctionPtr nParticlesInCone(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 2 && arguments.size() != 3) {
+        B2FATAL("nParticlesInCone requires a particle list, a cone half-angle in degrees, "
+                "and optionally a particle cut");
+      }
+
+      const std::string listName = arguments[0];
+
+      double angleDegrees = 0.;
+      try {
+        angleDegrees = Belle2::convertString<double>(arguments[1]);
+      } catch (const std::exception&) {
+        B2FATAL("Invalid cone half-angle: " << arguments[1]);
+      }
+      if (!std::isfinite(angleDegrees) || angleDegrees < 0. || angleDegrees > 180.) {
+        B2FATAL("The cone half-angle must be between 0 and 180 degrees");
+      }
+      const double cosineThreshold = std::cos(angleDegrees * std::acos(-1.) / 180.);
+
+      std::shared_ptr<Variable::Cut> cut;
+      if (arguments.size() == 3 && !arguments[2].empty()) {
+        cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(arguments[2]));
+      }
+
+      return [listName, cosineThreshold, cut](const Particle * particle) -> double {
+        StoreObjPtr<ParticleList> particles(listName);
+        if (!particles.isValid())
+        {
+          B2FATAL("Invalid particle list in nParticlesInCone: " << listName);
+        }
+
+        const auto isSupported = [](const Particle * candidate)
+        {
+          if (!candidate) return false;
+          const auto source = candidate->getParticleSource();
+          return source == Particle::c_Track ||
+          source == Particle::c_ECLCluster ||
+          source == Particle::c_KLMCluster;
+        };
+
+        if (!isSupported(particle)) return Const::doubleNaN;
+
+        const auto labToCms = PCmsLabTransform().rotateLabToCms();
+        const auto central = labToCms * particle->get4Vector();
+        const double cx = central.Px();
+        const double cy = central.Py();
+        const double cz = central.Pz();
+        const double c2 = cx * cx + cy * cy + cz * cz;
+        if (!std::isfinite(c2) || c2 <= 0.) return Const::doubleNaN;
+
+        const int ownSource = particle->getMdstSource();
+        std::unordered_set<int> countedSources;
+        int count = 0;
+
+        for (unsigned i = 0; i < particles->getListSize(); ++i)
+        {
+          const Particle* other = particles->getParticle(i);
+          if (!isSupported(other)) continue;
+
+          const int source = other->getMdstSource();
+          if (source == ownSource || countedSources.count(source)) continue;
+          if (cut && !cut->check(other)) continue;
+
+          const auto momentum = labToCms * other->get4Vector();
+          const double px = momentum.Px();
+          const double py = momentum.Py();
+          const double pz = momentum.Pz();
+          const double p2 = px * px + py * py + pz * pz;
+          if (!std::isfinite(p2) || p2 <= 0.) continue;
+
+          double cosine = (cx * px + cy * py + cz * pz) / std::sqrt(c2 * p2);
+          if (cosine > 1.) cosine = 1.;
+          if (cosine < -1.) cosine = -1.;
+
+          if (cosine >= cosineThreshold && countedSources.insert(source).second) {
+            ++count;
+          }
+        }
+        return count;
+      };
     }
 
     Manager::FunctionPtr isInList(const std::vector<std::string>& arguments)
@@ -3727,6 +3811,20 @@ Specifying the lab frame is useful in some corner-cases. For example:
                       "E.g. ``varForMCGen(PDG)`` returns the PDG code of the MC particle related to the given particle if it is primary, not virtual, and not initial.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("nParticlesInList(particleListName)", nParticlesInList,
                       "[Eventbased] Returns number of particles in the given particle List.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE(
+      "nParticlesInCone(particleListName, halfAngleDegrees, cut='')",
+      nParticlesInCone,
+      R"DOC(
+Counts distinct reconstructed final-state particles from Tracks, ECLClusters,
+or KLMClusters within a cone around this particle in the e+e- centre-of-mass
+frame. The half-angle is in degrees (0 to 180). The optional cut applies to
+particles in particleListName. A particle sharing the central particle's MDST
+source is excluded; each MDST source is counted at most once. An empty list
+gives zero. Returns NaN if the central particle has an unsupported source or
+invalid momentum.
+)DOC",
+      Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("isInList(particleListName)", isInList,
                       "Returns 1 if the particle is in the list provided, 0 if not. Note that this only checks the particle given. For daughters of composite particles, please see :b2:var:`isDaughterOfList`.", Manager::VariableDataType::c_bool);
     REGISTER_METAVARIABLE("isDaughterOfList(particleListNames)", isDaughterOfList,

@@ -159,7 +159,7 @@ namespace Belle2 {
       }
 
       /// Getter for the index of the hit in the StoreArray holding this hit.
-      Index getStoreIHit() const;
+      Index getStoreIHit() const { return m_iHit; }
 
       /// Getter for the CDCWire the hit is located on.
       const CDC::CDCWire& getWire() const
@@ -316,8 +316,12 @@ namespace Belle2 {
       /// Memory for the CDCWire pointer - Trailing comment indicates to not stream this member
       mutable CDC::CDCWire const* m_wire = nullptr; //!
 
-      /// Memory for the CDCHit pointer.
-      const CDCHit* m_hit = nullptr;
+      /// Memory for the CDCHit pointer - not streamed (ROOT would deep-copy the pointed object
+      /// and leak it on reading); m_iHit carries the CDCHit index instead.
+      const CDCHit* m_hit = nullptr; //!
+
+      /// Index of the CDCHit in its StoreArray, so the link survives serialisation.
+      Index m_iHit = c_InvalidIndex;
 
       /// Memory for the automaton cell.
       mutable AutomatonCell m_automatonCell{1};

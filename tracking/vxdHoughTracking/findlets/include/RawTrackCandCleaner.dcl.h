@@ -75,10 +75,13 @@ namespace Belle2 {
       std::vector<SpacePointTrackCand> m_filteredResults;
 
       /// maximum number of relations that can be created per track candidate
-      uint m_maxRelations = 100;
+      ushort m_maxRelations = 100;
 
       /// DB object containing the SVDHough parameters
       DBObjPtr<SVDHoughParameters> m_SVDHoughParameters;
+
+      /// maximum allowed size of the vectors before resizing
+      static constexpr ushort c_MaxAllowedVectorSize = 256;
     };
 
   }

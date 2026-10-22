@@ -222,7 +222,7 @@ For those explicitly doing machine learning, you can also ``import sklearn`` and
 
 **Concatinating**:
 
-For many analyses, you will probably be working with collections (see :ref:`GBASF2_Collections`), where you
+For many analyses, you will probably be working with `collections <https://gbasf2.belle2.org/collectionSearcher.html>`_, where you
 might have a ROOT file corresponding to each collection. Naturally, you might want a way to combine DataFrames 
 with the same columns/keys. In this scenario, simply do 
 

@@ -91,7 +91,6 @@ TBranch: mcPY, 0.1349
 TBranch: mcPZ, 1.365
 TBranch: mcPhi, 0.3005
 TBranch: FBDT_qrCombined, 0.3022
-TBranch: FANN_qrCombined, -2
 TBranch: qrMC, 1
 TBranch: mcFlavorOfOtherB, 1
 TBranch: qrGNN, nan
@@ -572,7 +571,6 @@ TBranch: mcPY, -0
 TBranch: mcPZ, 2.999
 TBranch: mcPhi, -0
 TBranch: FBDT_qrCombined, 0.2526
-TBranch: FANN_qrCombined, -2
 TBranch: qrMC, 0
 TBranch: mcFlavorOfOtherB, nan
 TBranch: qrGNN, 0.1778

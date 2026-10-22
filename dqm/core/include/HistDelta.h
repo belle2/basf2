@@ -14,7 +14,11 @@
 namespace Belle2 {
 
   /**
-   * Class to keep track of delta histograms
+   * Class to keep track of delta histograms.
+   * The class owns the histograms. It keeps track of necessary updates
+   * which are depending on underlying histogram changes and conditions like
+   * entries, undeflow entries, events, to determine the delta update.
+   * It can stored several delta histograms (time series).
    */
   class HistDelta {
   public:

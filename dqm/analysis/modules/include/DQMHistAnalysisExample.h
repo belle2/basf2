@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~DQMHistAnalysisExampleModule();
+    ~DQMHistAnalysisExampleModule() override;
 
     /**
      * Initializer.

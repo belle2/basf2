@@ -200,16 +200,16 @@ namespace Belle2 {
     double m_minEntries;
 
     /** Number of inefficient BKLM layers. */
-    int m_nEffBKLMLayers;
+    int m_nEffBKLMLayers = 0;
 
     /** Number of inefficient EKLM Layers*/
-    int m_nEffEKLMLayers;
+    int m_nEffEKLMLayers = 0;
 
     /** alarm limits from inefficient BKLM layers PV */
-    double m_BKLMLayerAlarm;
+    double m_BKLMLayerAlarm = 0.;
 
     /** alarm limits from inefficient EKLM layers PV*/
-    double m_EKLMLayerAlarm;
+    double m_EKLMLayerAlarm = 0.;
 
   };
 

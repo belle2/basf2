@@ -111,8 +111,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // Overall PXD DAQ Error
-    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQError", true);
-    if (hh1) {
+    if (auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQError", true); hh1 != nullptr) {
       m_cDAQError->Clear();
       m_cDAQError->cd();
       if (m_hDAQError) delete m_hDAQError;
@@ -128,8 +127,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   }
   {
     // DHC histogram
-    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHCError", true);
-    if (hh1) {
+    if (auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHCError", true); hh1 != nullptr) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       m_cMissingDHC->Clear();
       m_cMissingDHC->cd();
@@ -149,8 +147,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHE histogram
-    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHEError", true);
-    if (hh1) {
+    if (auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHEError", true); hh1 != nullptr) {
       auto events = hh1->GetBinContent(hh1->GetBin(-1, -1));
       // first, we have to relate the per-DHE overflow (DHE object count) to the overall overflow (event count)
       // second, we have to relate the "fake data" DHE bin to the per-DHE overflow (DHE object count)
@@ -170,8 +167,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHP histogram
-    auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHPDataMissing", true);
-    if (hh1) {
+    if (auto hh1 = findHist(m_histogramDirectoryName, "PXDDAQDHPDataMissing", true); hh1 != nullptr) {
       m_cMissingDHP->Clear();
       m_cMissingDHP->cd();
       if (m_hMissingDHP) delete m_hMissingDHP;
@@ -192,8 +188,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   std::string name = "PXDDAQStat";
 
-  auto* statsum = findHist(m_histogramDirectoryName, name, true);
-  if (statsum) {
+  if (auto* statsum = findHist(m_histogramDirectoryName, name, true); statsum != nullptr) {
     // Stat histogram
     m_cStatistic->Clear();
     m_cStatistic->cd();

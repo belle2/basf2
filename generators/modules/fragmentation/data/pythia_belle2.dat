@@ -20,3 +20,6 @@ ParticleDecays:FSRinDecays=on
 
 ## QED radiation of quarks (FSR)
 TimeShower:QEDshowerByQ=on
+
+## Avoid double showering (FSR) after the hard process with Pythia 8.3
+PartonLevel:FSRinResonances=off

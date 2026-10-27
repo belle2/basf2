@@ -126,8 +126,8 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
 
         fill_particle_lists(config, maskName, roe_path)
 
-        ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
-        ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
+        ma.rankByHighest('pi+:tflat', rank_variable, overwriteRank=True, path=roe_path)
+        ma.rankByHighest('gamma:tflat', rank_variable, overwriteRank=True, path=roe_path)
 
         vm.addAlias('refdx', 'getVariableByRank(pi+:tflat, p, dx, 1)')
         vm.addAlias('dxdiff', 'formula(dx-refdx)')
@@ -158,8 +158,8 @@ def flavorTagger(particleLists, mode='Expert', working_dir='', uniqueIdentifier=
 
         fill_particle_lists(config, maskName, roe_path)
 
-        ma.rankByHighest('pi+:tflat', rank_variable, path=roe_path)
-        ma.rankByHighest('gamma:tflat', rank_variable, path=roe_path)
+        ma.rankByHighest('pi+:tflat', rank_variable, overwriteRank=True, path=roe_path)
+        ma.rankByHighest('gamma:tflat', rank_variable, overwriteRank=True, path=roe_path)
 
         vm.addAlias('refdx', 'getVariableByRank(pi+:tflat, p, dx, 1)')
         vm.addAlias('dxdiff', 'formula(dx-refdx)')

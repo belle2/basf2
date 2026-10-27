@@ -89,7 +89,7 @@ namespace Belle2 {
     };
 
     /** Returns index of the specific alarm type and detailed information */
-    std::pair<int, ECLAlarmType> getAlarmByName(std::string name);
+    std::pair<int, ECLAlarmType> getAlarmByName(const std::string& name);
 
     /** Set alarm limits in DQM based on EPICS PV limits */
     void updateAlarmConfig();

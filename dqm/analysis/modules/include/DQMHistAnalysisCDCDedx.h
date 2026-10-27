@@ -125,7 +125,7 @@ namespace Belle2 {
     * @param hsigma histogram to store the sigma
     * @param nbin number of bins
     */
-    void setHistPars(TH2D*& hist, TH1F*& hmean, TH1F*& hsigma, int nbin);
+    void setHistPars(TH2* hist, TH1F* hmean, TH1F* hsigma, int nbin);
 
     /**
     * function to add plot style

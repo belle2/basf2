@@ -128,11 +128,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     std::string name = "DQMER_PXD_" + (std::string)m_PXDModules[i] + "_ClusterCharge";
     std::replace(name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
-    if (hh1) {
+    if (auto hh1 = findHist(m_histogramDirectoryName, name); hh1 != nullptr) {
 //       B2INFO("Histo " << name << " found in mem");
       /// FIXME Replace by a nice fit
       m_fLandau->SetParameter(0, 1000);

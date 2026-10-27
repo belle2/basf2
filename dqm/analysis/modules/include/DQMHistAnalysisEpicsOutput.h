@@ -8,14 +8,14 @@
 
 #pragma once
 
-//DQM
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
 
   /**
-   * Example module of how to use MonitoringObject in DQMHistAnalysis module
+   * DQM core framework module for flushing EPICS output and check errors
+   * or disconnections and report them with PV name.
+   * This module must run after the last analysis module using EPICS
    */
   class DQMHistAnalysisEpicsOutputModule final : public DQMHistAnalysisModule {
 

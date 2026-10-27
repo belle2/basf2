@@ -127,7 +127,7 @@ void DQMHistAnalysisKLMModule::initialize()
 
   std::string str;
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     std::string label = m_ElementNumbers->getSectorDAQName(klmSector.getSubdetector(), klmSector.getSection(), klmSector.getSector());
     KLMSectorNumber sector = klmSector.getKLMSectorNumber();
     KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
@@ -680,8 +680,8 @@ void DQMHistAnalysisKLMModule::processFEHistogram(TH1* feHist, const std::string
 
     /* Delta component */
     // Use the latest available deltas, not only "updated in the same event".
-    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", 0, false);
-    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", 0, false);
+    auto deltaDenom = getDelta(m_histogramDirectoryName, histName + "_1", false);
+    auto deltaNumer = getDelta(m_histogramDirectoryName, histName + "_0", false);
 
     UpdateCanvas(canvas->GetName(), (feHist != nullptr));
     if (deltaNumer != nullptr && deltaDenom != nullptr) {
@@ -731,7 +731,7 @@ void DQMHistAnalysisKLMModule::event()
   latex.SetTextAlign(11);
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   // gathering relevant info for analyseChannelHitHistogram
-  for (KLMChannelIndex& klmSector : klmIndex) {
+  for (const KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
       nHistograms = 2;
@@ -771,7 +771,7 @@ void DQMHistAnalysisKLMModule::event()
   /* Temporary change the color palette. */
   gStyle->SetPalette(kLightTemperature);
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
-  for (KLMChannelIndex& klmSection : klmIndex) {
+  for (const KLMChannelIndex& klmSection : klmIndex) {
     KLMSubdetectorNumber subdetector = klmSection.getSubdetector();
     if (subdetector == KLMElementNumbers::c_EKLM) {
       KLMSubdetectorNumber section = klmSection.getSection();

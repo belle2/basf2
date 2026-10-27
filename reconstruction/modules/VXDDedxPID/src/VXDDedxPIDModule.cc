@@ -210,8 +210,11 @@ void VXDDedxPIDModule::event()
     // add a few last things to the VXDDedxTrack
     const int numDedx = dedxTrack->dedx.size();
     dedxTrack->m_nHits = numDedx;
-    // no need to define lowedgetruncated and highedgetruncated as we always remove the highest 2 dE/dx values from 8 dE/dx value
+    // we remove the highest 2 dE/dx values, except when there is only 2 - then we remove 1 highest
     dedxTrack->m_nHitsUsed = numDedx - 2;
+    if (numDedx == 2) {
+      dedxTrack->m_nHitsUsed = 1;
+    }
 
     // calculate log likelihoods
     dedxTrack->clearLogLikelihoods();
@@ -240,11 +243,10 @@ void VXDDedxPIDModule::terminate()
 }
 
 
-// calculateMeans need some change as we always remove highest 2 dE/dx values
 void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, double& truncatedMeanErr,
                                       const std::vector<double>& dedx)
 {
-  // Calculate the truncated average by skipping only highest two value
+  // Calculate the truncated average by rejecting the highest two values (or highest one, if there are only 2 measurements)
   std::vector<double> sortedDedx = dedx;
   std::sort(sortedDedx.begin(), sortedDedx.end());
 
@@ -267,6 +269,8 @@ void VXDDedxPIDModule::calculateMeans(double& mean, double& truncatedMean, doubl
   }
   if (numDedx - 2 != 0) {
     truncatedMeanTmp /= numDedx - 2;
+  } else {
+    truncatedMeanTmp = sortedDedx[0];
   }
 
   mean = meanTmp;

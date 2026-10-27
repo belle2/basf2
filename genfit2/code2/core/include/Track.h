@@ -21,8 +21,7 @@
  * @{
  */
 
-#ifndef genfit_Track_h
-#define genfit_Track_h
+#pragma once
 
 #include "AbsTrackRep.h"
 #include "FitStatus.h"
@@ -329,5 +328,3 @@ class Track : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_Track_h

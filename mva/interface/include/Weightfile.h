@@ -127,6 +127,46 @@ namespace Belle2 {
       }
 
       /**
+       * Store the version of the contract between this weightfile and the code applying it.
+       *
+       * The contract version says which code can use this weightfile: how the inputs are
+       * built and how the outputs are interpreted. It is bumped by hand whenever such a
+       * change makes earlier weightfiles unusable. The applying code has to decide whether
+       * it implements that version, provides an older code path for it, or refuses to run.
+       * It is therefore meant for weightfiles whose payload names carry no version, where
+       * the file itself has to say which code it fits.
+       * @param version contract version of the code that created this weightfile
+       */
+      void addContractVersion(int version)
+      {
+        addElement(c_contractVersion, version);
+      }
+
+      /**
+       * Returns true if this weightfile records a contract version.
+       *
+       * False for weightfiles written before the contract version was introduced, which
+       * the applying code has to treat as the oldest version it knows.
+       */
+      bool hasContractVersion() const
+      {
+        return containsElement(c_contractVersion);
+      }
+
+      /**
+       * Returns the contract version of this weightfile, or the default value.
+       *
+       * The default is returned if no contract version is stored, and also if the stored
+       * value is not an integer. Use hasContractVersion() to tell the two apart.
+       * @param default_value returned if no usable contract version is stored
+       */
+      int getContractVersion(int default_value = -1) const
+      {
+        auto version = m_pt.get_optional<int>(c_contractVersion);
+        return version ? *version : default_value;
+      }
+
+      /**
        * Creates a file from our weightfile (mostly this will be a weightfile of an MVA library)
        * @param identifier of the file
        * @param custom_weightfile the filename which is created
@@ -283,6 +323,9 @@ namespace Belle2 {
       const boost::property_tree::ptree& getXMLTree() const { return m_pt; };
 
     private:
+      /** identifier of the element holding the contract version, shared by all weightfiles */
+      static constexpr const char* c_contractVersion = "contract_version";
+
       boost::property_tree::ptree m_pt; /**< xml tree containing all the saved information of this weightfile */
       std::vector<std::string> m_filenames; /**< generated temporary filenames, which will be removed in the destructor of this class */
       bool m_remove_temporary_directories = true; /**< remove all temporary directories in the destructor of this class */

@@ -25,13 +25,17 @@
 
 #ifdef _BELLE2_EPICS
 // EPICS
-#include "cadef.h"
+#include <cadef.h>
 #endif
 
 namespace Belle2 {
 
   /**
-   * The base class for the histogram analysis module.
+   * The base class for all DQM histogram analysis modules.
+   * This class provides all the interfaces, management, and storage for
+   * histograms, delta histograms, reference histograms, and EPICS integration.
+   * Even so the class is a module, it is not supposed to be added
+   * directly into an analysis path.
    */
   class DQMHistAnalysisModule : public Module {
 
@@ -218,13 +222,13 @@ namespace Belle2 {
 
     /**
      * Set the Run Type.
-     * @par t Run type string.
+     * @param t Run type string.
      */
     static void setRunType(const std::string& t) {s_runType = t;};
 
     /**
      * Set the number of processed events. (Attention, asynch histogram updates!)
-     * @par e Processed events.
+     * @param e Processed events.
      */
     static void setEventProcessed(int e) {s_eventProcessed = e;};
 
@@ -350,11 +354,11 @@ namespace Belle2 {
      * Get Delta histogram.
      * @param dirname directory
      * @param histname name of histogram
-     * @param n index of delta histogram, 0 is most recent one
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
+     * @param n index of delta histogram, 0 is most recent one
      * @return delta histogram or nullptr
      */
-    TH1* getDelta(const std::string& dirname, const std::string& histname = "", int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(const std::string& dirname, const std::string& histname = "", bool onlyIfUpdated = true, int n = 0);
 
     /**
      * Add Delta histogram parameters.

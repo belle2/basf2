@@ -498,7 +498,7 @@ namespace Belle2 {
       /**
        * Index of the output value to pick in non-multiclass mode
        */
-      int m_outputValueIndex;
+      int m_outputValueIndex = 0;
     };
   } // namespace MVA
 } // namespace Belle2

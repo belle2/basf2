@@ -12,7 +12,7 @@
 #include <TFile.h>
 
 namespace Belle2 {
-  /*! PXD DQM AnalysisModule */
+  /*! PXD DQM Analysis Module for ERECO plots */
 
   class DQMHistAnalysisPXDERModule final : public DQMHistAnalysisModule {
 
@@ -208,10 +208,6 @@ namespace Belle2 {
 
     /** Histogram Directory name */
     std::string m_histogramDirectoryName;
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
 
   };
 

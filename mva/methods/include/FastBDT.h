@@ -28,7 +28,7 @@ namespace Belle2 {
     bool isValidSignal(const std::vector<bool>& Signals);
 
     /**
-     * Options for the FANN MVA method
+     * Options for the FastBDT method
      */
     class FastBDTOptions : public SpecificOptions {
 

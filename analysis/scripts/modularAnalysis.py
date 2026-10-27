@@ -4537,6 +4537,25 @@ def addPi0VetoEfficiencySystematics(particleList, decayString, tableName, thresh
     """
     Add pi0 veto Data/MC efficiency ratio weights to the specified particle list
 
+    .. warning::
+        This function and the underlying ``Pi0VetoEfficiencySystematics`` module are **deprecated**
+        and will be removed in February 2027. Please use the generic `ParticleWeighting` module instead:
+
+        .. code-block:: python
+
+            path.add_module('ParticleWeighting',
+                            particleList='B0',
+                            selectedDaughters='B0 -> rho0 ^gamma',
+                            tableName='Pi0VetoEfficiencySystematics_Mar2022_standard30')
+
+        The ``tableName`` is the name of the payload, i.e. ``{tableName}_{mode}{thresholdPercent}`` with the
+        arguments of this function, where ``thresholdPercent`` is the veto threshold in percent as a two-digit
+        integer (e.g. ``threshold=0.30`` corresponds to ``Pi0VetoEfficiencySystematics_Mar2022_standard30``).
+        Only thresholds in whole percent are supported. The weights are then stored as extraInfo of the selected
+        hard photon (not of the mother particle) with the names ``{payloadName}_data_MC_ratio``,
+        ``{payloadName}_data_MC_uncertainty_stat``, etc. They can be accessed from the mother particle
+        with e.g. ``daughter(1, extraInfo(Pi0VetoEfficiencySystematics_Mar2022_standard30_data_MC_ratio))``.
+
     @param particleList   the input ParticleList
     @param decayString    specify hard photon to be performed pi0 veto (e.g. 'B+:sig -> rho+:sig ^gamma:hard')
     @param tableName      table name corresponding to payload version (e.g. 'Pi0VetoEfficiencySystematics_Mar2022')

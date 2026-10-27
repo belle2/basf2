@@ -161,8 +161,6 @@ class Method:
             self.specific_options = basf2_mva.TMVAOptionsClassification()
         elif self.general_options.m_method == "TMVARegression":
             self.specific_options = basf2_mva.TMVAOptionsRegression()
-        elif self.general_options.m_method == "FANN":
-            self.specific_options = basf2_mva.FANNOptions()
         elif self.general_options.m_method == "Python":
             self.specific_options = basf2_mva.PythonOptions()
         elif self.general_options.m_method == "PDF":

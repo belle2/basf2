@@ -61,6 +61,9 @@ namespace Belle2 {
 
     // Variables to be saved in the hit tree
     short m_channel = 0;  /**< Channel number (0-511) */
+    short m_asic = 0;  /**< ASIC number (0-3 within boardstack) */
+    short m_asicChannel = 0;  /**< ASIC channel number (0-7) */
+    short m_boardstack = 0;  /**< Boardstack number (0-3) */
     short m_window = 0;  /**< Window  number (0-???) */
     short m_sample = 0;  /**< Sample number (0-???) */
     short m_slot = 0;  /**< Slot number (1-16) */

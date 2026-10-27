@@ -18,7 +18,6 @@
 
 #include <TROOT.h>
 
-//#include <iostream>
 using namespace Belle2;
 using namespace boost::property_tree;
 
@@ -34,7 +33,8 @@ REG_MODULE(DQMHistAnalysisInputTest);
 DQMHistAnalysisInputTestModule::DQMHistAnalysisInputTestModule()
   : DQMHistAnalysisModule()
 {
-  setDescription("Testing input file functionality for DQMHistAnalysisModules");
+  setDescription("DQM histogram input testing/simulating");
+  // This module CAN NOT be run in parallel!
   addParam("Experiment", m_expno, "Experiment Nr", 26u);
   addParam("Run", m_runno, "Run Number List", 1u);
   addParam("RunType", m_runtype, "Run Type", std::string("physics"));
@@ -117,7 +117,7 @@ void DQMHistAnalysisInputTestModule::initialize()
         // as we are already on analysis side, we dont
         // need to put it in the directory
         // (even so it may be a cleaner solution)
-        m_testHisto.push_back((TH1*) new TH1F(name.data(), "test Histo", histparm.at(0), histparm.at(1), histparm.at(2)));
+        m_testHisto.push_back(new TH1F(name.data(), "test Histo", histparm.at(0), histparm.at(1), histparm.at(2)));
         m_myNames.push_back(name);
         auto func = new TF1(TString(name) + "_func", fitfunc.data(), fitparm.at(0), fitparm.at(1));
         /*        func->SetParameters(100, 100, 30); // scale, mean, sigma
@@ -176,7 +176,7 @@ void DQMHistAnalysisInputTestModule::event()
   }
 
   for (auto h : m_testHisto) {
-    addHist("test", h->GetName(), (TH1*)h->Clone());
+    addHist("test", h->GetName(), dynamic_cast<TH1*>(h->Clone()));
   }
 
   /*{
@@ -212,7 +212,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
            << " " << a.second.m_amountDeltas << " " << a.second.m_deltaHists.size());
   }
 
-  for (auto n : m_myNames) {
+  for (const auto& n : m_myNames) {
     // we use fixed dir here as example
     std::string name = "test/" + n;
     auto c = new TCanvas();
@@ -222,7 +222,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     if (h) h->Draw("hist");
 
     // for testing, we use low level access to histograms here
-    // for analysis, better use getDelta(name,index) base class function
+    // for analysis, better use getDelta(dir,name,flag,index) base class function
     c->cd(2);
     auto it = getDeltaList().find(name);
     if (it != getDeltaList().end()) {
@@ -260,7 +260,7 @@ void DQMHistAnalysisInputTestModule::endRun()
   B2INFO("DQMHistAnalysisInputTest: endRun called. Run: " << m_runno);
 
   B2INFO("DQMHistAnalysisInputTest: endRun: Histos");
-  for (auto& a : getHistList()) {
+  for (const auto& a : getHistList()) {
     B2INFO(a.first);
   }
   // The following will produce errors, as the histograms may not exist in endRun

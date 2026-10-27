@@ -27,5 +27,7 @@ namespace Belle2 {
   private:
     /// maximal distance from track to trajectory (in XY)
     double m_maximalHitDistance = 2;
+    /// maximal allowed arclength distance
+    double m_maximalArcLengthDistance = 20;
   };
 }

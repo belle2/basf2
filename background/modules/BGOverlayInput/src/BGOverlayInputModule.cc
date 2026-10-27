@@ -93,8 +93,14 @@ void BGOverlayInputModule::initialize()
         B2FATAL("The BG sample used is aimed for BG mixing, not for BG overlay."
                 << LogVar("File name", fileName));
       }
+      // skip empty BG files
+      const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
+      if (fileMetaData.getNEvents() == 0) {
+        B2WARNING("BG file is empty: skipping."
+                  << LogVar("FileName", fileName));
+        continue;
+      }
       if (not m_skipExperimentCheck) {
-        const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
         // we assume lowest experiment/run numbers are enough
         if (experiment != fileMetaData.getExperimentLow()) {
           B2FATAL("The BG sample used is aimed for a different experiment number. Please check what you are doing."

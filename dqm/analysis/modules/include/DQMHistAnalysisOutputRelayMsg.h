@@ -14,10 +14,11 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 #include <TSocket.h>
-#include <string>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * Module to relay Canvas+Histogram to our old jsroot webserver. deprecated.
+   */
 
   class DQMHistAnalysisOutputRelayMsgModule final : public DQMHistAnalysisModule {
 
@@ -35,19 +36,9 @@ namespace Belle2 {
     void initialize() override final;
 
     /**
-     * Called when entering a new run.
-     */
-    void beginRun() override final;
-
-    /**
      * This method is called for each event.
      */
     void event() override final;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.

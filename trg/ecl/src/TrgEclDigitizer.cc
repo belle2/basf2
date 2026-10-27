@@ -401,7 +401,7 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   double times_parallel =  3.15;   // noise scale
   double times_serial   =  3.15;   // noise scale
 
-  double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
+  [[maybe_unused]] double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
   double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
   double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
 

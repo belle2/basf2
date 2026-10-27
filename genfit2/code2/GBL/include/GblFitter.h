@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef GblFitter_H
-#define GblFitter_H
+#pragma once
 
 #include "GblTrajectory.h"
 #include "AbsFitter.h"
@@ -225,6 +224,3 @@ namespace genfit {
   
 }  /* End of namespace genfit */
 /** @} */
-
-#endif // GblFitter_H
-

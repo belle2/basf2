@@ -51,7 +51,6 @@ void FlavorTaggerInfoBuilderModule::event()
                                 m_flavorTaggerInfos.appendNew();
 
     flavTag -> addMethodMap("FBDT");
-    flavTag -> addMethodMap("FANN");
     flavTag -> addMethodMap("DNN");
     flavTag -> addMethodMap("TFLAT");
 

@@ -98,6 +98,26 @@ namespace {
 
   }
 
+  TEST(WeightfileTest, ContractVersion)
+  {
+
+    MVA::Weightfile weightfile;
+    EXPECT_FALSE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), -1);
+    EXPECT_EQ(weightfile.getContractVersion(1), 1);
+
+    weightfile.addContractVersion(2);
+    EXPECT_TRUE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), 2);
+
+    // a stored value which is not an integer is reported like a missing one,
+    // but can be told apart with hasContractVersion()
+    weightfile.addElement("contract_version", "not_a_version");
+    EXPECT_TRUE(weightfile.hasContractVersion());
+    EXPECT_EQ(weightfile.getContractVersion(), -1);
+
+  }
+
   TEST(WeightfileTest, Stream)
   {
 

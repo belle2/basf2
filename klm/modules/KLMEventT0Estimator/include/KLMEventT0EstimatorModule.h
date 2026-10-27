@@ -37,6 +37,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/RelationVector.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/gearbox/Unit.h>
 
 /* ROOT headers. */
@@ -59,13 +60,20 @@ namespace Belle2 {
    * Inputs:
    *   - ParticleList (tracks with relations to KLMHit2d and ExtHit)
    *   - KLM conditions (time constants, cable delays, channel status,
-   *     calibrated per-hit resolution)
+   *     calibrated per-hit resolution; all RPC hits use the RPC resolution measured with
+   *     the phi and z hits together)
    *   - BKLM/EKLM geometry for propagation distances and transforms
    *
    * Outputs:
    *   - A single KLM EventT0 component per event (combination of all available
-   *     categories: BKLM-Scint, BKLM-RPC, EKLM-Scint) saved via
-   *     addTemporaryEventT0 and setEventT0.
+   *     categories: BKLM-Scint, BKLM-RPC, EKLM-Scint) added to EventT0 via
+   *     addTemporaryEventT0, alongside the other detectors' values. The event T0
+   *     itself is never set or changed by this module.
+   *   - The per-track result of each category as extra info of the muons in MuonListName:
+   *     klmTrackT0<C>, klmTrackT0Err<C>, klmTrackNHits<C>, klmTrackSector<C>, klmTrackSection<C>
+   *     for <C> = BKLMScint, BKLMRPC, EKLMScint, and klmTrackT0All, klmTrackT0ErrAll over all
+   *     categories of the track.
+   *   - The per-event result of each category in EventExtraInfo: klmEventT0<C>, klmEventT0Err<C>.
    *   - Monitoring histograms under histogramDirectoryName with subdirectories:
    *       per_track/  — per-track T0 by detector category
    *       per_event/  — per-event track-averages and SEMs
@@ -73,7 +81,8 @@ namespace Belle2 {
    *
    * Validation histograms (pulls, residuals, dimuon ΔT0, pairwise sector
    * analysis, cross-detector ΔT0) are handled separately by
-   * KLMEventT0ValidationModule in klm/validation/KLMEventT0Validation.py.
+   * KLMEventT0ValidationModule in klm/scripts/KLMEventT0Validation.py, which reads
+   * the extra info above instead of recomputing it.
    */
   class KLMEventT0EstimatorModule : public HistoModule {
 
@@ -98,6 +107,15 @@ namespace Belle2 {
 
     /** Per-event algorithm: collect hits, compute residuals, fill outputs. */
     void event() override;
+
+    /** Running sums of the hits of one category on one track. */
+    struct CategorySums {
+      double sumW{0.0};   /**< Sum of the hit weights 1/sigma^2 [1/ns^2]. */
+      double sumWT{0.0};  /**< Sum of weight times hit T0 [1/ns]. */
+      int nHits{0};       /**< Number of hits used. */
+      int sumSector{0};   /**< Sum of the sector numbers of the hits used. */
+      int sumSection{0};  /**< Sum of the section numbers of the hits used. */
+    };
 
   private:
     /* Local helpers. */
@@ -131,37 +149,36 @@ namespace Belle2 {
 
     /**
      * Get per-hit sigma for a digit based on detector category.
-     * Uses calibrated per-hit resolution from KLMEventT0HitResolution payload.
+     * Uses calibrated per-hit resolution from KLMEventT0HitResolution payload; RPC hits of
+     * both readout directions use the RPC resolution measured with phi and z hits together.
      * @param subdetector KLM subdetector (BKLM or EKLM)
      * @param layer Layer number (1-indexed)
      * @param inRPC Whether the digit is from RPC
-     * @param plane Plane number (for RPC: BKLMElementNumbers::c_ZPlane or c_PhiPlane)
      * @return Per-hit sigma in ns
      */
-    double getHitSigma(int subdetector, int layer, bool inRPC, int plane = 0) const;
+    double getHitSigma(int subdetector, int layer, bool inRPC) const;
 
     /**
      * Accumulate EKLM scintillator per-digit T0 estimates (weighted).
      * Note: EKLM section 1=backward (z<0), section 2=forward (z>0).
      */
     void accumulateEKLM(const RelationVector<KLMHit2d>&, const ExtMap&,
-                        double& sumW, double& sumWT);
+                        CategorySums& sums);
 
     /**
      * Accumulate BKLM scintillator per-digit T0 estimates (weighted).
      */
     void accumulateBKLMScint(RelationVector<KLMHit2d>&, const ExtMap&,
-                             double& sumW, double& sumWT);
+                             CategorySums& sums);
 
     /**
      * Accumulate BKLM RPC per-digit T0 estimates (weighted, both readout directions).
      * @param[in]  klmHit2ds    KLM 2D hits associated with the track.
      * @param[in]  rpcMap       Map of extrapolated RPC hits keyed by module number.
-     * @param[out] sumW         Sum of inverse-variance weights.
-     * @param[out] sumWT        Sum of weight times time.
+     * @param[out] sums         Running sums of the RPC hits of the track.
      */
     void accumulateBKLMRPC(RelationVector<KLMHit2d>& klmHit2ds, const ExtMap& rpcMap,
-                           double& sumW, double& sumWT);
+                           CategorySums& sums);
 
     /* ---------- Parameters (set via addParam in constructor) ---------- */
 
@@ -207,6 +224,9 @@ namespace Belle2 {
 
     /** Reconstructed tracks. */
     StoreArray<Track> m_tracks;
+
+    /** Event extra info, receives the per-event result of each category. */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
     /* Working buffers. */
 

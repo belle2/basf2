@@ -98,14 +98,15 @@ void CATFinderModule::event()
 
   const std::vector<TrackingUtilities::CDCWireHit>& wireHitVector = *m_wireHitVector;
 
-  // Use only "unmasked" hits
+  // Use only hits that are not marked as "taken" or "background"
   unsigned int nHits = 0;
   for (const auto& wireHit : wireHitVector) {
-    if (!wireHit.getAutomatonCell().hasMaskedFlag())
+    const auto& cell = wireHit.getAutomatonCell();
+    if (not(cell.hasTakenFlag() or cell.hasBackgroundFlag()))
       nHits++;
   }
 
-  // Nothing to do if all the hits are already masked
+  // Nothing to do if there are no hits left...
   if (nHits == 0)
     return;
 
@@ -130,8 +131,9 @@ void CATFinderModule::event()
   unsigned int iHit = 0;
   for (unsigned int iWireHit = 0; iWireHit < wireHitVector.size(); ++iWireHit) {
 
-    // Again: skip the already masked hits
-    if (wireHitVector[iWireHit].getAutomatonCell().hasMaskedFlag())
+    // Again: skip the hits that are not marked as "taken" or "background"
+    const auto& cell = wireHitVector[iWireHit].getAutomatonCell();
+    if (cell.hasTakenFlag() or cell.hasBackgroundFlag())
       continue;
 
     // Prepare the input features

@@ -95,12 +95,12 @@ void DQMHistAnalysisV0Module::event()
 
     TList* c = contLevelXY[i];
     if (c && c->GetSize() > 0) {
-      auto* curv = (TGraph*)c->First();
+      auto* curv = dynamic_cast<TGraph*>(c->First());
       for (int j = 0; j < c->GetSize(); j++) {
         //auto* gc = (TGraph*)curv->Clone();
         //gc->Draw("C");
         curv->Draw("L");
-        curv = (TGraph*)c->After(curv); // Get Next graph
+        curv = dynamic_cast<TGraph*>(c->After(curv)); // Get Next graph
       }
     }
 
@@ -118,12 +118,12 @@ void DQMHistAnalysisV0Module::event()
   {
     TList* c = contLevelXZ;
     if (c && c->GetSize() > 0) {
-      auto* curv = (TGraph*)c->First();
+      auto* curv = dynamic_cast<TGraph*>(c->First());
       for (int j = 0; j < c->GetSize(); j++) {
         //auto* gc = (TGraph*)curv->Clone();
         //gc->Draw("C");
         curv->Draw("L");
-        curv = (TGraph*)c->After(curv); // Get Next graph
+        curv = dynamic_cast<TGraph*>(c->After(curv)); // Get Next graph
       }
     }
   }

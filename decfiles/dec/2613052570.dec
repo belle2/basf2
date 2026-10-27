@@ -1,0 +1,43 @@
+# EventType: 2613052570
+# Descriptor: [ccbar XicP2Xi0PipKs0, Xi02Lambda0Pi0]
+# NickName:  XicP2Xi0PipKs0_Xi02Lambda0Pi0
+# PhysicsWG: Charm
+# Responsible: Rishav Kumar Jaiswal
+# Date: 20260820 (YYYYMMDD)
+
+# Pythia default config file: basf2/data/generators/modules/fragmentation/pythia_belle2_charm.dat
+
+Decay vpho
+1.000 c    anti-c      PYTHIA 91;
+Enddecay
+
+Alias MyXi Xi0
+Alias MyLambda Lambda0
+Alias MyKs K_S0
+Alias MyPi pi0
+
+
+Decay Xi_c+
+1.000 MyXi pi+ MyKs      PHSP;
+Enddecay
+
+Decay MyXi
+1.000 MyLambda MyPi        PHSP;
+Enddecay
+
+Decay MyLambda
+1.000 p+ pi-               PHSP;
+Enddecay
+
+Decay MyPi 
+1.000 gamma gamma           PHSP;
+Enddecay
+
+Decay MyKs
+1.000 pi+ pi-              PHSP;
+Enddecay
+
+
+
+End
+

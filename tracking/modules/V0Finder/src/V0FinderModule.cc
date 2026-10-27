@@ -14,6 +14,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/v0Finding/fitter/V0VertexFitterFactory.h>
 
 using namespace Belle2;
 
@@ -89,6 +90,9 @@ V0FinderModule::V0FinderModule() : Module()
   addParam("precutCosAlpha", m_precutCosAlpha, "preselection cut on the cosine of opening angle between two tracks. "
            "Those above this cut are always accepted.", 0.9);
   addParam("useNewV0Fitter", m_useNewV0Fitter, "on true use new V0 fitter, otherwise use the old one", false);
+  addParam("vertexFitter", m_vertexFitterName,
+           "name of the vertex fitter to be used, one of: " + V0VertexFitterFactory::getNamesAsString(),
+           std::string("Rave"));
 }
 
 
@@ -106,6 +110,7 @@ void V0FinderModule::initialize()
     m_newV0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
                                   m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
     m_newV0Fitter->setFitterMode(m_v0FitterMode);
+    m_newV0Fitter->setVertexFitter(V0VertexFitterFactory::create(m_vertexFitterName));
   } else {
     m_v0Fitter = std::make_unique<V0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
                                             m_arrayNameV0ValidationVertex, m_arrayNameRecoTrack,
@@ -113,6 +118,7 @@ void V0FinderModule::initialize()
     m_v0Fitter->initializeCuts(m_beamPipeRadius,  m_vertexChi2CutOutside,
                                m_invMassRangeKshort, m_invMassRangeLambda, m_invMassRangePhoton);
     m_v0Fitter->setFitterMode(m_v0FitterMode);
+    m_v0Fitter->setVertexFitter(V0VertexFitterFactory::create(m_vertexFitterName));
   }
 
   // safeguard for users that try to break the code

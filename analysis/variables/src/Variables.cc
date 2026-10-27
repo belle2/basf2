@@ -1358,15 +1358,15 @@ value possible with the information provided.
                       "candidate in the best candidate selection.");
     REGISTER_VARIABLE("eventRandom", eventRandom,
                       "[Eventbased] Returns a random number between 0 and 1 for this event. Can be used, e.g. for applying an event prescale.");
-    REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName, useHighestProbMassForExt=1)", particleDistToClosestExtTrk,
+    REGISTER_METAVARIABLE("minET2ETDist(detName, detLayer, referenceListName[, useHighestProbMassForExt])", particleDistToClosestExtTrk,
                           R"DOC(Returns the distance :math:`d_{\mathrm{i}}` in [cm] between the particle and the nearest particle in the reference list at the given detector :math:`i`-th layer surface.
 The definition is based on the track helices extrapolation.
 
 * The first argument is the name of the detector to consider.
 * The second argument is the detector layer on whose surface we search for the nearest neighbour.
 * The third argument is the reference particle list name used to search for the nearest neighbour.
-* The fourth (optional) argument is an integer ("boolean") flag: if 1 (the default, if nothing is set), it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
-  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used.
+* The fourth (optional) argument is an integer ("boolean") flag: if 1, it is assumed the extrapolation was done with the most probable mass hypothesis for the track fit;
+  if 0, it is assumed the mass hypothesis matching the particle lists' PDG was used. The default value of ``useHighestProbMassForExt`` is 1.
 
 .. note::
     This variable requires to run the ``TrackIsoCalculator`` module first.

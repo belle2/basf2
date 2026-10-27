@@ -25,7 +25,7 @@ namespace Belle2 {
     /// Constructor set the prefix to PXDClusterPositionCalibrationAlgorithm
     PXDClusterPositionCalibrationAlgorithm();
 
-    /// Minimum number of collected clusters for estimating shape likelyhood
+    /// Minimum number of collected clusters for estimating shape likelihood
     int minClusterForShapeLikelyhood;
 
     /// Minimum number of collected clusters for estimating cluster position offsets

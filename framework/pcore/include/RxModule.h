@@ -13,6 +13,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/RandomGenerator.h>
 
+#include <vector>
+
 
 namespace Belle2 {
   class DataStoreStreamer;
@@ -40,7 +42,13 @@ namespace Belle2 {
     /** initialize m_streamer. */
     void initStreamer();
 
-    /** Gets data from m_rbuf and puts it into the data store. */
+    /** Gets data from m_rbuf and puts it into the data store.
+     *
+     * The receive buffer is sized on demand: a record that does not fit stays queued and
+     * remq() reports the size it needs, so the buffer is grown and the record read on the
+     * next turn of the loop. The buffer therefore settles at the size of the largest event
+     * seen so far instead of having to be dimensioned for the worst case up front.
+     */
     void readEvent();
 
   private:
@@ -55,6 +63,13 @@ namespace Belle2 {
 
     /** Current event number. */
     int m_nrecv;
+
+    /** Receive buffer in words, grown on demand by readEvent().
+     *
+     * Must never be empty: data() would be nullptr, which remq() reads as a request to
+     * discard the record.
+     */
+    std::vector<int> m_evtbuf;
 
     bool m_handleMergeable = true; /**< Whether to handle Mergeable objects. */
 

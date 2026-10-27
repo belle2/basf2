@@ -122,8 +122,8 @@ namespace TreeFitter {
 
       // the in going x-E correlations are 0 so we don't fill them
       const double R = cluster->getR();
-      const double theta = cluster->getPhi();
-      const double phi = cluster->getTheta();
+      const double theta = cluster->getTheta();
+      const double phi = cluster->getPhi();
 
       const double st = std::sin(theta);
       const double ct = std::cos(theta);

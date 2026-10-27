@@ -981,7 +981,7 @@ void PXDUnpackerModule::unpack_dhc_frame_v01(void* data, const int len, const in
     }
   }
 
-  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them alltogether.
+  // What do we do with wrong checksum frames? As we do not know WHAT is wrong, we have to skip them altogether.
   // As they might contain HEADER Info, we might better skip the processing of the full package, too.
   dhc.check_crc(m_errorMask, m_suppressErrorMask[c_nrDHE_CRC]);
   if (!m_continueOnError && m_errorMask[c_nrDHE_CRC]) {

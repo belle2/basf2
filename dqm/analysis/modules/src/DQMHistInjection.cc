@@ -15,7 +15,6 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <TROOT.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -29,6 +28,7 @@ REG_MODULE(DQMHistInjection);
 
 DQMHistInjectionModule::DQMHistInjectionModule() : DQMHistAnalysisModule()
 {
+  setDescription("DQM anaylsis module for hits,occupancy, etc after LER/HER injection");
   // This module CAN NOT be run in parallel!
 
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:INJ:"));

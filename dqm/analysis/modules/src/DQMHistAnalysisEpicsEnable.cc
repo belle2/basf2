@@ -9,7 +9,6 @@
 // Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisEpicsEnable.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------

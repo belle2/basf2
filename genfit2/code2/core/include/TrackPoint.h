@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_TrackPoint_h
-#define genfit_TrackPoint_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsFitterInfo.h"
@@ -154,5 +153,3 @@ class TrackPoint : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TrackPoint_h

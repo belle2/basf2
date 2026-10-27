@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_TrackCandHit_h
-#define genfit_TrackCandHit_h
+#pragma once
 
 #include <TObject.h>
 
@@ -93,5 +92,3 @@ class TrackCandHit : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_TrackCandHit_h

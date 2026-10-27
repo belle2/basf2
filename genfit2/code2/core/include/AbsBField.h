@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsBField_h
-#define genfit_AbsBField_h
+#pragma once
 
 #include <TVector3.h>
 
@@ -59,5 +58,3 @@ public:
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsBField_h

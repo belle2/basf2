@@ -40,7 +40,8 @@ namespace Belle2 {
         m_maximalLayerJump(2),
         m_maximalLayerJumpBackwardSeed(3),
         m_pathMaximalCandidatesInFlight(3),
-        m_stateMaximalHitCandidates(4)
+        m_stateMaximalHitCandidates(4),
+        m_stateCreatorFirstCDCLayer(0)
     {}
 
     /** Destructor */
@@ -130,6 +131,28 @@ namespace Belle2 {
      */
     unsigned int getStateMaximalHitCandidates() const;
 
+    /** Set first active CDC layer used in CDCCKFStateCreator
+     *
+     *  @param layer first active layer of the CDC (relevant if inner SL deactivated)
+     */
+    void setStateCreatorFirstCDCLayer(unsigned int layer);
+
+    /** Get first active CDC layer used in CDCCKFStateCreator
+     *
+     *  @return first active CDC layer used in CDCCKFStateCreator
+     */
+    unsigned int getStateCreatorFirstCDCLayer() const;
+
+    /** Set the maximal allowed arc length used in the RoughCDCStateFilter
+     * @param arclength the new arc length value which will be set
+     */
+    void setMaxArcLengthRoughCDCStateFilter(double arclength);
+
+    /** Get the maximal allowed arc length value used in the RoughCDCStateFilter
+     * @return value for the maximal allowed arc length currently stored in the payload
+     */
+    double getMaxArcLengthRoughCDCStateFilter() const;
+
 
   private:
     /** FLOAT PARAMETERS
@@ -160,7 +183,13 @@ namespace Belle2 {
     /** Maximal number of hit candidates for state filtering */
     unsigned int m_stateMaximalHitCandidates;
 
-    ClassDef(SVDToCDCCKFParameters, 1);  /**< ClassDef, necessary for ROOT */
+    /** first active CDC layer, needed to evaluate layer jumps in the CDCCKFStateCreator */
+    unsigned int m_stateCreatorFirstCDCLayer = 0;
+
+    /** maximal allowed arc length distance allowed by the RoughCDCStateFilter*/
+    double m_maxArcLengthRoughCDCStateFilter = 20;
+
+    ClassDef(SVDToCDCCKFParameters, 2);  /**< ClassDef, necessary for ROOT */
   };
 }
 

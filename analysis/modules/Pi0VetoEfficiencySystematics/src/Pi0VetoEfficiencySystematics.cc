@@ -62,6 +62,14 @@ WeightInfo Pi0VetoEfficiencySystematicsModule::getInfo(const Particle* particle)
 
 void Pi0VetoEfficiencySystematicsModule::initialize()
 {
+  B2WARNING("The Pi0VetoEfficiencySystematics module (and modularAnalysis.addPi0VetoEfficiencySystematics) is deprecated "
+            "and will be removed in February 2027. Please use the generic ParticleWeighting module instead, with "
+            "tableName='<tableName>_<mode><thresholdPercent>', where <thresholdPercent> is the threshold in percent "
+            "as a two-digit integer (e.g. 'Pi0VetoEfficiencySystematics_Mar2022_standard30' for threshold=0.30), "
+            "and selectedDaughters set to the decay string selecting the hard photon. "
+            "Note that the weights are then stored as extraInfo of the hard photon, not of the mother particle. "
+            "See the documentation of modularAnalysis.addPi0VetoEfficiencySystematics for details.");
+
   bool valid = m_decayDescriptor.init(m_decayString);
   if (!valid) {
     B2ERROR("Invalid input decay string: " << m_decayString);

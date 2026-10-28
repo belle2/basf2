@@ -54,6 +54,7 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   : m_wireID(ptrHit->getID())
   , m_wire(CDCWire::getInstance(*ptrHit))
   , m_hit(ptrHit)
+  , m_iHit(ptrHit->getArrayIndex())
   , m_automatonCell(1)
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
@@ -68,6 +69,7 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   : m_wireID(ptrHit->getID())
   , m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr)
   , m_hit(ptrHit)
+  , m_iHit(ptrHit ? ptrHit->getArrayIndex() : c_InvalidIndex)
   , m_automatonCell(1)
 {
   if (not ptrHit) {
@@ -122,6 +124,7 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
   : m_wireID(wireID)
   , m_wire(CDCWire::getInstance(wireID))
   , m_hit(nullptr)
+  , m_iHit(c_InvalidIndex)
   , m_automatonCell(1)
   , m_refDriftLength(driftLength)
   , m_refDriftLengthVariance(driftLengthVariance)
@@ -202,11 +205,6 @@ Circle2D CDCWireHit::conformalTransformed(const ROOT::Math::XYVector& relativeTo
   Circle2D driftCircle(getRefPos2D() - relativeTo, getRefDriftLength());
   driftCircle.conformalTransform();
   return driftCircle;
-}
-
-Index CDCWireHit::getStoreIHit() const
-{
-  return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
 }
 
 const ROOT::Math::XYVector& CDCWireHit::getRefPos2D() const

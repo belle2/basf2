@@ -10,11 +10,11 @@ TBranch: __ncandidates__, 1
 TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
-TBranch: chiProb, 0.1779
-TBranch: p, 1.105
+TBranch: chiProb, 0.1793
+TBranch: p, 1.121
 TBranch: mcP, 1.49
-TBranch: pErr, 0.04083
-TBranch: daughter__bo0__cm__spE__bc, 2.749
+TBranch: pErr, 0.04108
+TBranch: daughter__bo0__cm__spE__bc, 2.745
 TBranch: originalDaughter__bo0__cm__spE__bc, 2.752
-TBranch: x_uncertainty, 0.294
-TBranch: daughter__bo0__cm__spprodVertexXErr__bc, 0.294
+TBranch: x_uncertainty, 0.2931
+TBranch: daughter__bo0__cm__spprodVertexXErr__bc, 0.2931

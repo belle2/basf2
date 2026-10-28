@@ -15,6 +15,8 @@ Advanced Topics
 
 .. toctree:: FullEventInterpretation
 
+.. toctree:: ModeSelector
+
 .. toctree:: GraFEI
 
 .. toctree:: EventShape

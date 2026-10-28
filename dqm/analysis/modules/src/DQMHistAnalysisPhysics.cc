@@ -94,8 +94,8 @@ void DQMHistAnalysisPhysicsModule::beginRun()
   B2DEBUG(20, "DQMHistAnalysisPhysics: beginRun called.");
 }
 
-void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, std::string parts, std::string prefix,
-                                                       std::string pvname)
+void DQMHistAnalysisPhysicsModule::fitUpsilonFromHisto(TH1* histo, TPaveText* text, const std::string& parts,
+                                                       const std::string& prefix, const std::string& pvname)
 {
   double xMin = histo->GetXaxis()->GetXmin();
   double xMax = histo->GetXaxis()->GetXmax();
@@ -194,7 +194,7 @@ void DQMHistAnalysisPhysicsModule::event()
     }
 
     // for pv #new hadronb2_tight/#bhabha_trk_ecl
-    auto hist_hadronb2_tight_over_bhabha_trk_ecl =  getDelta("PhysicsObjects", "physicsresults", 0, true);// only if updated
+    auto hist_hadronb2_tight_over_bhabha_trk_ecl =  getDelta("PhysicsObjects", "physicsresults"); // only if updated
     if (hist_hadronb2_tight_over_bhabha_trk_ecl) {
       if (hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(6) != 0) {
         double hadronb2_tight_over_bhabha_trk_ecl = hist_hadronb2_tight_over_bhabha_trk_ecl->GetBinContent(4) /

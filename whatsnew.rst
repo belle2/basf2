@@ -29,6 +29,40 @@ Changes since release-10
 .. admonition:: New, removed and updated packages in externals
    :class: dropdown
 
+   .. list-table:: New, removed and updated packages in externals from v02-04-02 to v02-04-03
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - CA Certificates
+        - 2026-09-25
+        - 2026-10-20
+      * - certifi
+        - 2024.6.2
+        - 2026.10.19
+      * - pip
+        - 26.0.1
+        - 26.2.2
+
+   .. list-table:: New, removed and updated packages in externals from v02-04-00 to v02-04-02
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - CA Certificates
+        -
+        - 2026-09-25
+      * - FastBDT
+        - 5.4
+        - 6.0
+      * - OpenSSL
+        -
+        - 3.5.9
+
    .. list-table:: New, removed and updated packages in externals from v02-03-02 to v02-04-00
       :widths: 50 25 25
       :header-rows: 1
@@ -212,6 +246,8 @@ automatically done when switching the calculation on.
 .. include:: analysis/doc/whatsnew-since/release-10-00.txt
 
 .. include:: generators/doc/whatsnew-since/release-10-00.txt
+
+.. include:: tracking/doc/whatsnew-since/release-10-00.txt
 
 Changes since release-09
 ========================
@@ -1265,6 +1301,7 @@ Changes since release-08
 .. include:: analysis/doc/whatsnew-since/release-08-00.txt
 .. include:: skim/doc/whatsnew-since/release-08-00.txt
 .. include:: mva/doc/whatsnew-since/release-08-00.txt
+.. include:: tracking/doc/whatsnew-since/release-08-00.txt
 
 Changes since release-07
 ========================
@@ -1330,6 +1367,8 @@ the associated password. More information can be found in the section
 .. List of changes for the mva package
 
 .. include:: mva/doc/whatsnew-since/release-07-00.txt
+
+.. include:: tracking/doc/whatsnew-since/release-07-00.txt
 
 Changes since release-06
 ========================

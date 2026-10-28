@@ -1,0 +1,49 @@
+# EventType: 1143042007
+# Descriptor: [B0 
+#                -> D- [-> K+ pi- pi-] pi+ ]
+#                -> D*-[-> D0bar[                    pi-] pi+ ]
+#                                  -> K+ pi-
+#                                  -> K+ pi- pi0
+#                                  -> K+ pi- pi+ pi- ] 
+# NickName: Bd_Dstmpip_D0barpim_Kppim_Kppimpiz_Kppimpippim
+# Documentation: Decay mode for Lindblad-type decoherence analysis
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Lucas Stoetzer
+# Email: lucassto@hawaii.edu
+# Cuts: None
+# Date: 20260911
+
+Define lambda 0.2e12
+Define dgamma 3.97e-3
+Define qoverp 0.8
+Define phaseqoverp 0
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSSBMixNP dm dgamma lambda;
+Enddecay
+
+Decay B0sig
+0.48 D-sig pi+ PHSP;
+0.52 D*-sig pi+ PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay D-sig
+1.0 K+ pi- pi- PHSP;
+Enddecay
+CDecay D+sig
+
+Decay D*-sig
+1.0 anti-D0sig pi- VSS;
+Enddecay
+CDecay D*+sig
+
+Decay anti-D0sig
+0.15 K+ pi- PHSP;
+0.54 K+ pi- pi0 PHSP;
+0.31 K+ pi- pi+ pi- PHSP;
+Enddecay
+CDecay D0sig
+
+End

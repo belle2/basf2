@@ -1329,15 +1329,15 @@ Requires global tag 'pid_nn_<release>' with the correct data <release>.
     REGISTER_METAVARIABLE("pidMissingProbabilityExpert(detectorList)", pidMissingProbabilityExpert,
                           "returns 1 if PID is missing for at least one of the detectors in the list, otherwise 0. ",
 			  Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("pidMostLikelyPDG(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", mostLikelyPDG,
+    REGISTER_VARIABLE("pidMostLikelyPDG([ePrior, muPrior, piPrior, KPrior, pPrior, dPrior])", mostLikelyPDG,
                       R"DOC(
 Returns PDG code of the largest PID likelihood, or NaN if PID information is not available.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
-    REGISTER_VARIABLE("pidIsMostLikely(ePrior=1/6, muPrior=1/6, piPrior=1/6, KPrior=1/6, pPrior=1/6, dPrior=1/6)", isMostLikely, R"DOC(
+following the order shown in the metavariable's declaration. Flat priors are assumed as default, i.e. each prior defaults to ``1/6``.)DOC");
+    REGISTER_VARIABLE("pidIsMostLikely([ePrior, muPrior, piPrior, KPrior, pPrior, dPrior])", isMostLikely, R"DOC(
 Returns True if the largest PID likelihood of a given particle corresponds to its particle hypothesis.
 This function accepts either no arguments, or 6 floats as priors for the charged particle hypotheses
-following the order shown in the metavariable's declaration. Flat priors are assumed as default.)DOC");
+following the order shown in the metavariable's declaration. Flat priors are assumed as default, i.e. each prior defaults to ``1/6``.)DOC");
 
     REGISTER_METAVARIABLE("pidWeightedLogLikelihoodValueExpert(weightMatrixName, pdgCode, detectorList)",
                           pidWeightedLogLikelihoodValueExpert,

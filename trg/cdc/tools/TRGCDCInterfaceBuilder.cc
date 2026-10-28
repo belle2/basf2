@@ -102,7 +102,8 @@ main(int argc, char**)    // argv[]) {
   const string ts1 = TRGUtil::dateString();
 
   //...Get path to include directory...
-  const string path = getenv(ENV_PATH);
+  const char* envPath = getenv(ENV_PATH);
+  const string path = (envPath != nullptr ? envPath : "");
   const string indir = path + "/include/trg/cdc";
 
   //...Temporary output file...

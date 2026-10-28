@@ -199,8 +199,7 @@ Now we have to add to the steering path the relevant functions for:
 
    Do not try to generate a large sample: it will take a lot of time! For the exercise, limit the number
    of generated events to 10. If you want to produce a larger sample (e.g. 1000 events), consider to use
-   a batch submission system (whose usage will be explained in next lessons: :ref:`onlinebook_bsub`
-   for the KEKCC system and :ref:`onlinebook_htcondor`).
+   a batch submission system such as the one provided by KEKCC (see :ref:`onlinebook_batch`)
 
 
 .. warning::

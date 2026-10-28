@@ -306,7 +306,7 @@ int RingBuffer::insq(const int* buf, int size, bool checkTx)
   }
 }
 
-int RingBuffer::remq(int* buf)
+int RingBuffer::remq(int* buf, int capacityWords)
 {
   SemaphoreLocker locker(m_semid);
   if (m_bufinfo->nbuf < 0) {
@@ -329,6 +329,11 @@ int RingBuffer::remq(int* buf)
       m_procIsBusy = false;
     }
     return 0;
+  }
+  if (buf and capacityWords >= 0 and nw > capacityWords) {
+    //Record does not fit. Leave it queued and tell the caller how much it needs;
+    //no bookkeeping is touched, so this is simply "come back with a bigger buffer".
+    return -nw;
   }
   if (buf)
     memcpy(buf, r_ptr + 2, nw * sizeof(int));

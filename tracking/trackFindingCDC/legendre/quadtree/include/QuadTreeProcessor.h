@@ -12,7 +12,10 @@
 
 #include <tracking/trackingUtilities/utilities/Algorithms.h>
 
+#include <framework/logging/Logger.h>
+
 #include <algorithm>
+#include <array>
 #include <functional>
 #include <memory>
 #include <map>
@@ -34,6 +37,10 @@ namespace Belle2 {
      */
     template<typename AX, typename AY, class AData>
     class QuadTreeProcessor {
+
+    private:
+      /// Upper bound on the number of children of a node - they are kept on the stack
+      static const int c_maxNChildren = 16;
 
     public:
       /// The QuadTree will only see items of this type
@@ -128,16 +135,17 @@ namespace Belle2 {
         }
 
         // Fill the seed level with the items
+        m_itemPtrs.clear();
+        m_itemPtrs.reserve(m_items.size());
+        for (Item& item : m_items) {
+          m_itemPtrs.push_back(&item);
+        }
+
         for (QuadTree* seededTree : m_seededTrees) {
           seededTree->reserveItems(m_items.size());
-
-          for (Item& item : m_items) {
-            if (item.isUsed()) continue;
-            if (isInNode(seededTree, item.getPointer())) {
-              seededTree->insertItem(&item);
-            }
-          }
         }
+
+        this->insertItemsInNodes(m_seededTrees, m_itemPtrs);
       }
 
     public:
@@ -220,20 +228,24 @@ namespace Belle2 {
           node->setFilled();
         }
 
-        std::vector<QuadTree*> children;
+        // Kept on the stack - this function is called millions of times per event
+        std::array<QuadTree*, c_maxNChildren> children;
+        int nChildren = 0;
         for (QuadTree& child : node->getChildren()) {
-          children.push_back(&child);
+          B2ASSERT("More children than the quad tree processor supports", nChildren < c_maxNChildren);
+          children[nChildren++] = &child;
         }
         const auto compareNItems = [](const QuadTree * lhs, const QuadTree * rhs) {
           return lhs->getNItems() < rhs->getNItems();
         };
 
         // Explicitly count down the children
-        const int nChildren = children.size();
-        for (int iChild = 0; iChild < nChildren; ++iChild) {
-          auto itHeaviestChild = std::max_element(children.begin(), children.end(), compareNItems);
+        for (int nRemaining = nChildren; nRemaining > 0; --nRemaining) {
+          auto itHeaviestChild =
+            std::max_element(children.begin(), children.begin() + nRemaining, compareNItems);
           QuadTree* heaviestChild = *itHeaviestChild;
-          children.erase(itHeaviestChild);
+          // Drop the heaviest child from the list keeping the order of the remaining ones
+          std::move(itHeaviestChild + 1, children.begin() + nRemaining, itHeaviestChild);
           // After we have processed some children we need to get rid of the already used hits in all the children,
           // because this can change the number of items drastically
           erase_remove_if(heaviestChild->getItems(), [&](Item * hit) { return hit->isUsed(); });
@@ -247,6 +259,7 @@ namespace Belle2 {
        */
       void createChildren(QuadTree* node, QuadTreeChildren& m_children) const
       {
+        m_children.reserve(node->getXNbins() * node->getYNbins());
         for (int i = 0; i < node->getXNbins(); ++i) {
           for (int j = 0; j < node->getYNbins(); ++j) {
             const XYSpans& xySpans = createChild(node, i, j);
@@ -263,20 +276,17 @@ namespace Belle2 {
        */
       void fillChildren(QuadTree* node, const std::vector<Item*>& items)
       {
-        const size_t neededSize = 2 * items.size();
+        // An item can be inserted into each child at most once
+        const size_t neededSize = items.size();
+        m_childPtrs.clear();
+        m_childPtrs.reserve(node->getChildren().size());
         for (QuadTree& child : node->getChildren()) {
           child.reserveItems(neededSize);
+          m_childPtrs.push_back(&child);
         }
 
-        for (Item* item : items) {
-          if (item->isUsed()) continue;
+        this->insertItemsInNodes(m_childPtrs, items);
 
-          for (QuadTree& child : node->getChildren()) {
-            if (isInNode(&child, item->getPointer())) {
-              child.insertItem(item);
-            }
-          }
-        }
         afterFillDebugHook(node->getChildren());
       }
 
@@ -324,6 +334,29 @@ namespace Belle2 {
        * @return true if this item belongs into this node.
        */
       virtual bool isInNode(QuadTree* node, AData* item) const = 0;
+
+      /**
+       *  Insert each of the given items into every one of the given nodes it belongs to.
+       *
+       *  The default implementation simply asks isInNode for each item and node pair.
+       *  Processors may override it to share the parts of the containment check that only
+       *  depend on the item or on a part of the node geometry over the given set of nodes.
+       *  Any implementation has to insert the items into each node in the order in which
+       *  they appear in the given item range.
+       */
+      virtual void insertItemsInNodes(const std::vector<QuadTree*>& nodes,
+                                      const std::vector<Item*>& items)
+      {
+        for (Item* item : items) {
+          if (item->isUsed()) continue;
+
+          for (QuadTree* node : nodes) {
+            if (isInNode(node, item->getPointer())) {
+              node->insertItem(item);
+            }
+          }
+        }
+      }
 
       /**
        * Function which checks if given node is leaf
@@ -375,6 +408,12 @@ namespace Belle2 {
 
       /// Storage space for the items that are referenced by the quad tree nodes
       std::deque<Item> m_items;
+
+      /// Reusable buffer with pointers to all items - used to seed the tree
+      std::vector<Item*> m_itemPtrs;
+
+      /// Reusable buffer with pointers to the children of the node currently being filled
+      std::vector<QuadTree*> m_childPtrs;
 
       /**
        * Vector of QuadTrees

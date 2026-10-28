@@ -19,7 +19,8 @@ def stdKlongs(listtype='allklm', path=None):
         everything but the 'allklm' and 'allecl' lists is disabled pending study.
 
     By default, prepares the 'K_L0:allklm' list with no cuts (all KLM clusters are loaded).
-    It's possible to provide the argument 'allecl' to create a list of all ECL clusters loaded as Klong candidates.
+    It's possible to provide the argument 'allecl' to create a list of Klong candidates built
+    from all neutral ECL clusters, i.e. ECL clusters that are not matched to any track.
 
     Parameters:
         listtype (str): name of standard list options (currently only

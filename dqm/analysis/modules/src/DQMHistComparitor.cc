@@ -122,19 +122,6 @@ void DQMHistComparitorModule::event()
     refhist->SetLineStyle(3);// 2 or 3
     refhist->SetLineColor(3);
 
-    /*
-      // I think no need for this anymore
-      TIter nextkey(it->canvas->GetListOfPrimitives());
-      TObject* obj = NULL;
-      while ((obj = (TObject*)nextkey())) {
-        if (obj->IsA()->InheritsFrom("TH1")) {
-          if (string(obj->GetName()) == string(refhist->GetName())) {
-            delete obj;
-          }
-        }
-      }
-    */
-
     refhist->Draw("hist");
     refhist->SetStats(kFALSE);
     if (refhist->GetMaximum() > histo->GetMaximum())

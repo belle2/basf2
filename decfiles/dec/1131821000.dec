@@ -1,0 +1,28 @@
+# EventType: 1131821000
+# Descriptor: [B0 -> (J/psi -> l+l-) gamma ] cc
+# NickName: Bd_Jpsig
+# Documentation: Rare decay mode for search
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Lucija Dolzan
+# Email: ld13797@student.uni-lj.si
+# Cuts: None
+# Date: 20260914
+#
+
+Decay Upsilon(4S)
+1.0000 B0 anti-B0 B0sig  anti-B0sig     VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0   J/psisig  gamma      SVP_HELAMP 1.0 0.0 1.0 0.0;
+Enddecay
+CDecay anti-B0sig
+
+Decay J/psisig
+0.5 mu+ mu-  VLL;
+0.5 e+ e-   VLL;
+Enddecay
+
+End
+

@@ -18,7 +18,9 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * DQM histogram analysis example with EPICS usage (old)
+   */
 
   class DQMHistAnalysisEpicsExampleModule final : public DQMHistAnalysisModule {
 
@@ -57,13 +59,15 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** The name of the directory the histogram is in */
+    std::string m_histogramDirectoryName;
     /** The name of the histogram. */
-    std::string m_histoname;
+    std::string m_histogramName;
     /** The definition of the fit function. */
     std::string m_function;
-    /** The fit function parameters for EPICS. */
+    /** The number of fit function parameters for EPICS. */
     Int_t m_parameters;
-    /** The prefix of PV. */
+    /** The prefix of PVs. */
     std::string  m_pvPrefix;
 
     /** The fit function. */

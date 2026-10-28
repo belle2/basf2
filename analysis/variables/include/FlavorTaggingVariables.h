@@ -248,7 +248,7 @@ namespace Belle2 {
 
     /**
      * Returns function which returns the corresponding r (dilution) bin according to the Belle binning for the given combinerMethod.
-     * The default methods are 'FBDT' or 'FANN'.
+     * The default methods is 'FBDT'.
      * This is a Flavor Tagging variable for general use.
      */
     Manager::FunctionPtr rBinBelle(const std::vector<std::string>& arguments);

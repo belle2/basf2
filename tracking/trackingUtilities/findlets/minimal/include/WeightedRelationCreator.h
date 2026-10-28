@@ -77,7 +77,10 @@ namespace Belle2 {
       void apply(const std::vector<AObject*>& inputObjects,
                  std::vector<WeightedRelation<AObject>>& weightedRelations) final
       {
-
+        // The relation filters look their possible partners up with a std::equal_range over
+        // inputObjects. An unsorted input does not make that search fail, it makes it return
+        // the wrong range, so the mistake would show up as quietly missing relations instead
+        // of as a crash. Checking it here only costs one linear scan per event.
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
                  std::is_sorted(inputObjects.begin(), inputObjects.end(), LessOf<Deref>()));
 

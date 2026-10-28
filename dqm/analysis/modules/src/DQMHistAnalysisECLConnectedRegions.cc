@@ -27,7 +27,7 @@ DQMHistAnalysisECLConnectedRegionsModule::DQMHistAnalysisECLConnectedRegionsModu
 
 void DQMHistAnalysisECLConnectedRegionsModule::initialize()
 {
-  for (auto& pv_name : {"largest_cr_avg_crystals_num", "largest_cr_localmax_num"}) {
+  for (const auto& pv_name : {"largest_cr_avg_crystals_num", "largest_cr_localmax_num"}) {
     registerEpicsPV(m_pvPrefix + pv_name, pv_name);
   }
 
@@ -44,11 +44,11 @@ void DQMHistAnalysisECLConnectedRegionsModule::beginRun()
 void DQMHistAnalysisECLConnectedRegionsModule::event()
 {
   //== Get DQM info
-  auto crystalsDistributionHist = (TH1F*)findHist("ECL/Crystals_distribution_in_largest_cr");
+  auto* crystalsDistributionHist = findHist("ECL/Crystals_distribution_in_largest_cr");
   if (crystalsDistributionHist) {
     m_largestCRAvgCrystalsNum = crystalsDistributionHist->GetMean();
   }
-  auto localMaxDistributionHist = (TH1F*)findHist("ECL/LocalMaximum_distribution_in_largest_cr");
+  auto* localMaxDistributionHist = findHist("ECL/LocalMaximum_distribution_in_largest_cr");
   if (localMaxDistributionHist) {
     m_largestCRLocalMaxNum = localMaxDistributionHist->GetMean();
   }

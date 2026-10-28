@@ -1,0 +1,24 @@
+Changes in the tracking package since release-10-00
+---------------------------------------------------
+... (new features of release-11)
+
+mDST Information
+++++++++++++++++
+
+* the Track Quality Indicator is filled in the mDST and available to analysts
+
+
+Tracking
++++++++++++++
+
+* the GNN-based CDC pattern Recognition algorithm (CAT Finder) is now available for developers (but switched off in the standard tracking chain)
+* added the fix of tracking to preserve the tracks going through CDC dead boards --> off at the moment, need further validation
+* a combined cdc wire filter is available to perform a cut-based filter for inner layers and MVA-based filter for outer layers, layer number from which to switch to MVA could be changed via payloload
+* a "fit until success" strategy introduced in TrackCreator handles the pre-HLT fit (prefilter), leaving the remaining hypotheses for offline reconstruction (postfilter) to split the track fitting workload and save CPU time  
+
+
+Convenience Functions
++++++++++++++++++++++
+
+* the combined VXDFT2 and SVDHough pattern recognition chain has been bug-fixed and it is now available to developers
+* the parameters in SVDHough and SVDToCDCCKF can be changed via payload 

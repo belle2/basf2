@@ -17,7 +17,7 @@
 #include <TLine.h>
 
 //boost
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 using namespace Belle2;
 
@@ -312,7 +312,8 @@ void DQMHistAnalysisECLSummaryModule::terminate()
   delete h_bad_chi2_overlay;
 }
 
-std::pair<int, DQMHistAnalysisECLSummaryModule::ECLAlarmType> DQMHistAnalysisECLSummaryModule::getAlarmByName(std::string name)
+std::pair<int, DQMHistAnalysisECLSummaryModule::ECLAlarmType> DQMHistAnalysisECLSummaryModule::getAlarmByName(
+  const std::string& name)
 {
   int index = 0;
   for (const auto& alarm_info : m_ecl_alarms) {

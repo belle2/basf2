@@ -3325,7 +3325,10 @@ C
       COMMON / TAUDCD /IDFFIN(JMAX,NMODE),MULPIK(NMODE)
      &                ,NAMES
       CHARACTER NAMES(NMODE)*31
-    
+      COMMON / RadWilson/CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
+     *                   ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOFF_R_VAINT,OFF_PHOT
+      REAL*8             CV_LL,CV_LR,CS_RL,CS_RR,CV_RL,CV_RR,CS_LL,CS_LR,MNURD
+      INTEGER            ONOF_L_IB,ONOF_L_V,ONOF_L_A,ONOF_L_VAINT,ONOF_R_IB,ONOF_R_V,ONOF_R_A,ONOFF_R_VAINT,OFF_PHOT
       REAL*8  PKC(4),PKZ(4),PN(4),PR(4),QQ(4),A1,A2,A3
       REAL*8  AMF0,AMF1,AMF2
       REAL*8  ALP,ALP1,ALP1R,ALP2,ALP2R
@@ -3351,6 +3354,7 @@ C
       AMF1 = DCDMAS(IDFFIN(1,JNPI),0)
       AMF2 = DCDMAS(IDFFIN(2,JNPI),4)
       AMF0 = AMNUTAD
+      IF ((INUM.EQ.99).AND.(ONOF_R_IB.gt.0.OR.ONOF_R_V.gt.0.OR.ONOF_R_A.gt.0)) AMF0 = MNURD
 !      IF(INUM.GT.4) THEN
 !       write(*,*) inum,':',IDFFIN(1,IADDR),IDFFIN(2,IADDR),IDFFIN(3,IADDR),DCDMAS(IDFFIN(3,IADDR))
 !      ENDIF
@@ -4413,6 +4417,12 @@ C      write(*,*) 'USING DAM2PI_wrap'
      C                  CV_LL,CV_LR,CS_RL,CS_RR,
      C                  ONOF_L_IB, ONOF_L_V, ONOF_L_A, ONOF_L_VAINT,
      C                  PTD,PND,PIM1D,PIM2D,AMPLITD1,HVD1)
+      DO I = 1,4
+         PTD(I) = PT(I)
+         PND(I) = PN(I)
+         PIM1D(I)=PIM1(I)
+         PIM2D(I)=PIM2(I)
+      ENDDO
       CALL pigamma_right(!AMTAUD,AMPID,AMROD,GAMROD,AMA1D,GAMA1D,
      C                  CV_RL,CV_RR,CS_LL,CS_LR,MNURD,
      C                  ONOF_R_IB, ONOF_R_V, ONOF_R_A, ONOF_R_VAINT,

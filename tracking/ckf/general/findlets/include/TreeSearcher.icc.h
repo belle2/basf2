@@ -82,7 +82,7 @@ namespace Belle2 {
       TrackingUtilities::Weight weight = continuation.getWeight();
       // the state may still include information from an other round of processing, so lets set it back
 
-      if (std::count(path.begin(), path.end(), childState)) {
+      if (std::find(path.begin(), path.end(), childState) != path.end()) {
         // Cycle detected -- is this the best handling?
         // Other options: Raise an exception and bail out of this seed
         B2FATAL("Cycle detected!");

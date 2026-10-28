@@ -1,7 +1,6 @@
 ---
 output_vars:
   - FBDT_qrCombined
-  - FANN_qrCombined
   - qrMC
   - mcFlavorOfOtherB
   - qrGNN

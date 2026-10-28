@@ -122,7 +122,7 @@ void DQMHistAnalysisTRGGDLModule::event()
     //get histo
     char c_psn[1000];
     sprintf(c_psn, "TRGGDL/hGDL_psn_extra_fast_%s", skim_smap[iskim].c_str());
-    m_h_psn_extra_fast[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
+    m_h_psn_extra_fast[iskim] = findHist(c_psn);/**psn bits*/
 
     if (m_h_psn_extra_fast[iskim] == nullptr) {
       B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra_fast is not found.");
@@ -345,7 +345,7 @@ void DQMHistAnalysisTRGGDLModule::event()
     //get histo
     char c_psn[1000];
     sprintf(c_psn, "TRGGDL/hGDL_psn_extra_%s", skim_smap[iskim].c_str());
-    m_h_psn_extra[iskim] = (TH1D*)findHist(c_psn);/**psn bits*/
+    m_h_psn_extra[iskim] = findHist(c_psn);/**psn bits*/
 
     if (m_h_psn_extra[iskim] == nullptr) {
       B2WARNING("Histogram/canvas named TRGGDL/hGDL_psn_extra is not found.");
@@ -583,7 +583,7 @@ void DQMHistAnalysisTRGGDLModule::event()
 
 
   //fill efficiency with offline selection
-  m_h_psn_pure_extra = (TH1D*)findHist("TRGGDL/hGDL_psn_pure_extra_all");/**psn bits*/
+  m_h_psn_pure_extra = findHist("TRGGDL/hGDL_psn_pure_extra_all");/**psn bits*/
   if (m_h_psn_pure_extra == nullptr) {
     B2WARNING("Histogram/canvas named hGDL_psn_pure_extra is not found.");
   } else {
@@ -751,7 +751,7 @@ void DQMHistAnalysisTRGGDLModule::event()
       double data;
       //data = m_h_eff_shifter->GetBinContent(i + 1);
       data = m_h_eff_shifter_fast->GetBinContent(i + 1);
-      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], (void*)&data), "ca_set failure");
+      if (mychid[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid[i], &data), "ca_set failure");
     }
     for (auto i = 0; i < nskim_gdldqm; i++) {
       double data = 0;
@@ -767,7 +767,7 @@ void DQMHistAnalysisTRGGDLModule::event()
         }
       }
 
-      if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], (void*)&data), "ca_set failure");
+      if (mychid_entry[i]) SEVCHK(ca_put(DBR_DOUBLE, mychid_entry[i], &data), "ca_set failure");
     }
   }
 #endif

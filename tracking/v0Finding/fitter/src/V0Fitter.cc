@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/v0Finding/fitter/V0Fitter.h>
+#include <tracking/v0Finding/fitter/V0VertexFitterFactory.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/VectorUtil.h>
 #include <framework/geometry/BFieldManager.h>
-#include <tracking/v0Finding/dataobjects/VertexVector.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFitting/trackBuilder/factories/TrackBuilder.h>
@@ -22,9 +22,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 
 #include <genfit/Track.h>
-#include <genfit/TrackPoint.h>
 #include <genfit/MeasuredStateOnPlane.h>
-#include <genfit/GFRaveVertexFactory.h>
 #include <genfit/GFRaveVertex.h>
 #include <genfit/FieldManager.h>
 #include <genfit/MaterialEffects.h>
@@ -32,15 +30,13 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/KalmanFitterInfo.h>
 
-#include <framework/utilities/IOIntercept.h>
-
 using namespace Belle2;
 
 V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0sName,
                    const std::string& v0ValidationVerticesName, const std::string& recoTracksName,
                    const std::string& copiedRecoTracksName, bool enableValidation)
   : m_validation(enableValidation), m_recoTracksName(recoTracksName), m_v0FitterMode(1), m_forcestore(false),
-    m_useOnlyOneSVDHitPair(true)
+    m_useOnlyOneSVDHitPair(true), m_vertexFitter(V0VertexFitterFactory::create("Rave"))
 {
   m_trackFitResults.isRequired(trackFitResultsName);
   m_v0s.registerInDataStore(v0sName, DataStore::c_WriteOut | DataStore::c_ErrorIfAlreadyRegistered);
@@ -68,6 +64,11 @@ V0Fitter::V0Fitter(const std::string& trackFitResultsName, const std::string& v0
            genfit::MaterialEffects::getInstance()->isInitialized());
   B2ASSERT("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
            genfit::FieldManager::getInstance()->isInitialized());
+}
+
+void V0Fitter::setVertexFitter(std::unique_ptr<V0VertexFitter> vertexFitter)
+{
+  m_vertexFitter = std::move(vertexFitter);
 }
 
 void V0Fitter::setFitterMode(int fitterMode)
@@ -98,39 +99,6 @@ void V0Fitter::initializeCuts(double beamPipeRadius,
   m_invMassRangeKshort = invMassRangeKshort;
   m_invMassRangeLambda = invMassRangeLambda;
   m_invMassRangePhoton = invMassRangePhoton;
-}
-
-
-// cppcheck-suppress[constParameterReference] ; genfit::GFRaveVertexFactory::findVertices takes non-const Track pointers
-bool V0Fitter::fitGFRaveVertex(genfit::Track& trackPlus, genfit::Track& trackMinus, genfit::GFRaveVertex& vertex)
-{
-  VertexVector vertexVector;
-  std::vector<genfit::Track*> trackPair {&trackPlus, &trackMinus};
-
-  try {
-    IOIntercept::OutputToLogMessages
-    logCapture("V0Fitter GFRaveVertexFactory", LogConfig::c_Debug, LogConfig::c_Debug);
-    logCapture.start();
-
-    genfit::GFRaveVertexFactory vertexFactory;
-    vertexFactory.findVertices(&vertexVector.v, trackPair);
-  } catch (...) {
-    B2ERROR("Exception during vertex fit.");
-    return false;
-  }
-
-  if (vertexVector.size() != 1) {
-    B2DEBUG(21, "Vertex fit failed. Size of vertexVector not 1, but: " << vertexVector.size());
-    return false;
-  }
-
-  if ((*vertexVector[0]).getNTracks() != 2) {
-    B2DEBUG(20, "Wrong number of tracks in vertex.");
-    return false;
-  }
-
-  vertex = *vertexVector[0];
-  return true;
 }
 
 /// used in the fitAndStore function.
@@ -396,7 +364,7 @@ bool V0Fitter::vertexFitWithRecoTracks(const Track* trackPlus, const Track* trac
   genfit::MeasuredStateOnPlane stMinus = recoTrackMinus->getMeasuredStateOnPlaneFromFirstHit(minusRepresentation);
 
   genfit::GFRaveVertex vert;
-  if (not fitGFRaveVertex(gfTrackPlus, gfTrackMinus, vert)) {
+  if (not m_vertexFitter->fit(gfTrackPlus, gfTrackMinus, pdgTrackPlus, pdgTrackMinus, vert)) {
     return false;
   }
 

@@ -486,9 +486,9 @@ C            4- default ME wrapped curr., 5- wrapped ME
      a                1, 1, 1, 2, 2,   2, 2, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
      a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
-     a                1, 1, 1, 1, 1,   1, 1, 1, 5, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
-     a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
+     a                1, 1, 1, 1, 1,   1, 1, 1, 5, 1,
+     a                1, 1, 1, 1, 1,   1, 1, 1, 1, 1,
+     a                1, 1, 1, 1, 1,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0,
      a                0, 0, 0, 0, 0,   0, 0, 0, 0, 0/
       DATA KEYstrt3 / 2, 2, 2, 2, 2,   2, 2, 3, 2, 2, 
@@ -649,27 +649,27 @@ C AJWMOD fix sign bug, 2/22/99
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 94
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 96
      8             -1,20223,  0, 0, 0, 0,3*0,  -1,20223, 0, 0, 0, 0,3*0, ! new (may 2020) ! 98
-     8             -1,    8,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 100
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 102
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 104
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 106
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 108
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 110
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 112
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 114
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 116
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 118
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 120
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 122
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 124
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 126
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 128
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 130
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 132
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 134
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 136
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (may 2020) ! 138
-     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0/ ! new (may 2020)  ostattnie 2
+     8             -1,    8,  0, 0, 0, 0,3*0,  221, 213, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 100
+     8             221, 213,  0, 0, 0, 0,3*0,  221, 213, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 102
+     8             221, 213,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 104
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 106
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 108
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 110
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 112
+     8             221, 323,  0, 0, 0, 0,3*0,  221, 323, 0, 0, 0, 0,3*0, ! new (jun 2026) ! 114
+     8             221, 323,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 116
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 118
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 120
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 122
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 124
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 126
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 128
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 130
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 132
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 134
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 136
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0, ! new (jun 2026) ! 138
+     8             -3,   -3,  0, 0, 0, 0,3*0,  -3, -3,   0, 0, 0, 0,3*0/ ! new (jun 2026)  ostattnie 2
 
       DATA NOPIK1 /
      o               -1,0,  0,   0,0,0,3*0,     -3,0,  0,    0,0,0,3*0, ! new (may 2004) ! 2
@@ -1094,22 +1094,22 @@ C=================================================
         IF(II.EQ.97) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPP)  ' ! TauDecayModeBBB = 259 
         IF(II.EQ.98) NAMES(I-NLT)='  TAU-  -->pi-f1(2pi0eta:PPG)  ' ! TauDecayModeBBB = 260 
         IF(II.EQ.99) NAMES(I-NLT)='  TAU-  --> pi- gamma          ' ! TauDecayModeBBB = 261
-        IF(II.EQ.100)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 262
-        IF(II.EQ.101)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 263
-        IF(II.EQ.102)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 264
-        IF(II.EQ.103)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 265
-        IF(II.EQ.104)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 266
-        IF(II.EQ.105)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 267
-        IF(II.EQ.106)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 268
-        IF(II.EQ.107)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 269
-        IF(II.EQ.108)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 270
-        IF(II.EQ.109)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 271
-        IF(II.EQ.110)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 272
-        IF(II.EQ.111)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 273
-        IF(II.EQ.112)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 274
-        IF(II.EQ.113)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 275
-        IF(II.EQ.114)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 276
-        IF(II.EQ.115)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 277
+        IF(II.EQ.100)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(GG) ' ! TauDecayModeBBB = 262
+        IF(II.EQ.101)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(3P0)' ! TauDecayModeBBB = 263
+        IF(II.EQ.102)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(3PP)' ! TauDecayModeBBB = 264
+        IF(II.EQ.103)NAMES(I-NLT)='  TAU-  -->rho-(pi-pi0)eta(PPG)' ! TauDecayModeBBB = 265
+        IF(II.EQ.104)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(GG)  ' ! TauDecayModeBBB = 266
+        IF(II.EQ.105)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(3P0) ' ! TauDecayModeBBB = 267
+        IF(II.EQ.106)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(PPP) ' ! TauDecayModeBBB = 268
+        IF(II.EQ.107)NAMES(I-NLT)='  TAU-  --> K*-(K-pi0)eta(PPG) ' ! TauDecayModeBBB = 269
+        IF(II.EQ.108)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(GG) ' ! TauDecayModeBBB = 270
+        IF(II.EQ.109)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(3P0)' ! TauDecayModeBBB = 271
+        IF(II.EQ.110)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(PPP)' ! TauDecayModeBBB = 272
+        IF(II.EQ.111)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0S)eta(PPG)' ! TauDecayModeBBB = 273
+        IF(II.EQ.112)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(GG) ' ! TauDecayModeBBB = 274
+        IF(II.EQ.113)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(3P0)' ! TauDecayModeBBB = 275
+        IF(II.EQ.114)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(PPP)' ! TauDecayModeBBB = 276
+        IF(II.EQ.115)NAMES(I-NLT)='  TAU-  --> K*-(pi-K0L)eta(PPG)' ! TauDecayModeBBB = 277
         IF(II.EQ.116)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 278
         IF(II.EQ.117)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 279
         IF(II.EQ.118)NAMES(I-NLT)='  TAU-  --> xxxxxxxxx2xxxxxx   ' ! TauDecayModeBBB = 280

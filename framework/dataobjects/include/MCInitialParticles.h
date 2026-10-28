@@ -120,8 +120,8 @@ namespace Belle2 {
       *m_CMSToLab     = cmsToLab(bX, bY, bZ, angleXZ, angleYZ);
       *m_labToCMS     = m_CMSToLab->Inverse();
 
-      const double me = Const::electron.getMass();
-      double p = sqrt(Ecms * Ecms / 4 - me * me);
+      const double electronMass = Const::electron.getMass();
+      double p = sqrt(Ecms * Ecms / 4 - electronMass * electronMass);
       m_her = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0,  p, Ecms / 2);
       m_ler = (*m_CMSToLab) * ROOT::Math::PxPyPzEVector(0.0, 0.0, -p, Ecms / 2);
 

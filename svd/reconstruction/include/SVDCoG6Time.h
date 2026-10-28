@@ -28,13 +28,6 @@ namespace Belle2::SVD {
      * with the CoG6 algorithm
      */
     void computeClusterTime(Belle2::SVD::RawCluster& rawCluster, double& time, double& timeError, int& firstFrame) override;
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDCoG6Time() {};
-
-
   };
 
 }

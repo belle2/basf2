@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    /** Positon offset in r-phi */
+    /** Position offset in r-phi */
     float m_uOffset;
     /** Position offset in z */
     float m_vOffset;

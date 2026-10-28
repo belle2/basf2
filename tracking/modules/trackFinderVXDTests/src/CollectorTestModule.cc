@@ -19,15 +19,7 @@ CollectorTestModule::CollectorTestModule() : Module()
   setDescription("CollectorTest.");
 }
 
-void CollectorTestModule::initialize()
-{
 
-}
-
-void CollectorTestModule::event()
-{
-
-}
 
 void CollectorTestModule::terminate()
 {

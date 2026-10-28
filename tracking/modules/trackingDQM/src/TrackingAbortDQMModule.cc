@@ -423,6 +423,7 @@ void TrackingAbortDQMModule::event()
 
     float nSignalCDCHits = nTakenCDCHits[sl] - nBgCDCHits[sl];
     int nCDCExtraHits = nTotalCDCHits[sl] - nSignalCDCHits;
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int nCDCExtraHitsPostClean = nCDCExtraHits - nBgCDCHits[sl];
     if (nTracks > 0) nSignalCDCHits = nSignalCDCHits / nTracks;
 

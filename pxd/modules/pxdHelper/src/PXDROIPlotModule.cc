@@ -81,7 +81,7 @@ void PXDROIPlotModule::event()
     flag[it.getSensorID()] = true;
   }
 
-  for (auto& f : flag) {
+  for (const auto& f : flag) {
     c1->Clear();
     c1->cd();
     h->Reset();
@@ -120,7 +120,7 @@ void PXDROIPlotModule::event()
       b->Draw();
     }
     // we move the other box by half a bin. this is needed as alpha seems not to work, in addition we use a dashed style
-    // dashed style doesnt work with png export, thus if all ROIs are identical, lines might overlap completely
+    // dashed style does not work with png export, thus if all ROIs are identical, lines might overlap completely
     for (auto& it : listHLT[currentVxdId]) {
       TBox* b;
       b = new TBox(it.getMinVid() - 0.7, it.getMinUid() - 0.7, it.getMaxVid() - 0.7, it.getMaxUid() - 0.7);

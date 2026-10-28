@@ -143,7 +143,7 @@ void eclWaveformCalibCollectorModule::event()
 
     const int amplitude = aECLDigit.getAmp();
 
-    double energy = amplitude * m_ADCtoEnergy[cellid - 1];
+    double energy = static_cast<double>(amplitude * m_ADCtoEnergy[cellid - 1]);
 
     if (energy > m_LowEnergyThresholdGeV && energy < m_HighEnergyThresholdGeV) {
       for (auto& aECLDsp : m_eclDSPs) {

@@ -147,7 +147,6 @@ void PXDDQMTrackRawNtupleModule::event()
     }
 
     //loop over all PXD sensors to get the intersections
-    std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
     for (auto intercept : interceptList) {
       VxdID aVxdID = intercept.getSensorID();
       auto& info = m_vxdGeometry.getSensorInfo(aVxdID);

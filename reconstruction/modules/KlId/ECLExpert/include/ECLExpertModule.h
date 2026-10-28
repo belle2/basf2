@@ -38,7 +38,7 @@ namespace Belle2 {
     ECLExpertModule();
 
     /** Destructor */
-    virtual ~ECLExpertModule();
+    virtual ~ECLExpertModule() override;
 
     /** init */
     virtual void initialize() override;

@@ -361,7 +361,7 @@ void SVDPositionErrorScaleFactorImporterModule::endRun()
 
 double SVDPositionErrorScaleFactorImporterModule::oneSigma(TH1F* h1)
 {
-  TH1F* h1_res = (TH1F*)h1->Clone("h1_res");
+  TH1F* h1_res = static_cast<TH1F*>(h1->Clone("h1_res"));
 
   double probs[2] = {0.16, 1 - 0.16};
   double quant[2] = {0, 0};

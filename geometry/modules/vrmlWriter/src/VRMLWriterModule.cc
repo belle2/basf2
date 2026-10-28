@@ -9,19 +9,19 @@
 #include <geometry/modules/vrmlWriter/VRMLWriterModule.h>
 #include <geometry/GeometryManager.h>
 
-#include "G4PhysicalVolumeStore.hh"
-#include "G4LogicalVolumeStore.hh"
-#include "G4SolidStore.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4LogicalVolume.hh"
-#include "G4VSolid.hh"
-#include "G4VisAttributes.hh"
-#include "G4VisExtent.hh"
-#include "G4Material.hh"
-#include "G4ThreeVector.hh"
-#include "G4RotationMatrix.hh"
-#include "G4Transform3D.hh"
-#include "G4VPVParameterisation.hh"
+#include <G4PhysicalVolumeStore.hh>
+#include <G4LogicalVolumeStore.hh>
+#include <G4SolidStore.hh>
+#include <G4VPhysicalVolume.hh>
+#include <G4LogicalVolume.hh>
+#include <G4VSolid.hh>
+#include <G4VisAttributes.hh>
+#include <G4VisExtent.hh>
+#include <G4Material.hh>
+#include <G4ThreeVector.hh>
+#include <G4RotationMatrix.hh>
+#include <G4Transform3D.hh>
+#include <G4VPVParameterisation.hh>
 #include <G4Tubs.hh>
 #include <G4Box.hh>
 #include <G4Polyhedron.hh>
@@ -162,7 +162,7 @@ void VRMLWriterModule::describeSolid(G4VSolid* solid, const std::string& solidNa
 {
   m_File << "# Solid " << solid->GetName() << " of type " << solid->GetEntityType() << std::endl;
   if (isCylinder) {
-    auto* tube = (G4Tubs*)solid;
+    auto* tube = static_cast<G4Tubs*>(solid);
     // VRML cylinder is along y axis but G4Tubs is along z axis => rotate in logical volume
     m_File << "PROTO solid_" << solidName << " [ ] {" << std::endl <<
            " Cylinder {" << std::endl << std::setprecision(10) <<
@@ -171,7 +171,7 @@ void VRMLWriterModule::describeSolid(G4VSolid* solid, const std::string& solidNa
            " }" << std::endl <<
            "}" << std::endl;
   } else if (solid->GetEntityType() == "G4Box") {
-    auto* box = (G4Box*)solid;
+    auto* box = static_cast<G4Box*>(solid);
     m_File << "PROTO solid_" << solidName << " [ ] {" << std::endl <<
            " Box {" << std::endl << std::setprecision(10) <<
            "  size " << box->GetXHalfLength() * 2.0 << " " <<
@@ -276,7 +276,7 @@ void VRMLWriterModule::describeLogicalVolume(G4LogicalVolume* logVol, const std:
           pvNameReplica.append(std::to_string(replica));
           physVol->SetCopyNo(replica);
           physParameterisation->ComputeTransformation(replica, physVol);
-          G4VSolid* solidReplica = physParameterisation->ComputeSolid(replica, physVol);
+          const G4VSolid* solidReplica = physParameterisation->ComputeSolid(replica, physVol);
           if (solidReplica != solid) { // not sure if this works ...
             lvNameReplica.append("_");
             lvNameReplica.append(std::to_string(replica));
@@ -391,10 +391,10 @@ void VRMLWriterModule::describePhysicalVolume(G4VPhysicalVolume* physVol)
       for (int replica = 0; replica < nReplicas; ++replica) {
         if (axis == kRho) {
           if (solid->GetEntityType() == "G4Tubs") {
-            double originalRMin = ((G4Tubs*)solid)->GetInnerRadius();
-            double originalRMax = ((G4Tubs*)solid)->GetOuterRadius();
-            ((G4Tubs*)solid)->SetInnerRadius(offset + width * replica);
-            ((G4Tubs*)solid)->SetOuterRadius(offset + width * (replica + 1));
+            double originalRMin = (static_cast<G4Tubs*>(solid))->GetInnerRadius();
+            double originalRMax = (static_cast<G4Tubs*>(solid))->GetOuterRadius();
+            (static_cast<G4Tubs*>(solid))->SetInnerRadius(offset + width * replica);
+            (static_cast<G4Tubs*>(solid))->SetOuterRadius(offset + width * (replica + 1));
             std::string solidNameReplica = solidName;
             solidNameReplica.append("_");
             solidNameReplica.append(std::to_string(replica));
@@ -402,8 +402,8 @@ void VRMLWriterModule::describePhysicalVolume(G4VPhysicalVolume* physVol)
             lvNameReplica.append("_");
             lvNameReplica.append(std::to_string(replica));
             describeSolid(solid, solidNameReplica, (*m_IsCylinder)[solidIndex]);
-            ((G4Tubs*)solid)->SetInnerRadius(originalRMin);
-            ((G4Tubs*)solid)->SetOuterRadius(originalRMax);
+            (static_cast<G4Tubs*>(solid))->SetInnerRadius(originalRMin);
+            (static_cast<G4Tubs*>(solid))->SetOuterRadius(originalRMax);
             describeLogicalVolume(logVol, lvNameReplica, solidNameReplica, (*m_IsCylinder)[solidIndex]);
             descendAndDescribe(physVol, lvNameReplica, replica);
           } else {
@@ -581,7 +581,7 @@ HepPolyhedron* VRMLWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
   HepPolyhedron* polyhedronB = nullptr;
   G4VSolid* solidB2 = solidB;
   if (solidB->GetEntityType() == "G4DisplacedSolid") {
-    solidB2 = ((G4DisplacedSolid*)solidB)->GetConstituentMovedSolid();
+    solidB2 = (static_cast<G4DisplacedSolid*>(solidB))->GetConstituentMovedSolid();
   }
   if ((solidB2->GetEntityType() == "G4IntersectionSolid") ||
       (solidB2->GetEntityType() == "G4UnionSolid") ||
@@ -590,8 +590,8 @@ HepPolyhedron* VRMLWriterModule::getBooleanSolidPolyhedron(G4VSolid* solid)
     polyhedronB = getBooleanSolidPolyhedron(solidB2);
     if (solidB != solidB2) { // was solidB a G4DisplacedSolid?
       polyhedronB->Transform(G4Transform3D(
-                               ((G4DisplacedSolid*)solidB)->GetObjectRotation(),
-                               ((G4DisplacedSolid*)solidB)->GetObjectTranslation()));
+                               (static_cast<G4DisplacedSolid*>(solidB))->GetObjectRotation(),
+                               (static_cast<G4DisplacedSolid*>(solidB))->GetObjectTranslation()));
     }
   } else {
     polyhedronB = new HepPolyhedron(*(solidB->GetPolyhedron()));

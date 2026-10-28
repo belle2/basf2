@@ -30,7 +30,7 @@ namespace Belle2 {
     ROIDetPlane() = default;
 
     /**return the sensor ID*/
-    VxdID getVxdID() {return m_vxdID;};
+    VxdID getVxdID() const {return m_vxdID;};
 
     /** determine if the sensor is in range */
     bool isSensorInRange(const ROOT::Math::XYZVector& trackPosition, int layer);
@@ -38,7 +38,7 @@ namespace Belle2 {
     /** assign the shared-plane pointer */
     void setSharedPlanePtr(genfit::SharedPlanePtr spp) {m_sharedPlanePtr = spp;};
     /** return the shared-plane pointer */
-    genfit::SharedPlanePtr getSharedPlanePtr() {return m_sharedPlanePtr;};
+    genfit::SharedPlanePtr getSharedPlanePtr() const {return m_sharedPlanePtr;};
 
   private:
     VxdID m_vxdID; /**< the sensor ID*/

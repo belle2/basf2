@@ -100,7 +100,7 @@ void KLMStripEfficiencyCollectorModule::startRun()
     B2FATAL("KLM channel status data are not available.");
   int minimalActivePlanes = -1;
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (const KLMChannelIndex& klmSector : klmSectors) {
     KLMChannelIndex klmNextSector(klmSector);
     ++klmNextSector;
     int activePlanes = 0;

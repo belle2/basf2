@@ -99,7 +99,6 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
   vector<double> mean_crystalCrate_time_ns(m_numCrates, 0);
 
   vector< double > blank_vector = {} ;
-  vector< int > blank_vector_int = {} ;
   for (int temp_crate_id = 0; temp_crate_id < m_numCrates; temp_crate_id++) {
     allCrates_crate_times.push_back(blank_vector) ;
     allCrates_run_nums.push_back(blank_vector) ;
@@ -208,13 +207,12 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     for (int iCrate = 0; iCrate < m_numCrates; iCrate++) {
       double tcrate = Crate_time_ns_tree[iCrate] ;
       double tcrate_unc = Crate_time_unc_ns_tree[iCrate];
-      double tcrystalCrate = crystalCrate_time_ns_tree[iCrate];
-      double tcrystalCrate_unc = crystalCrate_time_unc_ns_tree[iCrate];
-
       if ((tcrate < m_tcrate_max_cut) &&
           (tcrate > m_tcrate_min_cut) &&
           (fabs(tcrate_unc) > m_tcrate_unc_min_cut) &&
           (fabs(tcrate_unc) < m_tcrate_unc_max_cut)) {
+        double tcrystalCrate = crystalCrate_time_ns_tree[iCrate];
+        double tcrystalCrate_unc = crystalCrate_time_unc_ns_tree[iCrate];
         allCrates_crate_times[iCrate].push_back(tcrate) ;
         allCrates_run_nums[iCrate].push_back(m_run_perCrystal) ;
         allCrates_time_unc[iCrate].push_back(tcrate_unc) ;
@@ -355,11 +353,9 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
     //------------------------------------------------------------------------
     /** Get the vectors from the input payloads */
     vector<float> crystalCalib = m_ECLCrystalTimeOffset->getCalibVector();
-    vector<float> crystalCalibUnc = m_ECLCrystalTimeOffset->getCalibUncVector();
     B2INFO("Loaded 'ECLCrystalTimeOffset' calibrations");
 
     vector<float> crateCalib = m_ECLCrateTimeOffset->getCalibVector();
-    vector<float> crateCalibUnc = m_ECLCrateTimeOffset->getCalibUncVector();
 
     B2INFO("Loaded 'ECLCrateTimeOffset' calibration with default exp/run");
 
@@ -471,13 +467,12 @@ CalibrationAlgorithm::EResult eclTimeShiftsAlgorithm::calibrate()
       for (int iCrate = 0; iCrate < m_numCrates; iCrate++) {
         double tcrate = Crate_time_ns[iCrate] ;
         double tcrate_unc = Crate_time_unc_ns[iCrate];
-        double tcrystalCrate = crystalCrate_time_ns[iCrate];
-        double tcrystalCrate_unc = crystalCrate_time_unc_ns[iCrate];
-
         if ((tcrate < m_tcrate_max_cut) &&
             (tcrate > m_tcrate_min_cut) &&
             (fabs(tcrate_unc) > m_tcrate_unc_min_cut) &&
             (fabs(tcrate_unc) < m_tcrate_unc_max_cut)) {
+          double tcrystalCrate = crystalCrate_time_ns[iCrate];
+          double tcrystalCrate_unc = crystalCrate_time_unc_ns[iCrate];
           allCrates_crate_times[iCrate].push_back(tcrate) ;
           allCrates_run_nums[iCrate].push_back(run) ;
           allCrates_time_unc[iCrate].push_back(tcrate_unc) ;

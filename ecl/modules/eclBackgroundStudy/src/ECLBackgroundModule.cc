@@ -170,10 +170,6 @@ void ECLBackgroundModule::initialize()
 
 }
 
-void ECLBackgroundModule::beginRun()
-{
-}
-
 void ECLBackgroundModule::event()
 {
 
@@ -212,7 +208,7 @@ void ECLBackgroundModule::event()
 
   int hitNum = m_eclArray.getEntries();
   for (int i = 0; i < hitNum; i++) { //loop over ECLSimHits
-    ECLSimHit* aECLHit = m_eclArray[i];
+    const ECLSimHit* aECLHit = m_eclArray[i];
     m_cellID    = aECLHit->getCellId() - 1; //cell ID
     edep        = aECLHit->getEnergyDep();  //energy deposited
     G4ThreeVector hitPosn   = aECLHit->getPosition();   //position of hit
@@ -343,7 +339,7 @@ void ECLBackgroundModule::event()
 
   int nShower = m_eclShowerArray.getEntries();
   for (int i = 0; i < nShower; i++) {
-    ECLShower* aShower = m_eclShowerArray[i];
+    const ECLShower* aShower = m_eclShowerArray[i];
 
     Energy = aShower->getEnergy();
     theta = aShower->getTheta();
@@ -415,10 +411,6 @@ void ECLBackgroundModule::endRun()
 
 }
 
-void ECLBackgroundModule::terminate()
-{
-}
-
 
 //
 // Methods to study performance of ECL shields
@@ -458,7 +450,8 @@ int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit)
 }
 
 #else
-int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit) { return 1;}
+// cppcheck-suppress functionStatic ; the DOARICH version of this function uses members
+int ECLBackgroundModule::FillARICHBeamBack(BeamBackHit* aBBHit) { return 1;} // cppcheck-suppress constParameterPointer ; the DOARICH version reads through it
 #endif
 
 int ECLBackgroundModule::BuildECL()

@@ -16,11 +16,10 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-
-#include <string>
-
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * DQM framework core module to write all canvas and/or histograms to a single root file
+   */
 
   class DQMHistAnalysisOutputFileModule final : public DQMHistAnalysisModule {
 
@@ -46,11 +45,6 @@ namespace Belle2 {
      * This method is called if the current run ends.
      */
     void endRun() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
 
     /**
      * Opens the root file and saves the content.

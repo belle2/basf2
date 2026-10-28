@@ -84,8 +84,8 @@ void MVAPrototypeModule::init_mva(MVA::Weightfile& weightfile)
 
   // Secondly we load all supported interfaces, and fetch the correct MVA::Expert
   // and load the weightfile into this expert
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
+  const auto& supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+  m_expert = supported_interfaces.at(general_options.m_method)->getExpert();
   m_expert->load(weightfile);
 
   // Finally, we create an MVA::SingleDataset, in which we will save our features later

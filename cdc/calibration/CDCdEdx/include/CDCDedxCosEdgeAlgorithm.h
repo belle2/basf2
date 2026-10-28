@@ -37,7 +37,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxCosEdgeAlgorithm() {}
+    virtual ~CDCDedxCosEdgeAlgorithm() override {}
 
     /**
     * function to merge paylaods (if relative)
@@ -97,7 +97,7 @@ namespace Belle2 {
     /**
     * function to draw dedx histograms for each bin
     */
-    void plotHist(std::vector<TH1D*>& hdedx, std::map<int, std::vector<double>>& fPars, std::string type);
+    void plotHist(std::vector<TH1D*>& hdedx, std::map<int, std::vector<double>>& fPars, const std::string& type);
 
     /**
     * function to draw the fit parameters (relative gains and resolutions)
@@ -117,7 +117,7 @@ namespace Belle2 {
     /**
     * function to change text styles
     */
-    void setTextCosmetics(TPaveText* pt, double size)
+    static void setTextCosmetics(TPaveText* pt, double size)
     {
       pt->SetTextAlign(11);
       pt->SetFillStyle(3001);
@@ -129,7 +129,7 @@ namespace Belle2 {
     /**
      * function to change histogram styles
      */
-    void setHistCosmetics(TH1D& hist, Color_t color, double min, double max, double size)
+    static void setHistCosmetics(TH1D& hist, Color_t color, double min, double max, double size)
     {
       hist.SetMarkerStyle(20);
       hist.SetMarkerSize(0.60);

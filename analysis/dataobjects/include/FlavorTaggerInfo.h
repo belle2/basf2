@@ -49,7 +49,7 @@ namespace Belle2 {
 
     /**
     * Saves the method and the corresponding FlavorTaggerMap
-    * @param method "TMVA" or "FANN".
+    * @param method "TMVA".
     */
     void addMethodMap(const std::string& method);
 
@@ -60,7 +60,7 @@ namespace Belle2 {
     const std::string& getUseModeFlavorTagger() const { return m_useModeFlavorTagger; }
 
     /** method used for the FlavorTagger and corresponding FlavorTaggerInfoMap
-    * @param method "TMVA" or "FANN".
+    * @param method "TMVA".
     * @return FlavorTaggerInfoMap with all FlavorTagger Information
     */
     FlavorTaggerInfoMap* getMethodMap(const std::string& method) const;
@@ -69,7 +69,7 @@ namespace Belle2 {
 
     std::string m_useModeFlavorTagger; /**< Usemode of the FlavorTagger: "Teacher" or "Expert".*/
 
-    /** Map containing the methods used for the FlavorTagger: "TMVA" or "FANN", and the corresponding map.*/
+    /** Map containing the methods used for the FlavorTagger: "TMVA", and the corresponding map.*/
     std::map<std::string, FlavorTaggerInfoMap*> m_methodMap;
 
     ClassDef(FlavorTaggerInfo, 4) /**< class definition */

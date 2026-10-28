@@ -12,12 +12,11 @@
 #include <vxd/geometry/SensorInfoBase.h>
 #include <vxd/geometry/GeoCache.h>
 
-#include <boost/format.hpp>
+#include <format>
 
 #include <TROOT.h>
 
 using namespace std;
-using boost::format;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -38,16 +37,10 @@ DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule
   // Set module properties
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDER"));
-  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
 }
 
 void DQMHistAnalysisPXDERModule::initialize()
 {
-  m_refFile = NULL;
-  if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());// default is read only
-  }
-
   gROOT->cd(); // this seems to be important, or strange things happen
   // basic constants presets:
   VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -80,55 +73,55 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iSensor = 0;
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
-    string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
+    string sensorDescr = std::format("{0}_{1}_{2}", iLayer, iLadder, iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame
     //----------------------------------------------------------------
-    m_fired.emplace_back(str(format("DQMER_PXD_%1%_Fired") % sensorDescr));
+    m_fired.emplace_back(std::format("DQMER_PXD_{0}_Fired", sensorDescr));
     m_ref_fired.emplace_back(m_fired.back());
     //----------------------------------------------------------------
     // Number of clusters per frame
     //----------------------------------------------------------------
-    m_clusters.emplace_back(str(format("DQMER_PXD_%1%_Clusters") % sensorDescr));
+    m_clusters.emplace_back(std::format("DQMER_PXD_{0}_Clusters", sensorDescr));
     m_ref_clusters.emplace_back(m_clusters.back());
     //----------------------------------------------------------------
     // Start row distribution
     //----------------------------------------------------------------
-    m_startRow.emplace_back(str(format("DQMER_PXD_%1%_StartRow") % sensorDescr));
+    m_startRow.emplace_back(std::format("DQMER_PXD_{0}_StartRow", sensorDescr));
     m_ref_startRow.emplace_back(m_startRow.back());
     //----------------------------------------------------------------
     // Cluster seed charge by distance from the start row
     //----------------------------------------------------------------
-    m_chargStartRow.emplace_back(str(format("DQMER_PXD_%1%_AverageSeedByStartRow") % sensorDescr));
+    m_chargStartRow.emplace_back(std::format("DQMER_PXD_{0}_AverageSeedByStartRow", sensorDescr));
     m_ref_chargStartRow.emplace_back(m_chargStartRow.back());
 
 
-    m_startRowCount.emplace_back(str(format("DQMER_PXD_%1%_SeedCountsByStartRow") % sensorDescr));
+    m_startRowCount.emplace_back(std::format("DQMER_PXD_{0}_SeedCountsByStartRow", sensorDescr));
     m_ref_startRowCount.emplace_back(m_startRowCount.back());
     //----------------------------------------------------------------
     // Cluster Charge
     //----------------------------------------------------------------
-    m_clusterCharge.emplace_back(str(format("DQMER_PXD_%1%_ClusterCharge") % sensorDescr));
+    m_clusterCharge.emplace_back(std::format("DQMER_PXD_{0}_ClusterCharge", sensorDescr));
     m_ref_clusterCharge.emplace_back(m_clusterCharge.back());
     //----------------------------------------------------------------
     // Pixel Signal
     //----------------------------------------------------------------
-    m_pixelSignal.emplace_back(str(format("DQMER_PXD_%1%_PixelSignal") % sensorDescr));
+    m_pixelSignal.emplace_back(std::format("DQMER_PXD_{0}_PixelSignal", sensorDescr));
     m_ref_pixelSignal.emplace_back(m_pixelSignal.back());
     //----------------------------------------------------------------
     // Cluster Size in U
     //----------------------------------------------------------------
-    m_clusterSizeU.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeU") % sensorDescr));
+    m_clusterSizeU.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeU", sensorDescr));
     m_ref_clusterSizeU.emplace_back(m_clusterSizeU.back());
     //----------------------------------------------------------------
     // Cluster Size in V
     //----------------------------------------------------------------
-    m_clusterSizeV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeV") % sensorDescr));
+    m_clusterSizeV.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeV", sensorDescr));
     m_ref_clusterSizeV.emplace_back(m_clusterSizeV.back());
     //----------------------------------------------------------------
     // Cluster Size in U+V
     //----------------------------------------------------------------
-    m_clusterSizeUV.emplace_back(str(format("DQMER_PXD_%1%_ClusterSizeUV") % sensorDescr));
+    m_clusterSizeUV.emplace_back(std::format("DQMER_PXD_{0}_ClusterSizeUV", sensorDescr));
     m_ref_clusterSizeUV.emplace_back(m_clusterSizeUV.back());
   }
 //   m_fHitMapCountsFlag = NULL;
@@ -174,15 +167,15 @@ void DQMHistAnalysisPXDERModule::initialize()
                                 c_nPXDSensors, 0, c_nPXDSensors);
   m_fPixelSignalFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fPixelSignalFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUFlag = new TH1I("DQMER_PXD_ClasterSizeUFlag", "DQM ER PXD Cluster Size U Flag",
+  m_fClusterSizeUFlag = new TH1I("DQMER_PXD_ClusterSizeUFlag", "DQM ER PXD Cluster Size U Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeVFlag = new TH1I("DQMER_PXD_ClasterSizeVFlag", "DQM ER PXD Cluster Size V Flag",
+  m_fClusterSizeVFlag = new TH1I("DQMER_PXD_ClusterSizeVFlag", "DQM ER PXD Cluster Size V Flag",
                                  c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeVFlag->GetYaxis()->SetTitle("flag");
-  m_fClusterSizeUVFlag = new TH1I("DQMER_PXD_ClasterSizeUVFlag", "DQM ER PXD Cluster Size UV Flag",
+  m_fClusterSizeUVFlag = new TH1I("DQMER_PXD_ClusterSizeUVFlag", "DQM ER PXD Cluster Size UV Flag",
                                   c_nPXDSensors, 0, c_nPXDSensors);
   m_fClusterSizeUVFlag->GetXaxis()->SetTitle("Sensor ID");
   m_fClusterSizeUVFlag->GetYaxis()->SetTitle("flag");
@@ -314,12 +307,9 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
   float WarningLevel = 6.0;
   float ErrorLevel = 10.0;
 
-  TH1* hist = nullptr, *refhist = nullptr;
-
-  hist = findHist(m_histogramDirectoryName, name_hist);
+  auto hist = findHist(m_histogramDirectoryName, name_hist);
   if (!hist) return -1;
-  // assumes that ref file has no sub dirs
-  refhist = findHistInFile(m_refFile, name_refhist);
+  auto refhist = findRefHist(m_histogramDirectoryName, name_refhist);
   if (!refhist) return -1;
 
   // What happens if they are TH1I, TH1D and not TH1F
@@ -459,7 +449,6 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
 
 void DQMHistAnalysisPXDERModule::terminate()
 {
-  if (m_refFile) delete m_refFile;
   if (m_fFiredFlag) delete m_fFiredFlag;
   if (m_fClustersFlag) delete m_fClustersFlag;
   if (m_fStartRowFlag) delete m_fStartRowFlag;

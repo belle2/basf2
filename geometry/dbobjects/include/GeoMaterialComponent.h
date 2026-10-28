@@ -35,9 +35,9 @@ namespace Belle2 {
     /** name of the component */
     std::string m_name;
     /** true if the component is a chemical element, false if it is a composite material */
-    bool m_isElement;
+    bool m_isElement{false};
     /** fraction of the component from the full materials */
-    double m_fraction;
+    double m_fraction{0};
     /** Add ROOT reflection info */
     ClassDef(GeoMaterialComponent, 1);
   };

@@ -176,6 +176,7 @@ namespace {
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
   /** Create overloads since default arguments are lost in C++ */
+  // cppcheck-suppress unknownMacro
   BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0, 1)
 #if !defined(__GNUG__) || defined(__ICC)
 #else

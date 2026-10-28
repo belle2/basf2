@@ -298,7 +298,7 @@ void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t co
 
   for (int ih = 0; ih < list->GetSize(); ih++) {
 
-    TH1D* hist = (TH1D*)list->At(ih);
+    TH1D* hist = static_cast<TH1D*>(list->At(ih));
     int jw = hist->GetUniqueID();
 
     double frac = stod(hist->GetYaxis()->GetTitle());
@@ -322,7 +322,7 @@ void CDCDedxBadWireAlgorithm::printCanvas(TList* list, TList* hflist, Color_t co
     pinfo->Draw("same");
 
     if (listname == "badwires") {
-      TH1D* histhf = (TH1D*)hflist->At(ih);
+      TH1D* histhf = static_cast<TH1D*>(hflist->At(ih));
       if (hist->GetMaximum() < histhf->GetMaximum()) hist->SetMaximum(histhf->GetMaximum() * 1.05);
       histhf->SetFillColor(kGray);
       histhf->SetStats(0);
@@ -396,7 +396,7 @@ TH2F* CDCDedxBadWireAlgorithm::getHistoPattern(const vector<double>& inwires, co
 {
 
   B2INFO("Creating CDCGeometryPar object");
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   TH2F* temp = new TH2F(Form("temp_%s_%s", m_suffix.data(), suffix.data()), "", 2400, -1.2, 1.2, 2400, -1.2, 1.2);
 

@@ -105,7 +105,7 @@ void CreateFieldMapModule::beginRun()
 
   //some values needed for output
   int lastPercent(-1);
-  uint64_t nSteps = m_nU * m_nV;
+  uint64_t nSteps = static_cast<uint64_t>(m_nU) * m_nV;
   uint64_t curStep{0};
   double startTime{0};
   auto showProgress = [&]() {

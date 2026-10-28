@@ -291,7 +291,7 @@ int16_t ECLLocalRunCalibratorModule::getTimeShift(
 // Decode time obtained
 // from collector.
 inline uint32_t
-ECLLocalRunCalibratorModule::decodeTrigTime(uint32_t time) const
+ECLLocalRunCalibratorModule::decodeTrigTime(uint32_t time)
 {
   // Bits magic by
   // Vladimir Zhulanov.

@@ -47,7 +47,7 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC4Algorithm::calibrate
 
   for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
 
-    TH1F* hChi2 = (TH1F*)Chi2VsCrysID->ProjectionY("hChi2", crysID + 1, crysID + 1);
+    TH1D* hChi2 = Chi2VsCrysID->ProjectionY("hChi2", crysID + 1, crysID + 1);
 
     int totalCounts = hChi2->GetEntries();
 

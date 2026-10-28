@@ -39,7 +39,7 @@ namespace Belle2 {
       StoreArray<PXDRawHit> m_pxdRawHit; /**< Required input for  PXDRawHit */
       StoreArray<PXDRawHit> m_pxdRawHitOut; /**< Required output for  PXDRawHit */
       /** Utility function to check pixel coordinates */
-      inline bool goodHit(const PXDRawHit& rawhit) const
+      static inline bool goodHit(const PXDRawHit& rawhit)
       {
         short u = rawhit.getColumn();
         bool goodU = (u == std::min(std::max(u, short(0)), short(249)));

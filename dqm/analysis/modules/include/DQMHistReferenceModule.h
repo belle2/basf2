@@ -9,17 +9,13 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
-#include <dqm/core/RefHistObject.h>
-#include <TH1.h>
-#include <TCanvas.h>
-#include <TFile.h>
-#include <TString.h>
-#include <vector>
 
 namespace Belle2 {
 
   /**
-   * Class to add DQM reference histograms
+   * DQM framework core module to load DQM reference histograms
+   * It must be run after the input modules and before the first real
+   * analysis module which may require a reference plot.
    */
 
   class DQMHistReferenceModule final : public DQMHistAnalysisModule {
@@ -32,29 +28,10 @@ namespace Belle2 {
     DQMHistReferenceModule();
 
     /**
-     * Initializer.
-     */
-    void initialize() override final;
-
-    /**
      * Called when entering a new run.
+     * This loads the run type dependend reference histograms into the framework.
      */
     void beginRun() override final;
-
-    /**
-     * This method is called for each event.
-     */
-    void event() override final;
-
-    /**
-     * This method is called if the current run ends.
-     */
-    void endRun() override final;
-
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override final;
 
   private:
 

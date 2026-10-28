@@ -149,7 +149,7 @@ void CurlingTrackCandSplitterModule::initialize()
     // check if there are two entries and if the second value is either UPDATE or RECREATE
     if (m_PARAMrootFileName.size() != 2 || (m_PARAMrootFileName[1] != "UPDATE" && m_PARAMrootFileName[1] != "RECREATE")) {
       std::string output;
-      for (std::string entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
+      for (const std::string& entry : m_PARAMrootFileName) { output += "'" + entry + "' "; }
       B2FATAL("CurlingTrackCandSplitter::initialize() : rootFileName is set wrong: entries are: " << output);
     }
     // create ROOT file
@@ -471,7 +471,7 @@ const std::vector<int> CurlingTrackCandSplitterModule::checkTrackCandForCurling(
               }
             }
             // if the TrueHits are related from a singleCluster SVD SpacePoint (i.e. more than one TrueHits are molded into one Cluster) do not throw this exception but continue with the curling checking
-            if (svdClusters.size() > 1) { TrueHitsNotMatching(); }
+            if (svdClusters.size() > 1) { throw TrueHitsNotMatching(); }
           }
         }
 

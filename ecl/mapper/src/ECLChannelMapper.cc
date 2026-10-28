@@ -398,9 +398,8 @@ int ECLChannelMapper::getFINESSE(int iCrate)
 int ECLChannelMapper::getSubSystem(int iCrate)
 {
   if (iCrate <= ECL_BARREL_CRATES) return 0;
-  if (ECL_BARREL_CRATES < iCrate && iCrate <= ECL_BARREL_CRATES + ECL_FWD_CRATES)
-    return 1;
-  if (ECL_BARREL_CRATES + ECL_FWD_CRATES < iCrate && iCrate <= ECL_CRATES) return 2;
+  if (iCrate <= ECL_BARREL_CRATES + ECL_FWD_CRATES) return 1;
+  if (iCrate <= ECL_CRATES) return 2;
   return -1;
 }
 

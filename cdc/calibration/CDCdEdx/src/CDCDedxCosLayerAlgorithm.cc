@@ -353,7 +353,7 @@ void CDCDedxCosLayerAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& h
 {
 
   TCanvas ctmp("tmp", "tmp", 1200, 1200);
-  int nx = isMethodSep ? 2 : 2;
+  int nx = 2;
   int ny = isMethodSep ? 1 : 2;
   unsigned int nPads = nx * ny;
   if (isMethodSep) ctmp.SetCanvasSize(1200, 600);
@@ -427,7 +427,7 @@ void CDCDedxCosLayerAlgorithm::plotLayerDist(std::array<TH1D*, 3>& hDedxGroup, i
     hDedxGroup[il]->Draw("histo");
 
     if (isFixTrunc) {
-      TH1D* hDedxGroupC = (TH1D*)hDedxGroup[il]->Clone(Form("hDedxGroupC%d", il));
+      TH1D* hDedxGroupC = static_cast<TH1D*>(hDedxGroup[il]->Clone(Form("hDedxGroupC%d", il)));
       hDedxGroupC->GetXaxis()->SetRange(minlay, maxlay);
       hDedxGroupC->SetFillColor(kAzure + 1);
       hDedxGroupC->Draw("same histo");
@@ -571,7 +571,7 @@ void CDCDedxCosLayerAlgorithm::plotConstants()
     }
 
     // --- Ratio ---
-    TH1D* hratio = (TH1D*)hnew->Clone(Form("hratio_%s", m_label[il].data()));
+    TH1D* hratio = static_cast<TH1D*>(hnew->Clone(Form("hratio_%s", m_label[il].data())));
     hratio->Divide(hold);
 
     TCanvas c(Form("c_%s", m_label[il].data()), Form("Final constants %s", m_label[il].data()), 1000, 500);

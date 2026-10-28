@@ -77,7 +77,7 @@ namespace Belle2 {
     /** Decode EvtMessage and store objects in temporary buffer
      *  @param id         Thread id
      */
-    void* decodeEvtMessage(int id);
+    static void* decodeEvtMessage(int id);
 
     /** Restore objects in DataStore from temporary buffer
      */
@@ -110,7 +110,7 @@ namespace Belle2 {
   private:
 
     /** restore StreamerInfo from data in a file */
-    int restoreStreamerInfos(const TList* list);
+    static int restoreStreamerInfos(const TList* list);
 
     /** bits to store in TObject.
      *

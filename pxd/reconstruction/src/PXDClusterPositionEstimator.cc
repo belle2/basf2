@@ -83,7 +83,7 @@ float Belle2::PXD::PXDClusterPositionEstimator::getShapeLikelyhood(const Belle2:
 
 
 float Belle2::PXD::PXDClusterPositionEstimator::computeEta(const std::set<Belle2::PXD::Pixel>& pixels, int vStart, int vSize,
-                                                           double thetaU, double thetaV) const
+                                                           double thetaU, double thetaV)
 {
   const Belle2::PXD::Pixel& headPixel = getHeadPixel(pixels, vStart, vSize, thetaU, thetaV);
   const Belle2::PXD::Pixel& tailPixel = getTailPixel(pixels, vStart, vSize, thetaU, thetaV);
@@ -99,7 +99,7 @@ float Belle2::PXD::PXDClusterPositionEstimator::computeEta(const std::set<Belle2
 
 const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getHeadPixel(const std::set<Belle2::PXD::Pixel>& pixels,
     int vStart, int vSize, double thetaU,
-    double thetaV) const
+    double thetaV)
 {
   if (thetaV >= 0) {
     if (thetaU >= 0) {
@@ -118,7 +118,7 @@ const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getHeadPixel
 
 const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getTailPixel(const std::set<Belle2::PXD::Pixel>& pixels,
     int vStart, int vSize, double thetaU,
-    double thetaV) const
+    double thetaV)
 {
   if (thetaV >= 0) {
     if (thetaU >= 0) {
@@ -137,7 +137,7 @@ const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getTailPixel
 
 const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getLastPixelWithVOffset(const std::set<Belle2::PXD::Pixel>&
     pixels,
-    int vStart, int vOffset) const
+    int vStart, int vOffset)
 {
   for (auto pxit = pixels.cbegin(); pxit != pixels.cend(); ++pxit) {
     int v = pxit->getV() - vStart;
@@ -158,7 +158,7 @@ const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getLastPixel
 
 const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getFirstPixelWithVOffset(
   const std::set<Belle2::PXD::Pixel>& pixels,
-  int vStart, int vOffset) const
+  int vStart, int vOffset)
 {
   for (const Belle2::PXD::Pixel& px : pixels) {
     int v = px.getV() - vStart;
@@ -174,7 +174,7 @@ const Belle2::PXD::Pixel& Belle2::PXD::PXDClusterPositionEstimator::getFirstPixe
 
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getShortName(const std::set<Belle2::PXD::Pixel>& pixels, int uStart,
     int vStart, int vSize, double thetaU,
-    double thetaV) const
+    double thetaV)
 {
   const Belle2::PXD::Pixel& headPixel = getHeadPixel(pixels, vStart, vSize, thetaU, thetaV);
   const Belle2::PXD::Pixel& tailPixel = getTailPixel(pixels, vStart, vSize, thetaU, thetaV);
@@ -202,7 +202,7 @@ int Belle2::PXD::PXDClusterPositionEstimator::computeShapeIndex(const std::set<B
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName(const std::set<Belle2::PXD::Pixel>& pixels,
     int uStart,
     int vStart, int vSize, double thetaU,
-    double thetaV) const
+    double thetaV)
 {
   const Belle2::PXD::Pixel& headPixel = getHeadPixel(pixels, vStart, vSize, thetaU, thetaV);
   const Belle2::PXD::Pixel& tailPixel = getTailPixel(pixels, vStart, vSize, thetaU, thetaV);
@@ -218,7 +218,7 @@ const std::string Belle2::PXD::PXDClusterPositionEstimator::getMirroredShortName
 }
 
 const std::string Belle2::PXD::PXDClusterPositionEstimator::getFullName(const std::set<Belle2::PXD::Pixel>& pixels, int uStart,
-    int vStart) const
+    int vStart)
 {
   return std::accumulate(pixels.begin(), pixels.end(), std::string("F"),
   [uStart, vStart](auto name, auto px) {
@@ -292,7 +292,7 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const std::vector<B
   return clusterkind;
 }
 
-int Belle2::PXD::PXDClusterPositionEstimator::getSectorIndex(double thetaU, double thetaV) const
+int Belle2::PXD::PXDClusterPositionEstimator::getSectorIndex(double thetaU, double thetaV)
 {
   int sectorIndex = 0;
   if (thetaU >= 0) {

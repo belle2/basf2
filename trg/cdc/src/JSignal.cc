@@ -761,6 +761,12 @@ namespace Belle2 {
     double t_minActual;
     double t_maxActual;
     double t_toReal;
+
+    if (data.size() == 0) {
+      cout << "[Error] TRGCDCJSignal::choose() => There is not enough data." << endl;
+      return;
+    }
+
     // Find targetMin and targetMax between assignments.
     for (unsigned iCondition = 0; iCondition < data.size(); iCondition++) {
       const TRGCDCJSignal* assign = &(data[iCondition][0]);

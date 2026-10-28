@@ -95,10 +95,6 @@ void TrackQETrainingDataCollectorModule::initialize()
   m_recorder = std::make_unique<SimpleVariableRecorder>(m_variableSet, m_TrainingDataOutputName, "tree");
 }
 
-void TrackQETrainingDataCollectorModule::beginRun()
-{
-
-}
 
 void TrackQETrainingDataCollectorModule::event()
 {

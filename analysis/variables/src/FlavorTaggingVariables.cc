@@ -936,9 +936,9 @@ namespace Belle2 {
 
         double output = 0.0;
 
-        double chargeTargetKaon = particle->getCharge();
         if (requestedVariable == "HaveOpositeCharges")
         {
+          double chargeTargetKaon = particle->getCharge();
           if (chargeTargetKaon * chargeTargetSlowPion == -1)
             output = 1;
         }
@@ -2429,6 +2429,7 @@ In other words, this variable checks the generated flavor of the other generated
     REGISTER_METAVARIABLE("BtagToWBosonVariables(requestedVariable[, maskName])", BtagToWBosonVariables, R"DOC(
 [Eventbased][Expert] Returns values of FlavorTagging-specific kinematical variables assuming a semileptonic decay with the given particle as target.
 The input values of ``requestedVariable`` can be the following:  recoilMass in GeV/c^2 , pMissCMS in ``GeV/c``, cosThetaMissCMS and EW90.
+The default mask name is ``all``.
 )DOC", Manager::VariableDataType::c_double);
   REGISTER_METAVARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables , R"DOC(
 [Expert] Returns values of FlavorTagging-specific kinematical variables for ``KaonPion`` category.
@@ -2559,7 +2560,7 @@ The allowed categories are the official Flavor Tagger Category Names.
 
     REGISTER_METAVARIABLE("rBinBelle(combinerMethod)", rBinBelle, R"DOC(
 Returns the corresponding :math:`r` (dilution) bin according to the Belle binning for the given ``combinerMethod``. 
-The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
+The available methods are 'FBDT' (category-based combiners), and 'DNN' (DNN tagger output).
 The return values and the corresponding dilution ranges are the following:
 
 * 0: :math:`0.000 < r < 0.100`;
@@ -2575,14 +2576,14 @@ The return values and the corresponding dilution ranges are the following:
 )DOC", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("qrOutput(combinerMethod)", qrOutput, R"DOC(
 Returns the output of the flavorTagger, flavor tag :math:`q` times the dilution factor :math:`r`, for the given combiner method. 
-The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
+The available methods are 'FBDT' (category-based combiners), and 'DNN' (DNN tagger output).
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("qOutput(combinerMethod)", qOutput, R"DOC(
 Returns the flavor tag :math:`q` output of the flavorTagger for the given combinerMethod. 
-The available methods are 'FBDT' and 'FANN' (category-based combiners), and 'DNN' (DNN tagger output).
+The available methods are 'FBDT' (category-based combiners), and 'DNN' (DNN tagger output).
 
 .. warning:: You have to run the Flavor Tagger for this variable to be meaningful.
 .. seealso:: :ref:`FlavorTagger` and :func:`flavorTagger.flavorTagger`.

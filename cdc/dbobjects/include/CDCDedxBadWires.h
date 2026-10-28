@@ -71,7 +71,7 @@ namespace Belle2 {
     /** print all wire numbers
      *
      */
-    void printBadWireStatus(bool save = true, std::string sfx = "local") const
+    void printBadWireStatus(bool save = true, const std::string& sfx = "local") const
     {
 
       std::ofstream fBadWires;

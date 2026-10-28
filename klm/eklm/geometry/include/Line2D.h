@@ -119,8 +119,8 @@ namespace Belle2 {
        * @param[in]     n             Number of intersections.
        * @return Number of selected intersections.
        */
-      int selectIntersections(HepGeom::Point3D<double>* intersections,
-                              bool* condition, int n) const;
+      static int selectIntersections(HepGeom::Point3D<double>* intersections,
+                                     const bool* condition, int n);
 
       /** Initial point. */
       HepGeom::Point3D<double> m_Point;

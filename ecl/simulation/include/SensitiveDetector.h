@@ -37,7 +37,7 @@ namespace Belle2 {
       SensitiveDetector(G4String, G4double, G4double);
 
       /** Destructor */
-      ~SensitiveDetector();
+      ~SensitiveDetector() override;
 
       /** Register ECL hits collection into G4HCofThisEvent */
       void Initialize(G4HCofThisEvent* HCTE) override;
@@ -79,7 +79,7 @@ namespace Belle2 {
       explicit SensitiveDiode(const G4String&);
 
       /** Destructor */
-      ~SensitiveDiode();
+      ~SensitiveDiode() override;
 
       /** Register ECL hits collection into G4HCofThisEvent */
       void Initialize(G4HCofThisEvent* HCTE) override;

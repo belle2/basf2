@@ -48,7 +48,7 @@ std::vector<int> eclRegion;
 int regionToFit;
 double templateDiff[6][1792];
 std::vector<double> dataMCDiff;
-// cppcheck-suppress constParameter ; TF1 fit functions cannot have const parameters
+// cppcheck-suppress constParameterCallback ; TF1 fit functions cannot have const parameters
 double fitTemplates (double *x, double *par) {
     int ix = x[0];
     double y = 0.;
@@ -70,19 +70,19 @@ void fitDataMinusMC () {
     //..Read in the various required histograms
     
     //..data minus MC vs location
-    TH1F *dataMinusMC1D = (TH1F*)fDifferences->Get("dataMinusMC1D");
+    TH1F *dataMinusMC1D = static_cast<TH1F*>(fDifferences->Get("dataMinusMC1D"));
     
     //..templates for fitting
     TH1F *diff1DTemplate[6];
     for(int im = 0; im<6; im++) {
         TString name = "diff1DTemplate_";
         name += im;
-        diff1DTemplate[im] = (TH1F*)fTemplates->Get(name);
+        diff1DTemplate[im] = static_cast<TH1F*>(fTemplates->Get(name));
     }
     
     //..ecl region and direction of each location
-    TH1F *eclRegionOfLocation = (TH1F*)fTemplates->Get("eclRegionOfLocation");
-    TH1F *directionOfLocation = (TH1F*)fTemplates->Get("directionOfLocation");
+    TH1F *eclRegionOfLocation = static_cast<TH1F*>(fTemplates->Get("eclRegionOfLocation"));
+    TH1F *directionOfLocation = static_cast<TH1F*>(fTemplates->Get("directionOfLocation"));
     
     //----------------------------------------------------------------------
     //..Convert these into vectors
@@ -190,8 +190,8 @@ void fitDataMinusMC () {
         double dthetaChisq = 0.;
         double dphiChisq = 0.;
         for(int i = 0; i<nLocations; i++) {
-            int bin = i+1;
             if(eclRegion[i] == regionToFit) {
+                int bin = i+1;
                 double xcenter = dataMinusMC1D->GetBinCenter(bin);
                 fitValue[i] = fitFunction->Eval(xcenter);
                 
@@ -234,7 +234,7 @@ void fitDataMinusMC () {
     
     //---------------------------------------------------------------------
     //..Just for presentation, store the fit result in 2D histograms
-    TH2F *dataMinusMC2D_neg_Phi = (TH2F*)fDifferences->Get("dataMinusMC2D_neg_Phi");
+    TH2F *dataMinusMC2D_neg_Phi = static_cast<TH2F*>(fDifferences->Get("dataMinusMC2D_neg_Phi"));
     int nx = dataMinusMC2D_neg_Phi->GetNbinsX();
     int ny = dataMinusMC2D_neg_Phi->GetNbinsY();
     

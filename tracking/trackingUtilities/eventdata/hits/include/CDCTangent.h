@@ -98,6 +98,7 @@ namespace Belle2 {
       void reverse() override;
 
       /// Same as reverse but returns a copy.
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
       CDCTangent reversed() const;
 
       /** Getter for the line representation of the line.

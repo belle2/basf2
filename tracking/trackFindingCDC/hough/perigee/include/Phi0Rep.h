@@ -47,7 +47,7 @@ namespace Belle2 {
 
     private:
       ///  Number of accessible bins
-      long m_nBins;
+      long m_nBins {};
 
       /// Overlap of the leaves in phi0 counted in number of discrete values.
       int m_nOverlap = 1;

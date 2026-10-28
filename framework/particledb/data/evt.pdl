@@ -641,8 +641,8 @@ add  p Particle  Sigma*+                         3224     1382.83e-3        36.2
 add  p Particle  anti-Sigma*-                   -3224     1382.83e-3        36.2e-3         200e-3    -3     3              0      -3224
 add  p Particle  Sigma*0                         3214      1383.7e-3          36e-3         200e-3     0     3              0       3214
 add  p Particle  anti-Sigma*0                   -3214      1383.7e-3          36e-3         200e-3     0     3              0      -3214
-add  p Particle  Sigma*-                         3114     1382.83e-3        36.2e-3         200e-3    -3     3              0       3114
-add  p Particle  anti-Sigma*+                   -3114     1382.83e-3        36.2e-3         200e-3     3     3              0      -3114
+add  p Particle  Sigma*-                         3114     1387.2e-3         39.4e-3         200e-3    -3     3              0       3114
+add  p Particle  anti-Sigma*+                   -3114     1387.2e-3         39.4e-3         200e-3     3     3              0      -3114
 * Sigma(1660)0. Pole residues are used.
 add  p Particle  Sigma(1660)0                   13212        1660e-3         200e-3         600e-3     0     1              0          0
 add  p Particle  anti-Sigma(1660)0             -13212        1660e-3         200e-3         600e-3     0     1              0          0

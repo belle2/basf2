@@ -222,7 +222,7 @@ void ECLTrackClusterMatchingModule::event()
         if (!isECLHit(extHit)) continue;
         ECLCluster* eclCluster = extHit.getRelatedFrom<ECLCluster>();
         if (!eclCluster) continue;
-        ECLShower* eclShower = eclCluster->getRelatedTo<ECLShower>();
+        const ECLShower* eclShower = eclCluster->getRelatedTo<ECLShower>();
         if (eclShower != nullptr) {
           // accept only shower from region matching track direction, exception for gaps
           int eclDetectorRegion = eclShower->getDetectorRegion();
@@ -292,11 +292,7 @@ void ECLTrackClusterMatchingModule::event()
   } // end loop on Tracks
 } // end event loop
 
-void ECLTrackClusterMatchingModule::terminate()
-{
-}
-
-bool ECLTrackClusterMatchingModule::isECLEnterHit(const ExtHit& extHit) const
+bool ECLTrackClusterMatchingModule::isECLEnterHit(const ExtHit& extHit)
 {
   if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
   if ((extHit.getStatus() != EXT_ENTER)) return false;
@@ -304,7 +300,7 @@ bool ECLTrackClusterMatchingModule::isECLEnterHit(const ExtHit& extHit) const
   else return true;
 }
 
-bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit) const
+bool ECLTrackClusterMatchingModule::isECLHit(const ExtHit& extHit)
 {
   if ((extHit.getDetectorID() != Const::EDetector::ECL)) return false;
   ExtHitStatus extHitStatus = extHit.getStatus();

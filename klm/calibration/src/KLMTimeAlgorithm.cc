@@ -24,6 +24,7 @@
 /* ROOT headers. */
 #include <Math/MinimizerOptions.h>
 #include <Math/Vector3D.h>
+#include <TF1.h>
 #include <TFile.h>
 #include <TFitResult.h>
 #include <TMinuit.h>
@@ -72,6 +73,8 @@ static double timeDensity(const double x[2], const double* par)
   return fabs(polynomial + gauss);
 }
 
+// the signature is imposed by TMinuit::SetFCN()
+// cppcheck-suppress constParameterCallback
 static void fcn(int& npar, double* grad, double& fval, double* par, int iflag)
 {
   (void)npar;
@@ -458,6 +461,19 @@ void KLMTimeAlgorithm::createHistograms()
                               "BKLM scintillator: corrected Event T0; T_{0}^{+} - T_{0}^{-} [ns]", nBin_t0, -40.0, 40.0);
   hc_eventT0_scint_end = new TH1F("hc_eventT0_scint_end",
                                   "EKLM scintillator: corrected Event T0; T_{0}^{+} - T_{0}^{-} [ns]", nBin_t0, -20.0, 20.0);
+
+  // Normalised di-muon time differences z = dT0 / sqrt(1/N+ + 1/N-), used to
+  // extract sigma_hit from a Gaussian core fit instead of a raw second moment.
+  h_z_bklm_scint   = new TH1F("h_z_bklm_scint",
+                              "BKLM scintillator: #DeltaT_{0}/#sqrt{v}; z [ns]", 400, -100.0, 100.0);
+  h_z_bklm_rpc_phi = new TH1F("h_z_bklm_rpc_phi",
+                              "BKLM RPC #phi: #DeltaT_{0}/#sqrt{v}; z [ns]", 400, -200.0, 200.0);
+  h_z_bklm_rpc_z   = new TH1F("h_z_bklm_rpc_z",
+                              "BKLM RPC z: #DeltaT_{0}/#sqrt{v}; z [ns]", 400, -200.0, 200.0);
+  h_z_bklm_rpc     = new TH1F("h_z_bklm_rpc",
+                              "BKLM RPC #phi and z: #DeltaT_{0}/#sqrt{v}; z [ns]", 400, -200.0, 200.0);
+  h_z_eklm_scint   = new TH1F("h_z_eklm_scint",
+                              "EKLM scintillator: #DeltaT_{0}/#sqrt{v}; z [ns]", 400, -100.0, 100.0);
 
   // ==== NEW DIAGNOSTIC PLOTS ====
 
@@ -849,14 +865,14 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
       TH2F* hist2d = nullptr;
       if (fill2dHistograms) {
         if (iSub == KLMElementNumbers::c_BKLM) {
-          int iF = klmChannel.getSection();
-          int iS = klmChannel.getSector() - 1;
           int iL = klmChannel.getLayer() - 1;
-          int iP = klmChannel.getPlane();
-          int iC = klmChannel.getStrip() - 1;
 
           // Only create for scintillators (layers 0-1)
           if (iL < 2) {
+            int iF = klmChannel.getSection();
+            int iS = klmChannel.getSector() - 1;
+            int iP = klmChannel.getPlane();
+            int iC = klmChannel.getStrip() - 1;
             TString hn = Form("time_length_bklm_F%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
             double stripLength = 200;
             hist2d = new TH2F(hn.Data(),
@@ -973,7 +989,6 @@ void KLMTimeAlgorithm::timeDistance2dFit(
   const std::vector< std::pair<KLMChannelNumber, unsigned int> >& channels,
   double& delay, double& delayError)
 {
-  std::vector<struct Event> eventsChannel;
   int nFits = 1000;
   int nConvergedFits = 0;
   delay = 0;
@@ -1001,7 +1016,7 @@ void KLMTimeAlgorithm::timeDistance2dFit(
       for (int k = 0; k < c_NBinsDistance; ++k)
         s_BinnedData[j][k] = 0;
     }
-    eventsChannel = m_evts[channels[i].first];
+    std::vector<struct Event> eventsChannel = m_evts[channels[i].first];
     double averageTime = 0;
     for (const Event& event : eventsChannel) {
       double timeHit = event.time();
@@ -1165,7 +1180,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   std::vector< std::pair<KLMChannelNumber, unsigned int> > channelsEKLM;
   KLMChannelIndex klmChannels;
 
-  for (KLMChannelIndex& klmChannel : klmChannels) {
+  for (const KLMChannelIndex& klmChannel : klmChannels) {
     KLMChannelNumber channel = klmChannel.getKLMChannelNumber();
     m_cFlag[channel] = ChannelCalibrationStatus::c_NotEnoughData;
 
@@ -2031,20 +2046,24 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     int nHits_BKLM_RPC_Phi;  // Split RPC by readout direction
     int nHits_BKLM_RPC_Z;
     int nHits_EKLM_Scint;
+    int nHits_BKLM_RPC;      // phi and z readouts together
     double sumT0_BKLM_Scint;
     double sumT0_BKLM_RPC_Phi;
     double sumT0_BKLM_RPC_Z;
     double sumT0_EKLM_Scint;
+    double sumT0_BKLM_RPC;   // phi and z readouts together
 
     TrackT0Info() : charge(0),
       nHits_BKLM_Scint(0),
       nHits_BKLM_RPC_Phi(0),
       nHits_BKLM_RPC_Z(0),
       nHits_EKLM_Scint(0),
+      nHits_BKLM_RPC(0),
       sumT0_BKLM_Scint(0.0),
       sumT0_BKLM_RPC_Phi(0.0),
       sumT0_BKLM_RPC_Z(0.0),
-      sumT0_EKLM_Scint(0.0) {}
+      sumT0_EKLM_Scint(0.0),
+      sumT0_BKLM_RPC(0.0) {}
   };
 
   // Map: (Run, Event) -> (nTrack -> TrackT0Info)
@@ -2110,6 +2129,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
         if (iSub == KLMElementNumbers::c_BKLM) {
           if (iL >= (BKLMElementNumbers::c_FirstRPCLayer - 1)) {
+            // RPC - phi and z readouts together, as the estimator combines them
+            trackInfo.nHits_BKLM_RPC++;
+            trackInfo.sumT0_BKLM_RPC += t0_estimate;
             // RPC - split by readout direction
             if (plane == BKLMElementNumbers::c_ZPlane) {
               trackInfo.nHits_BKLM_RPC_Z++;
@@ -2141,11 +2163,13 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   double sum_delta2_over_v_BKLM_RPC_Phi = 0.0;
   double sum_delta2_over_v_BKLM_RPC_Z   = 0.0;
   double sum_delta2_over_v_EKLM_Scint   = 0.0;
+  double sum_delta2_over_v_BKLM_RPC     = 0.0;
 
   int nDimuon_BKLM_Scint   = 0;
   int nDimuon_BKLM_RPC_Phi = 0;
   int nDimuon_BKLM_RPC_Z   = 0;
   int nDimuon_EKLM_Scint   = 0;
+  int nDimuon_BKLM_RPC     = 0;
 
   for (const auto& eventPair : eventTrackMap) {
     const auto& trackMap = eventPair.second;
@@ -2183,6 +2207,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
 
       // Accumulate for σ_hit^2 = (1/N_evt) Σ [ ΔT0^2 / v ]
       sum_delta2_over_v_BKLM_Scint += (deltaT0 * deltaT0) / v;
+      h_z_bklm_scint->Fill(deltaT0 / std::sqrt(v));
       nDimuon_BKLM_Scint++;
 
       // Histograms for monitoring
@@ -2220,6 +2245,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         continue;
 
       sum_delta2_over_v_BKLM_RPC_Phi += (deltaT0 * deltaT0) / v;
+      h_z_bklm_rpc_phi->Fill(deltaT0 / std::sqrt(v));
       nDimuon_BKLM_RPC_Phi++;
 
       h_eventT0_rpc->Fill(t0_plus);
@@ -2255,6 +2281,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         continue;
 
       sum_delta2_over_v_BKLM_RPC_Z += (deltaT0 * deltaT0) / v;
+      h_z_bklm_rpc_z->Fill(deltaT0 / std::sqrt(v));
       nDimuon_BKLM_RPC_Z++;
 
       h_eventT0_rpc->Fill(t0_plus);
@@ -2277,6 +2304,16 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       }
     }
 
+    // === BKLM RPC, phi and z readouts together (gives the payload's RPC value) ===
+    if (muPlus.nHits_BKLM_RPC > 0 && muMinus.nHits_BKLM_RPC > 0) {
+      double deltaT0 = muPlus.sumT0_BKLM_RPC / muPlus.nHits_BKLM_RPC
+                       - muMinus.sumT0_BKLM_RPC / muMinus.nHits_BKLM_RPC;
+      double v = 1.0 / muPlus.nHits_BKLM_RPC + 1.0 / muMinus.nHits_BKLM_RPC;
+      sum_delta2_over_v_BKLM_RPC += (deltaT0 * deltaT0) / v;
+      h_z_bklm_rpc->Fill(deltaT0 / std::sqrt(v));
+      nDimuon_BKLM_RPC++;
+    }
+
     // === EKLM Scintillator ===
     if (muPlus.nHits_EKLM_Scint > 0 && muMinus.nHits_EKLM_Scint > 0) {
       double t0_plus  = muPlus.sumT0_EKLM_Scint  / muPlus.nHits_EKLM_Scint;
@@ -2290,6 +2327,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         continue;
 
       sum_delta2_over_v_EKLM_Scint += (deltaT0 * deltaT0) / v;
+      h_z_eklm_scint->Fill(deltaT0 / std::sqrt(v));
       nDimuon_EKLM_Scint++;
 
       h_eventT0_scint_end->Fill(t0_plus);
@@ -2317,57 +2355,123 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   B2INFO("Di-muon ΔT0 data collected."
          << LogVar("BKLM Scint di-muon events", nDimuon_BKLM_Scint)
          << LogVar("BKLM RPC Phi di-muon events", nDimuon_BKLM_RPC_Phi)
+         << LogVar("BKLM RPC (phi and z) di-muon events", nDimuon_BKLM_RPC)
          << LogVar("BKLM RPC Z di-muon events", nDimuon_BKLM_RPC_Z)
          << LogVar("EKLM Scint di-muon events", nDimuon_EKLM_Scint));
 
-  // === Extract σ_hit using the Gaussian MLE ===
-  // σ_hit^2 = (1 / N_evt) Σ_i [ ΔT0_i^2 / (1/N⁺_i + 1/N⁻_i) ]
+  // === Extract σ_hit from the core of z = ΔT0 / sqrt(v) ===
+  //
+  // z is distributed as N(0, σ_hit) by construction, so fitting its Gaussian core
+  // measures σ_hit directly. The previous estimator used the plain second moment
+  //     σ_hit^2 = (1/N_evt) Σ_i [ ΔT0_i^2 / v_i ]
+  // which has no outlier rejection, so mis-associated hits and other non-Gaussian
+  // tails inflate it. On experiment 30 the second moment is 1.2 (BKLM scintillator),
+  // 1.3 (EKLM scintillator) and 1.7 (RPC) times the core width, so the estimator
+  // would overstate its per-event uncertainty by the same factors.
+  //
+  // The second moment is kept as the fallback when a fit cannot be done.
+  //
+  // The fit window is set once, from the interquartile range: IQR/1.349 is the
+  // standard deviation of a Gaussian with the same IQR, and the tails barely move
+  // it. A single Gaussian fit within +-2.5 of that width around the median then
+  // gives the core width; no iteration is needed. The returned uncertainty is the
+  // fit's own, or the Gaussian standard error of the fallback.
+  auto coreSigma = [](TH1F * h, double fallback, double & err, int nEntries) -> double {
+    err = (nEntries > 0) ? fallback / std::sqrt(2.0 * nEntries) : 0.0;
+    // Every fallback is reported, so that a failed fit cannot pass unnoticed.
+    auto useMoment = [&](const char* reason)
+    {
+      B2WARNING("sigma_hit: " << reason << ", using the second moment"
+                << LogVar("histogram", std::string((h != nullptr) ? h->GetName() : "none"))
+                << LogVar("second moment [ns]", fallback));
+      return fallback;
+    };
+    if (h == nullptr || h->GetEntries() < 100)
+      return useMoment("fewer than 100 events");
+    double prob[3] = {0.25, 0.50, 0.75};
+    double q[3];
+    h->GetQuantiles(3, q, prob);
+    const double median = q[1];
+    const double sigma0 = (q[2] - q[0]) / 1.349;
+    if (!(sigma0 > 0.0))
+      return useMoment("zero interquartile range");
+    TF1 f("fcore", "gaus", median - 2.5 * sigma0, median + 2.5 * sigma0);
+    f.SetParameters(h->GetMaximum(), median, sigma0);
+    if (h->Fit(&f, "RQN0") != 0)
+      return useMoment("core fit did not converge");
+    const double sg = std::fabs(f.GetParameter(2));
+    // Guard against a pathological fit running away from the second moment.
+    if (sg > 5.0 * fallback || sg < 0.1 * fallback)
+      return useMoment("core fit width far from the second moment");
+    err = f.GetParError(2);
+    return sg;
+  };
 
   float sigma_BKLM_Scint     = 10.0f;  // Default fallback
   float sigma_BKLM_Scint_err = 1.0f;
   if (nDimuon_BKLM_Scint > 0) {
     double sigma2 = sum_delta2_over_v_BKLM_Scint / static_cast<double>(nDimuon_BKLM_Scint);
-    sigma_BKLM_Scint = static_cast<float>(std::sqrt(sigma2));
-    // Uncertainty approximation (Gaussian statistics)
-    sigma_BKLM_Scint_err = sigma_BKLM_Scint / std::sqrt(2.0 * nDimuon_BKLM_Scint);
+    double moment = std::sqrt(sigma2);
+    double fitErr = 0.0;
+    double core = coreSigma(h_z_bklm_scint, moment, fitErr, nDimuon_BKLM_Scint);
+    sigma_BKLM_Scint = static_cast<float>(core);
+    B2INFO("sigma_hit BKLM Scint" << LogVar("core fit [ns]", core)
+           << LogVar("second moment [ns]", moment) << LogVar("ratio", moment / core));
+    sigma_BKLM_Scint_err = static_cast<float>(fitErr);
   }
 
   float sigma_RPC_Phi     = 10.0f;
   float sigma_RPC_Phi_err = 1.0f;
   if (nDimuon_BKLM_RPC_Phi > 0) {
     double sigma2 = sum_delta2_over_v_BKLM_RPC_Phi / static_cast<double>(nDimuon_BKLM_RPC_Phi);
-    sigma_RPC_Phi = static_cast<float>(std::sqrt(sigma2));
-    sigma_RPC_Phi_err = sigma_RPC_Phi / std::sqrt(2.0 * nDimuon_BKLM_RPC_Phi);
+    double moment = std::sqrt(sigma2);
+    double fitErr = 0.0;
+    double core = coreSigma(h_z_bklm_rpc_phi, moment, fitErr, nDimuon_BKLM_RPC_Phi);
+    sigma_RPC_Phi = static_cast<float>(core);
+    B2INFO("sigma_hit RPC phi" << LogVar("core fit [ns]", core)
+           << LogVar("second moment [ns]", moment) << LogVar("ratio", moment / core));
+    sigma_RPC_Phi_err = static_cast<float>(fitErr);
   }
 
   float sigma_RPC_Z     = 10.0f;
   float sigma_RPC_Z_err = 1.0f;
   if (nDimuon_BKLM_RPC_Z > 0) {
     double sigma2 = sum_delta2_over_v_BKLM_RPC_Z / static_cast<double>(nDimuon_BKLM_RPC_Z);
-    sigma_RPC_Z = static_cast<float>(std::sqrt(sigma2));
-    sigma_RPC_Z_err = sigma_RPC_Z / std::sqrt(2.0 * nDimuon_BKLM_RPC_Z);
+    double moment = std::sqrt(sigma2);
+    double fitErr = 0.0;
+    double core = coreSigma(h_z_bklm_rpc_z, moment, fitErr, nDimuon_BKLM_RPC_Z);
+    sigma_RPC_Z = static_cast<float>(core);
+    B2INFO("sigma_hit RPC z" << LogVar("core fit [ns]", core)
+           << LogVar("second moment [ns]", moment) << LogVar("ratio", moment / core));
+    sigma_RPC_Z_err = static_cast<float>(fitErr);
   }
 
-  // Compute combined RPC sigma (weighted average by number of events)
+  // RPC value used by the estimator: phi and z readouts filled together, as the
+  // estimator combines them. The separate phi and z values above are kept for reference.
   float sigma_RPC     = 10.0f;
   float sigma_RPC_err = 1.0f;
-  int nDimuon_RPC_total = nDimuon_BKLM_RPC_Phi + nDimuon_BKLM_RPC_Z;
-  if (nDimuon_RPC_total > 0) {
-    // Weighted average by statistics
-    double w_phi = static_cast<double>(nDimuon_BKLM_RPC_Phi) / nDimuon_RPC_total;
-    double w_z   = static_cast<double>(nDimuon_BKLM_RPC_Z) / nDimuon_RPC_total;
-    sigma_RPC = w_phi * sigma_RPC_Phi + w_z * sigma_RPC_Z;
-    // Propagate uncertainties
-    sigma_RPC_err = std::sqrt(w_phi * w_phi * sigma_RPC_Phi_err * sigma_RPC_Phi_err +
-                              w_z * w_z * sigma_RPC_Z_err * sigma_RPC_Z_err);
+  if (nDimuon_BKLM_RPC > 0) {
+    double sigma2 = sum_delta2_over_v_BKLM_RPC / static_cast<double>(nDimuon_BKLM_RPC);
+    double moment = std::sqrt(sigma2);
+    double fitErr = 0.0;
+    double core = coreSigma(h_z_bklm_rpc, moment, fitErr, nDimuon_BKLM_RPC);
+    sigma_RPC = static_cast<float>(core);
+    B2INFO("sigma_hit RPC (phi and z together)" << LogVar("core fit [ns]", core)
+           << LogVar("second moment [ns]", moment) << LogVar("ratio", moment / core));
+    sigma_RPC_err = static_cast<float>(fitErr);
   }
 
   float sigma_EKLM_Scint     = 10.0f;
   float sigma_EKLM_Scint_err = 1.0f;
   if (nDimuon_EKLM_Scint > 0) {
     double sigma2 = sum_delta2_over_v_EKLM_Scint / static_cast<double>(nDimuon_EKLM_Scint);
-    sigma_EKLM_Scint = static_cast<float>(std::sqrt(sigma2));
-    sigma_EKLM_Scint_err = sigma_EKLM_Scint / std::sqrt(2.0 * nDimuon_EKLM_Scint);
+    double moment = std::sqrt(sigma2);
+    double fitErr = 0.0;
+    double core = coreSigma(h_z_eklm_scint, moment, fitErr, nDimuon_EKLM_Scint);
+    sigma_EKLM_Scint = static_cast<float>(core);
+    B2INFO("sigma_hit EKLM Scint" << LogVar("core fit [ns]", core)
+           << LogVar("second moment [ns]", moment) << LogVar("ratio", moment / core));
+    sigma_EKLM_Scint_err = static_cast<float>(fitErr);
   }
 
   B2INFO("Extracted per-hit resolutions using event-by-event weighting:"
@@ -2428,6 +2532,11 @@ void KLMTimeAlgorithm::saveHist()
 
   hc_eventT0_rpc->SetDirectory(dir_eventT0);
   hc_eventT0_scint->SetDirectory(dir_eventT0);
+  h_z_bklm_scint->SetDirectory(dir_eventT0);
+  h_z_bklm_rpc_phi->SetDirectory(dir_eventT0);
+  h_z_bklm_rpc_z->SetDirectory(dir_eventT0);
+  h_z_bklm_rpc->SetDirectory(dir_eventT0);
+  h_z_eklm_scint->SetDirectory(dir_eventT0);
   hc_eventT0_scint_end->SetDirectory(dir_eventT0);
 
   // ==== NEW DIAGNOSTIC PLOTS ====
@@ -2690,11 +2799,6 @@ std::pair<int, double> KLMTimeAlgorithm::tS_lowerStrip(const KLMChannelIndex& kl
 {
   std::pair<int, double> tS;
   int cId = klmChannel.getKLMChannelNumber();
-  int iSub = klmChannel.getSubdetector();
-  int iF = klmChannel.getSection();
-  int iS = klmChannel.getSector();
-  int iL = klmChannel.getLayer();
-  int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   if (m_timeShift.find(cId) != m_timeShift.end()) {
     tS.first = iC;
@@ -2703,6 +2807,11 @@ std::pair<int, double> KLMTimeAlgorithm::tS_lowerStrip(const KLMChannelIndex& kl
     tS.first = iC;
     tS.second = 0.0;
   } else {
+    int iSub = klmChannel.getSubdetector();
+    int iF = klmChannel.getSection();
+    int iS = klmChannel.getSector();
+    int iL = klmChannel.getLayer();
+    int iP = klmChannel.getPlane();
     KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC - 1);
     tS = tS_lowerStrip(kCIndex);
   }
@@ -2770,11 +2879,6 @@ std::pair<int, double> KLMTimeAlgorithm::tR_lowerStrip(const KLMChannelIndex& kl
 {
   std::pair<int, double> tR;
   int cId = klmChannel.getKLMChannelNumber();
-  int iSub = klmChannel.getSubdetector();
-  int iF = klmChannel.getSection();
-  int iS = klmChannel.getSector();
-  int iL = klmChannel.getLayer();
-  int iP = klmChannel.getPlane();
   int iC = klmChannel.getStrip();
   if (m_timeRes.find(cId) != m_timeRes.end()) {
     tR.first = iC;
@@ -2783,6 +2887,11 @@ std::pair<int, double> KLMTimeAlgorithm::tR_lowerStrip(const KLMChannelIndex& kl
     tR.first = iC;
     tR.second = 0.0;
   } else {
+    int iSub = klmChannel.getSubdetector();
+    int iF = klmChannel.getSection();
+    int iS = klmChannel.getSector();
+    int iL = klmChannel.getLayer();
+    int iP = klmChannel.getPlane();
     KLMChannelIndex kCIndex(iSub, iF, iS, iL, iP, iC - 1);
     tR = tR_lowerStrip(kCIndex);
   }

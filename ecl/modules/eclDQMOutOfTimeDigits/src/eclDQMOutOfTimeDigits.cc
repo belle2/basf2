@@ -53,8 +53,8 @@ void ECLDQMOutOfTimeDigitsModule::defineHisto()
   dirDAQ->cd();
 
   // Create all necessary histograms for out-of-time ECLCalDigits counts
-  for (auto& event_type : {"rand", "dphy", "physics"}) {
-    for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
+  for (const auto& event_type : {"rand", "dphy", "physics"}) {
+    for (const auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string key_name = event_type + std::string("_") + ecl_part;
       TString hist_name    = "out_of_time_" + key_name;
       // Max possible value in the histogram is 8736 (=total number of crystals

@@ -65,7 +65,7 @@ void PXDRawDQMModule::defineHisto()
 
   hrawPxdHitsCount = new TH1F("hrawPxdCount", "Pxd Raw Count ;Nr per Event", 8192, 0, 8192);
 
-  VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
+  const VXD::GeoCache& vxdGeometry(GeoCache::getInstance());
   std::vector<VxdID> sensors = vxdGeometry.getListOfSensors();
   for (const VxdID& avxdid : sensors) {
     const auto&  info = vxdGeometry.getSensorInfo(avxdid);
@@ -139,7 +139,6 @@ void PXDRawDQMModule::event()
       B2ERROR("No DHE found for SensorId: " << currentVxdId);
       continue;
     }
-    auto startGate = dhe->getTriggerGate();
 
     if (hrawPxdHitMapAll) hrawPxdHitMapAll->Fill(it.getColumn() + ladder * 300 - 200,
                                                    100 + it.getRow() + 850 * (layer + layer + sensor - 3));
@@ -150,7 +149,10 @@ void PXDRawDQMModule::event()
     // Is this histogram necessary? we are folding with occupancy of sensor hits here
     // Think about 1024*framenr-hit_row?
     if (m_hrawPxdHitTimeWindow[currentVxdId]) m_hrawPxdHitTimeWindow[currentVxdId]->Fill(it.getFrameNr() * 192 - it.getRow() / 4);
-    if (m_hrawPxdGateTimeWindow[currentVxdId]) m_hrawPxdGateTimeWindow[currentVxdId]->Fill(it.getFrameNr() * 192 - startGate);
+    if (m_hrawPxdGateTimeWindow[currentVxdId]) {
+      auto startGate = dhe->getTriggerGate();
+      m_hrawPxdGateTimeWindow[currentVxdId]->Fill(it.getFrameNr() * 192 - startGate);
+    }
   }
 
   if (hrawPxdAdcMapAll) {

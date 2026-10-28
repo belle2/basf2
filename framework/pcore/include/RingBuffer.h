@@ -53,8 +53,22 @@ namespace Belle2 {
 
     /** Append a buffer to the RingBuffer */
     int insq(const int* buf, int size, bool checkTx = false);
-    /** Pick up a buffer from the RingBuffer */
-    int remq(int* buf);
+    /** Pick up a buffer from the RingBuffer.
+     *
+     * @param buf           destination, or nullptr to discard the next record.
+     * @param capacityWords capacity of buf in words. If the next record does not
+     *                      fit, nothing is dequeued and -(size in words) is
+     *                      returned, so the caller can grow its buffer and call
+     *                      again. Pass -1 (the default) to skip the check, in
+     *                      which case buf must be able to hold any record.
+     * @return  size of the record in words, 0 if the RingBuffer was empty,
+     *          or a negative value whose magnitude is the required capacity.
+     *
+     * The size check and the copy both happen under the same semaphore, so the
+     * retry is race free: on a negative return the record is still queued, and
+     * another reader taking it meanwhile is harmless.
+     */
+    int remq(int* buf, int capacityWords = -1);
     /** Prefetch a buffer from the RingBuffer w/o removing it*/
     int spyq(int* buf) const;
     /** Returns number of entries/buffers in the RingBuffer */

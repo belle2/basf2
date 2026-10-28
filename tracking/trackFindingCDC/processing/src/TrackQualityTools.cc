@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 using namespace TrackingUtilities;
 
 
-void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track)
+void TrackQualityTools::moveToNextAxialLayer(const CDCTrack& track)
 {
   for (const CDCRecoHit3D& recoHit : track) {
     if (recoHit.getStereoKind() == EStereoKind::c_Axial) {
@@ -124,7 +124,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
 }
 
-void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCylindricalRFactor)
+void TrackQualityTools::removeHitsAfterCDCWall(const CDCTrack& track, double outerCylindricalRFactor)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getLocalCircle()->absRadius();
@@ -160,7 +160,7 @@ void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCyli
   }
 }
 
-void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
+void TrackQualityTools::removeHitsAfterLayerBreak2(const CDCTrack& track)
 {
   ILayer lastLayer = -1;
   ROOT::Math::XYVector lastWirePosition;
@@ -204,7 +204,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak2(CDCTrack& track)
   }
 }
 
-void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maximumArcLength2DDistance)
+void TrackQualityTools::removeHitsAfterLayerBreak(const CDCTrack& track, double m_maximumArcLength2DDistance)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
@@ -310,7 +310,7 @@ void TrackQualityTools::removeHitsInTheBeginningIfAngleLarge(CDCTrack& track, do
 }
 
 
-void TrackQualityTools::removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
+void TrackQualityTools::removeHitsIfOnlyOneSuperLayer(const CDCTrack& track)
 {
   ISuperLayer lastLayer = -1;
   bool deleteTrack = true;
@@ -332,7 +332,7 @@ void TrackQualityTools::removeHitsIfOnlyOneSuperLayer(CDCTrack& track)
   }
 }
 
-void TrackQualityTools::removeHitsOnTheWrongSide(CDCTrack& track)
+void TrackQualityTools::removeHitsOnTheWrongSide(const CDCTrack& track)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
@@ -348,7 +348,7 @@ void TrackQualityTools::removeHitsOnTheWrongSide(CDCTrack& track)
   }
 }
 
-void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track, double m_maximumArcLength2DDistance)
+void TrackQualityTools::removeArcLength2DHoles(const CDCTrack& track, double m_maximumArcLength2DDistance)
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();

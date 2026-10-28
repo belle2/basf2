@@ -159,9 +159,8 @@ void DQMHistAnalysisPXDReductionModule::event()
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = getDelta(m_histogramDirectoryName, name);
-    // no initial sampling, we should get plenty of statistics
-    if (hh1) {
+    if (auto hh1 = getDelta(m_histogramDirectoryName, name); hh1 != nullptr) {
+      // no initial sampling, we should get plenty of statistics
       auto mean = hh1->GetMean();
       m_hReduction->SetBinContent(i + 1, mean);
       anyupdate = true;

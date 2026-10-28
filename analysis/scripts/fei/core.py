@@ -61,6 +61,7 @@ import os
 import shutil
 import typing
 import pickle
+import importlib
 import re
 import functools
 import subprocess
@@ -337,6 +338,15 @@ class PreReconstruction:
                 else:
                     ma.reconstructDecay(channel.decayString, channel.preCutConfig.userCut, channel.decayModeID,
                                         writeOut=True, path=path)
+
+                # optionaly here we run custom modules, that users provide by themselves
+                # in the channels list (useful for testing custom variables)
+                if channel.extraPathSpec is not None:
+                    spec = channel.extraPathSpec
+                    mod = importlib.import_module(spec["module"])
+                    registerFunc = getattr(mod, spec["function"])
+                    registerFunc(path, channel.name, *spec["args"], **spec["kwargs"])
+
                 if self.config.monitor:
                     if "tag" in (channel.name).lower():
                         ma.matchTagTruth(channel.name, path=path)
@@ -402,7 +412,8 @@ class PreReconstruction:
                         'pi0:veto',
                         {
                             'InvM': 'pi0vetoMass',
-                            'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEnergyAsymmetry',
+                            'formula((daughter(0,E)-daughter(1,E))/(daughter(0,E)+daughter(1,E)))': 'pi0vetoEneAsy',
+                            'cosHelicityAngleMomentum': 'pi0vetoCosHelMom',
                         },
                         path=Ddaughter_roe_path
                     )
@@ -897,9 +908,11 @@ def get_stages_from_particles(particles: typing.Sequence[typing.Union[config.Par
     stages = [
         [p for p in particles if get_pname(p) in ['e+', 'K+', 'pi+', 'mu+', 'gamma', 'p+', 'K_L0']],
         [p for p in particles if get_pname(p) in ['pi0', 'J/psi', 'Lambda0']],
-        [p for p in particles if get_pname(p) in ['K_S0', 'Sigma+']],
-        [p for p in particles if get_pname(p) in ['D+', 'D0', 'D_s+', 'Lambda_c+'] and 'tag' not in get_plabel(p)],
-        [p for p in particles if get_pname(p) in ['D*+', 'D*0', 'D_s*+'] and 'tag' not in get_plabel(p)],
+        [p for p in particles if get_pname(p) in ['K_S0', 'Sigma+', 'Sigma0', 'Xi0', 'Xi-']],
+        [p for p in particles if get_pname(p) in ['D+', 'D0', 'D_s+', 'Lambda_c+', 'Omega-'] and 'tag' not in get_plabel(p)],
+        [p for p in particles if get_pname(p) in ['D*+', 'D*0', 'D_s*+',
+                                                  'Sigma_c+', 'Sigma_c0', 'Sigma_c++',
+                                                  'Sigma_c*+', 'Sigma_c*0', 'Sigma_c*++'] and 'tag' not in get_plabel(p)],
         [p for p in particles if get_pname(p) in ['B0', 'B+', 'B_s0'] or 'tag' in get_plabel(p)],
         []
     ]

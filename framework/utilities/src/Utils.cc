@@ -55,7 +55,7 @@ namespace {
       stream = fopen(statm.c_str(), "r");
       // If we use buffering we might get the same value each time we read so
       // disable buffering
-      setvbuf(stream, nullptr, _IONBF, 0);
+      if (stream) setvbuf(stream, nullptr, _IONBF, 0);
     }
     unsigned long vmSizePages{0};
     unsigned long rssPages{0};

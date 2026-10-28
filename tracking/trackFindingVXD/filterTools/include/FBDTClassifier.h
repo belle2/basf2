@@ -30,7 +30,7 @@ namespace Belle2 {
    * + Longterm: template this properly
    */
   template<size_t Ndims = 9>
-  class FBDTClassifier : public RelationsObject {
+  class FBDTClassifier {
 
   public:
 
@@ -66,7 +66,7 @@ namespace Belle2 {
     FBDTForest getForest() const { return m_forest; }
 
     /** get the feature binnings */
-    std::vector<FastBDT::FeatureBinning<double> > getFeatureBinnings()  const { return m_featBins; }
+    const std::vector<FastBDT::FeatureBinning<double> >& getFeatureBinnings()  const { return m_featBins; }
 
     /** get the decorrelation matrix */
     Belle2::DecorrelationMatrix<9> getDecorrelationMatrix() const { return m_decorrMat; }
@@ -79,12 +79,7 @@ namespace Belle2 {
 
     Belle2::DecorrelationMatrix<Ndims> m_decorrMat{}; /**< the decorrelation matrix used in this classifier */
 
-    // TODO: make this work with the externals -> tell Thomas Keck what is needed for this stuff to work in the externals
-    /// Making this Class a ROOT class
-    ClassDef(FBDTClassifier, 2); // first version: only Forest and FeatureBinnings present
   };
-
-
 
   // =================================== IMPLEMENTATION ==============================
 

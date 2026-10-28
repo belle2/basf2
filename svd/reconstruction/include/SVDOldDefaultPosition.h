@@ -28,12 +28,6 @@ namespace Belle2::SVD {
      * with the OldDefault algorithm
      */
     void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDOldDefaultPosition() {};
-
   };
 
 }

@@ -221,7 +221,7 @@ void SVDRecoDigitCreatorModule::event()
       // set the relation SVDRecoDigit -> SVDShaperDigit
       recoDigit->addRelationTo(m_storeShaper[i]);
       // and SVDCluster -> SVDRecoDigit
-      SVDCluster* cluster = m_storeShaper[i]->getRelated<SVDCluster>(m_storeClustersName);
+      const SVDCluster* cluster = m_storeShaper[i]->getRelated<SVDCluster>(m_storeClustersName);
       cluster->addRelationTo(recoDigit, recoDigit->getCharge());
     }
   } //exit loop on ShaperDigits

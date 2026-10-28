@@ -39,23 +39,23 @@
 </header>
 */
 
-#include "string.h"
+#include <string.h>
 
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TFile.h"
-#include "TGraph.h"
-#include "TTree.h"
-#include "TF1.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include "TVectorD.h"
-#include "TMatrixD.h"
-#include "TObjArray.h"
-#include "TObjString.h"
-#include "TCanvas.h"
-#include "TLine.h"
+#include <TROOT.h>
+#include <TStyle.h>
+#include <TFile.h>
+#include <TGraph.h>
+#include <TTree.h>
+#include <TF1.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TH3D.h>
+#include <TVectorD.h>
+#include <TMatrixD.h>
+#include <TObjArray.h>
+#include <TObjString.h>
+#include <TCanvas.h>
+#include <TLine.h>
 
 
 // Definitions of files
@@ -289,7 +289,7 @@ void FillADC(Int_t iLayer)
 
 
     tree->Draw(Form("CDCHits.m_adcCount>>%s",chName),CutLayer);
-    hADCfit[iLayer] = (TH1D*) hADC[iLayer]->Clone();
+    hADCfit[iLayer] = static_cast<TH1D*>(hADC[iLayer]->Clone());
     hADCfit[iLayer]->SetName(chNameFit);
   } else {
     printf("ADC histogram for Layer %d is already filled\n", iLayer);
@@ -337,7 +337,7 @@ void FitADC(Int_t iLayer, Int_t kDraw)
   Double_t MaxX, Entry;
 
   TH1D *h = hADCfit[iLayer];
-  TH1D *hinit = (TH1D*) h->Clone();
+  TH1D *hinit = static_cast<TH1D*>(h->Clone());
 
   par[0] = (h->GetBinContent(1)+h->GetBinContent(2))/2.;
   par[1] = 0.;
@@ -479,7 +479,7 @@ void FillHisto()
 
     sprintf(Name, "hHitPatternSL%02d", iSL);
     sprintf(Title, "Hit Pattern (Super Layer %2d)", iSL);
-    hHitPatternSL[iSL] = (TH1D*) hHitPattern[iLayer]->Clone();
+    hHitPatternSL[iSL] = static_cast<TH1D*>(hHitPattern[iLayer]->Clone());
     hHitPatternSL[iSL]->SetName(Name);
 
     hHitPatternSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
@@ -495,7 +495,7 @@ void FillHisto()
 
     sprintf(Name, "hADCSL%02d", iSL);
     sprintf(Title, "ADC (Super Layer %2d)", iSL);
-    hADCSL[iSL] = (TH1D*) hADC[iLayer]->Clone();
+    hADCSL[iSL] = static_cast<TH1D*>(hADC[iLayer]->Clone());
     hADCSL[iSL]->SetName(Name);
     hADCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));
     if(iSL==0){
@@ -514,7 +514,7 @@ void FillHisto()
 
     sprintf(Name, "hTDCSL%02d", iSL);
     sprintf(Title, "TDC (Super Layer %2d)", iSL);
-    hTDCSL[iSL] = (TH1D*) hTDC[iLayer]->Clone();
+    hTDCSL[iSL] = static_cast<TH1D*>(hTDC[iLayer]->Clone());
     hTDCSL[iSL]->SetName(Name);
     hTDCSL[iSL]->GetXaxis()->SetTitle("TDC count");
     hTDCSL[iSL]->GetYaxis()->SetTitle("Entries");
@@ -532,7 +532,7 @@ void FillHisto()
 
     sprintf(Name, "hADCTDCSL%02d", iSL);
     sprintf(Title, "ADC-TDC (Super Layer %2d)", iSL);
-    hADCTDCSL[iSL] = (TH2D*) hADCTDC[iLayer]->Clone();
+    hADCTDCSL[iSL] = static_cast<TH2D*>(hADCTDC[iLayer]->Clone());
     hADCTDCSL[iSL]->SetName(Name);
 
     hADCTDCSL[iSL]->GetListOfFunctions()->Add(new TNamed("Description", Title));

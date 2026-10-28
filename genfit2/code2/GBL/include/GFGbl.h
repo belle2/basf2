@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef GFGBL_H
-#define GFGBL_H
+#pragma once
 
 #include "GblTrajectory.h"
 #include "AbsFitter.h"
@@ -128,6 +127,3 @@ namespace genfit {
   
 }  /* End of namespace genfit */
 /** @} */
-
-#endif // GFGBL_H
-

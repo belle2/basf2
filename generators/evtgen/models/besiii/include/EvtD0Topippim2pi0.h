@@ -157,9 +157,6 @@ namespace Belle2 {
     double m0_a21320;
     double w0_a21320;
 
-    double m0_pi11400;
-    double w0_pi11400;
-
     double m0_h11170;
     double w0_h11170;
 
@@ -177,8 +174,6 @@ namespace Belle2 {
     std::complex<double> m_AmpD0;
     std::complex<double> m_AmpDb;
     std::complex<double> m_RAmp;
-
-    double delta;
 
   };
 

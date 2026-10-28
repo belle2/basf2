@@ -121,8 +121,9 @@ void V0findingPerformanceEvaluationModule::initialize()
 
   m_h1_MCParticle_R = createHistogram1D("h1nMCParticleVSr", "entry per MCParticles", 50, 0, 20, "transverse L", m_histoList);
 
-  m_h1_V0sPerMCParticle_R = (TH1F*)duplicateHistogram("h1nV0perMCvsR", "entry per V0 related to a MCParticle",   m_h1_MCParticle_R,
-                                                      m_histoList);
+  m_h1_V0sPerMCParticle_R = dynamic_cast<TH1F*>(duplicateHistogram("h1nV0perMCvsR", "entry per V0 related to a MCParticle",
+                                                m_h1_MCParticle_R,
+                                                m_histoList));
 
 
   m_h3_MCParticle = createHistogram3D("h3MCParticle", "entry per MCParticle",
@@ -130,17 +131,17 @@ void V0findingPerformanceEvaluationModule::initialize()
                                       10, bins_theta, "#theta",
                                       14, bins_phi, "#phi" /*, m_histoList*/);
 
-  m_h3_V0sPerMCParticle = (TH3F*)duplicateHistogram("h3V0sPerMCParticle",
-                                                    "entry per V0 connected to a MCParticle",
-                                                    m_h3_MCParticle /*, m_histoList*/);
+  m_h3_V0sPerMCParticle = dynamic_cast<TH3F*>(duplicateHistogram("h3V0sPerMCParticle",
+                                              "entry per V0 connected to a MCParticle",
+                                              m_h3_MCParticle /*, m_histoList*/));
 
-  m_h3_V0s = (TH3F*)duplicateHistogram("h3V0s", "entry per V0",
-                                       m_h3_MCParticle /*, m_histoList*/);
+  m_h3_V0s = dynamic_cast<TH3F*>(duplicateHistogram("h3V0s", "entry per V0",
+                                                    m_h3_MCParticle /*, m_histoList*/));
 
   //histograms to produce purity plots
-  m_h3_MCParticlesPerV0 = (TH3F*)duplicateHistogram("h3MCParticlesPerV0",
-                                                    "entry per MCParticle connected to a V0",
-                                                    m_h3_MCParticle /*, m_histoList*/);
+  m_h3_MCParticlesPerV0 = dynamic_cast<TH3F*>(duplicateHistogram("h3MCParticlesPerV0",
+                                              "entry per MCParticle connected to a V0",
+                                              m_h3_MCParticle /*, m_histoList*/));
 }
 
 void V0findingPerformanceEvaluationModule::beginRun()
@@ -166,6 +167,7 @@ void V0findingPerformanceEvaluationModule::event()
     if (nMatchedDau != 2)
       continue;
 
+    // cppcheck-suppress variableScope ; declaration kept at this scope for readability
     int pdgCode = mcParticle.getPDG();
     B2DEBUG(29, "MCParticle has PDG code " << pdgCode);
     m_MCParticlePDGcode->Fill(mcParticle.getPDG());
@@ -285,7 +287,7 @@ void V0findingPerformanceEvaluationModule::endRun()
 void V0findingPerformanceEvaluationModule::terminate()
 {
 
-  TH1F* h_eff_R   = (TH1F*)duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList_efficiency);
+  TH1F* h_eff_R   = dynamic_cast<TH1F*>(duplicateHistogram("h_eff_R", "efficiency vs R", m_h1_MCParticle_R, m_histoList_efficiency));
 
   for (int bin = 0; bin < h_eff_R->GetXaxis()->GetNbins(); bin++) {
     float num = m_h1_V0sPerMCParticle_R->GetBinContent(bin + 1);

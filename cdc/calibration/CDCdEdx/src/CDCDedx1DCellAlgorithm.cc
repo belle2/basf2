@@ -151,7 +151,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       // rotation symmtery for 1<->3 and 4<->2 but only symmetric bin
       if (!isVarBins && isRotSymm) jea = rotationalBin(m_eaBinLocal[il], jea);
 
-      TH1D* htemp = (TH1D*)hdedxhit[il][jea]->Clone(Form("h_%s_b%d_c", m_label[il].data(), jea));
+      TH1D* htemp = static_cast<TH1D*>(hdedxhit[il][jea]->Clone(Form("h_%s_b%d_c", m_label[il].data(), jea)));
 
       int minbin = 1, maxbin = 1;
       if (isFixTrunc) {
@@ -549,7 +549,7 @@ void CDCDedx1DCellAlgorithm::plotdedxHist(std::array<std::vector<TH1D*>, 3>& hde
 
       hdedxhit[il][jea]->SetTitle(Form("%s;dedxhit;entries", hdedxhit[il][jea]->GetTitle()));
       hdedxhit[il][jea]->DrawClone("hist");
-      TH1D* htempC = (TH1D*)hdedxhit[il][jea]->Clone(Form("%sc2", hdedxhit[il][jea]->GetName()));
+      TH1D* htempC = static_cast<TH1D*>(hdedxhit[il][jea]->Clone(Form("%sc2", hdedxhit[il][jea]->GetName())));
       htempC->GetXaxis()->SetRange(minbin, maxbin);
       htempC->SetFillColor(kGray);
       htempC->DrawClone("same hist");
@@ -589,7 +589,7 @@ void CDCDedx1DCellAlgorithm::plotLayerDist(std::array<TH1D*, 3>& hdedxlay)
     hdedxlay[il]->Draw("histo");
 
     if (isFixTrunc) {
-      TH1D* hdedxlayC = (TH1D*)hdedxlay[il]->Clone(Form("hdedxlayC%d", il));
+      TH1D* hdedxlayC = static_cast<TH1D*>(hdedxlay[il]->Clone(Form("hdedxlayC%d", il)));
       hdedxlayC->GetXaxis()->SetRange(minlay, maxlay);
       hdedxlayC->SetFillColor(kAzure + 1);
       hdedxlayC->Draw("same histo");

@@ -108,7 +108,7 @@ def process_dir(
 
     # get list of executable script files
     executable_files = []
-    executable_mode = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    executable_mode = stat.S_IXUSR
     for tools_file in get_files(os.path.join(dir_name, 'tools', '*')):
         executable_file = str(tools_file)
         if os.stat(executable_file).st_mode & executable_mode \

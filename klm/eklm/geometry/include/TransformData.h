@@ -124,14 +124,14 @@ namespace Belle2 {
        * @param[in] hit Hit.
        * @return Transformation.
        */
-      const HepGeom::Transform3D* getStripLocalToGlobal(KLMDigit* hit) const;
+      const HepGeom::Transform3D* getStripLocalToGlobal(const KLMDigit* hit) const;
 
       /**
        * Get strip global to local transformation by hit.
        * @param[in] hit Hit.
        * @return Transformation.
        */
-      const HepGeom::Transform3D* getStripGlobalToLocal(KLMDigit* hit) const;
+      const HepGeom::Transform3D* getStripGlobalToLocal(const KLMDigit* hit) const;
 
       /**
        * Get strip transformation.
@@ -172,7 +172,7 @@ namespace Belle2 {
        *                      check off for debugging).
        * @return True if strips intersect.
        */
-      bool intersection(KLMDigit* hit1, KLMDigit* hit2,
+      bool intersection(const KLMDigit* hit1, const KLMDigit* hit2,
                         HepGeom::Point3D<double>* cross,
                         double* d1, double* d2, double* sd,
                         bool segments = true) const;
@@ -182,8 +182,8 @@ namespace Belle2 {
        * @param[in] section  Section number.
        * @param[in] position Position.
        */
-      int getSectorByPosition(int section,
-                              const HepGeom::Point3D<double>& position) const;
+      static int getSectorByPosition(int section,
+                                     const HepGeom::Point3D<double>& position);
 
 
       /**

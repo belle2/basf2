@@ -327,7 +327,7 @@ bool EKLM::AlignmentChecker::checkAlignment(
                         iSection, iLayer, iSector, iPlane, iSegment);
             const KLMAlignmentData* segmentAlignmentData =
               segmentAlignment->getSegmentAlignment(segment);
-            if (segmentAlignment == nullptr)
+            if (segmentAlignmentData == nullptr)
               B2FATAL("Incomplete alignment data.");
             if (!checkSegmentAlignment(iSection, iLayer, iSector, iPlane,
                                        iSegment, sectorAlignment,

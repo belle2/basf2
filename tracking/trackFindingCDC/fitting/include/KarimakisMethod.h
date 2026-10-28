@@ -44,7 +44,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the flag indicating that lines should be fitted
-      bool m_lineConstrained;
+      bool m_lineConstrained {};
     };
   }
 }

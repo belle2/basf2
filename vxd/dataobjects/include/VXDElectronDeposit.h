@@ -56,16 +56,22 @@ namespace Belle2 {
                  + (std::min(intelec, static_cast<unsigned int>(c_MaxElectrons)) << c_FractionBits);
     }
     /** get the fraction along the path */
+    // m_packed is a bit-field, which cppcheck does not count as member access
+    // cppcheck-suppress functionStatic
     float getFraction() const
     {
       return (m_packed & c_MaxFraction) * 1.0 / static_cast<float>(c_MaxFraction);
     }
     /** get the number of deposited electrons */
+    // m_packed is a bit-field, which cppcheck does not count as member access
+    // cppcheck-suppress functionStatic
     unsigned int getElectrons() const
     {
       return (m_packed >> c_FractionBits) & c_MaxElectrons;
     }
     /** get the packed value */
+    // m_packed is a bit-field, which cppcheck does not count as member access
+    // cppcheck-suppress functionStatic
     unsigned int getPacked() const { return m_packed; }
     /** convert to unsigned int using the packed representation */
     operator unsigned int() const { return m_packed; }

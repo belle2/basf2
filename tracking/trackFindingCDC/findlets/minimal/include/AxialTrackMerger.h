@@ -95,6 +95,9 @@ namespace Belle2 {
     private:
       /// Parameter : Minimal fit probability of the common fit of two tracks to be eligible for merging
       double m_param_minFitProb = 0.85;
+
+      /// Parameter : Remove the hits of the tracks after a super layer break before merging
+      bool m_param_removeHitsAfterSuperLayerBreak = true;
     };
   }
 }

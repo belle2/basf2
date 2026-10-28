@@ -25,9 +25,9 @@ namespace Belle2 {
   class SelectSubsetBase {
   public:
     /** Get list of arrays we inherit relations from. */
-    std::vector<std::string> getInheritFromArrays() const { return m_inheritFromArrays; }
+    const std::vector<std::string>& getInheritFromArrays() const { return m_inheritFromArrays; }
     /** Get list of arrays we inherit relations to. */
-    std::vector<std::string> getInheritToArrays() const { return m_inheritToArrays; }
+    const std::vector<std::string>& getInheritToArrays() const { return m_inheritToArrays; }
     /** Do we inherit relations from original set to itself? */
     bool getInheritToSelf() const { return m_inheritToSelf; }
 

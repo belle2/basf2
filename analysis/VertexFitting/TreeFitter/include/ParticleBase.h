@@ -176,7 +176,7 @@ namespace TreeFitter {
     /** controls if a particle is treated as a resonance(lifetime=0) or a particle that has a finite lifetime.
      * A finite life time means it will register a geo constraint for this particle
      * */
-    static bool isAResonance(Belle2::Particle* particle) ;
+    static bool isAResonance(const Belle2::Particle* particle) ;
 
     /** initialises tau as a length  */
     ErrCode initTau(FitParams& par) const ;

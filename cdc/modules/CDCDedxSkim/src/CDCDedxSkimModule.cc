@@ -163,7 +163,7 @@ bool CDCDedxSkimModule::isGoodTrack(const Track* track, const Const::ChargedStab
   }
 
   // check if there are (enough) cdc hits for this track
-  RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
+  const RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
   if (!recoTrack || recoTrack->getNumberOfTotalHits() == 0) {
     B2WARNING("Track has no associated hits, skipping");
     return false;

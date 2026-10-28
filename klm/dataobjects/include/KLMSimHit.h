@@ -493,7 +493,7 @@ namespace Belle2 {
     int m_Strip = 0;
 
     /** Number of last strip (for BKLM RPC hits). */
-    int m_LastStrip;
+    int m_LastStrip = 0;
 
     /** Time of the hit. */
     float m_Time = -1;
@@ -514,13 +514,13 @@ namespace Belle2 {
     float m_localZ = 0;
 
     /** Global position X coordinate. */
-    float m_globalX;
+    float m_globalX = 0;
 
     /** Global position Y coordinate. */
-    float m_globalY;
+    float m_globalY = 0;
 
     /** Global position Z coordinate. */
-    float m_globalZ;
+    float m_globalZ = 0;
 
     /** Energy. */
     float m_e = 0;

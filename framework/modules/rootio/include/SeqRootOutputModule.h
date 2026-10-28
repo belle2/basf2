@@ -31,6 +31,12 @@ namespace Belle2 {
     SeqRootOutputModule();
     virtual ~SeqRootOutputModule() override;
 
+    /** Copying is not allowed: the module owns raw pointers. */
+    SeqRootOutputModule(const SeqRootOutputModule&) = delete;
+
+    /** Copying is not allowed: the module owns raw pointers. */
+    SeqRootOutputModule& operator=(const SeqRootOutputModule&) = delete;
+
     //! Module functions to be called from main process
     virtual void initialize() override;
 

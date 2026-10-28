@@ -92,10 +92,6 @@ void ECLLOMModule::initialize()
   m_NSamples = 631;
 }
 
-void ECLLOMModule::beginRun()
-{
-}
-
 void ECLLOMModule::event()
 {
   clear_lom_data();
@@ -121,10 +117,6 @@ void ECLLOMModule::event()
   }
   m_testtree->Fill();
   m_evtNum++;
-}
-
-void ECLLOMModule::endRun()
-{
 }
 
 void ECLLOMModule::terminate()

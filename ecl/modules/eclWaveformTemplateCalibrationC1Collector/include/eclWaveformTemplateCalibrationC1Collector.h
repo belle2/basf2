@@ -55,7 +55,7 @@ namespace Belle2 {
     int m_ADCFloorThreshold; /**< Used to determine if waveform hit ADC floor */
     int m_baselineLimit; /**< Number of ADC points used to define baseline. */
 
-    TH2F* maxResvsCrysID; /**< Histogram to store collector output. */
+    TH2F* maxResvsCrysID = nullptr; /**< Histogram to store collector output. */
 
     std::vector<float> m_ADCtoEnergy; /**< Crystal calibration constants. */
 

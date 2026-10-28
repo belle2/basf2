@@ -18,6 +18,26 @@ namespace Belle2 {
     namespace func {
 
       /**
+       * Rounds to the nearest integer, halfway cases away from zero.
+       * Bit-for-bit equivalent to std::lround, but inlined instead of calling into libm,
+       * which matters because this is used in the innermost ray-tracing loops.
+       * @param x value to round
+       * @return the rounded value
+       */
+      inline long lround(double x)
+      {
+        // 2^52: above it every double is already an integer, and the conversion below could overflow
+        if (std::abs(x) < 4503599627370496.0) {
+          x += 0.5;
+          long n = static_cast<long>(std::abs(x)); // truncation towards zero
+          if (x > 0) return n;
+          return -(n + 1);
+        }
+        return std::lround(x); // also takes care of NaN and infinity
+      }
+
+
+      /**
        * unfold a coordinate.
        * @param x true position
        * @param nx signed number of reflections
@@ -54,7 +74,7 @@ namespace Belle2 {
        */
       inline void fold(double xu, double A, double& x, double& kx, int& nx)
       {
-        nx = lround(xu / A);
+        nx = func::lround(xu / A);
         x = xu - nx * A;
         if (nx % 2 != 0) {
           x = -x;

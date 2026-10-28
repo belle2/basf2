@@ -113,10 +113,11 @@ void TrackCandidateResultRefiner::apply(std::vector<SpacePointTrackCand>& unrefi
 
     // Track candidates of size >= 6 are very rare. If the track candidate already is quite long (>= 6 hits),
     // it's very likely it's a valid track anyway, so QI is not checked.
-    if ((aTrackCandidate.getNHits() == 3 and qi >= m_minQualitiyIndicatorSize3) or
-        (aTrackCandidate.getNHits() == 4 and qi >= m_minQualitiyIndicatorSize4) or
-        (aTrackCandidate.getNHits() == 5 and qi >= m_minQualitiyIndicatorSize5) or
-        (aTrackCandidate.getNHits() >= 6))  {
+    const size_t nHits = aTrackCandidate.getNHits();
+    if ((nHits == 3 and qi >= m_minQualitiyIndicatorSize3) or
+        (nHits == 4 and qi >= m_minQualitiyIndicatorSize4) or
+        (nHits == 5 and qi >= m_minQualitiyIndicatorSize5) or
+        (nHits >= 6))  {
       selectedResults.emplace_back(aTrackCandidate);
     }
   }

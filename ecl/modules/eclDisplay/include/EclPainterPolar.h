@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Destructor for EclPainter subclass.
      */
-    ~EclPainterPolar();
+    ~EclPainterPolar() override;
 
     /** Assignment operator */
     EclPainterPolar& operator=(const EclPainterPolar& other) { cloneFrom(other); return *this; }
@@ -64,14 +64,6 @@ namespace Belle2 {
     void setTitles();
 
   public:
-    /**
-     * Sets the information to be displayed in the provided
-     * MultilineWidget
-     * @param px X coordinate of mouse cursor.
-     * @param py Y coordinate of mouse cursor.
-     * @param panel MultilineWidget to display the information
-     */
-    virtual void getInformation(int px, int py, MultilineWidget* panel) override;
 
     /**
      * Return subtype of ECLPainterPolar.

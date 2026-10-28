@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "G4VProcess.hh"
-#include "G4TransportationManager.hh"
-#include "G4PropagatorInField.hh"
-#include "G4ParticleChangeForTransport.hh"
+#include <G4VProcess.hh>
+#include <G4TransportationManager.hh>
+#include <G4PropagatorInField.hh>
+#include <G4ParticleChangeForTransport.hh>
 
 class G4SafetyHelper;
 class G4CoupledTransportation;
@@ -35,7 +35,7 @@ namespace Belle2 {
      * Constructor
      * @param  verbosityLevel
      */
-    G4LongLivedNeutralTransportation(G4int verbosityLevel = 1);
+    explicit G4LongLivedNeutralTransportation(G4int verbosityLevel = 1);
 
     /**
      * Destructor
@@ -58,7 +58,7 @@ namespace Belle2 {
       G4double  currentMinimumStep,
       G4double& currentSafety,
       G4GPILSelection* selection
-    );
+    ) override;
 
     /**
      * G4VProcess::AlongStepDoIt() implementation,
@@ -69,7 +69,7 @@ namespace Belle2 {
     G4VParticleChange* AlongStepDoIt(
       const G4Track& track,
       const G4Step& stepData
-    );
+    ) override;
 
     /**
      * G4VProcess::PostStepDoIt() implementation,
@@ -80,7 +80,7 @@ namespace Belle2 {
     G4VParticleChange* PostStepDoIt(
       const G4Track& track,
       const G4Step&  stepData
-    );
+    ) override;
 
     /**
      * G4VProcess::PostStepGetPhysicalInteractionLength() implementation.
@@ -96,7 +96,7 @@ namespace Belle2 {
       const G4Track& track,
       G4double   previousStepSize,
       G4ForceCondition* pForceCond
-    );
+    ) override;
 
 
 
@@ -162,16 +162,16 @@ namespace Belle2 {
      * No operation in  AtRestGPIL.
      */
     G4double AtRestGetPhysicalInteractionLength(const G4Track&,
-                                                G4ForceCondition*)
+                                                G4ForceCondition*) override
     { return -1.0; }
 
     /**
      * No operation in  AtRestDoIt.
      */
-    G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&)
+    G4VParticleChange* AtRestDoIt(const G4Track&, const G4Step&) override
     { return 0; }
 
-    void StartTracking(G4Track* aTrack);
+    void StartTracking(G4Track* aTrack) override;
     /**< Reset state for new (potentially resumed) track*/
 
     /**
@@ -179,7 +179,7 @@ namespace Belle2 {
      *
      * @param outStream Output file with a description of process
      */
-    virtual void ProcessDescription(std::ostream& outStream) const;
+    void ProcessDescription(std::ostream& outStream) const override;
 
     void PrintStatistics(std::ostream& outStr) const;
     /**< returns current logging info of the algorithm */

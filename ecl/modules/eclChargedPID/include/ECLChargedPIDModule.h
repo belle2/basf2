@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Destructor, use to clean up anything you created in the constructor.
      */
-    virtual ~ECLChargedPIDModule();
+    virtual ~ECLChargedPIDModule() override;
 
     /**
      * Check the PDFs payload for consistency every time they change in the database.
@@ -90,18 +90,6 @@ namespace Belle2 {
      * This is most likely where your module will actually do anything.
      */
     virtual void event() override;
-
-    /**
-     * Called once when a run ends.
-     *
-     *  Use this method to save run information, which you aggregated over the last run.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Clean up anything you created in initialize().
-     */
-    virtual void terminate() override;
 
   private:
 
@@ -175,7 +163,7 @@ namespace Belle2 {
      * i: row index
      * j: column index
     */
-    inline int linIndex(int i, int j, int m)
+    static int linIndex(int i, int j, int m)
     {
       return j + m * i;
     }
@@ -195,7 +183,7 @@ namespace Belle2 {
      * Extract the PDF value for a given variable from the TF1 object.
      * If the variable is out of bounds, the pdf is set to be equal to the pdf value at the minimum/maximum of the TF1 range.
      */
-    double getPdfVal(const double& x, const TF1* pdf);
+    static double getPdfVal(const double& x, const TF1* pdf);
 
     /**
      * Definition of sqrt(2)

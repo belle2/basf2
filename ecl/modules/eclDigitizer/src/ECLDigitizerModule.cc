@@ -195,25 +195,26 @@ void ECLDigitizerModule::shapeFitterWrapper(const int j, const int* FitA, const 
   ECLShapeFit result;
 
   if (!m_dspDataTest) {
-    short int* id = (short int*)m_idn[t.idn].id;
+    const short int* id = m_idn[t.idn].id;
 
     int A0  = (int) * (id + 0) - 128;
     int Askip  = (int) * (id + 1) - 128;
 
     int Ahard  = (int) * (id + 2);
-    int k_a = (int) * ((unsigned char*)id + 26);
-    int k_b = (int) * ((unsigned char*)id + 27);
-    int k_c = (int) * ((unsigned char*)id + 28);
-    int k_16 = (int) * ((unsigned char*)id + 29);
-    int k1_chi = (int) * ((unsigned char*)id + 24);
-    int k2_chi = (int) * ((unsigned char*)id + 25);
+    int k_a = (int) * (reinterpret_cast<const unsigned char*>(id) + 26);
+    int k_b = (int) * (reinterpret_cast<const unsigned char*>(id) + 27);
+    int k_c = (int) * (reinterpret_cast<const unsigned char*>(id) + 28);
+    int k_16 = (int) * (reinterpret_cast<const unsigned char*>(id) + 29);
+    int k1_chi = (int) * (reinterpret_cast<const unsigned char*>(id) + 24);
+    int k2_chi = (int) * (reinterpret_cast<const unsigned char*>(id) + 25);
 
     int chi_thres = (int) * (id + 15);
 
     int trg_time = ttrig;
 
-    result = lftda_((int*)r.f, (int*)r.f1, (int*)r.fg41, (int*)r.fg43,
-                    (int*)r.fg31, (int*)r.fg32, (int*)r.fg33, (int*)FitA,
+    result = lftda_(reinterpret_cast<const int*>(r.f), reinterpret_cast<const int*>(r.f1), reinterpret_cast<const int*>(r.fg41),
+                    reinterpret_cast<const int*>(r.fg43),
+                    reinterpret_cast<const int*>(r.fg31), reinterpret_cast<const int*>(r.fg32), reinterpret_cast<const int*>(r.fg33), FitA,
                     trg_time, A0, Ahard, Askip, k_a, k_b, k_c, k_16, k1_chi,
                     k2_chi, chi_thres);
   } else {
@@ -369,7 +370,7 @@ void ECLDigitizerModule::makeWaveforms()
   std::vector<int> FitA(ec.m_nsmp); // buffer for the waveform fitter
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
+    const adccounts_t& a = m_adc[j];
     makeElectronicNoiseAndPedestal(j, FitA.data());
     for (int  i = 0; i < ec.m_nsmp; i++) {
       int A = 20000 * a.c[i] + FitA[i];
@@ -383,7 +384,7 @@ void ECLDigitizerModule::makeWaveforms()
   m_eclWaveforms.assign(wf);
 
   std::swap(out.getStore(), wf->getStore());
-  if (comp) delete comp;
+  delete comp;
 }
 
 void ECLDigitizerModule::event()
@@ -444,7 +445,7 @@ void ECLDigitizerModule::event()
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
-    adccounts_t& a = m_adc[j];
+    const adccounts_t& a = m_adc[j];
 
     //normalize the MC true arrival times
     if (m_adc[j].totalDep > 0) {
@@ -522,14 +523,6 @@ void ECLDigitizerModule::event()
   if (comp) delete comp;
 }
 
-void ECLDigitizerModule::endRun()
-{
-}
-
-void ECLDigitizerModule::terminate()
-{
-}
-
 void ECLDigitizerModule::callbackHadronSignalShapes()
 {
 
@@ -588,9 +581,9 @@ void ECLDigitizerModule::readDSPDB()
     assert(! dataFileName.empty());
 
     rootfile = new TFile(dataFileName.c_str(), "read");
-    tree  = (TTree*) rootfile->Get("EclWF");
-    tree2 = (TTree*) rootfile->Get("EclAlgo");
-    tree3 = (TTree*) rootfile->Get("EclNoise");
+    tree  = static_cast<TTree*>(rootfile->Get("EclWF"));
+    tree2 = static_cast<TTree*>(rootfile->Get("EclAlgo"));
+    tree3 = static_cast<TTree*>(rootfile->Get("EclNoise"));
   }
 
   if (tree == 0 || tree2 == 0 || tree3 == 0) B2FATAL("Data not found");
@@ -702,12 +695,12 @@ void ECLDigitizerModule::readDSPDB()
   // one sampled diode response in the pool, parameters vector from
   // pg.dat file, time offset 0.5 usec added to have peak position with
   // parameters from ps.dat roughly in the same place as in current MC
-  double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
+  const double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
   m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
 
   B2DEBUG(150, "ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 
-  if (eclWFData) delete eclWFData;
+  delete eclWFData;
 
   if (!m_useWaveformParameters) rootfile->Close();
 }

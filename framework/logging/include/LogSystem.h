@@ -270,7 +270,6 @@ namespace Belle2 {
     }
     //package specific config?
     if (package && !m_packageLogConfigs.empty()) {
-      // cppcheck-suppress stlIfFind ; cppcheck doesn't like scoped variables in if statements
       if (auto it = m_packageLogConfigs.find(package); it != m_packageLogConfigs.end()) {
         const LogConfig& logConfig = it->second;
         if (logConfig.getLogLevel() != LogConfig::c_Default)

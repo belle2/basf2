@@ -18,7 +18,7 @@
 
 
 namespace Belle2 {
-  /*! DQM Histogram Analysis for PXD occupancy after Injection */
+  /*! DQM Histogram Analysis for PXD occupancy after injection */
 
   class DQMHistAnalysisPXDInjectionModule final : public DQMHistAnalysisModule {
 

@@ -39,7 +39,7 @@ namespace Belle2 {
       /** Return the noise value for a given pixel */
       virtual float getNoise(const Pixel&) const { return m_noiseLevel; }
 
-      /** Check wether a signal exceeds a given significance
+      /** Check whether a signal exceeds a given significance
        * @param px pixel to check
        * @param significance minimum significance
        */

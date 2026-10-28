@@ -153,7 +153,9 @@ void KLMTriggerModule::beginRun()
     m_klm_trig_linear_fit->set_intercept_cutoff(m_intercept_cutoff);
 
 
+    m_klmtrg_layer_counter->set_NPlaneTrigger(KLMTriggerParameters->getNPlanes());
     m_klmtrg_layer_counter->set_NLayerTrigger(KLMTriggerParameters->getNLayers());
+    m_klmtrg_layer_counter->set_countPlanes(KLMTriggerParameters->getcountPlanes());
 
     for (auto e : m_layerUsed) {
       m_klmtrg_layer_counter->add_layersUsed(e);

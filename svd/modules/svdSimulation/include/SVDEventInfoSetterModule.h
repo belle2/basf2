@@ -38,7 +38,7 @@ namespace Belle2 {
     SVDEventInfoSetterModule();
 
     /** Destructor. */
-    virtual ~SVDEventInfoSetterModule();
+    virtual ~SVDEventInfoSetterModule() override;
 
     /** Initializes the Module.
      */

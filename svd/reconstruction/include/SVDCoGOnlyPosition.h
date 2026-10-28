@@ -28,12 +28,6 @@ namespace Belle2::SVD {
      * with the CoG algorithm
      */
     void computeClusterPosition(Belle2::SVD::RawCluster& rawCluster, double& position, double& positionError) override;
-
-    /**
-     * virtual destructor
-     */
-    virtual ~SVDCoGOnlyPosition() {};
-
   private:
 
 

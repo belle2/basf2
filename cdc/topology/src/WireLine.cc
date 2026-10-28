@@ -21,8 +21,8 @@ WireLine::WireLine(const ROOT::Math::XYZVector& forward,
   , m_sagCoeff(sagCoeff)
 {
   m_refPos2D = ROOT::Math::XYVector(m_refPos3D.x(), m_refPos3D.y());
-  const double deltaZ = forward.z() - backward.z();
-  m_nominalMovePerZ = ROOT::Math::XYVector((forward.x() - backward.x()) / deltaZ, (forward.y() - backward.y()) / deltaZ);
+  const double dz = forward.z() - backward.z();
+  m_nominalMovePerZ = ROOT::Math::XYVector((forward.x() - backward.x()) / dz, (forward.y() - backward.y()) / dz);
 
   B2ASSERT("Wire reference position is not at 0", m_refPos3D.z() == 0);
 }

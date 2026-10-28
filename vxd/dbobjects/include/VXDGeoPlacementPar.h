@@ -23,8 +23,8 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
-                       const std::string& w = "bottom", double woffset = 0);
+    explicit VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
+                                const std::string& w = "bottom", double woffset = 0);
     //! Destructor
     ~VXDGeoPlacementPar() {}
     /** get name of the component */

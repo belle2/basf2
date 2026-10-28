@@ -185,7 +185,7 @@ namespace Belle2 {
 
       /** Pack one DHC (several DHE) stored in one RawPXD object.
        */
-      void pack_dhc(int dhc_id, int dhe_mask, int* dhe_ids, bool send_all = true, bool send_roi = false);
+      void pack_dhc(int dhc_id, int dhe_mask, const int* dhe_ids, bool send_all = true, bool send_roi = false);
 
       /** Pack one DHE (several DHP) to buffer.
        */
@@ -197,7 +197,6 @@ namespace Belle2 {
 
       /** Pack one DHP RAW to buffer.
        */
-      /* cppcheck-suppress unusedPrivateFunction */
       void pack_dhp_raw(int dhp_id, int dhe_id);
 
       void start_frame(void); ///< Start with a new Frame
@@ -207,7 +206,7 @@ namespace Belle2 {
       void add_frame_to_payload(void); ///< Add Frame to Event payload
 
       /** function still to be implemented */
-      void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
+      static void do_the_reverse_mapping(unsigned int& row, unsigned int& col, unsigned short layer, unsigned short sensor);
 
       /** Check if we want this type of error in this event */
       bool isErrorIn(uint32_t enr);

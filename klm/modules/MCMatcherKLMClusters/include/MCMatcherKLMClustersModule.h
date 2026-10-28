@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    ~MCMatcherKLMClustersModule();
+    ~MCMatcherKLMClustersModule() override;
 
     /**
      * Initializer.

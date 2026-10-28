@@ -10,7 +10,7 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 
-#include "TMath.h"
+#include <TMath.h>
 
 #include <optional>
 
@@ -25,7 +25,7 @@ namespace Belle2 {
     explicit SVDClusterTimeShifterAlgorithm(const std::string& str);
 
     /** Destructor*/
-    virtual ~SVDClusterTimeShifterAlgorithm() {}
+    virtual ~SVDClusterTimeShifterAlgorithm() override {}
 
     /** Setter for m_allowedT0Shift*/
     void setMaximumAllowedShift(const float& value) {m_maximumAllowedShift = value;}

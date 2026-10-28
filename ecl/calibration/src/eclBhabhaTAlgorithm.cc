@@ -484,7 +484,6 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2INFO("Crystal id = " << crys_id);
 
 
-    vector<bool> ts_new_was_set(ECLElementNumbers::c_NCrystals, false);
 
 
     /* Determining which bins to mask out for mean calculation
@@ -492,9 +491,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
     TH1D* h_time = TimevsCrysPrevCrateCalibNoCrystCalib->ProjectionY((string("h_time_psi__") + to_string(crys_id)).c_str(),
                    crys_id, crys_id);
-    TH1D* h_timeMask = (TH1D*)h_time->Clone();
-    TH1D* h_timeMasked = (TH1D*)h_time->Clone((string("h_time_psi_masked__") + to_string(crys_id)).c_str());
-    TH1D* h_timeRebin = (TH1D*)h_time->Clone();
+    TH1D* h_timeMask = static_cast<TH1D*>(h_time->Clone());
+    TH1D* h_timeMasked = static_cast<TH1D*>(h_time->Clone((string("h_time_psi_masked__") + to_string(crys_id)).c_str()));
+    TH1D* h_timeRebin = static_cast<TH1D*>(h_time->Clone());
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down
     if (meanCleanRebinFactor != 1 || meanCleanCutMinFactor != 1) {
@@ -848,27 +847,27 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
 
 
     // If the histogram already exists then read it in and recreate the file so that we can save an updated version of the histogram.
-    TKey* key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld_allRuns");
+    const TKey* key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld_allRuns");
     if (key != 0) {
-      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns");
+      TH1F* h = static_cast<TH1F*>(histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns"));
       tcrateNew_MINUS_tcrateOld_allRuns->Add(h);
     }
 
     key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld_allRuns_allCrates");
     if (key != 0) {
-      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns_allCrates");
+      TH1F* h = static_cast<TH1F*>(histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld_allRuns_allCrates"));
       tcrateNew_MINUS_tcrateOld_allRuns_allCrates->Add(h);
     }
 
     key = histExtraCrateInfofile_dummy->FindKey("num_tcrates_perRun");
     if (key != 0) {
-      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("num_tcrates_perRun");
+      TH1F* h = static_cast<TH1F*>(histExtraCrateInfofile_dummy->Get("num_tcrates_perRun"));
       num_tcrates_perRun->Add(h);
     }
 
     key = histExtraCrateInfofile_dummy->FindKey("tcrateNew_MINUS_tcrateOld__vs__runNum");
     if (key != 0) {
-      TH1F* h = (TH1F*)histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld__vs__runNum");
+      TH1F* h = static_cast<TH1F*>(histExtraCrateInfofile_dummy->Get("tcrateNew_MINUS_tcrateOld__vs__runNum"));
       tcrateNew_MINUS_tcrateOld__vs__runNum->Add(h);
     }
 
@@ -886,9 +885,9 @@ CalibrationAlgorithm::EResult eclBhabhaTAlgorithm::calibrate()
     B2DEBUG(22, "Start of crate id = " << crate_id);
 
     TH1D* h_time_crate = TimevsCrateNoCrateCalibPrevCrystCalib->ProjectionY("h_time_psi_crate", crate_id, crate_id);
-    TH1D* h_time_crate_mask = (TH1D*)h_time_crate->Clone();
-    TH1D* h_time_crate_masked = (TH1D*)h_time_crate->Clone();
-    TH1D* h_time_crate_rebin = (TH1D*)h_time_crate->Clone();
+    TH1D* h_time_crate_mask = static_cast<TH1D*>(h_time_crate->Clone());
+    TH1D* h_time_crate_masked = static_cast<TH1D*>(h_time_crate->Clone());
+    TH1D* h_time_crate_rebin = static_cast<TH1D*>(h_time_crate->Clone());
 
 
     // Do rebinning and cleaning of some bins but only if the user selection values call for it since it slows the code down

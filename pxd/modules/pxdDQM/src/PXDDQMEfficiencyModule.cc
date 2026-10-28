@@ -247,7 +247,7 @@ void PXDDQMEfficiencyModule::defineHisto()
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
   std::sort(sensors.begin(), sensors.end());  // make sure it is our natural order
   int sensor_index = 0;
-  for (VxdID& avxdid : sensors) {
+  for (const VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors

@@ -39,7 +39,7 @@ namespace Belle2 {
     EclCovMatrixNtupleModule();
 
     /** Destructor. */
-    virtual ~EclCovMatrixNtupleModule() {}
+    virtual ~EclCovMatrixNtupleModule() override {}
 
     /** Initializes the module. */
     virtual void initialize() override;

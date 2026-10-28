@@ -1,5 +1,5 @@
-/* Copyright 2008-2014, Technische Universitaet Muenchen,
-   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch
+/* Copyright 2008-2026, Technische Universitaet Muenchen, DESY
+   Authors: Christian Hoeppner & Sebastian Neubert & Johannes Rauch & Christian Wessel
 
    This file is part of GENFIT.
 
@@ -20,6 +20,7 @@
 #include "TGeoMaterialInterface.h"
 #include "Exception.h"
 #include "IO.h"
+#include "MathHelpers.h"
 
 #include <TGeoMedium.h>
 #include <TGeoMaterial.h>
@@ -136,9 +137,9 @@ TGeoMaterialInterface::findNextBoundary(const RKTrackRep* rep,
 
     // Straight line distance² between extrapolation finish and
     // the end of the previously determined safe segment.
-    double dist2 = (pow(state7[0] - oldState7[0], 2)
-        + pow(state7[1] - oldState7[1], 2)
-        + pow(state7[2] - oldState7[2], 2));
+    double dist2 = (square(state7[0] - oldState7[0])
+        + square(state7[1] - oldState7[1])
+        + square(state7[2] - oldState7[2]));
     // Maximal lateral deviation².
     double maxDeviation2 = 0.25*(step*step - dist2);
 

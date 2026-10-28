@@ -56,10 +56,6 @@ namespace Belle2 {
      */
     void event() override;
 
-    /**
-     *Executed at the end of the run.
-     */
-    void endRun() override;
 
     /**
      * Termination action.

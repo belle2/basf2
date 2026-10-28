@@ -13,8 +13,8 @@ using namespace Belle2;
 
 void SelectSubsetBase::swapSetsAndDestroyOriginal()
 {
-  StoreAccessorBase* set = getSet();
-  StoreAccessorBase* subset = getSubSet();
+  const StoreAccessorBase* set = getSet();
+  const StoreAccessorBase* subset = getSubSet();
 
   //replace set with subset
   DataStore::Instance().replaceData(*subset, *set);

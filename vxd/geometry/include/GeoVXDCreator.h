@@ -50,7 +50,7 @@ namespace Belle2 {
       explicit GeoVXDCreator(const std::string& prefix);
 
       /** The destructor of the GeoVXDCreator class. */
-      virtual ~GeoVXDCreator();
+      virtual ~GeoVXDCreator() override;
 
       /**
        * Read the sensor definitions from the database
@@ -87,15 +87,15 @@ namespace Belle2 {
        * @param originCenter bool
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
-      G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
-                                bool originCenter);
+      static G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
+                                       bool originCenter);
 
       /**
        * Get Alignment from paylead object
        * @param  params Payload object
        * @return Transformation matrix for component
        */
-      G4Transform3D getAlignment(const VXDAlignmentPar& params);
+      static G4Transform3D getAlignment(const VXDAlignmentPar& params);
 
       /**
        * Place a list of subcomponents into an component.
@@ -115,7 +115,7 @@ namespace Belle2 {
        * @return offset in w which was applied to the component when extending it
        */
       GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent& component,
-                                         std::vector<VXDGeoPlacement> placements,
+                                         const std::vector<VXDGeoPlacement>& placements,
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
@@ -132,16 +132,16 @@ namespace Belle2 {
        *        angle
        * @return A G4VShape which could be a G4Box, a G4Trd or a G4Trap depending on the parameters
        */
-      G4VSolid* createTrapezoidal(const std::string& name, double width, double
-                                  width2, double length, double& height, double angle = 0);
+      static G4VSolid* createTrapezoidal(const std::string& name, double width, double
+                                         width2, double length, double& height, double angle = 0);
 
       /** Create diamond radiation sensors. */
-      void createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
+      static void createDiamonds(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
 
       /**
        * Return vector of VXDGeoPlacements with all the components defined inside a given path
        */
-      std::vector<VXDGeoPlacementPar> getSubComponents(const GearDir& path);
+      static std::vector<VXDGeoPlacementPar> getSubComponents(const GearDir& path);
 
       /**
        * Read parameters for a ladder in layer with given ID from gearbox and layer
@@ -162,7 +162,7 @@ namespace Belle2 {
        * @param components Path to components
        * @param vxdGeometryPar VXD geometry parameters
        */
-      void readComponent(const std::string& name, GearDir components, VXDGeometryPar& vxdGeometryPar);
+      void readComponent(const std::string& name, const GearDir& components, VXDGeometryPar& vxdGeometryPar);
 
       /**
        * Read parameters for all components in placement container from Gearbox

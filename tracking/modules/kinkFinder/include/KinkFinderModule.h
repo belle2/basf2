@@ -151,8 +151,8 @@ namespace Belle2 {
       }
 
     private:
-      double m_tangent; ///< tangent of the sloping line
-      double m_offset; ///< offset of the sloping line [cm]
+      double m_tangent {}; ///< tangent of the sloping line
+      double m_offset {}; ///< offset of the sloping line [cm]
     };
 
     std::string m_arrayNameTrack;  ///< StoreArray name of the Belle2::Track (Input).
@@ -167,10 +167,10 @@ namespace Belle2 {
     DBObjPtr<KinkFinderParameters> m_kinkFinderParameters; ///< kinkFinder parameters Database ObjPtr
 
     // CDC and SVD geometry variables
-    CDCForwardBackwardWallLine m_cdcForwardBottomWall; ///< Bottom part of forward CDC wall.
-    CDCForwardBackwardWallLine m_cdcForwardTopWall; ///< Top part of forward CDC wall.
-    CDCForwardBackwardWallLine m_cdcBackwardBottomWall; ///< Bottom part of backward CDC wall.
-    CDCForwardBackwardWallLine m_cdcBackwardTopWall; ///< Top part of backward CDC wall.
+    CDCForwardBackwardWallLine m_cdcForwardBottomWall {}; ///< Bottom part of forward CDC wall.
+    CDCForwardBackwardWallLine m_cdcForwardTopWall {}; ///< Top part of forward CDC wall.
+    CDCForwardBackwardWallLine m_cdcBackwardBottomWall {}; ///< Bottom part of backward CDC wall.
+    CDCForwardBackwardWallLine m_cdcBackwardTopWall {}; ///< Top part of backward CDC wall.
     static constexpr double m_cdcInnerWithFirstLayerWall = 15; ///< Smaller radius of inner CDC wall [cm].
     ///< It is taken a bit smaller not to loose some events with the first layer of CDC.
     static constexpr double m_cdcInnerWallWithoutFirstLayer = 17; ///< Bigger radius of inner CDC wall [cm].

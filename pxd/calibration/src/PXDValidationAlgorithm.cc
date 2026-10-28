@@ -203,10 +203,10 @@ CalibrationAlgorithm::EResult PXDValidationAlgorithm::calibrate()
     }
 
     if (save2DHists) {
-      m_hTrackPointsLayer1   = (TH2F*)hTotalHitsLayer1->Clone();
-      m_hTrackClustersLayer1 = (TH2F*)hPassedHitsLayer1->Clone();
-      m_hTrackPointsLayer2   = (TH2F*)hTotalHitsLayer2->Clone();
-      m_hTrackClustersLayer2 = (TH2F*)hPassedHitsLayer2->Clone();
+      m_hTrackPointsLayer1   = static_cast<TH2F*>(hTotalHitsLayer1->Clone());
+      m_hTrackClustersLayer1 = static_cast<TH2F*>(hPassedHitsLayer1->Clone());
+      m_hTrackPointsLayer2   = static_cast<TH2F*>(hTotalHitsLayer2->Clone());
+      m_hTrackClustersLayer2 = static_cast<TH2F*>(hPassedHitsLayer2->Clone());
 
       // associated histograms
       m_tree->Branch<TH2F>("hTrackPointsLayer1", &m_hTrackPointsLayer1, 32000, 0);

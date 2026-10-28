@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Default destructor
      */
-    virtual ~CDCDedxValidationModule() {}
+    virtual ~CDCDedxValidationModule() override {}
 
     /**
      * Initialize
@@ -88,7 +88,7 @@ namespace Belle2 {
      * Filling histograms
      * This will fill histogram defined histograms in above function
      */
-    void FillHistograms(CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack);
+    void FillHistograms(const CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack);
 
     /**
      * Extracting histogram and some calculation

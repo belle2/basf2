@@ -21,7 +21,7 @@ main(int argc, char** argv)
 
   Belle2::SVDOnlineToOfflineMap test(argv[1]);
   short sample[6] = {0, 0, 0, 10000, 0, 0};
-  Belle2::SVDShaperDigit* digit = test.NewShaperDigit(129, 6, 119, sample, 100);
+  const Belle2::SVDShaperDigit* digit = test.NewShaperDigit(129, 6, 119, sample, 100);
   printf("Layer/Ladder/Sensor: %i/%i/%i ",
          digit->getSensorID().getLayerNumber(),
          digit->getSensorID().getLadderNumber(),

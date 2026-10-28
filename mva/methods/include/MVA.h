@@ -18,7 +18,6 @@
 #include <mva/methods/FastBDT.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
-#include <mva/methods/FANN.h>
 #include <mva/methods/PDF.h>
 #include <mva/methods/Combination.h>
 #include <mva/methods/Reweighter.h>

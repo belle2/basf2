@@ -57,10 +57,6 @@ void ECLHitDebugModule::initialize()
   m_eclDebugHits.registerInDataStore();
 }
 
-void ECLHitDebugModule::beginRun()
-{
-}
-
 void ECLHitDebugModule::event()
 {
   //---------------------------------------------------------------------
@@ -79,7 +75,7 @@ void ECLHitDebugModule::event()
   // Loop over all hits of steps
   for (int iHits = 0; iHits < m_eclSimArray.getEntries(); iHits++) {
     // Get a hit
-    ECLSimHit* aECLSimHit = m_eclSimArray[iHits];
+    const ECLSimHit* aECLSimHit = m_eclSimArray[iHits];
 
     // Hit geom. info
     int hitCellId       =   aECLSimHit->getCellId() - 1;
@@ -92,8 +88,8 @@ void ECLHitDebugModule::event()
     const ROOT::Math::XYZVector& VecCell = eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (HitInPos  - PosCell).Dot(VecCell));
 
-    int iECLCell = hitCellId;
     if (hitTOF < 8000) {
+      int iECLCell = hitCellId;
       int TimeIndex = (int) hitTOF / interval;
       E_cell[iECLCell][TimeIndex] = E_cell[iECLCell][TimeIndex] + hitE;
       Tof_ave[iECLCell][TimeIndex]  += (6.05 + 0.0749 * local_pos - 0.00112 * local_pos * local_pos + hitTOF) * hitE ;
@@ -122,8 +118,4 @@ void ECLHitDebugModule::event()
 void ECLHitDebugModule::endRun()
 {
   m_nRun++;
-}
-
-void ECLHitDebugModule::terminate()
-{
 }

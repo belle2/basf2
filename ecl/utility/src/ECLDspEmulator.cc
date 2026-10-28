@@ -38,7 +38,7 @@ namespace Belle2 {
     template <typename INT>
     ECLShapeFit lftda_(const INT* f, const INT* f1, const INT* fg41,
                        const INT* fg43, const INT* fg31, const INT* fg32,
-                       const INT* fg33, int* y, int ttrig2, int la_thr,
+                       const INT* fg33, const int* y, int ttrig2, int la_thr,
                        int hit_thr, int skip_thr, int k_a, int k_b,
                        int k_c, int k_16, int k1_chi, int k2_chi,
                        int chi_thres, bool adjusted_timing)
@@ -419,13 +419,13 @@ namespace Belle2 {
 
     template ECLShapeFit lftda_<short>(const short* f, const short* f1, const short* fg41,
                                        const short* fg43, const short* fg31, const short* fg32,
-                                       const short* fg33, int* y, int ttrig2, int la_thr,
+                                       const short* fg33, const int* y, int ttrig2, int la_thr,
                                        int hit_thr, int skip_thr, int k_a, int k_b,
                                        int k_c, int k_16, int k1_chi, int k2_chi,
                                        int chi_thres, bool adjusted_timing);
     template ECLShapeFit lftda_<int>(const int* f, const int* f1, const int* fg41,
                                      const int* fg43, const int* fg31, const int* fg32,
-                                     const int* fg33, int* y, int ttrig2, int la_thr,
+                                     const int* fg33, const int* y, int ttrig2, int la_thr,
                                      int hit_thr, int skip_thr, int k_a, int k_b,
                                      int k_c, int k_16, int k1_chi, int k2_chi,
                                      int chi_thres, bool adjusted_timing);

@@ -22,7 +22,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -38,9 +37,6 @@ std::vector<const CDCSegment2D*> BaseSegmentRelationFilter::getPossibleTos(
   const CDCSegment2D* from,
   const std::vector<const CDCSegment2D*>& segments) const
 {
-  assert(std::is_sorted(segments.begin(), segments.end(), LessOf<Deref>()) &&
-         "Expected segments to be sorted");
-
   ConstVectorRange<const CDCSegment2D*> tos{
     std::equal_range(segments.begin(), segments.end(), from, LessOf<Deref>())};
 

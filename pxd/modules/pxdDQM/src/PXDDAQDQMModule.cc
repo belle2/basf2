@@ -71,7 +71,7 @@ void PXDDAQDQMModule::defineHisto()
   hDAQErrorEvent->LabelsOption("v"); // rotate the labels.
 
   std::vector<VxdID> sensors = m_vxdGeometry.getListOfSensors();
-  for (VxdID& avxdid : sensors) {
+  for (const VxdID& avxdid : sensors) {
     VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(avxdid);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     //Only interested in PXD sensors
@@ -282,6 +282,8 @@ void PXDDAQDQMModule::event()
 
 
   // And check if the stored data is valid
+  // the second isValid() is EventLevelTriggerTimeInfo's, not StoreObjPtr's
+  // cppcheck-suppress knownConditionTrueFalse
   if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
 
     double lasttrig = m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.; //  127MHz clock ticks to us, inexact rounding

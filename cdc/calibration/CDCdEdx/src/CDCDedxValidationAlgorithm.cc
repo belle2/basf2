@@ -131,10 +131,9 @@ void CDCDedxValidationAlgorithm::radeeValidation()
   ttree->SetBranchAddress("entaRS", &enta);
   ttree->SetBranchAddress("layer", &layer);
 
-  std::vector<double> vtlocaledges;
-  defineTimeBins(vtlocaledges);
-  m_tbins = vtlocaledges.size() - 1;
-  m_tedges = &vtlocaledges[0];
+  defineTimeBins(m_vtlocaledges);
+  m_tbins = m_vtlocaledges.size() - 1;
+  m_tedges = &m_vtlocaledges[0];
 
   std::array<std::array<std::vector<TH1D*>, 2>, 13> hdedx_mom;
   std::array<std::vector<TH1D*>, 2> hdedx_mom_peaks, hdedx_inj, hdedx_inj_nocor;
@@ -357,7 +356,7 @@ void CDCDedxValidationAlgorithm::bhabhaValidation()
 }
 
 //------------------------------------
-void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::string var, std::string stype)
+void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, const std::string& var, const std::string& stype)
 {
   int xbins = 0;
   double xmin = 0.0, xmax = 0.0;
@@ -403,10 +402,11 @@ void CDCDedxValidationAlgorithm::defineHisto(std::vector<TH1D*>& htemp, std::str
   }
 }
 
-void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, std::string namesfx, std::string svar)
+void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 2>& htemp, const std::string& namesfx,
+                                                 const std::string& svar)
 {
   int xbins = 4;
-  double xmin, xmax;
+  double xmin = 0., xmax = 0.;
 
   if (svar == "mom") {
     xmin = m_momMin; xmax = 4.0;
@@ -490,7 +490,7 @@ void CDCDedxValidationAlgorithm::printCanvasdEdx(std::array<std::vector<TH1D*>, 
   delete ctmp;
 }
 
-void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, std::string namesfx, std::string svar)
+void CDCDedxValidationAlgorithm::printCanvas(std::vector<TH1D*>& htemp, const std::string& namesfx, const std::string& svar)
 {
   int xbins = 0;
   double xmin = 0.0, xmax = 0.0;
@@ -600,7 +600,7 @@ void CDCDedxValidationAlgorithm::fit(TH1D*& hist, double& mean, double& meanErr,
   }
 }
 
-void CDCDedxValidationAlgorithm::printCanvasRun(std::map<int, TH1D*>& htemp, std::string namesfx)
+void CDCDedxValidationAlgorithm::printCanvasRun(const std::map<int, TH1D*>& htemp, const std::string& namesfx)
 {
   // Set up the TCanvas with 4x4 grid
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 1200, 1200);
@@ -702,7 +702,7 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   int activelayers = 0;
   double layeravg = 0.0;
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
   CDCDedxWireGainAlgorithm wireg;
 
   DBObjPtr<CDCDedxBadWires> Badwire;
@@ -765,7 +765,7 @@ void CDCDedxValidationAlgorithm::wireGain(std::vector<TH1D*>& hdedxhit)
   printCanvasWire(hdedxhit, Form("plots/wire/dedx_vs_wire_%s", m_suffix.data()), vdedx_means);
 }
 
-void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, std::string namesfx,
+void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, const std::string& namesfx,
                                                  const std::vector<double>& vdedx_mean)
 {
   TCanvas* ctmp = new TCanvas("tmp", "tmp", 900, 900);
@@ -786,7 +786,7 @@ void CDCDedxValidationAlgorithm::printCanvasWire(std::vector<TH1D*> temp, std::s
     ctmp->cd(ip % 16 + 1);
     gPad->cd();
     temp[ip]->DrawCopy("hist");
-    TH1D* hdedxhitC = (TH1D*)temp[ip]->Clone(Form("%sC", temp[ip]->GetName()));
+    TH1D* hdedxhitC = static_cast<TH1D*>(temp[ip]->Clone(Form("%sC", temp[ip]->GetName())));
     hdedxhitC->GetXaxis()->SetRange(minbin, maxbin);
     hdedxhitC->SetFillColor(kAzure + 1);
     hdedxhitC->DrawCopy("same histo");
@@ -895,7 +895,7 @@ WireGainData CDCDedxValidationAlgorithm::getwiregain(int experiment, int run)
   DBObjPtr<CDCDedxWireGain> DBWireGains;
   if (!DBWireGains.isValid())  B2FATAL("Wire gain data are not valid.");
 
-  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
+  const CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance(&(*m_cdcGeo));
 
   int jwire = -1;
   for (unsigned int il = 0; il < c_maxNSenseLayers; ++il) {

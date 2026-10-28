@@ -64,7 +64,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, it2, itLower, itUpper;
   std::set<int> digitVolumes;
-  ExtHit* extHit;
+  const ExtHit* extHit;
   TTree* calibrationData = getObjectPtr<TTree>("calibration_data");
   /* Create volume - extHit map. */
   n = m_Tracks.getEntries();

@@ -31,10 +31,6 @@ using namespace Belle2::Simulation;
 ExtPhysicsConstructor::ExtPhysicsConstructor() : G4VPhysicsConstructor("ExtPhysicsConstructor"),
   m_StepLengthLimitProcess(NULL), m_MagFieldLimitProcess(NULL), m_ELossProcess(NULL), m_Messenger(NULL)
 {
-  if (false) {
-    ConstructParticle();
-    ConstructProcess();
-  }
 }
 
 ExtPhysicsConstructor::~ExtPhysicsConstructor()
@@ -64,7 +60,7 @@ void ExtPhysicsConstructor::ConstructParticle()
   // Values copied verbatim from geant4, except our particles don't decay
   // and the names/PDGcodes are unique.
 
-  static G4ParticleDefinition* g4eParticle = NULL;
+  static const G4ParticleDefinition* g4eParticle = NULL;
 
   if (g4eParticle == NULL) {
     // Bohr Magneton for positron and positive muon

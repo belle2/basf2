@@ -320,7 +320,7 @@ namespace Belle2 {
 
 
     /** returns the name of the setup used for this trainer */
-    const std::string getSetupName() { return m_nameSetup; }
+    const std::string& getSetupName() const { return m_nameSetup; }
 
     /** checks if given TC is acceptable for this trainer and store it if it is accepted.
     *

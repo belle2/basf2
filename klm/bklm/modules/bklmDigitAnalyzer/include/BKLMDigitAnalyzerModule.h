@@ -67,11 +67,6 @@ namespace Belle2 {
      */
     void endRun() override;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate() override;
-
 
   private:
 
@@ -125,7 +120,7 @@ namespace Belle2 {
 
     //! Convert a number of type T into a string
     template <typename T>
-    std::string toString(T val)
+    static std::string toString(T val)
     {
       std::ostringstream stream;
       stream << val;

@@ -17,8 +17,7 @@
    along with GENFIT.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef genfit_mySpacepointDetectorHit_h
-#define genfit_mySpacepointDetectorHit_h
+#pragma once
 
 #include <TObject.h>
 
@@ -51,5 +50,3 @@ class mySpacepointDetectorHit : public TObject {
 /** @} */
 
 } /* End of namespace genfit */
-
-#endif // genfit_mySpacepointDetectorHit_h

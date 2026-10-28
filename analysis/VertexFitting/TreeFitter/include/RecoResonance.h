@@ -65,6 +65,7 @@ namespace TreeFitter {
 
   private:
     /** has mass constraint */
+    // cppcheck-suppress duplInheritedMember ; deliberately shadows the Composite member
     bool m_massconstraint;
 
 

@@ -71,8 +71,8 @@ namespace Belle2 {
           continue;
         }
 
-        Belle2::CDC::ILayer iclayerPrev = ((const CDCHit*)*prevHitPtr)->getICLayer(); // signed short
-        Belle2::CDC::ILayer iclayerThis = ((const CDCHit*)thisHit)->getICLayer();
+        Belle2::CDC::ILayer iclayerPrev = static_cast<const CDCHit*>(*prevHitPtr)->getICLayer(); // signed short
+        Belle2::CDC::ILayer iclayerThis = static_cast<const CDCHit*>(thisHit)->getICLayer();
 
         if (abs(iclayerPrev - iclayerThis) >= minJump) {
 

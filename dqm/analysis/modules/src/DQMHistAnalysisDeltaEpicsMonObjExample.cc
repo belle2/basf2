@@ -14,7 +14,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysisDeltaEpicsMonObjExample.h>
 #include <TROOT.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -137,18 +136,18 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
 
   // In the following, enable one
 
-  // get most recent delta, but only if updated since last call
-  auto hist =  getDelta(m_histogramDirectoryName, m_histogramName, 0, true);// only if updated
+  // get most recent delta, but only if updated since last call, nullptr otherwise
+  auto hist =  getDelta(m_histogramDirectoryName, m_histogramName);
   // get basic histogram (run integrated up) but only if updated since last call
   // auto hist = findHist(m_histogramDirectoryName, m_histogramName, true);// only if updated
 
   // the following cases do not make sense, unless you want to achieve something special.
   // get most recent delta even if not updated
-  // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName, 0, false);// even if no update
+  // auto hist =  getDelta(m_histogramDirectoryName, m_histogramName,false);// even if no update
   // get basic histogram (run integrated up) even if not updated
   // auto hist = findHist(m_histogramDirectoryName, m_histogramName, false);// even if no update
 
-  if (hist) {
+  if (hist != nullptr) {
     data_mean = hist->GetMean();
     data_width = hist->GetRMS();
 

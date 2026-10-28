@@ -50,7 +50,7 @@ namespace Belle2 {
       /** Get numbers of VXD layers
        * @return std::vector with numbers of VXD layers
        */
-      std::vector<unsigned short> getLayers() const { return m_listOfLayers; }
+      const std::vector<unsigned short>& getLayers() const { return m_listOfLayers; }
 
       /** Get numbers of PXD layers
        * @return std::vector with numbers of PXD layers

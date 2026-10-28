@@ -13,9 +13,7 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
-                                      loadStdD0, loadStdDplus, loadStdDstar0,
-                                      loadStdDstarPlus, loadPiSkimHighEff,
+from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons, loadPiSkimHighEff,
                                       loadKSkimHighEff, loadSlowPi,
                                       loadSkimHighEffD0_Kpi, loadSkimHighEffDstarPlus_D0pi_Kpi,
                                       loadSkimHighEffD0_Kpipipi, loadSkimHighEffDstarPlus_D0pi_Kpipipi,
@@ -29,7 +27,7 @@ from stdV0s import stdKshorts
 from variables import variables as vm
 # from ROOT import Belle2
 
-__liaison__ = "Tia Crane <tia.crane@desy.de>, Tommy Martinov <tommy.martinov@ts.infn.it>"
+__liaison__ = "Tia Crane <tia.crane@desy.de>"
 _VALIDATION_SAMPLE = "mdst16.root"
 
 
@@ -164,10 +162,18 @@ class SLUntagged(BaseSkim):
     """
     Cuts applied:
 
-    * :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
-    * :math:`5.24 < M_{\\text{bc}} < 5.29`
-    * :math:`|\\Delta E | < 0.5`
-    * :math:`n_{\\text{tracks}} > 4`
+    * Event selection: :math:`n_{\\text{tracks}} > 4`
+    * Leptons: :math:`p_{\\ell} > 0.35\\,\\text{GeV}`
+    * B candidates: :math:`5.24 < M_{\\text{bc}} < 5.29,\\text{GeV}`, :math:`|\\Delta E | < 0.5\\,\\text{GeV}`
+    * Photons (:math:`\\gamma\\text{:loose}`): :math:`|clusterTiming| < 200\\,\\text{ns}`,
+      :math:`|clusterTiming/clusterErrorTiming| < 2`
+    * :math:`\\pi^0` candidates (shared quality cuts, applied to both standard lists below):
+
+      * :math:`0.120 < M_{\\pi^0} < 0.145\\,\\text{GeV}`
+      * :math:`-1.5 < \\Delta \\phi (\\pi^0 \\text{ daughters}) < 1.5\\,\\text{rad}`
+      * :math:`\\theta (\\pi^0 \\text{ daughters}) < 1.4\\,\\text{rad}`
+      * per-daughter photon :math:`|clusterTiming| < 200\\,\\text{ns}`,
+        :math:`|clusterTiming/clusterErrorTiming| < 2`
 
     Reconstructed decays:
 
@@ -179,8 +185,21 @@ class SLUntagged(BaseSkim):
     * :math:`B^0 \\to  D^{-} \\mu^+`
     * :math:`B^0 \\to  D^{*-} e^+`
     * :math:`B^0 \\to  D^{*-} \\mu^+`
-    """
 
+    Note:
+
+        This skim uses `stdPi0s.stdPi0s` and `skim.standardlists.lightmesons.loadStdPi0ForBToHadrons`
+        where :math:`\\pi^0` and slow :math:`\\pi^0` are defined (for additional selections to these
+        lists, see above).
+
+        The pion and kaon lists used to define :math:`D` and :math:`D^{*}` are:
+        `skim.standardlists.charm.loadPiForBtoHadrons` and
+        `skim.standardlists.charm.loadKForBtoHadrons`,
+
+        Additional photon and :math:`\\pi^0` selections are applied in PromptRel9 to obtain required
+        CPU time per event. In previous releases, no additional selections were made to the standard
+        lists.
+    """
     __authors__ = ["Phillip Urquijo", "Racha Cheaib"]
     __description__ = (
         "Skim for semileptonic decays, :math:`B` decays "
@@ -199,33 +218,105 @@ class SLUntagged(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPi("loose", path=path)
+        stdKshorts(path=path)
+
         stdPhotons("loose", path=path)
         stdPi0s("eff40_May2020", path=path)
-        stdKshorts(path=path)
         loadStdPi0ForBToHadrons(path=path)
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
-        loadStdD0(path=path)
-        loadStdDstar0(path=path)
-        loadStdDplus(path=path)
-        loadStdDstarPlus(path=path)
 
     def build_lists(self, path):
         path = self.skim_event_cuts("nTracks > 4", path=path)
         ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)
         ma.cutAndCopyList("mu+:SLUntagged", "mu+:all", "p>0.35", True, path=path)
+
+        # additional selections added to meet threshold for HS06 CPU time per event
+        clusterQualityCut = (
+            "abs(clusterTiming)<200 and abs(formula(clusterTiming/clusterErrorTiming))<2"
+            )
+        pi0QualityCut = (
+            "0.120<InvM<0.145 and -1.5<daughterDiffOf(0,1,phi)<1.5 and daughterAngle(0,1)<1.4 and \
+            daughter(0, abs(clusterTiming))<200 and daughter(0, abs(formula(clusterTiming/clusterErrorTiming)))<2 and \
+            daughter(1, abs(clusterTiming))<200 and daughter(1, abs(formula(clusterTiming/clusterErrorTiming)))<2"
+        )
+        ma.cutAndCopyList("gamma:loose_SLUntagged", "gamma:loose", clusterQualityCut, path=path)
+        ma.cutAndCopyList("pi0:eff40_May2020_SLUtagged", "pi0:eff40_May2020", pi0QualityCut, path=path)
+        ma.cutAndCopyList("pi0:bth_skim_SLUntagged", "pi0:bth_skim", pi0QualityCut, path=path)
+
+        # modified loadStdD0
+        D0Cuts = '1.7 < M < 2.0'
+        D0_Channels = ['K-:GoodTrack pi+:GoodTrack',
+                       'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi-:GoodTrack',
+                       'K-:GoodTrack pi+:GoodTrack pi0:bth_skim_SLUntagged',
+                       'K_S0:merged pi+:GoodTrack pi-:GoodTrack',
+                       ]
+        D0List = []
+        for chID, channel in enumerate(D0_Channels):
+            ma.reconstructDecay(decayString='D0:SLUntagged' + str(chID) + ' -> ' + channel, cut=D0Cuts, dmID=chID, path=path)
+            D0List.append('D0:SLUntagged' + str(chID))
+        ma.copyLists(outputListName='D0:SLUntagged', inputListNames=D0List, path=path)
+
+        # modified loadStdDstar0
+        Dstar0Cuts = 'massDifference(0) < 0.16'
+        D_Channels = ['D0:SLUntagged pi0:eff40_May2020_SLUtagged',
+                      'D0:SLUntagged gamma:loose_SLUntagged']
+        DList = []
+        for chID, channel in enumerate(D_Channels):
+            ma.reconstructDecay(
+                decayString='D*0:std_SLUntagged' +
+                str(chID) +
+                ' -> ' +
+                channel,
+                cut=Dstar0Cuts,
+                dmID=chID,
+                path=path)
+            DList.append('D*0:std_SLUntagged' + str(chID))
+        ma.copyLists(outputListName='D*0:SLUntagged', inputListNames=DList, path=path)
+
+        # modified loadStdDplus
+        DplusCuts = '1.8 < M < 1.9'
+        Dplus_Channels = ['K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
+                          'K_S0:merged pi+:GoodTrack',
+                          'K_S0:merged pi+:GoodTrack pi0:bth_skim_SLUntagged',
+                          'K-:GoodTrack pi+:GoodTrack pi+:GoodTrack pi0:bth_skim_SLUntagged',
+                          ]
+        DplusList = []
+        for chID, channel in enumerate(Dplus_Channels):
+            ma.reconstructDecay(decayString='D+:SLUntagged' + str(chID) + ' -> ' + channel, cut=DplusCuts, dmID=chID, path=path)
+            DplusList.append('D+:SLUntagged' + str(chID))
+        ma.copyLists(outputListName='D+:SLUntagged', inputListNames=DplusList, path=path)
+
+        # modified loadStdDstarPlus
+        DstarPlusCuts = 'massDifference(0) < 0.16'
+        D_Channels = ['D0:SLUntagged pi+:GoodTrack',
+                      'D+:SLUntagged pi0:eff40_May2020_SLUtagged']
+        DList = []
+        for chID, channel in enumerate(D_Channels):
+            ma.reconstructDecay(
+                decayString='D*+:std_SLUntagged' +
+                str(chID) +
+                ' -> ' +
+                channel,
+                cut=DstarPlusCuts,
+                dmID=chID,
+                path=path)
+            DList.append('D*+:std_SLUntagged' + str(chID))
+        ma.copyLists(outputListName='D*+:SLUntagged', inputListNames=DList, path=path)
+
+        # reconstruct B
         Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
 
-        BplusChannels = ["anti-D0:all e+:SLUntagged",
-                         "anti-D0:all mu+:SLUntagged",
-                         "anti-D*0:all e+:SLUntagged",
-                         "anti-D*0:all mu+:SLUntagged"
+        BplusChannels = ["anti-D0:SLUntagged e+:SLUntagged",
+                         "anti-D0:SLUntagged mu+:SLUntagged",
+                         "anti-D*0:SLUntagged e+:SLUntagged",
+                         "anti-D*0:SLUntagged mu+:SLUntagged"
                          ]
 
-        B0Channels = ["D-:all e+:SLUntagged",
-                      "D-:all mu+:SLUntagged",
-                      "D*-:all e+:SLUntagged",
-                      "D*-:all mu+:SLUntagged"
+        B0Channels = ["D-:SLUntagged e+:SLUntagged",
+                      "D-:SLUntagged mu+:SLUntagged",
+                      "D*-:SLUntagged e+:SLUntagged",
+                      "D*-:SLUntagged mu+:SLUntagged"
                       ]
 
         bplusList = []
@@ -249,8 +340,8 @@ class SLUntagged(BaseSkim):
 
         ma.buildRestOfEvent('B+:all', path=path)
         ma.appendROEMask('B+:all', 'basic',
-                         'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
-                         'E>0.05',
+                         'pt>0.05 and dr<1 and abs(dz)<3',
+                         'E>0.05 and abs(clusterTiming)<200 and abs(formula(clusterTiming/clusterErrorTiming)) < 2.0',
                          path=path)
 
         vm.addAlias('d1_p', 'daughter(1,p)')
@@ -436,7 +527,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         gammaSignalECut = "1.4"
         BSLRecoCut = "InvM > 2.5 and cosBY > -3.0 and cosBY < 1.5"
         BSLSkimCut = f"e_ROE_pCM < 3.0 or mu_ROE_pCM < 3.0 or gamma_ROE_ECM > {gammaSignalECut}" +\
-                     " or nROE_Ch < 2.5 or E_extra_ROE < 1.6"
+            " or nROE_Ch < 2.5 or E_extra_ROE < 1.6"
 
         vm.addAlias('pCM', 'useCMSFrame(p)')
         vm.addAlias('ECM', 'useCMSFrame(E)')

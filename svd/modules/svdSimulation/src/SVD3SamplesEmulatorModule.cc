@@ -95,10 +95,6 @@ void SVD3SamplesEmulatorModule::initialize()
 }
 
 
-void SVD3SamplesEmulatorModule::beginRun()
-{
-}
-
 
 void SVD3SamplesEmulatorModule::event()
 {
@@ -153,14 +149,6 @@ void SVD3SamplesEmulatorModule::event()
     ShaperDigit3Samples.appendNew(sensorID, side, cellID, threeSamples, fadcT);
 
   }
-}
-
-void SVD3SamplesEmulatorModule::endRun()
-{
-}
-
-void SVD3SamplesEmulatorModule::terminate()
-{
 }
 
 int SVD3SamplesEmulatorModule::getFirstSample(const SVDModeByte modeByte)

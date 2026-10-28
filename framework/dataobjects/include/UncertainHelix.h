@@ -103,6 +103,7 @@ namespace Belle2 {
      *  The momentum at each point is reversed.
      *  The charge sign is changed to its opposite by this transformation.
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     void reverse();
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.
@@ -110,6 +111,7 @@ namespace Belle2 {
      *  @param by            Vector by which the origin of the coordinate system should be moved.
      *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     double passiveMoveBy(const ROOT::Math::XYZVector& by)
     { return passiveMoveBy(by.X(), by.Y(), by.Z()); }
 
@@ -121,6 +123,7 @@ namespace Belle2 {
      *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      *
      */
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     double passiveMoveBy(const double& byX,
                          const double& byY,
                          const double& byZ);

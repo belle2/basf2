@@ -31,9 +31,11 @@ namespace Belle2 {
     struct SegmentTrackTruthVarNames : public TrackingUtilities::VarNames<BaseSegmentTrackFilter::Object> {
 
       /// Number of variables to be generated
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which is the empty default of VarNames
       static const size_t nVars = TrackingUtilities::size(segmentTrackTruthVarNames);
 
       /// Getter for the name at the given index
+      // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member, which is the empty default of VarNames
       static constexpr char const* getName(int iName)
       {
         return segmentTrackTruthVarNames[iName];

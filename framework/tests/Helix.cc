@@ -87,9 +87,11 @@ namespace {
     double absError = 1e-6;
     double nominalBz = 1.5;
 
+    // cppcheck-suppress unusedStructMember ; kept to document the intended parameter set
     std::vector<float> omegas { -1, 0, 1};
     //std::vector<float> omegas {1};
     std::vector<float> phi0s = linspace(-M_PI, M_PI, 11);
+    // cppcheck-suppress unusedStructMember ; kept to document the intended parameter set
     std::vector<float> d0s { -0.5, -0.2, 0, 0.2, 0.5};
     //std::vector<float> d0s {0.5};
     std::vector<float> chis = linspace(-5 * M_PI / 6, 5 * M_PI / 6, 11);

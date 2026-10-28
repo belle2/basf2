@@ -35,8 +35,6 @@ namespace Belle2 {
     /** Open display. */
     void endRun() override;
 
-    /** Close display. */
-    void terminate() override;
 
 
   private:

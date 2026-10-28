@@ -662,7 +662,7 @@ void DQMHistoModuleBase::ProcessHistogramParameterChange(const std::string& name
   }
 }
 
-void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const std::string& parameter, std::string value)
+void DQMHistoModuleBase::EditHistogramParameter(TH1* histogram, const std::string& parameter, const std::string& value)
 {
   if (parameter == "title") {
     histogram->SetTitle(value.c_str());

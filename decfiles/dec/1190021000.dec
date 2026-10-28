@@ -1,0 +1,45 @@
+# EventType: 1190021000
+# Descriptor: [Bd -> eta' K*0]cc
+# NickName: Bd_etapKst
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Michele Veronesi
+# Email: michele.veronesi@ipmu.jp
+# Cuts: None
+# Date: 20260825
+#
+#
+Alias      eta'sig       eta'
+ChargeConj eta'sig       eta'sig
+Alias      etasig        eta
+ChargeConj etasig        etasig
+Alias      K*0sig        K*0
+ChargeConj K*0sig        anti-K*0
+Alias      K_0*0sig      K_0*0
+ChargeConj K_0*0sig      anti-K_0*0
+Alias      K_2*0sig      K_2*0
+ChargeConj K_2*0sig      anti-K_2*0
+#
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0             VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+0.122807   K*0sig    eta'sig                 SVS;
+0.276316   K_0*0sig  eta'sig                 PHSP;
+0.600877   K_2*0sig  eta'sig                 STS;
+Enddecay
+CDecay anti-B0sig
+#
+Decay eta'sig
+0.590278         etasig     pi+     pi-       ETAPRIME_DALITZ -0.047 -0.069 0.0 0.073;
+0.409722         rho0       gamma             SVP_HELAMP  1.0 0.0 1.0 0.0;
+Enddecay
+#
+Decay etasig
+0.630971   gamma  gamma                       PHSP;
+0.369029   pi+   pi-    pi0                   ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173;
+Enddecay
+#
+End

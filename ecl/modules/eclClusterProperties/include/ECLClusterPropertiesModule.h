@@ -36,7 +36,7 @@ namespace Belle2 {
     ECLClusterPropertiesModule();
 
     /** Destructor */
-    virtual ~ECLClusterPropertiesModule();
+    virtual ~ECLClusterPropertiesModule() override;
 
     /** Initialize the required input arrays */
     virtual void initialize() override;
@@ -48,7 +48,7 @@ namespace Belle2 {
   private:
 
     /** Minimal distance between track and shower. */
-    double computeTrkMinDistance(const ECLShower&, StoreArray<Track>&, unsigned short& trackID) const;
+    double computeTrkMinDistance(const ECLShower&, const StoreArray<Track>&, unsigned short& trackID) const;
 
     /**
      * Computation of depths / distances.

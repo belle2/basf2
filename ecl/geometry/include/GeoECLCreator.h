@@ -35,7 +35,7 @@ namespace Belle2 {
       GeoECLCreator();
 
       //! The destructor of the GeoECLCreator class.
-      ~GeoECLCreator();
+      ~GeoECLCreator() override;
 
       /**
        * Function to actually create the geometry, has to be overridden by derived classes
@@ -81,10 +81,10 @@ namespace Belle2 {
       /** Get Logical volume of preamplifier */
       G4LogicalVolume* get_preamp() const ;
       /** Getter for preamplifier box height (hard-coded to be 2) */
-      double get_pa_box_height() const {return 2;}
+      static double get_pa_box_height() {return 2;}
 
       /** pointer to a storage with crystal shapes and positions */
-      const ECLCrystalsShapeAndPosition* m_sap;
+      const ECLCrystalsShapeAndPosition* m_sap = nullptr;
 
       /** Sensitive detector */
       Simulation::SensitiveDetectorBase* m_sensitive;
@@ -93,7 +93,7 @@ namespace Belle2 {
       /** Vector of background-Sensitive detectors */
       std::map<std::string, G4VisAttributes*> m_atts;
       /** overlap */
-      int m_overlap;
+      int m_overlap = 0;
     };
 
   } // end of ecl namespace

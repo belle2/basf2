@@ -102,7 +102,12 @@ void ParticleWeightingModule::event()
         Particle* pp = m_particles[selParticle->getArrayIndex()];
         WeightInfo info = getInfo(pp);
         for (const auto& entry : info) {
-          pp->addExtraInfo(m_tableName + "_" + entry.first, entry.second);
+          const std::string extraInfoName = m_tableName + "_" + entry.first;
+          // The same daughter can be shared by several candidates of the list. The weight only depends on
+          // the daughter itself, so it is only added once. A different value still triggers an exception.
+          if (pp->hasExtraInfo(extraInfoName) && pp->getExtraInfo(extraInfoName) == entry.second)
+            continue;
+          pp->addExtraInfo(extraInfoName, entry.second);
         }
       }
     } else {

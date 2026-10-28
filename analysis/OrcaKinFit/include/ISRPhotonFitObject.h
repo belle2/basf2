@@ -76,6 +76,7 @@ namespace Belle2 {
 
       void updateCache() const override;
 
+      // cppcheck-suppress duplInheritedMember ; deliberately shadows the base class cache flag
       mutable bool cachevalid;
 
       mutable double pt2, p2, p, pz,

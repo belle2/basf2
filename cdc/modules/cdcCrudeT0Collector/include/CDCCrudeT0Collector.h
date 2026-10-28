@@ -38,15 +38,15 @@ namespace Belle2 {
       void finish() override;
 
     private:
-      unsigned short m_lay;  /**< Layer ID */
-      unsigned short m_wire; /**< Wire ID */
-      unsigned short m_tdc;  /**< TDC count */
+      unsigned short m_lay = 0;  /**< Layer ID */
+      unsigned short m_wire = 0; /**< Wire ID */
+      unsigned short m_tdc = 0;  /**< TDC count */
       StoreArray<CDCHit> m_cdcHits; /**< CDCHit array */
       unsigned short m_adcMin = 1;    /**< ADC cut to reject noise. */
       /**
        * Describe the process.
        */
-      void describeProcess(std::string functionName);
+      static void describeProcess(const std::string& functionName);
 
     };
   }

@@ -35,7 +35,7 @@ namespace Belle2 {
     KLMTrackingModule();
 
     //! Destructor
-    ~KLMTrackingModule();
+    ~KLMTrackingModule() override;
 
     //! Initialize at start of job
     void initialize() override;
@@ -53,7 +53,7 @@ namespace Belle2 {
     void terminate() override;
 
     //! Judge if two hits come from the same sector
-    bool sameSector(KLMHit2d* hit1, KLMHit2d* hit2);
+    static bool sameSector(const KLMHit2d* hit1, const KLMHit2d* hit2);
 
     //! find the closest RecoTrack, match KLMTrack to RecoTrack, if the matched RecoTrack is found, return true
     bool findClosestRecoTrack(KLMTrack* klmTrk, RecoTrack*& closestTrack);
@@ -91,7 +91,7 @@ namespace Belle2 {
   private:
 
     //! KLMGeometryPar to call on B/E-KLM
-    Belle2::KLM::KLMGeometryPar* m_GeoPar;
+    Belle2::KLM::KLMGeometryPar* m_GeoPar = nullptr;
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;
@@ -182,16 +182,16 @@ namespace Belle2 {
     void generateEffi(int iSubdetector, int section, int sector, int layer);
 
     //! my defined sort function using layer number
-    static bool sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2);
+    static bool sortByLayer(const KLMHit2d* hit1, const KLMHit2d* hit2);
 
     //! judge whether the current layer is understudy
-    bool isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit);
+    static bool isLayerUnderStudy(int section, int iSector, int iLayer, const KLMHit2d* hit);
 
     //! judge whether the hits come from the sctor under study
-    bool isSectorUnderStudy(int section, int iSector, KLMHit2d* hit);
+    static bool isSectorUnderStudy(int section, int iSector, const KLMHit2d* hit);
 
     //! calculate distance from track to hit
-    double distanceToHit(KLMTrack* track, KLMHit2d* hit,
+    double distanceToHit(KLMTrack* track, const KLMHit2d* hit,
                          double& error,
                          double& sigma);
 

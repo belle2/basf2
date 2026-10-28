@@ -42,7 +42,7 @@ int main(int argc, char** argv)
   DIR* dir;
   if ((dir = opendir(std::filesystem::temp_directory_path().c_str())) != nullptr) {
     int ret = 0;
-    struct dirent* ent;
+    const struct dirent* ent;
     while ((ent = readdir(dir)) != nullptr) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {
         //  printf ("%s\n", ent->d_name);

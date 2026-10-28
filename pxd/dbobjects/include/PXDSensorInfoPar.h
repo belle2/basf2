@@ -20,8 +20,8 @@ namespace Belle2 {
   public:
     /** Constructor which automatically sets the SensorType */
 
-    PXDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
-                     float splitLength = 0, int vCells2 = 0):
+    explicit PXDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
+                              float splitLength = 0, int vCells2 = 0):
       VXDSensorInfoBasePar(PXDSensorInfoPar::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2),
       m_bulkDoping(0), m_backVoltage(0), m_topVoltage(0), m_sourceBorderSmallPitch(0), m_clearBorderSmallPitch(0),
       m_drainBorderSmallPitch(0), m_sourceBorderLargePitch(0), m_clearBorderLargePitch(0), m_drainBorderLargePitch(0),

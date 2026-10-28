@@ -46,26 +46,17 @@ namespace Belle2 {
 
     /** Destructor.
      */
-    ~ECLDigitizerPureCsIModule();
+    ~ECLDigitizerPureCsIModule() override;
 
 
     /** Initialize variables  */
     virtual void initialize() override;
-
-    /** Nothing so far.*/
-    virtual void beginRun() override;
 
     /** Actual digitization of all pure CsI hits in the ECL.
      *
      *  The digitized hits are written into the DataStore.
      */
     virtual void event() override;
-
-    /** Nothing so far. */
-    virtual void endRun() override;
-
-    /** Free memory. */
-    virtual void terminate() override;
 
   private:
     /** ECL ring ID. */

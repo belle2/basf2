@@ -13,7 +13,7 @@ according to the following principles:
   mechanism.
 - **s:** Selection Flag, indicating the criteria used to define this event type, based on the presence
   of certain particles.
-- **d:** Decay Elag, indicating the general features of the decays considered for this event type.
+- **d:** Decay Flag, indicating the general features of the decays considered for this event type.
 - **c:** Charm Flag, for the selected decays in this event type.
 - **l:** Lepton Flag, for the selected decays in this event type.
 - **t:** Tracks Flag, indicating the number of charged tracks in the selected decays.
@@ -161,8 +161,8 @@ Decay Flag
 
 The **Decay Flag** indicates general features of the scheme used to force the decay of the particle(s)
 indicated by the Selection Flag. Tables below list the definitions. Events with additional photons,
-which may occur via radiative corrections, are considered as a single decay mode. Intermediate 
-esonances that are not explicitly defined in the decay file (for example, the use of resonant decay
+which may occur via radiative corrections, are considered as a single decay mode. Intermediate
+resonances that are not explicitly defined in the decay file (for example, the use of resonant decay
 models such as ``DALITZ`` and ``VUB``), are not counted either.
 
 +------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -221,7 +221,7 @@ Charm Flag
 
 The **Charm Flag** gives information about the presence or absence of charm hadrons in the forced
 part of the decay chain of the selected particle(s), as defined by the Decay Flag and the Selection
-Flag. This flag is useful to determine the presence of a tertiary vertex from the weak decay of a 
+Flag. This flag is useful to determine the presence of a tertiary vertex from the weak decay of a
 harm hadron. Given the signal particle is flagged elsewhere, the charm content of the signal particle
 does not trigger the charm and lepton flag (such as :math:`D^∗` and :math:`J/\psi` signal particles).
 Tables below give the lists of definitions for General Flags of 4 and below, and for above 4
@@ -302,11 +302,11 @@ charge and the decay is not a LFV mode. This flag specifically applies to Genera
 Track Flag
 ++++++++++
 
-The **Track Flag** is equal to the total number of “stable” charged particles in the forced part of 
+The **Track Flag** is equal to the total number of “stable” charged particles in the forced part of
 the decay chain of the selected particles. The forced part of the decay chains is defined by the Decay
 Flag, and the selected particles are those involved in the definition of the Selection Flag. Only the
 following charged particles are counted: protons, charged pions, charged kaons, electrons, and muons
-(tracks from :math:`K^0_S` and :math:`\Lambda` are counted as well). If the count is larger than 9, 
+(tracks from :math:`K^0_S` and :math:`\Lambda` are counted as well). If the count is larger than 9,
 the Track Flag is set to 9. The value 0 is possible. If the Decay Flag is 2, 3, 4, 7, or 8 the
 assignment of the Track Flag may become ambiguous. In that case, tracks should be counted using the
 dominant or more representative forced decay chain. For machine background event types (General

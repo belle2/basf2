@@ -357,7 +357,7 @@ namespace Belle2 {
 
   private:
     /// Member pointer to boolean indicating if filters are bypassed (true) or their actual result is returned (false).
-    const bool* m_bypass;
+    const bool* m_bypass {};
   };
 
 
@@ -464,7 +464,7 @@ namespace Belle2 {
 
   private:
     /// Member pointer to boolean indicating if filters are active (true) or inactive (false).
-    const bool* m_enable;
+    const bool* m_enable {};
   };
 
 

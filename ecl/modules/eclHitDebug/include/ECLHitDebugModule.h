@@ -26,13 +26,10 @@ namespace Belle2 {
     ECLHitDebugModule();
 
     /** Destructor.*/
-    virtual ~ECLHitDebugModule();
+    virtual ~ECLHitDebugModule() override;
 
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize() override;
-
-    /** Nothing so far.*/
-    virtual void beginRun() override;
 
     /** Actual digitization of all hits in the ECL.
      *
@@ -42,9 +39,6 @@ namespace Belle2 {
 
     /** Nothing so far. */
     virtual void endRun() override;
-
-    /** Stopping of CPU clock.*/
-    virtual void terminate() override;
 
   protected:
     /** Input array name. */

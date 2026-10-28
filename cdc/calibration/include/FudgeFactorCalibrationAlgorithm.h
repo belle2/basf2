@@ -22,7 +22,7 @@ namespace Belle2 {
       /// Constructor.
       FudgeFactorCalibrationAlgorithm();
       /// Destructor
-      ~FudgeFactorCalibrationAlgorithm() {}
+      ~FudgeFactorCalibrationAlgorithm() override {}
       /// store Hisotgram or not.
       //      void storeHisto(bool storeHist = false) {m_storeHisto = storeHist;}
       /// Set name for histogram output

@@ -10,7 +10,7 @@
 
 using namespace Belle2;
 
-void CDCDedxHadSat::setParameters(std::string infile)
+void CDCDedxHadSat::setParameters(const std::string& infile)
 {
 
   B2INFO("\n\t Hadron Saturation: Using parameters from file --> " << infile);
@@ -106,7 +106,7 @@ double CDCDedxHadSat::I2D(double cosTheta, double I = 1) const
 }
 
 double
-CDCDedxHadSat::D2I(double cosTheta, double D, double alpha, double gamma, double delta, double power, double ratio) const
+CDCDedxHadSat::D2I(double cosTheta, double D, double alpha, double gamma, double delta, double power, double ratio)
 {
 
   double absCosTheta   = fabs(cosTheta);
@@ -130,7 +130,7 @@ CDCDedxHadSat::D2I(double cosTheta, double D, double alpha, double gamma, double
 }
 
 double
-CDCDedxHadSat::I2D(double cosTheta, double I, double alpha, double gamma, double delta, double power, double ratio) const
+CDCDedxHadSat::I2D(double cosTheta, double I, double alpha, double gamma, double delta, double power, double ratio)
 {
 
   double absCosTheta = fabs(cosTheta);

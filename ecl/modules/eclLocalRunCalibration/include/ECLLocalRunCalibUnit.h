@@ -96,17 +96,17 @@ namespace Belle2 {
      * @param run is the current run number.
      * @param iov is the current validity interval.
      */
-    void markAsRefference(const bool& isLocal,
-                          const std::string& dbName,
-                          const int& run,
-                          const IntervalOfValidity& iov);
+    static void markAsRefference(const bool& isLocal,
+                                 const std::string& dbName,
+                                 const int& run,
+                                 const IntervalOfValidity& iov);
     /**
      * Change previous validity interval.
      * @param payload is the connection to a certain payload.
      * @param iov is the current validity interval.
      */
-    void changePreviousIoV(const ECLDBTool& payload,
-                           const IntervalOfValidity& iov);
+    static void changePreviousIoV(const ECLDBTool& payload,
+                                  const IntervalOfValidity& iov);
     /**
      * Mean value and standard deviation
      * accumulators for each cell id.

@@ -39,7 +39,7 @@ AddDescriptionToRootFile(TString filename, TString description, bool delete_tree
   } 
 
   // get the pointer to the old tree
-  TTree * tree = (TTree*)f.Get(tree_name);
+  TTree * tree = dynamic_cast<TTree*>(f.Get(tree_name));
 
   // create a new tree in this case
   if( delete_tree && tree != nullptr) {

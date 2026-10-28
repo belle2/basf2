@@ -302,10 +302,10 @@ namespace Belle2 {
       }
 
       //! Get the rotation from Transform3D
-      const CLHEP::HepRotation getRotationFromTransform3D(const HepGeom::Transform3D& trans) const;
+      static const CLHEP::HepRotation getRotationFromTransform3D(const HepGeom::Transform3D& trans);
 
       //! Get the translation from Transform3D
-      const CLHEP::Hep3Vector getTranslationFromTransform3D(const HepGeom::Transform3D& trans) const;
+      static const CLHEP::Hep3Vector getTranslationFromTransform3D(const HepGeom::Transform3D& trans);
 
     private:
 

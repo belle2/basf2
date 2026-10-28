@@ -158,13 +158,13 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
 }
 
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(PXDClusterShapeClassifierPar*
-    shapeClassifier, PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShapeClassifier(const PXDClusterShapeClassifierPar*
+    shapeClassifier, const PXDClusterShapeIndexPar* shapeIndexer, int clusterKind)
 {
   // Create a mirrored shape classifier
   auto mirroredShapeClassifier = PXDClusterShapeClassifierPar();
 
-  // Mirror the shape likelyhood map
+  // Mirror the shape likelihood map
   auto shapeLikelyhoodMap = shapeClassifier->getShapeLikelyhoodMap();
   for (auto indexAndValue : shapeLikelyhoodMap) {
     // Compute the mirrored shape index
@@ -194,11 +194,11 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
       // Copy over percentile
       auto percentile = percentileMap[shapeIndex][etaBin];
       mirroredShapeClassifier.addEtaPercentile(mirroredIndex, percentile);
-      // Copy over likelyhood
+      // Copy over likelihood
       auto likelyhood = likelyhoodMap[shapeIndex][etaBin];
       mirroredShapeClassifier.addEtaLikelyhood(mirroredIndex, likelyhood);
       // Mirror the offset: v offset shifts and covariance swaps sign
-      double shift = (m_sizeMap[shapeName] - 1) * m_pitchMap[clusterKind];
+      double shift = (m_sizeMap[shapeName] - 1) * static_cast<double>(m_pitchMap[clusterKind]);
       auto mirroredOffset = PXDClusterOffsetPar(offset.getU(), shift - offset.getV(), offset.getUSigma2(), offset.getVSigma2(),
                                                 -offset.getUVCovariance());
       mirroredShapeClassifier.addEtaOffset(mirroredIndex, mirroredOffset);
@@ -209,13 +209,14 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::mirrorShape
   return mirroredShapeClassifier;
 }
 
-PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(PXDClusterShapeClassifierPar* shapeClassifier,
-    PXDClusterShapeIndexPar* shapeIndexer, PXDClusterShapeIndexPar* globalShapeIndexer)
+PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlobal(const PXDClusterShapeClassifierPar*
+    shapeClassifier,
+    const PXDClusterShapeIndexPar* shapeIndexer, const PXDClusterShapeIndexPar* globalShapeIndexer)
 {
   // Create a shape classifier using global shape indices
   auto globalShapeClassifier = PXDClusterShapeClassifierPar();
 
-  // Re-index the the shape likelyhood map
+  // Re-index the the shape likelihood map
   auto shapeLikelyhoodMap = shapeClassifier->getShapeLikelyhoodMap();
   for (auto indexAndValue : shapeLikelyhoodMap) {
     // Compute the global shape index
@@ -243,7 +244,7 @@ PXDClusterShapeClassifierPar PXDClusterPositionCalibrationAlgorithm::localToGlob
       // Copy over percentile
       auto percentile = percentileMap[shapeIndex][etaBin];
       globalShapeClassifier.addEtaPercentile(globalIndex, percentile);
-      // Copy over likelyhood
+      // Copy over likelihood
       auto likelyhood = likelyhoodMap[shapeIndex][etaBin];
       globalShapeClassifier.addEtaLikelyhood(globalIndex, likelyhood);
       // Copy over offset
@@ -320,7 +321,7 @@ void PXDClusterPositionCalibrationAlgorithm::createShapeClassifier(string treena
     double likelyhood = counter / nEntries;
 
     if (counter >=  minClusterForShapeLikelyhood) {
-      //B2INFO("Adding shape " << name << " with index " << tmpIndex << " and shape likelyhood " << 100*likelyhood << "% and count " << counter);
+      //B2INFO("Adding shape " << name << " with index " << tmpIndex << " and shape likelihood " << 100*likelyhood << "% and count " << counter);
       shapeIndexer->addShape(name, tmpIndex);
       shapeClassifier->addShapeLikelyhood(tmpIndex, likelyhood);
 

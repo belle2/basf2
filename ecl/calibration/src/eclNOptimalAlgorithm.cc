@@ -113,7 +113,7 @@ std::vector<int> eclNOptimalFitRange(TH1D* h, const double& fraction)
 
 //-----------------------------------------------------------------------------------
 //..Resolution is the minimum range that contains 68.3% of entries
-double eclNOptimalResolution(TH1D* h, int& iLo75, int& iHi75)
+double eclNOptimalResolution(TH1D* h, const int& iLo75, const int& iHi75)
 {
 
   //..Search among the bin range that contains 75% of events for the smallest
@@ -161,7 +161,7 @@ double eclNOptimalResolution(TH1D* h, int& iLo75, int& iHi75)
   double fracBinToExcludeLo = fracEntriesToExcludeLo;
 
   //..Use the slope from the fit extrapolated to this point unless it is 0
-  TF1* func = (TF1*)h->GetFunction("eclNOptimalNovo");
+  TF1* func = static_cast<TF1*>(h->GetFunction("eclNOptimalNovo"));
   double f0 = func->Eval(xLow);
   double f1 = func->Eval(xLow + dx);
   if (abs(f1 - f0) > 1.) {
@@ -502,7 +502,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       int nCrysSumToFit = initialnCrysSumToFit;
       while (nCrysSumToFit > 0) {
 
-        TH1D* hEnergy = (TH1D*)eSum->ProjectionY("hEnergy", nCrysSumToFit, nCrysSumToFit);
+        TH1D* hEnergy = static_cast<TH1D*>(eSum->ProjectionY("hEnergy", nCrysSumToFit, nCrysSumToFit));
         TString newName = name + "_" + std::to_string(nCrysSumToFit);
         hEnergy->SetName(newName);
 
@@ -573,7 +573,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
         double bias = 0.;
         double biasSigma = 0.;
         if (nCrysSumToFit < nCrysBins) {
-          TH1D* hBias = (TH1D*)biasSum->ProjectionY("hBias", nCrysSumToFit, nCrysSumToFit);
+          TH1D* hBias = static_cast<TH1D*>(biasSum->ProjectionY("hBias", nCrysSumToFit, nCrysSumToFit));
           fitFraction = 0.683;
           std::vector<int> jBins = eclNOptimalFitRange(hBias, fitFraction);
           const double lowEdge = hBias->GetBinLowEdge(jBins[0]);
@@ -654,7 +654,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
       //..Store everything in diagnostic histograms
 
       //..Extract the function from the nOptimal histogram
-      TF1* funcOpt = (TF1*)eSumOpt->GetFunction("eclNOptimalNovo");
+      TF1* funcOpt = static_cast<TF1*>(eSumOpt->GetFunction("eclNOptimalNovo"));
 
       nOptimalPerGroup->SetBinContent(ig + 1, ie + 1, nOpt);
 
@@ -764,7 +764,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
           //..Find the bias
           std::string biasName = "biasSum_" + std::to_string(ig) + "_" + std::to_string(ieAdj);
           auto biasSum = getObjectPtr<TH2F>(biasName);
-          TH1D* hBias = (TH1D*)biasSum->ProjectionY("hBias", nOpt, nOpt);
+          TH1D* hBias = static_cast<TH1D*>(biasSum->ProjectionY("hBias", nOpt, nOpt));
 
           //..Bias is the mid-point of the range containing 68.3% of events
           double fitFraction = 0.683;
@@ -777,7 +777,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
           //..Get the eSum distribution to be fit
           std::string name = "eSum_" + std::to_string(ig) + "_" + std::to_string(ieAdj);
           auto eSum = getObjectPtr<TH2F>(name);
-          TH1D* hEnergy = (TH1D*)eSum->ProjectionY("hEnergy", nOpt, nOpt);
+          TH1D* hEnergy = static_cast<TH1D*>(eSum->ProjectionY("hEnergy", nOpt, nOpt));
           TString newName = name + "_" + std::to_string(nOpt);
           hEnergy->SetName(newName);
 

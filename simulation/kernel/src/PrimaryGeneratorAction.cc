@@ -20,10 +20,6 @@ PrimaryGeneratorAction::PrimaryGeneratorAction(const string& mcCollectionName,
                                                MCParticleGraph& mcParticleGraph) : G4VUserPrimaryGeneratorAction()
 {
   m_mcParticleGenerator = new MCParticleGenerator(mcCollectionName, mcParticleGraph);
-  if (false) {
-    G4Event* event = nullptr;
-    GeneratePrimaries(event);
-  }
 }
 
 

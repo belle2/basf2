@@ -252,10 +252,6 @@ ROOT::Math::XYZVector BFieldComponent3d::calculate(const ROOT::Math::XYZVector& 
   return B;
 }
 
-void BFieldComponent3d::terminate()
-{
-}
-
 ROOT::Math::XYZVector BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
                                                      double wr1, double wphi1, double wz1) const
 {

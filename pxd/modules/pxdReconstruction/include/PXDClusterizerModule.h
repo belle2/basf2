@@ -102,9 +102,9 @@ namespace Belle2 {
        * @param isAtVEdge true if the cluster is at sensor V edge
        * @param isAdjacentDead true if the cluster is neighbouring dead pixels
        */
-      void assignPositionErrorFromDB(ClusterProjection& primary, PXDClusterPositionErrorPar errorPar,
-                                     VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
-                                     bool isAtUEdge = false, bool isAtVEdge = false, bool isAdjacentDead = false);
+      static void assignPositionErrorFromDB(ClusterProjection& primary, const PXDClusterPositionErrorPar& errorPar,
+                                            VxdID sensorID, unsigned int uCell, unsigned int vCell, double centerPitch,
+                                            bool isAtUEdge = false, bool isAtVEdge = false, bool isAdjacentDead = false);
 
       /** Noise in ADU */
       double m_elNoise;

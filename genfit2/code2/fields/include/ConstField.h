@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_ConstField_h
-#define genfit_ConstField_h
+#pragma once
 
 #include "AbsBField.h"
 
@@ -55,5 +54,3 @@ class ConstField : public AbsBField {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_ConstField_h

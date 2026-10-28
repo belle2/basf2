@@ -18,7 +18,7 @@
 #include <sstream>
 
 //boost
-#include "boost/format.hpp"
+#include <boost/format.hpp>
 
 using namespace Belle2;
 

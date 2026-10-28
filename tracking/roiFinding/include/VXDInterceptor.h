@@ -69,7 +69,7 @@ namespace Belle2 {
 
     /** Append the Intercept infos related to the track theTrack to the listToBeFilled.
      */
-    static void appendIntercepts(StoreArray<aIntercept>* interceptList, std::list<ROIDetPlane> planeList,
+    static void appendIntercepts(StoreArray<aIntercept>* interceptList, const std::list<ROIDetPlane>& planeList,
                                  genfit::MeasuredStateOnPlane state,
                                  int recoTrackIndex, RelationArray* recoTrackToIntercepts);
 

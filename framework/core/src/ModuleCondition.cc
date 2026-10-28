@@ -88,6 +88,8 @@ std::string ModuleCondition::getString() const
 
 namespace {
   /// Same function as in the class itself, but return by value
+  // the signature is imposed by its use as a Python callback
+  // cppcheck-suppress constParameterCallback
   std::shared_ptr<Path> _getPathPython(ModuleCondition* m) {return m->getPath(); };
 }
 

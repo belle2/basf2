@@ -31,8 +31,8 @@ namespace Belle2 {
   public:
 
     /** Default constructor */
-    PXDClusterPositionErrorPar(unsigned short nBinsU = 1, unsigned short nBinsV = 3, unsigned short maxSize = 8,
-                               float defaultValue = 0.0, float defaultFactor = 1.0):
+    explicit PXDClusterPositionErrorPar(unsigned short nBinsU = 1, unsigned short nBinsV = 3, unsigned short maxSize = 8,
+                                        float defaultValue = 0.0, float defaultFactor = 1.0):
       m_nBinsU(nBinsU), m_nBinsV(nBinsV), m_maxSize(maxSize), m_defaultValue(defaultValue), m_defaultFactor(defaultFactor),
       m_factorSensorUEdgeMap(), m_factorSensorVEdgeMap(), m_factorDeadNeighbourMap(), m_clusterPositionErrorMap() { }
 
@@ -103,7 +103,7 @@ namespace Belle2 {
       auto mapIter = m_clusterPositionErrorMap.find(sensorID);
       if (mapIter != m_clusterPositionErrorMap.end()) {
         // Found sensor, return position error value
-        auto& errVec = mapIter->second;
+        const auto& errVec = mapIter->second;
         return errVec[globalID];
       }
       // Sensor not found, keep low profile and return default position error value
@@ -234,7 +234,7 @@ namespace Belle2 {
       auto mapIter = m_factorSensorUEdgeMap.find(sensorID);
       if (mapIter != m_factorSensorUEdgeMap.end()) {
         // Found sensor, return scale factor value
-        auto& facVec = mapIter->second;
+        const auto& facVec = mapIter->second;
         return facVec[globalID];
       }
       // Sensor not found, keep low profile and return default scale factor value
@@ -262,7 +262,7 @@ namespace Belle2 {
       auto mapIter = m_factorSensorVEdgeMap.find(sensorID);
       if (mapIter != m_factorSensorVEdgeMap.end()) {
         // Found sensor, return scale factor value
-        auto& facVec = mapIter->second;
+        const auto& facVec = mapIter->second;
         return facVec[globalID];
       }
       // Sensor not found, keep low profile and return default scale factor value
@@ -290,7 +290,7 @@ namespace Belle2 {
       auto mapIter = m_factorDeadNeighbourMap.find(sensorID);
       if (mapIter != m_factorDeadNeighbourMap.end()) {
         // Found sensor, return scale factor value
-        auto& facVec = mapIter->second;
+        const auto& facVec = mapIter->second;
         return facVec[globalID];
       }
       // Sensor not found, keep low profile and return default scale factor value

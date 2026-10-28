@@ -32,7 +32,7 @@ namespace Belle2 {
     ECLTrackClusterMatchingParametrizationExpertModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~ECLTrackClusterMatchingParametrizationExpertModule();
+    virtual ~ECLTrackClusterMatchingParametrizationExpertModule() override;
 
     /** Use this to initialize resources or memory your module needs.
      *
@@ -53,7 +53,7 @@ namespace Belle2 {
   private:
 
     /** Check if extrapolated hit is inside ECL and matches one of the desired categories. */
-    bool isECLHit(const ExtHit& extHit) const;
+    static bool isECLHit(const ExtHit& extHit);
 
     // required input
     StoreArray<ExtHit> m_extHits; /**< Required input array of ExtHits */

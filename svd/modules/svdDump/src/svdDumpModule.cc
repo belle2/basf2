@@ -94,7 +94,7 @@ void svdDumpModule::event()
   uint32_t  header = 0xf;
   header <<= 28;
   header |= ((total_nWords & 0xffff) << 12) + (m_event & 0xfff);
-  m_outputFile->write((char*)(&header), sizeof(uint32_t));
+  m_outputFile->write(reinterpret_cast<char*>((&header)), sizeof(uint32_t));
 
   for (int i = 0; i < rawSVD.getEntries(); i++) {
     for (int j = 0; j < rawSVD[ i ]->GetNumEntries(); j++) {
@@ -102,9 +102,9 @@ void svdDumpModule::event()
       unsigned int nWords = rawSVD[i]->Get1stDetectorNwords(j);
       unsigned int remaining_nWords = (nWords - m_nFtbHeader - m_nFtbTrailer);
 
-      uint32_t* data32 = (uint32_t*)rawSVD[i]->Get1stDetectorBuffer(j);
+      const uint32_t* data32 = reinterpret_cast<const uint32_t*>(rawSVD[i]->Get1stDetectorBuffer(j));
 
-      m_outputFile->write((char*)(data32 + m_nFtbHeader), sizeof(uint32_t)*remaining_nWords);
+      m_outputFile->write(reinterpret_cast<const char*>((data32 + m_nFtbHeader)), sizeof(uint32_t)*remaining_nWords);
 
     }
   }

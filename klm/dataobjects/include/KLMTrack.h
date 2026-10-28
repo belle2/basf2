@@ -152,10 +152,10 @@ namespace Belle2 {
     float m_TrackParamErr[4][4];
 
     //! in BKLM Flag
-    bool m_inBKLM;
+    bool m_inBKLM = false;
 
     //! in EKLM Flag
-    bool m_inEKLM;
+    bool m_inEKLM = false;
 
     //! Needed to make the ROOT object storable
     ClassDef(KLMTrack, 1)

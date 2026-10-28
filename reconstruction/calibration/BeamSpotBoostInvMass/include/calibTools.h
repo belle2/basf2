@@ -218,7 +218,8 @@ namespace Belle2 {
 
   /** Store payloads to files */
   template<typename Evt>
-  inline void storePayloads(const std::vector<Evt>& evts, const std::vector<CalibrationData>&  calVecConst, std::string objName,
+  inline void storePayloads(const std::vector<Evt>& evts, const std::vector<CalibrationData>&  calVecConst,
+                            const std::string& objName,
                             std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
     auto calVec = calVecConst;
@@ -283,7 +284,7 @@ namespace Belle2 {
 
 
   /** Store payloads to files, where calib data have no intra-run dependence */
-  inline void storePayloadsNoIntraRun(const std::vector<CalibrationData>&  calVecConst, std::string objName,
+  inline void storePayloadsNoIntraRun(const std::vector<CalibrationData>&  calVecConst, const std::string& objName,
                                       std::function<TObject*(Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd)  > getCalibObj)
   {
     auto calVec = calVecConst;
@@ -453,7 +454,7 @@ namespace Belle2 {
 
     //Loop over all calibration intervals
     std::vector<CalibrationData> calVec;
-    for (auto s : splits) {
+    for (const auto& s : splits) {
       CalibrationData calD = runAlgorithm(evts, s, calibAnalysis); // run the calibration over the interval s
       calVec.push_back(calD);
     }

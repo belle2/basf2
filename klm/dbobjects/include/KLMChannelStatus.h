@@ -86,13 +86,13 @@ namespace Belle2 {
     /**
      * Operator ==.
      */
-    bool operator==(KLMChannelStatus& status);
+    bool operator==(const KLMChannelStatus& status);
 
     /**
      * Number of new channels with status c_Normal
      * that have a different status in another channel-status data.
      */
-    unsigned int newNormalChannels(KLMChannelStatus& status);
+    unsigned int newNormalChannels(const KLMChannelStatus& status);
 
   private:
 

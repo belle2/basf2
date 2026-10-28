@@ -133,6 +133,9 @@ namespace TreeFitter {
   void HelixUtils::getHelixAndJacobianFromVertexNumerical(const Eigen::Matrix<double, 1, 6>& positionAndMom,
                                                           int charge, double Bz,
                                                           Belle2::Helix& helix,
+                                                          // output parameter: Eigen's const operator() overload hides the
+                                                          // assignments below from cppcheck
+                                                          // cppcheck-suppress constParameterReference
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
@@ -173,6 +176,9 @@ namespace TreeFitter {
     const Eigen::Matrix<double, 1, 6>& positionAndMom,
     int charge, double Bz,
     const Belle2::Helix& helix,
+    // output parameter: Eigen's const operator() overload hides the assignments
+    // below from cppcheck
+    // cppcheck-suppress constParameterReference
     Eigen::Matrix<double, 5, 6>& jacobian,
     double delta
   )
@@ -277,7 +283,9 @@ namespace TreeFitter {
 
     } else if (dX < Rmax) {
       // Tangent or non-intersecting circles, one inside the other (only one POCA)
+      // the two branches are symmetric; keep both assignments explicit
       if (R1 > R2) phi2[0] = r_2 < 0 ? phi : phinot ;
+      // cppcheck-suppress redundantAssignment
       else         phi1[0] = r_1 < 0 ? phi : phinot ;
     }
     // else: tangent or non-intersecting circles, outside of each other (only one POCA)
@@ -407,6 +415,7 @@ namespace TreeFitter {
     return sqrt(sqr(x - point.X()) + sqr(y - point.Y()) + sqr(z - point.Z())) ;
   }
 
+  // cppcheck-suppress constParameterReference ; output parameter, see above
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,
                                                         const double x,
                                                         const double y,

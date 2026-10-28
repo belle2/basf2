@@ -164,7 +164,7 @@ void KLMCalibrationChecker::checkAlignment()
   const KLMAlignmentData* alignment, *alignmentError, *alignmentCorrection;
   KLMAlignmentData zeroAlignment(0, 0, 0, 0, 0, 0);
   KLMChannelIndex klmModules(KLMChannelIndex::c_IndexLevelLayer);
-  for (KLMChannelIndex& klmModule : klmModules) {
+  for (const KLMChannelIndex& klmModule : klmModules) {
     KLMModuleNumber module = klmModule.getKLMModuleNumber();
     if (klmModule.getSubdetector() == KLMElementNumbers::c_BKLM) {
       alignment = bklmAlignment->getModuleAlignment(module);
@@ -377,7 +377,7 @@ void KLMCalibrationChecker::checkStripEfficiency()
   efficiencyTree->Branch("efficiency", &efficiency, "efficiency/F");
   efficiencyTree->Branch("error", &error, "error/F");
   KLMChannelIndex klmPlanes(KLMChannelIndex::c_IndexLevelPlane);
-  for (KLMChannelIndex& klmPlane : klmPlanes) {
+  for (const KLMChannelIndex& klmPlane : klmPlanes) {
     subdetector = klmPlane.getSubdetector();
     section = klmPlane.getSection();
     sector = klmPlane.getSector();
@@ -409,7 +409,7 @@ void KLMCalibrationChecker::createStripEfficiencyHistograms()
   /* Finally, loop over KLM sectors to check the efficiency. */
   KLMChannelIndex klmSectors(KLMChannelIndex::c_IndexLevelSector);
   TCanvas* canvas = new TCanvas();
-  for (KLMChannelIndex& klmSector : klmSectors) {
+  for (const KLMChannelIndex& klmSector : klmSectors) {
     int subdetector = klmSector.getSubdetector();
     int section = klmSector.getSection();
     int sector = klmSector.getSector();
@@ -498,7 +498,7 @@ void KLMCalibrationChecker::checkTimeCableDelay()
   cableDelayTree->Branch("channelNumber", &channelNumber, "channelNumber/I");
   cableDelayTree->Branch("timeDelay", &timeDelay, "timeDelay/D");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
-  for (KLMChannelIndex& klmStrip : klmStrips) {
+  for (const KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
     section = klmStrip.getSection();
     sector = klmStrip.getSector();
@@ -549,7 +549,7 @@ void KLMCalibrationChecker::checkTimeConstants()
   constantsTree->Branch("delayRPCPhi", &delayRPCPhi, "delayRPCPhi/F");
   constantsTree->Branch("delayRPCZ", &delayRPCZ, "delayRPCZ/F");
   KLMChannelIndex klmStrips(KLMChannelIndex::c_IndexLevelStrip);
-  for (KLMChannelIndex& klmStrip : klmStrips) {
+  for (const KLMChannelIndex& klmStrip : klmStrips) {
     subdetector = klmStrip.getSubdetector();
     section = klmStrip.getSection();
     sector = klmStrip.getSector();

@@ -469,8 +469,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           continue;
         }
 
-        std::int64_t innerSegmentID = static_cast<std::int64_t>(centerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
-                                      (innerHit->getEntry().getID());
+        std::int64_t innerSegmentID = static_cast<std::int64_t>(static_cast<std::uint32_t>(centerHit->getEntry().getID())) << 32 |
+                                      static_cast<std::int64_t>(static_cast<std::uint32_t>(innerHit->getEntry().getID()));
 
         if (not segmentNetwork.isNodeInNetwork(innerSegmentID)) {
           // create innerSegment first (order of storage in vector<segments> is irrelevant):
@@ -481,8 +481,8 @@ void SegmentNetworkProducerModule::buildSegmentNetwork()
           segmentNetwork.addNode(innerSegmentID, segments.back());
         }
 
-        std::int64_t outerSegmentID = static_cast<std::int64_t>(outerHit->getEntry().getID()) << 32 | static_cast<std::int64_t>
-                                      (centerHit->getEntry().getID());
+        std::int64_t outerSegmentID = static_cast<std::int64_t>(static_cast<std::uint32_t>(outerHit->getEntry().getID())) << 32 |
+                                      static_cast<std::int64_t>(static_cast<std::uint32_t>(centerHit->getEntry().getID()));
         if (not segmentNetwork.isNodeInNetwork(outerSegmentID)) {
           segments.emplace_back(outerHit->getEntry().m_sector->getFullSecID(),
                                 centerHit->getEntry().m_sector->getFullSecID(),

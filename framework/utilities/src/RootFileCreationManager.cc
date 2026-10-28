@@ -26,7 +26,7 @@ namespace {
 }
 
 namespace Belle2 {
-  std::shared_ptr<TFile> RootFileCreationManager::getFile(std::string fileName, bool ignoreErrors)
+  std::shared_ptr<TFile> RootFileCreationManager::getFile(const std::string& fileName, bool ignoreErrors)
   {
     std::shared_ptr<TFile> ptr = m_files[fileName].lock();
     if (!ptr) {

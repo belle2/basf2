@@ -32,7 +32,7 @@ namespace Belle2 {
   class ECLPackerModule : public Module {
   public:
     ECLPackerModule();
-    virtual ~ECLPackerModule();
+    virtual ~ECLPackerModule() override;
 
     /** initialize */
     virtual void initialize() override;
@@ -40,10 +40,6 @@ namespace Belle2 {
     virtual void beginRun() override;
     /** event */
     virtual void event() override;
-    /** endRun */
-    virtual void endRun() override;
-    /** terminate */
-    virtual void terminate() override;
 
     /// exception for errors during packing ADC data buffer
     BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,

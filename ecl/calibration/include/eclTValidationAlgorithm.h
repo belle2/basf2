@@ -31,23 +31,23 @@ namespace Belle2 {
       eclTValidationAlgorithm();
 
       /**..Constructor - main one as it allows user to choose which collector data to analyse*/
-      explicit eclTValidationAlgorithm(std::string physicsProcessCollectorName);
+      explicit eclTValidationAlgorithm(const std::string& physicsProcessCollectorName);
 
       /**..Destructor */
-      ~eclTValidationAlgorithm() {}
+      ~eclTValidationAlgorithm() override {}
 
       /*** Parameters ***/
 
-      int cellIDLo;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      int cellIDHi;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
-      bool readPrevCrysPayload; /**< Read the previous crystal payload values for comparison */
-      double meanCleanRebinFactor;  /**< Rebinning factor for mean calculation */
-      double meanCleanCutMinFactor;  /**< After rebinning, create a mask for bins that have values
+      int cellIDLo = 0;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      int cellIDHi = 0;     /**< Fit crystals with cellID0 in the inclusive range [cellIDLo,cellIDHi] */
+      bool readPrevCrysPayload = false; /**< Read the previous crystal payload values for comparison */
+      double meanCleanRebinFactor = 0.0;  /**< Rebinning factor for mean calculation */
+      double meanCleanCutMinFactor = 0.0;  /**< After rebinning, create a mask for bins that have values
                                           less than meanCleanCutMinFactor times the maximum bin value.
                                           Expand mask and apply to non-rebinned histogram. */
-      double clusterTimesFractionWindow_maxtime;  /**< Maximum time for window to calculate cluster
+      double clusterTimesFractionWindow_maxtime = 0.0;  /**< Maximum time for window to calculate cluster
                                                        time fraction, in ns*/
-      bool debugOutput; /**< Save every histogram and fitted function to debugFilename */
+      bool debugOutput = false; /**< Save every histogram and fitted function to debugFilename */
       /** Name of file with debug output, eclTValidationAlgorithm.root by default */
       std::string debugFilenameBase;
 

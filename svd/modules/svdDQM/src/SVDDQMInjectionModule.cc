@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <svd/modules/svdDQM/SVDDQMInjectionModule.h>
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using namespace Belle2;

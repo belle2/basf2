@@ -204,11 +204,13 @@ void stream_int(BitStream& OUT, int x, const width_t& w)
  */
 int fetch_int(BitStream& IN, const width_t& w)
 {
-  int m0 = 1 << (w.w0 - 1), m1 = 1 << (w.w1 - 1), m2 = 1 << (w.w2 - 1);
+  int m0 = 1 << (w.w0 - 1);
   int t = IN.getNBits(w.w0);
   if (t == m0) {
+    int m1 = 1 << (w.w1 - 1);
     t = IN.getNBits(w.w1);
     if (t == m1) {
+      int m2 = 1 << (w.w2 - 1);
       t = IN.getNBits(w.w2);
       if (t == m2) {
         t = IN.getNBits(w.w3);
@@ -245,6 +247,7 @@ void ECLDCTCompress::compress(BitStream& OUT, const int* a)
   const int N = EclConfiguration::m_nsmp;
   double buf[N], out[N];
   for (int k = 0; k < N; k++) buf[k] = a[k];
+  // cppcheck-suppress uninitvar ; buf is filled by the loop above
   e10_31(buf, out);
   for (int k = 0; k < N; k++) out[k] *= 1.0 / (2 * N);
 

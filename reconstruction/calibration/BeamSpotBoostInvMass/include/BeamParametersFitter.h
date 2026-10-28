@@ -101,7 +101,7 @@ namespace Belle2 {
     /**
      * Get beam parameters.
      */
-    BeamParameters getBeamParameters() const
+    const BeamParameters& getBeamParameters() const
     {
       return m_BeamParameters;
     }

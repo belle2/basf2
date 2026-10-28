@@ -35,7 +35,7 @@ namespace Belle2 {
     BKLMTrackingModule();
 
     //! Destructor
-    ~BKLMTrackingModule();
+    ~BKLMTrackingModule() override;
 
     //! Initialize at start of job
     void initialize() override;
@@ -53,7 +53,7 @@ namespace Belle2 {
     void terminate() override;
 
     //! Judge if two hits come from the same sector
-    bool sameSector(KLMHit2d* hit1, KLMHit2d* hit2);
+    static bool sameSector(const KLMHit2d* hit1, const KLMHit2d* hit2);
 
     //! find the closest RecoTrack, match BKLMTrack to RecoTrack, if the matched RecoTrack is found, return true
     bool findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& closestTrack);
@@ -143,16 +143,16 @@ namespace Belle2 {
     void generateEffi(int section, int sector, int layer);
 
     //! my defined sort function using layer number
-    static bool sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2);
+    static bool sortByLayer(const KLMHit2d* hit1, const KLMHit2d* hit2);
 
     //! judge whether the current layer is understudy
-    bool isLayerUnderStudy(int section, int iSector, int iLayer, KLMHit2d* hit);
+    static bool isLayerUnderStudy(int section, int iSector, int iLayer, const KLMHit2d* hit);
 
     //! judge whether the hits come from the sctor understudy
-    bool isSectorUnderStudy(int section, int iSector, KLMHit2d* hit);
+    static bool isSectorUnderStudy(int section, int iSector, const KLMHit2d* hit);
 
     //! calculate distance from track to hit
-    double distanceToHit(BKLMTrack* track, KLMHit2d* hit,
+    double distanceToHit(BKLMTrack* track, const KLMHit2d* hit,
                          double& error,
                          double& sigma);
 

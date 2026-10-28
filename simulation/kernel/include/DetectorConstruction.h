@@ -10,7 +10,7 @@
 
 #include <framework/logging/Logger.h>
 #include <geometry/GeometryManager.h>
-#include "G4VUserDetectorConstruction.hh"
+#include <G4VUserDetectorConstruction.hh>
 
 namespace Belle2 {
 

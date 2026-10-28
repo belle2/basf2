@@ -40,13 +40,13 @@ namespace Belle2 {
        * Returns the name of the third-party MVA library
        * @return name of the third-party MVA library
        */
-      std::string getName() const;
+      const std::string& getName() const;
 
       /**
        * Returns interfaces supported by the MVA Interface
        * @return supported interfaces
        */
-      static std::map<std::string, AbstractInterface*> getSupportedInterfaces() { return s_supported_interfaces; }
+      static const std::map<std::string, AbstractInterface*>& getSupportedInterfaces() { return s_supported_interfaces; }
 
       /**
        * Static function which initializes all supported interfaces,

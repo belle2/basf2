@@ -93,7 +93,7 @@ namespace Belle2 {
 
 
     /** initialize the RawSecMapRootInterface for two-hit-combinations (to be called in Module::initialize(). */
-    void initialize2Hit(std::vector<std::string> filterNames)
+    void initialize2Hit(const std::vector<std::string>& filterNames)
     {
       B2DEBUG(20, "RawSecMapRootInterface::initialize2Hit: start - got " << filterNames.size() << " filters");
       B2DEBUG(20, "and root file got size of: " << m_file->GetSize());
@@ -134,7 +134,7 @@ namespace Belle2 {
 
 
     /** initialize the RawSecMapRootInterface for three-hit-combinations (to be called in Module::initialize(). */
-    void initialize3Hit(std::vector<std::string> filterNames)
+    void initialize3Hit(const std::vector<std::string>& filterNames)
     {
       B2DEBUG(20, "RawSecMapRootInterface::initialize3Hit: start");
       m_file->cd();

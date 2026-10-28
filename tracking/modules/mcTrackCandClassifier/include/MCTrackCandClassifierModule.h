@@ -259,6 +259,6 @@ namespace Belle2 {
      * @param aTrueHit: pointer to vxd true hit
      * @return thetaMS value
      */
-    static float compute_thetaMS(MCParticleInfo& mcParticleInfo, VXDTrueHit* aTrueHit);
+    static float compute_thetaMS(MCParticleInfo& mcParticleInfo, const VXDTrueHit* aTrueHit);
   };
 }

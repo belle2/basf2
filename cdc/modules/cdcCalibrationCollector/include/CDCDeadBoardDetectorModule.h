@@ -31,7 +31,7 @@ namespace Belle2 {
       /**
        * Destructor of the module.
        */
-      virtual ~CDCDeadBoardDetectorModule();
+      virtual ~CDCDeadBoardDetectorModule() override;
 
       /**
        * Initializes the Module.

@@ -350,9 +350,11 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
              <<  ") U " << uBin << " V " << vBin
              << " Charge " << landaumpv << " Median " << median << " diff = " << diff << "/" << difff);
       charge = landaumpv; //FitLandau(signals);
+      // the preceding branches cover the other configured strategies
+      // cppcheck-suppress knownConditionTrueFalse
     } else if (strategy == 2) {
       double mean = 0;
-      for (auto& each : signals)
+      for (const auto& each : signals)
         mean += each;
       if (signals.size() > 0) mean = mean / signals.size();
       charge = mean;
@@ -381,6 +383,8 @@ double PXDDataMCGainCalibrationAlgorithm::EstimateCharge(VxdID sensorID, unsigne
 
       //return landaumpv; //FitLandau(signals);
       charge = landaumpv;
+      // the preceding branches cover the other configured strategies
+      // cppcheck-suppress knownConditionTrueFalse
     } else if (strategy == 2) {
       charge = hist_signals->GetMean();
     }

@@ -49,7 +49,7 @@ namespace Belle2 {
     /**
      * Get the whole map
      */
-    std::map<unsigned short, float> getBoards() const
+    const std::map<unsigned short, float>& getBoards() const
     {
       return m_boards;
     }

@@ -26,6 +26,7 @@ CDCTrajectorySZ CDCRobustSZFitter::fitUsingSimplifiedTheilSen(const CDCSZObserva
 
 
   CDCTrajectorySZ trajectorySZ;
+  // cppcheck-suppress variableScope ; declaration kept at this scope for readability
   CDCSZFitter szFitter;
 
   if (observationsSZ.size() > 4) {

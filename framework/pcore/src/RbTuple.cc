@@ -104,7 +104,7 @@ int RbTupleManager::begin(int procid)
   //  printf ( "RbTupleManager::TFile opened\n" );
 
   for (auto& mod : m_histdefs) {
-    auto* hmod = (HistoModule*) mod;
+    auto* hmod = static_cast<HistoModule*>(mod);
     hmod->defineHisto();
   }
 
@@ -189,7 +189,7 @@ int RbTupleManager::hadd(bool deleteflag)
     // Delete temporary files
     vector<string>::iterator it;
     for (it = filenames.begin(); it != filenames.end(); ++it) {
-      string& hfile = *it;
+      const string& hfile = *it;
       unlink(hfile.c_str());
     }
   }

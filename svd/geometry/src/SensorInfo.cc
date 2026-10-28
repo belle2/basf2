@@ -104,6 +104,8 @@ SensorInfo::getVelocity(CarrierType carrier, const ROOT::Math::XYZVector& point)
 const ROOT::Math::XYZVector& SensorInfo::getLorentzShift(double uCoord, double vCoord) const
 {
   static ROOT::Math::XYZVector result;
+  // both surfaces are half a thickness away from the mid-plane; the signs are applied below
+  // cppcheck-suppress duplicateAssignExpression
   double distanceToFrontPlane = 0.5 * m_thickness;
   double distanceToBackPlane = 0.5 * m_thickness;
 

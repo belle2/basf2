@@ -74,6 +74,7 @@ void CDCTangent::reverse()
   m_line.passiveMoveAtBy(-1);
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member to return the derived type
 CDCTangent CDCTangent::reversed() const
 {
   return CDCTangent(CDCRLWireHitPair::reversed(),

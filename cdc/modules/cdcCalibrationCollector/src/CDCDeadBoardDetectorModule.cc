@@ -49,7 +49,7 @@ void CDCDeadBoardDetectorModule::collect()
       int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
 
       for (int iFiness = 0; iFiness < MaxNumOfCh; ++iFiness) {
-        int* ibuf = (int*)m_rawCDCs[i]->GetDetectorBuffer(j, iFiness);
+        const int* ibuf = static_cast<int*>(m_rawCDCs[i]->GetDetectorBuffer(j, iFiness));
         const int nWord = m_rawCDCs[i]->GetDetectorNwords(j, iFiness);
         const int c_headearWords = 3;
         if (nWord < c_headearWords) {

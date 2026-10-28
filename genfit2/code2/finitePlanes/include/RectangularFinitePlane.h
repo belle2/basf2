@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_RectangularFinitePlane_h
-#define genfit_RectangularFinitePlane_h
+#pragma once
 
 #include "AbsFinitePlane.h"
 
@@ -60,5 +59,3 @@ class RectangularFinitePlane : public AbsFinitePlane {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_RectangularFinitePlane_h

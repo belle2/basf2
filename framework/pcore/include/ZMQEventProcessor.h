@@ -26,6 +26,7 @@ namespace Belle2 {
     virtual ~ZMQEventProcessor() override;
 
     /// Processes the full module chain using parallel processing, starting with the first module in the given path.
+    // cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
     void process(const PathPtr& spath, long maxEvent);
 
     /// clean up IPC resources (should only be called in one process).
@@ -73,9 +74,6 @@ namespace Belle2 {
 
     /// Instance of the process monitor
     ProcessMonitor m_processMonitor;
-
-    /// Stores previous eventMetaData
-    EventMetaData m_previousEventMetaData;
 
   };
 

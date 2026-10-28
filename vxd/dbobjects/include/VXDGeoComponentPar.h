@@ -23,8 +23,8 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
-                       double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):
+    explicit VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
+                                double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):
       m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
       m_height(height), m_angle(angle)
     {}

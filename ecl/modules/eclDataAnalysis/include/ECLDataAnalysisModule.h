@@ -56,18 +56,14 @@ namespace Belle2 {
     /**
      * Destructor of the module.
      */
-    virtual ~ECLDataAnalysisModule();
+    virtual ~ECLDataAnalysisModule() override;
 
     /**
      *Initializes the Module.
      */
     virtual void initialize() override;
-    /** beginRun */
-    virtual void beginRun() override;
     /** event */
     virtual void event() override;
-    /** endRun */
-    virtual void endRun() override;
 
     /**
      * Termination action.

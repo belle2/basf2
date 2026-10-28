@@ -35,7 +35,7 @@ namespace Belle2 {
        * @param uTolerance tolerance in the u direction
        * @param vTolerance tolerance in the v direction
        */
-      SensorPlane(VxdID sensorID = 0, double uTolerance = 0, double vTolerance = 0):
+      explicit SensorPlane(VxdID sensorID = 0, double uTolerance = 0, double vTolerance = 0):
         m_sensorID(sensorID), m_uTolerance(uTolerance), m_vTolerance(vTolerance), m_cosPhi(1.), m_sinPhi(0.), m_sensorInfo(0) {}
 
       /** Set plane rotation angle.
@@ -48,7 +48,7 @@ namespace Belle2 {
         m_sinPhi = sin(phi);
       }
       /** Destructor. */
-      virtual ~SensorPlane() {}
+      virtual ~SensorPlane() override {}
 
       /** Return whether the given coordinates are inside the finite region.
        * @param u u-coordinate of the point.

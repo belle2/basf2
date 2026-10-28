@@ -1122,7 +1122,7 @@ namespace Belle2 {
     }
 
     //! Get comment
-    std::string getBKLMGeometryParComment() const
+    const std::string& getBKLMGeometryParComment() const
     {
       return m_comment;
     }

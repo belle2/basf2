@@ -79,10 +79,18 @@ namespace Belle2 {
     {
       if (not m_status) return;
 
-      m_cosx = std::abs(m_kx);
-      m_cosy = std::abs(m_ky);
-      m_A = bar.A;
-      m_B = bar.B;
+      // local copies: stores to the data members would otherwise be assumed to alias bar
+      const double A = bar.A;
+      const double B = bar.B;
+      double x = m_x;
+      double y = m_y;
+      double kx = m_kx;
+      double ky = m_ky;
+
+      m_cosx = std::abs(kx);
+      m_cosy = std::abs(ky);
+      m_A = A;
+      m_B = B;
       m_type = c_BarSegment;
 
       double z = bar.zR;
@@ -93,10 +101,15 @@ namespace Belle2 {
 
       double len = (z - m_z) / m_kz;
       if (len < 0 or len > s_maxLen) return;
-      m_propLen += len;
 
-      func::fold(m_x + len * m_kx, bar.A, m_x, m_kx, m_nx);
-      func::fold(m_y + len * m_ky, bar.B, m_y, m_ky, m_ny);
+      func::fold(x + len * kx, A, x, kx, m_nx);
+      func::fold(y + len * ky, B, y, ky, m_ny);
+
+      m_propLen += len;
+      m_x = x;
+      m_y = y;
+      m_kx = kx;
+      m_ky = ky;
       m_z = z;
 
       m_status = true;
@@ -124,7 +137,7 @@ namespace Belle2 {
       }
 
       double xm = m_x + len * m_kx;
-      int nx = lround(xm / bar.A);
+      int nx = func::lround(xm / bar.A);
       double ss = m_kx * m_kx + m_kz * m_kz;
       if (ss == 0) return;
       int i = 0;
@@ -140,7 +153,7 @@ namespace Belle2 {
         len = (D - rdir) / ss;
         if (len < 0 or len > s_maxLen) return;
         double xmm = m_x + len * m_kx;
-        int nxx = lround(xmm / bar.A);
+        int nxx = func::lround(xmm / bar.A);
         if (nxx == nx) break;
         i++;
         if (i == 10) {
@@ -190,9 +203,9 @@ namespace Belle2 {
       }
 
       double xm = m_x + len * m_kx;
-      int nx = lround(xm / bar.A);
+      int nx = func::lround(xm / bar.A);
       double ym = m_y + len * m_ky;
-      int ny = lround(ym / bar.B);
+      int ny = func::lround(ym / bar.B);
       int i = 0;
       while (true) {
         double xc = func::unfold(mirror.xc, nx, bar.A);
@@ -208,9 +221,9 @@ namespace Belle2 {
         len = (D - rdir);
         if (len < 0 or len > s_maxLen) return;
         double xmm = m_x + len * m_kx;
-        int nxx = lround(xmm / bar.A);
+        int nxx = func::lround(xmm / bar.A);
         double ymm = m_y + len * m_ky;
-        int nyy = lround(ymm / bar.B);
+        int nyy = func::lround(ymm / bar.B);
         if (nxx == nx and nyy == ny) break;
         i++;
         if (i == 10) {
@@ -246,80 +259,118 @@ namespace Belle2 {
 
       m_status = false;
 
-      m_cosx = std::abs(m_kx);
-      m_A = prism.A;
-      m_B = prism.yUp - prism.yDown;
-      m_y0 = (prism.yUp + prism.yDown) / 2;
+      // Work on local copies of the state and of the prism geometry. Writing to the data members
+      // inside the loop below would force the compiler to re-load the window data on every
+      // iteration (a double stored through 'this' may alias the doubles of the unfolded windows).
+
+      double x = m_x;
+      double y = m_y;
+      double z = m_z;
+      double kx = m_kx;
+      double ky = m_ky;
+      double kz = m_kz;
+      double propLen = m_propLen;
+      double cosy = m_cosy;
+
+      const double prismA = prism.A;
+      const double yUp = prism.yUp;
+      const double yDown = prism.yDown;
+      const double zR = prism.zR;
+      const double zFlat = prism.zFlat;
+      const double zDet = prism.zD;
+
+      m_cosx = std::abs(kx);
+      m_A = prismA;
+      m_B = yUp - yDown;
+      m_y0 = (yUp + yDown) / 2;
       m_type = c_Prism;
 
-      if (m_kz > 0) {
-        if (m_z >= prism.zR or std::abs(m_ky / m_kz) < std::abs(prism.slope)) return;
-        if (std::abs(m_y + m_ky / m_kz * (prism.zR - m_z)) < prism.B / 2) return;
+      if (kz > 0) {
+        if (z >= zR or std::abs(ky / kz) < std::abs(prism.slope)) return;
+        if (std::abs(y + ky / kz * (zR - z)) < prism.B / 2) return;
       }
-      double ky_in = m_ky;
-      double kz_in = m_kz;
+      const double ky_in = ky;
+      const double kz_in = kz;
 
-      if (m_z > prism.zFlat) {
+      double yD = y;
+      double zD = z;
+
+      if (z > zFlat) {
 
         int step = 1;
         int ii = 0;
-        if (m_ky < 0) {
+        if (ky < 0) {
           step = -1;
           ii = 1;
-          m_y = std::min(m_y, prism.yUp);
+          y = std::min(y, yUp);
         }
 
-        unsigned k = prism.k0;
-        while (k < prism.unfoldedWindows.size()) {
-          const auto& win = prism.unfoldedWindows[k];
-          double s = m_ky * win.sz - m_kz * win.sy;
-          if (s == 0) {
-            k += step;
-            ii = (ii + 1) % 2;
-            continue;
+        const auto* windows = prism.unfoldedWindows.data();
+        const unsigned numWindows = prism.unfoldedWindows.size();
+        const int k0 = prism.k0;
+
+        bool found = false;
+        unsigned k = k0;
+        while (k < numWindows) {
+          const auto& win = windows[k];
+          double s = ky * win.sz - kz * win.sy;
+          if (s != 0) {
+            double len = ((win.y0 - y) * win.sz - (win.z0 - z) * win.sy) / s;
+            yD = y + len * ky;
+            zD = z + len * kz;
+            double yu = yD - win.y0;
+            double zu = zD - win.z0;
+            double yw = yu * win.sy + zu * win.sz;
+            if (yw >= yDown and yw <= yUp) {
+              if (len < 0 or len > s_maxLen) return;
+              double kyNew = ky * win.sy + kz * win.sz;
+              double kzNew = kz * win.sy - ky * win.sz;
+              int ny = k - k0;
+              x += len * kx;
+              y = yw;
+              ky = kyNew;
+              m_ny = ny;
+              z = zFlat;
+              kz = ny % 2 == 0 ? kzNew : -kzNew;
+              propLen += len;
+              found = true;
+              break;
+            }
+            cosy = std::max(cosy, std::abs(ky_in * win.nsy[ii] + kz_in * win.nsz[ii]));
           }
-          double len = ((win.y0 - m_y) * win.sz - (win.z0 - m_z) * win.sy) / s;
-          m_yD = m_y + len * m_ky;
-          m_zD = m_z + len * m_kz;
-          double yu = m_yD - win.y0;
-          double zu = m_zD - win.z0;
-          double y = yu * win.sy + zu * win.sz;
-          if (y >= prism.yDown and y <= prism.yUp) {
-            if (len < 0 or len > s_maxLen) return;
-            double ky = m_ky * win.sy + m_kz * win.sz;
-            double kz = m_kz * win.sy - m_ky * win.sz;
-            m_x += len * m_kx;
-            m_y = y;
-            m_ky = ky;
-            m_ny = k - prism.k0;
-            m_z = prism.zFlat;
-            m_kz = m_ny % 2 == 0 ? kz : -kz;
-            m_propLen += len;
-            goto success;
-          }
-          m_cosy = std::max(m_cosy, std::abs(ky_in * win.nsy[ii] + kz_in * win.nsz[ii]));
           k += step;
-          ii = (ii + 1) % 2;
+          ii ^= 1;
         }
-        B2DEBUG(20, "TOP::PhotonState::propagate: unfolded prism window not found"
-                << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown) << LogVar("zR", prism.zR)
-                << LogVar("y", m_y) << LogVar("z", m_z)
-                << LogVar("ky", ky_in) << LogVar("kz", kz_in));
-        return;
-      } else {
-        m_yD = m_y;
-        m_zD = m_z;
+
+        if (not found) {
+          B2DEBUG(20, "TOP::PhotonState::propagate: unfolded prism window not found"
+                  << LogVar("yUp", prism.yUp) << LogVar("yDown", prism.yDown) << LogVar("zR", prism.zR)
+                  << LogVar("y", y) << LogVar("z", z)
+                  << LogVar("ky", ky_in) << LogVar("kz", kz_in));
+          return;
+        }
       }
 
-success:
-      double len = (prism.zD - m_z) / m_kz;
+      double len = (zDet - z) / kz;
       if (len < 0 or len > s_maxLen) return;
-      func::fold(m_x + len * m_kx, prism.A, m_x, m_kx, m_nx);
-      m_y += len * m_ky;
-      m_z = prism.zD;
-      m_propLen += len;
-      m_yD += len * ky_in;
-      m_zD += len * kz_in;
+
+      func::fold(x + len * kx, prismA, x, kx, m_nx);
+      y += len * ky;
+      z = zDet;
+      propLen += len;
+      yD += len * ky_in;
+      zD += len * kz_in;
+
+      m_x = x;
+      m_y = y;
+      m_z = z;
+      m_kx = kx;
+      m_ky = ky;
+      m_kz = kz;
+      m_propLen = propLen;
+      m_yD = yD;
+      m_zD = zD;
+      m_cosy = cosy;
 
       m_status = true;
     }

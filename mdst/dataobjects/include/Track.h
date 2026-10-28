@@ -60,7 +60,7 @@ namespace Belle2 {
      *  @sa TrackFitResult
      */
     const TrackFitResult* getTrackFitResultByName(const Const::ChargedStable& chargedStable,
-                                                  const std::string trackFitResultsName) const;
+                                                  const std::string& trackFitResultsName) const;
 
     /** Default Access to TrackFitResults.
      *
@@ -97,7 +97,7 @@ namespace Belle2 {
      *         to check which fitting hypothesis was actually used for this result.
      */
     const TrackFitResult* getTrackFitResultWithClosestMassByName(const Const::ChargedStable& requestedType,
-        const std::string trackFitResultsName) const;
+        const std::string& trackFitResultsName) const;
 
     /** Return the track fit for the fit hypothesis with the closest mass
      *
@@ -139,7 +139,7 @@ namespace Belle2 {
      * Returns a vector of pair of all track fit results which have been set and the respective particle
      * hypothesis they have been fitted with.
      */
-    std::vector<ChargedStableTrackFitResultPair> getTrackFitResultsByName(const std::string trackFitResultsName) const;
+    std::vector<ChargedStableTrackFitResultPair> getTrackFitResultsByName(const std::string& trackFitResultsName) const;
 
     /** Default Access to all track fit results at the same time
         *

@@ -28,7 +28,7 @@ namespace Belle2 {
      *     instead of producing .sroot-N files
      */
     SeqFile(const std::string& filename, const std::string& rwflag,
-            char* streamerinfo = nullptr, int streamerinfo_size = 0,
+            const char* streamerinfo = nullptr, int streamerinfo_size = 0,
             bool filenameIsPattern = false);
     /** Destructor */
     ~SeqFile();

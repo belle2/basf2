@@ -30,7 +30,7 @@ namespace Belle2 {
     MCMatcherECLClustersModule();
 
     /** Destructor.*/
-    virtual ~MCMatcherECLClustersModule();
+    virtual ~MCMatcherECLClustersModule() override;
 
     /** Initialize variables, print info, and start CPU clock. */
     virtual void initialize() override;

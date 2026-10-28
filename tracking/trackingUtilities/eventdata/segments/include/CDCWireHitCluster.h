@@ -7,6 +7,8 @@
  **************************************************************************/
 #pragma once
 
+#include <Rtypes.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -62,6 +64,9 @@ namespace Belle2 {
 
       /// Memory for the flag marking this cluster as background
       bool m_backgroundFlag = false;
+
+      /** ROOT dictionary macro; the streamer is hand written, see CDCWireHitCluster.cc. */
+      ClassDefNV(CDCWireHitCluster, 1);
     };
   }
 }

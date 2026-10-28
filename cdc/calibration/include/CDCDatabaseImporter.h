@@ -42,35 +42,35 @@ namespace Belle2 {
     /**
      * Import channel map to the data base.
      */
-    void importChannelMap(std::string fileName);
+    void importChannelMap(const std::string& fileName);
     /**
      * Get the channel map from the database and
      * print it.
      */
-    void printChannelMap();
+    static void printChannelMap();
 
     /**
      * Import FEE params. to the data base.
      */
-    void importFEElectronics(std::string fileName);
+    void importFEElectronics(const std::string& fileName);
     /**
      * Get FEE params. from the database and print.
      */
-    void printFEElectronics();
+    static void printFEElectronics();
 
     /**
      * Import edep-to-adc params. to the data base.
      */
-    void importEDepToADC(std::string fileName);
+    void importEDepToADC(const std::string& fileName);
     /**
      * Get edep-to-adc params. from the database and print.
      */
-    void printEDepToADC();
+    static void printEDepToADC();
 
     /**
      * Import corrtothreshold to the data base.
      */
-    void importCorrToThreshold(std::string fileName);
+    void importCorrToThreshold(const std::string& fileName);
     /**
      * Get corrtothreshold from the database and print.
      */
@@ -79,17 +79,17 @@ namespace Belle2 {
     /**
      * Import t0 table to the data base.
      */
-    void importTimeZero(std::string fileName);
+    void importTimeZero(const std::string& fileName);
     /**
      * Get the t0 table from the database and
      * print it.
      */
-    void printTimeZero();
+    static void printTimeZero();
 
     /**
      * Import ADC delta pedestal table to the data base specifying the text data.
      */
-    void importADCDeltaPedestal(std::string fileName);
+    void importADCDeltaPedestal(const std::string& fileName);
 
     /**
      * Import ADC delta pedestal with all 0.
@@ -100,45 +100,45 @@ namespace Belle2 {
      * Get the ADC delta pedestal table from the database and
      * print it.
      */
-    void printADCDeltaPedestal();
+    static void printADCDeltaPedestal();
 
     /**
      * Import badwire table to the data base.
      */
-    void importBadWire(std::string fileName);
+    void importBadWire(const std::string& fileName);
     /**
      * Get the badwire table from the database and
      * print it.
      */
-    void printBadWire();
+    static void printBadWire();
     /**
      * Import badboards table to the data base.
      */
-    void importBadBoards(std::string fileName);
+    void importBadBoards(const std::string& fileName);
     /**
      * Get the badboard table from the database and
      * print it.
      */
-    void printBadBoards();
+    static void printBadBoards();
     /**
      * Import propspeed table to the database.
      */
-    void importPropSpeed(std::string fileName);
+    void importPropSpeed(const std::string& fileName);
     /**
      * Get the propspeed table from the database and
      * print it.
      */
-    void printPropSpeed();
+    static void printPropSpeed();
 
     /**
      * Import time-walk coeff. table to the database.
      */
-    void importTimeWalk(std::string fileName);
+    void importTimeWalk(const std::string& fileName);
     /**
      * Get the time-walk coeff. table from the database and
      * print it.
      */
-    void printTimeWalk();
+    static void printTimeWalk();
 
     /**
      * Import xt table to the database.
@@ -148,37 +148,37 @@ namespace Belle2 {
      * Get the xt table from the database and
      * print it.
      */
-    void printXT();
+    static void printXT();
 
     /**
      * Import sigma table to the database.
      */
-    void importSigma(std::string fileName);
+    void importSigma(const std::string& fileName);
     /**
      * Get the sigma table from the database and
      * print it.
      */
-    void printSigma();
+    static void printSigma();
 
     /**
      * Import fudge factor table to the database.
      */
-    void importFFactor(std::string fileName);
+    void importFFactor(const std::string& fileName);
     /**
      * Get the fudge factor table from the database and
      * print it.
      */
-    void printFFactor();
+    static void printFFactor();
 
     /**
      * Import alpha scale factors table to the database.
      */
-    void importAlphaScaleFactors(std::string fileName);
+    void importAlphaScaleFactors(const std::string& fileName);
     /**
      * Get the fudge factor table from the database and
      * print it.
      */
-    void printAlphaScaleFactors();
+    static void printAlphaScaleFactors();
 
 
     /**
@@ -190,7 +190,7 @@ namespace Belle2 {
      * Get the displacement of wire position from the database and
      * print it.
      */
-    void printDisplacement();
+    static void printDisplacement();
 
     /**
      * Import wire alignment table to the database.
@@ -200,7 +200,7 @@ namespace Belle2 {
      * Get the wire alignment table from the database and
      * print it.
      */
-    void printWirPosAlign();
+    static void printWirPosAlign();
 
     /**
      * Import wire misalignment table to the database.
@@ -210,7 +210,7 @@ namespace Belle2 {
      * Get the wire misalignment table from the database and
      * print it.
      */
-    void printWirPosMisalign();
+    static void printWirPosMisalign();
 
     /**
      * Import CDCWireHits cut values to the database.
@@ -224,22 +224,22 @@ namespace Belle2 {
      * Get CDCWireHits cut values from the database and
      * print them.
      */
-    void printCDCWireHitRequirements() const;
+    static void printCDCWireHitRequirements();
 
     /// Import crosstalk library prepared in rootFileName
     void importCDCCrossTalkLibrary(const std::string& rootFileName) const;
 
     /// Print the content of the crosstalk library
-    void printCDCCrossTalkLibrary() const;
+    static void printCDCCrossTalkLibrary();
 
     /// Do some basic testing of the CDCCrossTalkLibrary
-    void testCDCCrossTalkLibrary(bool spotChecks = false) const;
+    static void testCDCCrossTalkLibrary(bool spotChecks = false);
 
     /// import CDClayerTimeCut
     void importCDClayerTimeCut(const std::string& jsonFileName) const;
 
     /// Print content of CDClayerTimeCut
-    void printCDClayerTimeCut() const;
+    static void printCDClayerTimeCut();
 
   private:
 

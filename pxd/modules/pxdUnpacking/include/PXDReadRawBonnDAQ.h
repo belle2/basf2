@@ -62,9 +62,9 @@ namespace Belle2 {
       //! File handle
       PXDLocalDAQFile* fh;
 
-      unsigned int m_expNr; //!< set by Param
-      unsigned int m_runNr; //!< set by Param
-      unsigned int m_subRunNr; //!< set by Param
+      unsigned int m_expNr = 0; //!< set by Param
+      unsigned int m_runNr = 0; //!< set by Param
+      unsigned int m_subRunNr = 0; //!< set by Param
 
       int readOneEvent(void); //! Read data of one Event from File
 

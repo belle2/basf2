@@ -227,23 +227,40 @@ namespace Belle2 {
     }
 
     VARIABLE_GROUP("FEIVariables");
-    REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex,
-                      "By giving e.g. a FEI B meson candidate the B meson index on generator level is determined, where most reconstructed particles can be assigned to. If no B meson found on generator level -1 is returned.");
-    REGISTER_VARIABLE("percentageMissingParticlesBTag", percentageMissingParticlesBTag,
-                      "Get the percentage of missing particles by using the mostcommonBTagIndex. So the number of particles not reconstructed by e.g. the FEI are determined and divided by the number of generated particles using the given index of the B meson. If no B meson found on generator level -1 is returned.");
-    REGISTER_VARIABLE("percentageWrongParticlesBTag", percentageWrongParticlesBTag,
-                      "Get the percentage of wrong particles by using the mostcommonBTagIndex. In this context wrong means that the reconstructed particles originated from the other B meson. The absolute number is divided by the total number of generated FSP from the given B meson index. If no B meson found on generator level -1 is returned.");
-    REGISTER_VARIABLE("mostcommonBTagDeltaP", mostcommonBTagDeltaP,
-                      "Returns the magnitude of the 3-momentum difference in CMS frame between the "
-                      "reconstructed particle and the generated B meson identified by mostcommonBTagIndex. "
-                      "Returns NaN if no B meson is found on generator level.", "GeV/c");
-    REGISTER_VARIABLE("mostcommonBTagPDG", mostcommonBTagPDG,
-                      "Returns the PDG code of the generated B meson identified by mostcommonBTagIndex. "
-                      "Returns NaN if no B meson is found on generator level. "
-                      "Note: this is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. "
-                      "Other variables can be accessed the same way by replacing ``PDG`` with any variable.");
-    REGISTER_METAVARIABLE("sigProbRank(bp_list, b0_list)", sigProbRank,
-                          "Returns the rank (starting at 1) of the candidate when all candidates from the B+ list (bp_list) "
-                          "and B0 list (b0_list) are ordered together by descending ``extraInfo(SignalProbability)``.", Manager::VariableDataType::c_int);
+    REGISTER_VARIABLE("mostcommonBTagIndex", mostcommonBTagIndex, R"DOC(
+Returns the generator-level index of the :math:`B` meson candidate which is assigned the most reconstructed particles. Returns -1
+if no :math:`B` meson on the generator level is found. 
+
+)DOC");
+    REGISTER_VARIABLE("percentageMissingParticlesBTag", percentageMissingParticlesBTag, R"DOC(
+Returns the percentage of missing particles calculated by the number of particles not reconstructed by the FEI divided by the number
+of generated particles. The latter is determined by using the generator-level index corresponding to the :math:`B` meson returned by
+``mostcommonBTagIndex``. Returns -1 if no :math:`B` meson on the generator level is found. 
+
+)DOC");
+    REGISTER_VARIABLE("percentageWrongParticlesBTag", percentageWrongParticlesBTag, R"DOC(
+Returns the percentage of wrong particles calculated by the number of reconstructed particles originating from the other :math:`B` meson divided by the total
+number of generated final-state particles. The latter is determined by using the generator-level index corresponding to the :math:`B` meson returned by
+``mostcommonBTagIndex``. Returns -1 if no :math:`B` meson on the generator level is found. 
+
+)DOC");
+    REGISTER_VARIABLE("mostcommonBTagDeltaP", mostcommonBTagDeltaP, R"DOC(
+Returns the magnitude of the 3-momentum difference in the CM frame between the reconstructed particles and the generated :math:`B` meson identified using
+``mostcommonBTagIndex``. Returns ``NaN`` if no :math:`B` meson on the generator level is found. 
+
+)DOC", "GeV/c");
+    REGISTER_VARIABLE("mostcommonBTagPDG", mostcommonBTagPDG, R"DOC(
+Returns the PDG code of the generated :math:`B` meson identified using ``mostcommonBTagIndex``. Returns ``NaN`` if no :math:`B` meson on the generator level is found.
+
+.. note:: This is equivalent to ``genParticle(mostcommonBTagIndex, PDG)``. 
+
+)DOC");
+    REGISTER_METAVARIABLE("sigProbRank(bp_list, b0_list)", sigProbRank, R"DOC(
+Returns the rank (starting at 1) of the given candidate when all candidates from the :math:`B^+` (``bp_list``) and :math:`B^0` (``b0_list``) particle lists
+are ordered together by descening signal probability. 
+
+.. note:: The signal probability can be accessed using ``extraInfo(SignalProbability)``.
+
+)DOC", Manager::VariableDataType::c_int);
   }
 }

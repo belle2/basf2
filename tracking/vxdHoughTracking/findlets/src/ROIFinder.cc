@@ -300,7 +300,9 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
           const double shiftZ = (layer == 1) ? c_centerZShiftLayer1[sensor - 1] : c_centerZShiftLayer2[sensor - 1];
 
           double localVPosition       = z - shiftZ;
+          // cppcheck-suppress variableScope ; declaration kept at this scope for readability
           double localVPositionPlus   = zPlus - shiftZ;
+          // cppcheck-suppress variableScope ; declaration kept at this scope for readability
           double localVPositionMinus  = zMinus - shiftZ;
           // check whether z intersection possibly is on sensor to be checked, only continue with the rest of calculations if that's the case
           if (localVPosition >= ((-c_activeSensorLength[layer - 1] / 2.0) - m_toleranceZ) and

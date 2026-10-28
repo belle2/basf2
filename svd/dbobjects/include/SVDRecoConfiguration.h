@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #pragma once
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 
 namespace Belle2 {
   /**
@@ -20,7 +20,7 @@ namespace Belle2 {
     /**
     * Default constructor
     */
-    SVDRecoConfiguration(const TString& uniqueID = "")
+    explicit SVDRecoConfiguration(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
       , m_timeRecoWith6Samples("CoG6")
       , m_timeRecoWith3Samples("CoG3")

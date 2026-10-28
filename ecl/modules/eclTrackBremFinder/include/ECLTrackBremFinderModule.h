@@ -31,7 +31,7 @@ namespace Belle2 {
     ECLTrackBremFinderModule();
 
     /** Use to clean up anything you created in the constructor. */
-    virtual ~ECLTrackBremFinderModule() = default;
+    virtual ~ECLTrackBremFinderModule() override = default;
 
     /** Use this to initialize resources or memory your module needs.
      *

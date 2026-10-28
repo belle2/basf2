@@ -337,7 +337,7 @@ int BFieldComponentQuad::getRange(double s, const ranges_t& r) const
   return it - it0;
 }
 
-double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const_iterator jt0) const
+double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const_iterator jt0)
 {
   auto jt = linear_sentinel(jt0, s, [](double s_, const ApertPoint & r) {return s_ <= r.s;});
   const ApertPoint& p1 = *(jt - 1), &p2 = *jt;

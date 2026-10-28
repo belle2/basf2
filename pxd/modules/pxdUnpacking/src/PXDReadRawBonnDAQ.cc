@@ -93,12 +93,12 @@ int PXDReadRawBonnDAQModule::readOneEvent()
     unsigned int get_header8(void) { return (header & 0xFF00);};
   };
 
-  char* data = (char*)m_buffer;
-  struct EvtHeader* evt = (struct EvtHeader*)data;
+  char* data = reinterpret_cast<char*>(m_buffer);
+  struct EvtHeader* evt = reinterpret_cast<struct EvtHeader*>(data);
 
   while (1) {
-    ulittle32_t* data32 = (ulittle32_t*)data;
-    ulittle16_t* data16 = (ulittle16_t*)data;
+    ulittle32_t* data32 = reinterpret_cast<ulittle32_t*>(data);
+    ulittle16_t* data16 = reinterpret_cast<ulittle16_t*>(data);
     // Read 8 bytes header (group)
     int br = fh->read_data(data, 4);
     if (br <= 0) return br;

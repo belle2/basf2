@@ -417,7 +417,7 @@ void SVDClusterizerModule::finalizeCluster(Belle2::SVD::RawCluster& rawCluster)
     if (m_isMC) {
       // if no truehit associated to the cluster there is nothing to fudge
       int clsIndex = m_storeClusters.getEntries() - 1;
-      SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
+      const SVDTrueHit* trueHit = m_storeClusters[clsIndex]->getRelatedTo<SVDTrueHit>(m_storeTrueHitsName);
       if (trueHit) {
         alterClusterPosition(trueHit);
         alterClusterTime();
@@ -509,7 +509,7 @@ double SVDClusterizerModule::applyLorentzShiftCorrection(double position, VxdID 
   return position;
 }
 
-void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
+void SVDClusterizerModule::alterClusterPosition(const SVDTrueHit* trueHit)
 {
   // alter the position of the last cluster in the array
   int clsIndex = m_storeClusters.getEntries() - 1;
@@ -518,7 +518,6 @@ void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
   float clsPosition = m_storeClusters[clsIndex]->getPosition();
   VxdID sensorID = m_storeClusters[clsIndex]->getSensorID();
   bool isU = m_storeClusters[clsIndex]->isUCluster();
-  int layerNum = sensorID.getLayerNumber();
 
   // get the track's incident angle
   double trkAngle = 0.;
@@ -534,6 +533,9 @@ void SVDClusterizerModule::alterClusterPosition(SVDTrueHit* trueHit)
   float fudgeFactor = (float) gRandom->Gaus(0., sigma);
   m_storeClusters[clsIndex]->setPosition(clsPosition + fudgeFactor);
 
+  // only used in the B2DEBUG below, which expands to a conditional block
+  // cppcheck-suppress variableScope
+  int layerNum = sensorID.getLayerNumber();
   B2DEBUG(20, "Layer number: " << layerNum << ", is U side: " << isU << ", track angle: " << trkAngle << ", sigma: " << sigma <<
           ", cluster position: " << clsPosition << ", fudge factor: " << fudgeFactor);
 }

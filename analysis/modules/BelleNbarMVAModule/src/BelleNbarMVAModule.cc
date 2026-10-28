@@ -37,8 +37,8 @@ BelleNbarMVAModule::BelleNbarMVAModule() : Module(), m_model()
 
 void BelleNbarMVAModule::initialize()
 {
-  m_model = std::make_unique<fdeep::model>(fdeep::read_model_from_string(((DatabaseRepresentationOfWeightfile*)
-                                           Database::Instance().getData(m_identifier, 0, 0))->m_data));
+  m_model = std::make_unique<fdeep::model>(fdeep::read_model_from_string((static_cast<const DatabaseRepresentationOfWeightfile*>(
+                                             Database::Instance().getData(m_identifier, 0, 0)))->m_data));
   m_plist.isRequired(m_particleList);
 }
 

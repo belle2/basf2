@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_SpacepointMeasurement_h
-#define genfit_SpacepointMeasurement_h
+#pragma once
 
 #include "AbsMeasurement.h"
 #include "AbsHMatrix.h"
@@ -92,5 +91,3 @@ class SpacepointMeasurement : public AbsMeasurement {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_SpacepointMeasurement_h

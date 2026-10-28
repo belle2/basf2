@@ -346,6 +346,7 @@ void CDCDedxInjectTimeAlgorithm::getExpRunInfo()
   int rstart = erStart.second;
 
   const auto erEnd = getRunList()[cruns - 1];
+  // cppcheck-suppress variableScope ; kept next to the related declarations for readability
   int rend = erEnd.second;
 
   updateDBObjPtrs(1, erStart.second, erStart.first);
@@ -383,7 +384,7 @@ void CDCDedxInjectTimeAlgorithm::defineTimeBins()
 }
 
 //------------------------------------
-void CDCDedxInjectTimeAlgorithm::defineHisto(std::array<std::vector<TH1D*>, numdedx::nrings>& htemp, std::string var)
+void CDCDedxInjectTimeAlgorithm::defineHisto(std::array<std::vector<TH1D*>, numdedx::nrings>& htemp, const std::string& var)
 {
   for (unsigned int ir = 0; ir < c_rings; ir++) {
     htemp[ir].resize(m_tbins);
@@ -433,8 +434,8 @@ void CDCDedxInjectTimeAlgorithm::checkStatistics(std::array<std::vector<TH1D*>, 
 
 //------------------------------------
 void CDCDedxInjectTimeAlgorithm::correctBinBias(std::map<int, std::vector<double>>& varcorr,
-                                                std::map<int, std::vector<double>>& var,
-                                                std::map<int, std::vector<double>>& time, TH1D*& htimes)
+                                                const std::map<int, std::vector<double>>& var,
+                                                const std::map<int, std::vector<double>>& time, TH1D*& htimes)
 {
   //Deep copy OK
   varcorr = var;
@@ -444,18 +445,18 @@ void CDCDedxInjectTimeAlgorithm::correctBinBias(std::map<int, std::vector<double
     for (int ix = varcorr[ir * 2].size(); ix -- > 0;) {
 
       double var_thisbin = 1.0;
-      var_thisbin = var[ir * 2].at(ix);
+      var_thisbin = var.at(ir * 2).at(ix);
 
-      double atime_thisbin = time[ir * 2].at(ix);
+      double atime_thisbin = time.at(ir * 2).at(ix);
       double ctime_thisbin = htimes->GetBinCenter(ix + 1);
 
       if (atime_thisbin > 0 && atime_thisbin < 4e4 * 0.99) {
 
         double var_nextbin = 1.0;
-        var_nextbin = var[ir * 2].at(ix + 1);
+        var_nextbin = var.at(ir * 2).at(ix + 1);
         double var_diff = var_nextbin - var_thisbin;
 
-        double atime_nextbin = time[ir * 2].at(ix + 1);
+        double atime_nextbin = time.at(ir * 2).at(ix + 1);
         double atime_diff = atime_nextbin - atime_thisbin;
 
         double slope = (atime_diff > 0) ? var_diff / atime_diff : -1.0;
@@ -474,8 +475,8 @@ void CDCDedxInjectTimeAlgorithm::correctBinBias(std::map<int, std::vector<double
 
 //-------------------------------------
 void CDCDedxInjectTimeAlgorithm::createPayload(std::array<double, numdedx::nrings>& scale,
-                                               std::map<int, std::vector<double>>& var,
-                                               std::map<int, std::vector<double>>& varscal, std::string svar)
+                                               const std::map<int, std::vector<double>>& var,
+                                               std::map<int, std::vector<double>>& varscal, const std::string& svar)
 {
   varscal = var;
 
@@ -529,7 +530,7 @@ void CDCDedxInjectTimeAlgorithm::createPayload(std::array<double, numdedx::nring
 }
 
 //------------------------------------
-void CDCDedxInjectTimeAlgorithm::plotBinLevelDist(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar, std::string var)
+void CDCDedxInjectTimeAlgorithm::plotBinLevelDist(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar, const std::string& var)
 {
   TCanvas cfit("cfit", "cfit", 1000, 500);
   cfit.Divide(2, 1);
@@ -601,7 +602,7 @@ void CDCDedxInjectTimeAlgorithm::plotInjectionTime(std::array<std::array<TH1D*, 
 
 //------------------------------------
 void CDCDedxInjectTimeAlgorithm::plotRelConstants(std::map<int, std::vector<double>>& vmeans,
-                                                  std::map<int, std::vector<double>>& vresos, std::map<int, std::vector<double>>& corr, std::string svar)
+                                                  std::map<int, std::vector<double>>& vresos, std::map<int, std::vector<double>>& corr, const std::string& svar)
 {
   std::string sname[3] = {"mean", "reso"};
   const int lcolors[c_rings] = {2, 4};
@@ -871,7 +872,7 @@ void CDCDedxInjectTimeAlgorithm::plotFinalConstants(std::map<int, std::vector<do
 
 //------------------------------------
 double CDCDedxInjectTimeAlgorithm::getCorrection(unsigned int ring, unsigned int time,
-                                                 std::map<int, std::vector<double>>&  vmeans)
+                                                 const std::map<int, std::vector<double>>&  vmeans)
 {
 
   unsigned int iv = ring * 2;
@@ -900,7 +901,7 @@ double CDCDedxInjectTimeAlgorithm::getCorrection(unsigned int ring, unsigned int
     }
 
     if (it <= 2) {
-      double diff = vmeans[iv].at(2) - vmeans[iv].at(1) ;
+      double diff = vmeans.at(iv).at(2) - vmeans.at(iv).at(1) ;
       if (diff < -0.015) { //difference above 1.0%
         thisbin = it;
         if (it == 1) nextbin = it;
@@ -914,13 +915,13 @@ double CDCDedxInjectTimeAlgorithm::getCorrection(unsigned int ring, unsigned int
     }
   }
 
-  double thisdedx = vmeans[iv].at(thisbin);
-  double nextdedx = vmeans[iv].at(nextbin);
+  double thisdedx = vmeans.at(iv).at(thisbin);
+  double nextdedx = vmeans.at(iv).at(nextbin);
 
   double thistime = 0.5 * (m_vtlocaledges.at(thisbin) + m_vtlocaledges.at(thisbin + 1));
   double nexttime = 0.5 * (m_vtlocaledges.at(nextbin) + m_vtlocaledges.at(nextbin + 1));
 
-  double newdedx = vmeans[iv].at(it);
+  double newdedx = vmeans.at(iv).at(it);
   if (thisbin != nextbin)
     newdedx = thisdedx + ((nextdedx - thisdedx) / (nexttime - thistime)) * (time - thistime);
 

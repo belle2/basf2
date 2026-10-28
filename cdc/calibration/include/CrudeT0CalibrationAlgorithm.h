@@ -26,13 +26,13 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CrudeT0CalibrationAlgorithm() {}
+      virtual ~CrudeT0CalibrationAlgorithm() override {}
 
       /**
        * Set window for fitting.
        * @param window [TDC_min, TDC_max]
        */
-      void setFitWindow(std::vector<unsigned short> window)
+      void setFitWindow(const std::vector<unsigned short>& window)
       {
         if (window.size() != 2) {
           B2FATAL("Please specify [TDC_min, TDC_max]");
@@ -79,13 +79,13 @@ namespace Belle2 {
       virtual void write(StoreObjPtr<EventMetaData>& evtPtr);
     private:
 
-      double m_t0b[300];    /**< T0 for each board*/
-      double m_t0[56][400]; /**< T0 of each channel*/
+      double m_t0b[300] = {};    /**< T0 for each board*/
+      double m_t0[56][400] = {}; /**< T0 of each channel*/
       bool m_flag[56][400] = {{false}}; /**< flag =1 for good, =0 for low statistic or bad fit */
 
-      TH1D* m_hTDC[56][400];    /**< TDC distribution histo. */
-      TH1D* m_hTDCBoard[300];   /**< T0 distribution of each board. */
-      TH1D* m_hT0All;           /**< T0 distribution of all channel. */
+      TH1D* m_hTDC[56][400] = {};    /**< TDC distribution histo. */
+      TH1D* m_hTDCBoard[300] = {};   /**< T0 distribution of each board. */
+      TH1D* m_hT0All = nullptr;           /**< T0 distribution of all channel. */
       unsigned short m_tdcMin = 4500; /**< minimum of TDC hist for fitting */
       unsigned short m_tdcMax = 5000; /**< maximum of TDC hist for fitting */
       float m_initT0 = 4887.;   /**< Common initial T0 for fitting */

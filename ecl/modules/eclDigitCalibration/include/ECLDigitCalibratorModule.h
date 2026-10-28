@@ -45,7 +45,7 @@ namespace Belle2 {
 
     /** Destructor.
      */
-    ~ECLDigitCalibratorModule();
+    ~ECLDigitCalibratorModule() override;
 
     /** Initialize variables. */
     virtual void initialize() override;
@@ -56,12 +56,6 @@ namespace Belle2 {
     /** event per event.
      */
     virtual void event() override;
-
-    /** end run. */
-    virtual void endRun() override;
-
-    /** terminate.*/
-    virtual void terminate() override;
 
     /** Name of the ECLDigit.*/
     virtual const char* eclDigitArrayName() const
@@ -132,8 +126,8 @@ namespace Belle2 {
     double m_pureCsITimeOffset = 0.31; /**< ad-hoc offset correction for pureCsI timing/ */
 
     void initializeCalibration(); /**< reads calibration constants, performs checks, put them into a vector */
-    void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
-                             std::vector<float>& constantsUnc); /**< reads calibration constants */
+    static void callbackCalibration(DBObjPtr<ECLCrystalCalib>& cal, std::vector<float>& constants,
+                                    std::vector<float>& constantsUnc); /**< reads calibration constants */
 
     double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
     int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */

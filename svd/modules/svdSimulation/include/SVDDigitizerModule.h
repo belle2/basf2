@@ -68,7 +68,7 @@ namespace Belle2 {
        * @param noise the standard RMS noise on the strip
        * @return the new charge of the strip.
        */
-      double addNoise(double charge, double noise);
+      static double addNoise(double charge, double noise);
 
       /** Save digits to the DataStore
        * Saves samples of generated waveforms.
@@ -207,7 +207,7 @@ namespace Belle2 {
       int m_startingSample = 0;
 
       /** return the starting sample */
-      int getFirstSample(int triggerBin, int relativShift);
+      static int getFirstSample(int triggerBin, int relativShift);
 
       //payloads:
       SVDFADCMaskedStrips m_MaskedStr; /**< FADC masked strip payload*/

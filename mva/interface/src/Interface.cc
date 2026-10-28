@@ -11,7 +11,6 @@
 #include <mva/methods/RegressionFastBDT.h>
 #include <mva/methods/TMVA.h>
 #include <mva/methods/Python.h>
-#include <mva/methods/FANN.h>
 #include <mva/methods/PDF.h>
 #include <mva/methods/Trivial.h>
 #include <mva/methods/Reweighter.h>
@@ -35,7 +34,7 @@ namespace Belle2 {
       s_supported_interfaces.erase(m_name);
     }
 
-    std::string AbstractInterface::getName() const { return m_name; }
+    const std::string& AbstractInterface::getName() const { return m_name; }
 
     std::map<std::string, AbstractInterface*> AbstractInterface::s_supported_interfaces;
 
@@ -43,7 +42,6 @@ namespace Belle2 {
     {
       static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
       static Interface<RegressionFastBDTOptions, RegressionFastBDTTeacher, RegressionFastBDTExpert> interface_RegressionFastBDT;
-      static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;
       static Interface<TMVAOptionsRegression, TMVATeacherRegression, TMVAExpertRegression> interface_TMVARegression;

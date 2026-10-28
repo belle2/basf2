@@ -45,7 +45,7 @@ void ClusterMatcherModule::event()
     const ROOT::Math::XYZVector& eclClusterPos = eclCluster.getClusterPosition();
     const Cluster* clusterecl = m_Clusters.appendNew();
     eclCluster.addRelationTo(clusterecl);
-    for (KLMCluster& klmcluster : m_klmClusters) {
+    for (const KLMCluster& klmcluster : m_klmClusters) {
       const ROOT::Math::XYZVector& klmClusterPos = klmcluster.getClusterPosition();
       const float angleDist = ROOT::Math::VectorUtil::Angle(eclClusterPos, klmClusterPos);
       if (angleDist < (m_coneInRad / 2.0)) {

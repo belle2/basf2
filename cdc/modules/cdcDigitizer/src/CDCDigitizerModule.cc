@@ -187,7 +187,7 @@ void CDCDigitizerModule::initialize()
   m_mcParticles.registerRelationTo(m_cdcHits4Trg);
 
   m_cdcgp = &(CDCGeometryPar::Instance());
-  CDCGeometryPar& cdcgp = *m_cdcgp;
+  const CDCGeometryPar& cdcgp = *m_cdcgp;
   m_tdcBinWidth  = cdcgp.getTdcBinWidth();
   m_tdcBinWidthInv = 1. / m_tdcBinWidth;
   m_tdcResol     = m_tdcBinWidth / sqrt(12.);
@@ -670,7 +670,7 @@ void CDCDigitizerModule::event()
         for (std::set<int>::iterator it = vv.begin(); it != vv.end(); ++it) {
           // set all relations
           int idx = *it;
-          MCParticle* part = m_mcParticles[idx - 1];
+          const MCParticle* part = m_mcParticles[idx - 1];
           part->addRelationTo(firstHit, 1.0, m_OptionalAllMCParticlesToHitsName);
         }
       }
@@ -1176,6 +1176,7 @@ void CDCDigitizerModule::addXTalk()
     unsigned short tdcCount = aHit.second.m_tdc;
     unsigned short adcCount = aHit.second.m_adc;
     unsigned short tot      = aHit.second.m_tot;
+    // cppcheck-suppress variableScope ; kept next to the related declarations for readability
     unsigned short status   = aHit.second.m_status;
 
     if (iterXTalkMap1 == xTalkMap1.end()) { // new entry

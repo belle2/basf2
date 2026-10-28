@@ -120,7 +120,7 @@ namespace Belle2 {
 
 
     /// Tests length requirement on a path before adding it to path vector
-    void storeAcceptedPath(Path newPath, std::vector<Path>& allNodePaths) const
+    void storeAcceptedPath(const Path& newPath, std::vector<Path>& allNodePaths) const
     {
       if (newPath.size() >= minPathLength) {
         allNodePaths.push_back(newPath);

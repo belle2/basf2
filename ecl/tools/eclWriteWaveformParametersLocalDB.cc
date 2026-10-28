@@ -36,7 +36,7 @@ int main()
     B2FATAL("Could not open file " << FileName);
   }
   WaveformParameterFileInput->cd();
-  TTree* WaveformParametersTree = (TTree*) WaveformParameterFileInput->Get("ParTree");
+  TTree* WaveformParametersTree = static_cast<TTree*>(WaveformParameterFileInput->Get("ParTree"));
   //
   double treePhotonPar11[11];
   double treeHadronPar11[11];

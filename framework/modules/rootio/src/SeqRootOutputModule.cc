@@ -182,7 +182,7 @@ void SeqRootOutputModule::getStreamerInfos()
     (msg->header())->nArrays = 0;    // No. of arrays
 
     //    int size = m_file->write(msg->buffer());
-    m_streamerinfo_size = *((int*)(msg->buffer()));     // nbytes in the buffer at the beginning
+    m_streamerinfo_size = *reinterpret_cast<int*>(msg->buffer());     // nbytes in the buffer at the beginning
 
     //copy the steamerINfo for later use
     if (m_streamerinfo_size > 0) {

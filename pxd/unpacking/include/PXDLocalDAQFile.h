@@ -35,7 +35,7 @@ namespace Belle2 {
 
   private:
     /** actually open the file */
-    void openFile(std::string filename);
+    void openFile(const std::string& filename);
 
   private:
 

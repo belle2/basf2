@@ -30,7 +30,7 @@ namespace Belle2 {
     /**
     * Destructor
     */
-    virtual ~CDCDedxRunGainAlgorithm() {}
+    virtual ~CDCDedxRunGainAlgorithm() override {}
 
     /**
     * function to decide merged vs relative run-gains

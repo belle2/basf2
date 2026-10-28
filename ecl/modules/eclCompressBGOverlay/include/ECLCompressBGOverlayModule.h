@@ -31,7 +31,7 @@ namespace Belle2 {
     ECLCompressBGOverlayModule();
 
     /** Destructor  */
-    ~ECLCompressBGOverlayModule();
+    ~ECLCompressBGOverlayModule() override;
 
     /** Initialize variables  */
     void initialize() override;

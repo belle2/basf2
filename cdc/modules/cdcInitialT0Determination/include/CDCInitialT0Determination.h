@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~CDCInitialT0DeterminationModule();
+    virtual ~CDCInitialT0DeterminationModule() override;
 
     /**
      * Initializes the Module.

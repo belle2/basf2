@@ -57,10 +57,10 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
   ECLDspData* data = new ECLDspData(boardNumber);
 
   //== Do not fill data for non-existent shapers
-  int crateNum = (boardNumber - 1) / 12 + 1;
   int shaperNum = (boardNumber - 1) % 12;
 
   if (shaperNum >= 8) {
+    int crateNum = (boardNumber - 1) / 12 + 1;
     if (crateNum >= 45) {
       fclose(fl);
       return data;
@@ -131,7 +131,7 @@ ECLDspData* ECLDspUtilities::readEclDsp(const char* filename, int boardNumber)
   return data;
 }
 
-void ECLDspUtilities::writeEclDsp(const char* filename, ECLDspData* data)
+void ECLDspUtilities::writeEclDsp(const char* filename, const ECLDspData* data)
 {
   // Default header for DSP file.
   // Words '0xABCD' are overwritten with current parameters.
@@ -253,7 +253,7 @@ short int* vectorsplit(std::vector<short int>& vectorFrom, int channel)
   return (vectorFrom.data() + (size / 16) * (channel - 1));
 }
 
-ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttrig,
+ECLShapeFit ECLDspUtilities::shapeFitter(int cid, const std::vector<int>& adc, int ttrig,
                                          bool adjusted_timing)
 {
   ECLChannelMapper mapper;
@@ -281,13 +281,13 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   std::vector<short> vec_fg41; data->getF41(vec_fg41);
   std::vector<short> vec_fg43; data->getF43(vec_fg43);
 
-  short* f    = vectorsplit(vec_f,    channel);
-  short* f1   = vectorsplit(vec_f1,   channel);
-  short* fg31 = vectorsplit(vec_fg31, channel);
-  short* fg32 = vectorsplit(vec_fg32, channel);
-  short* fg33 = vectorsplit(vec_fg33, channel);
-  short* fg41 = vectorsplit(vec_fg41, channel);
-  short* fg43 = vectorsplit(vec_fg43, channel);
+  const short* f    = vectorsplit(vec_f,    channel);
+  const short* f1   = vectorsplit(vec_f1,   channel);
+  const short* fg31 = vectorsplit(vec_fg31, channel);
+  const short* fg32 = vectorsplit(vec_fg32, channel);
+  const short* fg33 = vectorsplit(vec_fg33, channel);
+  const short* fg41 = vectorsplit(vec_fg41, channel);
+  const short* fg43 = vectorsplit(vec_fg43, channel);
 
   int k_a = data->getka();
   int k_b = data->getkb();
@@ -298,7 +298,7 @@ ECLShapeFit ECLDspUtilities::shapeFitter(int cid, std::vector<int> adc, int ttri
   int chi_thres = data->getchiThresh();
 
   //== Get ADC data
-  int* y = adc.data();
+  const int* y = adc.data();
 
   //== Get trigger time
   int ttrig2 = ttrig - 2 * (ttrig / 8);
@@ -327,7 +327,7 @@ void ECLDspUtilities::initPedestalFit()
   if (!file->IsOpen()) {
     B2FATAL("Unable to load coefficients for ECL pedestal fit");
   }
-  TTree* tree = (TTree*)file->Get("dsp_coefs");
+  TTree* tree = static_cast<TTree*>(file->Get("dsp_coefs"));
   int nentries = tree->GetEntries();
   float fg31_i, fg32_i;
   tree->SetBranchAddress("fg31", &fg31_i);
@@ -343,7 +343,7 @@ void ECLDspUtilities::initPedestalFit()
   pedestal_fit_initialized = 1;
 }
 
-ECLPedestalFit ECLDspUtilities::pedestalFit(std::vector<int> adc)
+ECLPedestalFit ECLDspUtilities::pedestalFit(const std::vector<int>& adc)
 {
   if (!pedestal_fit_initialized) {
     initPedestalFit();

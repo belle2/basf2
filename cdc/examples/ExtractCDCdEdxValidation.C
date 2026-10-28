@@ -7,13 +7,13 @@
  **************************************************************************/
 
 
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TList.h"
-#include "TFile.h"
-#include "TString.h"
-#include "TCanvas.h"
-#include "TSystem.h"
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TList.h>
+#include <TFile.h>
+#include <TString.h>
+#include <TCanvas.h>
+#include <TSystem.h>
 #include <string>
 
 #include <iostream>
@@ -23,7 +23,7 @@ using namespace std;
 void GeneratePlots(TFile *file, TString ListName, string sfx, Bool_t isGroupC);
 
 //----------------------------
-void ExtractCDCdEdxValidation(string filename = "fvalidatehadron_outfile.root") {
+void ExtractCDCdEdxValidation(const string& filename = "fvalidatehadron_outfile.root") {
 
 	TFile* f = new TFile(Form("%s", filename.data()), "READ");
 	if (f->IsZombie()) {
@@ -52,9 +52,9 @@ void ExtractCDCdEdxValidation(string filename = "fvalidatehadron_outfile.root") 
 }
 
 //--------------------------------------
-void GeneratePlots(TFile *file, TString ListName, string sfx, Bool_t isGroupC) {
+void GeneratePlots(TFile *file, TString ListName, const string& sfx, Bool_t isGroupC) {
 
-	TList *InputList = (TList*)file->Get(ListName.Data());
+	TList *InputList = static_cast<TList*>(file->Get(ListName.Data()));
 	if (!InputList) {
 		Printf("No InputList list <%s> found, exiting... ", ListName.Data());
 		return;
@@ -88,11 +88,14 @@ void GeneratePlots(TFile *file, TString ListName, string sfx, Bool_t isGroupC) {
 
 	for (int ih = 0; ih < InputList->GetEntries(); ih++) {
 
+  // cppcheck-suppress unreadVariable ; overwritten before it is read
+  // cppcheck-suppress unreadVariable ; overwritten before it is read
+  // cppcheck-suppress unreadVariable ; overwritten before it is read
 		string fromR = "", toR = "", hname = "";
 		Int_t fRun = 1, sRun = 1;
 		Int_t iC = 1, iCd = 1;
 
-		((TH1F*)InputList->At(ih))->SetFillColor(kYellow);
+		(static_cast<TH1F*>(InputList->At(ih)))->SetFillColor(kYellow);
 
 		if (isGroupC) {
 			iC = ih / (splitY * splitX);

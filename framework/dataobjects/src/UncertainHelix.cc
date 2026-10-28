@@ -179,6 +179,7 @@ TMatrixDSym UncertainHelix::getCartesianCovariance(const double bZ_tesla) const
   return cov6;
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
 void UncertainHelix::reverse()
 {
   Helix::reverse();
@@ -195,6 +196,7 @@ void UncertainHelix::reverse()
   m_covariance.Similarity(jacobianReverse);
 }
 
+// cppcheck-suppress duplInheritedMember ; intentionally hides the base class member
 double UncertainHelix::passiveMoveBy(const double& byX,
                                      const double& byY,
                                      const double& byZ)

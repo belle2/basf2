@@ -185,7 +185,7 @@ namespace Belle2 {
     //Ok, lets search for the path
     B2INFO("Override '" << poverride.path << "' with '" << poverride.value
            << "' (unit: '" << poverride.unit << "')");
-    xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar*) query.c_str(), m_xpathContext);
+    xmlXPathObjectPtr result = xmlXPathEvalExpression(reinterpret_cast<const xmlChar*>(query.c_str()), m_xpathContext);
     if (result != nullptr && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
       //Found it, so let's replace the content
       int numNodes = xmlXPathNodeSetGetLength(result->nodesetval);
@@ -251,7 +251,7 @@ namespace Belle2 {
     //Nothing in cache, query xml
     string query = ensureNode(path);
     B2DEBUG(1000, "Gearbox XPath query: " << query);
-    xmlXPathObjectPtr result = xmlXPathEvalExpression((xmlChar*) query.c_str(), m_xpathContext);
+    xmlXPathObjectPtr result = xmlXPathEvalExpression(reinterpret_cast<const xmlChar*>(query.c_str()), m_xpathContext);
     if (result != nullptr && result->type == XPATH_NODESET && !xmlXPathNodeSetIsEmpty(result->nodesetval)) {
       value.numNodes = xmlXPathNodeSetGetLength(result->nodesetval);
       xmlNodePtr node = result->nodesetval->nodeTab[0];
@@ -260,18 +260,18 @@ namespace Belle2 {
       // - foo has not text children, so node->children->content should be 0
       //   but xmlXPathOrderDocElems assigns them an index<0 to speed up XPath
       //   so we have to cast to a long integer and check if it is positive
-      if (node->children && (long)node->children->content > 0) {
+      if (node->children && reinterpret_cast<long>(node->children->content) > 0) {
         xmlChar* valueString = xmlNodeListGetString(m_xmlDocument, node->children, 1);
-        value.value = (char*)valueString;
+        value.value = reinterpret_cast<char*>(valueString);
         xmlFree(valueString);
       }
       //See if we have a unit attribute and add it
       xmlAttrPtr attribute = node->properties;
       while (attribute) {
         B2DEBUG(1001, "Checking attribute " << attribute->name);
-        if (!strcmp((char*)attribute->name, "unit")) {
+        if (!strcmp(reinterpret_cast<const char*>(attribute->name), "unit")) {
           B2DEBUG(1001, "found Unit " << attribute->children->content);
-          value.unit = (char*)attribute->children->content;
+          value.unit = reinterpret_cast<char*>(attribute->children->content);
           break;
         }
         attribute = attribute->next;

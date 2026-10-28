@@ -22,7 +22,7 @@ namespace Belle2 {
   class VXDGeoRadiationSensorsPositionPar: public TObject {
   public:
     /** Constructor */
-    VXDGeoRadiationSensorsPositionPar(double z = 0, double radius = 0, double theta = 0) :
+    explicit VXDGeoRadiationSensorsPositionPar(double z = 0, double radius = 0, double theta = 0) :
       m_z(z), m_radius(radius), m_theta(theta) {}
     //! Destructor
     ~VXDGeoRadiationSensorsPositionPar() {}
@@ -63,8 +63,8 @@ namespace Belle2 {
   class VXDGeoRadiationSensorsPar: public TObject {
   public:
     /** Constructor */
-    VXDGeoRadiationSensorsPar(const std::string& subdetector = "", bool insideEnvelope = false,
-                              double width = 0, double length = 0, bool height = 0, const std::string& material = ""):
+    explicit VXDGeoRadiationSensorsPar(const std::string& subdetector = "", bool insideEnvelope = false,
+                                       double width = 0, double length = 0, bool height = 0, const std::string& material = ""):
       m_subdetector(subdetector), m_insideEnvelope(insideEnvelope), m_width(width), m_length(length), m_height(height),
       m_material(material) {}
     //! Destructor

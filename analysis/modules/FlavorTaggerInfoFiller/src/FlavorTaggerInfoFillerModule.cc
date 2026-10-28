@@ -29,8 +29,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
            vector<tuple<string, string>>());
   addParam("eventLevelParticleLists", m_eventLevelParticleLists, "Used Flavor Tagger eventLevel Categories of the lists ",
            vector<tuple<string, string, string>>());
-  addParam("FANNmlp", m_FANNmlp, "Sets if FANN Combiner output will be saved or not", false);
-  addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FANN Combiner output will be saved or not", false);
+  addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FBDT Combiner output will be saved or not", false);
   addParam("DNNmlp", m_DNNmlp, "Sets if DNN Tagger output will be saved or not", false);
   addParam("TFLATnn", m_TFLATnn, "Sets if TFLAT Tagger output will be saved or not", false);
   addParam("qpCategories", m_qpCategories, "Sets if individual categories output will be saved or not", false);
@@ -42,7 +41,7 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
 
 void FlavorTaggerInfoFillerModule::initialize()
 {
-  if (m_FANNmlp or m_TMVAfbdt) m_eventExtraInfo.isRequired();
+  if (m_TMVAfbdt) m_eventExtraInfo.isRequired();
 }
 
 void FlavorTaggerInfoFillerModule::event()
@@ -58,19 +57,6 @@ void FlavorTaggerInfoFillerModule::event()
   }
 
   flavorTaggerInfo -> setUseModeFlavorTagger("Expert");
-
-  if (m_FANNmlp) {
-    FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
-    // For FANN, the output is mapped to be qr
-    float qrCombined = m_eventExtraInfo->getExtraInfo("qrCombinedFANN");
-    if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
-    if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
-    float B0Probability = qrCombined / 2 + 0.5;
-    float B0barProbability = 1 - B0Probability;
-    infoMapsFANN->setQrCombined(qrCombined);
-    infoMapsFANN->setB0Probability(B0Probability);
-    infoMapsFANN->setB0barProbability(B0barProbability);
-  }
 
   FlavorTaggerInfoMap* infoMapsFBDT = flavorTaggerInfo -> getMethodMap("FBDT");
 

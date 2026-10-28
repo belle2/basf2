@@ -58,7 +58,7 @@ namespace Belle2 {
      */
     double getEigenvalue(short i) const
     {
-      return (i < 0 || i > 3) ? 0. : m_lambda[i];
+      return (i < 0 || i > 2) ? 0. : m_lambda[i];
     }
 
     /**
@@ -67,7 +67,7 @@ namespace Belle2 {
     ROOT::Math::XYZVector getEigenvector(short i) const
     {
       ROOT::Math::XYZVector nullVector(0., 0., 0.);
-      return (i < 0 || i > 3) ? nullVector : m_eVector[i];
+      return (i < 0 || i > 2) ? nullVector : m_eVector[i];
     }
 
   private:

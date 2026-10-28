@@ -51,7 +51,7 @@ void KLMChannelStatus::setChannelStatus(KLMChannelNumber channel,
 void KLMChannelStatus::setStatusAllChannels(enum ChannelStatus status)
 {
   KLMChannelIndex klmChannels;
-  for (KLMChannelIndex& klmChannel : klmChannels)
+  for (const KLMChannelIndex& klmChannel : klmChannels)
     setChannelStatus(klmChannel.getKLMChannelNumber(), status);
 }
 
@@ -86,11 +86,12 @@ int KLMChannelStatus::getActiveStripsInModule(KLMChannelNumber module) const
   return active;
 }
 
-bool KLMChannelStatus::operator==(KLMChannelStatus& status)
+bool KLMChannelStatus::operator==(const KLMChannelStatus& status)
 {
   if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
     return false;
-  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it, it2;
+  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it;
+  std::map<KLMChannelNumber, enum ChannelStatus>::const_iterator it2;
   it = this->m_ChannelStatus.begin();
   it2 = status.m_ChannelStatus.begin();
   while (it != this->m_ChannelStatus.end()) {
@@ -104,12 +105,13 @@ bool KLMChannelStatus::operator==(KLMChannelStatus& status)
   return true;
 }
 
-unsigned int KLMChannelStatus::newNormalChannels(KLMChannelStatus& status)
+unsigned int KLMChannelStatus::newNormalChannels(const KLMChannelStatus& status)
 {
   unsigned int channels = 0;
   if (this->m_ChannelStatus.size() != status.m_ChannelStatus.size())
     return 0;
-  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it, it2;
+  std::map<KLMChannelNumber, enum ChannelStatus>::iterator it;
+  std::map<KLMChannelNumber, enum ChannelStatus>::const_iterator it2;
   it = this->m_ChannelStatus.begin();
   it2 = status.m_ChannelStatus.begin();
   while (it != this->m_ChannelStatus.end()) {

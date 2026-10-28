@@ -240,7 +240,7 @@ std::set<int> ProcHandler::globalProcessList()
 {
   return std::set<int>(s_pidVector.begin(), s_pidVector.end());
 }
-std::set<int> ProcHandler::processList() const
+const std::set<int>& ProcHandler::processList() const
 {
   return m_processList;
 }

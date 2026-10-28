@@ -35,7 +35,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   try {
     m_tube = new G4Tubs("Tube_" + name, 0., std::max(r1, r2), halfZlen,
                         phi1, fabs(phi2 - phi1));
-  } catch (std::bad_alloc& ba) {
+  } catch (const std::bad_alloc& ba) {
     goto err_mem1;
   }
   if (r1 >= r2) {
@@ -53,7 +53,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
   try {
     m_box = new G4Box("Box_" + name, rl * sin_alpha,
                       rl * cos_alpha, halfZlen);
-  } catch (std::bad_alloc& ba) {
+  } catch (const std::bad_alloc& ba) {
     goto err_mem2;
   }
   if (r1 >= r2)
@@ -62,7 +62,7 @@ G4TriangularPrism::G4TriangularPrism(const G4String& name,
     t = G4RotateZ3D((phi2 - alpha) * CLHEP::rad + 90.0 * CLHEP::deg);
   try {
     m_is = new G4IntersectionSolid(name, m_tube, m_box, t);
-  } catch (std::bad_alloc& ba) {
+  } catch (const std::bad_alloc& ba) {
     goto err_mem3;
   }
   return;

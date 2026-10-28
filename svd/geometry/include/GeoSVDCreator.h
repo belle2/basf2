@@ -33,7 +33,7 @@ namespace Belle2 {
       GeoSVDCreator(): VXD::GeoVXDCreator("SVD") {};
 
       /** The destructor of the GeoSVDCreator class. */
-      virtual ~GeoSVDCreator();
+      virtual ~GeoSVDCreator() override;
 
       /** The old create member: create the configuration object(s) on the fly
        * and call the geometry creation routine.*/
@@ -94,7 +94,7 @@ namespace Belle2 {
        * Read the sensor definitions from gearbox
        * @param sensor Reference to the database containing the parameters
        */
-      SVDSensorInfoPar* readSensorInfo(const GearDir& sensor);
+      static SVDSensorInfoPar* readSensorInfo(const GearDir& sensor);
 
       /**
        * Return a SensitiveDetector implementation for a given sensor
@@ -111,7 +111,7 @@ namespace Belle2 {
        * @param support Reference to the database containing the parameters
        * @param svdGeometryPar
        */
-      void readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar);
+      static void readHalfShellSupport(const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
       /**
        * Create support structure for a SVD Layer
@@ -119,7 +119,7 @@ namespace Belle2 {
        * @param support Reference to the database containing the parameters
        * @param svdGeometryPar
        */
-      void readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
+      static void readLayerSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
       /**
        * Create support structure for a SVD Ladder
@@ -127,7 +127,7 @@ namespace Belle2 {
        * @param support Reference to the database containing the parameters
        * @param svdGeometryPar
        */
-      void readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
+      static void readLadderSupport(int layer, const GearDir& support, SVDGeometryPar& svdGeometryPar);
 
     private:
 

@@ -65,6 +65,7 @@ namespace Belle2 {
       const CDCCKFState& lastState = path.back();
       const TrackingUtilities::CDCTrajectory3D& trajectory = lastState.getTrajectory();
 
+      // cppcheck-suppress variableScope ; declaration kept at this scope for readability
       TrackingUtilities::Weight weight;
 
       B2DEBUG(29, "On layer: " << (lastState.isSeed() ? -1 : lastState.getWireHit()->getWire().getICLayer()));

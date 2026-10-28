@@ -103,7 +103,7 @@ void IPDQMModule::event()
   if (Y4SParticles.isValid() && abs(Y4SParticles->getPDGCode()) == 300553) {
     const auto& frame = ReferenceFrame::GetCurrent();
     for (unsigned int i = 0; i < Y4SParticles->getListSize(); i++) {
-      Particle* Y4S = Y4SParticles->getParticle(i);
+      const Particle* Y4S = Y4SParticles->getParticle(i);
       ROOT::Math::XYZVector IPVertex = frame.getVertex(Y4S);
       double IPX{IPVertex.X()};
       double IPY{IPVertex.Y()};

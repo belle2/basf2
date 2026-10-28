@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_AbsTrackRep_h
-#define genfit_AbsTrackRep_h
+#pragma once
 
 #include "SharedPlanePtr.h"
 //#include "MaterialInfo.h"
@@ -375,5 +374,3 @@ class AbsTrackRep : public TObject {
 
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_AbsTrackRep_h

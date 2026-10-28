@@ -103,7 +103,7 @@ namespace Belle2 {
     BFieldComponentQuad() = default;
 
     /** The BFieldComponentQuad destructor. */
-    virtual ~BFieldComponentQuad() = default;
+    virtual ~BFieldComponentQuad() override = default;
 
     /**
      * Initializes the magnetic field component.
@@ -178,7 +178,7 @@ namespace Belle2 {
      * @param hint Start search from this position
      * @return     The beam pipe aperture at given position.
      */
-    inline double getAperture(double s, std::vector<ApertPoint>::const_iterator hint) const;
+    inline static double getAperture(double s, std::vector<ApertPoint>::const_iterator hint);
 
     /** Magnetic field map of HER   */
     std::string m_mapFilenameHER{""};

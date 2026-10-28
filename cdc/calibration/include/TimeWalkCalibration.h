@@ -73,8 +73,8 @@ namespace Belle2 {
       virtual void fitToExponentialFunc(TH1D* h1);
 
     private:
-      TH1D* m_h1[300];                               /**<Mean of residual as function of ADC of each board*/
-      TH2D* m_h2[300];                               /**<2D histogram of residual vs ADC for each board*/
+      TH1D* m_h1[300] = {};                               /**<Mean of residual as function of ADC of each board*/
+      TH2D* m_h2[300] = {};                               /**<2D histogram of residual vs ADC for each board*/
 
       double m_xmin = 0.07;                          /**< minimum value cut of drift length. */
       double m_ndfmin = 20;                          /**< minimum number of degree of freedom required for track. */
@@ -86,7 +86,7 @@ namespace Belle2 {
       std::vector<float> m_tw_new[300];              /**< tw list new. */
       bool m_storeHisto = true;                      /**< Store all Histogram or not*/
       bool m_useDB = false;                          /**< flag to switch btw text mode and database. */
-      unsigned short m_flag[300];                    /**< flag for fit status*/
+      unsigned short m_flag[300] = {};                    /**< flag for fit status*/
       std::string m_InputTWFileName = "tw.dat";      /**< Old tw file name. */
       std::string m_InputT0FileName = "t0.dat";      /**< Old t0 file name. */
       std::string m_outputTWFileName = "tw_new.dat"; /**< Output tw file name for time walk. */
@@ -96,10 +96,10 @@ namespace Belle2 {
       int m_firstRun = 0;                            /**< First run. */
       int m_lastExperiment = -1;                     /**< Last experiment */
       int m_lastRun = -1;                            /**< Last run. */
-      unsigned short m_twParamMode_old;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
+      unsigned short m_twParamMode_old = 0;              /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
       unsigned short m_twParamMode_new = 1;          /**< =0 for P0/Sqrt(ADC); =1 for P0*Exp(-P1*ADC). */
       unsigned short m_nTwParams_new = 2;            /**< No. of tw parameters. for new database*/
-      unsigned short m_nTwParams_old;                /**< No. of tw parameters. in old database */
+      unsigned short m_nTwParams_old = 0;                /**< No. of tw parameters. in old database */
     };
   }//namespace CDC
 } // namespace Belle2

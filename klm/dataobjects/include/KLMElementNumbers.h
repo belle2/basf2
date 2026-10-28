@@ -63,14 +63,14 @@ namespace Belle2 {
      * @param[in] plane   Plane (0-based).
      * @param[in] strip   Strip (1-based).
      */
-    KLMChannelNumber channelNumberBKLM(int section, int sector, int layer, int plane,
-                                       int strip) const;
+    static KLMChannelNumber channelNumberBKLM(int section, int sector, int layer, int plane,
+                                              int strip);
 
     /**
      * Get channel number for BKLM.
      * @param[in] bklmChannel BKLM channel.
      */
-    KLMChannelNumber channelNumberBKLM(int bklmChannel) const;
+    static KLMChannelNumber channelNumberBKLM(int bklmChannel);
 
     /**
      * Get channel number for EKLM.
@@ -87,7 +87,7 @@ namespace Belle2 {
      * Get channel number for EKLM.
      * @param[in] eklmStrip EKLM strip number.
      */
-    KLMChannelNumber channelNumberEKLM(int eklmStrip) const;
+    static KLMChannelNumber channelNumberEKLM(int eklmStrip);
 
     /**
      * Determine whether a given channel is in BKLM.
@@ -149,8 +149,8 @@ namespace Belle2 {
      * @param[in] layer   Layer (1-based).
      * @param[in] plane   Plane (0-based).
      */
-    KLMPlaneNumber planeNumberBKLM(int section, int sector, int layer,
-                                   int plane) const;
+    static KLMPlaneNumber planeNumberBKLM(int section, int sector, int layer,
+                                          int plane);
 
     /**
      * Get channel number for EKLM.
@@ -178,7 +178,7 @@ namespace Belle2 {
      * @param[in] sector  Sector (1-based).
      * @param[in] layer   Layer (1-based).
      */
-    KLMModuleNumber moduleNumberBKLM(int section, int sector, int layer) const;
+    static KLMModuleNumber moduleNumberBKLM(int section, int sector, int layer);
 
     /**
      * Get module number for EKLM.
@@ -217,7 +217,7 @@ namespace Belle2 {
      * @param[in] section Forward (1) or backward (0) BKLM.
      * @param[in] sector  Sector (1-based).
      */
-    KLMSectorNumber sectorNumberBKLM(int section, int sector) const;
+    static KLMSectorNumber sectorNumberBKLM(int section, int sector);
 
     /**
      * Get sector number for EKLM.
@@ -232,7 +232,7 @@ namespace Belle2 {
      * @param[in] subdetector Subdetector.
      * @param[in] layer       Layer.
      */
-    int getExtrapolationLayer(int subdetector, int layer) const;
+    static int getExtrapolationLayer(int subdetector, int layer);
 
     /**
      * Get maximal extrapolation layer.
@@ -256,7 +256,7 @@ namespace Belle2 {
      * Get minimal plane number.
      * @param[in] subdetector Subdetector.
      */
-    int getMinimalPlaneNumber(int subdetector) const;
+    static int getMinimalPlaneNumber(int subdetector);
 
     /**
      * Get maximal plane number.

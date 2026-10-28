@@ -34,7 +34,7 @@ namespace Belle2 {
       //! Constructor / Destructor
       PXDReadRawONSENModule();
       //! Destructor
-      ~PXDReadRawONSENModule();
+      ~PXDReadRawONSENModule() override;
 
 
     private:
@@ -55,7 +55,7 @@ namespace Belle2 {
       StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
       //! Set Event Meta Info
-      bool m_setEvtMeta;
+      bool m_setEvtMeta = false;
       //! File Name
       std::string m_filename;
 

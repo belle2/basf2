@@ -21,10 +21,6 @@ namespace Belle2 {
     /** Constructor */
     CollectorTestModule();
 
-    /** Init the module */
-    void initialize() override;
-    /** Show progress */
-    void event() override;
     /** Don't break the terminal */
     void terminate() override;
 

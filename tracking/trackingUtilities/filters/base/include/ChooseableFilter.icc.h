@@ -72,13 +72,26 @@ namespace Belle2 {
       }
 
       /// Transfer parameters
-      ModuleParamList filterModuleParamList;
       const std::string prefix = "";
-      m_filter->exposeParameters(&filterModuleParamList, prefix);
-      m_param_filterParameters.assignTo(&filterModuleParamList);
+      m_filter->exposeParameters(&m_filterParamList, prefix);
+      m_param_filterParameters.assignTo(&m_filterParamList);
+
       this->addProcessingSignalListener(m_filter.get());
       Super::initialize();
     }
+
+    template <class AFilter>
+    void Chooseable<AFilter>::beginRun()
+    {
+
+      if (m_filter) {
+        // Re-uses the already-registered T& references — no exposeParameters() call needed
+        m_param_filterParameters.assignTo(&m_filterParamList);
+      }
+      Super::beginRun();
+    }
+
+
 
     template <class AFilter>
     bool Chooseable<AFilter>::needsTruthInformation()

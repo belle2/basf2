@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      ~GeoKLMCreator();
+      ~GeoKLMCreator() override;
 
       /**
        * Creation of the detector geometry from Gearbox (XML).

@@ -24,7 +24,7 @@
 
 #include <boost/format.hpp>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 
 using namespace std;
 using boost::format;
@@ -248,7 +248,6 @@ void vxdDigitMaskingModule::event()
 {
   m_nRealEventsProcess++;
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
-  int nPXDSensors = gTools->getNumberOfPXDSensors();
   if (gTools->getNumberOfPXDLayers() != 0) {
     const StoreArray<PXDDigit> storePXDDigits(m_storePXDDigitsName);
     // If there are no digits, leave
@@ -275,6 +274,7 @@ void vxdDigitMaskingModule::event()
     if (storeSVDDigits && storeSVDDigits.getEntries()) {
       int firstSVDLayer = gTools->getFirstSVDLayer();
       int lastSVDLayer = gTools->getLastSVDLayer();
+      int nPXDSensors = gTools->getNumberOfPXDSensors();
 
       for (const SVDShaperDigit& digit : storeSVDDigits) {
         int iLayer = digit.getSensorID().getLayerNumber();
@@ -343,7 +343,6 @@ void vxdDigitMaskingModule::endRun()
   FILE* MaskList;
 
   int nPXDSensors = gTools->getNumberOfPXDSensors();
-  int nSVDSensors = gTools->getNumberOfSVDSensors();
   if (gTools->getNumberOfPXDLayers() != 0) {
     TString message = Form("Start to create masking from %i events (fraction: %6.3f)", (int)m_nRealEventsProcess,
                            m_nEventsProcessFraction);
@@ -358,6 +357,10 @@ void vxdDigitMaskingModule::endRun()
     std::unique_ptr<PXDIgnoredPixelsMap> m_ignoredPixelsList = unique_ptr<PXDIgnoredPixelsMap>(new PXDIgnoredPixelsMap(
         ignoredPixelsListName));
     MaskList = fopen(FileName.data(), "w");
+    if (MaskList == nullptr) {
+      B2ERROR("Cannot open the mask file for writing: " << FileName);
+      return;
+    }
     fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fprintf(MaskList, "<Meta>\n");
     fprintf(MaskList, "    <Date>19.02.2018</Date>\n");
@@ -428,6 +431,10 @@ void vxdDigitMaskingModule::endRun()
     std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
         ignoredPixelsListName2));
     MaskList = fopen(FileName2.data(), "w");
+    if (MaskList == nullptr) {
+      B2ERROR("Cannot open the mask file for writing: " << FileName2);
+      return;
+    }
     fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fprintf(MaskList, "<Meta>\n");
     fprintf(MaskList, "    <Date>19.02.2018</Date>\n");
@@ -437,6 +444,7 @@ void vxdDigitMaskingModule::endRun()
     fprintf(MaskList, "    <Author>Peter Kodys</Author>\n");
     fprintf(MaskList, "</Meta>\n");
     fprintf(MaskList, "<SVD>\n");
+    int nSVDSensors = gTools->getNumberOfSVDSensors();
     for (int i = 0; i < nSVDSensors; i++) {
       if (m_nEventsPlane[nPXDSensors + i] == 0) continue;
       VxdID id = gTools->getSensorIDFromSVDIndex(i);
@@ -517,6 +525,10 @@ void vxdDigitMaskingModule::endRun()
     std::unique_ptr<SVDIgnoredStripsMap> m_ignoredStripsList2 = unique_ptr<SVDIgnoredStripsMap>(new SVDIgnoredStripsMap(
         ignoredPixelsListName2));
     MaskList = fopen(FileName2.data(), "w");
+    if (MaskList == nullptr) {
+      B2ERROR("Cannot open the mask file for writing: " << FileName2);
+      return;
+    }
     fprintf(MaskList, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fprintf(MaskList, "<Meta>\n");
     fprintf(MaskList, "    <Date>19.02.2018</Date>\n");

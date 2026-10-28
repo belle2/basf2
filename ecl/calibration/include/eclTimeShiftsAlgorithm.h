@@ -36,7 +36,7 @@ namespace Belle2 {
       eclTimeShiftsAlgorithm();
 
       /**..Destructor */
-      ~eclTimeShiftsAlgorithm() {}
+      ~eclTimeShiftsAlgorithm() override {}
 
 
       /*** Parameters ***/
@@ -46,14 +46,14 @@ namespace Belle2 {
 
       /** List of time offsets, one per crate, used just to centre the time
            constants around zero */
-      double timeShiftForPlotStyle[52] ;
+      double timeShiftForPlotStyle[52]  = {};
 
-      double crysCrateShift_min;   /**< Plotting time min for crystal+crate shift plots */
-      double crysCrateShift_max;   /**< Plotting time max for crystal+crate shift plots */
+      double crysCrateShift_min = 0.0;   /**< Plotting time min for crystal+crate shift plots */
+      double crysCrateShift_max = 0.0;   /**< Plotting time max for crystal+crate shift plots */
 
       /** Whether or not to have the algorithm code to loop
           over all the runs and read the payloads itself.  */
-      bool algorithmReadPayloads;
+      bool algorithmReadPayloads = false;
 
     protected:
 

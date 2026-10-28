@@ -55,7 +55,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::event()
 
       m_out_of_time_digits[pv_name] = 0;
 
-      auto hist = (TH1F*)findHist("ECL", "out_of_time_" + var_name, m_onlyIfUpdated);
+      const auto* hist = findHist("ECL", "out_of_time_" + var_name, m_onlyIfUpdated);
 
       if (!hist) continue;
 
@@ -73,7 +73,7 @@ void DQMHistAnalysisECLOutOfTimeDigitsModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisECLOutOfTimeDigits: endRun called");
 
-  auto main_hist = (TH1F*)findHist("ECL/out_of_time_physics_All");
+  const auto* main_hist = findHist("ECL/out_of_time_physics_All");
 
   if (main_hist == nullptr) {
     m_monObj->setVariable("comment_out_of_time_digits", "No ECL out-of-time ECLCalDigits histograms available");

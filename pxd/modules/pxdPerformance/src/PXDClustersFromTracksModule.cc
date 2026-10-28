@@ -73,10 +73,6 @@ void PXDClustersFromTracksModule::initialize()
 }
 
 
-void PXDClustersFromTracksModule::beginRun()
-{
-}
-
 
 void PXDClustersFromTracksModule::event()
 {
@@ -86,14 +82,6 @@ void PXDClustersFromTracksModule::event()
     return isRelatedToTrack(thePXDCluster);
   });
 
-}
-
-void PXDClustersFromTracksModule::endRun()
-{
-}
-
-void PXDClustersFromTracksModule::terminate()
-{
 }
 
 bool PXDClustersFromTracksModule::isRelatedToTrack(const PXDCluster* pxdCluster)

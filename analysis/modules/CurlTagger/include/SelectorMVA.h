@@ -19,8 +19,8 @@
 #include <framework/database/DBObjPtr.h>
 
 //Root Includes
-#include "TFile.h"
-#include "TTree.h"
+#include <TFile.h>
+#include <TTree.h>
 
 namespace Belle2 {
   class Particle;
@@ -60,7 +60,7 @@ namespace Belle2 {
     private:
 
       /** updates the value of the MVA variable */
-      void updateVariables(Particle* iPart, Particle* jPart);
+      void updateVariables(const Particle* iPart, const Particle* jPart);
 
       /** applying mva or training it */
       bool m_TrainFlag;
@@ -69,10 +69,10 @@ namespace Belle2 {
       std::string m_TFileName;
 
       /**output file for training data */
-      TFile* m_TFile;
+      TFile* m_TFile = nullptr;
 
       /**training data tree */
-      TTree* m_TTree;
+      TTree* m_TTree = nullptr;
 
       /** Database pointer to the Database representation of the weightfile */
       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;

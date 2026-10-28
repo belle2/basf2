@@ -20,8 +20,7 @@
  * @{
  */
 
-#ifndef genfit_GblFitStatus_h
-#define genfit_GblFitStatus_h
+#pragma once
 
 #include "FitStatus.h"
 #include "Track.h"
@@ -82,5 +81,3 @@ namespace genfit {
   
 } /* End of namespace genfit */
 /** @} */
-
-#endif // genfit_GblFitStatus_h

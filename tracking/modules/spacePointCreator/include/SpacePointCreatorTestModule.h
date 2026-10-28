@@ -47,8 +47,6 @@ namespace Belle2 {
     void event() override;
 
 
-    /** final output with mini-feedback */
-    void terminate() override {}
 
 
     /** initialize variables in constructor to avoid nondeterministic behavior */

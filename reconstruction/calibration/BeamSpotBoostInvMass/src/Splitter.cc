@@ -37,7 +37,7 @@ namespace Belle2 {
     std::map<ExpRun, std::pair<double, double>> runsCopy;
 
     for (auto r : runs) {
-      auto& I = r.second;
+      const auto& I = r.second;
       double d =  I.second - I.first;
       if (d > cut)
         runsCopy[r.first] = r.second;
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
   /// plot runs on time axis
-  void plotRuns(std::vector<std::pair<double, double>>  runs)
+  void plotRuns(const std::vector<std::pair<double, double>>&  runs)
   {
     TGraphErrors* gr = new TGraphErrors();
 
@@ -76,7 +76,7 @@ namespace Belle2 {
   }
 
   /// get the range of interval with nIntervals and breaks stored in a vector
-  std::pair<int, int> getStartEndIndexes(int nIntervals,  std::vector<int> breaks, int indx)
+  std::pair<int, int> getStartEndIndexes(int nIntervals,  const std::vector<int>& breaks, int indx)
   {
     B2ASSERT("There must be at least one interval", nIntervals >= 1);
     B2ASSERT("Interval index must be positive", indx >= 0);
@@ -87,7 +87,7 @@ namespace Belle2 {
   }
 
   /// plot clusters or runs on time axis
-  void plotSRuns(std::vector<std::pair<double, double>>  runs, std::vector<int> breaks, int offset = 2)
+  void plotSRuns(const std::vector<std::pair<double, double>>&  runs, const std::vector<int>& breaks, int offset = 2)
   {
     TGraphErrors* gr = new TGraphErrors();
 
@@ -112,7 +112,7 @@ namespace Belle2 {
 
 
   /// print sorted lengths of the runs
-  void printBySize(std::vector<std::pair<double, double>>  runs)
+  void printBySize(const std::vector<std::pair<double, double>>&  runs)
   {
     std::vector<double> dist;
     for (auto r : runs) {
@@ -166,13 +166,14 @@ namespace Belle2 {
 
 
   // split to many small intervals (atoms)
-  std::vector<std::pair<double, double>> Splitter::splitToSmall(std::map<ExpRun, std::pair<double, double>> runs, double intSize)
+  std::vector<std::pair<double, double>> Splitter::splitToSmall(const std::map<ExpRun, std::pair<double, double>>& runs,
+                                      double intSize)
   {
     // split into small intervals
     std::vector<std::pair<double, double>> smallRuns;
 
     for (auto r : runs) {
-      auto& I = r.second;
+      const auto& I = r.second;
       if (intSize < 0) {
         smallRuns.push_back(I);
         continue;
@@ -255,7 +256,7 @@ namespace Belle2 {
    * @param t: time of interest [hours]
    * @return:  the exp-run number at the input time t
    **/
-  static ExpRun getRun(std::map<ExpRun, std::pair<double, double>> runs, double t)
+  static ExpRun getRun(const std::map<ExpRun, std::pair<double, double>>& runs, double t)
   {
     ExpRun rFound(-1, -1);
     int nFound = 0;
@@ -302,8 +303,8 @@ namespace Belle2 {
   }
 
   //Merge two intervals together
-  std::map<ExpRun, std::pair<double, double>> Splitter::mergeIntervals(std::map<ExpRun, std::pair<double, double>> I1,
-                                           std::map<ExpRun, std::pair<double, double>> I2)
+  std::map<ExpRun, std::pair<double, double>> Splitter::mergeIntervals(const std::map<ExpRun, std::pair<double, double>>& I1,
+                                           const std::map<ExpRun, std::pair<double, double>>& I2)
   {
     std::map<ExpRun, std::pair<double, double>>  I = I1;
     for (auto r : I2) {

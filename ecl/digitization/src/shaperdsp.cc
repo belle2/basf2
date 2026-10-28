@@ -76,6 +76,7 @@ ShaperDSP_t::sv123shift_t ShaperDSP_t::sv123shift_t::operator +(const ShaperDSP_
   return a;
 }
 
+// cppcheck-suppress duplInheritedMember ; each level initialises its own fields
 void ShaperDSP_t::shaperdspshift_t::init(double _t, const ShaperDSP_t& _p)
 {
   sv123shift_t::init(_t, _p);
@@ -353,7 +354,7 @@ double ShaperDSP_t::operator()(double t) const
   return ShaperDSP(t0);
 }
 
-double ShaperDSP_t::operator()(double* x, double*)
+double ShaperDSP_t::operator()(const double* x, double*)
 {
   return (*this)(x[0]);
 }

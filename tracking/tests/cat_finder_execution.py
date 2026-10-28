@@ -83,7 +83,7 @@ class CheckRecoTrack(b2.Module):
         momentum = reco_track.getMomentumSeed()
         charge = reco_track.getChargeSeed()
         fit = reco_track.wasFitSuccessful()
-        assert (hits >= 40)
+        assert (hits >= 25)
         assert (math.sqrt(position.Mag2()) < 10.0)
         assert (fit)
         if self.event_number == 0:

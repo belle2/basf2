@@ -156,9 +156,9 @@ namespace Belle2 {
     /** Return the pointer to the current object and release ownership: The caller is responsible to clean up the object */
     TObject* releaseObject() { TObject* obj{nullptr}; std::swap(obj, m_object); return obj; }
     /** Check if a given TObject instance is compatible with the type of this entry */
-    bool checkType(const TObject* object) const;
+    void checkType(const TObject* object) const;
     /** Check if a given TClass is compatible with the type of this entry */
-    bool checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse = false) const;
+    void checkType(EPayloadType type, const TClass* objClass, bool array, bool inverse = false) const;
     /** Notify all the registered accessors */
     void notifyAccessors(bool onDestruction = false);
     /** Change status of this payload to required */

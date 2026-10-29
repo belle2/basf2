@@ -97,7 +97,7 @@ namespace Belle2 {
       double m_param_minFitProb = 0.85;
 
       /// Parameter : Remove the hits of the tracks after a super layer break before merging
-      bool m_param_removeHitsAfterSuperLayerBreak = true;
+      bool m_param_removeHitsAfterSuperLayerBreak = false;
     };
   }
 }

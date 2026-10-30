@@ -142,7 +142,8 @@ namespace Belle2 {
         if (filterNameValue.find("rough") != filterNameValue.npos) {
           std::map<std::string, variantType>& value =
             Belle2::Module::getParam< std::map<std::string, variantType> >(filterName + "Parameters").getValue();
-          value["maximalArcLengthDistance"] = payload->getMaxArcLengthRoughCDCStateFilter();
+          value.erase("maximalArcLengthDistance");
+          value.emplace("maximalArcLengthDistance", payload->getMaxArcLengthRoughCDCStateFilter());
         }
       }
 

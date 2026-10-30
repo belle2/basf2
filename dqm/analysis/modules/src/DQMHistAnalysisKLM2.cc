@@ -152,7 +152,7 @@ void DQMHistAnalysisKLM2Module::initialize()
   }
 
   for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerNumber(); lay_id++) {
-    std::string B_lay = std::to_string(lay_id);
+    std::string B_lay = std::to_string(lay_id + 1);
     m_eff2d_bklm->GetYaxis()->SetBinLabel(lay_id + 1, B_lay.c_str());
   }
 

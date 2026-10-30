@@ -161,7 +161,7 @@ def set_event_number(evt_number, run_number, exp_number):
 
 
 def get_all_cuts():
-    for base_identifier in ["filter", "skim"]:
+    for base_identifier in ["prefilter", "filter", "skim"]:
         menu = download_trigger_menu_from_db(
             base_name=base_identifier, do_set_event_number=False)
         if not menu:

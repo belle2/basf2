@@ -18,6 +18,14 @@ namespace Belle2 {
         unsigned int prescaleFactor,
         const bool rejectCut)
     {
+      // The prescale is not used for reject cuts, so a prescale of 0 does NOT switch a reject cut off.
+      if (rejectCut and prescaleFactor == 0) {
+        B2WARNING("A reject cut has a prescale factor of 0, but the prescale is ignored for reject cuts: "
+                  "this cut is still active and rejects every event fulfilling its condition. "
+                  "To switch it off, remove it from the trigger menu."
+                  << LogVar("cut condition", cut_string));
+      }
+
       auto compiledGeneralCut = GeneralCut<SoftwareTriggerVariableManager>::compile(cut_string);
       std::unique_ptr<SoftwareTriggerCut> compiledSoftwareTriggerCut(new SoftwareTriggerCut(std::move(compiledGeneralCut),
           prescaleFactor, rejectCut));

@@ -157,6 +157,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         # # CDC Hits in MC tracks
         mcTrackCandHitsByIndex = {}
+        mcTrackIndicesByHit = {}
         totalHitListMC = []
         for mcTrackCand in mcTrackCands:
             cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in getObjectList(mcTrackCand.getCDCHitList())]  # Checked
@@ -165,7 +166,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set()
             else:
                 cdcHitIDs = set(cdcHitIDs)
-            mcTrackCandHitsByIndex[mcTrackCand.getArrayIndex()] = cdcHitIDs
+            mcTrackIndex = mcTrackCand.getArrayIndex()
+            mcTrackCandHitsByIndex[mcTrackIndex] = cdcHitIDs
+            for hitID in cdcHitIDs:
+                mcTrackIndicesByHit.setdefault(hitID, []).append(mcTrackIndex)
             totalHitListMC.extend(cdcHitIDs)
 
         # Make the ids unique
@@ -224,31 +228,22 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             trackCandHits = trackCandHitsByIndex[trackCand.getArrayIndex()]
 
-            # this is not very efficient...
-            list_of_connected_mc_tracks = set()
-            list_of_numbers_of_hits_for_connected_tracks = collections.deque()
-            # number_of_connected_tracks = 0
-            # number_of_wrong_hits = 0
+            connected_mc_track_hit_counts = {}
+            for hitID in trackCandHits:
+                for mcTrackIndex in mcTrackIndicesByHit.get(hitID, ()):
+                    connected_mc_track_hit_counts[mcTrackIndex] = \
+                        connected_mc_track_hit_counts.get(mcTrackIndex, 0) + 1
 
-            for mcTrackCand in mcTrackCands:
-                mcTrackCandHits = mcTrackCandHitsByIndex[mcTrackCand.getArrayIndex()]
-
-                length_of_intersection = len(mcTrackCandHits & trackCandHits)
-                if length_of_intersection > 0:
-                    list_of_connected_mc_tracks.add(mcTrackCand)
-                    list_of_numbers_of_hits_for_connected_tracks.append(length_of_intersection)
-
-            if len(list_of_numbers_of_hits_for_connected_tracks) == 0:
+            if not connected_mc_track_hit_counts:
                 self.number_of_wrong_hits.append(0)
                 self.pr_number_of_matched_hits.append(0)
             else:
-                maximum_intersection = \
-                    max(list_of_numbers_of_hits_for_connected_tracks)
-                self.pr_number_of_matched_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks))
-                self.number_of_wrong_hits.append(sum(list_of_numbers_of_hits_for_connected_tracks) -
-                                                 maximum_intersection)
+                total_intersecting_hits = sum(connected_mc_track_hit_counts.values())
+                maximum_intersection = max(connected_mc_track_hit_counts.values())
+                self.pr_number_of_matched_hits.append(total_intersecting_hits)
+                self.number_of_wrong_hits.append(total_intersecting_hits - maximum_intersection)
 
-            self.number_of_connected_tracks.append(len(list_of_connected_mc_tracks))
+            self.number_of_connected_tracks.append(len(connected_mc_track_hit_counts))
 
             if is_matched or is_clone:
                 mcTrackCand = \

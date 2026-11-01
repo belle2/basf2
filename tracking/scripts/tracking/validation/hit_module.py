@@ -181,6 +181,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPRClone = []
         totalHitListPRFake = []
         trackCandHitsByIndex = {}
+        trackCandMatchInfoByIndex = {}
         for trackCand in trackCands:
             cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
@@ -190,15 +191,19 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
                 cdcHitIDs = set(cdcHitIDs)
             trackCandHitsByIndex[trackCand.getArrayIndex()] = cdcHitIDs
 
+            is_matched = self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
+            is_clone = self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
+            trackCandMatchInfoByIndex[trackCand.getArrayIndex()] = (is_matched, is_clone)
+
             if trackCand.getNumberOfTotalHits() == 0:
                 basf2.B2WARNING("Encountered a pattern recognition track with no hits")
                 continue
 
             totalHitListPR.extend(cdcHitIDs)
-            if self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand):
+            if is_matched:
                 totalHitListPRGood.extend(cdcHitIDs)
 
-            if self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand):
+            if is_clone:
                 totalHitListPRClone.extend(cdcHitIDs)
 
             if (self.trackMatchLookUp.isBackgroundPRRecoTrack(trackCand) or
@@ -220,11 +225,9 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
         is_hit_matched = 0
         is_hit_found = len(totalHitListMC & totalHitListPR)
-
         for trackCand in trackCands:
 
-            is_matched = self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
-            is_clone = self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
+            is_matched, is_clone = trackCandMatchInfoByIndex[trackCand.getArrayIndex()]
 
             trackCandHits = trackCandHitsByIndex[trackCand.getArrayIndex()]
 

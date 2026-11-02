@@ -43,7 +43,7 @@ Rbuf2DsModule::Rbuf2DsModule() : Module()
 {
   //Set module properties
   setDescription("Encode DataStore into RingBuffer");
-  //  setPropertyFlags(c_Input | c_ParallelProcessingCertified);
+  setPropertyFlags(c_Input);
 
   addParam("RingBufferName", m_rbufname, "Name of RingBuffer",
            string("InputRbuf"));

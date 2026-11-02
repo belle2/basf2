@@ -13,14 +13,23 @@
 
 using namespace Belle2;
 
+bool PathUtils::isWorthParallelising(const Path& path)
+{
+  for (const ModulePtr& module : path.getModules()) {
+    if (not module->hasProperties(Module::c_NoParallelWork)) return true;
+  }
+  return false;
+}
+
 std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 {
-  //modules that can be parallelized, but should not go into a parallel section by themselves
-  std::set<std::string> uselessParallelModules({"HistoManager", "Gearbox", "Geometry"});
-
   PathPtr inputPath(new Path);
   PathPtr mainPath(new Path);
   PathPtr outputPath(new Path);
+
+  // only collected here, and added below once the splitting is done: the merge-back
+  // discards and restarts the main path, taking anything put on it along
+  ModulePtrList histogramManagers;
 
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr& module : path->getModules()) {
@@ -28,7 +37,7 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
                            !module->hasProperties(Module::c_Input) and
                            !module->hasProperties(Module::c_Output) and
                            !module->hasProperties(Module::c_HistogramManager) ;
-    //entire conditional path must also be compatible
+    // entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
       for (const auto& conditionPath : module->getAllConditionPaths()) {
         if (!ModuleManager::allModulesHaveFlag(conditionPath->getModules(), Module::c_ParallelProcessingCertified)) {
@@ -36,23 +45,16 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
         }
       }
     }
-    //if modules have parallal flag -> stage = 1 , event/main
+    // if modules have parallal flag -> stage = 1 , event/main
     if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag)) {
       stage++;
 
       if (stage == 2) {
-        bool path_is_useful = false;
-        for (const auto& parallelModule : mainPath->getModules()) {
-          if (uselessParallelModules.count(parallelModule->getType()) == 0) {
-            path_is_useful = true;
-            break;
-          }
-        }
-        if (not path_is_useful) {
-          //merge mainPath back into input path
+        if (not isWorthParallelising(*mainPath)) {
+          // merge mainPath back into input path
           inputPath->addPath(mainPath);
           mainPath.reset(new Path);
-          //and search for further parallel sections
+          // and search for further parallel sections
           stage = 0;
         }
       }
@@ -60,12 +62,7 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 
     if (stage == 0) {
       inputPath->addModule(module);
-      if (module->hasProperties(Module::c_HistogramManager)) {
-        // Initialize histogram manager if found in the path
-        // add histogram to other paths
-        mainPath->addModule(module);
-        outputPath->addModule(module);
-      }
+      if (module->hasProperties(Module::c_HistogramManager)) histogramManagers.push_back(module);
     } else if (stage == 1) {
       mainPath->addModule(module);
     } else if (stage == 2) {
@@ -73,10 +70,14 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
     }
   }
 
-  bool createAllPaths = false; //usually we might not need e.g. an output path
+  // the histogram manager has to run in every process
+  prependModules(mainPath, histogramManagers);
+  prependModules(outputPath, histogramManagers);
+
+  bool createAllPaths = false; // usually we might not need e.g. an output path
   for (const ModulePtr& module : path->getModules()) {
     if (module->hasProperties(Module::c_TerminateInAllProcesses)) {
-      createAllPaths = true; //ensure there are all kinds of processes
+      createAllPaths = true; // ensure there are all kinds of processes
     }
   }
 
@@ -97,18 +98,13 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath)
 {
   ModulePtr histoManagerModule;
-
-
   for (const ModulePtr& module : inputPath->getModules()) {
-    if (module->hasProperties(Module::c_HistogramManager)) {
-      // Initialize histogram manager if found in the path
-      histoManagerModule = module;
-
-    }
+    // Initialize histogram manager if found in the path
+    if (module->hasProperties(Module::c_HistogramManager)) histoManagerModule = module;
   }
-
   return histoManagerModule;
 }
+
 ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath)
 {
   B2ASSERT("The main part is empty. This is a bug in the framework.",
@@ -147,7 +143,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxWorkerModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     zmqRxWorkerModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
     zmqRxWorkerModule->getParam<unsigned int>("eventBufferSize").setValue(eventBufferSize);
-    prependModule(mainPath, zmqRxWorkerModule);
+    prependModules(mainPath, {zmqRxWorkerModule});
 
   }
 
@@ -165,7 +161,7 @@ ModulePtrList PathUtils::preparePaths(PathPtr& inputPath, PathPtr& mainPath, Pat
     zmqRxOutputModule->getParam<std::string>("xpubProxySocketName").setValue(pubSocketAddress);
     zmqRxOutputModule->getParam<std::string>("xsubProxySocketName").setValue(subSocketAddress);
     zmqRxOutputModule->getParam<unsigned int>("maximalWaitingTime").setValue(maximalWaitingTime);
-    prependModule(outputPath, zmqRxOutputModule);
+    prependModules(outputPath, {zmqRxOutputModule});
 
   }
 
@@ -217,10 +213,13 @@ void PathUtils::appendModule(PathPtr& path, const ModulePtr& module)
   path->addModule(module);
 }
 
-void PathUtils::prependModule(PathPtr& path, const ModulePtr& module)
+void PathUtils::prependModules(PathPtr& path, const ModulePtrList& modules)
 {
+  // nothing to do, and wrapping an empty path would stop it from counting as empty
+  if (modules.empty()) return;
+
   PathPtr newPath(new Path());
-  newPath->addModule(module);
+  for (const ModulePtr& module : modules) newPath->addModule(module);
   newPath->addPath(path);
   path.swap(newPath);
 }

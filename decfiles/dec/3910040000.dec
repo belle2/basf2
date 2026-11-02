@@ -1,0 +1,16 @@
+# EventType: 3910040000
+# Descriptor: [gamma gamma] -> [phi -> K+ K-] [phi -> K+ K-]
+# NickName: gammagamma_phiphi_KK
+# Documentation: Two photon process
+# Tested: Yes
+# PhysicsWG: DSLM
+# Responsible: Youwen Xue
+# Email: youwen@mail.nankai.edu.cn
+# Cuts: None
+# Date: 20261031
+
+Decay phi
+1.0 K+ K- VSS;
+Enddecay
+
+End

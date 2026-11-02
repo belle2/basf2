@@ -1,0 +1,20 @@
+# EventType: 3910044000
+# Descriptor: [gamma gamma] -> [omega -> pi+ pi- pi0] [omega -> pi+ pi- pi0]
+# NickName: gammagamma_omegaomega_pipipi0
+# Documentation: Two photon process
+# Tested: Yes
+# PhysicsWG: DSLM
+# Responsible: Youwen Xue
+# Email: youwen@mail.nankai.edu.cn
+# Cuts: None
+# Date: 20261031
+
+Decay omega
+1.0 pi+ pi- pi0 OMEGA_DALITZ;
+Enddecay
+
+Decay pi0
+1.0 gamma gamma PHSP;
+Enddecay
+
+End

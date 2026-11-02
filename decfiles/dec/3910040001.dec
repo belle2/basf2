@@ -1,0 +1,21 @@
+# EventType: 3910040001
+# Descriptor: [gamma gamma] -> [K*0 -> K+ pi-] [anti-K*0 -> K- pi+]
+# NickName: gammagamma_Kstar0anti-Kstar0_Kpi
+# Documentation: Two photon process
+# Tested: Yes
+# PhysicsWG: DSLM
+# Responsible: Youwen Xue
+# Email: youwen@mail.nankai.edu.cn
+# Cuts: None
+# Date: 20261031
+
+
+Decay K*0
+1.0 K+ pi- VSS;
+Enddecay
+
+Decay anti-K*0
+1.0 K- pi+ VSS;
+Enddecay
+
+End

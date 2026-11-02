@@ -33,7 +33,8 @@ namespace Belle2 {
        * @param prescaleFactor: An optional prescale factor which will be used whenever the cut is checked.
        *        The prescale factor is a integer value. If the prescale is e.g. 10, the cut will only result in a "accept" result
        *        (although the cut condition itself is true) in 1 of 10 cases on average for accept cuts
-       *        (for reject cuts, the prescale is *not* used).
+       *        (for reject cuts, the prescale is *not* used: a prescale of 0 does not switch a reject cut off,
+       *        and a warning is issued in this case).
        *        Defaults to 1, which means that the prescale has no impact on the cut check.
        * @param rejectCut: Turn this cut into a reject cut and not a accept cut. The result of the SoftwareTriggerModules
        *        is defined by these two cut types. See the SoftwareTriggerModule for more information. Please note that

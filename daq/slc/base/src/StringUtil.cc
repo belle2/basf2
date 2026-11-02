@@ -109,7 +109,7 @@ bool StringUtil::find(const std::string& s, const std::string& str)
 
 bool StringUtil::isdigit(const std::string& s)
 {
-  if (s.starts_with("0x")) return true;
+  if (s.compare(0, 2, "0x") == 0) return true;
   for (size_t i = 0; i < s.size(); i++) {
     if (i == 0 && s.at(0) == '-') continue;
     if (!::isdigit(s.at(i))) return false;

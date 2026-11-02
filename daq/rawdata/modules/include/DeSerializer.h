@@ -36,7 +36,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerModule();
-    virtual ~DeSerializerModule();
+    virtual ~DeSerializerModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -44,7 +44,6 @@ namespace Belle2 {
     void terminate() override;
 
     //! Module functions to be called from main process
-    void event() override;
 
     //! Module functions to be called from event process
     virtual void openOutputFile();
@@ -88,13 +87,13 @@ namespace Belle2 {
     std::string m_dump_fname;
 
     //! dump file descripter
-    FILE* m_fp_dump;
+    FILE* m_fp_dump = nullptr;
 
     //! buffer
-    int* m_buffer;
+    int* m_buffer = nullptr;
 
     //! buffer
-    int* m_bufary[ NUM_PREALLOC_BUF ];
+    int* m_bufary[ NUM_PREALLOC_BUF ] = {};
     //    int* m_bufary[NUM_EVT_PER_BASF2LOOP];
 
     //! Getbuffer
@@ -106,23 +105,23 @@ namespace Belle2 {
     // For monitoring
     timeval m_t0;
     double m_totbytes;
-    double m_prev_totbytes;
-    int m_ncycle;
+    double m_prev_totbytes = 0.0;
+    int m_ncycle = 0;
     //! for time monitoring
-    double cur_time;
+    double cur_time = 0.0;
 
-    double m_start_time;
+    double m_start_time = 0.0;
     double m_prev_time;
-    double time_array0[1000];
-    double time_array1[1000];
-    double time_array2[1000];
-    double time_array3[1000];
-    double time_array4[1000];
-    double time_array5[1000];
+    double time_array0[1000] = {};
+    double time_array1[1000] = {};
+    double time_array2[1000] = {};
+    double time_array3[1000] = {};
+    double time_array4[1000] = {};
+    double time_array5[1000] = {};
     int prev_event;
 
     //! store time info.
-    double getTimeSec();
+    static double getTimeSec();
 
     //! store time info.
     void recordTime(int event, double* array);
@@ -131,10 +130,10 @@ namespace Belle2 {
     int checkData(char* buf, int prev_eve, int* cur_eve);
 
     //! calculate checksum
-    unsigned int calcSimpleChecksum(int* buf, int nwords);
+    static unsigned int calcSimpleChecksum(const int* buf, int nwords);
 
     //! calculate checksum
-    unsigned int calcXORChecksum(int* buf, int nwords);
+    static unsigned int calcXORChecksum(const int* buf, int nwords);
 
     virtual void clearNumUsedBuf()
     {
@@ -147,7 +146,7 @@ namespace Belle2 {
 
 
     //! # of already used buffers
-    int m_num_usedbuf;
+    int m_num_usedbuf = 0;
 
 
     //! Node(PC or COPPER) ID
@@ -181,16 +180,16 @@ namespace Belle2 {
     int m_shmflag;
 
     //! open shared memory
-    void shmOpen(char* path_cfg, char* path_sta);
+    static void shmOpen(char* path_cfg, char* path_sta);
 
     //! Get shared memory
-    int* shmGet(int fd, int size_words);
+    static int* shmGet(int fd, int size_words);
 
     //! file descripter for shm
-    int m_shmfd_cfg;
+    int m_shmfd_cfg = 0;
 
     //! file descripter for shm
-    int m_shmfd_sta;
+    int m_shmfd_sta = 0;
 
     //! buffer class to communicate with NSM client
     static RunInfoBuffer g_status;

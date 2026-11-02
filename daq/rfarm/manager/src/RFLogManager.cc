@@ -55,7 +55,7 @@ RFLogManager::~RFLogManager()
 int RFLogManager::today()
 {
   time_t today = time(NULL);
-  struct tm* tmtoday = gmtime(&today);
+  const struct tm* tmtoday = gmtime(&today);
   int day = tmtoday->tm_mday;
   int month = tmtoday->tm_mon + 1;
   int year = tmtoday->tm_year - 100;
@@ -112,7 +112,7 @@ int RFLogManager::WriteLog(const char* prefix, const char* msg)
 void RFLogManager::timestamp(char* buf)
 {
   struct timeval tb;
-  struct tm*     tp;
+  const struct tm*     tp;
   //  struct tm      result;
   gettimeofday(&tb, NULL);
   tp = localtime(&tb.tv_sec);

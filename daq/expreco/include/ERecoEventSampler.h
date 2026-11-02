@@ -24,15 +24,19 @@
 namespace Belle2 {
   class ERecoEventSampler : public RFServerBase {
   public:
-    ERecoEventSampler(std::string conffile);
+    explicit ERecoEventSampler(const std::string& conffile);
     ~ERecoEventSampler();
+    /** Copy constructor (disabled). */
+    ERecoEventSampler(const ERecoEventSampler&) = delete;
+
+    /** Operator = (disabled). */
+    ERecoEventSampler& operator=(const ERecoEventSampler&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
     int UnConfigure(NSMmsg*, NSMcontext*) override;
     int Start(NSMmsg*, NSMcontext*) override;
     int Stop(NSMmsg*, NSMcontext*) override;
-    int Restart(NSMmsg*, NSMcontext*) override;
 
     // Server function
     void server();
@@ -45,7 +49,7 @@ namespace Belle2 {
     RingBuffer*        m_rbufout;
 
     int m_pid_sampler;
-    int m_pid_server;
+    int m_pid_server = 0;
 
   };
 

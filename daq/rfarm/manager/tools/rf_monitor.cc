@@ -26,7 +26,7 @@ int main()
   char* conffile = getenv("RFARM_CONFFILE");
   RFConf conf(conffile);
 
-  char* format = conf.getconf("system", "nsmdata");
+  const char* format = conf.getconf("system", "nsmdata");
 
   // 1. Initialize NSM
   if (!b2nsm_init(MONITOR_NODE)) {
@@ -37,14 +37,14 @@ int main()
   printf("----- Control Nodes\n");
 
   // 1. Dump distributor node
-  char* node = conf.getconf("distributor", "nodename");
-  RfNodeInfo* nshm = (struct RfNodeInfo*) b2nsm_openmem(node, format, 1);
+  const char* node = conf.getconf("distributor", "nodename");
+  const RfNodeInfo* nshm = static_cast<struct RfNodeInfo*>(b2nsm_openmem(node, format, 1));
   printf(" RFIN    : %8d %4d %5.2f %5.2f           ; %6.2f; %5.2f\n",
          nshm->nevent_in, nshm->nqueue_in, nshm->avesize_in,
          nshm->flowrate_in, nshm->evtrate_in, nshm->loadave);
   // 2. Dump collector node
   node = conf.getconf("collector", "nodename");
-  nshm = (struct RfNodeInfo*) b2nsm_openmem(node, format, 1);
+  nshm = static_cast<struct RfNodeInfo*>(b2nsm_openmem(node, format, 1));
   printf(" RFOUT    : %8d %4d %5.2f %5.2f           ; %6.2f; %5.2f\n",
          nshm->nevent_out, nshm->nqueue_out, nshm->avesize_out,
          nshm->flowrate_out, nshm->evtrate_out, nshm->loadave);
@@ -54,7 +54,7 @@ int main()
   // 3. Dump processing nodes
   int maxnodes = conf.getconfi("processor", "nnodes");
   int idbase = conf.getconfi("processor", "idbase");
-  char* hostbase = conf.getconf("processor", "nodebase");
+  const char* hostbase = conf.getconf("processor", "nodebase");
   char* badlist = conf.getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -64,7 +64,7 @@ int main()
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
-      nshm = (struct RfNodeInfo*) b2nsm_openmem(hostnode, format, 1);
+      nshm = static_cast<struct RfNodeInfo*>(b2nsm_openmem(hostnode, format, 1));
       printf(" %s(in) : %8d %4d %5.2f %5.2f           ; %6.2f; %5.2f\n",
              hostnode,
              nshm->nevent_in, nshm->nqueue_in, nshm->avesize_in,

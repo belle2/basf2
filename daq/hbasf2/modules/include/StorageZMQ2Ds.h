@@ -69,7 +69,7 @@ namespace Belle2 {
 
     /// Utility class for deserialization
     StorageStreamHelper m_streamHelper;
-    DataStorePackage* m_package;
+    DataStorePackage* m_package = nullptr;
 
     /// Are we still in the first real event?
     bool m_firstEvent = true;

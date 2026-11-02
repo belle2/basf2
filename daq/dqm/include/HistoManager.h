@@ -13,13 +13,13 @@
 
 #include <daq/dqm/DqmMemFile.h>
 
-#include "TH1.h"
+#include <TH1.h>
 
 namespace Belle2 {
 
   class HistoManager {
   public:
-    HistoManager(DqmMemFile* mapfile);
+    explicit HistoManager(DqmMemFile* mapfile);
     ~HistoManager();
 
     // Register histogram
@@ -30,7 +30,7 @@ namespace Belle2 {
 
     bool merge(void);
     void clear(void);
-    void filedump(std::string outfile);
+    void filedump(const std::string& outfile);
 
   private:
     // List to handle histograms sent from different nodes

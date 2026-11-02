@@ -56,7 +56,7 @@ void NSMMessage::init(const NSMNode& node, const NSMVar& var)
   if (var.getType() != NSMVar::NONE) {
     int size = var.getNode().size() + 1 + var.getName().size() + 1 + var.size();
     m_data = Buffer(size);
-    char* pdata = (char*)m_data.ptr();
+    char* pdata = reinterpret_cast<char*>(m_data.ptr());
     memset(pdata, 0, size);
     memcpy(pdata, var.getNode().c_str(), var.getNode().size());
     pdata += var.getNode().size();
@@ -135,7 +135,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int npar, int* pars)
+                       int npar, const int* pars)
 {
   init();
   m_nodename = node.getName();
@@ -146,7 +146,7 @@ NSMMessage::NSMMessage(const NSMNode& node,
 
 NSMMessage::NSMMessage(const NSMNode& node,
                        const NSMCommand& cmd,
-                       int npar, int* pars,
+                       int npar, const int* pars,
                        const std::string& data)
 {
   init();
@@ -255,7 +255,7 @@ NSMMessage::NSMMessage(const DAQLogMessage& log)
 }
 
 NSMMessage::NSMMessage(const NSMCommand& cmd,
-                       int npar, int* pars)
+                       int npar, const int* pars)
 {
   init();
   m_reqname = cmd.getLabel();
@@ -454,7 +454,7 @@ size_t NSMMessage::read(NSMcontext* nsmc)
   int ret = 0;
   NSMtcphead hp;
   int datalen = sizeof(NSMtcphead);
-  if ((ret = try_read(sock, (char*)&hp, datalen)) < 0) {
+  if ((ret = try_read(sock, reinterpret_cast<char*>(&hp), datalen)) < 0) {
     throw (NSMHandlerException("Failed to read header"));
   }
   count += ret;
@@ -467,7 +467,7 @@ size_t NSMMessage::read(NSMcontext* nsmc)
 
   datalen = sizeof(int32) * m_nsm_msg.npar;
   if (datalen > 0) {
-    if ((ret = try_read(sock, (char*)(m_nsm_msg.pars), datalen)) < 0) {
+    if ((ret = try_read(sock, reinterpret_cast<char*>(m_nsm_msg.pars), datalen)) < 0) {
       throw (NSMHandlerException("Failed to read params"));
     }
     count += ret;
@@ -479,7 +479,7 @@ size_t NSMMessage::read(NSMcontext* nsmc)
   datalen = m_nsm_msg.len;
   if (datalen > 0) {
     m_data = Buffer(datalen);
-    if ((ret = try_read(sock, (char*)m_data.ptr(), datalen)) < 0) {
+    if ((ret = try_read(sock, reinterpret_cast<char*>(m_data.ptr()), datalen)) < 0) {
       throw (NSMHandlerException("Failed to read data"));
     }
     count += ret;

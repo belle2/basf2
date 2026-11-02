@@ -33,7 +33,7 @@ namespace Belle2 {
   class HLTEventProcessor : public EventProcessor {
   public:
     /// Create a new event processor and store the ZMQ addresses where to unregister workers
-    HLTEventProcessor(const std::vector<std::string>& outputAddresses);
+    explicit HLTEventProcessor(const std::vector<std::string>& outputAddresses);
 
     /**
      * Process the given path. If requested, restart failed workers (or not)

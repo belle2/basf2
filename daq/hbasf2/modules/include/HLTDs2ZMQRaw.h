@@ -52,7 +52,7 @@ namespace Belle2 {
     /// Module parameter: the ZMQ address of the connected application (to receive the messages)
     std::string m_param_output;
     /// Module paremeter: send out raw data with send header and trailer around the evtmessage instead of just the evtmessage.
-    bool m_param_raw;
+    bool m_param_raw = false;
     /// Module parameter: add event size in the output data or not
     bool m_param_addEventSize;
     /// Module parameters for streamHelper

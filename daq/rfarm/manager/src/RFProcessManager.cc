@@ -39,8 +39,10 @@ RFProcessManager::RFProcessManager(char* /*nodename*/)
     m_iopipe[0] = -1; m_iopipe[1] = -1;
   }
   FILE* f = fopen("pid.data", "w");
-  fprintf(f, "%d", getpid());
-  fclose(f);
+  if (f != NULL) {
+    fprintf(f, "%d", getpid());
+    fclose(f);
+  }
 }
 
 RFProcessManager::~RFProcessManager()
@@ -185,10 +187,10 @@ int RFProcessManager::CheckOutput()
       if (nsmc && FD_ISSET(nsmc->sock, &fdset)) {
         //        NSMCommunicator(nsmc).callContext();
         char buf[NSM_TCPMSGSIZ];
-        if (nsmlib_recv(nsmc, (struct NSMtcphead_struct*)buf, 1000) < 0)
+        if (nsmlib_recv(nsmc, reinterpret_cast<struct NSMtcphead_struct*>(buf), 1000) < 0)
           printf("RFProcessManager: Failed to read NSM context\n");
         else
-          nsmlib_call(nsmc, (struct NSMtcphead_struct*)buf);
+          nsmlib_call(nsmc, reinterpret_cast<struct NSMtcphead_struct*>(buf));
       }
       if (m_iopipe[0] > 0 &&
           FD_ISSET(m_iopipe[0], &fdset)) {

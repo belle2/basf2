@@ -19,14 +19,14 @@ namespace Belle2 {
     SendTrailer();
 
     //! Constructor using existing pointer to raw data buffer
-    SendTrailer(int*);
+    explicit SendTrailer(const int*);
 
     //! Destructor
     ~SendTrailer();
 
     int* GetBuffer(); //! return buffer
 
-    void SetBuffer(int* bufin); //! set buffer
+    void SetBuffer(const int* bufin); //! set buffer
 
     void Initialize(); //! initialize header
 
@@ -34,7 +34,7 @@ namespace Belle2 {
 
     void SetMagicWord(); //!
 
-    int GetTrlNwords(); //!
+    static int GetTrlNwords(); //!
 
     int GetMagicWord(); //!
 

@@ -96,6 +96,7 @@ void LogFile::close()
 void LogFile::debug(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, DEBUG, ap);
   va_end(ap);
@@ -104,6 +105,7 @@ void LogFile::debug(const std::string& msg, ...)
 void LogFile::info(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, INFO, ap);
   va_end(ap);
@@ -112,6 +114,7 @@ void LogFile::info(const std::string& msg, ...)
 void LogFile::notice(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, NOTICE, ap);
   va_end(ap);
@@ -120,6 +123,7 @@ void LogFile::notice(const std::string& msg, ...)
 void LogFile::warning(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, WARNING, ap);
   va_end(ap);
@@ -128,6 +132,7 @@ void LogFile::warning(const std::string& msg, ...)
 void LogFile::error(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, ERROR, ap);
   va_end(ap);
@@ -136,6 +141,7 @@ void LogFile::error(const std::string& msg, ...)
 void LogFile::fatal(const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, FATAL, ap);
   va_end(ap);
@@ -145,6 +151,7 @@ void LogFile::fatal(const std::string& msg, ...)
 void LogFile::put(Priority priority, const std::string& msg, ...)
 {
   va_list ap;
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, msg);
   put_impl(msg, priority, ap);
   va_end(ap);

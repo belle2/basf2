@@ -77,7 +77,7 @@ void DeSerializerPXDModule::event()
   int stat = 0;
   for (auto&    it : m_recvs) {
     do {
-      stat = it->recv_pxd_buffer((char*)m_buffer);
+      stat = it->recv_pxd_buffer(reinterpret_cast<char*>(m_buffer));
       if (stat <= 0) {
         B2INFO("DeserializerPXD Socket failed: stat = " << stat);
         DeSerializerPXDModule::endRun();

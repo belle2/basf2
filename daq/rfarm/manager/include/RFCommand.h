@@ -28,9 +28,12 @@ namespace Belle2 {
 
   public:
     RFCommand() {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RFCommand(const Enum& e) : NSMCommand(e) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RFCommand(const NSMCommand& cmd) : NSMCommand(cmd) {}
     RFCommand(const RFCommand& cmd) : NSMCommand(cmd) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     RFCommand(const char* label) { *this = label; }
     ~RFCommand() {}
 
@@ -48,7 +51,9 @@ namespace Belle2 {
      * Operator =.
      */
     const RFCommand& operator=(const RFCommand& command);
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     const RFCommand& operator=(const std::string& label);
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     const RFCommand& operator=(const char* label);
 
   };

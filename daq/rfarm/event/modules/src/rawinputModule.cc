@@ -11,7 +11,7 @@
 #include <daq/dataobjects/SendHeader.h>
 #include <daq/dataobjects/SendTrailer.h>
 
-#include "TSystem.h"
+#include <TSystem.h>
 
 using namespace std;
 using namespace Belle2;
@@ -112,7 +112,7 @@ void RawInputModule::registerRawCOPPERs()
     delete[] evtbuf;
     return;
   }
-  int* recsize = (int*)evtbuf;
+  const int* recsize = reinterpret_cast<int*>(evtbuf);
   int rstat = read(m_fd, evtbuf + sizeof(int), (*recsize - 1) * 4);
   if (rstat <= 0) {
     delete[] evtbuf;
@@ -126,7 +126,7 @@ void RawInputModule::registerRawCOPPERs()
 
   // Unpack SendHeader
   SendHeader sndhdr;
-  sndhdr.SetBuffer((int*)evtbuf);
+  sndhdr.SetBuffer(reinterpret_cast<int*>(evtbuf));
   int npackedevts = sndhdr.GetNumEventsinPacket();
   if (npackedevts != 1) {
     B2FATAL("Raw2DsModule::number of events in packet is not 1 " << npackedevts);
@@ -136,7 +136,7 @@ void RawInputModule::registerRawCOPPERs()
   B2INFO("RawInput: Ncprs=" << ncprs << " Nwords=" << nwords);
 
   // Get buffer header
-  int* bufbody = (int*)evtbuf + SendHeader::SENDHDR_NWORDS;
+  int* bufbody = reinterpret_cast<int*>(evtbuf) + SendHeader::SENDHDR_NWORDS;
 
   //
   // Copy from Raw2DsModule.cc -- From here

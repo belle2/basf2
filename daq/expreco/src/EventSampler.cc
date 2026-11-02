@@ -15,14 +15,14 @@ using namespace std;
 
 // constructor/destructor
 
-EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int interval) : m_interval(interval)
+EventSampler::EventSampler(const vector<string>& nodes, int port, const string& rbufname, int interval) : m_interval(interval)
 {
   // Attach to output RingBuffer
   m_rbuf = new RingBuffer(rbufname.c_str());
 
   // Open EvtSocket
-  for (vector<string>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
-    string& nodename = *it;
+  for (vector<string>::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
+    const string& nodename = *it;
     printf("EventSampler : connecting to %s (port %d)\n", nodename.c_str(), port);
     EvtSocketSend* sock = new EvtSocketSend(nodename.c_str(), port);
     if (sock == NULL) {
@@ -33,18 +33,16 @@ EventSampler::EventSampler(vector<string> nodes, int port, string rbufname, int 
     }
     fflush(stdout);
   }
-  printf("EventSampler : init : socklist = %lu\n", m_socklist.size());
+  printf("EventSampler : init : socklist = %zu\n", m_socklist.size());
   fflush(stdout);
 }
 
 EventSampler::~EventSampler()
 {
-  for (vector<EvtSocketSend*>::iterator it = m_socklist.begin();
-       it != m_socklist.end(); ++it) {
-    EvtSocketSend* sock = *it;
+  for (EvtSocketSend* sock : m_socklist) {
     delete sock;
-    m_socklist.erase(it);
   }
+  m_socklist.clear();
   delete m_rbuf;
 }
 
@@ -68,7 +66,7 @@ int EventSampler::server()
         return -1;
       }
       // Put the message in ring buffer. If full, just skip the event.
-      m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+      m_rbuf->insq(reinterpret_cast<int*>(msg->buffer()), msg->paddedSize());
       delete msg;
       nsample++;
       if (nsample % 1000 == 0)

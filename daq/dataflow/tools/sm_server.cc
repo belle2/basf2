@@ -38,9 +38,9 @@ int main(int argc, char** argv)
       printf("New connection made\n");
     } else if (is == 1) {
       int datbuf;
-      vector<int>& socklist = sockman.connected_socket_list();
+      const vector<int>& socklist = sockman.connected_socket_list();
       printf("no. of connected sockets = %zu\n", socklist.size());
-      for (vector<int>::iterator it = socklist.begin(); it != socklist.end(); ++it) {
+      for (vector<int>::const_iterator it = socklist.begin(); it != socklist.end(); ++it) {
         int fd = *it;
         int isNow = read(fd, &datbuf, 4);
         printf("Data read from sock %d (%d), ret = %d\n", fd, count++, isNow);

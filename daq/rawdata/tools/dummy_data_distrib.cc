@@ -58,7 +58,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
     sprintf(err_buf, "nwords value(%d) is invalid. Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
+    const string& err_str = err_buf;
     throw (err_str);
   }
 
@@ -104,7 +104,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
   //  printf("### %.8x %.4x\n", buf[ 0 ], crc16);
   while (nwords != 0) {
 
-    unsigned char temp_buf = *((unsigned char*)(buf + nints) + (-(cnt % 4) + 3));
+    unsigned char temp_buf = *(reinterpret_cast<const unsigned char*>(buf + nints) + (-(cnt % 4) + 3));
     crc16 = CRC16Table0x1021[(crc16 >> (16 - CHAR_BIT)) ^ temp_buf ] ^ (crc16 << CHAR_BIT);
     //    printf("%.2x %.4x\n", temp_buf, crc16);
     if ((cnt % 4) == 3) {
@@ -331,7 +331,7 @@ int main(int argc, char** argv)
     perror("Failed to set REUSEADDR");
   }
 
-  bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+  bind(listenfd, reinterpret_cast<struct sockaddr*>(&servaddr), sizeof(servaddr));
 
   listen(listenfd, LISTENQ);
 
@@ -346,7 +346,9 @@ int main(int argc, char** argv)
   int nconn = 0;
 
   while (1) {
-    //int nready = poll(client, maxi + 1, -1);
+    // poll() is what fills in revents below, so the accept loop cannot work
+    // without it
+    poll(client, maxi + 1, -1);
     if (client[0].revents & POLLRDNORM) {
       printf("Accepting..."); fflush(stdout);
       int connfd = accept(listenfd, (struct sockaddr*) NULL, NULL);

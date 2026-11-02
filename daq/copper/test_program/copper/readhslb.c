@@ -46,7 +46,7 @@ wrmgt(int fd, int adr, int val)
   }
 }
 void
-show_event(unsigned long * head, int len)
+show_event(const unsigned long * head, int len)
 {
     int i;
     for (i=0; i<(len/4); i+= 8) {
@@ -57,7 +57,7 @@ show_event(unsigned long * head, int len)
 }
 
 unsigned long
-xor(unsigned long * start, int wordlen)
+xor(const unsigned long * start, int wordlen)
 {
     unsigned long ret = 0;
     while (wordlen--) {
@@ -68,7 +68,7 @@ xor(unsigned long * start, int wordlen)
 
 int cprfd;
 
-main()
+int main(void)
 {
     int event=0;
     int ret, i = 0;
@@ -145,11 +145,11 @@ main()
 
         i++;
 
+        // cppcheck-suppress moduloofone ; the print interval is tuned by hand
         if(i % 1==0) {
             for( k = 0 ; k < 4 ; k ++ ) {
                if ( !use_slot[k] ) continue;
                err_check = rdmgt(fd[k], ERROR);
-               if ( !use_slot[k] ) continue;
                if(err_check != err_ini[k])
                {
                   printf("\nthe number of the events is %d\n",i);
@@ -170,8 +170,8 @@ main()
 
 	{
 	    char * p = (char *)buffer;
-	    struct copper_header * header = (struct copper_header *)p;
-	    struct copper_footer * footer =
+	    const struct copper_header * header = (struct copper_header *)p;
+	    const struct copper_footer * footer =
 		(struct copper_footer *)(p + ret - sizeof(struct copper_footer));
 
 	    if (header->magic != COPPER_DRIVER_HEADER_MAGIC) {

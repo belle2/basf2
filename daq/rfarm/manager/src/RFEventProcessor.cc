@@ -23,7 +23,7 @@
 using namespace std;
 using namespace Belle2;
 
-RFEventProcessor::RFEventProcessor(string conffile)
+RFEventProcessor::RFEventProcessor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -55,7 +55,7 @@ RFEventProcessor::RFEventProcessor(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_nodename);
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(m_nodename);
@@ -78,7 +78,7 @@ RFEventProcessor::RFEventProcessor(string conffile)
   m_log = new RFLogManager(m_nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
   // 7. Clear PID list
   m_pid_sender = 0;
@@ -136,7 +136,8 @@ int RFEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   // 3. Run sender / logger
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
-  m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), (char*)"1");
+  m_pid_sender = m_proc->Execute(sender, const_cast<char*>(rbufout.c_str()), port, const_cast<char*>(shmname.c_str()),
+                                 static_cast<char*>("1"));
   m_flow->clear(1);
 
   /*
@@ -168,7 +169,8 @@ int RFEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   rport += portbase;
   char portchar[256];
   sprintf(portchar, "%d", rport);
-  m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
+  m_pid_receiver = m_proc->Execute(receiver, const_cast<char*>(rbufin.c_str()), srchost, portchar, const_cast<char*>(shmname.c_str()),
+                                   static_cast<char*>("0"));
   m_flow->clear(0);
 
   printf("Configure : done\n");
@@ -251,10 +253,10 @@ int RFEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
   // 2. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
-    basf2 = (char*) nsmm->datap;
+    basf2 = const_cast<char*>(nsmm->datap);
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
-  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  m_pid_basf2 = m_proc->Execute(basf2, const_cast<char*>(rbufin.c_str()), const_cast<char*>(rbufout.c_str()), hport);
 
   return 0;
 }

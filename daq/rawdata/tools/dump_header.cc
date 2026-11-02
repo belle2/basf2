@@ -42,6 +42,7 @@ int main()
     int is = read(infn, &buf[0], 4);
     //    printf ( "buf[0] = %d\n", buf[0] );
     if (is <= 0) break;
+    // cppcheck-suppress unreadVariable ; body read is not validated here
     is = read(infn, &buf[1], (buf[0] - 1) * 4);
     //    printf ( "nw = %d, 1st = %d, 2nd = %d, 3rd = %d\n",
     //       buf[0], buf[1], buf[2], buf[3] );

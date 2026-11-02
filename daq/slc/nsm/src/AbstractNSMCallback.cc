@@ -34,36 +34,36 @@ int AbstractNSMCallback::addDB(const DBObject& obj)
     if (name.size() == 0 || name.at(0) == '$') continue;
     switch (it->type) {
       case DBField::BOOL:
-        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * ((bool*)it->buf)));
-        set(name, (int) * ((bool*)it->buf));
+        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * (static_cast<bool*>(it->buf))));
+        set(name, (int) * (static_cast<bool*>(it->buf)));
         break;
       case DBField::CHAR:
-        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * ((char*)it->buf)));
-        set(name, (int) * ((char*)it->buf));
+        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * (static_cast<char*>(it->buf))));
+        set(name, (int) * (static_cast<char*>(it->buf)));
         break;
       case DBField::SHORT:
-        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * ((short*)it->buf)));
-        set(name, (int) * ((short*)it->buf));
+        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * (static_cast<short*>(it->buf))));
+        set(name, (int) * (static_cast<short*>(it->buf)));
         break;
       case DBField::INT:
-        id = Callback::add(new NSMVHandlerInt(name, true, true, *((int*)it->buf)));
-        set(name, (int) * ((int*)it->buf));
+        id = Callback::add(new NSMVHandlerInt(name, true, true, *(static_cast<int*>(it->buf))));
+        set(name, (int) * (static_cast<int*>(it->buf)));
         break;
       case DBField::LONG:
-        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * ((long long*)it->buf)));
-        set(name, (int) * ((long long*)it->buf));
+        id = Callback::add(new NSMVHandlerInt(name, true, true, (int) * (static_cast<long long*>(it->buf))));
+        set(name, (int) * (static_cast<long long*>(it->buf)));
         break;
       case DBField::FLOAT:
-        id = Callback::add(new NSMVHandlerFloat(name, true, true, *((float*)it->buf)));
-        set(name, * ((float*)it->buf));
+        id = Callback::add(new NSMVHandlerFloat(name, true, true, *(static_cast<float*>(it->buf))));
+        set(name, * (static_cast<float*>(it->buf)));
         break;
       case DBField::DOUBLE:
-        id = Callback::add(new NSMVHandlerFloat(name, true, true, (float) * ((double*)it->buf)));
-        set(name, (float) * ((double*)it->buf));
+        id = Callback::add(new NSMVHandlerFloat(name, true, true, (float) * (static_cast<double*>(it->buf))));
+        set(name, (float) * (static_cast<double*>(it->buf)));
         break;
       case DBField::TEXT:
-        id = Callback::add(new NSMVHandlerText(name, true, true, *((std::string*)it->buf)));
-        set(name, *((std::string*)it->buf));
+        id = Callback::add(new NSMVHandlerText(name, true, true, *(static_cast<std::string*>(it->buf))));
+        set(name, *(static_cast<std::string*>(it->buf)));
         break;
       default:
         break;
@@ -95,9 +95,9 @@ NSMCommunicator& AbstractNSMCallback::wait(const NSMNode& node,
 int AbstractNSMCallback::wait(double timeout)
 {
   double t0 = Time().get();
-  double t = t0;
   int count = 0;
   try {
+    double t = t0;
     while (true) {
       double t1 = (timeout - (t - t0) > 0 ? timeout - (t - t0) : 0);
       if (t1 == 0) break;
@@ -310,28 +310,28 @@ bool AbstractNSMCallback::get(const DBObject& obj)
     std::string vs;
     switch (it->type) {
       case DBField::BOOL:
-        if (get(name, vi)) *((bool*)it->buf) = (bool)vi;
+        if (get(name, vi)) *(static_cast<bool*>(it->buf)) = (bool)vi;
         break;
       case DBField::CHAR:
-        if (get(name, vi)) *((char*)it->buf) = (char)vi;
+        if (get(name, vi)) *(static_cast<char*>(it->buf)) = (char)vi;
         break;
       case DBField::SHORT:
-        if (get(name, vi)) *((short*)it->buf) = (short)vi;
+        if (get(name, vi)) *(static_cast<short*>(it->buf)) = (short)vi;
         break;
       case DBField::INT:
-        if (get(name, vi)) *((int*)it->buf) = (int)vi;
+        if (get(name, vi)) *(static_cast<int*>(it->buf)) = (int)vi;
         break;
       case DBField::LONG:
-        if (get(name, vi)) *((long long*)it->buf) = vi;
+        if (get(name, vi)) *(static_cast<long long*>(it->buf)) = vi;
         break;
       case DBField::FLOAT:
-        if (get(name, vf)) *((float*)it->buf) = vf;
+        if (get(name, vf)) *(static_cast<float*>(it->buf)) = vf;
         break;
       case DBField::DOUBLE:
-        if (get(name, vf)) *((double*)it->buf) = vf;
+        if (get(name, vf)) *(static_cast<double*>(it->buf)) = vf;
         break;
       case DBField::TEXT:
-        if (get(name, vs)) *((std::string*)it->buf) = vs;
+        if (get(name, vs)) *(static_cast<std::string*>(it->buf)) = vs;
         break;
       default:
         break;

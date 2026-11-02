@@ -10,7 +10,6 @@
 #include <framework/pcore/zmq/connections/ZMQRawConnection.h>
 #include <framework/pcore/zmq/utils/ZMQParent.h>
 #include <framework/pcore/zmq/messages/ZMQNoIdMessage.h>
-#include <daq/roisend/h2m.h>
 
 #include <zmq.hpp>
 
@@ -41,10 +40,6 @@ namespace Belle2 {
     /// Return the connection string
     std::string getEndPoint() const { return m_rawOutput.getEndPoint(); }
   private:
-    /// Size of the header in bytes
-    static constexpr const unsigned int HEADER_SIZE = sizeof(struct h2m_header_t);
-    /// Size of the trailer in bytes
-    static constexpr const unsigned int TRAILER_SIZE = sizeof(struct h2m_footer_t);
 
     /// The used raw output
     ZMQRawOutput m_rawOutput;

@@ -171,7 +171,7 @@ public:
     if (!isstreamer) {
       m_nevents++;
     }
-    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
+    m_chksum = adler32(m_chksum, reinterpret_cast<unsigned char*>(evtbuf), nbyte);
     return ret;
   }
 
@@ -191,7 +191,6 @@ private:
   int m_diskid;
   int m_fileid;
   int m_file;
-  std::string m_configname;
   int m_expno;
   int m_runno;
   unsigned long long m_filesize;
@@ -224,7 +223,6 @@ int main(int argc, char** argv)
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
-  const char* obufname = argv[8];
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
@@ -248,7 +246,7 @@ int main(int argc, char** argv)
                                                     config.get("database.password"),
                                                     config.getInt("database.port"));
   SharedEventBuffer obuf;
-  if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
+  if (obufsize > 0) obuf.open(argv[8], obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
   unsigned long long nbyte_out [[maybe_unused]] = 0;
@@ -280,11 +278,10 @@ int main(int argc, char** argv)
     }
     for (unsigned int ib = 0; ib < ninput; ib++) {
       ibuf[ib].lock();
-      ibuf[ib].read((int*)&hd, true, true);
+      ibuf[ib].read(reinterpret_cast<int*>(&hd), true, true);
       ibuf[ib].read(evtbuf, true, true);
       ibuf[ib].unlock();
       int nbyte = evtbuf[0];
-      int nword = (nbyte - 1) / 4 + 1;
       bool isnew = false;
       if (not_record) continue;
       if (hd.type == MSG_STREAMERINFO) {
@@ -334,8 +331,11 @@ int main(int argc, char** argv)
         continue;
       }
       if (file) {
-        file.write((char*)evtbuf, nbyte);
+        file.write(reinterpret_cast<char*>(evtbuf), nbyte);
         nbyte_out += nbyte;
+        int nword = (nbyte - 1) / 4 + 1;
+        // cppcheck-suppress moduloofone ; interval is a tuning knob
+        // cppcheck-suppress knownConditionTrueFalse ; interval is a tuning knob
         if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
           obuf.write(evtbuf, nword, true);
         }

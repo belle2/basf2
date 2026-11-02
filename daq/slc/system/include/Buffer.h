@@ -17,7 +17,7 @@ namespace Belle2 {
     // constructors & destructors
   public:
     Buffer();
-    Buffer(unsigned int size, unsigned char* memory = NULL);
+    explicit Buffer(unsigned int size, unsigned char* memory = NULL);
     Buffer(const Buffer& w);
     virtual ~Buffer();
 

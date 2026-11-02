@@ -16,11 +16,9 @@
 using namespace Belle2;
 using namespace std;
 
-HistoRelay2::HistoRelay2(string& filename, string& dest, int port)
+HistoRelay2::HistoRelay2(string& filename, string& dest, int port) : m_filename(filename), m_dest(dest)
 {
-  m_dest = dest;
   m_port = port;
-  m_filename = filename;
   m_sock = new EvtSocketSend(m_dest, m_port);
 }
 
@@ -75,16 +73,16 @@ int HistoRelay2::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numo
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     TObject* obj = curdir->FindObjectAny(key->GetName());
     if (obj->IsA()->InheritsFrom("TH1")) {
-      TH1* h1 = (TH1*) obj;
+      TH1* h1 = static_cast<TH1*>(obj);
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
       msg->add(h1, h1->GetName());
       numobjs++;
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
-      TDirectory* tdir = (TDirectory*) obj;
+      TDirectory* tdir = static_cast<TDirectory*>(obj);
       //      m_msg->add(tdir, tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;

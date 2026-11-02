@@ -13,13 +13,13 @@
 using namespace std;
 using namespace Belle2;
 
-RevSock2Rb::RevSock2Rb(string rbuf, string src, int port, string shmname, int id)
+RevSock2Rb::RevSock2Rb(const string& rbuf, string src, int port, string shmname, int id)
 {
   //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(rbuf.c_str());
   m_sock = new REvtSocketRecv(src, port);
   m_evtbuf = new char[MAXEVTSIZE];
-  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()), id, m_rbuf);
 
 }
 
@@ -47,7 +47,7 @@ int RevSock2Rb::ReceiveEvent(void)
   // Put the message in ring buffer
   int stat = 0;
   for (;;) {
-    stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+    stat = m_rbuf->insq(reinterpret_cast<int*>(msg->buffer()), msg->paddedSize());
     if (stat >= 0) break;
     //    usleep(100);
     usleep(20);

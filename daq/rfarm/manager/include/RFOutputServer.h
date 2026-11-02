@@ -24,14 +24,18 @@ namespace Belle2 {
 
   class RFOutputServer : public RFServerBase {
   public:
-    RFOutputServer(std::string conffile);
+    explicit RFOutputServer(const std::string& conffile);
     ~RFOutputServer();
+    /** Copy constructor (disabled). */
+    RFOutputServer(const RFOutputServer&) = delete;
+
+    /** Operator = (disabled). */
+    RFOutputServer& operator=(const RFOutputServer&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
     int UnConfigure(NSMmsg*, NSMcontext*) override;
     int Start(NSMmsg*, NSMcontext*) override;
-    int Stop(NSMmsg*, NSMcontext*) override;
     int Restart(NSMmsg*, NSMcontext*) override;
 
     // Server function

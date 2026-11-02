@@ -41,7 +41,7 @@ namespace Belle2 {
     explicit NSMMessage(const NSMNode& node);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
-               int npar, int* pars);
+               int npar, const int* pars);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd,
                int par, const std::string& data);
     NSMMessage(const NSMNode& node, const NSMCommand& cmd, int par);
@@ -53,15 +53,15 @@ namespace Belle2 {
     NSMMessage(const NSMNode& node, const NSMData& data);
     explicit NSMMessage(const NSMCommand& cmd);
     NSMMessage(const NSMCommand& cmd, int par);
-    NSMMessage(const NSMCommand& cmd, int npar, int* pars);
-    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int npar, int* pars,
+    NSMMessage(const NSMCommand& cmd, int npar, const int* pars);
+    NSMMessage(const NSMNode& node, const NSMCommand& cmd, int npar, const int* pars,
                const std::string& data);
     NSMMessage(const NSMCommand& cmd, const std::string& data);
     explicit NSMMessage(const NSMVar& var);
     explicit NSMMessage(const DAQLogMessage& log);
     explicit NSMMessage(const NSMData& data);
     NSMMessage(const NSMMessage& msg);
-    virtual ~NSMMessage() { }
+    virtual ~NSMMessage() override { }
 
   public:
     const NSMMessage& operator=(const NSMMessage& msg);
@@ -115,7 +115,7 @@ namespace Belle2 {
     NSMmsg* getMsg() { return &m_nsm_msg; }
 
   private:
-    int try_read(int sock, char* buf, int datalen);
+    static int try_read(int sock, char* buf, int datalen);
 
   private:
     mutable NSMcontext* m_nsmc;

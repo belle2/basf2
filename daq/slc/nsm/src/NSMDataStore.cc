@@ -30,7 +30,7 @@ bool NSMDataStore::open(unsigned short max)
     return false;
   }
   m_mem.truncate(0);
-  char* buf = (char*)m_mem.map();
+  char* buf = static_cast<char*>(m_mem.map());
   m_buf = buf;
   m_mutex = MMutex(buf);
   buf += m_mutex.size();

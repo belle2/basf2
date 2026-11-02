@@ -55,7 +55,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
     sprintf(err_buf, "nwords value(%d) is invalid. Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
+    const string& err_str = err_buf;
     throw (err_str);
   }
 
@@ -101,7 +101,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
   //  printf("### %.8x %.4x\n", buf[ 0 ], crc16);
   while (nwords != 0) {
 
-    unsigned char temp_buf = *((unsigned char*)(buf + nints) + (-(cnt % 4) + 3));
+    unsigned char temp_buf = *(reinterpret_cast<const unsigned char*>(buf + nints) + (-(cnt % 4) + 3));
     crc16 = CRC16Table0x1021[(crc16 >> (16 - CHAR_BIT)) ^ temp_buf ] ^ (crc16 << CHAR_BIT);
     //    printf("%.2x %.4x\n", temp_buf, crc16);
     if ((cnt % 4) == 3) {
@@ -439,7 +439,7 @@ int main(int argc, char** argv)
     perror("Failed to set REUSEADDR");
   }
 
-  bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
+  bind(listenfd, reinterpret_cast<struct sockaddr*>(&servaddr), sizeof(servaddr));
 
   listen(listenfd, LISTENQ);
   printf("Accepting..."); fflush(stdout);
@@ -487,6 +487,7 @@ int main(int argc, char** argv)
   unsigned long long int start_cnt = 300000;
   for (;;) {
     //    addEvent(buff, total_words, cnt);
+    // cppcheck-suppress throwInEntryPoint ; a standalone generator may just abort
     addEvent(buff.data(), nwords_per_fee, cnt, ncpr, nhslb);
     //    printf("cnt %d bytes\n", cnt*total_words); fflush(stdout);
     //    sprintf( buff, "event %d dessa", cnt );

@@ -49,8 +49,7 @@ bool HistoManager::add(const string& subdir, const string& name, int pid, TH1* h
   // Get histogram map of subdir
   map<string, map<int, TH1*>>& dirlist = m_subdir[subdir];
   map<int, TH1*>& hlist = dirlist[name];
-  if (hlist.find(pid) == hlist.end()) {
-    hlist[pid] = histo;
+  if (hlist.try_emplace(pid, histo).second) {
     //    printf("HistoManager: histogram %s from %d registered in %s\n",
     //           histo->GetName(), pid, subdir.c_str());
     //    histo->Print();
@@ -138,7 +137,7 @@ bool HistoManager::merge()
           else
             newname = string(hist->GetName());
           hist->SetName(newname.c_str());
-          TH1* mhist = (TH1*)hist->Clone();
+          TH1* mhist = static_cast<TH1*>(hist->Clone());
           mergelist[name] = mhist;
           //    mergelist[name] = (TH1*)hist->Clone();
           //    m_mapfile->Add(mergelist[name]);
@@ -198,7 +197,7 @@ void HistoManager::clear()
 }
 
 
-void HistoManager::filedump(std::string outfile)
+void HistoManager::filedump(const std::string& outfile)
 {
   printf("dump to dqm file = %s\n", outfile.c_str());
   merge(); // Smart move to first merge, but necessary?

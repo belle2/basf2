@@ -28,7 +28,7 @@ namespace Belle2 {
 
   public:
     AbstractNSMCallback(int timeout);
-    virtual ~AbstractNSMCallback() {}
+    virtual ~AbstractNSMCallback() override {}
 
   public:
     int addDB(const DBObject& obj);
@@ -65,8 +65,9 @@ namespace Belle2 {
     bool set(const std::string& node, const std::string& name, const std::vector<int>& val) { return set_t(node, name, val); }
     bool set(const std::string& node, const std::string& name, const std::vector<float>& val) { return set_t(node, name, val); }
     int wait(double timeout = 5);
-    NSMCommunicator& wait(const NSMNode& node, const NSMCommand& cmd,
-                          double timeout = 5);
+    static NSMCommunicator& wait(const NSMNode& node, const NSMCommand& cmd,
+                                 double timeout = 5);
+    // cppcheck-suppress missingOverride ; this is the base declaration
     virtual void notify(const NSMVar& var) = 0;
     bool try_wait();
 
@@ -79,7 +80,7 @@ namespace Belle2 {
 
   protected:
     virtual bool perform(NSMCommunicator& com) = 0;
-    void readVar(const NSMMessage& msg, NSMVar& var);
+    static void readVar(const NSMMessage& msg, NSMVar& var);
 
   private:
     NSMNode m_node;

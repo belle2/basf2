@@ -19,8 +19,13 @@ namespace Belle2 {
   class Rb2Sock {
   public:
     /*! Constuctor and Destructor */
-    Rb2Sock(std::string rbuf, std::string dest, int port);
+    Rb2Sock(const std::string& rbuf, std::string dest, int port);
     ~Rb2Sock(void);
+    /** Copy constructor (disabled). */
+    Rb2Sock(const Rb2Sock&) = delete;
+
+    /** Operator = (disabled). */
+    Rb2Sock& operator=(const Rb2Sock&) = delete;
 
     /*! Event function */
     int SendEvent(void);

@@ -36,6 +36,7 @@ unsigned int ONSENBinData::getTimetag() const
   return (retval >> 4);
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 unsigned int ONSENBinData::getEventNumber() const
 {
   unsigned int nframe = getFrameNumber();

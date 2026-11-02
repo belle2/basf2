@@ -252,6 +252,7 @@ void StorageRootOutputModule::openFile()
     B2INFO("process(" << m_processNumber << "), Try open: " << ++openCounter);
   }
 
+  // cppcheck-suppress knownConditionTrueFalse ; TFile::Open can return null
   if (!m_file || m_file->IsZombie()) {
     B2FATAL("Couldn't open file " << out << " for writing!");
   }
@@ -468,14 +469,10 @@ void StorageRootOutputModule::event()
 
 void StorageRootOutputModule::fillFileMetaData()
 {
-  bool isMC = (m_fileMetaData) ? m_fileMetaData->isMC() : true;
-
-  // For online storage, force to declareRealData()
-  // I wonder why the no file meta data is associated with isMC == true
-  isMC = false;
+  // For online storage we always declare real data
 
   new(m_outputFileMetaData) FileMetaData;
-  if (!isMC) m_outputFileMetaData->declareRealData();
+  m_outputFileMetaData->declareRealData();
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree

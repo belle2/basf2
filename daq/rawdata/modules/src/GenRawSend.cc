@@ -54,6 +54,7 @@ GenRawSendModule::~GenRawSendModule()
 
 void GenRawSendModule::initialize()
 {
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_buffer = new char[ BUF_SIZE_WORD ];
   memset(m_buffer, 0,  BUF_SIZE_WORD);
 
@@ -68,10 +69,6 @@ void GenRawSendModule::initialize()
   // Open Socket
   m_sock = new EvtSocketSend(m_dest, m_port);
 
-}
-
-void GenRawSendModule::beginRun()
-{
 }
 
 
@@ -116,12 +113,6 @@ void GenRawSendModule::event()
 //   //  printf ( "nbytes = %d, stat = %d\n", nbytes, stat );
 
   m_nevt++;
-}
-
-
-void GenRawSendModule::endRun()
-{
-
 }
 
 

@@ -34,7 +34,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerPCModule();
-    virtual ~DeSerializerPCModule();
+    virtual ~DeSerializerPCModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -63,7 +63,7 @@ namespace Belle2 {
                            unsigned int* run_copper_0, unsigned int* subrun_copper_0,
                            unsigned int* eve_copper_0, unsigned int* error_bit_flag);
 
-    void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
+    static void setErrorFlag(unsigned int error_flag, StoreObjPtr<EventMetaData> evtmetadata);
 
 #ifdef NONSTOP
     //! wait for resume
@@ -95,11 +95,11 @@ namespace Belle2 {
     ///
     PreRawCOPPERFormat_latest m_pre_rawcpr;
 
-    int event_diff;
+    int event_diff = 0;
 
-    unsigned int m_prev_copper_ctr;
+    unsigned int m_prev_copper_ctr = 0;
 
-    unsigned int m_prev_evenum;
+    unsigned int m_prev_evenum = 0;
 
   };
 

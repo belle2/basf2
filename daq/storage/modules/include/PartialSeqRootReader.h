@@ -21,7 +21,12 @@ namespace Belle2 {
   public:
     //! Constructor / Destructor
     PartialSeqRootReaderModule();
-    virtual ~PartialSeqRootReaderModule();
+    virtual ~PartialSeqRootReaderModule() override;
+    /** Copy constructor (disabled). */
+    PartialSeqRootReaderModule(const PartialSeqRootReaderModule&) = delete;
+
+    /** Operator = (disabled). */
+    PartialSeqRootReaderModule& operator=(const PartialSeqRootReaderModule&) = delete;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -43,7 +48,7 @@ namespace Belle2 {
     int m_filemax;
     char* m_buf;
     int m_fileno;
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
   };
 

@@ -23,7 +23,12 @@ namespace Belle2 {
 
   public:
     EventServerCallback();
-    virtual ~EventServerCallback() noexcept;
+    virtual ~EventServerCallback() noexcept override;
+    /** Copy constructor (disabled). */
+    EventServerCallback(const EventServerCallback&) = delete;
+
+    /** Operator = (disabled). */
+    EventServerCallback& operator=(const EventServerCallback&) = delete;
 
   public:
     virtual void load(const DBObject&, const std::string&) override;
@@ -33,9 +38,9 @@ namespace Belle2 {
 
   private:
     RFConf* m_conf;
-    RFProcessManager* m_proc;
-    RFLogManager* m_log;
-    int m_pid_server;
+    RFProcessManager* m_proc = nullptr;
+    RFLogManager* m_log = nullptr;
+    int m_pid_server = 0;
     pthread_t m_logthread;
 
   };

@@ -17,9 +17,8 @@ Cond::Cond()
   init();
 }
 
-Cond::Cond(const Cond& cond)
+Cond::Cond(const Cond& cond) : m_cond_t(cond.m_cond_t)
 {
-  m_cond_t = cond.m_cond_t;
 }
 
 bool Cond::init()

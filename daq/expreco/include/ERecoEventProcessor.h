@@ -26,8 +26,13 @@ namespace Belle2 {
 
   class ERecoEventProcessor : public RFServerBase {
   public:
-    ERecoEventProcessor(std::string conffile);
+    explicit ERecoEventProcessor(const std::string& conffile);
     ~ERecoEventProcessor();
+    /** Copy constructor (disabled). */
+    ERecoEventProcessor(const ERecoEventProcessor&) = delete;
+
+    /** Operator = (disabled). */
+    ERecoEventProcessor& operator=(const ERecoEventProcessor&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
@@ -48,12 +53,12 @@ namespace Belle2 {
     RingBuffer*        m_rbufout;
     RFFlowStat*        m_flow;
 
-    int m_pid_receiver;
-    int m_pid_basf2;
-    int m_pid_sender;
-    int m_pid_hrecv;
-    int m_pid_hrelay;
-    int m_pid_evs;
+    int m_pid_receiver = 0;
+    int m_pid_basf2 = 0;
+    int m_pid_sender = 0;
+    int m_pid_hrecv = 0;
+    int m_pid_hrelay = 0;
+    int m_pid_evs = 0;
     char m_nodename[256 + 4];
 
   };

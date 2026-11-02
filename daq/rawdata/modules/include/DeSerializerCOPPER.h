@@ -31,7 +31,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerCOPPERModule();
-    virtual ~DeSerializerCOPPERModule();
+    virtual ~DeSerializerCOPPERModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -77,7 +77,7 @@ namespace Belle2 {
     int m_cpr_fd;
 
     //! bit flag for available FINESSE slot
-    int m_use_slot;
+    int m_use_slot = 0;
 
     //! bit flag for available FINESSE slot
     int m_finesse_bit_flag;

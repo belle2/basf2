@@ -21,7 +21,7 @@ namespace Belle2 {
     SendHeader();
 
     //! Constructor using existing pointer to raw data buffer
-    SendHeader(int*);
+    explicit SendHeader(const int*);
     //! Destructor
     ~SendHeader();
 
@@ -29,7 +29,7 @@ namespace Belle2 {
     int* GetBuffer(void);
 
     //! set buffer
-    void SetBuffer(int* hdr);
+    void SetBuffer(const int* hdr);
 
     void Initialize(); //! initialize Header
 
@@ -48,7 +48,7 @@ namespace Belle2 {
     void SetExpNum(int exp_num);   //!
 
     int GetTotalNwords();  //! get contents of Header
-    int GetHdrNwords();  //! get contents of Header
+    static int GetHdrNwords();  //! get contents of Header
     int GetNumEventsinPacket();
     int GetNumNodesinPacket();
     int GetEventNumber();

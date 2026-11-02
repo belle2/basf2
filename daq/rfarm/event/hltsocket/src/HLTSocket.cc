@@ -32,7 +32,7 @@ HLTSocket::~HLTSocket()
 int HLTSocket::put(char* data, int len)
 {
   const int to_size = htonl(len);
-  const int br = write_data((char*) &to_size, sizeof(int));
+  const int br = write_data(reinterpret_cast<char*>(const_cast<int*>(&to_size)), sizeof(int));
   if (br == 0) {
     B2ERROR("Can not write to broken pipe.");
     return 0;
@@ -58,7 +58,7 @@ int HLTSocket::put_wordbuf(int* data, int len)
   const int gcount = data[0];
   B2ASSERT("The first entry in the data must be the buffer size!", gcount == len);
 
-  int bcount = write_data((char*) data, len * sizeof(int));
+  int bcount = write_data(reinterpret_cast<char*>(data), len * sizeof(int));
   if (bcount == 0) {
     B2ERROR("Can not write to broken pipe.");
     return 0;
@@ -103,7 +103,7 @@ int HLTSocket::write_data(char* data, int len)
 int HLTSocket::get(char* data, int len)
 {
   int gcount;
-  const int br = read_data((char*) &gcount, 4);
+  const int br = read_data(reinterpret_cast<char*>(&gcount), 4);
   if (br < 0) {
     B2ERROR("Error in getting the size: " << strerror(errno));
     return br;
@@ -131,7 +131,7 @@ int HLTSocket::get(char* data, int len)
 
 int HLTSocket::get_wordbuf(int* wrdbuf, int len)
 {
-  int br = read_data((char*) wrdbuf, sizeof(int));
+  int br = read_data(reinterpret_cast<char*>(wrdbuf), sizeof(int));
   if (br < 0) {
     B2ERROR("Error in getting the size: " << strerror(errno));
     return br;
@@ -146,7 +146,7 @@ int HLTSocket::get_wordbuf(int* wrdbuf, int len)
     return -1;
   }
   // ATTENTION: the send size is size / 4
-  const int bcount = read_data((char*) &wrdbuf[1], gcount);
+  const int bcount = read_data(reinterpret_cast<char*>(&wrdbuf[1]), gcount);
   if (bcount < 0) {
     B2ERROR("Error in getting the data: " << strerror(errno));
     return bcount;
@@ -213,7 +213,7 @@ bool HLTSocket::accept(unsigned int port)
 
     signal(SIGPIPE, SIG_IGN);
 
-    if ((bind(m_listener, (struct sockaddr*) &sa, sizeof(sa))) < 0) {
+    if ((bind(m_listener, reinterpret_cast<struct sockaddr*>(&sa), sizeof(sa))) < 0) {
       B2ERROR("Socket binding failed: " << strerror(errno));
       return false;
     }
@@ -223,10 +223,10 @@ bool HLTSocket::accept(unsigned int port)
 
   struct sockaddr_in isa;
   socklen_t i = sizeof(isa);
-  getsockname(m_listener, (struct sockaddr*)&isa, &i);
+  getsockname(m_listener, reinterpret_cast<struct sockaddr*>(&isa), &i);
 
   B2RESULT("Started accepting new clients");
-  if ((m_socket =::accept(m_listener, (struct sockaddr*)&isa, &i)) < 0) {
+  if ((m_socket =::accept(m_listener, reinterpret_cast<struct sockaddr*>(&isa), &i)) < 0) {
     B2ERROR("Socket accepting failed: " << strerror(errno));
     return false;
   }
@@ -258,7 +258,7 @@ bool HLTSocket::connect(const std::string& hostName, unsigned int port, const HL
 
   struct sockaddr_in sa;
   bzero(&sa, sizeof(sa));
-  bcopy(hp->h_addr, (char*) &sa.sin_addr, hp->h_length);
+  bcopy(hp->h_addr, reinterpret_cast<char*>(&sa.sin_addr), hp->h_length);
   sa.sin_family = hp->h_addrtype;
   sa.sin_port = htons((u_short) port);
 
@@ -278,7 +278,7 @@ bool HLTSocket::connect(const std::string& hostName, unsigned int port, const HL
   using namespace std::chrono_literals;
 
   int maxretry = 0;
-  while (::connect(m_socket, (struct sockaddr*) &sa, sizeof(sa)) < 0) {
+  while (::connect(m_socket, reinterpret_cast<struct sockaddr*>(&sa), sizeof(sa)) < 0) {
     if (errno == ETIMEDOUT or errno == ECONNREFUSED) {
       B2WARNING("Connection failed, will retry in 1 second... " << maxretry);
       std::this_thread::sleep_for(1s);

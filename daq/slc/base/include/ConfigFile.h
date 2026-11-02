@@ -21,7 +21,7 @@ namespace Belle2 {
 
   public:
     ConfigFile() {}
-    ConfigFile(const std::string& file1)
+    explicit ConfigFile(const std::string& file1)
     {
       read(file1, true);
     }
@@ -38,7 +38,7 @@ namespace Belle2 {
       read(file2, true);
       read(file3, true);
     }
-    ConfigFile(std::istream& is)
+    explicit ConfigFile(std::istream& is)
     {
       read(is);
     }
@@ -61,7 +61,7 @@ namespace Belle2 {
     void print();
 
   private:
-    const std::string getFilePath(const std::string& filename);
+    static const std::string getFilePath(const std::string& filename);
 
   private:
     ValueList m_value_m;

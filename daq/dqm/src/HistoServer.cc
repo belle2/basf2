@@ -15,11 +15,10 @@ using namespace Belle2;
 using namespace std;
 
 // Constructor / Destructor
-HistoServer::HistoServer(int port, const string& filename)
+HistoServer::HistoServer(int port, const string& filename) : m_filename(filename)
 {
   m_port = port;
   m_force_exit = 0;
-  m_filename = filename;
 }
 
 HistoServer::~HistoServer()
@@ -31,6 +30,7 @@ HistoServer::~HistoServer()
 
 int HistoServer:: init()
 {
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
   //  m_mapfile = TMapFile::Create(m_filename.c_str(), "RECREATE", MAPFILESIZE);
@@ -61,8 +61,8 @@ int HistoServer::server()
     if (exam_stat == 0) {
     } else if (exam_stat == 1) { //
       // printf ( "Histo data ready on socket\n" );
-      vector<int>& recvsock = m_man->connected_socket_list();
-      for (vector<int>::iterator it = recvsock.begin();
+      const vector<int>& recvsock = m_man->connected_socket_list();
+      for (vector<int>::const_iterator it = recvsock.begin();
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd)) {
@@ -120,7 +120,7 @@ int HistoServer::server()
               if (subdir == "EXIT") subdir = "";
               //              printf("HistoServer : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
             } else {
-              m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
+              m_hman->update(subdir, strlist.at(i), fd, static_cast<TH1*>(objlist.at(i)));
             }
           }
         }

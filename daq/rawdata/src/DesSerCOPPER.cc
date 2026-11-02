@@ -21,7 +21,7 @@ using namespace Belle2;
 //                 Implementation
 //----------------------------------------------------------------
 
-DesSerCOPPER::DesSerCOPPER(string host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
+DesSerCOPPER::DesSerCOPPER(const string& host_recv, int port_recv, const string& host_send, int port_send, int shmflag,
                            const std::string& nodename, int nodeid, int finesse_bitflag)
 {
   m_finesse_bit_flag = finesse_bitflag;
@@ -185,7 +185,7 @@ void DesSerCOPPER::DataAcquisition()
 #ifdef NONSTOP
         break;
 #endif
-        print_err.PrintError((char*)err_str.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        print_err.PrintError(const_cast<char*>(err_str.c_str()), __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);
       }
       if (m_start_flag == 0) {
@@ -336,7 +336,8 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
   // Firstly, read data with an allocated buffer.
   while (1) {
     int read_size = 0;
-    if ((read_size = read(m_cpr_fd, (char*)m_bufary[entry] + recvd_byte, sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
+    if ((read_size = read(m_cpr_fd, reinterpret_cast<char*>(m_bufary[entry]) + recvd_byte,
+                          sizeof(int) *  BUF_SIZE_WORD  - recvd_byte)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -371,7 +372,8 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
   //
   // Calcurate data size
   //
-  *m_size_word = m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH + (m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
+  *m_size_word = m_bufary[ entry ][ static_cast<int>(m_pre_rawcpr.POS_DATA_LENGTH)
+                                    + static_cast<int>(m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) ]
                  + m_pre_rawcpr.SIZE_COPPER_DRIVER_HEADER + m_pre_rawcpr.SIZE_COPPER_DRIVER_TRAILER
                  + m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS +
                  m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS; // 9 words are COPPER haeder and trailer size.
@@ -386,11 +388,11 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
       *delete_flag = 1;
       temp_buf = new int[ *m_size_word ];
       memcpy(temp_buf, m_bufary[ entry ], recvd_byte);
-      recvd_byte += readFD(m_cpr_fd, (char*)temp_buf + recvd_byte,
+      recvd_byte += readFD(m_cpr_fd, reinterpret_cast<char*>(temp_buf) + recvd_byte,
                            (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte, *delete_flag);
     } else {
 
-      recvd_byte += readFD(m_cpr_fd, (char*)(m_bufary[ entry ]) + recvd_byte,
+      recvd_byte += readFD(m_cpr_fd, reinterpret_cast<char*>((m_bufary[ entry ])) + recvd_byte,
                            (*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int) - recvd_byte, *delete_flag);
     }
 
@@ -406,7 +408,7 @@ int* DesSerCOPPER::readOneEventFromCOPPERFIFO(const int entry, int* delete_flag,
     }
   } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %lu %lu %d %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %zu %lu %d %d\n",
             recvd_byte, *m_size_word * sizeof(int), m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -475,7 +477,7 @@ void DesSerCOPPER::initializeCOPPER()
   // Present slots to use
   //
   if (! m_use_slot) {
-    char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
+    const char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
     print_err.PrintError(m_shmflag, &m_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
@@ -546,7 +548,7 @@ int DesSerCOPPER::readFD(int fd, char* buf, int data_size_byte, int /*delete_fla
   int n = 0;
   while (1) {
     int read_size = 0;
-    if ((read_size = read(fd, (char*)buf + n, data_size_byte - n)) < 0) {
+    if ((read_size = read(fd, static_cast<char*>(buf) + n, data_size_byte - n)) < 0) {
       if (errno == EINTR) {
         continue;
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {

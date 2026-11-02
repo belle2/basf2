@@ -22,7 +22,7 @@ namespace Belle2 {
   public:
     //! Constructor / Destructor
     SeqRootMergerModule();
-    virtual ~SeqRootMergerModule();
+    virtual ~SeqRootMergerModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -38,7 +38,7 @@ namespace Belle2 {
 
   private:
     std::vector<SeqFile*> m_file;
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
   };
 

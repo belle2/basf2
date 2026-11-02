@@ -17,24 +17,28 @@
 namespace Belle2 {
   class ERecoMaster : public RFServerBase {
   public:
-    ERecoMaster(std::string conf);
+    explicit ERecoMaster(const std::string& conf);
     ~ERecoMaster();
+    /** Copy constructor (disabled). */
+    ERecoMaster(const ERecoMaster&) = delete;
+
+    /** Operator = (disabled). */
+    ERecoMaster& operator=(const ERecoMaster&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
     int UnConfigure(NSMmsg*, NSMcontext*) override;
-    int Start(NSMmsg*, NSMcontext*) override;
     int Stop(NSMmsg*, NSMcontext*) override;
     int Restart(NSMmsg*, NSMcontext*) override;
 
     // Function to hook message funnctions
-    void Hook_Message_Handlers();
+    static void Hook_Message_Handlers();
 
     // Message functions
     static void Log_Handler(NSMmsg* msg, NSMcontext* ctx);
 
     // Server function
-    void monitor_loop();
+    static void monitor_loop();
 
 
   private:

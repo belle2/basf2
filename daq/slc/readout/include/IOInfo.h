@@ -40,13 +40,13 @@ namespace Belle2 {
     void setRXQueue(int queue) { m_rx_queue = queue; }
 
   private:
-    unsigned int m_local_addr;
-    int m_local_port;
-    unsigned int m_remote_addr;
-    int m_remote_port;
-    int m_state;
-    int m_tx_queue;
-    int m_rx_queue;
+    unsigned int m_local_addr = 0;
+    int m_local_port = 0;
+    unsigned int m_remote_addr = 0;
+    int m_remote_port = 0;
+    int m_state = 0;
+    int m_tx_queue = 0;
+    int m_rx_queue = 0;
 
   };
 

@@ -23,8 +23,8 @@ namespace Belle2 {
     SocketIO();
     ~SocketIO();
 
-    int put(int sock, char* data, int len);
-    int put_wordbuf(int sock, int* data, int len);
+    static int put(int sock, char* data, int len);
+    static int put_wordbuf(int sock, int* data, int len);
     int get(int sock, char* data, int len);
     int get_wordbuf(int sock, int* data, int len);
 
@@ -32,18 +32,18 @@ namespace Belle2 {
 
     // protected:
     int read_data(int sock, char* data, int len);
-    int write_data(int sock, char* data, int len);
+    static int write_data(int sock, char* data, int len);
 
     void interrupt();
 
   private:
-    int m_int;
+    int m_int = 0;
 
   };
 
   class SocketRecv : public SocketIO {
   public:
-    SocketRecv(u_short port);
+    explicit SocketRecv(u_short port);
     ~SocketRecv();
 
     int examine();
@@ -61,6 +61,7 @@ namespace Belle2 {
     int write(char* data, int len);
 
     int err() const;
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     void interrupt();
 
   private:

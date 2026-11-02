@@ -26,8 +26,13 @@ namespace Belle2 {
 
   class RFEventProcessor : public RFServerBase {
   public:
-    RFEventProcessor(std::string conffile);
+    explicit RFEventProcessor(const std::string& conffile);
     ~RFEventProcessor();
+    /** Copy constructor (disabled). */
+    RFEventProcessor(const RFEventProcessor&) = delete;
+
+    /** Operator = (disabled). */
+    RFEventProcessor& operator=(const RFEventProcessor&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
@@ -58,8 +63,8 @@ namespace Belle2 {
     int m_pid_hrelay;
     char m_nodename[256 + 4];
 
-    int m_expno;
-    int m_runno;
+    int m_expno = 0;
+    int m_runno = 0;
 
   };
 

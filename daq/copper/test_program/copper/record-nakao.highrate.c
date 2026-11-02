@@ -30,7 +30,7 @@ void closefile( )
 
 
 void
-show_event(unsigned long * head, int len)
+show_event(const unsigned long * head, int len)
 {
   int i;
   for (i=0; i<(len/4); i+= 8) {
@@ -42,7 +42,7 @@ show_event(unsigned long * head, int len)
 
 
 unsigned long
-xor(unsigned long * start, int wordlen)
+xor(const unsigned long * start, int wordlen)
 {
   unsigned long ret = 0;
   while (wordlen--) {
@@ -65,10 +65,11 @@ main(int argc, char **argv)
   int amtfd[4];
   int iii;
   int istop;
+  // cppcheck-suppress unreadVariable ; kept for debugging
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
-  char *program = argv[0];
+  const char *program = argv[0];
   int tot_recvd_byte = 0;
   while (argc > 1) {
     if (argv[1][0] == '-') {
@@ -175,8 +176,8 @@ main(int argc, char **argv)
     if (i% 80000 == 0){ printf("\n event number = %i \n ",i);}
 
     char * p = (char *)buffer;
-    struct copper_header * header = (struct copper_header *)p;
-    struct copper_footer * footer =
+    const struct copper_header * header = (struct copper_header *)p;
+    const struct copper_footer * footer =
       (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
     int t;
     unsigned  short temph,templ;
@@ -282,12 +283,12 @@ main(int argc, char **argv)
 
     if( event % 10000 == 0 ){
       time_t timer;
-      struct tm *t_st;
+      const struct tm *t_st;
       time(&timer);
       t_st = localtime(&timer);
 
       char timeStr[100];
-      std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
+      strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
       printf(" Event : %i  received, xor = %08lx total received %.2lf[MB] %s", event,  xor((unsigned long *)buffer, ret/4), tot_recvd_byte/1.e6, timeStr);
     }
     if (event <= 10)  {/*   modified by sun */

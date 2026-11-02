@@ -28,6 +28,7 @@ const RCCommand& RCCommand::operator=(const RCCommand& command)
   return *this;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 const RCCommand& RCCommand::operator=(const std::string& label)
 {
   if (NSMCommand::operator=(label) != Enum::UNKNOWN) return *this;
@@ -45,6 +46,7 @@ const RCCommand& RCCommand::operator=(const std::string& label)
   return *this;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 const RCCommand& RCCommand::operator=(int id)
 {
   if (NSMCommand::operator=(id) != Enum::UNKNOWN) return *this;
@@ -62,6 +64,7 @@ const RCCommand& RCCommand::operator=(int id)
   return *this;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 const RCCommand& RCCommand::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);

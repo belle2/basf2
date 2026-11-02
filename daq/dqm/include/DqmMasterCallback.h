@@ -18,8 +18,13 @@ namespace Belle2 {
   class DqmMasterCallback : public RCCallback {
 
   public:
-    DqmMasterCallback(ConfigFile&);
-    virtual ~DqmMasterCallback();
+    explicit DqmMasterCallback(ConfigFile&);
+    virtual ~DqmMasterCallback() override;
+    /** Copy constructor (disabled). */
+    DqmMasterCallback(const DqmMasterCallback&) = delete;
+
+    /** Operator = (disabled). */
+    DqmMasterCallback& operator=(const DqmMasterCallback&) = delete;
 
   public:
     void load(const DBObject& obj, const std::string& runtype) override final;
@@ -29,8 +34,8 @@ namespace Belle2 {
 
     static int m_running;
   private:
-    int m_expno;
-    int m_runno;
+    int m_expno = 0;
+    int m_runno = 0;
     std::string m_runtype;
     std::string m_histodir;
     std::string m_tmpdir;

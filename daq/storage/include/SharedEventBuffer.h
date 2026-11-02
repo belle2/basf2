@@ -56,7 +56,7 @@ namespace Belle2 {
     bool isOpened() { return m_memory.isOpened(); }
 
   public:
-    const std::string getPath() const throw() { return m_path; }
+    const std::string& getPath() const throw() { return m_path; }
     Header* getHeader() throw() { return m_header; }
     int* getBuffer() throw() { return m_buf; }
     bool isWritable(int nword) throw();
@@ -75,7 +75,7 @@ namespace Belle2 {
     SharedMemory m_memory;
     MMutex m_mutex;
     MCond m_cond;
-    Header* m_header;
+    Header* m_header = nullptr;
     int* m_buf;
     unsigned int m_nword;
 

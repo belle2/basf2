@@ -66,6 +66,7 @@ std::string StringUtil::form(const std::string& str, ...)
 {
   va_list ap;
   static __thread char ss[1024 * 10];
+  // cppcheck-suppress va_start_referencePassed ; the format is taken by const reference throughout this API
   va_start(ap, str);
   vsnprintf(ss, sizeof(ss), str.c_str(), ap);
   va_end(ap);
@@ -108,7 +109,7 @@ bool StringUtil::find(const std::string& s, const std::string& str)
 
 bool StringUtil::isdigit(const std::string& s)
 {
-  if (s.find("0x") == 0) return true;
+  if (s.compare(0, 2, "0x") == 0) return true;
   for (size_t i = 0; i < s.size(); i++) {
     if (i == 0 && s.at(0) == '-') continue;
     if (!::isdigit(s.at(i))) return false;

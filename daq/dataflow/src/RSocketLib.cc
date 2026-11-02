@@ -51,7 +51,7 @@ RSocketSend::RSocketSend(u_short p)
   setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
   setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
 
-  if ((bind(s, (struct sockaddr*)&sa, sizeof(sa))) < 0) {
+  if ((bind(s, reinterpret_cast<struct sockaddr*>(&sa), sizeof(sa))) < 0) {
     m_errno = errno;
     perror("RSocketSend::bind");
     return;
@@ -85,10 +85,10 @@ int RSocketSend::accept()
   m_errno = 0;
   struct sockaddr_in isa;
   socklen_t i = sizeof(isa);
-  getsockname(m_sock, (struct sockaddr*)&isa, &i);
+  getsockname(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i);
 
   int t;
-  if ((t =::accept(m_sock, (struct sockaddr*)&isa, &i)) < 0) {
+  if ((t =::accept(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i)) < 0) {
     m_errno = errno;
     return (-1);
   }
@@ -205,6 +205,7 @@ int RSocketSend::err() const
   return m_errno;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 void RSocketSend::interrupt()
 {
   m_io.interrupt();
@@ -227,7 +228,7 @@ RSocketRecv::RSocketRecv(const char* node, u_short port)
 
   //  struct sockaddr_in sa;
   bzero(&m_sa, sizeof(m_sa));
-  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
+  bcopy(m_hp->h_addr, reinterpret_cast<char*>(&m_sa.sin_addr), m_hp->h_length);
   m_sa.sin_family = m_hp->h_addrtype;
   m_sa.sin_port = htons((u_short)port);
 
@@ -248,7 +249,7 @@ RSocketRecv::RSocketRecv(const char* node, u_short port)
   int maxretry = 1000;
   for (;;) {
     printf("SocketRecv: connect trying %d times\n", 1000 - maxretry + 1);
-    int istat = connect(s, (struct sockaddr*)&m_sa, sizeof(m_sa));
+    int istat = connect(s, reinterpret_cast<struct sockaddr*>(&m_sa), sizeof(m_sa));
     if (istat >= 0) {
       m_sock = s;
       m_port = port;
@@ -306,7 +307,7 @@ int RSocketRecv::reconnect(int ntry)
 
   // Setup socket parameters again;
   bzero(&m_sa, sizeof(m_sa));
-  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
+  bcopy(m_hp->h_addr, reinterpret_cast<char*>(&m_sa.sin_addr), m_hp->h_length);
   m_sa.sin_family = m_hp->h_addrtype;
   m_sa.sin_port = htons((u_short)m_port);
 
@@ -332,7 +333,7 @@ int RSocketRecv::reconnect(int ntry)
 
   for (;;) {
     printf("RSocketRecv: reconnecting (trial %d) \n", ntry - maxretry + 1);
-    int istat = connect(m_sock, (struct sockaddr*)&m_sa, sizeof(m_sa));
+    int istat = connect(m_sock, reinterpret_cast<struct sockaddr*>(&m_sa), sizeof(m_sa));
     if (istat >= 0) {
       printf("RSocketRecv: reconnected\n");
       return 0;

@@ -80,7 +80,7 @@ void FastRbuf2DsModule::initialize()
   // Prefetch the first record in Ring Buffer
   int size;
   char* evtbuf = new char[MAXEVTSIZE];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) usleep(20);
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf))) == 0) usleep(20);
 
   // Read 1st event in DataStore
   if (size > 0) {
@@ -127,7 +127,8 @@ void FastRbuf2DsModule::ReadRbufInThread()
   for (;;) {
     char* evtbuf = new char[EvtMessage::c_MaxEventSize];
     int size;
-    while ((size = m_rbuf->remq((int*)evtbuf)) == 0) usleep(20);
+    while ((size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf))) == 0) usleep(20);
+    // cppcheck-suppress knownConditionTrueFalse ; size comes from the ring buffer at runtime
     if (size == 0) { // TODO this condition is always false
       printf("ReadRbufInThread : ERROR! record with size=0 detected!!!!!\n");
       m_streamer->queueEvtMessage(NULL);

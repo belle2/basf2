@@ -24,24 +24,21 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DAQPerfModule();
-    virtual ~DAQPerfModule();
+    virtual ~DAQPerfModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
 
     //! Module functions to be called from event process
-    void beginRun() override;
     void event() override;
-    void endRun() override;
-    void terminate() override;
 
     // Data members
   private:
     timeval m_t0;
-    int m_nevent;
+    int m_nevent = 0;
     int m_ncycle;
     bool m_mon;
-    double m_totbytes;
+    double m_totbytes = 0.0;
 
   };
 

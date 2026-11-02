@@ -244,7 +244,7 @@ void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr, int nh
 void split_Ecltrg(int sender_id, unsigned int* data, std::vector< int > valid_ch,
                   unsigned int* data_main, unsigned int* data_splitted,
                   int& event_nwords_main, int& event_nwords_splitted,
-                  unsigned int splitted_node_id, std::vector< int > splitted_ch);
+                  unsigned int splitted_node_id, const std::vector< int >& splitted_ch);
 
 void* sender(void* arg);
 //int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb, std::vector< int > valid_ch)

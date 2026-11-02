@@ -23,7 +23,7 @@ using namespace Belle2;
 //#define DESY
 
 // Main
-RFMaster::RFMaster(string conffile)
+RFMaster::RFMaster(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -45,8 +45,10 @@ RFMaster::RFMaster(string conffile)
 
   // 4. Leave PID file
   FILE* f = fopen("pid.data", "w");
-  fprintf(f, "%d", getpid());
-  fclose(f);
+  if (f != NULL) {
+    fprintf(f, "%d", getpid());
+    fclose(f);
+  }
 
 }
 
@@ -85,7 +87,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   int* pars = nullptr;
 
   // 0. Configure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_LOAD", 0, pars);
@@ -94,7 +96,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   //  sleep(2);
 
   // 1. Configure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(distributor, "RC_LOAD", 0, pars);
@@ -106,7 +108,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -128,7 +130,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   printf("RFMaster:: distributor configured\n");
 
   // 3. Configure collector
-  char* collector = m_conf->getconf("collector", "nodename");
+  const char* collector = m_conf->getconf("collector", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(collector, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(collector, "RC_LOAD", 0, pars);
@@ -137,7 +139,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   //  sleep ( 5 );
 
   // 4. Configure
-  char* roisender = m_conf->getconf("roisender", "nodename");
+  const char* roisender = m_conf->getconf("roisender", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(roisender, "RF_CONFIGURE", 0, pars);
   b2nsm_sendreq(roisender, "RC_LOAD", 0, pars);
@@ -154,14 +156,14 @@ int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* /*msgc*/)
   pars[1] = msgm->pars[1];
 
   // Unconfigure RoiSender
-  char* roisender = m_conf->getconf("roisender", "nodename");
+  const char* roisender = m_conf->getconf("roisender", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(roisender, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(roisender, "RC_ABORT", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 1) b2nsm_wait(1);
 
   // Unconfigure collector
-  char* collector = m_conf->getconf("collector", "nodename");
+  const char* collector = m_conf->getconf("collector", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(collector, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(collector, "RC_ABORT", 0, pars);
@@ -170,7 +172,7 @@ int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* /*msgc*/)
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -201,14 +203,14 @@ int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* /*msgc*/)
 #endif
 
   // Unconfigure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_ABORT", 0, pars);
   while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
 
   // Unconfigure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(distributor, "RF_UNCONFIGURE", 0, pars);
   b2nsm_sendreq(distributor, "RC_ABORT", 0, pars);
@@ -230,7 +232,7 @@ int RFMaster::Start(NSMmsg* msgm, NSMcontext* /*msgc*/)
   fflush(stdout);
 
   // 0. Start DQMserver
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_START", 2, pars);
@@ -239,7 +241,7 @@ int RFMaster::Start(NSMmsg* msgm, NSMcontext* /*msgc*/)
   // 1. Start worker nodes
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -269,7 +271,7 @@ int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
   // Unconfigure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "nodebase");
+  const char* hostbase = m_conf->getconf("processor", "nodebase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -293,7 +295,7 @@ int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
 
   // 2. Stop DqmServer node
   // Unconfigure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   RFNSM_Status::Instance().set_flag(0);
   //  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_STOP", 0, pars);
@@ -311,13 +313,13 @@ int RFMaster::Restart(NSMmsg*, NSMcontext*)
   int* pars = nullptr;
 
   // 0. Configure DqmServer
-  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  const char* dqmserver = m_conf->getconf("dqmserver", "nodename");
   //  b2nsm_sendreq(dqmserver, "RF_RESTART", 0, pars);
   b2nsm_sendreq(dqmserver, "RC_RECOVER", 0, pars);
   sleep(2);
 
   // 1. Configure distributor
-  char* distributor = m_conf->getconf("distributor", "nodename");
+  const char* distributor = m_conf->getconf("distributor", "nodename");
   //  b2nsm_sendreq(distributor, "RF_RESTART", 0, pars);
   b2nsm_sendreq(distributor, "RC_RECOVER", 0, pars);
   sleep(2);
@@ -325,7 +327,7 @@ int RFMaster::Restart(NSMmsg*, NSMcontext*)
   // 2. Configure event processors
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  const char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
 
   char hostnode[512], idname[3];
@@ -341,7 +343,7 @@ int RFMaster::Restart(NSMmsg*, NSMcontext*)
   sleep(2);
 
   // 3. Configure collector
-  char* collector = m_conf->getconf("collector", "nodename");
+  const char* collector = m_conf->getconf("collector", "nodename");
   //  b2nsm_sendreq(collector, "RF_RESTART", 0, pars);
   b2nsm_sendreq(collector, "RC_RECOVER", 0, pars);
 

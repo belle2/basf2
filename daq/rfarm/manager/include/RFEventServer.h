@@ -24,8 +24,13 @@ namespace Belle2 {
 
   class RFEventServer : public RFServerBase {
   public:
-    RFEventServer(std::string conffile);
+    explicit RFEventServer(const std::string& conffile);
     ~RFEventServer();
+    /** Copy constructor (disabled). */
+    RFEventServer(const RFEventServer&) = delete;
+
+    /** Operator = (disabled). */
+    RFEventServer& operator=(const RFEventServer&) = delete;
 
     // Instance of singleton
     static RFEventServer& Create(const std::string& conffile);
@@ -54,9 +59,10 @@ namespace Belle2 {
 
     int m_pid_recv;
     int m_pid_sender[MAXNODES];
-    int m_nnodes;
+    int m_nnodes = 0;
 
   private:
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     static RFEventServer* s_instance;
   };
 

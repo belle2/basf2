@@ -30,7 +30,7 @@ void closefile( )
 
 
 void
-show_event(unsigned long * head, int len)
+show_event(const unsigned long * head, int len)
 {
     int i;
     for (i=0; i<(len/4); i+= 8) {
@@ -42,7 +42,7 @@ show_event(unsigned long * head, int len)
 
 
 unsigned long
-xor(unsigned long * start, int wordlen)
+xor(const unsigned long * start, int wordlen)
 {
     unsigned long ret = 0;
     while (wordlen--) {
@@ -53,7 +53,7 @@ xor(unsigned long * start, int wordlen)
 
 int cprfd;
 
-main()
+int main(void)
 {   
     FILE *fpr;  // for file read modified by Jingzhou Zhao
     char SaveFile[100];// SaveFile
@@ -102,6 +102,7 @@ main()
         exit(0);
     }
 
+    // cppcheck-suppress badBitmaskCheck ; the use_slot flags are edited by hand
     val = (use_slot_A<<0) | (use_slot_B<<1) | (use_slot_C<<2) | (use_slot_D<<3);
     ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &val, sizeof(val));
 
@@ -149,8 +150,8 @@ main()
         if (i% 80000 == 0){ printf("\n event number = %i \n ",i);}
 
 	char * p = (char *)buffer;
-	struct copper_header * header = (struct copper_header *)p;
-	struct copper_footer * footer =
+	const struct copper_header * header = (struct copper_header *)p;
+	const struct copper_footer * footer =
 	    (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
 	 int t;
        unsigned  short temph,templ;

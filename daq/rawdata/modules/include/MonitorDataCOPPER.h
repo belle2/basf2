@@ -13,7 +13,7 @@
 
 #include <framework/core/HistoModule.h>
 
-#include "TH1F.h"
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -26,7 +26,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     MonitorDataCOPPERModule();
-    virtual ~MonitorDataCOPPERModule();
+    virtual ~MonitorDataCOPPERModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -44,15 +44,15 @@ namespace Belle2 {
     //! No. of sent events
     int m_loop;
 
-    TH1* h_size;
-    TH1* h_nevt;
-    TH1* h_rate;
-    TH1* h_diff;
+    TH1* h_size = nullptr;
+    TH1* h_nevt = nullptr;
+    TH1* h_rate = nullptr;
+    TH1* h_diff = nullptr;
 
-    int m_nevt;
+    int m_nevt = 0;
 
     timeval m_tv;
-    double m_start_time;
+    double m_start_time = 0.0;
 
 
   };

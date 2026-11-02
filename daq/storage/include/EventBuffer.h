@@ -31,8 +31,13 @@ namespace Belle2 {
       m_buf = 0;
       m_nword = 0;
     }
-    EventBuffer(unsigned int nword);
+    explicit EventBuffer(unsigned int nword);
     ~EventBuffer();
+    /** Copy constructor (disabled). */
+    EventBuffer(const EventBuffer&) = delete;
+
+    /** Operator = (disabled). */
+    EventBuffer& operator=(const EventBuffer&) = delete;
 
   public:
     unsigned int size() throw();
@@ -49,7 +54,7 @@ namespace Belle2 {
     unsigned int read(int* buf, Header* hdr = 0);
 
   private:
-    Header m_header;
+    Header m_header = {};
     int* m_buf;
     unsigned int m_nword;
 

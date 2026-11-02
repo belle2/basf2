@@ -12,7 +12,7 @@ using namespace Belle2;
 
 // REvtSocketRecv
 
-REvtSocketRecv::REvtSocketRecv(std::string host, int port)
+REvtSocketRecv::REvtSocketRecv(const std::string& host, int port)
 {
   m_sock = new RSocketRecv(host.c_str(), (u_short)port);
   m_recbuf = new char[MAXEVTSIZE];
@@ -27,7 +27,7 @@ REvtSocketRecv::~REvtSocketRecv()
 int REvtSocketRecv::send(EvtMessage* msg)
 {
   //  printf ( "REvtSocketRecv : sending = %d\n", msg->size() );
-  return m_sock->put((char*)msg->buffer(), msg->size());
+  return m_sock->put(static_cast<char*>(msg->buffer()), msg->size());
 }
 
 EvtMessage* REvtSocketRecv::recv()
@@ -82,7 +82,7 @@ EvtMessage* REvtSocketSend::REvtSocketSend::recv()
 
 int REvtSocketSend::send(EvtMessage* msg)
 {
-  return m_sock->put((char*)msg->buffer(), msg->size());
+  return m_sock->put(static_cast<char*>(msg->buffer()), msg->size());
 }
 
 int REvtSocketSend::send_buffer(int nbytes, char* buf)

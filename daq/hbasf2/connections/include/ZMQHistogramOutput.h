@@ -59,6 +59,9 @@ namespace Belle2 {
     /// Forward a merge call to the base class handing over the stored messages
     void mergeAndSend(EMessageTypes messageType = EMessageTypes::c_eventMessage);
     /// Forward a clear call to the base class and clear the stored messages. Should be called on run start
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     void clear();
 
   private:

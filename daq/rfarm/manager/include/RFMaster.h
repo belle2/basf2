@@ -17,8 +17,13 @@
 namespace Belle2 {
   class RFMaster : public RFServerBase {
   public:
-    RFMaster(std::string conf);
+    explicit RFMaster(const std::string& conf);
     ~RFMaster();
+    /** Copy constructor (disabled). */
+    RFMaster(const RFMaster&) = delete;
+
+    /** Operator = (disabled). */
+    RFMaster& operator=(const RFMaster&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
@@ -28,13 +33,13 @@ namespace Belle2 {
     int Restart(NSMmsg*, NSMcontext*) override;
 
     // Function to hook message funnctions
-    void Hook_Message_Handlers();
+    static void Hook_Message_Handlers();
 
     // Message functions
     static void Log_Handler(NSMmsg* msg, NSMcontext* ctx);
 
     // Server function
-    void monitor_loop();
+    static void monitor_loop();
 
 
   private:

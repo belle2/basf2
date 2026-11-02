@@ -17,8 +17,8 @@ namespace Belle2 {
   class ERecoRunControlCallback : public RCCallback {
 
   public:
-    ERecoRunControlCallback(ERecoMasterCallback* callback);
-    virtual ~ERecoRunControlCallback() {}
+    explicit ERecoRunControlCallback(ERecoMasterCallback* callback);
+    virtual ~ERecoRunControlCallback() override {}
 
   public:
     void initialize(const DBObject& obj) override;

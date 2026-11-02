@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-Sock2Rb::Sock2Rb(string rbuf, int port)
+Sock2Rb::Sock2Rb(const string& rbuf, int port)
 {
   //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(rbuf.c_str());
@@ -45,7 +45,7 @@ int Sock2Rb::ReceiveEvent(void)
   // Put the message in ring buffer
   int stat = 0;
   for (;;) {
-    stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+    stat = m_rbuf->insq(reinterpret_cast<int*>(msg->buffer()), msg->paddedSize());
     if (stat >= 0) break;
     //    usleep(100);
     usleep(20);

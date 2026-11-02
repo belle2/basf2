@@ -122,8 +122,8 @@ void RFNSM::AllocMem(char* format)
 {
   printf("AllocMem : format file = %s\n", format);
   //  Allocate shared memory
-  m_info = (RfNodeInfo*)b2nsm_allocmem(m_nodename.c_str(), format,
-                                       1, 3);
+  m_info = static_cast<RfNodeInfo*>(b2nsm_allocmem(m_nodename.c_str(), format,
+                                                   1, 3));
   if (!m_info) {
     fprintf(RFNSMOUT, "RFNSM : %s allocmem failure, %s\n",
             m_nodename.c_str(), b2nsm_strerror());

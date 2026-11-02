@@ -18,6 +18,11 @@ namespace Belle2 {
   public:
     HistoRelay2(std::string& filename, std::string& dest, int port);
     ~HistoRelay2();
+    /** Copy constructor (disabled). */
+    HistoRelay2(const HistoRelay2&) = delete;
+
+    /** Operator = (disabled). */
+    HistoRelay2& operator=(const HistoRelay2&) = delete;
 
     int collect();
   private:
@@ -26,8 +31,8 @@ namespace Belle2 {
     std::string m_dest;
     int m_port;
 
-    EvtMessage* StreamFile(std::string& filename);
-    int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numobjs);
+    static EvtMessage* StreamFile(std::string& filename);
+    static int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numobjs);
 
   };
 }

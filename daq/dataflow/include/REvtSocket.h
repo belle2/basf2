@@ -21,8 +21,13 @@ namespace Belle2 {
 
   class REvtSocketRecv {
   public:
-    REvtSocketRecv(std::string hostname, int port);
+    REvtSocketRecv(const std::string& hostname, int port);
     ~REvtSocketRecv();
+    /** Copy constructor (disabled). */
+    REvtSocketRecv(const REvtSocketRecv&) = delete;
+
+    /** Operator = (disabled). */
+    REvtSocketRecv& operator=(const REvtSocketRecv&) = delete;
 
     int status();
 
@@ -41,8 +46,13 @@ namespace Belle2 {
 
   class REvtSocketSend {
   public:
-    REvtSocketSend(int port, bool accept_at_init = true);
+    explicit REvtSocketSend(int port, bool accept_at_init = true);
     ~REvtSocketSend();
+    /** Copy constructor (disabled). */
+    REvtSocketSend(const REvtSocketSend&) = delete;
+
+    /** Operator = (disabled). */
+    REvtSocketSend& operator=(const REvtSocketSend&) = delete;
 
     int status();
 

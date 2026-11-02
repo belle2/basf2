@@ -17,7 +17,7 @@ namespace Belle2 {
 
   class RFProcessManager {
   public:
-    RFProcessManager(char* nodename);
+    explicit RFProcessManager(char* nodename);
     virtual ~RFProcessManager();
 
     // Signal handler

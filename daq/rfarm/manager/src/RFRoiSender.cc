@@ -21,7 +21,7 @@
 using namespace Belle2;
 using namespace std;
 
-RFRoiSender::RFRoiSender(string conffile)
+RFRoiSender::RFRoiSender(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -40,7 +40,7 @@ RFRoiSender::RFRoiSender(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(nodename);
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
   printf("RoiSender : shmname = %s\n", shmname.c_str());
 
   // 3. Initialize process manager
@@ -50,7 +50,7 @@ RFRoiSender::RFRoiSender(string conffile)
   m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 5. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
   // 6. Clear PID list
   m_pid_sender = 0;
@@ -71,8 +71,8 @@ int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   // 0. Do you need RoI sender?
   char* roisw = m_conf->getconf("roisender", "enabled");
-  if (nsmm->len > 0) {
-    roisw = (char*) nsmm->datap;
+  if (nsmm != NULL && nsmm->len > 0) {
+    roisw = const_cast<char*>(nsmm->datap);
     printf("Configure: roisender enable flag is overridden : %s\n", roisw);
   }
   if (strstr(roisw, "yes") == 0) return 0;
@@ -91,7 +91,7 @@ int RFRoiSender::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
   if (strstr(merger, "none") == 0) {
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_ROI_ID);
-    m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+    m_pid_merger = m_proc->Execute(merger, const_cast<char*>(shmname.c_str()), idbuf, onsenhost, onsenport, mergerport);
     sleep(2);
   }
 
@@ -132,16 +132,6 @@ int RFRoiSender::UnConfigure(NSMmsg*, NSMcontext*)
     m_pid_merger = 0;
   }
   printf("UnConfigure : done\n");
-  return 0;
-}
-
-int RFRoiSender::Start(NSMmsg*, NSMcontext*)
-{
-  return 0;
-}
-
-int RFRoiSender::Stop(NSMmsg*, NSMcontext*)
-{
   return 0;
 }
 

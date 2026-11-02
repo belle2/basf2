@@ -14,8 +14,8 @@ void   main()
     printf(ctime(&lt));   /*english   format   output*/ 
 
     char timeLoc[100], timeGMT[100];
-    std::strftime(timeLoc, sizeof(timeLoc), "%Y-%m-%d %H:%M:%S\n", localtime(&lt));
-    std::strftime(timeGMT, sizeof(timeGMT), "%Y-%m-%d %H:%M:%S\n", gmtime(&lt));
+    strftime(timeLoc, sizeof(timeLoc), "%Y-%m-%d %H:%M:%S\n", localtime(&lt));
+    strftime(timeGMT, sizeof(timeGMT), "%Y-%m-%d %H:%M:%S\n", gmtime(&lt));
 
     printf(timeLoc);/*tranfer   to   tm*/ 
     printf(timeGMT);   /*tranfer   to   Greenwich   time*/ 

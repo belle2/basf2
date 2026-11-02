@@ -66,13 +66,13 @@ namespace Belle2 {
   private:
     /// We use the framework stream helper
     StreamHelper m_streamHelper;
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     /// Decoding input
     BinData m_data;
     BinData m_data_hlt;
     BinData m_data_pxd;
-    int* m_buf;
+    int* m_buf = nullptr;
     int m_eb2 = 1;
 
 /// Store Objects for HLT use

@@ -21,7 +21,7 @@ Fifo Fifo::mkfifo(const std::string& path)
 {
   ::mkfifo(path.c_str(), 0666);
   Fifo fifo;
-  fifo.open(path.c_str());
+  fifo.open(path);
   return fifo;
 }
 

@@ -19,6 +19,7 @@ namespace Belle2 {
 
   public:
     NSMState() : Enum(Enum::UNKNOWN) {}
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     NSMState(const Enum& num) : Enum(num) {}
     NSMState(const NSMState& st) : Enum(st) {}
     ~NSMState()  {}

@@ -24,7 +24,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     ElapsedTimeModule();
-    virtual ~ElapsedTimeModule();
+    virtual ~ElapsedTimeModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -37,8 +37,8 @@ namespace Belle2 {
 
     // Data members
   private:
-    int m_nevent;
-    int m_nevprev;
+    int m_nevent = 0;
+    int m_nevprev = 0;
     int m_interval;
     struct timeval m_t0;
     struct timeval m_tprev;

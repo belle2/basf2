@@ -29,11 +29,9 @@ void* RunDqmMasterLogger(void*)
   return nullptr;
 }
 
-DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
+DqmMasterCallback::DqmMasterCallback(ConfigFile& config) : m_histodir(config.get("dqmmaster.histodir")),
+  m_tmpdir(config.get("dqmmaster.tmpdir")), m_instance(config.get("dqmmaster.instance"))
 {
-  m_histodir = config.get("dqmmaster.histodir");
-  m_tmpdir = config.get("dqmmaster.tmpdir");
-  m_instance = config.get("dqmmaster.instance");
   auto host = config.get("dqmmaster.host");
   auto port = config.getInt("dqmmaster.port");
   m_running = 0;

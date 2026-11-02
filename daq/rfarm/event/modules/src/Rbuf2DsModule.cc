@@ -82,7 +82,7 @@ void Rbuf2DsModule::initialize()
   // Prefetch the first record in Ring Buffer
   int size;
   char* evtbuf = new char[MAXEVTSIZE];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf))) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     //    usleep(100);
     if (signalled != 0) break;
@@ -129,7 +129,7 @@ void Rbuf2DsModule::event()
   int size;
 
   char* evtbuf = new char[MAXEVTSIZE];
-  while ((size = m_rbuf->remq((int*)evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(evtbuf))) == 0) {
     //    printf ( "Signal Status = %d\n", globalSignalReceived );
     if (signalled != 0) break;
     usleep(100);

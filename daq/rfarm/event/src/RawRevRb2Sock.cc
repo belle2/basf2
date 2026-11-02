@@ -14,10 +14,10 @@ using namespace Belle2;
 RawRevRb2Sock::RawRevRb2Sock(string rbuf, int port, string shmname, int id)
 {
   //  m_rbuf = new RingBuffer((char*)rbuf.c_str(), RBUFSIZE);
-  m_rbuf = new RingBuffer((char*)rbuf.c_str());
+  m_rbuf = new RingBuffer(const_cast<char*>(rbuf.c_str()));
   m_sock = new RSocketSend(port);
   m_evtbuf = new int[MAXEVTSIZE];
-  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()), id, m_rbuf);
 
   m_sock->accept();
 }

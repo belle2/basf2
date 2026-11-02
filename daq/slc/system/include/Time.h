@@ -19,9 +19,9 @@ namespace Belle2 {
     // constructors & destructors
   public:
     explicit Time();
-    Time(const double);
+    explicit Time(const double);
     Time(const long, const long);
-    ~Time();
+    ~Time() override;
 
     // member methods
   private:

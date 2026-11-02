@@ -102,7 +102,7 @@ void ERecoMasterCallback::setState(NSMNode& node, const RCState& state)
   int i = 0;
   for (NSMNodeList::iterator it = m_nodes.begin();
        it != m_nodes.end(); ++it) {
-    NSMNode& rnode(*it);
+    const NSMNode& rnode(*it);
     if (StringUtil::toupper(rnode.getName()) == StringUtil::toupper(node.getName())) {
       std::string vname = StringUtil::form("node[%d].rcstate", i);
       set(vname, state.getLabel());
@@ -117,7 +117,7 @@ void ERecoMasterCallback::setState(NSMNode& node, const RCState& state)
 void ERecoMasterCallback::monitor()
 {
   if (!m_callback->getData().isAvailable()) return;
-  RfUnitInfo* unitinfo = (RfUnitInfo*)m_callback->getData().get();
+  RfUnitInfo* unitinfo = static_cast<RfUnitInfo*>(m_callback->getData().get());
   unitinfo->nnodes = m_dataname.size();
   unitinfo->updatetime = Time().get();
   unitinfo->rcstate = getNode().getState().getId();
@@ -128,7 +128,7 @@ void ERecoMasterCallback::monitor()
     try {
       if (data.isAvailable()) {
         RfUnitInfo::RfNodeInfo* nodeinfo_o = &unitinfo->nodeinfo[i];
-        RfNodeInfo* nodeinfo_i = (RfNodeInfo*)data.get();
+        const RfNodeInfo* nodeinfo_i = static_cast<RfNodeInfo*>(data.get());
         memcpy(nodeinfo_o, nodeinfo_i, sizeof(RfNodeInfo));
       }
     } catch (const NSMHandlerException& e) {}
@@ -328,7 +328,7 @@ void ERecoMasterCallback::start(int expno, int runno)
       perform(NSMCommunicator::select(30));
     } catch (const TimeoutException& e) {}
   }
-  char cmdline[] = "hsendcommand DQMRC:CLEAR erctl 9991";
+  const char cmdline[] = "hsendcommand DQMRC:CLEAR erctl 9991";
   system(cmdline);
   printf("ERecoMaster : DQM TMemFile cleared\n");
 

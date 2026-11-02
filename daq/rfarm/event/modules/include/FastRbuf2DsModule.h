@@ -34,7 +34,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     FastRbuf2DsModule();
-    virtual ~FastRbuf2DsModule();
+    virtual ~FastRbuf2DsModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -59,7 +59,7 @@ namespace Belle2 {
     pthread_t m_thr_input;
 
     //! DataStore streamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     //! Compression Level
     int m_compressionLevel;

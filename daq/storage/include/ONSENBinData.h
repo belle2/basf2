@@ -31,20 +31,21 @@ namespace Belle2 {
     static const unsigned int MAGIC = 0xBEBAFECA;
 
   public:
-    ONSENBinData(void* buf);
+    explicit ONSENBinData(void* buf);
     ~ONSENBinData() throw();
 
   public:
     unsigned int getTrigger() const;
     unsigned int getTimetag() const;
     unsigned int getTriggerType() const;
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     unsigned int getEventNumber() const;
     unsigned int getFrameNumber() const;
     unsigned int getFrameByteSize() const;
     unsigned int getONSENMagic() const;
 
   private:
-    mutable sose_frame_t* m_start_frame;
+    mutable sose_frame_t* m_start_frame = nullptr;
 
   };
 

@@ -31,6 +31,7 @@ void StorageStreamHelper::initialize()
 {
   //m_streamHelper.initialize(0, true);
 
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_buf = new int [10000000];
   m_data.setBuffer(m_buf);
   m_data_hlt.setBuffer(NULL);
@@ -89,7 +90,7 @@ void StorageStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
 
     m_data_hlt.setBuffer(m_data.getBody());
 
-    EvtMessage* msg = new EvtMessage((char*)m_data_hlt.getBody());
+    EvtMessage* msg = new EvtMessage(reinterpret_cast<char*>(m_data_hlt.getBody()));
     if (msg->type() == MSG_TERMINATE) {
       B2INFO("Got Termination message");
       delete msg;
@@ -111,7 +112,7 @@ void StorageStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
           return;
         }
         if (m_data_pxd.getBuffer() != NULL) {
-          m_rawPXDs.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
+          m_rawPXDs.appendNew(reinterpret_cast<int*>(m_data_pxd.getBody()), m_data_pxd.getBodyByteSize());
         }
       }
     } else {

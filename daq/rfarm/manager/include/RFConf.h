@@ -19,8 +19,13 @@ namespace Belle2 {
 
   class RFConf {
   public:
-    RFConf(const char* file);
+    explicit RFConf(const char* file);
     ~RFConf();
+    /** Copy constructor (disabled). */
+    RFConf(const RFConf&) = delete;
+
+    /** Operator = (disabled). */
+    RFConf& operator=(const RFConf&) = delete;
 
     char* getconf(const char* key1,
                   const char* key2 = NULL,

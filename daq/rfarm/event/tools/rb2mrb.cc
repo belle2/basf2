@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   int bsize;
   for (;;) {
     // Get a record from ringbuf
-    while ((bsize = rbufin->remq((int*)evbuf)) == 0) {
+    while ((bsize = rbufin->remq(reinterpret_cast<int*>(evbuf))) == 0) {
       //    printf ( "Rx : evtbuf is not available yet....\n" );
       //      usleep(100);
       usleep(20);
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
     // Put the message in ring buffer
     for (;;) {
-      int irb = rbufout[outptr]->insq((int*)evbuf, bsize);
+      int irb = rbufout[outptr]->insq(reinterpret_cast<int*>(evbuf), bsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
   // EOF
   for (int i = 0; i < nout; i++) {
     for (;;) {
-      int irb = rbufout[i]->insq((int*)evbuf, bsize);
+      int irb = rbufout[i]->insq(reinterpret_cast<int*>(evbuf), bsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

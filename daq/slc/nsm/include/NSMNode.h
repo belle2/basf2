@@ -17,6 +17,7 @@ namespace Belle2 {
   class NSMNode {
 
   public:
+    // cppcheck-suppress noExplicitConstructor ; a node name converts to a node by design
     NSMNode(const std::string& name = "");
     virtual ~NSMNode() {}
 
@@ -37,9 +38,9 @@ namespace Belle2 {
   protected:
     std::string m_name;
     int m_id;
-    bool m_used;
+    bool m_used = false;
     NSMState m_state;
-    int m_date;
+    int m_date = 0;
 
   };
 

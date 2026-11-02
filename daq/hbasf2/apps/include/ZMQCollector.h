@@ -129,7 +129,7 @@ namespace Belle2 {
     /// Parameter: output address
     std::string m_outputAddress;
     /// Parameter: add the event size at the beginning of the message
-    bool m_addEventSize;
+    bool m_addEventSize = false;
     /// Parameter: how long to wait after no events come anymore
     unsigned int m_stopWaitingTime = 2;
   };
@@ -158,7 +158,7 @@ namespace Belle2 {
     /// Parameter: output address for ROIs (second part of message)
     std::string m_roiOutputAddress;
     /// Parameter: add the event size at the beginning of the message
-    bool m_addEventSize;
+    bool m_addEventSize = false;
     /// Parameter: how long to wait after no events come anymore
     unsigned int m_stopWaitingTime = 2;
   };

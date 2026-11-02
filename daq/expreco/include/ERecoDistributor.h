@@ -24,14 +24,18 @@ namespace Belle2 {
 
   class ERecoDistributor : public RFServerBase {
   public:
-    ERecoDistributor(std::string conffile);
+    explicit ERecoDistributor(const std::string& conffile);
     ~ERecoDistributor();
+    /** Copy constructor (disabled). */
+    ERecoDistributor(const ERecoDistributor&) = delete;
+
+    /** Operator = (disabled). */
+    ERecoDistributor& operator=(const ERecoDistributor&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
     int UnConfigure(NSMmsg*, NSMcontext*) override;
     int Start(NSMmsg*, NSMcontext*) override;
-    int Stop(NSMmsg*, NSMcontext*) override;
     int Restart(NSMmsg*, NSMcontext*) override;
 
     // Server function
@@ -45,10 +49,10 @@ namespace Belle2 {
     RFFlowStat*        m_flow;
     RingBuffer*        m_rbufin;
 
-    int m_pid_recv[MAXNODES];
-    int m_pid_sender[MAXNODES];
-    int m_nnodes;
-    int m_nrecv;
+    int m_pid_recv[MAXNODES] = {};
+    int m_pid_sender[MAXNODES] = {};
+    int m_nnodes = 0;
+    int m_nrecv = 0;
 
   };
 

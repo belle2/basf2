@@ -41,7 +41,6 @@ const NSMCommand& NSMCommand::operator=(const std::string& label)
   else if (label == OK.getLabel()) *this = OK;
   else if (label == ERROR.getLabel()) *this = ERROR;
   else if (label == FATAL.getLabel()) *this = FATAL;
-  else if (label == LOG.getLabel()) *this = LOG;
   else if (label == LOGSET.getLabel()) *this = LOGSET;
   else if (label == LOGGET.getLabel()) *this = LOGGET;
   else if (label == STATE.getLabel()) *this = STATE;
@@ -67,7 +66,6 @@ const NSMCommand& NSMCommand::operator=(int id)
   else if (id == OK.getId()) *this = OK;
   else if (id == ERROR.getId()) *this = ERROR;
   else if (id == FATAL.getId()) *this = FATAL;
-  else if (id == LOG.getId()) *this = LOG;
   else if (id == LOGSET.getId()) *this = LOGSET;
   else if (id == LOGGET.getId()) *this = LOGGET;
   else if (id == STATE.getId()) *this = STATE;

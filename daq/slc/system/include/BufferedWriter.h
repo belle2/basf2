@@ -17,9 +17,9 @@ namespace Belle2 {
     // constructors & destructors
   public:
     BufferedWriter();
-    BufferedWriter(size_t size, unsigned char* memory = NULL);
+    explicit BufferedWriter(size_t size, unsigned char* memory = NULL);
     BufferedWriter(const BufferedWriter& w);
-    virtual ~BufferedWriter();
+    virtual ~BufferedWriter() override;
 
     // member methods implemented
   public:

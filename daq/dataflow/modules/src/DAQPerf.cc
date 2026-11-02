@@ -52,11 +52,6 @@ void DAQPerfModule::initialize()
 }
 
 
-void DAQPerfModule::beginRun()
-{
-}
-
-
 void DAQPerfModule::event()
 {
   if (m_nevent % m_ncycle == 0) {
@@ -92,15 +87,5 @@ void DAQPerfModule::event()
   m_nevent++;
   return;
   //  return type;
-}
-
-void DAQPerfModule::endRun()
-{
-  //fill Run data
-}
-
-
-void DAQPerfModule::terminate()
-{
 }
 

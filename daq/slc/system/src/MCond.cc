@@ -20,7 +20,7 @@ MCond::MCond(const MCond& cond)
 
 MCond::MCond(void* addr)
 {
-  set((pthread_cond_t*)addr);
+  set(static_cast<pthread_cond_t*>(addr));
 }
 
 MCond::~MCond() {}
@@ -44,7 +44,7 @@ bool MCond::init()
 
 bool MCond::set(void* addr)
 {
-  m_cond = (pthread_cond_t*)addr;
+  m_cond = static_cast<pthread_cond_t*>(addr);
   return true;
 }
 

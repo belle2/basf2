@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
     AbstractDBObject();
     AbstractDBObject(const AbstractDBObject& obj);
-    virtual ~AbstractDBObject();
+    virtual ~AbstractDBObject() override;
 
     /**
      * Operator =.
@@ -103,13 +103,13 @@ namespace Belle2 {
         throw (std::out_of_range(name + " not found"));
       }
       DBField::Type type(getProperty(name).getType());
-      if (type == DBField::INT) return (T)(((int*)value)[index]);
-      if (type == DBField::FLOAT) return (T)(((float*)value)[index]);
-      if (type == DBField::DOUBLE) return (T)(((double*)value)[index]);
-      if (type == DBField::SHORT) return (T)(((short*)value)[index]);
-      if (type == DBField::CHAR) return (T)(((char*)value)[index]);
-      if (type == DBField::LONG) return (T)(((long*)value)[index]);
-      return ((T*)value)[index];
+      if (type == DBField::INT) return (T)((static_cast<const int*>(value))[index]);
+      if (type == DBField::FLOAT) return (T)((static_cast<const float*>(value))[index]);
+      if (type == DBField::DOUBLE) return (T)((static_cast<const double*>(value))[index]);
+      if (type == DBField::SHORT) return (T)((static_cast<const short*>(value))[index]);
+      if (type == DBField::CHAR) return (T)((static_cast<const char*>(value))[index]);
+      if (type == DBField::LONG) return (T)((static_cast<const long*>(value))[index]);
+      return (static_cast<const T*>(value))[index];
     }
 
   };

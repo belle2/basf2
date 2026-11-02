@@ -114,13 +114,13 @@ bool NSMCommunicator::send(const NSMMessage& msg)
        it != g_comm.end(); ++it) {
     NSMCommunicator& com(*(*it));
     const char* node = msg.getNodeName();
+    if (node == NULL || strlen(node) == 0) continue;
     if (com.isConnected(node)) {
       alive = true;
       const char* req = msg.getRequestName();
-      if (node != NULL && req != NULL &&
-          strlen(node) > 0 && strlen(req) > 0) {
+      if (req != NULL && strlen(req) > 0) {
         b2nsm_context(com.m_nsmc);
-        if (b2nsm_sendany(node, req, msg.getNParams(), (int*)msg.getParams(),
+        if (b2nsm_sendany(node, req, msg.getNParams(), const_cast<int*>(msg.getParams()),
                           msg.getLength(), msg.getData(), NULL) < 0) {
           emsg = b2nsm_strerror();
         }
@@ -137,12 +137,11 @@ bool NSMCommunicator::send(const NSMMessage& msg)
   return sent;
 }
 
-NSMCommunicator::NSMCommunicator(const std::string& host, int port)
+NSMCommunicator::NSMCommunicator(const std::string& host, int port) : m_host(host)
 {
   m_id = -1;
   m_nsmc = NULL;
   m_callback = NULL;
-  m_host = host;
   m_port = port;
 }
 
@@ -195,7 +194,7 @@ void NSMCommunicator::setCallback(NSMCallback* callback)
     NSMCallback::NSMCommandList& req_v(callback->getCommandList());
     for (NSMCallback::NSMCommandList::iterator it = req_v.begin();
          it != req_v.end(); ++it) {
-      NSMCommand& command(*it);
+      const NSMCommand& command(*it);
       if (b2nsm_callback(command.getLabel(), NULL) < 0) {
         m_id = -1;
         throw (NSMHandlerException("Failed to register callback (%s)",

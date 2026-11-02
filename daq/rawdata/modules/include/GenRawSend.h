@@ -27,19 +27,17 @@ namespace Belle2 {
     GenRawSendModule();
 
     //! Destructor
-    virtual ~GenRawSendModule();
+    virtual ~GenRawSendModule() override;
 
     //! Initialize the Module
     void initialize() override;
 
     //! Called when entering a new run
-    void beginRun() override;
 
     //! Running over all events
     void event() override;
 
     //! Is called after processing the last event of a run
-    void endRun() override;
 
     //! Is called at the end of your Module
     void terminate() override;
@@ -69,7 +67,7 @@ namespace Belle2 {
     int m_port;
 
     //! EvtSocket
-    EvtSocketSend* m_sock;
+    EvtSocketSend* m_sock = nullptr;
 
 
   };

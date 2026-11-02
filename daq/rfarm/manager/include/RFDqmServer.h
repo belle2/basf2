@@ -22,8 +22,13 @@ namespace Belle2 {
 
   class RFDqmServer : public RFServerBase {
   public:
-    RFDqmServer(std::string conffile);
+    explicit RFDqmServer(const std::string& conffile);
     ~RFDqmServer();
+    /** Copy constructor (disabled). */
+    RFDqmServer(const RFDqmServer&) = delete;
+
+    /** Operator = (disabled). */
+    RFDqmServer& operator=(const RFDqmServer&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
@@ -43,11 +48,11 @@ namespace Belle2 {
     RFProcessManager*  m_proc;
     RFLogManager*      m_log;
 
-    int m_pid_dqm;
-    int m_pid_relay;
+    int m_pid_dqm = 0;
+    int m_pid_relay = 0;
 
-    int m_expno;
-    int m_runno;
+    int m_expno = 0;
+    int m_runno = 0;
 
   };
 }

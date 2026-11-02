@@ -32,7 +32,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     Rbuf2RbufModule();
-    virtual ~Rbuf2RbufModule();
+    virtual ~Rbuf2RbufModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;

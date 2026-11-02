@@ -18,7 +18,8 @@ using namespace Belle2;
 NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
   : m_value(NULL)
 {
-  int* v = (int*)malloc(value.size() * sizeof(int));
+  int* v = static_cast<int*>(malloc(value.size() * sizeof(int)));
+  if (v == NULL) return;
   for (size_t i = 0; i < value.size(); i++)
     v[i] = value[i];
   m_name = name;
@@ -32,7 +33,8 @@ NSMVar::NSMVar(const std::string& name, const std::vector<int>& value)
 NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
   : m_value(NULL)
 {
-  float* v = (float*)malloc(value.size() * sizeof(float));
+  float* v = static_cast<float*>(malloc(value.size() * sizeof(float)));
+  if (v == NULL) return;
   for (size_t i = 0; i < value.size(); i++)
     v[i] = value[i];
   m_name = name;
@@ -46,7 +48,8 @@ NSMVar::NSMVar(const std::string& name, const std::vector<float>& value)
 const NSMVar& NSMVar::operator=(const std::vector<int>& val)
 {
   if (m_value) free(m_value);
-  int* v = (int*)malloc(val.size() * sizeof(int));
+  int* v = static_cast<int*>(malloc(val.size() * sizeof(int)));
+  if (v == NULL) return *this;
   for (size_t i = 0; i < val.size(); i++)
     v[i] = val[i];
   m_value = v;
@@ -59,7 +62,8 @@ const NSMVar& NSMVar::operator=(const std::vector<int>& val)
 const NSMVar& NSMVar::operator=(const std::vector<float>& val)
 {
   if (m_value) free(m_value);
-  float* v = (float*)malloc(val.size() * sizeof(float));
+  float* v = static_cast<float*>(malloc(val.size() * sizeof(float)));
+  if (v == NULL) return *this;
   for (size_t i = 0; i < val.size(); i++)
     v[i] = val[i];
   m_value = v;
@@ -111,7 +115,7 @@ void NSMVar::copy(const std::string& name,
   int s = size();
   if (s > 0) {
     m_value = malloc(s);
-    memcpy(m_value, value, s);
+    if (m_value != NULL) memcpy(m_value, value, s);
   } else {
     m_type = NONE;
     m_len = 0;
@@ -137,22 +141,23 @@ void NSMVar::readObject(Reader& reader)
   if (s > 0) {
     if (m_value) free(m_value);
     m_value = malloc(s);
+    if (m_value == NULL) return;
     memset(m_value, 0, s);
     switch (m_type) {
       case INT: {
-        int* v = (int*)m_value;
+        int* v = static_cast<int*>(m_value);
         for (int i = 0; i < len; i++) {
           v[i] = reader.readInt();
         }
       } break;
       case FLOAT: {
-        float* v = (float*)m_value;
+        float* v = static_cast<float*>(m_value);
         for (int i = 0; i < len; i++) {
           v[i] = reader.readFloat();
         }
       } break;
       case TEXT: {
-        char* v = (char*)m_value;
+        char* v = static_cast<char*>(m_value);
         // Use m_len condition instead of len due to empty string problem
         for (int i = 0; i < m_len; i++) {
           v[i] = reader.readChar();
@@ -174,19 +179,19 @@ void NSMVar::writeObject(Writer& writer) const
   int len = (m_len > 0) ? m_len : 1;
   switch (m_type) {
     case INT: {
-      int* v = (int*)m_value;
+      const int* v = static_cast<int*>(m_value);
       for (int i = 0; i < len; i++) {
         writer.writeInt(v[i]);
       }
     } break;
     case FLOAT: {
-      float* v = (float*)m_value;
+      const float* v = static_cast<float*>(m_value);
       for (int i = 0; i < len; i++) {
         writer.writeFloat(v[i]);
       }
     } break;
     case TEXT: {
-      char* v = (char*)m_value;
+      const char* v = static_cast<char*>(m_value);
       writer.write(v, len);
     } break;
     default: return;
@@ -195,32 +200,32 @@ void NSMVar::writeObject(Writer& writer) const
 
 int NSMVar::getInt() const
 {
-  return (m_type == INT&& m_len == 0) ? *(int*)m_value : 0;
+  return (m_type == INT&& m_len == 0) ? *static_cast<int*>(m_value) : 0;
 }
 
 float NSMVar::getFloat() const
 {
-  return (m_type == FLOAT && m_len == 0) ? *(float*)m_value : 0;
+  return (m_type == FLOAT && m_len == 0) ? *static_cast<float*>(m_value) : 0;
 }
 
 const char* NSMVar::getText() const
 {
-  return (m_type == TEXT && m_len > 0 && m_value != NULL) ? (const char*)m_value : "";
+  return (m_type == TEXT && m_len > 0 && m_value != NULL) ? static_cast<const char*>(m_value) : "";
 }
 
 int NSMVar::getInt(int i) const
 {
-  return (m_type == INT&& i < m_len) ? ((int*)m_value)[i] : 0;
+  return (m_type == INT&& i < m_len) ? (static_cast<int*>(m_value))[i] : 0;
 }
 
 float NSMVar::getFloat(int i) const
 {
-  return (m_type == FLOAT && i < m_len) ? ((float*)m_value)[i] : 0;
+  return (m_type == FLOAT && i < m_len) ? (static_cast<float*>(m_value))[i] : 0;
 }
 
 const NSMVar& NSMVar::operator>>(std::vector<int>& val) const
 {
-  int* pv = (int*)get();
+  int* pv = static_cast<int*>(const_cast<void*>(get()));
   val = std::vector<int>();
   for (int i = 0; i < getLength(); i++) {
     val.push_back(pv[i]);
@@ -230,7 +235,7 @@ const NSMVar& NSMVar::operator>>(std::vector<int>& val) const
 
 const NSMVar& NSMVar::operator>>(std::vector<float>& val) const
 {
-  float* pv = (float*)get();
+  float* pv = static_cast<float*>(const_cast<void*>(get()));
   val = std::vector<float>();
   for (int i = 0; i < getLength(); i++) {
     val.push_back(pv[i]);

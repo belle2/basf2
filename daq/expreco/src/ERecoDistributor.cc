@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoDistributor::ERecoDistributor(string conffile)
+ERecoDistributor::ERecoDistributor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -39,7 +39,7 @@ ERecoDistributor::ERecoDistributor(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_conf->getconf("distributor", "nodename"));
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(nodename);
@@ -55,7 +55,7 @@ ERecoDistributor::ERecoDistributor(string conffile)
   m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
 }
 
@@ -94,16 +94,17 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
 
-  char hostname[512], idname[3], shmid[3];
+  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       int port = (idbase + i) + portbase;
       char portchar[256];
       sprintf(portchar, "%d", port);
-      m_pid_sender[m_nnodes] = m_proc->Execute(sender, (char*)ringbuf.c_str(), portchar, (char*)shmname.c_str(), shmid);
+      m_pid_sender[m_nnodes] = m_proc->Execute(sender, const_cast<char*>(ringbuf.c_str()), portchar, const_cast<char*>(shmname.c_str()),
+                                               shmid);
       printf("Running sender to %d\n", port);
       fflush(stdout);
       m_nnodes++;
@@ -114,21 +115,22 @@ int ERecoDistributor::Configure(NSMmsg*, NSMcontext*)
   m_nrecv = 0;
   int maxrecv = m_conf->getconfi("distributor", "receiver", "nnodes");
   int ridbase = m_conf->getconfi("distributor", "receiver", "idbase");
-  char* rhostbase = m_conf->getconf("distributor", "receiver", "hostbase");
+  const char* rhostbase = m_conf->getconf("distributor", "receiver", "hostbase");
   char* rbadlist = m_conf->getconf("distributor", "receiver", "badlist");
   char* port = m_conf->getconf("distributor", "receiver", "port");
   char* receiver = m_conf->getconf("distributor", "receiver", "script");
 
-  //  char hostname[512], idname[3], shmid[3];
+  //  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxrecv; i++) {
     sprintf(hostname, "%s%2.2d", rhostbase, ridbase + i);
-    sprintf(idname, "%2.2d", ridbase + i);
-    sprintf(shmid, "%2.2d", i + 20);
+    snprintf(idname, sizeof(idname), "%2.2d", ridbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i + 20);
     if (rbadlist == NULL  ||
         strstr(rbadlist, hostname) == 0) {
       printf("Running receiver for %s\n", hostname);
       fflush(stdout);
-      m_pid_recv[m_nrecv] = m_proc->Execute(receiver, (char*)ringbuf.c_str(), hostname, port, (char*)shmname.c_str(), shmid);
+      m_pid_recv[m_nrecv] = m_proc->Execute(receiver, const_cast<char*>(ringbuf.c_str()), hostname, port,
+                                            const_cast<char*>(shmname.c_str()), shmid);
       m_nrecv++;
     }
   }
@@ -173,12 +175,6 @@ int ERecoDistributor::UnConfigure(NSMmsg*, NSMcontext*)
 int ERecoDistributor::Start(NSMmsg*, NSMcontext*)
 {
   m_rbufin->clear();
-  return 0;
-}
-
-int ERecoDistributor::Stop(NSMmsg*, NSMcontext*)
-{
-  //  m_rbufin->clear();
   return 0;
 }
 

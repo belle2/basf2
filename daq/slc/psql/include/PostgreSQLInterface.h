@@ -25,7 +25,7 @@ namespace Belle2 {
                         const std::string& password,
                         int port);
     PostgreSQLInterface();
-    virtual ~PostgreSQLInterface() {}
+    virtual ~PostgreSQLInterface() override {}
 
   public:
     void connect() override;

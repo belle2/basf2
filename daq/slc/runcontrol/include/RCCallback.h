@@ -24,8 +24,8 @@ namespace Belle2 {
     friend class RCConfigHandler;
 
   public:
-    RCCallback(int timeout = 4);
-    virtual ~RCCallback() {}
+    explicit RCCallback(int timeout = 4);
+    virtual ~RCCallback() override {}
 
   public:
     void init(NSMCommunicator& com) override;

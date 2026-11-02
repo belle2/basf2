@@ -34,10 +34,6 @@ CertifyParallelModule::~CertifyParallelModule()
 {
 }
 
-void CertifyParallelModule::initialize()
-{
-}
-
 
 void CertifyParallelModule::beginRun()
 {

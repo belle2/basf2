@@ -42,7 +42,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     RawInputModule();
-    virtual ~RawInputModule();
+    virtual ~RawInputModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;

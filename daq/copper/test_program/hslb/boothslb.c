@@ -148,7 +148,7 @@ read_mgt(int mgt, int reg)
     if (xmemp) {
         const unsigned long csr[4] = { 0x00100000, 0x00100200,
                                        0x00100400, 0x00100600 };
-        volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
+        const volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
 
         static int first = 1;
         if (first) {
@@ -175,7 +175,7 @@ write_mgt(int mgt, int reg, int val)
                                        0x00100400, 0x00100600 };
         volatile unsigned long *regp = xmemp + csr[xslot] + reg*4;
 
-        *regp = (val & 0xff) << 24;
+        *regp = (unsigned long)(val & 0xff) << 24;
         static int first = 1;
         if (first) {
             first = 0;
@@ -192,6 +192,7 @@ write_mgt(int mgt, int reg, int val)
 static void
 write_fpga(mgt_t mgt, int m012, int ch, int n)
 {
+  // cppcheck-suppress variableScope ; locals are declared K&R style at the top of the function
   int i, mask, data;
 
   if (m012 == M012_SERIAL) {
@@ -222,7 +223,7 @@ write_fpga(mgt_t mgt, int m012, int ch, int n)
    dump_fpga
 \* ---------------------------------------------------------------------- */
 static void
-dump_fpga(int conf, char *str)
+dump_fpga(int conf, const char *str)
 {
   printf("CONF register=%02x M012=%d INIT=%d DONE=%d%s%s\n",
 	 conf&0xff, conf&7, (conf>>3)&1, (conf>>7)&1,
@@ -232,7 +233,7 @@ dump_fpga(int conf, char *str)
    boot_fpga
 \* ---------------------------------------------------------------------- */
 static int
-boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
+boot_fpga(mgt_t mgt, const char *file, int verbose, int forced, int m012)
 {
   int i, ch, conf;
   int count = 1, length = 0;
@@ -285,6 +286,7 @@ boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
     
   /* -- get and print header -- */
   if (verbose) printf("== file %s ==\n", file);
+  // cppcheck-suppress redundantAssignment ; the ioctl/getc result is only used for the diagnostic below
   while ((ch = getc(fp)) != 0xff && ch != EOF) {
     if (verbose) putchar(isprint(ch) ? ch : '.');
   }
@@ -318,7 +320,7 @@ boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
   conf = read_mgt(mgt, MGT_CONF);
   if (verbose) dump_fpga(conf, "");
   conf = read_mgt(mgt, MGT_CONF);
-  if (verbose & ! (conf & 0x80)) dump_fpga(conf, "");
+  if (verbose && ! (conf & 0x80)) dump_fpga(conf, "");
   if (conf & 0x80) {
     printf("done.\n");
     return 0;

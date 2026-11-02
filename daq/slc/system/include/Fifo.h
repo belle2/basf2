@@ -22,7 +22,7 @@ namespace Belle2 {
 
   public:
     Fifo() {}
-    virtual ~Fifo() {}
+    virtual ~Fifo() override {}
 
   public:
     void open(const std::string& path,

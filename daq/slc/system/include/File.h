@@ -21,10 +21,10 @@ namespace Belle2 {
 
   public:
     File() {}
-    File(int fd) : FileDescriptor(fd) {}
-    File(const std::string& path,
-         const std::string& mode = "r") { open(path, mode); }
-    virtual ~File() {}
+    explicit File(int fd) : FileDescriptor(fd) {}
+    explicit File(const std::string& path,
+                  const std::string& mode = "r") { open(path, mode); }
+    virtual ~File() override {}
 
   public:
     void open(const std::string& path,

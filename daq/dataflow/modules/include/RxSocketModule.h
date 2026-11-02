@@ -25,7 +25,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     RxSocketModule();
-    virtual ~RxSocketModule();
+    virtual ~RxSocketModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -43,10 +43,10 @@ namespace Belle2 {
     int m_port;
 
     //! Reciever Socket
-    EvtSocketRecv* m_recv;
+    EvtSocketRecv* m_recv = nullptr;
 
     //! DataStoreStreamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     //! Compression Level
     int m_compressionLevel;

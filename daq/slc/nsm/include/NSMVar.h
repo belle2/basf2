@@ -54,21 +54,21 @@ namespace Belle2 {
     {
       copy(name, FLOAT, 0, &value);
     }
-    NSMVar(const std::string& name, int len, int* value)
+    NSMVar(const std::string& name, int len, const int* value)
       : m_value(NULL)
     {
       copy(name, INT, len, value);
     }
-    NSMVar(const std::string& name, int len, float* value)
+    NSMVar(const std::string& name, int len, const float* value)
       : m_value(NULL)
     {
       copy(name, FLOAT, len, value);
     }
     NSMVar(const std::string& name, const std::vector<int>& value);
     NSMVar(const std::string& name, const std::vector<float>& value);
-    NSMVar(const std::string& name) : m_value(NULL), m_name(name), m_type(NONE), m_len(0) {}
+    explicit NSMVar(const std::string& name) : m_value(NULL), m_name(name), m_type(NONE), m_len(0) {}
     NSMVar(const NSMVar& var) : m_value(NULL) { *this = var; }
-    ~NSMVar();
+    ~NSMVar() override;
 
   public:
     const NSMVar& operator=(const NSMVar& var)
@@ -141,8 +141,8 @@ namespace Belle2 {
     std::string m_name;
     Type m_type;
     int m_len;
-    int m_id;
-    int m_date;
+    int m_id = 0;
+    int m_date = 0;
 
   };
 

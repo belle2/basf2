@@ -14,7 +14,7 @@ namespace Belle2 {
 
   public:
     FileDescriptor();
-    FileDescriptor(int fd);
+    explicit FileDescriptor(int fd);
     virtual ~FileDescriptor();
 
   public:

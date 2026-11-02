@@ -13,7 +13,7 @@
 using namespace std;
 using namespace Belle2;
 
-Rb2Sock::Rb2Sock(string rbuf, string dest, int port)
+Rb2Sock::Rb2Sock(const string& rbuf, string dest, int port)
 {
   //  m_rbuf = new RingBuffer(rbuf.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(rbuf.c_str());
@@ -32,7 +32,7 @@ int Rb2Sock::SendEvent(void)
 {
   // Get a record from ringbuf
   int size;
-  while ((size = m_rbuf->remq((int*)m_evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(m_evtbuf))) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     //    usleep(100);
     usleep(20);

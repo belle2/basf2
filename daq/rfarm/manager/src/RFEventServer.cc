@@ -25,7 +25,7 @@ using namespace Belle2;
 RFEventServer* RFEventServer::s_instance = 0;
 //RFServerBase* RFServerBase::s_instance = 0;
 
-RFEventServer::RFEventServer(string conffile)
+RFEventServer::RFEventServer(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -42,7 +42,7 @@ RFEventServer::RFEventServer(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_conf->getconf("distributor", "nodename"));
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(nodename);
@@ -58,7 +58,7 @@ RFEventServer::RFEventServer(string conffile)
   m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
   // 7. Clear PID list
   m_pid_recv = 0;
@@ -115,16 +115,17 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
   char* sender = m_conf->getconf("distributor", "sender", "script");
   int portbase = m_conf->getconfi("distributor", "sender", "portbase");
 
-  char idname[3], shmid[3];
+  char idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       int port = (idbase + i) + portbase;
       char portchar[256];
       sprintf(portchar, "%d", port);
-      m_pid_sender[m_nnodes] = m_proc->Execute(sender, (char*)ringbuf.c_str(), portchar, (char*)shmname.c_str(), shmid);
+      m_pid_sender[m_nnodes] = m_proc->Execute(sender, const_cast<char*>(ringbuf.c_str()), portchar, const_cast<char*>(shmname.c_str()),
+                                               shmid);
       m_flow->clear(i);
       m_nnodes++;
     }
@@ -140,7 +141,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     //    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_INPUT_ID);
-    m_pid_recv = m_proc->Execute(receiver, (char*)ringbuf.c_str(), src, port, (char*)shmname.c_str(), idbuf);
+    m_pid_recv = m_proc->Execute(receiver, const_cast<char*>(ringbuf.c_str()), src, port, const_cast<char*>(shmname.c_str()), idbuf);
     m_flow->clear(RF_INPUT_ID);
   } else if (strstr(srcG, "file") != 0) {
     // Run file reader
@@ -148,7 +149,7 @@ int RFEventServer::Configure(NSMmsg*, NSMcontext*)
     char* file = m_conf->getconf("distributor", "fileinput", "filename");
     //    char* ringbuf = m_conf->getconf("distributor", "ringbuffer");
     char* nnodechr = m_conf->getconf("distributor", "nnodes");
-    m_pid_recv = m_proc->Execute(filein, (char*)ringbuf.c_str(), file, nnodechr);
+    m_pid_recv = m_proc->Execute(filein, const_cast<char*>(ringbuf.c_str()), file, nnodechr);
   }
 
   m_rbufin->forceClear();

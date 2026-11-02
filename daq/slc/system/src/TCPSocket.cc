@@ -50,7 +50,7 @@ int TCPSocket::connect()
     if ((signed long) ip_address < 0) {
       throw (IOException("Wrong host name or ip"));
     } else {
-      host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
+      host = gethostbyaddr(reinterpret_cast<char*>(&ip_address), sizeof(ip_address), AF_INET);
     }
   }
   if (host == NULL) {
@@ -58,9 +58,9 @@ int TCPSocket::connect()
     throw (IOException("Failed to connect host %s:%d",
                        m_ip.c_str(), m_port));
   }
-  addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
+  addr.sin_addr.s_addr = (*reinterpret_cast<unsigned long*>(host->h_addr_list[0]));
 
-  if (::connect(m_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+  if (::connect(m_fd, reinterpret_cast<struct sockaddr*>(&addr), sizeof(addr)) < 0) {
     close();
     throw (IOException("Failed to connect host %s:%d",
                        m_ip.c_str(), m_port));
@@ -86,7 +86,7 @@ size_t TCPSocket::write(const void* buf, size_t count)
   size_t c = 0;
   while (c < count) {
     errno = 0;
-    int ret = send(m_fd, ((unsigned char*)buf + c), (count - c), MSG_NOSIGNAL);
+    int ret = send(m_fd, (static_cast<unsigned char*>(const_cast<void*>(buf)) + c), (count - c), MSG_NOSIGNAL);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -109,7 +109,7 @@ size_t TCPSocket::read(void* buf, size_t count)
   size_t c = 0;
   while (c < count) {
     errno = 0;
-    int ret = recv(m_fd, ((unsigned char*)buf + c), (count - c), 0);
+    int ret = recv(m_fd, (static_cast<unsigned char*>(buf) + c), (count - c), 0);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -146,7 +146,7 @@ void TCPSocket::print()
   sockaddr_in sa;
   memset(&sa, 0, sizeof(sockaddr_in));
   socklen_t sa_len = sizeof(sa);
-  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+  if (getsockname(m_fd, reinterpret_cast<struct sockaddr*>(&sa), static_cast<socklen_t*>(&sa_len)) != 0) {
     perror("getsockname");
   }
   printf("Local IP address is: %s\n", inet_ntoa(sa.sin_addr));
@@ -158,7 +158,7 @@ const std::string TCPSocket::getLocalIP()
   sockaddr_in sa;
   memset(&sa, 0, sizeof(sockaddr_in));
   socklen_t sa_len = sizeof(sa);
-  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+  if (getsockname(m_fd, reinterpret_cast<struct sockaddr*>(&sa), static_cast<socklen_t*>(&sa_len)) != 0) {
     return "";
   }
   return inet_ntoa(sa.sin_addr);
@@ -169,7 +169,7 @@ int TCPSocket::getLocalAddress()
   sockaddr_in sa;
   memset(&sa, 0, sizeof(sockaddr_in));
   socklen_t sa_len = sizeof(sa);
-  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+  if (getsockname(m_fd, reinterpret_cast<struct sockaddr*>(&sa), static_cast<socklen_t*>(&sa_len)) != 0) {
     return 0;
   }
   return sa.sin_addr.s_addr;
@@ -180,7 +180,7 @@ int TCPSocket::getLocalPort()
   sockaddr_in sa;
   memset(&sa, 0, sizeof(sockaddr_in));
   socklen_t sa_len = sizeof(sa);
-  if (getsockname(m_fd, (struct sockaddr*)&sa, (socklen_t*)&sa_len) != 0) {
+  if (getsockname(m_fd, reinterpret_cast<struct sockaddr*>(&sa), static_cast<socklen_t*>(&sa_len)) != 0) {
     return 0;
   }
   return ntohs(sa.sin_port);
@@ -196,8 +196,8 @@ unsigned int TCPSocket::getAddress()
       throw (std::exception());
       // throw (IOException("Wrong host name or ip")); // TODO which throw is the correct one?
     } else {
-      host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
+      host = gethostbyaddr(reinterpret_cast<char*>(&ip_address), sizeof(ip_address), AF_INET);
     }
   }
-  return (*(unsigned long*) host->h_addr_list[0]);
+  return (*reinterpret_cast<unsigned long*>(host->h_addr_list[0]));
 }

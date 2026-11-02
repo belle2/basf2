@@ -29,7 +29,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerFILEModule();
-    virtual ~DeSerializerFILEModule();
+    virtual ~DeSerializerFILEModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -55,7 +55,7 @@ namespace Belle2 {
     };
 
     //!
-    FILE* m_fp_in;
+    FILE* m_fp_in = nullptr;
 
     StoreArray<RawDataBlock> m_rawDataBlock; /**< RawDataBlock. */
     StoreArray<RawCOPPER> m_rawCOPPER; /**< RawCOPPER. */
@@ -67,19 +67,19 @@ namespace Belle2 {
     StoreArray<RawKLM> m_rawKLM; /**< RawKLM. */
 
     //!
-    int* m_prev_buf;
+    int* m_prev_buf = nullptr;
 
     //!
-    int m_prev_buf_flag;
+    int m_prev_buf_flag = 0;
 
     //!
-    int m_dummy_evenum;
+    int m_dummy_evenum = 0;
 
     //!
     int m_repetition_max;
 
     //!
-    int m_repetition_cnt;
+    int m_repetition_cnt = 0;
 
     //!
     std::string m_fname_in;

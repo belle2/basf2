@@ -95,7 +95,7 @@ void MonitorDataModule::event()
   for (int j = 0; j < ncpr; j++) {
     for (int i = 0; i < rawcprarray[ j ]->GetNumEntries(); i++) {
 
-      //int* buf;
+      //const int* buf;
       //buf = rawcprarray[ j ]->GetBuffer(i);
 
       int size_byte = rawcprarray[ j ]->GetBlockNwords(i) * sizeof(int);

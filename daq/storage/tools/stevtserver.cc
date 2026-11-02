@@ -35,7 +35,7 @@ namespace Belle2 {
   class EvtBuffer {
 
   public:
-    EvtBuffer(int id)
+    explicit EvtBuffer(int id)
     {
       m_id = id;
       m_evtbuf = new int[NWORD_BUFFER];
@@ -43,8 +43,16 @@ namespace Belle2 {
       m_readable = false;
     }
 
+    ~EvtBuffer()
+    {
+      delete [] m_evtbuf;
+    }
+
+    EvtBuffer(const EvtBuffer&) = delete;
+    EvtBuffer& operator=(const EvtBuffer&) = delete;
+
   public:
-    bool write(int* buf, int nbyte)
+    bool write(const int* buf, int nbyte)
     {
       m_mutex.lock();
       bool succeded = false;

@@ -95,6 +95,9 @@ void ZMQHistogramOutput<AConnectionClass>::mergeAndSend(EMessageTypes messageTyp
 }
 
 template<class AConnectionClass>
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 void ZMQHistogramOutput<AConnectionClass>::clear()
 {
   AConnectionClass::increment("histogram_clears");

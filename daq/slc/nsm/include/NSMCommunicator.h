@@ -43,7 +43,7 @@ namespace Belle2 {
     static Mutex g_mutex_select;
 
   public:
-    NSMCommunicator(const std::string& host = "", int port = -1);
+    explicit NSMCommunicator(const std::string& host = "", int port = -1);
     explicit NSMCommunicator(NSMcontext* nsmc);
     ~NSMCommunicator() {}
 
@@ -89,7 +89,7 @@ namespace Belle2 {
     NSMCallback* m_callback;
     NSMMessage m_message;
     std::string m_host;
-    int m_port;
+    int m_port = 0;
     NSMNode m_node;
     std::queue<NSMMessage> m_msg_q;
 

@@ -16,7 +16,7 @@ namespace Belle2 {
 
   public:
     DynamicLoader() {}
-    DynamicLoader(const std::string& path)
+    explicit DynamicLoader(const std::string& path)
     {
       open(path);
     }

@@ -158,7 +158,7 @@ int* DeSerializerModule::shmGet(int fd, int size_words)
 
 
 
-unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcXORChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -169,7 +169,7 @@ unsigned int  DeSerializerModule::calcXORChecksum(int* buf, int nwords)
 }
 
 
-unsigned int  DeSerializerModule::calcSimpleChecksum(int* buf, int nwords)
+unsigned int  DeSerializerModule::calcSimpleChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -210,7 +210,7 @@ void DeSerializerModule::openOutputFile()
 
 void DeSerializerModule::dumpData(char* buf, int size)
 {
-  if (fwrite(buf, size, 1, m_fp_dump) <= 0) {
+  if (fwrite(buf, size, 1, m_fp_dump) != 1) {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] Failed to write buffer to a file. Exiting...\n");
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -297,13 +297,13 @@ void DeSerializerModule::RateMonitor(unsigned int nevt, int subrun, int run)
   double total_time = current_time - m_start_time;
   double interval = current_time - m_prev_time;
   time_t timer;
-  struct tm* t_st;
+  const struct tm* t_st;
   time(&timer);
   t_st = localtime(&timer);
   char timeStr[100];
   std::strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S\n", t_st);
 
-  printf("[INFO] run %d sub %d Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
+  printf("[INFO] run %d sub %d Event %12u Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s] %s",
          run, subrun,
          nevt, (nevt  - m_prev_nevt) / interval / 1.e3,
          (m_totbytes - m_prev_totbytes) / interval / 1.e6,
@@ -479,8 +479,4 @@ int DeSerializerModule::CheckConnection(int socket)
 }
 
 #endif
-
-void DeSerializerModule::event()
-{
-}
 

@@ -32,14 +32,19 @@ namespace Belle2 {
   public:
     HistoServer2(int port, const std::string& mapfile);
     ~HistoServer2();
+    /** Copy constructor (disabled). */
+    HistoServer2(const HistoServer2&) = delete;
+
+    /** Operator = (disabled). */
+    HistoServer2& operator=(const HistoServer2&) = delete;
 
     int init();
 
     int server();  // Loop
 
   private:
-    EvtSocketRecv* m_sock;
-    EvtSocketManager* m_man;
+    EvtSocketRecv* m_sock = nullptr;
+    EvtSocketManager* m_man = nullptr;
     int m_port;
     int m_force_exit;
 
@@ -58,7 +63,7 @@ namespace Belle2 {
     void write_state(void);
   private:
     std::string m_filename;
-    HistoManager2* m_hman;
+    HistoManager2* m_hman = nullptr;
 
     /** connection IP, state and last update time */
     std::map <std::string, std::pair<int, bool>> m_units_connected;

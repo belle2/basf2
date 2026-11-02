@@ -62,8 +62,8 @@ namespace Belle2 {
     void clear();
 
   public:
-    const std::string getName() const  { return m_nodename; }
-    const std::string getPath() const  { return m_path; }
+    const std::string& getName() const  { return m_nodename; }
+    const std::string& getPath() const  { return m_path; }
     bool isAvailable() const  { return m_info != NULL; }
     ronode_info* get()  { return m_info; }
     unsigned int getNodeId() const  { return m_info->nodeid; }
@@ -99,7 +99,7 @@ namespace Belle2 {
     void addOutputCount(unsigned int count) { m_info->io[1].count += count; }
     void addOutputNBytes(unsigned long long nbyte) { m_info->io[1].nbyte += nbyte; }
     event_header& getEventHeader() { return m_info->header; }
-    void copyEventHeader(int* buf);
+    void copyEventHeader(const int* buf);
     bool isNotReady()  { return (m_info) && m_info->state == NOTREADY; }
     bool isReady()  { return (m_info) && m_info->state == READY; }
     bool isRunning()  { return (m_info) && m_info->state == RUNNING; }

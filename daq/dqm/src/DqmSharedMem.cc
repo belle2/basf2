@@ -79,10 +79,10 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
   }
   if (!writeable) {
     printf("ShM ID %d opened Readonly\n", m_shmid);
-    m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
+    m_shmadr = static_cast<int*>(shmat(m_shmid, 0, SHM_RDONLY));
   } else {
     printf("ShM ID %d opened Writeable\n", m_shmid);
-    m_shmadr = (int*) shmat(m_shmid, 0, 0);
+    m_shmadr = static_cast<int*>(shmat(m_shmid, 0, 0));
   }
   if (m_shmadr == (int*) - 1) {
     perror("DqmSharedMem::shmat");
@@ -119,9 +119,9 @@ DqmSharedMem::DqmSharedMem(const char* name, int size, bool writeable, const cha
     bool updateneeded = m_new;
     // 3.1 check if id of shm and semaphore in tmp file need update
     if (!m_new) {
-      int shmid = 0, semid = 0;
-      if (getIdFromTmpFileName(tmpPathName.c_str(), shmid, semid)) {
-        updateneeded = (shmid != m_shmid || semid != m_semid);
+      int shm_id = 0, sem_id = 0;
+      if (getIdFromTmpFileName(tmpPathName, shm_id, sem_id)) {
+        updateneeded = (shm_id != m_shmid || sem_id != m_semid);
         printf("tmp file %s content still uptodate\n", tmpPathName.c_str());
       } else {
         updateneeded = true; // could not open file or empty
@@ -149,7 +149,7 @@ DqmSharedMem::DqmSharedMem(int shm_id, int sem_id)
 {
   // Open DqmSharedMemory with given IDs, this is only possible for read-only access
   m_shmid = shm_id;
-  m_shmadr = (int*) shmat(m_shmid, 0, SHM_RDONLY);
+  m_shmadr = static_cast<int*>(shmat(m_shmid, 0, SHM_RDONLY));
   if (m_shmadr == (int*) - 1) {
     perror("DqmSharedMem::shmat");
     return;
@@ -185,12 +185,12 @@ bool DqmSharedMem::IsCreated(void)
   return m_new;
 }
 
-std::string DqmSharedMem::getTmpFileName(std::string user, std::string name)
+std::string DqmSharedMem::getTmpFileName(const std::string& user, const std::string& name)
 {
   return string("/tmp/") + user + string("_SHM_") + name;
 }
 
-bool DqmSharedMem::getIdFromTmpFileName(std::string filename, int& shmid, int& semid)
+bool DqmSharedMem::getIdFromTmpFileName(const std::string& filename, int& shmid, int& semid)
 {
   char shminfo[256];
   int fd = open(filename.c_str(), O_RDONLY);

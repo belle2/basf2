@@ -70,7 +70,7 @@ unsigned short CalcCRC16LittleEndian(unsigned short crc16, const int buf[], int 
     sprintf(err_buf, "nwords value(%d) is invalid. Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
-    string err_str = err_buf;
+    const string& err_str = err_buf;
     throw (err_str);
   }
 
@@ -345,12 +345,13 @@ int sender(int sender_id, int   run_no, int nwords_per_fee, int ncpr, int nhslb)
     sprintf(cmdline, "/usr/sbin/ss -ap | grep %d", port_to);
     if ((fp = popen(cmdline, "r")) == NULL) {
       printf("[WARNING] Failed to run %s\n", cmdline);
-    }
-    while (fgets(buf, 256, fp) != NULL) {
-      printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", port_to, buf); fflush(stdout);
+    } else {
+      while (fgets(buf, 256, fp) != NULL) {
+        printf("[ERROR] Failed to bind. output of ss(port %d) : %s\n", port_to, buf); fflush(stdout);
+      }
+      pclose(fp);
     }
     // Error message
-    fclose(fp);
     char err_buf[500];
     sprintf(err_buf, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), port_to);

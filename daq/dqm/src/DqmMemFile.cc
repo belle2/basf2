@@ -29,10 +29,10 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   m_memfile = NULL;
 
   // Allocate memory space for TMemFile
-  m_buf = (char*) new int[size];
+  m_buf = new char[size * sizeof(int)];
 
   // Allocate shared memory
-  m_shm = new DqmSharedMem((char*)name.c_str(), size, m_writeMode);
+  m_shm = new DqmSharedMem(const_cast<char*>(name.c_str()), size, m_writeMode);
 
   // Clear/Open TMemFile if write mode selected
   // it will check write mode by itself!
@@ -44,17 +44,16 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
 }
 
 
-DqmMemFile::DqmMemFile(int shm_id, int sem_id, int size)
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, int size) : m_name("dqm_mem_file")
 {
   // This defaults to read only access
   // Record parameters
   m_size = size;
   m_writeMode = false;
-  m_name = "dqm_mem_file";
   m_memfile = NULL;
 
   // Allocate memory space for TMemFile
-  m_buf = (char*) new int[size];
+  m_buf = new char[size * sizeof(int)];
 
   // Allocate shared memory
   m_shm = new DqmSharedMem(shm_id, sem_id);
@@ -67,7 +66,7 @@ DqmMemFile::~DqmMemFile()
   if (m_memfile != NULL)
     delete m_memfile;
   delete m_shm;
-  delete m_buf;
+  delete[] m_buf;
 }
 
 // Returns pointer to TMemFile
@@ -82,7 +81,7 @@ int DqmMemFile::UpdateSharedMem()
   if (!m_writeMode) return -1;
   m_memfile->Write(0, TObject::kOverwrite);
   m_shm->lock();
-  auto ret = m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  auto ret = m_memfile->CopyTo(static_cast<char*>((m_shm->ptr())), m_memfile->GetSize());
 
   FILE* fh = fopen(("/dev/shm/tmp_" + m_name).c_str(), "wb+");
   if (fh) {
@@ -106,7 +105,7 @@ int DqmMemFile::ClearSharedMem()
   m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");
 
   m_shm->lock();
-  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  m_memfile->CopyTo(static_cast<char*>((m_shm->ptr())), m_memfile->GetSize());
   m_shm->unlock();
 
   return 0;
@@ -159,18 +158,18 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   TKey* key = 0;
   int nkeys [[maybe_unused]] = 0;
   int nobjs [[maybe_unused]] = 0;
-  while ((key = (TKey*)nextkey())) {
+  while ((key = static_cast<TKey*>(nextkey()))) {
     nkeys++;
     TObject* obj = curdir->FindObjectAny(key->GetName());
     if (obj->IsA()->InheritsFrom("TH1")) {
-      TH1* h1 = (TH1*) obj;
+      TH1* h1 = static_cast<TH1*>(obj);
       //      printf ( "Key = %s, entry = %f\n", key->GetName(), h1->GetEntries() );
       msg->add(h1, h1->GetName());
       nobjs++;
       numobjs++;
     } else if (obj->IsA()->InheritsFrom(TDirectory::Class())) {
       //      printf ( "New directory found  %s, Go into subdir\n", obj->GetName() );
-      TDirectory* tdir = (TDirectory*) obj;
+      TDirectory* tdir = static_cast<TDirectory*>(obj);
       //      m_msg->add(tdir, tdir->GetName());
       TText subdir(0, 0, tdir->GetName());
       msg->add(&subdir, "SUBDIR:" + string(obj->GetName())) ;
@@ -188,7 +187,7 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   return 0;
 }
 
-bool DqmMemFile::SaveToFile(std::string outfile)
+bool DqmMemFile::SaveToFile(const std::string& outfile)
 {
   // we do not work on shared memory, thus can directly write w/o locking
 //   m_memfile->Write(0, TObject::kOverwrite);
@@ -201,8 +200,8 @@ bool DqmMemFile::SaveToFile(std::string outfile)
   // Copy all histograms in TFile
   TIter next(m_memfile->GetListOfKeys());
   TKey* key = NULL;
-  while ((key = (TKey*)next())) {
-    TH1* hist = (TH1*)key->ReadObj();
+  while ((key = static_cast<TKey*>(next()))) {
+    TH1* hist = static_cast<TH1*>(key->ReadObj());
     // printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
     hist->Write();
   }

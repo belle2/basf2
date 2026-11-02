@@ -33,7 +33,7 @@ namespace {
     TIter nextkey(keylist);
     TKey* key = nullptr;
 
-    while ((key = (TKey*)nextkey())) {
+    while ((key = static_cast<TKey*>(nextkey()))) {
       TObject* obj = curdir->Get(key->GetName());
       TClass* objectClass = obj->IsA();
       std::string objectName = dirName;
@@ -43,7 +43,7 @@ namespace {
       objectName += obj->GetName();
 
       if (objectClass->InheritsFrom(TH1::Class())) {
-        auto* h1 = dynamic_cast<TH1*>(obj);
+        const auto* h1 = dynamic_cast<TH1*>(obj);
         msg.add(h1, objectName);
       } else if (objectClass->InheritsFrom(TDirectory::Class())) {
         auto* tdir = dynamic_cast<TDirectory*>(obj);
@@ -283,7 +283,8 @@ void HLTStreamHelper::read(std::unique_ptr<ZMQNoIdMessage> message)
       }
 
       // Check the magic number of the Raw(ROB) header and trailer
-      if ((cprbuf[nwds_buf - (RawTrailer_latest::RAWTRAILER_NWORDS - RawTrailer_latest::POS_TERM_WORD)]
+      if ((cprbuf[nwds_buf - (static_cast<int>(RawTrailer_latest::RAWTRAILER_NWORDS)
+                              - static_cast<int>(RawTrailer_latest::POS_TERM_WORD))]
            != RawTrailer_latest::MAGIC_WORD_TERM_TRAILER) ||
           ((cprbuf[RawHeader_latest::POS_VERSION_HDRNWORDS] & RawHeader_latest::MAGIC_MASK)
            != RawHeader_latest::MAGIC_WORD)) {

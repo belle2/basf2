@@ -20,10 +20,11 @@ namespace Belle2 {
 
   public:
     Connection();
+    // cppcheck-suppress noExplicitConstructor ; implicit conversion is part of the Enum-style API
     Connection(const Enum& st) ;
     Connection(const Connection& st) ;
-    Connection(const std::string& st) { *this = st; }
-    Connection(int id) { *this = id; }
+    explicit Connection(const std::string& st) { *this = st; }
+    explicit Connection(int id) { *this = id; }
     ~Connection() ;
 
   private:

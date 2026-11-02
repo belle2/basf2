@@ -20,7 +20,7 @@ namespace Belle2 {
       : m_ip(""), m_port(0) {}
     TCPServerSocket(const std::string& ip, unsigned short port)
       : m_ip(ip), m_port(port) {}
-    virtual ~TCPServerSocket() {}
+    virtual ~TCPServerSocket() override {}
 
   public:
     void setIP(const std::string& ip) { m_ip = ip; }

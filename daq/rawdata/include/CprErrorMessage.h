@@ -28,17 +28,18 @@ namespace Belle2 {
     virtual ~CprErrorMessage();
 
     //!
-    void PrintError(char* err_message, const char* file, const char* func_name, const int line);
+    static void PrintError(const char* err_message, const char* file, const char* func_name, int line);
 
     //!
-    void PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message, const char* file, const char* func_name,
-                    const int line);
+    static void PrintError(const int shmflag, RunInfoBuffer* nsm_status, const char* err_message, const char* file,
+                           const char* func_name,
+                           const int line);
 
     //!
-    void PrintError(const int shmflag, RunInfoBuffer* nsm_status, std::string err_str);
+    static void PrintError(int shmflag, Belle2::RunInfoBuffer* nsm_status, const std::string& err_str);
 
     //!
-    void PrintError(const char* err_message);
+    static void PrintError(const char* err_message);
 
 
   };

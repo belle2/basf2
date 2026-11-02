@@ -15,14 +15,14 @@ namespace Belle2 {
   public:
     HLTMainLoop();
 
-    bool isRunning() const;
-    int writeToRingBufferWaiting(RingBuffer* ringBuffer, int* buffer, unsigned int size) const;
-    int readFromRingBufferWaiting(RingBuffer* ringBuffer, int* buffer) const;
+    static bool isRunning();
+    static int writeToRingBufferWaiting(Belle2::RingBuffer* ringBuffer, const int* buffer, unsigned int size);
+    static int readFromRingBufferWaiting(RingBuffer* ringBuffer, int* buffer);
 
   private:
     static bool s_interrupted;
     static void signalHandler(int signalValue);
 
-    void initSignalHandler() const;
+    static void initSignalHandler();
   };
 }

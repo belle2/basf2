@@ -18,9 +18,9 @@ using namespace Belle2;
 void Reader::reverse(void* buf, size_t len)
 {
   for (int c = 0 ; c < (int)len / 2 ; c ++) {
-    char tmp = *((char*)buf + c);
-    *((char*)buf + c) = *((char*)buf + len - 1 - c);
-    *((char*)buf + len - 1 - c) = tmp;
+    char tmp = *(static_cast<char*>(buf) + c);
+    *(static_cast<char*>(buf) + c) = *(static_cast<char*>(buf) + len - 1 - c);
+    *(static_cast<char*>(buf) + len - 1 - c) = tmp;
   }
 }
 

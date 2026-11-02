@@ -17,8 +17,8 @@ namespace Belle2 {
 
   public:
     FileReader() {}
-    FileReader(const FD& fd) : _fd(fd) {}
-    virtual ~FileReader() {}
+    explicit FileReader(const FD& fd) : _fd(fd) {}
+    virtual ~FileReader() override {}
 
   public:
     size_t read(void* v, size_t count) override { return _fd.read(v, count); }

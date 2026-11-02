@@ -21,11 +21,10 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoEventSampler::ERecoEventSampler(string conffile)
+ERecoEventSampler::ERecoEventSampler(const string& conffile) : m_conffile(conffile)
 {
 
   // 0. Initialize configuration manager
-  m_conffile = conffile;
   m_conf = new RFConf(conffile.c_str());
   char* nodename = m_conf->getconf("eventsampler", "nodename");
 
@@ -109,7 +108,7 @@ int ERecoEventSampler::Start(NSMmsg*, NSMcontext*)
 {
   // 1. Run EventSampler
   char* sampler = m_conf->getconf("eventsampler", "script");
-  m_pid_sampler = m_proc->Execute(sampler, (char*)m_conffile.c_str());
+  m_pid_sampler = m_proc->Execute(sampler, const_cast<char*>(m_conffile.c_str()));
 
   /* Public event server moved outside
   // 2. Run EventServer
@@ -141,11 +140,6 @@ int ERecoEventSampler::Stop(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-
-int ERecoEventSampler::Restart(NSMmsg*, NSMcontext*)
-{
-  return 0;
-}
 
 // Server function
 

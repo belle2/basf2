@@ -33,7 +33,7 @@ namespace Belle2 {
     static const unsigned int MAX_EVENT_WORDS = 2 * 1024 * 1024;
 
   public:
-    BinData(void* buf = NULL);
+    explicit BinData(void* buf = NULL);
     ~BinData() noexcept;
 
   public:
@@ -106,7 +106,7 @@ namespace Belle2 {
     const unsigned int* getBody() const { return m_body; };
 
   protected:
-    BinTrailer* m_trailer;
+    BinTrailer* m_trailer = nullptr;
     BinHeader* m_header;
     unsigned int* m_body;
     mutable int* m_buf;

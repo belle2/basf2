@@ -43,7 +43,7 @@ retry:
   for (;;) {
     int sstat = read(fd, buf, sizeof(int));
     if (sstat <= 0) break;
-    int* recsize = (int*)buf;
+    const int* recsize = reinterpret_cast<int*>(buf);
     int rstat = read(fd, buf + sizeof(int), (*recsize - 1) * 4);
     if (rstat <= 0) break;
     if (nrec % 1000 == 0) {
@@ -52,7 +52,7 @@ retry:
 
     // Put the message in ring buffer
     for (;;) {
-      int irb = rbuf->insq((int*)buf, *recsize);
+      int irb = rbuf->insq(reinterpret_cast<int*>(buf), *recsize);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

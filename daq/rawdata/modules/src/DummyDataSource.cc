@@ -124,6 +124,7 @@ void DummyDataSourceModule::event()
   */
   buf1 = new int[ nwords_1st];
 
+  // cppcheck-suppress knownConditionTrueFalse ; the word counts come from module parameters
   for (int i = 0; i < nwords_1st; i++) {
     if (i == 0) {
       buf1[ i ] = 0x12345678;
@@ -142,6 +143,7 @@ void DummyDataSourceModule::event()
   */
 
   buf2 = new int[ nwords_2nd];
+  // cppcheck-suppress knownConditionTrueFalse ; the word counts come from module parameters
   for (int i = 0; i < nwords_2nd; i++) {
     if (i == 0) {
       buf2[ i ] = 0x34567890;
@@ -160,6 +162,7 @@ void DummyDataSourceModule::event()
   */
 
   buf3 = new int[ nwords_3rd];
+  // cppcheck-suppress knownConditionTrueFalse ; the word counts come from module parameters
   for (int i = 0; i < nwords_3rd; i++) {
     if (i == 0) {
       buf3[ i ] = 0x56789012;
@@ -178,6 +181,7 @@ void DummyDataSourceModule::event()
   */
 
   buf4 = new int[ nwords_4th];
+  // cppcheck-suppress knownConditionTrueFalse ; the word counts come from module parameters
   for (int i = 0; i < nwords_4th; i++) {
     if (i == 0) {
       buf4[ i ] = 0x78901234;
@@ -226,7 +230,7 @@ void DummyDataSourceModule::event()
   //
   if (max_nevt >= 0) {
     if ((int)n_basf2evt >= max_nevt && max_nevt > 0) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
+      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %u \n",
              max_nevt, n_basf2evt);
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
@@ -240,7 +244,7 @@ void DummyDataSourceModule::event()
     if (n_basf2evt == 0) {
       interval = 1;
     }
-    printf("[INFO] Event %12d Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
+    printf("[INFO] Event %12u Rate %6.2lf[kHz] Recvd Flow %6.2lf[MB/s] RunTime %8.2lf[s] interval %8.4lf[s]\n",
            n_basf2evt * NUM_EVT_PER_BASF2LOOP_PC,
            (n_basf2evt  - m_prev_nevt)*NUM_EVT_PER_BASF2LOOP_PC / interval / 1.e3,
            (m_totbytes - m_prev_totbytes) / interval / 1.e6,

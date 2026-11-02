@@ -15,10 +15,10 @@ namespace Belle2 {
   class RCHandlerFatalException : public RCHandlerException {
 
   public:
-    RCHandlerFatalException(const std::string& comment = "");
+    explicit RCHandlerFatalException(const std::string& comment = "");
     RCHandlerFatalException(const char* comment, ...);
 #if __GNUC__ >= 7
-    virtual ~RCHandlerFatalException() {}
+    virtual ~RCHandlerFatalException() override {}
 #else
     virtual ~RCHandlerFatalException() throw() {}
 #endif

@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class RSocketSend : public SocketIO {
   public:
-    RSocketSend(u_short port);
+    explicit RSocketSend(u_short port);
     ~RSocketSend();
 
     int examine();
@@ -39,6 +39,7 @@ namespace Belle2 {
     int write(char* data, int len);
 
     int err() const;
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     void interrupt();
 
   private:

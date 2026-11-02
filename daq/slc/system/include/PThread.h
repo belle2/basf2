@@ -22,14 +22,14 @@ namespace Belle2 {
     template<class WORKER>
     static void destroy(void* arg)
     {
-      WORKER* worker = (WORKER*)arg;
+      WORKER* worker = static_cast<WORKER*>(arg);
       delete worker;
       worker = NULL;
     }
     template<class WORKER>
     static void* create_destroy(void* arg)
     {
-      WORKER* worker = (WORKER*)arg;
+      WORKER* worker = static_cast<WORKER*>(arg);
       pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
       pthread_cleanup_push(PThread::destroy<WORKER>, arg);
@@ -44,7 +44,7 @@ namespace Belle2 {
     template<class WORKER>
     static void* create(void* arg)
     {
-      WORKER* worker = (WORKER*)arg;
+      WORKER* worker = static_cast<WORKER*>(arg);
       pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
       pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
       try {
@@ -61,17 +61,17 @@ namespace Belle2 {
   public:
     PThread() : m_th(0) {}
     template<class WORKER>
-    PThread(WORKER* worker, bool destroyed = true, bool detached = true, [[maybe_unused]] const std::string& thread_name = "")
+    explicit PThread(WORKER* worker, bool destroyed = true,
+                     bool detached = true, [[maybe_unused]] const std::string& thread_name = "") : m_th(0)
     {
-      m_th = 0;
       if (destroyed) {
         if (pthread_create(&m_th, NULL, PThread::create_destroy<WORKER>,
-                           (void*)worker) != 0) {
+                           static_cast<void*>(worker)) != 0) {
           m_th = 0;
         }
       } else {
         if (pthread_create(&m_th, NULL, PThread::create<WORKER>,
-                           (void*)worker) != 0) {
+                           static_cast<void*>(worker)) != 0) {
           m_th = 0;
         }
       }

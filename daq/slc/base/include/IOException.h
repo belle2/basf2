@@ -19,7 +19,7 @@ namespace Belle2 {
     IOException(const std::string& comment, ...);
     IOException(int err, const std::string& comment, ...);
 #if __GNUC__ >= 7
-    virtual ~IOException() {}
+    virtual ~IOException() override {}
 #else
     virtual ~IOException() throw() {}
 #endif

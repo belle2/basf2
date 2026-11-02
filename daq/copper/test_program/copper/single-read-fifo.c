@@ -37,13 +37,13 @@ int maxevent = 0;
 
 void do_reset(void *start)
 {
-    unsigned long *lp = (unsigned long *) (start + COPPER_FF_RST);
+    unsigned long *lp = (unsigned long *) ((char*)start + COPPER_FF_RST);
     //*lp = 0x1F;
     *lp = 0;
 }
 
 void
-do_display_word(char * title, unsigned long offset, unsigned long value, int may_be_eof)
+do_display_word(const char * title, unsigned long offset, unsigned long value, int may_be_eof)
 {
     if (ninterest == 0) {
         if (may_be_eof) {
@@ -62,7 +62,7 @@ do_display_word(char * title, unsigned long offset, unsigned long value, int may
     }
 }
 
-int do_read_fifo(char *title, unsigned char *fifop)
+int do_read_fifo(const char *title, unsigned char *fifop)
 {
     int ret = 0;
     int ndup = 0;
@@ -114,9 +114,9 @@ void enable_single_read(unsigned char *start)
     *(unsigned long *) (start + COPPER_FF_RW) = 1;
 }
 
-void do_scan(void *start)
+void do_scan(const void *start)
 {
-    unsigned long *lp = start;
+    const unsigned long *lp = start;
     int i;
 
     for (i = 0; i * 4 < 0x100; i++) {
@@ -177,7 +177,7 @@ void doit()
     return;
 }
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     int ch;
     while ((ch = getopt(argc, argv, "c:hs:n:i:")) != -1) {

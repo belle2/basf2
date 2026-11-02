@@ -209,7 +209,7 @@ void SerializerModule::fillSendHeaderTrailer(SendHeader* hdr, SendTrailer* trl,
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", i, rawdblk->GetNumEntries(), rawdblk->TotalBufNwords());
       printData(rawdblk->GetBuffer(0), rawdblk->TotalBufNwords());
 
-      char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
+      const char err_buf[500] = "[FATAL] CORRUPTED DATA: No COPPER blocks in RawDataBlock. Exiting...";
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
       exit(-1);
@@ -234,13 +234,13 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
   int rawcopper_nwords = rawdblk->TotalBufNwords();
 
   //Fill iov info.
-  iov[0].iov_base = (char*)send_header.GetBuffer();
+  iov[0].iov_base = reinterpret_cast<char*>(send_header.GetBuffer());
   iov[0].iov_len = sizeof(int) * send_header.GetHdrNwords();
 
-  iov[1].iov_base = (char*)rawdblk->GetWholeBuffer();
+  iov[1].iov_base = reinterpret_cast<char*>(rawdblk->GetWholeBuffer());
   iov[1].iov_len = sizeof(int) * rawcopper_nwords;
 
-  iov[2].iov_base = (char*)send_trailer.GetBuffer();
+  iov[2].iov_base = reinterpret_cast<char*>(send_trailer.GetBuffer());
   iov[2].iov_len = sizeof(int) * send_trailer.GetTrlNwords();
 
 
@@ -297,15 +297,16 @@ int SerializerModule::sendByWriteV(RawDataBlock* rawdblk)
 
     // Send Header
     if (n < (int)(iov[ 0 ].iov_len)) {
-      n += Send(m_socket, (char*)iov[ 0 ].iov_base + n, iov[ 0 ].iov_len - n);
+      n += Send(m_socket, static_cast<char*>(iov[ 0 ].iov_base) + n, iov[ 0 ].iov_len - n);
     }
 
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len)) {
-      n += Send(m_socket, (char*)iov[ 1 ].iov_base + (n - iov[ 0 ].iov_len), iov[ 1 ].iov_len - (n - iov[ 0 ].iov_len));
+      n += Send(m_socket, static_cast<char*>(iov[ 1 ].iov_base) + (n - iov[ 0 ].iov_len), iov[ 1 ].iov_len - (n - iov[ 0 ].iov_len));
     }
 
     if (n < (int)(iov[ 0 ].iov_len + iov[ 1 ].iov_len + iov[ 2 ].iov_len)) {
-      n += Send(m_socket, (char*)iov[ 2 ].iov_base + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
+      // cppcheck-suppress unreadVariable ; the tail send is best effort
+      n += Send(m_socket, static_cast<char*>(iov[ 2 ].iov_base) + (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len),
                 iov[ 2 ].iov_len - (n - iov[ 0 ].iov_len - iov[ 1 ].iov_len));
     }
 
@@ -380,7 +381,7 @@ void SerializerModule::Accept()
   int fd_listen;
   struct sockaddr_in sock_listen;
   sock_listen.sin_family = AF_INET;
-  sock_listen.sin_addr.s_addr = *(unsigned int*)host->h_addr_list[0];
+  sock_listen.sin_addr.s_addr = *reinterpret_cast<unsigned int*>(host->h_addr_list[0]);
 
   socklen_t addrlen = sizeof(sock_listen);
   sock_listen.sin_port = htons(m_port_to);
@@ -392,7 +393,7 @@ void SerializerModule::Accept()
     perror("Failed to set REUSEADDR");
   }
 
-  if (bind(fd_listen, (struct sockaddr*)&sock_listen, sizeof(struct sockaddr)) < 0) {
+  if (bind(fd_listen, reinterpret_cast<struct sockaddr*>(&sock_listen), sizeof(struct sockaddr)) < 0) {
     char temp_char[500];
     sprintf(temp_char, "[FATAL] Failed to bind.(%s) Maybe other programs have already occupied this port(%d). Exiting...",
             strerror(errno), m_port_to);
@@ -419,7 +420,7 @@ void SerializerModule::Accept()
   //  fflush(stderr);
   //  B2INFO("Accepting... : port " << m_port_to << " server " << m_hostname_local.c_str() );
   B2INFO("Accepting...");
-  if ((fd_accept = accept(fd_listen, (struct sockaddr*) & (sock_accept), &addrlen)) == 0) {
+  if ((fd_accept = accept(fd_listen, reinterpret_cast<struct sockaddr*>(& (sock_accept)), &addrlen)) == 0) {
     char err_buf[500];
     sprintf(err_buf, "[FATAL] Failed to accept(%s). Exiting...", strerror(errno));
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -434,7 +435,7 @@ void SerializerModule::Accept()
     timeout.tv_usec = 0;
     ret = setsockopt(fd_accept, SOL_SOCKET, SO_SNDTIMEO, &timeout, (socklen_t)sizeof(timeout));
     if (ret < 0) {
-      char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
+      const char temp_char[100] = "[FATAL] Failed to set TIMEOUT. Exiting...";
       print_err.PrintError(temp_char, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
@@ -474,7 +475,7 @@ void SerializerModule::recordTime(int event, double* array)
 }
 
 
-unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
+unsigned int SerializerModule::calcXORChecksum(const int* buf, int nwords)
 {
   unsigned int checksum = 0;
   for (int i = 0; i < nwords; i++) {
@@ -484,7 +485,7 @@ unsigned int SerializerModule::calcXORChecksum(int* buf, int nwords)
 }
 
 
-void SerializerModule::printData(int* buf, int nwords)
+void SerializerModule::printData(const int* buf, int nwords)
 {
   printf("[DEBUG]");
   for (int i = 0; i < nwords; i++) {
@@ -647,7 +648,7 @@ void SerializerModule::event()
         return; // Go to DeSerializer***() to wait for run-resume.
       }
 #endif
-      print_err.PrintError((char*)(err_str.c_str()), __FILE__, __PRETTY_FUNCTION__, __LINE__);
+      print_err.PrintError(const_cast<char*>((err_str.c_str())), __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(1);
     }
     if (m_start_flag == 0) {

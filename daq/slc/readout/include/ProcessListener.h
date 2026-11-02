@@ -15,7 +15,7 @@ namespace Belle2 {
   class ProcessListener {
 
   public:
-    ProcessListener(ProcessController* con)
+    explicit ProcessListener(ProcessController* con)
       : m_con(con) {}
     ~ProcessListener() {}
 

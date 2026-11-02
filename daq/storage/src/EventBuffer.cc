@@ -21,11 +21,11 @@ unsigned int EventBuffer::size() throw()
 EventBuffer::EventBuffer(unsigned int nword)
 {
   m_nword = nword;
-  char* buf = (char*) malloc(size());
+  char* buf = static_cast<char*>(malloc(size()));
   if (buf == NULL) {
     return;
   }
-  m_buf = (int*)buf;
+  m_buf = reinterpret_cast<int*>(buf);
   memset(&m_header, 0, sizeof(Header));
   for (unsigned long long i = 0; i < m_nword; i++) {
     m_buf[i] = 0;
@@ -116,6 +116,7 @@ unsigned int EventBuffer::read(int* buf, EventBuffer::Header* hdr)
           } else {
             unsigned int count = m_nword - i_r;
             memcpy(buf, (m_buf + i_r + 1), sizeof(int) * count);
+            // cppcheck-suppress knownConditionTrueFalse ; the wrap-around case depends on the runtime write index
             if (nword > count) {
               memcpy(buf + count, m_buf, sizeof(int) * (nword - count));
             }

@@ -43,7 +43,7 @@ namespace Belle2 {
             const std::string& format, int revision);
     NSMData();
     NSMData(const NSMData& data);
-    virtual ~NSMData();
+    virtual ~NSMData() override;
 
     /**
      * Operator =.
@@ -109,13 +109,13 @@ namespace Belle2 {
     bool m_allocated;
     void* m_pdata;
     int m_size;
-    int m_offset;
+    int m_offset = 0;
     std::string m_format;
     int m_revision;
     NSMDataListMap m_data_v_m;
     std::string m_empty;
-    NSMCommunicator* m_com;
-    int m_tstamp;
+    NSMCommunicator* m_com = nullptr;
+    int m_tstamp = 0;
 
   };
 

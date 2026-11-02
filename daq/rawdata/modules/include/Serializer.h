@@ -35,7 +35,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     SerializerModule();
-    virtual ~SerializerModule();
+    virtual ~SerializerModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -54,7 +54,7 @@ namespace Belle2 {
     // Data members
 
     //! calculate checksum
-    unsigned int calcXORChecksum(int* buf, int nwords);
+    static unsigned int calcXORChecksum(const int* buf, int nwords);
 
     //! Use shared memory
     int m_shmflag;
@@ -63,28 +63,28 @@ namespace Belle2 {
     void shmOpen(char* path_cfg, char* path_sta);
 
     //! Get shared memory
-    int* shmGet(int fd, int size_words);
+    static int* shmGet(int fd, int size_words);
 
     //! send buffer
     int Send(int socket, char* buf, int size_bytes);
 
     //! print data contents
-    void printData(int* buf, int nwords);
+    static void printData(const int* buf, int nwords);
 
     //! Check socket status
     int CheckConnection(int socket);
 
     //! file descripter for shm
-    int m_shmfd_cfg;
+    int m_shmfd_cfg = 0;
 
     //! file descripter for shm
-    int m_shmfd_sta;
+    int m_shmfd_sta = 0;
 
     //! buffer for shared memory
-    int* m_cfg_buf;
+    int* m_cfg_buf = nullptr;
 
     //! buffer for shared memory
-    int* m_cfg_sta;
+    int* m_cfg_sta = nullptr;
 
 
   protected :
@@ -95,7 +95,7 @@ namespace Belle2 {
     };
 
     //! size of buffer for one event (word)
-    int BUF_SIZE_WORD;
+    int BUF_SIZE_WORD = 0;
 
     //!Compression parameter
     int m_compressionLevel;
@@ -103,7 +103,7 @@ namespace Belle2 {
     //! No. of sent events
     int n_basf2evt;
 
-    int* m_buffer;
+    int* m_buffer = nullptr;
 
     // Parameters for EvtSocket
 
@@ -114,29 +114,29 @@ namespace Belle2 {
     int m_port_to;
 
     //! Socket ID
-    int m_socket;
+    int m_socket = 0;
 
     //! EvtSocket
-    EvtSocketSend* m_sock;
+    EvtSocketSend* m_sock = nullptr;
 
-    double m_start_time;
+    double m_start_time = 0.0;
 
-    double m_prev_time;
+    double m_prev_time = 0.0;
 
-    unsigned int m_prev_nevt;
+    unsigned int m_prev_nevt = 0;
 
-    double m_prev_totbytes;
+    double m_prev_totbytes = 0.0;
 
-    double time_array0[1000];
-    double time_array1[1000];
-    double time_array2[1000];
+    double time_array0[1000] = {};
+    double time_array1[1000] = {};
+    double time_array2[1000] = {};
 
     //! How to handle data
     std::string p_method;
-    int p_method_val;
+    int p_method_val = 0;
 
     //! store time info.
-    double getTimeSec();
+    static double getTimeSec();
 
     //! store time info.
     void recordTime(int event, double* array);
@@ -145,7 +145,7 @@ namespace Belle2 {
     CprErrorMessage print_err;
 
     //! sent data size
-    unsigned long long m_totbytes;
+    unsigned long long m_totbytes = 0;
 
     //! start flag
     int m_start_flag;

@@ -33,10 +33,10 @@ void closefile( )
 
 
 void
-show_event(unsigned long * head, int len)
+show_event(const unsigned long * head, int len)
 {
   int i,j,k;
-  char* temp_buf = (char*)buffer;
+  const char* temp_buf = (char*)buffer;
 /*   for (i=0; i<(len/4); i+= 8) { */
 /*     printf("%08d %08x %08x %08x %08x %08x %08x %08x %08x\n", i, */
 /* 	   buffer[i], buffer[i+1], buffer[i+2], buffer[i+3], */
@@ -59,7 +59,7 @@ show_event(unsigned long * head, int len)
 
 
 unsigned long
-xor(unsigned long * start, int wordlen)
+xor(const unsigned long * start, int wordlen)
 {
   unsigned long ret = 0;
   while (wordlen--) {
@@ -83,7 +83,7 @@ main(int argc, char **argv)
   int j=1;
   int card_test[4];
   int use_slot = 0; /* bit mask */
-  char *program = argv[0];
+  const char *program = argv[0];
 
 
   //
@@ -226,8 +226,8 @@ main(int argc, char **argv)
     // Decode data
     //
     char * p = (char *)buffer;
-    struct copper_header * header = (struct copper_header *)p;
-    struct copper_footer * footer =
+    const struct copper_header * header = (struct copper_header *)p;
+    const struct copper_footer * footer =
       (struct copper_footer *)(p + ret - sizeof(struct copper_footer)); 
     int t;
     unsigned  short temph,templ;
@@ -260,7 +260,9 @@ main(int argc, char **argv)
  
 	  if((t-istart-3)%48==0)
             {
+              // cppcheck-suppress unreadVariable ; kept for debugging
               templ = buffer[t]&0xffff;
+              // cppcheck-suppress unreadVariable ; kept for debugging
               temph = (buffer[t]>>16)&0xffff;
 #ifdef FILE_OUT
               fprintf(fpw,"%04x,%04x\n", temph,templ);
@@ -269,7 +271,9 @@ main(int argc, char **argv)
 	    }
 	  else
             {
+              // cppcheck-suppress unreadVariable ; kept for debugging
               templ = buffer[t]&0xffff;
+              // cppcheck-suppress unreadVariable ; kept for debugging
               temph = (buffer[t]>>16)&0xffff;
 #ifdef FILE_OUT
               fprintf(fpw,"%04x,%04x,", temph,templ);

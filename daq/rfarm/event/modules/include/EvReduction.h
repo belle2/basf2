@@ -46,7 +46,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     EvReductionModule();
-    virtual ~EvReductionModule();
+    virtual ~EvReductionModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;

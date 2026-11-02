@@ -11,7 +11,7 @@
 
 #include <framework/core/HistoModule.h>
 
-#include "TH1F.h"
+#include <TH1F.h>
 
 namespace Belle2 {
 
@@ -24,7 +24,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     TrackAnaModule();
-    virtual ~TrackAnaModule();
+    virtual ~TrackAnaModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -32,7 +32,6 @@ namespace Belle2 {
     //! Module functions to be called from event process
     void beginRun() override;
     void event() override;
-    void endRun() override;
     void terminate() override;
 
     //! Module funcions to define histograms
@@ -40,8 +39,8 @@ namespace Belle2 {
 
     // Data members
   private:
-    TH1F* h_multi;
-    TH1F* h_p[4];
+    TH1F* h_multi = nullptr;
+    TH1F* h_p[4] = {};
 
   };
 

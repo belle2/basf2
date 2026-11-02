@@ -96,7 +96,7 @@ bool NSMVHandlerText::handleSet(const NSMVar& var)
 
 bool NSMVHandlerIntArray::handleGetIntArray(std::vector<int>& val)
 {
-  const int* pv = (const int*)m_var.get();
+  const int* pv = static_cast<const int*>(m_var.get());
   val = std::vector<int>();
   for (int i = 0; i < m_var.getLength(); i++) {
     val.push_back(pv[i]);
@@ -117,7 +117,7 @@ bool NSMVHandlerIntArray::handleGet(NSMVar& var)
 bool NSMVHandlerIntArray::handleSet(const NSMVar& var)
 {
   if (var.getType() == NSMVar::INT&& var.getLength() > 0) {
-    const int* pv = (const int*)var.get();
+    const int* pv = static_cast<const int*>(var.get());
     std::vector<int> val;
     for (int i = 0; i < var.getLength(); i++) {
       val.push_back(pv[i]);
@@ -132,7 +132,7 @@ bool NSMVHandlerIntArray::handleSet(const NSMVar& var)
 
 bool NSMVHandlerFloatArray::handleGetFloatArray(std::vector<float>& val)
 {
-  const float* pv = (const float*)m_var.get();
+  const float* pv = static_cast<const float*>(m_var.get());
   val = std::vector<float>();
   for (int i = 0; i < m_var.getLength(); i++) {
     val.push_back(pv[i]);
@@ -153,7 +153,7 @@ bool NSMVHandlerFloatArray::handleGet(NSMVar& var)
 bool NSMVHandlerFloatArray::handleSet(const NSMVar& var)
 {
   if (var.getType() == NSMVar::FLOAT && var.getLength() > 0) {
-    const float* pv = (const float*)var.get();
+    const float* pv = static_cast<const float*>(var.get());
     std::vector<float> val;
     for (int i = 0; i < var.getLength(); i++) {
       val.push_back(pv[i]);

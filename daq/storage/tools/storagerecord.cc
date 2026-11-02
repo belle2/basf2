@@ -189,7 +189,7 @@ public:
 
   int write(char* evtbuf, int nbyte, bool isstreamer = false)
   {
-    m_chksum = adler32(m_chksum, (unsigned char*)evtbuf, nbyte);
+    m_chksum = adler32(m_chksum, reinterpret_cast<unsigned char*>(evtbuf), nbyte);
     int ret = ::write(m_file, evtbuf, nbyte);
     m_filesize += nbyte;
     if (!isstreamer) {
@@ -214,7 +214,6 @@ private:
   int m_diskid;
   int m_fileid;
   int m_file;
-  std::string m_configname;
   int m_expno;
   int m_runno;
   unsigned long long m_filesize;
@@ -246,7 +245,6 @@ int main(int argc, char** argv)
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
-  const char* obufname = argv[8];
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   g_is_arich = StringUtil::find(runtype, "arich");
@@ -272,7 +270,7 @@ int main(int argc, char** argv)
                                                     config.get("database.password"),
                                                     config.getInt("database.port"));
   SharedEventBuffer obuf;
-  if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
+  if (obufsize > 0) obuf.open(argv[8], obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
   unsigned long long nbyte_out = 0;
@@ -306,7 +304,7 @@ int main(int argc, char** argv)
     }
     for (unsigned int ib = 0; ib < ninput; ib++) {
       ibuf[ib].lock();
-      ibuf[ib].read((int*)&hd, true, true);
+      ibuf[ib].read(reinterpret_cast<int*>(&hd), true, true);
       ibuf[ib].read(evtbuf, true, true);
       ibuf[ib].unlock();
       int nbyte = evtbuf[0];
@@ -385,7 +383,7 @@ int main(int argc, char** argv)
           ecount = 0;
           fileid++;
         }
-        file.write((char*)evtbuf, nbyte);
+        file.write(reinterpret_cast<char*>(evtbuf), nbyte);
         nbyte_out += nbyte;
         if (use_info) {
           info.addOutputCount(1);
@@ -401,6 +399,8 @@ int main(int argc, char** argv)
         ecount = 1;
       }
       // Dump data into output buffer
+      // cppcheck-suppress moduloofone ; interval is a tuning knob
+      // cppcheck-suppress knownConditionTrueFalse ; interval is a tuning knob
       if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {
         obuf.write(evtbuf, nword, true);
       }

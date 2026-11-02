@@ -22,10 +22,10 @@ namespace Belle2 {
     TCPSocket() : m_ip(""), m_port(0) {}
     TCPSocket(const std::string& ip, unsigned short port)
       : m_ip(ip), m_port(port) {}
-    virtual ~TCPSocket() {}
+    virtual ~TCPSocket() override {}
 
   private:
-    TCPSocket(int fd) : FileDescriptor(fd), m_ip(""), m_port(0) {}
+    explicit TCPSocket(int fd) : FileDescriptor(fd), m_ip(""), m_port(0) {}
 
   public:
     void setIP(const std::string& ip) { m_ip = ip; }

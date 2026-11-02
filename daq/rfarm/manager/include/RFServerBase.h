@@ -40,7 +40,7 @@ namespace Belle2 {
     static RFServerBase* s_instance;
 
   private:
-    RfNodeInfo* m_nsmmem;
+    RfNodeInfo* m_nsmmem = nullptr;
 
   };
 }

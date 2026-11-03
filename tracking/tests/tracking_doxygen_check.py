@@ -18,4 +18,4 @@ from b2test_utils import check_error_free
 if __name__ == "__main__":
     ignoreme = 'IGNORE_NOTHING'
     check_error_free("b2code-doxygen-warnings", "doxygen", "tracking",
-                     lambda x: re.findall(ignoreme, x) or x == "'", ["--check-only"])
+                     lambda x: re.findall(ignoreme, x) or x == "'")

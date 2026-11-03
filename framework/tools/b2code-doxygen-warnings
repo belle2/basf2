@@ -29,20 +29,23 @@ To run on the full release directory run it without any arguments:
 Use the option --all to show all doxygen warnings and not only those about
 undocumented items.
 
-Use the option --check-only to only check for undocumented items without
-generating any output (HTML, XML): this is much faster and meant for the tests.
-Combined with --all, the full configuration is used, but no output is kept.
+By default, only the check for undocumented items is performed, without
+generating any output (HTML, XML): this is much faster. Combined with --all,
+the full configuration is used, but no output is kept.
+
+Use the option --full-check to run doxygen with the full configuration and
+keep the generated output (HTML, XML) in the default output directory.
 EOT
     exit 1;
 fi
 
 GREP_STR=" not documented"
 FULL=false
-CHECK_ONLY=false
+CHECK_ONLY=true
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --all) GREP_STR=""; FULL=true; shift ;;
-    --check-only) CHECK_ONLY=true; shift ;;
+    --full-check) CHECK_ONLY=false; shift ;;
     *) break ;;
   esac
 done

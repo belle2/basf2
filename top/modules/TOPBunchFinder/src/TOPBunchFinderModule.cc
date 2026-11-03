@@ -619,7 +619,7 @@ namespace Belle2 {
   {
     const auto& binCenters = finder.getBinCenters();
     int numPhotons = 0;
-    bool sameNumPhotons = not binCenters.empty(); // for control only
+    bool sameNumPhotons = true; // for control only
     double logL_bkg = reco.getBackgroundLogL(timeMin, timeMax).logL;
     for (unsigned i = 0; i < binCenters.size(); i++) {
       double t0 = binCenters[i];

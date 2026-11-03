@@ -537,7 +537,6 @@ namespace Belle2 {
 
       // scratch space of the scan method, re-used by the subsequent calls
       mutable std::deque<EnergyMask> m_maskPool; /**< energy masks, grown on demand and never released */
-      mutable std::vector<std::pair<int, EnergyMask*> > m_maskIndex; /**< masks of the running scan, keyed by rounded Dy */
 
       // results of expand method (pixel column dependent)
       mutable std::vector<Result> m_results;   /**< results of PDF expansion in y */

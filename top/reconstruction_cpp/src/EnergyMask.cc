@@ -39,10 +39,7 @@ namespace Belle2 {
         return;
       }
 
-      double x[3];
-      x[0] = m_Wy;
-      x[1] = std::abs(dL * dydL / dyde);
-      x[2] = std::abs(dx * dydx / dyde);
+      double x[3] = {m_Wy, std::abs(dL* dydL / dyde), std::abs(dx* dydx / dyde)};
       std::sort(x, x + 3);
 
       m_A = x[2];

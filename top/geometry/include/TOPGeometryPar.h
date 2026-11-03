@@ -354,11 +354,14 @@ namespace Belle2 {
       const double b[] = {0.683740494, 0.420323613, 0.585027480};
       const double c[] = {0.00460352869, 0.0133968856, 64.4932732};
 
-      double x = pow(lambda * 0.001, 2);
-      double y = 1;
+      double lam = lambda * 0.001;
+      double x = lam * lam;
+      double y = 0;
       for (int i = 0; i < 3; i++) {
-        y += b[i] * x / (x - c[i]);
+        y += b[i] / (x - c[i]);
       }
+      y *= x;
+      y += 1;
       return sqrt(y);
     }
 
@@ -372,8 +375,9 @@ namespace Belle2 {
     {
       double lambda = c_hc / energy;
       double dl = 1.0; // [nm]
+      double dlHalf = dl / 2;
       double n = refractiveIndex(lambda);
-      double dndl = (refractiveIndex(lambda + dl / 2) - refractiveIndex(lambda - dl / 2)) / dl;
+      double dndl = (refractiveIndex(lambda + dlHalf) - refractiveIndex(lambda - dlHalf)) / dl;
       return n / (1 + lambda / n * dndl);
     }
 

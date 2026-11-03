@@ -311,8 +311,8 @@ namespace Belle2 {
       const double barB = m_bars.front().B;
 
       // the energy masks live in a pool that is re-used by the subsequent calls
-      m_maskIndex.clear();
       size_t numMasks = 0;
+      std::map<int, EnergyMask*> masks;
 
       for (unsigned row = 0; row < numRows; row++) {
 
@@ -334,13 +334,7 @@ namespace Belle2 {
           std::sort(projections[k].begin(), projections[k].end());
           for (auto& projection : projections[k]) {
             int iDy = func::lround(projection.Dy * 1000);
-            EnergyMask* mask = nullptr;
-            for (const auto& entry : m_maskIndex) {
-              if (entry.first == iDy) {
-                mask = entry.second;
-                break;
-              }
-            }
+            auto& mask = masks[iDy];
             if (not mask) {
               double Dy = projection.Dy;
               double step = m_quasyEnergyDistribution->step;
@@ -351,7 +345,6 @@ namespace Belle2 {
               }
               mask = &m_maskPool[numMasks];
               numMasks++;
-              m_maskIndex.emplace_back(iDy, mask);
             }
             projection.mask = mask;
           }

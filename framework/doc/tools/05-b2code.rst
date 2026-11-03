@@ -55,6 +55,12 @@ To run on the full release directory run it without any arguments::
 
     b2code-doxygen-warnings
 
+By default, only the check for undocumented items is performed and no doxygen
+output (HTML, XML) is kept, which is much faster. Use the option ``--all`` to
+show all doxygen warnings and not only those about undocumented items. Use the
+option ``--full-check`` to run doxygen with the full configuration and keep the
+generated output in the default output directory.
+
 
 ``b2code-classversion-check``: Perform sanity checks on ROOT class versions
 ---------------------------------------------------------------------------

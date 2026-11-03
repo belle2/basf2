@@ -28,16 +28,27 @@ To run on the full release directory run it without any arguments:
 
 Use the option --all to show all doxygen warnings and not only those about
 undocumented items.
+
+By default, only the check for undocumented items is performed, without
+generating any output (HTML, XML): this is much faster. Combined with --all,
+the full configuration is used, but no output is kept.
+
+Use the option --full-check to run doxygen with the full configuration and
+keep the generated output (HTML, XML) in the default output directory.
 EOT
     exit 1;
 fi
 
-# check for all option
 GREP_STR=" not documented"
-if [ "$1" = "--all" ]; then
-  GREP_STR=""
-  shift
-fi
+FULL=false
+CHECK_ONLY=true
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --all) GREP_STR=""; FULL=true; shift ;;
+    --full-check) CHECK_ONLY=false; shift ;;
+    *) break ;;
+  esac
+done
 
 # collect arguments or use belle2 release directory
 FILES=${@:-$BELLE2_LOCAL_DIR}
@@ -46,9 +57,32 @@ FILES=${@:-$BELLE2_LOCAL_DIR}
 TMPFILE=`mktemp`
 trap "rm -f $TMPFILE" EXIT
 
+EXTRA_SETTINGS=""
+if [ "$CHECK_ONLY" = true ]; then
+  # write the (unused) doxygen output to a temporary directory
+  OUTDIR=`mktemp -d`
+  trap "rm -rf $TMPFILE $OUTDIR" EXIT
+  EXTRA_SETTINGS="OUTPUT_DIRECTORY = ${OUTDIR}"
+  if [ "$FULL" = false ]; then
+    # The "not documented" warnings are emitted while parsing, so no output
+    # (HTML/XML, source browser) is needed: skip it and parse in parallel.
+    # The input filter is started once per file, so skip the python site setup.
+    EXTRA_SETTINGS="${EXTRA_SETTINGS}
+GENERATE_HTML = NO
+GENERATE_XML = NO
+SOURCE_BROWSER = NO
+INLINE_SOURCES = NO
+VERBATIM_HEADERS = NO
+NUM_PROC_THREADS = 4
+INPUT_FILTER = \"python3 -I -S site_scons/doxygen/doxygen_filter.py\""
+  fi
+fi
+
 # exclude imported code, but keep the code from GenFit
 IMPORTED=$(find . \( -path '*/genfit2/code2/*' -prune \) -o -name .imported -printf '%h ')
 
 # call doxygen on the files from the command line arguments
-sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | sed "s;IMPORTED;${IMPORTED};" | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee ${TMPFILE}
+{ sed "s;INPUT                  =;INPUT                  = ${FILES};" ${BELLE2_LOCAL_DIR}/site_scons/doxygen/Doxyfile | sed "s;IMPORTED;${IMPORTED};"
+  echo "${EXTRA_SETTINGS}"
+} | doxygen - 2>&1 >/dev/null | grep "${GREP_STR}" | tee ${TMPFILE}
 grep " not documented" ${TMPFILE} > /dev/null && exit 1 || exit 0

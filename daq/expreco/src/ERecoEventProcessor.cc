@@ -136,7 +136,7 @@ int ERecoEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, const_cast<char*>(rbufin.c_str()), srchost, portchar, const_cast<char*>(shmname.c_str()),
-                                   static_cast<char*>("0"));
+                                   const_cast<char*>("0"));
 
   // 5. Run EventServer
   char* evs = m_conf->getconf("processor", "eventserver", "script");

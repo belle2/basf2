@@ -137,7 +137,7 @@ int RFEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   char* sender = m_conf->getconf("processor", "sender", "script");
   char* port = m_conf->getconf("processor", "sender", "port");
   m_pid_sender = m_proc->Execute(sender, const_cast<char*>(rbufout.c_str()), port, const_cast<char*>(shmname.c_str()),
-                                 static_cast<char*>("1"));
+                                 const_cast<char*>("1"));
   m_flow->clear(1);
 
   /*
@@ -170,7 +170,7 @@ int RFEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   char portchar[256];
   sprintf(portchar, "%d", rport);
   m_pid_receiver = m_proc->Execute(receiver, const_cast<char*>(rbufin.c_str()), srchost, portchar, const_cast<char*>(shmname.c_str()),
-                                   static_cast<char*>("0"));
+                                   const_cast<char*>("0"));
   m_flow->clear(0);
 
   printf("Configure : done\n");

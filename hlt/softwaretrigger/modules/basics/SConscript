@@ -6,7 +6,6 @@ env['LIBS'] = [
     'framework',
     'hlt_softwaretrigger_dataobjects',
     'hlt',
-    'hlt_dbobjects',
     '$ROOT_LIBS',
     "framework",
     "mdst_dataobjects",

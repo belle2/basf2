@@ -16,16 +16,28 @@ namespace Belle2 {
 
     SignalPDF::SignalPDF(int pixelID, const TOPNominalTTS& tts):
       m_pixelID(pixelID), m_tts(&tts)
-    {}
+    {
+      // the largest TTS component width and offset, used to skip the peaks that are too far in time
+      for (const auto& gaus : tts.getTTS()) {
+        m_maxSigmaSq = std::max(m_maxSigmaSq, static_cast<double>(gaus.sigma * gaus.sigma));
+        m_maxAbsPos = std::max(m_maxAbsPos, std::abs(static_cast<double>(gaus.position)));
+      }
+    }
 
     double SignalPDF::getPDFValue(double time, double timeErr, double sigt) const
     {
       double wid0 = timeErr * timeErr + sigt * sigt;
       double f = 0;
       for (const auto& peak : m_peaks) {
+        // a peak whose every term is rejected by the x > 100 cut below cannot contribute:
+        // the 101 keeps this necessary condition on the safe side of rounding
+        double t = time - peak.t0;
+        double d = std::abs(t) - m_maxAbsPos;
+        if (d > 0 and d * d > 101 * (peak.wid + m_maxSigmaSq + wid0)) continue;
         for (const auto& gaus : m_tts->getTTS()) {
           double sigma = peak.wid + gaus.sigma * gaus.sigma + wid0; // sigma squared!
-          double x = pow(time - peak.t0 - gaus.position, 2) / sigma;
+          double dt = t - gaus.position;
+          double x = dt * dt / sigma;
           if (x > 100) continue;
           sigma = sqrt(2 * M_PI * sigma);
           f += peak.nph * gaus.fraction / sigma * exp(-x / 2);
@@ -33,17 +45,6 @@ namespace Belle2 {
       }
       return f;
     }
-
-    double SignalPDF::getIntegral(double minTime, double maxTime) const
-    {
-      double s = 0;
-      for (const auto& peak : m_peaks) {
-        if (peak.t0 < minTime or peak.t0 > maxTime) continue;
-        s += peak.nph;
-      }
-      return s;
-    }
-
 
   } // namespace TOP
 } // namespace Belle2

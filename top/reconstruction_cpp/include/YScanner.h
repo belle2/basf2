@@ -15,9 +15,11 @@
 #include <top/reconstruction_cpp/PixelEfficiencies.h>
 #include <top/reconstruction_cpp/EnergyMask.h>
 #include <vector>
+#include <deque>
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <utility>
 
 
 namespace Belle2 {
@@ -532,6 +534,9 @@ namespace Belle2 {
       m_quasyEnergyDistributions; /**< photon energy distributions convoluted with Gaussian of different widths */
       mutable Table* m_quasyEnergyDistribution = nullptr; /**< a pointer to the element in m_quasyEnergyDistributions */
       mutable bool m_aboveThreshold = false; /**< true if beta is above the Cerenkov threshold */
+
+      // scratch space of the scan method, re-used by the subsequent calls
+      mutable std::deque<EnergyMask> m_maskPool; /**< energy masks, grown on demand and never released */
 
       // results of expand method (pixel column dependent)
       mutable std::vector<Result> m_results;   /**< results of PDF expansion in y */

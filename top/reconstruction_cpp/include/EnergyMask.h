@@ -34,6 +34,19 @@ namespace Belle2 {
       EnergyMask(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE);
 
       /**
+       * Re-sets the mask, keeping the memory already allocated for the discrete mask.
+       * The resulting object is the same as one freshly constructed with these arguments.
+       * @param dyde derivative dy/de [cm/eV]
+       * @param dydL derivative dy/dL
+       * @param dydx derivative dy/dx
+       * @param dy effective PMT pad size in y [cm]
+       * @param dL length of particle trajectory within the quartz [cm]
+       * @param dx PMT pad size in x [cm]
+       * @param dE energy step [eV]
+       */
+      void set(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE);
+
+      /**
        * Sets minimal size of discrete mask
        * @param Nmin minimal size
        */

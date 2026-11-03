@@ -45,8 +45,8 @@ namespace Belle2 {
       m_yScanner->prepare(track.getMomentumMag(), m_beta, track.getLengthInQuartz());
       m_tof = track.getTOF(hypothesis, 0, overrideMass);
 
-      m_groupIndex = TOPGeometryPar::Instance()->getGroupIndex(m_yScanner->getMeanEnergy());
-      m_groupIndexDerivative = TOPGeometryPar::Instance()->getGroupIndexDerivative(m_yScanner->getMeanEnergy());
+      m_groupIndex = TOPGeometryPar::getGroupIndex(m_yScanner->getMeanEnergy());
+      m_groupIndexDerivative = TOPGeometryPar::getGroupIndexDerivative(m_yScanner->getMeanEnergy());
       m_cosTotal = m_yScanner->getCosTotal();
       m_minTime = TOPRecoManager::getMinTime();
       m_maxTime = TOPRecoManager::getMaxTime();
@@ -58,16 +58,37 @@ namespace Belle2 {
       const auto& pixelPositions = m_yScanner->getPixelPositions();
       int numPixels = pixelPositions.getNumPixels();
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      m_signalPDFs.reserve(numPixels);
+      const TOPNominalTTS* tts = nullptr; // the pixels of a module usually share the PMT type
+      unsigned lastPmtType = 0;
       for (int pixelID = 1; pixelID <= numPixels; pixelID++) {
         auto pmtType = pixelPositions.get(pixelID).pmtType;
-        const auto& tts = geo->getTTS(pmtType);
-        m_signalPDFs.push_back(SignalPDF(pixelID, tts));
+        if (not tts or pmtType != lastPmtType) {
+          tts = &geo->getTTS(pmtType);
+          lastPmtType = pmtType;
+        }
+        m_signalPDFs.push_back(SignalPDF(pixelID, *tts));
       }
 
       // construct PDF
 
       if (m_yScanner->isAboveThreshold()) {
         setSignalPDF();
+      }
+
+      // the sum and the time span of the PDF peaks, used to shortcut getExpectedSignalPhotons
+
+      for (const auto& signalPDF : m_signalPDFs) {
+        m_sumOfPeaks += signalPDF.getSum(); // equals getIntegral over a window containing all the peaks
+        if (signalPDF.getPDFPeaks().empty()) continue;
+        if (m_hasPeaks) {
+          m_minPeakT0 = std::min(m_minPeakT0, signalPDF.getMinT0());
+          m_maxPeakT0 = std::max(m_maxPeakT0, signalPDF.getMaxT0());
+        } else {
+          m_minPeakT0 = signalPDF.getMinT0();
+          m_maxPeakT0 = signalPDF.getMaxT0();
+          m_hasPeaks = true;
+        }
       }
 
       m_deltaRayPDF.prepare(track, hypothesis);
@@ -439,7 +460,7 @@ namespace Belle2 {
         auto& signalPDF = m_signalPDFs[result.pixelID - 1];
         double dE = result.e0 - m_yScanner->getMeanEnergy();
         double propLen = Len + D.dLen_de * dE;
-        double speedOfLight = Const::speedOfLight / TOPGeometryPar::Instance()->getGroupIndex(result.e0);
+        double speedOfLight = Const::speedOfLight / TOPGeometryPar::getGroupIndex(result.e0);
 
         SignalPDF::PDFPeak peak;
         peak.t0 = m_tof + propLen / speedOfLight;
@@ -481,7 +502,7 @@ namespace Belle2 {
     double PDFConstructor::propagationLosses(double E, double propLen, int nx, int ny,
                                              SignalPDF::EPeakType type) const
     {
-      double bulk = TOPGeometryPar::Instance()->getAbsorptionLength(E);
+      double bulk = TOPGeometryPar::getAbsorptionLength(E);
       // the surface reflectivity is a constant of the module, so its powers are tabulated
       // once per module by the YScanner instead of being re-computed for every photon
       double surf = m_yScanner->getSurfaceReflectivity(std::abs(nx) + std::abs(ny));

@@ -223,9 +223,19 @@ namespace Belle2 {
        */
       double getExpectedSignalPhotons(double minTime, double maxTime) const
       {
+        // the time window usually contains either all the PDF peaks or none of them,
+        // and then the sum over the pixels is known in advance
         double ps = 0;
-        for (const auto& signalPDF : m_signalPDFs) {
-          ps += signalPDF.getIntegral(minTime, maxTime);
+        if (not m_hasPeaks) {
+          ; // no peaks at all: the sum stays zero
+        } else if (minTime <= m_minPeakT0 and maxTime >= m_maxPeakT0) {
+          ps = m_sumOfPeaks;
+        } else if (maxTime < m_minPeakT0 or minTime > m_maxPeakT0) {
+          ; // no peak is inside the window: the sum stays zero
+        } else {
+          for (const auto& signalPDF : m_signalPDFs) {
+            ps += signalPDF.getIntegral(minTime, maxTime);
+          }
         }
         return ps * m_signalPhotons;
       }
@@ -690,14 +700,21 @@ namespace Belle2 {
 
       std::vector<SignalPDF> m_signalPDFs; /**< parameterized signal PDF in pixels (index = pixelID - 1) */
       double m_signalPhotons = 0; /**< expected number of signal photons */
+      bool m_hasPeaks = false;  /**< true if at least one pixel has a PDF peak */
+      double m_sumOfPeaks = 0;  /**< sum over the pixels of the normalized number of photons in all peaks */
+      double m_minPeakT0 = 0;   /**< position of the earliest PDF peak of all pixels [ns] */
+      double m_maxPeakT0 = 0;   /**< position of the latest PDF peak of all pixels [ns] */
       double m_bkgPhotons = 0; /**< expected number of uniform background photons */
       double m_deltaPhotons = 0; /**< expected number of delta-ray photons */
 
-      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles */
+      std::map<double, InverseRaytracer::CerenkovAngle> m_cerenkovAngles; /**< sine and cosine of Cerenkov angles for dE != 0 */
+      InverseRaytracer::CerenkovAngle m_cerenkovAngle0; /**< sine and cosine of Cerenkov angle at dE = 0 */
       double m_dFic = 0; /**< temporary storage for dFic used in last call to deltaXD */
       double m_Fic = 0;  /**< temporary storage for Cerenkov azimuthal angle */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsSetPDF; /**< number of calls to setSignalPDF<T> */
-      mutable std::map <SignalPDF::EPeakType, int> m_ncallsExpandPDF; /**< number of calls to expandSignalPDF */
+      /** number of calls to setSignalPDF<T>, indexed with SignalPDF::EPeakType */
+      int m_ncallsSetPDF[3] = {0, 0, 0};
+      /** number of calls to expandSignalPDF, indexed with SignalPDF::EPeakType */
+      int m_ncallsExpandPDF[3] = {0, 0, 0};
       mutable std::vector<LogL> m_pixelLLs; /**< pixel log likelihoods (index = pixelID - 1) */
       mutable std::vector<Pull> m_pulls; /**< photon pulls w.r.t PDF peaks */
       mutable bool m_deltaPDFOn = true; /**< include/exclude delta-ray PDF in likelihood calculation */
@@ -751,13 +768,14 @@ namespace Belle2 {
 
     inline double PDFConstructor::getCosCerenkovAngle(double E) const
     {
-      double refind = TOPGeometryPar::Instance()->getPhaseIndex(E);
+      double refind = TOPGeometryPar::getPhaseIndex(E);
       return std::min(1 / m_beta / refind, 1.0);
     }
 
     inline const InverseRaytracer::CerenkovAngle& PDFConstructor::cerenkovAngle(double dE)
     {
-      auto& cer = m_cerenkovAngles[dE];
+      // dE = 0 is by far the most frequent argument, so it is kept out of the map
+      auto& cer = (dE == 0) ? m_cerenkovAngle0 : m_cerenkovAngles[dE];
       if (cer.cosThc == 0 and cer.sinThc == 0) {
         double meanE = m_yScanner->getMeanEnergy();
         double cosThc = getCosCerenkovAngle(meanE + dE);

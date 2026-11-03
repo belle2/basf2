@@ -9,6 +9,8 @@
 #pragma once
 
 #include <top/dbobjects/TOPNominalTTS.h>
+#include <algorithm>
+#include <cmath>
 #include <vector>
 
 namespace Belle2 {
@@ -78,7 +80,18 @@ namespace Belle2 {
        * Appends single PDF peak
        * @param peak single PDF peak
        */
-      void append(const PDFPeak& peak) { m_peaks.push_back(peak);}
+      void append(const PDFPeak& peak)
+      {
+        if (m_peaks.empty()) {
+          m_minT0 = peak.t0;
+          m_maxT0 = peak.t0;
+        } else {
+          m_minT0 = std::min(m_minT0, peak.t0);
+          m_maxT0 = std::max(m_maxT0, peak.t0);
+        }
+        m_peaks.push_back(peak);
+        m_sum += peak.nph; // accumulated in the same order as the loop in getSum()
+      }
 
       /**
        * Appends extra information of single PDF peak
@@ -123,6 +136,18 @@ namespace Belle2 {
       const std::vector<PDFExtra>& getPDFExtraInfo() const {return m_extras;}
 
       /**
+       * Returns the position of the earliest peak (meaningless if there are no peaks)
+       * @return peak position [ns]
+       */
+      double getMinT0() const {return m_minT0;}
+
+      /**
+       * Returns the position of the latest peak (meaningless if there are no peaks)
+       * @return peak position [ns]
+       */
+      double getMaxT0() const {return m_maxT0;}
+
+      /**
        * Checks if extra info is available
        * @return true if available
        */
@@ -149,6 +174,11 @@ namespace Belle2 {
 
       int m_pixelID = 0; /**< pixel ID */
       const TOPNominalTTS* m_tts = 0; /**< nominal TTS */
+      double m_maxSigmaSq = 0; /**< the largest of the TTS component widths squared [ns^2] */
+      double m_maxAbsPos = 0;  /**< the largest of the TTS component offsets in absolute value [ns] */
+      double m_sum = 0;    /**< sum of nph of all peaks */
+      double m_minT0 = 0;  /**< position of the earliest peak [ns] */
+      double m_maxT0 = 0;  /**< position of the latest peak [ns] */
       std::vector<PDFPeak> m_peaks; /**< PDF peaks */
       std::vector<PDFExtra> m_extras; /**< extra information (stored only on request) */
 
@@ -159,12 +189,26 @@ namespace Belle2 {
     inline void SignalPDF::normalize(double a)
     {
       for (auto& peak : m_peaks) peak.nph /= a;
+      m_sum = 0;
+      for (const auto& peak : m_peaks) m_sum += peak.nph;
     }
 
     inline double SignalPDF::getSum() const
     {
+      return m_sum;
+    }
+
+    inline double SignalPDF::getIntegral(double minTime, double maxTime) const
+    {
+      if (m_peaks.empty()) return 0;
+      if (minTime <= m_minT0 and maxTime >= m_maxT0) return m_sum; // all the peaks are inside
+      if (maxTime < m_minT0 or minTime > m_maxT0) return 0;        // none of the peaks is inside
+
       double s = 0;
-      for (const auto& peak : m_peaks) s += peak.nph;
+      for (const auto& peak : m_peaks) {
+        if (peak.t0 < minTime or peak.t0 > maxTime) continue;
+        s += peak.nph;
+      }
       return s;
     }
 

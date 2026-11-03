@@ -135,6 +135,7 @@ namespace Belle2 {
       // background rate estimation
 
       const auto* geo = TOPGeometryPar::Instance()->getGeometry();
+      m_tts = &geo->getTTS(0); // PMT independent TTS should be fine in isScanRequired
       const auto& tdc = geo->getNominalTDC();
       double timeWindow = m_feSetting->getReadoutWindows() * tdc.getSyncTimeBase() / static_cast<double>(TOPNominalTDC::c_syncWindows);
 
@@ -166,6 +167,7 @@ namespace Belle2 {
     bool TOPTrack::setHelix(const Transform3D& transform)
     {
       m_emissionPoints.clear();
+      m_emissionPoint0.isSet = false;
 
       // helix in module nominal frame (z-axis still parallel to magnetic field)
 
@@ -354,7 +356,8 @@ namespace Belle2 {
     {
       if (m_emissionPoints.size() > 1000) m_emissionPoints.clear(); // prevent blow-up
 
-      auto& emissionPoint = m_emissionPoints[dL];
+      // dL = 0 is by far the most frequent argument, so it is kept out of the map
+      auto& emissionPoint = (dL == 0) ? m_emissionPoint0 : m_emissionPoints[dL];
       if (not emissionPoint.isSet) {
         emissionPoint.position = m_helix.getPosition(dL);
         emissionPoint.trackAngles = TrackAngles(m_helix.getDirection(dL));
@@ -365,7 +368,7 @@ namespace Belle2 {
 
     bool TOPTrack::isScanRequired(unsigned col, double time, double wid) const
     {
-      const auto& tts = TOPGeometryPar::Instance()->getGeometry()->getTTS(0); // PMT independent TTS should be fine here
+      const auto& tts = *m_tts;
       const auto& range = m_columnHits.equal_range(col);
       for (auto it = range.first; it != range.second; ++it) {
         const auto hit = it->second;

@@ -29,7 +29,6 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
-#include <set>
 
 using namespace std;
 
@@ -618,19 +617,19 @@ namespace Belle2 {
 
   int TOPBunchFinderModule::setFinder(Chi2MinimumFinder1D& finder, const PDFConstructor& reco, double timeMin, double timeMax)
   {
-    std::set<int> nfotSet; // for control only
     const auto& binCenters = finder.getBinCenters();
     int numPhotons = 0;
+    bool sameNumPhotons = true; // for control only
     double logL_bkg = reco.getBackgroundLogL(timeMin, timeMax).logL;
     for (unsigned i = 0; i < binCenters.size(); i++) {
       double t0 = binCenters[i];
       auto LL = reco.getLogL(t0, timeMin, timeMax, m_sigmaSmear);
       finder.add(i, -2 * (LL.logL - logL_bkg));
       if (i == 0) numPhotons = LL.numPhotons;
-      nfotSet.insert(LL.numPhotons);
+      else if (static_cast<int>(LL.numPhotons) != numPhotons) sameNumPhotons = false;
     }
 
-    if (nfotSet.size() != 1) B2ERROR("Different number of photons used for log likelihood of different time shifts");
+    if (not sameNumPhotons) B2ERROR("Different number of photons used for log likelihood of different time shifts");
 
     return numPhotons;
   }

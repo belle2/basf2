@@ -18,19 +18,29 @@ namespace Belle2 {
     unsigned EnergyMask::s_Nmin = 4;
     unsigned EnergyMask::s_Nmax = 256;
 
-    EnergyMask::EnergyMask(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE):
-      m_dE(dE), m_Wy(dy / std::abs(dyde))
+    EnergyMask::EnergyMask(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE)
     {
+      set(dyde, dydL, dydx, dy, dL, dx, dE);
+    }
+
+
+    void EnergyMask::set(double dyde, double dydL, double dydx, double dy, double dL, double dx, double dE)
+    {
+      m_dE = dE;
+      m_Wy = dy / std::abs(dyde);
+      m_A = 0;
+      m_B = 0;
+      m_C = 0;
+      m_threeSquare = false;
+      m_mask.clear(); // the capacity is kept, so that a re-used object does not re-allocate
+
       if (dy <= 0) {
         B2ERROR("TOP::EnergyMask: dy must be > 0");
         return;
       }
 
-      std::vector<double> x;
-      x.push_back(m_Wy);
-      x.push_back(std::abs(dL * dydL / dyde));
-      x.push_back(std::abs(dx * dydx / dyde));
-      std::sort(x.begin(), x.end());
+      double x[3] = {m_Wy, std::abs(dL* dydL / dyde), std::abs(dx* dydx / dyde)};
+      std::sort(x, x + 3);
 
       m_A = x[2];
       m_B = x[1];
@@ -40,6 +50,7 @@ namespace Belle2 {
       unsigned N = (m_A + m_B + m_C) / 2.0 / dE + 1;
       if (N < s_Nmin or N > s_Nmax) return;
 
+      m_mask.reserve(N + 1);
       if (m_threeSquare) {
         for (unsigned i = 0; i <= N; i++) {
           double E = i * dE;

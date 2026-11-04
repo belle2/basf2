@@ -397,12 +397,12 @@ class TDCPV_klong(BaseSkim):
         loadStdSkimHighEffPhi(path=path)
         ma.reconstructDecay(
             'eta:SkimHighEff1_TDCPV_klong -> gamma:tight_TDCPV_klong gamma:tight_TDCPV_klong',
-            '0.4 < M < 0.6',
+            '0.45 < M < 0.6',
             dmID=1,
             path=path)
         ma.reconstructDecay(
             'eta:SkimHighEff2_TDCPV_klong -> pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_klong pi-:SkimHighEff pi+:SkimHighEff',
-            '0.4 < M < 0.6',
+            '0.45 < M < 0.6',
             dmID=2,
             path=path)
         ma.copyLists('eta:SkimHighEff_TDCPV_klong', ['eta:SkimHighEff1_TDCPV_klong', 'eta:SkimHighEff2_TDCPV_klong'], path=path)

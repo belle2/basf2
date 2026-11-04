@@ -389,8 +389,6 @@ class TDCPV_klong(BaseSkim):
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         ma.cutAndCopyList('pi0:skim_TDCPV_klong', 'pi0:skim', pi0QualityCutWithDaughterAngleCuts, path=path)
-        loadStdSkimHighEffPi0(path=path)
-        ma.cutAndCopyList('pi0:SkimHighEff_TDCPV_klong', 'pi0:SkimHighEff', pi0QualityCutWithDaughterAngleCuts, path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
         ma.cutAndCopyList('pi0:eff40_May2020_no_daughter_angle_cuts_TDCPV_klong', 'pi0:eff40_May2020', pi0QualityCut, path=path)

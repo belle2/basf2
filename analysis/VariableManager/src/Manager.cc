@@ -412,7 +412,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
     if (make_fatal) {
       mapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
     } else {
-      mapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+      mapIter->second.get()->extendDescriptionString("\n\n.. note:: Deprecated since " + version + ".\n " + description);
     }
   } else {
     auto parMapIter = m_parameter_variables.find(name);
@@ -420,7 +420,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
       if (make_fatal) {
         parMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
       } else {
-        parMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+        parMapIter->second.get()->extendDescriptionString("\n\n.. note:: Deprecated since " + version + ".\n " + description);
       }
     } else {
       auto metaMapIter = m_meta_variables.find(name);
@@ -428,7 +428,7 @@ void Variable::Manager::deprecateVariable(const std::string& name, bool make_fat
         if (make_fatal) {
           metaMapIter->second.get()->extendDescriptionString("\n\n.. deprecated:: " + version + "\n " + description);
         } else {
-          metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: ");
+          metaMapIter->second.get()->extendDescriptionString("\n\n.. note:: Deprecated since " + version + ".\n " + description);
         }
       } else {
         B2FATAL("The variable '" << name << "' is not registered so it makes no sense to try to deprecate it.");

@@ -13,10 +13,10 @@ Perform code quality cppchecks for every commit to the analysis package.
 """
 
 import re
-from b2test_utils import check_error_free
+from b2test_utils import check_error_free, get_test_nproc
 
 if __name__ == "__main__":
 
     ignoreme = r"^((?!analysis\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "analysis",
-                     lambda x: re.findall(ignoreme, x) or x == "'", ["-j4"])
+                     lambda x: re.findall(ignoreme, x) or x == "'", [f"-j{get_test_nproc()}"])

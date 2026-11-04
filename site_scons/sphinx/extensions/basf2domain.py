@@ -168,6 +168,21 @@ class Basf2Domain(Domain):
             except Exception:
                 pass
 
+    def merge_domaindata(self, docnames, otherdata):
+        """Merge the domain data collected by a parallel reader process"""
+        for t in "modules", "variables":
+            for name, (doc, target) in otherdata[t].items():
+                if doc not in docnames:
+                    continue
+                if name in self.data[t]:
+                    # same duplicate warning as emitted when reading serially
+                    logger.warning(f"Duplicate description of basf2 {t[:-1]} {name}, " +
+                                   "Other instance in " + self.env.doc2path(self.data[t][name][0]) +
+                                   ", please add ':noindex:' to one",
+                                   location=doc)
+                else:
+                    self.data[t][name] = (doc, target)
+
     def get_objects(self):
         for i, type in enumerate(["modules", "variables"]):
             for name, (docname, target) in self.data[type].items():

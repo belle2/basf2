@@ -42,6 +42,9 @@ if __name__ == "__main__":
     #: ignore missing tracking_eventtimeextraction
     ignoretrackingeventtimeextraction = 'tracking_eventtimeextraction'
 
+    #: ignore warnings about the theme not supporting parallel writing (reading is still parallel)
+    ignoreparallel = 'not safe for parallel writing|doing serial write'
+
     sphinx_output_dir = os.getenv("BELLE2_SPHINX_LIGHT_OUTPUTDIR")
     check_error_free(
         "b2code-sphinx-warnings", "sphinx", None,
@@ -55,6 +58,9 @@ if __name__ == "__main__":
         re.findall(ignoreincludeproblem, x) or
         re.findall(ignoreonlinebook, x) or
         re.findall(ignoretrackmatching, x) or
-        re.findall(ignoretrackingeventtimeextraction, x),
-        ['--light'] + (["-o", sphinx_output_dir] if sphinx_output_dir else [])
+        re.findall(ignoretrackingeventtimeextraction, x) or
+        re.findall(ignoreparallel, x),
+        ['--light'] + (["-o", sphinx_output_dir] if sphinx_output_dir else []) + ["-j", "4"] +
+        # only render the sidebar branch of the current page: much faster, same warnings
+        ["-D", "html_theme_options.collapse_navbar=True"]
     )

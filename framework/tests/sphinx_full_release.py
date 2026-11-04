@@ -25,10 +25,16 @@ if __name__ == "__main__":
     #: ignore strange backward compatibility warning
     ignorebackward = '_BACKWARD_BACKWARD_WARNING_H'
 
+    #: ignore warnings about the theme not supporting parallel writing (reading is still parallel)
+    ignoreparallel = 'not safe for parallel writing|doing serial write'
+
     sphinx_output_dir = os.getenv("BELLE2_SPHINX_OUTPUTDIR")
     check_error_free(
         "b2code-sphinx-warnings", "sphinx", None,
         lambda x:
-        re.findall(ignorebackward, x),
-        ["-o", sphinx_output_dir] if sphinx_output_dir else []
+        re.findall(ignorebackward, x) or
+        re.findall(ignoreparallel, x),
+        (["-o", sphinx_output_dir] if sphinx_output_dir else []) + ["-j", "4"] +
+        # only render the sidebar branch of the current page: much faster, same warnings
+        ["-D", "html_theme_options.collapse_navbar=True"]
     )

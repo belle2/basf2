@@ -448,4 +448,4 @@ def setup(app):
     StandardDomain.initial_data["labels"]["b2-varindex"] = ("b2-varindex", "", "basf2 Variable Index")
     StandardDomain.initial_data["anonlabels"]["b2-modindex"] = ("b2-modindex", "")
     StandardDomain.initial_data["anonlabels"]["b2-varindex"] = ("b2-varindex", "")
-    return {'version': 0.3}
+    return {'version': 0.3, 'parallel_read_safe': True, 'parallel_write_safe': True}

@@ -165,396 +165,393 @@ int TauDecayMarkerModule::getNumDaughterOfTauExceptGamma(int s, int id, int sign
 
 int TauDecayMarkerModule::getDecayChannelOfTau(int s)
 {
-  int ret = 0;
-  if (tauPair && s != 0) {
-    if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-12), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (11), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 1 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-14), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (13), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 2 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
-    ) ret = 3 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-213), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
-    ) ret = 4 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-20213), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
-    ) ret = 5 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
-    ) ret = 6 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-323), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
-    ) ret = 7 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 8 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 9 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
-    ) ret = 10 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 3 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
-    ) ret = 11 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 3 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 7
-    ) ret = 12 + (getNumDaughterOfTau(s, 0, 1) - 7) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 7
-    ) ret = 13 + (getNumDaughterOfTau(s, 0, 1) - 7) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 14 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 15 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 2 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 2) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 15 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 16 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 16 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 17 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 18 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 19 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 19 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 20 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTau(s, 22, 1) >= 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 21 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 22 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 22 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 4 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
-    ) ret = 23 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
-    ) ret = 24 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 25 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 26 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 27 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-323), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 28 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 29 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 30 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 31 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 31 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 32 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 32 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 33 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 34 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 2 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 2) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 34 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 35 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 36 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-11), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-12), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (11), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 37 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 20223, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 38 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
-    ) ret = 39 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 40 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 40 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 41 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 41 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-    else if (
-      getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 42 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
-    else if (
-      (getNumDaughterOfTauExceptGamma(s, 130, 0)
-       + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
-       getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
-      getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
-      getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
-    ) ret = 42 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
-              + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
-              + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
-
-  }
-  return ret;
+  if (!tauPair || s == 0) return 0;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-12), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (11), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 1 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-14), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (13), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 2 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
+  ) return 3 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-213), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
+  ) return 4 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-20213), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
+  ) return 5 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
+  ) return 6 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-323), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 2
+  ) return 7 + (getNumDaughterOfTau(s, 0, 1) - 2) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 8 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 9 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
+  ) return 10 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 3 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
+  ) return 11 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 3 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 7
+  ) return 12 + (getNumDaughterOfTau(s, 0, 1) - 7) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 7
+  ) return 13 + (getNumDaughterOfTau(s, 0, 1) - 7) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 14 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 15 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 2 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 2) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 15 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 16 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 16 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 17 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 18 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 19 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 19 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 20 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTau(s, 22, 1) >= 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 21 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 22 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 22 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 4 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 6
+  ) return 23 + (getNumDaughterOfTau(s, 0, 1) - 6) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 4
+  ) return 24 + (getNumDaughterOfTau(s, 0, 1) - 4) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 25 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 26 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 27 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-323), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 221, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 28 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 29 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 3 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 30 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 31 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 31 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 32 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 32 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 33 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 34 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 2 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 2) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 34 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 35 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 36 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-11), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-12), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (11), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 37 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 20223, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 38 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 223, 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 3
+  ) return 39 + (getNumDaughterOfTau(s, 0, 1) - 3) * 1000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 40 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (211), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 40 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 41 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 111, 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 41 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  if (
+    getNumDaughterOfTauExceptGamma(s, -s * (-10313), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 42 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000;
+  if (
+    (getNumDaughterOfTauExceptGamma(s, 130, 0)
+     + getNumDaughterOfTauExceptGamma(s, 310, 0) == 1 ||
+     getNumDaughterOfTauExceptGamma(s, 311, 0) == 1) &&
+    getNumDaughterOfTauExceptGamma(s, -s * (-211), 1) == 2 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (16), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, -s * (321), 1) == 1 &&
+    getNumDaughterOfTauExceptGamma(s, 0, 1) == 5
+  ) return 42 + (getNumDaughterOfTau(s, 0, 1) - 5) * 1000
+             + getNumDaughterOfTauExceptGamma(s, 310, 0) * 10000
+             + getNumDaughterOfTauExceptGamma(s, 130, 0) * 100000;
+  return 0;
 }
 
 

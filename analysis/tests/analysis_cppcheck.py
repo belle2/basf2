@@ -19,4 +19,4 @@ if __name__ == "__main__":
 
     ignoreme = r"^((?!analysis\/).)*$"
     check_error_free("b2code-cppcheck", "cppcheck", "analysis",
-                     lambda x: re.findall(ignoreme, x) or x == "'")
+                     lambda x: re.findall(ignoreme, x) or x == "'", ["-j4"])

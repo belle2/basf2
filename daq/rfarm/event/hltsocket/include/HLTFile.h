@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/pcore/SeqFile.h>
+#include <daq/seqfile/SeqFile.h>
 #include <cstdio>
 
 namespace Belle2 {
@@ -34,9 +34,3 @@ namespace Belle2 {
     FILE* m_rfile = nullptr;
   };
 }
-
-
-
-
-
-

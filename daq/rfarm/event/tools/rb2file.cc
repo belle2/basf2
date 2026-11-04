@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "framework/pcore/SeqFile.h"
+#include "daq/seqfile/SeqFile.h"
 #include "framework/pcore/RingBuffer.h"
 #include "framework/pcore/EvtMessage.h"
 

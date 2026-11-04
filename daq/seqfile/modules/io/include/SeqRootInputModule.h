@@ -10,7 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/DataStoreStreamer.h>
-#include <framework/pcore/SeqFile.h>
+#include <daq/seqfile/SeqFile.h>
 
 #include <string>
 

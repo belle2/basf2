@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/modules/rootio/SeqRootInputModule.h>
+#include <daq/seqfile/modules/io/SeqRootInputModule.h>
 
 #include <framework/core/Environment.h>
 #include <framework/datastore/DataStore.h>

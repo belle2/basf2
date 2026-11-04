@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "framework/pcore/SeqFile.h"
+#include "daq/seqfile/SeqFile.h"
 #include "daq/dataflow/REvtSocket.h"
 
 #include <TRandom.h>

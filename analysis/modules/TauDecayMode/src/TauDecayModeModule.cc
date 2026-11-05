@@ -148,103 +148,20 @@ void TauDecayModeModule::event()
 void TauDecayModeModule::AnalyzeTauPairEvent()
 {
   // Clear local vectors
-  vec_nut.clear();
-  vec_anut.clear();
-  vec_numu.clear();
-  vec_anumu.clear();
-  vec_nue.clear();
-  vec_anue.clear();
-  vec_em.clear();
-  vec_ep.clear();
-  vec_mum.clear();
-  vec_mup.clear();
-  vec_pim.clear();
-  vec_pip.clear();
-  vec_km.clear();
-  vec_kp.clear();
-  vec_apro.clear();
-  vec_pro.clear();
-  vec_pi0.clear();
-  vec_k0s.clear();
-  vec_k0l.clear();
-  vec_eta.clear();
-  vec_omega.clear();
-  vec_etapr.clear();
-  vec_phi.clear();
-  vec_rhom.clear();
-  vec_rhop.clear();
-  vec_rho0.clear();
-  vec_kstarm.clear();
-  vec_kstarp.clear();
-  vec_kstar0.clear();
-  vec_kstar0_br.clear();
-  vec_a1m.clear();
-  vec_a1p.clear();
-  vec_a00_980.clear();
-  vec_a0m_980.clear();
-  vec_a0p_980.clear();
-  vec_a00_1450.clear();
-  vec_a0m_1450.clear();
-  vec_a0p_1450.clear();
-  vec_b1m.clear();
-  vec_b1p.clear();
-  vec_f1.clear();
-  vec_f0.clear();
-  vec_lambda.clear();
-  vec_lmb_br.clear();
-  vec_alpha.clear();
-  vec_gam.clear();
   vec_radgam_taum.clear();
   vec_radgam_taup.clear();
   //
+  // One (initially empty) vector of particle indices per PDG code
   map<int, std::vector<int>> map_vec;
-  //
-  map_vec[11] = vec_em;
-  map_vec[-11] = vec_ep;
-  map_vec[12] = vec_nue;
-  map_vec[-12] = vec_anue;
-  map_vec[13] = vec_mum;
-  map_vec[-13] = vec_mup;
-  map_vec[14] = vec_numu;
-  map_vec[-14] = vec_anumu;
-  map_vec[16] = vec_nut;
-  map_vec[-16] = vec_anut;
-  map_vec[-211] = vec_pim;
-  map_vec[211] = vec_pip;
-  map_vec[-321] = vec_km;
-  map_vec[321] = vec_kp;
-  map_vec[-2212] = vec_apro;
-  map_vec[2212] = vec_pro;
-  map_vec[111] = vec_pi0;
-  map_vec[310] = vec_k0s;
-  map_vec[130] = vec_k0l;
-  map_vec[221] = vec_eta;
-  map_vec[223] = vec_omega;
-  map_vec[331] = vec_etapr;
-  map_vec[333] = vec_phi;
-  map_vec[-213] = vec_rhom;
-  map_vec[213] = vec_rhop;
-  map_vec[113] = vec_rho0;
-  map_vec[-323] = vec_kstarm;
-  map_vec[323] = vec_kstarp;
-  map_vec[313] = vec_kstar0;
-  map_vec[-313] = vec_kstar0_br;
-  map_vec[-20213] = vec_a1m;
-  map_vec[20213] = vec_a1p;
-  map_vec[-9000211] = vec_a0m_980;
-  map_vec[9000211]  = vec_a0p_980;
-  map_vec[9000111]  = vec_a00_980;
-  map_vec[-10211] = vec_a0m_1450;
-  map_vec[10211]  = vec_a0p_1450;
-  map_vec[10111]  = vec_a00_1450;
-  map_vec[-10213] = vec_b1m;
-  map_vec[10213] = vec_b1p;
-  map_vec[20223] = vec_f1;
-  map_vec[9010221] = vec_f0;
-  map_vec[3122] = vec_lambda;
-  map_vec[-3122] = vec_lmb_br;
-  map_vec[94144] = vec_alpha;
-  map_vec[22] = vec_gam;
+  for (int pdg : {
+         11, -11, 12, -12, 13, -13, 14, -14,
+         16, -16, -211, 211, -321, 321, -2212, 2212,
+         111, 310, 130, 221, 223, 331, 333, -213,
+         213, 113, -323, 323, 313, -313, -20213, 20213,
+         -9000211, 9000211, 9000111, -10211, 10211, 10111, -10213, 10213,
+         20223, 9010221, 3122, -3122, 94144, 22
+       })
+    map_vec[pdg];
 
   bool TauMinusIsLeptonicDecay = false;
   bool TauPlusIsLeptonicDecay = false;

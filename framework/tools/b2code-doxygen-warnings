@@ -67,13 +67,19 @@ if [ "$CHECK_ONLY" = true ]; then
     # The "not documented" warnings are emitted while parsing, so no output
     # (HTML/XML, source browser) is needed: skip it and parse in parallel.
     # The input filter is started once per file, so skip the python site setup.
+    # The number of threads is taken from BELLE2_TEST_NPROC (default: 4).
+    NPROC=${BELLE2_TEST_NPROC:-4}
+    if ! [[ "${NPROC}" =~ ^[1-9][0-9]*$ ]]; then
+      echo "BELLE2_TEST_NPROC must be a positive integer, got '${NPROC}'"
+      exit 1
+    fi
     EXTRA_SETTINGS="${EXTRA_SETTINGS}
 GENERATE_HTML = NO
 GENERATE_XML = NO
 SOURCE_BROWSER = NO
 INLINE_SOURCES = NO
 VERBATIM_HEADERS = NO
-NUM_PROC_THREADS = 4
+NUM_PROC_THREADS = ${NPROC}
 INPUT_FILTER = \"python3 -I -S site_scons/doxygen/doxygen_filter.py\""
   fi
 fi

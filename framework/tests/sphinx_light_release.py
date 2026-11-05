@@ -15,7 +15,7 @@ However, a few warnings can not easily be omitted and are therefore accepted for
 
 import os
 import re
-from b2test_utils import check_error_free
+from b2test_utils import check_error_free, get_test_nproc
 
 
 if __name__ == "__main__":
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         re.findall(ignoretrackmatching, x) or
         re.findall(ignoretrackingeventtimeextraction, x) or
         re.findall(ignoreparallel, x),
-        ['--light'] + (["-o", sphinx_output_dir] if sphinx_output_dir else []) + ["-j", "4"] +
+        ['--light'] + (["-o", sphinx_output_dir] if sphinx_output_dir else []) + ["-j", str(get_test_nproc())] +
         # only render the sidebar branch of the current page: much faster, same warnings
         ["-D", "html_theme_options.collapse_navbar=True"]
     )

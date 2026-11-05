@@ -438,6 +438,22 @@ def is_ci() -> bool:
     ]
 
 
+def get_test_nproc(default: int = 4) -> int:
+    """
+    Returns the number of parallel jobs that a single test may use internally
+    (e.g. ``-j`` for cppcheck or sphinx). It is taken from the
+    'BELLE2_TEST_NPROC' environment variable, which can be set on CI, and
+    falls back to ``default`` if the variable is not defined or empty.
+    """
+    value = os.environ.get("BELLE2_TEST_NPROC", "").strip()
+    if not value:
+        return default
+    nproc = int(value)
+    if nproc < 1:
+        raise ValueError(f"BELLE2_TEST_NPROC must be a positive integer, got '{value}'")
+    return nproc
+
+
 def is_cdb_down() -> bool:
     """
     Returns true if the Conditions Database (CDB) is currently unavailable or slow to respond.

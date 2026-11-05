@@ -137,8 +137,9 @@ run-tests:
     - b2code-option opt
     - export BELLE2_SPHINX_OUTPUTDIR=${BELLE2_LOCAL_DIR}/build_doc/
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/output_tests_reports/tests-google.xml
-    # Run doxygen for analysis package to generate xml files needed for sphinx build
-    - b2code-doxygen-warnings --full-check analysis > /dev/null 2>&1 || true
+    # Run doxygen on the analysis variables to generate the xml files needed for the sphinx build
+    # (sphinx only uses them for the source links of the variables)
+    - b2code-doxygen-warnings --full-check analysis/variables analysis/VariableManager > /dev/null 2>&1 || true
     - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-framework.xml --timeout 1200
     - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml-input=${BELLE2_LOCAL_DIR}/input_tests_reports/tests-non-framework.xml --xml=${BELLE2_LOCAL_DIR}/output_tests_reports/tests-non-framework.xml --timeout 1200
     # Upload the tests reports (only if this is the main branch)

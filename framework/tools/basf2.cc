@@ -532,9 +532,11 @@ int main(int argc, char* argv[])
     Environment::Instance().printJobInformation();
   }
 
-  //Report completion in json metadata
-  MetadataService::Instance().addBasf2Status("finished successfully");
-  MetadataService::Instance().finishBasf2();
+  //Report completion in json metadata, but only if the steering file ran without errors
+  if (pyReturnValue == 0) {
+    MetadataService::Instance().addBasf2Status("finished successfully");
+    MetadataService::Instance().finishBasf2();
+  }
 
   return pyReturnValue;
 }

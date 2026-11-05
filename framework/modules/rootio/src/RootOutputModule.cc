@@ -192,7 +192,9 @@ void RootOutputModule::openFile()
     //try creating necessary directories since this is a local file
     auto dirpath = out.parent_path();
 
-    if (std::filesystem::create_directories(dirpath)) {
+    // use the non-throwing overload: on failure we want the B2FATAL below, not an exception
+    std::error_code ec;
+    if (!dirpath.empty() && std::filesystem::create_directories(dirpath, ec)) {
       B2INFO("Created missing directory " << dirpath << ".");
       //try again
       m_file = TFile::Open(out.c_str(), "RECREATE", "basf2 Event File");

@@ -42,7 +42,7 @@ namespace Belle2 {
     /**
      * Returns CMS energy of e+e- (aka. invariant mass in any system)
      */
-    double getCMSEnergy() const
+    static double getCMSEnergy()
     {
       return invariantMassDB()->getMass();
     }

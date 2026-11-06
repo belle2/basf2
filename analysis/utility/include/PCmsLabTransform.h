@@ -36,7 +36,7 @@ namespace Belle2 {
      */
     ROOT::Math::XYZVector getBoostVector() const
     {
-      return ROOT::Math::XYZVector(m_boostVectorDB->getBoost());
+      return ROOT::Math::XYZVector(boostVectorDB()->getBoost());
     }
 
     /**
@@ -44,7 +44,7 @@ namespace Belle2 {
      */
     double getCMSEnergy() const
     {
-      return m_invariantMassDB->getMass();
+      return invariantMassDB()->getMass();
     }
 
     /**
@@ -61,7 +61,7 @@ namespace Belle2 {
      */
     const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      return LabToCms::rotateLabToCms(getBoostVector(), m_axisCmsDB->getAngleXZ(), m_axisCmsDB->getAngleYZ());
+      return LabToCms::rotateLabToCms(getBoostVector(), axisCmsDB()->getAngleXZ(), axisCmsDB()->getAngleYZ());
     }
 
     /**
@@ -102,9 +102,18 @@ namespace Belle2 {
     static ROOT::Math::PxPyPzEVector cmsToLab(const ROOT::Math::PxPyPzEVector& vec);
 
   private:
-    const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
-    const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
-    const DBObjPtr<CollisionAxisCMS> m_axisCmsDB; /**< db object for collision axis in CM system from boost. */
+
+    // The DB accessors are function-local statics shared by all instances: creating
+    // a DBObjPtr is expensive, and this class is constructed for every call of many
+    // variables (e.g. Mbc, deltaE).
+    // The payloads are still updated by the DBStore on run changes.
+
+    /** DB object for the invariant mass. */
+    static const DBObjPtr<CollisionInvariantMass>& invariantMassDB();
+    /** DB object for the boost vector. */
+    static const DBObjPtr<CollisionBoostVector>& boostVectorDB();
+    /** DB object for the collision axis in CM system from the boost. */
+    static const DBObjPtr<CollisionAxisCMS>& axisCmsDB();
   };
 
 } // Belle2 namespace

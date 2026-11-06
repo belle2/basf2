@@ -114,6 +114,10 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
+    // reset the fit state for each TC, so it does not depend on the previous TC
+    FitSleepCounter = 100;
+    ShiftdTBin = 0;
+
     for (int iShift = 20; iShift < (NSampling - 12); iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
 
       FitSleepCounter++;

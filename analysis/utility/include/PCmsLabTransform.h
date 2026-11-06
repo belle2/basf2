@@ -39,7 +39,7 @@ namespace Belle2 {
     /**
      * Returns boost vector (beta=p/E)
      */
-    ROOT::Math::XYZVector getBoostVector() const;
+    static ROOT::Math::XYZVector getBoostVector();
 
     /**
      * Returns CMS energy of e+e- (aka. invariant mass in any system)
@@ -49,19 +49,19 @@ namespace Belle2 {
     /**
      * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
      */
-    ROOT::Math::PxPyPzEVector getBeamFourMomentum() const;
+    static ROOT::Math::PxPyPzEVector getBeamFourMomentum();
 
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
-    const ROOT::Math::LorentzRotation rotateLabToCms() const;
+    static const ROOT::Math::LorentzRotation rotateLabToCms();
 
     /**
      * Returns Lorentz transformation from CMS to Lab
      * @return const reference to Lorentz rotation matrix
      */
-    const ROOT::Math::LorentzRotation rotateCmsToLab() const;
+    static const ROOT::Math::LorentzRotation rotateCmsToLab();
 
     /**
      * Transforms Lorentz vector into CM System

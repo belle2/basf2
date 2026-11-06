@@ -69,7 +69,7 @@ namespace {
   }
 }
 
-ROOT::Math::XYZVector PCmsLabTransform::getBoostVector() const
+ROOT::Math::XYZVector PCmsLabTransform::getBoostVector()
 {
   return cmsTransform().boost;
 }
@@ -79,17 +79,17 @@ double PCmsLabTransform::getCMSEnergy()
   return cmsTransform().cmsEnergy;
 }
 
-ROOT::Math::PxPyPzEVector PCmsLabTransform::getBeamFourMomentum() const
+ROOT::Math::PxPyPzEVector PCmsLabTransform::getBeamFourMomentum()
 {
   return cmsTransform().beamFourMomentum;
 }
 
-const ROOT::Math::LorentzRotation PCmsLabTransform::rotateLabToCms() const
+const ROOT::Math::LorentzRotation PCmsLabTransform::rotateLabToCms()
 {
   return cmsTransform().labToCms;
 }
 
-const ROOT::Math::LorentzRotation PCmsLabTransform::rotateCmsToLab() const
+const ROOT::Math::LorentzRotation PCmsLabTransform::rotateCmsToLab()
 {
   return cmsTransform().cmsToLab;
 }

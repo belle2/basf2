@@ -293,6 +293,7 @@ namespace Belle2 {
 
     StoreArray<CDCHit> cdcHits(cdcCollectionName);
     StoreArray<CDCTriggerSegmentHit> segmentHits(tsCollectionName);
+    m_storeHits.reserve(segmentHits.getEntries());
 
     // get data clock of first and last hit
     const TRGClock& wireClock = m_wires[0]->signal().clock();
@@ -542,6 +543,7 @@ namespace Belle2 {
   TRGCDCSegment::hitPatternTime() const
   {
     std::vector<float> timeptn;
+    timeptn.reserve(m_wires.size());
     for (unsigned i = 0; i < m_wires.size(); i++) {
       const TRGSignal& s = m_wires[i]->signal();
       if (s.active())

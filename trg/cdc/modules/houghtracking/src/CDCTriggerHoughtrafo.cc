@@ -17,7 +17,6 @@
 /* defines */
 #define CDC_SUPER_LAYERS 45
 
-using namespace std;
 using namespace Belle2;
 
 unsigned short
@@ -54,13 +53,13 @@ CDCTrigger2DFinderModule::shortTrack(bool* layer)
 * y = a
 */
 int
-CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
+CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
                                               double x1_s, double x2_s,
                                               double y1_s, double y2_s,
                                               unsigned iterations,
                                               unsigned ix_s, unsigned iy_s)
 {
-  string indent = "";
+  std::string indent = "";
   for (unsigned i = 0; i < iterations; ++i) indent += " ";
   B2DEBUG(150, indent << "intercept finder iteration " << iterations
           << " x1 " << x1_s * 180 / M_PI << " x2 " << x2_s * 180 / M_PI
@@ -71,10 +70,10 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
   double unitx, unity;
   double y1, y2;
   double m, a;
-  cdcPair hp;
+  CDCPair hp;
   unsigned short iSL;
   // list of hit indices crossing the current rectangle
-  vector<unsigned> idx_list;
+  std::vector<unsigned> idx_list;
 
   // limits of divided rectangles
   double x1_d, x2_d, y1_d, y2_d;
@@ -98,14 +97,14 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
       iy = 2 * iy_s + j;
 
       // skip extra cells outside of the Hough plane
-      if (x2_d <= -M_PI || x1_d >= M_PI || y2_d <= -maxR + shiftR || y1_d >= maxR + shiftR) {
+      if (x2_d <= -M_PI || x1_d >= M_PI || y2_d <= -m_maxR + m_shiftR || y1_d >= m_maxR + m_shiftR) {
         B2DEBUG(150, indent << "skip Hough cell outside of plane limits");
         continue;
       }
 
       // if the cell size in phi is too large, the hit calculation is not reliable
       // -> continue to next iteration without hit check
-      if (iterations != maxIterations && unitx > M_PI / 2.) {
+      if (iterations != m_maxIterations && unitx > M_PI / 2.) {
         fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         continue;
       }
@@ -128,9 +127,9 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         y1 = m * sin_x1d - a * cos_x1d;
         y2 = m * sin_x2d - a * cos_x2d;
         // skip decreasing half of the sine (corresponds to curl back half of the track)
-        if (iterations == maxIterations && y1 > y2) continue;
+        if (iterations == m_maxIterations && y1 > y2) continue;
         if (!((y1 > y2_d && y2 > y2_d) || (y1 < y1_d && y2 < y1_d))) {
-          if (iterations == maxIterations) {
+          if (iterations == m_maxIterations) {
             idx_list.push_back(iHit);
           }
           layerHit[iSL] = true; /* layer filter */
@@ -146,15 +145,15 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
       //        << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
       //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
-        if (iterations != maxIterations) {
+        if (iterations != m_maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
           ROOT::Math::XYVector v1(x1_d, y1_d);
           ROOT::Math::XYVector v2(x2_d, y2_d);
-          houghCand.push_back(CDCTriggerHoughCand(idx_list, make_pair(v1, v2),
-                                                  nSL, houghCand.size()));
+          m_houghCand.push_back(CDCTriggerHoughCand(idx_list, std::make_pair(v1, v2),
+                                                    nSL, m_houghCand.size()));
           if (m_storePlane > 0) {
-            (*m_houghPlane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
+            (*m_houghPlane)[ix - (m_nCells - m_nCellsPhi) / 2][iy - (m_nCells - m_nCellsR) / 2] = nSL;
           }
         }
       } else if (m_storePlane > 1) {
@@ -162,10 +161,10 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         // to minimal cell size everywhere
         for (unsigned min = m_minHits - 1; min > 0; --min) {
           if (nSL >= min) {
-            if (iterations != maxIterations) {
+            if (iterations != m_maxIterations) {
               fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
             } else {
-              (*m_houghPlane)[ix - (nCells - m_nCellsPhi) / 2][iy - (nCells - m_nCellsR) / 2] = nSL;
+              (*m_houghPlane)[ix - (m_nCells - m_nCellsPhi) / 2][iy - (m_nCells - m_nCellsR) / 2] = nSL;
             }
             break;
           }
@@ -183,15 +182,15 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
 void
 CDCTrigger2DFinderModule::connectedRegions()
 {
-  vector<vector<CDCTriggerHoughCand>> regions;
-  vector<CDCTriggerHoughCand> cpyCand = houghCand;
+  std::vector<std::vector<CDCTriggerHoughCand>> regions;
+  std::vector<CDCTriggerHoughCand> cpyCand = m_houghCand;
 
   // debug: print candidate list
-  B2DEBUG(50, "houghCand number " << cpyCand.size());
-  for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
-    coord2dPair coord = houghCand[icand].getCoord();
-    B2DEBUG(100, houghCand[icand].getID()
-            << " nSL " << houghCand[icand].getSLcount()
+  B2DEBUG(50, "m_houghCand number " << cpyCand.size());
+  for (unsigned icand = 0; icand < m_houghCand.size(); ++icand) {
+    Coord2dPair coord = m_houghCand[icand].getCoord();
+    B2DEBUG(100, m_houghCand[icand].getID()
+            << " nSL " << m_houghCand[icand].getSLcount()
             << " x1 " << coord.first.X() << " x2 " << coord.second.X()
             << " y1 " << coord.first.Y() << " y2 " << coord.second.Y());
   }
@@ -199,8 +198,8 @@ CDCTrigger2DFinderModule::connectedRegions()
   // combine connected cells to regions
   while (cpyCand.size() > 0) {
     B2DEBUG(100, "make new region");
-    vector<CDCTriggerHoughCand> region;
-    vector<CDCTriggerHoughCand> rejected;
+    std::vector<CDCTriggerHoughCand> region;
+    std::vector<CDCTriggerHoughCand> rejected;
     CDCTriggerHoughCand start = cpyCand[0];
     cpyCand.erase(cpyCand.begin());
     region.push_back(start);
@@ -226,20 +225,20 @@ CDCTrigger2DFinderModule::connectedRegions()
     double x = 0;
     double y = 0;
     int n = 0;
-    vector<unsigned> mergedList;
+    std::vector<unsigned> mergedList;
     int xmin = m_nCellsPhi;
     int xmax = 0;
     int ymin = m_nCellsR;
     int ymax = 0;
-    vector<ROOT::Math::XYVector> cellIds = {};
+    std::vector<ROOT::Math::XYVector> cellIds = {};
     for (unsigned ir2 = 0; ir2 < regions[ir].size(); ++ir2) {
-      coord2dPair hc = regions[ir][ir2].getCoord();
+      Coord2dPair hc = regions[ir][ir2].getCoord();
       B2DEBUG(100, "  " << regions[ir][ir2].getID()
               << " nSL " << regions[ir][ir2].getSLcount()
               << " x1 " << hc.first.X() << " x2 " << hc.second.X()
               << " y1 " << hc.first.Y() << " y2 " << hc.second.Y());
       int ix = floor((hc.first.X() + M_PI) / 2. / M_PI * m_nCellsPhi + 0.5);
-      int iy = floor((hc.first.Y() + maxR - shiftR) / 2. / maxR * m_nCellsR + 0.5);
+      int iy = floor((hc.first.Y() + m_maxR - m_shiftR) / 2. / m_maxR * m_nCellsR + 0.5);
       x += (hc.first.X() + hc.second.X());
       if (xfirst - hc.first.X() > M_PI) {
         x += 4 * M_PI;
@@ -250,12 +249,12 @@ CDCTrigger2DFinderModule::connectedRegions()
       }
       y += (hc.first.Y() + hc.second.Y());
       n += 1;
-      vector<unsigned> idList = regions[ir][ir2].getIdList();
+      std::vector<unsigned> idList = regions[ir][ir2].getIdList();
       mergeIdList(mergedList, mergedList, idList);
-      xmin = min(xmin, ix);
-      xmax = max(xmax, ix);
-      ymin = min(ymin, iy);
-      ymax = max(ymax, iy);
+      xmin = std::min(xmin, ix);
+      xmax = std::max(xmax, ix);
+      ymin = std::min(ymin, iy);
+      ymax = std::max(ymax, iy);
       cellIds.push_back(ROOT::Math::XYVector(ix, iy));
     }
     x *= 0.5 / n;
@@ -267,8 +266,8 @@ CDCTrigger2DFinderModule::connectedRegions()
     B2DEBUG(50, "x " << x << " y " << y);
 
     // select 1 hit per super layer
-    vector<unsigned> selectedList = {};
-    vector<unsigned> unselectedList = {};
+    std::vector<unsigned> selectedList = {};
+    std::vector<unsigned> unselectedList = {};
     selectHits(mergedList, selectedList, unselectedList);
 
     // save track
@@ -293,9 +292,9 @@ CDCTrigger2DFinderModule::connectedRegions()
 
 void
 CDCTrigger2DFinderModule::addNeighbors(const CDCTriggerHoughCand& center,
-                                       const vector<CDCTriggerHoughCand>& candidates,
-                                       vector<CDCTriggerHoughCand>& merged,
-                                       vector<CDCTriggerHoughCand>& rejected,
+                                       const std::vector<CDCTriggerHoughCand>& candidates,
+                                       std::vector<CDCTriggerHoughCand>& merged,
+                                       std::vector<CDCTriggerHoughCand>& rejected,
                                        unsigned short nSLmax) const
 {
   for (unsigned icand = 0; icand < candidates.size(); ++icand) {
@@ -328,7 +327,7 @@ CDCTrigger2DFinderModule::addNeighbors(const CDCTriggerHoughCand& center,
         B2DEBUG(100, "  connected");
         merged.push_back(candidates[icand]);
       }
-      vector<CDCTriggerHoughCand> cpyCand = candidates;
+      std::vector<CDCTriggerHoughCand> cpyCand = candidates;
       cpyCand.erase(cpyCand.begin() + icand);
       addNeighbors(candidates[icand], cpyCand, merged, rejected, nSLmax);
     }
@@ -337,7 +336,7 @@ CDCTrigger2DFinderModule::addNeighbors(const CDCTriggerHoughCand& center,
 
 bool
 CDCTrigger2DFinderModule::inList(const CDCTriggerHoughCand& a,
-                                 const vector<CDCTriggerHoughCand>& list) const
+                                 const std::vector<CDCTriggerHoughCand>& list) const
 {
   for (unsigned i = 0; i < list.size(); ++i) {
     if (a == list[i]) return true;
@@ -421,7 +420,7 @@ void
 CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
                                               double x1, double x2,
                                               double y1, double y2,
-                                              const cdcMap& inputMap)
+                                              const CDCHitMap& inputMap)
 {
   double m, a, y1_h, y2_h;
 
@@ -436,11 +435,11 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
     // associate only the hits actually used to form the cluster
     if (m_suppressClone && inputMap.find(iHit) == inputMap.end()) continue;
     //TODO: add options: center cell / active priority cell / all priority cells
-    vector<double> phi = {0, 0, 0};
+    std::vector<double> phi = {0, 0, 0};
     phi[0] = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
     phi[1] = phi[0] + 0.5;
     phi[2] = phi[0] - 0.5;
-    vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
+    std::vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
     for (unsigned i = 0; i < 3; ++i) {
       phi[i] *= 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
       m = cos(phi[i]) / r[i];
@@ -496,18 +495,18 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
 * Alternative peak finding with nested patterns
 */
 void
-CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
+CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
 {
   // fill a matrix of 2 x 2 squares
   TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
   TMatrix planeIcand(m_nCellsPhi, m_nCellsR);
-  for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
-    double x = (houghCand[icand].getCoord().first.X() +
-                houghCand[icand].getCoord().second.X()) / 2.;
+  for (unsigned icand = 0; icand < m_houghCand.size(); ++icand) {
+    double x = (m_houghCand[icand].getCoord().first.X() +
+                m_houghCand[icand].getCoord().second.X()) / 2.;
     unsigned ix = floor((x + M_PI) / 2. / M_PI * m_nCellsPhi);
-    double y = (houghCand[icand].getCoord().first.Y() +
-                houghCand[icand].getCoord().second.Y()) / 2.;
-    unsigned iy = floor((y + maxR - shiftR) / 2. / maxR * m_nCellsR);
+    double y = (m_houghCand[icand].getCoord().first.Y() +
+                m_houghCand[icand].getCoord().second.Y()) / 2.;
+    unsigned iy = floor((y + m_maxR - m_shiftR) / 2. / m_maxR * m_nCellsR);
     plane2[ix / 2][iy / 2] += 1 << ((ix % 2) + 2 * (iy % 2));
     planeIcand[ix][iy] = icand;
     B2DEBUG(100, "candidate " << icand << " at ix " << ix << " iy " << iy);
@@ -530,9 +529,9 @@ CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
         continue;
       }
       // form cluster
-      vector<unsigned> pattern(rX * rY, 0);
+      std::vector<unsigned> pattern(rX * rY, 0);
       pattern[0] = plane2[ix][iy];
-      vector<ROOT::Math::XYVector> cellIds = {ROOT::Math::XYVector(2 * ix, 2 * iy)};
+      std::vector<ROOT::Math::XYVector> cellIds = {ROOT::Math::XYVector(2 * ix, 2 * iy)};
       for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
         for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
           if (iy + iy2 >= nY) continue;
@@ -613,20 +612,20 @@ CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
       B2DEBUG(100, "center at cell (" << centerX << ", " << centerY << ")");
       // convert to coordinates
       double x = -M_PI + (centerX + 0.5) * 2. * M_PI / m_nCellsPhi;
-      double y = -maxR + shiftR + (centerY + 0.5) * 2. * maxR / m_nCellsR;
+      double y = -m_maxR + m_shiftR + (centerY + 0.5) * 2. * m_maxR / m_nCellsR;
       B2DEBUG(100, "center coordinates (" << x << ", " << y << ")");
       // get list of related hits
-      vector <unsigned> idList = {};
+      std::vector <unsigned> idList = {};
       if (m_hitRelationsFromCorners) {
         unsigned icandTR = planeIcand[(ixTR + 2 * ix) % m_nCellsPhi][iyTR + 2 * iy];
         unsigned icandBL = planeIcand[ixBL + 2 * ix][iyBL + 2 * iy];
-        vector<unsigned> candIdListTR = houghCand[icandTR].getIdList();
-        vector<unsigned> candIdListBL = houghCand[icandBL].getIdList();
+        std::vector<unsigned> candIdListTR = m_houghCand[icandTR].getIdList();
+        std::vector<unsigned> candIdListBL = m_houghCand[icandBL].getIdList();
         mergeIdList(idList, candIdListTR, candIdListBL);
         B2DEBUG(100, "merge id lists from candidates " << icandTR << " and " << icandBL);
       } else {
         double dx = M_PI / m_nCellsPhi;
-        double dy = maxR / m_nCellsR;
+        double dy = m_maxR / m_nCellsR;
         double x1 = (round(centerX) == centerX) ? x - dx : x - 2 * dx;
         double x2 = (round(centerX) == centerX) ? x + dx : x + 2 * dx;
         double y1 = (round(centerY) == centerY) ? y - dy : y - 2 * dy;
@@ -639,8 +638,8 @@ CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
       }
 
       // select 1 hit per super layer
-      vector<unsigned> selectedList = {};
-      vector<unsigned> unselectedList = {};
+      std::vector<unsigned> selectedList = {};
+      std::vector<unsigned> unselectedList = {};
       selectHits(idList, selectedList, unselectedList);
 
       // save track
@@ -740,7 +739,7 @@ CDCTrigger2DFinderModule::connectedDiag(unsigned patternLD, unsigned patternRU)
 }
 
 unsigned
-CDCTrigger2DFinderModule::topRightSquare(vector<unsigned>& pattern)
+CDCTrigger2DFinderModule::topRightSquare(std::vector<unsigned>& pattern)
 {
   // scan from top right corner until an active square is found
   for (unsigned index = pattern.size() - 1; index > 0; --index) {

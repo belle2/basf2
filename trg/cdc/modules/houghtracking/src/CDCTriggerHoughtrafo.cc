@@ -442,8 +442,8 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
     std::vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
     for (unsigned i = 0; i < 3; ++i) {
       phi[i] *= 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-      m = cos(phi[i]) / r[i];
-      a = sin(phi[i]) / r[i];
+      m = std::cos(phi[i]) / r[i];
+      a = std::sin(phi[i]) / r[i];
       // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
       y1_h = m * sin_x1 - a * cos_x1;
       y2_h = m * sin_x2 - a * cos_x2;

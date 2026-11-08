@@ -12,6 +12,7 @@
 
 #include <cmath>
 #include <array>
+#include <bitset>
 
 #include <root/TMatrix.h>
 
@@ -32,7 +33,7 @@ CDCTrigger2DFinderModule::countSL(bool* layer)
 }
 
 bool
-CDCTrigger2DFinderModule::shortTrack(bool* layer)
+CDCTrigger2DFinderModule::shortTrack(std::bitset<CDC_SUPER_LAYERS>& layer)
 {
   unsigned short lcnt = 0;
   // check axial super layers (even layer number),
@@ -86,6 +87,11 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
   unitx = ((x2_s - x1_s) / 2.0);
   unity = ((y2_s - y1_s) / 2.0);
 
+  CDCHitMap containedHits;
+  containedHits.reserve(hits.size());
+
+  std::bitset<CDC_SUPER_LAYERS> layerHit; /* For layer filter */
+
   // divide x axis in half
   for (i = 0; i < 2 ; ++i) {
     // divide y axis in half
@@ -117,7 +123,8 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
       const double cos_x2d = std::cos(x2_d + 1e-10);
 
       idx_list.clear();
-      bool layerHit[CDC_SUPER_LAYERS] = {false}; /* For layer filter */
+      layerHit.reset();
+      containedHits.clear();
       for (auto it = hits.begin(); it != hits.end(); ++it) {
         iHit = it->first;
         hp = it->second;
@@ -135,9 +142,11 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
             idx_list.push_back(iHit);
           }
           layerHit[iSL] = true; /* layer filter */
+          containedHits.insert(*it);
         }
       }
-      unsigned short nSL = countSL(layerHit);
+      // if a hit in the first SL is required but not present, set nSL to 0, otherwise count the number of layers
+      unsigned short nSL = (m_requireSL0 && !layerHit[0]) ? 0 : layerHit.count();
       B2DEBUG(150, indent << "i " << i << " j " << j
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
@@ -148,7 +157,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
       //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != m_maxIterations) {
-          fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
+          fastInterceptFinder(containedHits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
           ROOT::Math::XYVector v1(x1_d, y1_d);
           ROOT::Math::XYVector v2(x2_d, y2_d);
@@ -164,7 +173,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
         for (unsigned min = m_minHits - 1; min > 0; --min) {
           if (nSL >= min) {
             if (iterations != m_maxIterations) {
-              fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
+              fastInterceptFinder(containedHits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
             } else {
               (*m_houghPlane)[ix - (m_nCells - m_nCellsPhi) / 2][iy - (m_nCells - m_nCellsR) / 2] = nSL;
             }

@@ -12,7 +12,7 @@
 #include <framework/core/Module.h>
 
 #include <utility>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <fstream>
 
@@ -31,7 +31,7 @@ namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, ROOT::Math::XYVector> cdcPair;
   /** Map of <counter, cdcPair>, for hits with indices */
-  typedef std::map<int, cdcPair> cdcMap;
+  typedef std::unordered_map<int, cdcPair> cdcMap;
   /** Hough Tuples */
   typedef std::pair<ROOT::Math::XYVector, ROOT::Math::XYVector> coord2dPair;
 

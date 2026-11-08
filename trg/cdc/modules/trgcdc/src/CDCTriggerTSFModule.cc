@@ -150,8 +150,6 @@ CDCTriggerTSFModule::initialize()
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
-  m_clocks.push_back(clockTDC);
-  m_clocks.push_back(clockData);
 
   //...Loop over layers...
   int superLayerId = -1;
@@ -666,12 +664,6 @@ CDCTriggerTSFModule::event()
 void
 CDCTriggerTSFModule::terminate()
 {
-  // delete clocks
-  for (unsigned ic = 0; ic < m_clocks.size(); ++ic) {
-    delete m_clocks[ic];
-  }
-  m_clocks.clear();
-
   // delete wire layers
   for (unsigned isl = 0; isl < m_superLayers.size(); ++isl) {
     for (unsigned il = 0; il < m_superLayers[isl].size(); ++il) {

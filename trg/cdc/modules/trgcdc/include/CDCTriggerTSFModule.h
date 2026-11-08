@@ -106,8 +106,6 @@ namespace Belle2 {
     std::vector<std::vector<TRGCDCLayer*>> m_superLayers;
     /** structure to hold pointers to all track segment shapes */
     std::vector<TRGCDCLayer*> m_tsLayers;
-    /** list of clocks used in the TSF */
-    std::vector<TRGClock*> m_clocks;
     /** list of (# true right, # true left, # true background)
      *  for the inner-most super layer */
     std::vector<std::vector<unsigned>> m_innerTrueLRTable = {};

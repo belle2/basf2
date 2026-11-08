@@ -110,6 +110,11 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         continue;
       }
 
+      const double sin_x1d = std::sin(x1_d - 1e-10);
+      const double cos_x1d = std::cos(x1_d - 1e-10);
+      const double sin_x2d = std::sin(x2_d + 1e-10);
+      const double cos_x2d = std::cos(x2_d + 1e-10);
+
       idx_list.clear();
       bool layerHit[CDC_SUPER_LAYERS] = {false}; /* For layer filter */
       for (auto it = hits.begin(); it != hits.end(); ++it) {
@@ -120,8 +125,8 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         a = hp.second.Y();
 
         // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
-        y1 = m * sin(x1_d - 1e-10) - a * cos(x1_d - 1e-10);
-        y2 = m * sin(x2_d + 1e-10) - a * cos(x2_d + 1e-10);
+        y1 = m * sin_x1d - a * cos_x1d;
+        y2 = m * sin_x2d - a * cos_x2d;
         // skip decreasing half of the sine (corresponds to curl back half of the track)
         if (iterations == maxIterations && y1 > y2) continue;
         if (!((y1 > y2_d && y2 > y2_d) || (y1 < y1_d && y2 < y1_d))) {

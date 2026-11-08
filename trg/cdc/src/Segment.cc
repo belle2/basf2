@@ -177,6 +177,8 @@ namespace Belle2 {
     const unsigned n = _wires.size();
     unsigned nHits = 0;
     vector<TRGSignal> signals;
+    signals.reserve(n);
+    _hits.reserve(n);
     for (unsigned i = 0; i < n; i++) {
 
       //...Store wire hit information...
@@ -260,6 +262,7 @@ namespace Belle2 {
       ///// TS LUT finder
       //... Find hit wires ...
       vector<TRGSignal> hitSignals;
+      hitSignals.reserve(signals.size());
       for (unsigned iWire = 0; iWire < signals.size(); iWire++) {
         if (signals[iWire].active()) hitSignals.push_back(signals[iWire]);
       }

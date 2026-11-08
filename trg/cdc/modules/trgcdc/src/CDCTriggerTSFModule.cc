@@ -23,7 +23,6 @@
 
 #define P3D HepGeom::Point3D<double>
 
-using namespace std;
 using namespace Belle2;
 
 //this line registers the module with the framework and actually makes it available
@@ -40,19 +39,19 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("CDCHitCollectionName",
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
-           string("CDCHits4Trg"));
+           std::string("CDCHits4Trg"));
   addParam("TSHitCollectionName",
            m_TSHitCollectionName,
            "Name of the output StoreArray of CDCTriggerSegmentHits.",
-           string(""));
+           std::string(""));
   addParam("InnerTSLUTFile",
            m_innerTSLUTFilename,
            "The filename of LUT for track segments from the inner-most super layer",
-           string(""));
+           std::string(""));
   addParam("OuterTSLUTFile",
            m_outerTSLUTFilename,
            "The filename of LUT for track segments from the outer super layers",
-           string(""));
+           std::string(""));
   addParam("ClockSimulation",
            m_clockSimulation,
            "Switch to simulate each data clock cycle separately.",
@@ -70,11 +69,11 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("innerTrueLRTableFilename",
            m_innerTrueLRTableFilename,
            "Filename for the true left/right table for the innermost super layer.",
-           string("innerTrueLRTable.dat"));
+           std::string("innerTrueLRTable.dat"));
   addParam("outerTrueLRTableFilename",
            m_outerTrueLRTableFilename,
            "Filename for the true left/right table for the outer super layers.",
-           string("outerTrueLRTable.dat"));
+           std::string("outerTrueLRTable.dat"));
   addParam("Deadchannel",
            m_deadchflag,
            "Mask dead channels based on database. True:mask False:unmask",
@@ -86,11 +85,11 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
   addParam("innerRecoLRTableFilename",
            m_innerRecoLRTableFilename,
            "Filename for the reconnstructed left/right table for the innermost super layer.",
-           string("innerRecoLRTable.dat"));
+           std::string("innerRecoLRTable.dat"));
   addParam("outerRecoLRTableFilename",
            m_outerRecoLRTableFilename,
            "Filename for the reconstructed left/right table for the outer super layers.",
-           string("outerRecoLRTable.dat"));
+           std::string("outerRecoLRTable.dat"));
   addParam("relateAllHits",
            m_relateAllHits,
            "Flag to relate all cdchits to the TrackSegment, not just the priority hits.",
@@ -128,14 +127,14 @@ CDCTriggerTSFModule::initialize()
   if (m_makeTrueLRTable) {
     StoreArray<CDCSimHit> simhits;
     simhits.isRequired();
-    m_innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
-    m_outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
+    m_innerTrueLRTable.assign(pow(2, 16), std::vector<unsigned>(5, 0));
+    m_outerTrueLRTable.assign(pow(2, 12), std::vector<unsigned>(5, 0));
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
     m_cdcHits.isRequired();
-    m_innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
-    m_outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
+    m_innerRecoLRTable.assign(pow(2, 16), std::vector<unsigned>(5, 0));
+    m_outerRecoLRTable.assign(pow(2, 12), std::vector<unsigned>(5, 0));
   }
   // register relations
   StoreArray<MCParticle> mcparticles;
@@ -182,7 +181,7 @@ CDCTriggerTSFModule::initialize()
     // Add empty TRGCDCLayer in case a superlayer is not present
     if (m_superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
       for (uint superLayerOffset = 0; superLayerOffset < cdc.getOffsetOfFirstSuperLayer(); superLayerOffset++) {
-        m_superLayers.push_back(vector<TRGCDCLayer*>());
+        m_superLayers.push_back(std::vector<TRGCDCLayer*>());
         superLayerId++;
       }
     }
@@ -190,7 +189,7 @@ CDCTriggerTSFModule::initialize()
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
       ++superLayerId;
-      m_superLayers.push_back(vector<TRGCDCLayer*>());
+      m_superLayers.push_back(std::vector<TRGCDCLayer*>());
       if (axial) ++ias;
       else ++iss;
       axialStereoSuperLayerId = (axial) ? ias : iss;
@@ -233,8 +232,8 @@ CDCTriggerTSFModule::initialize()
   }
 
   //...Make TSF's...
-  const unsigned c_nWiresInTS[2] = {15, 11};
-  const int c_shape[2][30] = {
+  const unsigned nWiresInTS[2] = {15, 11};
+  const int shape[2][30] = {
     {
       -2, 0, // relative layer id, relative wire id
         -1, -1,
@@ -296,13 +295,13 @@ CDCTriggerTSFModule::initialize()
 
       const unsigned localId = w.localId();
       const unsigned layerId = w.localLayerId();
-      vector<const TRGCDCWire*> cells;
+      std::vector<const TRGCDCWire*> cells;
 
       B2DEBUG(110, "TS localId " << localId << " layerId " << layerId);
 
-      for (unsigned k = 0; k < c_nWiresInTS[tsType]; k++) {
-        const int laid = layerId + c_shape[tsType][k * 2];
-        const int loid = localId + c_shape[tsType][k * 2 + 1];
+      for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
+        const int laid = layerId + shape[tsType][k * 2];
+        const int loid = localId + shape[tsType][k * 2 + 1];
 
         B2DEBUG(120, "cell localId " << loid << " layerId " << laid);
 
@@ -383,15 +382,12 @@ CDCTriggerTSFModule::event()
   // fill CDCHits into track segment shapes
 
   //crosstalk filter
-  vector<int> filtered_hit;
-  for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
-    filtered_hit.push_back(0);
-  }
+  std::vector<int> filtered_hit(m_cdcHits.getEntries(), 0);
 
   if (m_crosstalk_tdcfilter) {
     //check number of hits in each asic
     int ncdchit_asic[500][6] = {{0}};
-    vector<int> id_ncdchit_asic[500][6];
+    std::vector<int> id_ncdchit_asic[500][6];
     for (int i = 0; i < m_cdcHits.getEntries(); ++i) {
       UChar_t lay = m_cdcHits[i]->getICLayer();
       UShort_t IWire = m_cdcHits[i]->getIWire();
@@ -405,10 +401,11 @@ CDCTriggerTSFModule::event()
       }
     }
     //check 16ns time coincidence if >=4 hits are found in the same asic
+    std::vector<short> tdc_asic;
     for (int i = 0; i < 500; i++) {
       for (int j = 0; j < 6; j++) {
         if (ncdchit_asic[i][j] >= 4) {
-          std::vector<short> tdc_asic;
+          tdc_asic.clear();
           for (int k = 0; k < ncdchit_asic[i][j]; k++) {
             short tdc = m_cdcHits[id_ncdchit_asic[i][j][k]]->getTDCCount();
             tdc_asic.push_back(tdc);
@@ -428,7 +425,6 @@ CDCTriggerTSFModule::event()
             if (breakOuterLoop)
               break;
           }
-          tdc_asic.clear();
         }
       }
     }
@@ -518,6 +514,7 @@ CDCTriggerTSFModule::event()
         std::vector<float> fullADC = {};
         if (m_saveadc) {
           int nwires = (isl == 0) ? 15 : 11;
+          fullADC.reserve(nwires + 1);
           for (int iwire = 0; iwire < nwires; iwire++) {
             if (!s[iwire] || !(s[iwire]->hit())) { //Make sure the wire do exist
               fullADC.push_back(-1);
@@ -605,7 +602,7 @@ CDCTriggerTSFModule::event()
             // we will also use this information for the recolrtable and set the corresponding value again.
             // Just in the case, where after the loop over all recotracks it wasn't related to any of them, we will set
             // the background flag in the recolrtable.
-            vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
+            const std::vector<CDCHit*>& cdcHits = recoTrack->getCDCHitList();
             bool related = false;
             for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
 //std::cout << "now looping over cdchits... " << iHit << "/" << cdcHits.size() << std::endl;
@@ -698,15 +695,15 @@ CDCTriggerTSFModule::terminate()
 
   // save true left/right table
   if (m_makeTrueLRTable) {
-    ofstream innerFile(m_innerTrueLRTableFilename);
-    ostream_iterator<unsigned> innerIterator(innerFile, " ");
+    std::ofstream innerFile(m_innerTrueLRTableFilename);
+    std::ostream_iterator<unsigned> innerIterator(innerFile, " ");
     for (unsigned pattern = 0; pattern < m_innerTrueLRTable.size(); ++pattern) {
       copy(m_innerTrueLRTable[pattern].begin(), m_innerTrueLRTable[pattern].end(),
            innerIterator);
       innerFile << "\n";
     }
-    ofstream outerFile(m_outerTrueLRTableFilename);
-    ostream_iterator<unsigned> outerIterator(outerFile, " ");
+    std::ofstream outerFile(m_outerTrueLRTableFilename);
+    std::ostream_iterator<unsigned> outerIterator(outerFile, " ");
     for (unsigned pattern = 0; pattern < m_outerTrueLRTable.size(); ++pattern) {
       copy(m_outerTrueLRTable[pattern].begin(), m_outerTrueLRTable[pattern].end(),
            outerIterator);
@@ -716,15 +713,15 @@ CDCTriggerTSFModule::terminate()
 
   // save reco left/right table
   if (m_makeRecoLRTable) {
-    ofstream innerFile(m_innerRecoLRTableFilename);
-    ostream_iterator<unsigned> innerIterator(innerFile, " ");
+    std::ofstream innerFile(m_innerRecoLRTableFilename);
+    std::ostream_iterator<unsigned> innerIterator(innerFile, " ");
     for (unsigned pattern = 0; pattern < m_innerRecoLRTable.size(); ++pattern) {
       copy(m_innerRecoLRTable[pattern].begin(), m_innerRecoLRTable[pattern].end(),
            innerIterator);
       innerFile << "\n";
     }
-    ofstream outerFile(m_outerRecoLRTableFilename);
-    ostream_iterator<unsigned> outerIterator(outerFile, " ");
+    std::ofstream outerFile(m_outerRecoLRTableFilename);
+    std::ostream_iterator<unsigned> outerIterator(outerFile, " ");
     for (unsigned pattern = 0; pattern < m_outerRecoLRTable.size(); ++pattern) {
       copy(m_outerRecoLRTable[pattern].begin(), m_outerRecoLRTable[pattern].end(),
            outerIterator);

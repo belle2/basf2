@@ -24,7 +24,6 @@
 #include <trg/cdc/dbobjects/CDCTriggerTSFConfig.h>
 
 #include <string>
-#include <array>
 
 namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;

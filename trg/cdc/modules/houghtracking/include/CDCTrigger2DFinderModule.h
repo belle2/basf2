@@ -104,9 +104,6 @@ namespace Belle2 {
                             unsigned iterations,
                             unsigned ix_s, unsigned iy_s);
 
-    /** count the number of super layers with hits
-     *  @param superLayers array of hit/no hit for all super layers */
-    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
      *  @param superLayers array of hit/no hit for all super layers */

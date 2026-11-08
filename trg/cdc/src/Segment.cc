@@ -27,8 +27,6 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-using namespace std;
-
 #define P3D HepGeom::Point3D<double>
 
 namespace Belle2 {
@@ -44,10 +42,9 @@ namespace Belle2 {
              layer,
              w.forwardPosition(),
              w.backwardPosition()),
-      _wires(cells),
-      _center(), // 2019/07/31 by ytlai
-      _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
-      _storeHits{},
+      m_wires(cells),
+      m_signal(std::string("TS_") + TRGUtil::itostring(id), clock),
+      m_storeHits{},
       m_TSLUTFileName(TSLUTFile)
   {
   }
@@ -60,67 +57,67 @@ namespace Belle2 {
   void
   TRGCDCSegment::initialize()
   {
-    m_TSLUT = TRGCDCLUT::getLUT(m_TSLUTFileName, _wires.size() + 1);
+    m_TSLUT = TRGCDCLUT::getLUT(m_TSLUTFileName, m_wires.size() + 1);
   }
 
   void
-  TRGCDCSegment::dump(const string& msg,
-                      const string& pre) const
+  TRGCDCSegment::dump(const std::string& msg,
+                      const std::string& pre) const
   {
-    cout << pre << name() << " (ptn=" << hitPattern() << ")" << endl;
-    if ((msg.find("geometry") != string::npos) ||
-        (msg.find("detail") != string::npos)) {
-      cout << pre << "id " << id();
-      cout << ",local " << localId();
-      cout << ",layer " << layerId();
-      cout << ",super layer " << superLayerId();
-      cout << ",local layer " << localLayerId();
-      cout << endl;
+    std::cout << pre << name() << " (ptn=" << hitPattern() << ")" << std::endl;
+    if ((msg.find("geometry") != std::string::npos) ||
+        (msg.find("detail") != std::string::npos)) {
+      std::cout << pre << "id " << id();
+      std::cout << ",local " << localId();
+      std::cout << ",layer " << layerId();
+      std::cout << ",super layer " << superLayerId();
+      std::cout << ",local layer " << localLayerId();
+      std::cout << std::endl;
     }
-    if ((msg.find("hit") != string::npos) ||
-        (msg.find("detail") != string::npos)) {
-      cout << pre << "Wires ";
-      for (unsigned i = 0; i < _wires.size(); i++) {
-        cout << _wires[i]->name();
-        if (i < _wires.size() - 1)
-          cout << ",";
+    if ((msg.find("hit") != std::string::npos) ||
+        (msg.find("detail") != std::string::npos)) {
+      std::cout << pre << "Wires ";
+      for (unsigned i = 0; i < m_wires.size(); i++) {
+        std::cout << m_wires[i]->name();
+        if (i < m_wires.size() - 1)
+          std::cout << ",";
         else
-          cout << endl;
+          std::cout << std::endl;
       }
-      if (_hits.size() == 0) {
-        cout << pre << "no wire hit" << endl;
+      if (m_hits.size() == 0) {
+        std::cout << pre << "no wire hit" << std::endl;
       } else {
-        cout << pre << "WHit dump : ";
-        for (unsigned i = 0; i < _hits.size(); i++) {
-          cout << _hits[i]->cell().name();
-          if (i < _hits.size() - 1)
-            cout << ",";
+        std::cout << pre << "WHit dump : ";
+        for (unsigned i = 0; i < m_hits.size(); i++) {
+          std::cout << m_hits[i]->cell().name();
+          if (i < m_hits.size() - 1)
+            std::cout << ",";
           else
-            cout << endl;
+            std::cout << std::endl;
         }
-        for (unsigned i = 0; i < _hits.size(); i++) {
-          _hits[i]->dump(msg, pre + "    ");
+        for (unsigned i = 0; i < m_hits.size(); i++) {
+          m_hits[i]->dump(msg, pre + "    ");
         }
       }
       if (hit()) {
-        cout << pre << "SHit dump" << endl;
+        std::cout << pre << "SHit dump" << std::endl;
         hit()->dump(msg, pre + "    ");
       } else {
-        cout << pre << "no TSHit" << endl;
+        std::cout << pre << "no TSHit" << std::endl;
       }
     }
-//     if (msg.find("neighbor") != string::npos ||
-//         msg.find("detail") != string::npos) {
+//     if (msg.find("neighbor") != std::string::npos ||
+//         msg.find("detail") != std::string::npos) {
 //         for (unsigned i = 0; i < 7; i++)
 //             if (neighbor(i))
 //                 neighbor(i)->dump("", pre + TRGCDC::itostring(i) + "   ");
 //     }
-    if ((msg.find("trigger") != string::npos) ||
-        (msg.find("detail") != string::npos)) {
-      if (_signal.active())
-        _signal.dump(msg, pre + "    ");
+    if ((msg.find("trigger") != std::string::npos) ||
+        (msg.find("detail") != std::string::npos)) {
+      if (m_signal.active())
+        m_signal.dump(msg, pre + "    ");
       else
-        cout << pre << "no trigger signal" << endl;
+        std::cout << pre << "no trigger signal" << std::endl;
     }
   }
 
@@ -128,21 +125,21 @@ namespace Belle2 {
   TRGCDCSegment::clear(void)
   {
     TCCell::clear();
-    _signal.clear();
-    _hits.clear();
-    _storeHits.clear();
+    m_signal.clear();
+    m_hits.clear();
+    m_storeHits.clear();
   }
 
-  string
+  std::string
   TRGCDCSegment::name(void) const
   {
-    string t;
+    std::string t;
     if (axial())
       t = "-";
     else
       t = "=";
-    string n0 = string("TS") + TRGUtil::itostring(layerId());
-    string n1 = TRGUtil::itostring(localId());
+    std::string n0 = std::string("TS") + TRGUtil::itostring(layerId());
+    std::string n1 = TRGUtil::itostring(localId());
     return n0 + t + n1;
   }
 
@@ -152,8 +149,8 @@ namespace Belle2 {
   {
     //...Get wire information for speed-up...
     unsigned nHits = 0;
-    for (unsigned i = 0, n = _wires.size(); i < n; i++) {
-      if (_wires[i]->signal().active())
+    for (unsigned i = 0, n = m_wires.size(); i < n; i++) {
+      if (m_wires[i]->signal().active())
         ++nHits;
     }
 
@@ -174,20 +171,20 @@ namespace Belle2 {
     TRGDebug::enterStage("TS sim");
 
     //...Get wire information...
-    const unsigned n = _wires.size();
+    const unsigned n = m_wires.size();
     unsigned nHits = 0;
-    vector<TRGSignal> signals;
+    std::vector<TRGSignal> signals;
     signals.reserve(n);
-    _hits.reserve(n);
+    m_hits.reserve(n);
     for (unsigned i = 0; i < n; i++) {
 
       //...Store wire hit information...
-      const TCWHit* h = _wires[i]->hit();
+      const TCWHit* h = m_wires[i]->hit();
       if (h)
-        _hits.push_back(h);
+        m_hits.push_back(h);
 
       //...Copy signal from a wire...
-      const TRGSignal& s = _wires[i]->signal();
+      const TRGSignal& s = m_wires[i]->signal();
       signals.push_back(s);
 
       //...Widen it...
@@ -201,7 +198,7 @@ namespace Belle2 {
     if (logicLUTFlag == 0) {
       ///// TS Logic Finder
       //...Check number of hit wires...
-      //cout<<"TSF: nHits is "<<nHits<<endl;
+      //std::cout<<"TSF: nHits is "<<nHits<<std::endl;
       if (nHits < 4) {
         TRGDebug::leaveStage("TS sim");
         return;
@@ -249,10 +246,10 @@ namespace Belle2 {
 //      TRGSignal all = l0 & l1 & l2 & l3 & l4;
 
       if (all.nEdges()) {
-        //cout<<"TSF is found"<<endl;
+        //std::cout<<"TSF is found"<<std::endl;
         all.name(name());
-        _signal = all;
-        //cout<<all.name()<<":#signals="<<all.nSignals()<<endl;;
+        m_signal = all;
+        //std::cout<<all.name()<<":#signals="<<all.nSignals()<<std::endl;;
         //all.dump();
       }
       ///// End of TS logic finder
@@ -261,7 +258,7 @@ namespace Belle2 {
     if (logicLUTFlag == 1) {
       ///// TS LUT finder
       //... Find hit wires ...
-      vector<TRGSignal> hitSignals;
+      std::vector<TRGSignal> hitSignals;
       hitSignals.reserve(signals.size());
       for (unsigned iWire = 0; iWire < signals.size(); iWire++) {
         if (signals[iWire].active()) hitSignals.push_back(signals[iWire]);
@@ -278,7 +275,7 @@ namespace Belle2 {
       int lutValue = LUT()->getValue(lutPattern());
       if ((lutValue != 0) && (priority().signal().active() != 0)) {
         allSignals.name(name());
-        _signal = allSignals;
+        m_signal = allSignals;
       }
       ///// End of TS LUT finder
     }
@@ -287,7 +284,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCSegment::simulateWithClock(string cdcCollectionName, string tsCollectionName)
+  TRGCDCSegment::simulateWithClock(std::string cdcCollectionName, std::string tsCollectionName)
   {
     // check LUT pattern without clock -> if there is no hit, skip clock simulation
     if (m_TSLUT->getValue(lutPattern()) == 0) return;
@@ -298,11 +295,11 @@ namespace Belle2 {
     StoreArray<CDCTriggerSegmentHit> segmentHits(tsCollectionName);
 
     // get data clock of first and last hit
-    const TRGClock& wireClock = _wires[0]->signal().clock();
+    const TRGClock& wireClock = m_wires[0]->signal().clock();
     int clkMin = 1000;
     int clkMax = -1000;
-    for (unsigned i = 0, n = _wires.size(); i < n; ++i) {
-      const TRGSignal& s = _wires[i]->signal();
+    for (unsigned i = 0, n = m_wires.size(); i < n; ++i) {
+      const TRGSignal& s = m_wires[i]->signal();
       if (s.active()) {
         int clk0 = s[0]->time();
         int clk1 = s[s.nEdges() - 2]->time();
@@ -332,13 +329,13 @@ namespace Belle2 {
             (lastPriority != 3 && priorityPos == 3) ||
             fastest != lastFastest) {
           // add new edge to signal
-          TRGTime rise = TRGTime(wireClock.absoluteTime(iclk), true, _signal.clock());
+          TRGTime rise = TRGTime(wireClock.absoluteTime(iclk), true, m_signal.clock());
           TRGTime fall = rise;
           fall.shift(1).reverse();
-          _signal |= TRGSignal(rise & fall);
+          m_signal |= TRGSignal(rise & fall);
           // get priority wire from position flag
           int ipr = (priorityPos == 3) ? 0 : priorityPos;
-          const TRGCDCWire* priorityWire = (_wires.size() == 15) ? _wires[ipr] : _wires[ipr + 5];
+          const TRGCDCWire* priorityWire = (m_wires.size() == 15) ? m_wires[ipr] : m_wires[ipr + 5];
           // get priority time (first hit on priority wire in time window)
           int tdc = priorityWire->signal()[0]->time();
           if (tdc < iclk - width) {
@@ -359,11 +356,11 @@ namespace Belle2 {
                                   iclk + step);
           addStoreHit(storeHit);
           // relation to all CDCHits in segment
-          for (unsigned iw = 0; iw < _wires.size(); ++iw) {
-            if (_wires[iw]->signal().active(iclk - width, iclk + step)) {
+          for (unsigned iw = 0; iw < m_wires.size(); ++iw) {
+            if (m_wires[iw]->signal().active(iclk - width, iclk + step)) {
               // priority wire has relation weight 2
-              double weight = (_wires[iw] == priorityWire) ? 2. : 1.;
-              storeHit->addRelationTo(cdcHits[_wires[iw]->hit()->iCDCHit()], weight);
+              double weight = (m_wires[iw] == priorityWire) ? 2. : 1.;
+              storeHit->addRelationTo(cdcHits[m_wires[iw]->hit()->iCDCHit()], weight);
             }
           }
           // relation to MCParticles (same as priority hit)
@@ -387,9 +384,9 @@ namespace Belle2 {
   {
     if ((LUT()->getValue(lutPattern()))) {
       float tmpFastTime = 9999;
-      for (unsigned i = 0; i < _wires.size(); i++) {
-        if (_wires[i]->signal().active()) {
-          float dt = _wires[i]->signal()[0]->time();
+      for (unsigned i = 0; i < m_wires.size(); i++) {
+        if (m_wires[i]->signal().active()) {
+          float dt = m_wires[i]->signal()[0]->time();
           if (dt < tmpFastTime) {
             tmpFastTime = dt;
           }
@@ -404,10 +401,10 @@ namespace Belle2 {
   TRGCDCSegment::fastestTime(int clk0) const
   {
     int fastest = 9999;
-    for (unsigned iw = 0; iw < _wires.size(); ++iw) {
-      if (_wires[iw]->signal().active()) {
-        for (unsigned itdc = 0, edges = _wires[iw]->signal().nEdges(); itdc < edges; itdc += 2) {
-          float dt = _wires[iw]->signal()[itdc]->time();
+    for (unsigned iw = 0; iw < m_wires.size(); ++iw) {
+      if (m_wires[iw]->signal().active()) {
+        for (unsigned itdc = 0, edges = m_wires[iw]->signal().nEdges(); itdc < edges; itdc += 2) {
+          float dt = m_wires[iw]->signal()[itdc]->time();
           if (dt >= clk0) {
             if (dt < fastest) fastest = dt;
             break;
@@ -423,10 +420,10 @@ namespace Belle2 {
   {
     if ((LUT()->getValue(lutPattern()))) {
       float tmpFoundTime[5] = {9999, 9999, 9999, 9999, 9999};
-      for (unsigned i = 0; i < _wires.size(); i++) {
-        if (!_wires[i]->signal().active()) continue;
-        float dt = _wires[i]->signal()[0]->time();
-        if (_wires.size() == 11) {
+      for (unsigned i = 0; i < m_wires.size(); i++) {
+        if (!m_wires[i]->signal().active()) continue;
+        float dt = m_wires[i]->signal()[0]->time();
+        if (m_wires.size() == 11) {
           if (i < 3) {
             if (tmpFoundTime[0] > dt) tmpFoundTime[0] = dt;
           } else if (i < 5) {
@@ -452,7 +449,7 @@ namespace Belle2 {
           }
         }
       }
-      sort(tmpFoundTime, tmpFoundTime + 5);
+      std::sort(tmpFoundTime, tmpFoundTime + 5);
       return tmpFoundTime[3];
     } else
       return -1;
@@ -476,12 +473,12 @@ namespace Belle2 {
     } else {
       const TRGCDCWire* priorityL;
       const TRGCDCWire* priorityR;
-      if (_wires.size() == 15) {
-        priorityL = _wires[2];
-        priorityR = _wires[1];
+      if (m_wires.size() == 15) {
+        priorityL = m_wires[2];
+        priorityR = m_wires[1];
       } else {
-        priorityL = _wires[7];
-        priorityR = _wires[6];
+        priorityL = m_wires[7];
+        priorityR = m_wires[6];
       }
       if (priorityL->signal().active()) {
         if (priorityR->signal().active()) {
@@ -502,12 +499,12 @@ namespace Belle2 {
     } else {
       const TRGCDCWire* priorityL;
       const TRGCDCWire* priorityR;
-      if (_wires.size() == 15) {
-        priorityL = _wires[2];
-        priorityR = _wires[1];
+      if (m_wires.size() == 15) {
+        priorityL = m_wires[2];
+        priorityR = m_wires[1];
       } else {
-        priorityL = _wires[7];
-        priorityR = _wires[6];
+        priorityL = m_wires[7];
+        priorityR = m_wires[6];
       }
       if (priorityL->signal().active(clk0, clk1)) {
         if (priorityR->signal().active(clk0, clk1)) {
@@ -524,29 +521,29 @@ namespace Belle2 {
   TRGCDCSegment::priority() const
   {
     int priority = priorityPosition();
-    int offset = (_wires.size() == 15) ? 0 : 5;
+    int offset = (m_wires.size() == 15) ? 0 : 5;
     if (priority == 1 || priority == 2)
-      return *_wires[offset + priority];
-    return *_wires[offset];
+      return *m_wires[offset + priority];
+    return *m_wires[offset];
   }
 
   unsigned
   TRGCDCSegment::hitPattern() const
   {
     unsigned ptn = 0;
-    for (unsigned i = 0; i < _wires.size(); i++) {
-      const TRGSignal& s = _wires[i]->signal();
+    for (unsigned i = 0; i < m_wires.size(); i++) {
+      const TRGSignal& s = m_wires[i]->signal();
       if (s.active())
         ptn |= (1 << i);
     }
     return ptn;
   }
-  vector<float>
+  std::vector<float>
   TRGCDCSegment::hitPatternTime() const
   {
-    vector<float> timeptn;
-    for (unsigned i = 0; i < _wires.size(); i++) {
-      const TRGSignal& s = _wires[i]->signal();
+    std::vector<float> timeptn;
+    for (unsigned i = 0; i < m_wires.size(); i++) {
+      const TRGSignal& s = m_wires[i]->signal();
       if (s.active())
         timeptn.push_back(s[0]->time());
       else
@@ -559,8 +556,8 @@ namespace Belle2 {
   TRGCDCSegment::hitPattern_adc() const
   {
     unsigned ptn = 0;
-    for (unsigned i = 0; i < _wires.size(); i++) {
-      const TRGSignal& s = _wires[i]->signal_adc();
+    for (unsigned i = 0; i < m_wires.size(); i++) {
+      const TRGSignal& s = m_wires[i]->signal_adc();
       if (s.active())
         ptn |= (1 << i);
     }
@@ -571,8 +568,8 @@ namespace Belle2 {
   TRGCDCSegment::hitPattern(int clk0, int clk1) const
   {
     unsigned ptn = 0;
-    for (unsigned i = 0; i < _wires.size(); i++) {
-      const TRGSignal& s = _wires[i]->signal();
+    for (unsigned i = 0; i < m_wires.size(); i++) {
+      const TRGSignal& s = m_wires[i]->signal();
       if (s.active(clk0, clk1))
         ptn |= (1 << i);
     }
@@ -602,9 +599,9 @@ namespace Belle2 {
   bool
   TRGCDCSegment::hasMember(const std::string& a) const
   {
-    const unsigned n = _wires.size();
+    const unsigned n = m_wires.size();
     for (unsigned i = 0; i < n; i++) {
-      if (_wires[i]->hasMember(a))
+      if (m_wires[i]->hasMember(a))
         return true;
     }
     return false;

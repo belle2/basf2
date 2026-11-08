@@ -161,26 +161,20 @@ namespace Belle2 {
     /// LookUp Table. 0: no hit, 1: right, 2: left, 3: not determined.
     TRGCDCLUT* m_TSLUT = nullptr;
 
-    /// LookUp Table.
-//    const TRGCDCLUT * const _lut;  //Will be Removed.
-
     /// Wires.
-    std::vector<const TRGCDCWire*> _wires;
-
-    /// Center wire.
-    const TRGCDCWire* _center;
+    std::vector<const TRGCDCWire*> m_wires;
 
     /// Trigger signal.
-    TRGSignal _signal;
+    TRGSignal m_signal;
 
     /// Trigger signal.
-    TRGSignal _signal_adc;
+    TRGSignal m_signal_adc;
 
     /// Wire hits.
-    std::vector<const TRGCDCWireHit*> _hits;
+    std::vector<const TRGCDCWireHit*> m_hits;
 
     /// list of DataStore hits.
-    std::vector<const CDCTriggerSegmentHit*> _storeHits;
+    std::vector<const CDCTriggerSegmentHit*> m_storeHits;
 
     /// TS LUT file name.
     std::string m_TSLUTFileName;
@@ -195,15 +189,15 @@ namespace Belle2 {
   const std::vector<const TRGCDCWire*>&
   TRGCDCSegment::wires(void) const
   {
-    return _wires;
+    return m_wires;
   }
 
   inline
   const TRGCDCWire*
   TRGCDCSegment::operator[](unsigned id) const
   {
-    if (id < _wires.size())
-      return _wires[id];
+    if (id < m_wires.size())
+      return m_wires[id];
     return 0;
   }
 
@@ -211,14 +205,14 @@ namespace Belle2 {
   const TRGSignal&
   TRGCDCSegment::signal(void) const
   {
-    return _signal;
+    return m_signal;
   }
 
   inline
   const TRGSignal&
   TRGCDCSegment::signal_adc(void) const
   {
-    return _signal_adc;
+    return m_signal_adc;
   }
 
   inline
@@ -241,14 +235,14 @@ namespace Belle2 {
   void
   TRGCDCSegment::addStoreHit(const CDCTriggerSegmentHit* h)
   {
-    _storeHits.push_back(h);
+    m_storeHits.push_back(h);
   }
 
   inline
   const std::vector<const CDCTriggerSegmentHit*>
   TRGCDCSegment::storeHits(void) const
   {
-    return _storeHits;
+    return m_storeHits;
   }
 
   inline
@@ -262,9 +256,9 @@ namespace Belle2 {
   const TRGCDCWire&
   TRGCDCSegment::center(void) const
   {
-    if (_wires.size() == 15)
-      return * _wires[0];
-    return * _wires[5];
+    if (m_wires.size() == 15)
+      return * m_wires[0];
+    return * m_wires[5];
   }
 
 } // namespace Belle2

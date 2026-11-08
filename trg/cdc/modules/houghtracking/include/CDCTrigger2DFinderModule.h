@@ -274,9 +274,9 @@ namespace Belle2 {
     std::vector<CDCTriggerHoughCand> m_houghCand;
 
     /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
-    double radius[9][5] = {{0.}};
+    double m_radius[9][5] = {{0.}};
     /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
-    unsigned TSoffset[10] = {0};
+    unsigned m_TSoffset[10] = {0};
 
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

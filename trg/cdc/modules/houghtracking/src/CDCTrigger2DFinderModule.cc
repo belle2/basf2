@@ -140,6 +140,29 @@ CDCTrigger2DFinderModule::initialize()
   if (m_suppressClone) {
     B2INFO("2D finder will exit with the first track candidate in time.");
   }
+
+  /* Extent the Hough plane such that the cell number is a power of 2 (same for x and y).
+   * This is for the fast peak finder, which divides the Hough plane in half in each step.
+   * Peaks found outside of the actual limits are ignored. */
+  m_maxIterations = std::ceil(std::log2(std::max(m_nCellsPhi, m_nCellsR))) - 1;
+  m_nCells = std::pow(2, m_maxIterations + 1);
+  /* limits in phi: [-pi, pi] + extra cells */
+  m_rectX = M_PI * m_nCells / m_nCellsPhi;
+  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
+  m_maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
+  m_rectY = m_maxR * m_nCells / m_nCellsR;
+  m_shiftR = 0;
+  if (m_shiftPt < 0) {
+    m_shiftR = -m_maxR / 2. / m_nCellsR;
+  } else if (m_shiftPt > 0) {
+    m_shiftR = m_maxR / 2. / m_nCellsR;
+  }
+
+  B2DEBUG(50, "extending Hough plane to " << m_maxIterations << " iterations, "
+          << m_nCells << " cells: phi in ["
+          << -m_rectX * 180. / M_PI << ", " << m_rectX * 180. / M_PI
+          << "] deg, 1/r in [" << -m_rectY + m_shiftR << ", " << m_rectY + m_shiftR << "] /cm");
+
 }
 
 void
@@ -293,28 +316,6 @@ CDCTrigger2DFinderModule::event()
     }
   }
 
-  /* Extent the Hough plane such that the cell number is a power of 2 (same for x and y).
-   * This is for the fast peak finder, which divides the Hough plane in half in each step.
-   * Peaks found outside of the actual limits are ignored. */
-  m_maxIterations = std::ceil(std::log2(std::max(m_nCellsPhi, m_nCellsR))) - 1;
-  m_nCells = std::pow(2, m_maxIterations + 1);
-  /* limits in phi: [-pi, pi] + extra cells */
-  double rectX = M_PI * m_nCells / m_nCellsPhi;
-  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
-  m_maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
-  double rectY = m_maxR * m_nCells / m_nCellsR;
-  m_shiftR = 0;
-  if (m_shiftPt < 0) {
-    m_shiftR = -m_maxR / 2. / m_nCellsR;
-  } else if (m_shiftPt > 0) {
-    m_shiftR = m_maxR / 2. / m_nCellsR;
-  }
-
-  B2DEBUG(50, "extending Hough plane to " << m_maxIterations << " iterations, "
-          << m_nCells << " cells: phi in ["
-          << -rectX * 180. / M_PI << ", " << rectX * 180. / M_PI
-          << "] deg, 1/r in [" << -rectY + m_shiftR << ", " << rectY + m_shiftR << "] /cm");
-
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {
     m_houghPlane.create();
@@ -362,7 +363,7 @@ CDCTrigger2DFinderModule::event()
         layerHit[m_segmentHits[currentHit.first]->getISuperLayer()] = true;
       }
       copy_n(seqHitItr, nHitInCycle, inserter(fastHitMap, fastHitMap.end()));
-      fastInterceptFinder(fastHitMap, -rectX, rectX, -rectY + m_shiftR, rectY + m_shiftR, 0, 0, 0);
+      fastInterceptFinder(fastHitMap, -m_rectX, m_rectX, -m_rectY + m_shiftR, m_rectY + m_shiftR, 0, 0, 0);
       B2DEBUG(20, "at tick " << tick << ", number of candidates: " << m_houghCand.size());
       if (!m_houghCand.empty()) {
         B2DEBUG(10, "found a track at clock " << tick << " with "
@@ -373,7 +374,7 @@ CDCTrigger2DFinderModule::event()
     }
   } else {
     /* find track candidates in Hough plane using all TS hits */
-    fastInterceptFinder(m_hitMap, -rectX, rectX, -rectY + m_shiftR, rectY + m_shiftR, 0, 0, 0);
+    fastInterceptFinder(m_hitMap, -m_rectX, m_rectX, -m_rectY + m_shiftR, m_rectY + m_shiftR, 0, 0, 0);
     if (!m_houghCand.empty()) {
       B2DEBUG(10, "found a track with " << m_hitMap.size() << "hits");
     }

@@ -204,6 +204,11 @@ namespace Belle2 {
     /** number of cells for the fast peak finder: 2^(maxIterations + 1). Initialized at 0 by the SW shifter */
     unsigned m_nCells = 0;
 
+    /** Store the rectangle size in x */
+    double m_rectX = 0;
+    /** Store the rectangle size in y */
+    double m_rectY = 0;
+
     /** minimum number of hits from different super layers in a Hough cell
      *  to form a candidate */
     unsigned m_minHits;

@@ -128,14 +128,14 @@ CDCTriggerTSFModule::initialize()
   if (m_makeTrueLRTable) {
     StoreArray<CDCSimHit> simhits;
     simhits.isRequired();
-    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
-    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
+    m_innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    m_outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
   if (m_makeRecoLRTable) {
     m_recoTracks.isRequired("RecoTracks");
     m_cdcHits.isRequired();
-    innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
-    outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
+    m_innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    m_outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
   // register relations
   StoreArray<MCParticle> mcparticles;
@@ -151,8 +151,8 @@ CDCTriggerTSFModule::initialize()
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
-  clocks.push_back(clockTDC);
-  clocks.push_back(clockData);
+  m_clocks.push_back(clockTDC);
+  m_clocks.push_back(clockData);
 
   //...Loop over layers...
   int superLayerId = -1;
@@ -180,9 +180,9 @@ CDCTriggerTSFModule::initialize()
     axialStereoLayerId = (axial) ? ia : is;
 
     // Add empty TRGCDCLayer in case a superlayer is not present
-    if (superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
+    if (m_superLayers.size() == 0 and cdc.getOffsetOfFirstSuperLayer() != 0) {
       for (uint superLayerOffset = 0; superLayerOffset < cdc.getOffsetOfFirstSuperLayer(); superLayerOffset++) {
-        superLayers.push_back(vector<TRGCDCLayer*>());
+        m_superLayers.push_back(vector<TRGCDCLayer*>());
         superLayerId++;
       }
     }
@@ -190,7 +190,7 @@ CDCTriggerTSFModule::initialize()
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
       ++superLayerId;
-      superLayers.push_back(vector<TRGCDCLayer*>());
+      m_superLayers.push_back(vector<TRGCDCLayer*>());
       if (axial) ++ias;
       else ++iss;
       axialStereoSuperLayerId = (axial) ? ias : iss;
@@ -208,7 +208,7 @@ CDCTriggerTSFModule::initialize()
     //...New layer...
     TRGCDCLayer* layer = new TRGCDCLayer(i,
                                          superLayerId,
-                                         superLayers[superLayerId].size(),
+                                         m_superLayers[superLayerId].size(),
                                          axialStereoLayerId,
                                          axialStereoSuperLayerId,
                                          cdc.zOffsetWireLayer(i),
@@ -217,7 +217,7 @@ CDCTriggerTSFModule::initialize()
                                          nWiresInLayer,
                                          innerRadius,
                                          outerRadius);
-    superLayers.back().push_back(layer);
+    m_superLayers.back().push_back(layer);
 
     //...Loop over all wires in a layer...
     for (unsigned j = 0; j < nWiresInLayer; j++) {
@@ -233,8 +233,8 @@ CDCTriggerTSFModule::initialize()
   }
 
   //...Make TSF's...
-  const unsigned nWiresInTS[2] = {15, 11};
-  const int shape[2][30] = {
+  const unsigned c_nWiresInTS[2] = {15, 11};
+  const int c_shape[2][30] = {
     {
       -2, 0, // relative layer id, relative wire id
         -1, -1,
@@ -273,26 +273,26 @@ CDCTriggerTSFModule::initialize()
   const int layerOffset[2] = {5, 2};
   unsigned id = 0;
   unsigned idTS = 0;
-  for (unsigned i = 0; i < superLayers.size(); i++) {
+  for (unsigned i = 0; i < m_superLayers.size(); i++) {
     if (i < cdc.getOffsetOfFirstSuperLayer()) {
       TRGCDCLayer* emptylayer = new TRGCDCLayer();
-      tsLayers.push_back(emptylayer);
+      m_tsLayers.push_back(emptylayer);
       continue;
     }
     unsigned tsType = (i) ? 1 : 0;
 
     //...TS layer... w is a central wire
-    const TRGCDCCell* ww = superLayers[i][layerOffset[tsType]]->front();
+    const TRGCDCCell* ww = m_superLayers[i][layerOffset[tsType]]->front();
     TRGCDCLayer* layer = new TRGCDCLayer(id++, *ww);
-    tsLayers.push_back(layer);
+    m_tsLayers.push_back(layer);
 
     //...Loop over all wires in a central wire layer...
     const unsigned nWiresInLayer = ww->layer().nCells();
     B2DEBUG(100, "SL " << i << " layerOffset " << layerOffset[tsType] << ", "
-            << superLayers[i].size() << " layers, " << nWiresInLayer << " wires");
+            << m_superLayers[i].size() << " layers, " << nWiresInLayer << " wires");
     for (unsigned j = 0; j < nWiresInLayer; j++) {
       const TRGCDCWire& w =
-        (TRGCDCWire&) superLayers[i][layerOffset[tsType]]->cell(j);
+        (TRGCDCWire&) m_superLayers[i][layerOffset[tsType]]->cell(j);
 
       const unsigned localId = w.localId();
       const unsigned layerId = w.localLayerId();
@@ -300,14 +300,14 @@ CDCTriggerTSFModule::initialize()
 
       B2DEBUG(110, "TS localId " << localId << " layerId " << layerId);
 
-      for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
-        const int laid = layerId + shape[tsType][k * 2];
-        const int loid = localId + shape[tsType][k * 2 + 1];
+      for (unsigned k = 0; k < c_nWiresInTS[tsType]; k++) {
+        const int laid = layerId + c_shape[tsType][k * 2];
+        const int loid = localId + c_shape[tsType][k * 2 + 1];
 
         B2DEBUG(120, "cell localId " << loid << " layerId " << laid);
 
         const TRGCDCWire& c =
-          (TRGCDCWire&) superLayers[i][laid]->cell(loid);
+          (TRGCDCWire&) m_superLayers[i][laid]->cell(loid);
 
         cells.push_back(&c);
       }
@@ -346,7 +346,7 @@ CDCTriggerTSFModule::beginRun()
       for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
           for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
-            deadch_map[i][j][k] = true;
+            m_deadChannelMap[i][j][k] = true;
           }
         }
       }
@@ -354,7 +354,7 @@ CDCTriggerTSFModule::beginRun()
       for (unsigned int i = 0; i < c_nSuperLayers; i++) { //SL
         for (unsigned int j = 0; j < MAX_N_LAYERS; j++) { //Layer
           for (unsigned int k = 0; k < c_maxNDriftCells; k++) { //
-            deadch_map[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
+            m_deadChannelMap[i][j][k] = m_db_deadchannel->getdeadch(i, j, k);
           }
         }
       }
@@ -440,7 +440,7 @@ CDCTriggerTSFModule::event()
     const CDCHit& h = *m_cdcHits[i];
     // mask dead channel
     if (m_deadchflag) {
-      if (!deadch_map[h.getISuperLayer()][h.getILayer()][h.getIWire()]) {
+      if (!m_deadChannelMap[h.getISuperLayer()][h.getILayer()][h.getIWire()]) {
         continue;
       }
     }
@@ -455,7 +455,7 @@ CDCTriggerTSFModule::event()
     }
 
     TRGCDCWire& w =
-      (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
+      (TRGCDCWire&) m_superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
     // trigger timing signal
     const int tdcCount = floor((cdc.getT0(WireID(h.getID())) / cdc.getTdcBinWidth()
@@ -482,9 +482,9 @@ CDCTriggerTSFModule::event()
 
   // neighbor suppression
   unsigned neibor_hit[10][1000] = {};
-  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
-    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
-      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+  for (unsigned isl = 0; isl < m_tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < m_tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) m_tsLayers[isl]->cell(its);
       // simulate with logicLUTFlag = true
       // TODO: either add parameter or remove the option in Segment::simulate()
       s.simulate(m_clockSimulation, true,
@@ -496,9 +496,9 @@ CDCTriggerTSFModule::event()
   }
 
   // simulate track segments and create track segment hits
-  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
-    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
-      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+  for (unsigned isl = 0; isl < m_tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < m_tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) m_tsLayers[isl]->cell(its);
       // simulate with logicLUTFlag = true
       // TODO: either add parameter or remove the option in Segment::simulate()
       s.simulate(m_clockSimulation, true,
@@ -509,8 +509,8 @@ CDCTriggerTSFModule::event()
       if (!m_clockSimulation && s.signal().active()) {
 
         //neighbor suppression
-        if (s.priorityPosition() != 3 && (neibor_hit[isl][(its - 1) % tsLayers[isl]->nCells()] == 1
-                                          || neibor_hit[isl][(its + 1) % tsLayers[isl]->nCells()] == 1))continue;
+        if (s.priorityPosition() != 3 && (neibor_hit[isl][(its - 1) % m_tsLayers[isl]->nCells()] == 1
+                                          || neibor_hit[isl][(its + 1) % m_tsLayers[isl]->nCells()] == 1))continue;
 
         const CDCHit* priorityHit = m_cdcHits[s.priority().hit()->iCDCHit()];
 
@@ -564,26 +564,26 @@ CDCTriggerTSFModule::event()
           if (simHit && !simHit->getBackgroundTag()) {
             if (isl == 0) {
               B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
-              innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
-              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              innerTrueLRTable[s.lutPattern()][4] += adcSum;
+              m_innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              m_innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_innerTrueLRTable[s.lutPattern()][4] += adcSum;
             } else {
-              outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
-              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              outerTrueLRTable[s.lutPattern()][4] += adcSum;
+              m_outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              m_outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_outerTrueLRTable[s.lutPattern()][4] += adcSum;
               B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
             }
           } else {
             if (isl == 0) {
               B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
-              innerTrueLRTable[s.lutPattern()][2] += 1;
-              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              innerTrueLRTable[s.lutPattern()][4] += adcSum;
+              m_innerTrueLRTable[s.lutPattern()][2] += 1;
+              m_innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_innerTrueLRTable[s.lutPattern()][4] += adcSum;
             }  else {
               B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
-              outerTrueLRTable[s.lutPattern()][2] += 1;
-              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              outerTrueLRTable[s.lutPattern()][4] += adcSum;
+              m_outerTrueLRTable[s.lutPattern()][2] += 1;
+              m_outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_outerTrueLRTable[s.lutPattern()][4] += adcSum;
             }
           }
         }
@@ -622,17 +622,17 @@ CDCTriggerTSFModule::event()
                   // this getrightleftinformation function returns 2 for a right pass, and 3 for a left pass
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
-                  innerRecoLRTable[s.lutPattern()][lrflag] += 1;
-                  innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-                  innerRecoLRTable[s.lutPattern()][4] += adcSum;
+                  m_innerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  m_innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  m_innerRecoLRTable[s.lutPattern()][4] += adcSum;
                   B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
                           "), hit: " << iHit);
                 } else {
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
                   if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
-                  outerRecoLRTable[s.lutPattern()][lrflag] += 1;
-                  outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-                  outerRecoLRTable[s.lutPattern()][4] += adcSum;
+                  m_outerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  m_outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  m_outerRecoLRTable[s.lutPattern()][4] += adcSum;
                   B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
                           "), hit: " << iHit);
                 }
@@ -644,14 +644,14 @@ CDCTriggerTSFModule::event()
           if (lrflag == 2) {
             if (isl == 0) {
               B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
-              innerRecoLRTable[s.lutPattern()][2] += 1;
-              innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              innerRecoLRTable[s.lutPattern()][4] += adcSum;
+              m_innerRecoLRTable[s.lutPattern()][2] += 1;
+              m_innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_innerRecoLRTable[s.lutPattern()][4] += adcSum;
             } else {
               B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
-              outerRecoLRTable[s.lutPattern()][2] += 1;
-              outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
-              outerRecoLRTable[s.lutPattern()][4] += adcSum;
+              m_outerRecoLRTable[s.lutPattern()][2] += 1;
+              m_outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              m_outerRecoLRTable[s.lutPattern()][4] += adcSum;
 
             }
             //std::cout << " , lrflag: " << lrflag << ", 0=left, 1=right, 2=bg";
@@ -670,45 +670,45 @@ void
 CDCTriggerTSFModule::terminate()
 {
   // delete clocks
-  for (unsigned ic = 0; ic < clocks.size(); ++ic) {
-    delete clocks[ic];
+  for (unsigned ic = 0; ic < m_clocks.size(); ++ic) {
+    delete m_clocks[ic];
   }
-  clocks.clear();
+  m_clocks.clear();
 
   // delete wire layers
-  for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
-    for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
-      for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
-        delete &(superLayers[isl][il]->cell(iw));
+  for (unsigned isl = 0; isl < m_superLayers.size(); ++isl) {
+    for (unsigned il = 0; il < m_superLayers[isl].size(); ++il) {
+      for (unsigned iw = 0; iw < m_superLayers[isl][il]->nCells(); ++iw) {
+        delete &(m_superLayers[isl][il]->cell(iw));
       }
-      delete superLayers[isl][il];
+      delete m_superLayers[isl][il];
     }
-    superLayers[isl].clear();
+    m_superLayers[isl].clear();
   }
-  superLayers.clear();
+  m_superLayers.clear();
 
   // delete TS layers
-  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
-    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
-      delete &(tsLayers[isl]->cell(its));
+  for (unsigned isl = 0; isl < m_tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < m_tsLayers[isl]->nCells(); ++its) {
+      delete &(m_tsLayers[isl]->cell(its));
     }
-    delete tsLayers[isl];
+    delete m_tsLayers[isl];
   }
-  tsLayers.clear();
+  m_tsLayers.clear();
 
   // save true left/right table
   if (m_makeTrueLRTable) {
     ofstream innerFile(m_innerTrueLRTableFilename);
     ostream_iterator<unsigned> innerIterator(innerFile, " ");
-    for (unsigned pattern = 0; pattern < innerTrueLRTable.size(); ++pattern) {
-      copy(innerTrueLRTable[pattern].begin(), innerTrueLRTable[pattern].end(),
+    for (unsigned pattern = 0; pattern < m_innerTrueLRTable.size(); ++pattern) {
+      copy(m_innerTrueLRTable[pattern].begin(), m_innerTrueLRTable[pattern].end(),
            innerIterator);
       innerFile << "\n";
     }
     ofstream outerFile(m_outerTrueLRTableFilename);
     ostream_iterator<unsigned> outerIterator(outerFile, " ");
-    for (unsigned pattern = 0; pattern < outerTrueLRTable.size(); ++pattern) {
-      copy(outerTrueLRTable[pattern].begin(), outerTrueLRTable[pattern].end(),
+    for (unsigned pattern = 0; pattern < m_outerTrueLRTable.size(); ++pattern) {
+      copy(m_outerTrueLRTable[pattern].begin(), m_outerTrueLRTable[pattern].end(),
            outerIterator);
       outerFile << "\n";
     }
@@ -718,15 +718,15 @@ CDCTriggerTSFModule::terminate()
   if (m_makeRecoLRTable) {
     ofstream innerFile(m_innerRecoLRTableFilename);
     ostream_iterator<unsigned> innerIterator(innerFile, " ");
-    for (unsigned pattern = 0; pattern < innerRecoLRTable.size(); ++pattern) {
-      copy(innerRecoLRTable[pattern].begin(), innerRecoLRTable[pattern].end(),
+    for (unsigned pattern = 0; pattern < m_innerRecoLRTable.size(); ++pattern) {
+      copy(m_innerRecoLRTable[pattern].begin(), m_innerRecoLRTable[pattern].end(),
            innerIterator);
       innerFile << "\n";
     }
     ofstream outerFile(m_outerRecoLRTableFilename);
     ostream_iterator<unsigned> outerIterator(outerFile, " ");
-    for (unsigned pattern = 0; pattern < outerRecoLRTable.size(); ++pattern) {
-      copy(outerRecoLRTable[pattern].begin(), outerRecoLRTable[pattern].end(),
+    for (unsigned pattern = 0; pattern < m_outerRecoLRTable.size(); ++pattern) {
+      copy(m_outerRecoLRTable[pattern].begin(), m_outerRecoLRTable[pattern].end(),
            outerIterator);
       outerFile << "\n";
     }
@@ -737,19 +737,19 @@ void
 CDCTriggerTSFModule::clear()
 {
   const CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
-  for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+  for (unsigned isl = 0; isl < m_superLayers.size(); ++isl) {
     if (isl < cdc.getOffsetOfFirstSuperLayer()) {
       continue;
     }
-    for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
-      for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
-        TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
+    for (unsigned il = 0; il < m_superLayers[isl].size(); ++il) {
+      for (unsigned iw = 0; iw < m_superLayers[isl][il]->nCells(); ++iw) {
+        TRGCDCWire& w = (TRGCDCWire&) m_superLayers[isl][il]->cell(iw);
         delete w.hit();
         w.clear();
       }
     }
-    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
-      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+    for (unsigned its = 0; its < m_tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) m_tsLayers[isl]->cell(its);
       s.clear();
     }
   }

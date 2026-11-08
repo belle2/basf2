@@ -424,6 +424,12 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
                                               const cdcMap& inputMap)
 {
   double m, a, y1_h, y2_h;
+
+  const double sin_x1 = std::sin(x1 - 1e-10);
+  const double cos_x1 = std::cos(x1 - 1e-10);
+  const double sin_x2 = std::sin(x2 + 1e-10);
+  const double cos_x2 = std::cos(x2 + 1e-10);
+
   for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
     unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
@@ -440,8 +446,8 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
       m = cos(phi[i]) / r[i];
       a = sin(phi[i]) / r[i];
       // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
-      y1_h = m * sin(x1 - 1e-10) - a * cos(x1 - 1e-10);
-      y2_h = m * sin(x2 + 1e-10) - a * cos(x2 + 1e-10);
+      y1_h = m * sin_x1 - a * cos_x1;
+      y2_h = m * sin_x2 - a * cos_x2;
       // skip decreasing half of the sine (corresponds to curl back half of the track)
       if (y1_h > y2_h) continue;
       if (!((y1_h > y2 && y2_h > y2) || (y1_h < y1 && y2_h < y1))) {

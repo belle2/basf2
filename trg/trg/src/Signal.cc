@@ -88,9 +88,9 @@ namespace Belle2 {
     m_clock(t.m_clock)
   {
     const unsigned n = t.m_history.size();
-    for (unsigned i = 0; i < n; i++) {
-      m_history.push_back(t.m_history[i]);
-    }
+    m_history.reserve(n);
+    m_history.insert(m_history.end(), t.m_history.begin(), t.m_history.end());
+
 #if TRG_DEBUG
     consistencyCheck();
 #endif
@@ -101,6 +101,7 @@ namespace Belle2 {
     m_clock(& t.clock())
   {
 
+    m_history.reserve(m_history.size() + 2);
     //...Check edge...
     if (t.edge()) {
 
@@ -162,6 +163,7 @@ namespace Belle2 {
     //...Collect state changes...
     std::vector<int> sc0 = stateChanges();
     std::vector<int> sc1 = left.stateChanges();
+    sc0.reserve(sc0.size() + sc1.size());
     sc0.insert(sc0.end(), sc1.begin(), sc1.end());
 
     //...Sorting...
@@ -169,6 +171,7 @@ namespace Belle2 {
 
     //...Remove multiple same clock...
     std::vector<int> sc2;
+    sc2.reserve(sc0.size());
     int last = m_clock->min();
     for (unsigned i = 0; i < sc0.size(); i++) {
       const int j = sc0[i];
@@ -182,6 +185,7 @@ namespace Belle2 {
     std::string name = "(" + m_name + ")&(" + left.m_name + ")";
     TRGSignal t(name, * m_clock);
     bool active = false;
+    t.m_history.reserve(sc2.size());
     for (unsigned i = 0; i < sc2.size(); i++) {
       const int j = sc2[i];
       if ((! active) and state(j) and left.state(j)) {
@@ -251,6 +255,7 @@ namespace Belle2 {
   TRGSignal::operator|(const TRGSignal& left) const
   {
     TRGSignal t(* this);
+    t.m_history.reserve(t.m_history.size() + left.m_history.size());
     t.m_history.insert(t.m_history.end(),
                        left.m_history.begin(),
                        left.m_history.end());
@@ -266,6 +271,7 @@ namespace Belle2 {
   TRGSignal&
   TRGSignal::operator|=(const TRGSignal& left)
   {
+    m_history.reserve(m_history.size() + left.m_history.size());
     m_history.insert(m_history.end(),
                      left.m_history.begin(),
                      left.m_history.end());
@@ -289,6 +295,7 @@ namespace Belle2 {
     //...And operation...
     const unsigned n = history.size();
     std::vector<TRGTime> tmp;
+    tmp.reserve(n);
     unsigned signal = 0;
     for (unsigned i = 0; i < n; i++) {
       const bool edge = history[i].edge();
@@ -344,6 +351,7 @@ namespace Belle2 {
   {
     std::vector<int> list;
     const unsigned n = m_history.size();
+    list.reserve(n);
     for (unsigned i = 0; i < n; i++)
       list.push_back(m_history[i].time());
     return list;

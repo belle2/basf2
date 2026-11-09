@@ -754,19 +754,14 @@ namespace Belle2 {
         unsigned short cellID = cluster->getMaxECellId(); // [1, 8736]
         const unsigned short firstCellID = 161; // first cellID in CDC acceptance
         const unsigned short lastCellID = 8608; // last cellID in CDC acceptance
-        const double rawTime = cluster->getTime();
+        const double time = cluster->getTime();
         double tNorm90 = -99.;
         if (cellID < firstCellID or cellID > lastCellID) {
           const double dt99 = cluster->getDeltaTime99();
-          if (dt99 != 0) {tNorm90 = 1.5 * rawTime / dt99;}
+          if (dt99 != 0) {tNorm90 = 1.5 * time / dt99;}
           return tNorm90;
         }
         int iCrys = cellID - 1; // [0, 8735]
-
-        //..clusterTiming. Dither to remove artifacts from compression
-        const double timingBit = 2000. / 4096.;
-        double tSmear = timingBit * (gRandom->Uniform() - 0.5);
-        double time = rawTime + tSmear;
 
         //..Uncorrected single crystal energy
         double clusterECorrected = cluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons);

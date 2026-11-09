@@ -327,7 +327,7 @@ namespace Belle2 {
     for (unsigned i = 0; i < n; i++) {
       const bool edge = m_history[i].edge();
 
-      if (! edge) {
+      if (! edge and i > 0) {
         const int t0 = m_history[i - 1].time();
         const int t1 = m_history[i].time();
         if ((t1 - t0) < int(width))

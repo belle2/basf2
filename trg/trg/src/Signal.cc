@@ -47,10 +47,9 @@ namespace Belle2 {
     m_clock(& c),
     m_history()
   {
-    TRGTime time0(t0, true, c);
-    TRGTime time1(t1, false, c);
-    m_history.push_back(time0);
-    m_history.push_back(time1);
+    m_history.reserve(2);
+    m_history.emplace_back(TRGTime(t0, true, c));
+    m_history.emplace_back(TRGTime(t1, false, c));
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -62,10 +61,9 @@ namespace Belle2 {
     m_clock(& c),
     m_history()
   {
-    TRGTime time0(t0, true, c);
-    TRGTime time1(t1, false, c);
-    m_history.push_back(time0);
-    m_history.push_back(time1);
+    m_history.reserve(2);
+    m_history.emplace_back(TRGTime(t0, true, c));
+    m_history.emplace_back(TRGTime(t1, false, c));
 
 #if TRG_DEBUG
     consistencyCheck();

@@ -36,4 +36,20 @@ ROOT::Math::PxPyPzEVector PCmsLabTransform::cmsToLab(const ROOT::Math::PxPyPzEVe
 
 PCmsLabTransform::PCmsLabTransform() = default;
 
+const DBObjPtr<CollisionInvariantMass>& PCmsLabTransform::invariantMassDB()
+{
+  static const DBObjPtr<CollisionInvariantMass> invariantMass;
+  return invariantMass;
+}
 
+const DBObjPtr<CollisionBoostVector>& PCmsLabTransform::boostVectorDB()
+{
+  static const DBObjPtr<CollisionBoostVector> boostVector;
+  return boostVector;
+}
+
+const DBObjPtr<CollisionAxisCMS>& PCmsLabTransform::axisCmsDB()
+{
+  static const DBObjPtr<CollisionAxisCMS> axisCms;
+  return axisCms;
+}

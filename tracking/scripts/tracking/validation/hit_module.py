@@ -183,6 +183,10 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         trackCandHitsByIndex = {}
         trackCandMatchInfoByIndex = {}
         for trackCand in trackCands:
+            if trackCand.getNumberOfTotalHits() == 0:
+                basf2.B2WARNING("Encountered a pattern recognition track with no hits")
+                continue
+
             cdcHitIDs = [cdcHit.getArrayIndex() for cdcHit in getObjectList(trackCand.getCDCHitList())]  # Checked
             # Working around a bug in ROOT where you should not access empty std::vectors
             if len(cdcHitIDs) == 0:
@@ -194,10 +198,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             is_matched = self.trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
             is_clone = self.trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
             trackCandMatchInfoByIndex[trackCand.getArrayIndex()] = (is_matched, is_clone)
-
-            if trackCand.getNumberOfTotalHits() == 0:
-                basf2.B2WARNING("Encountered a pattern recognition track with no hits")
-                continue
 
             totalHitListPR.extend(cdcHitIDs)
             if is_matched:

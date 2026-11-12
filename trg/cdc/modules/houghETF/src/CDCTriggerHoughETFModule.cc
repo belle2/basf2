@@ -83,10 +83,10 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
   addParam("clusterCollectionName", m_clusterCollectionName,
            "Name of the StoreArray holding the clusters formed in the Hough plane.",
            std::string(""));
-  addParam("m_nCellsPhi", m_nCellsPhi,
+  addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
            (unsigned)(160));
-  addParam("m_nCellsR", m_nCellsR,
+  addParam("nCellsR", m_nCellsR,
            "Number of Hough cells in 1/r. Must be an even number.",
            (unsigned)(34));
   addParam("minPt", m_minPt,
@@ -104,7 +104,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
            "Minimum hits required required in a peak cell for a short track"
            " (must be in the first minHitsShort super layers).",
            (unsigned)(4));
-  addParam("mim_nCells", m_minCells,
+  addParam("minCells", m_minCells,
            "Peaks with less than mim_nCells connected cells are ignored.",
            (unsigned)(2));
   addParam("onlyLocalMax", m_onlyLocalMax,
@@ -139,7 +139,7 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
            "If true, create relations from cluster corners, otherwise "
            "from estimated cluster center (might not have relations).", false);
 
-  addParam("m_testFilename", m_testFilename,
+  addParam("testFilename", m_testFilename,
            "If not empty, a file with input (hits) and output (tracks) "
            "for each event is written (for firmware debugging).", std::string(""));
 

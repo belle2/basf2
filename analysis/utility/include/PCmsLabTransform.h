@@ -20,7 +20,12 @@
 namespace Belle2 {
 
   /**
-   * Class to hold Lorentz transformations from/to CMS and boost vector
+   * Class to hold Lorentz transformations from/to CMS and boost vector.
+   *
+   * The beam parameters are read from the conditions database through accessors shared by all
+   * instances, and the derived quantities (Lorentz rotations, CMS energy, ...) are cached. The cache
+   * is invalidated whenever one of the payloads changes or the DBStore is reset, so constructing
+   * this class is free and its getters are cheap.
    */
   class PCmsLabTransform {
 
@@ -34,44 +39,29 @@ namespace Belle2 {
     /**
      * Returns boost vector (beta=p/E)
      */
-    ROOT::Math::XYZVector getBoostVector() const
-    {
-      return ROOT::Math::XYZVector(boostVectorDB()->getBoost());
-    }
+    static ROOT::Math::XYZVector getBoostVector();
 
     /**
      * Returns CMS energy of e+e- (aka. invariant mass in any system)
      */
-    static double getCMSEnergy()
-    {
-      return invariantMassDB()->getMass();
-    }
+    static double getCMSEnergy();
 
     /**
      * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
      */
-    ROOT::Math::PxPyPzEVector getBeamFourMomentum() const
-    {
-      return rotateCmsToLab() * ROOT::Math::PxPyPzEVector(0, 0, 0, getCMSEnergy());
-    }
+    static ROOT::Math::PxPyPzEVector getBeamFourMomentum();
 
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
-    const ROOT::Math::LorentzRotation rotateLabToCms() const
-    {
-      return LabToCms::rotateLabToCms(getBoostVector(), axisCmsDB()->getAngleXZ(), axisCmsDB()->getAngleYZ());
-    }
+    static const ROOT::Math::LorentzRotation rotateLabToCms();
 
     /**
      * Returns Lorentz transformation from CMS to Lab
      * @return const reference to Lorentz rotation matrix
      */
-    const ROOT::Math::LorentzRotation rotateCmsToLab() const
-    {
-      return rotateLabToCms().Inverse();
-    }
+    static const ROOT::Math::LorentzRotation rotateCmsToLab();
 
     /**
      * Transforms Lorentz vector into CM System
@@ -101,19 +91,6 @@ namespace Belle2 {
      */
     static ROOT::Math::PxPyPzEVector cmsToLab(const ROOT::Math::PxPyPzEVector& vec);
 
-  private:
-
-    // The DB accessors are function-local statics shared by all instances: creating
-    // a DBObjPtr is expensive, and this class is constructed for every call of many
-    // variables (e.g. Mbc, deltaE).
-    // The payloads are still updated by the DBStore on run changes.
-
-    /** DB object for the invariant mass. */
-    static const DBObjPtr<CollisionInvariantMass>& invariantMassDB();
-    /** DB object for the boost vector. */
-    static const DBObjPtr<CollisionBoostVector>& boostVectorDB();
-    /** DB object for the collision axis in CM system from the boost. */
-    static const DBObjPtr<CollisionAxisCMS>& axisCmsDB();
   };
 
 } // Belle2 namespace

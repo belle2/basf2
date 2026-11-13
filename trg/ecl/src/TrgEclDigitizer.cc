@@ -334,32 +334,26 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   // (01)Signal digitization
   //==================
   for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
-    // get references to iner arrays for faster access
-    const std::array<double, c_nTimeBins>& TCEnergies = m_TCEnergy[iTCIdm];
-    const std::array<double, c_nTimeBins>& TCTiming = m_TCTiming[iTCIdm];
-    std::vector<double>& TCDigiE_iTCIdm = TCDigiE[iTCIdm];
-    std::vector<double>& TCDigiT_iTCIdm = TCDigiT[iTCIdm];
-
     for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
 
-      if (TCEnergies[iTimeBin] < 0.0001) {continue;} // 0.1MeV cut on TC bin_energy
+      if (m_TCEnergy[iTCIdm][iTimeBin] < 0.0001) {continue;} // 0.1MeV cut on TC bin_energy
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
         // inputTiming is in [us] <-- Be careful, here is NOT [ns]
         double inputTiming
-          = (-TCTiming[iTimeBin] - m_TimeRange + (-nbin_pedestal + iSampling) * fam_sampling_interval) * 0.001;
+          = (-m_TCTiming[iTCIdm][iTimeBin] - m_TimeRange + (-nbin_pedestal + iSampling) * fam_sampling_interval) * 0.001;
         inputTiming += random_sampling_correction * 0.001;
         if (inputTiming < 0 || inputTiming > 2.0) {continue;} // Shaping in t0 ~t0+ 2.0 us
         if (m_FADC == 1) {
 
-          TCDigiE_iTCIdm[iSampling] += interFADC(inputTiming) * TCEnergies[iTimeBin];
+          TCDigiE[iTCIdm][iSampling] += interFADC(inputTiming) * m_TCEnergy[iTCIdm][iTimeBin];
         } else {
-          TCDigiE_iTCIdm[iSampling] += SimplifiedFADC(0, inputTiming) * TCEnergies[iTimeBin];
+          TCDigiE[iTCIdm][iSampling] += SimplifiedFADC(0, inputTiming) * m_TCEnergy[iTCIdm][iTimeBin];
         }
       }
 
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        TCDigiT_iTCIdm[iSampling] = (-nbin_pedestal + iSampling - m_TimeRange / fam_sampling_interval) * fam_sampling_interval +
-                                    random_sampling_correction;
+        TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal + iSampling - m_TimeRange / fam_sampling_interval) * fam_sampling_interval +
+                                     random_sampling_correction;
       }
     }
   }
@@ -432,10 +426,8 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
     std::bitset<c_NTC> hasEnergy;
     for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
       hasEnergy[iTCIdm] = false;
-      // get references to iner arrays for faster access
-      const std::array<double, c_nTimeBins>& TCEnergies = m_TCEnergy[iTCIdm];
       for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
-        if (TCEnergies[iTimeBin] >= 1e-9) { hasEnergy[iTCIdm] = true; break; }
+        if (m_TCEnergy[iTCIdm][iTimeBin] >= 1e-9) { hasEnergy[iTCIdm] = true; break; }
       }
     }
 
@@ -453,19 +445,14 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
       m_noiseParallel.fill(0.);
       m_noiseSerial.fill(0.);
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        // get references to iner arrays for faster access
-        const std::vector<double>& parallelMatrixEntry = m_MatrixParallel[iSampling];
-        const std::vector<double>& serialMatrixEntry = m_MatrixSerial[iSampling];
         for (int jSampling = 0; jSampling < c_NSamplingDigi01; jSampling++) {
-          m_noiseParallel[iSampling] += 10 * corr_parallel * parallelMatrixEntry[jSampling] * m_Xpr[jSampling];
-          m_noiseSerial[iSampling] += 10 * corr_serial * serialMatrixEntry[jSampling] * m_Xsr[jSampling];
+          m_noiseParallel[iSampling] += 10 * corr_parallel * m_MatrixParallel[iSampling][jSampling] * m_Xpr[jSampling];
+          m_noiseSerial[iSampling] += 10 * corr_serial * m_MatrixSerial[iSampling][jSampling] * m_Xsr[jSampling];
         }
       }
 
-      // get references to iner arrays for faster access
-      std::vector<double>& TCDigiE_iTCIdm = TCDigiE[iTCIdm];
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        TCDigiE_iTCIdm[iSampling] += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
+        TCDigiE[iTCIdm][iSampling] += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
       }
     }
     if (0) {

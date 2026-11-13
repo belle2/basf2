@@ -16,7 +16,7 @@
 namespace Belle2 {
 
   /*! FAM module   */
-  class TrgEclFAMFit : public TObject {
+  class TrgEclFAMFit {
 
   public:
 

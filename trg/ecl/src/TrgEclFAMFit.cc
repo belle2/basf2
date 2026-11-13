@@ -81,8 +81,8 @@ TrgEclFAMFit::setup(int eventId)
 }
 
 void
-TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
-                       std::vector<std::vector<double>> digiTiming)
+TrgEclFAMFit::FAMFit01(const std::vector<std::vector<double>>& digiEnergy,
+                       const std::vector<std::vector<double>>& digiTiming)
 {
   //============================
   // In this function,
@@ -117,8 +117,8 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
     FitSleepCounter = 100;
     ShiftdTBin = 0;
 
-    for (int iShift = 20; iShift < (NSampling - c_nFitSample);
-         iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
+    // In order to avoid BKG shaping effect, iShift start from 20.
+    for (int iShift = 20; iShift < (NSampling - c_nFitSample); iShift++) {
 
       FitSleepCounter++;
       if (FitSleepCounter <= FitSleepThreshold) {continue;}
@@ -185,7 +185,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
 //
 void
 TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
-                       std::vector<std::vector<double>> TCDigiT)
+                       const std::vector<std::vector<double>>& TCDigiT)
 {
 
   int NSampling = 64;
@@ -299,8 +299,8 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
 //
 //
 void
-TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy,
-                       std::vector<std::vector<double>> TCDigiTiming)
+TrgEclFAMFit::FAMFit03(const std::vector<std::vector<double>>& TCDigiEnergy,
+                       const std::vector<std::vector<double>>& TCDigiTiming)
 {
   //===============
   // (03)Signal digitization (w/ 12ns interval for method-0)

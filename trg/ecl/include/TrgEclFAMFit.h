@@ -38,11 +38,11 @@ namespace Belle2 {
     /** save fitting result into tables */
     void save(int);
     /** function for fitting  */
-    void FAMFit01(std::vector<std::vector<double>>, std::vector<std::vector<double>>);
+    void FAMFit01(const std::vector<std::vector<double>>&, const std::vector<std::vector<double>>&);
     /** function for backup 1  */
-    void FAMFit02(std::vector<std::vector<double>>, std::vector<std::vector<double>>);
+    void FAMFit02(std::vector<std::vector<double>>, const std::vector<std::vector<double>>&);
     /** function for backup2 */
-    void FAMFit03(std::vector<std::vector<double>>, std::vector<std::vector<double>>);
+    void FAMFit03(const std::vector<std::vector<double>>&, const std::vector<std::vector<double>>&);
     /** set Beam Background Tag flag */
     void setBeamBkgTagFlag(int beambkgtagflag) { m_BeamBkgTag = beambkgtagflag; }
     /** set flag for saving analysis table*/

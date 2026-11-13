@@ -61,8 +61,6 @@ namespace Belle2 {
              m_SourceOfTC);
 
     B2DEBUG(100, "TRGECLFAMModule ... created");
-    m_TCEThreshold.clear();
-
   }
 //
 //
@@ -108,14 +106,14 @@ namespace Belle2 {
   TRGECLFAMModule::beginRun()
   {
     if (!m_ConditionDBFAM) {
-      m_TCEThreshold.resize(576, m_SetTCEThreshold);
+      m_TCEThreshold.fill(m_SetTCEThreshold);
     } else {
       //Use global tag
       // get TC ADC-to-Eneryg converion factor from conditionDB
       const auto& dbParmap = m_ETMParameters->getparMap();
       m_TCADCtoEnergy = getDBparmap(dbParmap, "adc2energy", 0) * 1000; // (MeV)
       // get TC Energy Threshold from TC ADC Threshold and ADC-to-Energy conversion factor
-      m_TCEThreshold.resize(576, 0);
+      m_TCEThreshold.fill(0);
       for (const auto& para : m_FAMTCADCThreshold) {
         int tc_id = (int) para.getTCId();
         m_TCEThreshold[tc_id - 1] = floor(para.getTCADCThreshold() * m_TCADCtoEnergy);

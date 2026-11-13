@@ -25,25 +25,12 @@ using namespace Belle2;
 //
 //
 //
-TrgEclFAMFit::TrgEclFAMFit(): m_BeamBkgTag(0), m_AnaTag(0), m_EventId(0) //, bin(0)
+TrgEclFAMFit::TrgEclFAMFit()
 {
-
-  m_CoeffSigPDF0.clear();
-  m_CoeffSigPDF1.clear();
-  m_CoeffNoise31.clear();
-  m_CoeffNoise32.clear();
-  m_CoeffNoise33.clear();
+  clear();
 
   m_TCMap = new TrgEclMapping();
   m_DataBase = new TrgEclDataBase();
-
-
-  m_TCEThreshold.resize(576, 100.0);
-  m_TCFitEnergy.resize(576);
-  m_TCFitTiming.resize(576);
-  m_TCRawEnergy.resize(576);
-  m_TCRawTiming.resize(576);
-  m_BeamBkgInfo.resize(576);
 }
 //
 //
@@ -61,20 +48,15 @@ TrgEclFAMFit::~TrgEclFAMFit()
 void
 TrgEclFAMFit::clear()
 {
-  m_TCEThreshold.clear();
-  m_TCFitEnergy.clear();
-  m_TCFitTiming.clear();
-  m_TCRawEnergy.clear();
-  m_TCRawTiming.clear();
-  m_BeamBkgInfo.clear();
-  m_TCLatency.clear();
+  for (uint i = 0; i < c_NTC; i++) {
+    m_TCFitEnergy[i].clear();
+    m_TCFitTiming[i].clear();
+    m_TCRawEnergy[i].clear();
+    m_TCRawTiming[i].clear();
+    m_BeamBkgInfo[i].clear();
+  }
 
-  m_TCEThreshold.resize(576, 100.0);
-  m_TCFitEnergy.resize(576);
-  m_TCFitTiming.resize(576);
-  m_TCRawEnergy.resize(576);
-  m_TCRawTiming.resize(576);
-  m_BeamBkgInfo.resize(576);
+  m_TCEThreshold.fill(100);
 }
 
 void
@@ -89,12 +71,6 @@ TrgEclFAMFit::setup(int eventId)
   delete m_DataBase;
   m_TCMap = new TrgEclMapping();
   m_DataBase = new TrgEclDataBase();
-
-  m_CoeffSigPDF0.clear();
-  m_CoeffSigPDF1.clear();
-  m_CoeffNoise31.clear();
-  m_CoeffNoise32.clear();
-  m_CoeffNoise33.clear();
 
   m_DataBase->getCoeffSigPDF(m_CoeffSigPDF0,  m_CoeffSigPDF1);
   m_DataBase->getCoeffNoise(0,  m_CoeffNoise31, m_CoeffNoise32, m_CoeffNoise33);
@@ -135,7 +111,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 12;   // # of clk to suspend fit
 
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
 
     // reset the fit state for each TC, so it does not depend on the previous TC
     FitSleepCounter = 100;
@@ -229,7 +205,7 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
   int ta_id[20] = {1000}; //@ id of T_a
   double ttt_a[20] = {0}; //@ time of T_a
   double ttt_b[20] = {0}; //@ time of T_b
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     int noutput = 0;
 
     //    double threshold = m_Threshold * 0.001; //GeV
@@ -347,7 +323,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy,
   //==================
   float max_shape_time = 563.48; // [ns], time between peak of PDF and t0.
   //  double threshold = m_Threshold * 0.001; //GeV
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     int noutput = 0;
     int maxId[500] = {0};
     int count_up = 0;
@@ -409,18 +385,19 @@ TrgEclFAMFit::setBeamBkgTag()
   std::vector<double> RawTCTiming;
   std::vector<double> RawTCEnergy;
   std::vector<double> RawBeamBkgTag;
-  RawBeamBkgTag.clear();
-  TCId.clear();
-  RawTCTiming.clear();
-  RawTCEnergy.clear();
-  // BeamBkgTag.resize(576  ,std::vector<int> (size,100));
-  // m_TCRawEnergy.resize(576,std::vector<double>(size,0.));
-  // m_TCRawTiming.resize(576,std::vector<double>(size,0.));
-  m_BeamBkgInfo.resize(576);
-  m_TCRawEnergy.resize(576);
-  m_TCRawTiming.resize(576);
+
+  for (uint i = 0; i < c_NTC; i++) {
+    m_TCRawEnergy[i].clear();
+    m_TCRawTiming[i].clear();
+    m_BeamBkgInfo[i].clear();
+  }
 
   StoreArray<TRGECLDigi0> trgeclDigiArray;
+  TCId.reserve(trgeclDigiArray.getEntries());
+  RawTCTiming.reserve(trgeclDigiArray.getEntries());
+  RawTCEnergy.reserve(trgeclDigiArray.getEntries());
+  RawBeamBkgTag.reserve(trgeclDigiArray.getEntries());
+
   for (int ii = 0; ii < trgeclDigiArray.getEntries(); ii++) {
     TRGECLDigi0* aTRGECLDigi = trgeclDigiArray[ii];
     int eventid = aTRGECLDigi->getEventId();
@@ -431,7 +408,7 @@ TrgEclFAMFit::setBeamBkgTag()
     RawBeamBkgTag.push_back(aTRGECLDigi -> getBeamBkgTag());
   }
 
-  for (int iTCId = 0; iTCId < 576 ; iTCId ++) {
+  for (int iTCId = 0; iTCId < c_NTC ; iTCId ++) {
     const int hitsize = m_TCFitEnergy[iTCId].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       const int rawsize = TCId.size();
@@ -463,7 +440,7 @@ TrgEclFAMFit::save(int eventid)
   // adjust TC timing (ns) to T=0 ns
   double tc_timing_correction = -15;
 
-  for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC;  iTCIdm++) {
     const int hitsize = m_TCFitEnergy[iTCIdm].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       StoreArray<TRGECLHit> TrgEclHitArray;
@@ -480,7 +457,7 @@ TrgEclFAMFit::save(int eventid)
   }
 
   if (m_AnaTag == 1) {
-    for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC;  iTCIdm++) {
       if (m_TCFitEnergy[iTCIdm].size() != m_TCRawEnergy[iTCIdm].size()) {continue;}
       const int hitsize = m_TCFitEnergy[iTCIdm].size();
       for (int iHit = 0; iHit < hitsize; iHit++) {

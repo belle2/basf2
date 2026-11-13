@@ -13,7 +13,6 @@
 
 //trg package headers
 #include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
-#include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
 
@@ -138,6 +137,11 @@ namespace Belle2 {
       m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
     }
 
+    m_TrgEclFAMFit.setBeamBkgTagFlag(m_beambkgtag);
+    m_TrgEclFAMFit.setAnaTagFlag(m_famana);
+    m_TrgEclFAMFit.setup(m_nEvent);
+    m_TrgEclFAMFit.setThreshold(m_TCEThreshold);
+
   }
 //
 //
@@ -175,16 +179,12 @@ namespace Belle2 {
 
 
     // FAM Fitter
-    TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
-    obj_trgeclfit->setBeamBkgTagFlag(m_beambkgtag);
-    obj_trgeclfit->setAnaTagFlag(m_famana);
-    obj_trgeclfit->setup(m_nEvent);
-    obj_trgeclfit->setThreshold(m_TCEThreshold);
+    m_TrgEclFAMFit.clear();
 
-    if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
-    else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
-    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
-    obj_trgeclfit-> save(m_nEvent);
+    if (m_famMethod == 1) { m_TrgEclFAMFit.FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
+    else if (m_famMethod == 2) { m_TrgEclFAMFit.FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
+    else if (m_famMethod == 3) { m_TrgEclFAMFit.FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
+    m_TrgEclFAMFit. save(m_nEvent);
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
     uint16_t nTCsPerRegion[3] = {};
@@ -211,7 +211,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
     //
     m_nEvent++;
-    delete obj_trgeclfit;
   }
 //
 //

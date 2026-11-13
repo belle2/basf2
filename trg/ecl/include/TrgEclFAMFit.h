@@ -47,6 +47,8 @@ namespace Belle2 {
     };
     /** set Beam Background Tag */
     void setBeamBkgTag();
+    /** Clear vectors */
+    void clear();
 
     //! Get TC Energy
     std::vector<std::vector<double>>  getFitEnergy() {return m_TCFitEnergy;}

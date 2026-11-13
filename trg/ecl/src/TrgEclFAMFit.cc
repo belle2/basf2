@@ -37,14 +37,6 @@ TrgEclFAMFit::TrgEclFAMFit(): m_BeamBkgTag(0), m_AnaTag(0), m_EventId(0) //, bin
   m_TCMap = new TrgEclMapping();
   m_DataBase = new TrgEclDataBase();
 
-  m_TCEThreshold.clear();
-
-  m_TCFitEnergy.clear();
-  m_TCFitTiming.clear();
-  m_TCRawEnergy.clear();
-  m_TCRawTiming.clear();
-  m_BeamBkgInfo.clear();
-  m_TCLatency.clear();
 
   m_TCEThreshold.resize(576, 100.0);
   m_TCFitEnergy.resize(576);
@@ -67,11 +59,42 @@ TrgEclFAMFit::~TrgEclFAMFit()
 //
 
 void
+TrgEclFAMFit::clear()
+{
+  m_TCEThreshold.clear();
+  m_TCFitEnergy.clear();
+  m_TCFitTiming.clear();
+  m_TCRawEnergy.clear();
+  m_TCRawTiming.clear();
+  m_BeamBkgInfo.clear();
+  m_TCLatency.clear();
+
+  m_TCEThreshold.resize(576, 100.0);
+  m_TCFitEnergy.resize(576);
+  m_TCFitTiming.resize(576);
+  m_TCRawEnergy.resize(576);
+  m_TCRawTiming.resize(576);
+  m_BeamBkgInfo.resize(576);
+}
+
+void
 TrgEclFAMFit::setup(int eventId)
 {
   //
   // prepare coefficient for fitting
   //
+  clear();
+
+  delete m_TCMap;
+  delete m_DataBase;
+  m_TCMap = new TrgEclMapping();
+  m_DataBase = new TrgEclDataBase();
+
+  m_CoeffSigPDF0.clear();
+  m_CoeffSigPDF1.clear();
+  m_CoeffNoise31.clear();
+  m_CoeffNoise32.clear();
+  m_CoeffNoise33.clear();
 
   m_DataBase->getCoeffSigPDF(m_CoeffSigPDF0,  m_CoeffSigPDF1);
   m_DataBase->getCoeffNoise(0,  m_CoeffNoise31, m_CoeffNoise32, m_CoeffNoise33);

@@ -25,6 +25,7 @@
 #include <trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h>
 #include <trg/ecl/dbobjects/TRGECLETMParameters.h>
 #include <trg/ecl/TrgEclDigitizer.h>
+#include <trg/ecl/TrgEclFAMFit.h>
 
 namespace Belle2 {
 
@@ -120,6 +121,8 @@ namespace Belle2 {
 
     /** TRGECLDigitizer */
     TrgEclDigitizer m_Digitizer;
+    /** TrgEclFAMFit */
+    TrgEclFAMFit m_TrgEclFAMFit;
     /// Number of ECL TriggerCells (TC)
     static constexpr int c_NTC = 576;
     /// Numer of sampling points for digitizer01

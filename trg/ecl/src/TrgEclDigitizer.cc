@@ -66,24 +66,19 @@ TrgEclDigitizer::initialize()
 void
 TrgEclDigitizer::clear()
 {
-
+  m_TCEnergy_tot.fill(0.);
+  m_TCTiming_tot.fill(0.);
   for (uint i = 0; i < c_NTC; i++) {
-    m_TCEnergy_tot[i] = 0;
-    m_TCTiming_tot[i] = 0;
-    for (uint j = 0; j < c_nTimeBins; j++) {
-      m_TCEnergy[i][j] = 0;
-      m_TCTiming[i][j] = 0;
-      m_TCBkgContribution[i][j] = 0;
-      m_TCSigContribution[i][j] = 0;
-      m_TCBeambkgTag[i][j] = 0;
-    }
-    for (uint j = 0; j < 60; j++) {
-      m_TCRawEnergy[i][j] = 0;
-      m_TCRawTiming[i][j] = 0;
-      m_TCRawBkgTag[i][j] = 0;
-    }
+    m_TCEnergy[i].fill(0.);
+    m_TCTiming[i].fill(0.);
+    m_TCBkgContribution[i].fill(0.);
+    m_TCSigContribution[i].fill(0.);
+    m_TCBeambkgTag[i].fill(0.);
+    m_TCRawEnergy[i].fill(0.);
+    m_TCRawTiming[i].fill(0.);
+    m_TCRawBkgTag[i].fill(0.);
     for (uint j = 0; j < 64; j++) {
-      m_WaveForm[i][j] = 0;
+      m_WaveForm[i][j] = 0.;
     }
   }
 }

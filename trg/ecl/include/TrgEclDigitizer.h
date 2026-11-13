@@ -85,25 +85,27 @@ namespace Belle2 {
     /** time range(default : -4000 ~ 4000 ns ) */
     double m_TimeRange = 4000;
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double m_TCEnergy[c_NTC][c_nTimeBins];
+    std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCEnergy;
     /** TC Timing converted from Xtarl Timing [GeV] */
-    double m_TCTiming[c_NTC][c_nTimeBins];
+    std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCTiming;
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double m_TCEnergy_tot[c_NTC];
+    std::array<double, c_NTC> m_TCEnergy_tot;
     /** TC Timing converted from Xtarl Timing [GeV] */
-    double m_TCTiming_tot[c_NTC];
+    std::array<double, c_NTC> m_TCTiming_tot;
 
     // background TC Energy [GeV]
     // double TCBGEnergy[c_NTC][c_nTimeBins];
+    // std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCEnergy;
     // background TC Timing [GeV]
+    // std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCEnergy;
     // double TCBGTiming[c_NTC][c_nTimeBins];
 
     /** Input  TC energy[GeV] */
-    double m_TCRawEnergy[c_NTC][60];
+    std::array<std::array<double, 60>, c_NTC> m_TCRawEnergy;
     /**Input  TC timing[ns]  */
-    double m_TCRawTiming[c_NTC][60];
+    std::array<std::array<double, 60>, c_NTC> m_TCRawTiming;
     /**Input  Beambackground tag  */
-    double m_TCRawBkgTag[c_NTC][60];
+    std::array<std::array<double, 60>, c_NTC> m_TCRawBkgTag;
 
     /** Object of TC Mapping */
     TrgEclMapping* m_TCMap;
@@ -116,15 +118,15 @@ namespace Belle2 {
     /** Noise Low triangle Matrix of Serial noise  */
     std::vector<std::vector<double>> m_MatrixSerial;
     /** Beambackground contribution */
-    double m_TCBkgContribution[c_NTC][c_nTimeBins];
+    std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCBkgContribution;
     /**  Signal contribution */
-    double m_TCSigContribution[c_NTC][c_nTimeBins];
+    std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCSigContribution;
     /** Beambackground tag */
-    int m_TCBeambkgTag[c_NTC][c_nTimeBins];
+    std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCBeambkgTag;
     /** Flag of waveform table */
     int m_SaveTCWaveForm = 0;
     /** TC Energy converted from Xtarl Energy [GeV] */
-    double m_WaveForm[c_NTC][c_NSamplingDigi01];
+    double m_WaveForm[c_NTC][c_NSamplingDigi01] = {{0.}};
     /** Flag of choosing the method of waveform generation function 0: use simplifiedFADC, 1: use interFADC(interpolation) */
     int m_FADC = 1;
     /** Flag of saving beam background tag  or not*/

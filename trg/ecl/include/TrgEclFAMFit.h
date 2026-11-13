@@ -9,9 +9,10 @@
 #ifndef TRGECLFAMFIT_H
 #define TRGECLFAMFIT_H
 
-#include <TObject.h>
 #include "trg/ecl/TrgEclMapping.h"
 #include <trg/ecl/TrgEclDataBase.h>
+
+#include <array>
 
 namespace Belle2 {
 
@@ -49,13 +50,6 @@ namespace Belle2 {
     void setBeamBkgTag();
     /** Clear vectors */
     void clear();
-
-    //! Get TC Energy
-    std::vector<std::vector<double>>  getFitEnergy() {return m_TCFitEnergy;}
-    //! Get TC Timing
-    std::vector<std::vector<double>>  getFitTiming() {return m_TCFitTiming;}
-    //! Get Background Tag of TC Hit
-    std::vector<std::vector<int>>     getBeamBkgTag() {return m_BeamBkgInfo;}
 
   private:
 

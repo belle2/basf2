@@ -20,6 +20,7 @@
 #include "trg/ecl/dataobjects/TRGECLWaveform.h" // by shebalin 
 
 #include <iostream>
+#include <bitset>
 #include <math.h>
 #include <TRandom.h>
 
@@ -66,10 +67,10 @@ void
 TrgEclDigitizer::clear()
 {
 
-  for (uint i = 0; i < 576; i++) {
+  for (uint i = 0; i < c_NTC; i++) {
     m_TCEnergy_tot[i] = 0;
     m_TCTiming_tot[i] = 0;
-    for (uint j = 0; j < 80; j++) {
+    for (uint j = 0; j < c_nTimeBins; j++) {
       m_TCEnergy[i][j] = 0;
       m_TCTiming[i][j] = 0;
       m_TCBkgContribution[i][j] = 0;
@@ -94,15 +95,14 @@ void
 TrgEclDigitizer::getTCHit()
 {
 
-  const int nBinTime = 80;
   //-------------------------------------------------------------------
   //                          read Xtal data
   //---------------------------------------------------------------------
   if (m_sourceOfTC == 1) { // read  ECLHit table
 
     // only needed to resolve the dominant background tag below
-    std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
-    std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0));
+    std::vector< std::vector<float> > E_cell(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
+    std::vector< std::vector<float> > beambkg_tag(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
 
     StoreArray<ECLHit> eclHitArray("ECLHits");
 
@@ -118,7 +118,7 @@ TrgEclDigitizer::getTCHit()
       float hitE     = aECLHit->getEnergyDep() / Unit::GeV;
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       if (aveT < - m_TimeRange || aveT > m_TimeRange) {continue;} //Choose - TimeRange ~ TimeTange
-      int  TimeIndex = (int)((aveT + m_TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 80th bin.
+      int  TimeIndex = (int)((aveT + m_TimeRange) / 100); //Binning : -4000 = 1st bin ~  4000 c_nTimeBinsth bin.
 
       int iTCIdm = m_TCMap->getTCIdFromXtalId(hitCellId + 1) - 1;
       m_TCEnergy[iTCIdm][TimeIndex] += hitE;
@@ -127,8 +127,8 @@ TrgEclDigitizer::getTCHit()
       else if (beambkg == 0) {m_TCSigContribution[iTCIdm][TimeIndex] += hitE;}
 
     }
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
+      for (int  iTime = 0; iTime < c_nTimeBins; iTime++) {
 
         if (m_TCEnergy[iTCIdm][iTime] < 1e-9) {continue;}// 0.01MeV cut
         /* cppcheck-suppress variableScope */
@@ -140,7 +140,7 @@ TrgEclDigitizer::getTCHit()
           if (m_TCBkgContribution[iTCIdm][iTime] < m_TCSigContribution[iTCIdm][iTime]) {
             m_TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
           } else {
-            for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+            for (int iXtalIdm = 0; iXtalIdm < c_nECLCrystals; iXtalIdm++) {
               int iTCId = m_TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
               if (iTCIdm != iTCId) {continue;}
               if (maxbkgE < E_cell[iXtalIdm][iTime]) {
@@ -157,10 +157,10 @@ TrgEclDigitizer::getTCHit()
 
 
   if (m_sourceOfTC == 2) { // read ECLSimHit
-    std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
-    std::vector< std::vector<float> > T_ave(8736, std::vector<float>(80, 0.0));
-    std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0));
-    std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0));
+    std::vector< std::vector<float> > E_cell(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
+    std::vector< std::vector<float> > T_ave(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
+    std::vector< std::vector<float> > Tof_ave(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
+    std::vector< std::vector<float> > beambkg_tag(c_nECLCrystals, std::vector<float>(c_nTimeBins, 0.0));
 
     ECL::ECLGeometryPar* eclp = ECL::ECLGeometryPar::Instance();
     //=====================
@@ -194,8 +194,8 @@ TrgEclDigitizer::getTCHit()
     //===============
     // Xtal energy and timing (0-8us, 0.2us interval, 40 bins)
     //===============
-    for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-      for (int  TimeIndex = 0; TimeIndex < nBinTime; TimeIndex++) {
+    for (int iECLCell = 0; iECLCell < c_nECLCrystals; iECLCell++) {
+      for (int  TimeIndex = 0; TimeIndex < c_nTimeBins; TimeIndex++) {
 
         if (E_cell[iECLCell][TimeIndex] < 1e-9) {continue;} // 0.01MeV cut
 
@@ -211,9 +211,9 @@ TrgEclDigitizer::getTCHit()
     //
     //
     //
-    for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+    for (int iXtalIdm = 0; iXtalIdm < c_nECLCrystals; iXtalIdm++) {
       int iTCIdm = m_TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
-      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+      for (int  iTime = 0; iTime < c_nTimeBins; iTime++) {
 
         if (E_cell[iXtalIdm][iTime] < 1e-9) {continue;}  // 0.01MeV cut
         m_TCEnergy[iTCIdm][iTime] += E_cell[iXtalIdm][iTime];
@@ -223,8 +223,8 @@ TrgEclDigitizer::getTCHit()
 
       }
     }
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
+      for (int  iTime = 0; iTime < c_nTimeBins; iTime++) {
         /* cppcheck-suppress variableScope */
         double maxbkgE = 0;
         /* cppcheck-suppress variableScope */
@@ -236,7 +236,7 @@ TrgEclDigitizer::getTCHit()
           if (m_TCBkgContribution[iTCIdm][iTime] < m_TCSigContribution[iTCIdm][iTime]) {
             m_TCBeambkgTag[iTCIdm][iTime] = 0; //signal Tag : 0
           } else {
-            for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
+            for (int iXtalIdm = 0; iXtalIdm < c_nECLCrystals; iXtalIdm++) {
               int iTCId = m_TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;
               if (iTCIdm != iTCId) {continue;}
               if (maxbkgE < E_cell[iXtalIdm][iTime]) {
@@ -270,7 +270,7 @@ TrgEclDigitizer::getTCHit()
       float aveT     = aECLHit->getTimeAve(); // ns :time from  IP  to PD
       // Choose - TimeRange ~ TimeTange
       if (aveT < - m_TimeRange || aveT > m_TimeRange) {continue;}
-      // Binning : -4000 = 1st bin ~  4000 80th bin.
+      // Binning : -4000 = 1st bin ~  4000 c_nTimeBinsth bin.
       int TimeIndex = (int)((aveT + m_TimeRange) / 100);
 
       int iTCIdm = m_TCMap->getTCIdFromXtalId(hitCellId + 1) - 1;
@@ -284,7 +284,7 @@ TrgEclDigitizer::getTCHit()
       double tcbg_t = ttt.getTimeAve();
       // Timing cut
       if (abs(tcbg_t) > m_TimeRange) continue;
-      //Binning : -4000 = 1st bin ~  4000 80th bin.
+      //Binning : -4000 = 1st bin ~  4000 c_nTimeBinsth bin.
       int TimeIndex = (int)((tcbg_t + m_TimeRange) / 100);
       // TC energy
       double tcbg_e = ttt.getEnergyDep();
@@ -296,8 +296,8 @@ TrgEclDigitizer::getTCHit()
       m_TCEnergy[iTCIdm][TimeIndex] += tcbg_e;
       m_TCTiming[iTCIdm][TimeIndex] += (tcbg_e * tcbg_t + tc_e * tc_t);
     }
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-      for (int  iTime = 0; iTime < nBinTime; iTime++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
+      for (int  iTime = 0; iTime < c_nTimeBins; iTime++) {
         m_TCTiming[iTCIdm][iTime] /= m_TCEnergy[iTCIdm][iTime];
       }
     }
@@ -305,7 +305,7 @@ TrgEclDigitizer::getTCHit()
   //--------------------------
   // TC energy and timing in t=0-1us as true values.
   //--------------------------
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     for (int  iTime = 40; iTime < 50; iTime++) {
       m_TCEnergy_tot[iTCIdm] += m_TCEnergy[iTCIdm][iTime];
       m_TCTiming_tot[iTCIdm] += m_TCTiming[iTCIdm][iTime] * m_TCEnergy[iTCIdm][iTime];
@@ -323,24 +323,23 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
                                 std::vector<std::vector<double>>& TCDigiT)
 {
   TCDigiE.clear();
-  TCDigiE.resize(576, vector<double>(c_NSamplingDigi01, 0));
+  TCDigiE.resize(c_NTC, vector<double>(c_NSamplingDigi01, 0));
   TCDigiT.clear();
-  TCDigiT.resize(576, vector<double>(c_NSamplingDigi01, 0));
+  TCDigiT.resize(c_NTC, vector<double>(c_NSamplingDigi01, 0));
 
   //
-  double cut_energy_tot = 0.03; // [GeV]
-  int nbin_pedestal = 4; // = nbin_pedestal*fam_sampling_interval [ns] in total
-  double fam_sampling_interval = 125; // [ns]
+  static constexpr double cut_energy_tot = 0.03; // [GeV]
+  static constexpr int nbin_pedestal = 4; // = nbin_pedestal*fam_sampling_interval [ns] in total
+  static constexpr double fam_sampling_interval = 125; // [ns]
 
 
   // (Make sampling time random between FAM sampling intervals)
-  double random_sampling_correction = 0; // [ns]
-  random_sampling_correction = gRandom->Rndm() * fam_sampling_interval;
+  const double random_sampling_correction = gRandom->Rndm() * fam_sampling_interval; // [ns]
   //==================
   // (01)Signal digitization
   //==================
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    for (int iTimeBin = 0; iTimeBin < 80; iTimeBin++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
+    for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
 
       if (m_TCEnergy[iTCIdm][iTimeBin] < 0.0001) {continue;} // 0.1MeV cut on TC bin_energy
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
@@ -358,17 +357,16 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
       }
 
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal + iSampling - m_TimeRange / fam_sampling_interval) * fam_sampling_interval;
-        TCDigiT[iTCIdm][iSampling] += random_sampling_correction;
+        TCDigiT[iTCIdm][iSampling] = (-nbin_pedestal + iSampling - m_TimeRange / fam_sampling_interval) * fam_sampling_interval +
+                                     random_sampling_correction;
       }
     }
   }
-  //
-  //
-  //
+
+
   if (0) {
     FILE* f_out_dat = fopen("ztsim.no_noise.dat", "w");
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
       if (m_TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
       fprintf(f_out_dat, "%5i %8.5f %8.5f %8.1f ",
               iTCIdm + 1, m_TCEnergy_tot[iTCIdm], m_TCEnergy[iTCIdm][0], TCDigiT[iTCIdm][0]);
@@ -382,29 +380,30 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   //==================
   // (01)noise embedding
   //==================
-  double  tmin_noise = -4; // original
-  double tgen = 10.3;   // original
-  int bkg_level = 1030;
+  static constexpr double  tmin_noise = -4; // original
+  static constexpr double tgen = 10.3;   // original
+  static constexpr int bkg_level = 1030;
   double ttt0 = 0; // [us]
   /* cppcheck-suppress variableScope */
   double ttt1 = 0; // [us]
   /* cppcheck-suppress variableScope */
   double ttt2 = 0; // [us]
   //
-  double frac_pileup   = 0.035; // pileup noise fraction?
-  double frac_parallel = 0.023; // parallel noise fraction?
-  double frac_serial   = 0.055; // serial noise fraction?
-  double times_pileup   =  1;   // noise scale based on Belle noise.
-  double times_parallel =  3.15;   // noise scale
-  double times_serial   =  3.15;   // noise scale
+  static constexpr double frac_pileup   = 0.035; // pileup noise fraction?
+  static constexpr double frac_parallel = 0.023; // parallel noise fraction?
+  static constexpr double frac_serial   = 0.055; // serial noise fraction?
+  static constexpr double times_pileup   =  1;   // noise scale based on Belle noise.
+  static constexpr double times_parallel =  3.15;   // noise scale
+  static constexpr double times_serial   =  3.15;   // noise scale
 
-  [[maybe_unused]] double corr_pileup   = times_pileup   * frac_pileup   * sqrt(fam_sampling_interval * 0.001);
-  double corr_parallel = times_parallel * frac_parallel * sqrt(fam_sampling_interval * 0.001);
-  double corr_serial   = times_serial   * frac_serial   * sqrt(fam_sampling_interval * 0.001);
+  const double sqrTerm = std::sqrt(fam_sampling_interval * 0.001);
+  const double corr_pileup   = times_pileup  * frac_pileup * sqrTerm;
+  const double corr_parallel = times_parallel * frac_parallel * sqrTerm;
+  const double corr_serial   = times_serial   * frac_serial   * sqrTerm;
 
 
   if (0) {
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
       if (m_TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
       for (int jjj = 0; jjj < bkg_level; jjj++) {
         ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
@@ -429,15 +428,15 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
     // contribution at all, so noise alone cannot bring it over the fit
     // threshold. Note m_TCEnergy_tot covers only bins 40-49 and so must NOT
     // be used here: a real signal arriving just before t=0 falls in bin 39.
-    bool hasEnergy[576];
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    std::bitset<c_NTC> hasEnergy;
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
       hasEnergy[iTCIdm] = false;
-      for (int iTimeBin = 0; iTimeBin < 80; iTimeBin++) {
+      for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
         if (m_TCEnergy[iTCIdm][iTimeBin] >= 1e-9) { hasEnergy[iTCIdm] = true; break; }
       }
     }
 
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
 
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
         m_Xpr[iSampling] = gRandom ->Gaus(0, 1);
@@ -458,12 +457,11 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
       }
 
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-
         TCDigiE[iTCIdm][iSampling] += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
       }
     }
     if (0) {
-      for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) { //Only Pile-up noise use old method.
+      for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) { //Only Pile-up noise use old method.
         if (m_TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // TC energy_tot cut
         for (int jjj = 0; jjj < bkg_level; jjj++) {
           ttt0 = -(tmin_noise + tgen * gRandom->Rndm()); // [us]
@@ -479,7 +477,7 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
 
   if (m_SaveTCWaveForm == 1) {
 
-    for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
         m_WaveForm[iTCIdm][iSampling] = TCDigiE[iTCIdm][iSampling];
       }
@@ -495,22 +493,22 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   // (03)Signal digitization (w/ 12ns interval for method-0)
   //===============
   TCDigiE.clear();
-  TCDigiE.resize(576, vector<double>(c_NSamplingDigi02, 0));
+  TCDigiE.resize(c_NTC, vector<double>(c_NSamplingDigi02, 0));
   TCDigiT.clear();
-  TCDigiT.resize(576, vector<double>(c_NSamplingDigi02, 0));
+  TCDigiT.resize(c_NTC, vector<double>(c_NSamplingDigi02, 0));
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
-  std::vector< std::vector<float> > TCDigiEnergy(576, std::vector<float>(c_NSamplingDigi02, 0.0));    // [GeV]
-  std::vector< std::vector<float> > TCDigiTiming(576, std::vector<float>(c_NSamplingDigi02, 0.0));    // [ns]
+  std::vector< std::vector<float> > TCDigiEnergy(c_NTC, std::vector<float>(c_NSamplingDigi02, 0.0));    // [GeV]
+  std::vector< std::vector<float> > TCDigiTiming(c_NTC, std::vector<float>(c_NSamplingDigi02, 0.0));    // [ns]
 
   // Make sampling time random between FAM sampling intervals
   float random_sampling_correction = 0; // [ns]
   random_sampling_correction = gRandom->Rndm() * fam_sampling_interval;
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     if (m_TCEnergy_tot[iTCIdm] < cut_energy_tot) {continue;} // TC energy_tot cut
-    for (int iTimeBin = 0; iTimeBin < 80; iTimeBin++) {
+    for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
       if (m_TCEnergy[iTCIdm][iTimeBin] < 0.0001) { continue; }   // 0.1 MeV cut on TC bin_energy
       for (int iSampling = 0; iSampling < c_NSamplingDigi02; iSampling++) {
         // inputTiming is in [us] <-- Be careful, here is NOT [ns]
@@ -552,7 +550,7 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   double corr_serial   = 0.0173925;
 
 
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     if (m_TCEnergy_tot[iTCIdm] < cut_energy_tot) { continue; }   // 1 MeV TC energy cut
     for (int jjj = 0; jjj < bkg_level; jjj++) {
       ttt0 = -(tmin_noise + tgen * gRandom->Rndm());  // [us]
@@ -583,8 +581,8 @@ TrgEclDigitizer::save(int m_nEvent)
   // Root Output
   //---------------
   int m_hitNum = 0;
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    for (int iBinTime = 0; iBinTime < 80; iBinTime++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
+    for (int iBinTime = 0; iBinTime < c_nTimeBins; iBinTime++) {
       if (m_TCEnergy[iTCIdm][iBinTime] < 0.001) {continue;}
       StoreArray<TRGECLDigi0> TCDigiArray;
       TCDigiArray.appendNew();
@@ -601,8 +599,8 @@ TrgEclDigitizer::save(int m_nEvent)
 
   if (m_SaveTCWaveForm == 1) {
     StoreArray<TRGECLWaveform> TCWaveformArray;
-    for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
-      if (iTCIdm == 80) iTCIdm =  512; // skip barrel
+    for (int iTCIdm = 0; iTCIdm < c_NTC;  iTCIdm++) {
+      if (iTCIdm == c_nTimeBins) iTCIdm =  512; // skip barrel
       int tc_phi_id = m_TCMap->getTCPhiIdFromTCId(iTCIdm + 1);
       int tc_theta_id   = m_TCMap->getTCThetaIdFromTCId(iTCIdm + 1);
       TRGECLWaveform* newWf =

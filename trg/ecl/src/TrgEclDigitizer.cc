@@ -330,10 +330,18 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   //==================
   // (01)Signal digitization
   //==================
+
+  // This is for the noise embedding step below, but can already be filled here to save time
+  std::bitset<c_NTC> hasEnergy;
   for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
 
-      if (m_TCEnergy[iTCIdm][iTimeBin] < 0.0001) {continue;} // 0.1MeV cut on TC bin_energy
+      if (m_TCEnergy[iTCIdm][iTimeBin] >= 1e-9) {
+        hasEnergy[iTCIdm] = true;
+      }
+      if (m_TCEnergy[iTCIdm][iTimeBin] < 0.0001) {
+        continue;
+      } // 0.1MeV cut on TC bin_energy
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
         // inputTiming is in [us] <-- Be careful, here is NOT [ns]
         double inputTiming
@@ -392,6 +400,8 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
   const double corr_pileup   = times_pileup  * frac_pileup * sqrTerm;
   const double corr_parallel = times_parallel * frac_parallel * sqrTerm;
   const double corr_serial   = times_serial   * frac_serial   * sqrTerm;
+  const double parallelNoiseCorrection = 10 * corr_parallel;
+  const double serialNoiseCorrection = 10 * corr_serial;
 
 
   if (0) {
@@ -420,14 +430,6 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
     // contribution at all, so noise alone cannot bring it over the fit
     // threshold. Note m_TCEnergy_tot covers only bins 40-49 and so must NOT
     // be used here: a real signal arriving just before t=0 falls in bin 39.
-    std::bitset<c_NTC> hasEnergy;
-    for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
-      hasEnergy[iTCIdm] = false;
-      for (int iTimeBin = 0; iTimeBin < c_nTimeBins; iTimeBin++) {
-        if (m_TCEnergy[iTCIdm][iTimeBin] >= 1e-9) { hasEnergy[iTCIdm] = true; break; }
-      }
-    }
-
     for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
 
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
@@ -442,15 +444,20 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
       m_noiseParallel.fill(0.);
       m_noiseSerial.fill(0.);
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
+        double parallelNoiseTerm = 0., serialNoiseTerm = 0.;
         for (int jSampling = 0; jSampling < c_NSamplingDigi01; jSampling++) {
-          m_noiseParallel[iSampling] += 10 * corr_parallel * m_MatrixParallel[iSampling][jSampling] * m_Xpr[jSampling];
-          m_noiseSerial[iSampling] += 10 * corr_serial * m_MatrixSerial[iSampling][jSampling] * m_Xsr[jSampling];
+          parallelNoiseTerm += parallelNoiseCorrection * m_MatrixParallel[iSampling][jSampling] * m_Xpr[jSampling];
+          serialNoiseTerm += serialNoiseCorrection * m_MatrixSerial[iSampling][jSampling] * m_Xsr[jSampling];
         }
+        m_noiseParallel[iSampling] += parallelNoiseTerm;
+        m_noiseSerial[iSampling] += serialNoiseTerm;
       }
 
+      double noiseVal = 0.;
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        TCDigiE[iTCIdm][iSampling] += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
+        noiseVal += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
       }
+      TCDigiE[iTCIdm][iSampling] += noiseVal;
     }
     if (0) {
       for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) { //Only Pile-up noise use old method.

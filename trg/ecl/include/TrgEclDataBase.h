@@ -28,7 +28,7 @@ namespace Belle2 {
     /**  read coefficient for fit */
     void getCoeffNoise(int, std::vector<std::vector<double>>&, std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
     /** Noise Matrix */
-    void readNoiseLMatrix(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void readNoiseLMatrix(std::array<std::array<double, 64>, 64>&, std::array<std::array<double, 64>, 64>&);
     /** TC flight time latency  */
     double getTCFLatency(int);
     /** TC CM Phi  */

@@ -114,9 +114,9 @@ namespace Belle2 {
 
     /** Noise Matrix of Parallel and Serial Noise */
     /** Noise Low triangle Matrix of Parallel noise  */
-    std::vector<std::vector<double>> m_MatrixParallel;
+    std::array<std::array<double, 64>, 64> m_MatrixParallel;
     /** Noise Low triangle Matrix of Serial noise  */
-    std::vector<std::vector<double>> m_MatrixSerial;
+    std::array<std::array<double, 64>, 64> m_MatrixSerial;
     /** Beambackground contribution */
     std::array<std::array<double, c_nTimeBins>, c_NTC> m_TCBkgContribution;
     /**  Signal contribution */

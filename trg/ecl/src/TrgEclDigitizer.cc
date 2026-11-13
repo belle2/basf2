@@ -56,9 +56,6 @@ TrgEclDigitizer::initialize()
   m_TCMap = new TrgEclMapping();
   m_DataBase = new TrgEclDataBase();
 
-  m_MatrixParallel.clear();
-  m_MatrixSerial.clear();
-
   // prepare Matrix for Noise generation
   m_DataBase->readNoiseLMatrix(m_MatrixParallel, m_MatrixSerial);
 }

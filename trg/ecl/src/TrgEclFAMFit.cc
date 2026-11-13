@@ -137,11 +137,10 @@ TrgEclFAMFit::FAMFit01(const std::vector<std::vector<double>>& digiEnergy,
       //
       //
 
-      dTBin = (int)(ShiftdTBin + Nsmalldt);
-      if (dTBin < 1)  {dTBin =   1;}
-      if (dTBin > 20) {dTBin = 20;}
+      // ensure 0 <= (ShiftdTBin + Nsmalldt) <= 20
+      dtBin = std::max(0, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20))
 
-      CoeffAAA = 0;
+              CoeffAAA = 0;
       CoeffBBB = 0;
       for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         CoeffAAA += m_CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];

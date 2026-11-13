@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /*! FAM module   */
-  class TrgEclDigitizer : public TObject {
+  class TrgEclDigitizer {
 
   public:
 

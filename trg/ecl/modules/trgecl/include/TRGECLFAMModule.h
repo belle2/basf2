@@ -24,6 +24,7 @@
 
 #include <trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h>
 #include <trg/ecl/dbobjects/TRGECLETMParameters.h>
+#include <trg/ecl/TrgEclDigitizer.h>
 
 namespace Belle2 {
 
@@ -116,6 +117,9 @@ namespace Belle2 {
 
     /** EventLevelClusteringInfo. */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
+
+    /** TRGECLDigitizer */
+    TrgEclDigitizer m_Digitizer;
 
   };
 

@@ -45,6 +45,8 @@ namespace Belle2 {
     /** Set flag of waveform table*/
     void setFADC(int fadc) { m_FADC = fadc;}
 
+    void clear();
+
 
 
     /** FADC  */

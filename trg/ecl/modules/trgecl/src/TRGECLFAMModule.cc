@@ -13,7 +13,6 @@
 
 //trg package headers
 #include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
-#include <trg/ecl/TrgEclDigitizer.h>
 #include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
@@ -158,18 +157,18 @@ namespace Belle2 {
     //
     //
     // FAM Digitizer
-    TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
-    obj_trgeclDigi->setWaveform(m_SaveTCWaveForm);
-    obj_trgeclDigi->setFADC(m_FADC);
-    obj_trgeclDigi->setup(m_SourceOfTC);
+    m_Digitizer.clear();
+    m_Digitizer.setWaveform(m_SaveTCWaveForm);
+    m_Digitizer.setFADC(m_FADC);
+    m_Digitizer.setup(m_SourceOfTC);
     if (m_famMethod == 1 || m_famMethod == 2) {
       // no-fit method = backup method 1
-      obj_trgeclDigi->digitization01(m_TCDigiE, m_TCDigiT);
+      m_Digitizer.digitization01(m_TCDigiE, m_TCDigiT);
     } else if (m_famMethod == 3) {
       // original method = backup method 2
-      obj_trgeclDigi->digitization02(m_TCDigiE, m_TCDigiT);
+      m_Digitizer.digitization02(m_TCDigiE, m_TCDigiT);
     }
-    obj_trgeclDigi->save(m_nEvent);
+    m_Digitizer.save(m_nEvent);
 
 
     // FAM Fitter
@@ -209,7 +208,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
     //
     m_nEvent++;
-    delete obj_trgeclDigi;
     delete obj_trgeclfit;
   }
 //

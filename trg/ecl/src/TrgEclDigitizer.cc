@@ -32,32 +32,7 @@ using namespace Belle2;
 TrgEclDigitizer::TrgEclDigitizer():
   m_TimeRange(0), m_SaveTCWaveForm(0), m_FADC(1), m_BeambkgTag(0)
 {
-  m_MatrixParallel.clear();
-  m_MatrixSerial.clear();
-
-  m_TCMap = new TrgEclMapping();
-  m_DataBase = new TrgEclDataBase();
-
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
-    m_TCEnergy_tot[iTCIdm] = 0;
-    m_TCTiming_tot[iTCIdm] = 0;
-    for (int  iTime = 0; iTime < 80; iTime++) {
-      m_TCEnergy[iTCIdm][iTime] = 0;
-      m_TCTiming[iTCIdm][iTime] = 0;
-      m_TCBkgContribution[iTCIdm][iTime] = 0;
-      m_TCSigContribution[iTCIdm][iTime] = 0;
-      m_TCBeambkgTag[iTCIdm][iTime] = 0;
-    }
-
-    for (int iii = 0; iii < 60 ; iii++) {
-      m_TCRawEnergy[iTCIdm][iii] = 0;
-      m_TCRawTiming[iTCIdm][iii] = 0;
-      m_TCRawBkgTag[iTCIdm][iii] = 0;
-    }
-    for (int iii = 0; iii < 64 ; iii++) {
-      m_WaveForm[iTCIdm][iii] = 0;
-    }
-  }
+  clear();
 }
 //
 //
@@ -70,6 +45,37 @@ TrgEclDigitizer::~TrgEclDigitizer()
 //
 //
 //
+
+void
+TrgEclDigitizer::clear()
+{
+  m_MatrixParallel.clear();
+  m_MatrixSerial.clear();
+
+  m_TCMap = new TrgEclMapping();
+  m_DataBase = new TrgEclDataBase();
+
+  for (uint i = 0; i < 576; i++) {
+    m_TCEnergy_tot[i] = 0;
+    m_TCTiming_tot[i] = 0;
+    for (uint j = 0; j < 80; j++) {
+      m_TCEnergy[i][j] = 0;
+      m_TCTiming[i][j] = 0;
+      m_TCBkgContribution[i][j] = 0;
+      m_TCSigContribution[i][j] = 0;
+      m_TCBeambkgTag[i][j] = 0;
+    }
+    for (uint j = 0; j < 60; j++) {
+      m_TCRawEnergy[i][j] = 0;
+      m_TCRawTiming[i][j] = 0;
+      m_TCRawBkgTag[i][j] = 0;
+    }
+    for (uint j = 0; j < 64; j++) {
+      m_WaveForm[i][j] = 0;
+    }
+  }
+}
+
 
 void
 TrgEclDigitizer::setup(int SourceOfTC)

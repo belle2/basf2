@@ -22,6 +22,8 @@ namespace Belle2 {
   private:
     /// Number of ECL TriggerCells (TC)
     static constexpr int c_NTC = 576;
+    /// Number of fit samples
+    static constexpr int c_nFitSample = 12;
 
   public:
 
@@ -74,15 +76,15 @@ namespace Belle2 {
     TrgEclDataBase* m_DataBase;
 
     /** Coeffisients of signal PDF0  */
-    std::array<std::array<double, 12>, 20> m_CoeffSigPDF0;
+    std::array<std::array<double, c_nFitSample>, 20> m_CoeffSigPDF0;
     /** Coeffisients of signal PDF1 */
-    std::array<std::array<double, 12>, 20> m_CoeffSigPDF1;
+    std::array<std::array<double, c_nFitSample>, 20> m_CoeffSigPDF1;
     /** Coeffisients of noise 1 */
-    std::array<std::array<double, 12>, 20> m_CoeffNoise31;
+    std::array<std::array<double, c_nFitSample>, 20> m_CoeffNoise31;
     /** Coeffisient of noise 2 */
-    std::array<std::array<double, 12>, 20> m_CoeffNoise32;
+    std::array<std::array<double, c_nFitSample>, 20> m_CoeffNoise32;
     /** Coeffisient of noise 3   */
-    std::array<std::array<double, 12>, 20> m_CoeffNoise33;
+    std::array<std::array<double, c_nFitSample>, 20> m_CoeffNoise33;
 
     /** Add beambkg */
     int m_BeamBkgTag = 0;

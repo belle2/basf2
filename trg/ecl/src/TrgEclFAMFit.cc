@@ -92,24 +92,24 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
   // o return energy unit must be [GeV/c2]
   // o return time unit must be [ns]
   //============================
-  double* TCFitSample = new double [12];  // MeV/c2
-  double* preped = new double [4];
+  std::array<double, c_nFitSample> TCFitSample{0};  // MeV/c2
+  std::array<double, 4> preped{0};
 
-  int nbin_pedestal = 4;
-  int fam_sampling_interval = 125;
-  int NSampling = 64;// 8 [us] / 125 [ns]
+  static constexpr int nbin_pedestal = 4;
+  static constexpr int fam_sampling_interval = 125;
+  static constexpr int NSampling = 64;// 8 [us] / 125 [ns]
 
   int pedFlag = 0;
   double CoeffAAA = 0;
   double CoeffBBB = 0;
   int dTBin = 0;
   int ShiftdTBin = 0;
-  int Nsmalldt = 10;
-  int SmallOffset = 1;
-  double IntervaldT  = 125 * 0.001 / Nsmalldt;
+  static constexpr int Nsmalldt = 10;
+  static constexpr int SmallOffset = 1;
+  static constexpr double IntervaldT  = 125 * 0.001 / Nsmalldt;
   //  double EThreshold = m_Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
-  int FitSleepThreshold = 12;   // # of clk to suspend fit
+  static constexpr int FitSleepThreshold = 12;   // # of clk to suspend fit
 
   for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
 
@@ -117,11 +117,12 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
     FitSleepCounter = 100;
     ShiftdTBin = 0;
 
-    for (int iShift = 20; iShift < (NSampling - 12); iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
+    for (int iShift = 20; iShift < (NSampling - c_nFitSample);
+         iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
 
       FitSleepCounter++;
       if (FitSleepCounter <= FitSleepThreshold) {continue;}
-      for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
+      for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         int iReplace = iFitSample + iShift;
         TCFitSample[iFitSample] = digiEnergy[iTCIdm][iReplace] * 1000.0;
         if (0) {
@@ -142,7 +143,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
 
       CoeffAAA = 0;
       CoeffBBB = 0;
-      for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
+      for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         CoeffAAA += m_CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
         CoeffBBB += m_CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       }
@@ -155,23 +156,16 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
       //-------
       // Require "expected time" is around middle of table = Nsmalldt.
       //-------
-      double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
+      const double timeConditionValue = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > m_TCEThreshold[iTCIdm]) {
-        double fitT =
-          condition_t +
-          (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
-
+      if (std::fabs(timeConditionValue) < 0.8 * (fam_sampling_interval * 0.001) && fitE > m_TCEThreshold[iTCIdm]) {
+        double fitT = timeConditionValue + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
         pedFlag = 1;
-        double rand_sampling_correction =
-          digiTiming[iTCIdm][iShift] +
-          (nbin_pedestal - iShift + 32) * fam_sampling_interval;
+        const double rand_sampling_correction = digiTiming[iTCIdm][iShift] + (nbin_pedestal - iShift + 32) * fam_sampling_interval;
 
         m_TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
-        m_TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 +
-                                        (m_DataBase->getTCFLatency(iTCIdm + 1)) +
-                                        rand_sampling_correction);
+        m_TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 + (m_DataBase->getTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
         FitSleepCounter = 0;
         ShiftdTBin = 0;
 
@@ -184,8 +178,6 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
   //
   //
   //
-  delete [] TCFitSample;
-  delete [] preped;
   return;
 }
 //

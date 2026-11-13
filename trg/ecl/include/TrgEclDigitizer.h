@@ -30,8 +30,12 @@ namespace Belle2 {
 
     /** setup fam module  */
     void setup(int);
-    /** get TC Hits from Xtal hits */
-    void getTCHit(int);
+    /** get TC Hits from Xtal hits
+     * Set TC data
+     * m_sourceOfTC => 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
+     * ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor)
+     */
+    void getTCHit();
     /** fit method,    digi with 125ns interval */
     void digitization01(std::vector<std::vector<double>>&,
                         std::vector<std::vector<double>>&);
@@ -44,9 +48,13 @@ namespace Belle2 {
     void setWaveform(int wave) { m_SaveTCWaveForm = wave;}
     /** Set flag of waveform table*/
     void setFADC(int fadc) { m_FADC = fadc;}
+    /** Set flag of waveform table*/
+    void setSourceOfTC(int SourceOfTC) { m_sourceOfTC = SourceOfTC;}
 
+    /** Clear all the data fields */
     void clear();
-
+    /** Initialize the class */
+    void initialize();
 
 
     /** FADC  */
@@ -65,7 +73,7 @@ namespace Belle2 {
   private:
 
     /** time range(default : -4000 ~ 4000 ns ) */
-    double m_TimeRange;
+    double m_TimeRange = 4000;
     /** TC Energy converted from Xtarl Energy [GeV] */
     double m_TCEnergy[576][80];
     /** TC Timing converted from Xtarl Timing [GeV] */
@@ -104,13 +112,25 @@ namespace Belle2 {
     /** Beambackground tag */
     int m_TCBeambkgTag[576][80];
     /** Flag of waveform table */
-    int m_SaveTCWaveForm;
+    int m_SaveTCWaveForm = 0;
     /** TC Energy converted from Xtarl Energy [GeV] */
     double m_WaveForm[576][64];
     /** Flag of choosing the method of waveform generation function 0: use simplifiedFADC, 1: use interFADC(interpolation) */
-    int m_FADC;
+    int m_FADC = 1;
     /** Flag of saving beam background tag  or not*/
-    int m_BeambkgTag;
+    int m_BeambkgTag = 0;
+    /** Which TC source to use */
+    int m_sourceOfTC = 0;
+
+    static constexpr int c_NSamplingDigi01 = 64; // # of sampling array for digi01
+    std::array<float, c_NSamplingDigi01> m_noisePileup = {0.};
+    std::array<float, c_NSamplingDigi01> m_noiseParallel = {0.};
+    std::array<float, c_NSamplingDigi01> m_noiseSerial = {0.};
+    std::array<float, c_NSamplingDigi01> m_Xpr = {0.};
+    std::array<float, c_NSamplingDigi01> m_Xsr = {0.};
+
+    static constexpr int c_NSamplingDigi02 = 666; // # of sampling array for digi02
+
 
     /** Normalised FADC signal shape, sampled every 12 ns from 0 to 2928 ns.
      *  Used by interFADC() to interpolate the waveform; the corresponding

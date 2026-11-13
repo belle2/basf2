@@ -36,17 +36,7 @@ namespace Belle2 {
 //
 //
   TRGECLFAMModule::TRGECLFAMModule()
-    : Module::Module(),
-      m_debugLevel(0),
-      m_famMethod(1),
-      m_binTimeInterval(125),
-      m_SaveTCWaveForm(0),
-      m_beambkgtag(0),
-      m_famana(0),
-      m_SetTCEThreshold(100.0),
-      m_FADC(1),
-      m_ConditionDBFAM(true),
-      m_SourceOfTC(3)
+    : Module::Module()
   {
 
     string desc = "TRGECLFAMModule(" + version() + ")";
@@ -135,6 +125,11 @@ namespace Belle2 {
 
     B2DEBUG(200, "TRGECLFAMModule ... beginRun called ");
 
+    m_Digitizer.setWaveform(m_SaveTCWaveForm);
+    m_Digitizer.setFADC(m_FADC);
+    m_Digitizer.setSourceOfTC(m_SourceOfTC);
+    m_Digitizer.initialize();
+
   }
 //
 //
@@ -158,9 +153,7 @@ namespace Belle2 {
     //
     // FAM Digitizer
     m_Digitizer.clear();
-    m_Digitizer.setWaveform(m_SaveTCWaveForm);
-    m_Digitizer.setFADC(m_FADC);
-    m_Digitizer.setup(m_SourceOfTC);
+    m_Digitizer.getTCHit();
     if (m_famMethod == 1 || m_famMethod == 2) {
       // no-fit method = backup method 1
       m_Digitizer.digitization01(m_TCDigiE, m_TCDigiT);

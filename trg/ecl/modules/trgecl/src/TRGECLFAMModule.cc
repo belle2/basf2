@@ -130,6 +130,14 @@ namespace Belle2 {
     m_Digitizer.setSourceOfTC(m_SourceOfTC);
     m_Digitizer.initialize();
 
+    if (m_famMethod == 1 || m_famMethod == 2) {
+      m_TCDigiE.resize(c_NTC, std::vector<double>(c_NSamplingDigi01, 0));
+      m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi01, 0));
+    } else if (m_famMethod == 3) {
+      m_TCDigiE.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
+      m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
+    }
+
   }
 //
 //

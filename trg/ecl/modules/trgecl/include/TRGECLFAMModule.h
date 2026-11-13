@@ -120,6 +120,12 @@ namespace Belle2 {
 
     /** TRGECLDigitizer */
     TrgEclDigitizer m_Digitizer;
+    /// Number of ECL TriggerCells (TC)
+    static constexpr int c_NTC = 576;
+    /// Numer of sampling points for digitizer01
+    static constexpr int c_NSamplingDigi01 = 64;
+    /// Numer of sampling points for digitizer02
+    static constexpr int c_NSamplingDigi02 = 666;
 
   };
 

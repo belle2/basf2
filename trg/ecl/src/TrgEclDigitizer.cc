@@ -317,10 +317,10 @@ void
 TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
                                 std::vector<std::vector<double>>& TCDigiT)
 {
-  TCDigiE.clear();
-  TCDigiE.resize(c_NTC, vector<double>(c_NSamplingDigi01, 0));
-  TCDigiT.clear();
-  TCDigiT.resize(c_NTC, vector<double>(c_NSamplingDigi01, 0));
+  for (uint i = 0; i < c_NTC; i++) {
+    TCDigiE[i].assign(c_NSamplingDigi01, 0);
+    TCDigiT[i].assign(c_NSamplingDigi01, 0);
+  }
 
   //
   static constexpr double cut_energy_tot = 0.03; // [GeV]
@@ -487,10 +487,10 @@ TrgEclDigitizer::digitization02(std::vector<std::vector<double>>& TCDigiE, std::
   //===============
   // (03)Signal digitization (w/ 12ns interval for method-0)
   //===============
-  TCDigiE.clear();
-  TCDigiE.resize(c_NTC, vector<double>(c_NSamplingDigi02, 0));
-  TCDigiT.clear();
-  TCDigiT.resize(c_NTC, vector<double>(c_NSamplingDigi02, 0));
+  for (uint i = 0; i < c_NTC; i++) {
+    TCDigiE[i].assign(c_NSamplingDigi02, 0);
+    TCDigiT[i].assign(c_NSamplingDigi02, 0);
+  }
   double cut_energy_tot = 0.03; // [GeV]
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]

@@ -13,7 +13,6 @@
 #include <iostream>
 #include <math.h>
 
-using namespace std;
 using namespace Belle2;
 
 TrgEclDataBase::TrgEclDataBase()

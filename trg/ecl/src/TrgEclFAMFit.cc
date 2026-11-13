@@ -19,7 +19,6 @@
 #include <iostream>
 #include <math.h>
 
-using namespace std;
 using namespace Belle2;
 //using namespace TRG;
 //
@@ -138,9 +137,9 @@ TrgEclFAMFit::FAMFit01(const std::vector<std::vector<double>>& digiEnergy,
       //
 
       // ensure 0 <= (ShiftdTBin + Nsmalldt) <= 20
-      dtBin = std::max(0, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20))
+      dTBin = std::max(0, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20));
 
-              CoeffAAA = 0;
+      CoeffAAA = 0;
       CoeffBBB = 0;
       for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         CoeffAAA += m_CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
@@ -201,10 +200,6 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
 
     //    double threshold = m_Threshold * 0.001; //GeV
     int maxId[500] = {0};
-    for (int iii = 0 ; iii < 500 ; iii++) {
-
-      maxId[iii] = 0;
-    }
     int count_up = 0;
     int count_down = 0;
     int flag_up = 3;

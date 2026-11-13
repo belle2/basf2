@@ -16,8 +16,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 namespace Belle2 {
 //
 //
@@ -26,10 +24,10 @@ namespace Belle2 {
 //
 //
 //
-  string
+  std::string
   TRGECLFAMModule::version() const
   {
-    return string("TRGECLFAMModule 1.00");
+    return std::string("TRGECLFAMModule 1.00");
   }
 //
 //
@@ -38,7 +36,7 @@ namespace Belle2 {
     : Module::Module()
   {
 
-    string desc = "TRGECLFAMModule(" + version() + ")";
+    std::string desc = "TRGECLFAMModule(" + version() + ")";
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 

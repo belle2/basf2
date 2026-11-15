@@ -453,11 +453,9 @@ TrgEclDigitizer::digitization01(std::vector<std::vector<double>>& TCDigiE,
         m_noiseSerial[iSampling] += serialNoiseTerm;
       }
 
-      double noiseVal = 0.;
       for (int iSampling = 0; iSampling < c_NSamplingDigi01; iSampling++) {
-        noiseVal += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
+        TCDigiE[iTCIdm][iSampling] += m_noisePileup[iSampling] + m_noiseParallel[iSampling] + m_noiseSerial[iSampling];
       }
-      TCDigiE[iTCIdm][iSampling] += noiseVal;
     }
     if (0) {
       for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) { //Only Pile-up noise use old method.

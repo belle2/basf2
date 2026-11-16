@@ -27,6 +27,7 @@
 #include <TMatrix.h>
 #include <Math/Vector2D.h>
 
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, ROOT::Math::XYVector> CDCPair;
@@ -103,13 +104,10 @@ namespace Belle2 {
                             unsigned iterations,
                             unsigned ix_s, unsigned iy_s);
 
-    /** count the number of super layers with hits
-     *  @param superLayers array of hit/no hit for all super layers */
-    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
      *  @param superLayers array of hit/no hit for all super layers */
-    bool shortTrack(bool* superLayers);
+    bool shortTrack(std::bitset<45>& superLayers);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */

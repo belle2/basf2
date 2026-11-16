@@ -475,7 +475,8 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
                                      std::vector<unsigned>& selected,
                                      std::vector<unsigned>& unselected)
 {
-  std::array<int, 5> bestPerSL = {-1};
+  std::array<int, 5> bestPerSL;
+  bestPerSL.fill(-1);
   for (unsigned i = 0; i < list.size(); ++i) {
     unsigned iax = m_segmentHits[list[i]]->getISuperLayer() / 2;
     bool firstPriority = (m_segmentHits[list[i]]->getPriorityPosition() == 3);

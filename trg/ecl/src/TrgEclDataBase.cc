@@ -268,7 +268,7 @@ double TrgEclDataBase::getTCFLatency(int TCId)
   };
 
   // safeguard agains invalid memory reads
-  return ((TCId >= 0 && TCId < 576) ? TCLatency[TCId - 1] : 0.);
+  return ((TCId > 0 && TCId <= 576) ? TCLatency[TCId - 1] : 0.);
 }
 
 

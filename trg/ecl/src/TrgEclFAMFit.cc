@@ -54,8 +54,6 @@ TrgEclFAMFit::clear()
     m_TCRawTiming[i].clear();
     m_BeamBkgInfo[i].clear();
   }
-
-  m_TCEThreshold.fill(100);
 }
 
 void
@@ -137,7 +135,7 @@ TrgEclFAMFit::FAMFit01(const std::vector<std::vector<double>>& digiEnergy,
       //
 
       // ensure 0 <= (ShiftdTBin + Nsmalldt) <= 20
-      dTBin = std::max(0, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20));
+      dTBin = std::max(1, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20));
 
       CoeffAAA = 0;
       CoeffBBB = 0;

@@ -19,7 +19,6 @@
 /* defines */
 #define CDC_SUPER_LAYERS 9
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::CDC;
 
@@ -41,13 +40,13 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
   // Define module parameters
   addParam("hitCollectionName", m_hitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
-           string(""));
+           std::string(""));
   addParam("outputCollectionName", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
-           string("TRGCDC2DFinderTracks"));
+           std::string("TRGCDC2DFinderTracks"));
   addParam("clusterCollectionName", m_clusterCollectionName,
            "Name of the StoreArray holding the clusters formed in the Hough plane.",
-           string(""));
+           std::string(""));
   addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
            (unsigned)(160));
@@ -106,7 +105,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("testFilename", m_testFilename,
            "If not empty, a file with input (hits) and output (tracks) "
-           "for each event is written (for firmware debugging).", string(""));
+           "for each event is written (for firmware debugging).", std::string(""));
 
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
@@ -135,12 +134,35 @@ CDCTrigger2DFinderModule::initialize()
   if (m_storePlane > 0) m_houghPlane.registerInDataStore("HoughPlane");
 
   if (m_testFilename != "") {
-    testFile.open(m_testFilename);
+    m_testFile.open(m_testFilename);
   }
 
   if (m_suppressClone) {
     B2INFO("2D finder will exit with the first track candidate in time.");
   }
+
+  /* Extent the Hough plane such that the cell number is a power of 2 (same for x and y).
+   * This is for the fast peak finder, which divides the Hough plane in half in each step.
+   * Peaks found outside of the actual limits are ignored. */
+  m_maxIterations = std::ceil(std::log2(std::max(m_nCellsPhi, m_nCellsR))) - 1;
+  m_nCells = std::pow(2, m_maxIterations + 1);
+  /* limits in phi: [-pi, pi] + extra cells */
+  m_rectX = M_PI * m_nCells / m_nCellsPhi;
+  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
+  m_maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
+  m_rectY = m_maxR * m_nCells / m_nCellsR;
+  m_shiftR = 0;
+  if (m_shiftPt < 0) {
+    m_shiftR = -m_maxR / 2. / m_nCellsR;
+  } else if (m_shiftPt > 0) {
+    m_shiftR = m_maxR / 2. / m_nCellsR;
+  }
+
+  B2DEBUG(50, "extending Hough plane to " << m_maxIterations << " iterations, "
+          << m_nCells << " cells: phi in ["
+          << -m_rectX * 180. / M_PI << ", " << m_rectX * 180. / M_PI
+          << "] deg, 1/r in [" << -m_rectY + m_shiftR << ", " << m_rectY + m_shiftR << "] /cm");
+
 }
 
 void
@@ -163,17 +185,17 @@ CDCTrigger2DFinderModule::beginRun()
   int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {
-    TSoffset[iSL] = nTS;
+    m_TSoffset[iSL] = nTS;
     nTS += cdc.nWiresInLayer(layerId);
-    TSoffset[iSL + 1] = nTS;
+    m_TSoffset[iSL + 1] = nTS;
     if (!m_usehitpattern) {
       for (int priority = 0; priority < 2; ++ priority) {
-        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
       }
     } else {
       for (int priority = 0; priority < 5; ++ priority) {
-        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+        if (iSL == 0) m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        else       m_radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
       }
     }
     layerId += (iSL > 0 ? 6 : 7);
@@ -184,15 +206,15 @@ void
 CDCTrigger2DFinderModule::event()
 {
   /* Clean hits */
-  hitMap.clear();
-  houghCand.clear();
+  m_hitMap.clear();
+  m_houghCand.clear();
 
   /* set default return value */
   setReturnValue(true);
 
   if (m_testFilename != "") {
-    testFile << StoreObjPtr<EventMetaData>()->getEvent() << " "
-             << m_segmentHits.getEntries() << endl;
+    m_testFile << StoreObjPtr<EventMetaData>()->getEvent() << " "
+               << m_segmentHits.getEntries() << std::endl;
   }
 
   if (m_segmentHits.getEntries() == 0) {
@@ -204,8 +226,8 @@ CDCTrigger2DFinderModule::event()
   for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
     unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (m_testFilename != "") {
-      testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
-               << m_segmentHits[iHit]->getPriorityPosition() << endl;
+      m_testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL] << " "
+                 << m_segmentHits[iHit]->getPriorityPosition() << std::endl;
     }
     if (iSL % 2) continue;
     if (m_ignore2nd && m_segmentHits[iHit]->getPriorityPosition() < 3) continue;
@@ -219,7 +241,7 @@ CDCTrigger2DFinderModule::event()
       else         nhitpattern = 11;
       for (int i = 0; i < nhitpattern; i++) {
         if ((hitpattern & (1 << i)) != 0) {
-          double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+          double phi = m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL];
           if (iSL != 0 && i == 0)  phi = phi - 1;
           else if (iSL != 0 && i == 1)  phi = phi + 0;
           else if (iSL != 0 && i == 2)  phi = phi + 1;
@@ -246,7 +268,7 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 12) phi = phi + 0;
           else if (iSL == 0 && i == 13) phi = phi + 1;
           else if (iSL == 0 && i == 14) phi = phi + 2;
-          phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
+          phi = phi * 2. * M_PI / (m_TSoffset[iSL + 1] - m_TSoffset[iSL]);
           int iLayer = 0;
           if (iSL != 0 && i == 0)   iLayer = 0;
           else if (iSL != 0 && i == 1)   iLayer = 0;
@@ -275,46 +297,24 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 13)  iLayer = 4;
           else if (iSL == 0 && i == 14)  iLayer = 4;
 
-          double r = radius[iSL][iLayer];
-          ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
-          hitMap.insert(std::make_pair(iHit * 15 + i, std::make_pair(iSL * 5 + iLayer, pos)));
+          double r = m_radius[iSL][iLayer];
+          ROOT::Math::XYVector pos(std::cos(phi) / r, std::sin(phi) / r);
+          m_hitMap.insert(std::make_pair(iHit * 15 + i, std::make_pair(iSL * 5 + iLayer, pos)));
         }
       }
     } else {
-      double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+      double phi = m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL];
       if (m_usePriority) {
         phi += 0.5 * (((m_segmentHits[iHit]->getPriorityPosition() >> 1) & 1)
                       - (m_segmentHits[iHit]->getPriorityPosition() & 1));
       }
-      phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-      double r = radius[iSL][int(m_usePriority &&
-                                 m_segmentHits[iHit]->getPriorityPosition() < 3)];
-      ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
-      hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
+      phi = phi * 2. * M_PI / (m_TSoffset[iSL + 1] - m_TSoffset[iSL]);
+      double r = m_radius[iSL][int(m_usePriority &&
+                                   m_segmentHits[iHit]->getPriorityPosition() < 3)];
+      ROOT::Math::XYVector pos(std::cos(phi) / r, std::sin(phi) / r);
+      m_hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
     }
   }
-
-  /* Extent the Hough plane such that the cell number is a power of 2 (same for x and y).
-   * This is for the fast peak finder, which divides the Hough plane in half in each step.
-   * Peaks found outside of the actual limits are ignored. */
-  maxIterations = ceil(log2(max(m_nCellsPhi, m_nCellsR))) - 1;
-  nCells = pow(2, maxIterations + 1);
-  /* limits in phi: [-pi, pi] + extra cells */
-  double rectX = M_PI * nCells / m_nCellsPhi;
-  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
-  maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
-  double rectY = maxR * nCells / m_nCellsR;
-  shiftR = 0;
-  if (m_shiftPt < 0) {
-    shiftR = -maxR / 2. / m_nCellsR;
-  } else if (m_shiftPt > 0) {
-    shiftR = maxR / 2. / m_nCellsR;
-  }
-
-  B2DEBUG(50, "extending Hough plane to " << maxIterations << " iterations, "
-          << nCells << " cells: phi in ["
-          << -rectX * 180. / M_PI << ", " << rectX * 180. / M_PI
-          << "] deg, 1/r in [" << -rectY + shiftR << ", " << rectY + shiftR << "] /cm");
 
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {
@@ -323,28 +323,29 @@ CDCTrigger2DFinderModule::event()
   }
 
   // hit map containing only the early hits
-  cdcMap fastHitMap;
-  if (m_suppressClone && !hitMap.empty()) {
+  CDCHitMap fastHitMap;
+  if (m_suppressClone && !m_hitMap.empty()) {
     // find the first track candidates in Hough plane
     // only for z0 resolution study with single-track events
     // This will surely fail with multi-track ones,
     // in which case we really need tick-by-tick simulation for all hits.
 
-    /** Pair of <counter, cdcPair>, for hits with indices */
-    typedef pair<int, cdcPair> cdcHitPair;
+    /** Pair of <counter, CDCPair>, for hits with indices */
+    typedef std::pair<int, CDCPair> CDCHitPair;
     // sequential hit map, ordered by TS found time
-    typedef vector<cdcHitPair> cdcSeqMap;
-    cdcSeqMap seqHitMap;
+    typedef std::vector<CDCHitPair> CDCSeqMap;
+    CDCSeqMap seqHitMap;
     // copy hit map to sequential hit map and sort it by TS found time
-    for (auto hit : hitMap) {
+    seqHitMap.reserve(m_hitMap.size());
+    for (auto hit : m_hitMap) {
       seqHitMap.push_back(hit);
     }
-    sort(seqHitMap.begin(), seqHitMap.end(), [this](cdcHitPair i, cdcHitPair j) {
+    sort(seqHitMap.begin(), seqHitMap.end(), [this](CDCHitPair i, CDCHitPair j) {
       return m_segmentHits[i.first]->foundTime() < m_segmentHits[j.first]->foundTime();
     });
     auto seqHitItr = seqHitMap.begin();
     /* layer filter */
-    vector<bool> layerHit(CDC_SUPER_LAYERS, false);
+    std::vector<bool> layerHit(CDC_SUPER_LAYERS, false);
     // data clock cycle in unit of 2ns
     short period = 16;
     short firstTick = m_segmentHits[(*seqHitMap.begin()).first]->foundTime() / period + 1;
@@ -353,9 +354,9 @@ CDCTrigger2DFinderModule::event()
     for (auto tick = firstTick * period; tick < lastTick * period; tick += period) {
       int nHitInCycle = 0;
       for (auto itr = seqHitItr; itr < seqHitMap.end(); ++itr) {
-        cdcHitPair currentHit = *itr;
+        CDCHitPair currentHit = *itr;
         // start from the first hit over SL threshold
-        if (count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
+        if (std::count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
             m_segmentHits[currentHit.first]->foundTime() > tick) {
           break;
         }
@@ -363,9 +364,9 @@ CDCTrigger2DFinderModule::event()
         layerHit[m_segmentHits[currentHit.first]->getISuperLayer()] = true;
       }
       copy_n(seqHitItr, nHitInCycle, inserter(fastHitMap, fastHitMap.end()));
-      fastInterceptFinder(fastHitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
-      B2DEBUG(20, "at tick " << tick << ", number of candidates: " << houghCand.size());
-      if (!houghCand.empty()) {
+      fastInterceptFinder(fastHitMap, -m_rectX, m_rectX, -m_rectY + m_shiftR, m_rectY + m_shiftR, 0, 0, 0);
+      B2DEBUG(20, "at tick " << tick << ", number of candidates: " << m_houghCand.size());
+      if (!m_houghCand.empty()) {
         B2DEBUG(10, "found a track at clock " << tick << " with "
                 << fastHitMap.size() << "hits");
         break;
@@ -374,9 +375,9 @@ CDCTrigger2DFinderModule::event()
     }
   } else {
     /* find track candidates in Hough plane using all TS hits */
-    fastInterceptFinder(hitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
-    if (!houghCand.empty()) {
-      B2DEBUG(10, "found a track with " << hitMap.size() << "hits");
+    fastInterceptFinder(m_hitMap, -m_rectX, m_rectX, -m_rectY + m_shiftR, m_rectY + m_shiftR, 0, 0, 0);
+    if (!m_houghCand.empty()) {
+      B2DEBUG(10, "found a track with " << m_hitMap.size() << "hits");
     }
   }
 
@@ -387,20 +388,20 @@ CDCTrigger2DFinderModule::event()
     connectedRegions();
 
   if (m_testFilename != "") {
-    testFile << m_tracks.getEntries() << endl;
+    m_testFile << m_tracks.getEntries() << std::endl;
     for (int i = 0; i < m_tracks.getEntries(); ++i) {
       float ix = (m_tracks[i]->getPhi0() - M_PI_4) * m_nCellsPhi / 2. / M_PI - 0.5;
-      float iy = (m_tracks[i]->getOmega() / 2. + maxR - shiftR) * m_nCellsR / 2. / maxR - 0.5;
-      testFile << round(2 * ix) / 2. << " " << round(2 * iy) / 2. << " "
-               << m_tracks[i]->getChargeSign() << endl;
+      float iy = (m_tracks[i]->getOmega() / 2. + m_maxR - m_shiftR) * m_nCellsR / 2. / m_maxR - 0.5;
+      m_testFile << round(2 * ix) / 2. << " " << round(2 * iy) / 2. << " "
+                 << m_tracks[i]->getChargeSign() << std::endl;
       RelationVector<CDCTriggerSegmentHit> hits =
         m_tracks[i]->getRelationsTo<CDCTriggerSegmentHit>(m_hitCollectionName);
-      testFile << hits.size() << endl;
+      m_testFile << hits.size() << std::endl;
       for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
         unsigned short iSL = hits[ihit]->getISuperLayer();
-        testFile << iSL << " " << hits[ihit]->getSegmentID() - TSoffset[iSL] << " "
-                 << hits[ihit]->getPriorityPosition() << " "
-                 << hits.weight(ihit) << endl;
+        m_testFile << iSL << " " << hits[ihit]->getSegmentID() - m_TSoffset[iSL] << " "
+                   << hits[ihit]->getPriorityPosition() << " "
+                   << hits.weight(ihit) << std::endl;
       }
     }
   }
@@ -409,5 +410,5 @@ CDCTrigger2DFinderModule::event()
 void
 CDCTrigger2DFinderModule::terminate()
 {
-  if (m_testFilename != "") testFile.close();
+  if (m_testFilename != "") m_testFile.close();
 }

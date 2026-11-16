@@ -27,6 +27,7 @@
 #include <TMatrix.h>
 #include <Math/Vector2D.h>
 
+
 namespace Belle2 {
   /** Pair of <iSuperLayer, (x, y)>, for hits in conformal space */
   typedef std::pair<unsigned short, ROOT::Math::XYVector> CDCPair;
@@ -103,13 +104,10 @@ namespace Belle2 {
                             unsigned iterations,
                             unsigned ix_s, unsigned iy_s);
 
-    /** count the number of super layers with hits
-     *  @param superLayers array of hit/no hit for all super layers */
-    unsigned short countSL(bool* superLayers);
     /** check the short track condition
      *  (= hits in the inner super layers rather than any super layers)
      *  @param superLayers array of hit/no hit for all super layers */
-    bool shortTrack(bool* superLayers);
+    bool shortTrack(std::bitset<45>& superLayers);
 
     /** Combine Hough candidates to tracks by merging connected cells.
      *  The track coordinate is the center of gravity of the resulting cell cluster. */
@@ -274,9 +272,9 @@ namespace Belle2 {
     std::vector<CDCTriggerHoughCand> m_houghCand;
 
     /** Radius of the CDC layers with priority wires (2 per super layer). Initialized at 0 by the SW shifter*/
-    double radius[9][5] = {{0.}};
+    double m_radius[9][5] = {{0.}};
     /** Number of track segments up to super layer. Initialized at 0 by the SW shifter */
-    unsigned TSoffset[10] = {0};
+    unsigned m_TSoffset[10] = {0};
 
     /** list of track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;

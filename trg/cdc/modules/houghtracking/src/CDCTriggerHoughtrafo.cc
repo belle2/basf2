@@ -11,6 +11,8 @@
 #include <framework/logging/Logger.h>
 
 #include <cmath>
+#include <array>
+#include <bitset>
 
 #include <root/TMatrix.h>
 
@@ -19,19 +21,8 @@
 
 using namespace Belle2;
 
-unsigned short
-CDCTrigger2DFinderModule::countSL(bool* layer)
-{
-  if (m_requireSL0 && !layer[0]) return 0;
-  unsigned short lcnt = 0;
-  for (int i = 0; i < CDC_SUPER_LAYERS; ++i) {
-    if (layer[i] == true) ++lcnt;
-  }
-  return lcnt;
-}
-
 bool
-CDCTrigger2DFinderModule::shortTrack(bool* layer)
+CDCTrigger2DFinderModule::shortTrack(std::bitset<CDC_SUPER_LAYERS>& layer)
 {
   unsigned short lcnt = 0;
   // check axial super layers (even layer number),
@@ -74,6 +65,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
   unsigned short iSL;
   // list of hit indices crossing the current rectangle
   std::vector<unsigned> idx_list;
+  idx_list.reserve(hits.size());
 
   // limits of divided rectangles
   double x1_d, x2_d, y1_d, y2_d;
@@ -83,6 +75,11 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
 
   unitx = ((x2_s - x1_s) / 2.0);
   unity = ((y2_s - y1_s) / 2.0);
+
+  CDCHitMap containedHits;
+  containedHits.reserve(hits.size());
+
+  std::bitset<CDC_SUPER_LAYERS> layerHit; /* For layer filter */
 
   // divide x axis in half
   for (i = 0; i < 2 ; ++i) {
@@ -115,7 +112,8 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
       const double cos_x2d = std::cos(x2_d + 1e-10);
 
       idx_list.clear();
-      bool layerHit[CDC_SUPER_LAYERS] = {false}; /* For layer filter */
+      layerHit.reset();
+      containedHits.clear();
       for (auto it = hits.begin(); it != hits.end(); ++it) {
         iHit = it->first;
         hp = it->second;
@@ -133,20 +131,18 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
             idx_list.push_back(iHit);
           }
           layerHit[iSL] = true; /* layer filter */
+          containedHits.insert(*it);
         }
       }
-      unsigned short nSL = countSL(layerHit);
+      // if a hit in the first SL is required but not present, set nSL to 0, otherwise count the number of layers
+      unsigned short nSL = (m_requireSL0 && !layerHit[0]) ? 0 : layerHit.count();
       B2DEBUG(150, indent << "i " << i << " j " << j
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
-      //std::cout << indent << "i " << i << " j " << j
-      //        << " layerHit " << int(layerHit[0]) << int(layerHit[2])
-      //        << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
-      //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != m_maxIterations) {
-          fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
+          fastInterceptFinder(containedHits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
           ROOT::Math::XYVector v1(x1_d, y1_d);
           ROOT::Math::XYVector v2(x2_d, y2_d);
@@ -162,7 +158,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
         for (unsigned min = m_minHits - 1; min > 0; --min) {
           if (nSL >= min) {
             if (iterations != m_maxIterations) {
-              fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
+              fastInterceptFinder(containedHits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
             } else {
               (*m_houghPlane)[ix - (m_nCells - m_nCellsPhi) / 2][iy - (m_nCells - m_nCellsR) / 2] = nSL;
             }
@@ -195,11 +191,14 @@ CDCTrigger2DFinderModule::connectedRegions()
             << " y1 " << coord.first.Y() << " y2 " << coord.second.Y());
   }
 
+  regions.reserve(cpyCand.size());
   // combine connected cells to regions
   while (cpyCand.size() > 0) {
     B2DEBUG(100, "make new region");
     std::vector<CDCTriggerHoughCand> region;
     std::vector<CDCTriggerHoughCand> rejected;
+    region.reserve(cpyCand.size());
+    rejected.reserve(cpyCand.size());
     CDCTriggerHoughCand start = cpyCand[0];
     cpyCand.erase(cpyCand.begin());
     region.push_back(start);
@@ -212,6 +211,8 @@ CDCTrigger2DFinderModule::connectedRegions()
         ++cand;
     }
   }
+
+  std::vector<ROOT::Math::XYVector> cellIds = {};
 
   // find center of gravity for each region
   for (unsigned ir = 0; ir < regions.size(); ++ir) {
@@ -230,7 +231,8 @@ CDCTrigger2DFinderModule::connectedRegions()
     int xmax = 0;
     int ymin = m_nCellsR;
     int ymax = 0;
-    std::vector<ROOT::Math::XYVector> cellIds = {};
+    cellIds.clear();
+    cellIds.reserve(regions[ir].size());
     for (unsigned ir2 = 0; ir2 < regions[ir].size(); ++ir2) {
       Coord2dPair hc = regions[ir][ir2].getCoord();
       B2DEBUG(100, "  " << regions[ir][ir2].getID()
@@ -389,6 +391,7 @@ CDCTrigger2DFinderModule::mergeIdList(std::vector<unsigned>& merged,
 {
   bool found;
 
+  merged.reserve(a.size() + b.size());
   for (auto it = a.begin(); it != a.end(); ++it) {
     found = false;
     for (auto it_in = merged.begin(); it_in != merged.end(); ++it_in) {
@@ -429,21 +432,22 @@ CDCTrigger2DFinderModule::findAllCrossingHits(std::vector<unsigned>& list,
   const double sin_x2 = std::sin(x2 + 1e-10);
   const double cos_x2 = std::cos(x2 + 1e-10);
 
+  std::array<double, 3> phi = {0, 0, 0};
+
   for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
     unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
     // associate only the hits actually used to form the cluster
     if (m_suppressClone && inputMap.find(iHit) == inputMap.end()) continue;
     //TODO: add options: center cell / active priority cell / all priority cells
-    std::vector<double> phi = {0, 0, 0};
-    phi[0] = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+    phi[0] = m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL];
     phi[1] = phi[0] + 0.5;
     phi[2] = phi[0] - 0.5;
-    std::vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
+    const auto& radiusISL = m_radius[iSL];
     for (unsigned i = 0; i < 3; ++i) {
-      phi[i] *= 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-      m = std::cos(phi[i]) / r[i];
-      a = std::sin(phi[i]) / r[i];
+      phi[i] *= 2. * M_PI / (m_TSoffset[iSL + 1] - m_TSoffset[iSL]);
+      m = std::cos(phi[i]) / radiusISL[std::min(i, 1u)];
+      a = std::sin(phi[i]) / radiusISL[std::min(i, 1u)];
       // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
       y1_h = m * sin_x1 - a * cos_x1;
       y2_h = m * sin_x2 - a * cos_x2;
@@ -465,7 +469,8 @@ CDCTrigger2DFinderModule::selectHits(std::vector<unsigned>& list,
                                      std::vector<unsigned>& selected,
                                      std::vector<unsigned>& unselected)
 {
-  std::vector<int> bestPerSL(5, -1);
+  std::array<int, 5> bestPerSL;
+  bestPerSL.fill(-1);
   for (unsigned i = 0; i < list.size(); ++i) {
     unsigned iax = m_segmentHits[list[i]]->getISuperLayer() / 2;
     bool firstPriority = (m_segmentHits[list[i]]->getPriorityPosition() == 3);
@@ -516,6 +521,9 @@ CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
   unsigned nY = m_nCellsR / 2;
   unsigned rX = m_clusterSizeX;
   unsigned rY = m_clusterSizeY;
+  std::vector<unsigned> pattern(rX * rY, 0);
+  std::vector<ROOT::Math::XYVector> cellIds;
+  cellIds.reserve(rX * rY);
   for (unsigned ix = 0; ix < nX; ++ix) {
     for (unsigned iy = 0; iy < nY; ++iy) {
       if (!plane2[ix][iy]) continue;
@@ -529,9 +537,10 @@ CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
         continue;
       }
       // form cluster
-      std::vector<unsigned> pattern(rX * rY, 0);
+      pattern.assign(rX * rY, 0);   // reset pattern to 0
       pattern[0] = plane2[ix][iy];
-      std::vector<ROOT::Math::XYVector> cellIds = {ROOT::Math::XYVector(2 * ix, 2 * iy)};
+      cellIds.clear();
+      cellIds.emplace_back(ROOT::Math::XYVector(2. * ix, 2. * iy));
       for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
         for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
           if (iy + iy2 >= nY) continue;
@@ -550,7 +559,7 @@ CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
                connectedDiag(plane2[ileft][iy + iy2 - 1], plane2[iright][iy + iy2]))) {
             pattern[ip] = plane2[iright][iy + iy2];
             B2DEBUG(100, "connect cell " << iright << " " << iy + iy2);
-            cellIds.push_back(ROOT::Math::XYVector(2 * (ix + ix2), 2 * (iy + iy2)));
+            cellIds.emplace_back(ROOT::Math::XYVector(2. * (ix + ix2), 2. * (iy + iy2)));
           }
         }
       }

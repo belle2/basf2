@@ -185,17 +185,17 @@ CDCTrigger2DFinderModule::beginRun()
   int layerId = 3;
   int nTS = 0;
   for (int iSL = 0; iSL < 9; ++iSL) {
-    TSoffset[iSL] = nTS;
+    m_TSoffset[iSL] = nTS;
     nTS += cdc.nWiresInLayer(layerId);
-    TSoffset[iSL + 1] = nTS;
+    m_TSoffset[iSL + 1] = nTS;
     if (!m_usehitpattern) {
       for (int priority = 0; priority < 2; ++ priority) {
-        radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
       }
     } else {
       for (int priority = 0; priority < 5; ++ priority) {
-        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
-        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+        if (iSL == 0) m_radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        else       m_radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
       }
     }
     layerId += (iSL > 0 ? 6 : 7);
@@ -226,7 +226,7 @@ CDCTrigger2DFinderModule::event()
   for (int iHit = 0; iHit < m_segmentHits.getEntries(); iHit++) {
     unsigned short iSL = m_segmentHits[iHit]->getISuperLayer();
     if (m_testFilename != "") {
-      m_testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
+      m_testFile << iSL << " " << m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL] << " "
                  << m_segmentHits[iHit]->getPriorityPosition() << std::endl;
     }
     if (iSL % 2) continue;
@@ -241,7 +241,7 @@ CDCTrigger2DFinderModule::event()
       else         nhitpattern = 11;
       for (int i = 0; i < nhitpattern; i++) {
         if ((hitpattern & (1 << i)) != 0) {
-          double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+          double phi = m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL];
           if (iSL != 0 && i == 0)  phi = phi - 1;
           else if (iSL != 0 && i == 1)  phi = phi + 0;
           else if (iSL != 0 && i == 2)  phi = phi + 1;
@@ -268,7 +268,7 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 12) phi = phi + 0;
           else if (iSL == 0 && i == 13) phi = phi + 1;
           else if (iSL == 0 && i == 14) phi = phi + 2;
-          phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
+          phi = phi * 2. * M_PI / (m_TSoffset[iSL + 1] - m_TSoffset[iSL]);
           int iLayer = 0;
           if (iSL != 0 && i == 0)   iLayer = 0;
           else if (iSL != 0 && i == 1)   iLayer = 0;
@@ -297,20 +297,20 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 13)  iLayer = 4;
           else if (iSL == 0 && i == 14)  iLayer = 4;
 
-          double r = radius[iSL][iLayer];
+          double r = m_radius[iSL][iLayer];
           ROOT::Math::XYVector pos(std::cos(phi) / r, std::sin(phi) / r);
           m_hitMap.insert(std::make_pair(iHit * 15 + i, std::make_pair(iSL * 5 + iLayer, pos)));
         }
       }
     } else {
-      double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
+      double phi = m_segmentHits[iHit]->getSegmentID() - m_TSoffset[iSL];
       if (m_usePriority) {
         phi += 0.5 * (((m_segmentHits[iHit]->getPriorityPosition() >> 1) & 1)
                       - (m_segmentHits[iHit]->getPriorityPosition() & 1));
       }
-      phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-      double r = radius[iSL][int(m_usePriority &&
-                                 m_segmentHits[iHit]->getPriorityPosition() < 3)];
+      phi = phi * 2. * M_PI / (m_TSoffset[iSL + 1] - m_TSoffset[iSL]);
+      double r = m_radius[iSL][int(m_usePriority &&
+                                   m_segmentHits[iHit]->getPriorityPosition() < 3)];
       ROOT::Math::XYVector pos(std::cos(phi) / r, std::sin(phi) / r);
       m_hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
     }
@@ -336,6 +336,7 @@ CDCTrigger2DFinderModule::event()
     typedef std::vector<CDCHitPair> CDCSeqMap;
     CDCSeqMap seqHitMap;
     // copy hit map to sequential hit map and sort it by TS found time
+    seqHitMap.reserve(m_hitMap.size());
     for (auto hit : m_hitMap) {
       seqHitMap.push_back(hit);
     }
@@ -355,7 +356,7 @@ CDCTrigger2DFinderModule::event()
       for (auto itr = seqHitItr; itr < seqHitMap.end(); ++itr) {
         CDCHitPair currentHit = *itr;
         // start from the first hit over SL threshold
-        if (count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
+        if (std::count(layerHit.begin(), layerHit.end(), true) >= m_minHits &&
             m_segmentHits[currentHit.first]->foundTime() > tick) {
           break;
         }
@@ -398,7 +399,7 @@ CDCTrigger2DFinderModule::event()
       m_testFile << hits.size() << std::endl;
       for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
         unsigned short iSL = hits[ihit]->getISuperLayer();
-        m_testFile << iSL << " " << hits[ihit]->getSegmentID() - TSoffset[iSL] << " "
+        m_testFile << iSL << " " << hits[ihit]->getSegmentID() - m_TSoffset[iSL] << " "
                    << hits[ihit]->getPriorityPosition() << " "
                    << hits.weight(ihit) << std::endl;
       }

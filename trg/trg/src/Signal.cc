@@ -12,32 +12,30 @@
 #include "trg/trg/Clock.h"
 #include "trg/trg/Signal.h"
 
-using namespace std;
-
 namespace Belle2 {
 
   TRGSignal::TRGSignal(const TRGClock& c) :
-    _name("?"),
-    _clock(& c),
-    _history()
+    m_name("?"),
+    m_clock(& c),
+    m_history()
   {
   }
 
   TRGSignal::TRGSignal(const TRGTime& t0, const TRGTime& t1) :
-    _name("?"),
-    _clock(& t0.clock()),
-    _history()
+    m_name("?"),
+    m_clock(& t0.clock()),
+    m_history()
   {
 #if TRG_DEBUG
     if ((& t0.clock()) != (& t1.clock()))
-      cout << "TRGSignal !!! signal is made with two different clocks"
-           << endl
-           << "    t0.clock=" << t0.clock().name() << endl
-           << "    t1.clock=" << t1.clock().name() << endl;
+      std::cout << "TRGSignal !!! signal is made with two different clocks"
+                << std::endl
+                << "    t0.clock=" << t0.clock().name() << std::endl
+                << "    t1.clock=" << t1.clock().name() << std::endl;
 #endif
 
-    _history.push_back(t0);
-    _history.push_back(t1);
+    m_history.push_back(t0);
+    m_history.push_back(t1);
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -45,14 +43,13 @@ namespace Belle2 {
   }
 
   TRGSignal::TRGSignal(const TRGClock& c, int t0, int t1) :
-    _name("?"),
-    _clock(& c),
-    _history()
+    m_name("?"),
+    m_clock(& c),
+    m_history()
   {
-    TRGTime time0(t0, true, c);
-    TRGTime time1(t1, false, c);
-    _history.push_back(time0);
-    _history.push_back(time1);
+    m_history.reserve(2);
+    m_history.emplace_back(TRGTime(t0, true, c));
+    m_history.emplace_back(TRGTime(t1, false, c));
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -60,24 +57,23 @@ namespace Belle2 {
   }
 
   TRGSignal::TRGSignal(const TRGClock& c, double t0, double t1) :
-    _name("?"),
-    _clock(& c),
-    _history()
+    m_name("?"),
+    m_clock(& c),
+    m_history()
   {
-    TRGTime time0(t0, true, c);
-    TRGTime time1(t1, false, c);
-    _history.push_back(time0);
-    _history.push_back(time1);
+    m_history.reserve(2);
+    m_history.emplace_back(TRGTime(t0, true, c));
+    m_history.emplace_back(TRGTime(t1, false, c));
 
 #if TRG_DEBUG
     consistencyCheck();
 #endif
   }
 
-  TRGSignal::TRGSignal(const string& name, const TRGClock& c) :
-    _name(name),
-    _clock(& c),
-    _history()
+  TRGSignal::TRGSignal(const std::string& name, const TRGClock& c) :
+    m_name(name),
+    m_clock(& c),
+    m_history()
   {
 #if TRG_DEBUG
     consistencyCheck();
@@ -85,39 +81,40 @@ namespace Belle2 {
   }
 
   TRGSignal::TRGSignal(const TRGSignal& t) :
-//  _history(t._history),
-    _name(t._name),
-    _clock(t._clock)
+//  m_history(t.m_history),
+    m_name(t.m_name),
+    m_clock(t.m_clock)
   {
-    const unsigned n = t._history.size();
-    for (unsigned i = 0; i < n; i++) {
-      _history.push_back(t._history[i]);
-    }
+    const unsigned n = t.m_history.size();
+    m_history.reserve(n);
+    m_history.insert(m_history.end(), t.m_history.begin(), t.m_history.end());
+
 #if TRG_DEBUG
     consistencyCheck();
 #endif
   }
 
   TRGSignal::TRGSignal(const TRGTime& t) :
-    _name(t.name()),
-    _clock(& t.clock())
+    m_name(t.name()),
+    m_clock(& t.clock())
   {
 
+    m_history.reserve(m_history.size() + 2);
     //...Check edge...
     if (t.edge()) {
 
       //...Store itself...
-      _history.push_back(t);
+      m_history.push_back(t);
 
       //...Set falling edge...
-      _history.push_back(t.clock().maxTRGTime(false));
+      m_history.push_back(t.clock().maxTRGTime(false));
     } else {
 
       //...Set rising edge...
-      _history.push_back(t.clock().minTRGTime(true));
+      m_history.push_back(t.clock().minTRGTime(true));
 
       //...Store itself...
-      _history.push_back(t);
+      m_history.push_back(t);
     }
 #if TRG_DEBUG
     consistencyCheck();
@@ -132,28 +129,28 @@ namespace Belle2 {
   }
 
   void
-  TRGSignal::dump(const string& msg,
-                  const string& pre) const
+  TRGSignal::dump(const std::string& msg,
+                  const std::string& pre) const
   {
 
-    string tmp;
-    tmp.resize(_name.size());
-    transform(_name.cbegin(), _name.cend(), tmp.begin(), ::toupper);
+    std::string tmp;
+    tmp.resize(m_name.size());
+    transform(m_name.cbegin(), m_name.cend(), tmp.begin(), ::toupper);
 
-    const bool ctr = tmp.find("CLOCKCOUNTER") != string::npos;
+    const bool ctr = tmp.find("CLOCKCOUNTER") != std::string::npos;
 
-    cout << pre << _name << ":#signal=" << _history.size();
+    std::cout << pre << m_name << ":#signal=" << m_history.size();
 
-    if (msg.find("clock") != string::npos ||
-        msg.find("detail") != string::npos) {
-      cout << ":clock=" << _clock->name();
+    if (msg.find("clock") != std::string::npos ||
+        msg.find("detail") != std::string::npos) {
+      std::cout << ":clock=" << m_clock->name();
     }
 
-    cout << endl;
+    std::cout << std::endl;
 
-    if (_history.size() && (! ctr)) {
-      for (unsigned i = 0; i < _history.size(); i++)
-        _history[i].dump(msg, pre + "    ");
+    if (m_history.size() && (! ctr)) {
+      for (unsigned i = 0; i < m_history.size(); i++)
+        m_history[i].dump(msg, pre + "    ");
     }
   }
 
@@ -162,16 +159,18 @@ namespace Belle2 {
   {
 
     //...Collect state changes...
-    vector<int> sc0 = stateChanges();
-    vector<int> sc1 = left.stateChanges();
+    std::vector<int> sc0 = stateChanges();
+    std::vector<int> sc1 = left.stateChanges();
+    sc0.reserve(sc0.size() + sc1.size());
     sc0.insert(sc0.end(), sc1.begin(), sc1.end());
 
     //...Sorting...
     std::sort(sc0.begin(), sc0.end());
 
     //...Remove multiple same clock...
-    vector<int> sc2;
-    int last = _clock->min();
+    std::vector<int> sc2;
+    sc2.reserve(sc0.size());
+    int last = m_clock->min();
     for (unsigned i = 0; i < sc0.size(); i++) {
       const int j = sc0[i];
       if (j != last) {
@@ -181,17 +180,18 @@ namespace Belle2 {
     }
 
     //...Make a new signal...
-    string name = "(" + _name + ")&(" + left._name + ")";
-    TRGSignal t(name, * _clock);
+    std::string name = "(" + m_name + ")&(" + left.m_name + ")";
+    TRGSignal t(name, * m_clock);
     bool active = false;
+    t.m_history.reserve(sc2.size());
     for (unsigned i = 0; i < sc2.size(); i++) {
       const int j = sc2[i];
       if ((! active) and state(j) and left.state(j)) {
         active = true;
-        t._history.push_back(TRGTime(j, true, * _clock));
+        t.m_history.push_back(TRGTime(j, true, * m_clock));
       } else if (active and ((! state(j)) or (! left.state(j)))) {
         active = false;
-        t._history.push_back(TRGTime(j, false, * _clock));
+        t.m_history.push_back(TRGTime(j, false, * m_clock));
       }
     }
 
@@ -207,8 +207,8 @@ namespace Belle2 {
   {
     TRGSignal t = (* this) & left;
 
-    _history.clear();
-    _history = t._history;
+    m_history.clear();
+    m_history = t.m_history;
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -217,14 +217,14 @@ namespace Belle2 {
     return * this;
   }
 
-// vector<TRGTime>
-// TRGSignal::andOperation(const vector<TRGTime> & history) {
+// std::vector<TRGTime>
+// TRGSignal::andOperation(const std::vector<TRGTime> & history) {
 
 //     //...And operation...
 //     const unsigned n = history.size();
 //     unsigned riseC = 0;
 //     bool signal = false;
-//     vector<TRGTime> tmp;
+//     std::vector<TRGTime> tmp;
 //     for (unsigned i = 0; i < n; i++) {
 //         const bool edge = history[i].edge();
 
@@ -233,8 +233,8 @@ namespace Belle2 {
 //         else
 //             --riseC;
 
-//         // cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
-//         //      << "," << history[i].time() << endl;
+//         // std::cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
+//         //      << "," << history[i].time() << std::endl;
 
 //         if (riseC == 2) {
 //             tmp.push_back(history[i]);
@@ -253,14 +253,15 @@ namespace Belle2 {
   TRGSignal::operator|(const TRGSignal& left) const
   {
     TRGSignal t(* this);
-    t._history.insert(t._history.end(),
-                      left._history.begin(),
-                      left._history.end());
-    t._name = "(" + t._name + ")|(" + left._name + ")";
-    std::sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
+    t.m_history.reserve(t.m_history.size() + left.m_history.size());
+    t.m_history.insert(t.m_history.end(),
+                       left.m_history.begin(),
+                       left.m_history.end());
+    t.m_name = "(" + t.m_name + ")|(" + left.m_name + ")";
+    std::sort(t.m_history.begin(), t.m_history.end(), TRGTime::sortByTime);
 
     //...And operation...
-    t._history = orOperation(t._history);
+    t.m_history = orOperation(t.m_history);
 
     return t;
   }
@@ -268,14 +269,15 @@ namespace Belle2 {
   TRGSignal&
   TRGSignal::operator|=(const TRGSignal& left)
   {
-    _history.insert(_history.end(),
-                    left._history.begin(),
-                    left._history.end());
-    this->_name = "(" + this->_name + ")&(" + left._name + ")";
-    std::sort(_history.begin(), _history.end(), TRGTime::sortByTime);
+    m_history.reserve(m_history.size() + left.m_history.size());
+    m_history.insert(m_history.end(),
+                     left.m_history.begin(),
+                     left.m_history.end());
+    this->m_name = "(" + this->m_name + ")&(" + left.m_name + ")";
+    std::sort(m_history.begin(), m_history.end(), TRGTime::sortByTime);
 
     //...And operation...
-    _history = orOperation(_history);
+    m_history = orOperation(m_history);
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -284,13 +286,14 @@ namespace Belle2 {
     return * this;
   }
 
-  vector<TRGTime>
-  TRGSignal::orOperation(const vector<TRGTime>& history)
+  std::vector<TRGTime>
+  TRGSignal::orOperation(const std::vector<TRGTime>& history)
   {
 
     //...And operation...
     const unsigned n = history.size();
-    vector<TRGTime> tmp;
+    std::vector<TRGTime> tmp;
+    tmp.reserve(n);
     unsigned signal = 0;
     for (unsigned i = 0; i < n; i++) {
       const bool edge = history[i].edge();
@@ -305,8 +308,8 @@ namespace Belle2 {
         --signal;
       }
 
-//         cout << "i,time,edge,signal=" << i << "," << history[i].time()
-//              << "," << edge << "," << signal << endl;
+//         std::cout << "i,time,edge,signal=" << i << "," << history[i].time()
+//              << "," << edge << "," << signal << std::endl;
 
     }
 
@@ -318,21 +321,21 @@ namespace Belle2 {
   {
 
     //...Check rising edges...
-    const unsigned n = _history.size();
+    const unsigned n = m_history.size();
     for (unsigned i = 0; i < n; i++) {
-      const bool edge = _history[i].edge();
+      const bool edge = m_history[i].edge();
 
-      if (! edge) {
-        const int t0 = _history[i - 1].time();
-        const int t1 = _history[i].time();
+      if (! edge and i > 0) {
+        const int t0 = m_history[i - 1].time();
+        const int t1 = m_history[i].time();
         if ((t1 - t0) < int(width))
-          _history[i].time(t0 + width);
+          m_history[i].time(t0 + width);
       }
     }
 
     // Merge overlapping history
-    std::sort(_history.begin(), _history.end(), TRGTime::sortByTime);
-    _history = orOperation(_history);
+    std::sort(m_history.begin(), m_history.end(), TRGTime::sortByTime);
+    m_history = orOperation(m_history);
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -345,31 +348,32 @@ namespace Belle2 {
   TRGSignal::stateChanges(void) const
   {
     std::vector<int> list;
-    const unsigned n = _history.size();
+    const unsigned n = m_history.size();
+    list.reserve(n);
     for (unsigned i = 0; i < n; i++)
-      list.push_back(_history[i].time());
+      list.push_back(m_history[i].time());
     return list;
   }
 
   const TRGClock&
   TRGSignal::clock(const TRGClock& c)
   {
-    _clock = & c;
+    m_clock = & c;
 
-    const unsigned n = _history.size();
+    const unsigned n = m_history.size();
     for (unsigned i = 0; i < n; i++)
-      _history[i].clock(c);
+      m_history[i].clock(c);
 
     //...Check pulse width...
     for (unsigned i = 0; i < n; i++) {
-      const bool edge = _history[i].edge();
+      const bool edge = m_history[i].edge();
 
       if (! edge) {
-        const int t0 = _history[i - 1].time();
-        const int t1 = _history[i].time();
+        const int t0 = m_history[i - 1].time();
+        const int t1 = m_history[i].time();
         const unsigned w = t1 - t0;
         if (w == 0)
-          _history[i].shift(1);
+          m_history[i].shift(1);
       }
     }
 
@@ -377,20 +381,20 @@ namespace Belle2 {
     consistencyCheck();
 #endif
 
-    return * _clock;
+    return * m_clock;
   }
 
   unsigned
   TRGSignal::width(unsigned a) const
   {
     unsigned j = 0;
-    const unsigned n = _history.size();
+    const unsigned n = m_history.size();
     for (unsigned i = 0; i < n; i++) {
-      const bool edge = _history[i].edge();
+      const bool edge = m_history[i].edge();
 
       if (! edge) {
-        const int t0 = _history[i - 1].time();
-        const int t1 = _history[i].time();
+        const int t0 = m_history[i - 1].time();
+        const int t1 = m_history[i].time();
         const unsigned w = t1 - t0;
         if (j == a) {
           return w;
@@ -412,7 +416,7 @@ namespace Belle2 {
 
 #if TRG_DEBUG
     if (consistencyCheck())
-      cout << "TRGSignal::set ... t0, t1=" << t0 << "," << t1 << endl;
+      std::cout << "TRGSignal::set ... t0, t1=" << t0 << "," << t1 << std::endl;
 #endif
 
     return * this;
@@ -437,7 +441,7 @@ namespace Belle2 {
   void
   TRGSignal::sort(void)
   {
-    std::sort(_history.begin(), _history.end(), TRGTime::sortByTime);
+    std::sort(m_history.begin(), m_history.end(), TRGTime::sortByTime);
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -447,10 +451,10 @@ namespace Belle2 {
   bool
   TRGSignal::consistencyCheck(void) const
   {
-    const unsigned n = _history.size();
+    const unsigned n = m_history.size();
     if (n % 2) {
-      cout << "TRGSignal::consistencyCheck !!! "
-           << "history has odd number entries : n=" << n << endl;
+      std::cout << "TRGSignal::consistencyCheck !!! "
+                << "history has odd number entries : n=" << n << std::endl;
       dump("detail", "!!! ");
     }
 
@@ -463,8 +467,8 @@ namespace Belle2 {
       if (i % 2)
         continue;
 
-      const TRGTime& t0 = _history[i];
-      const TRGTime& t1 = _history[i + 1];
+      const TRGTime& t0 = m_history[i];
+      const TRGTime& t1 = m_history[i + 1];
 
       if (t0.edge() != true)
         err |= (1 << i);
@@ -477,12 +481,12 @@ namespace Belle2 {
 
     if (err || errTiming) {
       if (err) {
-        cout << "TRGSignal::consistencyCheck !!! err in edge history"
-             << endl;
+        std::cout << "TRGSignal::consistencyCheck !!! err in edge history"
+                  << std::endl;
       }
       if (errTiming) {
-        cout << "TRGSignal::consistencyCheck !!! err in time history"
-             << endl;
+        std::cout << "TRGSignal::consistencyCheck !!! err in time history"
+                  << std::endl;
       }
       dump("detail", "!!! ");
       return true;
@@ -494,26 +498,26 @@ namespace Belle2 {
   const TRGSignal&
   TRGSignal::invert(void)
   {
-    if (_history.size()) {
-      for (unsigned i = 0; i < _history.size(); i++)
-        _history[i].reverse();
-      if (_history[0].time() > _clock->min()) {
-        TRGTime t0(_clock->min(), true, * _clock);
-        _history.insert(_history.begin(), t0);
+    if (m_history.size()) {
+      for (unsigned i = 0; i < m_history.size(); i++)
+        m_history[i].reverse();
+      if (m_history[0].time() > m_clock->min()) {
+        TRGTime t0(m_clock->min(), true, * m_clock);
+        m_history.insert(m_history.begin(), t0);
       } else {
-        _history.erase(_history.begin());
+        m_history.erase(m_history.begin());
       }
-      if (_history.back().time() < _clock->max()) {
-        TRGTime t0(_clock->max(), false, * _clock);
-        _history.push_back(t0);
+      if (m_history.back().time() < m_clock->max()) {
+        TRGTime t0(m_clock->max(), false, * m_clock);
+        m_history.push_back(t0);
       } else {
-        _history.erase(_history.end());
+        m_history.erase(m_history.end());
       }
     } else {
-      TRGTime time0(_clock->min(), true, * _clock);
-      TRGTime time1(_clock->max(), false, * _clock);
-      _history.push_back(time0);
-      _history.push_back(time1);
+      TRGTime time0(m_clock->min(), true, * m_clock);
+      TRGTime time1(m_clock->max(), false, * m_clock);
+      m_history.push_back(time0);
+      m_history.push_back(time1);
     }
 
 #if TRG_DEBUG
@@ -526,11 +530,11 @@ namespace Belle2 {
   bool
   TRGSignal::operator==(const TRGSignal& a) const
   {
-    if (_history.size() != a._history.size())
+    if (m_history.size() != a.m_history.size())
       return false;
 
-    for (unsigned i = 0; i < _history.size(); i++) {
-      if (_history[i] != a._history[i])
+    for (unsigned i = 0; i < m_history.size(); i++) {
+      if (m_history[i] != a.m_history[i])
         return false;
     }
 

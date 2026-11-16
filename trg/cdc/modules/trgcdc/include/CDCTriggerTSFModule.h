@@ -11,7 +11,6 @@
 #pragma once
 
 #include "framework/core/Module.h"
-#include <string>
 
 #include "CLHEP/Geometry/Point3D.h"
 #include "trg/trg/Clock.h"
@@ -23,6 +22,8 @@
 #include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <trg/cdc/dbobjects/CDCTriggerTSFConfig.h>
+
+#include <string>
 
 namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;
@@ -102,27 +103,25 @@ namespace Belle2 {
     bool m_saveadc;
   private:
     /** structure to hold pointers to all wires in the CDC */
-    std::vector<std::vector<TRGCDCLayer*>> superLayers;
+    std::vector<std::vector<TRGCDCLayer*>> m_superLayers;
     /** structure to hold pointers to all track segment shapes */
-    std::vector<TRGCDCLayer*> tsLayers;
-    /** list of clocks used in the TSF */
-    std::vector<TRGClock*> clocks;
+    std::vector<TRGCDCLayer*> m_tsLayers;
     /** list of (# true right, # true left, # true background)
      *  for the inner-most super layer */
-    std::vector<std::vector<unsigned>> innerTrueLRTable = {};
+    std::vector<std::vector<unsigned>> m_innerTrueLRTable = {};
     /** list of (# true right, # true left, # true background)
      *  for the outer super layers */
-    std::vector<std::vector<unsigned>> outerTrueLRTable = {};
+    std::vector<std::vector<unsigned>> m_outerTrueLRTable = {};
     /** number of layers in Super layer */
     const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
-    bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
+    bool m_deadChannelMap[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
     /** list of (# reconstructed right, # reconstructed left, # unrelated background)
      *  for the inner-most super layer */
-    std::vector<std::vector<unsigned>> innerRecoLRTable = {};
+    std::vector<std::vector<unsigned>> m_innerRecoLRTable = {};
     /** list of (# true right, # true left, # true background)
      *  for the outer super layers */
-    std::vector<std::vector<unsigned>> outerRecoLRTable = {};
+    std::vector<std::vector<unsigned>> m_outerRecoLRTable = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;

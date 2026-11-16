@@ -24,7 +24,6 @@
 #include <math.h>
 #include <TRandom.h>
 
-using namespace std;
 using namespace Belle2;
 //using namespace TRG;
 //

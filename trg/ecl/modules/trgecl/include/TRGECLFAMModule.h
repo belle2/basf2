@@ -25,6 +25,7 @@
 #include <trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h>
 #include <trg/ecl/dbobjects/TRGECLETMParameters.h>
 #include <trg/ecl/TrgEclDigitizer.h>
+#include <trg/ecl/TrgEclFAMFit.h>
 
 namespace Belle2 {
 
@@ -85,6 +86,12 @@ namespace Belle2 {
 
 
   private:
+    /// Number of ECL TriggerCells (TC)
+    static constexpr int c_NTC = 576;
+    /// Numer of sampling points for digitizer01
+    static constexpr int c_NSamplingDigi01 = 64;
+    /// Numer of sampling points for digitizer02
+    static constexpr int c_NSamplingDigi02 = 666;
 
     //! get payload from conditionDB (TRGECLETMParameters)
     double getDBparmap(const std::map<std::string, double>, std::string, double);
@@ -102,7 +109,7 @@ namespace Belle2 {
     /** Fit TC T [ns] */
     std::vector<std::vector<double>> m_TCFitT;
     /** TC Energy Threshold [MeV] */
-    std::vector<int> m_TCEThreshold;
+    std::array<int, c_NTC> m_TCEThreshold;
     /** TC ADC Energy conversion factor [MeV] */
     double m_TCADCtoEnergy;
 
@@ -120,13 +127,8 @@ namespace Belle2 {
 
     /** TRGECLDigitizer */
     TrgEclDigitizer m_Digitizer;
-    /// Number of ECL TriggerCells (TC)
-    static constexpr int c_NTC = 576;
-    /// Numer of sampling points for digitizer01
-    static constexpr int c_NSamplingDigi01 = 64;
-    /// Numer of sampling points for digitizer02
-    static constexpr int c_NSamplingDigi02 = 666;
-
+    /** TrgEclFAMFit */
+    TrgEclFAMFit m_TrgEclFAMFit;
   };
 
 } // namespace Belle2

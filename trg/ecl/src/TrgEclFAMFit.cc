@@ -19,39 +19,17 @@
 #include <iostream>
 #include <math.h>
 
-using namespace std;
 using namespace Belle2;
 //using namespace TRG;
 //
 //
 //
-TrgEclFAMFit::TrgEclFAMFit(): m_BeamBkgTag(0), m_AnaTag(0), m_EventId(0) //, bin(0)
+TrgEclFAMFit::TrgEclFAMFit()
 {
-
-  m_CoeffSigPDF0.clear();
-  m_CoeffSigPDF1.clear();
-  m_CoeffNoise31.clear();
-  m_CoeffNoise32.clear();
-  m_CoeffNoise33.clear();
+  clear();
 
   m_TCMap = new TrgEclMapping();
   m_DataBase = new TrgEclDataBase();
-
-  m_TCEThreshold.clear();
-
-  m_TCFitEnergy.clear();
-  m_TCFitTiming.clear();
-  m_TCRawEnergy.clear();
-  m_TCRawTiming.clear();
-  m_BeamBkgInfo.clear();
-  m_TCLatency.clear();
-
-  m_TCEThreshold.resize(576, 100.0);
-  m_TCFitEnergy.resize(576);
-  m_TCFitTiming.resize(576);
-  m_TCRawEnergy.resize(576);
-  m_TCRawTiming.resize(576);
-  m_BeamBkgInfo.resize(576);
 }
 //
 //
@@ -67,11 +45,29 @@ TrgEclFAMFit::~TrgEclFAMFit()
 //
 
 void
+TrgEclFAMFit::clear()
+{
+  for (uint i = 0; i < c_NTC; i++) {
+    m_TCFitEnergy[i].clear();
+    m_TCFitTiming[i].clear();
+    m_TCRawEnergy[i].clear();
+    m_TCRawTiming[i].clear();
+    m_BeamBkgInfo[i].clear();
+  }
+}
+
+void
 TrgEclFAMFit::setup(int eventId)
 {
   //
   // prepare coefficient for fitting
   //
+  clear();
+
+  delete m_TCMap;
+  delete m_DataBase;
+  m_TCMap = new TrgEclMapping();
+  m_DataBase = new TrgEclDataBase();
 
   m_DataBase->getCoeffSigPDF(m_CoeffSigPDF0,  m_CoeffSigPDF1);
   m_DataBase->getCoeffNoise(0,  m_CoeffNoise31, m_CoeffNoise32, m_CoeffNoise33);
@@ -82,8 +78,8 @@ TrgEclFAMFit::setup(int eventId)
 }
 
 void
-TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
-                       std::vector<std::vector<double>> digiTiming)
+TrgEclFAMFit::FAMFit01(const std::vector<std::vector<double>>& digiEnergy,
+                       const std::vector<std::vector<double>>& digiTiming)
 {
   //============================
   // In this function,
@@ -93,36 +89,37 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
   // o return energy unit must be [GeV/c2]
   // o return time unit must be [ns]
   //============================
-  double* TCFitSample = new double [12];  // MeV/c2
-  double* preped = new double [4];
+  std::array<double, c_nFitSample> TCFitSample{0};  // MeV/c2
+  std::array<double, 4> preped{0};
 
-  int nbin_pedestal = 4;
-  int fam_sampling_interval = 125;
-  int NSampling = 64;// 8 [us] / 125 [ns]
+  static constexpr int nbin_pedestal = 4;
+  static constexpr int fam_sampling_interval = 125;
+  static constexpr int NSampling = 64;// 8 [us] / 125 [ns]
 
   int pedFlag = 0;
   double CoeffAAA = 0;
   double CoeffBBB = 0;
   int dTBin = 0;
   int ShiftdTBin = 0;
-  int Nsmalldt = 10;
-  int SmallOffset = 1;
-  double IntervaldT  = 125 * 0.001 / Nsmalldt;
+  static constexpr int Nsmalldt = 10;
+  static constexpr int SmallOffset = 1;
+  static constexpr double IntervaldT  = 125 * 0.001 / Nsmalldt;
   //  double EThreshold = m_Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
-  int FitSleepThreshold = 12;   // # of clk to suspend fit
+  static constexpr int FitSleepThreshold = 12;   // # of clk to suspend fit
 
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
 
     // reset the fit state for each TC, so it does not depend on the previous TC
     FitSleepCounter = 100;
     ShiftdTBin = 0;
 
-    for (int iShift = 20; iShift < (NSampling - 12); iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
+    // In order to avoid BKG shaping effect, iShift start from 20.
+    for (int iShift = 20; iShift < (NSampling - c_nFitSample); iShift++) {
 
       FitSleepCounter++;
       if (FitSleepCounter <= FitSleepThreshold) {continue;}
-      for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
+      for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         int iReplace = iFitSample + iShift;
         TCFitSample[iFitSample] = digiEnergy[iTCIdm][iReplace] * 1000.0;
         if (0) {
@@ -137,13 +134,12 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
       //
       //
 
-      dTBin = (int)(ShiftdTBin + Nsmalldt);
-      if (dTBin < 1)  {dTBin =   1;}
-      if (dTBin > 20) {dTBin = 20;}
+      // ensure 0 <= (ShiftdTBin + Nsmalldt) <= 20
+      dTBin = std::max(1, std::min(static_cast<int>(ShiftdTBin + Nsmalldt), 20));
 
       CoeffAAA = 0;
       CoeffBBB = 0;
-      for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
+      for (int iFitSample = 0; iFitSample < c_nFitSample; iFitSample++) {
         CoeffAAA += m_CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
         CoeffBBB += m_CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       }
@@ -156,23 +152,16 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
       //-------
       // Require "expected time" is around middle of table = Nsmalldt.
       //-------
-      double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
+      const double timeConditionValue = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > m_TCEThreshold[iTCIdm]) {
-        double fitT =
-          condition_t +
-          (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
-
+      if (std::fabs(timeConditionValue) < 0.8 * (fam_sampling_interval * 0.001) && fitE > m_TCEThreshold[iTCIdm]) {
+        double fitT = timeConditionValue + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
         pedFlag = 1;
-        double rand_sampling_correction =
-          digiTiming[iTCIdm][iShift] +
-          (nbin_pedestal - iShift + 32) * fam_sampling_interval;
+        const double rand_sampling_correction = digiTiming[iTCIdm][iShift] + (nbin_pedestal - iShift + 32) * fam_sampling_interval;
 
         m_TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
-        m_TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 +
-                                        (m_DataBase->getTCFLatency(iTCIdm + 1)) +
-                                        rand_sampling_correction);
+        m_TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 + (m_DataBase->getTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
         FitSleepCounter = 0;
         ShiftdTBin = 0;
 
@@ -185,8 +174,6 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
   //
   //
   //
-  delete [] TCFitSample;
-  delete [] preped;
   return;
 }
 //
@@ -194,7 +181,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy,
 //
 void
 TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
-                       std::vector<std::vector<double>> TCDigiT)
+                       const std::vector<std::vector<double>>& TCDigiT)
 {
 
   int NSampling = 64;
@@ -206,15 +193,11 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
   int ta_id[20] = {1000}; //@ id of T_a
   double ttt_a[20] = {0}; //@ time of T_a
   double ttt_b[20] = {0}; //@ time of T_b
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     int noutput = 0;
 
     //    double threshold = m_Threshold * 0.001; //GeV
     int maxId[500] = {0};
-    for (int iii = 0 ; iii < 500 ; iii++) {
-
-      maxId[iii] = 0;
-    }
     int count_up = 0;
     int count_down = 0;
     int flag_up = 3;
@@ -308,8 +291,8 @@ TrgEclFAMFit::FAMFit02(std::vector<std::vector<double>> TCDigiE,
 //
 //
 void
-TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy,
-                       std::vector<std::vector<double>> TCDigiTiming)
+TrgEclFAMFit::FAMFit03(const std::vector<std::vector<double>>& TCDigiEnergy,
+                       const std::vector<std::vector<double>>& TCDigiTiming)
 {
   //===============
   // (03)Signal digitization (w/ 12ns interval for method-0)
@@ -324,7 +307,7 @@ TrgEclFAMFit::FAMFit03(std::vector<std::vector<double>> TCDigiEnergy,
   //==================
   float max_shape_time = 563.48; // [ns], time between peak of PDF and t0.
   //  double threshold = m_Threshold * 0.001; //GeV
-  for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC; iTCIdm++) {
     int noutput = 0;
     int maxId[500] = {0};
     int count_up = 0;
@@ -386,18 +369,19 @@ TrgEclFAMFit::setBeamBkgTag()
   std::vector<double> RawTCTiming;
   std::vector<double> RawTCEnergy;
   std::vector<double> RawBeamBkgTag;
-  RawBeamBkgTag.clear();
-  TCId.clear();
-  RawTCTiming.clear();
-  RawTCEnergy.clear();
-  // BeamBkgTag.resize(576  ,std::vector<int> (size,100));
-  // m_TCRawEnergy.resize(576,std::vector<double>(size,0.));
-  // m_TCRawTiming.resize(576,std::vector<double>(size,0.));
-  m_BeamBkgInfo.resize(576);
-  m_TCRawEnergy.resize(576);
-  m_TCRawTiming.resize(576);
+
+  for (uint i = 0; i < c_NTC; i++) {
+    m_TCRawEnergy[i].clear();
+    m_TCRawTiming[i].clear();
+    m_BeamBkgInfo[i].clear();
+  }
 
   StoreArray<TRGECLDigi0> trgeclDigiArray;
+  TCId.reserve(trgeclDigiArray.getEntries());
+  RawTCTiming.reserve(trgeclDigiArray.getEntries());
+  RawTCEnergy.reserve(trgeclDigiArray.getEntries());
+  RawBeamBkgTag.reserve(trgeclDigiArray.getEntries());
+
   for (int ii = 0; ii < trgeclDigiArray.getEntries(); ii++) {
     TRGECLDigi0* aTRGECLDigi = trgeclDigiArray[ii];
     int eventid = aTRGECLDigi->getEventId();
@@ -408,7 +392,7 @@ TrgEclFAMFit::setBeamBkgTag()
     RawBeamBkgTag.push_back(aTRGECLDigi -> getBeamBkgTag());
   }
 
-  for (int iTCId = 0; iTCId < 576 ; iTCId ++) {
+  for (int iTCId = 0; iTCId < c_NTC ; iTCId ++) {
     const int hitsize = m_TCFitEnergy[iTCId].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       const int rawsize = TCId.size();
@@ -440,7 +424,7 @@ TrgEclFAMFit::save(int eventid)
   // adjust TC timing (ns) to T=0 ns
   double tc_timing_correction = -15;
 
-  for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+  for (int iTCIdm = 0; iTCIdm < c_NTC;  iTCIdm++) {
     const int hitsize = m_TCFitEnergy[iTCIdm].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       StoreArray<TRGECLHit> TrgEclHitArray;
@@ -457,7 +441,7 @@ TrgEclFAMFit::save(int eventid)
   }
 
   if (m_AnaTag == 1) {
-    for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
+    for (int iTCIdm = 0; iTCIdm < c_NTC;  iTCIdm++) {
       if (m_TCFitEnergy[iTCIdm].size() != m_TCRawEnergy[iTCIdm].size()) {continue;}
       const int hitsize = m_TCFitEnergy[iTCIdm].size();
       for (int iHit = 0; iHit < hitsize; iHit++) {

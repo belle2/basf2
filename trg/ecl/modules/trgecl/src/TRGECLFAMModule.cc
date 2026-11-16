@@ -13,11 +13,8 @@
 
 //trg package headers
 #include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
-#include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
-
-using namespace std;
 
 namespace Belle2 {
 //
@@ -27,10 +24,10 @@ namespace Belle2 {
 //
 //
 //
-  string
+  std::string
   TRGECLFAMModule::version() const
   {
-    return string("TRGECLFAMModule 1.00");
+    return std::string("TRGECLFAMModule 1.00");
   }
 //
 //
@@ -39,7 +36,7 @@ namespace Belle2 {
     : Module::Module()
   {
 
-    string desc = "TRGECLFAMModule(" + version() + ")";
+    std::string desc = "TRGECLFAMModule(" + version() + ")";
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -62,8 +59,6 @@ namespace Belle2 {
              m_SourceOfTC);
 
     B2DEBUG(100, "TRGECLFAMModule ... created");
-    m_TCEThreshold.clear();
-
   }
 //
 //
@@ -109,14 +104,14 @@ namespace Belle2 {
   TRGECLFAMModule::beginRun()
   {
     if (!m_ConditionDBFAM) {
-      m_TCEThreshold.resize(576, m_SetTCEThreshold);
+      m_TCEThreshold.fill(m_SetTCEThreshold);
     } else {
       //Use global tag
       // get TC ADC-to-Eneryg converion factor from conditionDB
       const auto& dbParmap = m_ETMParameters->getparMap();
       m_TCADCtoEnergy = getDBparmap(dbParmap, "adc2energy", 0) * 1000; // (MeV)
       // get TC Energy Threshold from TC ADC Threshold and ADC-to-Energy conversion factor
-      m_TCEThreshold.resize(576, 0);
+      m_TCEThreshold.fill(0);
       for (const auto& para : m_FAMTCADCThreshold) {
         int tc_id = (int) para.getTCId();
         m_TCEThreshold[tc_id - 1] = floor(para.getTCADCThreshold() * m_TCADCtoEnergy);
@@ -137,6 +132,11 @@ namespace Belle2 {
       m_TCDigiE.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
       m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
     }
+
+    m_TrgEclFAMFit.setBeamBkgTagFlag(m_beambkgtag);
+    m_TrgEclFAMFit.setAnaTagFlag(m_famana);
+    m_TrgEclFAMFit.setup(m_nEvent);
+    m_TrgEclFAMFit.setThreshold(m_TCEThreshold);
 
   }
 //
@@ -175,16 +175,12 @@ namespace Belle2 {
 
 
     // FAM Fitter
-    TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
-    obj_trgeclfit->setBeamBkgTagFlag(m_beambkgtag);
-    obj_trgeclfit->setAnaTagFlag(m_famana);
-    obj_trgeclfit->setup(m_nEvent);
-    obj_trgeclfit->setThreshold(m_TCEThreshold);
+    m_TrgEclFAMFit.clear();
 
-    if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
-    else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
-    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
-    obj_trgeclfit-> save(m_nEvent);
+    if (m_famMethod == 1) { m_TrgEclFAMFit.FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
+    else if (m_famMethod == 2) { m_TrgEclFAMFit.FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
+    else if (m_famMethod == 3) { m_TrgEclFAMFit.FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
+    m_TrgEclFAMFit. save(m_nEvent);
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
     uint16_t nTCsPerRegion[3] = {};
@@ -211,7 +207,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
     //
     m_nEvent++;
-    delete obj_trgeclfit;
   }
 //
 //

@@ -140,10 +140,6 @@ CDCTrigger2DFinderModule::fastInterceptFinder(CDCHitMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
-      //std::cout << indent << "i " << i << " j " << j
-      //        << " layerHit " << int(layerHit[0]) << int(layerHit[2])
-      //        << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
-      //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != m_maxIterations) {
           fastInterceptFinder(containedHits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);

@@ -10,6 +10,7 @@
 #define TRGECLDATABASE_H
 
 #include <vector>
+#include <array>
 
 namespace Belle2 {
   ///  class TrgEclDataBase;
@@ -24,11 +25,12 @@ namespace Belle2 {
 
   public:
     /**  read coefficient for fit */
-    void getCoeffSigPDF(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void getCoeffSigPDF(std::array<std::array<double, 12>, 20>&, std::array<std::array<double, 12>, 20>&);
     /**  read coefficient for fit */
-    void getCoeffNoise(int, std::vector<std::vector<double>>&, std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void getCoeffNoise(int, std::array<std::array<double, 12>, 20>&, std::array<std::array<double, 12>, 20>&,
+                       std::array<std::array<double, 12>, 20>&);
     /** Noise Matrix */
-    void readNoiseLMatrix(std::vector<std::vector<double>>&, std::vector<std::vector<double>>&);
+    void readNoiseLMatrix(std::array<std::array<double, 64>, 64>&, std::array<std::array<double, 64>, 64>&);
     /** TC flight time latency  */
     double getTCFLatency(int);
     /** TC CM Phi  */

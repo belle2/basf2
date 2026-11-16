@@ -24,6 +24,8 @@
 
 #include <trg/ecl/dbobjects/TRGECLFAMTCADCThreshold.h>
 #include <trg/ecl/dbobjects/TRGECLETMParameters.h>
+#include <trg/ecl/TrgEclDigitizer.h>
+#include <trg/ecl/TrgEclFAMFit.h>
 
 namespace Belle2 {
 
@@ -55,26 +57,26 @@ namespace Belle2 {
   private: /** Parameters*/
 
     /** Debug level.*/
-    int m_debugLevel;
+    int m_debugLevel = 0;
     /** fam Method*/
-    int m_famMethod;
+    int m_famMethod = 1;
     /** Time interval */
-    int m_binTimeInterval;
+    int m_binTimeInterval = 125;
     /** Waveform */
-    int m_SaveTCWaveForm;
+    int m_SaveTCWaveForm = 0;
     /** save Beam background tag in TRGECLHit table */
-    int m_beambkgtag;
+    int m_beambkgtag = 0;
     /** save FAM ana table */
-    int m_famana;
+    int m_famana = 0;
     /** Threshold input*/
-    int m_SetTCEThreshold;
+    int m_SetTCEThreshold = 100;
     /** Set Shaping Function */
-    int m_FADC;
+    int m_FADC = 1;
     /** Use Condition DB*/
-    bool m_ConditionDBFAM;
+    bool m_ConditionDBFAM = true;
     /** Set source of TC data (1:=ECLHit or 2:=ECLSimHit or 3:=ECLHit+TRGECLBGTCHit) */
     /** ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor) */
-    int m_SourceOfTC;
+    int m_SourceOfTC = 3;
 
     /** Config. file name. */
     std::string m_configFilename;
@@ -84,6 +86,12 @@ namespace Belle2 {
 
 
   private:
+    /// Number of ECL TriggerCells (TC)
+    static constexpr int c_NTC = 576;
+    /// Numer of sampling points for digitizer01
+    static constexpr int c_NSamplingDigi01 = 64;
+    /// Numer of sampling points for digitizer02
+    static constexpr int c_NSamplingDigi02 = 666;
 
     //! get payload from conditionDB (TRGECLETMParameters)
     double getDBparmap(const std::map<std::string, double>, std::string, double);
@@ -101,7 +109,7 @@ namespace Belle2 {
     /** Fit TC T [ns] */
     std::vector<std::vector<double>> m_TCFitT;
     /** TC Energy Threshold [MeV] */
-    std::vector<int> m_TCEThreshold;
+    std::array<int, c_NTC> m_TCEThreshold;
     /** TC ADC Energy conversion factor [MeV] */
     double m_TCADCtoEnergy;
 
@@ -117,6 +125,10 @@ namespace Belle2 {
     /** EventLevelClusteringInfo. */
     StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
+    /** TRGECLDigitizer */
+    TrgEclDigitizer m_Digitizer;
+    /** TrgEclFAMFit */
+    TrgEclFAMFit m_TrgEclFAMFit;
   };
 
 } // namespace Belle2

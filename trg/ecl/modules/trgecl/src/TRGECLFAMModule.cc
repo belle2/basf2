@@ -13,12 +13,8 @@
 
 //trg package headers
 #include <trg/ecl/modules/trgecl/TRGECLFAMModule.h>
-#include <trg/ecl/TrgEclDigitizer.h>
-#include <trg/ecl/TrgEclFAMFit.h>
 
 #include <iostream>
-
-using namespace std;
 
 namespace Belle2 {
 //
@@ -28,29 +24,19 @@ namespace Belle2 {
 //
 //
 //
-  string
+  std::string
   TRGECLFAMModule::version() const
   {
-    return string("TRGECLFAMModule 1.00");
+    return std::string("TRGECLFAMModule 1.00");
   }
 //
 //
 //
   TRGECLFAMModule::TRGECLFAMModule()
-    : Module::Module(),
-      m_debugLevel(0),
-      m_famMethod(1),
-      m_binTimeInterval(125),
-      m_SaveTCWaveForm(0),
-      m_beambkgtag(0),
-      m_famana(0),
-      m_SetTCEThreshold(100.0),
-      m_FADC(1),
-      m_ConditionDBFAM(true),
-      m_SourceOfTC(3)
+    : Module::Module()
   {
 
-    string desc = "TRGECLFAMModule(" + version() + ")";
+    std::string desc = "TRGECLFAMModule(" + version() + ")";
     setDescription(desc);
     setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -73,8 +59,6 @@ namespace Belle2 {
              m_SourceOfTC);
 
     B2DEBUG(100, "TRGECLFAMModule ... created");
-    m_TCEThreshold.clear();
-
   }
 //
 //
@@ -120,14 +104,14 @@ namespace Belle2 {
   TRGECLFAMModule::beginRun()
   {
     if (!m_ConditionDBFAM) {
-      m_TCEThreshold.resize(576, m_SetTCEThreshold);
+      m_TCEThreshold.fill(m_SetTCEThreshold);
     } else {
       //Use global tag
       // get TC ADC-to-Eneryg converion factor from conditionDB
       const auto& dbParmap = m_ETMParameters->getparMap();
       m_TCADCtoEnergy = getDBparmap(dbParmap, "adc2energy", 0) * 1000; // (MeV)
       // get TC Energy Threshold from TC ADC Threshold and ADC-to-Energy conversion factor
-      m_TCEThreshold.resize(576, 0);
+      m_TCEThreshold.fill(0);
       for (const auto& para : m_FAMTCADCThreshold) {
         int tc_id = (int) para.getTCId();
         m_TCEThreshold[tc_id - 1] = floor(para.getTCADCThreshold() * m_TCADCtoEnergy);
@@ -135,6 +119,24 @@ namespace Belle2 {
     }
 
     B2DEBUG(200, "TRGECLFAMModule ... beginRun called ");
+
+    m_Digitizer.setWaveform(m_SaveTCWaveForm);
+    m_Digitizer.setFADC(m_FADC);
+    m_Digitizer.setSourceOfTC(m_SourceOfTC);
+    m_Digitizer.initialize();
+
+    if (m_famMethod == 1 || m_famMethod == 2) {
+      m_TCDigiE.resize(c_NTC, std::vector<double>(c_NSamplingDigi01, 0));
+      m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi01, 0));
+    } else if (m_famMethod == 3) {
+      m_TCDigiE.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
+      m_TCDigiT.resize(c_NTC, std::vector<double>(c_NSamplingDigi02, 0));
+    }
+
+    m_TrgEclFAMFit.setBeamBkgTagFlag(m_beambkgtag);
+    m_TrgEclFAMFit.setAnaTagFlag(m_famana);
+    m_TrgEclFAMFit.setup(m_nEvent);
+    m_TrgEclFAMFit.setThreshold(m_TCEThreshold);
 
   }
 //
@@ -147,42 +149,38 @@ namespace Belle2 {
     B2DEBUG(200, "TRGECLFAMMoudle ... event called");
     //
     //
-    if (m_nEvent < 1e2) {if (m_nEvent %    10 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
-    else if (m_nEvent < 1e3) {if (m_nEvent %   100 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
-    else if (m_nEvent < 1e4) {if (m_nEvent %  1000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
-    else if (m_nEvent < 1e5) {if (m_nEvent % 10000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
-    else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    if (m_debugLevel > 0) {
+      if (m_nEvent < 1e2) {if (m_nEvent %     10 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+      else if (m_nEvent < 1e3) {if (m_nEvent %    100 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+      else if (m_nEvent < 1e4) {if (m_nEvent %   1000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+      else if (m_nEvent < 1e5) {if (m_nEvent %  10000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+      else if (m_nEvent < 1e6) {if (m_nEvent % 100000 == 0) {B2DEBUG(200, "TRGECLFAMModule::event> evtno= " << m_nEvent);}}
+    }
 
 
     //
     //
     //
     // FAM Digitizer
-    TrgEclDigitizer* obj_trgeclDigi = new TrgEclDigitizer();
-    obj_trgeclDigi->setWaveform(m_SaveTCWaveForm);
-    obj_trgeclDigi->setFADC(m_FADC);
-    obj_trgeclDigi->setup(m_SourceOfTC);
+    m_Digitizer.clear();
+    m_Digitizer.getTCHit();
     if (m_famMethod == 1 || m_famMethod == 2) {
       // no-fit method = backup method 1
-      obj_trgeclDigi->digitization01(m_TCDigiE, m_TCDigiT);
+      m_Digitizer.digitization01(m_TCDigiE, m_TCDigiT);
     } else if (m_famMethod == 3) {
       // original method = backup method 2
-      obj_trgeclDigi->digitization02(m_TCDigiE, m_TCDigiT);
+      m_Digitizer.digitization02(m_TCDigiE, m_TCDigiT);
     }
-    obj_trgeclDigi->save(m_nEvent);
+    m_Digitizer.save(m_nEvent);
 
 
     // FAM Fitter
-    TrgEclFAMFit* obj_trgeclfit = new TrgEclFAMFit();
-    obj_trgeclfit->setBeamBkgTagFlag(m_beambkgtag);
-    obj_trgeclfit->setAnaTagFlag(m_famana);
-    obj_trgeclfit->setup(m_nEvent);
-    obj_trgeclfit->setThreshold(m_TCEThreshold);
+    m_TrgEclFAMFit.clear();
 
-    if (m_famMethod == 1) { obj_trgeclfit->FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
-    else if (m_famMethod == 2) { obj_trgeclfit->FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
-    else if (m_famMethod == 3) { obj_trgeclfit->FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
-    obj_trgeclfit-> save(m_nEvent);
+    if (m_famMethod == 1) { m_TrgEclFAMFit.FAMFit01(m_TCDigiE, m_TCDigiT); }      // fitting method
+    else if (m_famMethod == 2) { m_TrgEclFAMFit.FAMFit02(m_TCDigiE, m_TCDigiT); } // no-fit method = backup method 1
+    else if (m_famMethod == 3) { m_TrgEclFAMFit.FAMFit03(m_TCDigiE, m_TCDigiT); } // original method = backup method 2
+    m_TrgEclFAMFit. save(m_nEvent);
 
     // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
     uint16_t nTCsPerRegion[3] = {};
@@ -209,8 +207,6 @@ namespace Belle2 {
     m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
     //
     m_nEvent++;
-    delete obj_trgeclDigi;
-    delete obj_trgeclfit;
   }
 //
 //

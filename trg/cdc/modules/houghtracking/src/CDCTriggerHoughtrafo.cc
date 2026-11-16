@@ -546,7 +546,7 @@ CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
       pattern.assign(rX * rY, 0);   // reset pattern to 0
       pattern[0] = plane2[ix][iy];
       cellIds.clear();
-      cellIds.emplace_back(ROOT::Math::XYVector(2 * ix, 2 * iy));
+      cellIds.emplace_back(ROOT::Math::XYVector(2. * ix, 2. * iy));
       for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
         for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
           if (iy + iy2 >= nY) continue;
@@ -565,7 +565,7 @@ CDCTrigger2DFinderModule::patternClustering(const CDCHitMap& inputMap)
                connectedDiag(plane2[ileft][iy + iy2 - 1], plane2[iright][iy + iy2]))) {
             pattern[ip] = plane2[iright][iy + iy2];
             B2DEBUG(100, "connect cell " << iright << " " << iy + iy2);
-            cellIds.push_back(ROOT::Math::XYVector(2 * (ix + ix2), 2 * (iy + iy2)));
+            cellIds.emplace_back(ROOT::Math::XYVector(2. * (ix + ix2), 2. * (iy + iy2)));
           }
         }
       }

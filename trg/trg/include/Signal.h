@@ -168,13 +168,13 @@ namespace Belle2 {
   private:
 
     /// Name.
-    std::string _name;
+    std::string m_name;
 
     /// Clock.
-    const TRGClock* _clock;
+    const TRGClock* m_clock;
 
     /// Timing history.
-    std::vector<TRGTime> _history;
+    std::vector<TRGTime> m_history;
   };
 
 //-----------------------------------------------------------------------------
@@ -183,14 +183,14 @@ namespace Belle2 {
   const std::string&
   TRGSignal::name(void) const
   {
-    return _name;
+    return m_name;
   }
 
   inline
   const std::string&
   TRGSignal::name(const std::string& newName)
   {
-    return _name = newName;
+    return m_name = newName;
   }
 
   inline
@@ -246,14 +246,14 @@ namespace Belle2 {
   unsigned
   TRGSignal::nSignals(void) const
   {
-    return _history.size() / 2;
+    return m_history.size() / 2;
   }
 
   inline
   unsigned
   TRGSignal::nEdges(void) const
   {
-    return _history.size();
+    return m_history.size();
   }
 
   inline
@@ -265,14 +265,14 @@ namespace Belle2 {
     consistencyCheck();
 #endif
 
-    _history.clear();
+    m_history.clear();
   }
 
   inline
   bool
   TRGSignal::active(void) const
   {
-    if (_history.size())
+    if (m_history.size())
       return true;
     return false;
   }
@@ -281,12 +281,12 @@ namespace Belle2 {
   bool
   TRGSignal::state(int a) const
   {
-    if (_history.size()) {
+    if (m_history.size()) {
       bool last = false;
-      for (unsigned i = 0; i < _history.size(); i++) {
-        if (_history[i].time() <= a)
-          last = _history[i].edge();
-        else if (_history[i].time() > a)
+      for (unsigned i = 0; i < m_history.size(); i++) {
+        if (m_history[i].time() <= a)
+          last = m_history[i].edge();
+        else if (m_history[i].time() > a)
           break;
       }
       return last;
@@ -299,14 +299,14 @@ namespace Belle2 {
   bool
   TRGSignal::riseEdge(int a) const
   {
-    if (_history.size()) {
+    if (m_history.size()) {
       bool last = false;
-      for (unsigned i = 0; i < _history.size(); i++) {
-        if (_history[i].time() < a) {
+      for (unsigned i = 0; i < m_history.size(); i++) {
+        if (m_history[i].time() < a) {
           continue;
-        } else if (_history[i].time() == a) {
-          last = _history[i].edge();
-        } else if (_history[i].time() > a) {
+        } else if (m_history[i].time() == a) {
+          last = m_history[i].edge();
+        } else if (m_history[i].time() > a) {
           break;
         }
       }
@@ -319,14 +319,14 @@ namespace Belle2 {
   const TRGTime*
   TRGSignal::operator[](unsigned i) const
   {
-    return & _history[i];
+    return & m_history[i];
   }
 
   inline
   const TRGClock&
   TRGSignal::clock(void) const
   {
-    return * _clock;
+    return * m_clock;
   }
 
   inline
@@ -340,10 +340,10 @@ namespace Belle2 {
   bool
   TRGSignal::active(int c0, int c1) const
   {
-    for (unsigned i = 0; i < _history.size(); i++) {
-      if (! _history[i].edge()) {
-        const int t0 = _history[i - 1].time();
-        const int t1 = _history[i].time();
+    for (unsigned i = 0; i < m_history.size(); i++) {
+      if (! m_history[i].edge()) {
+        const int t0 = m_history[i - 1].time();
+        const int t1 = m_history[i].time();
 
         if ((c1 > t0) && (c0 < t1))
           return true;

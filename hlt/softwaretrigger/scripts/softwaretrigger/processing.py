@@ -49,16 +49,15 @@ def setup_basf2_and_db(event_distribution_mode=constants.EventDistributionModes.
         parser.add_argument("--input", required=True, type=str, help="ZMQ Address of the distributor process")
         parser.add_argument("--output", required=True, type=str, help="ZMQ Address of the collector process")
         parser.add_argument("--dqm", required=True, type=str, help="ZMQ Address of the histoserver process")
-        if event_distribution_mode == constants.EventDistributionModes.zmqbasf2:
-            parser.add_argument('--input-file', type=str,
-                                help="Input (s)root file, ZMQ input address is ignored if this is set",
-                                default=None)
-            parser.add_argument('--output-file', type=str,
-                                help="Filename for (s)root output, ZMQ input address is ignored if this is set",
-                                default=None)
-            parser.add_argument('--histo-output-file', type=str,
-                                help="Filename for histogram output, ZMQ histoserver address is ignored if this is set",
-                                default=None)
+        parser.add_argument('--input-file', type=str,
+                            help="Input (s)root file, ZMQ input address is ignored if this is set",
+                            default=None)
+        parser.add_argument('--output-file', type=str,
+                            help="Filename for (s)root output, ZMQ input address is ignored if this is set",
+                            default=None)
+        parser.add_argument('--histo-output-file', type=str,
+                            help="Filename for histogram output, ZMQ histoserver address is ignored if this is set",
+                            default=None)
 
     parser.add_argument('--number-processes', type=int, default=multiprocessing.cpu_count() - 5,
                         help='Number of parallel processes to use')
@@ -147,7 +146,7 @@ def start_zmq_path(args, location, event_distribution_mode):
     path = basf2.Path()
     reco_path = basf2.Path()
 
-    if not args.input_file:
+    if event_distribution_mode == constants.EventDistributionModes.zmq:
         if location == constants.Location.expressreco:
             input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
         elif location == constants.Location.hlt:
@@ -155,10 +154,18 @@ def start_zmq_path(args, location, event_distribution_mode):
         else:
             basf2.B2FATAL(f"Does not know location {location}")
     else:
-        if args.input_file.endswith(".sroot"):
-            path.add_module('SeqRootInput', inputFileName=args.input_file)
+        if not args.input_file:
+            if location == constants.Location.expressreco:
+                input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
+            elif location == constants.Location.hlt:
+                input_module = path.add_module("HLTZMQ2Ds", input=args.input)
+            else:
+                basf2.B2FATAL(f"Does not know location {location}")
         else:
-            path.add_module('RootInput', inputFileName=args.input_file)
+            if args.input_file.endswith(".sroot"):
+                path.add_module('SeqRootInput', inputFileName=args.input_file)
+            else:
+                path.add_module('RootInput', inputFileName=args.input_file)
 
     # zmq needs to discard the first event from HLTZMQ2Ds level
     if not args.histo_output_file:

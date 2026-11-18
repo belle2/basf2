@@ -29,6 +29,23 @@ Changes since release-10
 .. admonition:: New, removed and updated packages in externals
    :class: dropdown
 
+   .. list-table:: New, removed and updated packages in externals from v02-04-03 to v02-04-04
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - Mille
+        - -
+        - V01-01-04
+      * - Millepede-II
+        - V04-16-03
+        - V05-01-08
+      * - uv
+        - -
+        - 0.13.8
+
    .. list-table:: New, removed and updated packages in externals from v02-04-02 to v02-04-03
       :widths: 50 25 25
       :header-rows: 1

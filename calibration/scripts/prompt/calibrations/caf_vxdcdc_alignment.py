@@ -49,6 +49,8 @@ collection_names = ["cosmic", "hadron", "mumu", "offip"]
 default_config = {
     "only_prompt": False,
     "cosmic.max_processed_events_per_file": 4000,
+    # more cosmic events, to compensate for the selection against thick material in create_cosmics_path()
+    "cosmic.events_scale": 3.,
     "hadron.max_processed_events_per_file": 1000,
     "mumu.max_processed_events_per_file": 5000,
     "offip.max_processed_events_per_file": 2000,
@@ -254,9 +256,15 @@ def create_cosmics_path():
     path.add_module('SetRecoTrackMomentum', automatic=True)
     path.add_module('DAFRecoFitter', pdgCodesToUseForFitting=[13])
 
+    # Keep only cosmics which avoid the thick material (tungsten, tantalum) around the beam line outside
+    # of the interaction region. There the track is kinked and loses energy with large fluctuations, which
+    # the track model (single trajectory through both arms) cannot describe: it biases CDC layers in Y.
+    # The allowed z0 window opens with the distance from the beam line (cm).
     ana.fillParticleList(
         'mu+:goodForVXDCDCAlignment',
-        '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1',
+        '[z0 <= 57. or abs(d0) >= 26.5] and abs(dz) > 0.4 and nTracks == 1'
+        ' and [[-10. < z0 < 15.] or [abs(d0) > 5. and -15. < z0 < 30.]'
+        ' or [abs(d0) > 10. and -45. < z0 < 45.] or abs(d0) > 20.]',
         path=path)
     path.add_module('SkimFilter', particleLists=['mu+:goodForVXDCDCAlignment']).if_false(basf2.create_path())
 
@@ -367,7 +375,8 @@ def create_prompt(files, cfg, name='VXDCDCalignment_prompt'):
       Expert config dictionary
     """
     mumu = select_files(files["mumu"], 0.2e6, cfg["mumu.max_processed_events_per_file"])
-    cosmic = select_files(files["cosmic"], 1e6, cfg["cosmic.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 1e6 * cfg["cosmic.events_scale"],
+                          cfg["cosmic.max_processed_events_per_file"])
     hadron = select_files(files["hadron"], 0.5e5, cfg["hadron.max_processed_events_per_file"])
     offip = select_files(files["offip"], 0.2e6, cfg["offip.max_processed_events_per_file"])
 
@@ -375,7 +384,8 @@ def create_prompt(files, cfg, name='VXDCDCalignment_prompt'):
         name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment'],
         collections=[
-            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"],
+                                externalIterations=1, recalcJacobians=1, minPValue=0.001),
             mpc.make_collection("hadron", path=create_std_path(), tracks=["RecoTracks"]),
             mpc.make_collection("mumu", path=create_std_path(), tracks=["RecoTracks"]),
             mpc.make_collection("offip", path=create_std_path(), tracks=["RecoTracks"])
@@ -385,7 +395,7 @@ def create_prompt(files, cfg, name='VXDCDCalignment_prompt'):
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=True)
+            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=True, twist_curvature=False)
         ],
         fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False),
         commands=[
@@ -474,32 +484,65 @@ def create_stage1(files, cfg, name='VXDCDCalignment_stage1'):
     """
 
     mumu = select_files(files["mumu"], 1.5e6, cfg["mumu.max_processed_events_per_file"])
-    cosmic = select_files(files["cosmic"], 0.7e6, cfg["cosmic.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 0.7e6 * cfg["cosmic.events_scale"],
+                          cfg["cosmic.max_processed_events_per_file"])
     hadron_and_offip = select_files(files["hadron"] + files["offip"], int(4.0e6 / 10.), cfg["hadron.max_processed_events_per_file"])
 
     cal = mpc.create(
         name=name,
-        dbobjects=['VXDAlignment', 'CDCAlignment', 'BeamSpot'],
+        dbobjects=[
+            'VXDAlignment',
+            'CDCAlignment',
+            'BeamSpot'],
         collections=[
-            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
-            mpc.make_collection("hadron", path=create_std_path(), tracks=["RecoTracks"]),
-            make_mumu_collection(name="mumu")
-        ],
+            mpc.make_collection(
+                "cosmic",
+                path=create_cosmics_path(),
+                tracks=["RecoTracks"],
+                externalIterations=1,
+                recalcJacobians=1,
+                minPValue=0.001),
+            mpc.make_collection(
+                    "hadron",
+                    path=create_std_path(),
+                    tracks=["RecoTracks"]),
+            make_mumu_collection(
+                        name="mumu")],
         tags=None,
-        files=dict(mumu=mumu, cosmic=cosmic, hadron=hadron_and_offip),
+        files=dict(
+            mumu=mumu,
+            cosmic=cosmic,
+            hadron=hadron_and_offip),
         timedep=None,
         constraints=[
-            alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=cfg["stage1.z_offset"], z_scale=False, twist=False),
-            alignment.constraints.CDCWireConstraints(layer_rigid=True, layer_radius=[53], cdc_radius=True, hemisphere=[55])
-        ],
-        fixed=alignment.parameters.vxd_sensors(rigid=False, surface2=False, surface3=False, surface4=False)
-        + alignment.parameters.beamspot(),
+            alignment.constraints.VXDHierarchyConstraints(
+                type=2,
+                pxd=True,
+                svd=True),
+            alignment.constraints.CDCLayerConstraints(
+                                        z_offset=cfg["stage1.z_offset"],
+                                        z_scale=False,
+                                        twist=True,
+                                        twist_curvature=True),
+            alignment.constraints.CDCWireConstraints(
+                                            layer_rigid=True,
+                                            layer_radius=[53],
+                                            cdc_radius=True,
+                                            hemisphere=[55])],
+        fixed=alignment.parameters.vxd_sensors(
+                rigid=False,
+                surface2=False,
+                surface3=False,
+                surface4=False) +
+        alignment.parameters.beamspot(),
         commands=[
             f"method {cfg['stage1.method']} 6 0.001",
             "entries 1000",
             "threads 10 10"],
-        params=dict(minPValue=0.00001, externalIterations=0, granularity="run"),
+        params=dict(
+            minPValue=0.00001,
+            externalIterations=0,
+            granularity="run"),
         min_entries=500000)
 
     # Ignore results for BeamSpot
@@ -525,20 +568,22 @@ def create_stage2(files, cfg, name='VXDCDCalignment_stage2'):
       Expert config dictionary
     """
     mumu = select_files(files["mumu"], 10e6, cfg["mumu.max_processed_events_per_file"])
-    cosmic = select_files(files["cosmic"], 2e6, cfg["cosmic.max_processed_events_per_file"])
+    cosmic = select_files(files["cosmic"], 2e6 * cfg["cosmic.events_scale"],
+                          cfg["cosmic.max_processed_events_per_file"])
 
     cal = mpc.create(
         name=name,
         dbobjects=['VXDAlignment', 'CDCAlignment', 'BeamSpot'],
         collections=[
-            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"]),
+            mpc.make_collection("cosmic", path=create_cosmics_path(), tracks=["RecoTracks"],
+                                externalIterations=1, recalcJacobians=1, minPValue=0.001),
             make_mumu_collection(name="mumu")],
         tags=None,
         files=dict(mumu=mumu, cosmic=cosmic),
         timedep=None,
         constraints=[
             alignment.constraints.VXDHierarchyConstraints(type=2, pxd=True, svd=True),
-            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=False)],
+            alignment.constraints.CDCLayerConstraints(z_offset=True, z_scale=False, twist=True, twist_curvature=True)],
         fixed=alignment.parameters.vxd_sensors(layers=[3, 4, 5, 6]) +
         alignment.parameters.vxd_sensors(layers=[1, 2], rigid=False, surface2=False, surface3=False, surface4=True),
         commands=["method inversion 6 0.001", "entries 1000", "threads 10 10"],

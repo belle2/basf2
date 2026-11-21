@@ -67,6 +67,8 @@
 /.sconf_temp/
 /.sconsign.dblite
 /compile_commands.json
+# uv cache of tools run through uvx in the tests, cached by CI
+/.uv-cache/
 
 
 # Validation / Run artefacts #

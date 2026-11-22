@@ -586,12 +586,13 @@ def draw_impact_parameter(data_tree):
         z_resolutions[key] = [z_resolution, z_error]
         print(f'pt = {key:0.2f}: sigma_d0 = {d0_resolution:0.4f}, sigma_z = {z_resolution:0.4f}')
 
-    number_bins = 62
-    lower_edge = -0.025
-    upper_edge = 4.025
+    pt_lower = -0.025
+    pt_upper = 4.025
+    # 50 MeV wide bins.                            + 0.5 serves for correct rounding.
+    number_bins = int((pt_upper - pt_lower) / 0.05 + 0.5)
 
     hist_impact_parameter_d0 = TH1F('hd0resolution', 'hd0resolution',
-                                    number_bins, lower_edge, upper_edge)
+                                    number_bins, pt_lower, pt_upper)
     hist_impact_parameter_d0.SetTitle('d0 resolution')
     hist_impact_parameter_d0.SetXTitle('pt in GeV/c')
     hist_impact_parameter_d0.SetYTitle('#sigma_{d0} [cm]')
@@ -600,7 +601,7 @@ def draw_impact_parameter(data_tree):
                                                              CONTACT_PERSON['Email']))
 
     hist_impact_parameter_z = TH1F('hzresolution', 'hzresolution',
-                                   number_bins, lower_edge, upper_edge)
+                                   number_bins, pt_lower, pt_upper)
     hist_impact_parameter_z.SetTitle('z resolution')
     hist_impact_parameter_z.SetXTitle('pt in GeV/c')
     hist_impact_parameter_z.SetYTitle('#sigma_{z} [cm]')

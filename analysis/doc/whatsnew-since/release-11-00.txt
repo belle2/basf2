@@ -1,5 +1,8 @@
 Changes in the analysis package in light-2611-m
 -----------------------------------------------
+Variables
++++++++++
+* Calculation of the converted-photon convertedPhotonZ and convertedPhotonDelZ variables is fixed to account for the 2pi repetition.
 
 Vertex Fitting
 ++++++++++++++

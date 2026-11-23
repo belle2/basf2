@@ -9,6 +9,8 @@
 // Own header.
 #include <analysis/variables/V0DaughterTrackVariables.h>
 
+#include <TMath.h>
+
 // include VariableManager
 #include <analysis/VariableManager/Manager.h>
 
@@ -418,8 +420,9 @@ namespace Belle2 {
       //Getting running parameter phi at nominal vertex
       double phiN1 = atan2(n1.X(), -n1.Y());
       double phiN2 = atan2(n2.X(), -n2.Y());
-      double Phi01Intersect = phiN1 - Phi01;
-      double Phi02Intersect = phiN2 - Phi02;
+
+      double Phi01Intersect = std::remainder(phiN1 - Phi01, TMath::TwoPi());
+      double Phi02Intersect = std::remainder(phiN2 - Phi02, TMath::TwoPi());
 
       double z1 = Z01 - (radius1 * TanLambda1 * Phi01Intersect);
       double z2 = Z02 - (radius2 * TanLambda2 * Phi02Intersect);

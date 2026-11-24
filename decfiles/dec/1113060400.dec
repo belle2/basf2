@@ -1,0 +1,40 @@
+# EventType: 1113060400
+# Descriptor: anti-B0 -> D_s+ (-> phi (-> K+ K-) pi+) Lambda0 (-> p+ pi-) anti-p-
+# NickName: Bd_DsLambdaanti-p,phipi,KK
+# Documentation: anti-B0 -> D_s+ (-> phi (-> K+ K-) pi+) Lambda0 (-> p+ pi-) anti-p-
+# Responsible: Linfeng Li
+# Email: lingfeng@hunnu.edu.cn
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2026/11/22
+
+Alias phisig phi
+
+Decay Upsilon(4S)
+  1.0000 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay anti-B0sig
+  1.0000 D_s+sig Lambda0sig anti-p- PHOTOS PHSP;
+Enddecay
+CDecay B0sig
+
+Decay D_s+sig
+  1.0000 phisig pi+ PHOTOS SVS;
+Enddecay
+
+Decay D_s-sig
+  1.0000 phisig pi- PHOTOS SVS;
+Enddecay
+
+Decay phisig
+  1.0000 K+ K- PHOTOS VSS;
+Enddecay
+
+Decay Lambda0sig
+  1.0000 p+ pi- HypNonLepton 0.748 -6.5;
+Enddecay
+CDecay anti-Lambda0sig
+
+End

@@ -24,30 +24,19 @@ Enddecay
 Decay B+sig
   1.00 pi+ Lambda0sig anti-Xi_c0sig PHOTOS PHSP;
 Enddecay
-
-Decay B-sig
-  1.00 pi- anti-Lambda0sig Xi_c0sig PHOTOS PHSP;
-Enddecay
+CDecay B-sig
 
 Decay anti-Xi_c0sig
   0.3333333333333333 anti-Xi+sig pi- PHOTOS PHSP;
   0.3333333333333333 anti-Lambda0sig K+ pi- PHOTOS PHSP;
   0.3333333333333333 anti-p- K+ K+ pi- PHOTOS PHSP;
 Enddecay
-
-Decay Xi_c0sig
-  0.3333333333333333 Xi-sig pi+ PHOTOS PHSP;
-  0.3333333333333333 Lambda0sig K- pi+ PHOTOS PHSP;
-  0.3333333333333333 p+ K- K- pi+ PHOTOS PHSP;
-Enddecay
+CDecay Xi_c0sig
 
 Decay Xi-sig
-  1.00 Lambda0sig pi- PHOTOS PHSP;
+  1.00 Lambda0sig pi- HypNonLepton -0.385 -1.5;
 Enddecay
-
-Decay anti-Xi+sig
-  1.00 anti-Lambda0sig pi+ PHOTOS PHSP;
-Enddecay
+CDecay anti-Xi+sig
 
 Decay Lambda0sig
   1.00 p+ pi- HypNonLepton 0.748 -6.5;

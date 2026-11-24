@@ -1,0 +1,46 @@
+# EventType: 1243070400
+# Descriptor: B+ -> pi+ Lambda0 (-> p+ pi-) anti-Xi_c0 (-> anti-Xi+ (-> anti-Lambda0 (-> anti-p- pi+) pi+) pi- | anti-Lambda0 (-> anti-p- pi+) K+ pi- | anti-p- K+ K+ pi-)
+# NickName: Bu_piLambdaanti-Xic0=cocktail
+# Documentation: B+ -> pi+ Lambda0 (-> p+ pi-) anti-Xi_c0 (-> anti-Xi+ (-> anti-Lambda0 (-> anti-p- pi+) pi+) pi- | anti-Lambda0 (-> anti-p- pi+) K+ pi- | anti-p- K+ K+ pi-)
+# Responsible: Xinping Liu
+# Email: 2120220218@mail.nankai.edu.cn
+# Tested: yes
+# PhysicsWG: BHadronic
+# Cuts: None
+# Date: 2026/11/22
+
+Alias Xi_c0sig Xi_c0
+Alias anti-Xi_c0sig anti-Xi_c0
+ChargeConj Xi_c0sig anti-Xi_c0sig
+Alias Xi-sig Xi-
+Alias anti-Xi+sig anti-Xi+
+ChargeConj Xi-sig anti-Xi+sig
+
+Decay Upsilon(4S)
+  0.5 B- B+sig VSS;
+  0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+  1.00 pi+ Lambda0sig anti-Xi_c0sig PHOTOS PHSP;
+Enddecay
+CDecay B-sig
+
+Decay anti-Xi_c0sig
+  0.3333333333333333 anti-Xi+sig pi- PHOTOS PHSP;
+  0.3333333333333333 anti-Lambda0sig K+ pi- PHOTOS PHSP;
+  0.3333333333333333 anti-p- K+ K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay Xi_c0sig
+
+Decay Xi-sig
+  1.00 Lambda0sig pi- HypNonLepton -0.385 -1.5;
+Enddecay
+CDecay anti-Xi+sig
+
+Decay Lambda0sig
+  1.00 p+ pi- HypNonLepton 0.748 -6.5;
+Enddecay
+CDecay anti-Lambda0sig
+
+End

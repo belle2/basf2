@@ -264,12 +264,21 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     In case there is some output left, then prints the error message and exits
     (failing the test).
 
+    The tool does not have to be part of the basf2 externals/tools: any command
+    can be given as a list of arguments, so tools can be run through a package
+    runner such as ``uvx``::
+
+        check_error_free(["uvx", "-q", "--from", "codespell", "codespell"],
+                         "codespell", "framework")
+
     Warnings:
         If the test is skipped or the test contains errors this function does
         not return but will directly end the program.
 
     Arguments:
-        tool(str): executable to call
+        tool(str | list(str)): executable to call, or the full command used to
+           invoke it as a list of arguments if it needs extra arguments of its
+           own (e.g. when run through ``uvx``).
         toolname(str): human readable name of the tool
         package(str): package to run over. Also the first argument to the tool
         filter: function which gets called for each line of output and
@@ -280,7 +289,7 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
     if "BELLE2_LOCAL_DIR" not in os.environ and "BELLE2_RELEASE_DIR" not in os.environ:
         skip_test("No release is setup")
 
-    args = [tool]
+    args = [tool] if isinstance(tool, str) else list(tool)
     if toolopts:
         args += toolopts
     if package is not None:
@@ -288,7 +297,9 @@ def check_error_free(tool, toolname, package, filter=lambda x: False, toolopts=N
 
     with local_software_directory():
         try:
-            output = subprocess.check_output(args, encoding="utf8")
+            output = subprocess.check_output(args, encoding="utf8", stderr=subprocess.STDOUT)
+        except FileNotFoundError:
+            skip_test(f"Cannot run {toolname}: {args[0]} was not found on PATH")
         except subprocess.CalledProcessError as error:
             print(error)
             output = error.output

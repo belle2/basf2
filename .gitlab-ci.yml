@@ -15,6 +15,10 @@ variables:
   GITLAB_FORCE_RUNNING_PIPELINE: "no"
   GITLAB_RUNNER: "none"
   # The other BELLE2_ variables are defined in the "Variables" section of the CI/CD settings
+  # uv cache for the tools which are run through uvx (see
+  # decfiles/tests/decaylanguage_validate.py). It has to live inside the project
+  # directory, otherwise GitLab cannot cache it.
+  UV_CACHE_DIR: "${CI_PROJECT_DIR}/.uv-cache"
 
 workflow:
   rules:
@@ -60,6 +64,7 @@ default:
       - lib/
       - modules/
       - target_head_hash.txt
+      - .uv-cache/
   before_script:
     # Preliminary operations with Git
     - git config user.email "something@something.com"

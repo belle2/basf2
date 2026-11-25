@@ -22,6 +22,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 // ROOT headers.
 #include <TH1F.h>
@@ -134,6 +135,7 @@ namespace Belle2 {
     TH2F* m_PSBypassMode = 0; /**< PS-bypass mode vs. boardstack */
 
     TProfile* m_unpackErr = 0; /**< fraction of events with boardstack unpacker errors */
+    TProfile* m_activeVetoBG = 0; /**< background rate inside and outside of active veto */
 
     // other
     int m_numModules = 0; /**< number of TOP modules */
@@ -147,6 +149,7 @@ namespace Belle2 {
     StoreArray<Track> m_tracks;    /**< collection of tracks */
     StoreArray<TOPProductionEventDebug> m_productionEventDebugs;   /**< collection of event debug data */
     StoreObjPtr<TOPUnpackerErrors> m_unpackerErrors; /**< unpacker error flags */
+    StoreObjPtr<TRGSummary> m_trgSummary; /**< trigger summary */
 
     // dbobjects
     DBObjPtr<TOPCalCommonT0> m_commonT0;   /**< common T0 calibration constants */

@@ -139,6 +139,7 @@ namespace Belle2 {
 
     // other
     int m_numModules = 0; /**< number of TOP modules */
+    int m_numPMTs = 0; /**< total number of PMTs */
     double m_bunchTimeSep = 0; /**< bunch separation time */
 
     // dataobjects

@@ -766,10 +766,18 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   }
   m_averageRate = 0;
 
-  auto* signalHits = static_cast<TProfile*>(findHist("TOP/signalHits"));
+  auto* activeVetoBG = dynamic_cast<TProfile*>(findHist("TOP/activeVetoBG"));
+  if (activeVetoBG) {
+    double nondeadFract = 1 - m_deadFraction->Integral() / m_deadFraction->GetNbinsX();
+    if (nondeadFract > 0) activeVetoBG->Scale(1 / nondeadFract);
+    m_mirabelleVariables["bgRate_outsideActiveVeto"] = activeVetoBG->GetBinContent(1);
+    m_mirabelleVariables["bgRate_insideActiveVeto"] = activeVetoBG->GetBinContent(2);
+  }
+
+  auto* signalHits = dynamic_cast<TProfile*>(findHist("TOP/signalHits"));
   if (not signalHits) return;
 
-  auto* backgroundHits = static_cast<TProfile*>(findHist("TOP/backgroundHits"));
+  auto* backgroundHits = dynamic_cast<TProfile*>(findHist("TOP/backgroundHits"));
   if (not backgroundHits) return;
 
   if (m_photonYields) delete m_photonYields;
@@ -810,14 +818,6 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   m_backgroundRates->Scale(1.0 / 50.0e-3 / 32);  // measured in 50 ns window, 32 PMT's ==> rate in MHz/PMT
   m_backgroundRates->Divide(m_backgroundRates, activeFract);
   setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
-
-  auto* activeVetoBG = static_cast<TProfile*>(findHist("TOP/activeVetoBG"));
-  if (activeVetoBG) {
-    double nondeadFract = 1 - m_deadFraction->Integral() / m_deadFraction->GetNbinsX();
-    if (nondeadFract > 0) activeVetoBG->Scale(1 / nondeadFract);
-    m_mirabelleVariables["bgRate_outsideActiveVeto"] = activeVetoBG->GetBinContent(1);
-    m_mirabelleVariables["bgRate_insideActiveVeto"] = activeVetoBG->GetBinContent(2);
-  }
 
   alarmState = c_Gray;
   m_text3->Clear();

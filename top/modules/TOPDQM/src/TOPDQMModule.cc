@@ -60,6 +60,8 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
+    m_numPMTs = 0;
+    for (const auto& m : geo->getModules()) m_numPMTs += m.getPMTArray().getSize();
     m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     // Histograms
@@ -559,7 +561,7 @@ namespace Belle2 {
         if (m_trgSummary->testInput("passive_veto") == 1 and m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
       } catch (const std::exception&) {
       }
-      double bgRate = nBGHits / 512.0 / 50e-3; // [MHz/PMT]
+      double bgRate = nBGHits / static_cast<double>(m_numPMTs) / 50e-3; // [MHz/PMT]
       m_activeVetoBG->Fill(index, bgRate);
     }
 

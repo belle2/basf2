@@ -811,6 +811,14 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   m_backgroundRates->Divide(m_backgroundRates, activeFract);
   setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
 
+  auto* activeVetoBG = static_cast<TProfile*>(findHist("TOP/activeVetoBG"));
+  if (activeVetoBG) {
+    double nondeadFract = 1 - m_deadFraction->Integral() / m_deadFraction->GetNbinsX();
+    if (nondeadFract > 0) activeVetoBG->Scale(1 / nondeadFract);
+    m_mirabelleVariables["bgRate_outsideActiveVeto"] = activeVetoBG->GetBinContent(1);
+    m_mirabelleVariables["bgRate_insideActiveVeto"] = activeVetoBG->GetBinContent(2);
+  }
+
   alarmState = c_Gray;
   m_text3->Clear();
   if (backgroundHits->GetEntries() > 100 and activeFraction->Integral() > 0) {

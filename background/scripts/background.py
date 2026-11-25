@@ -23,7 +23,7 @@ BGO_OBJECTS = (
     'SVDShaperDigits',
     'CDCHits',
     'TOPDigits',
-    'TOPInjectionVeto'
+    'TOPInjectionVeto',
     'ARICHDigits',
     'ECLWaveforms',
     'KLMDigits',

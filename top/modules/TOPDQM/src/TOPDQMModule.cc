@@ -60,6 +60,8 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
+    m_numPMTs = 0;
+    for (const auto& m : geo->getModules()) m_numPMTs += m.getPMTArray().getSize();
     m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     // Histograms
@@ -325,6 +327,12 @@ namespace Belle2 {
     m_unpackErr->SetFillColor(2);
     m_unpackErr->SetDrawOption("hist");
 
+    m_activeVetoBG = new TProfile("activeVetoBG", "Background rates; active veto flag; background rate [MHz/PMT]", 2, 0, 2, 0, 1000);
+    m_activeVetoBG->GetXaxis()->SetNdivisions(2);
+    m_activeVetoBG->GetXaxis()->CenterLabels();
+    m_activeVetoBG->SetMinimum(0);
+    m_activeVetoBG->SetMarkerStyle(20);
+
     // cd back to root directory
     oldDir->cd();
   }
@@ -344,6 +352,7 @@ namespace Belle2 {
     m_recBunch.isOptional();
     m_timeZeros.isOptional();
     m_tracks.isOptional();
+    m_trgSummary.isOptional();
   }
 
   void TOPDQMModule::beginRun()
@@ -394,6 +403,7 @@ namespace Belle2 {
     m_injVetoFlagDiff->Reset();
     m_PSBypassMode->Reset();
     m_unpackErr->Reset();
+    m_activeVetoBG->Reset();
   }
 
   void TOPDQMModule::event()
@@ -479,6 +489,7 @@ namespace Belle2 {
     int nHits_bad = 0;
     std::vector<int> numSignalHits(m_numModules, 0);
     std::vector<int> numBackgroundHits(m_numModules, 0);
+    int nBGHits = 0;
 
     // loop over digits, fill histograms and increment counters
 
@@ -504,9 +515,10 @@ namespace Belle2 {
         m_goodChannelHits[slot - 1]->Fill(digit.getChannel());
         m_pulseHeights[slot - 1]->Fill(digit.getPMTNumber(), digit.getPulseHeight());
         nHits_good++;
+        double time = digit.getTime();
+        if (cosmics) time += 10; // move for 10 ns in order to get the complete signal at positive times
+        if (time > -50 and time < 0) nBGHits++;
         if (digit.hasStatus(TOPDigit::c_EventT0Subtracted)) {
-          double time = digit.getTime();
-          if (cosmics) time += 10; // move for 10 ns in order to get the complete signal at positive times
           if (numTracks[slot - 1] > 0) {
             m_goodTiming[slot - 1]->Fill(time);
             m_time->Fill(time);
@@ -538,6 +550,19 @@ namespace Belle2 {
         m_signalHits->Fill(slot, numSignalHits[slot - 1]);
         m_backgroundHits->Fill(slot, numBackgroundHits[slot - 1]);
       }
+    }
+
+    // fill BG rate inside/outside active veto
+
+    if (m_trgSummary.isValid()) {
+      //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+      int index = 0; //events accepted in the passive veto window but not in the active
+      try {
+        if (m_trgSummary->testInput("passive_veto") == 1 and m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
+      } catch (const std::exception&) {
+      }
+      double bgRate = nBGHits / static_cast<double>(m_numPMTs) / 50e-3; // [MHz/PMT]
+      m_activeVetoBG->Fill(index, bgRate);
     }
 
     // fill injection histograms

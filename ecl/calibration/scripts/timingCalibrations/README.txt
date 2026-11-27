@@ -147,9 +147,9 @@ The input parameters of the script have default values and can be changed via th
 
 
 Example configuration file:
-     {"caf_script": "caf_ecl_time_crystalCrate.py", "database_chain": ["Reco_master_patch_rel5", "ECL_testingNewPayload_RefCrystalPerCrate", "AIRFLOW_online_snapshot_20201207-094707", "data_reprocessing_prompt", "AIRFLOW_TEST_data_staging_calibration_prompt", "ECL_pre_bucket9", "ECL_testing_timingCalibs_forIteratingTowardsConvergence", "ECL_crystalTimeMergingTests"] , "requested_iov": [14, 694, 14, 7000], "backend_args": {"queue": "s"}, "expert_config": {"numCrysCrateIterations": 2, "payload_boundaries": [[14, 694], [14, 7000]]}}
+     {"caf_script": "caf_ecl_time_crystalCrate.py", "globaltags": ["ECL_crystalTimeMergingTests", "ECL_testing_timingCalibs_forIteratingTowardsConvergence", "ECL_pre_bucket9", "AIRFLOW_TEST_data_staging_calibration_prompt", "data_reprocessing_prompt", "AIRFLOW_online_snapshot_20201207-094707", "ECL_testingNewPayload_RefCrystalPerCrate", "Reco_master_patch_rel5"] , "requested_iov": [14, 694, 14, 7000], "backend_args": {"queue": "s"}, "expert_config": {"numCrysCrateIterations": 2, "payload_boundaries": [[14, 694], [14, 7000]]}}
 
-* You will have to modify the list of global tags
+* You will have to modify the list of global tags (the first one has the highest priority)
 * You will have to modify the requested_iov to the experiment and run range you care about.
   This is generally done automatically through the website.
 * You will have to modify the expert_config variable payload_boundaries.  The example here produces a single crystal calibration

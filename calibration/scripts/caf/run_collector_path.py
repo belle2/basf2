@@ -9,9 +9,9 @@
 ##########################################################################
 
 import basf2
-from basf2 import conditions as b2conditions
 from basf2 import create_path, process
 from basf2 import B2FATAL, B2INFO, B2WARNING
+from caf.utils import setup_database_chain
 
 # The backend provides the input data files to the job and you can get the list of
 # files from this function
@@ -32,19 +32,11 @@ def run_collectors():
     with open("collector_config.json") as config_file:
         config = json.load(config_file)
 
-    # Create the database chain to use the necessary central DB global tags and local DBs if they are requested
-    # We deliberately override the normal database ordering because we don't want input files GTs to affect
-    # the processing. Only explicit GTs and intermediate local DBs made by the CAF should be added here.
-    b2conditions.reset()
-    b2conditions.override_globaltags()
-
-    for db_type, database in config["database_chain"]:
-        if db_type == "local":
-            B2INFO(f"Adding Local Database {database[0]} to head of chain of local databases.")
-            b2conditions.prepend_testing_payloads(database[0])
-        else:
-            B2INFO(f"Using Global Tag {database}.")
-            b2conditions.prepend_globaltag(database)
+    # Create the database chain: the user-set one plus the local databases created by the CAF
+    # (dependent calibrations and previous iterations of this calibration).
+    setup_database_chain([(db_type, database[0] if db_type == "local" else database)
+                          for db_type, database in config["database_chain"]],
+                         [database[0] for database in config["dependent_databases"]])
 
     # create a path with all modules needed before calibration path is run.
     collector_path = create_path()

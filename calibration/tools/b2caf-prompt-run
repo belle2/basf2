@@ -135,6 +135,9 @@ Required format of JSON file:
      "testing_payloads" str    <- Optional, by default do not add testing payloads, possible only with --permissive
     }
 
+The global tags in database_chain follow the usual basf2 convention: the first global tag in the list has the highest
+priority, i.e. ``["A", "B", "C"]`` means that a payload is searched first in ``A``, then in ``B`` and finally in ``C``.
+
 The backend_args dictionary will be used to set up the `caf.backends.Backend` class and overrides the defaults of that class.
 If you set backend options via the command line e.g. ``--queue l``, then this will override backend_args values in this JSON
 file. Individual `caf.framework.Collection` objects can also override these options by setting them. So the final priority order

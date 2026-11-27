@@ -138,10 +138,8 @@ class Collection():
         if database_chain:
             self.database_chain = database_chain
         else:
-            # This may seem weird but the changes to the DB interface mean that they have effectively swapped from being
-            # described well by appending to a list to a deque. So we do bit of reversal to translate it back and make the
-            # most important GT the last one encountered.
-            for tag in reversed(b2conditions.default_globaltags):
+            # The first globaltag in the list has the highest priority, as in basf2.
+            for tag in b2conditions.default_globaltags:
                 self.use_central_database(tag)
 
         #: job script
@@ -164,7 +162,8 @@ This script will be copied into subjob directories as part of the input sandbox.
         Parameters:
             global_tag (str): The central database global tag to use for this calibration.
 
-        Using this allows you to add a central database to the head of the global tag database chain for this collection.
+        Using this allows you to append a central database to the global tag database chain for this collection.
+        As in basf2, earlier entries have higher priority, so tags added here rank below the existing ones.
         The default database chain is just the central one from
         `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
         The input file global tag will always be overridden and never used unless explicitly set.
@@ -192,6 +191,7 @@ This script will be copied into subjob directories as part of the input sandbox.
 
         Append a local database to the chain for this collection.
         You can call this function multiple times and each database will be added to the chain IN ORDER.
+        As in basf2, the first local database in the chain has the highest priority.
         The databases are applied to this collection ONLY.
 
         NOTE!! Since release-04-00-00 the behaviour of basf2 conditions databases has changed.
@@ -595,7 +595,7 @@ class Calibration(CalibrationBase):
             self.database_chain = database_chain
         else:
             # This database is already applied to the `Collection` automatically, so don't do it again
-            for tag in reversed(b2conditions.default_globaltags):
+            for tag in b2conditions.default_globaltags:
                 self.use_central_database(tag, apply_to_default_collection=False)
         #: The class that runs all the algorithms in this Calibration using their assigned
         #: :py:class:`caf.strategies.AlgorithmStrategy`.
@@ -694,6 +694,7 @@ class Calibration(CalibrationBase):
             apply_to_default_collection (bool): Should we also call use_central_database on the default collection (if it exists)
 
         Using this allows you to append a central database to the database chain for this calibration.
+        As in basf2, earlier entries have higher priority, so tags added here rank below the existing ones.
         The default database chain is just the central one from
         `basf2.conditions.default_globaltags <ConditionsConfiguration.default_globaltags>`.
         To turn off central database completely or use a custom tag as the base, you should call `Calibration.reset_database`
@@ -742,7 +743,7 @@ class Calibration(CalibrationBase):
 
         1) Local Database from previous iteration of this Calibration.
         2) Local Database chain from output of previous dependent Calibrations.
-        3) This chain of Local and Central databases where the last added is checked first.
+        3) This chain of Local and Central databases where the first added is checked first.
 
         Note that this function on the `Calibration` object will only affect the default `Collection` if it exists and if
         'apply_to_default_collection' remains True. So calling:

@@ -50,6 +50,14 @@ class Constraint():
 
     def get_checksum(self):
         """Get a checksum to distinguish constraints quickly (computed only from labels)
+
+        NOTE: the coefficients are not part of the checksum, and the constraints generator keeps only ONE
+        constraint per checksum (the last one generated; intended for time-dependent constraints, where the
+        same constraint is generated again for each event/IoV). Two different constraints on the same list
+        of labels (same order) therefore silently replace each other, e.g. a weighted and an unweighted sum
+        over the same parameters. Where this can happen, the constraints below append a dummy label with
+        coefficient 0 to make the label list (and so the checksum) unique. This is a workaround: the
+        de-duplication should be re-thought at some point (e.g. an explicit key per constraint).
         """
         labels_only = [label for (label, coeff) in self.data]
         checksum = hash(str(labels_only))
@@ -192,7 +200,11 @@ class CDCLayerConstraints(Constraints):
     parameter = [(1, 'x-offset bwd'), (2, 'y-offset bwd'), (6, 'z-rotation bwd'),
                  (11, 'x-offset fwd-bwd'), (12, 'y-offset fwd-bwd'), (16, 'z-rotation fwd-bwd')]
 
-    def __init__(self, filename='cdc-constraints.txt', rigid=True, twist=True, z_offset=False, r_scale=False, z_scale=False):
+    #: radii [cm] of the VXD layers, used as fixed (non-twisting) points in the twist_curvature constraint
+    vxd_radii = [1.4, 2.2, 3.9, 8.0, 10.4, 13.5]
+
+    def __init__(self, filename='cdc-constraints.txt', rigid=True, twist=True, z_offset=False, r_scale=False, z_scale=False,
+                 twist_curvature=False):
         """
         filename : str
           Filename with constraints (probably generated later)
@@ -206,6 +218,9 @@ class CDCLayerConstraints(Constraints):
           Constraint for R-scale
         z_scale : bool
           Constraint for Z-scale
+        twist_curvature : bool
+          Constraint for the combination of layer twists (drot) which tracks from the IP see as a change of
+          curvature proportional to tan(lambda) (weak mode for tracks with free curvature)
         """
         super().__init__(filename)
         #: 6D CDC constraints
@@ -218,6 +233,8 @@ class CDCLayerConstraints(Constraints):
         self.r_scale = r_scale
         #: Constraint for z-scale
         self.z_scale = z_scale
+        #: Constraint for the twist seen by IP tracks as curvature
+        self.twist_curvature = twist_curvature
 
     def generate(self):
         """Generate constraints from CDC geometry
@@ -236,15 +253,7 @@ class CDCLayerConstraints(Constraints):
 
         consts = []
 
-        parameters = self.parameter
-
-        for par in parameters:
-            nTot = 0
-            for sl in self.cdc:
-                nlyr = sl[1]
-                for lyr in range(nlyr):
-                    nTot += nlyr
-        nLayer = nTot
+        nLayer = sum(sl[1] for sl in self.cdc)
 
         if self.rigid:
             #  all layers
@@ -337,6 +346,37 @@ class CDCLayerConstraints(Constraints):
             #  f.write('\n')
             consts.append(const)
 
+        if self.twist_curvature:
+            #  all layers: twist rate drot/L of layer l moves the hits of a track with tan(lambda) t (z = t r)
+            #  by t r^2 drot/L along phi. The track sees the r^2 part as curvature: c = sum_l K_l dt_l, where K_l
+            #  is the row of the r^2 coefficient in the weighted least-squares fit a + b r + c r^2 to the CDC layers
+            #  and to the VXD layers (not moving, weight 100). Constraint: sum_l K_l r_l^2 / L_l drot_l = 0
+            import numpy as np
+
+            par = self.parameter[5]
+            radii, lengths = [], []
+            for layer in range(nLayer):
+                wire = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, 0))
+                bwd, fwd = wire.getBackwardPos3D(), wire.getForwardPos3D()
+                radii.append(0.5 * (bwd.Rho() + fwd.Rho()))
+                lengths.append(fwd.Z() - bwd.Z())
+
+            r = np.array(self.vxd_radii + radii)
+            w = np.array([100.] * len(self.vxd_radii) + [1.] * nLayer)
+            A = np.column_stack([np.ones_like(r), r, r * r])
+            K = np.linalg.solve(A.T @ (w[:, None] * A), (A * w[:, None]).T)[2][len(self.vxd_radii):]
+            coeffs = K * np.array(radii) ** 2 / np.array(lengths)
+            coeffs /= np.abs(coeffs).max()
+
+            const = Constraint()
+            for layer in range(nLayer):
+                const.add(cdc_layer_label(layer, par[0]), float(coeffs[layer]))
+            # same labels as the twist constraint above -> would replace it in the generator (checksum from labels
+            # only, see Constraint.get_checksum). Dummy label with coefficient 0 makes the label list unique.
+            # Workaround, to be re-thought together with the checksum.
+            const.add(cdc_layer_label(0, par[0]), 0.)
+            consts.append(const)
+
         return consts
 
 
@@ -407,7 +447,8 @@ class CDCWireConstraints(Constraints):
             layer_rigid=True,
             layer_radius=None,
             cdc_radius=False,
-            hemisphere=None):
+            hemisphere=None,
+            tangential_m1=None):
         """Initialize constraint
 
         Parameters
@@ -425,6 +466,11 @@ class CDCWireConstraints(Constraints):
         hemisphere : list(int)
           Modifies rigid and layer_radius (layer_radius constraint is added if not present for selected layer(s))
           constraint by splitting the constraints for a given list of layers to L/R up/down half of CDC
+        tangential_m1 : list(int)
+          4 constraints per listed layer - fix the first harmonic (cos, sin of the wire phi) of the tangential wire
+          displacement at each end-plate. With layer_rigid this removes all first-harmonic movement of the wires w.r.t.
+          the layer: otherwise a pattern dt = a sin(phi), dr = a cos(phi) passes the rigid constraints and, together with
+          a layer shift, gives a purely radial displacement that tracks from the IP cannot see
 
         """
 
@@ -453,6 +499,11 @@ class CDCWireConstraints(Constraints):
             hemisphere = []
         #: set list of layers
         self.hemisphere = hemisphere
+        #: list of layers subject to the tangential first-harmonic constraints
+        if tangential_m1 is None:
+            tangential_m1 = []
+        #: set list of layers
+        self.tangential_m1 = tangential_m1
 
     def configure_collector(self, collector):
         """Enables wire-by-wire derivatives in collector
@@ -594,6 +645,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -606,6 +659,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -622,6 +677,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -637,6 +694,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireBwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -652,6 +711,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -667,6 +728,8 @@ class CDCWireConstraints(Constraints):
 
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                 const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
+            # dummy label (coefficient 0): keeps the label list different from other constraints on these wires (see
+            # Constraint.get_checksum: same labels -> only one constraint kept); to be re-thought
             const.add(self.get_label(layer, 0, 0), 0.)
             consts.append(const)
 
@@ -688,6 +751,25 @@ class CDCWireConstraints(Constraints):
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdX), +math.cos(wirePhi))
                     const.add(self.get_label(layer, wire, Belle2.CDCAlignment.wireFwdY), +math.sin(wirePhi))
             consts.append(const)
+
+        # tangential_m1: sum(dt cos(phi)) = sum(dt sin(phi)) = 0 per layer and end-plate, dt = -sin(phi) dX + cos(phi) dY
+        for layer in self.tangential_m1:
+            for parX, parY, fwd in ((Belle2.CDCAlignment.wireBwdX, Belle2.CDCAlignment.wireBwdY, False),
+                                    (Belle2.CDCAlignment.wireFwdX, Belle2.CDCAlignment.wireFwdY, True)):
+                for dummyWire, harmonic in ((1, math.cos), (2, math.sin)):
+                    const = Constraint()
+                    for wire in range(0, self.wires_in_layer[layer]):
+                        cdcWire = Belle2.CDC.CDCWire.getInstance(Belle2.WireID(layer, wire))
+                        wirePhi = (cdcWire.getForwardPos3D() if fwd else cdcWire.getBackwardPos3D()).phi()
+                        const.add(self.get_label(layer, wire, parX), -math.sin(wirePhi) * harmonic(wirePhi))
+                        const.add(self.get_label(layer, wire, parY), +math.cos(wirePhi) * harmonic(wirePhi))
+                    # same labels (same order) as the rotation constraint of this layer and end-plate, and as each
+                    # other -> the generator would keep only one of the three (checksum from labels only, see
+                    # Constraint.get_checksum). Dummy label with coefficient 0, different for cos and sin and
+                    # different from the (layer, 0, 0) dummy of the radius constraints, makes each list unique.
+                    # Workaround, to be re-thought together with the checksum.
+                    const.add(self.get_label(layer, dummyWire, 0), 0.)
+                    consts.append(const)
 
         return consts
 

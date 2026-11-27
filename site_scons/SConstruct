@@ -110,7 +110,7 @@ global_env = Environment(
     # for now, add the include folder here, as the path set via
     # CPPPATH below seems to be ignored for C file compiles
     CCFLAGS=['-Wall', '-isystem$EXTINCDIR', '-Iinclude/'],
-    CXXFLAGS=['-std=c++20'],
+    CXXFLAGS=['-std=c++20', '-fsigned-char'],
     FORTRANFLAGS=['-std=legacy'],
     FORTRANMODDIR=os.path.join('$INCDIR', 'fortran_modules'),
     # disable warnings when compiling dictionaries, too much root problems
@@ -260,7 +260,7 @@ if(not GetOption('no-debuginfo')):
 override_from_environment = ['CC', 'CXX', 'LD']
 for v in override_from_environment:
     if v in os.environ:
-        print(f"Note: overriding variable {v} ('{global_env[v]}') from environment (${v}='{os.environ[v]}').")
+        print(f"Note: overriding variable {v} ('{global_env.get(v, '')}') from environment (${v}='{os.environ[v]}').")
         global_env[v] = os.environ[v]
 
 if os.environ.get("BELLE2_USE_CCACHE", "no").lower() in ["yes", "true", "on", "1"]:

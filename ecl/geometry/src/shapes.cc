@@ -12,6 +12,7 @@
 #include <G4ExtrudedSolid.hh>
 #include "G4Trap.hh"
 #include "ecl/geometry/BelleCrystal.h"
+#include <cassert>
 #include <iostream>
 #include <fstream>
 #include <iterator>

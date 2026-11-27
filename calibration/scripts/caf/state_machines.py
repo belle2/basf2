@@ -34,6 +34,7 @@ from caf.utils import method_dispatch
 from caf.utils import iov_from_runs
 from caf.utils import IoV_Result
 from caf.utils import get_iov_from_file
+from caf.utils import setup_database_chain
 from caf.backends import Job
 from caf.runners import AlgorithmsRunner
 
@@ -788,10 +789,10 @@ class CalibrationMachine(Machine):
                     json_db_chain.append(('central', database.global_tag))
                 else:
                     raise ValueError(f"Unknown database type {database.db_type}.")
-            # CAF created ones for dependent calibrations and previous iterations of this calibration
-            for database in list_dependent_databases:
-                json_db_chain.append(('local', database))
             job_config['database_chain'] = json_db_chain
+            # CAF created ones for dependent calibrations and previous iterations of this calibration.
+            # These are kept separate since they are put at the head of the chain, with priority over the user-set chain.
+            job_config['dependent_databases'] = list_dependent_databases
 
             job_config_file_path = input_data_directory.joinpath('collector_config.json').absolute()
             with open(job_config_file_path, 'w') as job_config_file:
@@ -1033,32 +1034,14 @@ class AlgorithmMachine(Machine):
         """
         Apply all databases in the correct order.
         """
-        # We deliberately override the normal database ordering because we don't want input files GTs to affect
-        # the processing. Only explicit GTs and intermediate local DBs made by the CAF should be added here.
-        b2conditions.reset()
-        b2conditions.override_globaltags()
-
-        # Apply all the databases in order, starting with the user-set chain for this Calibration
+        # The user-set chain for this Calibration, then the finished databases of the dependent calibrations.
+        # We can assume that the latter exist as we can't be here until they have returned with OK status.
         # Local variable avoids doxygen "no uniquely matching class member" warning
         database_chain = self.database_chain
-        for database in database_chain:
-            if database.db_type == 'local':
-                B2INFO(f"Adding Local Database {database.filepath.as_posix()} to head of chain of local databases, "
-                       f"for {self.algorithm.name}.")
-                b2conditions.prepend_testing_payloads(database.filepath.as_posix())
-            elif database.db_type == 'central':
-                B2INFO(f"Adding Central database tag {database.global_tag} to head of GT chain, "
-                       f"for {self.algorithm.name}.")
-                b2conditions.prepend_globaltag(database.global_tag)
-            else:
-                raise ValueError(f"Unknown database type {database.db_type}.")
-        # Here we add the finished databases of previous calibrations that we depend on.
-        # We can assume that the databases exist as we can't be here until they have returned
-        # with OK status.
-        for filename, directory in self.dependent_databases:
-            B2INFO(f"Adding Local Database {filename} to head of chain of local databases created by"
-                   f" a dependent calibration, for {self.algorithm.name}.")
-            b2conditions.prepend_testing_payloads(filename)
+        setup_database_chain([(db.db_type, db.global_tag if db.db_type == 'central' else db.filepath.as_posix())
+                              for db in database_chain],
+                             [filename for filename, directory in self.dependent_databases],
+                             log_suffix=f" for {self.algorithm.name}")
 
         # Create a directory to store the payloads of this algorithm
         create_directories(Path(self.output_database_dir), overwrite=False)

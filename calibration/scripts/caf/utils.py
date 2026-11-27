@@ -258,6 +258,36 @@ class CentralDatabase():
         self.global_tag = global_tag
 
 
+def setup_database_chain(database_chain, dependent_databases=(), log_suffix=""):
+    """
+    Parameters:
+        database_chain (list[tuple(str, str)]): The user-set database chain, as ``(db_type, location)`` pairs,
+            where ``db_type`` is ``'central'`` (``location`` is a global tag) or ``'local'`` (``location`` is the
+            path to a ``database.txt``). As in basf2, the first database in the chain has the highest priority.
+        dependent_databases (list[str]): Paths to the ``database.txt`` of the local databases created by the CAF
+            (dependent calibrations and previous iterations of this calibration). They always have priority over
+            ``database_chain``, with the last one in the list having the highest priority.
+        log_suffix (str): Optional text appended to every log message.
+
+    Reset the basf2 conditions configuration and set up the database chain used by the CAF.
+    Input file global tags are always ignored: only explicit global tags and local databases are used.
+    """
+    from basf2 import conditions as b2conditions
+    b2conditions.reset()
+    # After the reset, the global tags may still contain the defaults (e.g. from $BELLE2_CONDB_GLOBALTAG):
+    # we keep them as the lowest priority fallback.
+    globaltags = [location for db_type, location in database_chain if db_type == 'central']
+    testing_payloads = [location for db_type, location in database_chain if db_type == 'local']
+    unknown = {db_type for db_type, location in database_chain} - {'central', 'local'}
+    if unknown:
+        raise ValueError(f"Unknown database type(s) {unknown}.")
+    testing_payloads = list(reversed(dependent_databases)) + testing_payloads
+    b2conditions.override_globaltags(globaltags + list(b2conditions.globaltags))
+    b2conditions.testing_payloads = testing_payloads + list(b2conditions.testing_payloads)
+    B2INFO(f"Global tags (highest priority first){log_suffix}: {list(b2conditions.globaltags)}")
+    B2INFO(f"Local databases (highest priority first){log_suffix}: {list(b2conditions.testing_payloads)}")
+
+
 def split_runs_by_exp(runs):
     """
     Parameters:

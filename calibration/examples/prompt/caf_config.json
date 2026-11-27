@@ -1,6 +1,6 @@
 {
     "caf_script": "example_complex.py",
-    "database_chain": ["online", "data_reprocessing_prompt"],
+    "globaltags": ["data_reprocessing_prompt", "online"],
     "backend_args": {"queue": "s"},
     "requested_iov" : [12,900,12,2000],
     "expert_config" : {"max_files_per_run": 4,

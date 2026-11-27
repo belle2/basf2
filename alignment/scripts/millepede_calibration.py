@@ -248,6 +248,7 @@ def create(name,
         NOTE: This overrides possible list of files assigned during creation of collections (if set)
     tags : list(str)
         List of input global tags. Can include absolute file paths to local databases (added to the chain).
+        As in basf2, the first entry has the highest priority.
 
     timedep : list(tuple(list(int), list(tuple(int, int, int))))
         Time-depence configuration.
@@ -349,8 +350,8 @@ def create(name,
         # linearizations, small alignment changes have numerical negligible effects on
         # constraint coefficients. But we can do even better -> should be not difficult
         # but needs much more testing.
-        # NOTE: reversed (highest priority last) order expected here
-        constraint_tags = [tag for tag in reversed(basf2.conditions.globaltags)]
+        # NOTE: as in basf2, the first global tag has the highest priority
+        constraint_tags = list(basf2.conditions.globaltags)
 
         if len(consts):
             generate_constraints(consts, timedep, constraint_tags, init_event)

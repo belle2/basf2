@@ -33,7 +33,7 @@ def get_calibrations(input_data, **kwargs):
     # that have had their input files assigned and any configuration applied. The final output payload IoV(s)
     # should also be set correctly to be open-ended e.g. IoV(exp_low, run_low, -1, -1)
     #
-    # The database_chain, CAF backend_args, backend, and heartbeat of these
+    # The database chain (from the 'globaltags' key of the JSON config), CAF backend_args, backend, and heartbeat of these
     # calibrations will all be set by the b2caf-prompt-run tool.
     # You should set the `Calibration.max_subjobs` attribute yourself, probably to ~1500. But if you have many
     # Calibration objects running in parallel you might want to set  it lower per Calibration so that the total

@@ -222,12 +222,12 @@ def make_calibration(args, input_files, pulser_deltaT, use_seq_input):
     cal.reset_database()
     # Central DB global tags (highest priority first)
     global_tags = [g.strip() for g in args.global_tags.split(',') if g.strip()]
-    for gt in reversed(global_tags):
+    for gt in global_tags:
         cal.use_central_database(gt)
 
     # Local DB files (highest priority first)
     local_dbs = args.localDBs.split()
-    for ldb in reversed(local_dbs):
+    for ldb in local_dbs:
         cal.use_local_database(ldb)
 
     cal.pre_collector_path = main

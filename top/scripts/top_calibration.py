@@ -57,10 +57,10 @@ def BS13d_calibration_local(inputFiles, look_back=28, globalTags=None, localDBs=
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -96,10 +96,10 @@ def BS13d_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -149,10 +149,10 @@ def BS13d_calibration_cdst(inputFiles, time_offset=0, globalTags=None, localDBs=
     cal = Calibration(name='TOP_BS13dCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -201,10 +201,10 @@ def moduleT0_calibration_DeltaT(inputFiles, globalTags=None, localDBs=None,
     cal = Calibration(name='TOP_moduleT0_rough', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
@@ -255,10 +255,10 @@ def moduleT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     cal = Calibration(name='TOP_moduleT0_final', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
@@ -313,10 +313,10 @@ def moduleT0_calibration_cosmics(inputFiles, globalTags=None, localDBs=None,
     cal = Calibration(name='TOP_moduleT0_cosmics', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SingleIOV
@@ -364,10 +364,10 @@ def commonT0_calibration_BF(inputFiles, globalTags=None, localDBs=None,
     cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -417,10 +417,10 @@ def commonT0_calibration_LL(inputFiles, sample='dimuon', globalTags=None, localD
     cal = Calibration(name='TOP_commonT0Calibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -466,10 +466,10 @@ def pulseHeight_calibration_laser(inputFiles, t_min=-50.0, t_max=0.0, look_back=
     cal = Calibration(name='TOP_pulseHeightCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SingleIOV
@@ -506,10 +506,10 @@ def pulseHeight_calibration_rawdata(inputFiles, globalTags=None, localDBs=None):
     cal = Calibration(name='TOP_pulseHeightCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SingleIOV
@@ -534,10 +534,10 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
     #   define calibration
     cal = Calibration(name='TOP_alignment')
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.strategies = SingleIOV
 
@@ -578,10 +578,10 @@ def module_alignment(inputFiles, sample='dimuon', fixedParameters=None,
         collection = Collection(collector=collector, input_files=inputFiles,
                                 pre_collector_path=main, max_collector_jobs=1)
         if globalTags:
-            for globalTag in reversed(globalTags):
+            for globalTag in globalTags:
                 collection.use_central_database(globalTag)
         if localDBs:
-            for localDB in reversed(localDBs):
+            for localDB in localDBs:
                 collection.use_local_database(localDB)
         if backend_args:
             collection.backend_args = backend_args
@@ -625,10 +625,10 @@ def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=
     cal = Calibration(name='TOP_ChannelMaskCalibration', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -676,10 +676,10 @@ def offset_calibration(inputFiles, globalTags=None, localDBs=None,
     cal = Calibration(name='TOP_offsetCalibration', collector=collector,
                       algorithms=algorithms, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialRunByRun
@@ -725,10 +725,10 @@ def photonYields_calibration(inputFiles, sample='dimuon', globalTags=None, local
     cal = Calibration(name='TOP_photonYields', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SequentialBoundaries  # Was SingleIOV before proc12
@@ -777,10 +777,10 @@ def calibration_validation(inputFiles, sample='dimuon', globalTags=None, localDB
     cal = Calibration(name='TOP_validation', collector=collector,
                       algorithms=algorithm, input_files=inputFiles)
     if globalTags:
-        for globalTag in reversed(globalTags):
+        for globalTag in globalTags:
             cal.use_central_database(globalTag)
     if localDBs:
-        for localDB in reversed(localDBs):
+        for localDB in localDBs:
             cal.use_local_database(localDB)
     cal.pre_collector_path = main
     cal.strategies = SingleIOV

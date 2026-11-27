@@ -28,7 +28,7 @@ using namespace std;
 char* timestamp()
 {
   struct timeval tb;
-  struct tm*     tp;
+  const struct tm*     tp;
   static char buf[256];
   //  struct tm      result;
   gettimeofday(&tb, NULL);

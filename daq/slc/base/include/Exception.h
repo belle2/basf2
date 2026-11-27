@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     Exception();
-    Exception(const std::string&);
+    explicit Exception(const std::string&);
     Exception(const std::string&, int err);
 #if __GNUC__ >= 7
     virtual ~Exception() {}

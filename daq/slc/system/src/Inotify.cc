@@ -56,7 +56,7 @@ InotifyEventList Inotify::wait(int sec)
     if (r <= 0) return ievent_v;
     int index = 0;
     while (index < r) {
-      inotify_event* ev = (inotify_event*)&buf[index];
+      inotify_event* ev = reinterpret_cast<inotify_event*>(&buf[index]);
       int event_size =  sizeof(inotify_event) + ev->len;
       index += event_size;
       ievent_v.push_back(InotifyEvent(ev->wd, ev->mask, ev->name));

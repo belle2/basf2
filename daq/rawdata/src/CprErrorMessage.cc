@@ -32,7 +32,7 @@ CprErrorMessage::~CprErrorMessage()
 }
 
 
-void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, string err_str)
+void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, const string& err_str)
 {
   if (shmflag > 0) {
     nsm_status->reportError(RunInfoBuffer::CPRFIFO_FULL);//need to implement error flag
@@ -40,7 +40,7 @@ void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, s
   PrintError(err_str.c_str());
 }
 
-void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, char* err_message,
+void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, const char* err_message,
                                  const char* file, const char* func_name, const int line)
 {
   if (shmflag > 0) {
@@ -50,7 +50,7 @@ void CprErrorMessage::PrintError(const int shmflag, RunInfoBuffer* nsm_status, c
 }
 
 
-void CprErrorMessage::PrintError(char* err_message, const char* file, const char* func_name, const int line)
+void CprErrorMessage::PrintError(const char* err_message, const char* file, const char* func_name, const int line)
 {
   char err_buf[500];
   sprintf(err_buf, "%s : %s %s %d", err_message, file, func_name, line);

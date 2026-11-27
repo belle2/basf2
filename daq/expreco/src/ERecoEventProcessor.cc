@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-ERecoEventProcessor::ERecoEventProcessor(string conffile)
+ERecoEventProcessor::ERecoEventProcessor(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -43,7 +43,7 @@ ERecoEventProcessor::ERecoEventProcessor(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(m_nodename);
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
 
   // 3. Initialize process manager
   m_proc = new RFProcessManager(m_nodename);
@@ -66,7 +66,7 @@ ERecoEventProcessor::ERecoEventProcessor(string conffile)
   m_log = new RFLogManager(m_nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
 }
 
@@ -135,12 +135,13 @@ int ERecoEventProcessor::Configure(NSMmsg* /*nsmm*/, NSMcontext* /*nsmc*/)
   rport += portbase;
   char portchar[256];
   sprintf(portchar, "%d", rport);
-  m_pid_receiver = m_proc->Execute(receiver, (char*)rbufin.c_str(), srchost, portchar, (char*)shmname.c_str(), (char*)"0");
+  m_pid_receiver = m_proc->Execute(receiver, const_cast<char*>(rbufin.c_str()), srchost, portchar, const_cast<char*>(shmname.c_str()),
+                                   static_cast<char*>("0"));
 
   // 5. Run EventServer
   char* evs = m_conf->getconf("processor", "eventserver", "script");
   char* evsport = m_conf->getconf("processor", "eventserver", "port");
-  m_pid_evs = m_proc->Execute(evs, (char*)rbufout.c_str(), evsport);
+  m_pid_evs = m_proc->Execute(evs, const_cast<char*>(rbufout.c_str()), evsport);
 
   printf("Configure : done\n");
   fflush(stdout);
@@ -199,7 +200,7 @@ int ERecoEventProcessor::UnConfigure(NSMmsg*, NSMcontext*)
 int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
 {
   // Clear DQM histogram memory
-  char cmdline[] = "hsendcommand DQMRC:CLEAR localhost 10391";
+  const char cmdline[] = "hsendcommand DQMRC:CLEAR localhost 10391";
   system(cmdline);
   printf("ERecoEventProcessor : DQM TMemFile cleared\n");
 
@@ -215,10 +216,10 @@ int ERecoEventProcessor::Start(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
   // 3. Run basf2
   char* basf2 = m_conf->getconf("processor", "basf2", "script");
   if (nsmm->len > 0) {
-    basf2 = (char*) nsmm->datap;
+    basf2 = const_cast<char*>(nsmm->datap);
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
-  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  m_pid_basf2 = m_proc->Execute(basf2, const_cast<char*>(rbufin.c_str()), const_cast<char*>(rbufout.c_str()), hport);
 
   return 0;
 }

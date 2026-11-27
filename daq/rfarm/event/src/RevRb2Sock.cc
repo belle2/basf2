@@ -16,10 +16,10 @@ using namespace Belle2;
 RevRb2Sock::RevRb2Sock(string rbuf, int port, string shmname, int id)
 {
   //  m_rbuf = new RingBuffer((char*)rbuf.c_str(), RBUFSIZE);
-  m_rbuf = new RingBuffer((char*)rbuf.c_str());
+  m_rbuf = new RingBuffer(const_cast<char*>(rbuf.c_str()));
   m_sock = new REvtSocketSend(port);
   m_evtbuf = new char[MAXEVTSIZE];
-  m_flow = new RFFlowStat((char*)shmname.c_str(), id, m_rbuf);
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()), id, m_rbuf);
 
 }
 
@@ -33,7 +33,7 @@ int RevRb2Sock::SendEvent(void)
 {
   // Get a record from ringbuf
   int size;
-  while ((size = m_rbuf->remq((int*)m_evtbuf)) == 0) {
+  while ((size = m_rbuf->remq(reinterpret_cast<int*>(m_evtbuf))) == 0) {
     //    printf ( "Rx : evtbuf is not available yet....\n" );
     //    usleep(100);
     usleep(20);

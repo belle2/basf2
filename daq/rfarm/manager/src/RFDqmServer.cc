@@ -18,7 +18,7 @@
 using namespace Belle2;
 using namespace std;
 
-RFDqmServer::RFDqmServer(string conffile)
+RFDqmServer::RFDqmServer(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());

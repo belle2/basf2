@@ -30,8 +30,8 @@ namespace Belle2 {
     friend class NSMNodeDaemon;
 
   public:
-    NSMCallback(int timeout = 5);
-    virtual ~NSMCallback() {}
+    explicit NSMCallback(int timeout = 5);
+    virtual ~NSMCallback() override {}
 
   public:
     virtual void init(NSMCommunicator&) {}
@@ -53,6 +53,7 @@ namespace Belle2 {
     void reply(const NSMMessage& msg);
     void log(LogFile::Priority pri, const char* format, ...);
     void log(LogFile::Priority pri, const std::string& msg);
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     int reset();
 
   public:

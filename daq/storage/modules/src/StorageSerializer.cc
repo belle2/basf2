@@ -46,12 +46,13 @@ StorageSerializerModule::~StorageSerializerModule() { }
 
 void StorageSerializerModule::initialize()
 {
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_expno = m_runno = -1;
   m_count = m_count_0 = 0;
   if (m_obuf_name.size() > 0 && m_obuf_size > 0) {
-    m_obuf.open(m_obuf_name.c_str(), m_obuf_size * 1000000);
+    m_obuf.open(m_obuf_name, m_obuf_size * 1000000);
   } else {
     B2FATAL("Failed to load arguments for shared buffer (" <<
             m_obuf_name.c_str() << ":" << m_obuf_size << ")");
@@ -85,7 +86,7 @@ int StorageSerializerModule::writeStreamerInfos()
     (msg->header())->nObjects = 1;       // No. of objects
     (msg->header())->nArrays = 0;    // No. of arrays
     int nword = (msg->size() - 1) / 4 + 1;
-    m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
+    m_obuf.write(reinterpret_cast<int*>(msg->buffer()), nword, false, 0, true);
     int size = msg->size();
     B2INFO("Wrote StreamerInfo to a file : " << size << "bytes");
     delete msg;
@@ -102,7 +103,6 @@ void StorageSerializerModule::event()
   StoreObjPtr<EventMetaData> evtmetadata;
   unsigned int expno = evtmetadata->getExperiment();
   unsigned int runno = evtmetadata->getRun();
-  unsigned int subno = 0;//evtmetadata->getRun() & 0xFF;
   m_obuf.lock();
   SharedEventBuffer::Header* header = m_obuf.getHeader();
   struct dataheader {
@@ -112,6 +112,7 @@ void StorageSerializerModule::event()
     unsigned int runno;
   } hd;
   if (header->runno < runno || header->expno < expno) {
+    unsigned int subno = 0;//evtmetadata->getRun() & 0xFF;
     m_count = 0;
     B2INFO("New run detected: expno = " << expno << " runno = "
            << runno << " subno = " << subno);
@@ -122,22 +123,23 @@ void StorageSerializerModule::event()
     hd.type = MSG_STREAMERINFO;
     hd.expno = expno;
     hd.runno = runno;
-    m_obuf.write((int*)&hd, hd.nword, false, 0, true);
+    m_obuf.write(reinterpret_cast<int*>(&hd), hd.nword, false, 0, true);
     m_nbyte = writeStreamerInfos();
   }
   hd.nword = 4;
   hd.type = MSG_EVENT;
   hd.expno = expno;
   hd.runno = runno;
-  m_obuf.write((int*)&hd, hd.nword, false, 0, true);
+  m_obuf.write(reinterpret_cast<int*>(&hd), hd.nword, false, 0, true);
   EvtMessage* msg = m_streamer->streamDataStore(DataStore::c_Event);
   int nword = (msg->size() - 1) / 4 + 1;
-  m_obuf.write((int*)msg->buffer(), nword, false, 0, true);
+  m_obuf.write(reinterpret_cast<int*>(msg->buffer()), nword, false, 0, true);
   m_obuf.unlock();
   m_nbyte += msg->size();
   delete msg;
   if (m_count < 10000 && (m_count < 10 || (m_count > 10 && m_count < 100 && m_count % 10 == 0) ||
                           (m_count > 100 && m_count < 1000 && m_count % 100 == 0) ||
+                          // cppcheck-suppress knownConditionTrueFalse ; the count grows past 10000 at runtime
                           (m_count > 1000 && m_count < 10000 && m_count % 1000 == 0))) {
     std::cout << "[DEBUG] Storage count = " << m_count << " nword = " << nword << std::endl;
   }

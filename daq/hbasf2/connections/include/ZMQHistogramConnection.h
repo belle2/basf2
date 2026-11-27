@@ -55,7 +55,7 @@ namespace Belle2 {
     /// No sockets to poll on, so return an empty list
     std::vector<zmq::socket_t*> getSockets() const final;
     /// There should be never incoming data, so raise an exception if called anyways.
-    void handleIncomingData();
+    static void handleIncomingData();
     /// Return the connection string
     std::string getEndPoint() const { return "file://" + m_rootFileName; }
   private:
@@ -83,7 +83,7 @@ namespace Belle2 {
                       const std::optional<unsigned int>& run,
                       EMessageTypes messageType);
     /// Nothing to do on clear.
-    void clear() {}
+    static void clear() {}
 
     /// The monitoring JSON is just passed from the ZMQConfirmedOutput
     std::string getMonitoringJSON() const final { return m_output.getMonitoringJSON(); }
@@ -122,7 +122,7 @@ namespace Belle2 {
                       const std::optional<unsigned int>& run,
                       EMessageTypes messageType);
     /// Nothing to do on clear
-    void clear() {}
+    static void clear() {}
 
     /// The monitoring JSON is just passed from the ZMQRawOutput
     std::string getMonitoringJSON() const final { return m_output.getMonitoringJSON(); }

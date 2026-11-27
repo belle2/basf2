@@ -42,7 +42,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerHLTModule();
-    virtual ~DeSerializerHLTModule();
+    virtual ~DeSerializerHLTModule() override;
 
     //! initialize functions
     void initialize() override;
@@ -54,6 +54,7 @@ namespace Belle2 {
 
 
   protected :
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     StoreArray<RawCOPPER> rawcprarray;
     StoreArray<RawCDC> raw_cdcarray;
     StoreArray<RawSVD> raw_svdarray;
@@ -61,6 +62,7 @@ namespace Belle2 {
     StoreArray<RawECL> raw_eclarray;
     StoreArray<RawARICH> raw_epidarray;
     StoreArray<RawKLM> raw_klmarray;
+    // cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
     StoreArray<RawFTSW> raw_ftswarray;
 
   private:

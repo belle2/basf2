@@ -94,7 +94,7 @@ int main(int argc, char** argv)
   }
   string shmname = string(conf.getconf("system", "unitname")) + ":" +
                    string(nodename);
-  RFFlowStat flow((char*)shmname.c_str());
+  RFFlowStat flow(const_cast<char*>(shmname.c_str()));
 
   printf("nodename = %s, nid = %d\n", nodename, nid);
   printf("id range : %d to %d\n", idlist[0], idlist[nid - 1]);
@@ -102,7 +102,7 @@ int main(int argc, char** argv)
   //        123456789012345678901234567890123456789012345678901234567890
   printf("  At   :       Nevent     Nqueue  Flow(MB/s)  Size(KB)   Rate(Hz)\n");
   for (int i = 0; i < nid; i++) {
-    RfShm_Cell& cell = flow.getinfo(idlist[i]);
+    const RfShm_Cell& cell = flow.getinfo(idlist[i]);
     //    printf ( "cell %2.2d : %8d %4d %7.2f %7.2f %7.2f\n",
     //       idlist[i],
     //       cell.nevent, cell.nqueue, cell.flowrate, cell.avesize,

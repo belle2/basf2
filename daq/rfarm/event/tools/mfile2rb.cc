@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
     // Put the message in ring buffer
     for (;;) {
-      int irb = rbuf->insq((int*)evbuf[bufno], (is - 1) / 4 + 1);
+      int irb = rbuf->insq(reinterpret_cast<int*>(evbuf[bufno]), (is - 1) / 4 + 1);
       if (irb >= 0) break;
       //      usleep(100);
       usleep(20);

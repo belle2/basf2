@@ -18,6 +18,11 @@ namespace Belle2 {
   public:
     HistoRelay(std::string& filename, std::string& dest, int port);
     ~HistoRelay();
+    /** Copy constructor (disabled). */
+    HistoRelay(const HistoRelay&) = delete;
+
+    /** Operator = (disabled). */
+    HistoRelay& operator=(const HistoRelay&) = delete;
 
     int collect();
   private:

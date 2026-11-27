@@ -32,7 +32,7 @@ bool DataStorePackage::restore()
     B2FATAL("Bad tarailer magic for HLT = " << m_data_hlt.getTrailerMagic()
             << " count = " << count);
   }
-  EvtMessage* msg = new EvtMessage((char*)m_data_hlt.getBody());
+  EvtMessage* msg = new EvtMessage(reinterpret_cast<char*>(m_data_hlt.getBody()));
   if (msg->type() == MSG_TERMINATE) {
     B2INFO("Got Termination message");
     delete msg;
@@ -54,7 +54,7 @@ bool DataStorePackage::restore()
         return false;
       }
       if (m_data_pxd.getBuffer() != NULL) {
-        m_rawpxdary.appendNew((int*)m_data_pxd.getBody(), m_data_pxd.getBodyByteSize());
+        m_rawpxdary.appendNew(reinterpret_cast<int*>(m_data_pxd.getBody()), m_data_pxd.getBodyByteSize());
         //(m_sndhdrary.appendNew())->SetBuffer(m_data_pxd.getBuffer());
       }
     }

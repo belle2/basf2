@@ -22,7 +22,7 @@
 using namespace std;
 using namespace Belle2;
 
-RFOutputServer::RFOutputServer(string conffile)
+RFOutputServer::RFOutputServer(const string& conffile)
 {
   // 0. Initialize configuration manager
   m_conf = new RFConf(conffile.c_str());
@@ -39,7 +39,7 @@ RFOutputServer::RFOutputServer(string conffile)
   // 2. Initialize local shared memory
   string shmname = string(m_conf->getconf("system", "unitname")) + ":" +
                    string(nodename);
-  m_shm = new RFSharedMem((char*)shmname.c_str());
+  m_shm = new RFSharedMem(const_cast<char*>(shmname.c_str()));
 
   // 3. Initialize RingBuffers
   //  char* rbufin = m_conf->getconf("collector", "ringbufin");
@@ -60,7 +60,7 @@ RFOutputServer::RFOutputServer(string conffile)
   m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
-  m_flow = new RFFlowStat((char*)shmname.c_str());
+  m_flow = new RFFlowStat(const_cast<char*>(shmname.c_str()));
 
   // 7. Clear PID list
   m_pid_sender = 0;
@@ -122,44 +122,45 @@ int RFOutputServer::Configure(NSMmsg* nsmm, NSMcontext* /*nsmc*/)
     char* port = m_conf->getconf("collector", "sender", "port");
     char idbuf[3];
     sprintf(idbuf, "%2.2d", RF_OUTPUT_ID);
-    m_pid_sender = m_proc->Execute(sender, (char*)rbufout.c_str(), port, (char*)shmname.c_str(), idbuf);
+    m_pid_sender = m_proc->Execute(sender, const_cast<char*>(rbufout.c_str()), port, const_cast<char*>(shmname.c_str()), idbuf);
     m_flow->clear(RF_OUTPUT_ID);
   } else if (strstr(src, "file") != 0) {
     // Run file writer
     char* writer = m_conf->getconf("collector", "writer", "script");
     char* file = m_conf->getconf("collector", "writer", "filename");
     char* nnode = m_conf->getconf("processor", "nnodes");
-    m_pid_sender = m_proc->Execute(writer, (char*)rbufout.c_str(), file, nnode);
+    m_pid_sender = m_proc->Execute(writer, const_cast<char*>(rbufout.c_str()), file, nnode);
   } else {
     // Do not run anything
   }
 
   // 4. Run basf2
   char* basf2 = m_conf->getconf("collector", "basf2", "script");
-  if (nsmm->len > 0) {
-    basf2 = (char*) nsmm->datap;
+  if (nsmm != NULL && nsmm->len > 0) {
+    basf2 = const_cast<char*>(nsmm->datap);
     printf("Configure: basf2 script overridden : %s\n", basf2);
   }
-  m_pid_basf2 = m_proc->Execute(basf2, (char*)rbufin.c_str(), (char*)rbufout.c_str(), hport);
+  m_pid_basf2 = m_proc->Execute(basf2, const_cast<char*>(rbufin.c_str()), const_cast<char*>(rbufout.c_str()), hport);
 
   // 5. Run receiver
   m_nnodes = 0;
   int maxnodes = m_conf->getconfi("processor", "nnodes");
   int idbase = m_conf->getconfi("processor", "idbase");
   //  char* hostbase = m_conf->getconf("processor", "hostbase");
-  char* hostbase = m_conf->getconf("processor", "hostbase");
+  const char* hostbase = m_conf->getconf("processor", "hostbase");
   char* badlist = m_conf->getconf("processor", "badlist");
   char* port = m_conf->getconf("processor", "sender", "port");
 
   char* receiver = m_conf->getconf("collector", "receiver", "script");
-  char hostname[512], idname[3], shmid[3];
+  char hostname[512], idname[12], shmid[12];
   for (int i = 0; i < maxnodes; i++) {
-    sprintf(idname, "%2.2d", idbase + i);
-    sprintf(shmid, "%2.2d", i);
+    snprintf(idname, sizeof(idname), "%2.2d", idbase + i);
+    snprintf(shmid, sizeof(shmid), "%2.2d", i);
     if (badlist == NULL  ||
         strstr(badlist, idname) == 0) {
       sprintf(hostname, "%s%2.2d", hostbase, idbase + i);
-      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, (char*)rbufin.c_str(), hostname, port, (char*)shmname.c_str(), shmid);
+      m_pid_receiver[m_nnodes] = m_proc->Execute(receiver, const_cast<char*>(rbufin.c_str()), hostname, port,
+                                                 const_cast<char*>(shmname.c_str()), shmid);
       m_flow->clear(i);
       m_nnodes++;
     }
@@ -219,11 +220,6 @@ int RFOutputServer::Start(NSMmsg*, NSMcontext*)
   // Clear RingBuffer
   m_rbufout->forceClear();
   //  m_rbufin->forceClear();
-  return 0;
-}
-
-int RFOutputServer::Stop(NSMmsg*, NSMcontext*)
-{
   return 0;
 }
 

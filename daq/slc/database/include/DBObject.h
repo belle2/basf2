@@ -33,9 +33,9 @@ namespace Belle2 {
 
   public:
     DBObject();
-    DBObject(const std::string& path);
+    explicit DBObject(const std::string& path);
     DBObject(const DBObject& obj);
-    virtual ~DBObject();
+    virtual ~DBObject() override;
     const DBObject& operator=(const DBObject& obj);
 
   public:

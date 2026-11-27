@@ -16,7 +16,7 @@
 #include "framework/pcore/SeqFile.h"
 #include "daq/dataflow/REvtSocket.h"
 
-#include "TRandom.h"
+#include <TRandom.h>
 
 #define EVENTINTERVAL 5000
 
@@ -45,9 +45,13 @@ int main(int argc, char** argv)
   // Check file
   if ((int)filename.rfind(".list") != -1) {
     FILE* fd = fopen(filename.c_str(), "r");
+    if (fd == NULL) {
+      fprintf(stderr, "file2sockr: cannot open %s\n", filename.c_str());
+      exit(-1);
+    }
     for (;;) {
       char listfile[1024];
-      int is = fscanf(fd, "%s", listfile);
+      int is = fscanf(fd, "%1023s", listfile);
       if (is <= 0) break;
       filelist.push_back(string(listfile));
     }

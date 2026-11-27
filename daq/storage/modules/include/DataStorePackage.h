@@ -42,6 +42,12 @@ namespace Belle2 {
       m_data_pxd.setBuffer(NULL);
       m_eb2 = eb2;
     }
+    /** Copy constructor (disabled). */
+    DataStorePackage(const DataStorePackage&) = delete;
+
+    /** Operator = (disabled). */
+    DataStorePackage& operator=(const DataStorePackage&) = delete;
+
     ~DataStorePackage()
     {
       delete[] m_buf;

@@ -17,7 +17,7 @@ namespace Belle2 {
 
   public:
     Executor() {}
-    Executor(const std::string& path) : m_path(path) {}
+    explicit Executor(const std::string& path) : m_path(path) {}
 
   public:
     void setExecutable(const char* format, ...);

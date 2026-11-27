@@ -23,7 +23,7 @@ namespace Belle2 {
   public:
     MCond();
     MCond(const MCond&);
-    MCond(void*);
+    explicit MCond(void*);
     ~MCond();
 
     // member functions;

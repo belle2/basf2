@@ -58,15 +58,15 @@ int TCPServerSocket::open(int nqueue)
       throw (std::exception());
       // throw (IOException("Wrong host name or ip")); // TODO which throw is the correct one?
     } else {
-      host = gethostbyaddr((char*)&ip_address, sizeof(ip_address), AF_INET);
+      host = gethostbyaddr(reinterpret_cast<char*>(&ip_address), sizeof(ip_address), AF_INET);
     }
   }
   if (host == NULL) {
     throw (IOException("Fail to get host ip: %s", m_ip.c_str()));
   }
-  addr.sin_addr.s_addr = (*(unsigned long*)host->h_addr_list[0]);
+  addr.sin_addr.s_addr = (*reinterpret_cast<unsigned long*>(host->h_addr_list[0]));
 
-  if (bind(m_fd, (const sockaddr*) & (addr), sizeof(sockaddr_in)) != 0) {
+  if (bind(m_fd, reinterpret_cast<const sockaddr*>(& (addr)), sizeof(sockaddr_in)) != 0) {
     throw (IOException("Fail to bind the socket. %s:%d", m_ip.c_str(), m_port));
   }
   if (listen(m_fd, nqueue) != 0) {
@@ -86,7 +86,7 @@ TCPSocket TCPServerSocket::accept()
   int fd;
   errno = 0;
   while (true) {
-    if ((fd = ::accept(m_fd, (sockaddr*) & (addr), &len)) == -1) {
+    if ((fd = ::accept(m_fd, reinterpret_cast<sockaddr*>(& (addr)), &len)) == -1) {
       switch (errno) {
         case EINTR: continue;
         case EAGAIN: continue;

@@ -29,12 +29,12 @@ HLTMainLoop::HLTMainLoop()
   initSignalHandler();
 }
 
-bool HLTMainLoop::isRunning() const
+bool HLTMainLoop::isRunning()
 {
   return not s_interrupted;
 }
 
-void HLTMainLoop::initSignalHandler() const
+void HLTMainLoop::initSignalHandler()
 {
   struct sigaction action;
   action.sa_handler = signalHandler;
@@ -44,7 +44,7 @@ void HLTMainLoop::initSignalHandler() const
   sigaction(SIGTERM, &action, NULL);
 }
 
-int HLTMainLoop::writeToRingBufferWaiting(RingBuffer* ringBuffer, int* buffer, unsigned int size) const
+int HLTMainLoop::writeToRingBufferWaiting(RingBuffer* ringBuffer, const int* buffer, unsigned int size)
 {
   int irb = 0;
   while (isRunning()) {
@@ -58,7 +58,7 @@ int HLTMainLoop::writeToRingBufferWaiting(RingBuffer* ringBuffer, int* buffer, u
   return irb;
 }
 
-int HLTMainLoop::readFromRingBufferWaiting(RingBuffer* ringBuffer, int* buffer) const
+int HLTMainLoop::readFromRingBufferWaiting(RingBuffer* ringBuffer, int* buffer)
 {
   int bsize = 0;
   while ((bsize = ringBuffer->remq(buffer)) == 0 and isRunning()) {

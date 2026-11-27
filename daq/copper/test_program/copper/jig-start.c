@@ -30,12 +30,15 @@ enum finesse_generic_info {
 };
 
 #include "copper.h"
+// cppcheck-suppress missingInclude ; external COPPER driver header
 #include "plx9054.h"
+// cppcheck-suppress missingInclude ; external COPPER driver header
 #include "cprfin.h"
+// cppcheck-suppress missingInclude ; external COPPER driver header
 #include "cprfin-jig.h"
 
 void
-change_jig_regs(int * jigfd, char * key, int setcmd, int getcmd, int val)
+change_jig_regs(int * jigfd, const char * key, int setcmd, int getcmd, int val)
 {
     int i;
     int ret0, ret1, ret2;
@@ -147,14 +150,20 @@ int main()
 
   /* check copper FF_STA */
   {
-    char * p = getenv("FINESSE_SLOT");
+    const char * p = getenv("FINESSE_SLOT");
+    // cppcheck-suppress unreadVariable ; kept for debugging
     int valNow = 0;
     if (p) {
+      // cppcheck-suppress unreadVariable ; kept for debugging
       if (strchr(p, 'A') || strchr(p, 'a')) valNow |= 1;
+      // cppcheck-suppress unreadVariable ; kept for debugging
       if (strchr(p, 'B') || strchr(p, 'b')) valNow |= 2;
+      // cppcheck-suppress unreadVariable ; kept for debugging
       if (strchr(p, 'C') || strchr(p, 'c')) valNow |= 4;
+      // cppcheck-suppress unreadVariable ; kept for debugging
       if (strchr(p, 'D') || strchr(p, 'd')) valNow |= 8;
     } else {
+      // cppcheck-suppress unreadVariable ; kept for debugging
       valNow = 0xF;
     }
     ret = ioctl(cprfd, CPRIOSET_FINESSE_STA, &val, sizeof(val));
@@ -181,6 +190,7 @@ int main()
   val = 0x7;	/*	1(event fifo almost full)
                   2(length fifo almost full)
                   4(length fifo threshold)	*/
+  // cppcheck-suppress redundantAssignment ; the ioctl/getc result is only used for the diagnostic below
   ret  = ioctl(cprfd, CPRIOSET_INT_MASK, &val, sizeof(val));
   ret += ioctl(cprfd, CPRIOGET_INT_MASK, &val, sizeof(val));
   printf("INT_MASK = %x/%d\n", val, ret);
@@ -214,7 +224,7 @@ int main()
 
   /* set data size from jig */
   {
-    char * p = getenv("FINESSE_MODE");
+    const char * p = getenv("FINESSE_MODE");
     int finesse_mode = 0;
     if (p)
       finesse_mode = strtol(p, 0, 0);

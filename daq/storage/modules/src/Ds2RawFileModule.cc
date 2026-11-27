@@ -59,6 +59,7 @@ void Ds2RawFileModule::initialize()
 
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
   //m_rbuf = new RingBuffer(m_rbufname.c_str());
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_file = open("file.data", O_CREAT | O_RDWR | O_TRUNC, 0644);
 

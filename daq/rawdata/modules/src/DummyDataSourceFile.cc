@@ -141,7 +141,7 @@ void DummyDataSourceFileModule::event()
   //
   if (max_nevt >= 0) {
     if (n_basf2evt >= (unsigned int) max_nevt && max_nevt > 0) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n",
+      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %u \n",
              max_nevt, n_basf2evt);
       fflush(stdout);
       m_eventMetaDataPtr->setEndOfData();
@@ -149,7 +149,7 @@ void DummyDataSourceFileModule::event()
   }
 
   if (n_basf2evt % 1000 == 0) {
-    printf("Dummy data : Event # %.8d\n", n_basf2evt);
+    printf("Dummy data : Event # %.8u\n", n_basf2evt);
     fflush(stdout);
   }
 

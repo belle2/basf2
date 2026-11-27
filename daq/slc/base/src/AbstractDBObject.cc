@@ -26,7 +26,7 @@ AbstractDBObject::AbstractDBObject(const AbstractDBObject& obj)
 
 AbstractDBObject::~AbstractDBObject()
 {
-  reset();
+  AbstractDBObject::reset();
 }
 
 const AbstractDBObject& AbstractDBObject::operator=(

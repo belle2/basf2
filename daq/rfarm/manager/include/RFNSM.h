@@ -48,8 +48,8 @@ namespace Belle2 {
     int get_state();
 
   private:
-    int m_flag;
-    int m_state;
+    int m_flag = 0;
+    int m_state = 0;
     static RFNSM_Status* s_instance;
   };
 
@@ -67,7 +67,7 @@ namespace Belle2 {
   private:
     std::string m_nodename;
     std::string m_formatfile;
-    RfNodeInfo* m_info;
+    RfNodeInfo* m_info = nullptr;
     static NSMcontext* g_context;
     //    RFServerBase* m_server;
 

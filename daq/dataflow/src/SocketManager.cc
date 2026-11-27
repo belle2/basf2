@@ -68,13 +68,13 @@ int SocketManager::examine()
     int t;
     struct sockaddr_in isa;
     socklen_t i = sizeof(isa);
-    getsockname(m_sock, (struct sockaddr*)&isa, &i);
-    if ((t =::accept(m_sock, (struct sockaddr*)&isa, &i)) < 0) {
+    getsockname(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i);
+    if ((t =::accept(m_sock, reinterpret_cast<struct sockaddr*>(&isa), &i)) < 0) {
       //      m_errno = errno;
       return (-1);
     }
     m_fd.push_back(t);
-    printf("New socket registered t=%d, list size = %lu\n", t, m_fd.size());
+    printf("New socket registered t=%d, list size = %zu\n", t, m_fd.size());
     FD_SET(t, &m_allset);
     if (t > m_maxfd) m_maxfd = t;
 

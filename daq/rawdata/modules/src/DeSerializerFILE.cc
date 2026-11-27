@@ -198,7 +198,8 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
   int bytes_to_read = stop_word * sizeof(int);
   int read_size;
 
-  if ((read_size = fread((char*)temp_buf + recvd_byte, 1, bytes_to_read - recvd_byte, fp_in)) < 0) {
+  // cppcheck-suppress knownConditionTrueFalse ; fread returns size_t; the check guards a short read
+  if ((read_size = fread(reinterpret_cast<char*>(temp_buf) + recvd_byte, 1, bytes_to_read - recvd_byte, fp_in)) < 0) {
     if (feof(fp_in)) {
       delete[] temp_buf;
       return 0x0;

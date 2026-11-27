@@ -21,8 +21,13 @@ namespace Belle2 {
 
   class EvtSocketSend {
   public:
-    EvtSocketSend(std::string hostname, int port);
+    EvtSocketSend(const std::string& hostname, int port);
     ~EvtSocketSend();
+    /** Copy constructor (disabled). */
+    EvtSocketSend(const EvtSocketSend&) = delete;
+
+    /** Operator = (disabled). */
+    EvtSocketSend& operator=(const EvtSocketSend&) = delete;
 
     int status();
 
@@ -42,8 +47,13 @@ namespace Belle2 {
 
   class EvtSocketRecv {
   public:
-    EvtSocketRecv(int port, bool accept_at_init = true);
+    explicit EvtSocketRecv(int port, bool accept_at_init = true);
     ~EvtSocketRecv();
+    /** Copy constructor (disabled). */
+    EvtSocketRecv(const EvtSocketRecv&) = delete;
+
+    /** Operator = (disabled). */
+    EvtSocketRecv& operator=(const EvtSocketRecv&) = delete;
 
     int status();
 

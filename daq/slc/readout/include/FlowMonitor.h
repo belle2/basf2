@@ -29,7 +29,7 @@ namespace Belle2 {
 
   public:
     bool open(RunInfoBuffer* m_info);
-    bool close();
+    static bool close();
     ronode_status& monitor();
     const ronode_status& getStatus() const { return m_status; }
     ronode_status& getStatus() { return m_status; }
@@ -40,7 +40,7 @@ namespace Belle2 {
     RunInfoBuffer* m_info;
     std::vector<IOInfo> m_ioinfo;
     std::string m_ip[2];
-    unsigned long long m_nbyte[2];
+    unsigned long long m_nbyte[2] = {};
     ronode_status m_status;
 
   };

@@ -24,6 +24,7 @@ const RFCommand& RFCommand::operator=(const RFCommand& command)
   return *this;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 const RFCommand& RFCommand::operator=(const std::string& label)
 {
   if (label == CONFIGURE.getLabel()) *this = CONFIGURE;
@@ -40,6 +41,7 @@ const RFCommand& RFCommand::operator=(const std::string& label)
   return *this;
 }
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 const RFCommand& RFCommand::operator=(const char* label)
 {
   if (label != NULL)  *this = std::string(label);

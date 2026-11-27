@@ -10,13 +10,13 @@
 
 #include <string>
 #include <map>
-#include "TH1.h"
+#include <TH1.h>
 
 namespace Belle2 {
 
   class HistoManager2 {
   public:
-    HistoManager2(std::string name);
+    explicit HistoManager2(const std::string& name);
     ~HistoManager2();
 
     // Register histogram

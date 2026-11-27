@@ -25,7 +25,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     Root2RawModule();
-    virtual ~Root2RawModule();
+    virtual ~Root2RawModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -41,7 +41,7 @@ namespace Belle2 {
 
   protected :
     //!
-    int m_file;
+    int m_file = 0;
     std::string m_filename;
     int m_expno;
     int m_runno;

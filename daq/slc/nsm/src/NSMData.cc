@@ -59,7 +59,7 @@ NSMData::NSMData(const NSMData& data)
   m_pdata = NULL;
   if (m_allocated) {
     m_pdata = malloc(m_size);
-    memcpy(m_pdata, data.m_pdata, m_size);
+    if (m_pdata != NULL) memcpy(m_pdata, data.m_pdata, m_size);
   } else {
     if (data.m_pdata != NULL) m_pdata = data.m_pdata;
   }
@@ -73,8 +73,8 @@ NSMData::NSMData(const NSMData& data)
       NSMDataList data_v(data.getObjects(name));
       for (size_t i = 0; i < data_v.size(); i++) {
         NSMData& cdata(data_v[i]);
-        cdata.m_pdata = (void*)((char*)m_pdata +
-                                pro.getOffset() + cdata.m_size * i);
+        cdata.m_pdata = static_cast<void*>(static_cast<char*>(m_pdata) +
+                                           pro.getOffset() + cdata.m_size * i);
       }
       m_data_v_m.insert(NSMDataListMap::value_type(name, data_v));
     }
@@ -83,7 +83,7 @@ NSMData::NSMData(const NSMData& data)
 
 NSMData::~NSMData()
 {
-  reset();
+  NSMData::reset();
   if (m_allocated && m_pdata != NULL) {
     free(m_pdata);
     m_pdata = NULL;
@@ -127,7 +127,7 @@ void NSMData::addValue(const std::string& name, const void* data,
     m_offset += size;
   }
   if (data != NULL) {
-    memcpy((char*)m_pdata + pro.getOffset(), data, size);
+    memcpy(static_cast<char*>(m_pdata) + pro.getOffset(), data, size);
   }
 }
 
@@ -138,7 +138,7 @@ void NSMData::setValue(const std::string& name, const void* data,
   if (length == 0) length = 1;
   int size = pro.getTypeSize() * length;
   if (data != NULL && hasField(name) && size > 0) {
-    memcpy((char*)m_pdata + pro.getOffset(), data, size);
+    memcpy(static_cast<char*>(m_pdata) + pro.getOffset(), data, size);
   }
 }
 
@@ -198,8 +198,8 @@ void* NSMData::parse(const char* incpath, bool malloc_new)
   NSMparse* ptr = NULL;
   char fmtstr[256];
   int revision = 0;
-  if ((ptr = (NSMparse*)nsmlib_parsefile(getFormat().c_str(), getRevision(),
-                                         incpath, fmtstr, &revision)) == NULL) {
+  if ((ptr = static_cast<NSMparse*>(nsmlib_parsefile(getFormat().c_str(), getRevision(),
+                                                     incpath, fmtstr, &revision))) == NULL) {
     throw (NSMHandlerException("Failed to parse header file (%s:%d) : %s",
                                getFormat().c_str(), getRevision(), nsmlib_parseerr(NULL)));
   }
@@ -251,7 +251,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length, std::string& name_in)
     else if (type == 'f') type = DBField::FLOAT;
     else if (type == '(') {
       NSMData data(getName(), getFormat() + "." + name, getRevision());
-      char* pdata  = ((char*)m_pdata + offset);
+      char* pdata  = (static_cast<char*>(m_pdata) + offset);
       data.m_pdata = pdata;
       ptr = data.parse(ptr->next, length, name);
       data.setFormat(getFormat() + "." + name);
@@ -259,7 +259,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length, std::string& name_in)
       NSMDataList data_v;
       for (int i = 0; i < len; i++) {
         data.setIndex(i);
-        data.m_pdata = (void*)(pdata + i * data.getSize());
+        data.m_pdata = static_cast<void*>((pdata + i * data.getSize()));
         data_v.push_back(data);
       }
       m_data_v_m.insert(NSMDataListMap::value_type(name, data_v));
@@ -283,7 +283,7 @@ NSMparse* NSMData::parse(NSMparse* ptr, int& length, std::string& name_in)
 void* NSMData::getValue(const std::string& name)
 {
   if (!hasValue(name)) return NULL;
-  char* data = (char*)get();
+  char* data = static_cast<char*>(get());
   return (data + getProperty(name).getOffset());
 }
 
@@ -291,7 +291,7 @@ const void* NSMData::getValue(const std::string& name)
 const
 {
   if (!hasValue(name)) return NULL;
-  char* data = (char*)get();
+  char* data = static_cast<char*>(const_cast<void*>(get()));
   return (data + getProperty(name).getOffset());
 }
 
@@ -320,7 +320,7 @@ void NSMData::readObject(Reader& reader)
       NSMDataList data_v;
       for (size_t i = 0; i < length; i++) {
         NSMData data;
-        data.m_pdata = (char*)getValue(name) + length * i;
+        data.m_pdata = static_cast<char*>(getValue(name)) + length * i;
         reader.readObject(data);
         data_v.push_back(data);
       }
@@ -328,12 +328,12 @@ void NSMData::readObject(Reader& reader)
     } else {
       for (size_t i = 0; i < length; i++) {
         switch (type) {
-          case DBField::CHAR: ((char*)buf)[i] = reader.readChar(); break;
-          case DBField::SHORT: ((int16*)buf)[i] = reader.readShort(); break;
-          case DBField::INT: ((int32*)buf)[i] = reader.readInt(); break;
-          case DBField::LONG: ((int64*)buf)[i] = reader.readLong(); break;
-          case DBField::FLOAT: ((float*)buf)[i] = reader.readFloat(); break;
-          case DBField::DOUBLE: ((double*)buf)[i] = reader.readDouble(); break;
+          case DBField::CHAR: (static_cast<char*>(buf))[i] = reader.readChar(); break;
+          case DBField::SHORT: (static_cast<int16*>(buf))[i] = reader.readShort(); break;
+          case DBField::INT: (static_cast<int32*>(buf))[i] = reader.readInt(); break;
+          case DBField::LONG: (static_cast<int64*>(buf))[i] = reader.readLong(); break;
+          case DBField::FLOAT: (static_cast<float*>(buf))[i] = reader.readFloat(); break;
+          case DBField::DOUBLE: (static_cast<double*>(buf))[i] = reader.readDouble(); break;
           default: break;
         }
       }
@@ -368,12 +368,12 @@ void NSMData::writeObject(Writer& writer) const
     } else {
       for (size_t i = 0; i < length; i++) {
         switch (pro.getType()) {
-          case DBField::CHAR:   writer.writeChar(((char*)buf)[i]); break;
-          case DBField::SHORT:  writer.writeShort(((int16*)buf)[i]); break;
-          case DBField::INT:    writer.writeInt(((int64*)buf)[i]); break;
-          case DBField::LONG:   writer.writeLong(((int32*)buf)[i]); break;
-          case DBField::FLOAT:  writer.writeFloat(((float*)buf)[i]); break;
-          case DBField::DOUBLE: writer.writeDouble(((double*)buf)[i]); break;
+          case DBField::CHAR:   writer.writeChar((static_cast<const char*>(buf))[i]); break;
+          case DBField::SHORT:  writer.writeShort((static_cast<const int16*>(buf))[i]); break;
+          case DBField::INT:    writer.writeInt((static_cast<const int64*>(buf))[i]); break;
+          case DBField::LONG:   writer.writeLong((static_cast<const int32*>(buf))[i]); break;
+          case DBField::FLOAT:  writer.writeFloat((static_cast<const float*>(buf))[i]); break;
+          case DBField::DOUBLE: writer.writeDouble((static_cast<const double*>(buf))[i]); break;
           default : break;
         }
       }
@@ -420,7 +420,7 @@ void NSMData::search(NSMData::NameValueList& map,
         if (pro.getType() == DBField::CHAR) {
           NameValue nv;
           nv.name = name_out;
-          nv.value = (char*)buf;
+          nv.value = static_cast<char*>(const_cast<void*>(buf));
           map.push_back(nv);
         } else {
           const char* name_c = name_out.c_str();
@@ -429,15 +429,15 @@ void NSMData::search(NSMData::NameValueList& map,
             std::string val;
             switch (pro.getType()) {
               case DBField::SHORT:
-                val = StringUtil::form("%d", ((int16*)buf)[i]); break;
+                val = StringUtil::form("%d", (static_cast<const int16*>(buf))[i]); break;
               case DBField::INT:
-                val = StringUtil::form("%d", ((int32*)buf)[i]); break;
+                val = StringUtil::form("%d", (static_cast<const int32*>(buf))[i]); break;
               case DBField::LONG:
-                val = StringUtil::form("%ld", ((int64*)buf)[i]); break;
+                val = StringUtil::form("%ld", (static_cast<const int64*>(buf))[i]); break;
               case DBField::FLOAT:
-                val = StringUtil::form("%f", ((float*)buf)[i]); break;
+                val = StringUtil::form("%f", (static_cast<const float*>(buf))[i]); break;
               case DBField::DOUBLE:
-                val = StringUtil::form("%d", ((double*)buf)[i]); break;
+                val = StringUtil::form("%d", (static_cast<const double*>(buf))[i]); break;
               default : break;
             }
             NameValue nv;
@@ -542,12 +542,12 @@ const void* NSMData::find(const std::string& name_in, DBField::Type& type, int& 
   type = pro.getType();
   const void* buf = getValue(name_out);
   switch (type) {
-    case DBField::CHAR: return (((const char*)buf) + index);
-    case DBField::SHORT: return (((const int16*)buf) + index);
-    case DBField::INT: return (((const int32*)buf) + index);
-    case DBField::LONG: return (((const int64*)buf) + index);
-    case DBField::FLOAT: return (((const float*)buf) + index);
-    case DBField::DOUBLE: return (((const double*)buf) + index);
+    case DBField::CHAR: return ((static_cast<const char*>(buf)) + index);
+    case DBField::SHORT: return ((static_cast<const int16*>(buf)) + index);
+    case DBField::INT: return ((static_cast<const int32*>(buf)) + index);
+    case DBField::LONG: return ((static_cast<const int64*>(buf)) + index);
+    case DBField::FLOAT: return ((static_cast<const float*>(buf)) + index);
+    case DBField::DOUBLE: return ((static_cast<const double*>(buf)) + index);
     default: return NULL;
   }
   return NULL;

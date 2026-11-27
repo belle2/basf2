@@ -18,14 +18,17 @@ namespace Belle2 {
 
   class RFRoiSender : public RFServerBase {
   public:
-    RFRoiSender(std::string conffile);
+    explicit RFRoiSender(const std::string& conffile);
     ~RFRoiSender();
+    /** Copy constructor (disabled). */
+    RFRoiSender(const RFRoiSender&) = delete;
+
+    /** Operator = (disabled). */
+    RFRoiSender& operator=(const RFRoiSender&) = delete;
 
     // Functions to be hooked to NSM
     int Configure(NSMmsg*, NSMcontext*) override;
     int UnConfigure(NSMmsg*, NSMcontext*) override;
-    int Start(NSMmsg*, NSMcontext*) override;
-    int Stop(NSMmsg*, NSMcontext*) override;
     int Restart(NSMmsg*, NSMcontext*) override;
 
     // Server function

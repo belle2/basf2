@@ -53,6 +53,7 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
 
   // Search for the record in the configuration file
   rewind(m_fd);
+  // cppcheck-suppress knownConditionTrueFalse ; top.key is filled while parsing the file
   if (! top.key) { /* the first invokation */
     int line = 0;
     cur = &top;
@@ -70,9 +71,10 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
       //      printf ( "buf = %s\n", buf );
 
       /* sorry for this very tricky code... */
-      char* keyp = nullptr;
+      const char* keyp = nullptr;
+      // cppcheck-suppress constVariablePointer ; the delimiter is overwritten below
       char* delp = nullptr;
-      char* valp = nullptr;
+      const char* valp = nullptr;
       for (p = buf; *p && *p != '#'; p++) {
         if (! keyp) {
           if (! isspace(*p)) keyp = p;
@@ -102,13 +104,14 @@ char* RFConf::getconf(const char* key1, const char* key2, const char* key3)
           ;
       }
       if (delp) {
-        cur->next = (RFConf_t*)malloc(sizeof(*cur));
+        cur->next = static_cast<RFConf_t*>(malloc(sizeof(*cur)));
+        if (cur->next == 0) return NULL;
         cur = cur->next;
         cur->next = 0;
-        cur->key = (char*)malloc(strlen(keyp) + 1);
+        cur->key = static_cast<char*>(malloc(strlen(keyp) + 1));
         strcpy(cur->key, keyp);
         if (valp) {
-          cur->val = (char*)malloc(strlen(valp) + 1);
+          cur->val = static_cast<char*>(malloc(strlen(valp) + 1));
           strcpy(cur->val, valp);
         } else {
           cur->val = 0;

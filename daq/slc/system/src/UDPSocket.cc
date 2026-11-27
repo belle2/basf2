@@ -33,8 +33,8 @@ unsigned int UDPSocket::findSubnet(unsigned int addr)
     memset(addrstr, 0, sizeof(addrstr));
     memset(netmaskstr, 0, sizeof(netmaskstr));
     if (ifa->ifa_addr->sa_family == AF_INET &&
-        addr == ((struct sockaddr_in*)ifa->ifa_addr)->sin_addr.s_addr) {
-      addr |= ~(((struct sockaddr_in*)ifa->ifa_netmask)->sin_addr.s_addr);
+        addr == (reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr))->sin_addr.s_addr) {
+      addr |= ~((reinterpret_cast<struct sockaddr_in*>(ifa->ifa_netmask))->sin_addr.s_addr);
     }
   }
   freeifaddrs(ifa_list);
@@ -72,10 +72,10 @@ UDPSocket::UDPSocket(unsigned int port,
         throw (std::exception());
         // throw (IOException("Wrong host name or ip")); // TODO which throw is the right one?
       } else {
-        host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
+        host = gethostbyaddr(reinterpret_cast<char*>(&addr), sizeof(addr), AF_INET);
       }
     }
-    m_addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
+    m_addr.sin_addr.s_addr = (*reinterpret_cast<unsigned long*>(host->h_addr_list[0]));
   }
   if ((m_fd = ::socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
     throw (IOException("Failed to create socket"));
@@ -87,7 +87,7 @@ UDPSocket::UDPSocket(unsigned int port,
     }
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
-               (char*)&yes, sizeof(yes));
+               reinterpret_cast<char*>(&yes), sizeof(yes));
   }
 }
 
@@ -108,7 +108,7 @@ UDPSocket::UDPSocket(unsigned int port,
     }
     int yes = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_BROADCAST,
-               (char*)&yes, sizeof(yes));
+               reinterpret_cast<char*>(&yes), sizeof(yes));
   }
 }
 
@@ -128,10 +128,10 @@ int UDPSocket::bind(unsigned int port,
         throw (std::exception());
         // throw (IOException("Wrong host name or ip")); TODO which throw is the right one?
       } else {
-        host = gethostbyaddr((char*)&addr, sizeof(addr), AF_INET);
+        host = gethostbyaddr(reinterpret_cast<char*>(&addr), sizeof(addr), AF_INET);
       }
     }
-    m_addr.sin_addr.s_addr = (*(unsigned long*) host->h_addr_list[0]);
+    m_addr.sin_addr.s_addr = (*reinterpret_cast<unsigned long*>(host->h_addr_list[0]));
     if (broadcast) {
       unsigned int addr = m_addr.sin_addr.s_addr;
       if ((addr = findSubnet(addr)) > 0) {
@@ -144,7 +144,7 @@ int UDPSocket::bind(unsigned int port,
 
 int UDPSocket::bind()
 {
-  if (::bind(m_fd, (struct sockaddr*)&m_addr, sizeof(m_addr)) < 0) {
+  if (::bind(m_fd, reinterpret_cast<struct sockaddr*>(&m_addr), sizeof(m_addr)) < 0) {
     close();
     throw (IOException("Failed to bind socket port=%d",
                        ntohs(m_addr.sin_port)));
@@ -157,9 +157,9 @@ size_t UDPSocket::write(const void* buf, size_t count)
   size_t c = 0;
   while (c < count) {
     errno = 0;
-    int ret = sendto(m_fd, ((unsigned char*)buf + c),
+    int ret = sendto(m_fd, (static_cast<unsigned char*>(const_cast<void*>(buf)) + c),
                      (count - c), 0,
-                     (struct sockaddr*)&m_addr, sizeof(m_addr));
+                     reinterpret_cast<struct sockaddr*>(&m_addr), sizeof(m_addr));
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;
@@ -183,8 +183,8 @@ size_t UDPSocket::read(void* buf, size_t count)
   socklen_t addrlen = sizeof(m_remote_addr);
   while (true) {
     errno = 0;
-    int ret = recvfrom(m_fd, ((unsigned char*)buf + c), (count - c), 0,
-                       (struct sockaddr*)&m_remote_addr, &addrlen);
+    int ret = recvfrom(m_fd, (static_cast<unsigned char*>(buf) + c), (count - c), 0,
+                       reinterpret_cast<struct sockaddr*>(&m_remote_addr), &addrlen);
     if (ret <= 0) {
       switch (errno) {
         case EINTR: continue;

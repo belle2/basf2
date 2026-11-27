@@ -17,9 +17,9 @@ namespace Belle2 {
     // constructors & destructors
   public:
     BufferedReader();
-    BufferedReader(size_t size, unsigned char* memory = NULL);
+    explicit BufferedReader(size_t size, unsigned char* memory = NULL);
     BufferedReader(const BufferedReader& r);
-    virtual ~BufferedReader();
+    virtual ~BufferedReader() override;
 
     // member methods implemented
   public:

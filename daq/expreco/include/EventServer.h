@@ -20,8 +20,13 @@ namespace Belle2 {
 
   class EventServer {
   public:
-    EventServer(std::string rbufname, int port);
+    EventServer(const std::string& rbufname, int port);
     ~EventServer();
+    /** Copy constructor (disabled). */
+    EventServer(const EventServer&) = delete;
+
+    /** Operator = (disabled). */
+    EventServer& operator=(const EventServer&) = delete;
 
     int server();  // Loop
 
@@ -30,7 +35,7 @@ namespace Belle2 {
     EvtSocketManager* m_man;
     RingBuffer* m_rbuf;
     int m_port;
-    int m_force_exit;
+    int m_force_exit = 0;
   };
 }
 #endif

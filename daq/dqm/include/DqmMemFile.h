@@ -12,8 +12,8 @@
 #include <daq/dqm/DqmSharedMem.h>
 #include <framework/pcore/EvtMessage.h>
 
-#include "TMemFile.h"
-#include "TDirectory.h"
+#include <TMemFile.h>
+#include <TDirectory.h>
 
 namespace Belle2 {
   class MsgHandler;
@@ -22,10 +22,16 @@ namespace Belle2 {
   public:
     enum {c_memFileSize = 128000000};
   public:
+    // cppcheck-suppress noExplicitConstructor ; the name converts to a file by design
     DqmMemFile(std::string name = "dqmhisto",
                const std::string& mode = "readonly", int size = c_memFileSize);
     DqmMemFile(int shm_id, int sem_id, int size = c_memFileSize);
     ~DqmMemFile();
+    /** Copy constructor (disabled). */
+    DqmMemFile(const DqmMemFile&) = delete;
+
+    /** Operator = (disabled). */
+    DqmMemFile& operator=(const DqmMemFile&) = delete;
 
     // Sender function
     TMemFile* GetMemFile();
@@ -36,10 +42,10 @@ namespace Belle2 {
     // Receiver functions
     EvtMessage* StreamMemFile();
 
-    bool SaveToFile(std::string outfile);
+    bool SaveToFile(const std::string& outfile);
 
   private:
-    int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
+    static int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
 
   private:
     DqmSharedMem* m_shm;

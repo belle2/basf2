@@ -19,7 +19,7 @@ SendHeader::SendHeader()
   //  cout << "SendHeader NULL constructor" << endl;
 }
 
-SendHeader::SendHeader(int* buffer)
+SendHeader::SendHeader(const int* buffer)
 {
   //  cout << "SendHeader constructor with buffer" << endl;
   memcpy(m_buffer, buffer, SENDHDR_NWORDS * sizeof(int));
@@ -34,7 +34,7 @@ int* SendHeader::GetBuffer()
   return m_buffer;
 }
 
-void SendHeader::SetBuffer(int* bufin)
+void SendHeader::SetBuffer(const int* bufin)
 {
   memcpy(m_buffer, bufin, SENDHDR_NWORDS * sizeof(int));
 }

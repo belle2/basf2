@@ -18,11 +18,11 @@ RunNumber RunNumberTable::add(const std::string& node,
                               const std::string& runtype,
                               int expno, int runno)
 {
-  if (runtype.size() == 0 || node.size() == 0) {
+  if (node.size() == 0) {
     LogFile::fatal("Empty node name : node='%s' runtype='%s'", node.c_str(), runtype.c_str());
     return RunNumber();
   }
-  if (runtype.size() == 0 || node.size() == 0) {
+  if (runtype.size() == 0) {
     LogFile::fatal("Empty runtype : node='%s' runtype='%s'", node.c_str(), runtype.c_str());
     return RunNumber();
   }
@@ -75,6 +75,7 @@ int RunNumberTable::getRunNumber(const std::string& /*node*/, int expno)
   int runno = 1;
   try {
     //if (node.size() == 0) {
+    // cppcheck-suppress knownConditionTrueFalse ; kept to mirror the commented-out test
     if (expno == 0) {
       m_db.execute("select max(runno)+1 as runno from runnumber_new "
                    "limit 1;");

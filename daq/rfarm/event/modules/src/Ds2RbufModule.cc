@@ -53,6 +53,7 @@ void Ds2RbufModule::initialize()
 {
 
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
+  // cppcheck-suppress publicAllocationError ; initialize() is called exactly once per job
   m_rbuf = new RingBuffer(m_rbufname);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
   m_streamer->setStreamingObjects(m_saveobjs);
@@ -78,7 +79,7 @@ void Ds2RbufModule::event()
   //  printf("message size = %d\n", msg->size());
   // Put the message in ring buffer
   for (;;) {
-    int stat = m_rbuf->insq((int*)msg->buffer(), msg->paddedSize());
+    int stat = m_rbuf->insq(reinterpret_cast<int*>(msg->buffer()), msg->paddedSize());
     if (stat >= 0) break;
     usleep(100);
     //    usleep(20);

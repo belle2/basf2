@@ -15,7 +15,7 @@ namespace Belle2 {
   class Date {
 
   public:
-    Date(time_t time);
+    explicit Date(time_t time);
     Date(const Date& date);
     Date();
     ~Date();
@@ -33,6 +33,7 @@ namespace Belle2 {
     const char* toString(const char* format = NULL) const;
 
   public:
+    // cppcheck-suppress operatorEqVarError ; m_str is a scratch buffer rebuilt by toString()
     const Date& operator=(const Date& date)
     {
       set(date.m_time);
@@ -42,7 +43,7 @@ namespace Belle2 {
   private:
     time_t m_time;
     struct tm* m_tm;
-    mutable char m_str[31];
+    mutable char m_str[31] = {};
 
   };
 

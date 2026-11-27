@@ -37,6 +37,7 @@ NSMCallback::NSMCallback(const int timeout)
 }
 
 
+// cppcheck-suppress duplInheritedMember ; the derived class deliberately provides its own
 int NSMCallback::reset()
 {
   int revision = Callback::reset();
@@ -64,7 +65,7 @@ void NSMCallback::reply(const NSMMessage& msg)
   NSMMessage msg_out = msg;
   for (NSMNodeMap::iterator it = m_nodes.begin();
        it != m_nodes.end();) {
-    NSMNode& node(it->second);
+    const NSMNode& node(it->second);
     msg_out.setNodeName(node.getName());
     if (NSMCommunicator::send(msg_out)) {
       ++it;
@@ -183,6 +184,7 @@ void NSMCallback::vget(const std::string& nodename, const std::string& vname)
   NSMNode node(nodename);
   NSMVar var(vname);
   try {
+    // cppcheck-suppress constVariablePointer ; the handler is used mutably below
     NSMVHandler* handler_p = getHandler_p(nodename, vname);
     if (handler_p) {
       NSMVHandler& handler(*handler_p);
@@ -212,6 +214,7 @@ void NSMCallback::vset(NSMCommunicator& com, const NSMVar& var)
 {
   try {
     NSMMessage msg(com.getMessage());
+    // cppcheck-suppress constVariablePointer ; the handler is used mutably below
     NSMVHandler* handler_p = getHandler_p(var.getNode(), var.getName());
     if (handler_p) {
       NSMVHandler& handler(*handler_p);
@@ -289,8 +292,8 @@ void NSMCallback::vlistset(NSMCommunicator& com)
     }
   }
   for (size_t i = 0; i < vlist.size(); i++) {
-    vlistentry_t& en(vlist[i]);
-    std::cout << StringUtil::form(StringUtil::form("%%-%ds ", length).c_str(), en.name.c_str())
+    const vlistentry_t& en(vlist[i]);
+    std::cout << StringUtil::form(StringUtil::form("%%-%ds ", length), en.name.c_str())
               << " : " << en.type << " "
               << (en.useGet ? "get " : "")
               << (en.useSet ? "set " : "")  << std::endl;

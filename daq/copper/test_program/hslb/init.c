@@ -94,10 +94,14 @@ main(int argc, char **argv)
   int use[4];
   int readback[4];
   int i;
+  // cppcheck-suppress variableScope ; locals are declared K&R style at the top of the function
   int k = 0;
+  // cppcheck-suppress variableScope ; locals are declared K&R style at the top of the function
   int val;
+  // cppcheck-suppress variableScope ; locals are declared K&R style at the top of the function
   int feetype,feehwv,feefwv;
   time_t   lt;
+  // cppcheck-suppress variableScope ; locals are declared K&R style at the top of the function
   int err_check,err_ini;
 
   readback[0] = readback[1] = readback[2] = readback [3] = 0;

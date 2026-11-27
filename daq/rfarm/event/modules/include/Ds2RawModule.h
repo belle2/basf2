@@ -30,7 +30,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     Ds2RawModule();
-    virtual ~Ds2RawModule();
+    virtual ~Ds2RawModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -52,7 +52,7 @@ namespace Belle2 {
     RingBuffer* m_rbuf;
 
     //! DataStore streamer
-    DataStoreStreamer* m_streamer;
+    DataStoreStreamer* m_streamer = nullptr;
 
     //! No. of sent events
     int m_nsent;

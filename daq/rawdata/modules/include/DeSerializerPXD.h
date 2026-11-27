@@ -32,7 +32,12 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerPXDModule();
-    virtual ~DeSerializerPXDModule();
+    virtual ~DeSerializerPXDModule() override;
+    /** Copy constructor (disabled). */
+    DeSerializerPXDModule(const DeSerializerPXDModule&) = delete;
+
+    /** Operator = (disabled). */
+    DeSerializerPXDModule& operator=(const DeSerializerPXDModule&) = delete;
 
     //! Module functions to be called from main process
     void initialize() override;

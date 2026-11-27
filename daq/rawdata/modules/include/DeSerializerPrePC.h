@@ -34,7 +34,7 @@ namespace Belle2 {
 
     //! Constructor / Destructor
     DeSerializerPrePCModule();
-    virtual ~DeSerializerPrePCModule();
+    virtual ~DeSerializerPrePCModule() override;
 
     //! Module functions to be called from main process
     void initialize() override;
@@ -83,11 +83,11 @@ namespace Belle2 {
     ///
     PreRawCOPPERFormat_latest m_pre_rawcpr;
 
-    int event_diff;
+    int event_diff = 0;
 
-    unsigned int m_prev_copper_ctr;
+    unsigned int m_prev_copper_ctr = 0;
 
-    unsigned int m_prev_evenum;
+    unsigned int m_prev_evenum = 0;
 
   };
 

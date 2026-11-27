@@ -18,7 +18,7 @@ namespace Belle2 {
     NSMHandlerException(const std::string& format, ...);
     NSMHandlerException() {}
 #if __GNUC__ >= 7
-    ~NSMHandlerException() {}
+    ~NSMHandlerException() override {}
 #else
     ~NSMHandlerException() throw() {}
 #endif

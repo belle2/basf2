@@ -335,11 +335,25 @@ void MillepedeCollectorModule::collect()
       auto mother = list->getParticle(iParticle);
       std::vector<std::pair<std::vector<gbl::GblPoint>, TMatrixD> > daughters;
 
-      for (auto& track : getParticlesTracks(mother->getDaughters()))
+      // geometric constraint: 3 common (position) parameters + 3 external (curv., directions) per daughter
+      auto tracks = getParticlesTracks(mother->getDaughters());
+      TMatrixD innerTrafo(5, 3 + 3 * tracks.size());
+      unsigned int iCol(3);
+
+      for (auto& track : tracks) {
+        // local (q/p, u', v', u, v) at the first point: u, v from the common vertex position,
+        // q/p and the two slopes are free parameters of each daughter
+        innerTrafo.Zero();
+        innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
+        innerTrafo[0][iCol++] = 1.;
+        innerTrafo[1][iCol++] = 1.;
+        innerTrafo[2][iCol++] = 1.;
+
         daughters.push_back({
-        gbl->collectGblPoints(track, track->getCardinalRep()),
-        getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
-      });
+          gbl->collectGblPoints(track, track->getCardinalRep()),
+          innerTrafo
+        });
+      }
 
       if (daughters.size() > 1) {
         gbl::GblTrajectory combined(daughters);
@@ -374,13 +388,13 @@ void MillepedeCollectorModule::collect()
       TMatrixD extProjection(5, 3);
       TMatrixD locProjection(3, 5);
 
-      // geometric constaint: 3 common (position) parameters + 3 external (curv., directions) per daughter
-      //TODO: revert due to alignment issues in rel9 (!5184)
-      //TMatrixD innerTrafo(5, 3 + 3 * mother->getDaughters().size());
-      //unsigned int iCol(3);
+      // geometric constraint: 3 common (position) parameters + 3 external (curv., directions) per daughter
+      auto tracks = getParticlesTracks(mother->getDaughters());
+      TMatrixD innerTrafo(5, 3 + 3 * tracks.size());
+      unsigned int iCol(3);
 
       bool first(true);
-      for (auto& track : getParticlesTracks(mother->getDaughters())) {
+      for (auto& track : tracks) {
         if (first) {
           // For first trajectory only
           extProjection = getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2);
@@ -388,19 +402,17 @@ void MillepedeCollectorModule::collect()
           first = false;
         }
 
-        //TODO: revert due to alignment issues in rel9 (!5184)
-        //innerTrafo.Zero();
-        //innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
-        //innerTrafo[0][iCol++] = 1.;
-        //innerTrafo[1][iCol++] = 1.;
-        //innerTrafo[2][iCol++] = 1.;
-
+        // local (q/p, u', v', u, v) at the first point: u, v from the common vertex position,
+        // q/p and the two slopes are free parameters of each daughter
+        innerTrafo.Zero();
+        innerTrafo.SetSub(3, 0, getGlobalToLocalTransform(track->getFittedState()).GetSub(3, 4, 0, 2));
+        innerTrafo[0][iCol++] = 1.;
+        innerTrafo[1][iCol++] = 1.;
+        innerTrafo[2][iCol++] = 1.;
 
         daughters.push_back({
           gbl->collectGblPoints(track, track->getCardinalRep()),
-          //TODO: revert due to alignment issues in rel9 (!5184)
-          //innerTrafo
-          getGlobalToLocalTransform(track->getFittedState()).GetSub(0, 4, 0, 2)
+          innerTrafo
         });
       }
 
@@ -416,9 +428,7 @@ void MillepedeCollectorModule::collect()
         extMeasurements[1] = vertexResidual[1];
         extMeasurements[2] = vertexResidual[2];
 
-        //TODO: revert due to alignment issues in rel9 (!5184)
-        //TMatrixD extDeriv(3, 9);
-        TMatrixD extDeriv(3, 3);
+        TMatrixD extDeriv(3, innerTrafo.GetNcols());
         extDeriv.Zero();
         // beam vertex constraint
         extDeriv(0, 0) = 1.;

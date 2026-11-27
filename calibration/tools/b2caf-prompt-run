@@ -128,15 +128,19 @@ Required format of JSON file:
 
     {
      "caf_script": (str),
-     "database_chain" array[str],
+     "globaltags" array[str],
      "backend_args" dict,     <- Optional as the backend default values and/or values in the prompt script will be used otherwise
      "requested_iov" array[4](int),
      "expert_config" dict,     <- Optional as the prompt script default will be used if this isn't set here.
      "testing_payloads" str    <- Optional, by default do not add testing payloads, possible only with --permissive
     }
 
-The global tags in database_chain follow the usual basf2 convention: the first global tag in the list has the highest
+The global tags in globaltags follow the usual basf2 convention: the first global tag in the list has the highest
 priority, i.e. ``["A", "B", "C"]`` means that a payload is searched first in ``A``, then in ``B`` and finally in ``C``.
+
+.. note:: This key replaces the old ``database_chain`` key, where the last global tag had the highest priority.
+   Configuration files still using ``database_chain`` are rejected: rename the key to ``globaltags`` and reverse the
+   order of the global tags.
 
 The backend_args dictionary will be used to set up the `caf.backends.Backend` class and overrides the defaults of that class.
 If you set backend options via the command line e.g. ``--queue l``, then this will override backend_args values in this JSON
@@ -152,6 +156,18 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         raise FileNotFoundError(f"The file {caf_config_path.as_posix()} does not exist")
     with open(caf_config_path) as caf_config_file:
         caf_config = json.load(caf_config_file)
+
+    if "database_chain" in caf_config:
+        old_chain = caf_config["database_chain"]
+        raise KeyError(f"The key 'database_chain' in {caf_config_path.as_posix()} is no longer supported, since its "
+                       "global tags were processed with the last one having the highest priority. "
+                       "It has been replaced by the key 'globaltags', which takes the global tags ordered from the highest "
+                       "to the lowest priority, as in basf2. To fix the configuration, rename the key and reverse the order "
+                       "of the global tags, i.e. "
+                       f"replace\n  \"database_chain\": {json.dumps(old_chain)}\nwith\n"
+                       f"  \"globaltags\": {json.dumps(list(reversed(old_chain)))}")
+    if "globaltags" not in caf_config:
+        raise KeyError(f"The required key 'globaltags' is missing in {caf_config_path.as_posix()}.")
 
     # if for caf_script is given an full path import it from there, otherwise import it
     # from the prompt script package
@@ -218,7 +234,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
                 B2INFO("This appears to be a default Collection with no input files.")
                 B2INFO("Settings will be applied but it will likely be removed prior to the CAF process beginning.")
             collection.reset_database()
-            for global_tag in caf_config["database_chain"]:
+            for global_tag in caf_config["globaltags"]:
                 collection.use_central_database(global_tag)
             # Should we override the values set by the original script?
             if args.files_per_subjob:
@@ -228,7 +244,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         # Although we set the collection database chain already. The algorithm needs the overall Calibration database chain
         # to be set. Otherwise it doesn't know which Collection's database chain to use.
         cal.reset_database(apply_to_default_collection=False)
-        for global_tag in caf_config["database_chain"]:
+        for global_tag in caf_config["globaltags"]:
             cal.use_central_database(global_tag)
         # Add testing payloads if required:
         if permissive and "testing_payloads" in caf_config:

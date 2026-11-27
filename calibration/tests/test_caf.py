@@ -23,7 +23,7 @@ with b2test_utils.clean_working_directory():
     # Prepare the configuration dictionary for CAF and dump it into a JSON file.
     config = {
         "caf_script": "caf_klm_channel_status.py",
-        "database_chain": vgt.get_validation_globaltags(),
+        "globaltags": vgt.get_validation_globaltags(),
         "requested_iov": [0, 0, -1, -1]
     }
     with open("config.json", "w") as config_json:

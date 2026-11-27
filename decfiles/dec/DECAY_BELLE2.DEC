@@ -715,7 +715,7 @@ Decay B0
 0.001000000   anti-D0  pi-  pi+  pi0                       PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 0.000100000   anti-D0  pi0  pi0  pi0                       PHSP; #No PDGLive value. Keep original value in .DEC. #[Comment - PG 09/2020]
 
-0.012875000   D*-  a_1+                                    SVV_HELAMP 0.458 0.0 0.866 0.0 0.458 0.0; # Interpreting D*03pi BF as fully (D*0 a1(->3pi)) decay [BF update - LMH 06/2023]
+0.012875000   D*-  a_1+                                    SVV_HELAMP 0.458 0.0 0.866 0.0 0.200 0.0; # Interpreting D*03pi BF as fully (D*0 a1(->3pi)) decay [BF update - LMH 06/2023]
 0.000000000   D*-  rho0  pi+                               PHSP; #Put NR BF to be zero to avoid PYTHIA, dominated by D*rho component [BF update - LMH 06/2023]
 0.000000000   D*-  pi-  pi+  pi+                           PHSP; #Gamma_58 PDGLive => Nonresonant BF = 0. Use 0 or estimate? #[BF update - PG 09/2020]
 

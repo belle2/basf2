@@ -79,6 +79,7 @@ def save_config(constraint_sets, timedep_config=None, global_tags=None, init_eve
         the (event, run, exp) numbers at which values of these parameters can change.
     global_tags : list (str)
         List of global tag names and/or (absolute) file paths to local databases
+        (highest priority first, as in basf2)
     init_event : tuple( int, int, int)
         Event (event, run, exp) at which to initialize time-INdependent constraints
 
@@ -130,6 +131,7 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
         the (event, run, exp) numbers at which values of these parameters can change.
     global_tags : list (str)
         List of global tag names and/or (absolute) file paths to local databases
+        (highest priority first, as in basf2)
     init_event : tuple( int, int, int)
         Event (event, run, exp) at which to initialize time-INdependent constraints
 
@@ -156,14 +158,12 @@ def gen_constraints(constraint_sets, timedep_config=None, global_tags=None, init
     fileName = 'TimedepConfigEvent_exp{}run{}ev{}.root'
     files = []
 
-    print('Global tags:')
+    print('Global tags (highest priority first):')
     print(global_tags)
-    print('Global tags reversed (this will be used for b2.conditions.override_globaltags(...)):')
-    print([tag for tag in reversed(global_tags)])
 
     b2.conditions.override_globaltags()
 
-    for tag in [tag for tag in reversed(global_tags)]:
+    for tag in global_tags:
         if os.path.exists(tag):
             b2.conditions.append_testing_payloads(os.path.abspath(tag))
         else:

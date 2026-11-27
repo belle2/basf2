@@ -102,6 +102,7 @@ def generate_constraints(constraint_sets, timedep, global_tags, init_event):
         the (event, run, exp) numbers at which values of these parameters can change.
     global_tags : list (str)
         List of global tag names and/or (absolute) file paths to local databases
+        (highest priority first, as in basf2)
     init_event : tuple( int, int, int)
         Event (event, run, exp) at which to initialize time-INdependent constraints
     """

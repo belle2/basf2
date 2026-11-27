@@ -1,6 +1,6 @@
 {
     "caf_script": "caf_ecl_edge.py",
-    "globaltags": ["ECL_edge_geometry", "data_reprocessing_proc11", "online"],
+    "database_chain": ["online", "data_reprocessing_proc11", "ECL_edge_geometry"],
     "backend_args": {"queue": "s"},
     "requested_iov" : [10,3130,10,3130]
 }
